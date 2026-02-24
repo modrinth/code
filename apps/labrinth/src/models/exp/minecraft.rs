@@ -1,8 +1,9 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use eyre::{Result, eyre};
+use eyre::Result;
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 use validator::Validate;
 
 use crate::{
@@ -80,33 +81,37 @@ component::define! {
     /// Listing for a Minecraft server.
     #[derive(Debug, Clone, Serialize, Deserialize, Validate, utoipa::ToSchema)]
     pub struct ServerProject {
-        #[base()]
+        #[base(serde(default))]
         #[edit(serde(
             default,
             skip_serializing_if = "Option::is_none",
             with = "serde_with::rust::double_option"
         ))]
+        #[create(optional)]
         /// Maximum number of players allowed on the server.
         pub max_players: Option<u32>,
-        #[base()]
+        #[base(serde(default))]
         #[edit(serde(
             default,
             skip_serializing_if = "Option::is_none",
             with = "serde_with::rust::double_option"
         ))]
+        #[create(optional)]
         /// Country which this server is hosted in.
         #[validate(length(min = 2, max = 2))]
         pub country: Option<String>,
         #[base(serde(default))]
         #[edit(serde(default))]
+        #[create(default)]
         /// Languages which the owners of this server prefer.
         pub languages: Vec<Language>,
-        #[base()]
+        #[base(serde(default))]
         #[edit(serde(
             default,
             skip_serializing_if = "Option::is_none",
             with = "serde_with::rust::double_option"
         ))]
+        #[create(optional)]
         /// Which version of the listing this server is currently using.
         pub active_version: Option<VersionId>,
     }
@@ -120,11 +125,13 @@ component::define! {
     pub struct BedrockServerProject {
         #[base()]
         #[edit(serde(default))]
+        #[create(required)]
         /// Address (IP or domain name) of the Bedrock server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
         #[base()]
         #[edit(serde(default))]
+        #[create(required)]
         /// Port which the server runs on.
         pub port: u16,
     }
@@ -227,17 +234,24 @@ impl ComponentQuery for JavaServerProjectQuery {
                     recommended_game_version,
                 },
                 ServerContent::Modpack { version_id } => {
-                    let version = context
-                        .partial_versions
-                        .get(&version_id)
-                        .ok_or_else(|| {
-                            eyre!("no modpack info for version {version_id:?}")
-                        })?;
-                    ServerContentQuery::Modpack {
-                        version_id,
-                        project_id: version.project_id,
-                        project_name: version.project_name.clone(),
-                        project_icon: version.project_icon.clone(),
+                    match context.partial_versions.get(&version_id) {
+                        Some(version) => ServerContentQuery::Modpack {
+                            version_id,
+                            project_id: version.project_id,
+                            project_name: version.project_name.clone(),
+                            project_icon: version.project_icon.clone(),
+                        },
+                        None => {
+                            // TODO: should be upgraded to an error,
+                            // but it's too easy to fall into this illegal state right now
+                            warn!("no modpack info for version {version_id:?}");
+                            ServerContentQuery::Modpack {
+                                version_id,
+                                project_id: ProjectId(0),
+                                project_name: String::new(),
+                                project_icon: String::new(),
+                            }
+                        }
                     }
                 }
             },
@@ -256,7 +270,7 @@ impl ComponentEdit for JavaServerProjectEdit {
         Ok(JavaServerProject {
             address: self.address.wrap_err("missing `address`")?,
             port: self.port.wrap_err("missing `port`")?,
-            content: self.content.wrap_err("missing `content`")?,
+            content: self.content.unwrap_or_default(),
         })
     }
 

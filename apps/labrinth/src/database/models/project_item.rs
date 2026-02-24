@@ -874,7 +874,7 @@ impl DBProject {
                             &components_serial,
                             &mut project_types,
                         );
-                        let components = components_serial.into_query(
+                        let components = components_serial.clone().into_query(
                             ProjectId::from(project_id),
                             &project_query_context,
                         )
@@ -916,7 +916,7 @@ impl DBProject {
                                     &m.side_types_migration_review_status,
                                 ),
                                 loaders,
-                                components: exp::ProjectSerial::default(),
+                                components: components_serial,
                             },
                             categories: m.categories.unwrap_or_default(),
                             additional_categories: m.additional_categories.unwrap_or_default(),

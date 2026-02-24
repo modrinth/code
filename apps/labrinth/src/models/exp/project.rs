@@ -118,6 +118,7 @@ macro_rules! define_project_components {
         pub struct ProjectEdit {
             $(
                 #[validate(nested)]
+                #[serde(default)]
                 pub $field_name: Option<Edit<$ty>>,
             )*
         }

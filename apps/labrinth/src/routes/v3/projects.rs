@@ -200,7 +200,7 @@ pub async fn project_get_internal(
     Err(ApiError::NotFound)
 }
 
-#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
+#[derive(Debug, Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditProject {
     #[validate(
         length(min = 3, max = 64),
@@ -1015,7 +1015,7 @@ pub async fn project_edit_internal(
                     Some(edit.create().wrap_request_err_with(|| {
                         eyre!(
                             "failed to create `{}` component",
-                            type_name::<E>()
+                            type_name::<E::Component>()
                         )
                     })?);
             }
@@ -1025,7 +1025,7 @@ pub async fn project_edit_internal(
                     || {
                         eyre!(
                             "failed to update `{}` component",
-                            type_name::<E>()
+                            type_name::<E::Component>()
                         )
                     },
                 )?;

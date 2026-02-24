@@ -10,6 +10,7 @@ macro_rules! define {
                 #[edit(
                     $($field_edit_meta:meta),*
                 )]
+                #[create($create:ident)]
                 $(#[$field_meta:meta])*
                 $field_vis:vis $field:ident: $field_ty:ty
             ),* $(,)?
@@ -64,12 +65,12 @@ macro_rules! define {
         impl $crate::models::exp::component::ComponentEdit for [< $name Edit >] {
             type Component = $name;
 
-            fn create(self) -> eyre::Result<Self::Component> {
+            fn create(self) -> Result<Self::Component> {
                 Ok($name {
                     $(
-                        $field: eyre::OptionExt::ok_or_eyre(
+                        $field: $crate::models::exp::component::unwrap_edit::$create(
                             self.$field,
-                            concat!("missing field `", stringify!($field), "`")
+                            stringify!($field),
                         )?,
                     )*
                 })
@@ -79,7 +80,7 @@ macro_rules! define {
                 self,
                 #[allow(unused_variables)]
                 component: &mut Self::Component,
-            ) -> eyre::Result<()> {
+            ) -> Result<()> {
                 $(
                     if let Some(f) = self.$field {
                         component.$field = f;
@@ -91,6 +92,35 @@ macro_rules! define {
 
         $crate::models::exp::component::define!($($rest)*);
     }};
+}
+
+pub mod unwrap_edit {
+    use eyre::{Result, eyre};
+
+    pub fn required<T>(field: Option<T>, field_name: &str) -> Result<T> {
+        field.ok_or_else(|| eyre!("missing field `{field_name}`"))
+    }
+
+    pub fn optional<T>(
+        field: Option<Option<T>>,
+        field_name: &str,
+    ) -> Result<Option<T>> {
+        match field {
+            // present value
+            Some(Some(t)) => Ok(Some(t)),
+            // value is omitted from json -> no value
+            None => Ok(None),
+            // value is in json but is null -> empty
+            Some(None) => Err(eyre!("missing field `{field_name}`")),
+        }
+    }
+
+    pub fn default<T: Default>(
+        field: Option<T>,
+        _field_name: &str,
+    ) -> Result<T> {
+        Ok(field.unwrap_or_default())
+    }
 }
 
 macro_rules! relations {
