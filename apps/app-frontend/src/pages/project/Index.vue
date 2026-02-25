@@ -52,6 +52,7 @@
 					v-if="isServerProject"
 					:project="data"
 					:project-v3="projectV3"
+					:ping="serverPing"
 					@contextmenu.prevent.stop="handleRightClick"
 				>
 					<template #actions>
