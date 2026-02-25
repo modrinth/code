@@ -603,8 +603,8 @@ watch(filteredOptions, () => {
 })
 
 watch(
-	() => props.modelValue,
-	(val) => {
+	[() => props.modelValue, () => props.options],
+	([val]) => {
 		if (props.searchable && props.syncWithSelection && !isOpen.value) {
 			const opt = props.options.find((o) => isDropdownOption(o) && o.value === val)
 			searchQuery.value = opt && isDropdownOption(opt) ? opt.label : ''

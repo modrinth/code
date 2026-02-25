@@ -473,6 +473,33 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
+  "installation-settings.change-version": {
+    "defaultMessage": "Change version"
+  },
+  "installation-settings.game-version": {
+    "defaultMessage": "Game version"
+  },
+  "installation-settings.hide-snapshots": {
+    "defaultMessage": "Hide snapshots"
+  },
+  "installation-settings.installation-info": {
+    "defaultMessage": "Installation info"
+  },
+  "installation-settings.installed-modpack": {
+    "defaultMessage": "Installed modpack"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "{loader} version"
+  },
+  "installation-settings.platform": {
+    "defaultMessage": "Platform"
+  },
+  "installation-settings.show-all-versions": {
+    "defaultMessage": "Show all versions"
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Unlink"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
   },

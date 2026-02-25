@@ -413,9 +413,6 @@
   "instance.settings.tabs.installation.game-version": {
     "message": "Game version"
   },
-  "instance.settings.tabs.installation.install": {
-    "message": "Install"
-  },
   "instance.settings.tabs.installation.install.in-progress": {
     "message": "Installation in progress"
   },
@@ -439,12 +436,6 @@
   },
   "instance.settings.tabs.installation.reinstall.confirm.title": {
     "message": "Are you sure you want to reinstall this instance?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstall modpack"
   },
   "instance.settings.tabs.installation.repair.button": {
     "message": "Repair"
@@ -470,9 +461,6 @@
   "instance.settings.tabs.installation.reset-selections": {
     "message": "Reset to current"
   },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Show all versions"
-  },
   "instance.settings.tabs.installation.tooltip.action.install": {
     "message": "install"
   },
@@ -490,9 +478,6 @@
   },
   "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
     "message": "Cannot {action} while repairing"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(unknown version)"
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

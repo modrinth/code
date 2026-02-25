@@ -369,20 +369,16 @@ async function handleModpackUpdate() {
 	updatingProjectVersions.value = versions
 }
 
-async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog) return
-
-	loadingChangelog.value = true
-
-	const fullVersion = (await get_version(version.id, 'must_revalidate').catch(
-		handleError,
-	)) as Labrinth.Versions.v2.Version
-
-	loadingChangelog.value = false
-
+async function fetchAndSpliceVersion(
+	versionId: string,
+	cacheBehaviour?: Parameters<typeof get_version>[1],
+	onError?: (err: unknown) => void,
+) {
+	const fullVersion = (await get_version(versionId, cacheBehaviour).catch(
+		onError ?? (() => null),
+	)) as Labrinth.Versions.v2.Version | null
 	if (!fullVersion) return
-
-	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
+	const index = updatingProjectVersions.value.findIndex((v) => v.id === versionId)
 	if (index !== -1) {
 		const newVersions = [...updatingProjectVersions.value]
 		newVersions[index] = fullVersion
@@ -390,18 +386,16 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	}
 }
 
+async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog !== undefined) return
+	loadingChangelog.value = true
+	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError)
+	loadingChangelog.value = false
+}
+
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog) return
-	const fullVersion = (await get_version(version.id).catch(
-		() => null,
-	)) as Labrinth.Versions.v2.Version | null
-	if (!fullVersion) return
-	const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
-	if (index !== -1) {
-		const newVersions = [...updatingProjectVersions.value]
-		newVersions[index] = fullVersion
-		updatingProjectVersions.value = newVersions
-	}
+	if (version.changelog !== undefined) return
+	await fetchAndSpliceVersion(version.id)
 }
 
 function resetUpdateState() {
@@ -583,14 +577,14 @@ provideContentManager({
 							? `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`
 							: undefined,
 					owner: linkedModpackOwner.value
-					? {
-							...linkedModpackOwner.value,
-							link: () =>
-								openUrl(
-									`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
-								),
-						}
-					: undefined,
+						? {
+								...linkedModpackOwner.value,
+								link: () =>
+									openUrl(
+										`https://modrinth.com/${linkedModpackOwner.value!.type}/${linkedModpackOwner.value!.id}`,
+									),
+							}
+						: undefined,
 					categories: linkedModpackCategories.value,
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
