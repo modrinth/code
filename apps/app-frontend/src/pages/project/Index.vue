@@ -15,6 +15,7 @@
 				:required-content="serverRequiredContent"
 				:recommended-version="serverRecommendedVersion"
 				:supported-versions="serverSupportedVersions"
+				:ping="serverPing"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
@@ -245,6 +246,7 @@ import {
 } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { install as installVersion, playServerProject, useInstall } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
@@ -273,6 +275,7 @@ const projectV3 = shallowRef(null)
 const serverRequiredContent = shallowRef(null)
 const serverRecommendedVersion = shallowRef(null)
 const serverSupportedVersions = shallowRef([])
+const serverPing = ref(undefined)
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -335,6 +338,21 @@ async function fetchProjectData() {
 
 	isServerProject.value = projectV3.value?.minecraft_server !== undefined
 
+	// Ping server for latency
+	const serverAddress = projectV3.value?.minecraft_java_server?.address
+	if (serverAddress) {
+		serverPing.value = undefined
+		get_server_status(serverAddress)
+			.then((status) => {
+				if (status.ping != null) {
+					serverPing.value = status.ping
+				}
+			})
+			.catch((err) => {
+				console.error(`Failed to ping server ${serverAddress}:`, err)
+			})
+	}
+
 	// Fetch server sidebar data (modpack version + project)
 	const content = projectV3.value?.minecraft_java_server?.content
 	if (content?.kind === 'modpack' && content.version_id) {
@@ -350,7 +368,10 @@ async function fetchProjectData() {
 					serverRequiredContent.value = {
 						name: modpackProject.name,
 						icon: modpackProject.icon_url,
-						onclick: () => router.push(`/project/${modpackProject.id}`),
+						onclick:
+							modpackProject.id !== project.id
+								? () => router.push(`/project/${modpackProject.id}`)
+								: undefined,
 					}
 				}
 			}

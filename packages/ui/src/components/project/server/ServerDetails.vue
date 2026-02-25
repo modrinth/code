@@ -22,7 +22,7 @@ defineProps<{
 		<ServerOnlinePlayers v-if="onlinePlayers !== undefined" :online="onlinePlayers" />
 		<ServerRecentPlays v-if="recentPlays !== undefined" :recent-plays="recentPlays" />
 		<ServerRegion v-if="region" :region="region" />
-		<ServerPing v-if="ping" :ping="ping" />
+		<ServerPing v-if="ping !== undefined" :ping="ping" />
 		<ServerModpackContent
 			v-if="modpackContent"
 			:name="modpackContent.name"

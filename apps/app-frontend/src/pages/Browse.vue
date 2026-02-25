@@ -31,6 +31,7 @@ import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project_v3, get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { playServerProject, useInstall } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
@@ -384,6 +385,22 @@ const messages = defineMessages({
 // TODO_SERVER_PROJECTS: Remove serverProject fetching once search API returns server projects with project_type = 'server'
 const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
 const serverProjects = ref<Labrinth.Projects.v3.Project[]>([])
+const serverPings = ref<Record<string, number | undefined>>({})
+
+async function pingServerProjects(projects: Labrinth.Projects.v3.Project[]) {
+	for (const project of projects) {
+		const address = project.minecraft_java_server?.address
+		if (!address) continue
+		get_server_status(address)
+			.then((status) => {
+				serverPings.value = { ...serverPings.value, [project.id]: status.ping }
+			})
+			.catch((err) => {
+				console.error(`Failed to ping server ${address}:`, err)
+			})
+	}
+}
+
 watch(
 	() => [projectType.value, SERVER_PROJECT_IDS.value],
 	async () => {
@@ -392,7 +409,8 @@ watch(
 				// TODO_SERVER_PROJECTS will need to get project_v3 in search
 				const projects = await Promise.all(SERVER_PROJECT_IDS.value.map((id) => get_project_v3(id)))
 				serverProjects.value = projects.filter((p): p is Labrinth.Projects.v3.Project => !!p)
-			} catch (e) {
+				pingServerProjects(serverProjects.value)
+			} catch (e: any) {
 				handleError(e)
 			}
 		}
@@ -571,6 +589,7 @@ previousFilterState.value = JSON.stringify({
 						:server-region-code="project.minecraft_server?.country"
 						:server-recent-plays="12345"
 						:server-modpack-content="getServerModpackContent(project)"
+						:server-ping="serverPings[project.id]"
 						layout="list"
 						@contextmenu.prevent.stop="
 							(event: any) =>

@@ -49,6 +49,10 @@
 				</TagItem>
 			</div>
 		</section>
+		<section v-if="props.ping !== undefined" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">Latency</h3>
+			<ServerPing :ping="props.ping" />
+		</section>
 	</div>
 </template>
 <script setup lang="ts">
@@ -61,6 +65,7 @@ import { injectNotificationManager } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import TagItem from '../base/TagItem.vue'
 import ServerModpackContent from './server/ServerModpackContent.vue'
+import ServerPing from './server/ServerPing.vue'
 
 interface RequiredContent {
 	name: string
@@ -77,12 +82,14 @@ interface Props {
 	requiredContent?: RequiredContent | null
 	recommendedVersion?: string | null
 	supportedVersions?: string[]
+	ping?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	requiredContent: null,
 	recommendedVersion: null,
 	supportedVersions: () => [],
+	ping: undefined,
 })
 
 const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address ?? '')
