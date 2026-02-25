@@ -40,6 +40,7 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			suggestedStatus: 'flagged',
 			disablesActions: ['status_corrections_applied', 'status_account_issues'],
+			//TODO: don't show if this is a server
 			message: async () => (await import('../messages/status-alerts/private.md?raw')).default,
 		} as ButtonAction,
 		{

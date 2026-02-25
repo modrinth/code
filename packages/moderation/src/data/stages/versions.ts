@@ -9,6 +9,7 @@ const versions: Stage = {
 	icon: VersionIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
 	navigate: '/versions',
+	shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 	actions: [
 		{
 			id: 'versions_incorrect_additional',

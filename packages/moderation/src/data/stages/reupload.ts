@@ -8,6 +8,7 @@ const reupload: Stage = {
 	id: 'reupload',
 	icon: CopyrightIcon,
 	guidance_url: 'https://modrinth.com/legal/rules',
+	shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 	actions: [
 		{
 			id: 'reupload_reupload',
