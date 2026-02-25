@@ -165,7 +165,7 @@
 								query: instanceFilters,
 							},
 							subpages: ['version'],
-							shown: projectV3?.minecraft_server === undefined,
+							shown: projectV3?.minecraft_server == null,
 						},
 						{
 							label: 'Gallery',
@@ -176,7 +176,7 @@
 							label: 'Required content',
 							href: `/project/${$route.params.id}/required-content`,
 							shown:
-								projectV3?.minecraft_server !== undefined &&
+								projectV3?.minecraft_server != null &&
 								projectV3?.minecraft_java_server?.content?.kind === 'modpack',
 						},
 					]"
@@ -337,7 +337,7 @@ async function fetchProjectData() {
 		}
 	}
 
-	isServerProject.value = projectV3.value?.minecraft_server !== undefined
+	isServerProject.value = projectV3.value?.minecraft_server != null
 
 	// Ping server for latency
 	const serverAddress = projectV3.value?.minecraft_java_server?.address

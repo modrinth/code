@@ -36,7 +36,7 @@ const {
 
 const flags = useFeatureFlags()
 
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`

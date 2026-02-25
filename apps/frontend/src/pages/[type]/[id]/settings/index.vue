@@ -465,7 +465,7 @@ const visibility = ref(
 )
 
 // Server project specific refs
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)

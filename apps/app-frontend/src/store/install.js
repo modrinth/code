@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	create_profile_and_install as packInstall,
 	install_to_existing_profile,
+	create_profile_and_install as packInstall,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
@@ -131,7 +131,7 @@ export const install = async (
 	const project = await get_project(projectId, 'must_revalidate')
 	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
 
-	if (project.project_type === 'modpack' || projectV3?.minecraft_server !== undefined) {
+	if (project.project_type === 'modpack' || projectV3?.minecraft_server != null) {
 		const version = versionId ?? project.versions[project.versions.length - 1]
 		const packs = await list()
 
@@ -507,7 +507,7 @@ export const playServerProject = async (projectId) => {
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
 		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
 			try {
-			showUpdateSuccess(installStore, instance, serverAddress)
+				showUpdateSuccess(installStore, instance, serverAddress)
 				await joinServer(instance.path, serverAddress, project.id)
 			} catch (err) {
 				handleSevereError(err, { profilePath: instance.path })

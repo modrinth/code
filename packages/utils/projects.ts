@@ -250,7 +250,7 @@ export const PROJECT_TYPE_PRECEDENCE = [
 ] as const
 
 export function getPrimaryProjectType(project: Labrinth.Projects.v3.Project): DisplayProjectType {
-	if (project.minecraft_server !== undefined) {
+	if (project.minecraft_server != null) {
 		return 'server'
 	} else {
 		const sorted = project.project_types

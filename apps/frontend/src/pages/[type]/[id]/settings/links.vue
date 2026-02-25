@@ -259,7 +259,7 @@ const wikiUrl = ref(project.value.wiki_url)
 const discordUrl = ref(project.value.discord_url)
 
 // Server project links
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const siteUrl = ref(projectV3.value?.link_urls?.site?.url ?? '')
 const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
 const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')

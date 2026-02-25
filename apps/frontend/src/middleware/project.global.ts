@@ -45,7 +45,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 			queryClient.setQueryData(['project', 'v2', project.id], project)
 		}
 
-		const projectType = projectV3.minecraft_server !== undefined ? 'server' : project.project_type
+		const projectType = projectV3.minecraft_server != null ? 'server' : project.project_type
 		// Determine the correct URL type
 		const correctType = getProjectTypeForUrlShorthand(projectType, project.loaders, tags.value)
 

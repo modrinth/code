@@ -41,7 +41,7 @@ watch(
 		if (instance.linked_data?.project_id) {
 			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
 				.then((project: any) => {
-					if (project?.minecraft_server !== undefined) {
+					if (project?.minecraft_server != null) {
 						isMinecraftServer.value = true
 					}
 				})

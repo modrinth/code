@@ -359,7 +359,7 @@ async function fetchInstance() {
 				modrinthVersions.value = versions.sort(
 					(a: any, b: any) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
-				if (projectV3.value?.minecraft_server !== undefined) {
+				if (projectV3.value?.minecraft_server != null) {
 					isServerInstance.value = true
 					await fetchModpackContent()
 				}

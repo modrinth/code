@@ -1103,7 +1103,7 @@ const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
 
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -2518,7 +2518,7 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.requiredContentTab),
 			href: `${projectUrl}/required-content`,
 			shown:
-				projectV3.value?.minecraft_server !== undefined &&
+				projectV3.value?.minecraft_server != null &&
 				projectV3.value?.minecraft_java_server?.content?.kind === 'modpack',
 		},
 	]

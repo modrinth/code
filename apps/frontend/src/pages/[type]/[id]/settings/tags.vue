@@ -32,7 +32,7 @@
 			</p>
 
 			<p
-				v-if="project.versions.length === 0 && projectV3?.minecraft_server === undefined"
+				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
 				class="known-errors"
 			>
 				Please upload a version first in order to select tags!
