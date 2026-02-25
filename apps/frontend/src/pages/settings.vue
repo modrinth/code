@@ -37,6 +37,13 @@
 								: null,
 							auth.user
 								? {
+										link: '/settings/notifications',
+										label: formatMessage(commonSettingsMessages.notifications),
+										icon: BellIcon,
+									}
+								: null,
+							auth.user
+								? {
 										link: '/settings/authorizations',
 										label: formatMessage(commonSettingsMessages.authorizedApps),
 										icon: GridIcon,
@@ -83,6 +90,7 @@
 </template>
 <script setup>
 import {
+	BellIcon,
 	CardIcon,
 	GridIcon,
 	KeyIcon,
