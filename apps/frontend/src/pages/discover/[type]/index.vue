@@ -744,7 +744,7 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 							:tags="project.categories"
 							:link="`/server/${project.slug}`"
 							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
-							:server-recent-plays="12345"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_4w"
 							:server-region-code="project.minecraft_server?.country"
 							:server-modpack-content="getServerModpackContent(project)"
 							:layout="

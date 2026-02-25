@@ -432,6 +432,8 @@ export namespace Labrinth {
 				address?: string
 				port?: number
 				content?: ModpackContent | VanillaContent
+				verified_plays_4w?: number
+				verified_plays_2w?: number
 			}
 
 			export interface MinecraftBedrockServer {

@@ -14,11 +14,10 @@
 		</template>
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
-				<!-- TODO_SERVER_PROJECTS, hook up modrinth recent plays when ready -->
 				<ServerDetails
 					:region="minecraftServer?.country"
 					:online-players="playersOnline"
-					:recent-plays="12345"
+					:recent-plays="javaServer?.verified_plays_4w"
 					:ping="ping"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
