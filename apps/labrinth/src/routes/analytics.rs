@@ -45,7 +45,7 @@ pub const FILTERED_HEADERS: &[&str] = &[
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(page_view_ingest)
         .service(playtime_ingest)
-        .service(minecraft_java_server_play_ingest);
+        .service(minecraft_server_play_ingest);
 }
 
 #[derive(Deserialize)]
@@ -239,16 +239,16 @@ pub struct MinecraftJavaServerPlayInput {
 }
 
 #[derive(clickhouse::Row, serde::Serialize)]
-struct MinecraftJavaServerPlay {
+struct MinecraftServerPlay {
     recorded: i64,
     user_id: u64,
     project_id: u64,
 }
 
-pub const MINECRAFT_JAVA_SERVER_PLAYS: &str = "minecraft_java_server_plays";
+pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
-#[post("minecraft-java-server-play")]
-async fn minecraft_java_server_play_ingest(
+#[post("minecraft-server-play")]
+async fn minecraft_server_play_ingest(
     req: HttpRequest,
     session_queue: web::Data<AuthQueue>,
     play_input: web::Json<MinecraftJavaServerPlayInput>,
@@ -266,14 +266,14 @@ async fn minecraft_java_server_play_ingest(
     .await?;
 
     let project_id = play_input.project_id;
-    let row = MinecraftJavaServerPlay {
+    let row = MinecraftServerPlay {
         recorded: get_current_tenths_of_ms(),
         user_id: user.id.0,
         project_id: project_id.0,
     };
 
     let mut insert = clickhouse
-        .insert::<MinecraftJavaServerPlay>(MINECRAFT_JAVA_SERVER_PLAYS)
+        .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
         .await
         .wrap_internal_err("failed to begin inserting into ClickHouse")?;
     insert

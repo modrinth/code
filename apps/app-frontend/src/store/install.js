@@ -344,7 +344,7 @@ const reportServerJoin = async (projectId) => {
 	if (!creds?.session) return
 
 	try {
-		await fetch('https://api.modrinth.com/analytics/minecraft-java-server-play', {
+		await fetch('https://api.modrinth.com/analytics/minecraft-server-play', {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${creds.session}`,

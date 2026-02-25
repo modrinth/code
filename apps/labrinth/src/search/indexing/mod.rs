@@ -155,14 +155,8 @@ pub async fn index_projects(
         info!("Gathering index data chunk {idx}");
         idx += 1;
 
-        let (uploads, next_cursor) = index_local(
-            &ro_pool,
-            &redis,
-            todo!("wire clickhouse client into indexing context"),
-            cursor,
-            10000,
-        )
-        .await?;
+        let (uploads, next_cursor) =
+            index_local(&ro_pool, &redis, cursor, 10000).await?;
         total += uploads.len();
 
         if uploads.is_empty() {

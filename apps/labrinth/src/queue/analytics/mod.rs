@@ -9,6 +9,8 @@ use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use std::collections::HashMap;
 
+pub mod cache;
+
 const DOWNLOADS_NAMESPACE: &str = "downloads";
 const VIEWS_NAMESPACE: &str = "views";
 

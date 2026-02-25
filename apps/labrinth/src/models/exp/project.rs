@@ -17,7 +17,7 @@ use crate::{
         },
         ids::{ProjectId, VersionId},
     },
-    queue::server_ping,
+    queue::{analytics::cache::MinecraftServerAnalytics, server_ping},
     util::error::Context,
 };
 
@@ -173,14 +173,15 @@ component::relations! {
 pub struct ProjectQueryRequirements {
     pub partial_versions: HashSet<VersionId>,
     pub minecraft_java_server_pings: HashSet<ProjectId>,
-    pub minecraft_java_server_joins: HashSet<ProjectId>,
+    pub minecraft_server_analytics: HashSet<ProjectId>,
 }
 
 pub struct ProjectQueryContext {
     pub partial_versions: HashMap<VersionId, PartialVersion>,
     pub minecraft_java_server_pings:
         HashMap<ProjectId, minecraft::JavaServerPing>,
-    pub minecraft_java_server_joins: HashMap<ProjectId, u64>,
+    pub minecraft_server_analytics:
+        HashMap<ProjectId, MinecraftServerAnalytics>,
 }
 
 #[derive(Clone, Debug)]
@@ -194,7 +195,6 @@ pub async fn fetch_query_context(
     projects: &[(ProjectId, &ProjectSerial)],
     db: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     redis: &RedisPool,
-    clickhouse: &clickhouse::Client,
 ) -> Result<ProjectQueryContext> {
     let mut requirements = ProjectQueryRequirements::default();
     for (project_id, project) in projects {
@@ -203,7 +203,7 @@ pub async fn fetch_query_context(
     let ProjectQueryRequirements {
         partial_versions,
         minecraft_java_server_pings,
-        minecraft_java_server_joins,
+        minecraft_server_analytics,
     } = requirements;
 
     let partial_versions = if partial_versions.is_empty() {
@@ -242,13 +242,14 @@ pub async fn fetch_query_context(
         .collect::<HashMap<_, _>>()
     };
 
+    let mut redis = redis.connect().await?;
+
     let minecraft_java_server_pings =
         minecraft_java_server_pings.into_iter().collect::<Vec<_>>();
     let minecraft_java_server_pings = if minecraft_java_server_pings.is_empty()
     {
         HashMap::new()
     } else {
-        let mut redis = redis.connect().await?;
         redis
             .get_many_deserialized_from_json::<minecraft::JavaServerPing>(
                 server_ping::REDIS_NAMESPACE,
@@ -266,46 +267,31 @@ pub async fn fetch_query_context(
             .collect::<HashMap<_, _>>()
     };
 
-    #[derive(Debug, Deserialize, clickhouse::Row)]
-    struct JavaServerJoinsRow {
-        project_id: u64,
-        joins: u64,
-    }
-
-    let minecraft_java_server_joins =
-        minecraft_java_server_joins.into_iter().collect::<Vec<_>>();
-    let minecraft_java_server_joins = if minecraft_java_server_joins.is_empty()
-    {
+    let minecraft_server_analytics =
+        minecraft_server_analytics.into_iter().collect::<Vec<_>>();
+    let minecraft_server_analytics = if minecraft_server_analytics.is_empty() {
         HashMap::new()
     } else {
-        clickhouse
-            .query(
-                "
-                SELECT
-                    project_id,
-                    count(1) AS joins
-                FROM minecraft_java_server_plays
-                WHERE project_id IN ?
-                GROUP BY project_id
-                ",
-            )
-            .bind(
-                minecraft_java_server_joins
+        redis
+            .get_many_deserialized_from_json::<MinecraftServerAnalytics>(
+                server_ping::REDIS_NAMESPACE,
+                &minecraft_server_analytics
                     .iter()
-                    .map(|project_id| project_id.0)
+                    .map(ToString::to_string)
                     .collect::<Vec<_>>(),
             )
-            .fetch_all::<JavaServerJoinsRow>()
-            .await
-            .wrap_err("failed to fetch minecraft java server joins")?
+            .await?
             .into_iter()
-            .map(|row| (ProjectId(row.project_id), row.joins))
+            .enumerate()
+            .filter_map(|(idx, ping)| {
+                ping.map(|ping| (minecraft_server_analytics[idx], ping))
+            })
             .collect::<HashMap<_, _>>()
     };
 
     Ok(ProjectQueryContext {
         partial_versions,
         minecraft_java_server_pings,
-        minecraft_java_server_joins,
+        minecraft_server_analytics,
     })
 }

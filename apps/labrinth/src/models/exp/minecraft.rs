@@ -190,7 +190,8 @@ pub struct JavaServerProjectQuery {
     pub port: u16,
     pub content: ServerContentQuery,
     pub ping: Option<JavaServerPing>,
-    pub joins: u64,
+    pub verified_plays_2w: Option<u64>,
+    pub verified_plays_4w: Option<u64>,
 }
 
 impl Component for JavaServerProject {
@@ -216,7 +217,7 @@ impl ComponentQuery for JavaServerProjectQuery {
             }
         }
         requirements.minecraft_java_server_pings.insert(project_id);
-        requirements.minecraft_java_server_joins.insert(project_id);
+        requirements.minecraft_server_analytics.insert(project_id);
     }
 
     fn populate(
@@ -224,6 +225,7 @@ impl ComponentQuery for JavaServerProjectQuery {
         project_id: ProjectId,
         context: &ProjectQueryContext,
     ) -> Result<Self> {
+        let analytics = context.minecraft_server_analytics.get(&project_id);
         Ok(Self {
             address: serial.address,
             port: serial.port,
@@ -261,11 +263,8 @@ impl ComponentQuery for JavaServerProjectQuery {
                 .minecraft_java_server_pings
                 .get(&project_id)
                 .cloned(),
-            joins: context
-                .minecraft_java_server_joins
-                .get(&project_id)
-                .copied()
-                .unwrap_or(0),
+            verified_plays_2w: analytics.map(|a| a.verified_plays_2w),
+            verified_plays_4w: analytics.map(|a| a.verified_plays_4w),
         })
     }
 }

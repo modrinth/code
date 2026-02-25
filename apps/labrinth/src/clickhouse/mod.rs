@@ -7,7 +7,7 @@ pub use fetch::*;
 
 use crate::env::ENV;
 use crate::queue::server_ping;
-use crate::routes::analytics::MINECRAFT_JAVA_SERVER_PLAYS;
+use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -193,7 +193,7 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PLAYS} {cluster_line}
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
             (
                 recorded DateTime64(4),
                 user_id UInt64,
