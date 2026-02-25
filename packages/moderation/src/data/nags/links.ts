@@ -67,6 +67,36 @@ export function isUncommonLicenseUrl(url: string | null): boolean {
 
 export const linksNags: Nag[] = [
 	{
+		id: 'add-links',
+		title: defineMessage({
+			id: 'nags.add-links.title',
+			defaultMessage: 'Add external links',
+		}),
+		description: defineMessage({
+			id: 'nags.add-links.description',
+			defaultMessage:
+				'Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite.',
+		}),
+		status: 'suggestion',
+		shouldShow: (context: NagContext) =>
+			!context.projectV3.minecraft_server &&
+			!(
+				context.project.issues_url ||
+				context.project.source_url ||
+				context.project.wiki_url ||
+				context.project.discord_url ||
+				context.project.donation_urls?.length
+			),
+		link: {
+			path: 'settings/links',
+			title: defineMessage({
+				id: 'nags.settings.links.title',
+				defaultMessage: 'Visit links settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+		},
+	},
+	{
 		id: 'verify-external-links',
 		title: defineMessage({
 			id: 'nags.verify-external-links.title',
