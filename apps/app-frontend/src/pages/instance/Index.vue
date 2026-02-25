@@ -123,7 +123,7 @@
 							class="joined-buttons"
 						>
 							<ButtonStyled color="brand" size="large">
-								<button @click="playServerProject(instance.linked_data?.project_id)">
+								<button @click="handlePlayServer()">
 									<PlayIcon />
 									Play
 								</button>
@@ -133,7 +133,7 @@
 									:options="[
 										{
 											id: 'join_server',
-											action: () => playServerProject(instance?.linked_data?.project_id),
+											action: () => handlePlayServer(),
 										},
 										{
 											id: 'launch_instance',
@@ -468,6 +468,17 @@ const stopInstance = async (context: string) => {
 		game_version: instance.value.game_version,
 		source: context,
 	})
+}
+
+const handlePlayServer = async () => {
+	if (!instance.value?.linked_data?.project_id) return
+	loading.value = true
+	try {
+		await playServerProject(instance.value.linked_data.project_id)
+	} finally {
+		await updatePlayState()
+		loading.value = false
+	}
 }
 
 const repairInstance = async () => {
