@@ -35,7 +35,7 @@
 										icon: ShieldIcon,
 									}
 								: null,
-							auth.user
+							auth.user?.email
 								? {
 										link: '/settings/notifications',
 										label: formatMessage(commonSettingsMessages.notifications),

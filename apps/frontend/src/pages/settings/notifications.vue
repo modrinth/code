@@ -7,13 +7,6 @@
 			<div v-if="loading" class="mt-4">
 				<p>{{ formatMessage(messages.loading) }}</p>
 			</div>
-			<div v-else-if="!auth.user.email" class="mt-4">
-				<p>{{ formatMessage(messages.noEmail) }}</p>
-				<NuxtLink to="/settings/account" class="iconified-button mt-2">
-					<MailIcon />
-					{{ formatMessage(messages.addEmailButton) }}
-				</NuxtLink>
-			</div>
 			<template v-else>
 				<div class="flex flex-col gap-4 mt-4">
 					<div
@@ -54,7 +47,6 @@
 </template>
 
 <script setup>
-import { MailIcon } from '@modrinth/assets'
 import {
 	defineMessages,
 	injectNotificationManager,
@@ -88,15 +80,6 @@ const messages = defineMessages({
 	loading: {
 		id: 'settings.notifications.loading',
 		defaultMessage: 'Loading preferences...',
-	},
-	noEmail: {
-		id: 'settings.notifications.no-email',
-		defaultMessage:
-			'You need to add an email address to your account before you can configure email notifications.',
-	},
-	addEmailButton: {
-		id: 'settings.notifications.action.add-email',
-		defaultMessage: 'Add email address',
 	},
 	errorTitle: {
 		id: 'settings.notifications.toast.error.title',
