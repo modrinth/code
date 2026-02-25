@@ -31,6 +31,7 @@ export const useInstall = defineStore('installStore', {
 		installToPlayModal: null,
 		updateToPlayModal: null,
 		popupNotificationManager: null,
+		installingServerProjects: [],
 	}),
 	actions: {
 		setInstallConfirmModal(ref) {
@@ -65,6 +66,17 @@ export const useInstall = defineStore('installStore', {
 		},
 		setPopupNotificationManager(manager) {
 			this.popupNotificationManager = manager
+		},
+		startInstallingServer(projectId) {
+			if (!this.installingServerProjects.includes(projectId)) {
+				this.installingServerProjects.push(projectId)
+			}
+		},
+		stopInstallingServer(projectId) {
+			this.installingServerProjects = this.installingServerProjects.filter((id) => id !== projectId)
+		},
+		isServerInstalling(projectId) {
+			return this.installingServerProjects.includes(projectId)
 		},
 	},
 })
@@ -418,7 +430,10 @@ const showUpdateSuccess = (installStore, instance, serverAddress) => {
 
 export const playServerProject = async (projectId) => {
 	const installStore = useInstall()
+	await _playServerProjectInner(projectId, installStore)
+}
 
+const _playServerProjectInner = async (projectId, installStore) => {
 	const [project, projectV3] = await Promise.all([
 		get_project(projectId, 'must_revalidate'),
 		get_project_v3(projectId, 'must_revalidate'),
@@ -434,10 +449,16 @@ export const playServerProject = async (projectId) => {
 	let instance = await findInstalledInstance(project.id)
 
 	if (isVanilla && !instance) {
-		const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
-		if (path) {
-			instance = await get(path)
-			showModpackInstallSuccess(installStore, instance, serverAddress)
+		if (installStore.installingServerProjects.includes(projectId)) return
+		installStore.startInstallingServer(projectId)
+		try {
+			const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
+			if (path) {
+				instance = await get(path)
+				showModpackInstallSuccess(installStore, instance, serverAddress)
+			}
+		} finally {
+			installStore.stopInstallingServer(projectId)
 		}
 		return
 	}
@@ -464,8 +485,14 @@ export const playServerProject = async (projectId) => {
 		return
 	}
 	if (isVanilla && instance.game_version !== recommendedGameVersion) {
-		await updateVanillaGameVersion(instance, recommendedGameVersion)
-		showUpdateSuccess(installStore, instance, serverAddress)
+		if (installStore.installingServerProjects.includes(projectId)) return
+		installStore.startInstallingServer(projectId)
+		try {
+			await updateVanillaGameVersion(instance, recommendedGameVersion)
+			showUpdateSuccess(installStore, instance, serverAddress)
+		} finally {
+			installStore.stopInstallingServer(projectId)
+		}
 		return
 	}
 

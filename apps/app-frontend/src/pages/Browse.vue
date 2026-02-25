@@ -32,12 +32,13 @@ import { get_project_v3, get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { playServerProject } from '@/store/install.js'
+import { playServerProject, useInstall } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
 import type { Category, Platform } from '@modrinth/utils'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const installStore = useInstall()
 
 const router = useRouter()
 const route = useRoute()
@@ -578,9 +579,16 @@ previousFilterState.value = JSON.stringify({
 					>
 						<template #actions>
 							<ButtonStyled color="brand" type="outlined">
-								<button @click="() => playServerProject(project.id)">
+								<button
+									:disabled="installStore.installingServerProjects.includes(project.id)"
+									@click="() => playServerProject(project.id)"
+								>
 									<PlayIcon />
-									Play
+									{{
+										installStore.installingServerProjects.includes(project.id)
+											? 'Installing...'
+											: 'Play'
+									}}
 								</button>
 							</ButtonStyled>
 						</template>

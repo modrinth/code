@@ -94,7 +94,7 @@ import {
 	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { installServerProject } from '@/store/install.js'
+import { installServerProject, useInstall } from '@/store/install.js'
 import type { Labrinth } from '@modrinth/api-client'
 import { type ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
 
@@ -107,6 +107,7 @@ const organization = ref<any>(null)
 const teamMembers = ref<any[]>([])
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
+const installStore = useInstall()
 
 const usingCustomModpack = computed(() => {
 	return requiredContentProject.value?.id === project.value?.id
@@ -156,11 +157,15 @@ async function fetchData(versionId: string) {
 
 async function handleAccept() {
 	hide()
+	const serverProjectId = project.value.id
+	installStore.startInstallingServer(serverProjectId)
 	try {
-		await installServerProject(project.value.id)
+		await installServerProject(serverProjectId)
 		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install server project from InstallToPlayModal:', error)
+	} finally {
+		installStore.stopInstallingServer(serverProjectId)
 	}
 }
 
