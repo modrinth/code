@@ -219,8 +219,7 @@ const steps = [
 	{
 		icon: GlobeIcon,
 		title: 'Configure your world',
-		description:
-			'Set up your world just like singleplayer. Choose your gamemode and world seed.',
+		description: 'Set up your world just like singleplayer. Choose your gamemode and world seed.',
 	},
 	{
 		icon: UsersIcon,

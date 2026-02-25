@@ -18,7 +18,6 @@ import {
 	type CreationFlowContextValue,
 	type FlowType,
 	provideCreationFlowContext,
-	type SetupType,
 } from './creation-flow-context'
 
 const props = withDefaults(
@@ -28,7 +27,6 @@ const props = withDefaults(
 		showSnapshotToggle?: boolean
 		disableClose?: boolean
 		isInitialSetup?: boolean
-		initialSetupType?: SetupType
 		initialLoader?: string
 		initialGameVersion?: string
 	}>(),
@@ -38,7 +36,6 @@ const props = withDefaults(
 		showSnapshotToggle: false,
 		disableClose: false,
 		isInitialSetup: false,
-		initialSetupType: undefined,
 		initialLoader: undefined,
 		initialGameVersion: undefined,
 	},
@@ -63,7 +60,6 @@ const ctx = createCreationFlowContext(
 		showSnapshotToggle: props.showSnapshotToggle,
 		disableClose: props.disableClose,
 		isInitialSetup: props.isInitialSetup,
-		initialSetupType: props.initialSetupType,
 		initialLoader: props.initialLoader,
 		initialGameVersion: props.initialGameVersion,
 	},

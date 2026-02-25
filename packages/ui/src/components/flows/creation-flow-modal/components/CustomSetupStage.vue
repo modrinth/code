@@ -86,7 +86,9 @@
 							searchable
 							sync-with-selection
 							:placeholder="isPaperLike ? 'Select build number' : 'Select loader version'"
-							:search-placeholder="isPaperLike ? 'Search build number...' : 'Search loader version...'"
+							:search-placeholder="
+								isPaperLike ? 'Search build number...' : 'Search loader version...'
+							"
 						/>
 					</div>
 				</div>

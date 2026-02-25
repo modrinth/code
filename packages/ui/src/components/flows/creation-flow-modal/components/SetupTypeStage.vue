@@ -17,14 +17,12 @@
 					:icon="BoxesIcon"
 					title="Custom setup"
 					description="Start from scratch by picking a loader and game version."
-					:selected="ctx.initialSetupType === 'custom'"
 					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
 					:icon="PackageIcon"
 					title="Modpack base"
 					description="Use a popular modpack as your starting point."
-					:selected="ctx.initialSetupType === 'modpack'"
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
@@ -46,21 +44,18 @@
 					:icon="PackageIcon"
 					title="Modpack base"
 					description="Use a popular modpack as your starting point."
-					:selected="ctx.initialSetupType === 'modpack'"
 					@click="setSetupType('modpack')"
 				/>
 				<BigOptionButton
 					:icon="BoxesIcon"
 					title="Custom setup"
 					description="Start from scratch by picking a loader and game version."
-					:selected="ctx.initialSetupType === 'custom'"
 					@click="setSetupType('custom')"
 				/>
 				<BigOptionButton
 					:icon="BoxIcon"
 					title="Vanilla Minecraft"
 					description="Classic Minecraft with no mods or plugins."
-					:selected="ctx.initialSetupType === 'vanilla'"
 					@click="setSetupType('vanilla')"
 				/>
 			</div>

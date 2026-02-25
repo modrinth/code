@@ -43,8 +43,7 @@ export interface CreationFlowContextValue {
 	disableClose: boolean
 	isInitialSetup: boolean
 
-	// Initial values (for pre-selection when re-opening modal)
-	initialSetupType: SetupType | null
+	// Initial values
 	initialLoader: string | null
 	initialGameVersion: string | null
 
@@ -121,7 +120,6 @@ export interface CreationFlowOptions {
 	showSnapshotToggle?: boolean
 	disableClose?: boolean
 	isInitialSetup?: boolean
-	initialSetupType?: SetupType
 	initialLoader?: string
 	initialGameVersion?: string
 }
@@ -139,7 +137,6 @@ export function createCreationFlowContext(
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
 	const disableClose = options.disableClose ?? false
 	const isInitialSetup = options.isInitialSetup ?? false
-	const initialSetupType = options.initialSetupType ?? null
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
 
@@ -280,7 +277,6 @@ export function createCreationFlowContext(
 		showSnapshotToggle,
 		disableClose,
 		isInitialSetup,
-		initialSetupType,
 		initialLoader,
 		initialGameVersion,
 		setupType,

@@ -6,7 +6,6 @@
 		:show-snapshot-toggle="true"
 		:disable-close="props.initialSetup"
 		:is-initial-setup="props.initialSetup"
-		:initial-setup-type="initialSetupType"
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		@create="onFlowComplete"
@@ -30,10 +29,7 @@ import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
 import { AppearingProgressBar } from '../base'
-import type {
-	CreationFlowContextValue,
-	SetupType,
-} from '../flows/creation-flow-modal/creation-flow-context'
+import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
 import { NewModal } from '../modal'
 
@@ -62,14 +58,6 @@ const emit = defineEmits<{
 	hide: []
 	'browse-modpacks': []
 }>()
-
-const initialSetupType = computed<SetupType | undefined>(() => {
-	const server = serverContext.server.value
-	if (server.upstream) return 'modpack'
-	const loader = server.loader
-	if (!loader || loader === 'Vanilla') return 'vanilla'
-	return 'custom'
-})
 
 const initialLoader = computed(() => {
 	const loader = serverContext.server.value.loader

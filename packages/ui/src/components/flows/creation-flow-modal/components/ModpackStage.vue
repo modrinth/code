@@ -18,8 +18,8 @@
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
 				<button
-					disabled
-					v-tooltip="`Not supported by backend yet.`"
+					v-tooltip="isServerFlow ? 'Coming soon!' : undefined"
+					:disabled="isServerFlow"
 					class="flex-1 !border-surface-4"
 					@click="triggerFileInput"
 				>
@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { CompassIcon, ImportIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
-import { defineAsyncComponent, h, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, h, ref, watch } from 'vue'
 
 import { injectFilePicker, injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
@@ -51,6 +51,9 @@ const ctx = injectCreationFlowContext()
 const { labrinth } = injectModrinthClient()
 const filePicker = injectFilePicker()
 
+const isServerFlow = computed(
+	() => ctx.flowType === 'server-onboarding' || ctx.flowType === 'world',
+)
 const searchLoading = ref(false)
 
 function proceedWithModpack() {

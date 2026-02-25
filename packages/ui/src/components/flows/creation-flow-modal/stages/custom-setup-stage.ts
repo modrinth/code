@@ -8,7 +8,12 @@ import { type CreationFlowContextValue, flowTypeHeadings } from '../creation-flo
 function isForwardBlocked(ctx: CreationFlowContextValue): boolean {
 	if (!ctx.selectedGameVersion.value) return true
 	if (!ctx.hideLoaderChips.value && !ctx.selectedLoader.value) return true
-	if (!ctx.hideLoaderVersion.value && ctx.loaderVersionType.value === 'other' && !ctx.selectedLoaderVersion.value) return true
+	if (
+		!ctx.hideLoaderVersion.value &&
+		ctx.loaderVersionType.value === 'other' &&
+		!ctx.selectedLoaderVersion.value
+	)
+		return true
 	return false
 }
 
