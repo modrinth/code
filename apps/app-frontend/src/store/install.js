@@ -428,12 +428,17 @@ const showUpdateSuccess = (installStore, instance, serverAddress) => {
 	})
 }
 
+/**
+ * Handles logic when clicking "Play" on a server project. This includes:
+ * - Checking if need to install modpack content. If so, opens install to play modal
+ * - Checking if need to update modpack content. If so, open update to play modal
+ * - Checking if need to create instance for vanilla server. If so, creates instance.
+ * - Adding server to worlds list if not already there
+ * - Joining server
+ */
 export const playServerProject = async (projectId) => {
 	const installStore = useInstall()
-	await _playServerProjectInner(projectId, installStore)
-}
 
-const _playServerProjectInner = async (projectId, installStore) => {
 	const [project, projectV3] = await Promise.all([
 		get_project(projectId, 'must_revalidate'),
 		get_project_v3(projectId, 'must_revalidate'),
