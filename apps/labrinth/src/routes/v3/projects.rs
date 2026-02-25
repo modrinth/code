@@ -12,6 +12,7 @@ use crate::database::models::{
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
@@ -27,6 +28,7 @@ use crate::models::threads::MessageBody;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::delphi;
 use crate::search::indexing::remove_documents;
 use crate::search::{SearchConfig, SearchError, search_for_project};
 use crate::util::error::Context;
@@ -427,13 +429,13 @@ pub async fn project_edit(
 
         if status.is_searchable()
             && !project_item.inner.webhook_sent
-            && let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
+            && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
         {
             crate::util::webhook::send_discord_webhook(
                 project_item.inner.id.into(),
                 &pool,
                 &redis,
-                webhook_url,
+                &ENV.PUBLIC_DISCORD_WEBHOOK,
                 None,
             )
             .await
@@ -451,18 +453,16 @@ pub async fn project_edit(
             .await?;
         }
 
-        if user.role.is_mod()
-            && let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK")
-        {
+        if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
             crate::util::webhook::send_slack_project_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
-                    webhook_url,
+                    &ENV.MODERATION_SLACK_WEBHOOK,
                     Some(
                         format!(
                             "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                            dotenvy::var("SITE_URL")?,
+                            ENV.SITE_URL,
                             user.username,
                             user.username,
                             &project_item.inner.status.as_friendly_str(),
@@ -2219,6 +2219,18 @@ pub async fn project_delete(
         .begin()
         .await
         .wrap_internal_err("failed to start transaction")?;
+    let was_in_tech_review =
+        delphi::is_project_in_tech_review(project.inner.id, &mut transaction)
+            .await?;
+
+    if was_in_tech_review {
+        delphi::send_tech_review_exit_file_deleted_message(
+            project.inner.id,
+            &mut transaction,
+        )
+        .await?;
+    }
+
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
     };

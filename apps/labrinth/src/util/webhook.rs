@@ -1,8 +1,8 @@
-use crate::database::PgPool;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
 use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
+use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::to_base62;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
@@ -69,7 +69,7 @@ async fn get_webhook_metadata(
                     name: organization.name,
                     url: format!(
                         "{}/organization/{}",
-                        dotenvy::var("SITE_URL").unwrap_or_default(),
+                        ENV.SITE_URL,
                         to_base62(organization.id.0 as u64)
                     ),
                     icon_url: organization.icon_url,
@@ -95,7 +95,7 @@ async fn get_webhook_metadata(
                     owner = Some(WebhookAuthor {
                         url: format!(
                             "{}/user/{}",
-                            dotenvy::var("SITE_URL").unwrap_or_default(),
+                            ENV.SITE_URL,
                             to_base62(user.id.0 as u64)
                         ),
                         name: user.username,
@@ -142,7 +142,7 @@ async fn get_webhook_metadata(
         Ok(Some(WebhookMetadata {
             project_url: format!(
                 "{}/{}/{}",
-                dotenvy::var("SITE_URL").unwrap_or_default(),
+                ENV.SITE_URL,
                 project_type,
                 to_base62(project.inner.id.0 as u64)
             ),
@@ -251,7 +251,7 @@ pub async fn send_slack_project_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
-    webhook_url: String,
+    webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
     let metadata = get_webhook_metadata(project_id, pool, redis).await?;
@@ -350,7 +350,7 @@ pub async fn send_slack_project_webhook(
         let client = reqwest::Client::new();
 
         client
-            .post(&webhook_url)
+            .post(webhook_url)
             .json(&serde_json::json!({
                 "blocks": blocks,
             }))
@@ -422,7 +422,7 @@ pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     redis: &RedisPool,
-    webhook_url: String,
+    webhook_url: &str,
     message: Option<String>,
 ) -> Result<(), ApiError> {
     let metadata = get_webhook_metadata(project_id, pool, redis).await?;
@@ -482,7 +482,7 @@ pub async fn send_discord_webhook(
         let client = reqwest::Client::new();
 
         client
-            .post(&webhook_url)
+            .post(webhook_url)
             .json(&DiscordWebhook {
                 avatar_url: Some(
                     "https://cdn.modrinth.com/Modrinth_Dark_Logo.png"
