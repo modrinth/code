@@ -116,13 +116,13 @@ const messages = defineMessages({
 
 				<div class="flex flex-wrap gap-2">
 					<ButtonStyled>
-						<button :disabled="ctx.isBusy.value" @click="ctx.changeVersion()">
+						<button class="!shadow-none" :disabled="ctx.isBusy.value" @click="ctx.changeVersion()">
 							<ArrowLeftRightIcon class="size-5" />
 							{{ formatMessage(messages.changeVersion) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled>
-						<button :disabled="ctx.isBusy.value" @click="ctx.unlink()">
+						<button class="!shadow-none" :disabled="ctx.isBusy.value" @click="ctx.unlink()">
 							<UnlinkIcon class="size-5" />
 							{{ formatMessage(messages.unlink) }}
 						</button>
@@ -137,6 +137,7 @@ const messages = defineMessages({
 								v-tooltip="action.tooltip"
 								:disabled="action.disabled || ctx.isBusy.value"
 								@click="action.handler()"
+								class="!shadow-none"
 							>
 								<SpinnerIcon v-if="action.loading" class="animate-spin" />
 								<component :is="action.icon" v-else class="size-5" />

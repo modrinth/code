@@ -5,14 +5,14 @@
 				<template #extra>
 					<!-- Reset server section -->
 					<div class="flex flex-col gap-2.5">
-						<span class="font-semibold text-contrast text-lg">Reset server</span>
+						<span class="text-lg font-semibold text-contrast">Reset server</span>
 						<span class="m-0 text-primary">
 							Removes all data on your server, including your worlds, mods, and configuration files.
 							Backups will remain and can be restored.
 						</span>
 						<div>
 							<ButtonStyled color="red">
-								<button :disabled="isInstalling" @click="setupModal?.show()">
+								<button :disabled="isInstalling" @click="setupModal?.show()" class="!shadow-none">
 									<RotateCounterClockwiseIcon class="size-5" />
 									Reset server
 								</button>
@@ -32,7 +32,7 @@
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled :color="eraseAllData ? 'red' : 'brand'">
 							<button
-								class="max-w-fit"
+								class="max-w-fit !shadow-none"
 								:disabled="!isValid || (!hasChanges && !eraseAllData) || isSaving || isInstalling"
 								@click="handleSave"
 							>
@@ -42,7 +42,7 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled>
-							<button :disabled="!hasChanges" @click="resetToCurrent">
+							<button :disabled="!hasChanges" @click="resetToCurrent" class="!shadow-none">
 								<UndoIcon />
 								Reset to current
 							</button>
