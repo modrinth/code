@@ -190,6 +190,7 @@ pub struct JavaServerProjectQuery {
     pub port: u16,
     pub content: ServerContentQuery,
     pub ping: Option<JavaServerPing>,
+    pub joins: u64,
 }
 
 impl Component for JavaServerProject {
@@ -215,6 +216,7 @@ impl ComponentQuery for JavaServerProjectQuery {
             }
         }
         requirements.minecraft_java_server_pings.insert(project_id);
+        requirements.minecraft_java_server_joins.insert(project_id);
     }
 
     fn populate(
@@ -259,6 +261,11 @@ impl ComponentQuery for JavaServerProjectQuery {
                 .minecraft_java_server_pings
                 .get(&project_id)
                 .cloned(),
+            joins: context
+                .minecraft_java_server_joins
+                .get(&project_id)
+                .copied()
+                .unwrap_or(0),
         })
     }
 }

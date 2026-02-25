@@ -27,6 +27,7 @@ use crate::util::error::Context;
 pub async fn index_local(
     pool: &PgPool,
     redis: &RedisPool,
+    clickhouse: &clickhouse::Client,
     cursor: i64,
     limit: i64,
 ) -> Result<(Vec<UploadSearchProject>, i64), IndexingError> {
@@ -92,9 +93,14 @@ pub async fn index_local(
         .map(|project| (ProjectId::from(project.id), &project.components))
         .collect::<Vec<_>>();
     let project_query_context =
-        exp::project::fetch_query_context(&project_components, pool, redis)
-            .await
-            .wrap_err("failed to fetch query context")?;
+        exp::project::fetch_query_context(
+            &project_components,
+            pool,
+            redis,
+            clickhouse,
+        )
+        .await
+        .wrap_err("failed to fetch query context")?;
 
     let Some(largest) = project_ids.iter().max() else {
         return Ok((vec![], i64::MAX));

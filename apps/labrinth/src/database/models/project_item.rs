@@ -843,6 +843,9 @@ impl DBProject {
                     &project_components,
                     &mut exec,
                     redis,
+                    todo!(
+                        "wire clickhouse client into DBProject::get_many for fetch_query_context"
+                    ),
                 )
                 .await
                 .wrap_err("failed to fetch project query context")?;

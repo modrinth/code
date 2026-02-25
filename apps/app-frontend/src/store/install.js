@@ -1,11 +1,13 @@
+import { fetch } from '@tauri-apps/plugin-http'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
+import { get as getCreds } from '@/helpers/mr_auth.ts'
 import {
-	install_to_existing_profile,
 	create_profile_and_install as packInstall,
+	install_to_existing_profile,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
@@ -336,6 +338,31 @@ const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
 	}
 }
 
+const reportServerJoin = async (projectId) => {
+	if (!projectId) return
+	const creds = await getCreds().catch(() => null)
+	if (!creds?.session) return
+
+	try {
+		await fetch('https://api.modrinth.com/analytics/minecraft-java-server-play', {
+			method: 'POST',
+			headers: {
+				Authorization: `Bearer ${creds.session}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ project_id: projectId }),
+		})
+	} catch (err) {
+		console.error('Failed to report server join analytics:', err)
+	}
+}
+
+const joinServer = async (profilePath, serverAddress, serverProjectId) => {
+	if (!serverAddress) return
+	await start_join_server(profilePath, serverAddress)
+	await reportServerJoin(serverProjectId)
+}
+
 const findInstalledInstance = async (projectId) => {
 	const packs = await list()
 	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
@@ -380,7 +407,11 @@ const showModpackInstallSuccess = (installStore, project, serverAddress) => {
 							label: 'Launch game',
 							action: async () => {
 								try {
-									if (serverAddress) await start_join_server(project.path, serverAddress)
+									await joinServer(
+										project.path,
+										serverAddress,
+										project.linked_data?.project_id ?? null,
+									)
 								} catch (err) {
 									handleSevereError(err, { profilePath: project.path })
 								}
@@ -485,7 +516,12 @@ export const playServerProject = async (projectId) => {
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
 		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
+			try {
 			showUpdateSuccess(installStore, instance, serverAddress)
+				await joinServer(instance.path, serverAddress, project.id)
+			} catch (err) {
+				handleSevereError(err, { profilePath: instance.path })
+			}
 		})
 		return
 	}
@@ -503,7 +539,7 @@ export const playServerProject = async (projectId) => {
 
 	// join server
 	try {
-		if (serverAddress) await start_join_server(instance.path, serverAddress)
+		await joinServer(instance.path, serverAddress, project.id)
 	} catch (err) {
 		handleSevereError(err, { profilePath: instance.path })
 	}

@@ -7,6 +7,7 @@ pub use fetch::*;
 
 use crate::env::ENV;
 use crate::queue::server_ping;
+use crate::routes::analytics::MINECRAFT_JAVA_SERVER_PLAYS;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -16,7 +17,6 @@ pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
     const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
-    const MINECRAFT_JAVA_SERVER_PLAYS: &str = "minecraft_java_server_plays";
 
     let client = {
         let https_connector = HttpsConnectorBuilder::new()

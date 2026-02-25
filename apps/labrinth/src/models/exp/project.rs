@@ -173,12 +173,14 @@ component::relations! {
 pub struct ProjectQueryRequirements {
     pub partial_versions: HashSet<VersionId>,
     pub minecraft_java_server_pings: HashSet<ProjectId>,
+    pub minecraft_java_server_joins: HashSet<ProjectId>,
 }
 
 pub struct ProjectQueryContext {
     pub partial_versions: HashMap<VersionId, PartialVersion>,
     pub minecraft_java_server_pings:
         HashMap<ProjectId, minecraft::JavaServerPing>,
+    pub minecraft_java_server_joins: HashMap<ProjectId, u64>,
 }
 
 #[derive(Clone, Debug)]
@@ -192,6 +194,7 @@ pub async fn fetch_query_context(
     projects: &[(ProjectId, &ProjectSerial)],
     db: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     redis: &RedisPool,
+    clickhouse: &clickhouse::Client,
 ) -> Result<ProjectQueryContext> {
     let mut requirements = ProjectQueryRequirements::default();
     for (project_id, project) in projects {
@@ -200,6 +203,7 @@ pub async fn fetch_query_context(
     let ProjectQueryRequirements {
         partial_versions,
         minecraft_java_server_pings,
+        minecraft_java_server_joins,
     } = requirements;
 
     let partial_versions = if partial_versions.is_empty() {
@@ -262,8 +266,46 @@ pub async fn fetch_query_context(
             .collect::<HashMap<_, _>>()
     };
 
+    #[derive(Debug, Deserialize, clickhouse::Row)]
+    struct JavaServerJoinsRow {
+        project_id: u64,
+        joins: u64,
+    }
+
+    let minecraft_java_server_joins =
+        minecraft_java_server_joins.into_iter().collect::<Vec<_>>();
+    let minecraft_java_server_joins = if minecraft_java_server_joins.is_empty()
+    {
+        HashMap::new()
+    } else {
+        clickhouse
+            .query(
+                "
+                SELECT
+                    project_id,
+                    count(1) AS joins
+                FROM minecraft_java_server_plays
+                WHERE project_id IN ?
+                GROUP BY project_id
+                ",
+            )
+            .bind(
+                minecraft_java_server_joins
+                    .iter()
+                    .map(|project_id| project_id.0)
+                    .collect::<Vec<_>>(),
+            )
+            .fetch_all::<JavaServerJoinsRow>()
+            .await
+            .wrap_err("failed to fetch minecraft java server joins")?
+            .into_iter()
+            .map(|row| (ProjectId(row.project_id), row.joins))
+            .collect::<HashMap<_, _>>()
+    };
+
     Ok(ProjectQueryContext {
         partial_versions,
         minecraft_java_server_pings,
+        minecraft_java_server_joins,
     })
 }

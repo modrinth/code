@@ -3,11 +3,13 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::analytics::{PageView, Playtime};
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
 use serde::Deserialize;
@@ -39,6 +41,13 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-latitude",
     "x-vercel-ip-country",
 ];
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(page_view_ingest)
+        .service(playtime_ingest)
+        .service(minecraft_java_server_play_ingest);
+}
+
 #[derive(Deserialize)]
 pub struct UrlInput {
     url: String,
@@ -46,7 +55,7 @@ pub struct UrlInput {
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
 #[post("view")]
-pub async fn page_view_ingest(
+async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -167,7 +176,7 @@ pub struct PlaytimeInput {
 }
 
 #[post("playtime")]
-pub async fn playtime_ingest(
+async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -222,4 +231,59 @@ pub async fn playtime_ingest(
     }
 
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[derive(Deserialize, Debug)]
+pub struct MinecraftJavaServerPlayInput {
+    project_id: ProjectId,
+}
+
+#[derive(clickhouse::Row, serde::Serialize)]
+struct MinecraftJavaServerPlay {
+    recorded: i64,
+    user_id: u64,
+    project_id: u64,
+}
+
+pub const MINECRAFT_JAVA_SERVER_PLAYS: &str = "minecraft_java_server_plays";
+
+#[post("minecraft-java-server-play")]
+async fn minecraft_java_server_play_ingest(
+    req: HttpRequest,
+    session_queue: web::Data<AuthQueue>,
+    play_input: web::Json<MinecraftJavaServerPlayInput>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    clickhouse: web::Data<clickhouse::Client>,
+) -> Result<(), ApiError> {
+    let (_, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PERFORM_ANALYTICS,
+    )
+    .await?;
+
+    let project_id = play_input.project_id;
+    let row = MinecraftJavaServerPlay {
+        recorded: get_current_tenths_of_ms(),
+        user_id: user.id.0,
+        project_id: project_id.0,
+    };
+
+    let mut insert = clickhouse
+        .insert::<MinecraftJavaServerPlay>(MINECRAFT_JAVA_SERVER_PLAYS)
+        .await
+        .wrap_internal_err("failed to begin inserting into ClickHouse")?;
+    insert
+        .write(&row)
+        .await
+        .wrap_internal_err("failed to write row")?;
+    insert
+        .end()
+        .await
+        .wrap_internal_err("failed to end inserting into ClickHouse")?;
+
+    Ok(())
 }
