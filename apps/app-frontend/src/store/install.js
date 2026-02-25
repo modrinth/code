@@ -386,6 +386,36 @@ const showModpackInstallSuccess = (installStore, project, serverAddress) => {
 	})
 }
 
+const showUpdateSuccess = (installStore, instance, serverAddress) => {
+	installStore.popupNotificationManager?.addPopupNotification({
+		title: 'Update complete',
+		text: `${instance.name} has been updated and is ready to play.`,
+		type: 'success',
+		buttons: [
+			...(serverAddress
+				? [
+						{
+							label: 'Launch game',
+							action: async () => {
+								try {
+									if (serverAddress) await start_join_server(instance.path, serverAddress)
+								} catch (err) {
+									handleSevereError(err, { profilePath: instance.path })
+								}
+							},
+							color: 'brand',
+						},
+					]
+				: []),
+			{
+				label: 'Instance',
+				action: () => router.push(`/instance/${encodeURIComponent(instance.path)}`),
+			},
+		],
+		autoCloseMs: null,
+	})
+}
+
 export const playServerProject = async (projectId) => {
 	const installStore = useInstall()
 
@@ -429,16 +459,14 @@ export const playServerProject = async (projectId) => {
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
 		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
-			try {
-				if (serverAddress) await start_join_server(instance.path, serverAddress)
-			} catch (err) {
-				handleSevereError(err, { profilePath: instance.path })
-			}
+			showUpdateSuccess(installStore, instance, serverAddress)
 		})
 		return
 	}
 	if (isVanilla && instance.game_version !== recommendedGameVersion) {
 		await updateVanillaGameVersion(instance, recommendedGameVersion)
+		showUpdateSuccess(installStore, instance, serverAddress)
+		return
 	}
 
 	// join server
