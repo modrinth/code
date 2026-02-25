@@ -820,6 +820,23 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     res
 }
 
+#[tracing::instrument]
+pub async fn report_minecraft_server_play(
+    project_id: &str,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    fetch::post_json::<serde_json::Value>(
+        "https://api.modrinth.com/analytics/minecraft-server-play",
+        json!({ "project_id": project_id }),
+        &state.api_semaphore,
+        &state.pool,
+    )
+    .await?;
+
+    Ok(())
+}
+
 /// Creates a json configuration for a .mrpack zipped file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]

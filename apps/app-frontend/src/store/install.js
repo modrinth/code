@@ -1,10 +1,8 @@
-import { fetch } from '@tauri-apps/plugin-http'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
 
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
-import { get as getCreds } from '@/helpers/mr_auth.ts'
 import {
 	create_profile_and_install as packInstall,
 	install_to_existing_profile,
@@ -20,6 +18,7 @@ import {
 	install as installProfile,
 	list,
 	remove_project,
+	report_minecraft_server_play,
 } from '@/helpers/profile.js'
 import { add_server_to_profile, get_profile_worlds, start_join_server } from '@/helpers/worlds.ts'
 import router from '@/routes.js'
@@ -340,18 +339,9 @@ const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
 
 const reportServerJoin = async (projectId) => {
 	if (!projectId) return
-	const creds = await getCreds().catch(() => null)
-	if (!creds?.session) return
 
 	try {
-		await fetch('https://api.modrinth.com/analytics/minecraft-server-play', {
-			method: 'POST',
-			headers: {
-				Authorization: `Bearer ${creds.session}`,
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ project_id: projectId }),
-		})
+		await report_minecraft_server_play(projectId)
 	} catch (err) {
 		console.error('Failed to report server join analytics:', err)
 	}
