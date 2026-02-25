@@ -36,6 +36,7 @@
 				:project="data"
 				:has-versions="versions.length > 0"
 				:link-target="`_blank`"
+				:hide-license="isServerProject"
 				class="project-sidebar-section"
 			/>
 		</Teleport>

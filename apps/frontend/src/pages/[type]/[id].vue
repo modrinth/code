@@ -873,7 +873,7 @@
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
-							<div class="details-list__item">
+							<div class="details-list__item" v-if="!isServerProject">
 								<BookTextIcon aria-hidden="true" />
 								<div>
 									{{ formatMessage(messages.licensedLabel) }}
