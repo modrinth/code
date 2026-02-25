@@ -379,14 +379,14 @@ const serverPatchData = computed(() => {
 	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
 	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
 
-	if (siteUrl.value && checkDifference(siteUrl.value, originalSite)) {
-		data.site = siteUrl.value?.trim()
+	if (checkDifference(siteUrl.value, originalSite)) {
+		data.site = siteUrl.value === '' ? null : siteUrl.value?.trim()
 	}
-	if (storeUrl.value && checkDifference(storeUrl.value, originalStore)) {
-		data.store = storeUrl.value?.trim()
+	if (checkDifference(storeUrl.value, originalStore)) {
+		data.store = storeUrl.value === '' ? null : storeUrl.value?.trim()
 	}
-	if (serverDiscordUrl.value && checkDifference(serverDiscordUrl.value, originalDiscord)) {
-		data.discord = serverDiscordUrl.value?.trim()
+	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
+		data.discord = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value?.trim()
 	}
 	return data
 })
@@ -458,13 +458,7 @@ function updateDonationLinks() {
 }
 
 function checkDifference(newLink, existingLink) {
-	if (newLink === '' && existingLink !== null) {
-		return true
-	}
-	if (!newLink && !existingLink) {
-		return false
-	}
-	return newLink !== existingLink
+	return newLink != existingLink
 }
 </script>
 <style lang="scss" scoped>
