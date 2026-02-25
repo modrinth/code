@@ -796,7 +796,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
         }
 
         fetch::post_json(
-            "https://api.modrinth.com/analytics/playtime",
+            concat!(env!("MODRINTH_API_BASE_URL"), "analytics/playtime"),
             serde_json::to_value(hashmap)?,
             &state.api_semaphore,
             &state.pool,
@@ -826,14 +826,16 @@ pub async fn report_minecraft_server_play(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    fetch::post_json::<serde_json::Value>(
-        "https://api.modrinth.com/analytics/minecraft-server-play",
+    fetch::post_json(
+        concat!(
+            env!("MODRINTH_API_BASE_URL"),
+            "analytics/minecraft-server-play"
+        ),
         json!({ "project_id": project_id }),
         &state.api_semaphore,
         &state.pool,
     )
     .await?;
-
     Ok(())
 }
 
