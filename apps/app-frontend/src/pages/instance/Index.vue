@@ -88,16 +88,21 @@
 								)
 							"
 							color="brand"
+							size="large"
 						>
 							<button disabled>Installing...</button>
 						</ButtonStyled>
-						<ButtonStyled v-else-if="instance.install_stage !== 'installed'" color="brand">
+						<ButtonStyled
+							v-else-if="instance.install_stage !== 'installed'"
+							color="brand"
+							size="large"
+						>
 							<button @click="repairInstance()">
 								<DownloadIcon />
 								Repair
 							</button>
 						</ButtonStyled>
-						<ButtonStyled v-else-if="playing === true" color="red">
+						<ButtonStyled v-else-if="playing === true" color="red" size="large">
 							<button @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
 								Stop
@@ -106,6 +111,7 @@
 						<ButtonStyled
 							v-else-if="playing === false && loading === false && !isServerInstance"
 							color="brand"
+							size="large"
 						>
 							<button @click="startInstance('InstancePage')">
 								<PlayIcon />
@@ -116,13 +122,13 @@
 							v-else-if="playing === false && loading === false && isServerInstance"
 							class="joined-buttons"
 						>
-							<ButtonStyled color="brand">
+							<ButtonStyled color="brand" size="large">
 								<button @click="playServerProject(instance.linked_data?.project_id)">
 									<PlayIcon />
 									Play
 								</button>
 							</ButtonStyled>
-							<ButtonStyled color="brand">
+							<ButtonStyled color="brand" size="large">
 								<OverflowMenu
 									:options="[
 										{
@@ -135,7 +141,10 @@
 										},
 									]"
 								>
-									<DropdownIcon />
+									<div class="w-0 text-xl relative top-0.5 right-2.5">
+										<DropdownIcon />
+									</div>
+
 									<template #join_server>
 										<PlayIcon />
 										Join server
@@ -147,15 +156,19 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</div>
-						<ButtonStyled v-else-if="loading === true && playing === false" color="brand">
+						<ButtonStyled
+							v-else-if="loading === true && playing === false"
+							color="brand"
+							size="large"
+						>
 							<button disabled>Loading...</button>
 						</ButtonStyled>
-						<ButtonStyled circular>
+						<ButtonStyled circular size="large">
 							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
-						<ButtonStyled type="transparent" circular>
+						<ButtonStyled type="transparent" circular size="large">
 							<OverflowMenu
 								:options="[
 									{
