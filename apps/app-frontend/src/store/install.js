@@ -407,7 +407,9 @@ export const playServerProject = async (projectId) => {
 		const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
 		if (path) {
 			instance = await get(path)
+			showModpackInstallSuccess(installStore, instance, serverAddress)
 		}
+		return
 	}
 	if (isModpack && !instance) {
 		installStore.showInstallToPlayModal(projectV3, modpackVersionId, async () => {
