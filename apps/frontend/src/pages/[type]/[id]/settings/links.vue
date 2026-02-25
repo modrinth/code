@@ -2,7 +2,7 @@
 	<div>
 		<!-- Server Project Links -->
 		<section v-if="isServerProject" class="universal-card">
-			<h2>Links</h2>
+			<h2>External links</h2>
 			<div class="adjacent-input">
 				<label id="server-website" title="Your server's website.">
 					<span class="label__title">Website</span>
