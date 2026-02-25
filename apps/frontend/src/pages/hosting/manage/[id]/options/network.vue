@@ -277,7 +277,6 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
-	serverQueryOptions,
 	StyledInput,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -303,7 +302,10 @@ const {
 	data: allocationsData,
 	error: allocationsError,
 	refetch: refetchAllocations,
-} = useQuery(serverQueryOptions.allocations(serverId, client))
+} = useQuery({
+	queryKey: ['servers', 'allocations', serverId] as const,
+	queryFn: () => client.archon.servers_v0.getAllocations(serverId),
+})
 const allocations = allocationsData
 
 const newAllocationModal = ref<typeof NewModal>()
