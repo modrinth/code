@@ -10,7 +10,7 @@
 			:placeholder="searchPlaceholder || placeholder"
 			:disabled="disabled"
 			wrapper-class="w-full"
-			class="z-[9999] relative"
+			class="relative"
 			@input="handleSearchInput"
 			@keydown="handleSearchKeydown"
 			@focus="handleSearchFocus"

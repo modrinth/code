@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, HammerIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	ConfirmReinstallModal,
 	ConfirmUnlinkModal,
 	ContentUpdaterModal,
 	defineMessages,
@@ -40,7 +41,7 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const repairConfirmModal = ref()
-const modalConfirmReinstall = ref()
+const modalConfirmReinstall = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
@@ -532,14 +533,6 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.no-loader-versions',
 		defaultMessage: '{loader} is not available for Minecraft {version}. Try another mod loader.',
 	},
-	reinstallModpackConfirmTitle: {
-		id: 'instance.settings.tabs.installation.reinstall.confirm.title',
-		defaultMessage: 'Are you sure you want to reinstall this instance?',
-	},
-	reinstallModpackConfirmDescription: {
-		id: 'instance.settings.tabs.installation.reinstall.confirm.description',
-		defaultMessage: `Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds.`,
-	},
 	reinstallModpackButton: {
 		id: 'instance.settings.tabs.installation.reinstall.button',
 		defaultMessage: 'Reinstall modpack',
@@ -670,15 +663,7 @@ const messages = defineMessages({
 		:show-ad-on-close="false"
 		@proceed="() => repairProfile(true)"
 	/>
-	<ConfirmModalWrapper
-		ref="modalConfirmReinstall"
-		:title="formatMessage(messages.reinstallModpackConfirmTitle)"
-		:description="formatMessage(messages.reinstallModpackConfirmDescription)"
-		:proceed-icon="DownloadIcon"
-		:proceed-label="formatMessage(messages.reinstallModpackButton)"
-		:show-ad-on-close="false"
-		@proceed="() => repairModpack()"
-	/>
+	<ConfirmReinstallModal ref="modalConfirmReinstall" @reinstall="repairModpack" />
 	<ConfirmUnlinkModal ref="confirmUnlinkModal" @unlink="unlinkModpack" />
 	<Teleport to="body">
 		<ContentUpdaterModal

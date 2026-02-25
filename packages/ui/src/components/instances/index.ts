@@ -3,6 +3,7 @@ export { default as ContentCardTable } from './ContentCardTable.vue'
 export { default as ContentPageLayout } from './ContentPageLayout.vue'
 export { default as ConfirmBulkUpdateModal } from './modals/ConfirmBulkUpdateModal.vue'
 export { default as ConfirmDeletionModal } from './modals/ConfirmDeletionModal.vue'
+export { default as ConfirmReinstallModal } from './modals/ConfirmReinstallModal.vue'
 export { default as ConfirmUnlinkModal } from './modals/ConfirmUnlinkModal.vue'
 /**
  * @deprecated Use `ContentCardTable` with `ContentCardItem` instead.

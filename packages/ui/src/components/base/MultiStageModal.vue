@@ -5,7 +5,7 @@
 		max-content-height="72vh"
 		:on-hide="onModalHide"
 		:closable="true"
-		:close-on-click-outside="false"
+		:close-on-click-outside="closeOnClickOutside"
 		:width="resolvedMaxWidth"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
@@ -153,13 +153,19 @@ export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
 </script>
 
 <script setup lang="ts" generic="T">
-const props = defineProps<{
-	stages: StageConfigInput<T>[]
-	context: T
-	breadcrumbs?: boolean
-	fitContent?: boolean
-	disableProgress?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		stages: StageConfigInput<T>[]
+		context: T
+		breadcrumbs?: boolean
+		fitContent?: boolean
+		disableProgress?: boolean
+		closeOnClickOutside?: boolean
+	}>(),
+	{
+		closeOnClickOutside: true,
+	},
+)
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const currentStageIndex = ref<number>(0)
