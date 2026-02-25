@@ -57,7 +57,7 @@ const messages = defineMessages({
 	<div class="flex flex-col gap-4">
 		<template v-if="ctx.isLinked.value">
 			<div class="flex flex-col gap-2.5">
-				<span class="font-semibold text-contrast">
+				<span class="font-semibold text-contrast text-lg">
 					{{ formatMessage(messages.installedModpack) }}
 				</span>
 				<div
@@ -148,7 +148,7 @@ const messages = defineMessages({
 			</div>
 
 			<div class="flex flex-col gap-2.5">
-				<span class="font-semibold text-contrast">
+				<span class="font-semibold text-contrast text-lg">
 					{{ formatMessage(messages.installationInfo) }}
 				</span>
 				<div class="flex flex-col gap-2.5 overflow-clip rounded-[20px] bg-surface-2 p-4">
@@ -168,7 +168,7 @@ const messages = defineMessages({
 
 		<template v-else>
 			<div class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">
+				<span class="font-semibold text-contrast text-lg">
 					{{ formatMessage(messages.installationInfo) }}
 				</span>
 				<div class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4">

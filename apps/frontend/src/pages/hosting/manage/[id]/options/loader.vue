@@ -5,7 +5,7 @@
 				<template #extra>
 					<!-- Reset server section -->
 					<div class="flex flex-col gap-2.5">
-						<span class="font-semibold text-contrast">Reset server</span>
+						<span class="font-semibold text-contrast text-lg">Reset server</span>
 						<span class="m-0 text-primary">
 							Removes all data on your server, including your worlds, mods, and configuration files.
 							Backups will remain and can be restored.
