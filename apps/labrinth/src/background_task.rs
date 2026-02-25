@@ -83,7 +83,9 @@ impl BackgroundTask {
                 Ok(())
             }
             Mail => run_email(email_queue).await,
-            CacheAnalytics => cache_analytics(&redis_pool, &clickhouse).await,
+            CacheAnalytics => {
+                cache_analytics(&pool, &redis_pool, &clickhouse).await
+            }
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }

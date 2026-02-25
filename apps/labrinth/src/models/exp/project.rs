@@ -17,7 +17,12 @@ use crate::{
         },
         ids::{ProjectId, VersionId},
     },
-    queue::{analytics::cache::MinecraftServerAnalytics, server_ping},
+    queue::{
+        analytics::cache::{
+            MINECRAFT_SERVER_ANALYTICS, MinecraftServerAnalytics,
+        },
+        server_ping,
+    },
     util::error::Context,
 };
 
@@ -269,12 +274,13 @@ pub async fn fetch_query_context(
 
     let minecraft_server_analytics =
         minecraft_server_analytics.into_iter().collect::<Vec<_>>();
+
     let minecraft_server_analytics = if minecraft_server_analytics.is_empty() {
         HashMap::new()
     } else {
         redis
             .get_many_deserialized_from_json::<MinecraftServerAnalytics>(
-                server_ping::REDIS_NAMESPACE,
+                MINECRAFT_SERVER_ANALYTICS,
                 &minecraft_server_analytics
                     .iter()
                     .map(ToString::to_string)
@@ -283,8 +289,8 @@ pub async fn fetch_query_context(
             .await?
             .into_iter()
             .enumerate()
-            .filter_map(|(idx, ping)| {
-                ping.map(|ping| (minecraft_server_analytics[idx], ping))
+            .filter_map(|(idx, data)| {
+                data.map(|data| (minecraft_server_analytics[idx], data))
             })
             .collect::<HashMap<_, _>>()
     };

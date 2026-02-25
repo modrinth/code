@@ -5,6 +5,7 @@ use crate::models::analytics::{
     AffiliateCodeClick, Download, MinecraftServerPlay, PageView, Playtime,
 };
 use crate::routes::ApiError;
+use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use std::collections::HashMap;
@@ -118,7 +119,7 @@ impl AnalyticsQueue {
 
         if !minecraft_server_plays_queue.is_empty() {
             let mut plays = client
-                .insert::<MinecraftServerPlay>("minecraft_server_plays")
+                .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
                 .await?;
 
             for play in minecraft_server_plays_queue {

@@ -640,7 +640,18 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     // V2 legacy fields for logical consistency
     "client_side",
     "server_side",
+    "minecraft_server.country",
+    "minecraft_server.languages",
+    "minecraft_java_server.content.kind",
+    "minecraft_java_server.verified_plays_2w",
+    "minecraft_java_server.ping.data.players_online",
 ];
 
-const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =
-    &["downloads", "follows", "date_created", "date_modified"];
+const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
+    "downloads",
+    "follows",
+    "date_created",
+    "date_modified",
+    "minecraft_java_server.verified_plays_2w",
+    "minecraft_java_server.ping.data.players_online",
+];

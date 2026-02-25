@@ -1,3 +1,5 @@
+use actix_http::StatusCode;
+use actix_web::test;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Duration, Utc};
 use common::permissions::PermissionsTest;
@@ -9,8 +11,6 @@ use common::{
     environment::{TestEnvironment, with_test_environment},
 };
 use itertools::Itertools;
-use actix_http::StatusCode;
-use actix_web::test;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
@@ -250,7 +250,7 @@ pub async fn permissions_analytics_revenue() {
 }
 
 #[actix_rt::test]
-pub async fn analytics_minecraft_java_server_play_ingest() {
+pub async fn analytics_minecraft_server_play_ingest() {
     with_test_environment(
         None,
         |test_env: TestEnvironment<ApiV3>| async move {
