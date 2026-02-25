@@ -342,6 +342,7 @@ const reportServerJoin = async (projectId) => {
 
 	try {
 		await report_minecraft_server_play(projectId)
+		console.log(`Reported play for ${projectId}`)
 	} catch (err) {
 		console.error('Failed to report server join analytics:', err)
 	}
@@ -349,8 +350,8 @@ const reportServerJoin = async (projectId) => {
 
 const joinServer = async (profilePath, serverAddress, serverProjectId) => {
 	if (!serverAddress) return
-	await start_join_server(profilePath, serverAddress)
 	await reportServerJoin(serverProjectId)
+	await start_join_server(profilePath, serverAddress)
 }
 
 const findInstalledInstance = async (projectId) => {
