@@ -11,7 +11,6 @@ use common::{
 use itertools::Itertools;
 use actix_http::StatusCode;
 use actix_web::test;
-use labrinth::clickhouse;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::queue::payouts;
 use rust_decimal::{Decimal, prelude::ToPrimitive};
@@ -257,38 +256,14 @@ pub async fn analytics_minecraft_java_server_play_ingest() {
         |test_env: TestEnvironment<ApiV3>| async move {
             let api = &test_env.api;
             let project_id = test_env.dummy.project_alpha.project_id.clone();
-            let project_id_parsed = parse_base62(&project_id).unwrap() as u64;
-
-            let clickhouse = clickhouse::init_client().await.unwrap();
-            let before = clickhouse
-                .query(
-                    "SELECT count(1) FROM minecraft_java_server_plays WHERE user_id = ? AND project_id = ?",
-                )
-                .bind(USER_USER_ID_PARSED as u64)
-                .bind(project_id_parsed)
-                .fetch_one::<u64>()
-                .await
-                .unwrap();
 
             let req = test::TestRequest::post()
-                .uri("/analytics/minecraft-java-server-play")
+                .uri("/analytics/minecraft-server-play")
                 .append_header(("Authorization", USER_USER_PAT.unwrap()))
                 .set_json(serde_json::json!({ "project_id": project_id }))
                 .to_request();
             let resp = api.call(req).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);
-
-            let after = clickhouse
-                .query(
-                    "SELECT count(1) FROM minecraft_java_server_plays WHERE user_id = ? AND project_id = ?",
-                )
-                .bind(USER_USER_ID_PARSED as u64)
-                .bind(project_id_parsed)
-                .fetch_one::<u64>()
-                .await
-                .unwrap();
-
-            assert_eq!(after, before + 1);
         },
     )
     .await;

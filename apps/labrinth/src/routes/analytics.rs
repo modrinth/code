@@ -2,14 +2,13 @@ use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::models::analytics::{PageView, Playtime};
+use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
-use crate::util::error::Context;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
 use serde::Deserialize;
@@ -238,24 +237,17 @@ pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
 }
 
-#[derive(clickhouse::Row, serde::Serialize)]
-struct MinecraftServerPlay {
-    recorded: i64,
-    user_id: u64,
-    project_id: u64,
-}
-
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
 
 #[post("minecraft-server-play")]
 async fn minecraft_server_play_ingest(
     req: HttpRequest,
+    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
     play_input: web::Json<MinecraftJavaServerPlayInput>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    clickhouse: web::Data<clickhouse::Client>,
-) -> Result<(), ApiError> {
+) -> Result<HttpResponse, ApiError> {
     let (_, user) = get_user_from_headers(
         &req,
         &**pool,
@@ -272,18 +264,7 @@ async fn minecraft_server_play_ingest(
         project_id: project_id.0,
     };
 
-    let mut insert = clickhouse
-        .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
-        .await
-        .wrap_internal_err("failed to begin inserting into ClickHouse")?;
-    insert
-        .write(&row)
-        .await
-        .wrap_internal_err("failed to write row")?;
-    insert
-        .end()
-        .await
-        .wrap_internal_err("failed to end inserting into ClickHouse")?;
+    analytics_queue.add_minecraft_server_play(row);
 
-    Ok(())
+    Ok(HttpResponse::NoContent().finish())
 }

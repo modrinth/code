@@ -77,3 +77,10 @@ pub struct Playtime {
     /// Parent modpack this playtime was recorded in
     pub parent: u64,
 }
+
+#[derive(Row, Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+pub struct MinecraftServerPlay {
+    pub recorded: i64,
+    pub user_id: u64,
+    pub project_id: u64,
+}
