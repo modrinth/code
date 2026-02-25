@@ -80,6 +80,7 @@ export const linksNags: Nag[] = [
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
 			return (
+				!context.projectV3.minecraft_server &&
 				!isCommonUrl(context.project.source_url ?? null, commonLinkDomains.source) ||
 				!isCommonUrl(context.project.issues_url ?? null, commonLinkDomains.issues) ||
 				!isCommonUrl(context.project.discord_url ?? null, commonLinkDomains.discord)
@@ -107,9 +108,10 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			isDiscordUrl(context.project.source_url ?? null) ||
-			isDiscordUrl(context.project.issues_url ?? null) ||
-			isDiscordUrl(context.project.wiki_url ?? null),
+		!context.projectV3.minecraft_server &&
+		isDiscordUrl(context.project.source_url ?? null) ||
+		isDiscordUrl(context.project.issues_url ?? null) ||
+		isDiscordUrl(context.project.wiki_url ?? null),
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
@@ -141,6 +143,7 @@ export const linksNags: Nag[] = [
 			}
 
 			return (
+				!context.projectV3.minecraft_server &&
 				isLinkShortener(context.project.source_url ?? null) ||
 				isLinkShortener(context.project.issues_url ?? null) ||
 				isLinkShortener(context.project.wiki_url ?? null) ||
