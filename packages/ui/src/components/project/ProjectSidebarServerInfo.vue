@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div v-if="hasContent" class="flex flex-col gap-3">
 		<div
 			v-if="ipAddress"
 			class="bg-surface-4 flex gap-2 justify-between rounded-2xl items-center px-3 pr-2 h-12"
@@ -104,6 +104,15 @@ const recommendedVersions = computed(() => {
 
 	return []
 })
+
+const hasContent = computed(
+	() =>
+		!!ipAddress.value ||
+		!!props.requiredContent ||
+		recommendedVersions.value.length > 0 ||
+		supportedVersionsList.value.length > 0 ||
+		props.ping !== undefined,
+)
 
 const supportedVersionsList = computed(() => {
 	if (props.supportedVersions.length > 0) return props.supportedVersions
