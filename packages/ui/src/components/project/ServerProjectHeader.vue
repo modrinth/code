@@ -41,6 +41,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import type { Project } from '@modrinth/utils'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
 import FormattedTag from '../base/FormattedTag.vue'

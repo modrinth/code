@@ -136,7 +136,7 @@ watch(route, () => {
 				tags.rejectedStatuses.includes(project.status)
 			"
 			:project="project"
-			:projectV3="projectV3"
+			:project-v3="projectV3"
 			:versions="versions ?? undefined"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"

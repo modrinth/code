@@ -252,6 +252,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	CheckCircleIcon,
 	ClipboardCopyIcon,
@@ -309,7 +310,6 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
-import type { Labrinth } from '@modrinth/api-client'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)

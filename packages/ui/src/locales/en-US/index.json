@@ -887,6 +887,18 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.about.server.copied": {
+    "defaultMessage": "Copied!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP address copied to clipboard"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latency"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Server details"
+  },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
   },

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { SignalIcon } from '@modrinth/assets'
+
 import { defineMessage, useVIntl } from '../../../composables'
 import { TagItem } from '../../base'
 

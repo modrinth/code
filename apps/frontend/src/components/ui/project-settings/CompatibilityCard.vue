@@ -163,7 +163,7 @@
 				</div>
 
 				<ButtonStyled v-if="content">
-					<button @click="handleUpdateContent" class="!w-full !max-w-[160px]">
+					<button class="!w-full !max-w-[160px]" @click="handleUpdateContent">
 						<RefreshCwIcon />
 						Update
 					</button>

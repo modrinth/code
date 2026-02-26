@@ -117,7 +117,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
-					<button :disabled="disableCreate" @click="createProject" v-tooltip="missingFieldsTooltip">
+					<button v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createProject) }}
 					</button>

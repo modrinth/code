@@ -22,7 +22,7 @@
 			</div>
 		</div>
 		<ButtonStyled v-if="onclickDownload" circular>
-			<button @click="onclickDownload" v-tooltip="'Download modpack'">
+			<button v-tooltip="'Download modpack'" @click="onclickDownload">
 				<DownloadIcon />
 			</button>
 		</ButtonStyled>
@@ -31,6 +31,7 @@
 
 <script setup lang="ts">
 import { DownloadIcon } from '@modrinth/assets/generated-icons'
+
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 
