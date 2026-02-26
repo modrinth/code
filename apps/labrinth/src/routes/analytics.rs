@@ -17,6 +17,7 @@ use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tracing::trace;
 use url::Url;
+use uuid::Uuid;
 
 pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",
@@ -232,9 +233,10 @@ async fn playtime_ingest(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
+    minecraft_uuid: Uuid,
 }
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
@@ -262,6 +264,7 @@ async fn minecraft_server_play_ingest(
         recorded: get_current_tenths_of_ms(),
         user_id: user.id.0,
         project_id: project_id.0,
+        minecraft_uuid: play_input.minecraft_uuid,
     };
 
     analytics_queue.add_minecraft_server_play(row);

@@ -197,12 +197,23 @@ pub async fn init_client_with_database(
             (
                 recorded DateTime64(4),
                 user_id UInt64,
-                project_id UInt64
+                project_id UInt64,
+                minecraft_uuid UUID
             )
             ENGINE = {engine}
             {ttl}
             PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS minecraft_uuid UUID
             "
         ))
         .execute()
