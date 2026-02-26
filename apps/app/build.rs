@@ -41,6 +41,8 @@ fn main() {
                         "get_organization_many",
                         "get_search_results",
                         "get_search_results_many",
+                        "get_search_results_v3",
+                        "get_search_results_v3_many",
                         "purge_cache_types",
                     ])
                     .default_permission(

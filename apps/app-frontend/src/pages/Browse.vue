@@ -28,7 +28,7 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_project_v3, get_search_results } from '@/helpers/cache.js'
+import { get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
@@ -382,18 +382,25 @@ const messages = defineMessages({
 	},
 })
 
-// TODO_SERVER_PROJECTS: Remove serverProject fetching once search API returns server projects with project_type = 'server'
-const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
-const serverProjects = ref<Labrinth.Projects.v3.Project[]>([])
+const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
 const serverPings = ref<Record<string, number | undefined>>({})
 
-async function pingServerProjects(projects: Labrinth.Projects.v3.Project[]) {
-	for (const project of projects) {
-		const address = project.minecraft_java_server?.address
+const v3ServerRequestParams = computed(() => {
+	const params = [`limit=${maxResults.value}`, `index=${currentSortType.value.name}`]
+	if (query.value) params.push(`query=${encodeURIComponent(query.value)}`)
+	const offset = (currentPage.value - 1) * maxResults.value
+	if (offset > 0) params.push(`offset=${offset}`)
+	params.push(`new_filters=${encodeURIComponent('project_types = minecraft_java_server')}`)
+	return `?${params.join('&')}`
+})
+
+async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	for (const hit of hits) {
+		const address = hit.minecraft_java_server?.address
 		if (!address) continue
 		get_server_status(address)
 			.then((status) => {
-				serverPings.value = { ...serverPings.value, [project.id]: status.ping }
+				serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
 			})
 			.catch((err) => {
 				console.error(`Failed to ping server ${address}:`, err)
@@ -401,26 +408,33 @@ async function pingServerProjects(projects: Labrinth.Projects.v3.Project[]) {
 	}
 }
 
+async function refreshServerSearch() {
+	try {
+		const raw = await get_search_results_v3(v3ServerRequestParams.value, 'bypass')
+		const hits = (raw?.result?.hits ?? []) as Labrinth.Search.v3.ResultSearchProject[]
+		console.log('[v3 search] hits:', hits)
+		serverHits.value = hits
+		serverPings.value = {}
+		pingServerHits(hits)
+	} catch (e: any) {
+		handleError(e)
+	}
+}
+
 watch(
-	() => [projectType.value, SERVER_PROJECT_IDS.value],
-	async () => {
+	() => [projectType.value, v3ServerRequestParams.value],
+	() => {
 		if (projectType.value === 'server') {
-			try {
-				// TODO_SERVER_PROJECTS will need to get project_v3 in search
-				const projects = await Promise.all(SERVER_PROJECT_IDS.value.map((id) => get_project_v3(id)))
-				serverProjects.value = projects.filter((p): p is Labrinth.Projects.v3.Project => !!p)
-				pingServerProjects(serverProjects.value)
-			} catch (e: any) {
-				handleError(e)
-			}
+			refreshServerSearch()
 		}
 	},
 	{ immediate: true },
 )
 
-const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
-	if (project.minecraft_java_server?.content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = project.minecraft_java_server?.content || {}
+const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
+	const content = project.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
 		if (!project_name) return undefined
 		return {
 			name: project_name,
@@ -568,7 +582,11 @@ previousFilterState.value = JSON.stringify({
 			</section>
 			<section
 				v-else-if="
-					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
+					results &&
+					results.hits &&
+					results.hits.length === 0 &&
+					serverHits &&
+					serverHits.length === 0
 				"
 				class="offline"
 			>
@@ -578,18 +596,18 @@ previousFilterState.value = JSON.stringify({
 			<ProjectCardList v-else :layout="'list'">
 				<template v-if="projectType === 'server'">
 					<ProjectCard
-						v-for="project in serverProjects"
-						:key="`server-card-${project.id}`"
+						v-for="project in serverHits"
+						:key="`server-card-${project.project_id}`"
 						:title="project.name"
 						:icon-url="project.icon_url || undefined"
 						:summary="project.summary"
 						:tags="project.categories"
-						:link="`/project/${project.slug ?? project.id}`"
+						:link="`/project/${project.slug ?? project.project_id}`"
 						:server-online-players="project.minecraft_java_server_ping?.data?.players_online ?? 0"
 						:server-region-code="project.minecraft_server?.country"
 						:server-recent-plays="project.minecraft_java_server?.verified_plays_4w ?? 0"
 						:server-modpack-content="getServerModpackContent(project)"
-						:server-ping="serverPings[project.id]"
+						:server-ping="serverPings[project.project_id]"
 						:server-status-online="!!project.minecraft_java_server_ping?.data"
 						:hide-online-players-label="true"
 						:hide-recent-plays-label="true"
@@ -598,16 +616,21 @@ previousFilterState.value = JSON.stringify({
 							(event: any) =>
 								handleRightClick(event, { project_type: 'server', slug: project.slug })
 						"
+						:max-tags="2"
+						is-server-project
+						excludeLoaders
 					>
 						<template #actions>
 							<ButtonStyled color="brand" type="outlined">
 								<button
-									:disabled="installStore.installingServerProjects.includes(project.id)"
-									@click="() => playServerProject(project.id)"
+									:disabled="
+										(installStore.installingServerProjects as string[]).includes(project.project_id)
+									"
+									@click="() => playServerProject(project.project_id)"
 								>
 									<PlayIcon />
 									{{
-										installStore.installingServerProjects.includes(project.id)
+										(installStore.installingServerProjects as string[]).includes(project.project_id)
 											? 'Installing...'
 											: 'Play'
 									}}

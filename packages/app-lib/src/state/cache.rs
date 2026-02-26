@@ -35,6 +35,7 @@ pub enum CacheValueType {
     FileHash,
     FileUpdate,
     SearchResults,
+    SearchResultsV3,
 }
 
 impl CacheValueType {
@@ -57,6 +58,7 @@ impl CacheValueType {
             CacheValueType::FileHash => "file_hash",
             CacheValueType::FileUpdate => "file_update",
             CacheValueType::SearchResults => "search_results",
+            CacheValueType::SearchResultsV3 => "search_results_v3",
         }
     }
 
@@ -79,6 +81,7 @@ impl CacheValueType {
             "file_hash" => CacheValueType::FileHash,
             "file_update" => CacheValueType::FileUpdate,
             "search_results" => CacheValueType::SearchResults,
+            "search_results_v3" => CacheValueType::SearchResultsV3,
             _ => CacheValueType::Project,
         }
     }
@@ -122,7 +125,8 @@ impl CacheValueType {
             | CacheValueType::File
             | CacheValueType::LoaderManifest
             | CacheValueType::FileUpdate
-            | CacheValueType::SearchResults => None,
+            | CacheValueType::SearchResults
+            | CacheValueType::SearchResultsV3 => None,
         }
     }
 }
@@ -157,6 +161,7 @@ pub enum CacheValue {
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
+    SearchResultsV3(SearchResultsV3),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -196,6 +201,23 @@ pub struct SearchEntry {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultsV3 {
+    pub search: String,
+    pub result: SearchResultV3,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultV3 {
+    pub hits: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub offset: u32,
+    #[serde(default)]
+    pub limit: u32,
+    #[serde(default)]
+    pub total_hits: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -472,6 +494,7 @@ impl CacheValue {
             CacheValue::FileHash(_) => CacheValueType::FileHash,
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
             CacheValue::SearchResults(_) => CacheValueType::SearchResults,
+            CacheValue::SearchResultsV3(_) => CacheValueType::SearchResultsV3,
         }
     }
 
@@ -513,6 +536,7 @@ impl CacheValue {
                 )
             }
             CacheValue::SearchResults(search) => search.search.clone(),
+            CacheValue::SearchResultsV3(search) => search.search.clone(),
         }
     }
 
@@ -538,7 +562,8 @@ impl CacheValue {
             | CacheValue::File { .. }
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileUpdate(_)
-            | CacheValue::SearchResults(_) => None,
+            | CacheValue::SearchResults(_)
+            | CacheValue::SearchResultsV3(_) => None,
         }
     }
 }
@@ -647,7 +672,8 @@ impl_cache_methods!(
     (LoaderManifest, CachedLoaderManifest),
     (FileHash, CachedFileHash),
     (FileUpdate, CachedFileUpdate),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 impl_cache_method_singular!(
@@ -1429,6 +1455,48 @@ impl CachedEntry {
                 .map(|(index, result)| {
                     (
                         CacheValue::SearchResults(SearchResults {
+                            search: fetch_urls[index].0.to_string(),
+                            result,
+                        })
+                        .get_entry(),
+                        true,
+                    )
+                })
+                .collect()
+            }
+            CacheValueType::SearchResultsV3 => {
+                let fetch_urls = keys
+                    .iter()
+                    .map(|x| {
+                        (
+                            x.key().to_string(),
+                            format!(
+                                "{}search{}",
+                                env!("MODRINTH_API_URL_V3"),
+                                x.key()
+                            ),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                futures::future::try_join_all(fetch_urls.iter().map(
+                    |(_, url)| {
+                        fetch_json(
+                            Method::GET,
+                            url,
+                            None,
+                            None,
+                            fetch_semaphore,
+                            pool,
+                        )
+                    },
+                ))
+                .await?
+                .into_iter()
+                .enumerate()
+                .map(|(index, result)| {
+                    (
+                        CacheValue::SearchResultsV3(SearchResultsV3 {
                             search: fetch_urls[index].0.to_string(),
                             result,
                         })
