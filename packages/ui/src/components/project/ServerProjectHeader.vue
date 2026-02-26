@@ -15,10 +15,8 @@
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
 				<ServerDetails
-					:region="minecraftServer?.country"
 					:online-players="playersOnline"
 					:recent-plays="javaServer?.verified_plays_4w"
-					:ping="ping"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">
@@ -31,12 +29,6 @@
 						</TagItem>
 					</div>
 				</div>
-				<ServerModpackContent
-					v-if="serverModpackContent"
-					:name="serverModpackContent.name"
-					:icon="serverModpackContent.icon"
-					:link="serverModpackContent.link"
-				/>
 			</div>
 		</template>
 		<template #actions>
@@ -55,7 +47,6 @@ import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
 import ServerDetails from './server/ServerDetails.vue'
-import ServerModpackContent from './server/ServerModpackContent.vue'
 
 const router = useRouter()
 
@@ -66,21 +57,7 @@ const { project, projectV3, member } = defineProps<{
 	ping?: number
 }>()
 
-const minecraftServer = computed(() => projectV3?.minecraft_server)
 const javaServer = computed(() => projectV3?.minecraft_java_server)
 const javaServerPingData = computed(() => projectV3?.minecraft_java_server_ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
-
-const serverModpackContent = computed(() => {
-	if (projectV3?.minecraft_java_server?.content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = projectV3.minecraft_java_server.content
-		if (!project_name) return undefined
-		return {
-			name: project_name,
-			icon: project_icon,
-			link: project_id ? `/project/${project_id}` : undefined,
-		}
-	}
-	return undefined
-})
 </script>

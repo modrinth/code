@@ -15,12 +15,22 @@ defineProps<{
 		icon?: string
 		link?: string
 	}
+	hideOnlinePlayersLabel?: boolean
+	hideRecentPlaysLabel?: boolean
 }>()
 </script>
 <template>
 	<div class="empty:hidden flex items-center gap-2">
-		<ServerOnlinePlayers v-if="onlinePlayers !== undefined" :online="onlinePlayers" />
-		<ServerRecentPlays v-if="recentPlays !== undefined" :recent-plays="recentPlays" />
+		<ServerOnlinePlayers
+			v-if="onlinePlayers !== undefined"
+			:online="onlinePlayers"
+			:hide-label="hideOnlinePlayersLabel"
+		/>
+		<ServerRecentPlays
+			v-if="recentPlays !== undefined"
+			:recent-plays="recentPlays"
+			:hide-label="hideRecentPlaysLabel"
+		/>
 		<ServerRegion v-if="region" :region="region" />
 		<ServerPing v-if="ping !== undefined" :ping="ping" />
 		<ServerModpackContent

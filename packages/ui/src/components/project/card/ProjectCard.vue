@@ -54,6 +54,8 @@
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
+							:hide-online-players-label="true"
+							:hide-recent-plays-label="true"
 						/>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -134,6 +136,8 @@
 						:online-players="serverOnlinePlayers"
 						:recent-plays="serverRecentPlays"
 						:ping="serverPing"
+						:hide-online-players-label="true"
+						:hide-recent-plays-label="true"
 					/>
 					<div class="flex items-center gap-1 flex-wrap">
 						<ProjectCardEnvironment
