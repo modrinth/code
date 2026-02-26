@@ -17,7 +17,7 @@ const { formatMessage } = useVIntl()
 </script>
 <template>
 	<TagItem
-		v-if="ping !== undefined || statusOnline"
+		v-if="ping || statusOnline"
 		class="border !border-solid border-brand bg-brand-highlight !font-medium w-max"
 		style="--_color: var(--color-brand)"
 	>

@@ -4,7 +4,7 @@
 
 		<div
 			v-if="ipAddress"
-			class="bg-surface-4 flex gap-2 justify-between rounded-2xl items-center px-3 pr-2 h-12"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-2 h-12"
 		>
 			<div v-tooltip="`Java IP: ${ipAddress}`" class="font-semibold truncate">
 				{{ ipAddress }}

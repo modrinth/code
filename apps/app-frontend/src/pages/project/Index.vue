@@ -373,8 +373,10 @@ async function fetchProjectData() {
 							modpackProject.id !== project.id
 								? () => router.push(`/project/${modpackProject.id}`)
 								: undefined,
-						onclickVersion: () =>
-							router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`),
+						onclickVersion:
+							modpackProject.id !== project.id
+								? router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
+								: undefined,
 					}
 				}
 			}
