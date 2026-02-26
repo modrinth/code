@@ -20,6 +20,7 @@ defineProps<{
 		class="smart-clickable:allow-pointer-events"
 	>
 		<OnlineIndicatorIcon
+			:class="statusOnline && 'pulse-glow'"
 			:style="{
 				'--_color-inner': statusOnline ? 'var(--color-brand)' : 'var(--color-red)',
 				'--_color-outer': statusOnline
@@ -36,3 +37,19 @@ defineProps<{
 		}}
 	</StatItem>
 </template>
+
+<style scoped>
+.pulse-glow {
+	animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		filter: brightness(1.15);
+	}
+	50% {
+		filter: brightness(0.95);
+	}
+}
+</style>
