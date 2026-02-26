@@ -56,6 +56,7 @@ macro_rules! define_project_components {
         pub struct ProjectSerial {
             $(
                 #[validate(nested)]
+                #[serde(default, skip_serializing_if = "Option::is_none")]
                 pub $field_name: Option<$ty>,
             )*
         }
