@@ -260,7 +260,10 @@ pub async fn analytics_minecraft_server_play_ingest() {
             let req = test::TestRequest::post()
                 .uri("/analytics/minecraft-server-play")
                 .append_header(("Authorization", USER_USER_PAT.unwrap()))
-                .set_json(serde_json::json!({ "project_id": project_id }))
+                .set_json(serde_json::json!({
+                    "project_id": project_id,
+                    "minecraft_uuid": "12345678-1234-5678-1234-567812345678"
+                }))
                 .to_request();
             let resp = api.call(req).await;
             assert_status!(&resp, StatusCode::NO_CONTENT);

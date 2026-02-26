@@ -746,6 +746,7 @@ async fn run_credentials(
                 ),
                 json!({
                     "project_id": &linked_data.project_id,
+                    "minecraft_uuid": credentials.offline_profile.id,
                 }),
                 &state.api_semaphore,
                 &state.pool,
