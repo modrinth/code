@@ -5,13 +5,15 @@
 		<div
 			v-if="ipAddress"
 			v-tooltip="`Copy Java IP: ${ipAddress}`"
-			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 h-12 cursor-pointer hover:bg-button-bg-hover transition-colors"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover transition-colors"
 			@click="handleCopyIP"
 		>
 			<div class="font-semibold truncate">
 				{{ ipAddress }}
 			</div>
-			<CopyIcon class="shrink-0" />
+			<div class="w-9 h-9 grid place-content-center">
+				<CopyIcon class="shrink-0" />
+			</div>
 		</div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
