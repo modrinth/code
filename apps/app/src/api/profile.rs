@@ -35,7 +35,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
-            profile_report_minecraft_server_play,
         ])
         .build()
 }
@@ -247,20 +246,15 @@ pub async fn profile_get_pack_export_candidates(
     Ok(candidates)
 }
 
-#[tauri::command]
-pub async fn profile_report_minecraft_server_play(
-    project_id: &str,
-) -> Result<()> {
-    profile::report_minecraft_server_play(project_id).await?;
-    Ok(())
-}
-
 // Run minecraft using a profile using the default credentials
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
-pub async fn profile_run(path: &str, server_address: Option<String>) -> Result<ProcessMetadata> {
+pub async fn profile_run(
+    path: &str,
+    server_address: Option<String>,
+) -> Result<ProcessMetadata> {
     let quick_play = match server_address {
         Some(addr) => QuickPlayType::Server(ServerAddress::Unresolved(addr)),
         None => QuickPlayType::None,

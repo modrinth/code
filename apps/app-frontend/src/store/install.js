@@ -18,7 +18,6 @@ import {
 	install as installProfile,
 	list,
 	remove_project,
-	report_minecraft_server_play,
 } from '@/helpers/profile.js'
 import { add_server_to_profile, get_profile_worlds, start_join_server } from '@/helpers/worlds.ts'
 import router from '@/routes.js'
@@ -337,20 +336,8 @@ const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
 	}
 }
 
-const reportServerJoin = async (projectId) => {
-	if (!projectId) return
-
-	try {
-		await report_minecraft_server_play(projectId)
-		console.log(`Reported play for ${projectId}`)
-	} catch (err) {
-		console.error('Failed to report server join analytics:', err)
-	}
-}
-
 const joinServer = async (profilePath, serverAddress, serverProjectId) => {
 	if (!serverAddress) return
-	await reportServerJoin(serverProjectId)
 	await start_join_server(profilePath, serverAddress)
 }
 

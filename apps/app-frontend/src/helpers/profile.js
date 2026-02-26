@@ -179,10 +179,6 @@ export async function run(path, serverAddress = null) {
 	return await invoke('plugin:profile|profile_run', { path, serverAddress })
 }
 
-export async function report_minecraft_server_play(projectId) {
-	return await invoke('plugin:profile|profile_report_minecraft_server_play', { projectId })
-}
-
 export async function kill(path) {
 	return await invoke('plugin:profile|profile_kill', { path })
 }
