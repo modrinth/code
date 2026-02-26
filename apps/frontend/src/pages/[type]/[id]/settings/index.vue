@@ -244,12 +244,15 @@
 					<label for="server-language">
 						<span class="label__title">Language</span>
 					</label>
-					<Combobox
+					<Multiselect
 						id="server-language"
-						v-model="language"
-						:options="languageOptions"
-						searchable
-						placeholder="Select language"
+						v-model="languages"
+						:options="languageOptions.map((l) => l.value)"
+						:custom-label="(code) => languageOptions.find((l) => l.value === code)?.label ?? code"
+						:multiple="true"
+						:searchable="true"
+						:show-labels="false"
+						placeholder="Select languages"
 						:disabled="!hasPermission"
 					/>
 				</div>
@@ -428,6 +431,7 @@ import {
 	UnsavedChangesPopup,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
+import { Multiselect } from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput.vue'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
@@ -478,7 +482,7 @@ const supportedGameVersions = ref([])
 const recommendedGameVersion = ref('')
 const usingMrpack = ref(false)
 const country = ref('')
-const language = ref('')
+const languages = ref([])
 
 watch(
 	() => projectV3.value,
@@ -497,7 +501,7 @@ watch(
 			recommendedGameVersion.value = ''
 		}
 		country.value = v3.minecraft_server?.country ?? ''
-		language.value = v3.minecraft_server?.language ?? ''
+		languages.value = v3.minecraft_server?.languages ?? []
 	},
 	{ immediate: true },
 )
@@ -750,13 +754,15 @@ const serverPatchData = computed(() => {
 
 	const origServer = projectV3.value?.minecraft_server
 	const countryChanged = country.value && country.value !== origServer?.country
-	const languageChanged = language.value && language.value !== origServer?.language
+	const languagesChanged =
+		JSON.stringify([...languages.value].sort()) !==
+		JSON.stringify([...(origServer?.languages ?? [])].sort())
 
-	if (countryChanged || languageChanged) {
+	if (countryChanged || languagesChanged) {
 		return {
 			...origServer,
 			...(countryChanged ? { country: country.value } : {}),
-			...(languageChanged ? { language: language.value } : {}),
+			...(languagesChanged ? { languages: languages.value } : {}),
 		}
 	}
 
@@ -822,7 +828,7 @@ const original = computed(() => ({
 	bedrockAddress: projectV3.value?.minecraft_bedrock_server?.address ?? '',
 	bedrockPort: projectV3.value?.minecraft_bedrock_server?.port ?? 19132,
 	country: projectV3.value?.minecraft_server?.country ?? '',
-	language: projectV3.value?.minecraft_server?.language ?? '',
+	languages: projectV3.value?.minecraft_server?.languages ?? [],
 	icon: null,
 	deletedIcon: false,
 	bannerFile: null,
@@ -841,7 +847,7 @@ const modified = computed(() => ({
 	bedrockAddress: bedrockAddress.value,
 	bedrockPort: bedrockPort.value,
 	country: country.value,
-	language: language.value,
+	languages: languages.value,
 	icon: icon.value,
 	deletedIcon: deletedIcon.value,
 	bannerFile: bannerFile.value,
@@ -862,7 +868,7 @@ function resetChanges() {
 	bedrockAddress.value = projectV3.value?.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = projectV3.value?.minecraft_bedrock_server?.port ?? 19132
 	country.value = projectV3.value?.minecraft_server?.country ?? ''
-	language.value = projectV3.value?.minecraft_server?.language ?? ''
+	languages.value = projectV3.value?.minecraft_server?.languages ?? []
 	icon.value = null
 	previewImage.value = null
 	deletedIcon.value = false
