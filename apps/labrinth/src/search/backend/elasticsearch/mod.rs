@@ -662,6 +662,14 @@ impl SearchBackend for Elasticsearch {
 
         let aggregations = response_body.get("aggregations");
 
+        // failing case:
+        // http://localhost:8000/v2/search?facets=%5B%5B%22client_side%3Aoptional%22%2C%22client_side%3Arequired%22%5D%2C%5B%22project_type%3Amod%22%5D%2C%5B%22versions%3A1.8.9%22%2C%22versions%3A1.12.2%22%2C%22versions%3A1.17.1%22%2C%22versions%3A1.18.2%22%2C%22versions%3A1.19%22%2C%22versions%3A1.19.2%22%2C%22versions%3A1.19.3%22%2C%22versions%3A1.19.4%22%2C%22versions%3A1.20%22%2C%22versions%3A1.20.1%22%2C%22versions%3A1.20.2%22%2C%22versions%3A1.20.4%22%2C%22versions%3A1.20.6%22%2C%22versions%3A1.21%22%2C%22versions%3A1.21.1%22%2C%22versions%3A1.21.3%22%2C%22versions%3A1.21.4%22%2C%22versions%3A1.21.5%22%2C%22versions%3A1.21.7%22%2C%22versions%3A1.21.8%22%2C%22versions%3A1.21.10%22%2C%22versions%3A1.21.11%22%5D%5D&filters=(project_id%20NOT%20IN%20[P7dR8mSH,%20hvFnDODi,%20XaIYsn4W,%20xIEuGYOS,%20kqJFAPU9,%20H8CaAYZC,%203llatzyE,%20JyKlunuD])&index=relevance&limit=20&offset=0
+
+        tracing::info!(
+            "body = {}",
+            serde_json::to_string_pretty(&response_body).unwrap()
+        );
+
         let total_hits = aggregations
             .and_then(|aggs| aggs.get("unique_projects"))
             .and_then(|unique| unique.get("value"))
@@ -965,5 +973,55 @@ impl SearchBackend for Elasticsearch {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Elasticsearch;
+    use crate::models::projects::SearchRequest;
+    use serde_json::json;
+
+    #[test]
+    fn search_regression_not_in_filter_list_query_string() {
+        let facets = "[[\"client_side:optional\",\"client_side:required\"],[\"project_type:mod\"],[\"versions:1.8.9\",\"versions:1.12.2\",\"versions:1.17.1\",\"versions:1.18.2\",\"versions:1.19\",\"versions:1.19.2\",\"versions:1.19.3\",\"versions:1.19.4\",\"versions:1.20\",\"versions:1.20.1\",\"versions:1.20.2\",\"versions:1.20.4\",\"versions:1.20.6\",\"versions:1.21\",\"versions:1.21.1\",\"versions:1.21.3\",\"versions:1.21.4\",\"versions:1.21.5\",\"versions:1.21.7\",\"versions:1.21.8\",\"versions:1.21.10\",\"versions:1.21.11\"]]";
+        let filter_query = "(project_id NOT IN [P7dR8mSH, hvFnDODi, XaIYsn4W, xIEuGYOS, kqJFAPU9, H8CaAYZC, 3llatzyE, JyKlunuD])";
+
+        let info = SearchRequest {
+            query: None,
+            offset: Some("0".to_string()),
+            index: Some("relevance".to_string()),
+            limit: Some("20".to_string()),
+            new_filters: None,
+            facets: Some(facets.to_string()),
+            filters: Some(filter_query.to_string()),
+            version: None,
+        };
+
+        let mut filter =
+            Elasticsearch::facets_filter_clauses(info.facets.as_deref())
+                .expect("facets should parse");
+        let filter_string = Elasticsearch::meili_like_filters(&info)
+            .expect("expected filter string");
+        filter.push(json!({
+            "query_string": {
+                "query": filter_string,
+                "default_operator": "AND",
+                "lenient": true
+            }
+        }));
+
+        let query = filter
+            .last()
+            .and_then(|x| x.get("query_string"))
+            .and_then(|x| x.get("query"))
+            .and_then(|x| x.as_str())
+            .expect("expected query_string.query");
+
+        assert_eq!(query, filter_query);
+        assert!(
+            !query.contains("NOT IN ["),
+            "error case: Elasticsearch query_string cannot parse Meilisearch-style `NOT IN [..]` filters"
+        );
     }
 }
