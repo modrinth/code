@@ -175,13 +175,6 @@
 							href: `/project/${$route.params.id}/gallery`,
 							shown: data.gallery.length > 0,
 						},
-						{
-							label: 'Required content',
-							href: `/project/${$route.params.id}/required-content`,
-							shown:
-								projectV3?.minecraft_server != null &&
-								projectV3?.minecraft_java_server?.content?.kind === 'modpack',
-						},
 					]"
 				/>
 				<RouterView

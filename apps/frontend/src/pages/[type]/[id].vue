@@ -1399,10 +1399,6 @@ const messages = defineMessages({
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
 	},
-	requiredContentTab: {
-		id: 'project.required-content.title',
-		defaultMessage: 'Required content',
-	},
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
 		defaultMessage: 'Review environment settings',
@@ -2535,13 +2531,6 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.moderationTab),
 			href: `${projectUrl}/moderation`,
 			shown: !!currentMember.value,
-		},
-		{
-			label: formatMessage(messages.requiredContentTab),
-			href: `${projectUrl}/required-content`,
-			shown:
-				projectV3.value?.minecraft_server != null &&
-				projectV3.value?.minecraft_java_server?.content?.kind === 'modpack',
 		},
 	]
 })
