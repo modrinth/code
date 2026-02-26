@@ -204,11 +204,20 @@ export function createServerCompatibilityContext(
 				}
 			}
 
-			await nextTick()
-			modal.value?.hide()
-		} finally {
 			isUploading.value = false
 			isSubmitting.value = false
+			await nextTick()
+			modal.value?.hide()
+		} catch (err) {
+			isUploading.value = false
+			isSubmitting.value = false
+
+			const error = err as { data?: { description?: string } }
+			addNotification({
+				title: 'Failed to save compatibility settings',
+				text: error.data?.description || String(err),
+				type: 'error',
+			})
 		}
 	}
 
