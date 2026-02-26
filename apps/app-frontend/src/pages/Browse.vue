@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
 import type { GameVersion, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
@@ -15,9 +16,12 @@ import {
 	SearchSidebarFilter,
 	StyledInput,
 	useSearch,
+	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
+import type { Category, Platform } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { $fetch } from 'ofetch'
 import type { Ref } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
@@ -28,14 +32,12 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
+import { get_search_results } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { playServerProject, useInstall } from '@/store/install.js'
-import type { Labrinth } from '@modrinth/api-client'
-import type { Category, Platform } from '@modrinth/utils'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -385,14 +387,14 @@ const messages = defineMessages({
 const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
 const serverPings = ref<Record<string, number | undefined>>({})
 
-const v3ServerRequestParams = computed(() => {
-	const params = [`limit=${maxResults.value}`, `index=${currentSortType.value.name}`]
-	if (query.value) params.push(`query=${encodeURIComponent(query.value)}`)
-	const offset = (currentPage.value - 1) * maxResults.value
-	if (offset > 0) params.push(`offset=${offset}`)
-	params.push(`new_filters=${encodeURIComponent('project_types = minecraft_java_server')}`)
-	return `?${params.join('&')}`
-})
+const {
+	serverCurrentSortType,
+	serverCurrentFilters,
+	serverToggledGroups,
+	serverSortTypes,
+	serverFilterTypes,
+	serverRequestParams,
+} = useServerSearch({ tags, query, maxResults, currentPage })
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 	for (const hit of hits) {
@@ -410,8 +412,10 @@ async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 
 async function refreshServerSearch() {
 	try {
-		const raw = await get_search_results_v3(v3ServerRequestParams.value, 'bypass')
-		const hits = (raw?.result?.hits ?? []) as Labrinth.Search.v3.ResultSearchProject[]
+		const raw = await $fetch<Labrinth.Search.v3.SearchResults>(
+			`https://api.modrinth.com/v3/search${serverRequestParams.value}`,
+		)
+		const hits = raw?.hits ?? []
 		console.log('[v3 search] hits:', hits)
 		serverHits.value = hits
 		serverPings.value = {}
@@ -422,7 +426,7 @@ async function refreshServerSearch() {
 }
 
 watch(
-	() => [projectType.value, v3ServerRequestParams.value],
+	() => [projectType.value, serverRequestParams.value],
 	() => {
 		if (projectType.value === 'server') {
 			refreshServerSearch()
@@ -449,7 +453,8 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 
 const options = ref(null)
 const handleRightClick = (event: any, result: any) => {
-	options.value.showMenu(event, result, [
+	// @ts-ignore
+	options.value?.showMenu(event, result, [
 		{
 			name: 'open_link',
 		},
@@ -497,33 +502,54 @@ previousFilterState.value = JSON.stringify({
 				@click.prevent.stop
 			/>
 		</div>
-		<SearchSidebarFilter
-			v-for="filter in filters.filter((f) => f.display !== 'none')"
-			:key="`filter-${filter.id}`"
-			v-model:selected-filters="currentFilters"
-			v-model:toggled-groups="toggledGroups"
-			v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-			:provided-filters="instanceFilters"
-			:filter-type="filter"
-			class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
-			button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
-			content-class="mb-3"
-			inner-panel-class="ml-2 mr-3"
-			:open-by-default="
-				filter.id.startsWith('category') || filter.id === 'environment' || filter.id === 'license'
-			"
-		>
-			<template #header>
-				<h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
-			</template>
-			<template #locked-game_version>
-				{{ formatMessage(messages.gameVersionProvidedByInstance) }}
-			</template>
-			<template #locked-mod_loader>
-				{{ formatMessage(messages.modLoaderProvidedByInstance) }}
-			</template>
-			<template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
-		</SearchSidebarFilter>
+		<template v-if="projectType === 'server'">
+			<SearchSidebarFilter
+				v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
+				:key="`server-filter-${filterType.id}`"
+				v-model:selected-filters="serverCurrentFilters"
+				v-model:toggled-groups="serverToggledGroups"
+				:provided-filters="[]"
+				:filter-type="filterType"
+				class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
+				button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
+				content-class="mb-3"
+				inner-panel-class="ml-2 mr-3"
+				:open-by-default="true"
+			>
+				<template #header>
+					<h3 class="text-base m-0">{{ filterType.formatted_name }}</h3>
+				</template>
+			</SearchSidebarFilter>
+		</template>
+		<template v-else>
+			<SearchSidebarFilter
+				v-for="filter in filters.filter((f) => f.display !== 'none')"
+				:key="`filter-${filter.id}`"
+				v-model:selected-filters="currentFilters"
+				v-model:toggled-groups="toggledGroups"
+				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+				:provided-filters="instanceFilters"
+				:filter-type="filter"
+				class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
+				button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
+				content-class="mb-3"
+				inner-panel-class="ml-2 mr-3"
+				:open-by-default="
+					filter.id.startsWith('category') || filter.id === 'environment' || filter.id === 'license'
+				"
+			>
+				<template #header>
+					<h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
+				</template>
+				<template #locked-game_version>
+					{{ formatMessage(messages.gameVersionProvidedByInstance) }}
+				</template>
+				<template #locked-mod_loader>
+					{{ formatMessage(messages.modLoaderProvidedByInstance) }}
+				</template>
+				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
+			</SearchSidebarFilter>
+		</template>
 	</Teleport>
 	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
 		<template v-if="instance">
@@ -545,11 +571,17 @@ previousFilterState.value = JSON.stringify({
 		<div class="flex gap-2">
 			<DropdownSelect
 				v-slot="{ selected }"
-				v-model="currentSortType"
+				:model-value="projectType === 'server' ? serverCurrentSortType : currentSortType"
 				class="max-w-[16rem]"
 				name="Sort by"
-				:options="sortTypes as any"
+				:options="(projectType === 'server' ? serverSortTypes : sortTypes) as any"
 				:display-name="(option: SortType | undefined) => option?.display"
+				@update:model-value="
+					(v: SortType) => {
+						if (projectType === 'server') serverCurrentSortType = v
+						else currentSortType = v
+					}
+				"
 			>
 				<span class="font-semibold text-primary">Sort by: </span>
 				<span class="font-semibold text-secondary">{{ selected }}</span>
@@ -567,6 +599,14 @@ previousFilterState.value = JSON.stringify({
 			<Pagination :page="currentPage" :count="pageCount" class="ml-auto" @switch-page="setPage" />
 		</div>
 		<SearchFilterControl
+			v-if="projectType === 'server'"
+			v-model:selected-filters="serverCurrentFilters"
+			:filters="serverFilterTypes"
+			:provided-filters="[]"
+			:overridden-provided-filter-types="[]"
+		/>
+		<SearchFilterControl
+			v-else
 			v-model:selected-filters="currentFilters"
 			:filters="filters.filter((f) => f.display !== 'none')"
 			:provided-filters="instanceFilters"
@@ -577,7 +617,7 @@ previousFilterState.value = JSON.stringify({
 			<section v-if="loading" class="offline">
 				<LoadingIndicator />
 			</section>
-			<section v-else-if="offline && results.total_hits === 0" class="offline">
+			<section v-else-if="offline && results?.total_hits === 0" class="offline">
 				You are currently offline. Connect to the internet to browse Modrinth!
 			</section>
 			<section
@@ -603,22 +643,22 @@ previousFilterState.value = JSON.stringify({
 						:summary="project.summary"
 						:tags="project.categories"
 						:link="`/project/${project.slug ?? project.project_id}`"
-						:server-online-players="project.minecraft_java_server_ping?.data?.players_online ?? 0"
+						:server-online-players="project.minecraft_java_server?.ping?.data?.players_online ?? 0"
 						:server-region-code="project.minecraft_server?.country"
 						:server-recent-plays="project.minecraft_java_server?.verified_plays_4w ?? 0"
 						:server-modpack-content="getServerModpackContent(project)"
 						:server-ping="serverPings[project.project_id]"
-						:server-status-online="!!project.minecraft_java_server_ping?.data"
+						:server-status-online="!!project.minecraft_java_server?.ping?.data"
 						:hide-online-players-label="true"
 						:hide-recent-plays-label="true"
 						layout="list"
+						:max-tags="2"
+						is-server-project
+						exclude-loaders
 						@contextmenu.prevent.stop="
 							(event: any) =>
 								handleRightClick(event, { project_type: 'server', slug: project.slug })
 						"
-						:max-tags="2"
-						is-server-project
-						excludeLoaders
 					>
 						<template #actions>
 							<ButtonStyled color="brand" type="outlined">
