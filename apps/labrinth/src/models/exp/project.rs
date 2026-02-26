@@ -115,6 +115,7 @@ macro_rules! define_project_components {
         #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
         pub struct ProjectQuery {
             $(
+                #[serde(skip_serializing_if = "Option::is_none")]
                 pub $field_name: Option<Query<$ty>>,
             )*
         }
@@ -123,7 +124,7 @@ macro_rules! define_project_components {
         pub struct ProjectEdit {
             $(
                 #[validate(nested)]
-                #[serde(default)]
+                #[serde(skip_serializing_if = "Option::is_none", default)]
                 pub $field_name: Option<Edit<$ty>>,
             )*
         }
