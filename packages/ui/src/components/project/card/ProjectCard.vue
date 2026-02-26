@@ -76,6 +76,7 @@
 							:name="serverModpackContent.name"
 							:icon="serverModpackContent.icon"
 							:onclick="serverModpackContent.onclick"
+							:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
 							class="text-primary"
 						/>
 					</div>
@@ -163,6 +164,7 @@
 						:name="serverModpackContent.name"
 						:icon="serverModpackContent.icon"
 						:onclick="serverModpackContent.onclick"
+						:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
 						class="text-primary"
 					/>
 				</div>
@@ -223,6 +225,7 @@ const props = defineProps<{
 		name: string
 		icon?: string
 		onclick?: () => void
+		showCustomModpackTooltip?: boolean
 	}
 	isServerProject?: boolean
 	banner?: string
