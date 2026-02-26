@@ -29,11 +29,13 @@ use elasticsearch::{
     BulkParts, DeleteByQueryParts, Elasticsearch as EsClient, SearchParts,
 };
 use eyre::eyre;
+use regex::Regex;
 use reqwest::StatusCode;
 use serde::Serialize;
 use serde_json::{Value, json};
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use std::time::Duration;
 
 #[derive(Debug, Clone)]
@@ -71,6 +73,60 @@ pub struct Elasticsearch {
 }
 
 impl Elasticsearch {
+    fn escape_query_string_value(value: &str) -> String {
+        const RESERVED: [char; 21] = [
+            '+', '-', '=', '&', '|', '>', '<', '!', '(', ')', '{', '}', '[',
+            ']', '^', '"', '~', '*', '?', ':', '\\',
+        ];
+
+        let mut escaped = String::with_capacity(value.len());
+        for ch in value.chars() {
+            if RESERVED.contains(&ch) || ch == '/' {
+                escaped.push('\\');
+            }
+            escaped.push(ch);
+        }
+        escaped
+    }
+
+    fn normalize_meili_filter_syntax(filters: &str) -> String {
+        static IN_FILTER_RE: LazyLock<Regex> = LazyLock::new(|| {
+            Regex::new(
+                r"(?i)\b([a-zA-Z_][a-zA-Z0-9_]*)\s+(NOT\s+)?IN\s*\[([^\]]*)\]",
+            )
+            .expect("valid regex")
+        });
+
+        IN_FILTER_RE
+            .replace_all(filters, |captures: &regex::Captures<'_>| {
+                let field =
+                    captures.get(1).map(|m| m.as_str()).unwrap_or_default();
+                let is_not = captures.get(2).is_some();
+                let list = captures
+                    .get(3)
+                    .map(|m| m.as_str())
+                    .unwrap_or_default()
+                    .split(',')
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty())
+                    .map(Self::escape_query_string_value)
+                    .collect::<Vec<_>>();
+
+                if list.is_empty() {
+                    captures
+                        .get(0)
+                        .map(|m| m.as_str())
+                        .unwrap_or_default()
+                        .to_string()
+                } else if is_not {
+                    format!("NOT {field}:({})", list.join(" OR "))
+                } else {
+                    format!("{field}:({})", list.join(" OR "))
+                }
+            })
+            .into_owned()
+    }
+
     fn get_next_index_name(&self, alias_name: &str, next: bool) -> String {
         if next {
             format!("{alias_name}__alt")
@@ -511,16 +567,18 @@ impl Elasticsearch {
     }
 
     fn meili_like_filters(info: &SearchRequest) -> Option<Cow<'_, str>> {
-        if let Some(filters) = info.new_filters.as_deref() {
-            return Some(Cow::Borrowed(filters));
-        }
+        let raw = if let Some(filters) = info.new_filters.as_deref() {
+            Some(filters.to_string())
+        } else {
+            match (info.filters.as_deref(), info.version.as_deref()) {
+                (Some(f), Some(v)) => Some(format!("({f}) AND ({v})")),
+                (Some(f), None) => Some(f.to_string()),
+                (None, Some(v)) => Some(v.to_string()),
+                (None, None) => None,
+            }
+        }?;
 
-        match (info.filters.as_deref(), info.version.as_deref()) {
-            (Some(f), Some(v)) => Some(Cow::Owned(format!("({f}) AND ({v})"))),
-            (Some(f), None) => Some(Cow::Borrowed(f)),
-            (None, Some(v)) => Some(Cow::Borrowed(v)),
-            (None, None) => None,
-        }
+        Some(Cow::Owned(Self::normalize_meili_filter_syntax(&raw)))
     }
 }
 
@@ -617,6 +675,19 @@ impl SearchBackend for Elasticsearch {
             .await
             .wrap_internal_err("failed to execute Elasticsearch search")?;
 
+        if let Err(err) = response.error_for_status_code_ref() {
+            let err = eyre!(err);
+            match response.json::<Value>().await {
+                Ok(json) => {
+                    return Err(err.wrap_err(eyre!(
+                        "search request failed: {}",
+                        serde_json::to_string_pretty(&json).unwrap()
+                    )));
+                }
+                Err(_) => return Err(err.wrap_err("search request failed")),
+            }
+        }
+
         let response_body = response.json::<Value>().await.wrap_internal_err(
             "failed to parse Elasticsearch search response",
         )?;
@@ -660,22 +731,12 @@ impl SearchBackend for Elasticsearch {
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
-        let aggregations = response_body.get("aggregations");
-
-        // failing case:
-        // http://localhost:8000/v2/search?facets=%5B%5B%22client_side%3Aoptional%22%2C%22client_side%3Arequired%22%5D%2C%5B%22project_type%3Amod%22%5D%2C%5B%22versions%3A1.8.9%22%2C%22versions%3A1.12.2%22%2C%22versions%3A1.17.1%22%2C%22versions%3A1.18.2%22%2C%22versions%3A1.19%22%2C%22versions%3A1.19.2%22%2C%22versions%3A1.19.3%22%2C%22versions%3A1.19.4%22%2C%22versions%3A1.20%22%2C%22versions%3A1.20.1%22%2C%22versions%3A1.20.2%22%2C%22versions%3A1.20.4%22%2C%22versions%3A1.20.6%22%2C%22versions%3A1.21%22%2C%22versions%3A1.21.1%22%2C%22versions%3A1.21.3%22%2C%22versions%3A1.21.4%22%2C%22versions%3A1.21.5%22%2C%22versions%3A1.21.7%22%2C%22versions%3A1.21.8%22%2C%22versions%3A1.21.10%22%2C%22versions%3A1.21.11%22%5D%5D&filters=(project_id%20NOT%20IN%20[P7dR8mSH,%20hvFnDODi,%20XaIYsn4W,%20xIEuGYOS,%20kqJFAPU9,%20H8CaAYZC,%203llatzyE,%20JyKlunuD])&index=relevance&limit=20&offset=0
-
-        tracing::info!(
-            "body = {}",
-            serde_json::to_string_pretty(&response_body).unwrap()
-        );
-
-        let total_hits = aggregations
+        let total_hits = response_body.get("aggregations")
             .and_then(|aggs| aggs.get("unique_projects"))
             .and_then(|unique| unique.get("value"))
             .and_then(Value::as_u64)
             .map(|v| v as usize)
-            .wrap_internal_err_with(|| eyre!("missing `aggregations.unique_projects.value` in Elasticsearch response - aggregations: {aggregations:?}"))?;
+            .wrap_internal_err("missing `aggregations.unique_projects.value` in Elasticsearch response")?;
 
         Ok(SearchResults {
             hits,
@@ -984,6 +1045,9 @@ mod tests {
 
     #[test]
     fn search_regression_not_in_filter_list_query_string() {
+        // failing case:
+        // http://localhost:8000/v2/search?facets=%5B%5B%22client_side%3Aoptional%22%2C%22client_side%3Arequired%22%5D%2C%5B%22project_type%3Amod%22%5D%2C%5B%22versions%3A1.8.9%22%2C%22versions%3A1.12.2%22%2C%22versions%3A1.17.1%22%2C%22versions%3A1.18.2%22%2C%22versions%3A1.19%22%2C%22versions%3A1.19.2%22%2C%22versions%3A1.19.3%22%2C%22versions%3A1.19.4%22%2C%22versions%3A1.20%22%2C%22versions%3A1.20.1%22%2C%22versions%3A1.20.2%22%2C%22versions%3A1.20.4%22%2C%22versions%3A1.20.6%22%2C%22versions%3A1.21%22%2C%22versions%3A1.21.1%22%2C%22versions%3A1.21.3%22%2C%22versions%3A1.21.4%22%2C%22versions%3A1.21.5%22%2C%22versions%3A1.21.7%22%2C%22versions%3A1.21.8%22%2C%22versions%3A1.21.10%22%2C%22versions%3A1.21.11%22%5D%5D&filters=(project_id%20NOT%20IN%20[P7dR8mSH,%20hvFnDODi,%20XaIYsn4W,%20xIEuGYOS,%20kqJFAPU9,%20H8CaAYZC,%203llatzyE,%20JyKlunuD])&index=relevance&limit=20&offset=0
+
         let facets = "[[\"client_side:optional\",\"client_side:required\"],[\"project_type:mod\"],[\"versions:1.8.9\",\"versions:1.12.2\",\"versions:1.17.1\",\"versions:1.18.2\",\"versions:1.19\",\"versions:1.19.2\",\"versions:1.19.3\",\"versions:1.19.4\",\"versions:1.20\",\"versions:1.20.1\",\"versions:1.20.2\",\"versions:1.20.4\",\"versions:1.20.6\",\"versions:1.21\",\"versions:1.21.1\",\"versions:1.21.3\",\"versions:1.21.4\",\"versions:1.21.5\",\"versions:1.21.7\",\"versions:1.21.8\",\"versions:1.21.10\",\"versions:1.21.11\"]]";
         let filter_query = "(project_id NOT IN [P7dR8mSH, hvFnDODi, XaIYsn4W, xIEuGYOS, kqJFAPU9, H8CaAYZC, 3llatzyE, JyKlunuD])";
 
@@ -1018,7 +1082,8 @@ mod tests {
             .and_then(|x| x.as_str())
             .expect("expected query_string.query");
 
-        assert_eq!(query, filter_query);
+        let expected = "(NOT project_id:(P7dR8mSH OR hvFnDODi OR XaIYsn4W OR xIEuGYOS OR kqJFAPU9 OR H8CaAYZC OR 3llatzyE OR JyKlunuD))";
+        assert_eq!(query, expected);
         assert!(
             !query.contains("NOT IN ["),
             "error case: Elasticsearch query_string cannot parse Meilisearch-style `NOT IN [..]` filters"
