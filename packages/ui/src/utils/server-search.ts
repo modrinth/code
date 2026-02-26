@@ -86,7 +86,7 @@ export function useServerSearch(opts: {
 			searchable: false,
 			options: [
 				{ id: 'vanilla', formatted_name: 'Vanilla', method: 'or', value: 'vanilla' },
-				{ id: 'modpack', formatted_name: 'Modpack', method: 'or', value: 'modpack' },
+				{ id: 'modpack', formatted_name: 'Modded', method: 'or', value: 'modpack' },
 			],
 		},
 		{
