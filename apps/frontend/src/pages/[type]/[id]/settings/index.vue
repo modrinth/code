@@ -706,8 +706,7 @@ const javaServerPatchData = computed(() => {
 			: ''
 
 	const addressChanged =
-		(javaAddress.value && javaAddress.value !== origJava?.address) ||
-		javaPort.value !== (origJava?.port ?? 25565)
+		javaAddress.value !== origJava?.address || javaPort.value !== (origJava?.port ?? 25565)
 	const contentChanged =
 		JSON.stringify(supportedGameVersions.value) !== JSON.stringify(origSupported) ||
 		recommendedGameVersion.value !== (origRecommended ?? '')
@@ -734,7 +733,7 @@ const bedrockServerPatchData = computed(() => {
 
 	const origBedrock = projectV3.value?.minecraft_bedrock_server
 	if (
-		(bedrockAddress.value && bedrockAddress.value !== origBedrock?.address) ||
+		bedrockAddress.value !== (origBedrock?.address ?? '') ||
 		bedrockPort.value !== (origBedrock?.port ?? 19132)
 	) {
 		return {
