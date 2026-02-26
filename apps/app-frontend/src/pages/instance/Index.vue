@@ -416,11 +416,15 @@ const tabs = computed(() => {
 	return allTabs
 })
 
-watch([isServerInstance, hasContent], () => {
-	if (isServerInstance.value && !hasContent.value && route.path === basePath.value) {
-		router.replace(`${basePath.value}/worlds`)
-	}
-})
+watch(
+	[isServerInstance, hasContent],
+	() => {
+		if (isServerInstance.value && !hasContent.value && route.path === basePath.value) {
+			router.replace(`${basePath.value}/worlds`)
+		}
+	},
+	{ immediate: true },
+)
 
 if (instance.value) {
 	breadcrumbs.setName(

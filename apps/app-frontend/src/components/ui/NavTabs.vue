@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -145,6 +145,15 @@ onMounted(() => {
 onUnmounted(() => {
 	window.removeEventListener('resize', pickLink)
 })
+
+watch(
+	filteredLinks,
+	async () => {
+		await nextTick()
+		pickLink()
+	},
+	{ deep: true },
+)
 
 watch(route, () => {
 	pickLink()
