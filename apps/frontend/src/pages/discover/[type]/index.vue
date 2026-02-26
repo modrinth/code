@@ -13,7 +13,6 @@ import {
 	LeftArrowIcon,
 	ListIcon,
 	MoreVerticalIcon,
-	PlayIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -808,18 +807,6 @@ function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject
 							is-server-project
 							exclude-loaders
 						>
-							<template #actions>
-								<ButtonStyled
-									color="brand"
-									type="outlined"
-									@click="handleServerProjectPlay(project)"
-								>
-									<button>
-										<PlayIcon />
-										Play
-									</button>
-								</ButtonStyled>
-							</template>
 						</ProjectCard>
 					</template>
 					<template v-else>
