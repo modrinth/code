@@ -21,7 +21,7 @@ use elasticsearch::http::transport::{
 };
 use elasticsearch::indices::{
     IndicesCreateParts, IndicesDeleteParts, IndicesExistsParts,
-    IndicesRefreshParts,
+    IndicesGetAliasParts, IndicesRefreshParts,
 };
 use elasticsearch::params::Refresh;
 use elasticsearch::tasks::TasksCancelParts;
@@ -71,6 +71,22 @@ pub struct Elasticsearch {
 }
 
 impl Elasticsearch {
+    fn get_next_index_name(&self, alias_name: &str, next: bool) -> String {
+        if next {
+            format!("{alias_name}__alt")
+        } else {
+            format!("{alias_name}__current")
+        }
+    }
+
+    fn get_index_candidates(&self, alias_name: &str) -> [String; 3] {
+        [
+            alias_name.to_string(),
+            self.get_next_index_name(alias_name, false),
+            self.get_next_index_name(alias_name, true),
+        ]
+    }
+
     fn parse_condition_query(condition: &str) -> Value {
         let (field, value, negative) =
             if let Some((f, v)) = condition.split_once("!=") {
@@ -326,35 +342,116 @@ impl Elasticsearch {
         }
     }
 
-    async fn reset_indexes(&self) -> Result<(), ApiError> {
-        for index_name in [
-            self.config.get_index_name("projects"),
-            self.config.get_index_name("projects_filtered"),
-        ] {
-            let delete = self
-                .client
-                .indices()
-                .delete(IndicesDeleteParts::Index(&[index_name.as_str()]))
-                .send()
-                .await
-                .wrap_internal_err("failed to delete Elasticsearch index")?;
+    async fn delete_index_if_exists(
+        &self,
+        index_name: &str,
+    ) -> Result<(), ApiError> {
+        let delete = self
+            .client
+            .indices()
+            .delete(IndicesDeleteParts::Index(&[index_name]))
+            .send()
+            .await
+            .wrap_internal_err("failed to delete Elasticsearch index")?;
 
-            let success_or_not_found = delete.status_code().is_success()
-                || delete.status_code() == StatusCode::NOT_FOUND;
+        let success_or_not_found = delete.status_code().is_success()
+            || delete.status_code() == StatusCode::NOT_FOUND;
 
-            if !success_or_not_found {
-                let body =
-                    delete.json::<Value>().await.unwrap_or_else(|_| json!({}));
-                return Err(ApiError::Internal(eyre!(
-                    "failed to delete Elasticsearch index `{index_name}`: {body}"
-                )));
-            }
+        if !success_or_not_found {
+            let body =
+                delete.json::<Value>().await.unwrap_or_else(|_| json!({}));
+            return Err(ApiError::Internal(eyre!(
+                "failed to delete Elasticsearch index `{index_name}`: {body}"
+            )));
         }
 
-        self.ensure_index(&self.config.get_index_name("projects"))
-            .await?;
-        self.ensure_index(&self.config.get_index_name("projects_filtered"))
-            .await?;
+        Ok(())
+    }
+
+    async fn get_alias_target(
+        &self,
+        alias_name: &str,
+    ) -> Result<Option<String>, ApiError> {
+        let response = self
+            .client
+            .indices()
+            .get_alias(IndicesGetAliasParts::Name(&[alias_name]))
+            .send()
+            .await
+            .wrap_internal_err("failed to get Elasticsearch alias")?;
+
+        if response.status_code() == StatusCode::NOT_FOUND {
+            return Ok(None);
+        }
+
+        if !response.status_code().is_success() {
+            let body =
+                response.json::<Value>().await.unwrap_or_else(|_| json!({}));
+            return Err(ApiError::Internal(eyre!(
+                "failed to get Elasticsearch alias `{alias_name}`: {body}"
+            )));
+        }
+
+        let body = response.json::<Value>().await.wrap_internal_err(
+            "failed to parse Elasticsearch alias response",
+        )?;
+        Ok(body
+            .as_object()
+            .and_then(|x| x.keys().next().cloned())
+            .filter(|x| !x.is_empty()))
+    }
+
+    async fn index_exists(&self, index_name: &str) -> Result<bool, ApiError> {
+        let exists = self
+            .client
+            .indices()
+            .exists(IndicesExistsParts::Index(&[index_name]))
+            .send()
+            .await
+            .wrap_internal_err(
+                "failed to check Elasticsearch index existence",
+            )?;
+        Ok(exists.status_code().is_success())
+    }
+
+    async fn swap_alias(
+        &self,
+        alias_name: &str,
+        next_index: &str,
+        current_index: Option<&str>,
+    ) -> Result<(), ApiError> {
+        let mut actions = vec![json!({
+            "add": {
+                "index": next_index,
+                "alias": alias_name
+            }
+        })];
+        if let Some(current_index) = current_index {
+            actions.push(json!({
+                "remove": {
+                    "index": current_index,
+                    "alias": alias_name
+                }
+            }));
+        }
+
+        let response = self
+            .client
+            .indices()
+            .update_aliases()
+            .body(json!({ "actions": actions }))
+            .send()
+            .await
+            .wrap_internal_err("failed to update Elasticsearch aliases")?;
+
+        if !response.status_code().is_success() {
+            let body =
+                response.json::<Value>().await.unwrap_or_else(|_| json!({}));
+            return Err(ApiError::Internal(eyre!(
+                "failed to swap Elasticsearch alias `{alias_name}`: {body}"
+            )));
+        }
+
         Ok(())
     }
 
@@ -533,11 +630,9 @@ impl SearchBackend for Elasticsearch {
             .map(|source| -> Result<ResultSearchProject, ApiError> {
                 let source =
                     serde_json::from_value::<UploadSearchProject>(source)
-                        .map_err(|e| {
-                            ApiError::Internal(eyre!(
-                                "failed to deserialize Elasticsearch hit: {e}"
-                            ))
-                        })?;
+                        .wrap_internal_err(
+                            "failed to deserialize Elasticsearch hit",
+                        )?;
 
                 Ok(ResultSearchProject {
                     version_id: source.version_id,
@@ -571,11 +666,8 @@ impl SearchBackend for Elasticsearch {
             .and_then(|aggs| aggs.get("unique_projects"))
             .and_then(|unique| unique.get("value"))
             .and_then(Value::as_u64)
-            .ok_or_else(|| {
-                ApiError::Internal(eyre!(
-                    "missing `aggregations.unique_projects.value` in Elasticsearch response - aggregations: {aggregations:?}"
-                ))
-            })? as usize;
+            .map(|v| v as usize)
+            .wrap_internal_err_with(|| eyre!("missing `aggregations.unique_projects.value` in Elasticsearch response - aggregations: {aggregations:?}"))?;
 
         Ok(SearchResults {
             hits,
@@ -590,10 +682,37 @@ impl SearchBackend for Elasticsearch {
         ro_pool: PgPool,
         _redis: RedisPool,
     ) -> eyre::Result<()> {
-        self.reset_indexes().await?;
+        let projects_alias = self.config.get_index_name("projects");
+        let filtered_alias = self.config.get_index_name("projects_filtered");
 
-        let projects_index = self.config.get_index_name("projects");
-        let filtered_index = self.config.get_index_name("projects_filtered");
+        let projects_current = self.get_alias_target(&projects_alias).await?;
+        let filtered_current = self.get_alias_target(&filtered_alias).await?;
+        let projects_legacy_current = projects_current.is_none()
+            && self.index_exists(&projects_alias).await?;
+        let filtered_legacy_current = filtered_current.is_none()
+            && self.index_exists(&filtered_alias).await?;
+
+        let projects_next = if projects_current
+            .as_deref()
+            .is_some_and(|x| x.ends_with("__alt"))
+        {
+            self.get_next_index_name(&projects_alias, false)
+        } else {
+            self.get_next_index_name(&projects_alias, true)
+        };
+        let filtered_next = if filtered_current
+            .as_deref()
+            .is_some_and(|x| x.ends_with("__alt"))
+        {
+            self.get_next_index_name(&filtered_alias, false)
+        } else {
+            self.get_next_index_name(&filtered_alias, true)
+        };
+
+        self.delete_index_if_exists(&projects_next).await?;
+        self.delete_index_if_exists(&filtered_next).await?;
+        self.ensure_index(&projects_next).await?;
+        self.ensure_index(&filtered_next).await?;
         let mut cursor = 0_i64;
 
         loop {
@@ -608,18 +727,45 @@ impl SearchBackend for Elasticsearch {
                 break;
             }
 
-            self.bulk_index_documents(&projects_index, &uploads).await?;
-            self.bulk_index_documents(&filtered_index, &uploads).await?;
+            self.bulk_index_documents(&projects_next, &uploads).await?;
+            self.bulk_index_documents(&filtered_next, &uploads).await?;
             cursor = next_cursor;
         }
 
-        let indices = [projects_index.as_str(), filtered_index.as_str()];
+        let indices = [projects_next.as_str(), filtered_next.as_str()];
         self.client
             .indices()
             .refresh(IndicesRefreshParts::Index(&indices))
             .send()
             .await
             .wrap_internal_err("failed to refresh Elasticsearch indexes")?;
+
+        if projects_legacy_current {
+            self.delete_index_if_exists(&projects_alias).await?;
+        }
+        if filtered_legacy_current {
+            self.delete_index_if_exists(&filtered_alias).await?;
+        }
+
+        self.swap_alias(
+            &projects_alias,
+            &projects_next,
+            projects_current.as_deref(),
+        )
+        .await?;
+        self.swap_alias(
+            &filtered_alias,
+            &filtered_next,
+            filtered_current.as_deref(),
+        )
+        .await?;
+
+        if let Some(index) = projects_current {
+            self.delete_index_if_exists(&index).await?;
+        }
+        if let Some(index) = filtered_current {
+            self.delete_index_if_exists(&index).await?;
+        }
 
         Ok(())
     }
@@ -631,40 +777,43 @@ impl SearchBackend for Elasticsearch {
 
         let ids_base62 =
             ids.iter().map(|id| to_base62(id.0)).collect::<Vec<_>>();
-        for index_name in [
+        for alias_name in [
             self.config.get_index_name("projects"),
             self.config.get_index_name("projects_filtered"),
         ] {
-            let response = self
-                .client
-                .delete_by_query(DeleteByQueryParts::Index(&[
-                    index_name.as_str()
-                ]))
-                .refresh(true)
-                .body(json!({
-                    "query": {
-                        "terms": {
-                            "version_id": ids_base62
+            let index_names = self.get_index_candidates(&alias_name);
+            for index_name in index_names {
+                let response = self
+                    .client
+                    .delete_by_query(DeleteByQueryParts::Index(&[
+                        index_name.as_str()
+                    ]))
+                    .refresh(true)
+                    .body(json!({
+                        "query": {
+                            "terms": {
+                                "version_id": ids_base62
+                            }
                         }
-                    }
-                }))
-                .send()
-                .await
-                .wrap_internal_err(
-                    "failed to delete Elasticsearch documents by query",
-                )?;
-            let status = response.status_code();
-            if status == StatusCode::NOT_FOUND {
-                continue;
-            }
-            if !status.is_success() {
-                let body = response
-                    .json::<Value>()
+                    }))
+                    .send()
                     .await
-                    .unwrap_or_else(|_| json!({}));
-                return Err(eyre!(
-                    "failed to delete documents from index `{index_name}`: {body}"
-                ));
+                    .wrap_internal_err(
+                        "failed to delete Elasticsearch documents by query",
+                    )?;
+                let status = response.status_code();
+                if status == StatusCode::NOT_FOUND {
+                    continue;
+                }
+                if !status.is_success() {
+                    let body = response
+                        .json::<Value>()
+                        .await
+                        .unwrap_or_else(|_| json!({}));
+                    return Err(eyre!(
+                        "failed to delete documents from index `{index_name}`: {body}"
+                    ));
+                }
             }
         }
 
