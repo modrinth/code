@@ -745,6 +745,9 @@ function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 							"
+							:max-tags="2"
+							is-server-project
+							excludeLoaders
 						>
 							<template #actions>
 								<ButtonStyled

@@ -50,6 +50,7 @@
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
 						<ServerDetails
+							v-if="isServerProject"
 							:region="serverRegionCode"
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
@@ -68,7 +69,7 @@
 							:tags="tags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="6 + (!!environment ? 0 : 1)"
+							:max-tags="(maxTags || 6) + (!!environment ? 0 : 1)"
 						/>
 						<ServerModpackContent
 							v-if="serverModpackContent"
@@ -133,6 +134,7 @@
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
 				<div class="flex items-center gap-2 flex-wrap">
 					<ServerDetails
+						v-if="isServerProject"
 						:region="serverRegionCode"
 						:online-players="serverOnlinePlayers"
 						:recent-plays="serverRecentPlays"
@@ -152,7 +154,7 @@
 							:extra-tags="extraTags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+							:max-tags="(maxTags || (!!$slots.actions ? 4 : 5)) + (!!environment ? 0 : 1)"
 						/>
 					</div>
 					<ServerModpackContent
@@ -221,10 +223,12 @@ const props = defineProps<{
 		icon?: string
 		onclick?: () => void
 	}
+	isServerProject?: boolean
 	banner?: string
 	color?: string | number
 	environment?: ProjectCardEnvironmentProps
 	status?: ProjectStatus
+	maxTags?: number
 }>()
 
 const baseCardStyle =
