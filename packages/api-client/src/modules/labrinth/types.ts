@@ -408,11 +408,10 @@ export namespace Labrinth {
 			}
 
 			export interface MinecraftServer {
-				// num players
-				// latency tbd
 				max_players?: number
 				country?: string
 				active_version?: string
+				languages?: string[] // TODO_SERVER_PROJECTS: ensure this is what backend returns
 			}
 
 			interface ModpackContent {

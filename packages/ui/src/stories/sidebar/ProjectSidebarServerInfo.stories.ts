@@ -44,6 +44,10 @@ export const Default: Story = {
 					supported_game_versions: ['1.21.4', '1.21.3', '1.21.1'],
 				},
 			},
+			minecraft_server: {
+				country: 'US',
+				languages: ['English'],
+			},
 		} as any,
 		tags,
 		ping: 42,
@@ -59,11 +63,60 @@ export const WithRequiredContent: Story = {
 					kind: 'modpack',
 				},
 			},
+			minecraft_server: {
+				country: 'DE',
+				languages: ['English', 'German'],
+			},
 		} as any,
 		tags,
 		requiredContent: {
 			name: 'Better MC [FABRIC] - BMC4',
+			versionNumber: 'v32.1',
 			icon: 'https://cdn.modrinth.com/data/shrsKXYP/f68f3d07878e3cd26e33c1e379b85cdfc0e85a6d_96.webp',
+			onclickName: () => {
+				alert('Go to modpack project')
+			},
+			onclickVersion: () => {
+				alert('Go to modpack version')
+			},
+			onclickDownload: () => {
+				alert('Download content')
+			},
+		},
+		recommendedVersion: '1.21.4',
+		supportedVersions: ['1.21.4', '1.21.1', '1.20.4'],
+		ping: 85,
+	},
+}
+
+export const WithRequiredContentDownload: Story = {
+	args: {
+		projectV3: {
+			minecraft_java_server: {
+				address: 'mc.modrinth.com',
+				content: {
+					kind: 'modpack',
+				},
+			},
+			minecraft_server: {
+				country: 'DE',
+				languages: ['English', 'German'],
+			},
+		} as any,
+		tags,
+		requiredContent: {
+			name: 'Better MC [FABRIC] - BMC4',
+			versionNumber: 'v32.1',
+			icon: 'https://cdn.modrinth.com/data/shrsKXYP/f68f3d07878e3cd26e33c1e379b85cdfc0e85a6d_96.webp',
+			onclickName: () => {
+				alert('Go to modpack project')
+			},
+			onclickVersion: () => {
+				alert('Go to modpack version')
+			},
+			onclickDownload: () => {
+				alert('Download content')
+			},
 		},
 		recommendedVersion: '1.21.4',
 		supportedVersions: ['1.21.4', '1.21.1', '1.20.4'],
@@ -113,8 +166,33 @@ export const HighLatency: Story = {
 					supported_game_versions: ['1.21.4', '1.21.1'],
 				},
 			},
+			minecraft_server: {
+				country: 'JP',
+				languages: ['Japanese', 'English'],
+			},
 		} as any,
 		tags,
 		ping: 350,
+	},
+}
+
+export const WithLanguages: Story = {
+	args: {
+		projectV3: {
+			minecraft_java_server: {
+				address: 'eu.example.com',
+				content: {
+					kind: 'vanilla',
+					recommended_game_version: '1.21.4',
+					supported_game_versions: ['1.21.4'],
+				},
+			},
+			minecraft_server: {
+				country: 'FR',
+				languages: ['French', 'English', 'Spanish', 'German', 'Portuguese'],
+			},
+		} as any,
+		tags,
+		ping: 28,
 	},
 }

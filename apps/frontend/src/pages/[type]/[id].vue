@@ -837,6 +837,7 @@
 						:required-content="serverRequiredContent"
 						:recommended-version="serverRecommendedVersion"
 						:supported-versions="serverSupportedVersions"
+						:loaders="serverModpackLoaders"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
@@ -1640,10 +1641,21 @@ const { data: serverModpackProject } = useQuery({
 
 const serverRequiredContent = computed(() => {
 	if (!serverModpackProject.value) return null
+	const primaryFile =
+		serverModpackVersion.value?.files?.find((f) => f.primary) ??
+		serverModpackVersion.value?.files?.[0]
 	return {
 		name: serverModpackProject.value.name,
+		versionNumber: serverModpackVersion.value?.version_number ?? '',
 		icon: serverModpackProject.value.icon_url,
-		onclick: () => router.push(`/project/${serverModpackProject.value.slug}`),
+		onclickName: () => router.push(`/project/${serverModpackProject.value.slug}`),
+		onclickVersion: () =>
+			router.push(
+				`/project/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
+			),
+		onclickDownload: primaryFile?.url
+			? () => navigateTo(primaryFile.url, { external: true })
+			: undefined,
 	}
 })
 
@@ -1671,6 +1683,11 @@ const serverSupportedVersions = computed(() => {
 	}
 
 	return []
+})
+
+const serverModpackLoaders = computed(() => {
+	if (!serverModpackVersion.value) return []
+	return serverModpackVersion.value.mrpack_loaders ?? []
 })
 
 // Members

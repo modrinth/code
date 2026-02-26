@@ -15,6 +15,7 @@
 				:required-content="serverRequiredContent"
 				:recommended-version="serverRecommendedVersion"
 				:supported-versions="serverSupportedVersions"
+				:loaders="serverModpackLoaders"
 				:ping="serverPing"
 				class="project-sidebar-section"
 			/>
@@ -277,6 +278,7 @@ const projectV3 = shallowRef(null)
 const serverRequiredContent = shallowRef(null)
 const serverRecommendedVersion = shallowRef(null)
 const serverSupportedVersions = shallowRef([])
+const serverModpackLoaders = shallowRef([])
 const serverPing = ref(undefined)
 
 const instanceFilters = computed(() => {
@@ -361,6 +363,7 @@ async function fetchProjectData() {
 		const modpackVersion = await get_version(content.version_id, 'bypass').catch(handleError)
 		if (modpackVersion) {
 			serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
+			serverModpackLoaders.value = modpackVersion.mrpack_loaders ?? []
 			if (modpackVersion.project_id) {
 				const modpackProject = await get_project_v3(
 					modpackVersion.project_id,
@@ -369,11 +372,14 @@ async function fetchProjectData() {
 				if (modpackProject) {
 					serverRequiredContent.value = {
 						name: modpackProject.name,
+						versionNumber: modpackVersion.version_number ?? '',
 						icon: modpackProject.icon_url,
-						onclick:
+						onclickName:
 							modpackProject.id !== project.id
 								? () => router.push(`/project/${modpackProject.id}`)
 								: undefined,
+						onclickVersion: () =>
+							router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`),
 					}
 				}
 			}
