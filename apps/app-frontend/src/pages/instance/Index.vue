@@ -45,7 +45,7 @@
 						</template>
 
 						<template v-else>
-							<ServerOnlinePlayers v-if="playersOnline !== undefined" :online="playersOnline" />
+							<ServerOnlinePlayers :online="playersOnline ?? 0" :statusOnline="statusOnline" />
 
 							<div
 								v-if="playersOnline !== undefined && (minecraftServer?.country || ping)"
@@ -344,6 +344,7 @@ const selected = ref<unknown[]>([])
 const minecraftServer = computed(() => projectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server?.ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
+const statusOnline = computed(() => !!javaServerPingData.value)
 const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 async function fetchInstance() {

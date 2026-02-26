@@ -137,6 +137,7 @@
 						v-if="isServerProject"
 						:region="serverRegionCode"
 						:online-players="serverOnlinePlayers"
+						:status-online="serverStatusOnline"
 						:recent-plays="serverRecentPlays"
 						:ping="serverPing"
 						:hide-online-players-label="true"
@@ -215,9 +216,9 @@ const props = defineProps<{
 	displayedDate?: 'updated' | 'published'
 	serverRegionCode?: string
 	serverOnlinePlayers?: number
+	serverStatusOnline?: boolean
 	serverRecentPlays?: number
 	serverPing?: number
-	serverStatusOnline?: boolean
 	serverModpackContent?: {
 		name: string
 		icon?: string

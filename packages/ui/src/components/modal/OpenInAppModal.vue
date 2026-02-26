@@ -41,7 +41,10 @@
 							<div class="flex flex-col gap-1">
 								<span class="font-semibold text-contrast">{{ serverProject.name }}</span>
 								<div class="flex items-center gap-2 text-secondary">
-									<ServerOnlinePlayers :online="serverProject.numPlayers ?? 0" />
+									<ServerOnlinePlayers
+										:online="serverProject.numPlayers ?? 0"
+										:status-online="serverProject.statusOnline"
+									/>
 									<ServerRegion v-if="serverProject.region" :region="serverProject.region" />
 								</div>
 							</div>

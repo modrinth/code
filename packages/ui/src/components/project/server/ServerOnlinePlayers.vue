@@ -11,6 +11,7 @@ const { formatMessage } = useVIntl()
 defineProps<{
 	online: number
 	hideLabel?: boolean
+	statusOnline?: boolean
 }>()
 </script>
 <template>
@@ -18,7 +19,14 @@ defineProps<{
 		v-tooltip="`${formatNumber(online, true)} players online`"
 		class="smart-clickable:allow-pointer-events"
 	>
-		<OnlineIndicatorIcon />
+		<OnlineIndicatorIcon
+			:style="{
+				'--_color-inner': statusOnline ? 'var(--color-brand)' : 'var(--color-red)',
+				'--_color-outer': statusOnline
+					? 'var(--color-green-highlight)'
+					: 'var(--color-red-highlight)',
+			}"
+		/>
 		{{
 			hideLabel
 				? formatNumber(online, false)

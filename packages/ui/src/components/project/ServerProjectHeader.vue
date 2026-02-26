@@ -16,7 +16,8 @@
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
 				<ServerDetails
 					:online-players="playersOnline"
-					:recent-plays="javaServer?.verified_plays_4w"
+					:status-online="statusOnline"
+					:recent-plays="javaServer?.verified_plays_4w ?? 0"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">
@@ -61,4 +62,5 @@ const { project, projectV3, member } = defineProps<{
 const javaServer = computed(() => projectV3?.minecraft_java_server)
 const javaServerPingData = computed(() => projectV3?.minecraft_java_server?.ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
+const statusOnline = computed(() => !!javaServerPingData.value)
 </script>
