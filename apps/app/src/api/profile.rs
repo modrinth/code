@@ -35,7 +35,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit_icon,
             profile_export_mrpack,
             profile_get_pack_export_candidates,
-            profile_report_minecraft_server_play,
         ])
         .build()
 }
@@ -245,14 +244,6 @@ pub async fn profile_get_pack_export_candidates(
 ) -> Result<Vec<SafeRelativeUtf8UnixPathBuf>> {
     let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
-}
-
-#[tauri::command]
-pub async fn profile_report_minecraft_server_play(
-    project_id: &str,
-) -> Result<()> {
-    profile::report_minecraft_server_play(project_id).await?;
-    Ok(())
 }
 
 // Run minecraft using a profile using the default credentials

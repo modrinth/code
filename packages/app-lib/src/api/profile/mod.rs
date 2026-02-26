@@ -20,6 +20,7 @@ use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use path_util::SafeRelativeUtf8UnixPathBuf;
 use serde_json::json;
+use tracing::{info, warn};
 
 use std::collections::{HashMap, HashSet};
 
@@ -734,6 +735,32 @@ async fn run_credentials(
         mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
     }
 
+    // For server projects: track this play in analytics
+    if let Some(linked_data) = &profile.linked_data {
+        let project_id = &linked_data.project_id;
+        if !project_id.trim().is_empty() {
+            let result = fetch::post_json(
+                concat!(
+                    env!("MODRINTH_API_BASE_URL"),
+                    "analytics/minecraft-server-play"
+                ),
+                json!({
+                    "project_id": &linked_data.project_id,
+                }),
+                &state.api_semaphore,
+                &state.pool,
+            )
+            .await;
+
+            match result {
+                Ok(()) => {
+                    info!("Tracked server play for '{project_id}' in analytics")
+                }
+                Err(err) => warn!("Failed to report server play: {err:?}"),
+            }
+        }
+    }
+
     crate::launcher::launch_minecraft(
         &java_args,
         &env_args,
@@ -818,25 +845,6 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     }
 
     res
-}
-
-#[tracing::instrument]
-pub async fn report_minecraft_server_play(
-    project_id: &str,
-) -> crate::Result<()> {
-    let state = State::get().await?;
-
-    fetch::post_json(
-        concat!(
-            env!("MODRINTH_API_BASE_URL"),
-            "analytics/minecraft-server-play"
-        ),
-        json!({ "project_id": project_id }),
-        &state.api_semaphore,
-        &state.pool,
-    )
-    .await?;
-    Ok(())
 }
 
 /// Creates a json configuration for a .mrpack zipped file
