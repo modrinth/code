@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Feature"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Community"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Features"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Gameplay"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Performance impact"
   },

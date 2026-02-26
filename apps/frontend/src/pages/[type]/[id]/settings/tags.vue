@@ -221,7 +221,10 @@ const { saved, current, saving, reset, save } = useSavable(
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
-		if (x.project_type === project.value.actualProjectType) {
+		if (
+			x.project_type === project.value.actualProjectType ||
+			(x.project_type === 'minecraft_java_server' && projectV3.value?.minecraft_server != null)
+		) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []

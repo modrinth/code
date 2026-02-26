@@ -2744,6 +2744,21 @@
   "scopes.versionWrite.label": {
     "message": "Write versions"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Shader packs for older versions most likely work on newer versions with only minor issues."
+  },
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
+  },
+  "search.filter.locked.server.sync": {
+    "message": "Sync with server"
+  },
   "servers.backup.restore.in-progress.tooltip": {
     "message": "Backup restore in progress"
   },
