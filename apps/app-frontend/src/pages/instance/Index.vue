@@ -342,7 +342,7 @@ const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => projectV3.value?.minecraft_server)
-const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server_ping?.data)
+const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server?.ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
 const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 

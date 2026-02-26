@@ -58,6 +58,6 @@ const { project, projectV3, member } = defineProps<{
 }>()
 
 const javaServer = computed(() => projectV3?.minecraft_java_server)
-const javaServerPingData = computed(() => projectV3?.minecraft_java_server_ping?.data)
+const javaServerPingData = computed(() => projectV3?.minecraft_java_server?.ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
 </script>

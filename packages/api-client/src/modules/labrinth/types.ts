@@ -373,7 +373,6 @@ export namespace Labrinth {
 				minecraft_server?: MinecraftServer
 				minecraft_java_server?: MinecraftJavaServer
 				minecraft_bedrock_server?: MinecraftBedrockServer
-				minecraft_java_server_ping?: MinecraftJavaServerPing
 
 				/**
 				 * @deprecated Not recommended to use.
@@ -433,6 +432,7 @@ export namespace Labrinth {
 				content?: ModpackContent | VanillaContent
 				verified_plays_4w?: number | null
 				verified_plays_2w?: number | null
+				ping: Projects.v3.MinecraftJavaServerPing | null
 			}
 
 			export interface MinecraftBedrockServer {
@@ -901,7 +901,6 @@ export namespace Labrinth {
 				minecraft_server?: Projects.v3.MinecraftServer | null
 				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
 				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
-				minecraft_java_server_ping?: Projects.v3.MinecraftJavaServerPing | null
 				minecraft_mod?: unknown | null
 			}
 

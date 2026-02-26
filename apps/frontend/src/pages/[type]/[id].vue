@@ -1184,9 +1184,9 @@ const showVersionsCheckbox = computed(() => {
 const serverProject = computed(() => ({
 	name: project.value.title,
 	slug: project.value.slug || project.value.id,
-	numPlayers: projectV3.value?.minecraft_java_server_ping?.data?.players_online,
+	numPlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online,
 	icon: project.value.icon_url,
-	statusOnline: !!projectV3.value?.minecraft_java_server_ping?.data,
+	statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
 	region: projectV3.value?.minecraft_server?.country,
 }))
 
