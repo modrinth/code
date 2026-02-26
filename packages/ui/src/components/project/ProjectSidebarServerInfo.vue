@@ -4,17 +4,14 @@
 
 		<div
 			v-if="ipAddress"
-			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-2 h-12"
+			v-tooltip="`Copy Java IP: ${ipAddress}`"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 h-12 cursor-pointer hover:bg-button-bg-hover transition-colors"
+			@click="handleCopyIP"
 		>
-			<div v-tooltip="`Java IP: ${ipAddress}`" class="font-semibold truncate">
+			<div class="font-semibold truncate">
 				{{ ipAddress }}
 			</div>
-
-			<ButtonStyled type="transparent" size="small">
-				<button v-tooltip="'Copy IP address to clipboard'" @click="handleCopyIP">
-					<CopyIcon />
-				</button>
-			</ButtonStyled>
+			<CopyIcon class="shrink-0" />
 		</div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
@@ -80,7 +77,6 @@ import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables'
 import { injectNotificationManager } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 import ServerModpackContentCard from './server/ServerModpackContentCard.vue'
