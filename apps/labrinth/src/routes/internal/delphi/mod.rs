@@ -34,6 +34,8 @@ use crate::{
     util::{error::Context, guards::admin_key_guard},
 };
 
+pub mod rescan;
+
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("delphi")

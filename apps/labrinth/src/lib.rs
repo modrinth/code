@@ -19,6 +19,7 @@ use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
@@ -101,6 +102,15 @@ pub fn app_setup(
     }
 
     let scheduler = scheduler::Scheduler::new();
+
+    {
+        let pool_ref = pool.clone();
+        actix_rt::spawn(async move {
+            if let Err(err) = rescan_projects_in_queue(&pool_ref).await {
+                warn!("Delphi rescan failed: {err:#}");
+            }
+        });
+    }
 
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
