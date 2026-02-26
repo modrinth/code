@@ -217,6 +217,7 @@
 							:playing="playing"
 							:versions="modrinthVersions"
 							:installed="instance.install_stage !== 'installed'"
+							:is-server-instance="isServerInstance"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
@@ -302,7 +303,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
-import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
+import { finish_install, get, get_full_path, get_projects, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { handleSevereError } from '@/store/error.js'
@@ -335,6 +336,7 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
+const hasContent = ref(true)
 const projectV3 = ref<Labrinth.Projects.v3.Project>()
 const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
@@ -362,6 +364,8 @@ async function fetchInstance() {
 				if (projectV3.value?.minecraft_server != null) {
 					isServerInstance.value = true
 					await fetchModpackContent()
+					const projects = await get_projects(instance.value!.path).catch(() => ({}))
+					hasContent.value = Object.keys(projects).length > 0
 				}
 			}
 		} catch (error: any) {
@@ -402,20 +406,21 @@ watch(
 
 const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
-const tabs = computed(() => [
-	{
-		label: 'Content',
-		href: `${basePath.value}`,
-	},
-	{
-		label: 'Worlds',
-		href: `${basePath.value}/worlds`,
-	},
-	{
-		label: 'Logs',
-		href: `${basePath.value}/logs`,
-	},
-])
+const tabs = computed(() => {
+	const allTabs = []
+	if (!isServerInstance.value || hasContent.value) {
+		allTabs.push({ label: 'Content', href: `${basePath.value}` })
+	}
+	allTabs.push({ label: 'Worlds', href: `${basePath.value}/worlds` })
+	allTabs.push({ label: 'Logs', href: `${basePath.value}/logs` })
+	return allTabs
+})
+
+watch([isServerInstance, hasContent], () => {
+	if (isServerInstance.value && !hasContent.value && route.path === basePath.value) {
+		router.replace(`${basePath.value}/worlds`)
+	}
+})
 
 if (instance.value) {
 	breadcrumbs.setName(
