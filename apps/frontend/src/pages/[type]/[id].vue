@@ -862,6 +862,10 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card experimental-styles-within"
 					/>
+					<ProjectSidebarTags
+						:project="project"
+						class="card flex-card experimental-styles-within"
+					/>
 					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
 						v-if="false"
@@ -1035,6 +1039,7 @@ import {
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
+	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
 	ServerProjectHeader,

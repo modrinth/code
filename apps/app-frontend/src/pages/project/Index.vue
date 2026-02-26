@@ -40,6 +40,7 @@
 				:hide-license="isServerProject"
 				class="project-sidebar-section"
 			/>
+			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
 			<InstanceIndicator v-if="instance" :instance="instance" />
@@ -229,6 +230,7 @@ import {
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
+	ProjectSidebarTags,
 	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
