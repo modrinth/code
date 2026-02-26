@@ -25,12 +25,15 @@ const { formatMessage } = useVIntl()
 		<template v-if="ping !== undefined">
 			{{ formatMessage(pingMessage, { ping }) }}
 		</template>
-		<template v-else> Online </template>
+		<template v-else>
+			<SignalIcon />
+			Online
+		</template>
 	</TagItem>
 	<TagItem
 		v-else
 		v-tooltip="'Server is offline'"
-		class="border !border-solid border-surface-5 smart-clickable:allow-pointer-events w-max"
+		class="border !border-solid border-red bg-highlight-red text-red smart-clickable:allow-pointer-events w-max"
 	>
 		<SignalIcon />
 		Offline

@@ -58,7 +58,7 @@
 			<h3 class="text-primary text-base m-0">Country</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
 				<ServerRegion v-if="country" :region="country" />
-				<ServerPing :ping="props.ping" />
+				<ServerPing :ping="props.ping" :status-online="props.statusOnline" />
 			</div>
 		</section>
 		<section v-if="languages.length > 0" class="flex flex-col gap-2">
@@ -105,6 +105,7 @@ interface Props {
 	supportedVersions?: string[]
 	loaders?: string[]
 	ping?: number
+	statusOnline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

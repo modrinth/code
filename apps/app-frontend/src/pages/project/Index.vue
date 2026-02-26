@@ -17,6 +17,7 @@
 				:supported-versions="serverSupportedVersions"
 				:loaders="serverModpackLoaders"
 				:ping="serverPing"
+				:status-online="serverPing != null"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
@@ -275,6 +276,7 @@ const serverRecommendedVersion = shallowRef(null)
 const serverSupportedVersions = shallowRef([])
 const serverModpackLoaders = shallowRef([])
 const serverPing = ref(undefined)
+const serverStatusOnline = ref(false)
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -339,6 +341,7 @@ async function fetchProjectData() {
 
 	// Ping server for latency
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
+	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping
 	if (serverAddress) {
 		serverPing.value = undefined
 		get_server_status(serverAddress)

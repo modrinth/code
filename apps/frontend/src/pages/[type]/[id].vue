@@ -838,6 +838,7 @@
 						:recommended-version="serverRecommendedVersion"
 						:supported-versions="serverSupportedVersions"
 						:loaders="serverModpackLoaders"
+						:status-online="projectV3?.minecraft_java_server?.ping != null"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
