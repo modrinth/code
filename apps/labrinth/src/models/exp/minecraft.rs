@@ -170,6 +170,7 @@ pub struct JavaServerProject {
     /// Port which the server runs on.
     pub port: u16,
     /// What game content this server is using.
+    #[serde(default)]
     pub content: ServerContent,
 }
 
