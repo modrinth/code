@@ -43,8 +43,9 @@ pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
         .into_iter()
         .map(|file_id| FileId(file_id.cast_unsigned()));
 
-    // TODO: do we need to delete them?
-    // delete_project_reports(pool, &project_ids).await?;
+    // if we don't delete reports now, when we insert the new reports,
+    // they will conflict with the existing ones
+    delete_project_reports(pool, &project_ids).await?;
 
     try_join_all(file_ids.map(|file_id| async move {
         super::run(pool, DelphiRunParameters { file_id })
