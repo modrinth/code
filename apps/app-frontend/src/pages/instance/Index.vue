@@ -347,6 +347,12 @@ const playersOnline = computed(() => javaServerPingData.value?.players_online ??
 const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 async function fetchInstance() {
+	isServerInstance.value = false
+	projectV3.value = undefined
+	modpackContentProjectV3.value = null
+	modrinthVersions.value = []
+	hasContent.value = true
+
 	instance.value = await get(route.params.id as string).catch(handleError)
 
 	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
