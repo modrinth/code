@@ -206,13 +206,9 @@ pub async fn fetch_advanced(
     };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        // TODO_SERVER_PROJECTS figure out why circuit breaker is so harsh and uncomment once solved
-        // if is_api_url
-        //     && !cfg!(debug_assertions)
-        //     && GLOBAL_FETCH_FENCE.is_blocked()
-        // {
-        //     return Err(ErrorKind::ApiIsDownError.into());
-        // }
+        if is_api_url && GLOBAL_FETCH_FENCE.is_blocked() {
+            return Err(ErrorKind::ApiIsDownError.into());
+        }
 
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
 
