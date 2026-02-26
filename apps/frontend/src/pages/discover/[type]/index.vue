@@ -38,7 +38,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQueries, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -343,15 +343,29 @@ async function serverInstall(project: InstallableSearchResult) {
 }
 
 const noLoad = ref(false)
+
+const v3RequestParams = computed(() => {
+	const params = [`limit=${maxResults.value}`, `index=${currentSortType.value.name}`]
+	if (query.value) params.push(`query=${encodeURIComponent(query.value)}`)
+	const offset = (currentPage.value - 1) * maxResults.value
+	if (offset > 0) params.push(`offset=${offset}`)
+	params.push(`new_filters=${encodeURIComponent('project_types = minecraft_java_server')}`)
+	return `?${params.join('&')}`
+})
+
 const {
 	data: rawResults,
 	refresh: refreshSearch,
 	pending: searchLoading,
-	// TODO_SERVER_PROJECTS, replace tanstack query once search backend is in
 } = useLazyFetch(
 	() => {
 		const config = useRuntimeConfig()
-		const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+		let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+
+		if (currentType.value === 'server') {
+			base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
+			return `${base}search${v3RequestParams.value}`
+		}
 
 		return `${base}search${requestParams.value}`
 	},
@@ -359,6 +373,9 @@ const {
 		watch: false,
 		transform: (hits) => {
 			noLoad.value = false
+			if (currentType.value === 'server') {
+				console.log('[v3 search] hits:', (hits as Labrinth.Search.v3.SearchResults)?.hits)
+			}
 			return hits as Labrinth.Search.v2.SearchResults
 		},
 	},
@@ -453,34 +470,16 @@ useSeoMeta({
 	ogDescription: description,
 })
 
-// --- START HARDCODED SERVER PROJECT ---
-// TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
-// will need to query for v3 projects for card
-// another problem: server projects search should also return the required content icon and title, so then dont need to query it again
-const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
-
-const serverProjectQueries = useQueries({
-	queries: computed(() =>
-		SERVER_PROJECT_IDS.value
-			.filter((id): id is string => !!id)
-			.map((id) => ({
-				queryKey: ['discover', 'server-project', id],
-				queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
-				enabled: currentType.value === 'server',
-			})),
-	),
-})
-
-const serverProjects = computed(() =>
-	serverProjectQueries.value
-		.map((q) => q.data)
-		.filter((p): p is Labrinth.Projects.v3.Project => !!p?.minecraft_server),
+const serverHits = computed(
+	() =>
+		((rawResults.value as unknown as Labrinth.Search.v3.SearchResults)
+			?.hits as Labrinth.Search.v3.ResultSearchProject[]) ?? [],
 )
-// --- END HARDCODED SERVER PROJECT ---
 
-const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
-	if (project.minecraft_java_server?.content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = project.minecraft_java_server?.content || {}
+const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) => {
+	const content = hit.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
 		if (!project_name) return undefined
 		return {
 			name: project_name,
@@ -493,13 +492,13 @@ const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
 	return undefined
 }
 
-function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
+function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject) {
 	serverInAppModal.value?.show({
 		serverProject: {
 			name: project.name,
-			slug: project.slug,
+			slug: project.slug ?? '',
 			numPlayers: project.minecraft_java_server_ping?.data?.players_online,
-			icon: project.icon_url,
+			icon: project.icon_url ?? '',
 			statusOnline: !!project.minecraft_java_server_ping?.data,
 			region: project.minecraft_server?.country,
 		},
@@ -719,12 +718,7 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 				:provided-message="messages.providedByServer"
 			/>
 			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div
-				v-else-if="
-					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
-				"
-				class="no-results"
-			>
+			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
 				<p>No results found for your query!</p>
 			</div>
 			<div v-else class="search-results-container">
@@ -736,8 +730,8 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 				>
 					<template v-if="currentType === 'server'">
 						<ProjectCard
-							v-for="project in serverProjects"
-							:key="`server-card-${project.id}`"
+							v-for="project in serverHits"
+							:key="`server-card-${project.project_id}`"
 							:title="project.name"
 							:icon-url="project.icon_url || undefined"
 							:summary="project.summary"

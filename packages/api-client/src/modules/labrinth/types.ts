@@ -410,18 +410,18 @@ export namespace Labrinth {
 			export interface MinecraftServer {
 				max_players?: number
 				country?: string
-				active_version?: string
-				languages?: string[] // TODO_SERVER_PROJECTS: ensure this is what backend returns
+				active_version?: string | null
+				languages?: string[]
 			}
 
-			interface ModpackContent {
+			export interface ModpackContent {
 				kind: 'modpack'
 				version_id: string
 				project_id?: string
 				project_name?: string
 				project_icon?: string
 			}
-			interface VanillaContent {
+			export interface VanillaContent {
 				kind: 'vanilla'
 				supported_game_versions: string[]
 				recommended_game_version?: string
@@ -431,8 +431,8 @@ export namespace Labrinth {
 				address?: string
 				port?: number
 				content?: ModpackContent | VanillaContent
-				verified_plays_4w?: number
-				verified_plays_2w?: number
+				verified_plays_4w?: number | null
+				verified_plays_2w?: number | null
 			}
 
 			export interface MinecraftBedrockServer {
@@ -866,6 +866,43 @@ export namespace Labrinth {
 				gallery: string[]
 				featured_gallery: string | null
 				color: number | null
+			}
+
+			export interface SearchResults {
+				hits: ResultSearchProject[]
+				offset: number
+				limit: number
+				total_hits: number
+			}
+		}
+
+		export namespace v3 {
+			export interface ResultSearchProject {
+				version_id: string
+				project_id: string
+				project_types: string[]
+				slug: string | null
+				author: string
+				name: string
+				summary: string
+				categories: string[]
+				display_categories: string[]
+				downloads: number
+				follows: number
+				icon_url: string | null
+				date_created: string
+				date_modified: string
+				license: string
+				gallery: string[]
+				featured_gallery: string | null
+				color: number | null
+				loaders: string[]
+				project_loader_fields?: Record<string, unknown[]>
+				minecraft_server?: Projects.v3.MinecraftServer | null
+				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
+				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
+				minecraft_java_server_ping?: Projects.v3.MinecraftJavaServerPing | null
+				minecraft_mod?: unknown | null
 			}
 
 			export interface SearchResults {
