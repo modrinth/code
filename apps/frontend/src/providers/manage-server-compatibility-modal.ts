@@ -141,10 +141,9 @@ export function createServerCompatibilityContext(
 			}
 		}, 1500)
 		try {
-			let patchSuccess
 			switch (compatibilityType.value) {
 				case 'vanilla':
-					patchSuccess = await patchProjectV3({
+					await patchProjectV3({
 						minecraft_java_server: {
 							content: {
 								kind: 'vanilla',
@@ -153,10 +152,9 @@ export function createServerCompatibilityContext(
 							},
 						},
 					})
-
 					break
 				case 'published-modpack':
-					patchSuccess = await patchProjectV3({
+					await patchProjectV3({
 						minecraft_java_server: {
 							content: {
 								kind: 'modpack',
@@ -164,7 +162,6 @@ export function createServerCompatibilityContext(
 							},
 						},
 					})
-
 					break
 				case 'custom-modpack': {
 					if (!customModpackFile.value) break
@@ -184,33 +181,30 @@ export function createServerCompatibilityContext(
 					}
 
 					// Patch the project to point to the newly uploaded version
-					patchSuccess = await patchProjectV3({
-						minecraft_java_server: {
-							content: {
-								kind: 'modpack',
-								version_id: uploadedVersion.id,
+					try {
+						await patchProjectV3({
+							minecraft_java_server: {
+								content: {
+									kind: 'modpack',
+									version_id: uploadedVersion.id,
+								},
 							},
-						},
-					})
-
-					// If patch fails, clean up the uploaded version
-					if (!patchSuccess) {
+						})
+					} catch (err) {
+						// If patch fails, clean up the uploaded version
 						try {
 							await labrinth.versions_v3.deleteVersion(uploadedVersion.id)
 						} catch {
 							console.error('Failed to clean up uploaded version after patch failure')
 						}
+						throw err
 					}
 
 					break
 				}
 			}
-			if (!patchSuccess) {
-				throw new Error('Failed to patch project with new server compatibility settings')
-			}
 
 			await nextTick()
-
 			modal.value?.hide()
 		} finally {
 			isUploading.value = false
