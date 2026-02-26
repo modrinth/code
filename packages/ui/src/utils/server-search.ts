@@ -1,5 +1,5 @@
 import { getCategoryIcon } from '@modrinth/assets'
-import { computed, type Ref,ref } from 'vue'
+import { computed, type Ref, ref } from 'vue'
 
 import { useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
@@ -56,7 +56,7 @@ export const SERVER_SORT_TYPES: SortType[] = [
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
 	server_category: 'categories',
-	server_game_version: 'versions',
+	server_game_version: 'components.minecraft_java_server.content.supported_game_versions',
 	server_country: 'minecraft_server.country',
 	server_language: 'minecraft_server.languages',
 }
@@ -115,7 +115,9 @@ export function useServerSearch(opts: {
 			query_param: 'sgv',
 			supports_negative_filter: false,
 			searchable: true,
-			toggle_groups: [{ id: 'all_versions', formatted_name: 'Show all versions', query_param: 'sh' }],
+			toggle_groups: [
+				{ id: 'all_versions', formatted_name: 'Show all versions', query_param: 'sh' },
+			],
 			options: (tags.value?.gameVersions ?? []).map((gv) => ({
 				id: gv.version,
 				toggle_group: gv.version_type !== 'release' ? 'all_versions' : undefined,
