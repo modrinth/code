@@ -252,6 +252,7 @@
 						:multiple="true"
 						:searchable="true"
 						:show-labels="false"
+						:close-on-select="false"
 						placeholder="Select languages"
 						:disabled="!hasPermission"
 					/>
