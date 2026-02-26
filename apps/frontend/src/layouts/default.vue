@@ -39,7 +39,7 @@
 		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
 		<VerifyEmailBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			:has-email="auth?.user?.email"
+			:has-email="auth?.user?.email != null"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
