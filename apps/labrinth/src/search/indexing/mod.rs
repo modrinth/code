@@ -643,6 +643,8 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "minecraft_server.country",
     "minecraft_server.languages",
     "minecraft_java_server.content.kind",
+    "minecraft_java_server.content.supported_game_versions",
+    "minecraft_java_server.content.recommended_game_version",
     "minecraft_java_server.verified_plays_2w",
     "minecraft_java_server.ping.data.players_online",
 ];
