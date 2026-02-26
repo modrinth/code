@@ -93,7 +93,20 @@ impl Elasticsearch {
             // Meilisearch behavior for quoted/multi-word values.
             "name" | "summary" | "author" | "slug" => json!({
                 "match_phrase": {
-                    field: value
+                    field: {
+                        "value": value,
+                        "case_insensitive": true
+                    }
+                }
+            }),
+            "categories" | "license" | "project_types" | "project_id"
+            | "environment" | "game_versions" | "mrpack_loaders"
+            | "client_side" | "server_side" => json!({
+                "term": {
+                    field: {
+                        "value": value,
+                        "case_insensitive": true
+                    }
                 }
             }),
             _ => json!({
@@ -552,14 +565,15 @@ impl SearchBackend for Elasticsearch {
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
-        let total_hits = response_body
-            .get("aggregations")
+        let aggregations = response_body.get("aggregations");
+
+        let total_hits = aggregations
             .and_then(|aggs| aggs.get("unique_projects"))
             .and_then(|unique| unique.get("value"))
             .and_then(Value::as_u64)
             .ok_or_else(|| {
                 ApiError::Internal(eyre!(
-                    "missing `aggregations.unique_projects.value` in Elasticsearch response"
+                    "missing `aggregations.unique_projects.value` in Elasticsearch response - aggregations: {aggregations:?}"
                 ))
             })? as usize;
 
