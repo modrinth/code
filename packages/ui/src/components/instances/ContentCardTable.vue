@@ -1,26 +1,46 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
+import { computed, getCurrentInstance, ref, toRef } from 'vue'
 
 import { useVIntl } from '../../composables/i18n'
+import { useStickyObserver } from '../../composables/sticky-observer'
+import { useVirtualScroll } from '../../composables/virtual-scroll'
 import { commonMessages } from '../../utils/common-messages'
 import Checkbox from '../base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
-import type { ContentCardTableItem } from './types'
+import type {
+	ContentCardTableItem,
+	ContentCardTableSortColumn,
+	ContentCardTableSortDirection,
+} from './types'
 
 const { formatMessage } = useVIntl()
-
-const BUFFER_SIZE = 5
 
 interface Props {
 	items: ContentCardTableItem[]
 	showSelection?: boolean
+	sortable?: boolean
+	sortBy?: ContentCardTableSortColumn
+	sortDirection?: ContentCardTableSortDirection
 	virtualized?: boolean
+	hideDelete?: boolean
+	hideHeader?: boolean
+	flat?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	showSelection: false,
+	sortable: false,
+	sortBy: undefined,
+	sortDirection: 'asc',
 	virtualized: true,
+	hideDelete: false,
+	hideHeader: false,
+	flat: false,
 })
+
+const stickyHeaderRef = ref<HTMLElement | null>(null)
+const { isStuck } = useStickyObserver(stickyHeaderRef, 'ContentCardTable')
 
 const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
 
@@ -28,118 +48,49 @@ const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
 	delete: [id: string]
 	update: [id: string]
+	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
-// Virtualization state
-const listContainer = ref<HTMLElement | null>(null)
-const scrollContainer = ref<HTMLElement | Window | null>(null)
-const scrollTop = ref(0)
-const viewportHeight = ref(0)
-const itemHeight = 74
+// Check if any actions are available
+const instance = getCurrentInstance()
+const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
+const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasEnabledListener = computed(
+	() => typeof instance?.vnode.props?.['onUpdate:enabled'] === 'function',
+)
 
-const totalHeight = computed(() => props.items.length * itemHeight)
+const hasAnyActions = computed(() => {
+	// Check if there are listeners for actions
+	const hasListeners =
+		(hasDeleteListener.value && !props.hideDelete) ||
+		hasUpdateListener.value ||
+		hasEnabledListener.value
 
-// Find the nearest scrollable ancestor
-function findScrollableAncestor(element: HTMLElement | null): HTMLElement | Window {
-	if (!element) return window
+	// Check if any items have overflow options or updates
+	const hasItemActions = props.items.some(
+		(item) =>
+			(item.overflowOptions && item.overflowOptions.length > 0) ||
+			item.hasUpdate ||
+			item.enabled !== undefined,
+	)
 
-	let current: HTMLElement | null = element.parentElement
-	while (current) {
-		const style = getComputedStyle(current)
-		const overflowY = style.overflowY
-		const isScrollable =
-			(overflowY === 'auto' || overflowY === 'scroll') &&
-			current.scrollHeight > current.clientHeight
-
-		if (isScrollable) {
-			return current
-		}
-		current = current.parentElement
-	}
-	return window
-}
-
-function getScrollTop(container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return window.scrollY
-	}
-	return container.scrollTop
-}
-
-function getViewportHeight(container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return window.innerHeight
-	}
-	return container.clientHeight
-}
-
-function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window): number {
-	if (container instanceof Window) {
-		return listEl.getBoundingClientRect().top + window.scrollY
-	}
-	// For element containers, get the offset relative to the scroll container
-	const listRect = listEl.getBoundingClientRect()
-	const containerRect = container.getBoundingClientRect()
-	return listRect.top - containerRect.top + container.scrollTop
-}
-
-const visibleRange = computed(() => {
-	if (!props.virtualized) {
-		return { start: 0, end: props.items.length }
-	}
-
-	if (!listContainer.value || !scrollContainer.value) return { start: 0, end: 0 }
-
-	const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
-	const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
-
-	const start = Math.floor(relativeScrollTop / itemHeight)
-	const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
-
-	return {
-		start: Math.max(0, start - BUFFER_SIZE),
-		end: Math.min(props.items.length, start + visibleCount + BUFFER_SIZE * 2),
-	}
+	return hasListeners || hasItemActions
 })
 
-const visibleTop = computed(() => (props.virtualized ? visibleRange.value.start * itemHeight : 0))
-
-const visibleItems = computed(() =>
-	props.items.slice(visibleRange.value.start, visibleRange.value.end),
+// Virtualization
+const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
+	toRef(props, 'items'),
+	{
+		itemHeight: 74,
+		bufferSize: 5,
+		enabled: toRef(props, 'virtualized'),
+	},
 )
 
 // Expose for perf monitoring
 defineExpose({
 	visibleRange,
 	visibleItems,
-})
-
-function handleScroll() {
-	if (scrollContainer.value) {
-		scrollTop.value = getScrollTop(scrollContainer.value)
-	}
-}
-
-function handleResize() {
-	if (scrollContainer.value) {
-		viewportHeight.value = getViewportHeight(scrollContainer.value)
-	}
-}
-
-onMounted(() => {
-	scrollContainer.value = findScrollableAncestor(listContainer.value)
-	viewportHeight.value = getViewportHeight(scrollContainer.value)
-	scrollTop.value = getScrollTop(scrollContainer.value)
-
-	scrollContainer.value.addEventListener('scroll', handleScroll, { passive: true })
-	window.addEventListener('resize', handleResize, { passive: true })
-})
-
-onUnmounted(() => {
-	if (scrollContainer.value) {
-		scrollContainer.value.removeEventListener('scroll', handleScroll)
-	}
-	window.removeEventListener('resize', handleResize)
 })
 
 // Selection logic
@@ -153,7 +104,7 @@ const someSelected = computed(() => {
 })
 
 function toggleSelectAll() {
-	if (allSelected.value) {
+	if (allSelected.value || someSelected.value) {
 		selectedIds.value = []
 	} else {
 		selectedIds.value = props.items.map((item) => item.id)
@@ -173,35 +124,85 @@ function toggleItemSelection(itemId: string, selected: boolean) {
 function isItemSelected(itemId: string): boolean {
 	return selectedIds.value.includes(itemId)
 }
+
+function handleSort(column: ContentCardTableSortColumn) {
+	if (!props.sortable) return
+
+	const newDirection: ContentCardTableSortDirection =
+		props.sortBy === column && props.sortDirection === 'asc' ? 'desc' : 'asc'
+
+	emit('sort', column, newDirection)
+}
 </script>
 
 <template>
-	<div class="overflow-hidden rounded-[20px] border border-solid border-surface-3">
+	<div
+		class="@container border border-solid border-surface-4 shadow-sm overflow-clip"
+		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
+	>
 		<div
-			class="grid h-12 items-center gap-4 bg-surface-3 px-4"
-			:class="
-				showSelection
-					? 'grid-cols-[auto_1fr_1fr] md:grid-cols-[auto_1fr_335px_1fr]'
-					: 'grid-cols-[1fr_1fr] md:grid-cols-[1fr_335px_1fr]'
-			"
+			v-if="!hideHeader"
+			ref="stickyHeaderRef"
+			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
+			:class="[
+				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
+				isStuck
+					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
+					: '',
+			]"
 		>
-			<Checkbox
-				v-if="showSelection"
-				:model-value="allSelected"
-				:indeterminate="someSelected"
-				class="shrink-0"
-				@update:model-value="toggleSelectAll"
-			/>
+			<div
+				class="flex min-w-0 items-center gap-4"
+				:class="
+					hasAnyActions
+						? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+						: 'flex-1'
+				"
+			>
+				<Checkbox
+					v-if="showSelection"
+					:model-value="allSelected"
+					:indeterminate="someSelected"
+					class="shrink-0"
+					@update:model-value="toggleSelectAll"
+				/>
 
-			<span class="font-semibold text-contrast">
-				{{ formatMessage(commonMessages.projectLabel) }}
-			</span>
+				<button
+					v-if="sortable"
+					class="flex items-center gap-1.5 font-semibold text-secondary"
+					@click="handleSort('project')"
+				>
+					{{ formatMessage(commonMessages.projectLabel) }}
+					<ChevronUpIcon v-if="sortBy === 'project' && sortDirection === 'asc'" class="size-4" />
+					<ChevronDownIcon
+						v-else-if="sortBy === 'project' && sortDirection === 'desc'"
+						class="size-4"
+					/>
+				</button>
+				<span v-else class="font-semibold text-secondary">{{
+					formatMessage(commonMessages.projectLabel)
+				}}</span>
+			</div>
 
-			<span class="hidden font-semibold text-secondary md:block">
-				{{ formatMessage(commonMessages.versionLabel) }}
-			</span>
+			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
+				<button
+					v-if="sortable"
+					class="flex items-center gap-1.5 font-semibold text-secondary"
+					@click="handleSort('version')"
+				>
+					{{ formatMessage(commonMessages.versionLabel) }}
+					<ChevronUpIcon v-if="sortBy === 'version' && sortDirection === 'asc'" class="size-4" />
+					<ChevronDownIcon
+						v-else-if="sortBy === 'version' && sortDirection === 'desc'"
+						class="size-4"
+					/>
+				</button>
+				<span v-else class="font-semibold text-secondary">{{
+					formatMessage(commonMessages.versionLabel)
+				}}</span>
+			</div>
 
-			<div class="text-right">
+			<div v-if="hasAnyActions" class="min-w-[160px] shrink-0 text-right">
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -211,7 +212,8 @@ function isItemSelected(itemId: string): boolean {
 		<div
 			v-if="items.length > 0 && virtualized"
 			ref="listContainer"
-			class="relative w-full rounded-b-[20px]"
+			class="relative w-full"
+			:class="flat ? '' : 'rounded-b-[20px]'"
 			:style="{ minHeight: `${totalHeight}px` }"
 		>
 			<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
@@ -222,17 +224,20 @@ function isItemSelected(itemId: string): boolean {
 					:project="item.project"
 					:project-link="item.projectLink"
 					:version="item.version"
+					:version-link="item.versionLink"
 					:owner="item.owner"
 					:enabled="item.enabled"
 					:has-update="item.hasUpdate"
 					:overflow-options="item.overflowOptions"
 					:disabled="item.disabled"
 					:show-checkbox="showSelection"
+					:hide-delete="hideDelete"
+					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
 						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-						'border-t border-solid border-[1px] border-surface-3',
-						visibleRange.start + idx === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
+						'border-0 border-t border-solid border-surface-4',
+						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
 					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -249,7 +254,7 @@ function isItemSelected(itemId: string): boolean {
 			</div>
 		</div>
 
-		<div v-else-if="items.length > 0" ref="listContainer" class="rounded-b-[20px]">
+		<div v-else-if="items.length > 0" ref="listContainer" :class="flat ? '' : 'rounded-b-[20px]'">
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"
@@ -257,17 +262,20 @@ function isItemSelected(itemId: string): boolean {
 				:project="item.project"
 				:project-link="item.projectLink"
 				:version="item.version"
+				:version-link="item.versionLink"
 				:owner="item.owner"
 				:enabled="item.enabled"
 				:has-update="item.hasUpdate"
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
 				:show-checkbox="showSelection"
+				:hide-delete="hideDelete"
+				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
 					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
-					'border-t border-solid border-surface-3',
-					index === items.length - 1 ? 'rounded-b-[20px] !border-none' : '',
+					'border-0 border-t border-solid border-surface-4',
+					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
@@ -283,7 +291,11 @@ function isItemSelected(itemId: string): boolean {
 			</ContentCardItem>
 		</div>
 
-		<div v-else class="flex items-center justify-center rounded-b-[20px] py-12">
+		<div
+			v-else
+			class="flex items-center justify-center py-12"
+			:class="flat ? '' : 'rounded-b-[20px]'"
+		>
 			<slot name="empty">
 				<span class="text-secondary">{{ formatMessage(commonMessages.noItemsLabel) }}</span>
 			</slot>
