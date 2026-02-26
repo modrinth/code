@@ -54,6 +54,7 @@
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
+							:status-online="serverStatusOnline"
 							:hide-online-players-label="true"
 							:hide-recent-plays-label="true"
 						/>
@@ -214,6 +215,7 @@ const props = defineProps<{
 	serverOnlinePlayers?: number
 	serverRecentPlays?: number
 	serverPing?: number
+	serverStatusOnline?: boolean
 	serverModpackContent?: {
 		name: string
 		icon?: string

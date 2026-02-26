@@ -10,6 +10,7 @@ const { formatMessage } = useVIntl()
 
 defineProps<{
 	online: number
+	hideLabel?: boolean
 }>()
 </script>
 <template>
@@ -19,9 +20,11 @@ defineProps<{
 	>
 		<OnlineIndicatorIcon />
 		{{
-			formatMessage(commonMessages.projectOnlinePlayerCount, {
-				count: formatNumber(online, false),
-			})
+			hideLabel
+				? formatNumber(online, false)
+				: formatMessage(commonMessages.projectOnlinePlayerCount, {
+						count: formatNumber(online, false),
+					})
 		}}
 	</StatItem>
 </template>

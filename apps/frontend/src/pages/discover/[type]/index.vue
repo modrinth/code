@@ -743,9 +743,10 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 							:summary="project.summary"
 							:tags="project.categories"
 							:link="`/server/${project.slug}`"
-							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
-							:server-recent-plays="project.minecraft_java_server?.verified_plays_4w"
+							:server-online-players="project.minecraft_java_server_ping?.data?.players_online ?? 0"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_4w ?? 0"
 							:server-region-code="project.minecraft_server?.country"
+							:server-status-online="!!project.minecraft_java_server_ping?.data"
 							:server-modpack-content="getServerModpackContent(project)"
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'

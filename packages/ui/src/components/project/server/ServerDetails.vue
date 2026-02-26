@@ -10,6 +10,7 @@ defineProps<{
 	recentPlays?: number
 	region?: string
 	ping?: number
+	statusOnline?: boolean
 	modpackContent?: {
 		name: string
 		icon?: string
@@ -32,7 +33,7 @@ defineProps<{
 			:hide-label="hideRecentPlaysLabel"
 		/>
 		<ServerRegion v-if="region" :region="region" />
-		<ServerPing v-if="ping !== undefined" :ping="ping" />
+		<ServerPing :ping="ping" :status-online="statusOnline" />
 		<ServerModpackContent
 			v-if="modpackContent"
 			:name="modpackContent.name"
