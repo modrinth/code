@@ -341,7 +341,7 @@ async function fetchProjectData() {
 
 	// Ping server for latency
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
-	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping
+	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
 	if (serverAddress) {
 		serverPing.value = undefined
 		get_server_status(serverAddress)
