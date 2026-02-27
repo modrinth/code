@@ -99,9 +99,12 @@ const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
 await updateInstanceContext()
 
-watch(route, () => {
-	updateInstanceContext()
-})
+watch(
+	() => [route.query.i, route.query.ai, route.path],
+	() => {
+		updateInstanceContext()
+	},
+)
 
 async function updateInstanceContext() {
 	if (route.query.i) {
@@ -186,8 +189,8 @@ const {
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
 
-const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
-const serverPings = ref<Record<string, number | undefined>>({})
+const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
+const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
 async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
@@ -259,6 +262,7 @@ async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 }
 
 const previousFilterState = ref('')
+const isRefreshing = ref(false)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -304,84 +308,93 @@ watch(effectiveRequestParams, () => {
 })
 
 async function refreshSearch() {
-	const isServer = projectType.value === 'server'
+	if (isRefreshing.value) return
+	isRefreshing.value = true
 
-	if (isServer) {
-		const rawResults = await get_search_results_v3(serverRequestParams.value)
-		const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
-		const hits = searchResults.hits ?? []
-		serverHits.value = hits
-		serverPings.value = {}
-		pingServerHits(hits)
-		checkServerRunningStates(hits)
-		results.value = {
-			hits: [],
-			total_hits: searchResults.total_hits ?? 0,
-			limit: maxResults.value,
+	try {
+		const isServer = projectType.value === 'server'
+
+		if (isServer) {
+			const rawResults = await get_search_results_v3(serverRequestParams.value)
+			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
+			const hits = searchResults.hits ?? []
+			serverHits.value = hits
+			serverPings.value = {}
+			pingServerHits(hits)
+			checkServerRunningStates(hits)
+			results.value = {
+				hits: [],
+				total_hits: searchResults.total_hits ?? 0,
+				limit: maxResults.value,
+			}
+		} else {
+			let rawResults = await get_search_results(requestParams.value)
+			if (!rawResults) {
+				rawResults = {
+					result: {
+						hits: [],
+						total_hits: 0,
+						limit: 1,
+					},
+				}
+			}
+			if (instance.value) {
+				for (const val of rawResults.result.hits) {
+					val.installed =
+						newlyInstalled.value.includes(val.project_id) ||
+						Object.values(instanceProjects.value ?? {}).some(
+							(x) => x.metadata && x.metadata.project_id === val.project_id,
+						)
+				}
+			}
+			results.value = rawResults.result
 		}
-	} else {
-		let rawResults = await get_search_results(requestParams.value)
-		if (!rawResults) {
-			rawResults = {
-				result: {
-					hits: [],
-					total_hits: 0,
-					limit: 1,
-				},
+
+		const currentFilterState = JSON.stringify({
+			query: query.value,
+			filters: currentFilters.value,
+			sort: currentSortType.value,
+			maxResults: maxResults.value,
+			projectTypes: projectTypes.value,
+		})
+
+		if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
+			currentPage.value = 1
+		}
+
+		previousFilterState.value = currentFilterState
+
+		const persistentParams: LocationQuery = {}
+
+		for (const [key, value] of Object.entries(route.query)) {
+			if (PERSISTENT_QUERY_PARAMS.includes(key)) {
+				persistentParams[key] = value
 			}
 		}
-		if (instance.value) {
-			for (const val of rawResults.result.hits) {
-				val.installed =
-					newlyInstalled.value.includes(val.project_id) ||
-					Object.values(instanceProjects.value).some(
-						(x) => x.metadata && x.metadata.project_id === val.project_id,
-					)
-			}
+
+		if (instanceHideInstalled.value) {
+			persistentParams.ai = 'true'
+		} else {
+			delete persistentParams.ai
 		}
-		results.value = rawResults.result
-	}
 
-	const currentFilterState = JSON.stringify({
-		query: query.value,
-		filters: currentFilters.value,
-		sort: currentSortType.value,
-		maxResults: maxResults.value,
-		projectTypes: projectTypes.value,
-	})
-
-	if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
-		currentPage.value = 1
-	}
-
-	previousFilterState.value = currentFilterState
-
-	const persistentParams: LocationQuery = {}
-
-	for (const [key, value] of Object.entries(route.query)) {
-		if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-			persistentParams[key] = value
+		const params = {
+			...persistentParams,
+			...(isServer ? createServerPageParams() : createPageParams()),
 		}
-	}
 
-	if (instanceHideInstalled.value) {
-		persistentParams.ai = 'true'
-	} else {
-		delete persistentParams.ai
+		breadcrumbs.setContext({
+			name: 'Discover content',
+			link: `/browse/${projectType.value}`,
+			query: params,
+		})
+		await router.replace({ path: route.path, query: params })
+	} catch (err) {
+		console.error('Error refreshing search:', err)
+	} finally {
+		loading.value = false
+		isRefreshing.value = false
 	}
-
-	const params = {
-		...persistentParams,
-		...(isServer ? createServerPageParams() : createPageParams()),
-	}
-
-	breadcrumbs.setContext({
-		name: 'Discover content',
-		link: `/browse/${projectType.value}`,
-		query: params,
-	})
-	await router.replace({ path: route.path, query: params })
-	loading.value = false
 }
 
 async function setPage(newPageNumber: number) {
