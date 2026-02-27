@@ -10,6 +10,7 @@ pub mod gotenberg;
 pub mod medal;
 pub mod moderation;
 pub mod mural;
+pub mod notification_preferences;
 pub mod pats;
 pub mod search;
 pub mod session;
@@ -34,6 +35,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(statuses::config)
             .configure(medal::config)
             .configure(external_notifications::config)
+            .configure(notification_preferences::config)
             .configure(mural::config)
             .configure(delphi::config),
     );
