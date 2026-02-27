@@ -57,7 +57,13 @@ impl NotificationBuilder {
         let notification_ids =
             notification_ids.iter().map(|x| x.0).collect::<Vec<_>>();
 
-        sqlx::query!(
+        // Use RETURNING to get back only the notification_ids and user_ids
+        // that were actually inserted (i.e. those with sum >= 100).
+        // This is necessary because insert_many_deliveries references
+        // notifications(id) via a foreign key, passing notification_ids
+        // that were filtered out by the WHERE clause would cause a
+        // FK constraint violation and fail the entire transaction.
+        let inserted_rows = sqlx::query!(
             "
             WITH
               period_payouts AS (
@@ -83,15 +89,29 @@ impl NotificationBuilder {
               ) body
             FROM period_payouts
             WHERE sum >= 100
+            RETURNING id, user_id
             ",
             &notification_ids[..],
             &users_raw_ids[..],
             &dates_available[..],
         )
-        .execute(&mut *transaction)
+        .fetch_all(&mut *transaction)
         .await?;
 
-        let notification_types = notification_ids
+        if inserted_rows.is_empty() {
+            return Ok(());
+        }
+
+        let inserted_notification_ids: Vec<i64> =
+            inserted_rows.iter().map(|r| r.id).collect();
+        let inserted_user_raw_ids: Vec<i64> =
+            inserted_rows.iter().map(|r| r.user_id).collect();
+        let inserted_users: Vec<DBUserId> = inserted_user_raw_ids
+            .iter()
+            .map(|&id| DBUserId(id))
+            .collect();
+
+        let notification_types = inserted_notification_ids
             .iter()
             .map(|_| NotificationType::PayoutAvailable.as_str())
             .collect::<Vec<_>>();
@@ -99,10 +119,10 @@ impl NotificationBuilder {
         NotificationBuilder::insert_many_deliveries(
             transaction,
             redis,
-            &notification_ids,
-            &users_raw_ids,
+            &inserted_notification_ids,
+            &inserted_user_raw_ids,
             &notification_types,
-            &users,
+            &inserted_users,
         )
         .await?;
 

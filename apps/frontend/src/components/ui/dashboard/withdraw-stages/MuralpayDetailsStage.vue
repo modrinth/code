@@ -100,7 +100,7 @@
 			/>
 		</div>
 
-		<div v-for="field in selectedRail?.fields" :key="field.name" class="flex flex-col gap-2.5">
+		<div v-for="field in visibleFields" :key="field.name" class="flex flex-col gap-2.5">
 			<label>
 				<span class="text-md font-semibold text-contrast">
 					{{ formatMessage(field.label) }}
@@ -398,6 +398,26 @@ const isBusinessEntity = computed(() => {
 	return providerDataValue.kycData?.type === 'business'
 })
 
+const visibleFields = computed(() => {
+	const rail = selectedRail.value
+	if (!rail) return []
+
+	return rail.fields.filter((field) => {
+		if (!field.dependsOn) return true
+
+		const { field: dependsOnField, value: dependsOnValue } = field.dependsOn
+		const currentValue = formData.value[dependsOnField]
+
+		if (!currentValue) return false
+
+		if (Array.isArray(dependsOnValue)) {
+			return dependsOnValue.includes(currentValue)
+		} else {
+			return currentValue === dependsOnValue
+		}
+	})
+})
+
 const allRequiredFieldsFilled = computed(() => {
 	const rail = selectedRail.value
 	if (!rail) return false
@@ -407,7 +427,7 @@ const allRequiredFieldsFilled = computed(() => {
 
 	if (rail.requiresBankName && !formData.value.bankName) return false
 
-	const requiredFields = rail.fields.filter((f) => f.required)
+	const requiredFields = visibleFields.value.filter((f) => f.required)
 	const allRequiredPresent = requiredFields.every((f) => {
 		const value = formData.value[f.name]
 		return value !== undefined && value !== null && value !== ''
