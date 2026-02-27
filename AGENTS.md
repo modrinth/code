@@ -10,3 +10,4 @@ Project-specific skills (patterns, conventions, and implementation guides) are l
 - **[Figma MCP](./.claude/skills/figma-mcp/SKILL.md)** — Translating Figma designs to Modrinth Vue components
 - **[i18n Convert](./.claude/skills/i18n-convert/SKILL.md)** — Converting hard-coded strings to vue-i18n localization
 - **[API Module](./.claude/skills/api-module/SKILL.md)** — Adding new endpoint modules to `@modrinth/api-client`
+- **[TanStack Query](./.claude/skills/tanstack-query/SKILL.md)** — Server state management with `@tanstack/vue-query` v5
