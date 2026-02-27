@@ -63,15 +63,21 @@ const projectTypes = computed(() => {
 })
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
-	get_categories().catch(handleError).then(ref),
-	get_loaders().catch(handleError).then(ref),
-	get_game_versions().catch(handleError).then(ref),
+	get_categories()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.Category[]>),
+	get_loaders()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.Loader[]>),
+	get_game_versions()
+		.catch(handleError)
+		.then(ref<Labrinth.Tags.v2.GameVersion[]>),
 ])
 
 const tags: Ref<Tags> = computed(() => ({
-	gameVersions: availableGameVersions.value as Labrinth.Tags.v2.GameVersion[],
-	loaders: loaders.value as Labrinth.Tags.v2.Loader[],
-	categories: categories.value as Labrinth.Tags.v2.Category[],
+	gameVersions: availableGameVersions.value ?? [],
+	loaders: loaders.value ?? [],
+	categories: categories.value ?? [],
 }))
 
 type Instance = {
@@ -92,7 +98,7 @@ type InstanceProject = {
 const instance: Ref<Instance | null> = ref(null)
 const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
-const newlyInstalled = ref([])
+const newlyInstalled = ref<string[]>([])
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -276,20 +282,14 @@ breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: rout
 
 const loading = ref(true)
 
-const projectType = ref(route.params.projectType)
+const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
 
 watch(projectType, () => {
 	loading.value = true
 })
 
-type SearchResult = {
-	project_id: string
-}
-
-type SearchResults = {
-	total_hits: number
-	limit: number
-	hits: SearchResult[]
+interface SearchResults extends Labrinth.Search.v2.SearchResults {
+	hits: (Labrinth.Search.v2.ResultSearchProject & { installed?: boolean })[]
 }
 
 const results: Ref<SearchResults | null> = shallowRef(null)
@@ -329,10 +329,11 @@ async function refreshSearch() {
 				hits: [],
 				total_hits: searchResults.total_hits ?? 0,
 				limit: maxResults.value,
+				offset: 0,
 			}
 		} else {
 			let rawResults = (await get_search_results(requestParams.value)) as {
-				result: Labrinth.Search.v2.SearchResults
+				result: SearchResults
 			} | null
 
 			if (!rawResults) {
@@ -437,7 +438,7 @@ function clearSearch() {
 }
 
 watch(
-	() => route.params.projectType,
+	() => route.params.projectType as ProjectType,
 	async (newType) => {
 		// Check if the newType is not the same as the current value
 		if (!newType || newType === projectType.value) return
@@ -456,8 +457,9 @@ const selectableProjectTypes = computed(() => {
 
 	if (instance.value) {
 		if (
-			availableGameVersions.value.findIndex((x) => x.version === instance.value.game_version) <=
-			availableGameVersions.value.findIndex((x) => x.version === '1.13')
+			availableGameVersions.value &&
+			availableGameVersions.value.findIndex((x) => x.version === instance.value?.game_version) <=
+				availableGameVersions.value.findIndex((x) => x.version === '1.13')
 		) {
 			dataPacks = true
 		}
@@ -782,25 +784,14 @@ previousFilterState.value = JSON.stringify({
 						:key="result?.project_id"
 						:project-type="projectType"
 						:project="result"
-						:instance="instance"
-						:categories="[
-							...categories.filter(
-								(cat) =>
-									result?.display_categories.includes(cat.name) && cat.project_type === projectType,
-							),
-							...loaders.filter(
-								(loader) =>
-									result?.display_categories.includes(loader.name) &&
-									loader.supported_project_types?.includes(projectType),
-							),
-						]"
-						:installed="result.installed || newlyInstalled.includes(result.project_id)"
+						:instance="instance ?? undefined"
+						:installed="result.installed || newlyInstalled.includes(result.project_id || '')"
 						@install="
 							(id) => {
 								newlyInstalled.push(id)
 							}
 						"
-						@contextmenu.prevent.stop="(event) => handleRightClick(event, result)"
+						@contextmenu.prevent.stop="(event: any) => handleRightClick(event, result)"
 					/>
 				</template>
 
