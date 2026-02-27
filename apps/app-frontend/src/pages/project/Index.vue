@@ -34,6 +34,7 @@
 				link-target="_blank"
 				class="project-sidebar-section"
 			/>
+			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarDetails
 				:project="data"
 				:has-versions="versions.length > 0"
@@ -41,7 +42,6 @@
 				:hide-license="isServerProject"
 				class="project-sidebar-section"
 			/>
-			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
 			<InstanceIndicator v-if="instance" :instance="instance" />
