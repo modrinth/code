@@ -121,17 +121,17 @@
 							<label
 								class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-dashed border-surface-5 transition-colors"
 								:class="
-									!deletedBanner && (bannerPreview || featuredGalleryImage?.url)
+									!deletedBanner && (bannerPreview || bannerGalleryImage?.url)
 										? 'border-none'
 										: 'aspect-[468/60] border-2 bg-surface-2'
 								"
 							>
 								<div
-									v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
+									v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
 									class="relative h-full w-full overflow-hidden rounded-2xl"
 								>
 									<img
-										:src="bannerPreview || featuredGalleryImage?.url"
+										:src="bannerPreview || bannerGalleryImage?.url"
 										alt="Banner preview"
 										class="h-full w-full object-cover"
 									/>
@@ -167,7 +167,7 @@
 								<UploadIcon aria-hidden="true" />
 							</FileInput>
 							<button
-								v-if="!deletedBanner && (bannerPreview || featuredGalleryImage?.url)"
+								v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
 								class="iconified-button"
 								:disabled="!hasPermission"
 								@click="markBannerForDeletion"
@@ -360,11 +360,14 @@ const visibility = ref(
 )
 
 // Server project specific refs
+const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const bannerPreview = ref(null)
 const deletedBanner = ref(false)
 const bannerFile = ref(null)
-const featuredGalleryImage = computed(() => project.value.gallery?.find((img) => img.featured))
+const bannerGalleryImage = computed(() =>
+	project.value.gallery?.find((img) => img.title === MC_SERVER_BANNER_NAME),
+)
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
@@ -563,18 +566,20 @@ const uploadBanner = async () => {
 	if (!bannerFile.value) return
 
 	try {
-		// First, delete existing featured image if there is one
-		const existingFeatured = project.value.gallery?.find((img) => img.featured)
-		if (existingFeatured) {
-			await labrinth.projects_v2.deleteGalleryImage(project.value.id, existingFeatured.url)
+		// First, delete existing banner image if there is one
+		const existingBanner = project.value.gallery?.find(
+			(img) => img.title === MC_SERVER_BANNER_NAME,
+		)
+		if (existingBanner) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, existingBanner.url)
 		}
 
-		// Upload new banner as featured gallery image
+		// Upload new banner as gallery image with special title
 		const ext = bannerFile.value.type.split('/').pop() ?? 'png'
 		await labrinth.projects_v2.createGalleryImage(project.value.id, bannerFile.value, {
 			ext,
-			featured: true,
-			title: 'Banner',
+			featured: false,
+			title: MC_SERVER_BANNER_NAME,
 		})
 
 		await invalidate()
@@ -594,9 +599,11 @@ const uploadBanner = async () => {
 
 const deleteBanner = async () => {
 	try {
-		const featuredImage = project.value.gallery?.find((img) => img.featured)
-		if (featuredImage) {
-			await labrinth.projects_v2.deleteGalleryImage(project.value.id, featuredImage.url)
+		const bannerImage = project.value.gallery?.find(
+			(img) => img.title === MC_SERVER_BANNER_NAME,
+		)
+		if (bannerImage) {
+			await labrinth.projects_v2.deleteGalleryImage(project.value.id, bannerImage.url)
 			await invalidate()
 			addNotification({
 				title: 'Banner removed',
