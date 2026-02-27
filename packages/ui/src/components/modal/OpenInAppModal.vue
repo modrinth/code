@@ -182,7 +182,7 @@ const serverProject = ref<ServerProject>({
 	region: '',
 })
 const appLink = computed(() => {
-	return `modrinth://modpack/${serverProject.value.slug}`
+	return `modrinth://server/${serverProject.value.slug}`
 })
 
 function startCountdown() {
