@@ -8,14 +8,15 @@
 						<span> SFTP allows you to access your server's files from outside of Modrinth. </span>
 					</label>
 					<ButtonStyled>
-						<button
+						<a
 							v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
 							class="!w-full sm:!w-auto"
-							@click="openSftp"
+							:href="sftpUrl"
+							target="_blank"
 						>
 							<ExternalIcon class="h-5 w-5" />
 							Launch SFTP
-						</button>
+						</a>
 					</ButtonStyled>
 				</div>
 
@@ -130,10 +131,7 @@ const props = defineProps<{
 const data = computed(() => props.server.general)
 const showPassword = ref(false)
 
-const openSftp = () => {
-	const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`
-	window.open(sftpUrl, '_blank')
-}
+const sftpUrl = computed(() => `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`)
 
 const togglePassword = () => {
 	showPassword.value = !showPassword.value
