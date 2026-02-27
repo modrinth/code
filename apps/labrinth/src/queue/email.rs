@@ -5,6 +5,7 @@ use crate::database::models::notifications_template_item::NotificationTemplate;
 use crate::database::models::user_item::DBUser;
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::notifications::{NotificationBody, NotificationType};
 use crate::models::v3::notifications::{
     NotificationChannel, NotificationDeliveryStatus,
@@ -36,16 +37,16 @@ impl Mailer {
     ) -> Result<Arc<AsyncSmtpTransport<Tokio1Executor>>, MailError> {
         let maybe_transport = match self {
             Mailer::Uninitialized => {
-                let username = dotenvy::var("SMTP_USERNAME")?;
-                let password = dotenvy::var("SMTP_PASSWORD")?;
-                let host = dotenvy::var("SMTP_HOST")?;
-                let port =
-                    dotenvy::var("SMTP_PORT")?.parse::<u16>().unwrap_or(465);
+                let username = &ENV.SMTP_USERNAME;
+                let password = &ENV.SMTP_PASSWORD;
+                let host = &ENV.SMTP_HOST;
+                let port = ENV.SMTP_PORT;
 
-                let creds = (!username.is_empty())
-                    .then(|| Credentials::new(username, password));
+                let creds = (!username.is_empty()).then(|| {
+                    Credentials::new(username.clone(), password.clone())
+                });
 
-                let tls_setting = match dotenvy::var("SMTP_TLS")?.as_str() {
+                let tls_setting = match ENV.SMTP_TLS.as_str() {
                     "none" => Tls::None,
                     "opportunistic_start_tls" => Tls::Opportunistic(
                         TlsParameters::new(host.to_string())?,
@@ -65,7 +66,7 @@ impl Mailer {
                 };
 
                 let mut mailer =
-                    AsyncSmtpTransport::<Tokio1Executor>::relay(&host)?
+                    AsyncSmtpTransport::<Tokio1Executor>::relay(host)?
                         .port(port)
                         .tls(tls_setting);
 

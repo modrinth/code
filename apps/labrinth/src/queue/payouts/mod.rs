@@ -2,13 +2,13 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::payouts_values_notifications;
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodType,
     TremendousForexResponse,
 };
 use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
-use crate::util::env::env_var;
 use crate::util::error::Context;
 use crate::util::webhook::{
     PayoutSourceAlertType, send_slack_payout_source_alert_webhook,
@@ -76,21 +76,18 @@ impl Default for PayoutsQueue {
 }
 
 pub fn create_muralpay_client() -> Result<muralpay::Client> {
-    let api_url = env_var("MURALPAY_API_URL")?;
-    let api_key = env_var("MURALPAY_API_KEY")?;
-    let transfer_api_key = env_var("MURALPAY_TRANSFER_API_KEY")?;
-    Ok(muralpay::Client::new(api_url, api_key, transfer_api_key))
+    Ok(muralpay::Client::new(
+        &ENV.MURALPAY_API_URL,
+        ENV.MURALPAY_API_KEY.as_str(),
+        ENV.MURALPAY_TRANSFER_API_KEY.as_str(),
+    ))
 }
 
 pub fn create_muralpay() -> Result<MuralPayConfig> {
     let client = create_muralpay_client()?;
-    let source_account_id = env_var("MURALPAY_SOURCE_ACCOUNT_ID")?
-        .parse::<muralpay::AccountId>()
-        .wrap_err("failed to parse source account ID")?;
-
     Ok(MuralPayConfig {
         client,
-        source_account_id,
+        source_account_id: ENV.MURALPAY_SOURCE_ACCOUNT_ID,
     })
 }
 
@@ -185,11 +182,8 @@ impl PayoutsQueue {
         let mut creds = self.credential.write().await;
         let client = reqwest::Client::new();
 
-        let combined_key = format!(
-            "{}:{}",
-            dotenvy::var("PAYPAL_CLIENT_ID")?,
-            dotenvy::var("PAYPAL_CLIENT_SECRET")?
-        );
+        let combined_key =
+            format!("{}:{}", ENV.PAYPAL_CLIENT_ID, ENV.PAYPAL_CLIENT_SECRET);
         let formatted_key = format!(
             "Basic {}",
             base64::engine::general_purpose::STANDARD.encode(combined_key)
@@ -206,7 +200,7 @@ impl PayoutsQueue {
         }
 
         let credential: PaypalCredential = client
-            .post(format!("{}oauth2/token", dotenvy::var("PAYPAL_API_URL")?))
+            .post(format!("{}oauth2/token", ENV.PAYPAL_API_URL))
             .header("Accept", "application/json")
             .header("Accept-Language", "en_US")
             .header("Authorization", formatted_key)
@@ -274,7 +268,7 @@ impl PayoutsQueue {
                 if no_api_prefix.unwrap_or(false) {
                     path.to_string()
                 } else {
-                    format!("{}{path}", dotenvy::var("PAYPAL_API_URL")?)
+                    format!("{}{path}", ENV.PAYPAL_API_URL)
                 },
             )
             .header(
@@ -355,13 +349,10 @@ impl PayoutsQueue {
     ) -> Result<X, ApiError> {
         let client = reqwest::Client::new();
         let mut request = client
-            .request(
-                method,
-                format!("{}{path}", dotenvy::var("TREMENDOUS_API_URL")?),
-            )
+            .request(method, format!("{}{path}", ENV.TREMENDOUS_API_URL))
             .header(
                 "Authorization",
-                format!("Bearer {}", dotenvy::var("TREMENDOUS_API_KEY")?),
+                format!("Bearer {}", ENV.TREMENDOUS_API_KEY),
             );
 
         if let Some(body) = body {
@@ -511,8 +502,8 @@ impl PayoutsQueue {
 
         let client = reqwest::Client::new();
         let res = client
-            .get(format!("{}accounts/cash", dotenvy::var("BREX_API_URL")?))
-            .bearer_auth(&dotenvy::var("BREX_API_KEY")?)
+            .get(format!("{}accounts/cash", ENV.BREX_API_URL))
+            .bearer_auth(&ENV.BREX_API_KEY)
             .send()
             .await?
             .json::<BrexResponse>()
@@ -538,16 +529,16 @@ impl PayoutsQueue {
 
     pub async fn get_paypal_balance() -> Result<Option<AccountBalance>, ApiError>
     {
-        let api_username = dotenvy::var("PAYPAL_NVP_USERNAME")?;
-        let api_password = dotenvy::var("PAYPAL_NVP_PASSWORD")?;
-        let api_signature = dotenvy::var("PAYPAL_NVP_SIGNATURE")?;
+        let api_username = &ENV.PAYPAL_NVP_USERNAME;
+        let api_password = &ENV.PAYPAL_NVP_PASSWORD;
+        let api_signature = &ENV.PAYPAL_NVP_SIGNATURE;
 
         let mut params = HashMap::new();
         params.insert("METHOD", "GetBalance");
         params.insert("VERSION", "204");
-        params.insert("USER", &api_username);
-        params.insert("PWD", &api_password);
-        params.insert("SIGNATURE", &api_signature);
+        params.insert("USER", api_username);
+        params.insert("PWD", api_password);
+        params.insert("SIGNATURE", api_signature);
         params.insert("RETURNALLCURRENCIES", "1");
 
         let endpoint = "https://api-3t.paypal.com/nvp";
@@ -870,7 +861,7 @@ pub async fn make_aditude_request(
 ) -> Result<Vec<AditudePoints>, ApiError> {
     let request = reqwest::Client::new()
         .post("https://cloud.aditude.io/api/public/insights/metrics")
-        .bearer_auth(&dotenvy::var("ADITUDE_API_KEY")?)
+        .bearer_auth(&ENV.ADITUDE_API_KEY)
         .json(&serde_json::json!({
             "metrics": metrics,
             "range": range,
@@ -1326,25 +1317,25 @@ pub async fn insert_bank_balances_and_webhook(
     if inserted {
         check_balance_with_webhook(
             "paypal",
-            "PAYPAL_BALANCE_ALERT_THRESHOLD",
+            ENV.PAYPAL_BALANCE_ALERT_THRESHOLD,
             paypal_result,
         )
         .await?;
         check_balance_with_webhook(
             "brex",
-            "BREX_BALANCE_ALERT_THRESHOLD",
+            ENV.BREX_BALANCE_ALERT_THRESHOLD,
             brex_result,
         )
         .await?;
         check_balance_with_webhook(
             "tremendous",
-            "TREMENDOUS_BALANCE_ALERT_THRESHOLD",
+            ENV.TREMENDOUS_BALANCE_ALERT_THRESHOLD,
             tremendous_result,
         )
         .await?;
         check_balance_with_webhook(
             "mural",
-            "MURAL_BALANCE_ALERT_THRESHOLD",
+            ENV.MURAL_BALANCE_ALERT_THRESHOLD,
             mural_result,
         )
         .await?;
@@ -1357,14 +1348,11 @@ pub async fn insert_bank_balances_and_webhook(
 
 async fn check_balance_with_webhook(
     source: &str,
-    threshold_env_var_name: &str,
+    threshold: u64,
     result: Result<Option<AccountBalance>, ApiError>,
 ) -> Result<Option<AccountBalance>, ApiError> {
-    let maybe_threshold = dotenvy::var(threshold_env_var_name)
-        .ok()
-        .and_then(|x| x.parse::<u64>().ok())
-        .filter(|x| *x != 0);
-    let payout_alert_webhook = dotenvy::var("PAYOUT_ALERT_SLACK_WEBHOOK")?;
+    let maybe_threshold = if threshold > 0 { Some(threshold) } else { None };
+    let payout_alert_webhook = &ENV.PAYOUT_ALERT_SLACK_WEBHOOK;
 
     match &result {
         Ok(Some(account_balance)) => {
@@ -1379,7 +1367,7 @@ async fn check_balance_with_webhook(
                         threshold,
                         current_balance: available,
                     },
-                    &payout_alert_webhook,
+                    payout_alert_webhook,
                 )
                 .await?;
             }
@@ -1394,7 +1382,7 @@ async fn check_balance_with_webhook(
                         source: source.to_owned(),
                         display_error: error.to_string(),
                     },
-                    &payout_alert_webhook,
+                    payout_alert_webhook,
                 )
                 .await?;
             }
@@ -1404,4 +1392,180 @@ async fn check_balance_with_webhook(
     }
 
     Ok(result.ok().flatten())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test::{
+        api_v3::ApiV3,
+        database::USER_USER_ID_PARSED,
+        environment::{TestEnvironment, with_test_environment},
+    };
+    use rust_decimal::dec;
+
+    async fn setup_payouts_values(
+        db: &PgPool,
+        entries: Vec<(i64, Decimal, DateTime<Utc>)>, // (user_id, amount, date_available)
+    ) {
+        for (user_id, amount, date_available) in &entries {
+            sqlx::query!(
+                "INSERT INTO payouts_values (user_id, mod_id, amount, created, date_available)
+                 VALUES ($1, NULL, $2, NOW(), $3)",
+                user_id,
+                amount,
+                date_available,
+            )
+                .execute(db)
+                .await
+                .unwrap();
+        }
+
+        for (user_id, _amount, date_available) in &entries {
+            sqlx::query!(
+                "INSERT INTO payouts_values_notifications (date_available, user_id, notified)
+                 VALUES ($1, $2, FALSE)
+                 ON CONFLICT (date_available, user_id) DO NOTHING",
+                date_available,
+                user_id,
+            )
+                .execute(db)
+                .await
+                .unwrap();
+        }
+    }
+
+    /// When a user's payout amount is below
+    /// the $1.00 (100 cents) threshold, the `WHERE sum >= 100` filter in
+    /// insert_many_payout_notifications skips the INSERT into notifications
+    /// for that user, but the old code still passed ALL pre-generated
+    /// notification_ids to insert_many_deliveries. Since
+    /// notifications_deliveries.notification_id has a FK constraint on
+    /// notifications(id), this caused a violation that failed
+    /// the entire transaction. The notified flag was never set to `true`,
+    /// so the rows accumulated and the same failure repeated every run.
+    #[actix_rt::test]
+    async fn test_payout_notification_below_threshold_does_not_fail() {
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
+            let redis = &env.db.redis_pool;
+
+            let user_id = USER_USER_ID_PARSED;
+
+            // date_available must be in the past so the notification query
+            // picks it up (date_available <= NOW()).
+            let date_available = Utc::now() - Duration::hours(1);
+
+            // Amount of $0.50 -- below the $1.00 threshold (sum < 100 cents).
+            setup_payouts_values(
+                db,
+                vec![(user_id, dec!(0.50), date_available)],
+            )
+                .await;
+
+            // This should succeed, NOT return an error.
+            // Before the fix, this would fail with a FK constraint violation.
+            let result = index_payouts_notifications(db, redis).await;
+            assert!(
+                result.is_ok(),
+                "index_payouts_notifications should succeed for below-threshold payouts, got: {:?}",
+                result.err()
+            );
+
+            // Verify the notification row was marked as notified (not stuck).
+            let remaining = sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM payouts_values_notifications WHERE notified = FALSE AND user_id = $1",
+                user_id,
+            )
+                .fetch_one(db)
+                .await
+                .unwrap()
+                .unwrap_or(0);
+
+            assert_eq!(
+                remaining, 0,
+                "All payouts_values_notifications rows should be marked notified"
+            );
+        })
+            .await;
+    }
+
+    /// When there is a mix of users, some above and some below the
+    /// threshold, the above-threshold users should get notifications
+    /// while the below-threshold ones are silently skipped. The entire
+    /// transaction must succeed (not fail due to the below-threshold user).
+    #[actix_rt::test]
+    async fn test_payout_notification_mixed_threshold_users() {
+        with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
+            let db = &env.db.pool;
+            let redis = &env.db.redis_pool;
+
+            let above_user_id = USER_USER_ID_PARSED; // user 3
+            let below_user_id = 4i64; // FRIEND_USER_ID
+            let date_available = Utc::now() - Duration::hours(1);
+
+            setup_payouts_values(
+                db,
+                vec![
+                    // Above threshold
+                    (above_user_id, dec!(5.00), date_available),
+                    // Below threshold
+                    (below_user_id, dec!(0.25), date_available),
+                ],
+            )
+                .await;
+
+            let result = index_payouts_notifications(db, redis).await;
+            assert!(
+                result.is_ok(),
+                "index_payouts_notifications should succeed with mixed users, got: {:?}",
+                result.err()
+            );
+
+            // Above-threshold user should have a notification.
+            let above_count = sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND body->>'type' = 'payout_available'",
+                above_user_id,
+            )
+                .fetch_one(db)
+                .await
+                .unwrap()
+                .unwrap_or(0);
+
+            assert!(
+                above_count > 0,
+                "Above-threshold user should have a payout notification"
+            );
+
+            // Below-threshold user should NOT have a notification.
+            let below_count = sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM notifications WHERE user_id = $1 AND body->>'type' = 'payout_available'",
+                below_user_id,
+            )
+                .fetch_one(db)
+                .await
+                .unwrap()
+                .unwrap_or(0);
+
+            assert_eq!(
+                below_count, 0,
+                "Below-threshold user should NOT have a payout notification"
+            );
+
+            // Both should be marked notified.
+            let remaining = sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM payouts_values_notifications WHERE notified = FALSE",
+            )
+                .fetch_one(db)
+                .await
+                .unwrap()
+                .unwrap_or(0);
+
+            assert_eq!(
+                remaining, 0,
+                "All payouts_values_notifications rows should be marked notified"
+            );
+        })
+            .await;
+    }
 }

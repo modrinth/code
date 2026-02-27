@@ -4,6 +4,7 @@ use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
@@ -212,7 +213,7 @@ pub async fn paypal_webhook(
                     \"webhook_id\": \"{}\",
                     \"webhook_event\": {body}
                 }}",
-                dotenvy::var("PAYPAL_WEBHOOK_ID")?
+                ENV.PAYPAL_WEBHOOK_ID,
             )),
             None,
         )
@@ -322,7 +323,7 @@ pub async fn tremendous_webhook(
         })?;
 
     let mut mac: Hmac<Sha256> = Hmac::new_from_slice(
-        dotenvy::var("TREMENDOUS_PRIVATE_KEY")?.as_bytes(),
+        ENV.TREMENDOUS_PRIVATE_KEY.as_bytes(),
     )
     .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
     mac.update(body.as_bytes());
@@ -439,6 +440,7 @@ pub async fn calculate_fees(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {
@@ -471,6 +473,7 @@ pub async fn create_payout(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {
@@ -1114,9 +1117,7 @@ async fn update_compliance_status(
 }
 
 fn tax_compliance_payout_threshold() -> Option<Decimal> {
-    dotenvy::var("COMPLIANCE_PAYOUT_THRESHOLD")
-        .ok()
-        .and_then(|s| s.parse().ok())
+    ENV.COMPLIANCE_PAYOUT_THRESHOLD.parse().ok()
 }
 
 #[derive(Deserialize)]

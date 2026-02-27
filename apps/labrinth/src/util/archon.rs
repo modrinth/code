@@ -2,6 +2,7 @@ use reqwest::header::HeaderName;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::env::ENV;
 use crate::routes::ApiError;
 
 const X_MASTER_KEY: HeaderName = HeaderName::from_static("x-master-key");
@@ -42,13 +43,12 @@ impl ArchonClient {
     pub fn from_env() -> Result<Self, ApiError> {
         let client = reqwest::Client::new();
 
-        let base_url =
-            dotenvy::var("ARCHON_URL")?.trim_end_matches('/').to_owned();
+        let base_url = ENV.ARCHON_URL.trim_end_matches('/').to_owned();
 
         Ok(Self {
             client,
             base_url,
-            pyro_api_key: dotenvy::var("PYRO_API_KEY")?,
+            pyro_api_key: ENV.PYRO_API_KEY.clone(),
         })
     }
 

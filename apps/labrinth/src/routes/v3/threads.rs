@@ -7,6 +7,7 @@ use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::ids::{ThreadId, ThreadMessageId};
 use crate::models::images::{Image, ImageContext};
@@ -631,9 +632,8 @@ pub async fn message_delete(
         let images =
             database::DBImage::get_many_contexted(context, &mut transaction)
                 .await?;
-        let cdn_url = dotenvy::var("CDN_URL")?;
         for image in images {
-            let name = image.url.split(&format!("{cdn_url}/")).nth(1);
+            let name = image.url.split(&format!("{}/", ENV.CDN_URL)).nth(1);
             if let Some(icon_path) = name {
                 file_host
                     .delete_file(

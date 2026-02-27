@@ -13,6 +13,10 @@ export interface FieldConfig {
 	pattern?: string
 	validate?: (value: string) => string | null
 	autocomplete?: string
+	dependsOn?: {
+		field: string
+		value?: string | string[]
+	}
 }
 
 export interface RailConfig {
@@ -330,6 +334,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					defaultMessage: 'Enter PIX email',
 				}),
 				autocomplete: 'email',
+				dependsOn: {
+					field: 'pixAccountType',
+					value: 'EMAIL',
+				},
 			},
 			{
 				name: 'pixPhone',
@@ -341,6 +349,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					defaultMessage: '+55...',
 				}),
 				autocomplete: 'tel',
+				dependsOn: {
+					field: 'pixAccountType',
+					value: 'PHONE',
+				},
 			},
 			{
 				name: 'branchCode',
@@ -352,6 +364,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					defaultMessage: 'Enter branch code',
 				}),
 				autocomplete: 'off',
+				dependsOn: {
+					field: 'pixAccountType',
+					value: 'BANK_ACCOUNT',
+				},
 			},
 			{
 				name: 'documentNumber',
@@ -367,6 +383,10 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					defaultMessage: 'Brazilian tax identification number',
 				}),
 				autocomplete: 'off',
+				dependsOn: {
+					field: 'pixAccountType',
+					value: 'DOCUMENT',
+				},
 			},
 		],
 	},

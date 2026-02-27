@@ -66,6 +66,7 @@ import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
@@ -399,6 +400,7 @@ loading.setEnabled(false)
 
 const error = useError()
 const errorModal = ref()
+const minecraftAuthErrorModal = ref()
 
 const install = useInstall()
 const modInstallModal = ref()
@@ -477,6 +479,7 @@ onMounted(() => {
 	invoke('show_window')
 
 	error.setErrorModal(errorModal.value)
+	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
 
 	install.setIncompatibilityWarningModal(incompatibilityWarningModal)
 	install.setInstallConfirmModal(installConfirmModal)
@@ -1146,6 +1149,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />
+	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ModInstallModal ref="modInstallModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 	<InstallConfirmModal ref="installConfirmModal" />
