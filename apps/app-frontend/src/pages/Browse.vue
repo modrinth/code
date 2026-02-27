@@ -29,7 +29,7 @@ import {
 import type { Category, Platform } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
-import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -314,8 +314,12 @@ async function refreshSearch() {
 	try {
 		const isServer = projectType.value === 'server'
 
+		console.log('[browse] refreshSearch start, isServer:', isServer)
+
 		if (isServer) {
+			console.log('[browse] fetching v3 results')
 			const rawResults = await get_search_results_v3(serverRequestParams.value)
+			console.log('[browse] v3 results received')
 			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
 			const hits = searchResults.hits ?? []
 			serverHits.value = hits
@@ -327,6 +331,7 @@ async function refreshSearch() {
 				total_hits: searchResults.total_hits ?? 0,
 				limit: maxResults.value,
 			}
+			console.log('[browse] server results assigned')
 		} else {
 			let rawResults = await get_search_results(requestParams.value)
 			if (!rawResults) {
@@ -350,13 +355,15 @@ async function refreshSearch() {
 			results.value = rawResults.result
 		}
 
+		console.log('[browse] building filter state')
 		const currentFilterState = JSON.stringify({
 			query: query.value,
-			filters: currentFilters.value,
-			sort: currentSortType.value,
+			filters: toRaw(currentFilters.value),
+			sort: toRaw(currentSortType.value),
 			maxResults: maxResults.value,
-			projectTypes: projectTypes.value,
+			projectTypes: toRaw(projectTypes.value),
 		})
+		console.log('[browse] filter state built')
 
 		if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
 			currentPage.value = 1
@@ -378,17 +385,21 @@ async function refreshSearch() {
 			delete persistentParams.ai
 		}
 
+		console.log('[browse] creating page params')
 		const params = {
 			...persistentParams,
 			...(isServer ? createServerPageParams() : createPageParams()),
 		}
+		console.log('[browse] page params created')
 
 		breadcrumbs.setContext({
 			name: 'Discover content',
 			link: `/browse/${projectType.value}`,
 			query: params,
 		})
+		console.log('[browse] calling router.replace')
 		await router.replace({ path: route.path, query: params })
+		console.log('[browse] router.replace done')
 	} catch (err) {
 		console.error('Error refreshing search:', err)
 	} finally {
