@@ -123,7 +123,6 @@
 import { CheckIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Combobox,
-	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
@@ -134,12 +133,7 @@ import { Multiselect } from 'vue-multiselect'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const { addNotification } = injectNotificationManager()
-const {
-	projectV2: project,
-	projectV3,
-	currentMember,
-	patchProjectV3,
-} = injectProjectPageContext()
+const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
 const javaAddress = ref('')
 const javaPort = ref(25565)
@@ -150,27 +144,37 @@ const recommendedGameVersion = ref('')
 const country = ref('')
 const languages = ref([])
 
-watch(
-	() => projectV3.value,
-	(v3) => {
-		if (!v3) return
-		javaAddress.value = v3.minecraft_java_server?.address ?? ''
-		javaPort.value = v3.minecraft_java_server?.port ?? 25565
-		bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
-		bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
-		const javaContent = v3.minecraft_java_server?.content
-		if (javaContent && 'supported_game_versions' in javaContent) {
-			supportedGameVersions.value = javaContent.supported_game_versions ?? []
-			recommendedGameVersion.value = javaContent.recommended_game_version ?? ''
-		} else {
-			supportedGameVersions.value = []
-			recommendedGameVersion.value = ''
-		}
-		country.value = v3.minecraft_server?.country ?? ''
-		languages.value = v3.minecraft_server?.languages ?? []
-	},
-	{ immediate: true },
-)
+function initFromProjectV3(v3) {
+	if (!v3) return
+	javaAddress.value = v3.minecraft_java_server?.address ?? ''
+	javaPort.value = v3.minecraft_java_server?.port ?? 25565
+	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
+	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
+	const javaContent = v3.minecraft_java_server?.content
+	if (javaContent && 'supported_game_versions' in javaContent) {
+		supportedGameVersions.value = javaContent.supported_game_versions ?? []
+		recommendedGameVersion.value = javaContent.recommended_game_version ?? ''
+	} else {
+		supportedGameVersions.value = []
+		recommendedGameVersion.value = ''
+	}
+	country.value = v3.minecraft_server?.country ?? ''
+	languages.value = v3.minecraft_server?.languages ?? []
+}
+
+// initialize projectV3 values once
+if (projectV3.value) {
+	initFromProjectV3(projectV3.value)
+} else {
+	const stop = watch(
+		() => projectV3.value,
+		(v3) => {
+			if (!v3) return
+			initFromProjectV3(v3)
+			stop()
+		},
+	)
+}
 
 const javaPingLoading = ref(false)
 const javaPingResult = ref(null)
