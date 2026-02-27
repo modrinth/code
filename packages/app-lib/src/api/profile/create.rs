@@ -113,17 +113,12 @@ pub async fn profile_create(
                     &state.pool,
                 )
                 .await?;
-                let name = icon
-                    .rsplit('/')
-                    .next()
-                    .unwrap_or("icon")
-                    .to_string();
+                let name =
+                    icon.rsplit('/').next().unwrap_or("icon").to_string();
                 (fetched, name)
             } else {
-                let data = io::read(
-                    state.directories.caches_dir().join(icon),
-                )
-                .await?;
+                let data =
+                    io::read(state.directories.caches_dir().join(icon)).await?;
                 (bytes::Bytes::from(data), icon.clone())
             };
             profile
