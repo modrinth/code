@@ -1709,6 +1709,9 @@
   "muralpay.field.country": {
     "message": "国"
   },
+  "muralpay.field.iban": {
+    "message": ""
+  },
   "muralpay.field.phone-number": {
     "message": "電話番号"
   },
@@ -1829,6 +1832,12 @@
   "project-moderation-nags.submit-for-review-button": {
     "message": "レビューを提出する"
   },
+  "project-moderation-nags.suggestion": {
+    "message": "提案"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "モデレーションページを表示する"
+  },
   "project-moderation-nags.warning": {
     "message": "警告"
   },
@@ -1856,14 +1865,47 @@
   "project-type.modpack.singular": {
     "message": "Modパック"
   },
+  "project-type.plugin.plural": {
+    "message": "プラグイン"
+  },
+  "project-type.plugin.singular": {
+    "message": "プラグイン"
+  },
+  "project-type.project.plural": {
+    "message": "プロジェクト"
+  },
+  "project-type.project.singular": {
+    "message": "プロジェクト"
+  },
   "project-type.resourcepack.plural": {
+    "message": "リソースパック"
+  },
+  "project-type.resourcepack.singular": {
     "message": "リソースパック"
   },
   "project-type.shader.plural": {
     "message": "シェーダー"
   },
+  "project-type.shader.singular": {
+    "message": "シェーダー"
+  },
   "project.about.details.created": {
     "message": "{date}に作成"
+  },
+  "project.about.details.licensed": {
+    "message": "ライセンス: {license}"
+  },
+  "project.about.details.published": {
+    "message": "{date} に公開"
+  },
+  "project.about.details.submitted": {
+    "message": "提出時刻: {date}"
+  },
+  "project.about.details.title": {
+    "message": "詳細"
+  },
+  "project.about.details.updated": {
+    "message": "{date} に更新"
   },
   "project.actions.create-server": {
     "message": "サーバーを作成"
@@ -1874,8 +1916,14 @@
   "project.actions.dont-show-again": {
     "message": "再度表示しない"
   },
+  "project.actions.review-project": {
+    "message": "プロジェクトを評価"
+  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "{price}<small> / 月</small>から"
   },
   "project.actions.servers-promo.title": {
     "message": "サーバーを作成"
@@ -1885,6 +1933,9 @@
   },
   "project.collections.none-found": {
     "message": "コレクションを見つかりませんでした。"
+  },
+  "project.description.title": {
+    "message": "概要"
   },
   "project.download.game-version": {
     "message": "ゲームバージョン: {version}"
@@ -2011,6 +2062,9 @@
   },
   "servers.plan.small.name": {
     "message": "少"
+  },
+  "settings.applications.field.description": {
+    "message": "概要"
   },
   "settings.billing.payment_method.card_expiry": {
     "message": "有効期限：{year}年{month}月"

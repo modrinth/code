@@ -1143,7 +1143,7 @@
     "message": "Ми також підтримуємо широкий спектр завантажувачів модів і плаґінів, таких як Fabric, Quilt, Forge і NeoForge для модів, а також Paper і Purpur для плаґінів. Доступність залежить від того, чи підтримує завантажувач модів або плаґінів вибрану вами версію Minecraft."
   },
   "hosting-marketing.get-started": {
-    "message": "Почнімо"
+    "message": "Розпочати"
   },
   "hosting-marketing.hero.button.manage-your-servers": {
     "message": "Керувати своїми серверами"

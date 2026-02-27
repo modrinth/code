@@ -699,7 +699,7 @@
     "message": "RUC-Nummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "RUC-Nummer eingeben"
+    "message": "RUC Nummer eingeben"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Steueridentifikationsnummer"
@@ -1713,7 +1713,7 @@
     "message": "Litauen"
   },
   "muralpay.country.lu": {
-    "message": "Luxenburg"
+    "message": "Luxemburg"
   },
   "muralpay.country.lv": {
     "message": "Lettland"

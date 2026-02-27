@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installeer om te spelen"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installeer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one {# mod}other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Deze server vereist mods om te spelen. Klik op 'Installeren' om de benodigde bestanden van Modrinth te installeren."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} heeft deze instantie vandaag met je gedeeld."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Gedeelde instantie"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Gedeelde server instantie"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} toegevoegd"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Toegevoegd"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Verwijderd"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Geüpdatet"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Update om te spelen"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} verwijderd"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Update vereist"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} geüpdatet"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
   },
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App v{version} is beschikbaar. Gebruik je pakketbeheerder om te updaten voor de laatste functies en oplossingen!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Download ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Download"
   },
   "app.update-toast.downloading": {
     "message": "Aan het downloaden..."

@@ -14,11 +14,26 @@
   "app.modal.install-to-play.mod-count": {
     "message": ""
   },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "يتطلب تشغيل هذا الخادم استخدام إضافات. انقر على \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} شارك معك هذه المجموعة من الإضافات ليلعب معك اليوم."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "حُزْمَة مشاركة"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "حُزْمَة خادم مشاركة"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} مضاف"
+  },
   "app.modal.update-to-play.diff-type.added": {
-    "message": "تم إضافة"
+    "message": "تمت الإضافة"
   },
   "app.modal.update-to-play.diff-type.removed": {
-    "message": "تم إزالة"
+    "message": "تمت الإزالة"
   },
   "app.modal.update-to-play.diff-type.updated": {
     "message": "تم تحديث"
@@ -26,8 +41,20 @@
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
   },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} مزال"
+  },
   "app.modal.update-to-play.update-required": {
     "message": "يلزم التحديث"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "هناك تحديث لازم للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} حُدِّث"
   },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
@@ -62,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
   },
+  "app.update-toast.body.linux": {
+    "message": "Modrinth App إصدار رَقَم {version} متوفر. استخدم منظم الحُزْمَة لتّحديث لآخر المزايا والإصلاحات!"
+  },
   "app.update-toast.body.metered": {
     "message": "تطبيق Modrinth الإصدار {version} متاح الآن!\nنظرًا لأنك تستخدم شبكة محدودة البيانات، لم نقم بتنزيل التحديث تلقائيًا.\n"
   },
@@ -70,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "تنزيل ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "تنزيل"
   },
   "app.update-toast.downloading": {
     "message": "جار التنزيل..."

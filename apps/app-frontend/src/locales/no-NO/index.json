@@ -5,6 +5,57 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentiseringsservere"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installer for å spille"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {#mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Det krever mods for å spille på denne serveren. Klikk på \"installer\" for å sette opp de påkrevde filene fra Modrinth."
+  },
+  "app.modal.install-to-play.shared-by-today": {
+    "message": "{name} delte denne instansen med deg i dag."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Delt instans"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Delt serverinstans"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} lagt til"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Lagt til"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Fjerna"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Oppdatert"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Oppdater for å spille"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} fjerna"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Krever oppdatering"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Ei oppdatering er påkrevd for å spille {name}. Vær så snill å oppdater til den siste versjonen av spillet for å spille det."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "Oppdaterte {count} mods"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Utviklermodus aktivert."
   },
@@ -38,6 +89,9 @@
   "app.update-toast.body.download-complete": {
     "message": "Modrinth App v{version} er ferdig lastet ned. Last in på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
   },
+  "app.update-toast.body.linux": {
+    "message": "Versjon v{version} av Modrinth er tilgjengelig. Bruk pakkehandtereren for å oppdatere for de siste funksjonene og fiksene!"
+  },
   "app.update-toast.body.metered": {
     "message": "Modrinth App v{version} er tilgjengelig nå! Siden du er på en forbruksmålt tilkobling, lastet vi den ikke ned automatisk."
   },
@@ -46,6 +100,9 @@
   },
   "app.update-toast.download": {
     "message": "Last ned ({size})"
+  },
+  "app.update-toast.download-page": {
+    "message": "Last ned"
   },
   "app.update-toast.downloading": {
     "message": "Laster ned..."

@@ -41,6 +41,9 @@
   "badge.new": {
     "defaultMessage": "Ny"
   },
+  "button.accept": {
+    "defaultMessage": "Aksepter"
+  },
   "button.affiliate-links": {
     "defaultMessage": "Affiliatelenker"
   },
@@ -70,6 +73,9 @@
   },
   "button.create-a-project": {
     "defaultMessage": "Lag et prosjekt"
+  },
+  "button.decline": {
+    "defaultMessage": "Avslå"
   },
   "button.download": {
     "defaultMessage": "Nedlast"
@@ -113,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "Reset"
   },
+  "button.retry": {
+    "defaultMessage": "Prøv igjen"
+  },
   "button.save": {
     "defaultMessage": "Lagre"
   },
@@ -137,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "Slutt å følge"
   },
+  "button.update": {
+    "defaultMessage": "Oppdater"
+  },
   "button.upload-image": {
     "defaultMessage": "Last opp bilde"
   },
@@ -154,6 +166,9 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Nettside"
+  },
+  "collections.label.private": {
+    "defaultMessage": "Privat"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
@@ -233,6 +248,33 @@
   "form.placeholder.state": {
     "defaultMessage": "Skriv inn delstat / region"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategori"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Funksjon"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Ytelsespåvirkning"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Oppløysing"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Burst opp til {cpus} CPU-er"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU-bursting lar serveren din midlertidig bruke yttligere tråder for å hjelpe med å mitigere TPS-hopp. Klikk for mer informasjon."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Lagringsplass"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} Delte CPU-er"
+  },
   "icon-select.edit": {
     "defaultMessage": "Rediger ikon"
   },
@@ -272,14 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukjent spillmodus"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "Kople fra modpack"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Nåværende"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Ikke kompatibel"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Gå ned i versjon til v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Oppdater versjon"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Gjøm manglende kompatibilitet"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Denne versjonen har ingen endringslogg."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Ingen versjon funnet"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "Søk opp versjon..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "Velg en versjon for å vise endringsloggen sin"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Vis manglende kompatibilitet"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Oppdater til v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for instansen din. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for verda di. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
+  },
+  "label.actions": {
+    "defaultMessage": "Handlinger"
+  },
   "label.available": {
     "defaultMessage": "{amount} tilgjengelig."
+  },
+  "label.changelog": {
+    "defaultMessage": "Endringslogg"
   },
   "label.changes-saved": {
     "defaultMessage": "Endringer lagret"
   },
   "label.collections": {
     "defaultMessage": "Kolleksjoner"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "Bekreft passord"
+  },
+  "label.content": {
+    "defaultMessage": "Innhold"
   },
   "label.created-ago": {
     "defaultMessage": "Opprettet {ago}"
@@ -293,8 +389,20 @@
   "label.description": {
     "defaultMessage": "Beskrivelse"
   },
+  "label.details": {
+    "defaultMessage": "Detaljer"
+  },
+  "label.email": {
+    "defaultMessage": "E-post"
+  },
+  "label.email-username": {
+    "defaultMessage": "E-post eller brukernavn"
+  },
   "label.error": {
     "defaultMessage": "Feil"
+  },
+  "label.filter-by": {
+    "defaultMessage": "Filtrer ved"
   },
   "label.followed-projects": {
     "defaultMessage": "Følgte prosjekter"
@@ -304,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "Moderasjon"
+  },
+  "label.no": {
+    "defaultMessage": "Nei"
+  },
+  "label.no-items": {
+    "defaultMessage": "Ingen innhold"
   },
   "label.notifications": {
     "defaultMessage": "Notifikasjoner"
@@ -316,6 +430,9 @@
   },
   "label.played": {
     "defaultMessage": "Spilt {time}"
+  },
+  "label.project": {
+    "defaultMessage": "Prosjekt"
   },
   "label.public": {
     "defaultMessage": "Offentlig"
@@ -332,6 +449,9 @@
   "label.scopes": {
     "defaultMessage": "Tilganger"
   },
+  "label.search": {
+    "defaultMessage": "Søk"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -344,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "Enspiller"
   },
+  "label.sort-by": {
+    "defaultMessage": "Sorter etter"
+  },
+  "label.success": {
+    "defaultMessage": "Suksess"
+  },
   "label.title": {
     "defaultMessage": "Tittel"
   },
   "label.unlisted": {
     "defaultMessage": "Skjult"
   },
+  "label.update-available": {
+    "defaultMessage": "Oppdatering tilgjengelig"
+  },
+  "label.username": {
+    "defaultMessage": "Brukernavn"
+  },
+  "label.version": {
+    "defaultMessage": "Versjon"
+  },
   "label.visibility": {
     "defaultMessage": "Synlighet"
   },
   "label.visit-your-profile": {
     "defaultMessage": "Besøk din profil"
+  },
+  "label.yes": {
+    "defaultMessage": "Ja"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Legg til betalingsmetode"
@@ -449,17 +587,56 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Ustøttet"
   },
+  "payment-method.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
+  },
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} slutter i {last_four}"
+  },
+  "payment-method.cashapp": {
+    "defaultMessage": "Cash App"
+  },
   "payment-method.charity": {
     "defaultMessage": "Veldedighet"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "Veldedige formål"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diner Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Utforsk"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
   "payment-method.gift-card": {
     "defaultMessage": "Gavekort"
   },
   "payment-method.gift-card-plural": {
     "defaultMessage": "Gavekort"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal (internasjonalt)"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Ukjent betalingsmetode"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -469,6 +646,21 @@
   },
   "payment-method.virtual-visa-plural": {
     "defaultMessage": "Virtuelle Visa-kort"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Klient"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Klient og server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Klient eller server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
   },
   "project-type.all": {
     "defaultMessage": "Alle"
@@ -482,14 +674,32 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
   },
+  "project-type.mod.capital": {
+    "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
+  },
   "project-type.mod.category": {
     "defaultMessage": "Mods"
+  },
+  "project-type.mod.lowercase": {
+    "defaultMessage": "{count, plural, one {mod} other {mods}}"
+  },
+  "project-type.modpack.capital": {
+    "defaultMessage": "{count, plural, one {Modpack} other {Modpacks}}"
   },
   "project-type.modpack.category": {
     "defaultMessage": "Modpakker"
   },
+  "project-type.modpack.lowercase": {
+    "defaultMessage": "{count, plural, one {modpack} other {modpacks}}"
+  },
+  "project-type.plugin.capital": {
+    "defaultMessage": "{count, plural, one {Plugin} other {Plugins}}"
+  },
   "project-type.plugin.category": {
     "defaultMessage": "Plugins"
+  },
+  "project-type.plugin.lowercase": {
+    "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Prosjekter"
@@ -1042,6 +1252,9 @@
   },
   "settings.sessions.title": {
     "defaultMessage": "Økter"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Utstyr"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} klokken {time, time, short}"
