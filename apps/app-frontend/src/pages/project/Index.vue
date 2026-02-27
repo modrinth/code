@@ -17,7 +17,7 @@
 				:supported-versions="serverSupportedVersions"
 				:loaders="serverModpackLoaders"
 				:ping="serverPing"
-				:status-online="serverPing != null"
+				:status-online="serverStatusOnline"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
