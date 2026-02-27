@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClipboardCopyIcon, ExternalIcon, GlobeIcon, PlayIcon, SearchIcon } from '@modrinth/assets'
+import {
+	ClipboardCopyIcon,
+	ExternalIcon,
+	GlobeIcon,
+	PlayIcon,
+	SearchIcon,
+	StopCircleIcon,
+} from '@modrinth/assets'
 import type { GameVersion, ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
 	ButtonStyled,
@@ -22,7 +29,7 @@ import {
 import type { Category, Platform } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
-import { computed, nextTick, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -32,7 +39,14 @@ import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
+import { process_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import {
+	get as getInstance,
+	get_projects as getInstanceProjects,
+	kill,
+	list as listInstances,
+} from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -174,6 +188,51 @@ const {
 
 const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
 const serverPings = ref<Record<string, number | undefined>>({})
+const runningServerProjects = ref<Record<string, string>>({})
+
+async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	const packs = await listInstances()
+	const newRunning: Record<string, string> = {}
+	for (const hit of hits) {
+		const inst = packs.find((p: any) => p.linked_data?.project_id === hit.project_id)
+		if (inst) {
+			const processes = await get_by_profile_path(inst.path).catch(() => [])
+			if (Array.isArray(processes) && processes.length > 0) {
+				newRunning[hit.project_id] = inst.path
+			}
+		}
+	}
+	runningServerProjects.value = newRunning
+}
+
+async function handleStopServerProject(projectId: string) {
+	const instancePath = runningServerProjects.value[projectId]
+	if (!instancePath) return
+	await kill(instancePath).catch(() => {})
+	const { [projectId]: _, ...rest } = runningServerProjects.value
+	runningServerProjects.value = rest
+}
+
+async function handlePlayServerProject(projectId: string) {
+	await playServerProject(projectId)
+	checkServerRunningStates(serverHits.value)
+}
+
+const unlistenProcesses = await process_listener((e: any) => {
+	if (e.event === 'finished') {
+		const projectId = Object.entries(runningServerProjects.value).find(
+			([, path]) => path === e.profile_path_id,
+		)?.[0]
+		if (projectId) {
+			const { [projectId]: _, ...rest } = runningServerProjects.value
+			runningServerProjects.value = rest
+		}
+	}
+})
+
+onUnmounted(() => {
+	unlistenProcesses()
+})
 
 const {
 	serverCurrentSortType,
@@ -254,6 +313,7 @@ async function refreshSearch() {
 		serverHits.value = hits
 		serverPings.value = {}
 		pingServerHits(hits)
+		checkServerRunningStates(hits)
 		results.value = {
 			hits: [],
 			total_hits: searchResults.total_hits ?? 0,
@@ -655,12 +715,22 @@ previousFilterState.value = JSON.stringify({
 						"
 					>
 						<template #actions>
-							<ButtonStyled color="brand" type="outlined">
+							<ButtonStyled
+								v-if="runningServerProjects[project.project_id]"
+								color="red"
+								type="outlined"
+							>
+								<button @click="() => handleStopServerProject(project.project_id)">
+									<StopCircleIcon />
+									Stop
+								</button>
+							</ButtonStyled>
+							<ButtonStyled v-else color="brand" type="outlined">
 								<button
 									:disabled="
 										(installStore.installingServerProjects as string[]).includes(project.project_id)
 									"
-									@click="() => playServerProject(project.project_id)"
+									@click="() => handlePlayServerProject(project.project_id)"
 								>
 									<PlayIcon />
 									{{

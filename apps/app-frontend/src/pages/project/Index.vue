@@ -60,7 +60,13 @@
 					@contextmenu.prevent.stop="handleRightClick"
 				>
 					<template #actions>
-						<ButtonStyled size="large" color="brand">
+						<ButtonStyled v-if="serverPlaying" size="large" color="red">
+							<button @click="handleStopServer">
+								<StopCircleIcon />
+								Stop
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else size="large" color="brand">
 							<button
 								:disabled="data && installStore.installingServerProjects.includes(data.id)"
 								@click="handleClickPlay"
@@ -212,6 +218,7 @@ import {
 	MoreVerticalIcon,
 	PlayIcon,
 	ReportIcon,
+	StopCircleIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -230,7 +237,7 @@ import {
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -243,7 +250,14 @@ import {
 	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
+import { process_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import {
+	get as getInstance,
+	get_projects as getInstanceProjects,
+	kill,
+	list as listInstances,
+} from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -277,6 +291,8 @@ const serverSupportedVersions = shallowRef([])
 const serverModpackLoaders = shallowRef([])
 const serverPing = ref(undefined)
 const serverStatusOnline = ref(false)
+const serverInstancePath = ref(null)
+const serverPlaying = ref(false)
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -304,6 +320,27 @@ const [allLoaders, allGameVersions] = await Promise.all([
 async function handleClickPlay() {
 	if (!isServerProject.value) return
 	await playServerProject(data.value.id).catch(handleError)
+	await updateServerPlayState()
+}
+
+async function updateServerPlayState() {
+	if (!isServerProject.value || !data.value) return
+	const packs = await listInstances()
+	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
+	if (inst) {
+		serverInstancePath.value = inst.path
+		const processes = await get_by_profile_path(inst.path).catch(() => [])
+		serverPlaying.value = Array.isArray(processes) && processes.length > 0
+	} else {
+		serverInstancePath.value = null
+		serverPlaying.value = false
+	}
+}
+
+async function handleStopServer() {
+	if (!serverInstancePath.value) return
+	await kill(serverInstancePath.value).catch(() => {})
+	serverPlaying.value = false
 }
 
 async function fetchProjectData() {
@@ -391,9 +428,21 @@ async function fetchProjectData() {
 	}
 
 	breadcrumbs.setName('Project', data.value.title)
+
+	await updateServerPlayState()
 }
 
 await fetchProjectData()
+
+const unlistenProcesses = await process_listener((e) => {
+	if (e.event === 'finished' && serverInstancePath.value && e.profile_path_id === serverInstancePath.value) {
+		serverPlaying.value = false
+	}
+})
+
+onUnmounted(() => {
+	unlistenProcesses()
+})
 
 watch(
 	() => route.params.id,
