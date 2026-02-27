@@ -1,21 +1,40 @@
 <template>
 	<JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
-	<div class="toggle-setting" :class="{ compact }">
-		<StyledInput
-			autocomplete="off"
-			:disabled="props.disabled"
-			:model-value="props.modelValue ? props.modelValue.path : ''"
-			:placeholder="placeholder ?? '/path/to/java'"
-			wrapper-class="installation-input"
-			@update:model-value="
-				(val) => {
-					emit('update:modelValue', {
-						...props.modelValue,
-						path: val,
-					})
-				}
-			"
-		/>
+	<div :id="props.id" class="toggle-setting" :class="{ compact }">
+		<div class="input-with-status">
+			<StyledInput
+				autocomplete="off"
+				:disabled="props.disabled"
+				:model-value="props.modelValue ? props.modelValue.path : ''"
+				:placeholder="placeholder ?? '/path/to/java'"
+				wrapper-class="installation-input"
+				@update:model-value="
+					(val) => {
+						emit('update:modelValue', {
+							...props.modelValue,
+							path: val,
+						})
+					}
+				"
+			/>
+			<Button
+				:disabled="testingJava || props.disabled"
+				@click="runTest(props.modelValue?.path)"
+				@mouseenter="!props.disabled && (hoveringTest = true)"
+				@mouseleave="hoveringTest = false"
+			>
+				<SpinnerIcon v-if="testingJava" class="animate-spin h-4 w-4" />
+				<CheckCircleIcon
+					v-else-if="testingJavaSuccess === true && !hoveringTest"
+					class="h-4 w-4 text-brand-green"
+				/>
+				<XCircleIcon
+					v-else-if="testingJavaSuccess !== true && !hoveringTest"
+					class="h-4 w-4 text-brand-red"
+				/>
+				<RefreshCwIcon v-else-if="!props.disabled" class="h-4 w-4" />
+			</Button>
+		</div>
 		<span class="installation-buttons">
 			<Button
 				v-if="props.version"
@@ -33,43 +52,37 @@
 				<FolderSearchIcon />
 				Browse
 			</Button>
-			<Button v-if="testingJava" disabled> Testing... </Button>
-			<Button v-else-if="testingJavaSuccess === true">
-				<CheckIcon class="test-success" />
-				Success
-			</Button>
-			<Button v-else-if="testingJavaSuccess === false">
-				<XIcon class="test-fail" />
-				Failed
-			</Button>
-			<Button v-else :disabled="props.disabled" @click="testJava">
-				<PlayIcon />
-				Test
-			</Button>
 		</span>
 	</div>
 </template>
 
 <script setup>
 import {
-	CheckIcon,
+	CheckCircleIcon,
 	DownloadIcon,
 	FolderSearchIcon,
-	PlayIcon,
+	RefreshCwIcon,
 	SearchIcon,
-	XIcon,
+	SpinnerIcon,
+	XCircleIcon,
 } from '@modrinth/assets'
 import { Button, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { open } from '@tauri-apps/plugin-dialog'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
+import useJavaTest from '@/composables/useJavaTest.js'
 import { trackEvent } from '@/helpers/analytics'
-import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
+import { auto_install_java, find_filtered_jres, get_jre } from '@/helpers/jre.js'
 
 const { handleError } = injectNotificationManager()
 
 const props = defineProps({
+	id: {
+		type: String,
+		required: false,
+		default: null,
+	},
 	version: {
 		type: Number,
 		required: false,
@@ -100,28 +113,35 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const testingJava = ref(false)
-const testingJavaSuccess = ref(null)
+const {
+	testingJava,
+	javaTestResult: testingJavaSuccess,
+	testJavaInstallationDebounced,
+	testJavaInstallation,
+} = useJavaTest()
 
 const installingJava = ref(false)
+const hoveringTest = ref(false)
+let hasInitialized = false
 
-async function testJava() {
-	testingJava.value = true
-	testingJavaSuccess.value = await test_jre(
-		props.modelValue ? props.modelValue.path : '',
-		props.version,
-	)
-	testingJava.value = false
-
-	trackEvent('JavaTest', {
-		path: props.modelValue ? props.modelValue.path : '',
-		success: testingJavaSuccess.value,
-	})
-
-	setTimeout(() => {
-		testingJavaSuccess.value = null
-	}, 2000)
+async function runTest(path) {
+	await testJavaInstallation(path, props.version, true)
 }
+
+watch(
+	() => props.modelValue?.path,
+	(newPath) => {
+		if (newPath) {
+			if (!hasInitialized) {
+				testJavaInstallation(newPath, props.version, false)
+				hasInitialized = true
+			} else {
+				testJavaInstallationDebounced(newPath, props.version)
+			}
+		}
+	},
+	{ immediate: true },
+)
 
 async function handleJavaFileInput() {
 	const filePath = await open()
@@ -132,6 +152,7 @@ async function handleJavaFileInput() {
 			result = {
 				path: filePath.path ?? filePath,
 				version: props.version.toString(),
+				parsed_version: props.version,
 				architecture: 'x86',
 			}
 		}
@@ -165,6 +186,7 @@ async function reinstallJava() {
 		result = {
 			path: path,
 			version: props.version.toString(),
+			parsed_version: props.version,
 			architecture: 'x86',
 		}
 	}
@@ -176,13 +198,23 @@ async function reinstallJava() {
 
 	emit('update:modelValue', result)
 	installingJava.value = false
+	runTest(result.path)
 }
 </script>
 
 <style lang="scss" scoped>
+.input-with-status {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-width: 0;
+}
+
 .installation-input {
-	width: 100% !important;
-	flex-grow: 1;
+	flex: 1 1 0;
+	min-width: 0;
 }
 
 .toggle-setting {
@@ -208,13 +240,5 @@ async function reinstallJava() {
 	.btn {
 		width: max-content;
 	}
-}
-
-.test-success {
-	color: var(--color-green);
-}
-
-.test-fail {
-	color: var(--color-red);
 }
 </style>
