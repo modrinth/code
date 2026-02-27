@@ -75,7 +75,7 @@
 				autocomplete="off"
 				clearable
 				size="small"
-				inputClass="!bg-button-bg"
+				input-class="!bg-button-bg"
 				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 			/>
 

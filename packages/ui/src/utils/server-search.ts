@@ -98,7 +98,7 @@ export function useServerSearch(opts: {
 			supported_project_types: ['server'],
 			display: 'all',
 			query_param: 'sc',
-			supports_negative_filter: false,
+			supports_negative_filter: true,
 			searchable: false,
 			options: (tags.value?.categories ?? [])
 				.filter((c) => c.project_type === 'minecraft_java_server')
@@ -133,7 +133,7 @@ export function useServerSearch(opts: {
 			supported_project_types: ['server'],
 			display: 'scrollable',
 			query_param: 'sco',
-			supports_negative_filter: false,
+			supports_negative_filter: true,
 			searchable: true,
 			options: SERVER_COUNTRIES.map((c) => ({
 				id: c.code,
@@ -164,9 +164,15 @@ export function useServerSearch(opts: {
 
 		for (const [filterId, field] of Object.entries(FILTER_FIELD_MAP)) {
 			const matched = serverCurrentFilters.value.filter((f) => f.type === filterId)
-			if (matched.length > 0) {
-				const values = matched.map((f) => `"${f.option}"`).join(', ')
+			const included = matched.filter((f) => !f.negative)
+			const excluded = matched.filter((f) => f.negative)
+			if (included.length > 0) {
+				const values = included.map((f) => `"${f.option}"`).join(', ')
 				parts.push(`${field} IN [${values}]`)
+			}
+			if (excluded.length > 0) {
+				const values = excluded.map((f) => `"${f.option}"`).join(', ')
+				parts.push(`${field} NOT IN [${values}]`)
 			}
 		}
 
@@ -212,11 +218,14 @@ export function useServerSearch(opts: {
 					: paramValue.filter((v): v is string => v !== null)
 
 			for (const value of values) {
-				const option = filterType.options.find((o) => o.id === value)
+				const isNegative = value.startsWith('!')
+				const cleanValue = isNegative ? value.slice(1) : value
+				const option = filterType.options.find((o) => o.id === cleanValue)
 				if (option) {
 					serverCurrentFilters.value.push({
 						type: filterType.id,
 						option: option.id,
+						negative: isNegative,
 					})
 				}
 			}
@@ -233,10 +242,11 @@ export function useServerSearch(opts: {
 		for (const filterValue of serverCurrentFilters.value) {
 			const type = serverFilterTypes.value.find((t) => t.id === filterValue.type)
 			if (type) {
+				const value = filterValue.negative ? `!${filterValue.option}` : filterValue.option
 				if (items[type.query_param]) {
-					items[type.query_param].push(filterValue.option)
+					items[type.query_param].push(value)
 				} else {
-					items[type.query_param] = [filterValue.option]
+					items[type.query_param] = [value]
 				}
 			}
 		}
