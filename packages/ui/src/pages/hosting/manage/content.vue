@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContentPageLayout from '../../../components/instances/ContentPageLayout.vue'
 import ConfirmUnlinkModal from '../../../components/instances/modals/ConfirmUnlinkModal.vue'
+import ModpackContentModal from '../../../components/instances/modals/ModpackContentModal.vue'
 import type {
 	ContentItem,
 	ContentModpackCardCategory,
@@ -41,6 +42,10 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-unlink',
 		defaultMessage: 'Failed to unlink modpack',
 	},
+	failedToLoadModpackContent: {
+		id: 'hosting.content.failed-to-load-modpack-content',
+		defaultMessage: 'Failed to load modpack content',
+	},
 })
 
 const client = injectModrinthClient()
@@ -69,11 +74,13 @@ const modpack = computed<ContentModpackData | null>(() => {
 			downloads: mp.downloads ?? 0,
 			followers: mp.followers ?? 0,
 		} as ContentModpackCardProject,
+		projectLink: `/project/${mp.spec.project_id}`,
 		version: {
 			id: mp.spec.version_id,
 			version_number: mp.version_number ?? '',
 			date_published: mp.date_published ?? '',
 		} as ContentModpackCardVersion,
+		versionLink: `/project/${mp.spec.project_id}/version/${mp.spec.version_id}`,
 		owner: undefined as ContentOwner | undefined,
 		categories: [] as ContentModpackCardCategory[],
 		hasUpdate: mp.has_update,
@@ -84,7 +91,7 @@ const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 
 const contentQuery = useQuery({
 	queryKey,
-	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined),
+	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -105,33 +112,7 @@ const addonLookup = computed(() => {
 })
 
 const contentItems = computed<ContentItem[]>(() => {
-	return (contentQuery.data.value?.addons ?? []).map((addon) => ({
-		project: {
-			id: addon.project_id ?? addon.filename,
-			slug: addon.project_id ?? addon.filename,
-			title: friendlyAddonName(addon),
-			icon_url: addon.icon_url ?? undefined,
-		},
-		version: {
-			id: addon.version?.id ?? addon.filename,
-			version_number: addon.version?.name ?? 'Unknown',
-			file_name: addon.filename,
-		},
-		owner: addon.owner
-			? {
-					id: addon.owner.id,
-					name: addon.owner.name,
-					type: addon.owner.type,
-					avatar_url: addon.owner.icon_url ?? undefined,
-					link: `/${addon.owner.type}/${addon.owner.id}`,
-				}
-			: undefined,
-		enabled: !addon.disabled,
-		file_name: addon.filename,
-		project_type: addon.kind,
-		has_update: addon.has_update,
-		update_version_id: null,
-	}))
+	return (contentQuery.data.value?.addons ?? []).map(addonToContentItem)
 })
 
 const deleteMutation = useMutation({
@@ -250,6 +231,7 @@ const uploadState = ref<UploadState>({
 })
 
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
 
 function handleBrowseContent() {
 	router.push({
@@ -306,11 +288,59 @@ function handleUploadFiles() {
 	input.click()
 }
 
-function handleModpackContent() {
-	const projectId = contentQuery.data.value?.modpack?.spec.project_id
-	if (projectId) {
-		window.location.href = `/project/${projectId}`
+function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
+	return {
+		project: {
+			id: addon.project_id ?? addon.filename,
+			slug: addon.project_id ?? addon.filename,
+			title: friendlyAddonName(addon),
+			icon_url: addon.icon_url ?? undefined,
+		},
+		version: {
+			id: addon.version?.id ?? addon.filename,
+			version_number: addon.version?.name ?? 'Unknown',
+			file_name: addon.filename,
+		},
+		owner: addon.owner
+			? {
+					id: addon.owner.id,
+					name: addon.owner.name,
+					type: addon.owner.type,
+					avatar_url: addon.owner.icon_url ?? undefined,
+					link: `/${addon.owner.type}/${addon.owner.id}`,
+				}
+			: undefined,
+		enabled: !addon.disabled,
+		file_name: addon.filename,
+		project_type: addon.kind,
+		has_update: addon.has_update,
+		update_version_id: null,
 	}
+}
+
+async function handleViewModpackContent() {
+	modpackContentModal.value?.showLoading()
+	try {
+		const data = await client.archon.content_v1.getAddons(
+			serverId,
+			worldId.value ?? undefined,
+			{ from_modpack: true },
+		)
+		const items = (data.addons ?? []).map(addonToContentItem)
+		modpackContentModal.value?.show(items)
+	} catch (err) {
+		modpackContentModal.value?.hide()
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadModpackContent),
+		})
+	}
+}
+
+async function handleModpackContentToggle(item: ContentItem) {
+	const addon = addonLookup.value.get(item.file_name)
+	if (!addon) return
+	await toggleMutation.mutateAsync({ addon })
 }
 
 function handleModpackUnlink() {
@@ -384,7 +414,7 @@ provideContentManager({
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	updateModpack: handleModpackUpdate,
-	viewModpackContent: handleModpackContent,
+	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
 	mapToTableItem: (item) => ({
 		id: item.file_name,
@@ -405,6 +435,13 @@ provideContentManager({
 	<ContentPageLayout>
 		<template #modals>
 			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
+			<ModpackContentModal
+				ref="modpackContentModal"
+				:modpack-name="modpack?.project.title"
+				:modpack-icon-url="modpack?.project.icon_url"
+				enable-toggle
+				@update:enabled="handleModpackContentToggle"
+			/>
 		</template>
 	</ContentPageLayout>
 </template>
