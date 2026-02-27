@@ -18,7 +18,7 @@
 					<TagItem
 						v-if="isServerInstance"
 						v-tooltip="
-							`This instance's content is locked and managed by ${projectV3?.name || 'a server project'}`
+							`This instance's content is locked and managed by ${linkedProjectV3?.name || 'a server project'}`
 						"
 						class="border !border-solid border-blue bg-highlight-blue !font-medium"
 						style="--_color: var(--color-blue)"
@@ -42,6 +42,27 @@
 								</template>
 								<template v-else> Never played </template>
 							</div>
+
+							<div v-if="linkedProjectV3" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+							<div
+								v-if="linkedProjectV3"
+								class="flex gap-1.5 items-center font-medium text-primary"
+							>
+								Linked to
+								<Avatar
+									:src="linkedProjectV3.icon_url"
+									:alt="linkedProjectV3.name"
+									:tint-by="instance.path"
+									size="24px"
+								/>
+								<router-link
+									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
+									class="hover:underline text-primary"
+								>
+									{{ linkedProjectV3.name }}
+								</router-link>
+							</div>
 						</template>
 
 						<template v-else>
@@ -61,19 +82,22 @@
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
-							<div v-if="projectV3" class="flex gap-1.5 items-center font-medium text-primary">
+							<div
+								v-if="linkedProjectV3"
+								class="flex gap-1.5 items-center font-medium text-primary"
+							>
 								Linked to
 								<Avatar
-									:src="projectV3.icon_url"
-									:alt="projectV3.name"
+									:src="linkedProjectV3.icon_url"
+									:alt="linkedProjectV3.name"
 									:tint-by="instance.path"
 									size="24px"
 								/>
 								<router-link
-									:to="`/project/${projectV3.slug ?? projectV3.id}`"
+									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
 									class="hover:underline text-primary"
 								>
-									{{ projectV3.name }}
+									{{ linkedProjectV3.name }}
 								</router-link>
 							</div>
 						</template>
@@ -337,19 +361,19 @@ const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
 const hasContent = ref(true)
-const projectV3 = ref<Labrinth.Projects.v3.Project>()
+const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
 
-const minecraftServer = computed(() => projectV3.value?.minecraft_server)
-const javaServerPingData = computed(() => projectV3.value?.minecraft_java_server?.ping?.data)
+const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
+const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
 const statusOnline = computed(() => !!javaServerPingData.value)
 const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
 
 async function fetchInstance() {
 	isServerInstance.value = false
-	projectV3.value = undefined
+	linkedProjectV3.value = undefined
 	modpackContentProjectV3.value = null
 	modrinthVersions.value = []
 	hasContent.value = true
@@ -358,17 +382,17 @@ async function fetchInstance() {
 
 	if (!offline.value && instance.value?.linked_data && instance.value.linked_data.project_id) {
 		try {
-			projectV3.value = await get_project_v3(
+			linkedProjectV3.value = await get_project_v3(
 				instance.value.linked_data.project_id,
 				'must_revalidate',
 			)
 
-			if (projectV3.value && projectV3.value.versions) {
-				const versions = await get_version_many(projectV3.value.versions, 'must_revalidate')
+			if (linkedProjectV3.value && linkedProjectV3.value.versions) {
+				const versions = await get_version_many(linkedProjectV3.value.versions, 'must_revalidate')
 				modrinthVersions.value = versions.sort(
 					(a: any, b: any) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
-				if (projectV3.value?.minecraft_server != null) {
+				if (linkedProjectV3.value?.minecraft_server != null) {
 					isServerInstance.value = true
 					await fetchModpackContent()
 					const projects = await get_projects(instance.value!.path).catch(() => ({}))
