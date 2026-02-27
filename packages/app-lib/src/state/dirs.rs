@@ -33,7 +33,15 @@ impl DirectoryInfo {
     // Get the settings directory
     // init() is not needed for this function
     pub fn initial_settings_dir_path(app_identifier: &str) -> Option<PathBuf> {
-        Self::env_path("THESEUS_CONFIG_DIR")
+        // Use option_env! to read compile-time env var set by build.rs from .env file
+        option_env!("THESEUS_CONFIG_DIR")
+            .and_then(|p| {
+                if p.is_empty() {
+                    None
+                } else {
+                    Some(PathBuf::from(p))
+                }
+            })
             .or_else(|| Some(dirs::data_dir()?.join(app_identifier)))
     }
 
@@ -182,12 +190,6 @@ impl DirectoryInfo {
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
         self.config_dir.join(CACHES_FOLDER_NAME)
-    }
-
-    /// Get path from environment variable
-    #[inline]
-    fn env_path(name: &str) -> Option<PathBuf> {
-        std::env::var_os(name).map(PathBuf::from)
     }
 
     #[tracing::instrument(skip(settings, exec, io_semaphore))]
