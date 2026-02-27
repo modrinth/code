@@ -202,6 +202,11 @@ pub struct UploadSearchProject {
     pub open_source: bool,
     pub color: Option<u32>,
 
+    pub required_dependencies: Vec<String>,
+    pub optional_dependencies: Vec<String>,
+    pub embedded_dependencies: Vec<String>,
+    pub incompatibilities: Vec<String>,
+
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
@@ -240,6 +245,11 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+
+    pub required_dependencies: Vec<String>,
+    pub optional_dependencies: Vec<String>,
+    pub embedded_dependencies: Vec<String>,
+    pub incompatibilities: Vec<String>,
 
     // Hidden fields to get the Project model out of the search results.
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
