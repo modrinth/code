@@ -868,7 +868,7 @@ const newMCVersion = ref<string | null>(null)
 
 const onReinstall = async (potentialArgs: any) => {
 	if (serverData.value?.flows?.intro) {
-		await client.archon.servers_v0.endIntro(serverId)
+		await client.archon.servers_v1.endIntro(serverId)
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	}
 
@@ -1309,7 +1309,7 @@ function initializeServer() {
 	}
 
 	if (serverData.value?.flows?.intro && serverProject.value) {
-		client.archon.servers_v0.endIntro(serverId).then(() => {
+		client.archon.servers_v1.endIntro(serverId).then(() => {
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		})
 	}

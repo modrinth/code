@@ -29,8 +29,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** GET /v1/:server_id/worlds/:world_id/backups/:backup_id */
 	public async get(
 		serverId: string,
-		backupId: string,
 		worldId: string = DEFAULT_WORLD_ID,
+		backupId: string,
 	): Promise<Archon.Backups.v1.Backup> {
 		return this.client.request<Archon.Backups.v1.Backup>(
 			`/${serverId}/worlds/${worldId}/backups/${backupId}`,
@@ -41,8 +41,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/backups */
 	public async create(
 		serverId: string,
-		request: Archon.Backups.v1.BackupRequest,
 		worldId: string = DEFAULT_WORLD_ID,
+		request: Archon.Backups.v1.BackupRequest,
 	): Promise<Archon.Backups.v1.PostBackupResponse> {
 		return this.client.request<Archon.Backups.v1.PostBackupResponse>(
 			`/${serverId}/worlds/${worldId}/backups`,
@@ -53,8 +53,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/backups/:backup_id/restore */
 	public async restore(
 		serverId: string,
-		backupId: string,
 		worldId: string = DEFAULT_WORLD_ID,
+		backupId: string,
 	): Promise<void> {
 		await this.client.request<void>(`/${serverId}/worlds/${worldId}/backups/${backupId}/restore`, {
 			api: 'archon',
@@ -66,8 +66,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** DELETE /v1/:server_id/worlds/:world_id/backups/:backup_id */
 	public async delete(
 		serverId: string,
-		backupId: string,
 		worldId: string = DEFAULT_WORLD_ID,
+		backupId: string,
 	): Promise<void> {
 		await this.client.request<void>(`/${serverId}/worlds/${worldId}/backups/${backupId}`, {
 			api: 'archon',
@@ -79,8 +79,8 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/backups/:backup_id/retry */
 	public async retry(
 		serverId: string,
-		backupId: string,
 		worldId: string = DEFAULT_WORLD_ID,
+		backupId: string,
 	): Promise<void> {
 		await this.client.request<void>(`/${serverId}/worlds/${worldId}/backups/${backupId}/retry`, {
 			api: 'archon',
@@ -92,9 +92,9 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** PATCH /v1/:server_id/worlds/:world_id/backups/:backup_id */
 	public async rename(
 		serverId: string,
+		worldId: string = DEFAULT_WORLD_ID,
 		backupId: string,
 		request: Archon.Backups.v1.PatchBackup,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/${serverId}/worlds/${worldId}/backups/${backupId}`, {
 			api: 'archon',

@@ -1,6 +1,5 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
-import { ArchonBackupsV0Module } from './archon/backups/v0'
 import { ArchonBackupsV1Module } from './archon/backups/v1'
 import { ArchonContentV1Module } from './archon/content/v1'
 import { ArchonServersV0Module } from './archon/servers/v0'
@@ -27,7 +26,6 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  * TODO: Better way? Probably not
  */
 export const MODULE_REGISTRY = {
-	archon_backups_v0: ArchonBackupsV0Module,
 	archon_backups_v1: ArchonBackupsV1Module,
 	archon_content_v1: ArchonContentV1Module,
 	archon_servers_v0: ArchonServersV0Module,

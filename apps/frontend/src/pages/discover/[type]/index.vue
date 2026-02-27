@@ -572,7 +572,7 @@ async function onOnboardingCreate(config: CreationFlowContextValue) {
 			} satisfies Archon.Content.v1.InstallWorldContent,
 			currentWorldId.value,
 		)
-		await client.archon.servers_v0.endIntro(currentServerId.value)
+		await client.archon.servers_v1.endIntro(currentServerId.value)
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
 		navigateTo(`/hosting/manage/${currentServerId.value}/content`)
 	} catch (e) {

@@ -90,7 +90,7 @@ const props = defineProps<{
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
 
 const createMutation = useMutation({
-	mutationFn: (name: string) => client.archon.backups_v0.create(ctx.serverId, { name }),
+	mutationFn: (name: string) => client.archon.backups_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

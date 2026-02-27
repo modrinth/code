@@ -29,4 +29,16 @@ export class ArchonServersV1Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	/**
+	 * End the intro flow for a server
+	 * DELETE /v1/servers/:id/flows/intro
+	 */
+	public async endIntro(serverId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/flows/intro`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
+		})
+	}
 }

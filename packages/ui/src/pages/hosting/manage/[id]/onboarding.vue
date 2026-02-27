@@ -134,7 +134,7 @@ onMounted(async () => {
 async function finalizeSetup() {
 	modalRef.value?.hide()
 	server.value.flows = { intro: false }
-	client.archon.servers_v0.endIntro(serverId).then(() => {
+	client.archon.servers_v1.endIntro(serverId).then(() => {
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	})
 	await router.push(`/hosting/manage/${serverId}/content`)

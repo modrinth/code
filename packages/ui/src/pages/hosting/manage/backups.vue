@@ -164,7 +164,7 @@ import {
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, backupsState, markBackupCancelled } = injectModrinthServerContext()
+const { server, worldId, backupsState, markBackupCancelled } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -183,11 +183,11 @@ const {
 	refetch,
 } = useQuery({
 	queryKey: backupsQueryKey,
-	queryFn: () => client.archon.backups_v0.list(serverId),
+	queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
 })
 
 const deleteMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.delete(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
 	onSuccess: (_data, backupId) => {
 		markBackupCancelled(backupId)
 		backupsState.delete(backupId)
@@ -196,7 +196,7 @@ const deleteMutation = useMutation({
 })
 
 const retryMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v0.retry(serverId, backupId),
+	mutationFn: (backupId: string) => client.archon.backups_v1.retry(serverId, worldId.value!, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 
