@@ -215,7 +215,9 @@ import {
 } from '@modrinth/ui'
 import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
+
 import { useGeneratedState } from '~/composables/generated'
+
 import ServerCompatibilityModal from './ServerCompatibilityModal/ServerCompatibilityModal.vue'
 
 const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompatibilityModal>>(

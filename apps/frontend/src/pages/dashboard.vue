@@ -34,12 +34,12 @@
 <script setup lang="ts">
 import {
 	AffiliateIcon,
+	BellIcon as NotificationsIcon,
 	ChartIcon,
 	CurrencyIcon,
 	DashboardIcon,
 	LibraryIcon,
 	ListIcon,
-	BellIcon as NotificationsIcon,
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
