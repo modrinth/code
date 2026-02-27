@@ -860,7 +860,7 @@ const messages = defineMessages({
 	faqDDOSProtectionAnswer: {
 		id: 'hosting-marketing.faq.ddos-protection.answer',
 		defaultMessage:
-			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps capacity in some locations.',
+			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17 Tbps capacity in some locations.',
 	},
 	faqLocation: {
 		id: 'hosting-marketing.faq.location',

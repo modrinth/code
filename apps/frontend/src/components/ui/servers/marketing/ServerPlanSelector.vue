@@ -133,7 +133,6 @@ const billingMonths = computed(() => {
 				</div>
 				<span class="m-0 text-2xl font-bold text-contrast">
 					{{ formatPrice(locale, price / billingMonths, currency, true) }}
-					{{ isUsa ? '' : currency }}
 					<span class="text-lg font-semibold text-secondary">
 						/ month<template v-if="interval !== 'monthly'">, billed {{ interval }}</template>
 					</span>

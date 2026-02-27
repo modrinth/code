@@ -435,7 +435,7 @@ const messages = defineMessages({
 	unlinkInstanceConfirmDescription: {
 		id: 'instance.settings.tabs.installation.unlink.confirm.description',
 		defaultMessage:
-			'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal.',
+			'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal instance.',
 	},
 	reinstallModpackConfirmTitle: {
 		id: 'instance.settings.tabs.installation.reinstall.confirm.title',
