@@ -52,7 +52,7 @@
 			</InstallationSettingsLayout>
 
 			<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
-			<ServerSetupModal ref="setupModal" @reinstall="emit('reinstall', $event)" />
+			<ServerSetupModal ref="setupModal" @reinstall="emit('reinstall', $event)" @browse-modpacks="onBrowseModpacks" />
 			<PlatformChangeModpackVersionModal
 				ref="modpackVersionModal"
 				:project="serverProject"
@@ -99,6 +99,13 @@ const emit = defineEmits<{
 }>()
 
 const isInstalling = computed(() => server.value?.status === 'installing')
+
+function onBrowseModpacks() {
+	navigateTo({
+		path: '/discover/modpacks',
+		query: { sid: serverId, from: 'content', wid: worldId.value },
+	})
+}
 
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()

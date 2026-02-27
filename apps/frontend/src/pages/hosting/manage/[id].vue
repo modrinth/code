@@ -287,21 +287,25 @@
 					Hang on, we're reconnecting to your server.
 				</div>
 
-				<div
-					v-if="serverData.status === 'installing'"
-					data-pyro-server-installing
-					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
+				<Transition
+					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-40"
+					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+					leave-from-class="opacity-100 max-h-40"
+					leave-to-class="opacity-0 max-h-0"
 				>
-					<ServerIcon :image="serverImage" class="!h-10 !w-10" />
-
-					<div class="flex flex-col gap-1">
-						<span class="text-lg font-bold"> We're preparing your server! </span>
-						<div class="flex flex-row items-center gap-2">
-							<PanelSpinner class="!h-3 !w-3" />
-							<InstallingTicker />
-						</div>
-					</div>
-				</div>
+					<InstallingBanner
+						v-if="serverData.status === 'installing' || isSyncingContent"
+						data-pyro-server-installing
+						class="mb-4"
+						:progress="syncProgress"
+					>
+						<template #icon>
+							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
+						</template>
+					</InstallingBanner>
+				</Transition>
 				<NuxtPage
 					:route="route"
 					:is-connected="isConnected"
@@ -353,6 +357,7 @@ import {
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,
+	InstallingBanner,
 	provideModrinthServerContext,
 	ServerIcon,
 	ServerInfoLabels,
@@ -367,7 +372,6 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
-import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
@@ -466,6 +470,13 @@ const cancelledBackups = new Set<string>()
 const markBackupCancelled = (backupId: string) => {
 	cancelledBackups.add(backupId)
 }
+
+// Parthenon state event
+const serverReadiness = ref<Archon.Websocket.v0.ReadinessState | null>(null)
+const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
+const isSyncingContent = computed(
+	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
+)
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -699,6 +710,41 @@ const handlePowerState = (data: Archon.Websocket.v0.WSPowerStateEvent) => {
 		})
 	} else {
 		updatePowerState(data.state)
+	}
+}
+
+const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
+	serverReadiness.value = data.readiness
+	syncProgress.value = data.progress
+
+	// Sync power state from the state event
+	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
+		{
+			not_ready: 'stopped',
+			starting: 'starting',
+			running: 'running',
+			stopping: 'stopping',
+			idle: data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
+		}
+	updatePowerState(powerMap[data.power_variant], {
+		exit_code: data.exit_code ?? undefined,
+		oom_killed: data.was_oom,
+	})
+
+	// Sync uptime
+	if (data.uptime > 0) {
+		stopUptimeUpdates()
+		uptimeSeconds.value = data.uptime
+		startUptimeUpdates()
+	}
+
+	// Update installing status from readiness
+	if (serverData.value) {
+		if (data.readiness === 'sync_content') {
+			serverData.value.status = 'installing'
+		} else if (serverData.value.status === 'installing' && data.readiness === 'ready') {
+			serverData.value.status = 'available'
+		}
 	}
 }
 
@@ -1244,6 +1290,7 @@ function initializeServer() {
 				unsubscribers.value = [
 					client.archon.sockets.on(serverId, 'log', handleLog),
 					client.archon.sockets.on(serverId, 'stats', handleStats),
+					client.archon.sockets.on(serverId, 'state', handleState),
 					client.archon.sockets.on(serverId, 'power-state', handlePowerState),
 					client.archon.sockets.on(serverId, 'uptime', handleUptime),
 					client.archon.sockets.on(serverId, 'auth-incorrect', handleAuthIncorrect),

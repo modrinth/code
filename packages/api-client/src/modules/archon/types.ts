@@ -468,6 +468,43 @@ export namespace Archon {
 				all: FilesystemOperation[]
 			}
 
+			export type ReadinessState =
+				| 'deprovisioned'
+				| 'waiting_active_world'
+				| 'waiting_world_spec_details_for_progress'
+				| 'pulling_world_data'
+				| 'migration_zfs'
+				| 'sync_content'
+				| 'container_readying'
+				| 'ready'
+
+			export type FlattenedPowerState =
+				| 'not_ready'
+				| 'starting'
+				| 'running'
+				| 'stopping'
+				| 'idle'
+
+			export type SyncInstallPhase = 'install_modloader' | 'install_modpack' | 'install_addons'
+
+			export type SyncContentProgress = {
+				started_at: string
+				phase: SyncInstallPhase | null
+				percent: number
+			}
+
+			export type WSStateEvent = {
+				event: 'state'
+				debug: string
+				readiness: ReadinessState
+				power_variant: FlattenedPowerState
+				exit_code?: number | null
+				was_oom?: boolean
+				target: 'start' | 'stop' | 'restart' | null
+				uptime: number
+				progress: SyncContentProgress | null
+			}
+
 			// Outgoing messages (client -> server)
 			export type WSOutgoingMessage = WSAuthMessage | WSCommandMessage
 
@@ -486,6 +523,7 @@ export namespace Archon {
 				| WSLogEvent
 				| WSStatsEvent
 				| WSPowerStateEvent
+				| WSStateEvent
 				| WSAuthExpiringEvent
 				| WSAuthIncorrectEvent
 				| WSAuthOkEvent
