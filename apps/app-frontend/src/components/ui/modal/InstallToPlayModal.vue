@@ -221,8 +221,8 @@ async function openViewContents() {
 					? {
 							version: {
 								id: depVersion.id,
-								file_name: depVersion.files?.[0]?.filename ?? dep.file_name ?? 'unknown',
-								version_number: depVersion.version_number ?? '',
+								file_name: depVersion.files?.[0]?.filename ?? dep.file_name,
+								version_number: depVersion.version_number ?? undefined,
 								date_published: depVersion.date_published ?? undefined,
 							},
 						}
