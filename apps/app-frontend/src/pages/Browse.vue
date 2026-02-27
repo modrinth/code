@@ -298,12 +298,13 @@ const pageCount = computed(() =>
 	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
 
-const effectiveRequestParams = computed(() =>
-	projectType.value === 'server' ? serverRequestParams.value : requestParams.value,
-)
+const effectiveRequestParams = computed(() => {
+	return projectType.value === 'server' ? serverRequestParams.value : requestParams.value
+})
 
-watch(effectiveRequestParams, () => {
+watch(effectiveRequestParams, async () => {
 	if (!route.params.projectType) return
+	await nextTick()
 	refreshSearch()
 })
 
