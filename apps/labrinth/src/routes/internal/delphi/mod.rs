@@ -34,6 +34,8 @@ use crate::{
     util::{error::Context, guards::admin_key_guard},
 };
 
+pub mod rescan;
+
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("delphi")
@@ -197,7 +199,10 @@ async fn ingest_report_deserialized(
 
     report.send_to_slack(&pool, &redis).await.ok();
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin Delphi ingest transaction")?;
 
     let report_id = DBDelphiReport {
         id: DelphiReportId(0), // This will be set by the database
@@ -208,7 +213,8 @@ async fn ingest_report_deserialized(
         severity: report.severity,
     }
     .upsert(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("failed to upsert Delphi report")?;
 
     info!(
         num_issues = %report.issues.len(),
@@ -293,7 +299,8 @@ async fn ingest_report_deserialized(
             issue_type: "__dummy".into(),
         }
         .insert(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err("failed to insert dummy Delphi report issue")?;
 
         ReportIssueDetail {
             id: DelphiReportIssueDetailsId(0), // This will be set by the database
@@ -307,7 +314,10 @@ async fn ingest_report_deserialized(
             status: DelphiStatus::Pending,
         }
         .insert(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err(
+            "failed to insert dummy Delphi report issue detail",
+        )?;
     }
 
     for (issue_type, issue_details) in report.issues {
@@ -317,11 +327,13 @@ async fn ingest_report_deserialized(
             issue_type,
         }
         .insert(&mut transaction)
-        .await?;
+        .await
+        .wrap_internal_err("failed to insert Delphi report issue")?;
 
         // This is required to handle the case where the same Delphi version is re-run on the same file
         ReportIssueDetail::remove_all_by_issue_id(issue_id, &mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to remove old Delphi issue details")?;
 
         for issue_detail in issue_details {
             let decompiled_source =
@@ -339,11 +351,15 @@ async fn ingest_report_deserialized(
                 status: DelphiStatus::Pending,
             }
             .insert(&mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to insert Delphi issue detail")?;
         }
     }
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit Delphi ingest transaction")?;
 
     Ok(())
 }
