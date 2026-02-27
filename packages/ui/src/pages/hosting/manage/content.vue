@@ -248,7 +248,8 @@ function handleUploadFiles() {
 	input.onchange = async () => {
 		if (!input.files) return
 		const files = Array.from(input.files)
-		const folder = `/${type.value}s`
+		const wid = worldId.value
+		if (!wid) return
 
 		uploadState.value = {
 			isUploading: true,
@@ -259,22 +260,18 @@ function handleUploadFiles() {
 		}
 
 		try {
-			for (const file of files) {
-				uploadState.value.currentFileName = file.name
-				uploadState.value.currentFileProgress = 0
-				try {
-					await client.kyros.files_v0.uploadFile(`${folder}/${file.name}`, file).onProgress((p) => {
-						uploadState.value.currentFileProgress = p.progress
-					}).promise
-				} catch (err) {
-					addNotification({
-						type: 'error',
-						text: err instanceof Error ? err.message : formatMessage(messages.failedToUpload),
-					})
-				}
-				uploadState.value.completedFiles++
-			}
+			await client.kyros.content_v1.uploadAddonFile(wid, files, {
+				onProgress: (p) => {
+					uploadState.value.currentFileProgress = p.progress
+				},
+			}).promise
+			uploadState.value.completedFiles = files.length
 			await contentQuery.refetch()
+		} catch (err) {
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToUpload),
+			})
 		} finally {
 			uploadState.value = {
 				isUploading: false,
