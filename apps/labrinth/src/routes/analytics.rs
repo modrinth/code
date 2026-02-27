@@ -250,19 +250,21 @@ async fn minecraft_server_play_ingest(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let (_, user) = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
-        Scopes::PERFORM_ANALYTICS,
+        Scopes::empty(),
     )
-    .await?;
+    .await
+    .map(|(_, user)| user)
+    .ok();
 
     let project_id = play_input.project_id;
     let row = MinecraftServerPlay {
         recorded: get_current_tenths_of_ms(),
-        user_id: user.id.0,
+        user_id: user.map(|u| u.id.0).unwrap_or(0),
         project_id: project_id.0,
         minecraft_uuid: play_input.minecraft_uuid,
     };
