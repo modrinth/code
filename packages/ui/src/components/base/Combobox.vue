@@ -5,17 +5,25 @@
 			v-if="searchable"
 			ref="searchTriggerRef"
 			v-model="searchQuery"
-			:icon="SearchIcon"
+			:icon="showSearchIcon ? SearchIcon : undefined"
 			type="text"
 			:placeholder="searchPlaceholder || placeholder"
 			:disabled="disabled"
 			wrapper-class="w-full"
+			:input-class="showChevron ? '!pr-9' : undefined"
 			class="relative"
 			@input="handleSearchInput"
 			@keydown="handleSearchKeydown"
 			@focus="handleSearchFocus"
 			@click="handleSearchClick"
-		/>
+		>
+			<template v-if="showChevron" #right>
+				<ChevronLeftIcon
+					class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary transition-transform duration-150"
+					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
+				/>
+			</template>
+		</StyledInput>
 
 		<!-- Standard mode: button trigger -->
 		<span
@@ -179,6 +187,8 @@ const props = withDefaults(
 		disableSearchFilter?: boolean
 		/** Keep the selected option's label in the input after selection, and show all options on focus */
 		syncWithSelection?: boolean
+		/** Show a search icon in the searchable input */
+		showSearchIcon?: boolean
 	}>(),
 	{
 		placeholder: 'Select an option',
@@ -190,6 +200,8 @@ const props = withDefaults(
 		showIconInSelected: false,
 		maxHeight: DEFAULT_MAX_HEIGHT,
 		noOptionsMessage: 'No results found',
+		syncWithSelection: true,
+		showSearchIcon: false,
 	},
 )
 
@@ -203,6 +215,7 @@ const emit = defineEmits<{
 
 const isOpen = ref(false)
 const searchQuery = ref('')
+const userHasTyped = ref(false)
 const focusedIndex = ref(-1)
 const containerRef = ref<HTMLElement>()
 const triggerRef = ref<HTMLElement>()
@@ -247,7 +260,7 @@ const optionsWithKeys = computed(() => {
 })
 
 const filteredOptions = computed(() => {
-	if (!searchQuery.value || !props.searchable || props.disableSearchFilter) {
+	if (!searchQuery.value || !props.searchable || props.disableSearchFilter || !userHasTyped.value) {
 		return optionsWithKeys.value
 	}
 
@@ -370,6 +383,7 @@ function closeDropdown() {
 
 	stopPositionTracking()
 	isOpen.value = false
+	userHasTyped.value = false
 	focusedIndex.value = -1
 	emit('close')
 
@@ -534,6 +548,7 @@ function handleSearchKeydown(event: KeyboardEvent) {
 }
 
 function handleSearchInput() {
+	userHasTyped.value = true
 	emit('searchInput', searchQuery.value)
 	if (!isOpen.value) {
 		openDropdown()

@@ -122,10 +122,14 @@ const {
 	hideLoaderVersion,
 } = ctx
 
-// For instance flow, prepend 'vanilla' to available loaders
+// For instance flow, prepend 'vanilla' to available loaders.
+// For server-onboarding, vanilla is a separate option in the setup type stage, so exclude it here.
 const effectiveLoaders = computed(() => {
 	if (ctx.flowType === 'instance') {
 		return ['vanilla', ...ctx.availableLoaders.filter((l) => l !== 'vanilla')]
+	}
+	if (ctx.flowType === 'server-onboarding') {
+		return ctx.availableLoaders.filter((l) => l !== 'vanilla')
 	}
 	return ctx.availableLoaders
 })
@@ -184,14 +188,30 @@ const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVers
 const paperVersions = ref<Record<string, number[]>>({})
 const purpurVersions = ref<Record<string, string[]>>({})
 
+// Paper/Purpur supported game version sets (for filtering the game version combobox)
+const paperSupportedVersions = ref<Set<string> | null>(null)
+const purpurSupportedVersions = ref<Set<string> | null>(null)
+
 // Game versions from tags provider, filtered by loader support
 const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	const versions = ctx.showSnapshots.value
 		? tags.gameVersions.value
 		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
-	// For loaders with per-version entries (NeoForge, Forge, Paper, Purpur), only show supported versions
+	// For loaders with per-version data, only show game versions that have builds
 	if (selectedLoader.value && selectedLoader.value !== 'vanilla') {
+		if (selectedLoader.value === 'paper' && paperSupportedVersions.value) {
+			return versions
+				.filter((v) => paperSupportedVersions.value!.has(v.version))
+				.map((v) => ({ value: v.version, label: v.version }))
+		}
+
+		if (selectedLoader.value === 'purpur' && purpurSupportedVersions.value) {
+			return versions
+				.filter((v) => purpurSupportedVersions.value!.has(v.version))
+				.map((v) => ({ value: v.version, label: v.version }))
+		}
+
 		let apiLoader = selectedLoader.value
 		if (apiLoader === 'neoforge') apiLoader = 'neo'
 
@@ -212,11 +232,15 @@ const gameVersionOptions = computed<ComboboxOption<string>[]>(() => {
 	return versions.map((v) => ({ value: v.version, label: v.version }))
 })
 
-// Auto-select latest game version when options become available and none is selected
+// Auto-select latest game version when options change and current selection is missing or invalid
 watch(
 	gameVersionOptions,
 	(options) => {
-		if (!selectedGameVersion.value && options.length > 0) {
+		if (options.length === 0) return
+		if (
+			!selectedGameVersion.value ||
+			!options.some((o) => o.value === selectedGameVersion.value)
+		) {
 			selectedGameVersion.value = options[0].value
 		}
 	},
@@ -237,6 +261,28 @@ async function fetchLoaderManifest(loader: string) {
 		loaderVersionsCache.value[apiLoader] = data.gameVersions
 	} catch {
 		loaderVersionsCache.value[apiLoader] = []
+	}
+}
+
+async function fetchPaperSupportedVersions() {
+	if (paperSupportedVersions.value) return
+	try {
+		const res = await fetch('https://api.papermc.io/v2/projects/paper')
+		const data = (await res.json()) as { versions: string[] }
+		paperSupportedVersions.value = new Set(data.versions)
+	} catch {
+		paperSupportedVersions.value = new Set()
+	}
+}
+
+async function fetchPurpurSupportedVersions() {
+	if (purpurSupportedVersions.value) return
+	try {
+		const res = await fetch('https://api.purpurmc.org/v2/purpur')
+		const data = (await res.json()) as { versions: string[] }
+		purpurSupportedVersions.value = new Set(data.versions)
+	} catch {
+		purpurSupportedVersions.value = new Set()
 	}
 }
 
@@ -280,11 +326,19 @@ function getLoaderVersionsForGameVersion(
 	return entry?.loaders ?? []
 }
 
-// Fetch manifest when loader changes so game versions can be filtered
+// Fetch version data when loader changes so game versions can be filtered
 watch(
 	() => selectedLoader.value,
 	async (loader) => {
-		if (!loader || loader === 'vanilla' || loader === 'paper' || loader === 'purpur') return
+		if (!loader || loader === 'vanilla') return
+		if (loader === 'paper') {
+			await fetchPaperSupportedVersions()
+			return
+		}
+		if (loader === 'purpur') {
+			await fetchPurpurSupportedVersions()
+			return
+		}
 		await fetchLoaderManifest(loader)
 	},
 	{ immediate: true },
@@ -343,8 +397,10 @@ function autoSelectLoaderVersion() {
 		selectedLoaderVersion.value = stable?.id ?? loaderVersionsData.value[0]?.id ?? null
 	} else if (loaderVersionType.value === 'latest') {
 		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
+	} else if (loaderVersionType.value === 'other' && !selectedLoaderVersion.value) {
+		// Pre-fill with latest when selection was cleared (e.g. loader switch)
+		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
 	}
-	// 'other' — user picks manually via Combobox
 }
 
 const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {

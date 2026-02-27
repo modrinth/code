@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import {
 	BookmarkIcon,
 	CheckIcon,
@@ -21,6 +21,8 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	CreationFlowModal,
+	type CreationFlowContextValue,
 	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
@@ -40,7 +42,7 @@ import {
 import { capitalizeString, cycleValue } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
-import { computed, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -370,13 +372,22 @@ async function serverInstall(project: InstallableSearchResult) {
 
 		if (projectType.value?.id === 'modpack') {
 			if (fromContext.value === 'onboarding') {
-				const params = new URLSearchParams({
-					resumeModal: 'modpack',
-					mp_pid: project.project_id,
-					mp_vid: version.id,
-					mp_name: project.title,
-				})
-				navigateTo(`/hosting/manage/${currentServerId.value}?${params}`)
+				// Show creation flow modal overlay on discovery page
+				const modalInstance = onboardingModalRef.value
+				if (modalInstance) {
+					onboardingInstallingProject.value = project
+					modalInstance.show()
+					await nextTick()
+					const ctx = modalInstance.ctx
+					ctx.setupType.value = 'modpack'
+					ctx.modpackSelection.value = {
+						projectId: project.project_id,
+						versionId: version.id,
+						name: project.title,
+						iconUrl: project.icon_url ?? undefined,
+					}
+					ctx.modal.value?.setStage('final-config')
+				}
 				return
 			}
 			const hardResetParam = eraseDataOnInstall.value ? 'true' : 'false'
@@ -525,9 +536,50 @@ const serverBackUrl = computed(() => {
 	if (!serverData.value) return ''
 	const id = serverData.value.server_id
 	return fromContext.value === 'onboarding'
-		? `/hosting/manage/${id}?resumeModal=modpack`
+		? `/hosting/manage/${id}?resumeModal=setup-type`
 		: `/hosting/manage/${id}/content`
 })
+
+// Onboarding modpack flow: show creation flow modal overlay on discovery page
+const onboardingModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+const onboardingInstallingProject = ref<InstallableSearchResult | null>(null)
+
+function onOnboardingHide() {
+	if (onboardingInstallingProject.value) {
+		onboardingInstallingProject.value.installing = false
+		onboardingInstallingProject.value = null
+	}
+}
+
+function onOnboardingBack() {
+	onboardingModalRef.value?.hide()
+}
+
+async function onOnboardingCreate(config: CreationFlowContextValue) {
+	if (!currentServerId.value || !config.modpackSelection.value) return
+
+	try {
+		await client.archon.content_v1.installContent(
+			currentServerId.value,
+			{
+				content_variant: 'modpack',
+				spec: {
+					platform: 'modrinth',
+					project_id: config.modpackSelection.value.projectId,
+					version_id: config.modpackSelection.value.versionId,
+				},
+				soft_override: false,
+			} satisfies Archon.Content.v1.InstallWorldContent,
+			currentWorldId.value,
+		)
+		await client.archon.servers_v0.endIntro(currentServerId.value)
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
+		navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+	} catch (e) {
+		handleError(new Error(`Error installing modpack: ${e}`))
+		config.loading.value = false
+	}
+}
 
 useSeoMeta({
 	description,
@@ -571,7 +623,7 @@ useSeoMeta({
 			<ButtonStyled>
 				<button @click="navigateTo(serverBackUrl)">
 					<LeftArrowIcon />
-					Back to server
+					{{ fromContext === 'onboarding' ? 'Back to setup' : 'Back to server' }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -853,6 +905,18 @@ useSeoMeta({
 			</div>
 		</div>
 	</section>
+
+	<CreationFlowModal
+		v-if="currentServerId && fromContext === 'onboarding' && projectType?.id === 'modpack'"
+		ref="onboardingModalRef"
+		type="server-onboarding"
+		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+		:show-snapshot-toggle="true"
+		:on-back="onOnboardingBack"
+		@hide="onOnboardingHide"
+		@browse-modpacks="() => {}"
+		@create="onOnboardingCreate"
+	/>
 </template>
 <style lang="scss" scoped>
 .normal-page__content {

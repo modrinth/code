@@ -101,6 +101,9 @@ export interface CreationFlowContextValue {
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
 
+	// Callbacks
+	onBack: (() => void) | null
+
 	// Methods
 	reset: () => void
 	setSetupType: (type: SetupType) => void
@@ -122,6 +125,7 @@ export interface CreationFlowOptions {
 	isInitialSetup?: boolean
 	initialLoader?: string
 	initialGameVersion?: string
+	onBack?: () => void
 }
 
 export function createCreationFlowContext(
@@ -139,6 +143,7 @@ export function createCreationFlowContext(
 	const isInitialSetup = options.isInitialSetup ?? false
 	const initialLoader = options.initialLoader ?? null
 	const initialGameVersion = options.initialGameVersion ?? null
+	const onBack = options.onBack ?? null
 
 	const setupType = ref<SetupType | null>(null)
 	const isImportMode = ref(false)
@@ -315,6 +320,7 @@ export function createCreationFlowContext(
 		loading,
 		modal,
 		stageConfigs: resolvedStageConfigs,
+		onBack,
 		reset,
 		setSetupType,
 		setImportMode,

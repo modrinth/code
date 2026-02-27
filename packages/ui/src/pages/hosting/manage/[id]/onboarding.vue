@@ -101,6 +101,12 @@ function onBrowseModpacks() {
 }
 
 onMounted(async () => {
+	if (route.query.resumeModal === 'setup-type') {
+		router.replace({ query: {} })
+		openModal()
+		return
+	}
+
 	if (route.query.resumeModal === 'modpack') {
 		const mpPid = route.query.mp_pid as string | undefined
 		const mpVid = route.query.mp_vid as string | undefined

@@ -29,6 +29,7 @@ const props = withDefaults(
 		isInitialSetup?: boolean
 		initialLoader?: string
 		initialGameVersion?: string
+		onBack?: (() => void) | null
 	}>(),
 	{
 		type: 'world',
@@ -38,6 +39,7 @@ const props = withDefaults(
 		isInitialSetup: false,
 		initialLoader: undefined,
 		initialGameVersion: undefined,
+		onBack: null,
 	},
 )
 
@@ -62,6 +64,7 @@ const ctx = createCreationFlowContext(
 		isInitialSetup: props.isInitialSetup,
 		initialLoader: props.initialLoader,
 		initialGameVersion: props.initialGameVersion,
+		onBack: props.onBack ?? undefined,
 	},
 )
 provideCreationFlowContext(ctx)

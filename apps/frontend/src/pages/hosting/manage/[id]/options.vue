@@ -42,7 +42,12 @@ const navLinks = computed(() => [
 	{ icon: WrenchIcon, label: 'Platform', href: `/hosting/manage/${serverId}/options/loader` },
 	{ icon: TextQuoteIcon, label: 'Startup', href: `/hosting/manage/${serverId}/options/startup` },
 	{ icon: VersionIcon, label: 'Network', href: `/hosting/manage/${serverId}/options/network` },
-	{ icon: ListIcon, label: 'Properties', href: `/hosting/manage/${serverId}/options/properties` },
+	{
+		icon: ListIcon,
+		label: 'Properties',
+		href: `/hosting/manage/${serverId}/options/properties`,
+		shown: server.value?.status !== 'installing',
+	},
 	{
 		icon: UserIcon,
 		label: 'Preferences',

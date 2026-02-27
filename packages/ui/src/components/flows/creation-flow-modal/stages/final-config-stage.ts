@@ -20,15 +20,21 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
-		onClick: () => ctx.modal.value?.prevStage(),
+		onClick: () => {
+			if (ctx.onBack) {
+				ctx.onBack()
+			} else {
+				ctx.modal.value?.prevStage()
+			}
+		},
 	}),
 	rightButtonConfig: (ctx) => {
 		const isWorld = ctx.flowType === 'world'
 		const isOnboarding = ctx.flowType === 'server-onboarding'
 		const isFinish = isWorld || isOnboarding
 		return {
-			label: isWorld ? 'Create world' : isOnboarding ? 'Install' : 'Continue',
-			icon: isFinish ? (isWorld ? PlusIcon : DownloadIcon) : RightArrowIcon,
+			label: isWorld ? 'Create world' : isOnboarding ? 'Setup server' : 'Continue',
+			icon: isFinish ? PlusIcon : RightArrowIcon,
 			iconPosition: isFinish ? ('before' as const) : ('after' as const),
 			color: isFinish ? ('brand' as const) : undefined,
 			disabled: isForwardBlocked(ctx),
