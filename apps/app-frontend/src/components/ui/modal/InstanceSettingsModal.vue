@@ -67,7 +67,6 @@ const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
-		shown: !isMinecraftServer.value,
 	},
 	{
 		name: defineMessage({
@@ -119,6 +118,10 @@ defineExpose({ show })
 			</span>
 		</template>
 
-		<TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props }))" />
+		<TabbedModal
+			:tabs="
+				tabs.map((tab) => ({ ...tab, props: { ...props, isMinecraftServer: isMinecraftServer } }))
+			"
+		/>
 	</ModalWrapper>
 </template>
