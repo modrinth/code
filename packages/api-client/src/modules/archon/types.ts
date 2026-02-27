@@ -96,7 +96,6 @@ export namespace Archon {
 						soft_override: boolean
 				  }
 		}
-
 	}
 
 	export namespace Servers {
@@ -478,12 +477,7 @@ export namespace Archon {
 				| 'container_readying'
 				| 'ready'
 
-			export type FlattenedPowerState =
-				| 'not_ready'
-				| 'starting'
-				| 'running'
-				| 'stopping'
-				| 'idle'
+			export type FlattenedPowerState = 'not_ready' | 'starting' | 'running' | 'stopping' | 'idle'
 
 			export type SyncInstallPhase = 'install_modloader' | 'install_modpack' | 'install_addons'
 

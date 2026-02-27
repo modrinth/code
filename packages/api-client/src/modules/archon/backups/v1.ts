@@ -56,11 +56,14 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		worldId: string = DEFAULT_WORLD_ID,
 		backupId: string,
 	): Promise<void> {
-		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/restore`, {
-			api: 'archon',
-			version: 1,
-			method: 'POST',
-		})
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/restore`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
 	}
 
 	/** DELETE /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
@@ -82,11 +85,14 @@ export class ArchonBackupsV1Module extends AbstractModule {
 		worldId: string = DEFAULT_WORLD_ID,
 		backupId: string,
 	): Promise<void> {
-		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/retry`, {
-			api: 'archon',
-			version: 1,
-			method: 'POST',
-		})
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/retry`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
 	}
 
 	/** PATCH /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */

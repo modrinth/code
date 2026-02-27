@@ -422,6 +422,9 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolutions"
   },
+  "hosting.content.failed-to-load-modpack-content": {
+    "defaultMessage": "Failed to load modpack content"
+  },
   "hosting.content.failed-to-remove": {
     "defaultMessage": "Failed to remove content"
   },

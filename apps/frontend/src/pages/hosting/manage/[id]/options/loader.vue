@@ -1,95 +1,291 @@
 <template>
-	<div class="max-h-fit rounded-2xl bg-surface-3 p-6">
+	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
 		<template v-if="server">
-			<InstallationSettingsLayout>
-				<template #extra>
-					<!-- Reset server section -->
-					<div class="flex flex-col gap-2.5">
-						<span class="text-lg font-semibold text-contrast">Reset server</span>
-						<span class="m-0 text-primary">
-							Removes all data on your server, including your worlds, mods, and configuration files.
-							Backups will remain and can be restored.
-						</span>
-						<div>
-							<ButtonStyled color="red">
-								<button :disabled="isInstalling" class="!shadow-none" @click="setupModal?.show()">
-									<RotateCounterClockwiseIcon class="size-5" />
-									Reset server
+			<template v-if="isLinked">
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Installation info</span>
+					<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+						<div
+							v-for="row in installationInfo"
+							:key="row.label"
+							class="flex items-center justify-between"
+						>
+							<span class="text-primary">{{ row.label }}</span>
+							<span class="font-semibold text-contrast">{{ row.value }}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Installed modpack</span>
+					<div
+						v-if="modpack"
+						class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
+					>
+						<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
+							<div
+								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+							>
+								<Avatar
+									v-if="modpack.icon_url"
+									:src="modpack.icon_url"
+									:alt="modpack.title ?? 'Modpack'"
+									size="100%"
+									no-shadow
+								/>
+							</div>
+						</AutoLink>
+						<div class="flex flex-col gap-1">
+							<AutoLink
+								:to="`/project/${modpack.spec.project_id}`"
+								class="font-semibold text-contrast hover:underline"
+							>
+								{{ modpack.title ?? modpack.spec.project_id }}
+							</AutoLink>
+							<div
+								v-if="modpack.version_number"
+								class="flex items-center gap-2 text-sm font-medium text-primary"
+							>
+								<span>{{ modpack.version_number }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="flex flex-wrap gap-2">
+						<ButtonStyled>
+							<button
+								class="!shadow-none"
+								:disabled="isInstalling"
+								@click="modpackVersionModal?.show()"
+							>
+								<ArrowLeftRightIcon class="size-5" />
+								Change version
+							</button>
+						</ButtonStyled>
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="handleRepair">
+								<HammerIcon class="size-5" />
+								Repair
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Linked instance</span>
+					<div>
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
+								<UnlinkIcon class="size-5" />
+								Unlink modpack
+							</button>
+						</ButtonStyled>
+					</div>
+					<span class="text-primary">
+						Unlinking permanently disconnects this instance from the modpack project, allowing you
+						to change the loader and Minecraft version, but you won't receive future updates.
+					</span>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Re-install modpack</span>
+					<div>
+						<ButtonStyled color="red">
+							<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
+								<DownloadIcon class="size-5" />
+								Re-install modpack
+							</button>
+						</ButtonStyled>
+					</div>
+					<span class="text-primary">
+						Re-installing the modpack resets the instance's content to its original state, removing
+						any mods or content you have added.
+					</span>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Reset server</span>
+					<span class="text-primary">
+						Removes all data on your server, including your worlds, mods, and configuration files.
+						Backups will remain and can be restored.
+					</span>
+					<div>
+						<ButtonStyled color="red">
+							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+								<RotateCounterClockwiseIcon class="size-5" />
+								Reset server
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</template>
+
+			<template v-else>
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Installation info</span>
+
+					<div v-if="!isEditing" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+						<div
+							v-for="row in installationInfo"
+							:key="row.label"
+							class="flex items-center justify-between"
+						>
+							<span class="text-primary">{{ row.label }}</span>
+							<span class="font-semibold text-contrast">{{ row.value }}</span>
+						</div>
+					</div>
+
+					<div
+						v-else
+						class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+					>
+						<div class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast">Platform</span>
+							<Chips v-model="selectedPlatform" :items="availablePlatforms" />
+						</div>
+
+						<div class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast">Game version</span>
+							<Combobox
+								v-model="selectedGameVersion"
+								:options="gameVersionOptions"
+								searchable
+								sync-with-selection
+								placeholder="Select version"
+								search-placeholder="Search game version..."
+								:display-value="selectedGameVersion || 'Select version'"
+							>
+								<template v-if="hasSnapshots" #dropdown-footer>
+									<button
+										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										@mousedown.prevent
+										@click="showSnapshots = !showSnapshots"
+									>
+										<EyeOffIcon v-if="showSnapshots" class="size-4" />
+										<EyeIcon v-else class="size-4" />
+										{{ showSnapshots ? 'Hide snapshots' : 'Show all versions' }}
+									</button>
+								</template>
+							</Combobox>
+						</div>
+
+						<div v-if="selectedPlatform !== 'vanilla'" class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast"> {{ formattedLoaderName }} version </span>
+							<Combobox
+								v-model="selectedLoaderVersion"
+								searchable
+								sync-with-selection
+								:placeholder="loaderVersionDisplayValue"
+								search-placeholder="Search version..."
+								:options="loaderVersionOptions"
+								:display-value="loaderVersionDisplayValue"
+							/>
+						</div>
+
+						<div class="flex flex-wrap gap-2">
+							<ButtonStyled color="brand">
+								<button
+									class="!shadow-none"
+									:disabled="!isValid || !hasChanges || isSaving"
+									@click="handleSave"
+								>
+									<SpinnerIcon v-if="isSaving" class="animate-spin" />
+									<SaveIcon v-else />
+									{{ isSaving ? 'Saving...' : 'Save' }}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled type="outlined">
+								<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
+									<XIcon />
+									Cancel
 								</button>
 							</ButtonStyled>
 						</div>
 					</div>
-				</template>
+				</div>
 
-				<template #unlinked-extra>
-					<div class="my-2 flex items-center gap-2">
-						<Toggle v-model="eraseAllData" small />
-						<span class="font-semibold text-contrast">Erase all data</span>
+				<template v-if="!isEditing">
+					<div class="flex items-start gap-2">
+						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+						<span class="text-primary">
+							We don't recommend editing your installation settings after installing content. If you
+							want to edit them reset your server.
+						</span>
 					</div>
-				</template>
 
-				<template #save-button>
 					<div class="flex flex-wrap gap-2">
-						<ButtonStyled :color="eraseAllData ? 'red' : 'brand'">
-							<button
-								class="max-w-fit !shadow-none"
-								:disabled="!isValid || (!hasChanges && !eraseAllData) || isSaving || isInstalling"
-								@click="handleSave"
-							>
-								<SpinnerIcon v-if="isSaving" class="animate-spin" />
-								<SaveIcon v-else />
-								{{ isSaving ? 'Saving...' : eraseAllData ? 'Erase and save' : 'Save' }}
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="isEditing = true">
+								<PencilIcon class="size-5" />
+								Edit
 							</button>
 						</ButtonStyled>
 						<ButtonStyled>
-							<button :disabled="!hasChanges" class="!shadow-none" @click="resetToCurrent">
-								<UndoIcon />
-								Reset to current
+							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+								Reset server
+								<ChevronRightIcon class="size-5" />
 							</button>
 						</ButtonStyled>
 					</div>
 				</template>
-			</InstallationSettingsLayout>
-
-			<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
-			<ServerSetupModal ref="setupModal" @reinstall="emit('reinstall', $event)" @browse-modpacks="onBrowseModpacks" />
-			<PlatformChangeModpackVersionModal
-				ref="modpackVersionModal"
-				:project="serverProject"
-				:versions="Array.isArray(versions) ? versions : []"
-				:current-version="currentVersion"
-				:current-version-id="server?.upstream?.version_id"
-				:server-status="server?.status"
-				@reinstall="emit('reinstall')"
-			/>
+			</template>
 		</template>
 	</div>
+	<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
+	<ServerSetupModal
+		ref="setupModal"
+		@reinstall="emit('reinstall', $event)"
+		@browse-modpacks="onBrowseModpacks"
+	/>
+	<PlatformChangeModpackVersionModal
+		ref="modpackVersionModal"
+		:project="modpackProjectForModal"
+		:versions="versions ?? []"
+		:current-version="modpackCurrentVersionForModal"
+		:current-version-id="modpack?.spec.version_id"
+		:server-status="server?.status"
+		@reinstall="emit('reinstall')"
+	/>
+	<ConfirmReinstallModal ref="reinstallModal" @reinstall="handleReinstallConfirm" />
 </template>
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { RotateCounterClockwiseIcon, SaveIcon, SpinnerIcon, UndoIcon } from '@modrinth/assets'
 import {
+	ArrowLeftRightIcon,
+	ChevronRightIcon,
+	CircleAlertIcon,
+	DownloadIcon,
+	PencilIcon,
+	EyeIcon,
+	EyeOffIcon,
+	HammerIcon,
+	RotateCounterClockwiseIcon,
+	SaveIcon,
+	SpinnerIcon,
+	UnlinkIcon,
+	XIcon,
+} from '@modrinth/assets'
+import {
+	AutoLink,
+	Avatar,
 	ButtonStyled,
+	Chips,
+	Combobox,
+	ConfirmReinstallModal,
 	ConfirmUnlinkModal,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	injectTags,
-	InstallationSettingsLayout,
-	provideInstallationSettings,
 	ServerSetupModal,
-	Toggle,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
 import PlatformChangeModpackVersionModal from '~/components/ui/servers/PlatformChangeModpackVersionModal.vue'
-import { useServerProject } from '~/composables/servers/use-server-project.ts'
 
 const client = injectModrinthClient()
 const { server, serverId, worldId } = injectModrinthServerContext()
-const { data: serverProject } = useServerProject(computed(() => server.value?.upstream ?? null))
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const tags = injectTags()
@@ -99,6 +295,60 @@ const emit = defineEmits<{
 }>()
 
 const isInstalling = computed(() => server.value?.status === 'installing')
+const isEditing = ref(false)
+
+const addonsQuery = useQuery({
+	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
+	queryFn: () =>
+		client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined),
+	enabled: computed(() => worldId.value !== null),
+})
+
+const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
+const isLinked = computed(() => !!modpack.value)
+
+function capitalize(str: string): string {
+	return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+const installationInfo = computed(() => {
+	const addons = addonsQuery.data.value
+	const rawLoader = addons?.modloader ?? server.value?.loader ?? 'Unknown'
+	const loader = capitalize(rawLoader)
+	const gameVersion = addons?.game_version ?? server.value?.mc_version ?? 'Unknown'
+	const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? 'Unknown'
+
+	const rows = [
+		{ label: 'Platform', value: loader },
+		{ label: 'Game version', value: gameVersion },
+	]
+	if (loader && loader !== 'Vanilla') {
+		rows.push({ label: `${loader} version`, value: loaderVersion })
+	}
+	return rows
+})
+
+const versionsQuery = useQuery({
+	queryKey: computed(() => ['content', 'loader', 'versions', modpack.value?.spec.project_id ?? null]),
+	queryFn: () =>
+		client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id),
+	enabled: computed(() => !!modpack.value?.spec.project_id),
+})
+
+const versions = computed(() => versionsQuery.data.value ?? [])
+
+const modpackProjectForModal = computed(() => {
+	if (!modpack.value) return null
+	return {
+		id: modpack.value.spec.project_id,
+		title: modpack.value.title ?? modpack.value.spec.project_id,
+	}
+})
+
+const modpackCurrentVersionForModal = computed(() => {
+	if (!modpack.value) return null
+	return { version_number: modpack.value.version_number ?? '' }
+})
 
 function onBrowseModpacks() {
 	navigateTo({
@@ -110,40 +360,7 @@ function onBrowseModpacks() {
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 const modpackVersionModal = ref()
-
-// --- Linked modpack data ---
-
-const { data: versions, refresh: refreshVersions } = await useAsyncData(
-	`content-loader-versions-${server.value?.upstream?.project_id}`,
-	async () => {
-		if (!server.value?.upstream?.project_id) return []
-		try {
-			const result = await useBaseFetch(`project/${server.value.upstream.project_id}/version`)
-			return result || []
-		} catch (e) {
-			console.error('couldnt fetch all versions:', e)
-			throw new Error('Failed to load modpack versions.')
-		}
-	},
-	{ default: () => [] },
-)
-
-const { data: currentVersion, refresh: refreshCurrentVersion } = await useAsyncData(
-	`content-loader-version-${server.value?.upstream?.version_id}`,
-	async () => {
-		if (!server.value?.upstream?.version_id) return null
-		try {
-			const result = await useBaseFetch(`version/${server.value.upstream.version_id}`)
-			return result || null
-		} catch (e) {
-			console.error('couldnt fetch version:', e)
-			throw new Error('Failed to load modpack version.')
-		}
-	},
-	{ default: () => null },
-)
-
-// --- Unlinked state ---
+const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 
 const availablePlatforms = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 
@@ -151,10 +368,8 @@ const selectedPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
 const selectedGameVersion = ref(server.value?.mc_version ?? '')
 const selectedLoaderVersion = ref<number>(0)
 const showSnapshots = ref(false)
-const eraseAllData = ref(false)
 const isSaving = ref(false)
 
-// Loader version manifest cache
 interface LoaderVersionEntry {
 	id: string
 	stable: boolean
@@ -233,7 +448,6 @@ function getLoaderVersionsForGameVersion(
 	return entry?.loaders ?? []
 }
 
-// Game version options filtered by loader support and snapshot toggle
 const gameVersionsForLoader = computed(() => {
 	const versions = showSnapshots.value
 		? tags.gameVersions.value
@@ -310,7 +524,6 @@ const isValid = computed(() => {
 	return true
 })
 
-// Fetch manifest when loader changes
 watch(
 	selectedPlatform,
 	async (loader) => {
@@ -327,7 +540,6 @@ watch(
 	{ immediate: true },
 )
 
-// Fetch paper/purpur versions when game version changes
 watch(selectedGameVersion, async (gv) => {
 	selectedLoaderVersion.value = 0
 	if (!gv) return
@@ -338,17 +550,16 @@ watch(selectedGameVersion, async (gv) => {
 	}
 })
 
-/** Map UI loader names to API Modloader values */
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'
 	return loader as Archon.Content.v1.Modloader
 }
 
-function resetToCurrent() {
+function cancelEditing() {
 	selectedPlatform.value = server.value?.loader?.toLowerCase() ?? 'vanilla'
 	selectedGameVersion.value = server.value?.mc_version ?? ''
 	selectedLoaderVersion.value = 0
-	eraseAllData.value = false
+	isEditing.value = false
 }
 
 async function handleSave() {
@@ -361,12 +572,12 @@ async function handleSave() {
 			loader: toApiLoader(selectedPlatform.value),
 			version: loaderVersion,
 			game_version: selectedGameVersion.value || undefined,
-			soft_override: !eraseAllData.value,
+			soft_override: true,
 		}
 
 		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
 		server.value.status = 'installing'
-		eraseAllData.value = false
+		isEditing.value = false
 	} catch (err) {
 		addNotification({
 			type: 'error',
@@ -377,63 +588,54 @@ async function handleSave() {
 	}
 }
 
-// --- Context ---
+async function handleRepair() {
+	if (!modpack.value) return
+	try {
+		await client.archon.servers_v0.reinstall(
+			serverId,
+			{
+				project_id: modpack.value.spec.project_id,
+				version_id: modpack.value.spec.version_id,
+			},
+			false,
+		)
+		server.value.status = 'installing'
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : 'Failed to repair server',
+		})
+	}
+}
 
-provideInstallationSettings({
-	isLinked: computed(() => !!server.value?.upstream),
-	modpack: computed(() =>
-		serverProject.value
-			? {
-					title: serverProject.value.title ?? 'Unknown modpack',
-					iconUrl: serverProject.value.icon_url ?? undefined,
-					projectLink: `/project/${serverProject.value.slug ?? serverProject.value.id}`,
-					versionName: (currentVersion.value as any)?.version_number ?? undefined,
-					versionLink: currentVersion.value
-						? `/project/${serverProject.value.slug ?? serverProject.value.id}/version/${(currentVersion.value as any).id}`
-						: undefined,
-				}
-			: null,
-	),
-	installationInfo: computed(() => {
-		const rows = [
-			{ label: 'Platform', value: server.value?.loader ?? 'Unknown' },
-			{ label: 'Game version', value: server.value?.mc_version ?? 'Unknown' },
-		]
-		if (server.value?.loader && server.value.loader !== 'Vanilla') {
-			rows.push({
-				label: `${server.value.loader} version`,
-				value: server.value?.loader_version ?? 'Unknown',
-			})
-		}
-		return rows
-	}),
-	isBusy: isInstalling,
-	changeVersion: () => modpackVersionModal.value?.show(),
-	unlink: () => unlinkModal.value?.show(),
-
-	// Unlinked state
-	platforms: computed(() => availablePlatforms),
-	selectedPlatform,
-	gameVersionOptions,
-	selectedGameVersion,
-	loaderVersionOptions,
-	selectedLoaderVersion,
-	loaderVersionDisplayValue,
-	formattedLoaderName,
-	hasChanges,
-	isValid,
-	isSaving,
-	save: handleSave,
-	showSnapshots,
-	hasSnapshots,
-})
-
-// --- Linked state actions ---
+async function handleReinstallConfirm() {
+	if (!modpack.value) return
+	try {
+		await client.archon.servers_v0.reinstall(
+			serverId,
+			{
+				project_id: modpack.value.spec.project_id,
+				version_id: modpack.value.spec.version_id,
+			},
+			true,
+		)
+		server.value.status = 'installing'
+		emit('reinstall')
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : 'Failed to reinstall modpack',
+		})
+	}
+}
 
 async function handleUnlinkConfirm() {
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value ?? undefined)
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		])
 	} catch (err) {
 		addNotification({
 			type: 'error',
@@ -446,14 +648,14 @@ watch(
 	() => server.value?.status,
 	async (newStatus, oldStatus) => {
 		if (oldStatus === 'installing' && newStatus === 'available') {
-			// Update unlinked state refs to reflect new server state
 			selectedPlatform.value = server.value?.loader?.toLowerCase() ?? 'vanilla'
 			selectedGameVersion.value = server.value?.mc_version ?? ''
 			selectedLoaderVersion.value = 0
+			isEditing.value = false
 
 			await Promise.all([
-				refreshVersions(),
-				refreshCurrentVersion(),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'loader', 'versions'] }),
 				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			])
 		}

@@ -61,38 +61,52 @@ const type = computed(() => {
 	return loader === 'paper' || loader === 'purpur' ? 'plugin' : 'mod'
 })
 
-const modpack = computed<ContentModpackData | null>(() => {
-	const mp = contentQuery.data.value?.modpack
-	if (!mp) return null
-	return {
-		project: {
-			id: mp.spec.project_id,
-			slug: mp.spec.project_id,
-			title: mp.title ?? mp.spec.project_id,
-			icon_url: mp.icon_url ?? undefined,
-			description: mp.description ?? '',
-			downloads: mp.downloads ?? 0,
-			followers: mp.followers ?? 0,
-		} as ContentModpackCardProject,
-		projectLink: `/project/${mp.spec.project_id}`,
-		version: {
-			id: mp.spec.version_id,
-			version_number: mp.version_number ?? '',
-			date_published: mp.date_published ?? '',
-		} as ContentModpackCardVersion,
-		versionLink: `/project/${mp.spec.project_id}/version/${mp.spec.version_id}`,
-		owner: undefined as ContentOwner | undefined,
-		categories: [] as ContentModpackCardCategory[],
-		hasUpdate: mp.has_update,
-	}
-})
-
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 
 const contentQuery = useQuery({
 	queryKey,
 	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+})
+
+const modpackProjectId = computed(() => contentQuery.data.value?.modpack?.spec.project_id ?? null)
+
+const projectQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'project', modpackProjectId.value]),
+	queryFn: () => client.labrinth.projects_v2.get(modpackProjectId.value!),
+	enabled: computed(() => !!modpackProjectId.value),
+})
+
+const modpack = computed<ContentModpackData | null>(() => {
+	const mp = contentQuery.data.value?.modpack
+	if (!mp) return null
+	const project = projectQuery.data.value
+	return {
+		project: {
+			id: mp.spec.project_id,
+			slug: project?.slug ?? mp.spec.project_id,
+			title: mp.title ?? mp.spec.project_id,
+			icon_url: mp.icon_url ?? undefined,
+			description: mp.description ?? '',
+			downloads: mp.downloads ?? 0,
+			followers: mp.followers ?? 0,
+		} as ContentModpackCardProject,
+		projectLink: `/project/${project?.slug ?? mp.spec.project_id}`,
+		version: {
+			id: mp.spec.version_id,
+			version_number: mp.version_number ?? '',
+			date_published: mp.date_published ?? '',
+		} as ContentModpackCardVersion,
+		versionLink: `/project/${project?.slug ?? mp.spec.project_id}/version/${mp.spec.version_id}`,
+		owner: undefined as ContentOwner | undefined,
+		categories: (project?.display_categories ?? []).map((name) => ({
+			name,
+			icon: name,
+			project_type: 'modpack',
+			header: 'categories',
+		})) as ContentModpackCardCategory[],
+		hasUpdate: mp.has_update,
+	}
 })
 
 function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
