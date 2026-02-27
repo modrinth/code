@@ -8,7 +8,7 @@ import {
 	SearchIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
-import type { GameVersion, ProjectType, SortType, Tags } from '@modrinth/ui'
+import type { ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
 	ButtonStyled,
 	Checkbox,
@@ -26,7 +26,6 @@ import {
 	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
-import type { Category, Platform } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
@@ -70,9 +69,9 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 ])
 
 const tags: Ref<Tags> = computed(() => ({
-	gameVersions: availableGameVersions.value as GameVersion[],
-	loaders: loaders.value as Platform[],
-	categories: categories.value as Category[],
+	gameVersions: availableGameVersions.value as Labrinth.Tags.v2.GameVersion[],
+	loaders: loaders.value as Labrinth.Tags.v2.Loader[],
+	categories: categories.value as Labrinth.Tags.v2.Category[],
 }))
 
 type Instance = {
@@ -316,7 +315,10 @@ async function refreshSearch() {
 		const isServer = projectType.value === 'server'
 
 		if (isServer) {
-			const rawResults = await get_search_results_v3(serverRequestParams.value)
+			const rawResults = (await get_search_results_v3(serverRequestParams.value)) as {
+				result: Labrinth.Search.v3.SearchResults
+			} | null
+
 			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
 			const hits = searchResults.hits ?? []
 			serverHits.value = hits
@@ -329,24 +331,32 @@ async function refreshSearch() {
 				limit: maxResults.value,
 			}
 		} else {
-			let rawResults = await get_search_results(requestParams.value)
+			let rawResults = (await get_search_results(requestParams.value)) as {
+				result: Labrinth.Search.v2.SearchResults
+			} | null
+
 			if (!rawResults) {
 				rawResults = {
 					result: {
 						hits: [],
 						total_hits: 0,
 						limit: 1,
+						offset: 0,
 					},
 				}
 			}
 			if (instance.value) {
-				for (const val of rawResults.result.hits) {
-					val.installed =
-						newlyInstalled.value.includes(val.project_id) ||
-						Object.values(instanceProjects.value ?? {}).some(
-							(x) => x.metadata && x.metadata.project_id === val.project_id,
-						)
-				}
+				const installedProjectIds = new Set([
+					...newlyInstalled.value,
+					...Object.values(instanceProjects.value ?? {})
+						.filter((x) => x.metadata)
+						.map((x) => x.metadata.project_id),
+				])
+
+				rawResults.result.hits = rawResults.result.hits.map((val) => ({
+					...val,
+					installed: installedProjectIds.has(val.project_id),
+				}))
 			}
 			results.value = rawResults.result
 		}
