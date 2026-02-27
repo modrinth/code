@@ -1109,6 +1109,9 @@
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "No permission"
   },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
+  },
   "project.settings.tags.title": {
     "defaultMessage": "Tags"
   },

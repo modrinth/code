@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex gap-1.5 items-center justify-between px-3 pr-1.5 py-1.5 rounded-2xl bg-surface-2"
+		class="flex gap-1.5 items-center justify-between px-3 pr-1.5 py-1.5 rounded-2xl bg-surface-1"
 	>
 		<div class="grid grid-cols-[auto_1fr] gap-1.5 items-center">
 			<Avatar :src="icon" size="34px" class="!rounded-xl !shadow-none" />

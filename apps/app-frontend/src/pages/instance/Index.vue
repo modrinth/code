@@ -45,7 +45,7 @@
 						</template>
 
 						<template v-else>
-							<ServerOnlinePlayers :online="playersOnline ?? 0" :statusOnline="statusOnline" />
+							<ServerOnlinePlayers :online="playersOnline ?? 0" :status-online="statusOnline" />
 
 							<div
 								v-if="playersOnline !== undefined && (minecraftServer?.country || ping)"

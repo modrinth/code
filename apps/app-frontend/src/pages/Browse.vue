@@ -21,7 +21,6 @@ import {
 } from '@modrinth/ui'
 import type { Category, Platform } from '@modrinth/utils'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { $fetch } from 'ofetch'
 import type { Ref } from 'vue'
 import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
@@ -32,7 +31,7 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_search_results } from '@/helpers/cache.js'
+import { get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
@@ -173,6 +172,33 @@ const {
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
 
+const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
+const serverPings = ref<Record<string, number | undefined>>({})
+
+const {
+	serverCurrentSortType,
+	serverCurrentFilters,
+	serverToggledGroups,
+	serverSortTypes,
+	serverFilterTypes,
+	serverRequestParams,
+	createServerPageParams,
+} = useServerSearch({ tags, query, maxResults, currentPage })
+
+async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	for (const hit of hits) {
+		const address = hit.minecraft_java_server?.address
+		if (!address) continue
+		get_server_status(address)
+			.then((status) => {
+				serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
+			})
+			.catch((err) => {
+				console.error(`Failed to ping server ${address}:`, err)
+			})
+	}
+}
+
 const previousFilterState = ref('')
 
 const offline = ref(!navigator.onLine)
@@ -209,32 +235,52 @@ const pageCount = computed(() =>
 	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
 
-watch(requestParams, () => {
+const effectiveRequestParams = computed(() =>
+	projectType.value === 'server' ? serverRequestParams.value : requestParams.value,
+)
+
+watch(effectiveRequestParams, () => {
 	if (!route.params.projectType) return
 	refreshSearch()
 })
 
 async function refreshSearch() {
-	let rawResults = await get_search_results(requestParams.value)
-	if (!rawResults) {
-		rawResults = {
-			result: {
-				hits: [],
-				total_hits: 0,
-				limit: 1,
-			},
+	const isServer = projectType.value === 'server'
+
+	if (isServer) {
+		const rawResults = await get_search_results_v3(serverRequestParams.value)
+		const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
+		const hits = searchResults.hits ?? []
+		serverHits.value = hits
+		serverPings.value = {}
+		pingServerHits(hits)
+		results.value = {
+			hits: [],
+			total_hits: searchResults.total_hits ?? 0,
+			limit: maxResults.value,
 		}
-	}
-	if (instance.value) {
-		for (const val of rawResults.result.hits) {
-			val.installed =
-				newlyInstalled.value.includes(val.project_id) ||
-				Object.values(instanceProjects.value).some(
-					(x) => x.metadata && x.metadata.project_id === val.project_id,
-				)
+	} else {
+		let rawResults = await get_search_results(requestParams.value)
+		if (!rawResults) {
+			rawResults = {
+				result: {
+					hits: [],
+					total_hits: 0,
+					limit: 1,
+				},
+			}
 		}
+		if (instance.value) {
+			for (const val of rawResults.result.hits) {
+				val.installed =
+					newlyInstalled.value.includes(val.project_id) ||
+					Object.values(instanceProjects.value).some(
+						(x) => x.metadata && x.metadata.project_id === val.project_id,
+					)
+			}
+		}
+		results.value = rawResults.result
 	}
-	results.value = rawResults.result
 
 	const currentFilterState = JSON.stringify({
 		query: query.value,
@@ -266,7 +312,7 @@ async function refreshSearch() {
 
 	const params = {
 		...persistentParams,
-		...createPageParams(),
+		...(isServer ? createServerPageParams() : createPageParams()),
 	}
 
 	breadcrumbs.setContext({
@@ -383,57 +429,6 @@ const messages = defineMessages({
 		defaultMessage: 'Sync with instance',
 	},
 })
-
-const serverHits = ref<Labrinth.Search.v3.ResultSearchProject[]>([])
-const serverPings = ref<Record<string, number | undefined>>({})
-
-const {
-	serverCurrentSortType,
-	serverCurrentFilters,
-	serverToggledGroups,
-	serverSortTypes,
-	serverFilterTypes,
-	serverRequestParams,
-} = useServerSearch({ tags, query, maxResults, currentPage })
-
-async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	for (const hit of hits) {
-		const address = hit.minecraft_java_server?.address
-		if (!address) continue
-		get_server_status(address)
-			.then((status) => {
-				serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
-			})
-			.catch((err) => {
-				console.error(`Failed to ping server ${address}:`, err)
-			})
-	}
-}
-
-async function refreshServerSearch() {
-	try {
-		const raw = await $fetch<Labrinth.Search.v3.SearchResults>(
-			`https://api.modrinth.com/v3/search${serverRequestParams.value}`,
-		)
-		const hits = raw?.hits ?? []
-		console.log('[v3 search] hits:', hits)
-		serverHits.value = hits
-		serverPings.value = {}
-		pingServerHits(hits)
-	} catch (e: any) {
-		handleError(e)
-	}
-}
-
-watch(
-	() => [projectType.value, serverRequestParams.value],
-	() => {
-		if (projectType.value === 'server') {
-			refreshServerSearch()
-		}
-	},
-	{ immediate: true },
-)
 
 const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
 	const content = project.minecraft_java_server?.content
@@ -623,11 +618,9 @@ previousFilterState.value = JSON.stringify({
 			</section>
 			<section
 				v-else-if="
-					results &&
-					results.hits &&
-					results.hits.length === 0 &&
-					serverHits &&
-					serverHits.length === 0
+					projectType === 'server'
+						? serverHits.length === 0
+						: results && results.hits && results.hits.length === 0
 				"
 				class="offline"
 			>
