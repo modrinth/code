@@ -493,13 +493,8 @@ export const playServerProject = async (projectId) => {
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
-		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
-			try {
-				showUpdateSuccess(installStore, instance, serverAddress)
-				await joinServer(instance.path, serverAddress, project.id)
-			} catch (err) {
-				handleSevereError(err, { profilePath: instance.path })
-			}
+		installStore.showUpdateToPlayModal(instance, modpackVersionId, () => {
+			showUpdateSuccess(installStore, instance, serverAddress)
 		})
 		return
 	}
