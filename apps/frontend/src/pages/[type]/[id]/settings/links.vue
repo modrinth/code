@@ -32,6 +32,25 @@
 				/>
 			</div>
 			<div class="adjacent-input">
+				<label
+					id="server-wiki"
+					title="A page containing information, documentation, and help for the server."
+				>
+					<span class="label__title">Wiki page</span>
+					<span class="label__description"
+						>A page containing information, documentation, and help for the server.</span
+					>
+				</label>
+				<input
+					id="server-wiki"
+					v-model="serverWikiUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
 				<label id="server-discord" title="An invitation link to your Discord server.">
 					<span class="label__title">Discord</span>
 					<span class="label__description">An invitation link to your Discord server.</span>
@@ -262,6 +281,7 @@ const discordUrl = ref(project.value.discord_url)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 const siteUrl = ref(projectV3.value?.link_urls?.site?.url ?? '')
 const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
+const serverWikiUrl = ref(projectV3.value?.link_urls?.wiki?.url ?? '')
 const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
 
 watch(
@@ -270,6 +290,7 @@ watch(
 		if (newVal) {
 			siteUrl.value = newVal.link_urls?.site?.url ?? ''
 			storeUrl.value = newVal.link_urls?.store?.url ?? ''
+			serverWikiUrl.value = newVal.link_urls?.wiki?.url ?? ''
 			serverDiscordUrl.value = newVal.link_urls?.discord?.url ?? ''
 		}
 	},
@@ -377,6 +398,7 @@ const serverPatchData = computed(() => {
 	const data = {}
 	const originalSite = projectV3.value?.link_urls?.site?.url ?? ''
 	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
+	const originalWiki = projectV3.value?.link_urls?.wiki?.url ?? ''
 	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
 
 	if (checkDifference(siteUrl.value, originalSite)) {
@@ -384,6 +406,9 @@ const serverPatchData = computed(() => {
 	}
 	if (checkDifference(storeUrl.value, originalStore)) {
 		data.store = storeUrl.value === '' ? null : storeUrl.value?.trim()
+	}
+	if (checkDifference(serverWikiUrl.value, originalWiki)) {
+		data.wiki = serverWikiUrl.value === '' ? null : serverWikiUrl.value?.trim()
 	}
 	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
 		data.discord = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value?.trim()
