@@ -56,7 +56,7 @@ pub struct LabrinthConfig {
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
-    pub search_config: search::SearchConfig,
+    pub search_backend: web::Data<dyn search::SearchBackend>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -75,7 +75,7 @@ pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
-    search_config: search::SearchConfig,
+    search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     stripe_client: stripe::Client,
@@ -113,19 +113,22 @@ pub fn app_setup(
         let local_index_interval =
             Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
         let pool_ref = pool.clone();
-        let search_config_ref = search_config.clone();
         let redis_pool_ref = redis_pool.clone();
+        let search_backend_ref = search_backend.clone();
         scheduler.run(local_index_interval, move || {
             let pool_ref = pool_ref.clone();
             let redis_pool_ref = redis_pool_ref.clone();
-            let search_config_ref = search_config_ref.clone();
+            let search_backend = search_backend_ref.clone();
             async move {
-                background_task::index_search(
+                if let Err(err) = background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
-                    search_config_ref,
+                    search_backend,
                 )
-                .await;
+                .await
+                {
+                    warn!("Failed to index search: {err:?}");
+                }
             }
         });
 
@@ -269,7 +272,7 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_config,
+        search_backend,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
@@ -307,7 +310,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())

@@ -17,6 +17,7 @@ use labrinth::utoipa_app_config;
 use labrinth::{app_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use std::ffi::CStr;
+use std::io;
 use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
@@ -56,7 +57,6 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
-    dotenvy::dotenv().ok();
     modrinth_util::log::init().expect("failed to initialize logging");
     env::init().expect("failed to initialize environment variables");
 
@@ -152,7 +152,8 @@ async fn app() -> std::io::Result<()> {
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let search_config = search::SearchConfig::new(None);
+    let search_backend =
+        actix_web::web::Data::from(Arc::from(search::backend(None)));
 
     let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
@@ -167,19 +168,20 @@ async fn app() -> std::io::Result<()> {
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
-        task.run(
-            pool,
-            ro_pool.into_inner(),
-            redis_pool,
-            search_config,
-            clickhouse,
-            stripe_client,
-            anrok_client.clone(),
-            email_queue,
-            muralpay,
-        )
-        .await;
-        return Ok(());
+        return task
+            .run(
+                pool,
+                ro_pool.into_inner(),
+                redis_pool,
+                search_backend,
+                clickhouse,
+                stripe_client,
+                anrok_client.clone(),
+                email_queue,
+                muralpay,
+            )
+            .await
+            .map_err(io::Error::other);
     }
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")
@@ -206,7 +208,7 @@ async fn app() -> std::io::Result<()> {
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),
-        search_config.clone(),
+        search_backend.clone(),
         &mut clickhouse,
         file_host.clone(),
         stripe_client,

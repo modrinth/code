@@ -37,6 +37,167 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  elasticsearch-certs:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch-certs
+    user: '0'
+    networks:
+      - elasticsearch-mesh
+    restart: 'no'
+    volumes:
+      - elasticsearch-certs:/usr/share/elasticsearch/config/certs
+    command: |
+      bash -c '
+        set -euo pipefail
+        if [ ! -s config/certs/ca/ca.crt ] || [ ! -s config/certs/elasticsearch0/elasticsearch0.crt ] || [ ! -s config/certs/elasticsearch1/elasticsearch1.crt ] || [ ! -s config/certs/elasticsearch2/elasticsearch2.crt ]; then
+          rm -rf config/certs/*
+          printf "%s\n" \
+            "instances:" \
+            "  - name: elasticsearch0" \
+            "    dns:" \
+            "      - elasticsearch0" \
+            "      - localhost" \
+            "    ip:" \
+            "      - 127.0.0.1" \
+            "  - name: elasticsearch1" \
+            "    dns:" \
+            "      - elasticsearch1" \
+            "      - localhost" \
+            "    ip:" \
+            "      - 127.0.0.1" \
+            "  - name: elasticsearch2" \
+            "    dns:" \
+            "      - elasticsearch2" \
+            "      - localhost" \
+            "    ip:" \
+            "      - 127.0.0.1" \
+            > config/certs/instances.yml
+          bin/elasticsearch-certutil ca --silent --pem --out config/certs/ca.zip
+          unzip config/certs/ca.zip -d config/certs
+          bin/elasticsearch-certutil cert --silent --pem --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key --out config/certs/certs.zip
+          unzip config/certs/certs.zip -d config/certs
+        fi
+        chown -R 1000:0 config/certs
+        find config/certs -type d -exec chmod 750 {} \;
+        find config/certs -type f -exec chmod 640 {} \;
+        echo "Set up certificates"
+      '
+  elasticsearch0:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch0
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    depends_on:
+      elasticsearch-certs:
+        condition: service_completed_successfully
+    ports:
+      - '127.0.0.1:9200:9200'
+    volumes:
+      - elasticsearch0-data:/usr/share/elasticsearch/data
+      - elasticsearch-certs:/usr/share/elasticsearch/config/certs:ro
+    environment:
+      - logger.level=WARN
+      - node.name=elasticsearch0
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch1,elasticsearch2
+      - bootstrap.memory_lock=false
+      # auth
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.key=certs/elasticsearch0/elasticsearch0.key
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch0/elasticsearch0.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elastic
+    mem_limit: 1g
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s -u elastic:elastic http://localhost:9200/_cluster/health | grep -qE "\"status\":\"(yellow|green)\""',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  elasticsearch1:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch1
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    depends_on:
+      elasticsearch-certs:
+        condition: service_completed_successfully
+    volumes:
+      - elasticsearch1-data:/usr/share/elasticsearch/data
+      - elasticsearch-certs:/usr/share/elasticsearch/config/certs:ro
+    environment:
+      - logger.level=WARN
+      - node.name=elasticsearch1
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch0,elasticsearch2
+      - bootstrap.memory_lock=false
+      # auth
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.key=certs/elasticsearch1/elasticsearch1.key
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch1/elasticsearch1.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elastic
+    mem_limit: 1g
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s -u elastic:elastic http://localhost:9200/_cluster/health | grep -qE "\"status\":\"(yellow|green)\""',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  elasticsearch2:
+    image: elasticsearch:9.3.0
+    container_name: labrinth-elasticsearch2
+    networks:
+      - elasticsearch-mesh
+    restart: on-failure
+    depends_on:
+      elasticsearch-certs:
+        condition: service_completed_successfully
+    volumes:
+      - elasticsearch2-data:/usr/share/elasticsearch/data
+      - elasticsearch-certs:/usr/share/elasticsearch/config/certs:ro
+    environment:
+      - logger.level=WARN
+      - node.name=elasticsearch2
+      - cluster.name=labrinth
+      - cluster.initial_master_nodes=elasticsearch0,elasticsearch1,elasticsearch2
+      - discovery.seed_hosts=elasticsearch0,elasticsearch1
+      - bootstrap.memory_lock=false
+      # auth
+      - xpack.security.enabled=true
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.key=certs/elasticsearch2/elasticsearch2.key
+      - xpack.security.transport.ssl.certificate=certs/elasticsearch2/elasticsearch2.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=elastic
+    mem_limit: 1g
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl -s -u elastic:elastic http://localhost:9200/_cluster/health | grep -qE "\"status\":\"(yellow|green)\""',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   redis:
     image: redis:alpine
     container_name: labrinth-redis
@@ -89,8 +250,6 @@ services:
     ports:
       - '127.0.0.1:13000:3000'
     extra_hosts:
-      # Gotenberg must send a message on a webhook to our backend,
-      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
   labrinth:
     profiles:
@@ -108,6 +267,12 @@ services:
       postgres_db:
         condition: service_healthy
       meilisearch:
+        condition: service_healthy
+      elasticsearch0:
+        condition: service_healthy
+      elasticsearch1:
+        condition: service_healthy
+      elasticsearch2:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -136,14 +301,9 @@ services:
       timeout: 5s
       retries: 3
     volumes:
-      # Labrinth deposits version files here;
-      # Delphi reads them from here
       - /tmp/modrinth:/tmp/modrinth:ro,z
     extra_hosts:
-      # Delphi must send a message on a webhook to our backend,
-      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
-
   # Sharded Meilisearch
   meilisearch1:
     profiles:
@@ -166,7 +326,6 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
-
   nginx-meilisearch-lb:
     profiles:
       - sharded-meilisearch
@@ -186,9 +345,15 @@ services:
 networks:
   meilisearch-mesh:
     driver: bridge
+  elasticsearch-mesh:
+    driver: bridge
 volumes:
   meilisearch-data:
   meilisearch1-data:
+  elasticsearch0-data:
+  elasticsearch1-data:
+  elasticsearch2-data:
+  elasticsearch-certs:
   db-data:
   redis-data:
   labrinth-cdn-data:

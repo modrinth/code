@@ -2,8 +2,9 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
 use crate::env::ENV;
-use crate::search;
+use crate::search::{self, SearchBackend};
 use sqlx::postgres::PgPoolOptions;
+use std::sync::Arc;
 use std::time::Duration;
 use url::Url;
 
@@ -42,8 +43,8 @@ pub struct TemporaryDatabase {
     pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
-    pub search_config: crate::search::SearchConfig,
     pub database_name: String,
+    pub search_backend: Arc<dyn SearchBackend>,
 }
 
 impl TemporaryDatabase {
@@ -91,15 +92,14 @@ impl TemporaryDatabase {
         // Gets new Redis pool
         let redis_pool = RedisPool::new(temp_database_name.clone());
 
-        // Create new meilisearch config
-        let search_config =
-            search::SearchConfig::new(Some(temp_database_name.clone()));
+        // Create search backend
+        let search_backend = search::backend(Some(temp_database_name.clone()));
         Self {
             pool,
             ro_pool,
             database_name: temp_database_name,
             redis_pool,
-            search_config,
+            search_backend: Arc::from(search_backend),
         }
     }
 
@@ -193,7 +193,9 @@ impl TemporaryDatabase {
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
                         redis_pool: RedisPool::new(name.clone()),
-                        search_config: search::SearchConfig::new(Some(name)),
+                        search_backend: Arc::from(search::backend(Some(
+                            name.clone(),
+                        ))),
                     };
                     let setup_api =
                         TestEnvironment::<ApiV3>::build_setup_api(&db).await;

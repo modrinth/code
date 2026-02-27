@@ -1,3 +1,4 @@
+use crate::database;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::queue::billing::{index_billing, index_subscriptions};
@@ -7,9 +8,9 @@ use crate::queue::payouts::{
     insert_bank_balances_and_webhook, process_affiliate_payouts,
     process_payout, remove_payouts_for_refunded_charges,
 };
-use crate::search::indexing::index_projects;
+use crate::search::SearchBackend;
 use crate::util::anrok;
-use crate::{database, search};
+use actix_web::web;
 use clap::ValueEnum;
 use tracing::{error, info, warn};
 
@@ -34,18 +35,19 @@ impl BackgroundTask {
         pool: PgPool,
         ro_pool: PgPool,
         redis_pool: RedisPool,
-        search_config: search::SearchConfig,
+        search_backend: web::Data<dyn SearchBackend>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
         mural_client: muralpay::Client,
-    ) {
+    ) -> eyre::Result<()> {
         use BackgroundTask::*;
+        // TODO: all of these tasks should return `eyre::Result`s
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
-                index_search(ro_pool, redis_pool, search_config).await
+                return index_search(ro_pool, redis_pool, search_backend).await;
             }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
@@ -77,6 +79,7 @@ impl BackgroundTask {
                 run_email(email_queue).await;
             }
         }
+        Ok(())
     }
 }
 
@@ -122,14 +125,10 @@ pub async fn run_migrations() {
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
-    search_config: search::SearchConfig,
-) {
+    search_backend: web::Data<dyn SearchBackend>,
+) -> eyre::Result<()> {
     info!("Indexing local database");
-    let result = index_projects(ro_pool, redis_pool, &search_config).await;
-    if let Err(e) = result {
-        warn!("Local project indexing failed: {:?}", e);
-    }
-    info!("Done indexing local database");
+    search_backend.index_projects(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) {
