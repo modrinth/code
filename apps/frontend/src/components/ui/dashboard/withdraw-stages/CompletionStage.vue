@@ -124,9 +124,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineMessages, IntlFormatted, normalizeChildren, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
-import dayjs from 'dayjs'
+import {
+	defineMessages,
+	IntlFormatted,
+	normalizeChildren,
+	useFormatDateTime,
+	useFormatMoney,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed, onMounted, ref } from 'vue'
 import ConfettiExplosion from 'vue-confetti-explosion'
 
@@ -135,6 +140,8 @@ import { getRailConfig } from '@/utils/muralpay-rails'
 
 const { withdrawData } = useWithdrawContext()
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const result = computed(() => withdrawData.value.result)
 
@@ -149,7 +156,7 @@ onMounted(() => {
 
 const formattedDate = computed(() => {
 	if (!result.value?.created) return 'N/A'
-	return dayjs(result.value.created).format('MMMM D, YYYY')
+	return formatDate(result.value.created)
 })
 
 const selectedRail = computed(() => {
@@ -185,16 +192,7 @@ const formattedLocalCurrency = computed(() => {
 	if (!shouldShowExchangeRate.value || !netAmountInLocalCurrency.value || !localCurrency.value)
 		return ''
 
-	try {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: localCurrency.value,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(netAmountInLocalCurrency.value)
-	} catch {
-		return `${localCurrency.value} ${netAmountInLocalCurrency.value.toFixed(2)}`
-	}
+	return formatMoney(netAmountInLocalCurrency.value, localCurrency.value)
 })
 
 const isMuralPayWithdrawal = computed(() => {

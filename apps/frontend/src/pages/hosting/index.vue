@@ -616,7 +616,7 @@
 						<p v-if="lowestPrice" class="m-0 text-sm">
 							{{
 								formatMessage(messages.startingAtPrice, {
-									price: formatPrice(locale, lowestPrice, selectedCurrency, true),
+									price: formatPrice(lowestPrice, selectedCurrency, true),
 								})
 							}}
 						</p>
@@ -644,10 +644,10 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
+	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
-import { formatPrice } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
@@ -678,7 +678,8 @@ if (affiliateCode.value) {
 }
 
 const { addNotification } = injectNotificationManager()
-const { locale, formatMessage } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 const flags = useFeatureFlags()
 
 const messages = defineMessages({

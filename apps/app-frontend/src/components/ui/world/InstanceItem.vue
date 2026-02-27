@@ -14,13 +14,13 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	SmartClickable,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import type { Dayjs } from 'dayjs'
-import dayjs from 'dayjs'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -36,6 +36,10 @@ import { handleSevereError } from '@/store/error'
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const router = useRouter()
 
@@ -145,11 +149,7 @@ onUnmounted(() => {
 				</div>
 				<div class="flex items-center gap-2 text-sm text-secondary">
 					<div
-						v-tooltip="
-							instance.last_played
-								? dayjs(instance.last_played).format('MMMM D, YYYY [at] h:mm A')
-								: null
-						"
+						v-tooltip="instance.last_played ? formatDateTime(instance.last_played) : null"
 						class="w-fit shrink-0"
 						:class="{ 'cursor-help smart-clickable:allow-pointer-events': last_played }"
 					>

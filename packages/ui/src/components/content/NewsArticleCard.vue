@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
+import { useFormatDateTime } from '../../composables'
 import AutoLink from '../base/AutoLink.vue'
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 export interface Article {
 	path: string
@@ -34,7 +35,7 @@ defineProps<{
 					{{ article.summary }}
 				</p>
 				<div class="mt-auto text-sm text-secondary">
-					{{ dayjs(article.date).format('MMMM D, YYYY') }}
+					{{ formatDate(article.date) }}
 				</div>
 			</div>
 		</article>

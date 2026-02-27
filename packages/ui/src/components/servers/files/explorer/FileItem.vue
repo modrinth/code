@@ -81,6 +81,7 @@ import {
 	getFileExtensionIcon,
 	isEditableFile as isEditableFileExt,
 	isImageFile,
+	useFormatDateTime,
 } from '@modrinth/ui'
 import { computed, ref, shallowRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -122,6 +123,14 @@ const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
 const route = shallowRef(useRoute())
 const router = useRouter()
+
+const formatDateTime = useFormatDateTime({
+	year: '2-digit',
+	month: '2-digit',
+	day: '2-digit',
+	hour: 'numeric',
+	minute: 'numeric',
+})
 
 const containerClasses = computed(() => [
 	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-3 px-4 py-3 focus:!outline-none',
@@ -179,28 +188,12 @@ const iconComponent = computed(() => {
 
 const formattedModifiedDate = computed(() => {
 	const date = new Date(props.modified * 1000)
-	return `${date.toLocaleDateString('en-US', {
-		month: '2-digit',
-		day: '2-digit',
-		year: '2-digit',
-	})}, ${date.toLocaleTimeString('en-US', {
-		hour: 'numeric',
-		minute: 'numeric',
-		hour12: true,
-	})}`
+	return formatDateTime(date)
 })
 
 const formattedCreationDate = computed(() => {
 	const date = new Date(props.created * 1000)
-	return `${date.toLocaleDateString('en-US', {
-		month: '2-digit',
-		day: '2-digit',
-		year: '2-digit',
-	})}, ${date.toLocaleTimeString('en-US', {
-		hour: 'numeric',
-		minute: 'numeric',
-		hour12: true,
-	})}`
+	return formatDateTime(date)
 })
 
 const isEditableFile = computed(() => {

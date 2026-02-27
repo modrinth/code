@@ -39,6 +39,7 @@
 							{{
 								formatMessage(messages.projectsCountLabel, {
 									count: formatCompactNumber(user ? user.follows.length : 0),
+									countPlural: formatCompactNumberPlural(user ? user.follows.length : 0),
 								})
 							}}
 						</div>
@@ -69,6 +70,7 @@
 							{{
 								formatMessage(messages.projectsCountLabel, {
 									count: formatCompactNumber(collection.projects?.length || 0),
+									countPlural: formatCompactNumberPlural(collection.projects?.length || 0),
 								})
 							}}
 						</div>
@@ -106,12 +108,20 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	StyledInput,
+	useCompactNumber,
+	useVIntl,
+} from '@modrinth/ui'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
 const { formatMessage } = useVIntl()
-const formatCompactNumber = useCompactNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
 
 const messages = defineMessages({
 	createNewButton: {
@@ -128,7 +138,7 @@ const messages = defineMessages({
 	},
 	projectsCountLabel: {
 		id: 'dashboard.collections.label.projects-count',
-		defaultMessage: '{count, plural, one {{count} project} other {{count} projects}}',
+		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
 	},
 	searchInputLabel: {
 		id: 'dashboard.collections.label.search-input',

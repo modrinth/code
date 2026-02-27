@@ -178,12 +178,7 @@
 							class="categories"
 						/>
 						{{ $formatVersion(notif.extra_data.version.game_versions) }}
-						<span
-							v-tooltip="
-								$dayjs(notif.extra_data.version.date_published).format('MMMM D, YYYY [at] h:mm A')
-							"
-							class="date"
-						>
+						<span v-tooltip="formatDateTime(notif.extra_data.version.date_published)" class="date">
 							{{ formatRelativeTime(notif.extra_data.version.date_published) }}
 						</span>
 					</span>
@@ -197,10 +192,7 @@
 			<span v-if="notification.read" class="read-badge inline-flex">
 				<CheckCircleIcon /> Read
 			</span>
-			<span
-				v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
-				class="inline-flex"
-			>
+			<span v-tooltip="formatDateTime(notification.created)" class="inline-flex">
 				<CalendarIcon class="mr-1" /> Received
 				{{ formatRelativeTime(notification.created) }}
 			</span>
@@ -338,6 +330,7 @@ import {
 	DoubleIcon,
 	injectNotificationManager,
 	ProjectStatusBadge,
+	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { getUserLink, renderString } from '@modrinth/utils'
@@ -351,6 +344,10 @@ import ThreadSummary from './thread/ThreadSummary.vue'
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const props = defineProps({
 	notification: {

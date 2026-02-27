@@ -10,9 +10,9 @@ import {
 	UserRoundIcon,
 	XIcon,
 } from '@modrinth/assets'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { useFormatDateTime } from '../../../composables'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils'
 import ButtonStyled from '../../base/ButtonStyled.vue'
@@ -20,6 +20,10 @@ import OverflowMenu, { type Option as OverflowOption } from '../../base/Overflow
 import ProgressBar from '../../base/ProgressBar.vue'
 
 const { formatMessage } = useVIntl()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const emit = defineEmits<{
 	(e: 'download' | 'rename' | 'restore' | 'retry'): void
@@ -254,7 +258,7 @@ const messages = defineMessages({
 			</template>
 			<template v-else>
 				<span class="w-full font-medium text-contrast md:text-center">
-					{{ dayjs(backup.created_at).format('MMMM Do YYYY, h:mm A') }}
+					{{ formatDateTime(backup.created_at) }}
 				</span>
 				<!-- TODO: Uncomment when API supports size field -->
 				<!-- <span class="text-secondary">{{ formatBytes(backup.size) }}</span> -->

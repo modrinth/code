@@ -88,9 +88,9 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	useDebugLogger,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { useGeolocation } from '@vueuse/core'
 
 import { useCountries, useFormattedCountries, useUserCountry } from '@/composables/country.ts'
@@ -115,6 +115,7 @@ const userCountry = useUserCountry()
 const allCountries = useCountries()
 const { coords } = useGeolocation()
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 const { addNotification } = injectNotificationManager()
 const auth = await useAuth()
 

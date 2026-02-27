@@ -55,9 +55,9 @@ import {
 	commonMessages,
 	formFieldPlaceholders,
 	StyledInput,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(
@@ -82,6 +82,7 @@ const emit = defineEmits<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 const amountInput = ref<InstanceType<typeof StyledInput> | null>(null)
 
 const safeMaxAmount = computed(() => {

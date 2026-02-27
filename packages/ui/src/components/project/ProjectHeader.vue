@@ -17,20 +17,20 @@
 				v-tooltip="
 					capitalizeString(
 						formatMessage(commonMessages.projectDownloads, {
-							count: formatNumber(project.downloads, false),
+							count: project.downloads,
 						}),
 					)
 				"
 				class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold cursor-help"
 			>
 				<DownloadIcon class="h-6 w-6 text-secondary" />
-				{{ formatNumber(project.downloads) }}
+				{{ formatCompactNumber(project.downloads) }}
 			</div>
 			<div
 				v-tooltip="
 					capitalizeString(
 						formatMessage(commonMessages.projectFollowers, {
-							count: formatNumber(project.followers, false),
+							count: project.followers,
 						}),
 					)
 				"
@@ -39,7 +39,7 @@
 			>
 				<HeartIcon class="h-6 w-6 text-secondary" />
 				<span class="font-semibold">
-					{{ formatNumber(project.followers) }}
+					{{ formatCompactNumber(project.followers) }}
 				</span>
 			</div>
 			<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
@@ -62,10 +62,10 @@
 </template>
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
-import { capitalizeString, formatNumber, type Project } from '@modrinth/utils'
+import { capitalizeString, type Project } from '@modrinth/utils'
 import { useRouter } from 'vue-router'
 
-import { useVIntl } from '../../composables'
+import { useCompactNumber, useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
@@ -75,6 +75,7 @@ import ProjectStatusBadge from './ProjectStatusBadge.vue'
 
 const router = useRouter()
 const { formatMessage } = useVIntl()
+const { formatCompactNumber } = useCompactNumber()
 
 withDefaults(
 	defineProps<{

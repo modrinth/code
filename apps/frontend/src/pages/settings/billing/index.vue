@@ -51,7 +51,6 @@
 							<template v-if="midasCharge">
 								{{
 									formatPrice(
-										vintl.locale,
 										midasSubscriptionPrice.prices.intervals[midasSubscription.interval],
 										midasSubscriptionPrice.currency_code,
 									)
@@ -60,7 +59,7 @@
 								{{ midasSubscription.interval }}
 							</template>
 							<template v-else>
-								{{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}
+								{{ formatPrice(price.prices.intervals.monthly, price.currency_code) }}
 								/ month
 							</template>
 						</span>
@@ -77,7 +76,7 @@
 						>
 							<span class="opacity-70">Next:</span>
 							<span class="font-semibold text-contrast">
-								{{ formatPrice(vintl.locale, midasCharge.amount, midasCharge.currency_code) }}
+								{{ formatPrice(midasCharge.amount, midasCharge.currency_code) }}
 							</span>
 							<span>/{{ midasCharge.subscription_interval.replace('ly', '') }}</span>
 						</div>
@@ -90,21 +89,17 @@
 							>
 								Save
 								{{
-									formatPrice(
-										vintl.locale,
-										midasCharge.amount * 12 - oppositePrice,
-										midasCharge.currency_code,
-									)
+									formatPrice(midasCharge.amount * 12 - oppositePrice, midasCharge.currency_code)
 								}}/year by switching to yearly billing!
 							</span>
 							<span class="text-sm text-secondary">
-								Since {{ $dayjs(midasSubscription.created).format('MMMM D, YYYY') }}
+								Since {{ formatDate(midasSubscription.created) }}
 							</span>
 							<span v-if="midasCharge.status === 'open'" class="text-sm text-secondary">
-								Renews {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								Renews {{ formatDate(midasCharge.due) }}
 							</span>
 							<span v-else-if="midasCharge.status === 'cancelled'" class="text-sm text-secondary">
-								Expires {{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								Expires {{ formatDate(midasCharge.due) }}
 							</span>
 							<span
 								v-if="
@@ -116,14 +111,13 @@
 								class="text-sm text-secondary"
 							>
 								Switches to {{ midasCharge.subscription_interval }} billing on
-								{{ $dayjs(midasCharge.due).format('MMMM D, YYYY') }}
+								{{ formatDate(midasCharge.due) }}
 							</span>
 						</template>
 
 						<span v-else class="text-sm text-secondary">
 							Or
-							{{ formatPrice(vintl.locale, price.prices.intervals.yearly, price.currency_code) }} /
-							year (save
+							{{ formatPrice(price.prices.intervals.yearly, price.currency_code) }} / year (save
 							{{
 								calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly)
 							}}%)!
@@ -188,7 +182,6 @@
 								v-tooltip="
 									midasCharge.subscription_interval === 'yearly'
 										? `Monthly billing will cost you an additional ${formatPrice(
-												vintl.locale,
 												oppositePrice * 12 - midasCharge.amount,
 												midasCharge.currency_code,
 											)} per year`
@@ -307,7 +300,6 @@
 											<span class="text-contrast">
 												{{
 													formatPrice(
-														vintl.locale,
 														getProductPrice(getPyroProduct(subscription), subscription.interval)
 															.prices.intervals[subscription.interval],
 														getProductPrice(getPyroProduct(subscription), subscription.interval)
@@ -333,7 +325,6 @@
 											<span class="font-semibold text-contrast">
 												{{
 													formatPrice(
-														vintl.locale,
 														getPyroCharge(subscription).amount,
 														getPyroCharge(subscription).currency_code,
 													)
@@ -351,13 +342,13 @@
 										</div>
 										<div v-if="getPyroCharge(subscription)" class="mb-4 flex flex-col items-end">
 											<span class="text-sm text-secondary">
-												Since {{ $dayjs(subscription.created).format('MMMM D, YYYY') }}
+												Since {{ formatDate(subscription.created) }}
 											</span>
 											<span
 												v-if="getPyroCharge(subscription).status === 'open'"
 												class="text-sm text-secondary"
 											>
-												Renews {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												Renews {{ formatDate(getPyroCharge(subscription).due) }}
 											</span>
 											<span
 												v-if="
@@ -371,7 +362,7 @@
 												Switches to
 												{{ getPyroCharge(subscription).subscription_interval }}
 												billing on
-												{{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												{{ formatDate(getPyroCharge(subscription).due) }}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'processing'"
@@ -384,7 +375,7 @@
 												v-else-if="getPyroCharge(subscription).status === 'cancelled'"
 												class="text-sm text-secondary"
 											>
-												Expires {{ $dayjs(getPyroCharge(subscription).due).format('MMMM D, YYYY') }}
+												Expires {{ formatDate(getPyroCharge(subscription).due) }}
 											</span>
 											<span
 												v-else-if="getPyroCharge(subscription).status === 'failed'"
@@ -624,9 +615,11 @@ import {
 	paymentMethodMessages,
 	PurchaseModal,
 	ServerListing,
+	useFormatDateTime,
+	useFormatPrice,
 	useVIntl,
 } from '@modrinth/ui'
-import { calculateSavings, formatPrice, getCurrency } from '@modrinth/utils'
+import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useBaseFetch } from '@/composables/fetch.js'
@@ -655,8 +648,13 @@ useHead({
 
 const config = useRuntimeConfig()
 
-const vintl = useVIntl()
-const { formatMessage } = vintl
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+})
 
 const deleteModalMessages = defineMessages({
 	title: {
