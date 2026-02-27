@@ -3,7 +3,7 @@ import { computed, type Ref, ref } from 'vue'
 
 import { useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
-import { formatCategory } from './tag-messages'
+import { formatCategory, formatCategoryHeader } from './tag-messages'
 
 export const SERVER_COUNTRIES = [
 	{ code: 'US', name: 'United States' },
@@ -98,13 +98,14 @@ export function useServerSearch(opts: {
 			supports_negative_filter: false,
 			searchable: false,
 			options: (tags.value?.categories ?? [])
-				.filter((c) => c.project_type === 'server')
+				.filter((c) => c.project_type === 'minecraft_java_server')
 				.map((c) => ({
 					id: c.name,
 					formatted_name: formatCategory(formatMessage, c.name),
 					icon: getCategoryIcon(c.name),
 					method: 'or' as const,
 					value: c.name,
+					group: formatCategoryHeader(formatMessage, c.header),
 				})),
 		},
 		{
