@@ -9,6 +9,7 @@ export namespace Archon {
 				id: string
 				name: string
 				type: ContentOwnerType
+				icon_url: string | null
 			}
 
 			export type AddonVersion = {
@@ -22,6 +23,7 @@ export namespace Archon {
 				filesize: number
 				disabled: boolean
 				kind: AddonKind
+				from_modpack: boolean
 				has_update: boolean
 				name: string | null
 				project_id: string | null
@@ -34,8 +36,8 @@ export namespace Archon {
 				modloader: string | null
 				modloader_version: string | null
 				game_version: string | null
-				modpack: ModpackSpec | null
-				addons: Addon[]
+				modpack: ModpackFields | null
+				addons: Addon[] | null
 			}
 
 			export type AddAddonRequest = {
@@ -46,6 +48,10 @@ export namespace Archon {
 
 			export type RemoveAddonRequest = {
 				kind: AddonKind
+				filename: string
+			}
+
+			export type UpdateAddonRequest = {
 				filename: string
 			}
 
@@ -64,6 +70,18 @@ export namespace Archon {
 				version_id: string
 			}
 
+			export type ModpackFields = {
+				spec: ModpackSpec
+				has_update: boolean
+				title: string | null
+				description: string | null
+				icon_url: string | null
+				version_number: string | null
+				date_published: string | null
+				downloads: number | null
+				followers: number | null
+			}
+
 			export type InstallWorldContent =
 				| {
 						content_variant: 'modpack'
@@ -79,39 +97,6 @@ export namespace Archon {
 				  }
 		}
 
-		export namespace v0 {
-			export type ContentKind = 'mod' | 'plugin'
-
-			export type Mod = {
-				filename: string
-				project_id: string | undefined
-				version_id: string | undefined
-				name: string | undefined
-				version_number: string | undefined
-				icon_url: string | undefined
-				owner: string | undefined
-				disabled: boolean
-				installing: boolean
-			}
-
-			export type InstallModRequest = {
-				rinth_ids: {
-					project_id: string
-					version_id: string
-				}
-				install_as: ContentKind
-			}
-
-			export type DeleteModRequest = {
-				path: string
-			}
-
-			export type UpdateModRequest = {
-				replace: string
-				project_id: string
-				version_id: string
-			}
-		}
 	}
 
 	export namespace Servers {

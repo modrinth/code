@@ -12,7 +12,7 @@
 						</span>
 						<div>
 							<ButtonStyled color="red">
-								<button :disabled="isInstalling" @click="setupModal?.show()" class="!shadow-none">
+								<button :disabled="isInstalling" class="!shadow-none" @click="setupModal?.show()">
 									<RotateCounterClockwiseIcon class="size-5" />
 									Reset server
 								</button>
@@ -42,7 +42,7 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled>
-							<button :disabled="!hasChanges" @click="resetToCurrent" class="!shadow-none">
+							<button :disabled="!hasChanges" class="!shadow-none" @click="resetToCurrent">
 								<UndoIcon />
 								Reset to current
 							</button>

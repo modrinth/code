@@ -136,8 +136,8 @@ const messages = defineMessages({
 							<button
 								v-tooltip="action.tooltip"
 								:disabled="action.disabled || ctx.isBusy.value"
-								@click="action.handler()"
 								class="!shadow-none"
+								@click="action.handler()"
 							>
 								<SpinnerIcon v-if="action.loading" class="animate-spin" />
 								<component :is="action.icon" v-else class="size-5" />

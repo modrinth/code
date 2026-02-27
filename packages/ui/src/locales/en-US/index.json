@@ -500,6 +500,21 @@
   "installation-settings.unlink": {
     "defaultMessage": "Unlink"
   },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Reinstallation warning"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Reinstall modpack"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Reinstall modpack"
+  },
+  "instance.confirm-reinstall.warning-body": {
+    "defaultMessage": "We recommend creating a backup before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them."
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
   },

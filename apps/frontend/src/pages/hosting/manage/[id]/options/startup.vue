@@ -36,7 +36,7 @@
 						/>
 						<div
 							v-if="isStartupLoading"
-							class="absolute inset-0 flex items-center justify-center rounded-xl bg-bg/50"
+							class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
 						>
 							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
 						</div>
@@ -68,7 +68,7 @@
 							/>
 							<div
 								v-if="isStartupLoading"
-								class="absolute inset-0 flex items-center justify-center rounded-xl bg-bg/50"
+								class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
 							>
 								<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 							</div>
@@ -90,7 +90,7 @@
 							/>
 							<div
 								v-if="isStartupLoading"
-								class="absolute inset-0 flex items-center justify-center rounded-xl bg-bg/50"
+								class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
 							>
 								<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 							</div>
@@ -131,10 +131,7 @@ const queryClient = useQueryClient()
 
 const STARTUP_QUERY_KEY = ['servers', 'startup', serverId] as const
 
-const {
-	data: startupData,
-	isLoading: isStartupLoading,
-} = useQuery({
+const { data: startupData, isLoading: isStartupLoading } = useQuery({
 	queryKey: STARTUP_QUERY_KEY,
 	queryFn: () => client.archon.servers_v0.getStartupConfig(serverId),
 })
@@ -166,7 +163,9 @@ const jdkVersion = ref<string>()
 const jdkBuild = ref<string>()
 
 // Display labels for comboboxes
-const jdkVersionLabel = computed(() => JDK_VERSIONS.find((v) => v.value === jdkVersion.value)?.label)
+const jdkVersionLabel = computed(
+	() => JDK_VERSIONS.find((v) => v.value === jdkVersion.value)?.label,
+)
 const jdkBuildLabel = computed(() => JDK_BUILDS.find((v) => v.value === jdkBuild.value)?.label)
 
 function syncFormFromData() {
@@ -175,11 +174,15 @@ function syncFormFromData() {
 	jdkBuild.value = savedJdkBuild.value
 }
 
-watch(startupData, (newData, oldData) => {
-	if (newData && !oldData) {
-		syncFormFromData()
-	}
-}, { immediate: true })
+watch(
+	startupData,
+	(newData, oldData) => {
+		if (newData && !oldData) {
+			syncFormFromData()
+		}
+	},
+	{ immediate: true },
+)
 
 const hasUnsavedChanges = computed(
 	() =>

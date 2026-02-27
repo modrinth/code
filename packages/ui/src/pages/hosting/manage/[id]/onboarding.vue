@@ -94,7 +94,10 @@ const openModal = () => modalRef.value?.show()
 onBeforeUnmount(() => modalRef.value?.hide())
 
 function onBrowseModpacks() {
-	router.push(`/discover/modpacks?sid=${serverId}&from=onboarding`)
+	router.push({
+		path: '/discover/modpacks',
+		query: { sid: serverId, from: 'onboarding', wid: worldId.value },
+	})
 }
 
 onMounted(async () => {

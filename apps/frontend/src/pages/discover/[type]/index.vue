@@ -107,6 +107,7 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 
 const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 const fromContext = computed(() => queryAsString(route.query.from) || null)
+const currentWorldId = computed(() => queryAsString(route.query.wid) || undefined)
 debug('currentServerId:', currentServerId.value)
 
 const {
@@ -146,7 +147,7 @@ const eraseDataOnInstall = ref(false)
 const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
 const { data: serverContentData, error: serverContentError } = useQuery({
 	queryKey: contentQueryKey,
-	queryFn: () => client.archon.content_v0.list(currentServerId.value!),
+	queryFn: () => client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value),
 	enabled: computed(() => !!currentServerId.value),
 })
 
@@ -162,19 +163,18 @@ watch(serverContentError, (error) => {
 const installContentMutation = useMutation({
 	mutationFn: ({
 		serverId,
-		type,
 		projectId,
 		versionId,
 	}: {
 		serverId: string
-		type: 'mod' | 'plugin'
 		projectId: string
 		versionId: string
 	}) =>
-		client.archon.content_v0.install(serverId, {
-			rinth_ids: { project_id: projectId, version_id: versionId },
-			install_as: type,
-		}),
+		client.archon.content_v1.addAddon(
+			serverId,
+			{ project_id: projectId, version_id: versionId },
+			currentWorldId.value,
+		),
 	onSuccess: () => {
 		if (currentServerId.value) {
 			queryClient.invalidateQueries({ queryKey: ['content', 'list', currentServerId.value] })
@@ -182,7 +182,7 @@ const installContentMutation = useMutation({
 	},
 })
 
-const PERSISTENT_QUERY_PARAMS = ['sid', 'shi', 'from']
+const PERSISTENT_QUERY_PARAMS = ['sid', 'wid', 'shi', 'from']
 
 if (route.query.shi && projectType.value?.id !== 'modpack') {
 	serverHideInstalled.value = route.query.shi === 'true'
@@ -233,12 +233,12 @@ const serverFilters = computed(() => {
 		}
 
 		if (serverHideInstalled.value && serverContentData.value) {
-			const installedMods = serverContentData.value
+			const installedIds = (serverContentData.value.addons ?? [])
 				.filter((x) => x.project_id)
 				.map((x) => x.project_id)
-				.filter((id): id is string => id !== undefined)
+				.filter((id): id is string => id !== null)
 
-			installedMods
+			installedIds
 				.map((x: string) => ({
 					type: 'project_id',
 					option: `project_id:${x}`,
@@ -386,18 +386,9 @@ async function serverInstall(project: InstallableSearchResult) {
 			})
 			project.installed = true
 			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
-		} else if (projectType.value?.id === 'mod') {
+		} else if (projectType.value?.id === 'mod' || projectType.value?.id === 'plugin') {
 			await installContentMutation.mutateAsync({
 				serverId: currentServerId.value,
-				type: 'mod',
-				projectId: version.project_id,
-				versionId: version.id,
-			})
-			project.installed = true
-		} else if (projectType.value?.id === 'plugin') {
-			await installContentMutation.mutateAsync({
-				serverId: currentServerId.value,
-				type: 'plugin',
 				projectId: version.project_id,
 				versionId: version.id,
 			})
@@ -828,7 +819,9 @@ useSeoMeta({
 											v-if="
 												(result as InstallableSearchResult).installed ||
 												(serverContentData &&
-													serverContentData.find((x) => x.project_id === result.project_id)) ||
+													(serverContentData.addons ?? []).find(
+														(x) => x.project_id === result.project_id,
+													)) ||
 												serverData.upstream?.project_id === result.project_id
 											"
 											disabled
