@@ -57,7 +57,7 @@ export const SERVER_SORT_TYPES: SortType[] = [
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
 	server_category: 'categories',
-	server_game_version: 'components.minecraft_java_server.content.supported_game_versions',
+	server_game_version: 'minecraft_java_server.content.supported_game_versions',
 	server_country: 'minecraft_server.country',
 	server_language: 'minecraft_server.languages',
 }
@@ -207,7 +207,9 @@ export function useServerSearch(opts: {
 			if (!paramValue) continue
 
 			const values =
-				typeof paramValue === 'string' ? [paramValue] : paramValue.filter((v): v is string => v !== null)
+				typeof paramValue === 'string'
+					? [paramValue]
+					: paramValue.filter((v): v is string => v !== null)
 
 			for (const value of values) {
 				const option = filterType.options.find((o) => o.id === value)
