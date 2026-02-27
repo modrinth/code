@@ -721,6 +721,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.upload.title',
 		defaultMessage: 'Upload',
 	},
+	server: {
+		id: 'project.settings.server.title',
+		defaultMessage: 'Server',
+	},
 	versions: {
 		id: 'project.settings.versions.title',
 		defaultMessage: 'Versions',

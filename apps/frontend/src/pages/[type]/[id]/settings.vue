@@ -7,6 +7,7 @@ import {
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
+	ServerIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -59,6 +60,11 @@ const navItems = computed(() => {
 					icon: InfoIcon,
 				}
 			: null,
+		isServerProject.value && {
+			link: `/${base}/settings/server`,
+			label: formatMessage(commonProjectSettingsMessages.server),
+			icon: ServerIcon,
+		},
 		{
 			link: `/${base}/settings/tags`,
 			label: formatMessage(commonProjectSettingsMessages.tags),
