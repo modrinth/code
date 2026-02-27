@@ -139,8 +139,6 @@ const javaAddress = ref('')
 const javaPort = ref(25565)
 const bedrockAddress = ref('')
 const bedrockPort = ref(19132)
-const supportedGameVersions = ref([])
-const recommendedGameVersion = ref('')
 const country = ref('')
 const languages = ref([])
 
@@ -150,14 +148,6 @@ function initFromProjectV3(v3) {
 	javaPort.value = v3.minecraft_java_server?.port ?? 25565
 	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
-	const javaContent = v3.minecraft_java_server?.content
-	if (javaContent && 'supported_game_versions' in javaContent) {
-		supportedGameVersions.value = javaContent.supported_game_versions ?? []
-		recommendedGameVersion.value = javaContent.recommended_game_version ?? ''
-	} else {
-		supportedGameVersions.value = []
-		recommendedGameVersion.value = ''
-	}
 	country.value = v3.minecraft_server?.country ?? ''
 	languages.value = v3.minecraft_server?.languages ?? []
 }
@@ -313,33 +303,15 @@ const languageOptions = [
 
 const javaServerPatchData = computed(() => {
 	const origJava = projectV3.value?.minecraft_java_server
-	const origContent = origJava?.content
-	const origSupported =
-		origContent && 'supported_game_versions' in origContent
-			? origContent.supported_game_versions
-			: []
-	const origRecommended =
-		origContent && 'recommended_game_version' in origContent
-			? origContent.recommended_game_version
-			: ''
 
 	const addressChanged =
-		javaAddress.value !== origJava?.address || javaPort.value !== (origJava?.port ?? 25565)
-	const contentChanged =
-		JSON.stringify(supportedGameVersions.value) !== JSON.stringify(origSupported) ||
-		recommendedGameVersion.value !== (origRecommended ?? '')
+		javaAddress.value !== (origJava?.address ?? '') ||
+		javaPort.value !== (origJava?.port ?? 25565)
 
-	if (addressChanged || contentChanged) {
+	if (addressChanged) {
 		return {
 			address: javaAddress.value.trim(),
 			port: javaPort.value,
-			content: {
-				kind: 'vanilla',
-				supported_game_versions: supportedGameVersions.value,
-				...(recommendedGameVersion.value
-					? { recommended_game_version: recommendedGameVersion.value }
-					: {}),
-			},
 		}
 	}
 
