@@ -266,26 +266,30 @@ pub struct ResultSearchProject {
 pub fn get_sort_index(
     config: &SearchConfig,
     index: &str,
-) -> Result<(String, [&'static str; 1]), SearchError> {
+) -> Result<(String, &'static [&'static str]), SearchError> {
     let projects_name = config.get_index_name("projects", false);
     let projects_filtered_name =
         config.get_index_name("projects_filtered", false);
     Ok(match index {
-        "relevance" => (projects_name, ["downloads:desc"]),
-        "downloads" => (projects_filtered_name, ["downloads:desc"]),
-        "follows" => (projects_name, ["follows:desc"]),
-        "updated" => (projects_name, ["date_modified:desc"]),
-        "newest" => (projects_name, ["date_created:desc"]),
-        "verified_plays_2w"
-        | "components.minecraft_java_server.verified_plays_2w" => (
+        "relevance" => (
             projects_name,
-            ["minecraft_java_server.verified_plays_2w:desc"],
+            &[
+                "downloads:desc",
+                "minecraft_java_server.verified_plays_2w:desc",
+                "minecraft_java_server.ping.data.players_online:desc",
+            ],
         ),
-        "players_online"
-        | "ping.players_online"
-        | "components.minecraft_java_server.ping.players_online" => (
+        "downloads" => (projects_filtered_name, &["downloads:desc"]),
+        "follows" => (projects_name, &["follows:desc"]),
+        "updated" => (projects_name, &["date_modified:desc"]),
+        "newest" => (projects_name, &["date_created:desc"]),
+        "minecraft_java_server.verified_plays_2w" => (
             projects_name,
-            ["minecraft_java_server.ping.data.players_online:desc"],
+            &["minecraft_java_server.verified_plays_2w:desc"],
+        ),
+        "minecraft_java_server.ping.players_online" => (
+            projects_name,
+            &["minecraft_java_server.ping.data.players_online:desc"],
         ),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
@@ -347,7 +351,7 @@ pub async fn search_for_project(
             .with_page(page)
             .with_hits_per_page(hits_per_page)
             .with_query(info.query.as_deref().unwrap_or_default())
-            .with_sort(&sort.1);
+            .with_sort(sort.1);
 
         let normalized_new_filters =
             info.new_filters.as_deref().map(normalize_filter_aliases);
