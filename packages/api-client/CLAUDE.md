@@ -109,12 +109,13 @@ File uploads use `XMLHttpRequest` for progress tracking (not available via `fetc
 ```ts
 interface UploadHandle<T> {
 	promise: Promise<T>
-	onProgress(callback: (progress: UploadProgress) => void): UploadHandle<T>  // chainable
+	onProgress(callback: (progress: UploadProgress) => void): UploadHandle<T> // chainable
 	cancel(): void
 }
 ```
 
 Supports two modes:
+
 - **Single file** — `{ file: File | Blob }` sends with `Content-Type: application/octet-stream`
 - **FormData** — `{ formData: FormData }` for multipart uploads (browser/platform sets boundary)
 

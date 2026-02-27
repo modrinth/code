@@ -11,15 +11,15 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 
 ### Apps (`apps/`)
 
-| App               | Description                         |
-| ----------------- | ----------------------------------- |
-| `frontend`        | Main Modrinth website (Nuxt 3)      |
-| `app-frontend`    | Desktop/mobile app frontend (Vue 3) |
-| `app`             | Desktop/mobile app shell (Tauri)    |
-| `app-playground`  | Testing playground for app          |
-| `labrinth`        | Backend API service                 |
-| `daedalus_client` | Daedalus client implementation      |
-| `docs`            | Documentation site (Astro)          |
+| App               | Description                    |
+| ----------------- | ------------------------------ |
+| `frontend`        | Main Modrinth website (Nuxt 3) |
+| `app-frontend`    | Desktop/app frontend (Vue 3)   |
+| `app`             | Desktop/app shell (Tauri)      |
+| `app-playground`  | Testing playground for app     |
+| `labrinth`        | Backend API service            |
+| `daedalus_client` | Daedalus client implementation |
+| `docs`            | Documentation site (Astro)     |
 
 ### Packages (`packages/`)
 
