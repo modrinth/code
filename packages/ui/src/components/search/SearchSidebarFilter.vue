@@ -75,6 +75,7 @@
 				autocomplete="off"
 				clearable
 				size="small"
+				inputClass="!bg-button-bg"
 				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 			/>
 
@@ -113,7 +114,11 @@
 									class="inline-flex items-center justify-center shrink-0 h-4 w-4"
 									:style="iconStyle(option)"
 								>
-									<div v-if="typeof option.icon === 'string'" class="h-4 w-4" v-html="option.icon" />
+									<div
+										v-if="typeof option.icon === 'string'"
+										class="h-4 w-4"
+										v-html="option.icon"
+									/>
 									<component :is="option.icon" v-else class="h-4 w-4" />
 								</span>
 								<span class="truncate text-sm" :style="iconStyle(option)">
