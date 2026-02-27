@@ -7,6 +7,18 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Get list of servers for the authenticated user
+	 * GET /v1/servers
+	 */
+	public async list(): Promise<Archon.Servers.v1.ServerFull[]> {
+		return this.client.request<Archon.Servers.v1.ServerFull[]>('/servers', {
+			api: 'archon',
+			version: 1,
+			method: 'GET',
+		})
+	}
+
+	/**
 	 * Get full server details including worlds, backups, and content
 	 * GET /v1/servers/:server_id
 	 */

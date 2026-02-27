@@ -298,6 +298,7 @@ export namespace Archon {
 				game_version: string
 				java_version: number
 				invocation: string
+				original_invocation: string
 			}
 
 			export type Region = {
@@ -323,19 +324,18 @@ export namespace Archon {
 
 			export type Backup = {
 				id: string
+				physical_id: string
 				name: string
 				created_at: string
 				automated: boolean
 				interrupted: boolean
 				ongoing: boolean
+				locked: boolean
 				task?: {
 					file?: BackupTaskProgress
 					create?: BackupTaskProgress
 					restore?: BackupTaskProgress
 				}
-				// TODO: Uncomment when API supports these fields
-				// size?: number // bytes
-				// creator_id?: string // user ID, or 'auto' for automated backups
 			}
 
 			export type BackupRequest = {
