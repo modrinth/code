@@ -1,6 +1,6 @@
 # Modrinth Monorepo
 
-This is the Modrinth monorepo — it contains all Modrinth projects, both frontend and backend.
+This is the Modrinth monorepo — it contains all Modrinth projects, both frontend and backend. When entering a project, either to edit or analyse, you should read it's CLAUDE.md.
 
 ## Architecture
 
@@ -17,9 +17,9 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `app-frontend`    | Desktop/mobile app frontend (Vue 3) |
 | `app`             | Desktop/mobile app shell (Tauri)    |
 | `app-playground`  | Testing playground for app          |
-| `labrinth`        | Backend API service (Rust)          |
+| `labrinth`        | Backend API service                 |
 | `daedalus_client` | Daedalus client implementation      |
-| `docs`            | Documentation site (Nuxt)           |
+| `docs`            | Documentation site (Astro)          |
 
 ### Packages (`packages/`)
 
@@ -32,15 +32,15 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `blog`             | Blog system and changelog data                        |
 | `utils`            | Shared utility functions                              |
 | `moderation`       | Moderation utilities                                  |
-| `daedalus`         | Daedalus protocol (JS)                                |
+| `daedalus`         | Daedalus protocol                                     |
 | `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
-| `ariadne`          | Analytics library (Rust)                              |
-| `modrinth-log`     | Logging utilities (Rust)                              |
-| `modrinth-maxmind` | MaxMind GeoIP (Rust)                                  |
-| `modrinth-util`    | General utilities (Rust)                              |
-| `muralpay`         | Payment processing (Rust)                             |
-| `path-util`        | Path utilities (Rust)                                 |
-| `sqlx-tracing`     | SQLx query tracing (Rust)                             |
+| `ariadne`          | Analytics library                                     |
+| `modrinth-log`     | Logging utilities                                     |
+| `modrinth-maxmind` | MaxMind GeoIP                                         |
+| `modrinth-util`    | General utilities                                     |
+| `muralpay`         | Payment processing                                    |
+| `path-util`        | Path utilities                                        |
+| `sqlx-tracing`     | SQLx query tracing                                    |
 
 ## Pre-PR Commands
 
@@ -64,7 +64,7 @@ The website and app `prepr` commands
 
 Each project may have its own `CLAUDE.md` with detailed instructions:
 
-- [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API (Rust)
+- [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API
 - [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
 ## Code Guidelines

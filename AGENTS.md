@@ -9,3 +9,4 @@ Project-specific skills (patterns, conventions, and implementation guides) are l
 - **[Multistage Modals](./.claude/skills/multistage-modals/SKILL.md)** — Wizard-like modal flows with `MultiStageModal`
 - **[Figma MCP](./.claude/skills/figma-mcp/SKILL.md)** — Translating Figma designs to Modrinth Vue components
 - **[i18n Convert](./.claude/skills/i18n-convert/SKILL.md)** — Converting hard-coded strings to vue-i18n localization
+- **[API Module](./.claude/skills/api-module/SKILL.md)** — Adding new endpoint modules to `@modrinth/api-client`
