@@ -5,7 +5,7 @@
 		max-content-height="72vh"
 		:on-hide="onModalHide"
 		:closable="true"
-		:close-on-click-outside="false"
+		:close-on-click-outside="closeOnClickOutside"
 		:width="resolvedMaxWidth"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
@@ -58,7 +58,7 @@
 		</template>
 
 		<progress
-			v-if="nonProgressStage !== true"
+			v-if="nonProgressStage !== true && !disableProgress"
 			:value="progressValue"
 			max="100"
 			class="w-full h-1 appearance-none border-none absolute top-0 left-0"
@@ -73,7 +73,7 @@
 			>
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
-						class="!border-surface-5"
+						class="!border-surface-5 !shadow-none"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"
 					>
@@ -82,16 +82,28 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.onClick">
+					<button
+						class="!shadow-none"
+						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
+						@click="rightButtonConfig.onClick"
+					>
+						<SpinnerIcon
+							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'before'"
+							class="animate-spin"
+						/>
 						<component
 							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'before'"
+							v-else-if="rightButtonConfig.iconPosition === 'before'"
 							:class="rightButtonConfig.iconClass"
 						/>
 						{{ rightButtonConfig.label }}
+						<SpinnerIcon
+							v-if="rightButtonConfig.loading && rightButtonConfig.iconPosition === 'after'"
+							class="animate-spin"
+						/>
 						<component
 							:is="rightButtonConfig.icon"
-							v-if="rightButtonConfig.iconPosition === 'after'"
+							v-else-if="rightButtonConfig.iconPosition === 'after'"
 							:class="rightButtonConfig.iconClass"
 						/>
 					</button>
@@ -102,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { ChevronRightIcon } from '@modrinth/assets'
+import { ChevronRightIcon, SpinnerIcon } from '@modrinth/assets'
 import { ButtonStyled, NewModal } from '@modrinth/ui'
 import type { Component } from 'vue'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
@@ -113,6 +125,7 @@ export interface StageButtonConfig {
 	iconPosition?: 'before' | 'after'
 	color?: InstanceType<typeof ButtonStyled>['$props']['color']
 	disabled?: boolean
+	loading?: boolean
 	iconClass?: string | null
 	onClick?: () => void
 }
@@ -140,12 +153,19 @@ export function resolveCtxFn<T, R>(value: MaybeCtxFn<T, R>, ctx: T): R {
 </script>
 
 <script setup lang="ts" generic="T">
-const props = defineProps<{
-	stages: StageConfigInput<T>[]
-	context: T
-	breadcrumbs?: boolean
-	fitContent?: boolean
-}>()
+const props = withDefaults(
+	defineProps<{
+		stages: StageConfigInput<T>[]
+		context: T
+		breadcrumbs?: boolean
+		fitContent?: boolean
+		disableProgress?: boolean
+		closeOnClickOutside?: boolean
+	}>(),
+	{
+		closeOnClickOutside: true,
+	},
+)
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')
 const currentStageIndex = ref<number>(0)

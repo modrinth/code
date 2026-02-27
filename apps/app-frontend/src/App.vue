@@ -31,6 +31,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
 	NewsArticleCard,
@@ -65,7 +66,6 @@ import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
@@ -84,6 +84,7 @@ import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -100,11 +101,11 @@ import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
+import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
 import { useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
 
-import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
@@ -134,6 +135,10 @@ provideModalBehavior({
 	onShow: () => hide_ads_window(),
 	onHide: () => show_ads_window(),
 })
+
+const { installationModal, handleCreate, handleBrowseModpacks } =
+	setupProviders(notificationManager)
+
 const news = ref([])
 const availableSurvey = ref(false)
 
@@ -804,9 +809,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
-		<Suspense>
-			<InstanceCreationModal ref="installationModal" />
-		</Suspense>
+		<CreationFlowModal
+			ref="installationModal"
+			type="instance"
+			show-snapshot-toggle
+			@create="handleCreate"
+			@browse-modpacks="handleBrowseModpacks"
+		/>
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -852,7 +861,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</suspense>
 			<NavButton
 				v-tooltip.right="'Create new instance'"
-				:to="() => $refs.installationModal.show()"
+				:to="() => installationModal?.show()"
 				:disabled="offline"
 			>
 				<PlusIcon />
@@ -940,9 +949,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-			<div data-tauri-drag-region class="flex p-3">
-				<ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="flex items-center gap-1 ml-3">
+			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
+				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
+				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
 					<button
 						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
 						@click="router.back()"
@@ -958,7 +967,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</div>
 				<Breadcrumbs class="pt-[2px]" />
 			</div>
-			<section data-tauri-drag-region class="flex ml-auto items-center">
+			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<ButtonStyled
 					v-if="!forceSidebar && themeStore.toggleSidebar"
 					:type="sidebarToggled ? 'standard' : 'transparent'"

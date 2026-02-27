@@ -189,10 +189,10 @@
     "defaultMessage": "Updating can break your instance. New incompatibilities may be introduced. It's recommended to update content one-by-one. Proceed with caution and back up your instance first."
   },
   "content.confirm-deletion.admonition-body": {
-    "defaultMessage": "Removing content from your instance may corrupt worlds where they were used. Are you sure you want to continue?"
+    "defaultMessage": "Deleting a mod can permanently affect your worlds and may cause missing content or unexpected issues when loading again."
   },
   "content.confirm-deletion.admonition-body-server": {
-    "defaultMessage": "Are you sure you want to remove the selected content from your server?"
+    "defaultMessage": "Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again."
   },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Deletion warning"
@@ -203,11 +203,17 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
   },
-  "content.confirm-deletion.warning-body": {
-    "defaultMessage": "This action is irreversable. Consider making a backup of your worlds before continuing."
+  "content.confirm-deletion.warning-body-instance": {
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your worlds if anything breaks."
+  },
+  "content.confirm-deletion.warning-body-instance-backup": {
+    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your worlds if anything breaks."
   },
   "content.confirm-deletion.warning-body-server": {
-    "defaultMessage": "This action cannot be undone."
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your world if anything breaks."
+  },
+  "content.confirm-deletion.warning-body-server-backup": {
+    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks."
   },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Are you sure you want to unlink the modpack from your instance? Modpack content will remain installed, but will no longer be managed."
@@ -242,14 +248,26 @@
   "content.page-layout.bulk.deleting": {
     "defaultMessage": "Deleting content... ({progress}/{total})"
   },
+  "content.page-layout.bulk.deleting-waiting": {
+    "defaultMessage": "Deleting content..."
+  },
   "content.page-layout.bulk.disabling": {
     "defaultMessage": "Disabling content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.disabling-waiting": {
+    "defaultMessage": "Disabling content..."
   },
   "content.page-layout.bulk.enabling": {
     "defaultMessage": "Enabling content... ({progress}/{total})"
   },
+  "content.page-layout.bulk.enabling-waiting": {
+    "defaultMessage": "Enabling content..."
+  },
   "content.page-layout.bulk.updating": {
     "defaultMessage": "Updating content... ({progress}/{total})"
+  },
+  "content.page-layout.bulk.updating-waiting": {
+    "defaultMessage": "Updating content..."
   },
   "content.page-layout.disable": {
     "defaultMessage": "Disable"
@@ -455,6 +473,33 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
+  "installation-settings.change-version": {
+    "defaultMessage": "Change version"
+  },
+  "installation-settings.game-version": {
+    "defaultMessage": "Game version"
+  },
+  "installation-settings.hide-snapshots": {
+    "defaultMessage": "Hide snapshots"
+  },
+  "installation-settings.installation-info": {
+    "defaultMessage": "Installation info"
+  },
+  "installation-settings.installed-modpack": {
+    "defaultMessage": "Installed modpack"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "{loader} version"
+  },
+  "installation-settings.platform": {
+    "defaultMessage": "Platform"
+  },
+  "installation-settings.show-all-versions": {
+    "defaultMessage": "Show all versions"
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Unlink"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
   },
@@ -469,9 +514,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
-  },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Unlink modpack"
   },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Back"

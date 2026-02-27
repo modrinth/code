@@ -51,10 +51,7 @@
 		/>
 	</div>
 	<div
-		v-else-if="
-			server.moduleErrors?.general?.error.statusCode === 403 ||
-			server.moduleErrors?.general?.error.statusCode === 404
-		"
+		v-else-if="serverError?.statusCode === 403 || serverError?.statusCode === 404"
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
@@ -67,7 +64,7 @@
 		/>
 	</div>
 	<div
-		v-else-if="server.moduleErrors?.general?.error || !nodeAccessible"
+		v-else-if="serverError || !nodeAccessible"
 		class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
 	>
 		<ErrorInformationCard
@@ -95,35 +92,14 @@
 			</template>
 		</ErrorInformationCard>
 	</div>
-	<!-- <div
-    v-else-if="server.moduleErrors?.general?.error"
-    class="flex min-h-[calc(100vh-4rem)] items-center justify-center text-contrast"
-  >
-    <ErrorInformationCard
-      title="Connection lost"
-      description=""
-      :icon="TransferIcon"
-      icon-color="orange"
-      :action="connectionLostAction"
-    >
-      <template #description>
-        <div class="space-y-4">
-          <p class="text-lg text-secondary">
-            Something went wrong, and we couldn't connect to your server. This is likely due to a
-            temporary network issue.
-          </p>
-        </div>
-      </template>
-    </ErrorInformationCard>
-  </div> -->
 	<!-- SERVER START -->
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
 		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
-			'--server-bg-image': serverData.image
-				? `url(${serverData.image})`
+			'--server-bg-image': serverImage
+				? `url(${serverImage})`
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
@@ -135,7 +111,7 @@
 			<div class="flex w-full min-w-0 select-none flex-col items-center gap-4 pt-4 sm:flex-row">
 				<ServerIcon
 					:image="
-						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverData.image
+						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverImage
 					"
 					class="drop-shadow-lg sm:drop-shadow-none"
 				/>
@@ -188,26 +164,7 @@
 			</div>
 		</div>
 
-		<template v-if="serverData.flows?.intro">
-			<div
-				v-if="serverData?.status === 'installing'"
-				class="w-50 h-50 flex items-center justify-center gap-2 text-center text-lg font-bold"
-			>
-				<PanelSpinner class="size-10 animate-spin" /> Setting up your server...
-			</div>
-			<div v-else>
-				<h2 class="my-4 text-xl font-extrabold">
-					What would you like to install on your new server?
-				</h2>
-
-				<ServerInstallation
-					:server="server as ModrinthServer"
-					:backup-in-progress="backupInProgress"
-					ignore-current-installation
-					@reinstall="onReinstall"
-				/>
-			</div>
-		</template>
+		<ServerOnboardingPanelPage v-if="serverData.flows?.intro" />
 
 		<template v-else>
 			<div
@@ -309,7 +266,7 @@
 				</div>
 
 				<div v-if="serverData.is_medal" class="mb-4">
-					<MedalServerCountdown :server-id="server.serverId" />
+					<MedalServerCountdown :server-id="serverId" />
 				</div>
 
 				<div
@@ -335,7 +292,7 @@
 					data-pyro-server-installing
 					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-blue p-4 text-sm text-contrast"
 				>
-					<ServerIcon :image="serverData.image" class="!h-10 !w-10" />
+					<ServerIcon :image="serverImage" class="!h-10 !w-10" />
 
 					<div class="flex flex-col gap-1">
 						<span class="text-lg font-bold"> We're preparing your server! </span>
@@ -353,7 +310,6 @@
 					:stats="stats"
 					:server-power-state="serverPowerState"
 					:power-state-details="powerStateDetails"
-					:server="server"
 					:backup-in-progress="backupInProgress"
 					@reinstall="onReinstall"
 				/>
@@ -366,7 +322,7 @@
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
 		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
-			safeStringify(server)
+			safeStringify(serverData)
 		}}</pre>
 	</div>
 </template>
@@ -374,7 +330,7 @@
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon } from '@modrinth/api-client'
-import { clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
+import { clearNodeAuthState, ModrinthApiError, setNodeAuthState } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -401,11 +357,12 @@ import {
 	ServerIcon,
 	ServerInfoLabels,
 	ServerNotice,
+	ServerOnboardingPanelPage,
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, type Reactive, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import NavTabs from '~/components/ui/NavTabs.vue'
@@ -414,10 +371,8 @@ import InstallingTicker from '~/components/ui/servers/InstallingTicker.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
-import ServerInstallation from '~/components/ui/servers/ServerInstallation.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
+import { useServerImage } from '~/composables/servers/use-server-image.ts'
+import { useServerProject } from '~/composables/servers/use-server-project.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
@@ -444,10 +399,15 @@ const route = useNativeRoute()
 const router = useRouter()
 const serverId = route.params.id as string
 
-// TODO: ditch useModrinthServers for this + ctx DI.
-const { data: n_server } = useQuery({
+const { data: serverData, error: serverQueryError } = useQuery({
 	queryKey: ['servers', 'detail', serverId],
 	queryFn: () => client.archon.servers_v0.get(serverId)!,
+})
+
+const serverError = computed(() => {
+	const err = serverQueryError.value
+	if (err instanceof ModrinthApiError) return err
+	return err ? ModrinthApiError.fromUnknown(err) : null
 })
 
 const { data: serverFull } = useQuery({
@@ -461,16 +421,11 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
-const server: Reactive<ModrinthServer> = await useModrinthServers(serverId, ['general', 'ws'])
-
-const loadModulesPromise = Promise.resolve().then(() => {
-	if (server.general?.status === 'suspended') {
-		return
-	}
-	return server.refresh(['content', 'backups', 'network', 'startup'])
-})
-
-provide('modulesLoaded', loadModulesPromise)
+const serverImage = useServerImage(
+	serverId,
+	computed(() => serverData.value?.upstream ?? null),
+)
+const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
 const errorTitle = ref('Error')
 const errorMessage = ref('An unexpected error occurred.')
@@ -494,7 +449,6 @@ function safeStringify(obj: unknown, indent = ' '): string {
 	)
 }
 
-const serverData = computed(() => server.general)
 const isConnected = ref(false)
 const isWSAuthIncorrect = ref(false)
 const modrinthServersConsole = useModrinthServersConsole()
@@ -532,7 +486,7 @@ setNodeAuthState(() => fsAuth.value, refreshFsAuth)
 provideModrinthServerContext({
 	serverId,
 	worldId,
-	server: n_server as Ref<Archon.Servers.v0.Server>,
+	server: serverData as Ref<Archon.Servers.v0.Server>,
 	isConnected,
 	powerState: serverPowerState,
 	isServerRunning,
@@ -677,8 +631,8 @@ const popupOptions = computed(
 				server_id: serverData.value?.server_id,
 				loader: serverData.value?.loader,
 				game_version: serverData.value?.mc_version,
-				modpack_id: serverData.value?.project?.id,
-				modpack_name: serverData.value?.project?.title,
+				modpack_id: serverProject.value?.id,
+				modpack_name: serverProject.value?.title,
 			},
 			onOpen: () => console.log(`Opened survey notice: ${surveyNotice.value?.id}`),
 			onClose: async () => await dismissSurvey(),
@@ -859,16 +813,17 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 }
 
 const handleNewMod = () => {
-	server.refresh(['content'])
+	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 }
 
 const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
 const newMCVersion = ref<string | null>(null)
 
-const onReinstall = (potentialArgs: any) => {
+const onReinstall = async (potentialArgs: any) => {
 	if (serverData.value?.flows?.intro) {
-		server.general?.endIntro()
+		await client.archon.servers_v0.endIntro(serverId)
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	}
 
 	if (!serverData.value) return
@@ -905,15 +860,13 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 				while (!hasValidData && attempts < maxAttempts) {
 					attempts++
 
-					await server.refresh(['general'], {
-						preserveConnection: true,
-						preserveInstallState: true,
-					})
+					await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 
 					if (serverData.value?.loader && serverData.value?.mc_version) {
 						hasValidData = true
 						serverData.value.status = 'available'
-						await server.refresh(['content', 'startup'])
+						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', serverId] })
+						queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 						break
 					}
 
@@ -1022,7 +975,7 @@ const sendPowerAction = async (action: PowerAction) => {
 	const actionName = action.charAt(0).toUpperCase() + action.slice(1)
 	try {
 		isActioning.value = true
-		await server.general?.power(action)
+		await client.archon.servers_v0.power(serverId, action)
 	} catch (error) {
 		console.error(`Error ${toAdverb(actionName)} server:`, error)
 		notifyError(
@@ -1067,21 +1020,21 @@ const backupInProgress = computed(() => {
 const nodeUnavailableDetails = computed(() => [
 	{
 		label: 'Server ID',
-		value: server.serverId,
+		value: serverId,
 		type: 'inline' as const,
 	},
 	{
 		label: 'Node',
 		value:
-			(server.moduleErrors?.general?.error.responseData as any)?.hostname ??
-			server.general?.datacenter ??
+			(serverError.value?.responseData as any)?.hostname ??
+			serverData.value?.datacenter ??
 			'Unknown',
 		type: 'inline' as const,
 	},
 	{
 		label: 'Error message',
 		value: nodeAccessible.value
-			? (server.moduleErrors?.general?.error.message ?? 'Unknown')
+			? (serverError.value?.message ?? 'Unknown')
 			: 'Unable to reach node. Ping test failed.',
 		type: 'block' as const,
 	},
@@ -1100,38 +1053,38 @@ const suspendedDescription = computed(() => {
 const generalErrorDetails = computed(() => [
 	{
 		label: 'Server ID',
-		value: server.serverId,
+		value: serverId,
 		type: 'inline' as const,
 	},
 	{
 		label: 'Timestamp',
-		value: String(server.moduleErrors?.general?.timestamp),
+		value: String(new Date().toISOString()),
 		type: 'inline' as const,
 	},
 	{
 		label: 'Error Name',
-		value: server.moduleErrors?.general?.error.name,
+		value: serverError.value?.name,
 		type: 'inline' as const,
 	},
 	{
 		label: 'Error Message',
-		value: server.moduleErrors?.general?.error.message,
+		value: serverError.value?.message,
 		type: 'block' as const,
 	},
-	...(server.moduleErrors?.general?.error.originalError
+	...(serverError.value?.originalError
 		? [
 				{
 					label: 'Original Error',
-					value: String(server.moduleErrors.general.error.originalError),
+					value: String(serverError.value.originalError),
 					type: 'hidden' as const,
 				},
 			]
 		: []),
-	...(server.moduleErrors?.general?.error.stack
+	...(serverError.value?.stack
 		? [
 				{
 					label: 'Stack Trace',
-					value: server.moduleErrors.general.error.stack,
+					value: serverError.value.stack,
 					type: 'hidden' as const,
 				},
 			]
@@ -1198,35 +1151,70 @@ const cleanup = () => {
 }
 
 async function dismissNotice(noticeId: number) {
-	await useServersFetch(`servers/${serverId}/notices/${noticeId}/dismiss`, {
-		method: 'POST',
-	}).catch((err) => {
+	await client.archon.servers_v0.dismissNotice(serverId, noticeId).catch((err) => {
 		addNotification({
 			title: 'Error dismissing notice',
 			text: err,
 			type: 'error',
 		})
 	})
-	await server.refresh(['general'])
+	await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 }
 
 const nodeAccessible = ref(true)
 
-onMounted(() => {
-	isMounted.value = true
-	if (server.general?.status === 'suspended') {
+async function testNodeReachability(): Promise<boolean> {
+	const nodeInstance = serverData.value?.node?.instance
+	if (!nodeInstance) {
+		console.warn('No node instance available for ping test')
+		return false
+	}
+
+	const wsUrl = `wss://${nodeInstance}/pingtest`
+
+	try {
+		return await new Promise((resolve) => {
+			const socket = new WebSocket(wsUrl)
+			const timeout = setTimeout(() => {
+				socket.close()
+				resolve(false)
+			}, 5000)
+
+			socket.onopen = () => {
+				clearTimeout(timeout)
+				socket.send(performance.now().toString())
+			}
+
+			socket.onmessage = () => {
+				clearTimeout(timeout)
+				socket.close()
+				resolve(true)
+			}
+
+			socket.onerror = () => {
+				clearTimeout(timeout)
+				resolve(false)
+			}
+		})
+	} catch (error) {
+		console.error(`Failed to ping node ${wsUrl}:`, error)
+		return false
+	}
+}
+
+function initializeServer() {
+	if (serverData.value?.status === 'suspended') {
 		isLoading.value = false
 		return
 	}
 
 	// Skip node test if node is null (upgrading/provisioning)
-	if (server.general?.node === null) {
+	if (serverData.value?.node === null) {
 		isLoading.value = false
 		return
 	}
 
-	server
-		.testNodeReachability()
+	testNodeReachability()
 		.then((result) => {
 			nodeAccessible.value = result
 			if (!nodeAccessible.value) {
@@ -1239,7 +1227,7 @@ onMounted(() => {
 			isLoading.value = false
 		})
 
-	if (server.moduleErrors.general?.error) {
+	if (serverError.value) {
 		isLoading.value = false
 	} else {
 		client.archon.sockets
@@ -1273,8 +1261,27 @@ onMounted(() => {
 			})
 	}
 
-	if (server.general?.flows?.intro && server.general?.project) {
-		server.general?.endIntro()
+	if (serverData.value?.flows?.intro && serverProject.value) {
+		client.archon.servers_v0.endIntro(serverId).then(() => {
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		})
+	}
+}
+
+onMounted(() => {
+	isMounted.value = true
+
+	// serverData comes from useQuery and may not be available yet at mount time.
+	// Wait for it before initializing WebSocket, node reachability, etc.
+	if (serverData.value) {
+		initializeServer()
+	} else {
+		const stopWatch = watch(serverData, (data) => {
+			if (data) {
+				stopWatch()
+				initializeServer()
+			}
+		})
 	}
 
 	if (username.value && email.value && userId.value && createdAt.value) {

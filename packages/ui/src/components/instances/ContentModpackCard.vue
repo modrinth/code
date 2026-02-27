@@ -191,7 +191,6 @@ const collapsedOptions = computed(() => {
 								{{ formatMessage(commonMessages.contentLabel) }}
 							</button>
 						</ButtonStyled>
-
 					</div>
 
 					<!-- Collapsed actions visible at < 700px -->

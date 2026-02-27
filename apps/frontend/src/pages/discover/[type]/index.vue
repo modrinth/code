@@ -106,6 +106,7 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 )
 
 const currentServerId = computed(() => queryAsString(route.query.sid) || null)
+const fromContext = computed(() => queryAsString(route.query.from) || null)
 debug('currentServerId:', currentServerId.value)
 
 const {
@@ -181,7 +182,7 @@ const installContentMutation = useMutation({
 	},
 })
 
-const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
+const PERSISTENT_QUERY_PARAMS = ['sid', 'shi', 'from']
 
 if (route.query.shi && projectType.value?.id !== 'modpack') {
 	serverHideInstalled.value = route.query.shi === 'true'
@@ -368,6 +369,16 @@ async function serverInstall(project: InstallableSearchResult) {
 			) ?? versions[0]
 
 		if (projectType.value?.id === 'modpack') {
+			if (fromContext.value === 'onboarding') {
+				const params = new URLSearchParams({
+					resumeModal: 'modpack',
+					mp_pid: project.project_id,
+					mp_vid: version.id,
+					mp_name: project.title,
+				})
+				navigateTo(`/hosting/manage/${currentServerId.value}?${params}`)
+				return
+			}
 			const hardResetParam = eraseDataOnInstall.value ? 'true' : 'false'
 			await useServersFetch(`servers/${currentServerId.value}/reinstall?hard=${hardResetParam}`, {
 				method: 'POST',
@@ -519,6 +530,14 @@ const description = computed(
 		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
 )
 
+const serverBackUrl = computed(() => {
+	if (!serverData.value) return ''
+	const id = serverData.value.server_id
+	return fromContext.value === 'onboarding'
+		? `/hosting/manage/${id}?resumeModal=modpack`
+		: `/hosting/manage/${id}/content`
+})
+
 useSeoMeta({
 	description,
 	ogTitle,
@@ -536,7 +555,7 @@ useSeoMeta({
 			<button
 				tabindex="-1"
 				class="flex cursor-pointer flex-col gap-4 bg-transparent text-primary"
-				@click="navigateTo(`/hosting/manage/${serverData.server_id}/content`)"
+				@click="navigateTo(serverBackUrl)"
 			>
 				<span class="flex items-center gap-2">
 					<Avatar
@@ -559,7 +578,7 @@ useSeoMeta({
 				</span>
 			</button>
 			<ButtonStyled>
-				<button @click="navigateTo(`/hosting/manage/${serverData.server_id}/content`)">
+				<button @click="navigateTo(serverBackUrl)">
 					<LeftArrowIcon />
 					Back to server
 				</button>

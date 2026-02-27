@@ -105,7 +105,7 @@
 		<div v-else />
 		<SaveBanner
 			:is-visible="!!hasUnsavedChanges && !!isValidServerName"
-			:server="props.server"
+			:server-id="serverId"
 			:is-updating="isUpdating"
 			:save="saveGeneral"
 			:reset="resetGeneral"
@@ -117,29 +117,28 @@
 import { EditIcon, TransferIcon } from '@modrinth/assets'
 import {
 	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	ServerIcon,
 	StyledInput,
 } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
+import { useQueryClient } from '@tanstack/vue-query'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+const { server, serverId } = injectModrinthServerContext()
+const queryClient = useQueryClient()
 
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
-const data = computed(() => props.server.general)
+const data = server
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
 const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5)
 const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value))
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
-const icon = computed(() => data.value?.image)
+const icon = useState<string | undefined>(`server-icon-${serverId}`)
 
 const isUpdating = ref(false)
 const hasUnsavedChanges = computed(
@@ -161,14 +160,14 @@ const saveGeneral = async () => {
 	try {
 		isUpdating.value = true
 		if (serverName.value !== data.value?.name) {
-			await data.value?.updateName(serverName.value ?? '')
+			await client.archon.servers_v0.updateName(serverId, serverName.value ?? '')
 		}
 		if (serverSubdomain.value !== data.value?.net?.domain) {
 			try {
-				// type shit backend makes me do
-				const available = await props.server.network?.checkSubdomainAvailability(
+				const result = await client.archon.servers_v0.checkSubdomainAvailability(
 					serverSubdomain.value,
 				)
+				const available = result.available
 
 				if (!available) {
 					addNotification({
@@ -179,7 +178,7 @@ const saveGeneral = async () => {
 					return
 				}
 
-				await props.server.network?.changeSubdomain(serverSubdomain.value)
+				await client.archon.servers_v0.changeSubdomain(serverId, serverSubdomain.value)
 			} catch (error) {
 				console.error('Error checking subdomain availability:', error)
 				addNotification({
@@ -191,7 +190,7 @@ const saveGeneral = async () => {
 			}
 		}
 		await new Promise((resolve) => setTimeout(resolve, 500))
-		await props.server.refresh()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		addNotification({
 			type: 'success',
 			title: 'Server settings updated',
@@ -247,7 +246,7 @@ const uploadFile = async (e: Event) => {
 	})
 
 	try {
-		if (data.value?.image) {
+		if (icon.value) {
 			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
 			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
 		}
@@ -264,8 +263,7 @@ const uploadFile = async (e: Event) => {
 				canvas.height = 512
 				ctx?.drawImage(img, 0, 0, 512, 512)
 				const dataURL = canvas.toDataURL('image/png')
-				useState(`server-icon-${props.server.serverId}`).value = dataURL
-				if (data.value) data.value.image = dataURL
+				useState(`server-icon-${serverId}`).value = dataURL
 				resolve()
 				URL.revokeObjectURL(img.src)
 			}
@@ -288,15 +286,14 @@ const uploadFile = async (e: Event) => {
 }
 
 const resetIcon = async () => {
-	if (data.value?.image) {
+	if (icon.value) {
 		try {
 			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
 			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
 
-			useState(`server-icon-${props.server.serverId}`).value = undefined
-			if (data.value) data.value.image = undefined
+			useState(`server-icon-${serverId}`).value = undefined
 
-			await props.server.refresh(['general'])
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 
 			addNotification({
 				type: 'success',

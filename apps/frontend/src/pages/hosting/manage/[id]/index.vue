@@ -182,13 +182,12 @@
 
 <script setup lang="ts">
 import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthClient, injectModrinthServerContext } from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
 import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
 import PanelTerminal from '~/components/ui/servers/PanelTerminal.vue'
 import ServerStats from '~/components/ui/servers/ServerStats.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 type ServerProps = {
 	isConnected: boolean
@@ -200,13 +199,12 @@ type ServerProps = {
 		exit_code?: number
 	}
 	isServerRunning: boolean
-	server: ModrinthServer
 }
 
 const props = defineProps<ServerProps>()
 
 const client = injectModrinthClient()
-const serverId = props.server.serverId
+const { server: serverData, serverId } = injectModrinthServerContext()
 
 interface ErrorData {
 	id: string
@@ -581,7 +579,6 @@ const commandInput = ref('')
 const suggestions = ref<string[]>([])
 const selectedSuggestionIndex = ref(0)
 
-const serverData = computed(() => props.server.general)
 // const serverIP = computed(() => serverData.value?.net.ip ?? "");
 // const serverPort = computed(() => serverData.value?.net.port ?? 0);
 // const serverDomain = computed(() => serverData.value?.net.domain ?? "");
