@@ -5,7 +5,7 @@
 		<div
 			v-if="ipAddress"
 			v-tooltip="`Copy Java IP: ${ipAddress}`"
-			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover transition-colors"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all"
 			@click="handleCopyIP"
 		>
 			<div class="font-semibold truncate">
