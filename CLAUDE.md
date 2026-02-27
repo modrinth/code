@@ -1,63 +1,86 @@
-# Architecture
+# Modrinth Monorepo
 
-Use TAB instead of spaces.
+This is the Modrinth monorepo — it contains all Modrinth projects, both frontend and backend.
 
-## Frontend
+## Architecture
 
-There are two similar frontends in the Modrinth monorepo, the website (apps/frontend) and the app frontend (apps/app-frontend).
+- **Monorepo tooling:** [Turborepo](https://turbo.build/) (`turbo.jsonc`) + [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`)
+- **Frontend:** Vue 3 / Nuxt 3, Tailwind CSS v3
+- **Backend:** Rust (Labrinth API), Postgres, Clickhouse
+- **Indentation:** Use TAB everywhere, never spaces
 
-Both use Tailwind v3, and their respective configs can be seen at `tailwind.config.ts` and `tailwind.config.js` respectively.
+### Apps (`apps/`)
 
-Both utilize shared and common components from `@modrinth/ui` which can be found at `packages/ui`, and stylings from `@modrinth/assets` which can be found at `packages/assets`.
+| App               | Description                         |
+| ----------------- | ----------------------------------- |
+| `frontend`        | Main Modrinth website (Nuxt 3)      |
+| `app-frontend`    | Desktop/mobile app frontend (Vue 3) |
+| `app`             | Desktop/mobile app shell (Tauri)    |
+| `app-playground`  | Testing playground for app          |
+| `labrinth`        | Backend API service (Rust)          |
+| `daedalus_client` | Daedalus client implementation      |
+| `docs`            | Documentation site (Nuxt)           |
 
-Both can utilize icons from `@modrinth/assets`, which are automatically generated based on what's available within the `icons` folder of the `packages/assets` directory. You can see the generated icons list in `generated-icons.ts`.
+### Packages (`packages/`)
 
-Both have access to our dependency injection framework, examples as seen in `packages/ui/src/providers/`. Ideally any state which is shared between a page and it's subpages should be shared using this dependency injection framework.
+| Package            | Description                                           |
+| ------------------ | ----------------------------------------------------- |
+| `ui`               | Shared Vue component library (`@modrinth/ui`)         |
+| `assets`           | Styling and auto-generated icons (`@modrinth/assets`) |
+| `api-client`       | API client for Nuxt, Tauri, and Node/browser          |
+| `app-lib`          | Shared app library                                    |
+| `blog`             | Blog system and changelog data                        |
+| `utils`            | Shared utility functions                              |
+| `moderation`       | Moderation utilities                                  |
+| `daedalus`         | Daedalus protocol (JS)                                |
+| `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
+| `ariadne`          | Analytics library (Rust)                              |
+| `modrinth-log`     | Logging utilities (Rust)                              |
+| `modrinth-maxmind` | MaxMind GeoIP (Rust)                                  |
+| `modrinth-util`    | General utilities (Rust)                              |
+| `muralpay`         | Payment processing (Rust)                             |
+| `path-util`        | Path utilities (Rust)                                 |
+| `sqlx-tracing`     | SQLx query tracing (Rust)                             |
 
-### Website (apps/frontend)
+## Pre-PR Commands
 
-Before a pull request can be opened for the website, run `pnpm prepr:frontend:web` from the root folder, otherwise CI will fail.
+Run these from the **root** folder before opening a pull request - do not run these after each prompt the user gives you, only run when asked, ask the user a question if they want to run it if the user indicates that they are about to create a pull request.
 
-To run a development version of the frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within the `apps/frontend` folder into `apps/frontend/.env`. Then you can run the frontend by running `pnpm web:dev` in the root folder.
+- **Website:** `pnpm prepr:frontend:web`
+- **App frontend:** `pnpm prepr:frontend:app`
+- **Frontend libs:** `pnpm prepr:frontend:lib`
+- **All frontend (app+web):** `pnpm prepr`
+- **Labrinth (backend):** See `apps/labrinth/CLAUDE.md`
 
-### App Frontend (apps/app-frontend)
+The website and app `prepr` commands
 
-Before a pull request can be opened for the app frontend, run `pnpm prepr:frontend:app` from the root folder, otherwise CI will fail.
+## Dev Commands
 
-To run a development version of the app frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within `packages/app-lib` into `packages/app-lib/.env`. Then you must run the app itself by running `pnpm app:dev` in the root folder.
+- **Website:** `pnpm web:dev` (copy `.env` template in `apps/frontend/` first)
+- **App:** `pnpm app:dev` (copy `.env` template in `packages/app-lib/` first)
+- **Storybook (packages/ui):** `pnpm storybook`
 
-### Localization
+## Project-Specific Instructions
 
-Refer to `.github/instructions/i18n-convert.instructions.md` if the user asks you to perform any i18n conversion work on a component, set of components, pages or sets of pages.
+Each project may have its own `CLAUDE.md` with detailed instructions:
 
-## Labrinth
+- [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API (Rust)
+- [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
-Labrinth is the backend API service for Modrinth.
+## Code Guidelines
 
-### Testing
+### Comments
+- DO NOT use "heading" comments like: // === Helper methods === .
+- Use doc comments, but avoid inline comments unless ABSOLUTELY necessary for clarity. Code should aim to be self documenting!
 
-Before a pull request can be opened, run `cargo clippy -p labrinth --all-targets` and make sure there are ZERO warnings, otherwise CI will fail.
+## Bash Guidelines
 
-Use `cargo test -p labrinth --all-targets` to test your changes. All tests must pass, otherwise CI will fail.
+### Output handling
+- DO NOT pipe output through `head`, `tail`, `less`, or `more`
+- NEVER use `| head -n X` or `| tail -n X` to truncate output
+- Run commands directly without pipes when possible
+- If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
+- ALWAYS read the full output — never pipe through filters
 
-To prepare the sqlx cache, cd into `apps/labrinth` and run `cargo sqlx prepare`. Make sure to NEVER run `cargo sqlx prepare --workspace`.
-
-Read the root `docker-compose.yml` to see what running services are available while developing. Use `docker exec` to access these services.
-
-When the user refers to "performing pre-PR checks", do the following:
-
-- Run clippy as described above
-- DO NOT run tests unless explicitly requested (they take a long time)
-- Prepare the sqlx cache
-
-### Clickhouse
-
-Use `docker exec labrinth-clickhouse clickhouse-client` to access the Clickhouse instance. We use the `staging_ariadne` database to store data in testing.
-
-### Postgres
-
-Use `docker exec labrinth-postgres psql -U labrinth -d labrinth -c "SELECT 1"` to access the PostgreSQL instance, replacing the `SELECT 1` with your query.
-
-# Guidelines
-
-- Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to.
+### General
+- Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
