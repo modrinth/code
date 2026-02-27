@@ -1,6 +1,6 @@
 <template>
 	<div class="gallery">
-		<Card v-for="(image, index) in project.gallery" :key="image.url" class="gallery-item">
+		<Card v-for="(image, index) in filteredGallery" :key="image.url" class="gallery-item">
 			<a @click="expandImage(image, index)">
 				<img :src="image.url" :alt="image.title" class="gallery-image" />
 			</a>
@@ -64,14 +64,14 @@
 							<ContractIcon v-else aria-hidden="true" />
 						</Button>
 						<Button
-							v-if="project.gallery.length > 1"
+							v-if="filteredGallery.length > 1"
 							class="previous"
 							icon-only
 							@click="previousImage()"
 						>
 							<LeftArrowIcon aria-hidden="true" />
 						</Button>
-						<Button v-if="project.gallery.length > 1" class="next" icon-only @click="nextImage()">
+						<Button v-if="filteredGallery.length > 1" class="next" icon-only @click="nextImage()">
 							<RightArrowIcon aria-hidden="true" />
 						</Button>
 					</div>
@@ -92,10 +92,12 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { Button, Card } from '@modrinth/ui'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { trackEvent } from '@/helpers/analytics'
+
+const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 
 const props = defineProps({
 	project: {
@@ -103,6 +105,10 @@ const props = defineProps({
 		default: () => ({}),
 	},
 })
+
+const filteredGallery = computed(() =>
+	props.project.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
+)
 
 const expandedGalleryItem = ref(null)
 const expandedGalleryIndex = ref(0)
@@ -115,10 +121,10 @@ const hideImage = () => {
 
 const nextImage = () => {
 	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= props.project.gallery.length) {
+	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
 		expandedGalleryIndex.value = 0
 	}
-	expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
 	trackEvent('GalleryImageNext', {
 		project_id: props.project.id,
 		url: expandedGalleryItem.value.url,
@@ -128,9 +134,9 @@ const nextImage = () => {
 const previousImage = () => {
 	expandedGalleryIndex.value--
 	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = props.project.gallery.length - 1
+		expandedGalleryIndex.value = filteredGallery.value.length - 1
 	}
-	expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value]
 	trackEvent('GalleryImagePrevious', {
 		project_id: props.project.id,
 		url: expandedGalleryItem.value,
