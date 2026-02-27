@@ -168,17 +168,7 @@ export function createServerCompatibilityContext(
 
 					// Upload the modpack file as a new version
 					let uploadedVersion: Labrinth.Versions.v3.Version
-					try {
-						uploadedVersion = await uploadCustomModpackFile(customModpackFile.value)
-					} catch (err: unknown) {
-						const error = err as { data?: { description?: string } }
-						addNotification({
-							title: 'Failed to upload modpack',
-							text: error.data?.description || String(err),
-							type: 'error',
-						})
-						return
-					}
+					uploadedVersion = await uploadCustomModpackFile(customModpackFile.value)
 
 					// Patch the project to point to the newly uploaded version
 					try {
@@ -214,7 +204,7 @@ export function createServerCompatibilityContext(
 
 			const error = err as { data?: { description?: string } }
 			addNotification({
-				title: 'Failed to save compatibility settings',
+				title: 'Failed to save server compatibility',
 				text: error.data?.description || String(err),
 				type: 'error',
 			})
