@@ -351,6 +351,7 @@ const {
 	serverSortTypes,
 	serverFilterTypes,
 	serverRequestParams,
+	createServerPageParams,
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
 const effectiveSortType = computed({
@@ -431,7 +432,7 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 		const params = {
 			...persistentParams,
-			...createPageParams(),
+			...(currentType.value === 'server' ? createServerPageParams() : createPageParams()),
 		}
 
 		router.replace({ path: route.path, query: params })

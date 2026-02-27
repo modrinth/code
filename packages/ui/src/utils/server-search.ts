@@ -1,5 +1,6 @@
 import { getCategoryIcon } from '@modrinth/assets'
 import { computed, type Ref, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
@@ -70,6 +71,8 @@ export function useServerSearch(opts: {
 	const { tags, query, maxResults, currentPage } = opts
 
 	const { formatMessage } = useVIntl()
+
+	const route = useRoute()
 
 	const serverCurrentSortType = ref<SortType>(SERVER_SORT_TYPES[0])
 	const serverCurrentFilters = ref<FilterValue[]>([])
@@ -179,6 +182,80 @@ export function useServerSearch(opts: {
 		return `?${params.join('&')}`
 	})
 
+	function readServerQueryParams() {
+		const q = route.query
+
+		if (q.q) {
+			query.value = String(q.q)
+		}
+
+		if (q.ss) {
+			serverCurrentSortType.value =
+				SERVER_SORT_TYPES.find((s) => s.name === String(q.ss)) ?? SERVER_SORT_TYPES[0]
+		}
+
+		if (q.m) {
+			maxResults.value = Number(q.m)
+		}
+
+		if (q.page) {
+			currentPage.value = Number(q.page)
+		}
+
+		for (const filterType of serverFilterTypes.value) {
+			const paramValue = q[filterType.query_param]
+			if (!paramValue) continue
+
+			const values =
+				typeof paramValue === 'string' ? [paramValue] : paramValue.filter((v): v is string => v !== null)
+
+			for (const value of values) {
+				const option = filterType.options.find((o) => o.id === value)
+				if (option) {
+					serverCurrentFilters.value.push({
+						type: filterType.id,
+						option: option.id,
+					})
+				}
+			}
+		}
+	}
+
+	function createServerPageParams(): Record<string, string | string[]> {
+		const items: Record<string, string[]> = {}
+
+		if (query.value) {
+			items.q = [query.value]
+		}
+
+		for (const filterValue of serverCurrentFilters.value) {
+			const type = serverFilterTypes.value.find((t) => t.id === filterValue.type)
+			if (type) {
+				if (items[type.query_param]) {
+					items[type.query_param].push(filterValue.option)
+				} else {
+					items[type.query_param] = [filterValue.option]
+				}
+			}
+		}
+
+		if (serverCurrentSortType.value.name !== 'relevance') {
+			items.ss = [serverCurrentSortType.value.name]
+		}
+
+		if (maxResults.value !== 20) {
+			items.m = [String(maxResults.value)]
+		}
+
+		if (currentPage.value > 1) {
+			items.page = [String(currentPage.value)]
+		}
+
+		return items
+	}
+
+	readServerQueryParams()
+
 	return {
 		serverCurrentSortType,
 		serverCurrentFilters,
@@ -187,5 +264,6 @@ export function useServerSearch(opts: {
 		serverFilterTypes,
 		newFilters,
 		serverRequestParams,
+		createServerPageParams,
 	}
 }
