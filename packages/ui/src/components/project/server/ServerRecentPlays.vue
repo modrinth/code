@@ -10,6 +10,7 @@ const { formatMessage } = useVIntl()
 
 defineProps<{
 	recentPlays: number
+	hideLabel?: boolean
 }>()
 </script>
 <template>
@@ -19,7 +20,11 @@ defineProps<{
 	>
 		<PlayIcon />
 		{{
-			formatMessage(commonMessages.projectRecentPlays, { count: formatNumber(recentPlays, true) })
+			hideLabel
+				? formatNumber(recentPlays, true)
+				: formatMessage(commonMessages.projectRecentPlays, {
+						count: formatNumber(recentPlays, true),
+					})
 		}}
 	</StatItem>
 </template>

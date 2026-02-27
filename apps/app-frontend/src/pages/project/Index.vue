@@ -15,7 +15,9 @@
 				:required-content="serverRequiredContent"
 				:recommended-version="serverRecommendedVersion"
 				:supported-versions="serverSupportedVersions"
+				:loaders="serverModpackLoaders"
 				:ping="serverPing"
+				:status-online="serverStatusOnline"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarLinks
@@ -32,10 +34,12 @@
 				link-target="_blank"
 				class="project-sidebar-section"
 			/>
+			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarDetails
 				:project="data"
 				:has-versions="versions.length > 0"
 				:link-target="`_blank`"
+				:hide-license="isServerProject"
 				class="project-sidebar-section"
 			/>
 		</Teleport>
@@ -56,7 +60,13 @@
 					@contextmenu.prevent.stop="handleRightClick"
 				>
 					<template #actions>
-						<ButtonStyled size="large" color="brand">
+						<ButtonStyled v-if="serverPlaying" size="large" color="red">
+							<button @click="handleStopServer">
+								<StopCircleIcon />
+								Stop
+							</button>
+						</ButtonStyled>
+						<ButtonStyled v-else size="large" color="brand">
 							<button
 								:disabled="data && installStore.installingServerProjects.includes(data.id)"
 								@click="handleClickPlay"
@@ -165,19 +175,12 @@
 								query: instanceFilters,
 							},
 							subpages: ['version'],
-							shown: projectV3?.minecraft_server === undefined,
+							shown: projectV3?.minecraft_server == null,
 						},
 						{
 							label: 'Gallery',
 							href: `/project/${$route.params.id}/gallery`,
 							shown: data.gallery.length > 0,
-						},
-						{
-							label: 'Required content',
-							href: `/project/${$route.params.id}/required-content`,
-							shown:
-								projectV3?.minecraft_server !== undefined &&
-								projectV3?.minecraft_java_server?.content?.kind === 'modpack',
 						},
 					]"
 				/>
@@ -215,6 +218,7 @@ import {
 	MoreVerticalIcon,
 	PlayIcon,
 	ReportIcon,
+	StopCircleIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -227,12 +231,13 @@ import {
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
+	ProjectSidebarTags,
 	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -245,7 +250,14 @@ import {
 	get_version,
 	get_version_many,
 } from '@/helpers/cache.js'
-import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
+import { process_listener } from '@/helpers/events'
+import { get_by_profile_path } from '@/helpers/process'
+import {
+	get as getInstance,
+	get_projects as getInstanceProjects,
+	kill,
+	list as listInstances,
+} from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -276,7 +288,11 @@ const projectV3 = shallowRef(null)
 const serverRequiredContent = shallowRef(null)
 const serverRecommendedVersion = shallowRef(null)
 const serverSupportedVersions = shallowRef([])
+const serverModpackLoaders = shallowRef([])
 const serverPing = ref(undefined)
+const serverStatusOnline = ref(false)
+const serverInstancePath = ref(null)
+const serverPlaying = ref(false)
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -304,6 +320,27 @@ const [allLoaders, allGameVersions] = await Promise.all([
 async function handleClickPlay() {
 	if (!isServerProject.value) return
 	await playServerProject(data.value.id).catch(handleError)
+	await updateServerPlayState()
+}
+
+async function updateServerPlayState() {
+	if (!isServerProject.value || !data.value) return
+	const packs = await listInstances()
+	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
+	if (inst) {
+		serverInstancePath.value = inst.path
+		const processes = await get_by_profile_path(inst.path).catch(() => [])
+		serverPlaying.value = Array.isArray(processes) && processes.length > 0
+	} else {
+		serverInstancePath.value = null
+		serverPlaying.value = false
+	}
+}
+
+async function handleStopServer() {
+	if (!serverInstancePath.value) return
+	await kill(serverInstancePath.value).catch(() => {})
+	serverPlaying.value = false
 }
 
 async function fetchProjectData() {
@@ -337,10 +374,11 @@ async function fetchProjectData() {
 		}
 	}
 
-	isServerProject.value = projectV3.value?.minecraft_server !== undefined
+	isServerProject.value = projectV3.value?.minecraft_server != null
 
 	// Ping server for latency
 	const serverAddress = projectV3.value?.minecraft_java_server?.address
+	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
 	if (serverAddress) {
 		serverPing.value = undefined
 		get_server_status(serverAddress)
@@ -360,6 +398,7 @@ async function fetchProjectData() {
 		const modpackVersion = await get_version(content.version_id, 'bypass').catch(handleError)
 		if (modpackVersion) {
 			serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
+			serverModpackLoaders.value = modpackVersion.mrpack_loaders ?? []
 			if (modpackVersion.project_id) {
 				const modpackProject = await get_project_v3(
 					modpackVersion.project_id,
@@ -368,10 +407,15 @@ async function fetchProjectData() {
 				if (modpackProject) {
 					serverRequiredContent.value = {
 						name: modpackProject.name,
+						versionNumber: modpackVersion.version_number ?? '',
 						icon: modpackProject.icon_url,
-						onclick:
+						onclickName:
 							modpackProject.id !== project.id
 								? () => router.push(`/project/${modpackProject.id}`)
+								: undefined,
+						onclickVersion:
+							modpackProject.id !== project.id
+								? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
 								: undefined,
 					}
 				}
@@ -384,9 +428,21 @@ async function fetchProjectData() {
 	}
 
 	breadcrumbs.setName('Project', data.value.title)
+
+	await updateServerPlayState()
 }
 
 await fetchProjectData()
+
+const unlistenProcesses = await process_listener((e) => {
+	if (e.event === 'finished' && serverInstancePath.value && e.profile_path_id === serverInstancePath.value) {
+		serverPlaying.value = false
+	}
+})
+
+onUnmounted(() => {
+	unlistenProcesses()
+})
 
 watch(
 	() => route.params.id,

@@ -13,7 +13,6 @@ import {
 	LeftArrowIcon,
 	ListIcon,
 	MoreVerticalIcon,
-	PlayIcon,
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -35,10 +34,11 @@ import {
 	StyledInput,
 	Toggle,
 	useSearch,
+	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
-import { useQueries, useQueryClient } from '@tanstack/vue-query'
+import { useQueryClient } from '@tanstack/vue-query'
 import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
@@ -343,15 +343,41 @@ async function serverInstall(project: InstallableSearchResult) {
 }
 
 const noLoad = ref(false)
+
+const {
+	serverCurrentSortType,
+	serverCurrentFilters,
+	serverToggledGroups,
+	serverSortTypes,
+	serverFilterTypes,
+	serverRequestParams,
+	createServerPageParams,
+} = useServerSearch({ tags, query, maxResults, currentPage })
+
+const effectiveSortType = computed({
+	get: () => (currentType.value === 'server' ? serverCurrentSortType.value : currentSortType.value),
+	set: (v: SortType) => {
+		if (currentType.value === 'server') serverCurrentSortType.value = v
+		else currentSortType.value = v
+	},
+})
+const effectiveSortTypes = computed(() =>
+	currentType.value === 'server' ? serverSortTypes : [...sortTypes],
+)
+
 const {
 	data: rawResults,
 	refresh: refreshSearch,
 	pending: searchLoading,
-	// TODO_SERVER_PROJECTS, replace tanstack query once search backend is in
 } = useLazyFetch(
 	() => {
 		const config = useRuntimeConfig()
-		const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+		let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+
+		if (currentType.value === 'server') {
+			base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
+			return `${base}search${serverRequestParams.value}`
+		}
 
 		return `${base}search${requestParams.value}`
 	},
@@ -359,6 +385,9 @@ const {
 		watch: false,
 		transform: (hits) => {
 			noLoad.value = false
+			if (currentType.value === 'server') {
+				console.log('[v3 search] hits:', (hits as Labrinth.Search.v3.SearchResults)?.hits)
+			}
 			return hits as Labrinth.Search.v2.SearchResults
 		},
 	},
@@ -403,7 +432,7 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 		const params = {
 			...persistentParams,
-			...createPageParams(),
+			...(currentType.value === 'server' ? createServerPageParams() : createPageParams()),
 		}
 
 		router.replace({ path: route.path, query: params })
@@ -412,6 +441,12 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 watch([currentFilters], () => {
 	updateSearchResults(1, false)
+})
+
+watch([serverCurrentFilters, serverCurrentSortType], () => {
+	if (currentType.value === 'server') {
+		updateSearchResults(1, false)
+	}
 })
 
 const throttledSearch = useThrottleFn(() => updateSearchResults(), 500, true)
@@ -453,54 +488,40 @@ useSeoMeta({
 	ogDescription: description,
 })
 
-// --- START HARDCODED SERVER PROJECT ---
-// TODO_SERVER_PROJECTS: Remove this block once the search API returns server projects with project_type = 'server'.
-// will need to query for v3 projects for card
-// another problem: server projects search should also return the required content icon and title, so then dont need to query it again
-const SERVER_PROJECT_IDS = computed(() => [query.value, 'ipxQs0xE', 'YVzRe9Ps', 'SITrYrVv'])
-
-const serverProjectQueries = useQueries({
-	queries: computed(() =>
-		SERVER_PROJECT_IDS.value
-			.filter((id): id is string => !!id)
-			.map((id) => ({
-				queryKey: ['discover', 'server-project', id],
-				queryFn: () => modrinthClient.labrinth.projects_v3.get(id),
-				enabled: currentType.value === 'server',
-			})),
-	),
-})
-
-const serverProjects = computed(() =>
-	serverProjectQueries.value
-		.map((q) => q.data)
-		.filter((p): p is Labrinth.Projects.v3.Project => !!p?.minecraft_server),
+const serverHits = computed(
+	() =>
+		((rawResults.value as unknown as Labrinth.Search.v3.SearchResults)
+			?.hits as Labrinth.Search.v3.ResultSearchProject[]) ?? [],
 )
-// --- END HARDCODED SERVER PROJECT ---
 
-const getServerModpackContent = (project: Labrinth.Projects.v3.Project) => {
-	if (project.minecraft_java_server?.content?.kind === 'modpack') {
-		const { project_name, project_icon, project_id } = project.minecraft_java_server?.content || {}
+const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) => {
+	const content = hit.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
 		if (!project_name) return undefined
 		return {
 			name: project_name,
 			icon: project_icon,
-			onclick: () => {
-				router.push(`/project/${project_id}`)
-			},
+			onclick:
+				project_id !== hit.project_id
+					? () => {
+							router.push(`/project/${project_id}`)
+						}
+					: undefined,
+			showCustomModpackTooltip: project_id === hit.project_id,
 		}
 	}
 	return undefined
 }
 
-function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
+function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject) {
 	serverInAppModal.value?.show({
 		serverProject: {
 			name: project.name,
-			slug: project.slug,
-			numPlayers: project.minecraft_java_server_ping?.data?.players_online,
-			icon: project.icon_url,
-			statusOnline: !!project.minecraft_java_server_ping?.data,
+			slug: project.slug ?? '',
+			numPlayers: project.minecraft_java_server?.ping?.data?.players_online,
+			icon: project.icon_url ?? '',
+			statusOnline: !!project.minecraft_java_server?.ping?.data,
 			region: project.minecraft_server?.country,
 		},
 	})
@@ -608,42 +629,66 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 					@update:model-value="updateSearchResults()"
 				/>
 			</div>
-			<div v-if="currentType === 'server'">TBD</div>
-			<SearchSidebarFilter
-				v-for="filter in filters.filter((f) => f.display !== 'none')"
-				:key="`filter-${filter.id}`"
-				v-model:selected-filters="currentFilters"
-				v-model:toggled-groups="toggledGroups"
-				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-filters="serverFilters"
-				:filter-type="filter"
-				:class="
-					filtersMenuOpen
-						? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-						: 'card-shadow rounded-2xl bg-bg-raised'
-				"
-				button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-				content-class="mb-4 mx-3"
-				inner-panel-class="p-1"
-				:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
-			>
-				<template #header>
-					<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-				</template>
-				<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
-					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
-						<InfoIcon class="mt-1 size-4" />
-						<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
-					</div>
-				</template>
-				<template #locked-game_version>
-					{{ formatMessage(messages.gameVersionProvidedByServer) }}
-				</template>
-				<template #locked-mod_loader>
-					{{ formatMessage(messages.modLoaderProvidedByServer) }}
-				</template>
-				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
-			</SearchSidebarFilter>
+			<template v-if="currentType === 'server'">
+				<SearchSidebarFilter
+					v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
+					:key="`server-filter-${filterType.id}`"
+					v-model:selected-filters="serverCurrentFilters"
+					v-model:toggled-groups="serverToggledGroups"
+					:provided-filters="serverFilters"
+					:filter-type="filterType"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="true"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filterType.formatted_name }}</h3>
+					</template>
+				</SearchSidebarFilter>
+			</template>
+			<template v-else>
+				<SearchSidebarFilter
+					v-for="filter in filters.filter((f) => f.display !== 'none')"
+					:key="`filter-${filter.id}`"
+					v-model:selected-filters="currentFilters"
+					v-model:toggled-groups="toggledGroups"
+					v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+					:provided-filters="serverFilters"
+					:filter-type="filter"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+					</template>
+					<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
+						<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+							<InfoIcon class="mt-1 size-4" />
+							<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
+						</div>
+					</template>
+					<template #locked-game_version>
+						{{ formatMessage(messages.gameVersionProvidedByServer) }}
+					</template>
+					<template #locked-mod_loader>
+						{{ formatMessage(messages.modLoaderProvidedByServer) }}
+					</template>
+					<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
+				</SearchSidebarFilter>
+			</template>
 		</div>
 	</aside>
 	<section class="normal-page__content">
@@ -663,10 +708,10 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownSelect
 					v-slot="{ selected }"
-					v-model="currentSortType"
+					v-model="effectiveSortType"
 					class="!w-auto flex-grow md:flex-grow-0"
 					name="Sort by"
-					:options="[...sortTypes]"
+					:options="effectiveSortTypes"
 					:display-name="(option?: SortType) => option?.display"
 					@change="updateSearchResults()"
 				>
@@ -712,6 +757,14 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 				/>
 			</div>
 			<SearchFilterControl
+				v-if="currentType === 'server'"
+				v-model:selected-filters="serverCurrentFilters"
+				:filters="serverFilterTypes"
+				:provided-filters="[]"
+				:overridden-provided-filter-types="[]"
+			/>
+			<SearchFilterControl
+				v-else
 				v-model:selected-filters="currentFilters"
 				:filters="filters.filter((f) => f.display !== 'none')"
 				:provided-filters="serverFilters"
@@ -721,7 +774,9 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 			<LogoAnimated v-if="searchLoading && !noLoad" />
 			<div
 				v-else-if="
-					results && results.hits && results.hits.length === 0 && serverProjects.length === 0
+					currentType === 'server'
+						? serverHits.length === 0
+						: results && results.hits && results.hits.length === 0
 				"
 				class="no-results"
 			>
@@ -736,33 +791,27 @@ function handleServerProjectPlay(project: Labrinth.Projects.v3.Project) {
 				>
 					<template v-if="currentType === 'server'">
 						<ProjectCard
-							v-for="project in serverProjects"
-							:key="`server-card-${project.id}`"
+							v-for="project in serverHits"
+							:key="`server-card-${project.project_id}`"
 							:title="project.name"
 							:icon-url="project.icon_url || undefined"
 							:summary="project.summary"
 							:tags="project.categories"
 							:link="`/server/${project.slug}`"
-							:server-online-players="project.minecraft_java_server_ping?.data?.players_online"
-							:server-recent-plays="12345"
+							:server-online-players="
+								project.minecraft_java_server?.ping?.data?.players_online ?? 0
+							"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
 							:server-region-code="project.minecraft_server?.country"
+							:server-status-online="!!project.minecraft_java_server?.ping?.data"
 							:server-modpack-content="getServerModpackContent(project)"
 							:layout="
 								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 							"
+							:max-tags="2"
+							is-server-project
+							exclude-loaders
 						>
-							<template #actions>
-								<ButtonStyled
-									color="brand"
-									type="outlined"
-									@click="handleServerProjectPlay(project)"
-								>
-									<button>
-										<PlayIcon />
-										Play
-									</button>
-								</ButtonStyled>
-							</template>
 						</ProjectCard>
 					</template>
 					<template v-else>

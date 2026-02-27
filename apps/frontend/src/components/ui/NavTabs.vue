@@ -1,4 +1,5 @@
 <template>
+	<!-- TODO_SERVER_PROJECTS, only show tabs if theres more than one in filteredLinks -->
 	<nav
 		ref="scrollContainer"
 		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"

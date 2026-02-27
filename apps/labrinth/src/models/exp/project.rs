@@ -17,7 +17,12 @@ use crate::{
         },
         ids::{ProjectId, VersionId},
     },
-    queue::server_ping,
+    queue::{
+        analytics::cache::{
+            MINECRAFT_SERVER_ANALYTICS, MinecraftServerAnalytics,
+        },
+        server_ping,
+    },
     util::error::Context,
 };
 
@@ -51,6 +56,7 @@ macro_rules! define_project_components {
         pub struct ProjectSerial {
             $(
                 #[validate(nested)]
+                #[serde(default, skip_serializing_if = "Option::is_none")]
                 pub $field_name: Option<$ty>,
             )*
         }
@@ -110,6 +116,7 @@ macro_rules! define_project_components {
         #[derive(Debug, Clone, Default, Serialize, Deserialize, utoipa::ToSchema)]
         pub struct ProjectQuery {
             $(
+                #[serde(skip_serializing_if = "Option::is_none")]
                 pub $field_name: Option<Query<$ty>>,
             )*
         }
@@ -118,7 +125,7 @@ macro_rules! define_project_components {
         pub struct ProjectEdit {
             $(
                 #[validate(nested)]
-                #[serde(default)]
+                #[serde(skip_serializing_if = "Option::is_none", default)]
                 pub $field_name: Option<Edit<$ty>>,
             )*
         }
@@ -173,12 +180,15 @@ component::relations! {
 pub struct ProjectQueryRequirements {
     pub partial_versions: HashSet<VersionId>,
     pub minecraft_java_server_pings: HashSet<ProjectId>,
+    pub minecraft_server_analytics: HashSet<ProjectId>,
 }
 
 pub struct ProjectQueryContext {
     pub partial_versions: HashMap<VersionId, PartialVersion>,
     pub minecraft_java_server_pings:
         HashMap<ProjectId, minecraft::JavaServerPing>,
+    pub minecraft_server_analytics:
+        HashMap<ProjectId, MinecraftServerAnalytics>,
 }
 
 #[derive(Clone, Debug)]
@@ -200,6 +210,7 @@ pub async fn fetch_query_context(
     let ProjectQueryRequirements {
         partial_versions,
         minecraft_java_server_pings,
+        minecraft_server_analytics,
     } = requirements;
 
     let partial_versions = if partial_versions.is_empty() {
@@ -238,13 +249,14 @@ pub async fn fetch_query_context(
         .collect::<HashMap<_, _>>()
     };
 
+    let mut redis = redis.connect().await?;
+
     let minecraft_java_server_pings =
         minecraft_java_server_pings.into_iter().collect::<Vec<_>>();
     let minecraft_java_server_pings = if minecraft_java_server_pings.is_empty()
     {
         HashMap::new()
     } else {
-        let mut redis = redis.connect().await?;
         redis
             .get_many_deserialized_from_json::<minecraft::JavaServerPing>(
                 server_ping::REDIS_NAMESPACE,
@@ -262,8 +274,32 @@ pub async fn fetch_query_context(
             .collect::<HashMap<_, _>>()
     };
 
+    let minecraft_server_analytics =
+        minecraft_server_analytics.into_iter().collect::<Vec<_>>();
+
+    let minecraft_server_analytics = if minecraft_server_analytics.is_empty() {
+        HashMap::new()
+    } else {
+        redis
+            .get_many_deserialized_from_json::<MinecraftServerAnalytics>(
+                MINECRAFT_SERVER_ANALYTICS,
+                &minecraft_server_analytics
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>(),
+            )
+            .await?
+            .into_iter()
+            .enumerate()
+            .filter_map(|(idx, data)| {
+                data.map(|data| (minecraft_server_analytics[idx], data))
+            })
+            .collect::<HashMap<_, _>>()
+    };
+
     Ok(ProjectQueryContext {
         partial_versions,
         minecraft_java_server_pings,
+        minecraft_server_analytics,
     })
 }

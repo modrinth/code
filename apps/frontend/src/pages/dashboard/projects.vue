@@ -457,6 +457,14 @@ async function bulkEditLinks() {
 await initUserProjects()
 if (user.value?.projects) {
 	projects.value = updateSort(user.value.projects, 'Name', false)
+
+	// minecraft_java_server type determined from component on projectV3
+	projects.value = projects.value.map((project) => {
+		const projectV3 = user.value?.projectsV3?.find((p) => p.id === project.id)
+		if (projectV3?.minecraft_server != null)
+			return { ...project, project_type: 'minecraft_java_server' }
+		return project
+	})
 	user.value?.projectsV3?.forEach((project) => {
 		if (
 			project.side_types_migration_review_status === 'pending' &&

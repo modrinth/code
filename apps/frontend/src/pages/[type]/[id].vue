@@ -837,6 +837,8 @@
 						:required-content="serverRequiredContent"
 						:recommended-version="serverRecommendedVersion"
 						:supported-versions="serverSupportedVersions"
+						:loaders="serverModpackLoaders"
+						:status-online="projectV3?.minecraft_java_server?.ping != null"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
@@ -861,6 +863,10 @@
 						:user-link="(username) => `/user/${username}`"
 						class="card flex-card experimental-styles-within"
 					/>
+					<ProjectSidebarTags
+						:project="project"
+						class="card flex-card experimental-styles-within"
+					/>
 					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
 						v-if="false"
@@ -873,7 +879,7 @@
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
-							<div class="details-list__item">
+							<div v-if="!isServerProject" class="details-list__item">
 								<BookTextIcon aria-hidden="true" />
 								<div>
 									{{ formatMessage(messages.licensedLabel) }}
@@ -1034,6 +1040,7 @@ import {
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
+	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
 	ServerProjectHeader,
@@ -1103,7 +1110,7 @@ const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
 
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -1178,9 +1185,9 @@ const showVersionsCheckbox = computed(() => {
 const serverProject = computed(() => ({
 	name: project.value.title,
 	slug: project.value.slug || project.value.id,
-	numPlayers: projectV3.value?.minecraft_java_server_ping?.data?.players_online,
+	numPlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online,
 	icon: project.value.icon_url,
-	statusOnline: !!projectV3.value?.minecraft_java_server_ping?.data,
+	statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
 	region: projectV3.value?.minecraft_server?.country,
 }))
 
@@ -1392,10 +1399,6 @@ const messages = defineMessages({
 	projectUpdatedMessage: {
 		id: 'project.notification.updated.message',
 		defaultMessage: 'Your project has been updated.',
-	},
-	requiredContentTab: {
-		id: 'project.required-content.title',
-		defaultMessage: 'Required content',
 	},
 	reviewEnvironmentSettings: {
 		id: 'project.environment.migration.review-button',
@@ -1640,10 +1643,21 @@ const { data: serverModpackProject } = useQuery({
 
 const serverRequiredContent = computed(() => {
 	if (!serverModpackProject.value) return null
+	const primaryFile =
+		serverModpackVersion.value?.files?.find((f) => f.primary) ??
+		serverModpackVersion.value?.files?.[0]
 	return {
 		name: serverModpackProject.value.name,
+		versionNumber: serverModpackVersion.value?.version_number ?? '',
 		icon: serverModpackProject.value.icon_url,
-		onclick: () => router.push(`/project/${serverModpackProject.value.slug}`),
+		onclickName: () => router.push(`/project/${serverModpackProject.value.slug}`),
+		onclickVersion: () =>
+			router.push(
+				`/project/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
+			),
+		onclickDownload: primaryFile?.url
+			? () => navigateTo(primaryFile.url, { external: true })
+			: undefined,
 	}
 })
 
@@ -1671,6 +1685,11 @@ const serverSupportedVersions = computed(() => {
 	}
 
 	return []
+})
+
+const serverModpackLoaders = computed(() => {
+	if (!serverModpackVersion.value) return []
+	return serverModpackVersion.value.mrpack_loaders ?? []
 })
 
 // Members
@@ -2513,13 +2532,6 @@ const navLinks = computed(() => {
 			label: formatMessage(messages.moderationTab),
 			href: `${projectUrl}/moderation`,
 			shown: !!currentMember.value,
-		},
-		{
-			label: formatMessage(messages.requiredContentTab),
-			href: `${projectUrl}/required-content`,
-			shown:
-				projectV3.value?.minecraft_server !== undefined &&
-				projectV3.value?.minecraft_java_server?.content?.kind === 'modpack',
 		},
 	]
 })

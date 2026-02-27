@@ -1,7 +1,6 @@
 use crate::database::models::DelphiReportIssueDetailsId;
 use crate::env::ENV;
 use crate::file_hosting::FileHostingError;
-use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
 use actix_cors::Cors;
 use actix_files::Files;
@@ -16,7 +15,7 @@ pub mod v2;
 pub mod v2_reroute;
 pub mod v3;
 
-mod analytics;
+pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
@@ -57,8 +56,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                     ])
                     .max_age(3600),
             )
-            .service(page_view_ingest)
-            .service(playtime_ingest),
+            .configure(analytics::config),
     );
     cfg.service(
         web::scope("api/v1")

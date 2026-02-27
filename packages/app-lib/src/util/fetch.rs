@@ -206,13 +206,9 @@ pub async fn fetch_advanced(
     };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        // TODO_SERVER_PROJECTS figure out why circuit breaker is so harsh and uncomment once solved
-        // if is_api_url
-        //     && !cfg!(debug_assertions)
-        //     && GLOBAL_FETCH_FENCE.is_blocked()
-        // {
-        //     return Err(ErrorKind::ApiIsDownError.into());
-        // }
+        if is_api_url && GLOBAL_FETCH_FENCE.is_blocked() {
+            return Err(ErrorKind::ApiIsDownError.into());
+        }
 
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
 
@@ -344,15 +340,12 @@ pub async fn fetch_mirrors(
 
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
-pub async fn post_json<T>(
+pub async fn post_json(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<T>
-where
-    T: DeserializeOwned,
-{
+) -> crate::Result<()> {
     let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
@@ -363,10 +356,8 @@ where
         req = req.header("Authorization", &creds.session);
     }
 
-    let result = req.send().await?.error_for_status()?;
-
-    let value = result.json().await?;
-    Ok(value)
+    req.send().await?.error_for_status()?;
+    Ok(())
 }
 
 pub async fn read_json<T>(

@@ -1,6 +1,6 @@
 use crate::state::{
     CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
-    ProjectV3, SearchResults, TeamMember, User, Version,
+    ProjectV3, SearchResults, SearchResultsV3, TeamMember, User, Version,
 };
 
 macro_rules! impl_cache_methods {
@@ -41,7 +41,8 @@ impl_cache_methods!(
     (User, User),
     (Team, Vec<TeamMember>),
     (Organization, Organization),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 pub async fn purge_cache_types(

@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
@@ -26,6 +27,11 @@ pub enum BackgroundTask {
     IndexSubscriptions,
     Migrations,
     Mail,
+    /// Queries server project analytics (e.g. number of verified plays in last
+    /// 2 weeks for server projects) and caches them in Redis.
+    CacheAnalytics,
+    /// Attempts to ping Minecraft Java servers as if we were a client, to
+    /// collect info on if they're online, game version, description, etc.
     PingMinecraftJavaServers,
 }
 
@@ -77,6 +83,9 @@ impl BackgroundTask {
                 Ok(())
             }
             Mail => run_email(email_queue).await,
+            CacheAnalytics => {
+                cache_analytics(&pool, &redis_pool, &clickhouse).await
+            }
             PingMinecraftJavaServers => {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }

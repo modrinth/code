@@ -16,6 +16,7 @@ import { useRouter } from 'vue-router'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
+import { get_project_v3_many } from '@/helpers/cache.js'
 import {
 	add_project_from_version as installMod,
 	check_installed,
@@ -50,7 +51,10 @@ const profiles = ref([])
 
 const shownProfiles = computed(() =>
 	profiles.value.filter((profile) => {
-		return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+		return (
+			!profile.isServerInstance &&
+			profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+		)
 	}),
 )
 
@@ -81,6 +85,22 @@ defineExpose({
 				handleError,
 			)
 		}
+
+		const linkedProjectIds = profilesVal
+			.filter((p) => p.linked_data?.project_id)
+			.map((p) => p.linked_data.project_id)
+		if (linkedProjectIds.length > 0) {
+			const linkedProjects = await get_project_v3_many(linkedProjectIds, 'stale_while_revalidate_skip_offline').catch(
+				() => [],
+			)
+			const serverProjectIds = new Set(
+				linkedProjects.filter((p) => p?.minecraft_server != null).map((p) => p.id),
+			)
+			for (const profile of profilesVal) {
+				profile.isServerInstance = serverProjectIds.has(profile.linked_data?.project_id)
+			}
+		}
+
 		profiles.value = profilesVal
 
 		installModal.value.show()

@@ -32,7 +32,7 @@
 			</p>
 
 			<p
-				v-if="project.versions.length === 0 && projectV3?.minecraft_server === undefined"
+				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
 				class="known-errors"
 			>
 				Please upload a version first in order to select tags!
@@ -157,7 +157,6 @@ interface Category {
 }
 
 const tags = useGeneratedState()
-console.log(tags.value) // TODO_SERVER_PROJECTS remove comment
 const { formatMessage, locale } = useVIntl()
 
 const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
@@ -166,18 +165,22 @@ const formatCategoryName = (categoryName: string) => {
 	return formatCategory(formatMessage, categoryName)
 }
 
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
+const matchesProjectType = (x: Category) =>
+	x.project_type === project.value.actualProjectType ||
+	(x.project_type === 'minecraft_java_server' && isServerProject.value)
+
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
-				x.project_type === project.value.actualProjectType &&
+				matchesProjectType(x) &&
 				(project.value.categories.includes(x.name) ||
 					project.value.additional_categories.includes(x.name)),
 		) as Category[],
 		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
-			(x: Category) =>
-				x.project_type === project.value.actualProjectType &&
-				project.value.categories.includes(x.name),
+			(x: Category) => matchesProjectType(x) && project.value.categories.includes(x.name),
 		) as Category[],
 	}),
 	async () => {
@@ -221,7 +224,7 @@ const { saved, current, saving, reset, save } = useSavable(
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
-		if (x.project_type === project.value.actualProjectType) {
+		if (matchesProjectType(x)) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []

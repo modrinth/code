@@ -32,8 +32,8 @@
 						:src="
 							previewImage
 								? previewImage
-								: project.gallery?.[editIndex]?.url
-									? project.gallery[editIndex].url
+								: filteredGallery[editIndex]?.url
+									? filteredGallery[editIndex].url
 									: 'https://cdn.modrinth.com/placeholder-banner.svg'
 						"
 						alt="gallery-preview"
@@ -175,14 +175,14 @@
 								<ContractIcon v-else aria-hidden="true" />
 							</button>
 							<button
-								v-if="(project?.gallery?.length ?? 0) > 1"
+								v-if="filteredGallery.length > 1"
 								class="previous circle-button"
 								@click="previousImage()"
 							>
 								<LeftArrowIcon aria-hidden="true" />
 							</button>
 							<button
-								v-if="(project?.gallery?.length ?? 0) > 1"
+								v-if="filteredGallery.length > 1"
 								class="next circle-button"
 								@click="nextImage()"
 							>
@@ -222,7 +222,7 @@
 				</div>
 			</template>
 		</Admonition>
-		<div v-if="currentMember && project?.gallery?.length" class="card header-buttons">
+		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
 			<FileInput
 				:max-size="5242880"
 				:accept="acceptFileTypes"
@@ -243,8 +243,8 @@
 				@change="handleFiles"
 			/>
 		</div>
-		<div v-if="project?.gallery?.length" class="items">
-			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
+		<div v-if="filteredGallery.length" class="items">
+			<div v-for="(item, index) in filteredGallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item as GalleryItem, index)">
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
@@ -414,7 +414,12 @@ const previewImage = ref<string | null>(null)
 const shouldPreventActions = ref(false)
 
 // Constant for accepted file types
+const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+
+const filteredGallery = computed(() =>
+	project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
+)
 
 // Keyboard navigation for expanded image modal
 useEventListener(document, 'keydown', (e) => {
@@ -435,18 +440,18 @@ useEventListener(document, 'keydown', (e) => {
 // Navigation functions
 function nextImage() {
 	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= project.value.gallery!.length) {
+	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
 		expandedGalleryIndex.value = 0
 	}
-	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
 }
 
 function previousImage() {
 	expandedGalleryIndex.value--
 	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = project.value.gallery!.length - 1
+		expandedGalleryIndex.value = filteredGallery.value.length - 1
 	}
-	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
 }
 
 function expandImage(item: GalleryItem, index: number) {
@@ -509,7 +514,7 @@ async function editGalleryItem() {
 	shouldPreventActions.value = true
 	startLoading()
 
-	const imageUrl = project.value!.gallery![editIndex.value].url
+	const imageUrl = filteredGallery.value[editIndex.value].url
 	const success = await contextEditGalleryItem(
 		imageUrl,
 		editTitle.value || undefined,
@@ -529,7 +534,7 @@ async function editGalleryItem() {
 async function deleteGalleryImage() {
 	startLoading()
 
-	const imageUrl = project.value!.gallery![deleteIndex.value].url!
+	const imageUrl = filteredGallery.value[deleteIndex.value].url!
 	await contextDeleteGalleryItem(imageUrl)
 
 	stopLoading()

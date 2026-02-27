@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { NoSignalIcon } from '../../../../../assets/generated-icons'
+import { SignalIcon } from '@modrinth/assets'
+
 import { defineMessage, useVIntl } from '../../../composables'
 import { TagItem } from '../../base'
 
 defineProps<{
-	ping: number
+	ping?: number
+	statusOnline?: boolean
 }>()
 
 const pingMessage = defineMessage({
@@ -16,17 +18,24 @@ const { formatMessage } = useVIntl()
 </script>
 <template>
 	<TagItem
-		v-if="ping"
+		v-if="ping || statusOnline"
 		class="border !border-solid border-brand bg-brand-highlight !font-medium w-max"
 		style="--_color: var(--color-brand)"
 	>
-		{{ formatMessage(pingMessage, { ping }) }}
+		<template v-if="ping !== undefined">
+			{{ formatMessage(pingMessage, { ping }) }}
+		</template>
+		<template v-else>
+			<SignalIcon />
+			Online
+		</template>
 	</TagItem>
 	<TagItem
 		v-else
 		v-tooltip="'Server is offline'"
-		class="border !border-solid border-surface-5 smart-clickable:allow-pointer-events w-max"
+		class="border !border-solid border-red bg-highlight-red text-red smart-clickable:allow-pointer-events w-max"
 	>
-		<NoSignalIcon />
+		<SignalIcon />
+		Offline
 	</TagItem>
 </template>

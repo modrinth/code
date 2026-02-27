@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	install_to_existing_profile,
 	create_profile_and_install as packInstall,
+	install_to_existing_profile,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
@@ -130,7 +130,7 @@ export const install = async (
 	const project = await get_project(projectId, 'must_revalidate')
 	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
 
-	if (project.project_type === 'modpack' || projectV3?.minecraft_server !== undefined) {
+	if (project.project_type === 'modpack' || projectV3?.minecraft_server != null) {
 		const version = versionId ?? project.versions[project.versions.length - 1]
 		const packs = await list()
 
@@ -336,6 +336,11 @@ const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
 	}
 }
 
+const joinServer = async (profilePath, serverAddress, serverProjectId) => {
+	if (!serverAddress) return
+	await start_join_server(profilePath, serverAddress)
+}
+
 const findInstalledInstance = async (projectId) => {
 	const packs = await list()
 	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
@@ -380,7 +385,11 @@ const showModpackInstallSuccess = (installStore, project, serverAddress) => {
 							label: 'Launch game',
 							action: async () => {
 								try {
-									if (serverAddress) await start_join_server(project.path, serverAddress)
+									await joinServer(
+										project.path,
+										serverAddress,
+										project.linked_data?.project_id ?? null,
+									)
 								} catch (err) {
 									handleSevereError(err, { profilePath: project.path })
 								}
@@ -484,7 +493,7 @@ export const playServerProject = async (projectId) => {
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
-		installStore.showUpdateToPlayModal(instance, modpackVersionId, async () => {
+		installStore.showUpdateToPlayModal(instance, modpackVersionId, () => {
 			showUpdateSuccess(installStore, instance, serverAddress)
 		})
 		return
@@ -503,7 +512,7 @@ export const playServerProject = async (projectId) => {
 
 	// join server
 	try {
-		if (serverAddress) await start_join_server(instance.path, serverAddress)
+		await joinServer(instance.path, serverAddress, project.id)
 	} catch (err) {
 		handleSevereError(err, { profilePath: instance.path })
 	}

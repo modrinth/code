@@ -54,6 +54,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, SearchError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
@@ -99,7 +100,7 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_for_project(&info, &config).await?;
+    let results = search_for_project(&info, &config, &redis).await?;
 
     let results = LegacySearchResults::from(results);
 

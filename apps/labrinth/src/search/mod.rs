@@ -1,9 +1,14 @@
 use crate::env::ENV;
 use crate::models::exp;
+use crate::models::exp::minecraft::JavaServerPing;
+use crate::models::ids::ProjectId;
 use crate::models::projects::SearchRequest;
+use crate::queue::server_ping;
+use crate::{database::models::DatabaseError, database::redis::RedisPool};
 use crate::{models::error::ApiError, search::indexing::IndexingError};
 use actix_web::HttpResponse;
 use actix_web::http::StatusCode;
+use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
@@ -33,6 +38,8 @@ pub enum SearchError {
     Env(#[from] dotenvy::Error),
     #[error("Invalid index to sort by: {0}")]
     InvalidIndex(String),
+    #[error("Database error: {0}")]
+    Database(#[from] DatabaseError),
 }
 
 impl actix_web::ResponseError for SearchError {
@@ -44,6 +51,7 @@ impl actix_web::ResponseError for SearchError {
             SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
             SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
             SearchError::FormatError(..) => StatusCode::BAD_REQUEST,
+            SearchError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -56,6 +64,7 @@ impl actix_web::ResponseError for SearchError {
                 SearchError::IntParsing(..) => "invalid_input",
                 SearchError::InvalidIndex(..) => "invalid_input",
                 SearchError::FormatError(..) => "invalid_input",
+                SearchError::Database(..) => "database_error",
             },
             description: self.to_string(),
             details: None,
@@ -257,23 +266,64 @@ pub struct ResultSearchProject {
 pub fn get_sort_index(
     config: &SearchConfig,
     index: &str,
-) -> Result<(String, [&'static str; 1]), SearchError> {
+) -> Result<(String, &'static [&'static str]), SearchError> {
     let projects_name = config.get_index_name("projects", false);
     let projects_filtered_name =
         config.get_index_name("projects_filtered", false);
     Ok(match index {
-        "relevance" => (projects_name, ["downloads:desc"]),
-        "downloads" => (projects_filtered_name, ["downloads:desc"]),
-        "follows" => (projects_name, ["follows:desc"]),
-        "updated" => (projects_name, ["date_modified:desc"]),
-        "newest" => (projects_name, ["date_created:desc"]),
+        "relevance" => (
+            projects_name,
+            &[
+                "downloads:desc",
+                "minecraft_java_server.verified_plays_2w:desc",
+                "minecraft_java_server.ping.data.players_online:desc",
+            ],
+        ),
+        "downloads" => (projects_filtered_name, &["downloads:desc"]),
+        "follows" => (projects_name, &["follows:desc"]),
+        "updated" => (projects_name, &["date_modified:desc"]),
+        "newest" => (projects_name, &["date_created:desc"]),
+        "minecraft_java_server.verified_plays_2w" => (
+            projects_name,
+            &["minecraft_java_server.verified_plays_2w:desc"],
+        ),
+        "minecraft_java_server.ping.players_online" => (
+            projects_name,
+            &["minecraft_java_server.ping.data.players_online:desc"],
+        ),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
+}
+
+fn normalize_filter_aliases(filters: &str) -> String {
+    let mut filters = filters.replace("components.", "");
+    for (from, to) in [
+        (
+            "minecraft_java_server.content =",
+            "minecraft_java_server.content.kind =",
+        ),
+        (
+            "minecraft_java_server.content !=",
+            "minecraft_java_server.content.kind !=",
+        ),
+        (
+            "minecraft_java_server.content IN ",
+            "minecraft_java_server.content.kind IN ",
+        ),
+        (
+            "minecraft_java_server.content NOT IN ",
+            "minecraft_java_server.content.kind NOT IN ",
+        ),
+    ] {
+        filters = filters.replace(from, to);
+    }
+    filters
 }
 
 pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
+    redis_pool: &RedisPool,
 ) -> Result<SearchResults, SearchError> {
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
@@ -301,9 +351,11 @@ pub async fn search_for_project(
             .with_page(page)
             .with_hits_per_page(hits_per_page)
             .with_query(info.query.as_deref().unwrap_or_default())
-            .with_sort(&sort.1);
+            .with_sort(sort.1);
 
-        if let Some(new_filters) = info.new_filters.as_deref() {
+        let normalized_new_filters =
+            info.new_filters.as_deref().map(normalize_filter_aliases);
+        if let Some(new_filters) = normalized_new_filters.as_deref() {
             query.with_filter(new_filters);
         } else {
             let facets = if let Some(facets) = &info.facets {
@@ -319,6 +371,7 @@ pub async fn search_for_project(
                     (None, Some(v)) => v.into(),
                     (None, None) => "".into(),
                 };
+            let filters = normalize_filter_aliases(&filters);
 
             if let Some(facets) = facets {
                 // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
@@ -355,7 +408,10 @@ pub async fn search_for_project(
                         for (facet_inner_index, facet) in
                             facet_inner_list.iter().enumerate()
                         {
-                            filter_string.push_str(&facet.replace(':', " = "));
+                            let facet = normalize_filter_aliases(
+                                &facet.replace(':', " = "),
+                            );
+                            filter_string.push_str(&facet);
                             if facet_inner_index != (facet_inner_list.len() - 1)
                             {
                                 filter_string.push_str(" AND ")
@@ -391,10 +447,101 @@ pub async fn search_for_project(
         query.execute::<ResultSearchProject>().await?
     };
 
+    // Minecraft Java servers should fetch the latest player count that we have
+    // from Redis, rather than the (pretty stale) data from search backend
+    // TODO: this block should be made generic over the component type,
+    // for now we can hardcode MC java servers tho
+    let mut hits = results.hits.into_iter().map(|r| r.result).collect_vec();
+
+    let project_ids = hits
+        .iter()
+        .filter(|hit| hit.components.minecraft_java_server.is_some())
+        .filter_map(|hit| parse_base62(&hit.project_id).ok().map(ProjectId))
+        .collect_vec();
+
+    let pings_by_project_id = if project_ids.is_empty() {
+        HashMap::new()
+    } else {
+        let mut redis = redis_pool.connect().await?;
+        let ping_results = redis
+            .get_many_deserialized_from_json::<JavaServerPing>(
+                server_ping::REDIS_NAMESPACE,
+                &project_ids.iter().map(ToString::to_string).collect_vec(),
+            )
+            .await?;
+
+        ping_results
+            .into_iter()
+            .enumerate()
+            .filter_map(|(idx, ping)| ping.map(|ping| (project_ids[idx], ping)))
+            .collect::<HashMap<_, _>>()
+    };
+
+    for hit in &mut hits {
+        let Some(java_server) = hit.components.minecraft_java_server.as_mut()
+        else {
+            continue;
+        };
+        if let Ok(project_id) = parse_base62(&hit.project_id).map(ProjectId) {
+            java_server.ping = pings_by_project_id.get(&project_id).cloned();
+        } else {
+            java_server.ping = None;
+        }
+    }
+
     Ok(SearchResults {
-        hits: results.hits.into_iter().map(|r| r.result).collect(),
+        hits,
         page: results.page.unwrap_or_default(),
         hits_per_page: results.hits_per_page.unwrap_or_default(),
         total_hits: results.total_hits.unwrap_or_default(),
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{SearchConfig, get_sort_index, normalize_filter_aliases};
+
+    #[test]
+    fn normalizes_component_filter_aliases() {
+        assert_eq!(
+            normalize_filter_aliases(
+                "components.minecraft_java_server.content = vanilla AND components.minecraft_server.country = US"
+            ),
+            "minecraft_java_server.content.kind = vanilla AND minecraft_server.country = US"
+        );
+    }
+
+    #[test]
+    fn maps_server_sort_indexes() {
+        let config = SearchConfig {
+            addresses: Vec::new(),
+            read_lb_address: String::new(),
+            key: String::new(),
+            meta_namespace: "test".to_string(),
+        };
+
+        let (_, sort_verified) = get_sort_index(&config, "verified_plays_2w")
+            .expect("verified sort index should be valid");
+        assert_eq!(
+            sort_verified[0],
+            "minecraft_java_server.verified_plays_2w:desc"
+        );
+
+        let (_, sort_players) = get_sort_index(&config, "ping.players_online")
+            .expect("players online sort index should be valid");
+        assert_eq!(
+            sort_players[0],
+            "minecraft_java_server.ping.data.players_online:desc"
+        );
+
+        let (_, sort_components_verified) = get_sort_index(
+            &config,
+            "components.minecraft_java_server.verified_plays_2w",
+        )
+        .expect("components verified sort index should be valid");
+        assert_eq!(
+            sort_components_verified[0],
+            "minecraft_java_server.verified_plays_2w:desc"
+        );
+    }
 }

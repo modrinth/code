@@ -29,9 +29,7 @@
 			>
 				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
 				<div class="flex flex-col">
-					<span
-						class="grid grid-cols-[1fr_auto] w-full flex-nowrap items-center gap-1 group-hover:underline"
-					>
+					<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
 						<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
 						<CrownIcon
 							v-if="member.is_owner"

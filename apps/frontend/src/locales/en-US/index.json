@@ -500,6 +500,9 @@
   "create.project.create-server-project": {
     "message": "Create server"
   },
+  "create.project.missing-fields-tooltip": {
+    "message": "Missing fields: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },

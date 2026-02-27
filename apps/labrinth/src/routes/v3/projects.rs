@@ -1180,8 +1180,9 @@ pub async fn edit_project_categories(
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config).await?;
+    let results = search_for_project(&info, &config, &redis).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {

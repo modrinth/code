@@ -7,6 +7,7 @@ import {
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
+	ServerIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -36,7 +37,7 @@ const {
 
 const flags = useFeatureFlags()
 
-const isServerProject = computed(() => projectV3.value?.minecraft_server !== undefined)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
@@ -59,6 +60,11 @@ const navItems = computed(() => {
 					icon: InfoIcon,
 				}
 			: null,
+		isServerProject.value && {
+			link: `/${base}/settings/server`,
+			label: formatMessage(commonProjectSettingsMessages.server),
+			icon: ServerIcon,
+		},
 		{
 			link: `/${base}/settings/tags`,
 			label: formatMessage(commonProjectSettingsMessages.tags),
@@ -136,7 +142,7 @@ watch(route, () => {
 				tags.rejectedStatuses.includes(project.status)
 			"
 			:project="project"
-			:projectV3="projectV3"
+			:project-v3="projectV3"
 			:versions="versions ?? undefined"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"

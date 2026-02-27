@@ -50,10 +50,14 @@
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
 						<ServerDetails
+							v-if="isServerProject"
 							:region="serverRegionCode"
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
+							:status-online="serverStatusOnline"
+							:hide-online-players-label="true"
+							:hide-recent-plays-label="true"
 						/>
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -65,13 +69,14 @@
 							:tags="tags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="6 + (!!environment ? 0 : 1)"
+							:max-tags="(maxTags || 6) + (!!environment ? 0 : 1)"
 						/>
 						<ServerModpackContent
 							v-if="serverModpackContent"
 							:name="serverModpackContent.name"
 							:icon="serverModpackContent.icon"
 							:onclick="serverModpackContent.onclick"
+							:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
 							class="text-primary"
 						/>
 					</div>
@@ -130,10 +135,14 @@
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
 				<div class="flex items-center gap-2 flex-wrap">
 					<ServerDetails
+						v-if="isServerProject"
 						:region="serverRegionCode"
 						:online-players="serverOnlinePlayers"
+						:status-online="serverStatusOnline"
 						:recent-plays="serverRecentPlays"
 						:ping="serverPing"
+						:hide-online-players-label="true"
+						:hide-recent-plays-label="true"
 					/>
 					<div class="flex items-center gap-1 flex-wrap">
 						<ProjectCardEnvironment
@@ -147,7 +156,7 @@
 							:extra-tags="extraTags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+							:max-tags="(maxTags || (!!$slots.actions ? 4 : 5)) + (!!environment ? 0 : 1)"
 						/>
 					</div>
 					<ServerModpackContent
@@ -155,6 +164,7 @@
 						:name="serverModpackContent.name"
 						:icon="serverModpackContent.icon"
 						:onclick="serverModpackContent.onclick"
+						:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
 						class="text-primary"
 					/>
 				</div>
@@ -208,17 +218,21 @@ const props = defineProps<{
 	displayedDate?: 'updated' | 'published'
 	serverRegionCode?: string
 	serverOnlinePlayers?: number
+	serverStatusOnline?: boolean
 	serverRecentPlays?: number
 	serverPing?: number
 	serverModpackContent?: {
 		name: string
 		icon?: string
 		onclick?: () => void
+		showCustomModpackTooltip?: boolean
 	}
+	isServerProject?: boolean
 	banner?: string
 	color?: string | number
 	environment?: ProjectCardEnvironmentProps
 	status?: ProjectStatus
+	maxTags?: number
 }>()
 
 const baseCardStyle =

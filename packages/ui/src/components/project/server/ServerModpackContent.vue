@@ -1,7 +1,11 @@
 <template>
 	<div
+		v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : undefined"
 		class="flex gap-1.5 items-center"
-		:class="onclick ? 'smart-clickable:allow-pointer-events hover:underline cursor-pointer' : ''"
+		:class="[
+			onclick ? 'hover:underline cursor-pointer' : '',
+			onclick || showCustomModpackTooltip ? 'smart-clickable:allow-pointer-events' : '',
+		]"
 		@click="onclick"
 	>
 		<Avatar :src="icon" size="24px" />
@@ -18,5 +22,6 @@ defineProps<{
 	name: string
 	icon?: string
 	onclick?: () => void
+	showCustomModpackTooltip?: boolean
 }>()
 </script>

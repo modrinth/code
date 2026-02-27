@@ -24,6 +24,10 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
         Some(("modpack", id)) => {
             CommandPayload::InstallModpack { id: id.to_string() }
         }
+        // /server/{id}   -    Opens a server project page and triggers play flow
+        Some(("server", id)) => {
+            CommandPayload::InstallServer { id: id.to_string() }
+        }
         _ => {
             emit_warning(&format!(
                 "Invalid command, unrecognized path: {sublink}"

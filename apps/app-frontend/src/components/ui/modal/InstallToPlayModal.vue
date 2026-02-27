@@ -71,6 +71,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, EyeIcon, XIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -95,8 +96,8 @@ import {
 	get_version_many,
 } from '@/helpers/cache.js'
 import { installServerProject, useInstall } from '@/store/install.js'
-import type { Labrinth } from '@modrinth/api-client'
-import { type ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
+
+import type { ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)
@@ -220,8 +221,8 @@ async function openViewContents() {
 					? {
 							version: {
 								id: depVersion.id,
-								file_name: depVersion.files?.[0]?.filename ?? dep.file_name ?? 'unknown',
-								version_number: depVersion.version_number ?? '',
+								file_name: depVersion.files?.[0]?.filename ?? dep.file_name,
+								version_number: depVersion.version_number ?? undefined,
 								date_published: depVersion.date_published ?? undefined,
 							},
 						}

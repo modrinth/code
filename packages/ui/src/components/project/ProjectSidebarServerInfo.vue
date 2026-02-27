@@ -1,76 +1,97 @@
 <template>
-	<div class="flex flex-col gap-3">
+	<div v-if="hasContent" class="flex flex-col gap-3">
+		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+
 		<div
 			v-if="ipAddress"
-			class="bg-surface-4 flex gap-2 justify-between rounded-2xl items-center px-3 pr-2 h-12"
+			v-tooltip="`Copy Java IP: ${ipAddress}`"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all"
+			@click="handleCopyIP"
 		>
-			<div v-tooltip="`Java IP: ${ipAddress}`" class="font-semibold text-contrast truncate">
+			<div class="font-semibold truncate">
 				{{ ipAddress }}
 			</div>
-
-			<ButtonStyled type="transparent" size="small">
-				<button v-tooltip="'Copy IP address to clipboard'" @click="handleCopyIP">
-					<CopyIcon />
-				</button>
-			</ButtonStyled>
+			<div class="w-9 h-9 grid place-content-center">
+				<CopyIcon class="shrink-0" />
+			</div>
 		</div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Required content</h3>
-			<ServerModpackContent
+			<ServerModpackContentCard
 				:name="requiredContent.name"
+				:version-number="requiredContent.versionNumber ?? ''"
 				:icon="requiredContent.icon"
-				class="text-contrast"
-				:onclick="requiredContent?.onclick"
+				:onclick-name="requiredContent.onclickName"
+				:onclick-version="requiredContent.onclickVersion"
+				:onclick-download="requiredContent.onclickDownload"
 			/>
 		</section>
 		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">
-				<template v-if="supportedVersionsList.length"> Recommended version </template>
-				<template v-else>Version</template>
-			</h3>
+			<h3 class="text-primary text-base m-0">Minecraft: Java Edition</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem
 					v-for="version in formatVersionsForDisplay(recommendedVersions, tags.gameVersions)"
 					:key="`recommended-tag-${version}`"
 				>
 					{{ version }}
+					<template v-if="supportedVersions.length > 0"> (Recommended) </template>
 				</TagItem>
-			</div>
-		</section>
-		<section v-if="supportedVersionsList.length" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Supported versions</h3>
-			<div class="flex flex-wrap gap-1.5">
 				<TagItem
 					v-for="version in formatVersionsForDisplay(supportedVersionsList, tags.gameVersions)"
 					:key="`supported-tag-${version}`"
 				>
 					{{ version }}
 				</TagItem>
+				<TagItem
+					v-for="loader in loaders ?? []"
+					:key="`loader-${loader}`"
+					class="border !border-solid border-surface-5"
+					:style="`--_color: var(--color-platform-${loader})`"
+				>
+					<component :is="getLoaderIcon(loader)" v-if="getLoaderIcon(loader)" />
+					<FormattedTag :tag="loader" enforce-type="loader" />
+				</TagItem>
 			</div>
 		</section>
-		<section v-if="props.ping !== undefined" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Latency</h3>
-			<ServerPing :ping="props.ping" />
+		<section v-if="props.ping !== undefined || country" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">Country</h3>
+			<div class="flex flex-wrap gap-1.5 items-center">
+				<ServerRegion v-if="country" :region="country" />
+				<ServerPing :ping="props.ping" :status-online="props.statusOnline" />
+			</div>
+		</section>
+		<section v-if="languages.length > 0" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">Languages</h3>
+			<div class="flex flex-wrap gap-1.5">
+				<TagItem v-for="language in languages" :key="`${language}`">
+					{{ language }}
+				</TagItem>
+			</div>
 		</section>
 	</div>
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CopyIcon } from '@modrinth/assets'
+import { CopyIcon, getLoaderIcon } from '@modrinth/assets'
 import { formatVersionsForDisplay, type GameVersionTag, type PlatformTag } from '@modrinth/utils'
 import { computed } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables'
 import { injectNotificationManager } from '../../providers'
-import ButtonStyled from '../base/ButtonStyled.vue'
+import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
-import ServerModpackContent from './server/ServerModpackContent.vue'
+import ServerModpackContentCard from './server/ServerModpackContentCard.vue'
 import ServerPing from './server/ServerPing.vue'
+import ServerRegion from './server/ServerRegion.vue'
 
 interface RequiredContent {
 	name: string
+	versionNumber?: string
 	icon?: string
-	onclick?: () => void
+	onclickName?: () => void
+	onclickVersion?: () => void
+	onclickDownload?: () => void
 }
 
 interface Props {
@@ -82,17 +103,22 @@ interface Props {
 	requiredContent?: RequiredContent | null
 	recommendedVersion?: string | null
 	supportedVersions?: string[]
+	loaders?: string[]
 	ping?: number
+	statusOnline?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	requiredContent: null,
 	recommendedVersion: null,
 	supportedVersions: () => [],
+	loaders: () => [],
 	ping: undefined,
 })
 
 const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address ?? '')
+const languages = computed(() => props.projectV3?.minecraft_server?.languages ?? [])
+const country = computed(() => props.projectV3?.minecraft_server?.country)
 
 const recommendedVersions = computed(() => {
 	if (props.recommendedVersion) return [props.recommendedVersion]
@@ -104,6 +130,16 @@ const recommendedVersions = computed(() => {
 
 	return []
 })
+
+const hasContent = computed(
+	() =>
+		!!ipAddress.value ||
+		!!props.requiredContent ||
+		recommendedVersions.value.length > 0 ||
+		supportedVersionsList.value.length > 0 ||
+		languages.value.length > 0 ||
+		props.ping !== undefined,
+)
 
 const supportedVersionsList = computed(() => {
 	if (props.supportedVersions.length > 0) return props.supportedVersions
@@ -117,14 +153,34 @@ const supportedVersionsList = computed(() => {
 })
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 
 function handleCopyIP() {
 	navigator.clipboard.writeText(ipAddress.value).then(() => {
 		addNotification({
 			type: 'success',
-			title: 'Copied!',
-			text: 'IP address copied to clipboard',
+			title: formatMessage(messages.copied),
+			text: formatMessage(messages.copiedText),
 		})
 	})
 }
+
+const messages = defineMessages({
+	copied: {
+		id: `project.about.server.copied`,
+		defaultMessage: 'Copied!',
+	},
+	copiedText: {
+		id: `project.about.server.copiedText`,
+		defaultMessage: 'IP address copied to clipboard',
+	},
+	title: {
+		id: `project.about.server.title`,
+		defaultMessage: 'Server details',
+	},
+	latency: {
+		id: `project.about.server.latency`,
+		defaultMessage: 'Latency',
+	},
+})
 </script>

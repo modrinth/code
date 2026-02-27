@@ -7,6 +7,7 @@ pub use fetch::*;
 
 use crate::env::ENV;
 use crate::queue::server_ping;
+use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -16,7 +17,6 @@ pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
     const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
-    const MINECRAFT_JAVA_SERVER_PLAYS: &str = "minecraft_java_server_plays";
 
     let client = {
         let https_connector = HttpsConnectorBuilder::new()
@@ -193,16 +193,27 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
-            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PLAYS} {cluster_line}
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
             (
                 recorded DateTime64(4),
                 user_id UInt64,
-                project_id UInt64
+                project_id UInt64,
+                minecraft_uuid UUID
             )
             ENGINE = {engine}
             {ttl}
             PRIMARY KEY (project_id, recorded)
             SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS minecraft_uuid UUID
             "
         ))
         .execute()

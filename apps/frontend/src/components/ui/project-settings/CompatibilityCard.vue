@@ -71,7 +71,13 @@
 					<div class="flex flex-col gap-2">
 						<div class="font-medium text-secondary">Supported versions</div>
 						<div class="flex flex-wrap gap-1.5">
-							<TagItem v-for="v in content.supported_game_versions" :key="v">
+							<TagItem
+								v-for="v in formatVersionsForDisplay(
+									content.supported_game_versions,
+									tags.gameVersions,
+								)"
+								:key="v"
+							>
 								{{ v }}
 							</TagItem>
 							<div v-if="!content.supported_game_versions.length">—</div>
@@ -135,7 +141,21 @@
 									>
 										v{{ modpackVersion.version_number }}
 									</NuxtLink>
-									<span v-else-if="modpackVersion"> v{{ modpackVersion.version_number }} </span>
+									<div v-else-if="modpackVersion" class="flex items-center gap-1.5">
+										<div>v{{ modpackVersion.version_number }}</div>
+										<div class="h-1.5 w-1.5 rounded-full bg-surface-5"></div>
+										<a
+											v-if="modpackVersion.files?.length"
+											:href="
+												modpackVersion.files.find((f) => f.primary)?.url ??
+												modpackVersion.files[0]?.url
+											"
+											class="flex items-center gap-0.5 hover:underline"
+										>
+											<DownloadIcon />
+											Download
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -163,7 +183,7 @@
 				</div>
 
 				<ButtonStyled v-if="content">
-					<button @click="handleUpdateContent" class="!w-full !max-w-[160px]">
+					<button class="!w-full !max-w-[160px]" @click="handleUpdateContent">
 						<RefreshCwIcon />
 						Update
 					</button>
@@ -179,6 +199,7 @@ import {
 	ArrowLeftRightIcon,
 	BoxIcon,
 	ComponentIcon,
+	DownloadIcon,
 	getLoaderIcon,
 	PackageIcon,
 	PackagePlusIcon,
@@ -192,7 +213,10 @@ import {
 	injectProjectPageContext,
 	TagItem,
 } from '@modrinth/ui'
+import { formatVersionsForDisplay } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
+
+import { useGeneratedState } from '~/composables/generated'
 
 import ServerCompatibilityModal from './ServerCompatibilityModal/ServerCompatibilityModal.vue'
 
@@ -202,6 +226,7 @@ const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompat
 
 const { projectV3 } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
+const tags = useGeneratedState()
 
 const content = computed(() => {
 	if (!projectV3.value) return null

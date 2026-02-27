@@ -103,7 +103,7 @@ import {
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
 import { useError } from '@/store/error.js'
-import { useInstall } from '@/store/install.js'
+import { playServerProject, useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
 
 import { create_profile_and_install_from_file } from './helpers/pack'
@@ -502,6 +502,9 @@ async function handleCommand(e) {
 				source: 'CreationModalFileDrop',
 			})
 		}
+	} else if (e.event === 'InstallServer') {
+		await router.push(`/project/${e.id}`)
+		await playServerProject(e.id).catch(handleError)
 	} else {
 		// Other commands are URL-based (deep linking)
 		urlModal.value.show(e)

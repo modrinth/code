@@ -6,9 +6,9 @@
 
 			<DropzoneFileInput
 				v-if="!ctx.customModpackFile.value"
-				primary-prompt="Drag and drop your .mrpack or .zip file"
+				primary-prompt="Drag and drop your .mrpack file"
 				secondary-prompt="Or click to browse"
-				accept=".zip,.mrpack"
+				accept=".mrpack"
 				size="medium"
 				@change="handleFileUpload"
 			/>
@@ -39,7 +39,7 @@
 							ref="fileInput"
 							class="hidden"
 							type="file"
-							accept=".zip,.mrpack"
+							accept=".mrpack"
 							@change="handleFileInputChange"
 						/>
 					</button>

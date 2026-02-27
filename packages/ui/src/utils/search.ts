@@ -19,6 +19,7 @@ type BaseOption = {
 	toggle_group?: string
 	icon?: string | Component
 	query_value?: string
+	group?: string
 }
 
 export type FilterOption = BaseOption &

@@ -285,7 +285,7 @@ async function computeDependencyDiffs(
 	const projectMap = new Map<string, ProjectInfo>(projects.map((p: ProjectInfo) => [p.id, p]))
 	const versionMap = new Map<string, Version>(versions.map((v: Version) => [v.id, v]))
 
-	return diffs
+	const mappedDiffs = diffs
 		.map((diff) => {
 			const project = projectMap.get(diff.project_id)
 			return {
@@ -305,7 +305,8 @@ async function computeDependencyDiffs(
 			const aDate = a.newVersion?.date_published || a.currentVersion?.date_published || ''
 			const bDate = b.newVersion?.date_published || b.currentVersion?.date_published || ''
 			return dayjs(bDate).valueOf() - dayjs(aDate).valueOf()
-		})
+		}).filter((d) => d.project || d.fileName) // filter out any diffs that couldn't be matched to a project or file
+	return mappedDiffs
 }
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {

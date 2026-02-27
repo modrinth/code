@@ -251,7 +251,10 @@ pub async fn profile_get_pack_export_candidates(
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
-pub async fn profile_run(path: &str, server_address: Option<String>) -> Result<ProcessMetadata> {
+pub async fn profile_run(
+    path: &str,
+    server_address: Option<String>,
+) -> Result<ProcessMetadata> {
     let quick_play = match server_address {
         Some(addr) => QuickPlayType::Server(ServerAddress::Unresolved(addr)),
         None => QuickPlayType::None,

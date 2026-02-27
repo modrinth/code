@@ -11,7 +11,7 @@
 					clearable
 					wrapper-class="flex-grow"
 				/>
-				<AddContentButton :instance="instance" />
+				<AddContentButton v-if="!props.isServerInstance" :instance="instance" />
 			</div>
 			<div class="flex items-center justify-between">
 				<div v-if="filterOptions.length > 1" class="flex flex-wrap gap-1 items-center pb-4">
@@ -120,13 +120,13 @@
 								<template #share-markdown> <CodeIcon /> Markdown links </template>
 							</OverflowMenu>
 						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
+						<ButtonStyled v-if="!props.isServerInstance && selectedProjects.some((m) => m.disabled)">
 							<button @click="enableAll()"><CheckCircleIcon /> Enable</button>
 						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
+						<ButtonStyled v-if="!props.isServerInstance && selectedProjects.some((m) => !m.disabled)">
 							<button @click="disableAll()"><SlashIcon /> Disable</button>
 						</ButtonStyled>
-						<ButtonStyled color="red">
+						<ButtonStyled v-if="!props.isServerInstance" color="red">
 							<button @click="deleteSelected()"><TrashIcon /> Remove</button>
 						</ButtonStyled>
 					</div>
@@ -177,11 +177,12 @@
 					</ButtonStyled>
 					<div v-else class="w-[36px]"></div>
 					<Toggle
+						v-if="!props.isServerInstance"
 						class="!mx-2"
 						:model-value="!item.data.disabled"
 						@update:model-value="toggleDisableMod(item.data)"
 					/>
-					<ButtonStyled type="transparent" circular>
+					<ButtonStyled v-if="!props.isServerInstance" type="transparent" circular>
 						<button v-tooltip="'Remove'" @click="removeMod(item)">
 							<TrashIcon />
 						</button>
@@ -229,7 +230,7 @@
 				</div>
 			</RadialHeader>
 			<div class="flex mt-4 mx-auto">
-				<AddContentButton :instance="instance" />
+				<AddContentButton v-if="!props.isServerInstance" :instance="instance" />
 			</div>
 		</div>
 		<ShareModalWrapper
@@ -323,6 +324,7 @@ const props = defineProps<{
 	playing: boolean
 	versions: Version[]
 	installed: boolean
+	isServerInstance?: boolean
 }>()
 
 type ProjectListEntryAuthor = {

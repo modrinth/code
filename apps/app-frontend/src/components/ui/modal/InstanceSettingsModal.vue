@@ -24,8 +24,8 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-
 import { get_project_v3 } from '@/helpers/cache'
+
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
@@ -41,7 +41,7 @@ watch(
 		if (instance.linked_data?.project_id) {
 			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
 				.then((project: any) => {
-					if (project?.minecraft_server !== undefined) {
+					if (project?.minecraft_server != null) {
 						isMinecraftServer.value = true
 					}
 				})
@@ -67,7 +67,6 @@ const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 		}),
 		icon: WrenchIcon,
 		content: InstallationSettings,
-		shown: !isMinecraftServer.value,
 	},
 	{
 		name: defineMessage({
@@ -119,6 +118,10 @@ defineExpose({ show })
 			</span>
 		</template>
 
-		<TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props }))" />
+		<TabbedModal
+			:tabs="
+				tabs.map((tab) => ({ ...tab, props: { ...props, isMinecraftServer: isMinecraftServer } }))
+			"
+		/>
 	</ModalWrapper>
 </template>

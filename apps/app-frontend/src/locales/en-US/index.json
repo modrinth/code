@@ -23,14 +23,14 @@
   "app.modal.install-to-play.server-requires-mods": {
     "message": "This server requires mods to play. Click Install to set up the required files from Modrinth, then launch directly into the server."
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} shared this instance with you today."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Shared instance"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Shared server instance"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "View contents"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} added"

@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Feature"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Community"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Features"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Gameplay"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Performance impact"
   },
@@ -887,6 +899,18 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.about.server.copied": {
+    "defaultMessage": "Copied!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP address copied to clipboard"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latency"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Server details"
+  },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
   },
@@ -1084,6 +1108,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "No permission"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tags"

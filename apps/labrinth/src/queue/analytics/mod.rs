@@ -2,12 +2,15 @@ use crate::database::PgPool;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::analytics::{
-    AffiliateCodeClick, Download, PageView, Playtime,
+    AffiliateCodeClick, Download, MinecraftServerPlay, PageView, Playtime,
 };
 use crate::routes::ApiError;
+use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use std::collections::HashMap;
+
+pub mod cache;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";
 const VIEWS_NAMESPACE: &str = "views";
@@ -16,6 +19,7 @@ pub struct AnalyticsQueue {
     views_queue: DashMap<(u64, u64), Vec<PageView>>,
     downloads_queue: DashMap<(u64, u64), Download>,
     playtime_queue: DashSet<Playtime>,
+    minecraft_server_plays_queue: DashSet<MinecraftServerPlay>,
     affiliate_code_clicks_queue: DashMap<(u64, u64), Vec<AffiliateCodeClick>>,
 }
 
@@ -32,6 +36,7 @@ impl AnalyticsQueue {
             views_queue: DashMap::with_capacity(1000),
             downloads_queue: DashMap::with_capacity(1000),
             playtime_queue: DashSet::with_capacity(1000),
+            minecraft_server_plays_queue: DashSet::with_capacity(1000),
             affiliate_code_clicks_queue: DashMap::with_capacity(1000),
         }
     }
@@ -52,6 +57,10 @@ impl AnalyticsQueue {
 
     pub fn add_playtime(&self, playtime: Playtime) {
         self.playtime_queue.insert(playtime);
+    }
+
+    pub fn add_minecraft_server_play(&self, play: MinecraftServerPlay) {
+        self.minecraft_server_plays_queue.insert(play);
     }
 
     pub fn add_affiliate_code_click(&self, click: AffiliateCodeClick) {
@@ -75,6 +84,10 @@ impl AnalyticsQueue {
 
         let playtime_queue = self.playtime_queue.clone();
         self.playtime_queue.clear();
+
+        let minecraft_server_plays_queue =
+            self.minecraft_server_plays_queue.clone();
+        self.minecraft_server_plays_queue.clear();
 
         let affiliate_code_clicks_queue =
             self.affiliate_code_clicks_queue.clone();
@@ -102,6 +115,18 @@ impl AnalyticsQueue {
             }
 
             playtimes.end().await?;
+        }
+
+        if !minecraft_server_plays_queue.is_empty() {
+            let mut plays = client
+                .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
+                .await?;
+
+            for play in minecraft_server_plays_queue {
+                plays.write(&play).await?;
+            }
+
+            plays.end().await?;
         }
 
         if !views_queue.is_empty() {

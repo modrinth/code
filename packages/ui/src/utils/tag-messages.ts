@@ -428,6 +428,22 @@ export const categoryHeaderMessages = defineMessages({
 		id: 'header.category.performance-impact',
 		defaultMessage: 'Performance impact',
 	},
+	minecraft_server_community: {
+		id: 'header.category.minecraft-server-community',
+		defaultMessage: 'Community',
+	},
+	minecraft_server_features: {
+		id: 'header.category.minecraft-server-features',
+		defaultMessage: 'Features',
+	},
+	minecraft_server_gameplay: {
+		id: 'header.category.minecraft-server-gameplay',
+		defaultMessage: 'Gameplay',
+	},
+	minecraft_server_meta: {
+		id: 'header.category.minecraft-server-meta',
+		defaultMessage: 'Meta',
+	},
 })
 
 export function getTagMessage(

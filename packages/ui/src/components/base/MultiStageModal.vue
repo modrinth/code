@@ -86,8 +86,8 @@
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
 					<button
 						:disabled="rightButtonConfig.disabled"
-						@click="rightButtonConfig.onClick"
 						:class="rightButtonConfig.buttonClass"
+						@click="rightButtonConfig.onClick"
 					>
 						<component
 							:is="rightButtonConfig.icon"
