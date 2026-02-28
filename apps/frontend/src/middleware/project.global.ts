@@ -32,7 +32,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		// Fetch v2 project for redirect check AND cache it for the page
 		// Using fetchQuery ensures the page's useQuery gets this cached result
 		const project = await queryClient.fetchQuery(projectQueryOptions.v2(projectId, client))
-		const projectV3 = await queryClient.fetchQuery(projectQueryOptions.v3(projectId, client))
 
 		// Let page handle 404
 		if (!project) return
@@ -45,9 +44,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
 			queryClient.setQueryData(['project', 'v2', project.id], project)
 		}
 
-		const projectType = projectV3.minecraft_server != null ? 'server' : project.project_type
 		// Determine the correct URL type
-		const correctType = getProjectTypeForUrlShorthand(projectType, project.loaders, tags.value)
+		const correctType = getProjectTypeForUrlShorthand(
+			project.project_type,
+			project.loaders,
+			tags.value,
+		)
 
 		// Preserve the rest of the path (subpages like /versions, /settings, etc.)
 		const pathParts = to.path.split('/')
