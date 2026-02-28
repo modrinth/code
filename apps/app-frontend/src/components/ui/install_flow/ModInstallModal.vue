@@ -51,10 +51,7 @@ const profiles = ref([])
 
 const shownProfiles = computed(() =>
 	profiles.value.filter((profile) => {
-		return (
-			!profile.isServerInstance &&
-			profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-		)
+		return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
 	}),
 )
 

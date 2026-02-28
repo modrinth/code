@@ -464,6 +464,12 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(unknown version)"
   },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "This instance is linked to a server, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the server."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Unlink from server"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Unlink instance"
   },
