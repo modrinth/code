@@ -646,18 +646,27 @@ const search = computed(() => {
 		return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
 	})
 
+	const baseSort = (a: ProjectListEntry, b: ProjectListEntry) => {
+		if (!props.isServerInstance) return 0
+		const aBase = isBaseContent(a) ? 1 : 0
+		const bBase = isBaseContent(b) ? 1 : 0
+		return aBase - bBase
+	}
+
 	switch (sortColumn.value) {
 		case 'Updated':
 			return filtered.slice().sort((a, b) => {
+				const base = baseSort(a, b)
+				if (base !== 0) return base
 				const updated = a.updated.isAfter(b.updated) ? 1 : -1
 				return ascending.value ? -updated : updated
 			})
 		default:
-			return filtered
-				.slice()
-				.sort((a, b) =>
-					ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name),
-				)
+			return filtered.slice().sort((a, b) => {
+				const base = baseSort(a, b)
+				if (base !== 0) return base
+				return ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+			})
 	}
 })
 
