@@ -29,7 +29,7 @@ import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vu
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache'
+import { get_project, get_version, get_version_many } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import { edit, install, update_repair_modrinth } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
@@ -110,6 +110,12 @@ if (props.instance.linked_data && props.instance.linked_data.project_id && !prop
 							versions.find(
 								(version: Version) => version.id === props.instance.linked_data?.version_id,
 							) ?? null
+
+						if (!modpackVersion.value) {
+							get_version(props.instance.linked_data?.version_id, 'bypass')
+								.then((version: Version) => (modpackVersion.value = version ?? null))
+								.catch(handleError)
+						}
 					})
 					.catch(handleError)
 					.finally(() => {
@@ -569,16 +575,26 @@ const messages = defineMessages({
 										})
 							}}
 						</span>
-						<span class="text-sm text-secondary leading-none">
+						<span class="text-sm text-secondary leading-none capitalize">
 							{{
 								modpackProject
 									? modpackVersion
 										? modpackVersion?.version_number
-										: 'Unknown version'
+										: props.isMinecraftServer
+											? ''
+											: 'Unknown version'
 									: formatLoader(formatMessage, instance.loader)
 							}}
 							<template v-if="instance.loader !== 'vanilla' && !modpackProject">
 								{{ instance.loader_version || formatMessage(messages.unknownVersion) }}
+							</template>
+							<template
+								v-else-if="
+									instance.loader && instance.loader !== 'vanilla' && props.isMinecraftServer
+								"
+							>
+								{{ instance.loader }}
+								{{ instance.loader_version }}
 							</template>
 						</span>
 					</div>
@@ -611,7 +627,10 @@ const messages = defineMessages({
 							}}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-if="modpackProject && !props.isMinecraftServer" hover-color-fill="background">
+					<ButtonStyled
+						v-if="modpackProject && !props.isMinecraftServer"
+						hover-color-fill="background"
+					>
 						<button
 							v-tooltip="
 								changingVersion
@@ -766,10 +785,22 @@ const messages = defineMessages({
 		<template v-else>
 			<template v-if="instance.linked_data && instance.linked_data.locked">
 				<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
-					{{ formatMessage(props.isMinecraftServer ? messages.unlinkServerTitle : messages.unlinkInstanceTitle) }}
+					{{
+						formatMessage(
+							props.isMinecraftServer ? messages.unlinkServerTitle : messages.unlinkInstanceTitle,
+						)
+					}}
 				</h2>
 				<p class="m-0">
-					{{ formatMessage(props.isMinecraftServer ? (instance.loader === 'vanilla' ? messages.unlinkServerVanillaDescription : messages.unlinkServerDescription) : messages.unlinkInstanceDescription) }}
+					{{
+						formatMessage(
+							props.isMinecraftServer
+								? instance.loader === 'vanilla'
+									? messages.unlinkServerVanillaDescription
+									: messages.unlinkServerDescription
+								: messages.unlinkInstanceDescription,
+						)
+					}}
 				</p>
 				<ButtonStyled>
 					<button class="mt-2" @click="modalConfirmUnpair.show()">
