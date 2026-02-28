@@ -80,6 +80,11 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular type="transparent">
+							<button v-tooltip="'Add server to instance'" @click="handleAddServerToInstance">
+								<PlusIcon />
+							</button>
+						</ButtonStyled>
+						<ButtonStyled size="large" circular type="transparent">
 							<OverflowMenu
 								:tooltip="`More options`"
 								:options="[
@@ -217,6 +222,7 @@ import {
 	HeartIcon,
 	MoreVerticalIcon,
 	PlayIcon,
+	PlusIcon,
 	ReportIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
@@ -261,7 +267,12 @@ import {
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { install as installVersion, playServerProject, useInstall } from '@/store/install.js'
+import {
+	getServerAddress,
+	install as installVersion,
+	playServerProject,
+	useInstall,
+} from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -341,6 +352,12 @@ async function handleStopServer() {
 	if (!serverInstancePath.value) return
 	await kill(serverInstancePath.value).catch(() => {})
 	serverPlaying.value = false
+}
+
+function handleAddServerToInstance() {
+	const address = getServerAddress(projectV3.value?.minecraft_java_server)
+	if (!address || !data.value) return
+	installStore.showAddServerToInstanceModal(data.value.title, address)
 }
 
 async function fetchProjectData() {
@@ -435,7 +452,11 @@ async function fetchProjectData() {
 await fetchProjectData()
 
 const unlistenProcesses = await process_listener((e) => {
-	if (e.event === 'finished' && serverInstancePath.value && e.profile_path_id === serverInstancePath.value) {
+	if (
+		e.event === 'finished' &&
+		serverInstancePath.value &&
+		e.profile_path_id === serverInstancePath.value
+	) {
 		serverPlaying.value = false
 	}
 })

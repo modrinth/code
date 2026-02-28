@@ -15,17 +15,6 @@
 				</template>
 				<template #title>
 					{{ instance.name }}
-					<TagItem
-						v-if="isServerInstance"
-						v-tooltip="
-							`This instance's content is locked and managed by ${linkedProjectV3?.name || 'a server project'}`
-						"
-						class="border !border-solid border-blue bg-highlight-blue !font-medium"
-						style="--_color: var(--color-blue)"
-					>
-						<LockIcon />
-						Managed
-					</TagItem>
 				</template>
 				<template #stats>
 					<div class="flex items-center flex-wrap gap-2">
@@ -288,7 +277,6 @@ import {
 	FolderOpenIcon,
 	GlobeIcon,
 	HashIcon,
-	LockIcon,
 	MoreVerticalIcon,
 	PackageIcon,
 	PlayIcon,
@@ -310,7 +298,6 @@ import {
 	ServerOnlinePlayers,
 	ServerPing,
 	ServerRegion,
-	TagItem,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'

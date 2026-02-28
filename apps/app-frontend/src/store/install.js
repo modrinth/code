@@ -32,6 +32,7 @@ export const useInstall = defineStore('installStore', {
 		updateToPlayModal: null,
 		popupNotificationManager: null,
 		installingServerProjects: [],
+		addServerToInstanceModal: null,
 	}),
 	actions: {
 		setInstallConfirmModal(ref) {
@@ -66,6 +67,12 @@ export const useInstall = defineStore('installStore', {
 		},
 		setPopupNotificationManager(manager) {
 			this.popupNotificationManager = manager
+		},
+		setAddServerToInstanceModal(ref) {
+			this.addServerToInstanceModal = ref
+		},
+		showAddServerToInstanceModal(serverName, serverAddress) {
+			this.addServerToInstanceModal.show(serverName, serverAddress)
 		},
 		startInstallingServer(projectId) {
 			if (!this.installingServerProjects.includes(projectId)) {
@@ -317,7 +324,7 @@ export const installServerProject = async (serverProjectId) => {
 	await addServerAsWorld(profilePath, project.title, serverAddress)
 }
 
-const getServerAddress = (javaServer) => {
+export const getServerAddress = (javaServer) => {
 	if (!javaServer) return null
 	const { address, port } = javaServer
 	return port !== 25565 ? `${address}:${port}` : address
@@ -350,8 +357,8 @@ const createVanillaInstance = async (project, gameVersion, serverAddress) => {
 	const profilePath = await create(
 		project.title,
 		gameVersion,
-		'vanilla',
-		null,
+		'fabric',
+		'latest',
 		project.icon_url,
 		false,
 		{
