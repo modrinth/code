@@ -432,6 +432,10 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.unlink-server.description',
 		defaultMessage: `This instance is linked to a server, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the server.`,
 	},
+	unlinkServerVanillaDescription: {
+		id: 'instance.settings.tabs.installation.unlink-server-vanilla.description',
+		defaultMessage: `This instance is linked to a server, which means you can't change the Minecraft version. Unlinking will permanently disconnect this instance from the server.`,
+	},
 	unlinkInstanceButton: {
 		id: 'instance.settings.tabs.installation.unlink.button',
 		defaultMessage: 'Unlink instance',
@@ -765,14 +769,14 @@ const messages = defineMessages({
 					{{ formatMessage(props.isMinecraftServer ? messages.unlinkServerTitle : messages.unlinkInstanceTitle) }}
 				</h2>
 				<p class="m-0">
-					{{ formatMessage(props.isMinecraftServer ? messages.unlinkServerDescription : messages.unlinkInstanceDescription) }}
+					{{ formatMessage(props.isMinecraftServer ? (instance.loader === 'vanilla' ? messages.unlinkServerVanillaDescription : messages.unlinkServerDescription) : messages.unlinkInstanceDescription) }}
 				</p>
 				<ButtonStyled>
 					<button class="mt-2" @click="modalConfirmUnpair.show()">
 						<UnlinkIcon /> {{ formatMessage(messages.unlinkInstanceButton) }}
 					</button>
 				</ButtonStyled>
-				<template v-if="modpackProject">
+				<template v-if="modpackProject && !props.isMinecraftServer">
 					<div>
 						<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast block mt-4">
 							{{ formatMessage(messages.reinstallModpackTitle) }}
