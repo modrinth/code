@@ -5,6 +5,7 @@ import {
 	ExternalIcon,
 	GlobeIcon,
 	PlayIcon,
+	PlusIcon,
 	SearchIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
@@ -49,7 +50,7 @@ import {
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { playServerProject, useInstall } from '@/store/install.js'
+import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -224,6 +225,12 @@ async function handleStopServerProject(projectId: string) {
 async function handlePlayServerProject(projectId: string) {
 	await playServerProject(projectId)
 	checkServerRunningStates(serverHits.value)
+}
+
+function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
+	const address = getServerAddress(project.minecraft_java_server)
+	if (!address) return
+	installStore.showAddServerToInstanceModal(project.name, address)
 }
 
 const unlistenProcesses = await process_listener((e: any) => {
@@ -750,31 +757,45 @@ previousFilterState.value = JSON.stringify({
 						"
 					>
 						<template #actions>
-							<ButtonStyled
-								v-if="runningServerProjects[project.project_id]"
-								color="red"
-								type="outlined"
-							>
-								<button @click="() => handleStopServerProject(project.project_id)">
-									<StopCircleIcon />
-									Stop
-								</button>
-							</ButtonStyled>
-							<ButtonStyled v-else color="brand" type="outlined">
-								<button
-									:disabled="
-										(installStore.installingServerProjects as string[]).includes(project.project_id)
-									"
-									@click="() => handlePlayServerProject(project.project_id)"
+							<div class="flex gap-2">
+								<ButtonStyled circular>
+									<button
+										v-tooltip="'Add server to instance'"
+										@click.stop="() => handleAddServerToInstance(project)"
+									>
+										<PlusIcon />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-if="runningServerProjects[project.project_id]"
+									color="red"
+									type="outlined"
 								>
-									<PlayIcon />
-									{{
-										(installStore.installingServerProjects as string[]).includes(project.project_id)
-											? 'Installing...'
-											: 'Play'
-									}}
-								</button>
-							</ButtonStyled>
+									<button @click="() => handleStopServerProject(project.project_id)">
+										<StopCircleIcon />
+										Stop
+									</button>
+								</ButtonStyled>
+								<ButtonStyled v-else color="brand" type="outlined">
+									<button
+										:disabled="
+											(installStore.installingServerProjects as string[]).includes(
+												project.project_id,
+											)
+										"
+										@click="() => handlePlayServerProject(project.project_id)"
+									>
+										<PlayIcon />
+										{{
+											(installStore.installingServerProjects as string[]).includes(
+												project.project_id,
+											)
+												? 'Installing...'
+												: 'Play'
+										}}
+									</button>
+								</ButtonStyled>
+							</div>
 						</template>
 					</ProjectCard>
 				</template>

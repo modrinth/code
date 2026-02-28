@@ -63,6 +63,7 @@ import AccountsCard from '@/components/ui/AccountsCard.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
@@ -400,6 +401,7 @@ const minecraftAuthErrorModal = ref()
 
 const install = useInstall()
 const modInstallModal = ref()
+const addServerToInstanceModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
@@ -482,6 +484,7 @@ onMounted(() => {
 	install.setIncompatibilityWarningModal(incompatibilityWarningModal)
 	install.setInstallConfirmModal(installConfirmModal)
 	install.setModInstallModal(modInstallModal)
+	install.setAddServerToInstanceModal(addServerToInstanceModal)
 	install.setInstallToPlayModal(installToPlayModal)
 	install.setUpdateToPlayModal(updateToPlayModal)
 	install.setPopupNotificationManager(popupNotificationManager)
@@ -1237,6 +1240,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ModInstallModal ref="modInstallModal" />
+	<AddServerToInstanceModal ref="addServerToInstanceModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 	<InstallConfirmModal ref="installConfirmModal" />
 	<InstallToPlayModal ref="installToPlayModal" />
