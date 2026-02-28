@@ -21,6 +21,6 @@ const regionLower = computed(() => region.toLowerCase())
 		v-tooltip="`Server hosted in ${region}`"
 		:src="`https://flagcdn.com/${regionLower}.svg`"
 		:alt="formatMessage(alt, { regionCode: regionLower })"
-		class="h-4 aspect-[3/2] border-[1px] border-surface-5 border-solid shrink-0 rounded-[3px] object-cover"
+		class="h-4 aspect-[3/2] border-[1px] border-surface-5 border-solid shrink-0 rounded-[3px] object-cover smart-clickable:allow-pointer-events"
 	/>
 </template>

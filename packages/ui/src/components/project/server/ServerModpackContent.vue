@@ -1,11 +1,8 @@
 <template>
 	<div
-		v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : undefined"
-		class="flex gap-1.5 items-center"
-		:class="[
-			onclick ? 'hover:underline cursor-pointer' : '',
-			onclick || showCustomModpackTooltip ? 'smart-clickable:allow-pointer-events' : '',
-		]"
+		v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : name"
+		class="flex gap-1.5 items-center flex-shrink overflow-hidden smart-clickable:allow-pointer-events"
+		:class="[onclick ? 'hover:underline cursor-pointer' : '']"
 		@click="onclick"
 	>
 		<Avatar :src="icon" size="24px" />
