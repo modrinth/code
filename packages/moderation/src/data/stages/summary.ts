@@ -55,7 +55,7 @@ const summary: Stage = {
 			weight: 303,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			//TODO: only show if this is a server
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
 			message: async () => (await import('../messages/summary/repeat-ip.md?raw')).default,
 		}
 	],

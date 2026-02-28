@@ -69,7 +69,7 @@ const titleSlug: Stage = {
 						{
 							label: 'Forked project',
 							weight: 112,
-							//TODO: Don't show if this is a server.
+							shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 							message: async () =>
 								(await import('../messages/title/similarities-fork.md?raw')).default,
 						},
