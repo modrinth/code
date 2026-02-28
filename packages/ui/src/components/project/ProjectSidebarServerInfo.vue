@@ -5,7 +5,7 @@
 		<div
 			v-if="ipAddress"
 			v-tooltip="`Copy Java IP: ${ipAddress}`"
-			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all"
+			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all active:scale-95"
 			@click="handleCopyIP"
 		>
 			<div class="font-semibold truncate">
@@ -65,7 +65,7 @@
 			<h3 class="text-primary text-base m-0">Languages</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem v-for="language in languages" :key="`${language}`">
-					{{ language }}
+					{{ languageDisplay.find((l) => l.value === language)?.label ?? language }}
 				</TagItem>
 			</div>
 		</section>
@@ -164,6 +164,48 @@ function handleCopyIP() {
 		})
 	})
 }
+
+const languageDisplay = [
+	{ value: 'en', label: 'English' },
+	{ value: 'es', label: 'Spanish' },
+	{ value: 'pt', label: 'Portuguese' },
+	{ value: 'fr', label: 'French' },
+	{ value: 'de', label: 'German' },
+	{ value: 'it', label: 'Italian' },
+	{ value: 'nl', label: 'Dutch' },
+	{ value: 'ru', label: 'Russian' },
+	{ value: 'uk', label: 'Ukrainian' },
+	{ value: 'pl', label: 'Polish' },
+	{ value: 'cs', label: 'Czech' },
+	{ value: 'sk', label: 'Slovak' },
+	{ value: 'hu', label: 'Hungarian' },
+	{ value: 'ro', label: 'Romanian' },
+	{ value: 'bg', label: 'Bulgarian' },
+	{ value: 'hr', label: 'Croatian' },
+	{ value: 'sr', label: 'Serbian' },
+	{ value: 'el', label: 'Greek' },
+	{ value: 'tr', label: 'Turkish' },
+	{ value: 'ar', label: 'Arabic' },
+	{ value: 'he', label: 'Hebrew' },
+	{ value: 'hi', label: 'Hindi' },
+	{ value: 'bn', label: 'Bengali' },
+	{ value: 'ur', label: 'Urdu' },
+	{ value: 'zh', label: 'Chinese' },
+	{ value: 'ja', label: 'Japanese' },
+	{ value: 'ko', label: 'Korean' },
+	{ value: 'th', label: 'Thai' },
+	{ value: 'vi', label: 'Vietnamese' },
+	{ value: 'id', label: 'Indonesian' },
+	{ value: 'ms', label: 'Malay' },
+	{ value: 'tl', label: 'Filipino' },
+	{ value: 'sv', label: 'Swedish' },
+	{ value: 'no', label: 'Norwegian' },
+	{ value: 'da', label: 'Danish' },
+	{ value: 'fi', label: 'Finnish' },
+	{ value: 'lt', label: 'Lithuanian' },
+	{ value: 'lv', label: 'Latvian' },
+	{ value: 'et', label: 'Estonian' },
+]
 
 const messages = defineMessages({
 	copied: {

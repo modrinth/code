@@ -158,6 +158,8 @@ export const formatProjectType = (name, short = false) => {
 		return 'Data Pack'
 	} else if (name === 'modpack') {
 		return 'Modpack'
+	} else if (name === 'minecraft_java_server') {
+		return 'Server'
 	}
 
 	return capitalizeString(name)

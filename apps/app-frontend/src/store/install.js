@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	create_profile_and_install as packInstall,
 	install_to_existing_profile,
+	create_profile_and_install as packInstall,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
@@ -271,7 +271,9 @@ export const installVersionDependencies = async (profile, version) => {
 
 /**
  * Server projects that use modpack content use have linked_data.project_id as
- * the server project id and linked_data.version_id as the modpack version id
+ * the server project id and linked_data.version_id as the modpack content version id
+ *
+ * The modpack content version can be of the same server project, or from a different project
  */
 export const installServerProject = async (serverProjectId) => {
 	const [project, projectV3] = await Promise.all([

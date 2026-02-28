@@ -133,7 +133,7 @@
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
-				<div class="flex items-center gap-2 flex-wrap">
+				<div class="flex items-center gap-2 w-full">
 					<ServerDetails
 						v-if="isServerProject"
 						:region="serverRegionCode"
@@ -144,7 +144,7 @@
 						:hide-online-players-label="true"
 						:hide-recent-plays-label="true"
 					/>
-					<div class="flex items-center gap-1 flex-wrap">
+					<div class="flex items-center gap-1">
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"

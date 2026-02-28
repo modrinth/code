@@ -495,7 +495,7 @@ const selectableProjectTypes = computed(() => {
 		{ label: 'Resource Packs', href: `/browse/resourcepack` },
 		{ label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks },
 		{ label: 'Shaders', href: `/browse/shader` },
-		{ label: 'Servers', href: `/browse/server` },
+		{ label: 'Servers', href: `/browse/server`, shown: !instance.value },
 	]
 
 	if (params) {
