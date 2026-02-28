@@ -56,10 +56,14 @@ export const SERVER_SORT_TYPES: SortType[] = [
 
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
-	server_category: 'categories',
 	server_game_version: 'minecraft_java_server.content.supported_game_versions',
 	server_country: 'minecraft_server.country',
 	server_language: 'minecraft_server.languages',
+}
+
+function getFilterField(filterId: string): string | undefined {
+	if (filterId.startsWith('server_category_')) return 'categories'
+	return FILTER_FIELD_MAP[filterId]
 }
 
 export function useServerSearch(opts: {
@@ -78,92 +82,111 @@ export function useServerSearch(opts: {
 	const serverCurrentFilters = ref<FilterValue[]>([])
 	const serverToggledGroups = ref<string[]>([])
 
-	const serverFilterTypes = computed<FilterType[]>(() => [
-		{
-			id: 'server_content_type',
-			formatted_name: 'Type',
-			supported_project_types: ['server'],
-			display: 'all',
-			query_param: 'sct',
-			supports_negative_filter: false,
-			searchable: false,
-			options: [
-				{ id: 'vanilla', formatted_name: 'Vanilla', method: 'or', value: 'vanilla' },
-				{ id: 'modpack', formatted_name: 'Modded', method: 'or', value: 'modpack' },
-			],
-		},
-		{
-			id: 'server_category',
-			formatted_name: 'Category',
-			supported_project_types: ['server'],
-			display: 'all',
-			query_param: 'sc',
-			supports_negative_filter: true,
-			searchable: false,
-			options: (tags.value?.categories ?? [])
-				.filter((c) => c.project_type === 'minecraft_java_server')
-				.map((c) => ({
-					id: c.name,
-					formatted_name: formatCategory(formatMessage, c.name),
-					icon: getCategoryIcon(c.name),
+	const serverFilterTypes = computed<FilterType[]>(() => {
+		const categoryFilters: Record<string, FilterType> = {}
+		for (const c of (tags.value?.categories ?? []).filter(
+			(c) => c.project_type === 'minecraft_java_server',
+		)) {
+			const filterTypeId = `server_category_${c.header}`
+			if (!categoryFilters[filterTypeId]) {
+				categoryFilters[filterTypeId] = {
+					id: filterTypeId,
+					formatted_name: formatCategoryHeader(formatMessage, c.header),
+					supported_project_types: ['server'],
+					display: 'all',
+					query_param: 'sc',
+					supports_negative_filter: true,
+					searchable: false,
+					options: [],
+				}
+			}
+			categoryFilters[filterTypeId].options.push({
+				id: c.name,
+				formatted_name: formatCategory(formatMessage, c.name),
+				icon: getCategoryIcon(c.name),
+				method: 'or' as const,
+				value: c.name,
+			})
+		}
+
+		return [
+			{
+				id: 'server_content_type',
+				formatted_name: 'Type',
+				supported_project_types: ['server'],
+				display: 'all',
+				query_param: 'sct',
+				supports_negative_filter: false,
+				searchable: false,
+				options: [
+					{ id: 'vanilla', formatted_name: 'Vanilla', method: 'or', value: 'vanilla' },
+					{ id: 'modpack', formatted_name: 'Modded', method: 'or', value: 'modpack' },
+				],
+			},
+			...[
+				'minecraft_server_gameplay',
+				'minecraft_server_features',
+				'minecraft_server_meta',
+				'minecraft_server_community',
+			]
+				.map((h) => categoryFilters[`server_category_${h}`])
+				.filter(Boolean),
+			{
+				id: 'server_game_version',
+				formatted_name: 'Game Version',
+				supported_project_types: ['server'],
+				display: 'scrollable',
+				query_param: 'sgv',
+				supports_negative_filter: false,
+				searchable: true,
+				options: (tags.value?.gameVersions ?? []).map((gv) => ({
+					id: gv.version,
+					toggle_group: gv.version_type !== 'release' ? 'all_versions' : undefined,
 					method: 'or' as const,
-					value: c.name,
-					group: formatCategoryHeader(formatMessage, c.header),
+					value: gv.version,
+					query_value: gv.version,
 				})),
-		},
-		{
-			id: 'server_game_version',
-			formatted_name: 'Game Version',
-			supported_project_types: ['server'],
-			display: 'scrollable',
-			query_param: 'sgv',
-			supports_negative_filter: false,
-			searchable: true,
-			options: (tags.value?.gameVersions ?? []).map((gv) => ({
-				id: gv.version,
-				toggle_group: gv.version_type !== 'release' ? 'all_versions' : undefined,
-				method: 'or' as const,
-				value: gv.version,
-				query_value: gv.version,
-			})),
-		},
-		{
-			id: 'server_country',
-			formatted_name: 'Country',
-			supported_project_types: ['server'],
-			display: 'scrollable',
-			query_param: 'sco',
-			supports_negative_filter: true,
-			searchable: true,
-			options: SERVER_COUNTRIES.map((c) => ({
-				id: c.code,
-				formatted_name: c.name,
-				method: 'or' as const,
-				value: c.code,
-			})),
-		},
-		{
-			id: 'server_language',
-			formatted_name: 'Language',
-			supported_project_types: ['server'],
-			display: 'scrollable',
-			query_param: 'sl',
-			supports_negative_filter: false,
-			searchable: true,
-			options: SERVER_LANGUAGES.map((l) => ({
-				id: l.code,
-				formatted_name: l.name,
-				method: 'or' as const,
-				value: l.code,
-			})),
-		},
-	])
+			},
+			{
+				id: 'server_country',
+				formatted_name: 'Country',
+				supported_project_types: ['server'],
+				display: 'scrollable',
+				query_param: 'sco',
+				supports_negative_filter: true,
+				searchable: true,
+				options: SERVER_COUNTRIES.map((c) => ({
+					id: c.code,
+					formatted_name: c.name,
+					method: 'or' as const,
+					value: c.code,
+				})),
+			},
+			{
+				id: 'server_language',
+				formatted_name: 'Language',
+				supported_project_types: ['server'],
+				display: 'scrollable',
+				query_param: 'sl',
+				supports_negative_filter: false,
+				searchable: true,
+				options: SERVER_LANGUAGES.map((l) => ({
+					id: l.code,
+					formatted_name: l.name,
+					method: 'or' as const,
+					value: l.code,
+				})),
+			},
+		]
+	})
 
 	const newFilters = computed(() => {
 		const parts = ['project_types = minecraft_java_server']
 
-		for (const [filterId, field] of Object.entries(FILTER_FIELD_MAP)) {
-			const matched = serverCurrentFilters.value.filter((f) => f.type === filterId)
+		for (const filterType of serverFilterTypes.value) {
+			const field = getFilterField(filterType.id)
+			if (!field) continue
+			const matched = serverCurrentFilters.value.filter((f) => f.type === filterType.id)
 			const included = matched.filter((f) => !f.negative)
 			const excluded = matched.filter((f) => f.negative)
 			if (included.length > 0) {
