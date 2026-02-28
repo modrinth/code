@@ -11,7 +11,8 @@ const environment: Stage = {
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
 	text: async () =>
 		(await import('../../messages/checklist-text/environment/environment.md?raw')).default,
-	shouldShow: (project, projectV3) => (projectV3?.environment?.length ?? 0) === 1 && !projectV3?.minecraft_server,
+	shouldShow: (project, projectV3) =>
+		(projectV3?.environment?.length ?? 0) === 1 && !projectV3?.minecraft_server,
 	actions: [
 		{
 			id: 'side_types_inaccurate',

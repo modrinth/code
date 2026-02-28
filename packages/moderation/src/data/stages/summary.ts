@@ -57,7 +57,7 @@ const summary: Stage = {
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
 			message: async () => (await import('../messages/summary/repeat-ip.md?raw')).default,
-		}
+		},
 	],
 }
 

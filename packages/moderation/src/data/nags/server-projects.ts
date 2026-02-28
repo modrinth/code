@@ -1,10 +1,8 @@
-
 import { defineMessage } from '@modrinth/ui'
 import type { Nag, NagContext } from '../../types/nags'
 
 export const serverProjectsNags: Nag[] = [
-
-/*
+	/*
 	{
 		id: 'add-banner',
 		title: defineMessage({
@@ -17,7 +15,7 @@ export const serverProjectsNags: Nag[] = [
 				"Add your server's banner.",
 		}),
 		status: 'suggestion',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server && !context.projectV3.banner_url,
+		shouldShow: (context: NagContext) => !!context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings',
 			title: defineMessage({
@@ -36,21 +34,20 @@ export const serverProjectsNags: Nag[] = [
 		}),
 		description: defineMessage({
 			id: 'nags.select-country.description',
-			defaultMessage:
-				"Let players know what country your server is located in.",
+			defaultMessage: 'Let players know what country your server is located in.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server && !context.projectV3.minecraft_server.country,
+		shouldShow: (context: NagContext) =>
+			!!context.projectV3?.minecraft_server && !context.projectV3?.minecraft_server.country,
 		link: {
-			path: 'settings',
+			path: 'settings/server',
 			title: defineMessage({
-				id: 'nags.settings.title',
-				defaultMessage: 'Visit general settings',
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
 		},
 	},
-/*
 	{
 		id: 'select-language',
 		title: defineMessage({
@@ -59,21 +56,21 @@ export const serverProjectsNags: Nag[] = [
 		}),
 		description: defineMessage({
 			id: 'nags.select-language.description',
-			defaultMessage:
-				"List the language or languages supported by your server.",
+			defaultMessage: 'List the language or languages supported by your server.',
 		}),
 		status: 'suggestion',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server,
+		shouldShow: (context: NagContext) =>
+			!!context.projectV3?.minecraft_server &&
+			context.projectV3?.minecraft_server?.languages?.length === 0,
 		link: {
-			path: 'settings',
+			path: 'settings/server',
 			title: defineMessage({
-				id: 'nags.settings.title',
-				defaultMessage: 'Visit general settings',
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
 		},
 	},
-*/
 	{
 		id: 'add-java-address',
 		title: defineMessage({
@@ -83,17 +80,18 @@ export const serverProjectsNags: Nag[] = [
 		description: defineMessage({
 			id: 'nags.add-java-address.description',
 			defaultMessage:
-				"Add the IP address and port Java Edition players can use to join your server.",
+				'Add the IP address and port Java Edition players can use to join your server.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server && !context.projectV3.minecraft_java_server?.address,
+		shouldShow: (context: NagContext) =>
+			!!context.projectV3?.minecraft_server && !context.projectV3?.minecraft_java_server?.address,
 		link: {
-			path: 'settings',
+			path: 'settings/server',
 			title: defineMessage({
-				id: 'nags.settings.title',
-				defaultMessage: 'Visit general settings',
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
 		},
 	},
 	{
@@ -105,20 +103,21 @@ export const serverProjectsNags: Nag[] = [
 		description: defineMessage({
 			id: 'nags.add-bedrock-address.description',
 			defaultMessage:
-				"If your server supports connections from Bedrock Edition players, add the IP address and port they can use to join.",
+				'If your server supports connections from Bedrock Edition players, add the IP address and port they can use to join.',
 		}),
 		status: 'suggestion',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server && !context.projectV3.minecraft_bedrock_server?.address,
+		shouldShow: (context: NagContext) =>
+			!!context.projectV3?.minecraft_server &&
+			!context.projectV3?.minecraft_bedrock_server?.address,
 		link: {
-			path: 'settings',
+			path: 'settings/server',
 			title: defineMessage({
-				id: 'nags.settings.title',
-				defaultMessage: 'Visit general settings',
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
 		},
 	},
-/*
 	{
 		id: 'select-compatibility',
 		title: defineMessage({
@@ -128,20 +127,24 @@ export const serverProjectsNags: Nag[] = [
 		description: defineMessage({
 			id: 'nags.select-compatibility.description',
 			defaultMessage:
-				"Select what versions your server supports, choose a Modpack, or upload your own.",
+				'Select what versions your server supports, choose a Modpack, or upload your own.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => !!context.projectV3.minecraft_server,
+		shouldShow: (context: NagContext) => {
+			if (
+				context.projectV3?.minecraft_java_server?.content?.kind === 'vanilla' &&
+				!context.projectV3?.minecraft_java_server?.content?.recommended_game_version
+			)
+				return true
+			return false
+		},
 		link: {
-			path: 'settings',
+			path: 'settings/server',
 			title: defineMessage({
-				id: 'nags.settings.title',
-				defaultMessage: 'Visit general settings',
+				id: 'nags.server.title',
+				defaultMessage: 'Visit server settings',
 			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings',
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-server',
 		},
 	},
-*/
-
 ]
-

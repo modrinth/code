@@ -1,6 +1,6 @@
-import { BookTextIcon } from '@modrinth/assets';
+import { BookTextIcon } from '@modrinth/assets'
 
-import type { Stage } from '../../types/stage';
+import type { Stage } from '../../types/stage'
 
 const licensesNotRequiringSource: string[] = [
 	'LicenseRef-All-Rights-Reserved',
@@ -27,7 +27,7 @@ const licenseStage: Stage = {
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
 	navigate: '/settings/license',
 	shouldShow(project, projectV3) {
-		return !projectV3?.minecraft_server;
+		return !projectV3?.minecraft_server
 	},
 	actions: [
 		{

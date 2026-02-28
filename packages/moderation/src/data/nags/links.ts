@@ -79,7 +79,7 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) =>
-			!context.projectV3.minecraft_server &&
+			!context.projectV3?.minecraft_server &&
 			!(
 				context.project.issues_url ||
 				context.project.source_url ||
@@ -87,6 +87,35 @@ export const linksNags: Nag[] = [
 				context.project.discord_url ||
 				context.project.donation_urls?.length
 			),
+		link: {
+			path: 'settings/links',
+			title: defineMessage({
+				id: 'nags.settings.links.title',
+				defaultMessage: 'Visit links settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+		},
+	},
+	{
+		id: 'add-links-server',
+		title: defineMessage({
+			id: 'nags.add-links-server.title',
+			defaultMessage: 'Add external links',
+		}),
+		description: defineMessage({
+			id: 'nags.add-links-server.description',
+			defaultMessage:
+				'Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite.',
+		}),
+		status: 'suggestion',
+		shouldShow: (context: NagContext) => {
+			return !(
+				context.projectV3?.link_urls?.site?.url ||
+				context.projectV3?.link_urls?.store?.url ||
+				context.projectV3?.link_urls?.discord?.url ||
+				context.projectV3?.link_urls?.wiki?.url
+			)
+		},
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
@@ -110,7 +139,6 @@ export const linksNags: Nag[] = [
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
 			return (
-				!context.projectV3.minecraft_server &&
 				!isCommonUrl(context.project.source_url ?? null, commonLinkDomains.source) ||
 				!isCommonUrl(context.project.issues_url ?? null, commonLinkDomains.issues) ||
 				!isCommonUrl(context.project.discord_url ?? null, commonLinkDomains.discord)
@@ -138,10 +166,11 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-		!context.projectV3.minecraft_server &&
-		isDiscordUrl(context.project.source_url ?? null) ||
-		isDiscordUrl(context.project.issues_url ?? null) ||
-		isDiscordUrl(context.project.wiki_url ?? null),
+			isDiscordUrl(context.project.source_url ?? null) ||
+			isDiscordUrl(context.project.issues_url ?? null) ||
+			isDiscordUrl(context.project.wiki_url ?? null) ||
+			isDiscordUrl(context.projectV3?.link_urls?.site?.url ?? null) ||
+			isDiscordUrl(context.projectV3?.link_urls?.store?.url ?? null),
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
@@ -173,11 +202,12 @@ export const linksNags: Nag[] = [
 			}
 
 			return (
-				!context.projectV3.minecraft_server &&
 				isLinkShortener(context.project.source_url ?? null) ||
 				isLinkShortener(context.project.issues_url ?? null) ||
 				isLinkShortener(context.project.wiki_url ?? null) ||
 				isLinkShortener(context.project.discord_url ?? null) ||
+				isLinkShortener(context.projectV3?.link_urls?.site?.url ?? null) ||
+				isLinkShortener(context.projectV3?.link_urls?.store?.url ?? null) ||
 				Boolean(context.project.license.url && isLinkShortener(context.project.license.url ?? null))
 			)
 		},

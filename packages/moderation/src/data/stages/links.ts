@@ -18,24 +18,23 @@ const links: Stage = {
 			project.donation_urls.length > 0,
 		),
 	text: async (project, projectV3) => {
-	let text
-	if (!!projectV3?.minecraft_server)
-		text = (await import('../messages/checklist-text/links/server.md?raw')).default
-	else
-		text = (await import('../messages/checklist-text/links/base.md?raw')).default
+		let text
+		if (!!projectV3?.minecraft_server)
+			text = (await import('../messages/checklist-text/links/server.md?raw')).default
+		else text = (await import('../messages/checklist-text/links/base.md?raw')).default
 
-	if (project.donation_urls && project.donation_urls.length > 0) {
-		text += (await import('../messages/checklist-text/links/donation/donations.md?raw')).default
+		if (project.donation_urls && project.donation_urls.length > 0) {
+			text += (await import('../messages/checklist-text/links/donation/donations.md?raw')).default
 
-		for (const donation of project.donation_urls) {
-			text += (await import(`../messages/checklist-text/links/donation/donation.md?raw`)).default
-				.replace('{URL}', donation.url)
-				.replace('{PLATFORM}', donation.platform)
+			for (const donation of project.donation_urls) {
+				text += (await import(`../messages/checklist-text/links/donation/donation.md?raw`)).default
+					.replace('{URL}', donation.url)
+					.replace('{PLATFORM}', donation.platform)
+			}
 		}
-	}
 
-	return text
-},
+		return text
+	},
 	actions: [
 		{
 			id: 'links_misused',

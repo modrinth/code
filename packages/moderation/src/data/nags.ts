@@ -5,4 +5,10 @@ import { linksNags } from './nags/links'
 import { serverProjectsNags } from './nags/server-projects'
 import { tagsNags } from './nags/tags'
 
-export default [...coreNags, ...linksNags, ...descriptionNags, ...tagsNags, ...serverProjectsNags] as Nag[]
+export default [
+	...coreNags,
+	...linksNags,
+	...descriptionNags,
+	...tagsNags,
+	...serverProjectsNags,
+] as Nag[]

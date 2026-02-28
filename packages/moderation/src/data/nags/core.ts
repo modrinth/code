@@ -37,7 +37,8 @@ export const coreNags: Nag[] = [
 			defaultMessage: 'At least one version is required for a project to be submitted for review.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => context.versions.length < 1 && !context.projectV3.minecraft_server,
+		shouldShow: (context: NagContext) =>
+			context.versions.length < 1 && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
@@ -203,7 +204,8 @@ export const coreNags: Nag[] = [
 			)
 		},
 		status: 'required',
-		shouldShow: (context: NagContext) => context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3.minecraft_server,
+		shouldShow: (context: NagContext) =>
+			context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
