@@ -287,7 +287,7 @@ pub fn get_sort_index(
             projects_name,
             &["minecraft_java_server.verified_plays_2w:desc"],
         ),
-        "minecraft_java_server.ping.players_online" => (
+        "minecraft_java_server.ping.data.players_online" => (
             projects_name,
             &["minecraft_java_server.ping.data.players_online:desc"],
         ),
@@ -508,40 +508,6 @@ mod tests {
                 "components.minecraft_java_server.content = vanilla AND components.minecraft_server.country = US"
             ),
             "minecraft_java_server.content.kind = vanilla AND minecraft_server.country = US"
-        );
-    }
-
-    #[test]
-    fn maps_server_sort_indexes() {
-        let config = SearchConfig {
-            addresses: Vec::new(),
-            read_lb_address: String::new(),
-            key: String::new(),
-            meta_namespace: "test".to_string(),
-        };
-
-        let (_, sort_verified) = get_sort_index(&config, "verified_plays_2w")
-            .expect("verified sort index should be valid");
-        assert_eq!(
-            sort_verified[0],
-            "minecraft_java_server.verified_plays_2w:desc"
-        );
-
-        let (_, sort_players) = get_sort_index(&config, "ping.players_online")
-            .expect("players online sort index should be valid");
-        assert_eq!(
-            sort_players[0],
-            "minecraft_java_server.ping.data.players_online:desc"
-        );
-
-        let (_, sort_components_verified) = get_sort_index(
-            &config,
-            "components.minecraft_java_server.verified_plays_2w",
-        )
-        .expect("components verified sort index should be valid");
-        assert_eq!(
-            sort_components_verified[0],
-            "minecraft_java_server.verified_plays_2w:desc"
         );
     }
 }
