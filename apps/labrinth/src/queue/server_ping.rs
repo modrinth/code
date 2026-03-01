@@ -238,7 +238,7 @@ impl ServerPingQueue {
     }
 }
 
-async fn ping_server(
+pub async fn ping_server(
     address: &str,
     port: u16,
 ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
