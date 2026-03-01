@@ -28,6 +28,7 @@ watch(
 async function purgeCache() {
 	await purge_cache_types([
 		'project',
+		'projectV3',
 		'version',
 		'user',
 		'team',
