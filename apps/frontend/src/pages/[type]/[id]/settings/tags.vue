@@ -237,7 +237,13 @@ const categoryLists = computed(() => {
 
 const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length
-	if (tagCount > 8) {
+	if (projectV3?.value?.minecraft_server != null) {
+		if (tagCount > 18) {
+			return `You've selected ${tagCount} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.`
+		} else if (tagCount > 12) {
+			return `You've selected ${tagCount} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.`
+		}
+	} else if (tagCount > 8) {
 		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
 	}
 	return null
