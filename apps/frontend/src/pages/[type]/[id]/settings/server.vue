@@ -168,32 +168,6 @@ const bedrockPort = ref(19132)
 const country = ref('')
 const languages = ref([])
 
-function initFromProjectV3(v3) {
-	if (!v3) return
-	javaAddress.value = v3.minecraft_java_server?.address ?? ''
-	javaPort.value = v3.minecraft_java_server?.port ?? 25565
-	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
-	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
-	country.value = v3.minecraft_server?.country ?? ''
-	languages.value = v3.minecraft_server?.languages ?? []
-
-	pingJavaServer()
-}
-
-// initialize projectV3 values once
-if (projectV3.value) {
-	initFromProjectV3(projectV3.value)
-} else {
-	const stop = watch(
-		() => projectV3.value,
-		(v3) => {
-			if (!v3) return
-			initFromProjectV3(v3)
-			stop()
-		},
-	)
-}
-
 const javaPingLoading = ref(false)
 const javaPingResult = ref(null)
 
@@ -206,7 +180,12 @@ const lastPingAddressChanged = computed(() => {
 	)
 })
 
-const pingJavaServer = async () => {
+const hasPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+})
+
+async function pingJavaServer() {
 	const address = javaAddress.value?.trim()
 	if (!address) {
 		javaPingResult.value = null
@@ -233,10 +212,31 @@ const pingJavaServer = async () => {
 	}
 }
 
-const hasPermission = computed(() => {
-	const EDIT_DETAILS = 1 << 2
-	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
-})
+function initFromProjectV3(v3) {
+	if (!v3) return
+	javaAddress.value = v3.minecraft_java_server?.address ?? ''
+	javaPort.value = v3.minecraft_java_server?.port ?? 25565
+	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
+	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
+	country.value = v3.minecraft_server?.country ?? ''
+	languages.value = v3.minecraft_server?.languages ?? []
+
+	pingJavaServer()
+}
+
+// initialize projectV3 values once
+if (projectV3.value) {
+	initFromProjectV3(projectV3.value)
+} else {
+	const stop = watch(
+		() => projectV3.value,
+		(v3) => {
+			if (!v3) return
+			initFromProjectV3(v3)
+			stop()
+		},
+	)
+}
 
 const countryOptions = [
 	{ value: 'US', label: 'United States' },
