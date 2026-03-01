@@ -1650,10 +1650,10 @@ const serverRequiredContent = computed(() => {
 		name: serverModpackProject.value.name,
 		versionNumber: serverModpackVersion.value?.version_number ?? '',
 		icon: serverModpackProject.value.icon_url,
-		onclickName: () => router.push(`/project/${serverModpackProject.value.slug}`),
+		onclickName: () => navigateTo(`/modpack/${serverModpackProject.value.slug}`),
 		onclickVersion: () =>
-			router.push(
-				`/project/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
+			navigateTo(
+				`/modpack/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
 			),
 		onclickDownload: primaryFile?.url
 			? () => navigateTo(primaryFile.url, { external: true })

@@ -385,9 +385,6 @@ const {
 		watch: false,
 		transform: (hits) => {
 			noLoad.value = false
-			if (currentType.value === 'server') {
-				console.log('[v3 search] hits:', (hits as Labrinth.Search.v3.SearchResults)?.hits)
-			}
 			return hits as Labrinth.Search.v2.SearchResults
 		},
 	},
@@ -505,7 +502,11 @@ const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) =>
 			onclick:
 				project_id !== hit.project_id
 					? () => {
-							router.push(`/project/${project_id}`)
+							navigateTo(
+								hit.slug
+									? `/${hit.project_types[0]}/${hit.slug}`
+									: `/${hit.project_types[0]}/${hit.project_id}`,
+							)
 						}
 					: undefined,
 			showCustomModpackTooltip: project_id === hit.project_id,
