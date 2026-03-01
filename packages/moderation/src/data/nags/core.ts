@@ -148,6 +148,7 @@ export const coreNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) => {
+			if (!!context.projectV3?.minecraft_server) return false
 			const featuredGalleryImage = context.project.gallery?.find((img) => img.featured)
 			return context.project?.gallery?.length === 0 || !featuredGalleryImage
 		},

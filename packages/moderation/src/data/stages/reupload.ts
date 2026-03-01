@@ -8,7 +8,6 @@ const reupload: Stage = {
 	id: 'reupload',
 	icon: CopyrightIcon,
 	guidance_url: 'https://modrinth.com/legal/rules',
-	shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 	actions: [
 		{
 			id: 'reupload_reupload',
@@ -17,12 +16,14 @@ const reupload: Stage = {
 			weight: 1100,
 			suggestedStatus: 'rejected',
 			severity: 'high',
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/reupload/reupload.md?raw')).default,
 			disablesActions: [
 				'reupload_unclear_fork',
 				'reupload_insufficient_fork',
 				'reupload_request_proof',
 				'reupload_identity_verification',
+				'reupload_request_proof_server'
 			],
 			relevantExtraInput: [
 				{
@@ -46,12 +47,14 @@ const reupload: Stage = {
 			weight: 1100,
 			suggestedStatus: 'rejected',
 			severity: 'high',
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/reupload/fork.md?raw')).default,
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_insufficient_fork',
 				'reupload_request_proof',
 				'reupload_identity_verification',
+				'reupload_request_proof_server'
 			],
 		} as ButtonAction,
 		{
@@ -61,12 +64,14 @@ const reupload: Stage = {
 			weight: 1100,
 			suggestedStatus: 'rejected',
 			severity: 'high',
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/reupload/insufficient_fork.md?raw')).default,
 			disablesActions: [
 				'reupload_unclear_fork',
 				'reupload_reupload',
 				'reupload_request_proof',
 				'reupload_identity_verification',
+				'reupload_request_proof_server'
 			],
 		} as ButtonAction,
 		{
@@ -83,6 +88,7 @@ const reupload: Stage = {
 				'reupload_unclear_fork',
 				'reupload_insufficient_fork',
 				'reupload_identity_verification',
+				'reupload_request_proof_server'
 			],
 		},
 		{
@@ -92,6 +98,7 @@ const reupload: Stage = {
 			weight: 1100,
 			suggestedStatus: 'rejected',
 			severity: 'high',
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () =>
 				(await import('../messages/reupload/identity_verification.md?raw')).default,
 			relevantExtraInput: [
@@ -104,6 +111,25 @@ const reupload: Stage = {
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_insufficient_fork',
+				'reupload_request_proof',
+				'reupload_request_proof_server'
+			],
+		},
+		{
+			id: 'reupload_request_proof_server',
+			type: 'button',
+			label: 'Custom modpack permissions',
+			weight: 1100,
+			suggestedStatus: 'rejected',
+			severity: 'high',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
+			message: async () =>
+				(await import('../messages/reupload/custom_server.md?raw')).default,
+			disablesActions: [
+				'reupload_reupload',
+				'reupload_unclear_fork',
+				'reupload_insufficient_fork',
+				'reupload_identity_verification',
 				'reupload_request_proof',
 			],
 		},

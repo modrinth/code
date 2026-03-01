@@ -106,6 +106,15 @@ const statusAlerts: Stage = {
 			message: async () =>
 				(await import('../messages/status-alerts/automod_confusion.md?raw')).default,
 		} as ButtonAction,
+		{
+			id: 'status_serverpack',
+			type: 'button',
+			label: `Serverpack`,
+			weight: -999999,
+			shouldShow: (project) => project.project_type === 'modpack',
+			message: async () =>
+				(await import('../messages/status-alerts/serverpack.md?raw')).default,
+		} as ButtonAction,
 	],
 }
 
