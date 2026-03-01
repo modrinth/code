@@ -6,6 +6,7 @@ import type { Nag, NagContext } from '../../types/nags'
 const allResolutionTags = ['8x-', '16x', '32x', '48x', '64x', '128x', '256x', '512x+']
 
 const MAX_TAG_COUNT = 8
+const MAX_TAG_COUNT_SERVER = 18
 
 function getCategories(
 	project: Labrinth.Projects.v2.Project & { actualProjectType: string },
@@ -23,6 +24,29 @@ function getCategories(
 }
 
 export const tagsNags: Nag[] = [
+	{
+		id: 'select-tags',
+		title: defineMessage({
+			id: 'nags.select-tags.title',
+			defaultMessage: 'Select tags',
+		}),
+		description: defineMessage({
+			id: 'nags.select-tags.description',
+			defaultMessage:
+				'Select the tags that correctly apply to your project to help the right users find it.',
+		}),
+		status: 'suggestion',
+		shouldShow: (context: NagContext) =>
+			context.project.versions.length > 0 && context.project.categories.length < 1,
+		link: {
+			path: 'settings/tags',
+			title: defineMessage({
+				id: 'nags.settings.tags.title',
+				defaultMessage: 'Visit tag settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+		},
+	},
 	{
 		id: 'too-many-tags',
 		title: defineMessage({
@@ -49,14 +73,49 @@ export const tagsNags: Nag[] = [
 		},
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
-			console.log("is this a server?" + (context.projectV3?.minecraft_server != null))
-			console.log("but does it have languages?" + (context.projectV3?.minecraft_server?.languages?.length !== 0))
-			console.log(context.projectV3)
-			console.log(JSON.stringify(context.projectV3))
-			if ((context.projectV3?.minecraft_java_server)) return false
+			if (context.projectV3?.minecraft_java_server) return false
 			const tagCount =
 				context.project.categories.length + (context.project.additional_categories?.length || 0)
-			return tagCount > MAX_TAG_COUNT
+			return tagCount > MAX_TAG_COUNT && !context.projectV3?.minecraft_server
+		},
+		link: {
+			path: 'settings/tags',
+			title: defineMessage({
+				id: 'nags.edit-tags.title',
+				defaultMessage: 'Edit tags',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
+		},
+	},
+	{
+		id: 'too-many-tags-server',
+		title: defineMessage({
+			id: 'nags.too-many-tags-server.title',
+			defaultMessage: 'Select accurate tags',
+		}),
+		description: (context: NagContext) => {
+			const { formatMessage } = useVIntl()
+			const tagCount =
+				context.project.categories.length + (context.project.additional_categories?.length || 0)
+			const maxTagCount = MAX_TAG_COUNT_SERVER
+
+			return formatMessage(
+				defineMessage({
+					id: 'nags.too-many-tags-server.description',
+					defaultMessage:
+						"You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results.",
+				}),
+				{
+					tagCount,
+					maxTagCount,
+				},
+			)
+		},
+		status: 'required',
+		shouldShow: (context: NagContext) => {
+			const tagCount =
+				context.project.categories.length + (context.project.additional_categories?.length || 0)
+			return tagCount > MAX_TAG_COUNT_SERVER && context.projectV3?.minecraft_server != null
 		},
 		link: {
 			path: 'settings/tags',

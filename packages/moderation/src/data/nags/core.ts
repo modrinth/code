@@ -161,29 +161,6 @@ export const coreNags: Nag[] = [
 		},
 	},
 	{
-		id: 'select-tags',
-		title: defineMessage({
-			id: 'nags.select-tags.title',
-			defaultMessage: 'Select tags',
-		}),
-		description: defineMessage({
-			id: 'nags.select-tags.description',
-			defaultMessage:
-				'Select the tags that correctly apply to your project to help the right users find it.',
-		}),
-		status: 'suggestion',
-		shouldShow: (context: NagContext) =>
-			context.project.versions.length > 0 && context.project.categories.length < 1,
-		link: {
-			path: 'settings/tags',
-			title: defineMessage({
-				id: 'nags.settings.tags.title',
-				defaultMessage: 'Visit tag settings',
-			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
-		},
-	},
-	{
 		id: 'select-license',
 		title: defineMessage({
 			id: 'nags.select-license.title',
