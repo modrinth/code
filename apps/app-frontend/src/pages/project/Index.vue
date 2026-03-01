@@ -422,6 +422,9 @@ async function fetchProjectData() {
 					'must_revalidate',
 				).catch(handleError)
 				if (modpackProject) {
+					const primaryFile =
+						modpackVersion.files?.find((f) => f.primary) ?? modpackVersion.files?.[0]
+
 					serverRequiredContent.value = {
 						name: modpackProject.name,
 						versionNumber: modpackVersion.version_number ?? '',
@@ -434,6 +437,7 @@ async function fetchProjectData() {
 							modpackProject.id !== project.id
 								? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
 								: undefined,
+						onclickDownload: primaryFile?.url ? () => openUrl(primaryFile.url) : undefined,
 					}
 				}
 			}
