@@ -25,7 +25,7 @@ pub struct Globals {
     pub captcha_enabled: bool,
 }
 
-static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
+pub static GLOBALS: LazyLock<Globals> = LazyLock::new(|| Globals {
     tax_compliance_thresholds: [(2025, 600), (2026, 2000)]
         .into_iter()
         .collect(),

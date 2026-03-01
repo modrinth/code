@@ -15,7 +15,7 @@ use crate::util::avalara1099;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Datelike, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use modrinth_util::decimal::Decimal2dp;
@@ -1117,7 +1117,29 @@ async fn update_compliance_status(
 }
 
 fn tax_compliance_payout_threshold() -> Option<Decimal> {
-    ENV.COMPLIANCE_PAYOUT_THRESHOLD.parse().ok()
+    let globals = &crate::routes::internal::globals::GLOBALS;
+    let current_year = Utc::now().year() as u16;
+    let thresholds = &globals.tax_compliance_thresholds;
+
+    if thresholds.is_empty() {
+        return None;
+    }
+
+    let mut years: Vec<u16> = thresholds.keys().copied().collect();
+    years.sort();
+
+    let value = if current_year <= years[0] {
+        thresholds[&years[0]]
+    } else if current_year >= *years.last().unwrap() {
+        thresholds[years.last().unwrap()]
+    } else {
+        thresholds
+            .get(&current_year)
+            .copied()
+            .unwrap_or_else(|| thresholds[years.last().unwrap()])
+    };
+
+    Some(Decimal::from(value))
 }
 
 #[derive(Deserialize)]
