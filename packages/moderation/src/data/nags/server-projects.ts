@@ -2,7 +2,6 @@ import { defineMessage } from '@modrinth/ui'
 import type { Nag, NagContext } from '../../types/nags'
 
 export const serverProjectsNags: Nag[] = [
-
 	{
 		id: 'select-country',
 		title: defineMessage({

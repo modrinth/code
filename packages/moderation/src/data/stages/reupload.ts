@@ -122,7 +122,10 @@ const reupload: Stage = {
 			weight: 1100,
 			suggestedStatus: 'rejected',
 			severity: 'high',
-			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
+			shouldShow: (project, projectV3) =>
+				!!projectV3?.minecraft_server &&
+				projectV3?.minecraft_java_server?.content?.kind === 'modpack' &&
+				projectV3?.minecraft_java_server?.content?.['project_id'] === project.id,
 			message: async () => (await import('../messages/reupload/custom_server.md?raw')).default,
 			disablesActions: [
 				'reupload_reupload',
