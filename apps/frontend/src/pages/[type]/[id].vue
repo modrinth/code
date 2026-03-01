@@ -434,6 +434,7 @@
 			>
 				<div class="normal-page__header relative my-4">
 					<component
+						v-if="projectV3Loaded"
 						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
 						v-bind="
 							isServerProject
@@ -842,7 +843,7 @@
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCompatibility
-						v-if="!isServerProject"
+						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
 						:v3-metadata="projectV3"
@@ -878,7 +879,7 @@
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
-							<div v-if="!isServerProject" class="details-list__item">
+							<div v-if="projectV3Loaded && !isServerProject" class="details-list__item">
 								<BookTextIcon aria-hidden="true" />
 								<div>
 									{{ formatMessage(messages.licensedLabel) }}
@@ -1109,6 +1110,7 @@ const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
 
+const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
@@ -1611,7 +1613,7 @@ const project = computed(() => {
 const projectId = computed(() => projectRaw.value?.id)
 
 // V3 Project
-const { data: projectV3, error: _projectV3Error } = useQuery({
+const { data: projectV3, error: _projectV3Error, isPending: projectV3Pending } = useQuery({
 	queryKey: computed(() => ['project', 'v3', projectId.value]),
 	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
 	staleTime: STALE_TIME,
@@ -2522,7 +2524,10 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.changelogTab),
 			href: `${projectUrl}/changelog`,
-			shown: hasVersions.value && projectV3.value?.minecraft_server === undefined,
+			shown:
+				hasVersions.value &&
+				projectV3Loaded.value &&
+				projectV3.value?.minecraft_server === undefined,
 			onHover: loadVersions,
 		},
 		{
@@ -2530,6 +2535,7 @@ const navLinks = computed(() => {
 			href: `${projectUrl}/versions`,
 			shown:
 				(hasVersions.value || !!currentMember.value) &&
+				projectV3Loaded.value &&
 				projectV3.value?.minecraft_server === undefined,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
