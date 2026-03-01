@@ -67,7 +67,9 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { install as installVersion } from '@/composables/content-install'
+import { injectContentInstall } from '@/providers/content-install'
+
+const { install: installVersion } = injectContentInstall()
 
 dayjs.extend(relativeTime)
 

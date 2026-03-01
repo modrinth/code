@@ -65,7 +65,7 @@ const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 
 const contentQuery = useQuery({
 	queryKey,
-	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined, { from_modpack: false }),
+	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -133,8 +133,8 @@ const deleteMutation = useMutation({
 	mutationFn: ({ addon }: { addon: Archon.Content.v1.Addon }) =>
 		client.archon.content_v1.deleteAddon(
 			serverId,
+			worldId.value!,
 			{ filename: addon.filename, kind: addon.kind },
-			worldId.value ?? undefined,
 		),
 	onMutate: async ({ addon }) => {
 		await queryClient.cancelQueries({ queryKey: queryKey.value })
@@ -169,9 +169,9 @@ const toggleMutation = useMutation({
 			kind: addon.kind,
 		}
 		if (addon.disabled) {
-			await client.archon.content_v1.enableAddon(serverId, request, worldId.value ?? undefined)
+			await client.archon.content_v1.enableAddon(serverId, worldId.value!, request)
 		} else {
-			await client.archon.content_v1.disableAddon(serverId, request, worldId.value ?? undefined)
+			await client.archon.content_v1.disableAddon(serverId, worldId.value!, request)
 		}
 		return { filename: addon.filename, newDisabled: !addon.disabled }
 	},
@@ -218,21 +218,21 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 async function handleBulkDelete(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.deleteAddons(serverId, requests, worldId.value ?? undefined)
+	await client.archon.content_v1.deleteAddons(serverId, worldId.value!, requests)
 	await queryClient.invalidateQueries({ queryKey: queryKey.value })
 }
 
 async function handleBulkEnable(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.enableAddons(serverId, requests, worldId.value ?? undefined)
+	await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
 	await queryClient.invalidateQueries({ queryKey: queryKey.value })
 }
 
 async function handleBulkDisable(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.disableAddons(serverId, requests, worldId.value ?? undefined)
+	await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
 	await queryClient.invalidateQueries({ queryKey: queryKey.value })
 }
 
@@ -334,7 +334,7 @@ async function handleViewModpackContent() {
 	try {
 		const data = await client.archon.content_v1.getAddons(
 			serverId,
-			worldId.value ?? undefined,
+			worldId.value!,
 			{ from_modpack: true },
 		)
 		const items = (data.addons ?? []).map(addonToContentItem)
@@ -360,7 +360,7 @@ function handleModpackUnlink() {
 
 async function handleModpackUnlinkConfirm() {
 	try {
-		await client.archon.content_v1.unlinkModpack(serverId, worldId.value ?? undefined)
+		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
 		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({
@@ -376,8 +376,8 @@ async function handleUpdateItem(fileNameKey: string) {
 	try {
 		await client.archon.content_v1.updateAddon(
 			serverId,
+			worldId.value!,
 			{ filename: addon.filename },
-			worldId.value ?? undefined,
 		)
 		await contentQuery.refetch()
 	} catch (err) {
@@ -390,7 +390,7 @@ async function handleUpdateItem(fileNameKey: string) {
 
 async function handleModpackUpdate() {
 	try {
-		await client.archon.content_v1.updateModpack(serverId, worldId.value ?? undefined)
+		await client.archon.content_v1.updateModpack(serverId, worldId.value!)
 		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({

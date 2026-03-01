@@ -47,7 +47,6 @@ import { computed, nextTick, ref, watch } from 'vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
@@ -149,8 +148,8 @@ const eraseDataOnInstall = ref(false)
 const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
 const { data: serverContentData, error: serverContentError } = useQuery({
 	queryKey: contentQueryKey,
-	queryFn: () => client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value),
-	enabled: computed(() => !!currentServerId.value),
+	queryFn: () => client.archon.content_v1.getAddons(currentServerId.value!, currentWorldId.value!),
+	enabled: computed(() => !!currentServerId.value && !!currentWorldId.value),
 })
 
 // Watch for errors and notify user
@@ -174,8 +173,8 @@ const installContentMutation = useMutation({
 	}) =>
 		client.archon.content_v1.addAddon(
 			serverId,
+			currentWorldId.value!,
 			{ project_id: projectId, version_id: versionId },
-			currentWorldId.value,
 		),
 	onSuccess: () => {
 		if (currentServerId.value) {
@@ -357,18 +356,23 @@ async function serverInstall(project: InstallableSearchResult) {
 	}
 	project.installing = true
 	try {
-		const versions = (await useBaseFetch(
-			`project/${project.project_id}/version`,
-			{},
-			true,
-		)) as Labrinth.Versions.v2.Version[]
+		const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
 
-		const version =
-			versions.find(
-				(x) =>
-					x.game_versions.includes(serverData.value!.mc_version!) &&
-					x.loaders.includes(serverData.value!.loader!.toLowerCase()),
-			) ?? versions[0]
+		const version = versions.find(
+			(x) =>
+				x.game_versions.includes(serverData.value!.mc_version!) &&
+				x.loaders.includes(serverData.value!.loader!.toLowerCase()),
+		)
+
+		if (!version) {
+			handleError(
+				new Error(
+					`No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
+				),
+			)
+			project.installing = false
+			return
+		}
 
 		if (projectType.value?.id === 'modpack') {
 			if (fromContext.value === 'onboarding') {
@@ -390,11 +394,15 @@ async function serverInstall(project: InstallableSearchResult) {
 				}
 				return
 			}
-			const hardResetParam = eraseDataOnInstall.value ? 'true' : 'false'
-			await useServersFetch(`servers/${currentServerId.value}/reinstall?hard=${hardResetParam}`, {
-				method: 'POST',
-				body: { project_id: project.project_id, version_id: version.id },
-			})
+			await client.archon.content_v1.installContent(
+				currentServerId.value,
+				currentWorldId.value!,
+				{
+					content_variant: 'modpack',
+					spec: { platform: 'modrinth', project_id: project.project_id, version_id: version.id },
+					soft_override: !eraseDataOnInstall.value,
+				},
+			)
 			project.installed = true
 			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
 		} else if (projectType.value?.id === 'mod' || projectType.value?.id === 'plugin') {
@@ -439,7 +447,7 @@ const {
 watch(searchLoading, (val) => debug('searchLoading:', val))
 watch(rawResults, (val) => debug('rawResults changed, total_hits:', val?.total_hits))
 
-const results = shallowRef(toRaw(rawResults))
+const results = computed(() => rawResults.value)
 const pageCount = computed(() =>
 	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
@@ -561,6 +569,7 @@ async function onOnboardingCreate(config: CreationFlowContextValue) {
 	try {
 		await client.archon.content_v1.installContent(
 			currentServerId.value,
+			currentWorldId.value!,
 			{
 				content_variant: 'modpack',
 				spec: {
@@ -570,7 +579,6 @@ async function onOnboardingCreate(config: CreationFlowContextValue) {
 				},
 				soft_override: false,
 			} satisfies Archon.Content.v1.InstallWorldContent,
-			currentWorldId.value,
 		)
 		await client.archon.servers_v1.endIntro(currentServerId.value)
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })

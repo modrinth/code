@@ -1,14 +1,6 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Archon } from '../types'
 
-/**
- * Default world ID - Uuid::nil() which the backend treats as "first/active world"
- * See: apps/archon/src/routes/v1/servers/worlds/mod.rs - world_id_nullish()
- * TODO:
- * - Make sure world ID is being passed before we ship worlds.
- */
-const DEFAULT_WORLD_ID: string = '00000000-0000-0000-0000-000000000000' as const
-
 export class ArchonContentV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'archon_content_v1'
@@ -17,7 +9,7 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** GET /v1/:server_id/worlds/:world_id/addons */
 	public async getAddons(
 		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
+		worldId: string,
 		options?: {
 			from_modpack?: boolean
 			disabled?: boolean
@@ -46,8 +38,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons */
 	public async addAddon(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.AddAddonRequest,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons`, {
 			api: 'archon',
@@ -60,8 +52,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/delete */
 	public async deleteAddon(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.RemoveAddonRequest,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/delete`, {
 			api: 'archon',
@@ -74,8 +66,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/disable */
 	public async disableAddon(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.RemoveAddonRequest,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/disable`, {
 			api: 'archon',
@@ -88,8 +80,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/enable */
 	public async enableAddon(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.RemoveAddonRequest,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/enable`, {
 			api: 'archon',
@@ -102,8 +94,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/delete-many */
 	public async deleteAddons(
 		serverId: string,
+		worldId: string,
 		items: Archon.Content.v1.RemoveAddonRequest[],
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/delete-many`, {
 			api: 'archon',
@@ -116,8 +108,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/disable-many */
 	public async disableAddons(
 		serverId: string,
+		worldId: string,
 		items: Archon.Content.v1.RemoveAddonRequest[],
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/disable-many`, {
 			api: 'archon',
@@ -130,8 +122,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/enable-many */
 	public async enableAddons(
 		serverId: string,
+		worldId: string,
 		items: Archon.Content.v1.RemoveAddonRequest[],
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/enable-many`, {
 			api: 'archon',
@@ -144,8 +136,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/content */
 	public async installContent(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.InstallWorldContent,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/content`, {
 			api: 'archon',
@@ -156,7 +148,7 @@ export class ArchonContentV1Module extends AbstractModule {
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/content/unlink-modpack */
-	public async unlinkModpack(serverId: string, worldId: string = DEFAULT_WORLD_ID): Promise<void> {
+	public async unlinkModpack(serverId: string, worldId: string): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/content/unlink-modpack`,
 			{
@@ -170,8 +162,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** GET /v1/:server_id/worlds/:world_id/addons/update?filename=... */
 	public async getAddonUpdate(
 		serverId: string,
+		worldId: string,
 		filename: string,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<Archon.Content.v1.Addon> {
 		return this.client.request<Archon.Content.v1.Addon>(
 			`/servers/${serverId}/worlds/${worldId}/addons/update?filename=${encodeURIComponent(filename)}`,
@@ -186,8 +178,8 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** POST /v1/:server_id/worlds/:world_id/addons/update */
 	public async updateAddon(
 		serverId: string,
+		worldId: string,
 		request: Archon.Content.v1.UpdateAddonRequest,
-		worldId: string = DEFAULT_WORLD_ID,
 	): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/addons/update`, {
 			api: 'archon',
@@ -200,7 +192,7 @@ export class ArchonContentV1Module extends AbstractModule {
 	/** GET /v1/:server_id/worlds/:world_id/addons/modpack/update */
 	public async getModpackUpdate(
 		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
+		worldId: string,
 	): Promise<Archon.Content.v1.ModpackFields> {
 		return this.client.request<Archon.Content.v1.ModpackFields>(
 			`/servers/${serverId}/worlds/${worldId}/addons/modpack/update`,
@@ -213,7 +205,7 @@ export class ArchonContentV1Module extends AbstractModule {
 	}
 
 	/** POST /v1/:server_id/worlds/:world_id/addons/modpack/update */
-	public async updateModpack(serverId: string, worldId: string = DEFAULT_WORLD_ID): Promise<void> {
+	public async updateModpack(serverId: string, worldId: string): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/addons/modpack/update`,
 			{

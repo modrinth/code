@@ -31,6 +31,8 @@ export function useBulkOperation() {
 		} finally {
 			isBulkOperating.value = false
 			bulkOperation.value = null
+			bulkProgress.value = 0
+			bulkTotal.value = 0
 		}
 	}
 
@@ -53,14 +55,16 @@ export function useBulkOperation() {
 		onBeforeUnmount(() => {
 			window.removeEventListener('beforeunload', handleBeforeUnload)
 		})
-	}
 
-	onBeforeRouteLeave(() => {
-		if (isBulkOperating.value) {
-			return window.confirm('A bulk operation is in progress. Are you sure you want to leave?')
-		}
-		return true
-	})
+		onBeforeRouteLeave(() => {
+			if (isBulkOperating.value) {
+				return window.confirm(
+					'A bulk operation is in progress. Are you sure you want to leave?',
+				)
+			}
+			return true
+		})
+	}
 
 	return { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk }
 }

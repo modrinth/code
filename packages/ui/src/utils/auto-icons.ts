@@ -11,6 +11,7 @@ import {
 	FileImageIcon,
 	FileTextIcon,
 	FolderOpenIcon,
+	DiscordIcon,
 	GithubIcon,
 	GlassesIcon,
 	GlobeIcon,
@@ -56,7 +57,7 @@ export const PAYMENT_METHOD_ICONS: Record<string, Component> = {
 }
 
 export const SOCIAL_PLATFORM_ICONS: Record<string, Component> = {
-	discord: GithubIcon,
+	discord: DiscordIcon,
 	github: GithubIcon,
 }
 

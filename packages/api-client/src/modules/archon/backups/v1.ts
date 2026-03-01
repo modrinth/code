@@ -1,25 +1,13 @@
 import { AbstractModule } from '../../../core/abstract-module'
 import type { Archon } from '../types'
 
-/**
- * Default world ID - Uuid::nil() which the backend treats as "first/active world"
- * See: apps/archon/src/routes/v1/servers/worlds/mod.rs - world_id_nullish()
- * TODO:
- * - Make sure world ID is being passed before we ship worlds.
- * - The schema will change when Backups v4 (routes stay as v1) so remember to do that.
- */
-const DEFAULT_WORLD_ID: string = '00000000-0000-0000-0000-000000000000' as const
-
 export class ArchonBackupsV1Module extends AbstractModule {
 	public getModuleID(): string {
 		return 'archon_backups_v1'
 	}
 
 	/** GET /v1/servers/:server_id/worlds/:world_id/backups */
-	public async list(
-		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
-	): Promise<Archon.Backups.v1.Backup[]> {
+	public async list(serverId: string, worldId: string): Promise<Archon.Backups.v1.Backup[]> {
 		return this.client.request<Archon.Backups.v1.Backup[]>(
 			`/servers/${serverId}/worlds/${worldId}/backups`,
 			{ api: 'archon', version: 1, method: 'GET' },
@@ -29,7 +17,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** GET /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async get(
 		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
+		worldId: string,
 		backupId: string,
 	): Promise<Archon.Backups.v1.Backup> {
 		return this.client.request<Archon.Backups.v1.Backup>(
@@ -41,7 +29,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups */
 	public async create(
 		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
+		worldId: string,
 		request: Archon.Backups.v1.BackupRequest,
 	): Promise<Archon.Backups.v1.PostBackupResponse> {
 		return this.client.request<Archon.Backups.v1.PostBackupResponse>(
@@ -51,11 +39,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	}
 
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups/:backup_id/restore */
-	public async restore(
-		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
-		backupId: string,
-	): Promise<void> {
+	public async restore(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/restore`,
 			{
@@ -67,11 +51,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	}
 
 	/** DELETE /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
-	public async delete(
-		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
-		backupId: string,
-	): Promise<void> {
+	public async delete(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(`/servers/${serverId}/worlds/${worldId}/backups/${backupId}`, {
 			api: 'archon',
 			version: 1,
@@ -80,11 +60,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	}
 
 	/** POST /v1/servers/:server_id/worlds/:world_id/backups/:backup_id/retry */
-	public async retry(
-		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
-		backupId: string,
-	): Promise<void> {
+	public async retry(serverId: string, worldId: string, backupId: string): Promise<void> {
 		await this.client.request<void>(
 			`/servers/${serverId}/worlds/${worldId}/backups/${backupId}/retry`,
 			{
@@ -98,7 +74,7 @@ export class ArchonBackupsV1Module extends AbstractModule {
 	/** PATCH /v1/servers/:server_id/worlds/:world_id/backups/:backup_id */
 	public async rename(
 		serverId: string,
-		worldId: string = DEFAULT_WORLD_ID,
+		worldId: string,
 		backupId: string,
 		request: Archon.Backups.v1.PatchBackup,
 	): Promise<void> {

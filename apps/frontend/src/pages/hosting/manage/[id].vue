@@ -897,31 +897,11 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 			if (!serverData.value) break
 
 			try {
-				await new Promise((resolve) => setTimeout(resolve, 2000))
-
-				let attempts = 0
-				const maxAttempts = 3
-				let hasValidData = false
-
-				while (!hasValidData && attempts < maxAttempts) {
-					attempts++
-
-					await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-
-					if (serverData.value?.loader && serverData.value?.mc_version) {
-						hasValidData = true
-						serverData.value.status = 'available'
-						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', serverId] })
-						queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
-						break
-					}
-
-					await new Promise((resolve) => setTimeout(resolve, 2000))
-				}
-
-				if (!hasValidData) {
-					console.error('Failed to get valid server data after installation')
-				}
+				await Promise.all([
+					queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+					queryClient.invalidateQueries({ queryKey: ['servers', 'startup', serverId] }),
+					queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+				])
 			} catch (err: unknown) {
 				console.error('Error refreshing data after installation:', err)
 			}

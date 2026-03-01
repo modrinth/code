@@ -104,7 +104,7 @@ import {
 } from '@/providers/download-progress.ts'
 import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
-import { setupContentInstall } from '@/composables/content-install'
+import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import { useLoading, useTheming } from '@/store/state'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -402,22 +402,24 @@ const error = useError()
 const errorModal = ref()
 const minecraftAuthErrorModal = ref()
 
+const contentInstall = createContentInstall({ router, handleError })
+provideContentInstall(contentInstall)
 const {
-	contentInstallInstances,
-	contentInstallLoaders,
-	contentInstallGameVersions,
-	contentInstallLoading,
-	contentInstallDefaultTab,
-	contentInstallPreferredLoader,
-	contentInstallPreferredGameVersion,
-	contentInstallReleaseGameVersions,
+	instances: contentInstallInstances,
+	compatibleLoaders: contentInstallLoaders,
+	gameVersions: contentInstallGameVersions,
+	loading: contentInstallLoading,
+	defaultTab: contentInstallDefaultTab,
+	preferredLoader: contentInstallPreferredLoader,
+	preferredGameVersion: contentInstallPreferredGameVersion,
+	releaseGameVersions: contentInstallReleaseGameVersions,
 	handleInstallToInstance,
 	handleCreateAndInstall,
 	handleCancel: handleContentInstallCancel,
 	setContentInstallModal,
 	setInstallConfirmModal: setContentInstallConfirmModal,
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
-} = setupContentInstall({ router, handleError })
+} = contentInstall
 
 const modInstallModal = ref()
 const installConfirmModal = ref()

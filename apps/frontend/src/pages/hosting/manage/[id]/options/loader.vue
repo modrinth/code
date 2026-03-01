@@ -249,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -300,7 +300,7 @@ const isEditing = ref(false)
 const addonsQuery = useQuery({
 	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
 	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value ?? undefined),
+		client.archon.content_v1.getAddons(serverId, worldId.value!),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -370,75 +370,55 @@ const selectedLoaderVersion = ref<number>(0)
 const showSnapshots = ref(false)
 const isSaving = ref(false)
 
-interface LoaderVersionEntry {
-	id: string
-	stable: boolean
+type LoaderVersionEntry = LauncherMeta.Manifest.v0.LoaderVersion
+
+const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
+
+function toApiLoaderName(loader: string): string {
+	return loader === 'neoforge' ? 'neo' : loader
 }
 
-const loaderVersionsCache = ref<Record<string, { id: string; loaders: LoaderVersionEntry[] }[]>>({})
-const paperVersions = ref<Record<string, number[]>>({})
-const purpurVersions = ref<Record<string, string[]>>({})
+const apiLoaderName = computed(() =>
+	modLoaders.includes(selectedPlatform.value) ? toApiLoaderName(selectedPlatform.value) : null,
+)
 
-async function fetchLoaderManifest(loader: string) {
-	let apiLoader = loader
-	if (apiLoader === 'neoforge') apiLoader = 'neo'
+const manifestQuery = useQuery({
+	queryKey: computed(() => ['loader-manifest', apiLoaderName.value] as const),
+	queryFn: () => client.launchermeta.manifest_v0.getManifest(apiLoaderName.value!),
+	enabled: computed(() => !!apiLoaderName.value),
+	staleTime: 5 * 60 * 1000,
+})
 
-	if (loaderVersionsCache.value[apiLoader]) return
+const paperBuildsQuery = useQuery({
+	queryKey: computed(() => ['paper-builds', selectedGameVersion.value] as const),
+	queryFn: () => client.paper.versions_v3.getBuilds(selectedGameVersion.value),
+	enabled: computed(() => selectedPlatform.value === 'paper' && !!selectedGameVersion.value),
+	staleTime: 5 * 60 * 1000,
+})
 
-	try {
-		const res = await fetch(`https://launcher-meta.modrinth.com/${apiLoader}/v0/manifest.json`)
-		const data = (await res.json()) as {
-			gameVersions: { id: string; loaders: LoaderVersionEntry[] }[]
-		}
-		loaderVersionsCache.value[apiLoader] = data.gameVersions
-	} catch {
-		loaderVersionsCache.value[apiLoader] = []
-	}
-}
-
-async function fetchPaperVersions(mcVersion: string) {
-	if (paperVersions.value[mcVersion]) return
-	try {
-		const res = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
-		const data = (await res.json()) as { builds: number[] }
-		paperVersions.value[mcVersion] = data.builds.sort((a, b) => b - a)
-	} catch {
-		paperVersions.value[mcVersion] = []
-	}
-}
-
-async function fetchPurpurVersions(mcVersion: string) {
-	if (purpurVersions.value[mcVersion]) return
-	try {
-		const res = await fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
-		const data = (await res.json()) as { builds: { all: string[] } }
-		purpurVersions.value[mcVersion] = data.builds.all.sort((a, b) => parseInt(b) - parseInt(a))
-	} catch {
-		purpurVersions.value[mcVersion] = []
-	}
-}
+const purpurBuildsQuery = useQuery({
+	queryKey: computed(() => ['purpur-builds', selectedGameVersion.value] as const),
+	queryFn: () => client.purpur.versions_v2.getBuilds(selectedGameVersion.value),
+	enabled: computed(() => selectedPlatform.value === 'purpur' && !!selectedGameVersion.value),
+	staleTime: 5 * 60 * 1000,
+})
 
 function getLoaderVersionsForGameVersion(
 	loader: string,
 	gameVersion: string,
 ): LoaderVersionEntry[] {
-	let apiLoader = loader
-	if (apiLoader === 'neoforge') apiLoader = 'neo'
-
 	if (loader === 'paper') {
-		return (paperVersions.value[gameVersion] ?? []).map((b) => ({
-			id: String(b),
-			stable: true,
-		}))
+		return (paperBuildsQuery.data.value?.builds ?? [])
+			.toSorted((a, b) => b - a)
+			.map((b) => ({ id: String(b), stable: true }))
 	}
 	if (loader === 'purpur') {
-		return (purpurVersions.value[gameVersion] ?? []).map((b) => ({
-			id: b,
-			stable: true,
-		}))
+		return (purpurBuildsQuery.data.value?.builds.all ?? [])
+			.toSorted((a, b) => parseInt(b) - parseInt(a))
+			.map((b) => ({ id: b, stable: true }))
 	}
 
-	const manifest = loaderVersionsCache.value[apiLoader]
+	const manifest = manifestQuery.data.value?.gameVersions
 	if (!manifest) return []
 
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
@@ -454,10 +434,7 @@ const gameVersionsForLoader = computed(() => {
 		: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
 	if (selectedPlatform.value && selectedPlatform.value !== 'vanilla') {
-		let apiLoader = selectedPlatform.value
-		if (apiLoader === 'neoforge') apiLoader = 'neo'
-
-		const manifest = loaderVersionsCache.value[apiLoader]
+		const manifest = manifestQuery.data.value?.gameVersions
 		if (manifest) {
 			const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 			if (!hasPlaceholder) {
@@ -524,30 +501,12 @@ const isValid = computed(() => {
 	return true
 })
 
-watch(
-	selectedPlatform,
-	async (loader) => {
-		selectedLoaderVersion.value = 0
-		if (!loader || loader === 'vanilla') return
-		if (loader === 'paper') {
-			if (selectedGameVersion.value) await fetchPaperVersions(selectedGameVersion.value)
-		} else if (loader === 'purpur') {
-			if (selectedGameVersion.value) await fetchPurpurVersions(selectedGameVersion.value)
-		} else {
-			await fetchLoaderManifest(loader)
-		}
-	},
-	{ immediate: true },
-)
-
-watch(selectedGameVersion, async (gv) => {
+watch(selectedPlatform, () => {
 	selectedLoaderVersion.value = 0
-	if (!gv) return
-	if (selectedPlatform.value === 'paper') {
-		await fetchPaperVersions(gv)
-	} else if (selectedPlatform.value === 'purpur') {
-		await fetchPurpurVersions(gv)
-	}
+})
+
+watch(selectedGameVersion, () => {
+	selectedLoaderVersion.value = 0
 })
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
@@ -575,8 +534,8 @@ async function handleSave() {
 			soft_override: true,
 		}
 
-		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
-		server.value.status = 'installing'
+		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		isEditing.value = false
 	} catch (err) {
 		addNotification({
@@ -599,7 +558,7 @@ async function handleRepair() {
 			},
 			false,
 		)
-		server.value.status = 'installing'
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	} catch (err) {
 		addNotification({
 			type: 'error',
@@ -619,7 +578,7 @@ async function handleReinstallConfirm() {
 			},
 			true,
 		)
-		server.value.status = 'installing'
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		emit('reinstall')
 	} catch (err) {
 		addNotification({
@@ -631,7 +590,7 @@ async function handleReinstallConfirm() {
 
 async function handleUnlinkConfirm() {
 	try {
-		await client.archon.content_v1.unlinkModpack(serverId, worldId.value ?? undefined)
+		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),

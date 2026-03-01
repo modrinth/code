@@ -205,7 +205,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 	// TODO: POST server.properties fields (worldName, gamemode, difficulty, seed, etc.) once the endpoint is available
 
 	try {
-		await client.archon.content_v1.installContent(serverId, request, worldId.value ?? undefined)
+		await client.archon.content_v1.installContent(serverId, worldId.value!, request)
 		server.value.status = 'installing'
 		await finalizeSetup()
 	} catch {

@@ -1,6 +1,5 @@
 import type { StageConfigInput } from '../../../base'
 import type { CreationFlowContextValue } from '../creation-flow-context'
-import { stageConfig as confirmStageConfig } from './confirm-stage'
 import { stageConfig as customSetupStageConfig } from './custom-setup-stage'
 import { stageConfig as finalConfigStageConfig } from './final-config-stage'
 import { stageConfig as importInstanceStageConfig } from './import-instance-stage'
@@ -13,5 +12,4 @@ export const stageConfigs: StageConfigInput<CreationFlowContextValue>[] = [
 	importInstanceStageConfig,
 	customSetupStageConfig,
 	finalConfigStageConfig,
-	confirmStageConfig,
 ]

@@ -6,9 +6,10 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project, get_version } from '@/helpers/cache.js'
 import { get_categories } from '@/helpers/tags.js'
-import { install as installVersion } from '@/composables/content-install'
+import { injectContentInstall } from '@/providers/content-install'
 
 const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
 
 const confirmModal = ref(null)
 const project = ref(null)
