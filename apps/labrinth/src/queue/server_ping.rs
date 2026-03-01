@@ -4,6 +4,7 @@ use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::exp;
 use crate::models::ids::ProjectId;
+use crate::models::projects::ProjectStatus;
 use crate::{database::PgPool, util::error::Context};
 use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
@@ -14,7 +15,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use tracing::{Instrument, info, info_span, trace, warn};
+use tracing::{Instrument, debug, info, info_span, trace, warn};
 
 pub struct ServerPingQueue {
     pub db: PgPool,
@@ -167,8 +168,14 @@ impl ServerPingQueue {
             r#"
             SELECT id, components AS "components: Json<exp::ProjectSerial>"
             FROM mods
-            WHERE components ? 'minecraft_java_server'
-            "#
+            WHERE
+                status = ANY($1)
+                AND components ? 'minecraft_java_server'
+            "#,
+            &ProjectStatus::iterator()
+                .filter(|s| s.is_searchable())
+                .map(|s| s.to_string())
+                .collect::<Vec<_>>()
         )
         .fetch_all(&self.db)
         .await
@@ -247,8 +254,9 @@ pub async fn ping_server(
     port: u16,
 ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
     let start = Instant::now();
+    let timeout = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
 
-    let task = async move {
+    let task1 = async move {
         let conn = async_minecraft_ping::ConnectionConfig::build(address)
             .with_port(port)
             .connect()
@@ -261,7 +269,8 @@ pub async fn ping_server(
             .wrap_err("failed to get server status")?
             .status;
 
-        Ok(exp::minecraft::JavaServerPingData {
+        debug!("Successful ping with `async_minecraft_ping`");
+        eyre::Ok(exp::minecraft::JavaServerPingData {
             latency: start.elapsed(),
             version_name: status.version.name,
             version_protocol: status.version.protocol,
@@ -273,12 +282,61 @@ pub async fn ping_server(
             players_max: status.players.max,
         })
     };
+    let task1 = tokio::time::timeout(timeout, task1);
 
-    let timeout = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
-    tokio::time::timeout(timeout, task)
-        .await
-        .wrap_err("server ping timed out")
-        .flatten()
+    let task2 = async move {
+        fn map_component(c: elytra_ping::parse::TextComponent) -> String {
+            match c {
+                elytra_ping::parse::TextComponent::Plain(t) => t,
+                elytra_ping::parse::TextComponent::Fancy(t) => {
+                    t.text.unwrap_or_default()
+                }
+                elytra_ping::parse::TextComponent::Extra(e) => e
+                    .into_iter()
+                    .map(map_component)
+                    .collect::<Vec<String>>()
+                    .join(""),
+            }
+        }
+
+        let (result, latency) =
+            elytra_ping::ping_or_timeout((address.to_string(), port), timeout)
+                .await?;
+
+        debug!("Successful ping with `elytra_ping`");
+        eyre::Ok(exp::minecraft::JavaServerPingData {
+            latency,
+            version_name: result
+                .version
+                .as_ref()
+                .map(|v| v.name.to_string())
+                .unwrap_or_default(),
+            version_protocol: result
+                .version
+                .as_ref()
+                .map(|v| v.protocol.cast_unsigned())
+                .unwrap_or_default(),
+            description: map_component(result.description),
+            players_online: result
+                .players
+                .as_ref()
+                .map(|p| p.online)
+                .unwrap_or(0),
+            players_max: result.players.as_ref().map(|p| p.max).unwrap_or(0),
+        })
+    };
+
+    async move {
+        if let Ok(t) = task1
+            .await
+            .wrap_err("failed to ping with `async_minecraft_ping`")?
+        {
+            return Ok(t);
+        }
+
+        task2.await.wrap_err("failed to ping with `elytra_ping`")
+    }
+    .await
 }
 
 #[derive(Debug, Row, Serialize, Clone)]

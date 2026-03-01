@@ -12,6 +12,7 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
+elytra-ping = { workspace = true }
 actix-http = { workspace = true }
 actix-multipart = { workspace = true }
 actix-rt = { workspace = true }
