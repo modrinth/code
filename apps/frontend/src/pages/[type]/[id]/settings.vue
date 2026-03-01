@@ -138,8 +138,9 @@ watch(route, () => {
 	<div class="mb-8 flex w-full flex-col gap-4">
 		<ModerationProjectNags
 			v-if="
-				(currentMember && project.status === 'draft') ||
-				tags.rejectedStatuses.includes(project.status)
+				projectV3 &&
+				((currentMember && project.status === 'draft') ||
+					tags.rejectedStatuses.includes(project.status))
 			"
 			:project="project"
 			:project-v3="projectV3"

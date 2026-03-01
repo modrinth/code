@@ -9,18 +9,23 @@ const links: Stage = {
 	icon: LinkIcon,
 	guidance_url: 'https://modrinth.com/legal/rules',
 	navigate: '/settings/links',
-	shouldShow: (project) =>
+	shouldShow: (project, projectV3) =>
 		Boolean(
 			project.issues_url ||
 			project.source_url ||
 			project.wiki_url ||
 			project.discord_url ||
+			projectV3?.link_urls?.site ||
+			projectV3?.link_urls?.store ||
 			project.donation_urls.length > 0,
 		),
-	text: async (project) => {
-		let text = (await import('../messages/checklist-text/links/base.md?raw')).default
+	text: async (project, projectV3) => {
+		let text
+		if (!!projectV3?.minecraft_server)
+			text = (await import('../messages/checklist-text/links/server.md?raw')).default
+		else text = (await import('../messages/checklist-text/links/base.md?raw')).default
 
-		if (project.donation_urls.length > 0) {
+		if (project.donation_urls && project.donation_urls.length > 0) {
 			text += (await import('../messages/checklist-text/links/donation/donations.md?raw')).default
 
 			for (const donation of project.donation_urls) {

@@ -40,7 +40,18 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			suggestedStatus: 'flagged',
 			disablesActions: ['status_corrections_applied', 'status_account_issues'],
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/status-alerts/private.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'status_server_use',
+			type: 'button',
+			label: 'Server use',
+			weight: -999999,
+			suggestedStatus: 'flagged',
+			disablesActions: ['status_corrections_applied', 'status_account_issues'],
+			shouldShow: (project) => project.project_type === 'modpack',
+			message: async () => (await import('../messages/status-alerts/serverpack.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'status_account_issues',
@@ -94,6 +105,14 @@ const statusAlerts: Stage = {
 			weight: -999999,
 			message: async () =>
 				(await import('../messages/status-alerts/automod_confusion.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'status_serverpack',
+			type: 'button',
+			label: `Serverpack`,
+			weight: -999999,
+			shouldShow: (project) => project.project_type === 'modpack',
+			message: async () => (await import('../messages/status-alerts/serverpack.md?raw')).default,
 		} as ButtonAction,
 	],
 }
