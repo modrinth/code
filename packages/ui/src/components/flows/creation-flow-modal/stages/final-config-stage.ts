@@ -1,4 +1,4 @@
-import { DownloadIcon, LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
+import { LeftArrowIcon, PlusIcon, RightArrowIcon } from '@modrinth/assets'
 import { markRaw } from 'vue'
 
 import type { StageConfigInput } from '../../../base'

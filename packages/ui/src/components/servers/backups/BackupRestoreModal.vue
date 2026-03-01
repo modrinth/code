@@ -58,7 +58,8 @@ const ctx = injectModrinthServerContext()
 
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
 const restoreMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.restore(ctx.serverId, ctx.worldId.value!, backupId),
+	mutationFn: (backupId: string) =>
+		client.archon.backups_v1.restore(ctx.serverId, ctx.worldId.value!, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

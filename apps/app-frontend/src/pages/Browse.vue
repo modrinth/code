@@ -181,7 +181,6 @@ const activeGameVersion = computed(() => {
 	return instance.value?.game_version ?? null
 })
 
-
 const previousFilterState = ref('')
 
 const offline = ref(!navigator.onLine)

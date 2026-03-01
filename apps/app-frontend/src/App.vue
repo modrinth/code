@@ -98,13 +98,13 @@ import {
 	isNetworkMetered,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
+import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
 import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
-import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import { useLoading, useTheming } from '@/store/state'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'

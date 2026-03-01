@@ -18,8 +18,6 @@ export class PurpurVersionsV2Module extends AbstractModule {
 	 * @param mcVersion - Minecraft version (e.g. "1.21.4")
 	 */
 	public async getBuilds(mcVersion: string): Promise<Purpur.Versions.v2.VersionBuilds> {
-		return $fetch<Purpur.Versions.v2.VersionBuilds>(
-			`${BASE_URL}/purpur/${mcVersion}`,
-		)
+		return $fetch<Purpur.Versions.v2.VersionBuilds>(`${BASE_URL}/purpur/${mcVersion}`)
 	}
 }

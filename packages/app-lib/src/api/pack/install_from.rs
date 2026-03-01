@@ -311,7 +311,8 @@ pub async fn generate_pack_from_version_id(
 
     // Set the icon immediately so the UI shows it during download.
     if let Some(ref icon_path) = icon {
-        let _ = profile::edit_icon(&profile_path, Some(icon_path.as_path())).await;
+        let _ =
+            profile::edit_icon(&profile_path, Some(icon_path.as_path())).await;
     }
 
     Ok(CreatePack {

@@ -187,7 +187,8 @@ const {
 })
 
 const deleteMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
+	mutationFn: (backupId: string) =>
+		client.archon.backups_v1.delete(serverId, worldId.value!, backupId),
 	onSuccess: (_data, backupId) => {
 		markBackupCancelled(backupId)
 		backupsState.delete(backupId)
@@ -196,7 +197,8 @@ const deleteMutation = useMutation({
 })
 
 const retryMutation = useMutation({
-	mutationFn: (backupId: string) => client.archon.backups_v1.retry(serverId, worldId.value!, backupId),
+	mutationFn: (backupId: string) =>
+		client.archon.backups_v1.retry(serverId, worldId.value!, backupId),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

@@ -104,7 +104,7 @@ const [
 
 const queryClient = useQueryClient()
 
-const { data: modpackInfo, isFetching: fetching } = useQuery({
+const { data: modpackInfo } = useQuery({
 	queryKey: computed(() => ['linkedModpackInfo', props.instance.path]),
 	queryFn: () => get_linked_modpack_info(props.instance.path, 'must_revalidate'),
 	enabled: computed(() => !!props.instance.linked_data?.project_id && !props.offline),
@@ -476,7 +476,7 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'instance.settings.tabs.installation.reinstall.description',
 		defaultMessage:
-			'Re-installing the modpack resets the instance\'s content to its original state, removing any mods or content you have added.',
+			"Re-installing the modpack resets the instance's content to its original state, removing any mods or content you have added.",
 	},
 	editWarning: {
 		id: 'instance.settings.tabs.installation.edit.warning',
@@ -533,10 +533,7 @@ const messages = defineMessages({
 				<span class="text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.installedModpackTitle) }}
 				</span>
-				<div
-					v-if="modpackInfo"
-					class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
-				>
+				<div v-if="modpackInfo" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
 					<AutoLink
 						:to="`/project/${modpackInfo.project.slug ?? modpackInfo.project.id}`"
 						class="shrink-0"

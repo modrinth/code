@@ -237,10 +237,7 @@ watch(
 	gameVersionOptions,
 	(options) => {
 		if (options.length === 0) return
-		if (
-			!selectedGameVersion.value ||
-			!options.some((o) => o.value === selectedGameVersion.value)
-		) {
+		if (!selectedGameVersion.value || !options.some((o) => o.value === selectedGameVersion.value)) {
 			selectedGameVersion.value = options[0].value
 		}
 	},

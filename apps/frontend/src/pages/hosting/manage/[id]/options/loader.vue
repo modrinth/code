@@ -18,10 +18,7 @@
 
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">Installed modpack</span>
-					<div
-						v-if="modpack"
-						class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
-					>
+					<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
 						<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
 							<div
 								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
@@ -272,10 +269,10 @@ import {
 	ChevronRightIcon,
 	CircleAlertIcon,
 	DownloadIcon,
-	PencilIcon,
 	EyeIcon,
 	EyeOffIcon,
 	HammerIcon,
+	PencilIcon,
 	RotateCounterClockwiseIcon,
 	SaveIcon,
 	SpinnerIcon,
@@ -317,8 +314,7 @@ const isEditing = ref(false)
 
 const addonsQuery = useQuery({
 	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
-	queryFn: () =>
-		client.archon.content_v1.getAddons(serverId, worldId.value!),
+	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -347,9 +343,13 @@ const installationInfo = computed(() => {
 })
 
 const versionsQuery = useQuery({
-	queryKey: computed(() => ['content', 'loader', 'versions', modpack.value?.spec.project_id ?? null]),
-	queryFn: () =>
-		client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id),
+	queryKey: computed(() => [
+		'content',
+		'loader',
+		'versions',
+		modpack.value?.spec.project_id ?? null,
+	]),
+	queryFn: () => client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id),
 	enabled: computed(() => !!modpack.value?.spec.project_id),
 })
 

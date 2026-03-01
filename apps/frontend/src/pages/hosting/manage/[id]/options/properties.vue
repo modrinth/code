@@ -1,9 +1,6 @@
 <template>
 	<div class="relative h-full w-full select-none overflow-y-auto">
-		<div
-			v-if="propsData"
-			class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
-		>
+		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
 			<div class="card flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
@@ -148,7 +145,7 @@ import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { server, serverId } = injectModrinthServerContext()
+const { serverId } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 
 const tags = useGeneratedState()

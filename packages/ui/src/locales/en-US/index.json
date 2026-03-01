@@ -476,33 +476,6 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
-  "installation-settings.change-version": {
-    "defaultMessage": "Change version"
-  },
-  "installation-settings.game-version": {
-    "defaultMessage": "Game version"
-  },
-  "installation-settings.hide-snapshots": {
-    "defaultMessage": "Hide snapshots"
-  },
-  "installation-settings.installation-info": {
-    "defaultMessage": "Installation info"
-  },
-  "installation-settings.installed-modpack": {
-    "defaultMessage": "Installed modpack"
-  },
-  "installation-settings.loader-version": {
-    "defaultMessage": "{loader} version"
-  },
-  "installation-settings.platform": {
-    "defaultMessage": "Platform"
-  },
-  "installation-settings.show-all-versions": {
-    "defaultMessage": "Show all versions"
-  },
-  "installation-settings.unlink": {
-    "defaultMessage": "Unlink"
-  },
   "instance.confirm-reinstall.admonition-body": {
     "defaultMessage": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation."
   },
@@ -517,6 +490,24 @@
   },
   "instance.confirm-reinstall.warning-body": {
     "defaultMessage": "We recommend creating a backup before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them."
+  },
+  "instance.confirm-repair.admonition-body": {
+    "defaultMessage": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."
+  },
+  "instance.confirm-repair.admonition-header": {
+    "defaultMessage": "Repair warning"
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Repair instance"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Repair"
+  },
+  "instance.confirm-repair.server-admonition-body": {
+    "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
+  },
+  "instance.confirm-repair.server-header": {
+    "defaultMessage": "Repair server"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
@@ -538,9 +529,6 @@
   },
   "instances.content-install.existing-tab": {
     "defaultMessage": "Existing instance"
-  },
-  "instances.content-install.no-instances": {
-    "defaultMessage": "No compatible instances found"
   },
   "instances.content-install.game-version-label": {
     "defaultMessage": "Game version"
@@ -577,6 +565,9 @@
   },
   "instances.content-install.new-tab": {
     "defaultMessage": "New instance"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "No compatible instances found"
   },
   "instances.content-install.remove-icon": {
     "defaultMessage": "Remove icon"

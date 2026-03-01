@@ -357,7 +357,6 @@ import {
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,
-	InstallingBanner,
 	provideModrinthServerContext,
 	ServerIcon,
 	ServerInfoLabels,
@@ -474,9 +473,9 @@ const markBackupCancelled = (backupId: string) => {
 // Parthenon state event
 const serverReadiness = ref<Archon.Websocket.v0.ReadinessState | null>(null)
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
-const isSyncingContent = computed(
-	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
-)
+// const isSyncingContent = computed(
+// 	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
+// )
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -724,7 +723,8 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			starting: 'starting',
 			running: 'running',
 			stopping: 'stopping',
-			idle: data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
+			idle:
+				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
 		}
 	updatePowerState(powerMap[data.power_variant], {
 		exit_code: data.exit_code ?? undefined,

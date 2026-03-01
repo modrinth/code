@@ -65,7 +65,8 @@ const queryKey = computed(() => ['content', 'list', 'v1', serverId])
 
 const contentQuery = useQuery({
 	queryKey,
-	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
+	queryFn: () =>
+		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -131,11 +132,10 @@ const contentItems = computed<ContentItem[]>(() => {
 
 const deleteMutation = useMutation({
 	mutationFn: ({ addon }: { addon: Archon.Content.v1.Addon }) =>
-		client.archon.content_v1.deleteAddon(
-			serverId,
-			worldId.value!,
-			{ filename: addon.filename, kind: addon.kind },
-		),
+		client.archon.content_v1.deleteAddon(serverId, worldId.value!, {
+			filename: addon.filename,
+			kind: addon.kind,
+		}),
 	onMutate: async ({ addon }) => {
 		await queryClient.cancelQueries({ queryKey: queryKey.value })
 		const previousData = queryClient.getQueryData<Archon.Content.v1.Addons>(queryKey.value)
@@ -332,11 +332,9 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 async function handleViewModpackContent() {
 	modpackContentModal.value?.showLoading()
 	try {
-		const data = await client.archon.content_v1.getAddons(
-			serverId,
-			worldId.value!,
-			{ from_modpack: true },
-		)
+		const data = await client.archon.content_v1.getAddons(serverId, worldId.value!, {
+			from_modpack: true,
+		})
 		const items = (data.addons ?? []).map(addonToContentItem)
 		modpackContentModal.value?.show(items)
 	} catch (err) {
@@ -374,11 +372,9 @@ async function handleUpdateItem(fileNameKey: string) {
 	const addon = addonLookup.value.get(fileNameKey)
 	if (!addon) return
 	try {
-		await client.archon.content_v1.updateAddon(
-			serverId,
-			worldId.value!,
-			{ filename: addon.filename },
-		)
+		await client.archon.content_v1.updateAddon(serverId, worldId.value!, {
+			filename: addon.filename,
+		})
 		await contentQuery.refetch()
 	} catch (err) {
 		addNotification({

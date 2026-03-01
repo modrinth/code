@@ -21,8 +21,8 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
-	CreationFlowModal,
 	type CreationFlowContextValue,
+	CreationFlowModal,
 	defineMessages,
 	DropdownSelect,
 	injectModrinthClient,
@@ -171,11 +171,10 @@ const installContentMutation = useMutation({
 		projectId: string
 		versionId: string
 	}) =>
-		client.archon.content_v1.addAddon(
-			serverId,
-			currentWorldId.value!,
-			{ project_id: projectId, version_id: versionId },
-		),
+		client.archon.content_v1.addAddon(serverId, currentWorldId.value!, {
+			project_id: projectId,
+			version_id: versionId,
+		}),
 	onSuccess: () => {
 		if (currentServerId.value) {
 			queryClient.invalidateQueries({ queryKey: ['content', 'list', currentServerId.value] })
@@ -394,15 +393,11 @@ async function serverInstall(project: InstallableSearchResult) {
 				}
 				return
 			}
-			await client.archon.content_v1.installContent(
-				currentServerId.value,
-				currentWorldId.value!,
-				{
-					content_variant: 'modpack',
-					spec: { platform: 'modrinth', project_id: project.project_id, version_id: version.id },
-					soft_override: !eraseDataOnInstall.value,
-				},
-			)
+			await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value!, {
+				content_variant: 'modpack',
+				spec: { platform: 'modrinth', project_id: project.project_id, version_id: version.id },
+				soft_override: !eraseDataOnInstall.value,
+			})
 			project.installed = true
 			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
 		} else if (projectType.value?.id === 'mod' || projectType.value?.id === 'plugin') {
@@ -567,19 +562,15 @@ async function onOnboardingCreate(config: CreationFlowContextValue) {
 	if (!currentServerId.value || !config.modpackSelection.value) return
 
 	try {
-		await client.archon.content_v1.installContent(
-			currentServerId.value,
-			currentWorldId.value!,
-			{
-				content_variant: 'modpack',
-				spec: {
-					platform: 'modrinth',
-					project_id: config.modpackSelection.value.projectId,
-					version_id: config.modpackSelection.value.versionId,
-				},
-				soft_override: false,
-			} satisfies Archon.Content.v1.InstallWorldContent,
-		)
+		await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value!, {
+			content_variant: 'modpack',
+			spec: {
+				platform: 'modrinth',
+				project_id: config.modpackSelection.value.projectId,
+				version_id: config.modpackSelection.value.versionId,
+			},
+			soft_override: false,
+		} satisfies Archon.Content.v1.InstallWorldContent)
 		await client.archon.servers_v1.endIntro(currentServerId.value)
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
 		navigateTo(`/hosting/manage/${currentServerId.value}/content`)

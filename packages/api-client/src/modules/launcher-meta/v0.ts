@@ -18,8 +18,6 @@ export class LauncherMetaManifestV0Module extends AbstractModule {
 	 * @param loader - Loader platform (fabric, forge, quilt, neo)
 	 */
 	public async getManifest(loader: string): Promise<LauncherMeta.Manifest.v0.Manifest> {
-		return $fetch<LauncherMeta.Manifest.v0.Manifest>(
-			`${BASE_URL}/${loader}/v0/manifest.json`,
-		)
+		return $fetch<LauncherMeta.Manifest.v0.Manifest>(`${BASE_URL}/${loader}/v0/manifest.json`)
 	}
 }

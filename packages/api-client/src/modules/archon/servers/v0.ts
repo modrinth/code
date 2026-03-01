@@ -301,5 +301,4 @@ export class ArchonServersV0Module extends AbstractModule {
 			version: 'modrinth/v0',
 		})
 	}
-
 }

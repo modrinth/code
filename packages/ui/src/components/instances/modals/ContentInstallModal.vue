@@ -30,9 +30,9 @@
 				/>
 				<ButtonStyled type="outlined" circular>
 					<button
-						@click="hideIncompatible = !hideIncompatible"
-						class="!border-surface-4 !border"
 						v-tooltip="`${hideIncompatible ? 'Show' : 'Hide'} incompatible`"
+						class="!border-surface-4 !border"
+						@click="hideIncompatible = !hideIncompatible"
 					>
 						<EyeIcon v-if="hideIncompatible" />
 						<EyeOffIcon v-else />
@@ -59,10 +59,10 @@
 					"
 				>
 					<div
-						class="flex items-center gap-2 overflow-hidden"
 						v-tooltip="
 							!inst.compatible ? 'This instance is not compatible with this project' : undefined
 						"
+						class="flex items-center gap-2 overflow-hidden"
 					>
 						<Avatar :src="inst.iconUrl ?? undefined" size="20px" rounded="md" />
 						<span class="truncate font-semibold text-contrast">{{ inst.name }}</span>
@@ -171,7 +171,7 @@
 					</span>
 				</div>
 				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()" class="!border-surface-4 !border">
+					<button class="!border-surface-4 !border" @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
@@ -180,7 +180,7 @@
 
 			<div v-else class="flex items-center justify-end gap-2">
 				<ButtonStyled type="outlined">
-					<button @click="modal?.hide()" class="!border-surface-4 !border">
+					<button class="!border-surface-4 !border" @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>

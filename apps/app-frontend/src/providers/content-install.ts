@@ -1,8 +1,9 @@
+import type { Labrinth } from '@modrinth/api-client'
 import type { ContentInstallInstance } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-import { type Ref, nextTick, ref } from 'vue'
+import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
@@ -17,8 +18,36 @@ import {
 	list,
 	remove_project,
 } from '@/helpers/profile.js'
-import { findPreferredVersion, installVersionDependencies, isVersionCompatible } from '@/store/install.js'
 import { get_game_versions } from '@/helpers/tags'
+import {
+	findPreferredVersion,
+	installVersionDependencies,
+	isVersionCompatible,
+} from '@/store/install.js'
+
+interface ModalRef {
+	show: () => void
+	hide: () => void
+}
+
+interface InstallConfirmModalRef {
+	show: (
+		project: Labrinth.Projects.v2.Project,
+		version: string,
+		callback: (versionId?: string) => void,
+		createInstanceCallback: (profile: string) => void,
+	) => void
+}
+
+interface IncompatibilityWarningModalRef {
+	show: (
+		instance: GameInstance,
+		project: Labrinth.Projects.v2.Project,
+		versions: Labrinth.Versions.v2.Version[],
+		version: Labrinth.Versions.v2.Version,
+		callback: (versionId?: string) => void,
+	) => void
+}
 
 const LOADER_ORDER = ['vanilla', 'fabric', 'quilt', 'neoforge', 'forge']
 const SUPPORTED_LOADERS: Set<string> = new Set(['vanilla', 'forge', 'fabric', 'quilt', 'neoforge'])
@@ -53,9 +82,9 @@ export interface ContentInstallContext {
 		gameVersion: string
 	}) => Promise<void>
 	handleCancel: () => void
-	setContentInstallModal: (ref: any) => void
-	setInstallConfirmModal: (ref: any) => void
-	setIncompatibilityWarningModal: (ref: any) => void
+	setContentInstallModal: (ref: ModalRef) => void
+	setInstallConfirmModal: (ref: InstallConfirmModalRef) => void
+	setIncompatibilityWarningModal: (ref: IncompatibilityWarningModalRef) => void
 	install: (
 		projectId: string,
 		versionId?: string | null,
@@ -67,12 +96,14 @@ export interface ContentInstallContext {
 	) => Promise<void>
 }
 
-export const [injectContentInstall, provideContentInstall] =
-	createContext<ContentInstallContext>('root', 'contentInstall')
+export const [injectContentInstall, provideContentInstall] = createContext<ContentInstallContext>(
+	'root',
+	'contentInstall',
+)
 
 export function createContentInstall(opts: {
 	router: Router
-	handleError: (err: any) => void
+	handleError: (err: unknown) => void
 }): ContentInstallContext {
 	const instances = ref<ContentInstallInstance[]>([])
 	const compatibleLoaders = ref<string[]>([])
@@ -83,17 +114,17 @@ export function createContentInstall(opts: {
 	const preferredGameVersion = ref<string | null>(null)
 	const releaseGameVersions = ref<Set<string>>(new Set())
 
-	let modalRef: { show: () => void; hide: () => void } | null = null
-	let installConfirmModalRef: any = null
-	let incompatibilityWarningModalRef: any = null
-	let currentProject: any = null
-	let currentVersions: any[] = []
+	let modalRef: ModalRef | null = null
+	let installConfirmModalRef: InstallConfirmModalRef | null = null
+	let incompatibilityWarningModalRef: IncompatibilityWarningModalRef | null = null
+	let currentProject: Labrinth.Projects.v2.Project | null = null
+	let currentVersions: Labrinth.Versions.v2.Version[] = []
 	let currentCallback: (versionId?: string) => void = () => {}
-	let profileMap: Record<string, any> = {}
+	let profileMap: Record<string, GameInstance> = {}
 
 	async function showModInstallModal(
-		project: any,
-		versions: any[],
+		project: Labrinth.Projects.v2.Project,
+		versions: Labrinth.Versions.v2.Version[],
 		onInstall: (versionId?: string) => void,
 		hints?: { preferredLoader?: string; preferredGameVersion?: string },
 	) {
@@ -138,9 +169,7 @@ export function createContentInstall(opts: {
 		}
 
 		preferredLoader.value =
-			hints?.preferredLoader && loaderSet.has(hints.preferredLoader)
-				? hints.preferredLoader
-				: null
+			hints?.preferredLoader && loaderSet.has(hints.preferredLoader) ? hints.preferredLoader : null
 		preferredGameVersion.value =
 			hints?.preferredGameVersion && gameVersionSet.has(hints.preferredGameVersion)
 				? hints.preferredGameVersion
@@ -152,26 +181,22 @@ export function createContentInstall(opts: {
 
 		try {
 			const profiles = await list()
-			const newProfileMap: Record<string, any> = {}
+			const newProfileMap: Record<string, GameInstance> = {}
 			const installedChecks = await Promise.all(
-				profiles.map((profile: any) => check_installed(profile.path, project.id)),
+				profiles.map((profile) => check_installed(profile.path, project.id)),
 			)
 
-			const newInstances: ContentInstallInstance[] = profiles.map(
-				(profile: any, i: number) => {
-					newProfileMap[profile.path] = profile
-					return {
-						id: profile.path,
-						name: profile.name,
-						iconUrl: profile.icon_path ? convertFileSrc(profile.icon_path) : null,
-						installed: installedChecks[i],
-						compatible: versions.some((v: any) =>
-							isVersionCompatible(v, project, profile),
-						),
-						installing: false,
-					}
-				},
-			)
+			const newInstances: ContentInstallInstance[] = profiles.map((profile, i: number) => {
+				newProfileMap[profile.path] = profile
+				return {
+					id: profile.path,
+					name: profile.name,
+					iconUrl: profile.icon_path ? convertFileSrc(profile.icon_path) : null,
+					installed: installedChecks[i],
+					compatible: versions.some((v) => isVersionCompatible(v, project, profile)),
+					installing: false,
+				}
+			})
 
 			profileMap = newProfileMap
 			instances.value = newInstances
@@ -231,12 +256,10 @@ export function createContentInstall(opts: {
 		gameVersion: string
 	}) {
 		const loaderCandidates =
-			data.loader === 'vanilla'
-				? ['vanilla', 'datapack', 'minecraft']
-				: [data.loader]
+			data.loader === 'vanilla' ? ['vanilla', 'datapack', 'minecraft'] : [data.loader]
 		const version =
 			currentVersions.find(
-				(v: any) =>
+				(v) =>
 					v.game_versions.includes(data.gameVersion) &&
 					loaderCandidates.some((l) => v.loaders.includes(l)),
 			) ?? currentVersions[0]
@@ -245,7 +268,7 @@ export function createContentInstall(opts: {
 			const id = await create(
 				data.name,
 				data.gameVersion,
-				data.loader as any,
+				data.loader as InstanceLoader,
 				'latest',
 				data.iconPath,
 				false,
@@ -291,7 +314,7 @@ export function createContentInstall(opts: {
 		createInstanceCallback: (profile: string) => void = () => {},
 		hints?: { preferredLoader?: string; preferredGameVersion?: string },
 	) {
-		const project = await get_project(projectId, 'must_revalidate')
+		const project: Labrinth.Projects.v2.Project = await get_project(projectId, 'must_revalidate')
 
 		if (project.project_type === 'modpack') {
 			const version = versionId ?? project.versions[project.versions.length - 1]
@@ -299,7 +322,7 @@ export function createContentInstall(opts: {
 
 			if (
 				packs.length === 0 ||
-				!packs.find((pack: any) => pack.linked_data?.project_id === project.id)
+				!packs.find((pack) => pack.linked_data?.project_id === project.id)
 			) {
 				await packInstall(
 					project.id,
@@ -322,23 +345,24 @@ export function createContentInstall(opts: {
 			const [instanceOrNull, instanceProjects, versions] = await Promise.all([
 				get(instancePath),
 				get_projects(instancePath),
-				get_version_many(project.versions, 'must_revalidate'),
+				get_version_many(project.versions, 'must_revalidate') as Promise<
+					Labrinth.Versions.v2.Version[]
+				>,
 			])
 			if (!instanceOrNull) return
 
 			const instance = instanceOrNull
 			const projectVersions = versions.sort(
-				(a: any, b: any) =>
-					dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
+				(a, b) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 			)
 
 			let version = versionId
-				? projectVersions.find((v: any) => v.id === versionId)
+				? projectVersions.find((v) => v.id === versionId)
 				: findPreferredVersion(projectVersions, project, instance)
 			if (!version) version = projectVersions[0]
 
 			if (isVersionCompatible(version, project, instance)) {
-				for (const [path, file] of Object.entries(instanceProjects) as [string, any][]) {
+				for (const [path, file] of Object.entries(instanceProjects)) {
 					if (file.metadata?.project_id === project.id) {
 						await remove_project(instance.path, path)
 					}
@@ -358,20 +382,13 @@ export function createContentInstall(opts: {
 				})
 				callback(version.id)
 			} else {
-				incompatibilityWarningModalRef?.show(
-					instance,
-					project,
-					projectVersions,
-					version,
-					callback,
-				)
+				incompatibilityWarningModalRef?.show(instance, project, projectVersions, version, callback)
 			}
 		} else {
-			let versions = (await get_version_many(project.versions)).sort(
-				(a: any, b: any) =>
-					dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
-			)
-			if (versionId) versions = versions.filter((v: any) => v.id === versionId)
+			let versions = (
+				(await get_version_many(project.versions)) as Labrinth.Versions.v2.Version[]
+			).sort((a, b) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf())
+			if (versionId) versions = versions.filter((v) => v.id === versionId)
 			await showModInstallModal(project, versions, callback, hints)
 		}
 	}
@@ -388,13 +405,13 @@ export function createContentInstall(opts: {
 		handleInstallToInstance,
 		handleCreateAndInstall,
 		handleCancel,
-		setContentInstallModal(ref: any) {
+		setContentInstallModal(ref: ModalRef) {
 			modalRef = ref
 		},
-		setInstallConfirmModal(ref: any) {
+		setInstallConfirmModal(ref: InstallConfirmModalRef) {
 			installConfirmModalRef = ref
 		},
-		setIncompatibilityWarningModal(ref: any) {
+		setIncompatibilityWarningModal(ref: IncompatibilityWarningModalRef) {
 			incompatibilityWarningModalRef = ref
 		},
 		install,
