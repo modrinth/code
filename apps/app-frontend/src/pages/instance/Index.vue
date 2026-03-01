@@ -64,7 +64,7 @@
 
 							<ServerRegion v-if="minecraftServer?.country" :region="minecraftServer?.country" />
 
-							<ServerPing :ping="ping" />
+							<ServerPing v-if="ping" :ping="ping" />
 
 							<div
 								v-if="modpackContentProjectV3 && (minecraftServer?.country || ping)"

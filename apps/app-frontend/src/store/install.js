@@ -19,7 +19,12 @@ import {
 	list,
 	remove_project,
 } from '@/helpers/profile.js'
-import { add_server_to_profile, get_profile_worlds, start_join_server } from '@/helpers/worlds.ts'
+import {
+	add_server_to_profile,
+	edit_server_in_profile,
+	get_profile_worlds,
+	start_join_server,
+} from '@/helpers/worlds.ts'
 import router from '@/routes.js'
 import { handleSevereError } from '@/store/error.js'
 
@@ -323,7 +328,7 @@ export const installServerProject = async (serverProjectId) => {
 	})
 	await edit_icon(profilePath, originalIconPath)
 
-	await addServerAsWorld(profilePath, project.title, serverAddress)
+	await syncServerAsWorld(profilePath, project.title, serverAddress, serverProjectId)
 }
 
 export const getServerAddress = (javaServer) => {
@@ -332,13 +337,45 @@ export const getServerAddress = (javaServer) => {
 	return port !== 25565 ? `${address}:${port}` : address
 }
 
-const addServerAsWorld = async (profilePath, serverName, serverAddress) => {
+const syncServerAsWorld = async (
+	profilePath,
+	serverName,
+	serverAddress,
+	serverProjectId = null,
+) => {
 	if (!profilePath || !serverAddress) return
 	try {
 		const worlds = await get_profile_worlds(profilePath)
+
+		if (serverProjectId) {
+			// Check if a linked world for this project already exists
+			const linkedWorld = worlds.find(
+				(w) => w.type === 'server' && w.linked_project_id === serverProjectId,
+			)
+			if (linkedWorld) {
+				// Sync linked world data with project details
+				if (linkedWorld.address !== serverAddress || linkedWorld.name !== serverName) {
+					await edit_server_in_profile(
+						profilePath,
+						linkedWorld.index,
+						serverName,
+						serverAddress,
+						linkedWorld.pack_status,
+					)
+				}
+				return
+			}
+		}
+
 		const alreadyExists = worlds.some((w) => w.type === 'server' && w.address === serverAddress)
 		if (!alreadyExists) {
-			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
+			await add_server_to_profile(
+				profilePath,
+				serverName,
+				serverAddress,
+				'prompt',
+				serverProjectId ?? undefined,
+			)
 		}
 	} catch (err) {
 		console.error('Failed to add server to instance worlds:', err)
@@ -370,7 +407,7 @@ const createVanillaInstance = async (project, gameVersion, serverAddress) => {
 		},
 	)
 
-	await addServerAsWorld(profilePath, project.title, serverAddress)
+	await syncServerAsWorld(profilePath, project.title, serverAddress, project.id)
 
 	return profilePath
 }
@@ -462,6 +499,10 @@ export const playServerProject = async (projectId) => {
 		get_project_v3(projectId, 'must_revalidate'),
 	])
 
+	if (projectV3?.minecraft_server == null) {
+		console.warn('playServerProject failed: project is not a server project')
+	}
+
 	const content = projectV3?.minecraft_java_server?.content
 	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
 	const isVanilla = content?.kind === 'vanilla'
@@ -490,7 +531,7 @@ export const playServerProject = async (projectId) => {
 			const newInstance = await findInstalledInstance(project.id)
 			if (!newInstance) return
 			// Ensure the server is in the worlds list after modpack install
-			await addServerAsWorld(newInstance.path, project.title, serverAddress)
+			await syncServerAsWorld(newInstance.path, project.title, serverAddress, project.id)
 			showModpackInstallSuccess(installStore, newInstance, serverAddress)
 		})
 		return
@@ -498,7 +539,7 @@ export const playServerProject = async (projectId) => {
 
 	if (!instance) return
 
-	await addServerAsWorld(instance.path, project.title, serverAddress)
+	await syncServerAsWorld(instance.path, project.title, serverAddress, project.id)
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {

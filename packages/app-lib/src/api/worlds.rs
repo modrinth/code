@@ -139,6 +139,8 @@ pub enum WorldDetails {
         index: usize,
         address: String,
         pack_status: ServerPackStatus,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        linked_project_id: Option<String>,
     },
 }
 
@@ -423,6 +425,7 @@ async fn get_server_worlds_in_profile(
                 index,
                 address: server.ip,
                 pack_status: server.accept_textures.into(),
+                linked_project_id: server.linked_project_id,
             },
         };
         worlds.push(world);
@@ -712,6 +715,7 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    linked_project_id: Option<String>,
 ) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
     let insert_index = servers
@@ -726,6 +730,7 @@ pub async fn add_server_to_profile(
             accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
+            linked_project_id,
         },
     );
     servers_data::write(profile_path, &servers).await?;
@@ -792,6 +797,8 @@ mod servers_data {
         pub name: String,
         #[serde(skip_serializing_if = "Option::is_none")]
         pub accept_textures: Option<bool>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pub linked_project_id: Option<String>,
     }
 
     pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {

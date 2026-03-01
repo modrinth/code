@@ -151,11 +151,18 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    linked_project_id: Option<String>,
 ) -> Result<usize> {
     let path = get_full_path(path).await?;
     Ok(
-        worlds::add_server_to_profile(&path, name, address, pack_status)
-            .await?,
+        worlds::add_server_to_profile(
+            &path,
+            name,
+            address,
+            pack_status,
+            linked_project_id,
+        )
+        .await?,
     )
 }
 

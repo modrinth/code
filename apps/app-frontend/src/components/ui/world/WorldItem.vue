@@ -44,7 +44,7 @@ import type {
 	SingleplayerWorld,
 	World,
 } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
+import { getWorldIdentifier, isLinkedWorld, set_world_display_status } from '@/helpers/worlds.ts'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -117,6 +117,7 @@ const serverIncompatible = computed(
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
+const linked = computed(() => isLinkedWorld(props.world))
 
 const messages = defineMessages({
 	hardcore: {
@@ -170,6 +171,10 @@ const messages = defineMessages({
 	dontShowOnHome: {
 		id: 'instance.worlds.dont_show_on_home',
 		defaultMessage: `Don't show on Home`,
+	},
+	linkedServer: {
+		id: 'instance.worlds.linked_server',
+		defaultMessage: 'Managed by server project',
 	},
 })
 </script>
@@ -396,8 +401,12 @@ const messages = defineMessages({
 								id: 'edit',
 								action: () => emit('edit'),
 								shown: !instancePath,
-								disabled: locked,
-								tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
+								disabled: locked || linked,
+								tooltip: locked
+									? formatMessage(messages.worldInUse)
+									: linked
+										? formatMessage(messages.linkedServer)
+										: undefined,
 							},
 							{
 								id: 'open-folder',
@@ -432,8 +441,12 @@ const messages = defineMessages({
 								hoverFilled: true,
 								action: () => emit('delete'),
 								shown: !instancePath,
-								disabled: locked,
-								tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
+								disabled: locked || linked,
+								tooltip: locked
+									? formatMessage(messages.worldInUse)
+									: linked
+										? formatMessage(messages.linkedServer)
+										: undefined,
 							},
 						]"
 					>
