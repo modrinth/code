@@ -145,16 +145,15 @@
 <script setup>
 import { CheckIcon, RefreshCwIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
+ButtonStyled, 
 	Combobox,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
-	UnsavedChangesPopup,
-} from '@modrinth/ui'
+	UnsavedChangesPopup} from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 
-import { ButtonStyled } from '@modrinth/ui'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const client = injectModrinthClient()

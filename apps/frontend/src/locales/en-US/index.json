@@ -2162,6 +2162,12 @@
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
   },
+  "project-type.server.plural": {
+    "message": "Servers"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
+  },
   "project-type.shader.plural": {
     "message": "Shaders"
   },

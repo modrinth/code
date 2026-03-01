@@ -18,10 +18,10 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import {
+	add_project_from_version as installMod,
 	check_installed,
 	create,
 	get,
-	add_project_from_version as installMod,
 	list,
 } from '@/helpers/profile'
 import {

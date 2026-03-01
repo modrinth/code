@@ -434,8 +434,8 @@
 			>
 				<div class="normal-page__header relative my-4">
 					<component
-						v-if="projectV3Loaded"
 						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
+						v-if="projectV3Loaded"
 						v-bind="
 							isServerProject
 								? { project, projectV3, member: !!currentMember }

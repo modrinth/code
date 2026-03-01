@@ -464,6 +464,9 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(unknown version)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "This instance is linked to a server, which means you can't change the Minecraft version. Unlinking will permanently disconnect this instance from the server."
+  },
   "instance.settings.tabs.installation.unlink-server.description": {
     "message": "This instance is linked to a server, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the server."
   },
@@ -557,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Server is incompatible"
   },
+  "instance.worlds.linked_server": {
+    "message": "Managed by server project"
+  },
   "instance.worlds.no_contact": {
     "message": "Server couldn't be contacted"
   },
@@ -592,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sync with instance"
+  },
+  "search.filter.locked.server": {
+    "message": "Provided by the server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Only client-side mods can be added to the server instance"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Game version is provided by the server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is provided by the server"
   }
 }
