@@ -42,10 +42,41 @@
 
 				<!-- Java Address -->
 				<div class="max-w-[600px]">
-					<label for="java-address">
-						<span class="label__title !text-contrast">Java address</span>
-					</label>
-					<div class="mt-2 flex items-center gap-2" @focusout="pingJavaServer">
+					<div class="flex items-center justify-between">
+						<label for="java-address">
+							<span class="label__title !m-0 !text-contrast">Java address</span>
+						</label>
+						<div class="flex items-center gap-1.5">
+							<div
+								v-if="javaPingResult !== null && !javaPingLoading"
+								class="flex items-center gap-1.5"
+								:class="javaPingResult.online ? 'text-green' : 'text-orange'"
+							>
+								<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
+								<TriangleAlertIcon v-else class="h-4 w-4" />
+								{{
+									javaPingResult.online
+										? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
+										: 'Cannot ping server'
+								}}
+							</div>
+							<ButtonStyled v-if="javaAddress" circular type="transparent" size="small">
+								<button :disabled="javaPingLoading" @click="pingJavaServer">
+									<SpinnerIcon v-if="javaPingLoading" class="animate-spin" />
+									<RefreshCwIcon v-else class="" />
+								</button>
+							</ButtonStyled>
+						</div>
+					</div>
+					<div
+						class="mt-2 flex items-center gap-2"
+						@focusout="
+							() => {
+								if (!lastPingAddressChanged) return
+								pingJavaServer()
+							}
+						"
+					>
 						<StyledInput
 							id="java-address"
 							v-model="javaAddress"
@@ -64,19 +95,6 @@
 							input-class="text-center"
 							autocomplete="off"
 						/>
-					</div>
-					<div
-						v-if="javaPingResult !== null"
-						class="mt-2 flex items-center gap-1.5"
-						:class="javaPingResult.online ? 'text-green' : 'text-orange'"
-					>
-						<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
-						<TriangleAlertIcon v-else class="h-4 w-4" />
-						{{
-							javaPingResult.online
-								? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
-								: 'Cannot ping server'
-						}}
 					</div>
 				</div>
 
@@ -125,9 +143,10 @@
 </template>
 
 <script setup>
-import { CheckIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { CheckIcon, RefreshCwIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
 	Combobox,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
@@ -135,8 +154,10 @@ import {
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 
+import { ButtonStyled } from '@modrinth/ui'
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
@@ -155,6 +176,8 @@ function initFromProjectV3(v3) {
 	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
 	country.value = v3.minecraft_server?.country ?? ''
 	languages.value = v3.minecraft_server?.languages ?? []
+
+	pingJavaServer()
 }
 
 // initialize projectV3 values once
@@ -174,6 +197,15 @@ if (projectV3.value) {
 const javaPingLoading = ref(false)
 const javaPingResult = ref(null)
 
+const lastPingedAddress = ref({ address: '', port: null })
+
+const lastPingAddressChanged = computed(() => {
+	return (
+		javaAddress.value.trim() !== lastPingedAddress.value.address ||
+		javaPort.value !== lastPingedAddress.value.port
+	)
+})
+
 const pingJavaServer = async () => {
 	const address = javaAddress.value?.trim()
 	if (!address) {
@@ -188,11 +220,16 @@ const pingJavaServer = async () => {
 	const query = port !== 25565 ? `${address}:${port}` : address
 
 	try {
-		// TODO replace with api-client labrinth server ping route
+		await client.labrinth.server_ping_internal.pingMinecraftJava({
+			address,
+			port,
+		})
+		javaPingResult.value = { online: true, latency: null }
 	} catch {
 		javaPingResult.value = { online: false, latency: null }
 	} finally {
 		javaPingLoading.value = false
+		lastPingedAddress.value = { address, port }
 	}
 }
 
@@ -307,11 +344,9 @@ const languageOptions = [
 ]
 
 const javaServerPatchData = computed(() => {
-	const origJava = projectV3.value?.minecraft_java_server
-
 	const addressChanged =
-		javaAddress.value !== (origJava?.address ?? '') || javaPort.value !== (origJava?.port ?? 25565)
-
+		javaAddress.value.trim() !== (projectV3.value?.minecraft_java_server?.address ?? '') ||
+		javaPort.value !== (projectV3.value?.minecraft_java_server?.port ?? 25565)
 	if (addressChanged) {
 		return {
 			address: javaAddress.value.trim(),

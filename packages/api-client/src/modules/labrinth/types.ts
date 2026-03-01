@@ -813,6 +813,15 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace ServerPing {
+		export namespace Internal {
+			export type MinecraftJavaPingRequest = {
+				address: string
+				port: number
+			}
+		}
+	}
+
 	export namespace Tags {
 		export namespace v2 {
 			export interface Category {
