@@ -441,25 +441,20 @@ watch(
 
 const basePath = computed(() => `/instance/${encodeURIComponent(route.params.id as string)}`)
 
-const tabs = computed(() => {
-	const allTabs = []
-	if (!isServerInstance.value || hasContent.value) {
-		allTabs.push({ label: 'Content', href: `${basePath.value}` })
-	}
-	allTabs.push({ label: 'Worlds', href: `${basePath.value}/worlds` })
-	allTabs.push({ label: 'Logs', href: `${basePath.value}/logs` })
-	return allTabs
-})
-
-watch(
-	[isServerInstance, hasContent],
-	() => {
-		if (isServerInstance.value && !hasContent.value && route.path === basePath.value) {
-			router.replace(`${basePath.value}/worlds`)
-		}
+const tabs = computed(() => [
+	{
+		label: 'Content',
+		href: `${basePath.value}`,
 	},
-	{ immediate: true },
-)
+	{
+		label: 'Worlds',
+		href: `${basePath.value}/worlds`,
+	},
+	{
+		label: 'Logs',
+		href: `${basePath.value}/logs`,
+	},
+])
 
 if (instance.value) {
 	breadcrumbs.setName(
