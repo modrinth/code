@@ -42,7 +42,7 @@ client.archon.backups_v1
 client.archon.content_v0
 client.kyros.files_v0
 client.iso3166.data
-... ect.
+... etc.
 ```
 
 This structure is derived at runtime from the flat `MODULE_REGISTRY` in `modules/index.ts` via `buildModuleStructure()`, and the TypeScript types are inferred automatically via `InferredClientModules`.
