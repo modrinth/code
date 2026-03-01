@@ -9,12 +9,14 @@ const links: Stage = {
 	icon: LinkIcon,
 	guidance_url: 'https://modrinth.com/legal/rules',
 	navigate: '/settings/links',
-	shouldShow: (project) =>
+	shouldShow: (project, projectV3) =>
 		Boolean(
 			project.issues_url ||
 			project.source_url ||
 			project.wiki_url ||
 			project.discord_url ||
+			projectV3?.link_urls?.site ||
+			projectV3?.link_urls?.store ||
 			project.donation_urls.length > 0,
 		),
 	text: async (project, projectV3) => {
