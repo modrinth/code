@@ -31,15 +31,20 @@ interface ShowModalOptions {
 }
 
 async function show(options?: ShowModalOptions) {
+	const content = projectV3.value?.minecraft_java_server?.content
+
 	if (options?.updateContentKind) {
 		ctx.compatibilityType.value = options.updateContentKind
 		ctx.isEditingExistingCompatibility.value = true
 
 		// Prefill existing values for vanilla
-		const content = projectV3.value?.minecraft_java_server?.content
 		if (options.updateContentKind === 'vanilla' && content && content.kind === 'vanilla') {
 			ctx.supportedGameVersions.value = content.supported_game_versions ?? []
 			ctx.recommendedGameVersion.value = content.recommended_game_version ?? null
+		}
+
+		if (options.updateContentKind === 'published-modpack') {
+			ctx.selectedProjectId.value = content?.kind === 'modpack' ? content.project_id || '' : ''
 		}
 
 		await nextTick()

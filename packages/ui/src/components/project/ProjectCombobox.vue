@@ -77,6 +77,23 @@ const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
 
 const { labrinth } = injectModrinthClient()
 
+function hitToOption(hit: SearchHit): ComboboxOption<string> {
+	return {
+		label: hit.title,
+		value: hit.project_id,
+		icon: defineAsyncComponent(() =>
+			Promise.resolve({
+				setup: () => () =>
+					h('img', {
+						src: hit.icon_url,
+						alt: hit.title,
+						class: 'h-5 w-5 rounded',
+					}),
+			}),
+		),
+	}
+}
+
 // Watch for external changes to projectId to update selectedProject
 watch(
 	projectId,
@@ -86,26 +103,32 @@ watch(
 			return
 		}
 
+		let hit: SearchHit | null = null
+
 		if (searchResultsCache.value.has(newId)) {
-			selectedProject.value = searchResultsCache.value.get(newId) || null
-			return
+			hit = searchResultsCache.value.get(newId) || null
+		} else {
+			try {
+				const project = await labrinth.projects_v2.get(newId)
+				if (project) {
+					hit = {
+						project_id: project.id,
+						title: project.title,
+						icon_url: project.icon_url ?? undefined,
+						project_type: project.project_type,
+						slug: project.slug,
+					}
+					searchResultsCache.value.set(project.id, hit)
+				}
+			} catch {
+				selectedProject.value = null
+				return
+			}
 		}
 
-		try {
-			const project = await labrinth.projects_v2.get(newId)
-			if (project) {
-				const hit: SearchHit = {
-					project_id: project.id,
-					title: project.title,
-					icon_url: project.icon_url ?? undefined,
-					project_type: project.project_type,
-					slug: project.slug,
-				}
-				searchResultsCache.value.set(project.id, hit)
-				selectedProject.value = hit
-			}
-		} catch {
-			selectedProject.value = null
+		selectedProject.value = hit
+		if (hit && !options.value.some((o) => o.value === hit!.project_id)) {
+			options.value = [hitToOption(hit), ...options.value]
 		}
 	},
 	{ immediate: true },
@@ -148,20 +171,7 @@ const search = async (query: string) => {
 			}
 		}
 
-		options.value = uniqueHits.map((hit) => ({
-			label: hit.title,
-			value: hit.project_id,
-			icon: defineAsyncComponent(() =>
-				Promise.resolve({
-					setup: () => () =>
-						h('img', {
-							src: hit.icon_url,
-							alt: hit.title,
-							class: 'h-5 w-5 rounded',
-						}),
-				}),
-			),
-		}))
+		options.value = uniqueHits.map(hitToOption)
 	} catch (error: unknown) {
 		const err = error as { data?: { description?: string } }
 		addNotification({

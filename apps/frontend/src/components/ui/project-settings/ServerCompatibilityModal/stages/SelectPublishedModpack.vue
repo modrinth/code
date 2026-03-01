@@ -135,5 +135,6 @@ watch(
 			versionsLoading.value = false
 		}
 	},
+	{ immediate: true },
 )
 </script>
