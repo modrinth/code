@@ -287,7 +287,7 @@
 					Hang on, we're reconnecting to your server.
 				</div>
 
-				<Transition
+				<!-- <Transition
 					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
 					enter-from-class="opacity-0 max-h-0"
 					enter-to-class="opacity-100 max-h-40"
@@ -305,7 +305,7 @@
 							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
 						</template>
 					</InstallingBanner>
-				</Transition>
+				</Transition> -->
 				<NuxtPage
 					:route="route"
 					:is-connected="isConnected"

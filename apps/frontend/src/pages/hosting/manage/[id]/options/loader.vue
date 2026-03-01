@@ -62,7 +62,7 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled color="orange">
-							<button class="!shadow-none" :disabled="isInstalling" @click="handleRepair">
+							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
 								<HammerIcon class="size-5" />
 								Repair
 							</button>
@@ -72,6 +72,10 @@
 
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">Linked instance</span>
+					<span class="text-primary">
+						Unlinking permanently disconnects this instance from the modpack project, allowing you
+						to change the loader and Minecraft version, but you won't receive future updates.
+					</span>
 					<div>
 						<ButtonStyled color="orange">
 							<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
@@ -80,14 +84,14 @@
 							</button>
 						</ButtonStyled>
 					</div>
-					<span class="text-primary">
-						Unlinking permanently disconnects this instance from the modpack project, allowing you
-						to change the loader and Minecraft version, but you won't receive future updates.
-					</span>
 				</div>
 
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">Re-install modpack</span>
+					<span class="text-primary">
+						Re-installing the modpack resets the instance's content to its original state, removing
+						any mods or content you have added.
+					</span>
 					<div>
 						<ButtonStyled color="red">
 							<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
@@ -96,10 +100,6 @@
 							</button>
 						</ButtonStyled>
 					</div>
-					<span class="text-primary">
-						Re-installing the modpack resets the instance's content to its original state, removing
-						any mods or content you have added.
-					</span>
 				</div>
 
 				<div class="flex flex-col gap-2.5">
@@ -227,6 +227,22 @@
 						</ButtonStyled>
 					</div>
 				</template>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">Repair server</span>
+					<span class="text-primary">
+						Reinstalls the loader and Minecraft dependencies without deleting your content. This may
+						resolve issues if your server is not starting correctly.
+					</span>
+					<div>
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
+								<HammerIcon class="size-5" />
+								Repair
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
 			</template>
 		</template>
 	</div>
@@ -245,6 +261,7 @@
 		:server-status="server?.status"
 		@reinstall="emit('reinstall')"
 	/>
+	<ConfirmRepairModal ref="repairModal" server @repair="handleRepair" />
 	<ConfirmReinstallModal ref="reinstallModal" @reinstall="handleReinstallConfirm" />
 </template>
 
@@ -272,6 +289,7 @@ import {
 	Chips,
 	Combobox,
 	ConfirmReinstallModal,
+	ConfirmRepairModal,
 	ConfirmUnlinkModal,
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -361,6 +379,7 @@ const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 const modpackVersionModal = ref()
 const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
+const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
 
 const availablePlatforms = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 
@@ -548,36 +567,60 @@ async function handleSave() {
 }
 
 async function handleRepair() {
-	if (!modpack.value) return
-	try {
-		await client.archon.servers_v0.reinstall(
-			serverId,
-			{
-				project_id: modpack.value.spec.project_id,
-				version_id: modpack.value.spec.version_id,
-			},
-			false,
-		)
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-	} catch (err) {
-		addNotification({
-			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to repair server',
-		})
+	if (modpack.value) {
+		try {
+			await client.archon.content_v1.installContent(serverId, worldId.value!, {
+				content_variant: 'modpack',
+				spec: {
+					platform: 'modrinth',
+					project_id: modpack.value.spec.project_id,
+					version_id: modpack.value.spec.version_id,
+				},
+				soft_override: true,
+			})
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		} catch (err) {
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : 'Failed to repair server',
+			})
+		}
+	} else {
+		const addons = addonsQuery.data.value
+		const currentLoader = addons?.modloader ?? server.value?.loader
+		const currentGameVersion = addons?.game_version ?? server.value?.mc_version
+		const currentLoaderVersion = addons?.modloader_version ?? server.value?.loader_version
+		if (!currentLoader || !currentGameVersion) return
+		try {
+			await client.archon.content_v1.installContent(serverId, worldId.value!, {
+				content_variant: 'bare',
+				loader: toApiLoader(currentLoader),
+				version: currentLoaderVersion ?? '',
+				game_version: currentGameVersion,
+				soft_override: true,
+			})
+			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		} catch (err) {
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : 'Failed to repair server',
+			})
+		}
 	}
 }
 
 async function handleReinstallConfirm() {
 	if (!modpack.value) return
 	try {
-		await client.archon.servers_v0.reinstall(
-			serverId,
-			{
+		await client.archon.content_v1.installContent(serverId, worldId.value!, {
+			content_variant: 'modpack',
+			spec: {
+				platform: 'modrinth',
 				project_id: modpack.value.spec.project_id,
 				version_id: modpack.value.spec.version_id,
 			},
-			true,
-		)
+			soft_override: false,
+		})
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		emit('reinstall')
 	} catch (err) {
