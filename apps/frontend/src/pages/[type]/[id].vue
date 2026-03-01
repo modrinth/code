@@ -855,15 +855,15 @@
 						:link-target="$external()"
 						class="card flex-card experimental-styles-within"
 					/>
+					<ProjectSidebarTags
+						:project="project"
+						class="card flex-card experimental-styles-within"
+					/>
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
-						class="card flex-card experimental-styles-within"
-					/>
-					<ProjectSidebarTags
-						:project="project"
 						class="card flex-card experimental-styles-within"
 					/>
 					<!-- TODO: Finish license modal and enable -->
