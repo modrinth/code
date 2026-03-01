@@ -202,6 +202,11 @@ export function getWorldIdentifier(world: World) {
 
 export function sortWorlds(worlds: World[]) {
 	worlds.sort((a, b) => {
+		const aLinked = isLinkedWorld(a)
+		const bLinked = isLinkedWorld(b)
+		if (aLinked !== bLinked) {
+			return aLinked ? -1 : 1
+		}
 		if (!a.last_played) {
 			return 1
 		}
