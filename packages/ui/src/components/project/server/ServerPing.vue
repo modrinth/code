@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { SignalIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { defineMessage, useVIntl } from '../../../composables'
 import { TagItem } from '../../base'
 
-defineProps<{
+const props = defineProps<{
 	ping?: number
 	statusOnline?: boolean
 }>()
@@ -15,12 +16,25 @@ const pingMessage = defineMessage({
 })
 
 const { formatMessage } = useVIntl()
+
+const pingClass = computed(() => {
+	if (props.ping === undefined) {
+		return 'border-brand bg-highlight-green text-brand'
+	}
+	if (props.ping < 100) {
+		return 'border-brand bg-highlight-green text-brand'
+	}
+	if (props.ping < 250) {
+		return 'border-brand-orange bg-highlight-orange text-orange'
+	}
+	return 'border-red bg-highlight-red text-red'
+})
 </script>
 <template>
 	<TagItem
 		v-if="ping || statusOnline"
-		class="border !border-solid border-brand bg-brand-highlight !font-medium w-max"
-		style="--_color: var(--color-brand)"
+		class="border !border-solid !font-medium w-max"
+		:class="pingClass"
 	>
 		<template v-if="ping !== undefined">
 			{{ formatMessage(pingMessage, { ping }) }}
