@@ -135,6 +135,7 @@ redis = "0.32.7"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
+elytra-ping = "6.0.1"
 rust_decimal = { version = "1.39.0", features = [
   "serde-with-float",
   "serde-with-str"
