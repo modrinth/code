@@ -71,14 +71,15 @@ Server projects use two new discovery metrics instead of downloads to help surfa
 - **Players online:** The live player count reported by the server.
 - **Verified plays:** Joins from the Modrinth App in the last two weeks.
 
-![[IMG] Server discovery](Server%20projects%20blog/image.png)
-
-[IMG] Server discovery
+![Server discovery](./project-discovery.webp)
 
 Server Projects also have their own set of filters to make finding the right server easier:
 
 - Type (vanilla vs modded)
-- Category
+- Features
+- Gameplay
+- Meta
+- Community
 - Game version
 - Country
 - Language
@@ -89,10 +90,10 @@ Additionally, Server Projects are different from other project types because the
 
 Joining a server is where this all comes together. While in the App, clicking play on a server triggers different flows depending on the server type:
 
-1. Vanilla servers immediately create a fabric instance in the app using the recommended version set by the author.
+1. Vanilla servers immediately create a Fabric instance in the app using the recommended version set by the author.
 2. Modded servers show a modal which displays the required content. Clicking install creates an instance with the that content.
 
-![[IMG] Required content modal](Server%20projects%20blog/image.png)
+![Required content modal](./joining-a-server.webp)
 
 Once installation finishes, you’ll see a completion toast which when clicked skips the multiplayer screen and loaders you directly to the server. After the initial setup, clicking play always boots straight into the server.
 
@@ -112,7 +113,7 @@ Key differences:
 
 When a server updates its compatibility, such as publishing a new modpack version, that update is distributed to all linked instances. The next time a player launches, they’re prompted to accept the changes before joining. This keeps the server and and associated instances in sync.
 
-![[IMG] Update available modal](Server%20projects%20blog/image.png)
+![Update available modal](./server-project-updates.webp)
 
 —
 
