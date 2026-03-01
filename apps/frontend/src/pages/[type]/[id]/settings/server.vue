@@ -22,7 +22,9 @@
 				<!-- Language -->
 				<div class="max-w-[600px]">
 					<label for="server-language">
-						<span class="label__title">Language</span>
+						<span class="label__title"
+							>Languages <span class="font-normal text-secondary">(optional)</span></span
+						>
 					</label>
 					<Multiselect
 						id="server-language"
@@ -81,7 +83,10 @@
 				<!-- Bedrock Address -->
 				<div class="max-w-[600px]">
 					<label for="bedrock-address">
-						<span class="label__title !text-contrast">Bedrock address</span>
+						<span class="label__title !text-contrast"
+							>Bedrock address
+							<span class="font-normal text-secondary">(optional)</span>
+						</span>
 					</label>
 					<div class="mt-2 flex items-center gap-2">
 						<StyledInput
@@ -305,8 +310,7 @@ const javaServerPatchData = computed(() => {
 	const origJava = projectV3.value?.minecraft_java_server
 
 	const addressChanged =
-		javaAddress.value !== (origJava?.address ?? '') ||
-		javaPort.value !== (origJava?.port ?? 25565)
+		javaAddress.value !== (origJava?.address ?? '') || javaPort.value !== (origJava?.port ?? 25565)
 
 	if (addressChanged) {
 		return {
