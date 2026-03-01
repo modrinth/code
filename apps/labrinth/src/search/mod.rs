@@ -499,7 +499,7 @@ pub async fn search_for_project(
 
 #[cfg(test)]
 mod tests {
-    use super::{SearchConfig, get_sort_index, normalize_filter_aliases};
+    use super::normalize_filter_aliases;
 
     #[test]
     fn normalizes_component_filter_aliases() {
