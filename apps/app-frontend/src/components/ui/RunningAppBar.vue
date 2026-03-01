@@ -104,12 +104,7 @@ import {
 	TerminalSquareIcon,
 	UnplugIcon,
 } from '@modrinth/assets'
-import {
-	Button,
-	ButtonStyled,
-	Card,
-	injectNotificationManager,
-} from '@modrinth/ui'
+import { Button, ButtonStyled, Card, injectNotificationManager } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -183,7 +178,7 @@ const goToTerminal = (path) => {
 const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
-	const previousBars = [...currentLoadingBars.value]
+	const currentLoadingBarCount = currentLoadingBars.value.length
 	currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
 		.map((x) => {
 			if (x.bar_type.type === 'java_download') {
@@ -212,7 +207,7 @@ const refreshInfo = async () => {
 
 	if (currentLoadingBars.value.length === 0) {
 		showCard.value = false
-	} else if (previousBars.length < currentLoadingBars.value.length) {
+	} else if (currentLoadingBarCount < currentLoadingBars.value.length) {
 		showCard.value = true
 	}
 }
