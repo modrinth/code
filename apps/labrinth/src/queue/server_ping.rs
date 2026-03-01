@@ -14,7 +14,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use tracing::{Instrument, debug, info, info_span, warn};
+use tracing::{Instrument, info, info_span, trace, warn};
 
 pub struct ServerPingQueue {
     pub db: PgPool,
@@ -40,16 +40,10 @@ impl ServerPingQueue {
 
         let active_pings =
             Arc::new(Semaphore::new(ENV.SERVER_PING_MAX_CONCURRENT));
-
         let pings = server_projects
             .into_iter()
-            .filter_map(|(project_id, java_server)| {
+            .map(|(project_id, java_server)| {
                 let address = java_server.address.to_string();
-                if address.trim().is_empty() {
-                    debug!("Skipping ping for server project {project_id} with empty address");
-                    return None;
-                }
-
                 let port = java_server.port;
                 let span = info_span!("ping", %project_id, %address, %port);
 
@@ -61,15 +55,15 @@ impl ServerPingQueue {
                     let result = loop {
                         match ping_server(&address, port).await {
                             Ok(ping) => {
-                                debug!(?ping, "Received successful ping");
+                                info!(?ping, "Received successful ping");
                                 break Ok(ping);
                             }
                             Err(err) if retries == 0 => {
-                                debug!("Failed to ping server in {:?}ms, no retries left: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
+                                info!("Failed to ping server in {:?}ms, no retries left: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
                                 break Err(err);
                             }
                             Err(err) => {
-                                debug!(%retries, "Failed to ping server in {:?}ms, retrying: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
+                                trace!(%retries, "Failed to ping server in {:?}ms, retrying: {err:#}", ENV.SERVER_PING_TIMEOUT_MS);
                                 retries -= 1;
                                 continue;
                             }
@@ -83,7 +77,7 @@ impl ServerPingQueue {
                         data: result.ok(),
                     })
                 };
-                Some(tokio::spawn(task.instrument(span)))
+                tokio::spawn(task.instrument(span))
             })
             .collect::<JoinSet<_>>()
             .join_all()
@@ -214,11 +208,21 @@ impl ServerPingQueue {
         let projects_to_ping = all_server_projects
             .into_iter()
             .zip(all_server_last_pings)
-            // only include projects which:
+            // only include projects which have and address AND:
             // - have not had a ping in redis yet
             // - OR their last ping was a failure
             // - OR their last successful ping was more than `SERVER_PING_MIN_INTERVAL_SEC` seconds ago
-            .filter(|(_, ping)| {
+            .filter(|(row, ping)| {
+                if row
+                    .components
+                    .0
+                    .minecraft_java_server
+                    .as_ref()
+                    .is_none_or(|p| p.address.trim().is_empty())
+                {
+                    return false;
+                }
+
                 let Some(ping) = ping else { return true };
                 if ping.data.is_none() {
                     return true;
