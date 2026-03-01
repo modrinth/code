@@ -139,8 +139,8 @@ export const install = async (
 	callback = () => {},
 	createInstanceCallback = () => {},
 ) => {
-	const project = await get_project(projectId, 'must_revalidate')
-	const projectV3 = await get_project_v3(projectId, 'must_revalidate')
+	const project = await get_project(projectId, 'bypass')
+	const projectV3 = await get_project_v3(projectId, 'bypass')
 
 	if (project.project_type === 'modpack' || projectV3?.minecraft_server != null) {
 		const version = versionId ?? project.versions[project.versions.length - 1]
@@ -172,7 +172,7 @@ export const install = async (
 			const [instance, instanceProjects, versions] = await Promise.all([
 				await get(instancePath),
 				await get_projects(instancePath),
-				await get_version_many(project.versions, 'must_revalidate'),
+				await get_version_many(project.versions, 'bypass'),
 			])
 
 			const projectVersions = versions.sort(
@@ -260,9 +260,9 @@ export const installVersionDependencies = async (profile, version) => {
 		} else {
 			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
 
-			const depProject = await get_project(dep.project_id, 'must_revalidate')
+			const depProject = await get_project(dep.project_id, 'bypass')
 
-			const depVersions = (await get_version_many(depProject.versions, 'must_revalidate')).sort(
+			const depVersions = (await get_version_many(depProject.versions, 'bypass')).sort(
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
 
@@ -282,8 +282,8 @@ export const installVersionDependencies = async (profile, version) => {
  */
 export const installServerProject = async (serverProjectId) => {
 	const [project, projectV3] = await Promise.all([
-		get_project(serverProjectId, 'must_revalidate'),
-		get_project_v3(serverProjectId, 'must_revalidate'),
+		get_project(serverProjectId, 'bypass'),
+		get_project_v3(serverProjectId, 'bypass'),
 	])
 
 	const serverAddress = getServerAddress(projectV3?.minecraft_java_server)
@@ -495,8 +495,8 @@ export const playServerProject = async (projectId) => {
 	const installStore = useInstall()
 
 	const [project, projectV3] = await Promise.all([
-		get_project(projectId, 'must_revalidate'),
-		get_project_v3(projectId, 'must_revalidate'),
+		get_project(projectId, 'bypass'),
+		get_project_v3(projectId, 'bypass'),
 	])
 
 	if (projectV3?.minecraft_server == null) {

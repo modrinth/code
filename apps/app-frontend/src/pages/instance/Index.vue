@@ -416,10 +416,10 @@ async function fetchModpackContent() {
 	const versionId = instance.value?.linked_data?.version_id
 	if (!versionId) return
 
-	const contentVersion = await get_version(versionId, 'bypass')
+	const contentVersion = await get_version(versionId, 'must_revalidate')
 	const projectId = contentVersion?.project_id
 	if (projectId) {
-		modpackContentProjectV3.value = await get_project_v3(projectId, 'bypass')
+		modpackContentProjectV3.value = await get_project_v3(projectId, 'must_revalidate')
 	}
 }
 

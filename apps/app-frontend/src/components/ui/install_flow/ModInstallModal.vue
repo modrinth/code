@@ -18,10 +18,10 @@ import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3_many } from '@/helpers/cache.js'
 import {
-	add_project_from_version as installMod,
 	check_installed,
 	create,
 	get,
+	add_project_from_version as installMod,
 	list,
 } from '@/helpers/profile'
 import {
@@ -87,7 +87,7 @@ defineExpose({
 			.filter((p) => p.linked_data?.project_id)
 			.map((p) => p.linked_data.project_id)
 		if (linkedProjectIds.length > 0) {
-			const linkedProjects = await get_project_v3_many(linkedProjectIds, 'stale_while_revalidate_skip_offline').catch(
+			const linkedProjects = await get_project_v3_many(linkedProjectIds, 'must_revalidate').catch(
 				() => [],
 			)
 			const serverProjectIds = new Set(
