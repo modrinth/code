@@ -831,7 +831,7 @@
 
 				<div class="normal-page__sidebar">
 					<ProjectSidebarServerInfo
-						v-if="isServerProject"
+						v-if="isServerProject && serverDataLoaded"
 						:project-v3="projectV3"
 						:tags="tags"
 						:required-content="serverRequiredContent"
@@ -1624,7 +1624,7 @@ const serverModpackVersionId = computed(() => {
 	return content?.kind === 'modpack' ? content.version_id : null
 })
 
-const { data: serverModpackVersion } = useQuery({
+const { data: serverModpackVersion, isPending: serverModpackVersionPending } = useQuery({
 	queryKey: computed(() => ['sidebar-modpack-version', serverModpackVersionId.value]),
 	queryFn: () => client.labrinth.versions_v3.getVersion(serverModpackVersionId.value),
 	staleTime: STALE_TIME,
@@ -1633,11 +1633,18 @@ const { data: serverModpackVersion } = useQuery({
 
 const serverModpackProjectId = computed(() => serverModpackVersion.value?.project_id ?? null)
 
-const { data: serverModpackProject } = useQuery({
+const { data: serverModpackProject, isPending: serverModpackProjectPending } = useQuery({
 	queryKey: computed(() => ['sidebar-modpack-project', serverModpackProjectId.value]),
 	queryFn: () => client.labrinth.projects_v3.get(serverModpackProjectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!serverModpackProjectId.value),
+})
+
+const serverDataLoaded = computed(() => {
+	if (!projectV3.value) return false
+	if (serverModpackVersionId.value && serverModpackVersionPending.value) return false
+	if (serverModpackProjectId.value && serverModpackProjectPending.value) return false
+	return true
 })
 
 const serverRequiredContent = computed(() => {
