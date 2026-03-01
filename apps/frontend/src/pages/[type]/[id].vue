@@ -1613,7 +1613,11 @@ const project = computed(() => {
 const projectId = computed(() => projectRaw.value?.id)
 
 // V3 Project
-const { data: projectV3, error: _projectV3Error, isPending: projectV3Pending } = useQuery({
+const {
+	data: projectV3,
+	error: _projectV3Error,
+	isPending: projectV3Pending,
+} = useQuery({
 	queryKey: computed(() => ['project', 'v3', projectId.value]),
 	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
 	staleTime: STALE_TIME,
@@ -1821,8 +1825,10 @@ async function updateProjectRoute() {
 
 async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId.value] })
 	if (routeProjectId.value !== projectId.value) {
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId.value] })
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId.value] })
 	}
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value] })
