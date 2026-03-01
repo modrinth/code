@@ -1,6 +1,13 @@
 {
 	"articles": [
 		{
+			"title": "Server projects — available now",
+			"summary": "Introducing Modrinth's first new project type in over three years!",
+			"thumbnail": "https://modrinth.com/news/default.webp",
+			"date": "2026-03-01T15:00:00.000Z",
+			"link": "https://modrinth.com/news/article/server-projects-available-now"
+		},
+		{
 			"title": "Streamlined Version Creation",
 			"summary": "Version creation is now dramatically more intelligent and easier for creators.",
 			"thumbnail": "https://modrinth.com/news/article/streamlined-version-creation/thumbnail.webp",
