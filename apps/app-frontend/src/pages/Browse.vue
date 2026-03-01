@@ -38,7 +38,7 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
+import { get_project_v3, get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
@@ -88,6 +88,11 @@ type Instance = {
 	install_stage: string
 	icon_path?: string
 	name: string
+	linked_data?: {
+		project_id: string
+		version_id: string
+		locked: boolean
+	}
 }
 
 type InstanceProject = {
@@ -100,6 +105,7 @@ const instance: Ref<Instance | null> = ref(null)
 const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
+const isServerInstance = ref(false)
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -119,6 +125,17 @@ async function updateInstanceContext() {
 			getInstanceProjects(route.query.i).catch(handleError),
 		])
 		newlyInstalled.value = []
+
+		isServerInstance.value = false
+		if (instance.value?.linked_data?.project_id) {
+			const projectV3 = await get_project_v3(
+				instance.value.linked_data.project_id,
+				'must_revalidate',
+			).catch(handleError)
+			if (projectV3?.minecraft_server != null) {
+				isServerInstance.value = true
+			}
+		}
 	}
 
 	if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
@@ -151,6 +168,13 @@ const instanceFilters = computed(() => {
 			filters.push({
 				type: 'mod_loader',
 				option: platform,
+			})
+		}
+
+		if (isServerInstance.value) {
+			filters.push({
+				type: 'environment',
+				option: 'client',
 			})
 		}
 
@@ -518,13 +542,29 @@ const messages = defineMessages({
 		id: 'search.filter.locked.instance-game-version.title',
 		defaultMessage: 'Game version is provided by the instance',
 	},
+	gameVersionProvidedByServer: {
+		id: 'search.filter.locked.server-game-version.title',
+		defaultMessage: 'Game version is provided by the server',
+	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
 		defaultMessage: 'Loader is provided by the instance',
 	},
+	modLoaderProvidedByServer: {
+		id: 'search.filter.locked.server-loader.title',
+		defaultMessage: 'Loader is provided by the server',
+	},
+	environmentProvidedByServer: {
+		id: 'search.filter.locked.server-environment.title',
+		defaultMessage: 'Only client-side mods can be added to the server instance',
+	},
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
 		defaultMessage: 'Provided by the instance',
+	},
+	providedByServer: {
+		id: 'search.filter.locked.server',
+		defaultMessage: 'Provided by the server',
 	},
 	syncFilterButton: {
 		id: 'search.filter.locked.instance.sync',
@@ -640,10 +680,25 @@ previousFilterState.value = JSON.stringify({
 					<h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
 				</template>
 				<template #locked-game_version>
-					{{ formatMessage(messages.gameVersionProvidedByInstance) }}
+					{{
+						formatMessage(
+							isServerInstance
+								? messages.gameVersionProvidedByServer
+								: messages.gameVersionProvidedByInstance,
+						)
+					}}
 				</template>
 				<template #locked-mod_loader>
-					{{ formatMessage(messages.modLoaderProvidedByInstance) }}
+					{{
+						formatMessage(
+							isServerInstance
+								? messages.modLoaderProvidedByServer
+								: messages.modLoaderProvidedByInstance,
+						)
+					}}
+				</template>
+				<template #locked-environment>
+					{{ formatMessage(messages.environmentProvidedByServer) }}
 				</template>
 				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
 			</SearchSidebarFilter>
@@ -709,7 +764,7 @@ previousFilterState.value = JSON.stringify({
 			:filters="filters.filter((f) => f.display !== 'none')"
 			:provided-filters="instanceFilters"
 			:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-			:provided-message="messages.providedByInstance"
+			:provided-message="isServerInstance ? messages.providedByServer : messages.providedByInstance"
 		/>
 		<div class="search">
 			<section v-if="loading" class="offline">

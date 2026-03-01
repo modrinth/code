@@ -479,10 +479,10 @@ export function useSearch(
        Add environment facets, separate from the rest because it oddly depends on the combination
        of filters selected to determine which facets to add.
      */
-		const client = currentFilters.value.some(
+		const client = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'client',
 		)
-		const server = currentFilters.value.some(
+		const server = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'server',
 		)
 		andFacets.push(...createEnvironmentFacets(client, server))
