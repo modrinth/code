@@ -49,6 +49,11 @@ export const tagsNags: Nag[] = [
 		},
 		status: 'warning',
 		shouldShow: (context: NagContext) => {
+			console.log("is this a server?" + (context.projectV3?.minecraft_server != null))
+			console.log("but does it have languages?" + (context.projectV3?.minecraft_server?.languages?.length !== 0))
+			console.log(context.projectV3)
+			console.log(JSON.stringify(context.projectV3))
+			if ((context.projectV3?.minecraft_java_server)) return false
 			const tagCount =
 				context.project.categories.length + (context.project.additional_categories?.length || 0)
 			return tagCount > MAX_TAG_COUNT
