@@ -369,6 +369,10 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	switchVersionButton: {
+		id: 'button.switch-version',
+		defaultMessage: 'Switch version',
+	},
 	projectCreated: {
 		id: 'project.about.details.created',
 		defaultMessage: 'Created {date}',

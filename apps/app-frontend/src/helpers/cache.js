@@ -51,3 +51,17 @@ export async function get_search_results_many(ids, cacheBehaviour) {
 export async function purge_cache_types(cacheTypes) {
 	return await invoke('plugin:cache|purge_cache_types', { cacheTypes })
 }
+
+/**
+ * Get versions for a project (without changelogs for fast loading).
+ * Uses the cache system - versions are cached for 30 minutes.
+ * @param {string} projectId - The project ID
+ * @param {string} [cacheBehaviour] - Cache behaviour ('must_revalidate', etc.)
+ * @returns {Promise<Array|null>} Array of version objects (without changelogs) or null
+ */
+export async function get_project_versions(projectId, cacheBehaviour) {
+	return await invoke('plugin:cache|get_project_versions', {
+		projectId,
+		cacheBehaviour,
+	})
+}

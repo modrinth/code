@@ -168,13 +168,14 @@ import NavTabs from '@/components/ui/NavTabs.vue'
 import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { injectContentInstall } from '@/providers/content-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { install as installVersion } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()

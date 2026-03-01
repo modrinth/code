@@ -1,21 +1,13 @@
-<template>
-	<div class="flex h-full w-full flex-col">
-		<NuxtPage :route="route" :server="props.server" />
-	</div>
-</template>
-
 <script setup lang="ts">
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import { injectModrinthServerContext, ServersManageContentPage } from '@modrinth/ui'
 
-const route = useNativeRoute()
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
-const data = computed(() => props.server.general)
+const { server } = injectModrinthServerContext()
 
 useHead({
-	title: `Content - ${data.value?.name ?? 'Server'} - Modrinth`,
+	title: `Content - ${server.value?.name ?? 'Server'} - Modrinth`,
 })
 </script>
+
+<template>
+	<ServersManageContentPage />
+</template>

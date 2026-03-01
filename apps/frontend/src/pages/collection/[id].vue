@@ -347,24 +347,16 @@
 				</template>
 			</ProjectCard>
 		</ProjectCardList>
-		<div v-else>
-			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
-				<EmptyIllustration class="h-[120px] w-auto" />
-				<div class="-mt-4 flex flex-col gap-4">
-					<div class="flex flex-col items-center gap-1.5">
-						<span class="text-lg text-contrast md:text-2xl">{{
-							formatMessage(messages.noProjectsLabel)
-						}}</span>
-					</div>
-					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
-						<nuxt-link class="mx-auto w-min" to="/discover/mods">
-							<CompassIcon class="size-5" />
-							Discover mods
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</div>
-		</div>
+		<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
+			<template #actions>
+				<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
+					<nuxt-link class="mx-auto w-min" to="/discover/mods">
+						<CompassIcon class="size-5" />
+						Discover mods
+					</nuxt-link>
+				</ButtonStyled>
+			</template>
+		</EmptyState>
 	</NormalPage>
 </template>
 
@@ -374,7 +366,6 @@ import {
 	ChevronLeftIcon,
 	CompassIcon,
 	EditIcon,
-	EmptyIllustration,
 	GlobeIcon,
 	HeartMinusIcon,
 	LinkIcon,
@@ -395,6 +386,7 @@ import {
 	ConfirmModal,
 	defineMessage,
 	defineMessages,
+	EmptyState,
 	FileInput,
 	HorizontalRule,
 	injectModrinthClient,

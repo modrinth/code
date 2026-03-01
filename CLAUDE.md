@@ -67,10 +67,22 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 - [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API
 - [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
+## Skills (`.claude/skills/`)
+
+Project-specific skill files with detailed patterns. Use them when the task matches:
+
+- **`api-module`** — Adding a new API endpoint module to `packages/api-client` (types, module class, registry registration)
+- **`cross-platform-pages`** — Building a page that needs to work in both the website (`apps/frontend`) and the desktop app (`apps/app-frontend`)
+- **`dependency-injection`** — Creating or wiring up a `provide`/`inject` context for platform abstraction or deep component state sharing
+- **`figma-mcp`** — Translating a Figma design into Vue components using the Figma MCP tools
+- **`i18n-convert`** — Converting hardcoded English strings in Vue SFCs into the `@modrinth/ui` i18n system (`defineMessages`, `formatMessage`, `IntlFormatted`)
+- **`multistage-modals`** — Building a wizard-like modal with multiple stages, progress tracking, and per-stage buttons using `MultiStageModal`
+- **`tanstack-query`** — Fetching, caching, or mutating server data with `@tanstack/vue-query` (queries, mutations, invalidation, optimistic updates)
+
 ## Code Guidelines
 
 ### Comments
-- DO NOT use "heading" comments like: // === Helper methods === .
+- DO NOT use "heading" comments like: `=== Helper methods ===`.
 - Use doc comments, but avoid inline comments unless ABSOLUTELY necessary for clarity. Code should aim to be self documenting!
 
 ## Bash Guidelines

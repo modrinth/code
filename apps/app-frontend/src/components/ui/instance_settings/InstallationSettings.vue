@@ -1,37 +1,47 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
+	ArrowLeftRightIcon,
+	CircleAlertIcon,
 	DownloadIcon,
-	getLoaderIcon,
+	EyeIcon,
+	EyeOffIcon,
 	HammerIcon,
-	IssuesIcon,
+	PencilIcon,
+	SaveIcon,
 	SpinnerIcon,
-	TransferIcon,
-	UndoIcon,
 	UnlinkIcon,
-	UnplugIcon,
-	WrenchIcon,
+	XIcon,
 } from '@modrinth/assets'
 import {
+	AutoLink,
 	Avatar,
 	ButtonStyled,
-	Checkbox,
 	Chips,
 	Combobox,
+	ConfirmReinstallModal,
+	ConfirmRepairModal,
+	ConfirmUnlinkModal,
+	ContentUpdaterModal,
 	defineMessages,
 	formatLoader,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
-import type { GameVersionTag, PlatformTag, Project, Version } from '@modrinth/utils'
-import dayjs from 'dayjs'
-import { computed, type ComputedRef, type Ref, ref, shallowRef, watch } from 'vue'
+import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, type ComputedRef, nextTick, type Ref, ref, shallowRef, watch } from 'vue'
 
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
-import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache'
+import { get_project_versions, get_version } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
-import { edit, install, update_repair_modrinth } from '@/helpers/profile'
+import {
+	edit,
+	get_linked_modpack_info,
+	install,
+	update_managed_modrinth_version,
+	update_repair_modrinth,
+} from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 
 import type {
@@ -43,16 +53,18 @@ import type {
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-const repairConfirmModal = ref()
-const modpackVersionModal = ref()
-const modalConfirmUnpair = ref()
-const modalConfirmReinstall = ref()
+const repairConfirmModal = ref<InstanceType<typeof ConfirmRepairModal>>()
+const modalConfirmReinstall = ref<InstanceType<typeof ConfirmReinstallModal>>()
+const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
+const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
 const props = defineProps<InstanceSettingsTabProps>()
 
+const isLinked = computed(() => !!props.instance.linked_data?.locked)
+const isEditing = ref(false)
+
 const loader = ref(props.instance.loader)
 const gameVersion = ref(props.instance.game_version)
-
 const showSnapshots = ref(false)
 
 const [
@@ -90,42 +102,121 @@ const [
 		.catch(handleError),
 ])
 
-const modpackProject: Ref<Project | null> = ref(null)
-const modpackVersion: Ref<Version | null> = ref(null)
-const modpackVersions: Ref<Version[] | null> = ref(null)
-const fetching = ref(true)
+const queryClient = useQueryClient()
 
-if (props.instance.linked_data && props.instance.linked_data.project_id && !props.offline) {
-	get_project(props.instance.linked_data.project_id, 'must_revalidate')
-		.then((project) => {
-			modpackProject.value = project
+const { data: modpackInfo } = useQuery({
+	queryKey: computed(() => ['linkedModpackInfo', props.instance.path]),
+	queryFn: () => get_linked_modpack_info(props.instance.path, 'must_revalidate'),
+	enabled: computed(() => !!props.instance.linked_data?.project_id && !props.offline),
+})
 
-			if (project && project.versions) {
-				get_version_many(project.versions, 'must_revalidate')
-					.then((versions: Version[]) => {
-						modpackVersions.value = versions.sort((a, b) =>
-							dayjs(b.date_published).diff(dayjs(a.date_published)),
-						)
-						modpackVersion.value =
-							versions.find(
-								(version: Version) => version.id === props.instance.linked_data?.version_id,
-							) ?? null
-					})
-					.catch(handleError)
-					.finally(() => {
-						fetching.value = false
-					})
-			}
+const installationInfo = computed(() => {
+	const rows = [
+		{
+			label: formatMessage(messages.platform),
+			value: formatLoader(formatMessage, props.instance.loader),
+		},
+		{ label: formatMessage(messages.gameVersion), value: props.instance.game_version },
+	]
+	if (props.instance.loader !== 'vanilla' && props.instance.loader_version) {
+		rows.push({
+			label: formatMessage(messages.loaderVersion, {
+				loader: formatLoader(formatMessage, props.instance.loader),
+			}),
+			value: props.instance.loader_version,
 		})
-		.catch((err) => {
-			handleError(err)
-			fetching.value = false
-		})
-} else {
-	fetching.value = false
+	}
+	return rows
+})
+
+const platforms = computed(() => loaders?.value?.map((x) => x.name) ?? [])
+const formattedLoaderName = computed(() => formatLoader(formatMessage, loader.value))
+
+const updatingModpack = ref(false)
+const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
+const loadingVersions = ref(false)
+const loadingChangelog = ref(false)
+const isModpackUpdating = ref(false)
+
+async function handleModpackUpdate() {
+	if (!props.instance?.linked_data?.project_id) return
+
+	updatingModpack.value = true
+	updatingProjectVersions.value = []
+	loadingVersions.value = true
+	loadingChangelog.value = false
+
+	await nextTick()
+
+	contentUpdaterModal.value?.show(
+		modpackInfo.value?.update_version_id ?? props.instance?.linked_data?.version_id ?? undefined,
+	)
+
+	const versions = (await get_project_versions(props.instance.linked_data.project_id).catch(
+		handleError,
+	)) as Labrinth.Versions.v2.Version[] | null
+
+	loadingVersions.value = false
+
+	if (!versions) return
+
+	versions.sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+
+	updatingProjectVersions.value = versions
 }
 
-const currentLoaderIcon = computed(() => getLoaderIcon(props.instance.loader))
+async function fetchAndSpliceVersion(
+	versionId: string,
+	cacheBehaviour?: Parameters<typeof get_version>[1],
+	onError?: (err: unknown) => void,
+) {
+	const fullVersion = (await get_version(versionId, cacheBehaviour).catch(
+		onError ?? (() => null),
+	)) as Labrinth.Versions.v2.Version | null
+	if (!fullVersion) return
+	const index = updatingProjectVersions.value.findIndex((v) => v.id === versionId)
+	if (index !== -1) {
+		const newVersions = [...updatingProjectVersions.value]
+		newVersions[index] = fullVersion
+		updatingProjectVersions.value = newVersions
+	}
+}
+
+async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog !== undefined) return
+	loadingChangelog.value = true
+	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError)
+	loadingChangelog.value = false
+}
+
+async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog !== undefined) return
+	await fetchAndSpliceVersion(version.id)
+}
+
+function resetUpdateState() {
+	updatingModpack.value = false
+	updatingProjectVersions.value = []
+	loadingVersions.value = false
+	loadingChangelog.value = false
+}
+
+async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	if (!props.instance?.path) return
+
+	isModpackUpdating.value = true
+	try {
+		await update_managed_modrinth_version(props.instance.path, selectedVersion.id)
+		await queryClient.invalidateQueries({ queryKey: ['linkedModpackInfo', props.instance.path] })
+	} catch (err) {
+		handleError(err)
+	} finally {
+		isModpackUpdating.value = false
+		resetUpdateState()
+	}
+}
 
 const gameVersionsForLoader = computed(() => {
 	return all_game_versions?.value.filter((item) => {
@@ -231,19 +322,26 @@ async function saveGvLoaderEdits() {
 	} else {
 		loaderVersionIndex.value = -1
 	}
-	console.log('Editing:')
-	console.log(loader.value)
 
 	await edit(props.instance.path, editProfile).catch(handleError)
 	await repairProfile(false)
 
 	editing.value = false
+	isEditing.value = false
 }
 
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const repairing = ref(false)
 const reinstalling = ref(false)
-const changingVersion = ref(false)
+
+const isBusy = computed(
+	() =>
+		installing.value ||
+		repairing.value ||
+		reinstalling.value ||
+		isModpackUpdating.value ||
+		!!props.offline,
+)
 
 async function repairProfile(force: boolean) {
 	if (force) {
@@ -260,16 +358,6 @@ async function repairProfile(force: boolean) {
 	})
 }
 
-async function unpairProfile() {
-	await edit(props.instance.path, {
-		linked_data: null,
-	})
-	modpackProject.value = null
-	modpackVersion.value = null
-	modpackVersions.value = null
-	modalConfirmUnpair.value.hide()
-}
-
 async function repairModpack() {
 	reinstalling.value = true
 	await update_repair_modrinth(props.instance.path).catch(handleError)
@@ -279,6 +367,19 @@ async function repairModpack() {
 		loader: props.instance.loader,
 		game_version: props.instance.game_version,
 	})
+}
+
+async function unlinkModpack() {
+	await edit(props.instance.path, {
+		linked_data: null as unknown as undefined,
+	})
+}
+
+function cancelEditing() {
+	loader.value = props.instance.loader
+	gameVersion.value = props.instance.game_version
+	resetLoaderVersionIndex()
+	isEditing.value = false
 }
 
 const messages = defineMessages({
@@ -294,9 +395,14 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.tooltip.cannot-while-repairing',
 		defaultMessage: 'Cannot {action} while repairing',
 	},
-	currentlyInstalled: {
-		id: 'instance.settings.tabs.installation.currently-installed',
-		defaultMessage: 'Currently installed',
+	repairInstanceTitle: {
+		id: 'instance.settings.tabs.installation.repair.title',
+		defaultMessage: 'Repair instance',
+	},
+	repairInstanceDescription: {
+		id: 'instance.settings.tabs.installation.repair.description',
+		defaultMessage:
+			'Reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors.',
 	},
 	platform: {
 		id: 'instance.settings.tabs.installation.platform',
@@ -309,31 +415,6 @@ const messages = defineMessages({
 	loaderVersion: {
 		id: 'instance.settings.tabs.installation.loader-version',
 		defaultMessage: '{loader} version',
-	},
-	showAllVersions: {
-		id: 'instance.settings.tabs.installation.show-all-versions',
-		defaultMessage: 'Show all versions',
-	},
-	install: {
-		id: 'instance.settings.tabs.installation.install',
-		defaultMessage: 'Install',
-	},
-	resetSelections: {
-		id: 'instance.settings.tabs.installation.reset-selections',
-		defaultMessage: 'Reset to current',
-	},
-	unknownVersion: {
-		id: 'instance.settings.tabs.installation.unknown-version',
-		defaultMessage: '(unknown version)',
-	},
-	repairConfirmTitle: {
-		id: 'instance.settings.tabs.installation.repair.confirm.title',
-		defaultMessage: 'Repair instance?',
-	},
-	repairConfirmDescription: {
-		id: 'instance.settings.tabs.installation.repair.confirm.description',
-		defaultMessage:
-			'Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods.',
 	},
 	repairButton: {
 		id: 'instance.settings.tabs.installation.repair.button',
@@ -351,108 +432,6 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.tooltip.action.repair',
 		defaultMessage: 'repair',
 	},
-	changeVersionCannotWhileFetching: {
-		id: 'instance.settings.tabs.installation.change-version.cannot-while-fetching',
-		defaultMessage: 'Fetching modpack versions',
-	},
-	changeVersionButton: {
-		id: 'instance.settings.tabs.installation.change-version.button',
-		defaultMessage: 'Change version',
-	},
-	changeVersionAction: {
-		id: 'instance.settings.tabs.installation.tooltip.action.change-version',
-		defaultMessage: 'change version',
-	},
-	installingButton: {
-		id: 'instance.settings.tabs.installation.change-version.button.installing',
-		defaultMessage: 'Installing',
-	},
-	installInProgress: {
-		id: 'instance.settings.tabs.installation.install.in-progress',
-		defaultMessage: 'Installation in progress',
-	},
-	installButton: {
-		id: 'instance.settings.tabs.installation.change-version.button.install',
-		defaultMessage: 'Install',
-	},
-	alreadyInstalledVanilla: {
-		id: 'instance.settings.tabs.installation.change-version.already-installed.vanilla',
-		defaultMessage: 'Vanilla {game_version} already installed',
-	},
-	alreadyInstalledModded: {
-		id: 'instance.settings.tabs.installation.change-version.already-installed.modded',
-		defaultMessage: '{platform} {version} for Minecraft {game_version} already installed',
-	},
-	installAction: {
-		id: 'instance.settings.tabs.installation.tooltip.action.install',
-		defaultMessage: 'install',
-	},
-	installingNewVersion: {
-		id: 'instance.settings.tabs.installation.change-version.in-progress',
-		defaultMessage: 'Installing new version',
-	},
-	minecraftVersion: {
-		id: 'instance.settings.tabs.installation.minecraft-version',
-		defaultMessage: 'Minecraft {version}',
-	},
-	noLoaderVersions: {
-		id: 'instance.settings.tabs.installation.no-loader-versions',
-		defaultMessage: '{loader} is not available for Minecraft {version}. Try another mod loader.',
-	},
-	noConnection: {
-		id: 'instance.settings.tabs.installation.no-connection',
-		defaultMessage: 'Cannot fetch linked modpack details. Please check your internet connection.',
-	},
-	noModpackFound: {
-		id: 'instance.settings.tabs.installation.no-modpack-found',
-		defaultMessage:
-			'This instance is linked to a modpack, but the modpack could not be found on Modrinth.',
-	},
-	debugInformation: {
-		id: 'instance.settings.tabs.installation.debug-information',
-		defaultMessage: 'Debug information:',
-	},
-	fetchingModpackDetails: {
-		id: 'instance.settings.tabs.installation.fetching-modpack-details',
-		defaultMessage: 'Fetching modpack details',
-	},
-	unlinkInstanceTitle: {
-		id: 'instance.settings.tabs.installation.unlink.title',
-		defaultMessage: 'Unlink from modpack',
-	},
-	unlinkInstanceDescription: {
-		id: 'instance.settings.tabs.installation.unlink.description',
-		defaultMessage: `This instance is linked to a modpack, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the modpack.`,
-	},
-	unlinkInstanceButton: {
-		id: 'instance.settings.tabs.installation.unlink.button',
-		defaultMessage: 'Unlink instance',
-	},
-	unlinkInstanceConfirmTitle: {
-		id: 'instance.settings.tabs.installation.unlink.confirm.title',
-		defaultMessage: 'Are you sure you want to unlink this instance?',
-	},
-	unlinkInstanceConfirmDescription: {
-		id: 'instance.settings.tabs.installation.unlink.confirm.description',
-		defaultMessage:
-			'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal.',
-	},
-	reinstallModpackConfirmTitle: {
-		id: 'instance.settings.tabs.installation.reinstall.confirm.title',
-		defaultMessage: 'Are you sure you want to reinstall this instance?',
-	},
-	reinstallModpackConfirmDescription: {
-		id: 'instance.settings.tabs.installation.reinstall.confirm.description',
-		defaultMessage: `Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds.`,
-	},
-	reinstallModpackTitle: {
-		id: 'instance.settings.tabs.installation.reinstall.title',
-		defaultMessage: 'Reinstall modpack',
-	},
-	reinstallModpackDescription: {
-		id: 'instance.settings.tabs.installation.reinstall.description',
-		defaultMessage: `Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack.`,
-	},
 	reinstallModpackButton: {
 		id: 'instance.settings.tabs.installation.reinstall.button',
 		defaultMessage: 'Reinstall modpack',
@@ -465,114 +444,135 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.tooltip.action.reinstall',
 		defaultMessage: 'reinstall',
 	},
+	installationInfoTitle: {
+		id: 'instance.settings.tabs.installation.info.title',
+		defaultMessage: 'Installation info',
+	},
+	installedModpackTitle: {
+		id: 'instance.settings.tabs.installation.installed-modpack.title',
+		defaultMessage: 'Installed modpack',
+	},
+	changeVersionButton: {
+		id: 'instance.settings.tabs.installation.change-version.button',
+		defaultMessage: 'Change version',
+	},
+	linkedInstanceTitle: {
+		id: 'instance.settings.tabs.installation.linked-instance.title',
+		defaultMessage: 'Linked instance',
+	},
+	unlinkDescription: {
+		id: 'instance.settings.tabs.installation.unlink.description',
+		defaultMessage:
+			"Unlinking permanently disconnects this instance from the modpack project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+	},
+	unlinkButton: {
+		id: 'instance.settings.tabs.installation.unlink.button',
+		defaultMessage: 'Unlink modpack',
+	},
+	reinstallModpackTitle: {
+		id: 'instance.settings.tabs.installation.reinstall.title',
+		defaultMessage: 'Re-install modpack',
+	},
+	reinstallModpackDescription: {
+		id: 'instance.settings.tabs.installation.reinstall.description',
+		defaultMessage:
+			"Re-installing the modpack resets the instance's content to its original state, removing any mods or content you have added.",
+	},
+	editWarning: {
+		id: 'instance.settings.tabs.installation.edit.warning',
+		defaultMessage:
+			"We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues.",
+	},
+	editButton: {
+		id: 'instance.settings.tabs.installation.edit.button',
+		defaultMessage: 'Edit',
+	},
+	cancelButton: {
+		id: 'instance.settings.tabs.installation.cancel.button',
+		defaultMessage: 'Cancel',
+	},
+	saveButton: {
+		id: 'instance.settings.tabs.installation.save.button',
+		defaultMessage: 'Save',
+	},
+	savingButton: {
+		id: 'instance.settings.tabs.installation.saving.button',
+		defaultMessage: 'Saving...',
+	},
+	showAllVersions: {
+		id: 'instance.settings.tabs.installation.show-all-versions',
+		defaultMessage: 'Show all versions',
+	},
+	hideSnapshots: {
+		id: 'instance.settings.tabs.installation.hide-snapshots',
+		defaultMessage: 'Hide snapshots',
+	},
 })
 </script>
 
 <template>
-	<ConfirmModalWrapper
-		ref="repairConfirmModal"
-		:title="formatMessage(messages.repairConfirmTitle)"
-		:description="formatMessage(messages.repairConfirmDescription)"
-		:proceed-icon="HammerIcon"
-		:proceed-label="formatMessage(messages.repairButton)"
-		:danger="false"
-		:show-ad-on-close="false"
-		@proceed="() => repairProfile(true)"
-	/>
-	<ModpackVersionModal
-		v-if="instance.linked_data && modpackVersions"
-		ref="modpackVersionModal"
-		:instance="instance"
-		:versions="modpackVersions"
-		@finish-install="
-			() => {
-				changingVersion = false
-				modpackVersion =
-					modpackVersions?.find(
-						(version: Version) => version.id === props.instance.linked_data?.version_id,
-					) ?? null
-			}
-		"
-	/>
-	<ConfirmModalWrapper
-		ref="modalConfirmUnpair"
-		:title="formatMessage(messages.unlinkInstanceConfirmTitle)"
-		:description="formatMessage(messages.unlinkInstanceConfirmDescription)"
-		:proceed-icon="UnlinkIcon"
-		:proceed-label="formatMessage(messages.unlinkInstanceButton)"
-		:show-ad-on-close="false"
-		@proceed="() => unpairProfile()"
-	/>
-	<ConfirmModalWrapper
-		ref="modalConfirmReinstall"
-		:title="formatMessage(messages.reinstallModpackConfirmTitle)"
-		:description="formatMessage(messages.reinstallModpackConfirmDescription)"
-		:proceed-icon="DownloadIcon"
-		:proceed-label="formatMessage(messages.reinstallModpackButton)"
-		:show-ad-on-close="false"
-		@proceed="() => repairModpack()"
-	/>
-	<div>
-		<h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.currentlyInstalled) }}
-		</h2>
-		<div
-			v-if="!modpackProject && instance.linked_data && offline && !fetching"
-			class="text-secondary font-medium mb-2"
-		>
-			<UnplugIcon class="top-[3px] relative" /> {{ formatMessage(messages.noConnection) }}
-		</div>
-		<div v-else-if="!modpackProject && instance.linked_data && !fetching" class="mb-2">
-			<p class="text-brand-red font-medium mt-0">
-				<IssuesIcon class="top-[3px] relative" />
-				{{ formatMessage(messages.noModpackFound) }}
-			</p>
-			<p>{{ formatMessage(messages.debugInformation) }}</p>
-			<div class="bg-bg p-6 rounded-2xl mt-2 text-sm text-secondary">
-				{{ instance.linked_data }}
-			</div>
-		</div>
-		<div class="flex gap-4 items-center justify-between p-4 bg-bg rounded-2xl">
-			<div v-if="fetching" class="flex items-center gap-2 h-10">
-				<SpinnerIcon class="animate-spin" />
-				{{ formatMessage(messages.fetchingModpackDetails) }}
-			</div>
-			<template v-else>
-				<div class="flex gap-2 items-center">
-					<Avatar v-if="modpackProject" :src="modpackProject?.icon_url" size="40px" />
+	<div class="flex flex-col gap-6">
+		<template v-if="isLinked">
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.installationInfoTitle) }}
+				</span>
+				<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
 					<div
-						v-else
-						class="w-10 h-10 flex items-center justify-center rounded-full bg-button-bg border-solid border-[1px] border-button-border p-2 [&_svg]:h-full [&_svg]:w-full"
+						v-for="row in installationInfo"
+						:key="row.label"
+						class="flex items-center justify-between"
 					>
-						<component :is="currentLoaderIcon" v-if="currentLoaderIcon" />
-						<WrenchIcon v-else />
-					</div>
-					<div class="flex flex-col gap-2 justify-center">
-						<span class="font-semibold leading-none">
-							{{
-								modpackProject
-									? modpackProject.title
-									: formatMessage(messages.minecraftVersion, {
-											version: instance.game_version,
-										})
-							}}
-						</span>
-						<span class="text-sm text-secondary leading-none">
-							{{
-								modpackProject
-									? modpackVersion
-										? modpackVersion?.version_number
-										: 'Unknown version'
-									: formatLoader(formatMessage, instance.loader)
-							}}
-							<template v-if="instance.loader !== 'vanilla' && !modpackProject">
-								{{ instance.loader_version || formatMessage(messages.unknownVersion) }}
-							</template>
-						</span>
+						<span class="text-primary">{{ row.label }}</span>
+						<span class="font-semibold text-contrast">{{ row.value }}</span>
 					</div>
 				</div>
-				<div class="flex gap-1">
-					<ButtonStyled color="orange" type="transparent" hover-color-fill="background">
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.installedModpackTitle) }}
+				</span>
+				<div v-if="modpackInfo" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
+					<AutoLink
+						:to="`/project/${modpackInfo.project.slug ?? modpackInfo.project.id}`"
+						class="shrink-0"
+					>
+						<div
+							class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+						>
+							<Avatar
+								v-if="modpackInfo.project.icon_url"
+								:src="modpackInfo.project.icon_url"
+								:alt="modpackInfo.project.title"
+								size="100%"
+								no-shadow
+							/>
+						</div>
+					</AutoLink>
+					<div class="flex flex-col gap-1">
+						<AutoLink
+							:to="`/project/${modpackInfo.project.slug ?? modpackInfo.project.id}`"
+							class="font-semibold text-contrast hover:underline"
+						>
+							{{ modpackInfo.project.title }}
+						</AutoLink>
+						<div
+							v-if="modpackInfo.version?.version_number"
+							class="flex items-center gap-2 text-sm font-medium text-primary"
+						>
+							<span>{{ modpackInfo.version.version_number }}</span>
+						</div>
+					</div>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					<ButtonStyled>
+						<button class="!shadow-none" :disabled="isBusy" @click="handleModpackUpdate">
+							<ArrowLeftRightIcon class="size-5" />
+							{{ formatMessage(messages.changeVersionButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="orange">
 						<button
 							v-tooltip="
 								repairing
@@ -587,11 +587,12 @@ const messages = defineMessages({
 												})
 											: null
 							"
-							:disabled="installing || repairing || reinstalling || offline"
+							class="!shadow-none"
+							:disabled="isBusy"
 							@click="repairConfirmModal.show()"
 						>
 							<SpinnerIcon v-if="repairing" class="animate-spin" />
-							<HammerIcon v-else />
+							<HammerIcon v-else class="size-5" />
 							{{
 								repairing
 									? formatMessage(messages.repairingButton)
@@ -599,181 +600,35 @@ const messages = defineMessages({
 							}}
 						</button>
 					</ButtonStyled>
-					<ButtonStyled v-if="modpackProject" hover-color-fill="background">
-						<button
-							v-tooltip="
-								changingVersion
-									? formatMessage(messages.installingNewVersion)
-									: repairing
-										? formatMessage(messages.cannotWhileRepairing, {
-												action: formatMessage(messages.changeVersionAction),
-											})
-										: installing || reinstalling
-											? formatMessage(messages.cannotWhileInstalling, {
-													action: formatMessage(messages.changeVersionAction),
-												})
-											: fetching && !modpackVersions
-												? formatMessage(messages.changeVersionCannotWhileFetching)
-												: offline
-													? formatMessage(messages.cannotWhileOffline, {
-															action: formatMessage(messages.changeVersionAction),
-														})
-													: null
-							"
-							:disabled="
-								changingVersion ||
-								repairing ||
-								installing ||
-								reinstalling ||
-								offline ||
-								fetching ||
-								!modpackVersions
-							"
-							@click="
-								() => {
-									changingVersion = true
-									modpackVersionModal.show()
-								}
-							"
-						>
-							<SpinnerIcon v-if="changingVersion" class="animate-spin" />
-							<TransferIcon v-else />
-							{{
-								changingVersion
-									? formatMessage(messages.installingButton)
-									: formatMessage(messages.changeVersionButton)
-							}}
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.linkedInstanceTitle) }}
+				</span>
+				<span class="text-primary">
+					{{ formatMessage(messages.unlinkDescription) }}
+				</span>
+				<div>
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isBusy" @click="confirmUnlinkModal?.show()">
+							<UnlinkIcon class="size-5" />
+							{{ formatMessage(messages.unlinkButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
-			</template>
-		</div>
-		<template v-if="!instance.linked_data || !instance.linked_data.locked">
-			<h2 class="m-0 mt-4 text-lg font-extrabold text-contrast block">
-				{{ formatMessage(messages.platform) }}
-			</h2>
-			<Chips v-if="loaders" v-model="loader" :items="loaders.map((x) => x.name)" class="mt-2" />
-			<h2 class="m-0 mt-4 text-lg font-extrabold text-contrast block">
-				{{ formatMessage(messages.gameVersion) }}
-			</h2>
-			<div class="flex flex-wrap mt-2 gap-2">
-				<Combobox
-					v-if="selectableGameVersionNumbers !== undefined"
-					v-model="gameVersion"
-					:options="gameVersionOptions"
-					:display-value="gameVersion || formatMessage(messages.unknownVersion)"
-				/>
-				<Checkbox
-					v-if="hasSnapshots"
-					v-model="showSnapshots"
-					:label="formatMessage(messages.showAllVersions)"
-				/>
 			</div>
-			<template v-if="loader !== 'vanilla'">
-				<h2 class="m-0 mt-4 text-lg font-extrabold text-contrast block">
-					{{
-						formatMessage(messages.loaderVersion, {
-							loader: formatLoader(formatMessage, loader),
-						})
-					}}
-				</h2>
-				<Combobox
-					v-if="selectableLoaderVersions"
-					v-model="loaderVersionIndex"
-					:options="loaderVersionOptions"
-					:display-value="loaderVersionLabel"
-					name="Version selector"
-					class="mt-2"
-				/>
-				<div v-else class="mt-2 text-brand-red flex gap-2 items-center">
-					<IssuesIcon />
-					{{
-						formatMessage(messages.noLoaderVersions, {
-							loader: loader,
-							version: gameVersion,
-						})
-					}}
-				</div>
-			</template>
-			<div class="mt-4 flex flex-wrap gap-2">
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="
-							installing || reinstalling
-								? formatMessage(messages.installInProgress)
-								: !isChanged
-									? formatMessage(
-											loader === 'vanilla'
-												? messages.alreadyInstalledVanilla
-												: messages.alreadyInstalledModded,
-											{
-												platform: formatLoader(formatMessage, loader),
-												version: instance.loader_version,
-												game_version: gameVersion,
-											},
-										)
-									: repairing
-										? formatMessage(messages.cannotWhileRepairing, {
-												action: formatMessage(messages.installAction),
-											})
-										: offline
-											? formatMessage(messages.cannotWhileOffline, {
-													action: formatMessage(messages.installAction),
-												})
-											: null
-						"
-						:disabled="!isValid || !isChanged || editing || offline || repairing"
-						@click="saveGvLoaderEdits()"
-					>
-						<SpinnerIcon v-if="editing" class="animate-spin" />
-						<DownloadIcon v-else />
-						{{
-							editing
-								? formatMessage(messages.installingButton)
-								: formatMessage(messages.installButton)
-						}}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button
-						:disabled="!isChanged"
-						@click="
-							() => {
-								loader = instance.loader
-								gameVersion = instance.game_version
-								resetLoaderVersionIndex()
-							}
-						"
-					>
-						<UndoIcon />
-						{{ formatMessage(messages.resetSelections) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</template>
-		<template v-else>
-			<template v-if="instance.linked_data && instance.linked_data.locked">
-				<h2 class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
-					{{ formatMessage(messages.unlinkInstanceTitle) }}
-				</h2>
-				<p class="m-0">
-					{{ formatMessage(messages.unlinkInstanceDescription) }}
-				</p>
-				<ButtonStyled>
-					<button class="mt-2" @click="modalConfirmUnpair.show()">
-						<UnlinkIcon /> {{ formatMessage(messages.unlinkInstanceButton) }}
-					</button>
-				</ButtonStyled>
-				<template v-if="modpackProject">
-					<div>
-						<h2 class="m-0 mb-1 text-lg font-extrabold text-contrast block mt-4">
-							{{ formatMessage(messages.reinstallModpackTitle) }}
-						</h2>
-						<p class="m-0">
-							{{ formatMessage(messages.reinstallModpackDescription) }}
-						</p>
-					</div>
-					<ButtonStyled color="red" type="outlined">
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.reinstallModpackTitle) }}
+				</span>
+				<span class="text-primary">
+					{{ formatMessage(messages.reinstallModpackDescription) }}
+				</span>
+				<div>
+					<ButtonStyled color="red">
 						<button
 							v-tooltip="
 								reinstalling
@@ -792,19 +647,12 @@ const messages = defineMessages({
 													})
 												: null
 							"
-							class="mt-2"
-							:disabled="
-								changingVersion ||
-								repairing ||
-								installing ||
-								offline ||
-								fetching ||
-								!modpackVersions
-							"
-							@click="modalConfirmReinstall.show()"
+							class="!shadow-none"
+							:disabled="isBusy || !modpackInfo"
+							@click="modalConfirmReinstall?.show()"
 						>
 							<SpinnerIcon v-if="reinstalling" class="animate-spin" />
-							<DownloadIcon v-else />
+							<DownloadIcon v-else class="size-5" />
 							{{
 								reinstalling
 									? formatMessage(messages.reinstallingModpackButton)
@@ -812,8 +660,189 @@ const messages = defineMessages({
 							}}
 						</button>
 					</ButtonStyled>
-				</template>
+				</div>
+			</div>
+		</template>
+
+		<template v-else>
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.installationInfoTitle) }}
+				</span>
+
+				<div v-if="!isEditing" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+					<div
+						v-for="row in installationInfo"
+						:key="row.label"
+						class="flex items-center justify-between"
+					>
+						<span class="text-primary">{{ row.label }}</span>
+						<span class="font-semibold text-contrast">{{ row.value }}</span>
+					</div>
+				</div>
+
+				<div
+					v-else
+					class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+				>
+					<div class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast">
+							{{ formatMessage(messages.platform) }}
+						</span>
+						<Chips v-model="loader" :items="platforms" />
+					</div>
+
+					<div class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast">
+							{{ formatMessage(messages.gameVersion) }}
+						</span>
+						<Combobox
+							v-model="gameVersion"
+							:options="gameVersionOptions"
+							searchable
+							sync-with-selection
+							placeholder="Select version"
+							search-placeholder="Search game version..."
+							:display-value="gameVersion || 'Select version'"
+						>
+							<template v-if="hasSnapshots" #dropdown-footer>
+								<button
+									class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+									@mousedown.prevent
+									@click="showSnapshots = !showSnapshots"
+								>
+									<EyeOffIcon v-if="showSnapshots" class="size-4" />
+									<EyeIcon v-else class="size-4" />
+									{{
+										showSnapshots
+											? formatMessage(messages.hideSnapshots)
+											: formatMessage(messages.showAllVersions)
+									}}
+								</button>
+							</template>
+						</Combobox>
+					</div>
+
+					<div v-if="loader !== 'vanilla'" class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast">
+							{{ formatMessage(messages.loaderVersion, { loader: formattedLoaderName }) }}
+						</span>
+						<Combobox
+							v-model="loaderVersionIndex"
+							searchable
+							sync-with-selection
+							:placeholder="loaderVersionLabel"
+							search-placeholder="Search version..."
+							:options="loaderVersionOptions"
+							:display-value="loaderVersionLabel"
+						/>
+					</div>
+
+					<div class="flex flex-wrap gap-2">
+						<ButtonStyled color="brand">
+							<button
+								class="!shadow-none"
+								:disabled="!isValid || !isChanged || editing || !!offline || repairing"
+								@click="saveGvLoaderEdits()"
+							>
+								<SpinnerIcon v-if="editing" class="animate-spin" />
+								<SaveIcon v-else />
+								{{
+									editing
+										? formatMessage(messages.savingButton)
+										: formatMessage(messages.saveButton)
+								}}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled type="outlined">
+							<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
+								<XIcon />
+								{{ formatMessage(messages.cancelButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</div>
+
+			<template v-if="!isEditing">
+				<div class="flex items-start gap-2">
+					<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+					<span class="text-primary">
+						{{ formatMessage(messages.editWarning) }}
+					</span>
+				</div>
+				<div class="flex flex-wrap gap-2">
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isBusy" @click="isEditing = true">
+							<PencilIcon class="size-5" />
+							{{ formatMessage(messages.editButton) }}
+						</button>
+					</ButtonStyled>
+				</div>
 			</template>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">
+					{{ formatMessage(messages.repairInstanceTitle) }}
+				</span>
+				<span class="text-primary">
+					{{ formatMessage(messages.repairInstanceDescription) }}
+				</span>
+				<div>
+					<ButtonStyled color="orange">
+						<button
+							v-tooltip="
+								repairing
+									? formatMessage(messages.repairInProgress)
+									: installing || reinstalling
+										? formatMessage(messages.cannotWhileInstalling, {
+												action: formatMessage(messages.repairAction),
+											})
+										: offline
+											? formatMessage(messages.cannotWhileOffline, {
+													action: formatMessage(messages.repairAction),
+												})
+											: null
+							"
+							class="!shadow-none"
+							:disabled="isBusy"
+							@click="repairConfirmModal.show()"
+						>
+							<SpinnerIcon v-if="repairing" class="animate-spin" />
+							<HammerIcon v-else class="size-5" />
+							{{
+								repairing
+									? formatMessage(messages.repairingButton)
+									: formatMessage(messages.repairButton)
+							}}
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
 		</template>
 	</div>
+
+	<ConfirmRepairModal ref="repairConfirmModal" @repair="() => repairProfile(true)" />
+	<ConfirmReinstallModal ref="modalConfirmReinstall" @reinstall="repairModpack" />
+	<ConfirmUnlinkModal ref="confirmUnlinkModal" @unlink="unlinkModpack" />
+	<Teleport to="body">
+		<ContentUpdaterModal
+			v-if="updatingModpack"
+			ref="contentUpdaterModal"
+			:versions="updatingProjectVersions"
+			:current-game-version="instance.game_version"
+			:current-loader="instance.loader"
+			:current-version-id="instance.linked_data?.version_id ?? ''"
+			:is-app="true"
+			:is-modpack="true"
+			:project-icon-url="modpackInfo?.project?.icon_url"
+			:project-name="modpackInfo?.project?.title ?? 'Modpack'"
+			:loading="loadingVersions"
+			:loading-changelog="loadingChangelog"
+			@update="handleModalUpdate"
+			@cancel="resetUpdateState"
+			@version-select="handleVersionSelect"
+			@version-hover="handleVersionHover"
+		/>
+	</Teleport>
 </template>

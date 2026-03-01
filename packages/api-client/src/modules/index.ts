@@ -1,19 +1,22 @@
 import type { AbstractModrinthClient } from '../core/abstract-client'
 import type { AbstractModule } from '../core/abstract-module'
-import { ArchonBackupsV0Module } from './archon/backups/v0'
 import { ArchonBackupsV1Module } from './archon/backups/v1'
-import { ArchonContentV0Module } from './archon/content/v0'
+import { ArchonContentV1Module } from './archon/content/v1'
 import { ArchonServersV0Module } from './archon/servers/v0'
 import { ArchonServersV1Module } from './archon/servers/v1'
 import { ISO3166Module } from './iso3166'
+import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
-import { LabrinthVersionsV3Module } from './labrinth'
+import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthStateModule } from './labrinth/state'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
+import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
+import { PaperVersionsV3Module } from './paper/v3'
+import { PurpurVersionsV2Module } from './purpur/v2'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -27,12 +30,13 @@ type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
  * TODO: Better way? Probably not
  */
 export const MODULE_REGISTRY = {
-	archon_backups_v0: ArchonBackupsV0Module,
 	archon_backups_v1: ArchonBackupsV1Module,
-	archon_content_v0: ArchonContentV0Module,
+	archon_content_v1: ArchonContentV1Module,
 	archon_servers_v0: ArchonServersV0Module,
 	archon_servers_v1: ArchonServersV1Module,
 	iso3166_data: ISO3166Module,
+	launchermeta_manifest_v0: LauncherMetaManifestV0Module,
+	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
@@ -40,7 +44,10 @@ export const MODULE_REGISTRY = {
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_state: LabrinthStateModule,
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
+	labrinth_versions_v2: LabrinthVersionsV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
+	paper_versions_v3: PaperVersionsV3Module,
+	purpur_versions_v2: PurpurVersionsV2Module,
 } as const satisfies Record<string, ModuleConstructor>
 
 export type ModuleID = keyof typeof MODULE_REGISTRY

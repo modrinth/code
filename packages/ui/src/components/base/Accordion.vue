@@ -10,14 +10,18 @@
 					<slot name="title" :open="isOpen" />
 					<DropdownIcon
 						v-if="!forceOpen"
-						class="ml-auto size-5 transition-transform duration-300 shrink-0"
+						class="ml-auto size-5 transition-transform duration-300 shrink-0 text-contrast"
 						:class="{ 'rotate-180': isOpen }"
 					/>
 				</div>
 			</slot>
 			<slot name="summary" />
 		</button>
-		<div class="accordion-content" :class="{ open: isOpen }">
+		<div
+			class="accordion-content"
+			:class="{ open: isOpen, 'overflow-visible': overflowVisible && showOverflow }"
+			@transitionend="onTransitionEnd"
+		>
 			<div>
 				<div :class="contentClass ? contentClass : ''" :inert="!isOpen">
 					<slot />
@@ -39,6 +43,7 @@ const props = withDefaults(
 		contentClass?: string
 		titleWrapperClass?: string
 		forceOpen?: boolean
+		overflowVisible?: boolean
 	}>(),
 	{
 		type: 'standard',
@@ -47,11 +52,13 @@ const props = withDefaults(
 		contentClass: null,
 		titleWrapperClass: null,
 		forceOpen: false,
+		overflowVisible: false,
 	},
 )
 
 const toggledOpen = ref(props.openByDefault)
 const isOpen = computed(() => toggledOpen.value || props.forceOpen)
+const showOverflow = ref(props.openByDefault)
 const emit = defineEmits(['onOpen', 'onClose'])
 
 const slots = useSlots()
@@ -71,8 +78,14 @@ function open() {
 	emit('onOpen')
 }
 function close() {
+	showOverflow.value = false
 	toggledOpen.value = false
 	emit('onClose')
+}
+function onTransitionEnd() {
+	if (isOpen.value) {
+		showOverflow.value = true
+	}
 }
 
 defineExpose({
@@ -104,5 +117,9 @@ defineOptions({
 
 .accordion-content > div {
 	overflow: hidden;
+}
+
+.accordion-content.overflow-visible > div {
+	overflow: visible;
 }
 </style>

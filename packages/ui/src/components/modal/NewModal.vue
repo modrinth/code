@@ -14,7 +14,7 @@
 				'modal-overlay',
 				{
 					shown: visible,
-					noblur: props.noblur,
+					noblur: effectiveNoblur,
 				},
 				computedFade,
 			]"
@@ -38,7 +38,7 @@
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" class="text-lg font-extrabold text-contrast">
+							<span v-if="header" class="text-2xl font-semibold text-contrast">
 								{{ header }}
 							</span>
 						</slot>
@@ -64,14 +64,14 @@
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-24"
+						enter-to-class="opacity-100 max-h-12"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-24"
+						leave-from-class="opacity-100 max-h-12"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-24 bg-gradient-to-b from-bg-raised to-transparent"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-12 bg-gradient-to-b from-bg-raised to-transparent"
 						/>
 					</Transition>
 
@@ -91,14 +91,14 @@
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-24"
+						enter-to-class="opacity-100 max-h-12"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-24"
+						leave-from-class="opacity-100 max-h-12"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-bg-raised to-transparent"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-bg-raised to-transparent"
 						/>
 					</Transition>
 				</div>
@@ -113,7 +113,7 @@
 					<slot> You just lost the game.</slot>
 				</div>
 
-				<div v-if="$slots.actions" class="p-4">
+				<div v-if="$slots.actions" class="p-4 pt-0">
 					<slot name="actions" />
 				</div>
 			</div>
@@ -124,10 +124,20 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
+import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
+import { injectModalBehavior } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
+
+const modalBehavior = injectModalBehavior(null)
+const {
+	push: pushModal,
+	pop: popModal,
+	isTopmost: isTopmostModal,
+	stackSize: modalStackSize,
+} = useModalStack()
 
 const props = withDefaults(
 	defineProps<{
@@ -157,6 +167,7 @@ const props = withDefaults(
 	}>(),
 	{
 		type: true,
+		noblur: undefined,
 		closable: true,
 		danger: false,
 		fade: undefined,
@@ -178,6 +189,8 @@ const props = withDefaults(
 	},
 )
 
+const effectiveNoblur = computed(() => props.noblur ?? modalBehavior?.noblur.value ?? false)
+
 const computedFade = computed(() => {
 	if (props.fade) return props.fade
 	if (props.danger) return 'danger'
@@ -192,7 +205,10 @@ const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scr
 
 function show(event?: MouseEvent) {
 	props.onShow?.()
+	const wasEmpty = modalStackSize() === 0
 	open.value = true
+	pushModal()
+	if (wasEmpty) modalBehavior?.onShow?.()
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
@@ -212,7 +228,11 @@ function hide() {
 	if (props.disableClose) return
 	props.onHide?.()
 	visible.value = false
-	document.body.style.overflow = ''
+	popModal()
+	if (modalStackSize() === 0) {
+		modalBehavior?.onHide?.()
+		document.body.style.overflow = ''
+	}
 	window.removeEventListener('mousedown', updateMousePosition)
 	window.removeEventListener('keydown', handleKeyDown)
 	setTimeout(() => {
@@ -234,8 +254,21 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseY.value = event.clientY
 }
 
+onUnmounted(() => {
+	if (open.value) {
+		popModal()
+		window.removeEventListener('mousedown', updateMousePosition)
+		window.removeEventListener('keydown', handleKeyDown)
+		if (modalStackSize() === 0) {
+			document.body.style.overflow = ''
+			modalBehavior?.onHide?.()
+		}
+	}
+})
+
 function handleKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
+		if (!isTopmostModal()) return
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2

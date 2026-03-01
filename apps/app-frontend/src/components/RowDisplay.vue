@@ -24,10 +24,11 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_by_profile_path } from '@/helpers/process.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
+import { injectContentInstall } from '@/providers/content-install'
 import { handleSevereError } from '@/store/error.js'
-import { install as installVersion } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
 
 const router = useRouter()
 

@@ -72,6 +72,10 @@ const instance: Ref<Instance | null> = ref(null)
 const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref([])
+// Non-reactive snapshot used by instanceFilters to avoid triggering a search
+// refresh when an item is installed mid-browse (which causes content shift).
+// Synced before each search triggered by filter/page/query changes.
+let newlyInstalledSnapshot: string[] = []
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -128,7 +132,7 @@ const instanceFilters = computed(() => {
 				.filter((x) => x.metadata)
 				.map((x) => x.metadata.project_id)
 
-			installedMods.push(...newlyInstalled.value)
+			installedMods.push(...newlyInstalledSnapshot)
 
 			installedMods
 				?.map((x) => ({
@@ -163,6 +167,19 @@ const {
 	// Functions
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
+
+const activeLoader = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'mod_loader')
+	if (filter) return filter.option
+	if (projectType.value === 'datapack' || projectType.value === 'resourcepack') return 'vanilla'
+	return instance.value?.loader ?? null
+})
+
+const activeGameVersion = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'game_version')
+	if (filter) return filter.option
+	return instance.value?.game_version ?? null
+})
 
 const previousFilterState = ref('')
 
@@ -206,6 +223,7 @@ watch(requestParams, () => {
 })
 
 async function refreshSearch() {
+	newlyInstalledSnapshot = [...newlyInstalled.value]
 	let rawResults = await get_search_results(requestParams.value)
 	if (!rawResults) {
 		rawResults = {
@@ -515,6 +533,8 @@ previousFilterState.value = JSON.stringify({
 					:project-type="projectType"
 					:project="result"
 					:instance="instance"
+					:active-loader="activeLoader"
+					:active-game-version="activeGameVersion"
 					:categories="[
 						...categories.filter(
 							(cat) =>

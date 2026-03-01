@@ -15,6 +15,7 @@ import {
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { ref } from 'vue'
 
@@ -24,6 +25,7 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get_linked_modpack_info } from '@/helpers/profile'
 
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 
@@ -74,9 +76,16 @@ const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
 	},
 ]
 
+const queryClient = useQueryClient()
 const modal = ref()
 
 function show() {
+	if (props.instance.linked_data?.project_id) {
+		queryClient.prefetchQuery({
+			queryKey: ['linkedModpackInfo', props.instance.path],
+			queryFn: () => get_linked_modpack_info(props.instance.path, 'stale_while_revalidate'),
+		})
+	}
 	modal.value.show()
 }
 

@@ -23,6 +23,7 @@ export interface FilesystemAuth {
 
 export interface ModrinthServerContext {
 	readonly serverId: string
+	readonly worldId: Ref<string | null>
 	readonly server: Ref<Archon.Servers.v0.Server>
 
 	// Websocket state

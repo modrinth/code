@@ -58,7 +58,7 @@
 
 		<div class="relative h-full w-full overflow-y-auto">
 			<div
-				v-if="server.moduleErrors.network"
+				v-if="allocationsError"
 				class="flex w-full flex-col items-center justify-center gap-4 p-4"
 			>
 				<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -72,10 +72,10 @@
 						<p class="text-lg text-secondary">
 							We couldn't load your server's network settings. Here's what we know:
 							<span class="break-all font-mono">{{
-								JSON.stringify(server.moduleErrors.network.error)
+								allocationsError?.message ?? 'Unknown error'
 							}}</span>
 						</p>
-						<ButtonStyled size="large" color="brand" @click="() => server.refresh(['network'])">
+						<ButtonStyled size="large" color="brand" @click="() => refetchAllocations()">
 							<button class="mt-6 !w-full">Retry</button>
 						</ButtonStyled>
 					</div>
@@ -249,7 +249,7 @@
 			</div>
 			<SaveBanner
 				:is-visible="!!hasUnsavedChanges && !!isValidSubdomain"
-				:server="props.server"
+				:server-id="serverId"
 				:is-updating="isUpdating"
 				:save="saveNetwork"
 				:reset="resetNetwork"
@@ -273,22 +273,24 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	CopyCode,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref } from 'vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server, serverId } = injectModrinthServerContext()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
 const isUpdating = ref(false)
-const data = computed(() => props.server.general)
+const data = server
 
 const serverIP = ref(data?.value?.net?.ip ?? '')
 const serverSubdomain = ref(data?.value?.net?.domain ?? '')
@@ -296,8 +298,15 @@ const serverPrimaryPort = ref(data?.value?.net?.port ?? 0)
 const userDomain = ref('')
 const exampleDomain = 'play.example.com'
 
-const network = computed(() => props.server.network)
-const allocations = computed(() => network.value?.allocations)
+const {
+	data: allocationsData,
+	error: allocationsError,
+	refetch: refetchAllocations,
+} = useQuery({
+	queryKey: ['servers', 'allocations', serverId] as const,
+	queryFn: () => client.archon.servers_v0.getAllocations(serverId),
+})
+const allocations = allocationsData
 
 const newAllocationModal = ref<typeof NewModal>()
 const editAllocationModal = ref<typeof NewModal>()
@@ -316,8 +325,8 @@ const addNewAllocation = async () => {
 	if (!newAllocationName.value) return
 
 	try {
-		await props.server.network?.reserveAllocation(newAllocationName.value)
-		await props.server.refresh(['network'])
+		await client.archon.servers_v0.reserveAllocation(serverId, newAllocationName.value)
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 
 		newAllocationModal.value?.hide()
 		newAllocationName.value = ''
@@ -360,8 +369,8 @@ const showConfirmDeleteModal = (port: number) => {
 const confirmDeleteAllocation = async () => {
 	if (allocationToDelete.value === null) return
 
-	await props.server.network?.deleteAllocation(allocationToDelete.value)
-	await props.server.refresh(['network'])
+	await client.archon.servers_v0.deleteAllocation(serverId, allocationToDelete.value)
+	await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 
 	addNotification({
 		type: 'success',
@@ -376,8 +385,12 @@ const editAllocation = async () => {
 	if (!newAllocationName.value) return
 
 	try {
-		await props.server.network?.updateAllocation(newAllocationPort.value, newAllocationName.value)
-		await props.server.refresh(['network'])
+		await client.archon.servers_v0.updateAllocation(
+			serverId,
+			newAllocationPort.value,
+			newAllocationName.value,
+		)
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 
 		editAllocationModal.value?.hide()
 		newAllocationName.value = ''
@@ -397,7 +410,8 @@ const saveNetwork = async () => {
 
 	try {
 		isUpdating.value = true
-		const available = await props.server.network?.checkSubdomainAvailability(serverSubdomain.value)
+		const result = await client.archon.servers_v0.checkSubdomainAvailability(serverSubdomain.value)
+		const available = result.available
 		if (!available) {
 			addNotification({
 				type: 'error',
@@ -407,13 +421,18 @@ const saveNetwork = async () => {
 			return
 		}
 		if (serverSubdomain.value !== data?.value?.net?.domain) {
-			await props.server.network?.changeSubdomain(serverSubdomain.value)
+			await client.archon.servers_v0.changeSubdomain(serverId, serverSubdomain.value)
 		}
 		if (serverPrimaryPort.value !== data?.value?.net?.port) {
-			await props.server.network?.updateAllocation(serverPrimaryPort.value, newAllocationName.value)
+			await client.archon.servers_v0.updateAllocation(
+				serverId,
+				serverPrimaryPort.value,
+				newAllocationName.value,
+			)
 		}
 		await new Promise((resolve) => setTimeout(resolve, 500))
-		await props.server.refresh()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 		addNotification({
 			type: 'success',
 			title: 'Server settings updated',

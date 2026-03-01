@@ -177,7 +177,7 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type { ComponentPublicInstance } from 'vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ServersUpgradeModalWrapper from '../../../components/billing/ServersUpgradeModalWrapper.vue'
@@ -234,15 +234,17 @@ const {
 			pollingState.value.count++
 			if (response.servers.length !== pollingState.value.initialServers.length) {
 				pollingState.value.enabled = false
+				isPollingForNewServers.value = false
 				router.replace({ query: {} })
 			} else if (pollingState.value.count >= 5) {
 				pollingState.value.enabled = false
+				isPollingForNewServers.value = false
 			}
 		}
 
 		return response
 	},
-	refetchInterval: () => (pollingState.value.enabled ? 5000 : false),
+	refetchInterval: computed(() => (pollingState.value.enabled ? 5000 : false)),
 })
 
 watch([fetchError, serverResponse], ([error, response]) => {
@@ -280,13 +282,19 @@ const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
 		: []
 })
 
-onMounted(() => {
-	if (route.query.redirect_status === 'succeeded') {
+// Start polling only after initial data is available so the baseline is correct
+watch(serverResponse, (response) => {
+	if (
+		route.query.redirect_status === 'succeeded' &&
+		response &&
+		!pollingState.value.enabled &&
+		pollingState.value.count === 0
+	) {
 		isPollingForNewServers.value = true
 		pollingState.value = {
 			enabled: true,
 			count: 0,
-			initialServers: [...(serverResponse.value?.servers ?? [])],
+			initialServers: [...response.servers],
 		}
 	}
 })

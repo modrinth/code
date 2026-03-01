@@ -1,37 +1,100 @@
 export namespace Archon {
 	export namespace Content {
-		export namespace v0 {
-			export type ContentKind = 'mod' | 'plugin'
+		export namespace v1 {
+			export type AddonKind = 'mod' | 'plugin' | 'datapack' | 'shader' | 'resourcepack'
 
-			export type Mod = {
+			export type ContentOwnerType = 'user' | 'organization'
+
+			export type ContentOwner = {
+				id: string
+				name: string
+				type: ContentOwnerType
+				icon_url: string | null
+			}
+
+			export type AddonVersion = {
+				id: string
+				name: string | null
+			}
+
+			export type Addon = {
+				id: string
 				filename: string
-				project_id: string | undefined
-				version_id: string | undefined
-				name: string | undefined
-				version_number: string | undefined
-				icon_url: string | undefined
-				owner: string | undefined
+				filesize: number
 				disabled: boolean
-				installing: boolean
+				kind: AddonKind
+				from_modpack: boolean
+				has_update: boolean
+				name: string | null
+				project_id: string | null
+				version: AddonVersion | null
+				owner: ContentOwner | null
+				icon_url: string | null
 			}
 
-			export type InstallModRequest = {
-				rinth_ids: {
-					project_id: string
-					version_id: string
-				}
-				install_as: ContentKind
+			export type Addons = {
+				modloader: string | null
+				modloader_version: string | null
+				game_version: string | null
+				modpack: ModpackFields | null
+				addons: Addon[] | null
 			}
 
-			export type DeleteModRequest = {
-				path: string
+			export type AddAddonRequest = {
+				project_id: string
+				version_id?: string
+				kind?: AddonKind
 			}
 
-			export type UpdateModRequest = {
-				replace: string
+			export type RemoveAddonRequest = {
+				kind: AddonKind
+				filename: string
+			}
+
+			export type UpdateAddonRequest = {
+				filename: string
+			}
+
+			export type Modloader =
+				| 'forge'
+				| 'neo_forge'
+				| 'fabric'
+				| 'quilt'
+				| 'paper'
+				| 'purpur'
+				| 'vanilla'
+
+			export type ModpackSpec = {
+				platform: 'modrinth'
 				project_id: string
 				version_id: string
 			}
+
+			export type ModpackFields = {
+				spec: ModpackSpec
+				has_update: boolean
+				title: string | null
+				description: string | null
+				icon_url: string | null
+				version_number: string | null
+				date_published: string | null
+				downloads: number | null
+				followers: number | null
+			}
+
+			export type InstallWorldContent =
+				| {
+						content_variant: 'modpack'
+						spec: ModpackSpec
+						soft_override: boolean
+				  }
+				| {
+						content_variant: 'bare'
+						loader: Modloader
+						version: string
+						game_version?: string
+						soft_override: boolean
+				  }
 		}
 	}
 
@@ -148,9 +211,95 @@ export namespace Archon {
 				url: string // e.g., "node-xyz.modrinth.com/modrinth/v0/fs"
 				token: string // JWT token for filesystem access
 			}
+
+			export type ReinstallLoaderRequest = {
+				loader: string
+				loader_version?: string
+				game_version?: string
+			}
+
+			export type ReinstallModpackRequest = {
+				project_id: string
+				version_id?: string
+			}
+
+			export type ReinstallRequest = ReinstallLoaderRequest | ReinstallModpackRequest
+
+			export type MrpackReinstallAuth = {
+				url: string
+				token: string
+			}
+
+			export type Allocation = {
+				port: number
+				name: string
+			}
+
+			export type StartupConfig = {
+				invocation: string
+				original_invocation: string
+				jdk_version: 'lts8' | 'lts11' | 'lts17' | 'lts21'
+				jdk_build: 'corretto' | 'temurin' | 'graal'
+			}
 		}
 
 		export namespace v1 {
+			export type ServerFull = {
+				id: string
+				name: string
+				subdomain: string
+				specs: ServerResources
+				sftp_username: string
+				sftp_password: string
+				tags: string[]
+				location: ServerLocation
+				worlds: WorldFull[]
+			}
+
+			export type ServerResources = {
+				cpu: number
+				memory_mb: number
+				storage_mb: number
+				swap_mb: number
+			}
+
+			export type ServerLocation =
+				| {
+						status: 'assigned'
+						location_metadata: {
+							region: string
+							region_should_be_user_displayed: boolean
+							hostname: string
+							is_decommissioned_node: boolean
+						}
+				  }
+				| {
+						status: 'unassigned'
+				  }
+
+			export type WorldFull = {
+				id: string
+				name: string
+				created_at: string
+				is_active: boolean
+				backups: Archon.Backups.v1.Backup[]
+				content: WorldContentInfo | null
+				readiness: WorldReadiness
+			}
+
+			export type WorldReadiness = {
+				data_synchronized_fetched: boolean
+			}
+
+			export type WorldContentInfo = {
+				modloader: string
+				modloader_version: string
+				game_version: string
+				java_version: number
+				invocation: string
+				original_invocation: string
+			}
+
 			export type Region = {
 				shortcode: string
 				country_code: string
@@ -174,19 +323,18 @@ export namespace Archon {
 
 			export type Backup = {
 				id: string
+				physical_id: string
 				name: string
 				created_at: string
 				automated: boolean
 				interrupted: boolean
 				ongoing: boolean
+				locked: boolean
 				task?: {
 					file?: BackupTaskProgress
 					create?: BackupTaskProgress
 					restore?: BackupTaskProgress
 				}
-				// TODO: Uncomment when API supports these fields
-				// size?: number // bytes
-				// creator_id?: string // user ID, or 'auto' for automated backups
 			}
 
 			export type BackupRequest = {
@@ -319,6 +467,38 @@ export namespace Archon {
 				all: FilesystemOperation[]
 			}
 
+			export type ReadinessState =
+				| 'deprovisioned'
+				| 'waiting_active_world'
+				| 'waiting_world_spec_details_for_progress'
+				| 'pulling_world_data'
+				| 'migration_zfs'
+				| 'sync_content'
+				| 'container_readying'
+				| 'ready'
+
+			export type FlattenedPowerState = 'not_ready' | 'starting' | 'running' | 'stopping' | 'idle'
+
+			export type SyncInstallPhase = 'install_modloader' | 'install_modpack' | 'install_addons'
+
+			export type SyncContentProgress = {
+				started_at: string
+				phase: SyncInstallPhase | null
+				percent: number
+			}
+
+			export type WSStateEvent = {
+				event: 'state'
+				debug: string
+				readiness: ReadinessState
+				power_variant: FlattenedPowerState
+				exit_code?: number | null
+				was_oom?: boolean
+				target: 'start' | 'stop' | 'restart' | null
+				uptime: number
+				progress: SyncContentProgress | null
+			}
+
 			// Outgoing messages (client -> server)
 			export type WSOutgoingMessage = WSAuthMessage | WSCommandMessage
 
@@ -337,6 +517,7 @@ export namespace Archon {
 				| WSLogEvent
 				| WSStatsEvent
 				| WSPowerStateEvent
+				| WSStateEvent
 				| WSAuthExpiringEvent
 				| WSAuthIncorrectEvent
 				| WSAuthOkEvent

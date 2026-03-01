@@ -1,9 +1,6 @@
 <template>
 	<div class="relative h-full w-full select-none overflow-y-auto">
-		<div
-			v-if="propsData && status === 'success'"
-			class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto"
-		>
+		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto">
 			<div class="card flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
@@ -121,7 +118,7 @@
 
 		<SaveBanner
 			:is-visible="hasUnsavedChanges"
-			:server="props.server"
+			:server-id="serverId"
 			:is-updating="isUpdating"
 			restart
 			:save="saveProperties"
@@ -135,22 +132,21 @@ import { EyeIcon, SearchIcon } from '@modrinth/assets'
 import {
 	Combobox,
 	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
-import { computed, inject, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { serverId } = injectModrinthServerContext()
+const queryClient = useQueryClient()
 
 const tags = useGeneratedState()
 
@@ -158,43 +154,41 @@ const isUpdating = ref(false)
 
 const searchInput = ref('')
 
-const data = computed(() => props.server.general)
-const modulesLoaded = inject<Promise<void>>('modulesLoaded')
-const { data: propsData, status } = await useAsyncData('ServerProperties', async () => {
-	await modulesLoaded
-	try {
+function parseServerProperties(raw: string): Record<string, string | boolean | number> {
+	const properties: Record<string, string | boolean | number> = {}
+
+	for (const line of raw.split('\n')) {
+		if (line.startsWith('#') || !line.includes('=')) continue
+		const [key, ...valueParts] = line.split('=')
+		const rawValue = valueParts.join('=')
+		let value: string | boolean | number = rawValue
+
+		if (rawValue.toLowerCase() === 'true' || rawValue.toLowerCase() === 'false') {
+			value = rawValue.toLowerCase() === 'true'
+		} else {
+			const intLike = /^[-+]?\d+$/.test(rawValue)
+			if (intLike) {
+				const n = Number(rawValue)
+				if (Number.isSafeInteger(n)) {
+					value = n
+				}
+			}
+		}
+
+		properties[key.trim()] = value
+	}
+
+	return properties
+}
+
+const { data: propsData } = useQuery({
+	queryKey: ['servers', 'properties', serverId],
+	queryFn: async () => {
 		const blob = await client.kyros.files_v0.downloadFile('/server.properties')
 		const rawProps = await blob.text()
 		if (!rawProps) return null
-
-		const properties: Record<string, any> = {}
-		const lines = rawProps.split('\n')
-
-		for (const line of lines) {
-			if (line.startsWith('#') || !line.includes('=')) continue
-			const [key, ...valueParts] = line.split('=')
-			const rawValue = valueParts.join('=')
-			let value: string | boolean | number = rawValue
-
-			if (rawValue.toLowerCase() === 'true' || rawValue.toLowerCase() === 'false') {
-				value = rawValue.toLowerCase() === 'true'
-			} else {
-				const intLike = /^[-+]?\d+$/.test(rawValue)
-				if (intLike) {
-					const n = Number(rawValue)
-					if (Number.isSafeInteger(n)) {
-						value = n
-					}
-				}
-			}
-
-			properties[key.trim()] = value
-		}
-
-		return properties
-	} catch {
-		return null
-	}
+		return parseServerProperties(rawProps)
+	},
 })
 
 const liveProperties = ref<Record<string, any>>({})
@@ -204,7 +198,6 @@ watch(
 	propsData,
 	(newPropsData) => {
 		if (newPropsData) {
-			console.log(newPropsData)
 			liveProperties.value = JSON.parse(JSON.stringify(newPropsData))
 			originalProperties.value = JSON.parse(JSON.stringify(newPropsData))
 		}
@@ -292,7 +285,7 @@ const saveProperties = async () => {
 		await client.kyros.files_v0.updateFile('/server.properties', constructServerProperties())
 		await new Promise((resolve) => setTimeout(resolve, 500))
 		originalProperties.value = JSON.parse(JSON.stringify(liveProperties.value))
-		await props.server.refresh()
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 		addNotification({
 			type: 'success',
 			title: 'Server properties updated',

@@ -201,8 +201,8 @@ async function dataURLToBlob(dataURL: string): Promise<Blob> {
 
 const { data: image } = useQuery({
 	queryKey: ['server-icon', props.server_id] as const,
-	queryFn: async (): Promise<string | undefined> => {
-		if (!props.server_id || props.status !== 'available') return undefined
+	queryFn: async (): Promise<string | null> => {
+		if (!props.server_id || props.status !== 'available') return null
 
 		try {
 			const auth = await archon.servers_v0.getFilesystemAuth(props.server_id)
@@ -242,8 +242,10 @@ const { data: image } = useQuery({
 			}
 		} catch (error) {
 			console.debug('Icon processing failed:', error)
-			return undefined
+			return null
 		}
+
+		return null
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })

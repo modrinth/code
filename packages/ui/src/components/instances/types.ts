@@ -10,6 +10,7 @@ export type ContentCardProject = Pick<
 
 export type ContentCardVersion = Pick<Labrinth.Versions.v2.Version, 'id' | 'version_number'> & {
 	file_name: string
+	date_published?: string
 }
 
 export interface ContentOwner {
@@ -17,7 +18,7 @@ export interface ContentOwner {
 	name: string
 	avatar_url?: string
 	type: 'user' | 'organization'
-	link?: string | RouteLocationRaw
+	link?: string | RouteLocationRaw | (() => void)
 }
 
 export interface ContentCardTableItem {
@@ -25,11 +26,30 @@ export interface ContentCardTableItem {
 	project: ContentCardProject
 	projectLink?: string | RouteLocationRaw
 	version?: ContentCardVersion
+	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	enabled?: boolean
 	disabled?: boolean
 	hasUpdate?: boolean
 	overflowOptions?: OverflowMenuOption[]
+}
+
+export type ContentCardTableSortColumn = 'project' | 'version'
+export type ContentCardTableSortDirection = 'asc' | 'desc'
+
+/** Content item returned from the app backend API - maps to ContentCardTableItem for display */
+export interface ContentItem extends Omit<
+	ContentCardTableItem,
+	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
+> {
+	file_name: string
+	file_path?: string
+	hash?: string
+	size?: number
+	project_type: string
+	has_update: boolean
+	update_version_id: string | null
+	date_added?: string
 }
 
 export type ContentModpackCardProject = Pick<
