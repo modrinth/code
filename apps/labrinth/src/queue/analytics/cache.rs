@@ -35,21 +35,43 @@ pub async fn cache_analytics(
         plays_4w: u64,
     }
 
+    // for each project..
+    // - count last 2 weeks and 4 weeks of play rows
+    // for each play row...
+    // - build a per-actor key per project id
+    //   - user_id` when `user_id != 0`
+    //   - otherwise `minecraft_uuid
+    // - keep only rows where the rolling 24h count per actor is <= 3
     let rows = clickhouse
         .query(formatcp!(
             "
             SELECT
-          		project_id,
-          		countIf(
-         			recorded BETWEEN toUInt64(toUnixTimestamp(now() - INTERVAL 2 WEEK))
-        			             AND toUInt64(toUnixTimestamp(now()))
-          		) AS plays_2w,
-          		countIf(
-         			recorded BETWEEN toUInt64(toUnixTimestamp(now() - INTERVAL 4 WEEK))
-        			             AND toUInt64(toUnixTimestamp(now()))
-          		) AS plays_4w
-           	FROM {MINECRAFT_SERVER_PLAYS}
-           	GROUP BY project_id
+                project_id,
+                countIf(
+                    recorded BETWEEN now64(4) - INTERVAL 2 WEEK AND now64(4)
+                ) AS plays_2w,
+                countIf(
+                    recorded BETWEEN now64(4) - INTERVAL 4 WEEK AND now64(4)
+                ) AS plays_4w
+            FROM (
+                SELECT
+                    project_id,
+                    recorded,
+                    count() OVER (
+                        PARTITION BY
+                            project_id,
+                            if(
+                                user_id != 0,
+                                concat('u:', toString(user_id)),
+                                concat('m:', toString(minecraft_uuid))
+                            )
+                        ORDER BY toUnixTimestamp64Milli(recorded)
+                        RANGE BETWEEN 86400000 PRECEDING AND CURRENT ROW
+                    ) AS plays_per_actor_24h
+                FROM {MINECRAFT_SERVER_PLAYS}
+            )
+            WHERE plays_per_actor_24h <= 3
+            GROUP BY project_id
             "
         ))
         .fetch_all::<Row>()
