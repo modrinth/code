@@ -28,6 +28,32 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a project's dependencies (v3)
+	 *
+	 * Returns all projects and versions that are dependencies of this project's versions.
+	 *
+	 * @param id - Project ID or slug
+	 * @returns Promise resolving to dependency data with projects and versions
+	 *
+	 * @example
+	 * ```typescript
+	 * const deps = await client.labrinth.projects_v3.getDependencies('sodium')
+	 * console.log(deps.projects) // Array of project objects
+	 * console.log(deps.versions) // Array of version objects
+	 * ```
+	 */
+	public async getDependencies(id: string): Promise<Labrinth.Projects.v3.ProjectDependencies> {
+		return this.client.request<Labrinth.Projects.v3.ProjectDependencies>(
+			`/project/${id}/dependencies`,
+			{
+				api: 'labrinth',
+				version: 3,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get multiple projects by IDs (v3)
 	 *
 	 * @param ids - Array of project IDs or slugs
@@ -101,6 +127,75 @@ export class LabrinthProjectsV3Module extends AbstractModule {
 			api: 'labrinth',
 			version: 3,
 			method: 'GET',
+		})
+	}
+
+	public async createServerProject(
+		data: Labrinth.Projects.v3.CreateServerProjectRequest,
+	): Promise<Labrinth.Projects.v3.Project> {
+		return this.client.request<Labrinth.Projects.v3.Project>(`/project`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PUT',
+			body: data,
+		})
+	}
+
+	/**
+	 * Delete a project
+	 *
+	 * @param id - Project ID or slug
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.deleteProject('my-project')
+	 * ```
+	 */
+	public async deleteProject(id: string): Promise<void> {
+		return this.client.request(`/project/${id}`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
+		})
+	}
+
+	/**
+	 * Change the icon of a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param file - Image file to upload
+	 * @param ext - File extension (e.g., 'png', 'jpeg', 'gif', 'webp')
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.changeIcon('sodium', imageFile, 'png')
+	 * ```
+	 */
+	public async changeIcon(id: string, file: Blob, ext: string): Promise<void> {
+		return this.client.request(`/project/${id}/icon`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'PATCH',
+			params: { ext },
+			body: file,
+		})
+	}
+
+	/**
+	 * Delete the icon of a project
+	 *
+	 * @param id - Project ID or slug
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v3.deleteIcon('sodium')
+	 * ```
+	 */
+	public async deleteIcon(id: string): Promise<void> {
+		return this.client.request(`/project/${id}/icon`, {
+			api: 'labrinth',
+			version: 3,
+			method: 'DELETE',
 		})
 	}
 }

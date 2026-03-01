@@ -1654,7 +1654,7 @@ function shouldShowStage(stage: Stage): boolean {
 
 function shouldShowAction(action: Action): boolean {
 	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value)
+		return action.shouldShow(projectV2.value, projectV3.value)
 	}
 
 	return true
@@ -1663,7 +1663,7 @@ function shouldShowAction(action: Action): boolean {
 function getVisibleDropdownOptions(action: DropdownAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value)
+			return option.shouldShow(projectV2.value, projectV3.value)
 		}
 		return true
 	})
@@ -1672,7 +1672,7 @@ function getVisibleDropdownOptions(action: DropdownAction) {
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value)
+			return option.shouldShow(projectV2.value, projectV3.value)
 		}
 		return true
 	})

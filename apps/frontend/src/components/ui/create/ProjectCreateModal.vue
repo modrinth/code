@@ -1,12 +1,35 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.title)">
-		<div class="min-w-md flex max-w-md flex-col gap-3">
+	<NewModal
+		ref="modal"
+		:header="
+			projectType === 'server'
+				? formatMessage(messages.serverProjectTitle)
+				: formatMessage(messages.title)
+		"
+		:max-width="'550px'"
+	>
+		<div class="flex w-full flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
-			<div class="flex flex-col gap-2">
+
+			<div v-if="showTypeSelector" class="flex flex-col gap-2.5">
+				<label for="project-type">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.typeLabel) }}
+					</span>
+				</label>
+				<Combobox
+					id="project-type"
+					v-model="projectType"
+					name="project-type"
+					:options="projectTypeOptions"
+					:disabled="hasHitLimit"
+				/>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
 				<label for="name">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.nameLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
 				</label>
 				<StyledInput
@@ -19,32 +42,46 @@
 					@update:model-value="updatedName()"
 				/>
 			</div>
-			<div class="flex flex-col gap-2">
-				<label for="slug">
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.urlLabel) }}
-						<span class="text-brand-red">*</span>
-					</span>
-				</label>
-				<div class="text-input-wrapper">
+			<label for="slug" class="flex flex-col gap-2.5">
+				<span class="text-md font-semibold text-contrast">
+					{{ formatMessage(messages.urlLabel) }}
+				</span>
+				<div class="text-input-wrapper !w-full">
 					<div class="text-input-wrapper__before">https://modrinth.com/project/</div>
 					<StyledInput
 						id="slug"
 						v-model="slug"
 						:maxlength="64"
+						class="w-full"
+						type="text"
 						autocomplete="off"
 						:disabled="hasHitLimit"
 						@update:model-value="manualSlug = true"
 					/>
 				</div>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="visibility" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(commonMessages.visibilityLabel) }}
-						<span class="text-brand-red">*</span>
+			</label>
+			<div class="flex flex-col gap-2.5">
+				<label for="owner">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(messages.ownerLabel) }}
 					</span>
-					<span>{{ formatMessage(messages.visibilityDescription) }}</span>
+				</label>
+				<Combobox
+					id="owner"
+					v-model="owner"
+					name="owner"
+					:options="[userOption, ...ownerOptions]"
+					searchable
+					:disabled="hasHitLimit"
+					show-icon-in-selected
+				/>
+				<span>{{ formatMessage(messages.ownerDescription) }}</span>
+			</div>
+			<div class="flex flex-col gap-2.5">
+				<label for="visibility" class="flex flex-col gap-1">
+					<span class="text-md font-semibold text-contrast">
+						{{ formatMessage(commonMessages.visibilityLabel) }}
+					</span>
 				</label>
 				<Chips
 					id="visibility"
@@ -54,14 +91,13 @@
 					:capitalize="false"
 					:disabled="hasHitLimit"
 				/>
+				<span>{{ formatMessage(messages.visibilityDescription) }}</span>
 			</div>
-			<div class="flex flex-col gap-2">
+			<div class="flex flex-col gap-2.5">
 				<label for="additional-information" class="flex flex-col gap-1">
-					<span class="text-lg font-semibold text-contrast">
+					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.summaryLabel) }}
-						<span class="text-brand-red">*</span>
 					</span>
-					<span>{{ formatMessage(messages.summaryDescription) }}</span>
 				</label>
 				<StyledInput
 					id="additional-information"
@@ -71,8 +107,9 @@
 					:placeholder="formatMessage(messages.summaryPlaceholder)"
 					:disabled="hasHitLimit"
 				/>
+				<span>{{ formatMessage(messages.summaryDescription) }}</span>
 			</div>
-			<div class="flex justify-end gap-2">
+			<div class="flex justify-end gap-2.5">
 				<ButtonStyled class="w-24">
 					<button @click="cancel">
 						<XIcon aria-hidden="true" />
@@ -80,7 +117,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand" class="w-32">
-					<button :disabled="hasHitLimit" @click="createProject">
+					<button v-tooltip="missingFieldsTooltip" :disabled="disableCreate" @click="createProject">
 						<PlusIcon aria-hidden="true" />
 						{{ formatMessage(messages.createProject) }}
 					</button>
@@ -90,29 +127,76 @@
 	</NewModal>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, XIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Chips,
+	Combobox,
+	type ComboboxOption,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { computed, defineAsyncComponent, h } from 'vue'
 
 import CreateLimitAlert from './CreateLimitAlert.vue'
+
+type ProjectTypes = 'server' | 'project'
+interface VisibilityOption {
+	actual: Labrinth.Projects.v2.ProjectStatus
+	display: string
+}
+interface ShowOptions {
+	type?: 'server' | 'project'
+	showTypeSelector?: boolean
+}
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const router = useRouter()
 
+defineExpose({
+	show,
+})
+
+const auth = (await useAuth()) as Ref<{
+	user: { id: string; username: string; avatar_url: string } | null
+}>
+
 const messages = defineMessages({
 	title: {
 		id: 'create.project.title',
 		defaultMessage: 'Creating a project',
+	},
+	serverProjectTitle: {
+		id: 'create.project.server-project-title',
+		defaultMessage: 'Creating a server project',
+	},
+	typeLabel: {
+		id: 'create.project.type-label',
+		defaultMessage: 'Type',
+	},
+	typeProject: {
+		id: 'create.project.type-project',
+		defaultMessage: 'Project',
+	},
+	typeServer: {
+		id: 'create.project.type-server',
+		defaultMessage: 'Server',
+	},
+	ownerLabel: {
+		id: 'create.project.owner-label',
+		defaultMessage: 'Owner',
+	},
+	ownerDescription: {
+		id: 'create.project.owner-description',
+		defaultMessage: `Set the project owner as yourself or an organization you're a member of.`,
 	},
 	nameLabel: {
 		id: 'create.project.name-label',
@@ -146,6 +230,10 @@ const messages = defineMessages({
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
 	},
+	createServerProject: {
+		id: 'create.project.create-server-project',
+		defaultMessage: 'Create server',
+	},
 	visibilityPublic: {
 		id: 'create.project.visibility-public',
 		defaultMessage: 'Public',
@@ -158,24 +246,39 @@ const messages = defineMessages({
 		id: 'create.project.visibility-private',
 		defaultMessage: 'Private',
 	},
-})
-
-const props = defineProps({
-	organizationId: {
-		type: String,
-		required: false,
-		default: null,
+	missingFieldsTooltip: {
+		id: 'create.project.missing-fields-tooltip',
+		defaultMessage: 'Missing fields: {fields}',
 	},
 })
 
-const modal = ref()
+const props = defineProps<{
+	organizationId?: string | null
+}>()
+
+const modal = ref<InstanceType<typeof NewModal>>()
 const hasHitLimit = ref(false)
 
 const name = ref('')
 const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
-const visibilities = ref([
+const projectType = ref<ProjectTypes>('project')
+const showTypeSelector = ref(false)
+const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
+	{
+		value: 'project',
+		label: formatMessage(messages.typeProject),
+	},
+	{
+		value: 'server',
+		label: formatMessage(messages.typeServer),
+	},
+])
+const ownerOptions = ref<ComboboxOption<string>[]>([])
+const owner = ref<string | undefined>('self')
+const organizations = ref<Labrinth.Projects.v3.Organization[]>([])
+const visibilities = ref<VisibilityOption[]>([
 	{
 		actual: 'approved',
 		display: formatMessage(messages.visibilityPublic),
@@ -189,10 +292,84 @@ const visibilities = ref([
 		display: formatMessage(messages.visibilityPrivate),
 	},
 ])
-const visibility = ref(visibilities.value[0])
+const visibility = ref<VisibilityOption>(visibilities.value[0])
+
+const disableCreate = computed(() => {
+	if (hasHitLimit.value) return true
+	if (!name.value.trim() || !slug.value.trim()) return true
+	if (description.value.trim().length < 3) return true
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		return true
+	return false
+})
+
+const missingFieldsTooltip = computed(() => {
+	const missingFields = []
+	if (!name.value.trim()) missingFields.push(formatMessage(messages.nameLabel))
+	if (!slug.value.trim()) missingFields.push(formatMessage(messages.urlLabel))
+	if (description.value.trim().length < 3) missingFields.push(formatMessage(messages.summaryLabel))
+	if (owner.value !== 'self' && !organizations.value.find((org) => org.id === owner.value))
+		missingFields.push(formatMessage(messages.ownerLabel))
+
+	if (missingFields.length === 0) return ''
+	return formatMessage(messages.missingFieldsTooltip, {
+		fields: missingFields.join(', '),
+	})
+})
 
 const cancel = () => {
-	modal.value.hide()
+	modal.value?.hide()
+}
+
+const userOption = computed(() => ({
+	value: 'self',
+	label: auth.value.user?.username || 'Unknown user',
+	icon: auth.value.user?.avatar_url
+		? defineAsyncComponent(() =>
+				Promise.resolve({
+					setup: () => () =>
+						h('img', {
+							src: auth.value.user?.avatar_url,
+							alt: 'User Avatar',
+							class: 'h-5 w-5 rounded',
+						}),
+				}),
+			)
+		: undefined,
+}))
+
+const { labrinth } = injectModrinthClient()
+
+async function fetchOrganizations() {
+	if (!auth.value.user?.id) return
+
+	try {
+		const orgs = (await useBaseFetch(`user/${auth.value.user.id}/organizations`, {
+			apiVersion: 3,
+		})) as Labrinth.Projects.v3.Organization[]
+
+		organizations.value = orgs || []
+
+		ownerOptions.value = organizations.value.map((org) => ({
+			value: org.id,
+			label: org.name,
+			icon: org.icon_url
+				? defineAsyncComponent(() =>
+						Promise.resolve({
+							setup: () => () =>
+								h('img', {
+									src: org.icon_url,
+									alt: `${org.name} Icon`,
+									class: 'h-5 w-5 rounded',
+								}),
+						}),
+					)
+				: undefined,
+		}))
+		if (props.organizationId) owner.value = props.organizationId
+	} catch (err) {
+		console.error('Failed to fetch organizations:', err)
+	}
 }
 
 async function createProject() {
@@ -200,9 +377,7 @@ async function createProject() {
 
 	const formData = new FormData()
 
-	const auth = await useAuth()
-
-	const projectData = {
+	const projectData: Labrinth.Projects.v2.CreateProjectBase = {
 		title: name.value.trim(),
 		project_type: 'mod',
 		slug: slug.value,
@@ -212,8 +387,8 @@ async function createProject() {
 		initial_versions: [],
 		team_members: [
 			{
-				user_id: auth.value.user.id,
-				name: auth.value.user.username,
+				user_id: auth.value.user?.id,
+				name: auth.value.user?.username,
 				role: 'Owner',
 			},
 		],
@@ -224,44 +399,70 @@ async function createProject() {
 		is_draft: true,
 	}
 
-	if (props.organizationId) {
-		projectData.organization_id = props.organizationId
-	}
-
 	formData.append('data', JSON.stringify(projectData))
 
 	try {
-		await useBaseFetch('project', {
-			method: 'POST',
-			body: formData,
-			headers: {
-				'Content-Disposition': formData,
-			},
-		})
+		let createdProjectId: string | undefined
 
-		modal.value.hide()
+		if (projectType.value === 'server') {
+			const result = await labrinth.projects_v3.createServerProject({
+				base: {
+					name: projectData.title,
+					slug: projectData.slug,
+					summary: projectData.description,
+					description: '',
+					requested_status: projectData.requested_status,
+					organization_id: owner.value !== 'self' ? owner.value : undefined,
+				},
+				minecraft_server: {
+					// empty component
+				},
+				minecraft_java_server: {
+					address: '',
+					port: 25565,
+				},
+				minecraft_bedrock_server: {
+					address: '',
+					port: 19132,
+				},
+			})
+			createdProjectId = result.id
+		} else {
+			const result = (await useBaseFetch('project', {
+				method: 'POST',
+				body: formData,
+				headers: {
+					'Content-Disposition': formData as unknown as string,
+				},
+			})) as Labrinth.Projects.v3.Project
+			createdProjectId = result.id
+			console.log(createdProjectId)
+		}
+
+		modal.value?.hide()
 		await router.push(`/project/${slug.value}/settings`)
-	} catch (err) {
+	} catch (err: unknown) {
+		const error = err as { data?: { description?: string } }
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
-			text: err.data ? err.data.description : err,
+			text: error.data?.description ?? String(err),
 			type: 'error',
 		})
 	}
 	stopLoading()
 }
 
-function show(event) {
+async function show(event?: MouseEvent, options?: ShowOptions) {
 	name.value = ''
 	slug.value = ''
 	description.value = ''
 	manualSlug.value = false
-	modal.value.show(event)
+	owner.value = 'self'
+	projectType.value = options?.type ?? 'project'
+	showTypeSelector.value = options?.showTypeSelector ?? false
+	await fetchOrganizations()
+	modal.value?.show(event)
 }
-
-defineExpose({
-	show,
-})
 
 function updatedName() {
 	if (!manualSlug.value) {

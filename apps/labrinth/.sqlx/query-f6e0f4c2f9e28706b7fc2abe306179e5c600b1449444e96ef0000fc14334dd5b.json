@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, components AS \"components: Json<exp::ProjectSerial>\"\n            FROM mods\n            WHERE\n                status = ANY($1)\n                AND components ? 'minecraft_java_server'\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "components: Json<exp::ProjectSerial>",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "f6e0f4c2f9e28706b7fc2abe306179e5c600b1449444e96ef0000fc14334dd5b"
+}

@@ -18,6 +18,18 @@ export const Small: Story = {
 	},
 }
 
+export const Medium: Story = {
+	args: {
+		size: 'medium',
+	},
+}
+
+export const Large: Story = {
+	args: {
+		size: 'large',
+	},
+}
+
 export const MultipleFiles: Story = {
 	args: {
 		multiple: true,

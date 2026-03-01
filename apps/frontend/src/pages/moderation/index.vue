@@ -221,6 +221,7 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Data Packs', label: 'Data Packs' },
 	{ value: 'Plugins', label: 'Plugins' },
 	{ value: 'Shaders', label: 'Shaders' },
+	{ value: 'Servers', label: 'Servers' },
 ]
 
 const currentSortType = ref('Oldest')
@@ -282,15 +283,17 @@ const typeFiltered = computed(() => {
 		'Data Packs': 'datapack',
 		Plugins: 'plugin',
 		Shaders: 'shader',
+		Servers: 'minecraft_java_server',
 	}
-
 	const projectType = filterMap[currentFilterType.value]
 	if (!projectType) return baseFiltered.value
 
 	return baseFiltered.value.filter(
 		(queueItem) =>
-			queueItem.project.project_types.length > 0 &&
-			queueItem.project.project_types[0] === projectType,
+			(queueItem.project.project_types.length > 0 &&
+				queueItem.project.project_types[0] === projectType) ||
+			(projectType === 'minecraft_java_server' &&
+				queueItem.project.project_types.includes('minecraft_java_server')),
 	)
 })
 

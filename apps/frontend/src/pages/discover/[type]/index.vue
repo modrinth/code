@@ -24,6 +24,7 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
+	OpenInAppModal,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -33,11 +34,12 @@ import {
 	StyledInput,
 	Toggle,
 	useSearch,
+	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
-import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
+import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -84,6 +86,10 @@ const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
 )
 
+watch(currentType, (newType) => {
+	console.log('currentType changed:', newType)
+})
+
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
 
@@ -99,6 +105,7 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
+const serverInAppModal = templateRef('openInAppModal')
 
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
@@ -336,6 +343,28 @@ async function serverInstall(project: InstallableSearchResult) {
 }
 
 const noLoad = ref(false)
+
+const {
+	serverCurrentSortType,
+	serverCurrentFilters,
+	serverToggledGroups,
+	serverSortTypes,
+	serverFilterTypes,
+	serverRequestParams,
+	createServerPageParams,
+} = useServerSearch({ tags, query, maxResults, currentPage })
+
+const effectiveSortType = computed({
+	get: () => (currentType.value === 'server' ? serverCurrentSortType.value : currentSortType.value),
+	set: (v: SortType) => {
+		if (currentType.value === 'server') serverCurrentSortType.value = v
+		else currentSortType.value = v
+	},
+})
+const effectiveSortTypes = computed(() =>
+	currentType.value === 'server' ? serverSortTypes : [...sortTypes],
+)
+
 const {
 	data: rawResults,
 	refresh: refreshSearch,
@@ -343,7 +372,12 @@ const {
 } = useLazyFetch(
 	() => {
 		const config = useRuntimeConfig()
-		const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+		let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+
+		if (currentType.value === 'server') {
+			base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
+			return `${base}search${serverRequestParams.value}`
+		}
 
 		return `${base}search${requestParams.value}`
 	},
@@ -395,7 +429,7 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 		const params = {
 			...persistentParams,
-			...createPageParams(),
+			...(currentType.value === 'server' ? createServerPageParams() : createPageParams()),
 		}
 
 		router.replace({ path: route.path, query: params })
@@ -404,6 +438,12 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 watch([currentFilters], () => {
 	updateSearchResults(1, false)
+})
+
+watch([serverCurrentFilters, serverCurrentSortType], () => {
+	if (currentType.value === 'server') {
+		updateSearchResults(1, false)
+	}
 })
 
 const throttledSearch = useThrottleFn(() => updateSearchResults(), 500, true)
@@ -444,6 +484,45 @@ useSeoMeta({
 	ogTitle,
 	ogDescription: description,
 })
+
+const serverHits = computed(
+	() =>
+		((rawResults.value as unknown as Labrinth.Search.v3.SearchResults)
+			?.hits as Labrinth.Search.v3.ResultSearchProject[]) ?? [],
+)
+
+const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) => {
+	const content = hit.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick:
+				project_id !== hit.project_id
+					? () => {
+							navigateTo(`/project/${project_id}`)
+						}
+					: undefined,
+			showCustomModpackTooltip: project_id === hit.project_id,
+		}
+	}
+	return undefined
+}
+
+function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject) {
+	serverInAppModal.value?.show({
+		serverProject: {
+			name: project.name,
+			slug: project.slug ?? '',
+			numPlayers: project.minecraft_java_server?.ping?.data?.players_online,
+			icon: project.icon_url ?? '',
+			statusOnline: !!project.minecraft_java_server?.ping?.data,
+			region: project.minecraft_server?.country,
+		},
+	})
+}
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -547,41 +626,66 @@ useSeoMeta({
 					@update:model-value="updateSearchResults()"
 				/>
 			</div>
-			<SearchSidebarFilter
-				v-for="filter in filters.filter((f) => f.display !== 'none')"
-				:key="`filter-${filter.id}`"
-				v-model:selected-filters="currentFilters"
-				v-model:toggled-groups="toggledGroups"
-				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-filters="serverFilters"
-				:filter-type="filter"
-				:class="
-					filtersMenuOpen
-						? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-						: 'card-shadow rounded-2xl bg-bg-raised'
-				"
-				button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-				content-class="mb-4 mx-3"
-				inner-panel-class="p-1"
-				:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
-			>
-				<template #header>
-					<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-				</template>
-				<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
-					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
-						<InfoIcon class="mt-1 size-4" />
-						<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
-					</div>
-				</template>
-				<template #locked-game_version>
-					{{ formatMessage(messages.gameVersionProvidedByServer) }}
-				</template>
-				<template #locked-mod_loader>
-					{{ formatMessage(messages.modLoaderProvidedByServer) }}
-				</template>
-				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
-			</SearchSidebarFilter>
+			<template v-if="currentType === 'server'">
+				<SearchSidebarFilter
+					v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
+					:key="`server-filter-${filterType.id}`"
+					v-model:selected-filters="serverCurrentFilters"
+					v-model:toggled-groups="serverToggledGroups"
+					:provided-filters="serverFilters"
+					:filter-type="filterType"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="!['server_category_minecraft_server_meta', 'server_category_minecraft_server_community', 'server_game_version'].includes(filterType.id)"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filterType.formatted_name }}</h3>
+					</template>
+				</SearchSidebarFilter>
+			</template>
+			<template v-else>
+				<SearchSidebarFilter
+					v-for="filter in filters.filter((f) => f.display !== 'none')"
+					:key="`filter-${filter.id}`"
+					v-model:selected-filters="currentFilters"
+					v-model:toggled-groups="toggledGroups"
+					v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+					:provided-filters="serverFilters"
+					:filter-type="filter"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+					</template>
+					<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
+						<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+							<InfoIcon class="mt-1 size-4" />
+							<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
+						</div>
+					</template>
+					<template #locked-game_version>
+						{{ formatMessage(messages.gameVersionProvidedByServer) }}
+					</template>
+					<template #locked-mod_loader>
+						{{ formatMessage(messages.modLoaderProvidedByServer) }}
+					</template>
+					<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
+				</SearchSidebarFilter>
+			</template>
 		</div>
 	</aside>
 	<section class="normal-page__content">
@@ -601,10 +705,10 @@ useSeoMeta({
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownSelect
 					v-slot="{ selected }"
-					v-model="currentSortType"
+					v-model="effectiveSortType"
 					class="!w-auto flex-grow md:flex-grow-0"
 					name="Sort by"
-					:options="[...sortTypes]"
+					:options="effectiveSortTypes"
 					:display-name="(option?: SortType) => option?.display"
 					@change="updateSearchResults()"
 				>
@@ -650,6 +754,14 @@ useSeoMeta({
 				/>
 			</div>
 			<SearchFilterControl
+				v-if="currentType === 'server'"
+				v-model:selected-filters="serverCurrentFilters"
+				:filters="serverFilterTypes"
+				:provided-filters="[]"
+				:overridden-provided-filter-types="[]"
+			/>
+			<SearchFilterControl
+				v-else
 				v-model:selected-filters="currentFilters"
 				:filters="filters.filter((f) => f.display !== 'none')"
 				:provided-filters="serverFilters"
@@ -657,7 +769,14 @@ useSeoMeta({
 				:provided-message="messages.providedByServer"
 			/>
 			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
+			<div
+				v-else-if="
+					currentType === 'server'
+						? serverHits.length === 0
+						: results && results.hits && results.hits.length === 0
+				"
+				class="no-results"
+			>
 				<p>No results found for your query!</p>
 			</div>
 			<div v-else class="search-results-container">
@@ -667,90 +786,117 @@ useSeoMeta({
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 					"
 				>
-					<ProjectCard
-						v-for="result in results?.hits"
-						:key="result.project_id"
-						:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-						:title="result.title"
-						:icon-url="result.icon_url"
-						:author="{ name: result.author, link: `/user/${result.author}` }"
-						:date-updated="result.date_modified"
-						:date-published="result.date_created"
-						:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
-						:downloads="result.downloads"
-						:summary="result.description"
-						:tags="result.display_categories"
-						:all-tags="result.categories"
-						:deprioritized-tags="deprioritizedTags"
-						:exclude-loaders="excludeLoaders"
-						:followers="result.follows"
-						:banner="result.featured_gallery ?? undefined"
-						:color="result.color ?? undefined"
-						:environment="
-							['mod', 'modpack'].includes(currentType)
-								? {
-										clientSide: result.client_side,
-										serverSide: result.server_side,
-									}
-								: undefined
-						"
-						:layout="
-							resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-						"
-						@mouseenter="handleProjectMouseEnter(result)"
-						@mouseleave="handleProjectHoverEnd"
-					>
-						<template v-if="flags.showDiscoverProjectButtons || server" #actions>
-							<template v-if="flags.showDiscoverProjectButtons">
-								<ButtonStyled color="brand">
-									<button>
-										<DownloadIcon />
-										Download
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<HeartIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular>
-									<button>
-										<BookmarkIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled circular type="transparent">
-									<button>
-										<MoreVerticalIcon />
-									</button>
-								</ButtonStyled>
+					<template v-if="currentType === 'server'">
+						<ProjectCard
+							v-for="project in serverHits"
+							:key="`server-card-${project.project_id}`"
+							:title="project.name"
+							:icon-url="project.icon_url || undefined"
+							:summary="project.summary"
+							:tags="project.categories"
+							:link="`/server/${project.slug}`"
+							:server-online-players="
+								project.minecraft_java_server?.ping?.data?.players_online ?? 0
+							"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
+							:server-region-code="project.minecraft_server?.country"
+							:server-status-online="!!project.minecraft_java_server?.ping?.data"
+							:server-modpack-content="getServerModpackContent(project)"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+							:max-tags="2"
+							is-server-project
+							exclude-loaders
+						>
+						</ProjectCard>
+					</template>
+					<template v-else>
+						<ProjectCard
+							v-for="result in results?.hits"
+							:key="result.project_id"
+							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+							:title="result.title"
+							:icon-url="result.icon_url"
+							:author="{ name: result.author, link: `/user/${result.author}` }"
+							:date-updated="result.date_modified"
+							:date-published="result.date_created"
+							:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
+							:downloads="result.downloads"
+							:summary="result.description"
+							:tags="result.display_categories"
+							:all-tags="result.categories"
+							:deprioritized-tags="deprioritizedTags"
+							:exclude-loaders="excludeLoaders"
+							:followers="result.follows"
+							:banner="result.featured_gallery ?? undefined"
+							:color="result.color ?? undefined"
+							:environment="
+								['mod', 'modpack'].includes(currentType)
+									? {
+											clientSide: result.client_side as Labrinth.Projects.v2.Environment,
+											serverSide: result.server_side as Labrinth.Projects.v2.Environment,
+										}
+									: undefined
+							"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+							@mouseenter="handleProjectMouseEnter(result)"
+							@mouseleave="handleProjectHoverEnd"
+						>
+							<template v-if="flags.showDiscoverProjectButtons || server" #actions>
+								<template v-if="flags.showDiscoverProjectButtons">
+									<ButtonStyled color="brand">
+										<button>
+											<DownloadIcon />
+											Download
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<HeartIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular>
+										<button>
+											<BookmarkIcon />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled circular type="transparent">
+										<button>
+											<MoreVerticalIcon />
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else-if="server">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											v-if="
+												(result as InstallableSearchResult).installed ||
+												(server?.content?.data &&
+													server.content.data.find(
+														(x: InstallableMod) => x.project_id === result.project_id,
+													)) ||
+												server.general?.project?.id === result.project_id
+											"
+											disabled
+										>
+											<CheckIcon />
+											Installed
+										</button>
+										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+											Installing...
+										</button>
+										<button v-else @click="serverInstall(result as InstallableSearchResult)">
+											<DownloadIcon />
+											Install
+										</button>
+									</ButtonStyled>
+								</template>
 							</template>
-							<template v-else-if="server">
-								<ButtonStyled color="brand" type="outlined">
-									<button
-										v-if="
-											(result as InstallableSearchResult).installed ||
-											(server?.content?.data &&
-												server.content.data.find(
-													(x: InstallableMod) => x.project_id === result.project_id,
-												)) ||
-											server.general?.project?.id === result.project_id
-										"
-										disabled
-									>
-										<CheckIcon />
-										Installed
-									</button>
-									<button v-else-if="(result as InstallableSearchResult).installing" disabled>
-										Installing...
-									</button>
-									<button v-else @click="serverInstall(result as InstallableSearchResult)">
-										<DownloadIcon />
-										Install
-									</button>
-								</ButtonStyled>
-							</template>
-						</template>
-					</ProjectCard>
+						</ProjectCard>
+					</template>
 				</ProjectCardList>
 			</div>
 			<div class="pagination-after">
@@ -763,6 +909,8 @@ useSeoMeta({
 			</div>
 		</div>
 	</section>
+
+	<OpenInAppModal ref="openInAppModal" />
 </template>
 <style lang="scss" scoped>
 .normal-page__content {

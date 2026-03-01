@@ -2,7 +2,7 @@
 	<label
 		:class="[
 			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
-			size === 'small' ? 'p-5' : 'p-12',
+			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
 			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
 			isDragOver ? 'border-purple' : 'border-surface-5',
@@ -69,12 +69,12 @@ const props = withDefaults(
 		maxSize?: number | null
 		shouldAlwaysReset?: boolean
 		disabled?: boolean
-		size?: 'small' | 'standard'
+		size?: 'small' | 'medium' | 'large'
 	}>(),
 	{
 		primaryPrompt: 'Drop files here or click to upload',
 		secondaryPrompt: 'Only supported file types will be accepted',
-		size: 'standard',
+		size: 'large',
 	},
 )
 

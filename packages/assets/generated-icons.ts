@@ -58,6 +58,7 @@ import _CoinsIcon from './icons/coins.svg?component'
 import _CollapseIcon from './icons/collapse.svg?component'
 import _CollectionIcon from './icons/collection.svg?component'
 import _CompassIcon from './icons/compass.svg?component'
+import _ComponentIcon from './icons/component.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
@@ -112,6 +113,7 @@ import _HeartMinusIcon from './icons/heart-minus.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
+import _ImagesIcon from './icons/images.svg?component'
 import _ImportIcon from './icons/import.svg?component'
 import _InProgressIcon from './icons/in-progress.svg?component'
 import _InfoIcon from './icons/info.svg?component'
@@ -155,16 +157,20 @@ import _NewspaperIcon from './icons/newspaper.svg?component'
 import _NoSignalIcon from './icons/no-signal.svg?component'
 import _NotepadTextIcon from './icons/notepad-text.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
+import _OnlineIndicatorIcon from './icons/online-indicator.svg?component'
 import _OrganizationIcon from './icons/organization.svg?component'
 import _PackageIcon from './icons/package.svg?component'
 import _PackageClosedIcon from './icons/package-closed.svg?component'
 import _PackageOpenIcon from './icons/package-open.svg?component'
+import _PackagePlusIcon from './icons/package-plus.svg?component'
 import _PaintbrushIcon from './icons/paintbrush.svg?component'
 import _PaletteIcon from './icons/palette.svg?component'
 import _PickaxeIcon from './icons/pickaxe.svg?component'
 import _PlayIcon from './icons/play.svg?component'
 import _PlugIcon from './icons/plug.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
+import _PowerIcon from './icons/power.svg?component'
+import _PowerOffIcon from './icons/power-off.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonCheckedIcon from './icons/radio-button-checked.svg?component'
 import _ReceiptTextIcon from './icons/receipt-text.svg?component'
@@ -199,6 +205,7 @@ import _SparklesIcon from './icons/sparkles.svg?component'
 import _SpinnerIcon from './icons/spinner.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
+import _StoreIcon from './icons/store.svg?component'
 import _StrikethroughIcon from './icons/strikethrough.svg?component'
 import _SunIcon from './icons/sun.svg?component'
 import _SunriseIcon from './icons/sunrise.svg?component'
@@ -208,60 +215,105 @@ import _TagsIcon from './icons/tags.svg?component'
 import _TagCategoryAdventureIcon from './icons/tags/categories/adventure.svg?component'
 import _TagCategoryAtmosphereIcon from './icons/tags/categories/atmosphere.svg?component'
 import _TagCategoryAudioIcon from './icons/tags/categories/audio.svg?component'
+import _TagCategoryBackpackIcon from './icons/tags/categories/backpack.svg?component'
+import _TagCategoryBadgeIcon from './icons/tags/categories/badge.svg?component'
+import _TagCategoryBadgeCheckIcon from './icons/tags/categories/badge-check.svg?component'
+import _TagCategoryBedDoubleIcon from './icons/tags/categories/bed-double.svg?component'
 import _TagCategoryBlocksIcon from './icons/tags/categories/blocks.svg?component'
 import _TagCategoryBloomIcon from './icons/tags/categories/bloom.svg?component'
+import _TagCategoryBuilding2Icon from './icons/tags/categories/building-2.svg?component'
+import _TagCategoryCameraIcon from './icons/tags/categories/camera.svg?component'
 import _TagCategoryCartoonIcon from './icons/tags/categories/cartoon.svg?component'
+import _TagCategoryCastleIcon from './icons/tags/categories/castle.svg?component'
 import _TagCategoryChallengingIcon from './icons/tags/categories/challenging.svg?component'
+import _TagCategoryClapperboardIcon from './icons/tags/categories/clapperboard.svg?component'
+import _TagCategoryCloudIcon from './icons/tags/categories/cloud.svg?component'
 import _TagCategoryColoredLightingIcon from './icons/tags/categories/colored-lighting.svg?component'
 import _TagCategoryCombatIcon from './icons/tags/categories/combat.svg?component'
+import _TagCategoryCompassIcon from './icons/tags/categories/compass.svg?component'
 import _TagCategoryCoreShadersIcon from './icons/tags/categories/core-shaders.svg?component'
+import _TagCategoryCrownIcon from './icons/tags/categories/crown.svg?component'
 import _TagCategoryCursedIcon from './icons/tags/categories/cursed.svg?component'
 import _TagCategoryDecorationIcon from './icons/tags/categories/decoration.svg?component'
+import _TagCategoryDicesIcon from './icons/tags/categories/dices.svg?component'
 import _TagCategoryEconomyIcon from './icons/tags/categories/economy.svg?component'
 import _TagCategoryEntitiesIcon from './icons/tags/categories/entities.svg?component'
 import _TagCategoryEnvironmentIcon from './icons/tags/categories/environment.svg?component'
 import _TagCategoryEquipmentIcon from './icons/tags/categories/equipment.svg?component'
 import _TagCategoryFantasyIcon from './icons/tags/categories/fantasy.svg?component'
+import _TagCategoryFilmIcon from './icons/tags/categories/film.svg?component'
+import _TagCategoryFlagIcon from './icons/tags/categories/flag.svg?component'
 import _TagCategoryFoliageIcon from './icons/tags/categories/foliage.svg?component'
 import _TagCategoryFontsIcon from './icons/tags/categories/fonts.svg?component'
 import _TagCategoryFoodIcon from './icons/tags/categories/food.svg?component'
+import _TagCategoryFootprintsIcon from './icons/tags/categories/footprints.svg?component'
 import _TagCategoryGameMechanicsIcon from './icons/tags/categories/game-mechanics.svg?component'
+import _TagCategoryGamepad2Icon from './icons/tags/categories/gamepad-2.svg?component'
+import _TagCategoryGaugeIcon from './icons/tags/categories/gauge.svg?component'
+import _TagCategoryGlobeIcon from './icons/tags/categories/globe.svg?component'
+import _TagCategoryGrid3x3Icon from './icons/tags/categories/grid-3x3.svg?component'
 import _TagCategoryGuiIcon from './icons/tags/categories/gui.svg?component'
+import _TagCategoryHandshakeIcon from './icons/tags/categories/handshake.svg?component'
+import _TagCategoryHeartCrackIcon from './icons/tags/categories/heart-crack.svg?component'
+import _TagCategoryHeartPulseIcon from './icons/tags/categories/heart-pulse.svg?component'
 import _TagCategoryHighIcon from './icons/tags/categories/high.svg?component'
+import _TagCategoryHouseIcon from './icons/tags/categories/house.svg?component'
 import _TagCategoryItemsIcon from './icons/tags/categories/items.svg?component'
 import _TagCategoryKitchenSinkIcon from './icons/tags/categories/kitchen-sink.svg?component'
 import _TagCategoryLibraryIcon from './icons/tags/categories/library.svg?component'
 import _TagCategoryLightweightIcon from './icons/tags/categories/lightweight.svg?component'
 import _TagCategoryLocaleIcon from './icons/tags/categories/locale.svg?component'
+import _TagCategoryLockIcon from './icons/tags/categories/lock.svg?component'
 import _TagCategoryLowIcon from './icons/tags/categories/low.svg?component'
 import _TagCategoryMagicIcon from './icons/tags/categories/magic.svg?component'
 import _TagCategoryManagementIcon from './icons/tags/categories/management.svg?component'
+import _TagCategoryMapPinnedIcon from './icons/tags/categories/map-pinned.svg?component'
 import _TagCategoryMediumIcon from './icons/tags/categories/medium.svg?component'
 import _TagCategoryMinigameIcon from './icons/tags/categories/minigame.svg?component'
 import _TagCategoryMobsIcon from './icons/tags/categories/mobs.svg?component'
 import _TagCategoryModdedIcon from './icons/tags/categories/modded.svg?component'
 import _TagCategoryModelsIcon from './icons/tags/categories/models.svg?component'
 import _TagCategoryMultiplayerIcon from './icons/tags/categories/multiplayer.svg?component'
+import _TagCategoryNetworkIcon from './icons/tags/categories/network.svg?component'
 import _TagCategoryOptimizationIcon from './icons/tags/categories/optimization.svg?component'
+import _TagCategoryPaletteIcon from './icons/tags/categories/palette.svg?component'
 import _TagCategoryPathTracingIcon from './icons/tags/categories/path-tracing.svg?component'
+import _TagCategoryPawPrintIcon from './icons/tags/categories/paw-print.svg?component'
 import _TagCategoryPbrIcon from './icons/tags/categories/pbr.svg?component'
+import _TagCategoryPickaxeIcon from './icons/tags/categories/pickaxe.svg?component'
 import _TagCategoryPotatoIcon from './icons/tags/categories/potato.svg?component'
 import _TagCategoryQuestsIcon from './icons/tags/categories/quests.svg?component'
 import _TagCategoryRealisticIcon from './icons/tags/categories/realistic.svg?component'
 import _TagCategoryReflectionsIcon from './icons/tags/categories/reflections.svg?component'
+import _TagCategoryRefreshCcwIcon from './icons/tags/categories/refresh-ccw.svg?component'
 import _TagCategoryScreenshotIcon from './icons/tags/categories/screenshot.svg?component'
+import _TagCategoryScrollTextIcon from './icons/tags/categories/scroll-text.svg?component'
 import _TagCategorySemiRealisticIcon from './icons/tags/categories/semi-realistic.svg?component'
 import _TagCategoryShadowsIcon from './icons/tags/categories/shadows.svg?component'
+import _TagCategoryShieldIcon from './icons/tags/categories/shield.svg?component'
 import _TagCategorySimplisticIcon from './icons/tags/categories/simplistic.svg?component'
+import _TagCategorySkullIcon from './icons/tags/categories/skull.svg?component'
 import _TagCategorySocialIcon from './icons/tags/categories/social.svg?component'
+import _TagCategorySquareIcon from './icons/tags/categories/square.svg?component'
 import _TagCategoryStorageIcon from './icons/tags/categories/storage.svg?component'
+import _TagCategorySwordIcon from './icons/tags/categories/sword.svg?component'
+import _TagCategorySwordsIcon from './icons/tags/categories/swords.svg?component'
+import _TagCategoryTargetIcon from './icons/tags/categories/target.svg?component'
 import _TagCategoryTechnologyIcon from './icons/tags/categories/technology.svg?component'
+import _TagCategoryTerminalIcon from './icons/tags/categories/terminal.svg?component'
+import _TagCategoryTheaterIcon from './icons/tags/categories/theater.svg?component'
 import _TagCategoryThemedIcon from './icons/tags/categories/themed.svg?component'
 import _TagCategoryTransportationIcon from './icons/tags/categories/transportation.svg?component'
+import _TagCategoryTreePineIcon from './icons/tags/categories/tree-pine.svg?component'
+import _TagCategoryTrophyIcon from './icons/tags/categories/trophy.svg?component'
 import _TagCategoryTweaksIcon from './icons/tags/categories/tweaks.svg?component'
+import _TagCategoryUsersIcon from './icons/tags/categories/users.svg?component'
 import _TagCategoryUtilityIcon from './icons/tags/categories/utility.svg?component'
 import _TagCategoryVanillaLikeIcon from './icons/tags/categories/vanilla-like.svg?component'
+import _TagCategoryWandSparklesIcon from './icons/tags/categories/wand-sparkles.svg?component'
+import _TagCategoryWifiOffIcon from './icons/tags/categories/wifi-off.svg?component'
 import _TagCategoryWorldgenIcon from './icons/tags/categories/worldgen.svg?component'
+import _TagCategoryZapIcon from './icons/tags/categories/zap.svg?component'
 import _TagLoaderBabricIcon from './icons/tags/loaders/babric.svg?component'
 import _TagLoaderBtaBabricIcon from './icons/tags/loaders/bta-babric.svg?component'
 import _TagLoaderBukkitIcon from './icons/tags/loaders/bukkit.svg?component'
@@ -383,6 +435,7 @@ export const CoinsIcon = _CoinsIcon
 export const CollapseIcon = _CollapseIcon
 export const CollectionIcon = _CollectionIcon
 export const CompassIcon = _CompassIcon
+export const ComponentIcon = _ComponentIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
@@ -437,6 +490,7 @@ export const HeartMinusIcon = _HeartMinusIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
+export const ImagesIcon = _ImagesIcon
 export const ImportIcon = _ImportIcon
 export const InProgressIcon = _InProgressIcon
 export const InfoIcon = _InfoIcon
@@ -480,16 +534,20 @@ export const NewspaperIcon = _NewspaperIcon
 export const NoSignalIcon = _NoSignalIcon
 export const NotepadTextIcon = _NotepadTextIcon
 export const OmorphiaIcon = _OmorphiaIcon
+export const OnlineIndicatorIcon = _OnlineIndicatorIcon
 export const OrganizationIcon = _OrganizationIcon
 export const PackageIcon = _PackageIcon
 export const PackageClosedIcon = _PackageClosedIcon
 export const PackageOpenIcon = _PackageOpenIcon
+export const PackagePlusIcon = _PackagePlusIcon
 export const PaintbrushIcon = _PaintbrushIcon
 export const PaletteIcon = _PaletteIcon
 export const PickaxeIcon = _PickaxeIcon
 export const PlayIcon = _PlayIcon
 export const PlugIcon = _PlugIcon
 export const PlusIcon = _PlusIcon
+export const PowerIcon = _PowerIcon
+export const PowerOffIcon = _PowerOffIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonCheckedIcon = _RadioButtonCheckedIcon
 export const ReceiptTextIcon = _ReceiptTextIcon
@@ -524,6 +582,7 @@ export const SparklesIcon = _SparklesIcon
 export const SpinnerIcon = _SpinnerIcon
 export const StarIcon = _StarIcon
 export const StopCircleIcon = _StopCircleIcon
+export const StoreIcon = _StoreIcon
 export const StrikethroughIcon = _StrikethroughIcon
 export const SunIcon = _SunIcon
 export const SunriseIcon = _SunriseIcon
@@ -533,60 +592,105 @@ export const TagsIcon = _TagsIcon
 export const TagCategoryAdventureIcon = _TagCategoryAdventureIcon
 export const TagCategoryAtmosphereIcon = _TagCategoryAtmosphereIcon
 export const TagCategoryAudioIcon = _TagCategoryAudioIcon
+export const TagCategoryBackpackIcon = _TagCategoryBackpackIcon
+export const TagCategoryBadgeIcon = _TagCategoryBadgeIcon
+export const TagCategoryBadgeCheckIcon = _TagCategoryBadgeCheckIcon
+export const TagCategoryBedDoubleIcon = _TagCategoryBedDoubleIcon
 export const TagCategoryBlocksIcon = _TagCategoryBlocksIcon
 export const TagCategoryBloomIcon = _TagCategoryBloomIcon
+export const TagCategoryBuilding2Icon = _TagCategoryBuilding2Icon
+export const TagCategoryCameraIcon = _TagCategoryCameraIcon
 export const TagCategoryCartoonIcon = _TagCategoryCartoonIcon
+export const TagCategoryCastleIcon = _TagCategoryCastleIcon
 export const TagCategoryChallengingIcon = _TagCategoryChallengingIcon
+export const TagCategoryClapperboardIcon = _TagCategoryClapperboardIcon
+export const TagCategoryCloudIcon = _TagCategoryCloudIcon
 export const TagCategoryColoredLightingIcon = _TagCategoryColoredLightingIcon
 export const TagCategoryCombatIcon = _TagCategoryCombatIcon
+export const TagCategoryCompassIcon = _TagCategoryCompassIcon
 export const TagCategoryCoreShadersIcon = _TagCategoryCoreShadersIcon
+export const TagCategoryCrownIcon = _TagCategoryCrownIcon
 export const TagCategoryCursedIcon = _TagCategoryCursedIcon
 export const TagCategoryDecorationIcon = _TagCategoryDecorationIcon
+export const TagCategoryDicesIcon = _TagCategoryDicesIcon
 export const TagCategoryEconomyIcon = _TagCategoryEconomyIcon
 export const TagCategoryEntitiesIcon = _TagCategoryEntitiesIcon
 export const TagCategoryEnvironmentIcon = _TagCategoryEnvironmentIcon
 export const TagCategoryEquipmentIcon = _TagCategoryEquipmentIcon
 export const TagCategoryFantasyIcon = _TagCategoryFantasyIcon
+export const TagCategoryFilmIcon = _TagCategoryFilmIcon
+export const TagCategoryFlagIcon = _TagCategoryFlagIcon
 export const TagCategoryFoliageIcon = _TagCategoryFoliageIcon
 export const TagCategoryFontsIcon = _TagCategoryFontsIcon
 export const TagCategoryFoodIcon = _TagCategoryFoodIcon
+export const TagCategoryFootprintsIcon = _TagCategoryFootprintsIcon
 export const TagCategoryGameMechanicsIcon = _TagCategoryGameMechanicsIcon
+export const TagCategoryGamepad2Icon = _TagCategoryGamepad2Icon
+export const TagCategoryGaugeIcon = _TagCategoryGaugeIcon
+export const TagCategoryGlobeIcon = _TagCategoryGlobeIcon
+export const TagCategoryGrid3x3Icon = _TagCategoryGrid3x3Icon
 export const TagCategoryGuiIcon = _TagCategoryGuiIcon
+export const TagCategoryHandshakeIcon = _TagCategoryHandshakeIcon
+export const TagCategoryHeartCrackIcon = _TagCategoryHeartCrackIcon
+export const TagCategoryHeartPulseIcon = _TagCategoryHeartPulseIcon
 export const TagCategoryHighIcon = _TagCategoryHighIcon
+export const TagCategoryHouseIcon = _TagCategoryHouseIcon
 export const TagCategoryItemsIcon = _TagCategoryItemsIcon
 export const TagCategoryKitchenSinkIcon = _TagCategoryKitchenSinkIcon
 export const TagCategoryLibraryIcon = _TagCategoryLibraryIcon
 export const TagCategoryLightweightIcon = _TagCategoryLightweightIcon
 export const TagCategoryLocaleIcon = _TagCategoryLocaleIcon
+export const TagCategoryLockIcon = _TagCategoryLockIcon
 export const TagCategoryLowIcon = _TagCategoryLowIcon
 export const TagCategoryMagicIcon = _TagCategoryMagicIcon
 export const TagCategoryManagementIcon = _TagCategoryManagementIcon
+export const TagCategoryMapPinnedIcon = _TagCategoryMapPinnedIcon
 export const TagCategoryMediumIcon = _TagCategoryMediumIcon
 export const TagCategoryMinigameIcon = _TagCategoryMinigameIcon
 export const TagCategoryMobsIcon = _TagCategoryMobsIcon
 export const TagCategoryModdedIcon = _TagCategoryModdedIcon
 export const TagCategoryModelsIcon = _TagCategoryModelsIcon
 export const TagCategoryMultiplayerIcon = _TagCategoryMultiplayerIcon
+export const TagCategoryNetworkIcon = _TagCategoryNetworkIcon
 export const TagCategoryOptimizationIcon = _TagCategoryOptimizationIcon
+export const TagCategoryPaletteIcon = _TagCategoryPaletteIcon
 export const TagCategoryPathTracingIcon = _TagCategoryPathTracingIcon
+export const TagCategoryPawPrintIcon = _TagCategoryPawPrintIcon
 export const TagCategoryPbrIcon = _TagCategoryPbrIcon
+export const TagCategoryPickaxeIcon = _TagCategoryPickaxeIcon
 export const TagCategoryPotatoIcon = _TagCategoryPotatoIcon
 export const TagCategoryQuestsIcon = _TagCategoryQuestsIcon
 export const TagCategoryRealisticIcon = _TagCategoryRealisticIcon
 export const TagCategoryReflectionsIcon = _TagCategoryReflectionsIcon
+export const TagCategoryRefreshCcwIcon = _TagCategoryRefreshCcwIcon
 export const TagCategoryScreenshotIcon = _TagCategoryScreenshotIcon
+export const TagCategoryScrollTextIcon = _TagCategoryScrollTextIcon
 export const TagCategorySemiRealisticIcon = _TagCategorySemiRealisticIcon
 export const TagCategoryShadowsIcon = _TagCategoryShadowsIcon
+export const TagCategoryShieldIcon = _TagCategoryShieldIcon
 export const TagCategorySimplisticIcon = _TagCategorySimplisticIcon
+export const TagCategorySkullIcon = _TagCategorySkullIcon
 export const TagCategorySocialIcon = _TagCategorySocialIcon
+export const TagCategorySquareIcon = _TagCategorySquareIcon
 export const TagCategoryStorageIcon = _TagCategoryStorageIcon
+export const TagCategorySwordIcon = _TagCategorySwordIcon
+export const TagCategorySwordsIcon = _TagCategorySwordsIcon
+export const TagCategoryTargetIcon = _TagCategoryTargetIcon
 export const TagCategoryTechnologyIcon = _TagCategoryTechnologyIcon
+export const TagCategoryTerminalIcon = _TagCategoryTerminalIcon
+export const TagCategoryTheaterIcon = _TagCategoryTheaterIcon
 export const TagCategoryThemedIcon = _TagCategoryThemedIcon
 export const TagCategoryTransportationIcon = _TagCategoryTransportationIcon
+export const TagCategoryTreePineIcon = _TagCategoryTreePineIcon
+export const TagCategoryTrophyIcon = _TagCategoryTrophyIcon
 export const TagCategoryTweaksIcon = _TagCategoryTweaksIcon
+export const TagCategoryUsersIcon = _TagCategoryUsersIcon
 export const TagCategoryUtilityIcon = _TagCategoryUtilityIcon
 export const TagCategoryVanillaLikeIcon = _TagCategoryVanillaLikeIcon
+export const TagCategoryWandSparklesIcon = _TagCategoryWandSparklesIcon
+export const TagCategoryWifiOffIcon = _TagCategoryWifiOffIcon
 export const TagCategoryWorldgenIcon = _TagCategoryWorldgenIcon
+export const TagCategoryZapIcon = _TagCategoryZapIcon
 export const TagLoaderBabricIcon = _TagLoaderBabricIcon
 export const TagLoaderBtaBabricIcon = _TagLoaderBtaBabricIcon
 export const TagLoaderBukkitIcon = _TagLoaderBukkitIcon
@@ -655,60 +759,105 @@ export const categoryIconMap: Record<string, IconComponent> = {
 	adventure: TagCategoryAdventureIcon,
 	atmosphere: TagCategoryAtmosphereIcon,
 	audio: TagCategoryAudioIcon,
+	backpack: TagCategoryBackpackIcon,
+	badge: TagCategoryBadgeIcon,
+	'badge-check': TagCategoryBadgeCheckIcon,
+	'bed-double': TagCategoryBedDoubleIcon,
 	blocks: TagCategoryBlocksIcon,
 	bloom: TagCategoryBloomIcon,
+	'building-2': TagCategoryBuilding2Icon,
+	camera: TagCategoryCameraIcon,
 	cartoon: TagCategoryCartoonIcon,
+	castle: TagCategoryCastleIcon,
 	challenging: TagCategoryChallengingIcon,
+	clapperboard: TagCategoryClapperboardIcon,
+	cloud: TagCategoryCloudIcon,
 	'colored-lighting': TagCategoryColoredLightingIcon,
 	combat: TagCategoryCombatIcon,
+	compass: TagCategoryCompassIcon,
 	'core-shaders': TagCategoryCoreShadersIcon,
+	crown: TagCategoryCrownIcon,
 	cursed: TagCategoryCursedIcon,
 	decoration: TagCategoryDecorationIcon,
+	dices: TagCategoryDicesIcon,
 	economy: TagCategoryEconomyIcon,
 	entities: TagCategoryEntitiesIcon,
 	environment: TagCategoryEnvironmentIcon,
 	equipment: TagCategoryEquipmentIcon,
 	fantasy: TagCategoryFantasyIcon,
+	film: TagCategoryFilmIcon,
+	flag: TagCategoryFlagIcon,
 	foliage: TagCategoryFoliageIcon,
 	fonts: TagCategoryFontsIcon,
 	food: TagCategoryFoodIcon,
+	footprints: TagCategoryFootprintsIcon,
 	'game-mechanics': TagCategoryGameMechanicsIcon,
+	'gamepad-2': TagCategoryGamepad2Icon,
+	gauge: TagCategoryGaugeIcon,
+	globe: TagCategoryGlobeIcon,
+	'grid-3x3': TagCategoryGrid3x3Icon,
 	gui: TagCategoryGuiIcon,
+	handshake: TagCategoryHandshakeIcon,
+	'heart-crack': TagCategoryHeartCrackIcon,
+	'heart-pulse': TagCategoryHeartPulseIcon,
 	high: TagCategoryHighIcon,
+	house: TagCategoryHouseIcon,
 	items: TagCategoryItemsIcon,
 	'kitchen-sink': TagCategoryKitchenSinkIcon,
 	library: TagCategoryLibraryIcon,
 	lightweight: TagCategoryLightweightIcon,
 	locale: TagCategoryLocaleIcon,
+	lock: TagCategoryLockIcon,
 	low: TagCategoryLowIcon,
 	magic: TagCategoryMagicIcon,
 	management: TagCategoryManagementIcon,
+	'map-pinned': TagCategoryMapPinnedIcon,
 	medium: TagCategoryMediumIcon,
 	minigame: TagCategoryMinigameIcon,
 	mobs: TagCategoryMobsIcon,
 	modded: TagCategoryModdedIcon,
 	models: TagCategoryModelsIcon,
 	multiplayer: TagCategoryMultiplayerIcon,
+	network: TagCategoryNetworkIcon,
 	optimization: TagCategoryOptimizationIcon,
+	palette: TagCategoryPaletteIcon,
 	'path-tracing': TagCategoryPathTracingIcon,
+	'paw-print': TagCategoryPawPrintIcon,
 	pbr: TagCategoryPbrIcon,
+	pickaxe: TagCategoryPickaxeIcon,
 	potato: TagCategoryPotatoIcon,
 	quests: TagCategoryQuestsIcon,
 	realistic: TagCategoryRealisticIcon,
 	reflections: TagCategoryReflectionsIcon,
+	'refresh-ccw': TagCategoryRefreshCcwIcon,
 	screenshot: TagCategoryScreenshotIcon,
+	'scroll-text': TagCategoryScrollTextIcon,
 	'semi-realistic': TagCategorySemiRealisticIcon,
 	shadows: TagCategoryShadowsIcon,
+	shield: TagCategoryShieldIcon,
 	simplistic: TagCategorySimplisticIcon,
+	skull: TagCategorySkullIcon,
 	social: TagCategorySocialIcon,
+	square: TagCategorySquareIcon,
 	storage: TagCategoryStorageIcon,
+	sword: TagCategorySwordIcon,
+	swords: TagCategorySwordsIcon,
+	target: TagCategoryTargetIcon,
 	technology: TagCategoryTechnologyIcon,
+	terminal: TagCategoryTerminalIcon,
+	theater: TagCategoryTheaterIcon,
 	themed: TagCategoryThemedIcon,
 	transportation: TagCategoryTransportationIcon,
+	'tree-pine': TagCategoryTreePineIcon,
+	trophy: TagCategoryTrophyIcon,
 	tweaks: TagCategoryTweaksIcon,
+	users: TagCategoryUsersIcon,
 	utility: TagCategoryUtilityIcon,
 	'vanilla-like': TagCategoryVanillaLikeIcon,
+	'wand-sparkles': TagCategoryWandSparklesIcon,
+	'wifi-off': TagCategoryWifiOffIcon,
 	worldgen: TagCategoryWorldgenIcon,
+	zap: TagCategoryZapIcon,
 }
 
 export const loaderIconMap: Record<string, IconComponent> = {

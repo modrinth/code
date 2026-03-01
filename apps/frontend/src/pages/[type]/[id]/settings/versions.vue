@@ -208,7 +208,7 @@
 		</ProjectPageVersions>
 
 		<template v-if="!versions?.length">
-			<div class="grid place-content-center py-10">
+			<div class="grid place-items-center py-10">
 				<svg
 					width="250"
 					height="200"

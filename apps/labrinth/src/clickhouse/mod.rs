@@ -6,6 +6,8 @@ mod fetch;
 pub use fetch::*;
 
 use crate::env::ENV;
+use crate::queue::server_ping;
+use crate::routes::analytics::MINECRAFT_SERVER_PLAYS;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     init_client_with_database(&ENV.CLICKHOUSE_DATABASE).await
@@ -14,6 +16,8 @@ pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
 pub async fn init_client_with_database(
     database: &str,
 ) -> clickhouse::error::Result<clickhouse::Client> {
+    const MINECRAFT_JAVA_SERVER_PINGS: &str = server_ping::CLICKHOUSE_TABLE;
+
     let client = {
         let https_connector = HttpsConnectorBuilder::new()
             .with_native_roots()?
@@ -155,6 +159,61 @@ pub async fn init_client_with_database(
             {ttl}
             PRIMARY KEY (affiliate_code_id, recorded)
             SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
+            (
+                recorded DateTime64(4),
+                project_id UInt64,
+                address String,
+                port UInt16,
+                online Bool,
+                latency_ms Nullable(UInt32),
+                description Nullable(String),
+                version_name Nullable(String),
+                version_protocol Nullable(UInt32),
+                players_online Nullable(UInt32),
+                players_max Nullable(UInt32)
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (project_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            CREATE TABLE IF NOT EXISTS {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            (
+                recorded DateTime64(4),
+                user_id UInt64,
+                project_id UInt64,
+                minecraft_uuid UUID
+            )
+            ENGINE = {engine}
+            {ttl}
+            PRIMARY KEY (project_id, recorded)
+            SETTINGS index_granularity = 8192
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS minecraft_uuid UUID
             "
         ))
         .execute()

@@ -103,14 +103,30 @@ pub async fn profile_create(
 
     let result = async {
         if let Some(ref icon) = icon_path {
-            let bytes =
-                io::read(state.directories.caches_dir().join(icon)).await?;
+            let (bytes, file_name) = if icon.starts_with("https://")
+                || icon.starts_with("http://")
+            {
+                let fetched = crate::util::fetch::fetch(
+                    icon,
+                    None,
+                    &state.fetch_semaphore,
+                    &state.pool,
+                )
+                .await?;
+                let name =
+                    icon.rsplit('/').next().unwrap_or("icon").to_string();
+                (fetched, name)
+            } else {
+                let data =
+                    io::read(state.directories.caches_dir().join(icon)).await?;
+                (bytes::Bytes::from(data), icon.clone())
+            };
             profile
                 .set_icon(
                     &state.directories.caches_dir(),
                     &state.io_semaphore,
-                    bytes::Bytes::from(bytes),
-                    icon,
+                    bytes,
+                    &file_name,
                 )
                 .await?;
         }

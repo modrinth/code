@@ -278,7 +278,12 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
-import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
+import type {
+	Organization,
+	Project,
+	TeamMember,
+	Version
+} from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useStorage } from '@vueuse/core'
@@ -323,6 +328,7 @@ const props = defineProps<{
 	playing: boolean
 	versions: Version[]
 	installed: boolean
+	isServerInstance?: boolean
 }>()
 
 type ProjectListEntryAuthor = {
@@ -352,6 +358,7 @@ type ProjectListEntry = {
 const isPackLocked = computed(() => {
 	return props.instance.linked_data && props.instance.linked_data.locked
 })
+
 const canUpdatePack = computed(() => {
 	if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
 	return props.instance.linked_data.version_id !== props.versions[0].id

@@ -12,6 +12,7 @@ pub mod moderation;
 pub mod mural;
 pub mod pats;
 pub mod search;
+pub mod server_ping;
 pub mod session;
 pub mod statuses;
 
@@ -61,5 +62,10 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/globals")
             .wrap(default_cors())
             .configure(globals::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/server-ping")
+            .wrap(default_cors())
+            .configure(server_ping::config),
     );
 }

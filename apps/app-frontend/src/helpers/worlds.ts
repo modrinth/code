@@ -30,6 +30,7 @@ export type ServerWorld = BaseWorld & {
 	index: number
 	address: string
 	pack_status: ServerPackStatus
+	linked_project_id?: string
 }
 
 export type World = SingleplayerWorld | ServerWorld
@@ -140,8 +141,15 @@ export async function add_server_to_profile(
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
+	linkedProjectId?: string,
 ): Promise<number> {
-	return await invoke('plugin:worlds|add_server_to_profile', { path, name, address, packStatus })
+	return await invoke('plugin:worlds|add_server_to_profile', {
+		path,
+		name,
+		address,
+		packStatus,
+		linkedProjectId,
+	})
 }
 
 export async function edit_server_in_profile(
@@ -194,6 +202,11 @@ export function getWorldIdentifier(world: World) {
 
 export function sortWorlds(worlds: World[]) {
 	worlds.sort((a, b) => {
+		const aLinked = isLinkedWorld(a)
+		const bLinked = isLinkedWorld(b)
+		if (aLinked !== bLinked) {
+			return aLinked ? -1 : 1
+		}
 		if (!a.last_played) {
 			return 1
 		}
@@ -210,6 +223,10 @@ export function isSingleplayerWorld(world: World): world is SingleplayerWorld {
 
 export function isServerWorld(world: World): world is ServerWorld {
 	return world.type === 'server'
+}
+
+export function isLinkedWorld(world: World): boolean {
+	return world.type === 'server' && !!world.linked_project_id
 }
 
 export async function refreshServerData(

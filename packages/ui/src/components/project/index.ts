@@ -1,10 +1,11 @@
-// Settings
+export * from './server'
 export * from './settings'
 
 // Other
 export { default as ProjectCard } from './card/ProjectCard.vue'
 export { default as ProjectBackgroundGradient } from './ProjectBackgroundGradient.vue'
 export { default as ProjectCardList } from './ProjectCardList.vue'
+export { default as ProjectCombobox } from './ProjectCombobox.vue'
 export { default as ProjectHeader } from './ProjectHeader.vue'
 export { default as ProjectPageDescription } from './ProjectPageDescription.vue'
 export { default as ProjectPageVersions } from './ProjectPageVersions.vue'
@@ -12,5 +13,8 @@ export { default as ProjectSidebarCompatibility } from './ProjectSidebarCompatib
 export { default as ProjectSidebarCreators } from './ProjectSidebarCreators.vue'
 export { default as ProjectSidebarDetails } from './ProjectSidebarDetails.vue'
 export { default as ProjectSidebarLinks } from './ProjectSidebarLinks.vue'
+export { default as ProjectSidebarServerInfo } from './ProjectSidebarServerInfo.vue'
+export { default as ProjectSidebarTags } from './ProjectSidebarTags.vue'
 export { default as ProjectStatusBadge } from './ProjectStatusBadge.vue'
+export { default as ServerProjectHeader } from './ServerProjectHeader.vue'
 export { default as TagsOverflow } from './TagsOverflow.vue'

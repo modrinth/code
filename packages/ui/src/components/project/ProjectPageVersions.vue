@@ -180,7 +180,7 @@
 								class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
 							>
 								<CalendarIcon class="xl:hidden" />
-								{{ formatRelativeTime(version.date_published) }}
+								{{ formatRelativeTime(new Date(version.date_published)) }}
 							</div>
 							<div
 								class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"

@@ -8,6 +8,7 @@ members = [
   "packages/app-lib",
   "packages/ariadne",
   "packages/daedalus",
+  "packages/labrinth-derive",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
   "packages/modrinth-util",
@@ -32,6 +33,7 @@ arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
+async-minecraft-ping = { version = "0.8.0" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
@@ -58,6 +60,7 @@ color-eyre = "0.6.5"
 color-thief = "0.2.2"
 const_format = "0.2.34"
 daedalus = { path = "packages/daedalus" }
+darling = { version = "0.23" }
 dashmap = "6.1.0"
 data-url = "0.3.2"
 deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "db5fb00b036ecc8fe5f18853c559b745ffe47bde", version = "0.22.1" }
@@ -121,15 +124,18 @@ paste = "1.0.15"
 path-util = { path = "packages/path-util" }
 phf = { version = "0.13.1", features = ["macros"] }
 png = "0.18.0"
+proc-macro2 = { version = "1.0" }
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.3"
+quote = { version = "1.0" }
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.7"
 regex = "1.12.2"
 reqwest = { version = "0.12.24", default-features = false }
 rgb = "0.8.52"
+elytra-ping = "6.0.1"
 rust_decimal = { version = "1.39.0", features = [
   "serde-with-float",
   "serde-with-str"
@@ -166,6 +172,7 @@ spdx = "0.12.0"
 sqlx = { version = "0.8.6", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
 strum = "0.27.2"
+syn = { version = "2.0" }
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
 tauri = "2.8.5"

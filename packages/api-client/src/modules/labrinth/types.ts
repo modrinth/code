@@ -189,10 +189,28 @@ export namespace Labrinth {
 				url: string
 			}
 
+			export interface CreateProjectBase {
+				title: string
+				project_type: 'mod'
+				slug: string
+				description: string
+				body: string
+				requested_status: v2.ProjectStatus
+				initial_versions: unknown[]
+				team_members: any[]
+				categories: string[]
+				client_side: string
+				server_side: string
+				license_id: string
+				is_draft: boolean
+				organization_id?: string
+			}
+
 			export type Project = {
 				id: string
 				slug: string
 				project_type: ProjectType
+				actualProjectType: ProjectType
 				team: string
 				organization: string | null
 				title: string
@@ -280,6 +298,14 @@ export namespace Labrinth {
 		}
 
 		export namespace v3 {
+			export type ProjectType =
+				| 'mod'
+				| 'modpack'
+				| 'resourcepack'
+				| 'shader'
+				| 'plugin'
+				| 'datapack'
+
 			export type Environment =
 				| 'client_and_server'
 				| 'client_only'
@@ -311,7 +337,7 @@ export namespace Labrinth {
 			export type Project = {
 				id: string
 				slug?: string
-				project_types: string[]
+				project_types: ProjectType[]
 				games: string[]
 				team_id: string
 				organization?: string
@@ -344,10 +370,81 @@ export namespace Labrinth {
 				side_types_migration_review_status: 'reviewed' | 'pending'
 				environment?: Environment[]
 
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
+
 				/**
 				 * @deprecated Not recommended to use.
 				 **/
 				[key: string]: unknown
+			}
+
+			interface CreateProjectBase {
+				name: string // 3-64 chars
+				slug: string // 3-64 chars, URL-safe
+				summary: string // 3-255 chars
+				description: string // max 65536 chars, markdown
+				requested_status: v2.ProjectStatus
+				organization_id?: string // automatically transfer the project to this organization
+			}
+
+			export interface MinecraftJavaServerPing {
+				address: string
+				data?: {
+					description: string
+					latency: {
+						nanos: number
+						secs: number
+					}
+					players_max: number
+					players_online: number
+					version_name: string
+					version_protocol: number
+				}
+				port: number
+				when: string
+			}
+
+			export interface MinecraftServer {
+				max_players?: number
+				country?: string
+				active_version?: string | null
+				languages?: string[]
+			}
+
+			export interface ModpackContent {
+				kind: 'modpack'
+				version_id: string
+				project_id?: string
+				project_name?: string
+				project_icon?: string
+			}
+			export interface VanillaContent {
+				kind: 'vanilla'
+				supported_game_versions: string[]
+				recommended_game_version?: string
+			}
+
+			export interface MinecraftJavaServer {
+				address?: string
+				port?: number
+				content?: ModpackContent | VanillaContent
+				verified_plays_4w?: number | null
+				verified_plays_2w?: number | null
+				ping: Projects.v3.MinecraftJavaServerPing | null
+			}
+
+			export interface MinecraftBedrockServer {
+				address?: string
+				port?: number
+			}
+
+			export interface CreateServerProjectRequest {
+				base: CreateProjectBase
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
 			}
 
 			export type EditProjectRequest = {
@@ -367,6 +464,10 @@ export namespace Labrinth {
 				monetization_status?: v2.MonetizationStatus
 				side_types_migration_review_status?: 'reviewed' | 'pending'
 				environment?: Environment
+
+				minecraft_server?: MinecraftServer
+				minecraft_java_server?: MinecraftJavaServer
+				minecraft_bedrock_server?: MinecraftBedrockServer
 				[key: string]: unknown
 			}
 
@@ -403,6 +504,51 @@ export namespace Labrinth {
 				accepted: boolean
 				payouts_split: number | null
 				ordering: number
+			}
+
+			export type Team = {
+				id: string
+				members: TeamMember[]
+			}
+
+			export type ProjectDependencies = {
+				projects: Project[]
+				versions: Labrinth.Versions.v3.Version[]
+			}
+		}
+	}
+
+	export namespace Organizations {
+		export namespace v3 {
+			export type Organization = {
+				id: string
+				slug: string
+				name: string
+				team_id: string
+				description: string
+				icon_url: string | null
+				color: number | null
+				members: Projects.v3.TeamMember[]
+			}
+
+			export type CreateOrganizationRequest = {
+				slug: string
+				name: string
+				description: string
+			}
+
+			export type EditOrganizationRequest = {
+				description?: string
+				slug?: string
+				name?: string
+			}
+
+			export type AddProjectRequest = {
+				project_id: string
+			}
+
+			export type RemoveProjectRequest = {
+				new_owner: string
 			}
 		}
 	}
@@ -512,6 +658,13 @@ export namespace Labrinth {
 				file_type?: FileType
 			}
 
+			interface JavaServerVersion {
+				/**
+				 * The version id of the modpack
+				 */
+				modpack: string
+			}
+
 			export interface Version {
 				name: string
 				version_number: string
@@ -530,6 +683,8 @@ export namespace Labrinth {
 				files: VersionFile[]
 				environment?: Labrinth.Projects.v3.Environment
 				mrpack_loaders?: string[]
+
+				minecraft_java_server?: JavaServerVersion
 			}
 
 			export interface DraftVersionFile {
@@ -658,6 +813,15 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace ServerPing {
+		export namespace Internal {
+			export type MinecraftJavaPingRequest = {
+				address: string
+				port: number
+			}
+		}
+	}
+
 	export namespace Tags {
 		export namespace v2 {
 			export interface Category {
@@ -718,6 +882,103 @@ export namespace Labrinth {
 				offset: number
 				limit: number
 				total_hits: number
+			}
+		}
+
+		export namespace v3 {
+			export interface ResultSearchProject {
+				version_id: string
+				project_id: string
+				project_types: string[]
+				slug: string | null
+				author: string
+				name: string
+				summary: string
+				categories: string[]
+				display_categories: string[]
+				downloads: number
+				follows: number
+				icon_url: string | null
+				date_created: string
+				date_modified: string
+				license: string
+				gallery: string[]
+				featured_gallery: string | null
+				color: number | null
+				loaders: string[]
+				project_loader_fields?: Record<string, unknown[]>
+				minecraft_server?: Projects.v3.MinecraftServer | null
+				minecraft_java_server?: Projects.v3.MinecraftJavaServer | null
+				minecraft_bedrock_server?: Projects.v3.MinecraftBedrockServer | null
+				minecraft_mod?: unknown | null
+			}
+
+			export interface SearchResults {
+				hits: ResultSearchProject[]
+				offset: number
+				limit: number
+				total_hits: number
+			}
+		}
+	}
+
+	export namespace Threads {
+		export namespace v3 {
+			export type ThreadType = 'report' | 'project' | 'direct_message'
+
+			export type MessageBody =
+				| {
+						type: 'text'
+						body: string
+						private?: boolean
+						replying_to?: string
+						associated_images?: string[]
+				  }
+				| {
+						type: 'status_change'
+						new_status: Projects.v2.ProjectStatus
+						old_status: Projects.v2.ProjectStatus
+				  }
+				| {
+						type: 'thread_closure'
+				  }
+				| {
+						type: 'thread_reopen'
+				  }
+				| {
+						type: 'deleted'
+						private?: boolean
+				  }
+
+			export type ThreadMessage = {
+				id: string | null
+				author_id: string | null
+				body: MessageBody
+				created: string
+				hide_identity: boolean
+			}
+
+			export type ThreadMember = {
+				id: string
+				username: string
+				avatar_url: string
+				role: string
+				badges: number
+				created: string
+				bio?: string
+			}
+
+			export type Thread = {
+				id: string
+				type: ThreadType
+				project_id: string | null
+				report_id: string | null
+				messages: ThreadMessage[]
+				members: ThreadMember[]
+			}
+
+			export type SendMessageRequest = {
+				body: MessageBody
 			}
 		}
 	}

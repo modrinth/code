@@ -178,7 +178,8 @@ async fn app() -> std::io::Result<()> {
             email_queue,
             muralpay,
         )
-        .await;
+        .await
+        .map_err(std::io::Error::other)?;
         return Ok(());
     }
 
