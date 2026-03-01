@@ -993,7 +993,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<SettingsIcon />
 			</NavButton>
 			<OverflowMenu
-				v-if="credentials"
+				v-if="credentials.user"
 				v-tooltip.right="`Modrinth account`"
 				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
 				:options="[
@@ -1009,25 +1009,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				]"
 				placement="right-end"
 			>
-				<Avatar
-					v-if="credentials.user?.avatar_url"
-					:src="credentials.user.avatar_url"
-					alt=""
-					size="32px"
-					circle
-				/>
+				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
 				<template #view-profile>
 					<UserIcon />
 					<span class="inline-flex items-center gap-1">
 						Signed in as
 						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar
-								v-if="credentials.user?.avatar_url"
-								:src="credentials.user.avatar_url"
-								alt=""
-								size="20px"
-								circle
-							/>
+							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
 							{{ credentials.user.username }}
 						</span>
 					</span>
