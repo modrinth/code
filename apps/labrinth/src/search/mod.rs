@@ -281,8 +281,8 @@ pub fn get_sort_index(
         ),
         "downloads" => (projects_filtered_name, &["downloads:desc"]),
         "follows" => (projects_name, &["follows:desc"]),
-        "updated" => (projects_name, &["date_modified:desc"]),
-        "newest" => (projects_name, &["date_created:desc"]),
+        "updated" | "date_modified" => (projects_name, &["date_modified:desc"]),
+        "newest" | "date_created" => (projects_name, &["date_created:desc"]),
         "minecraft_java_server.verified_plays_2w" => (
             projects_name,
             &["minecraft_java_server.verified_plays_2w:desc"],
