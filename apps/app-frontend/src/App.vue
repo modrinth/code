@@ -31,6 +31,7 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	ContentInstallModal,
 	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
@@ -65,7 +66,6 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
@@ -104,7 +104,7 @@ import {
 } from '@/providers/download-progress.ts'
 import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
-import { useInstall } from '@/store/install.js'
+import { setupContentInstall } from '@/composables/content-install'
 import { useLoading, useTheming } from '@/store/state'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
@@ -402,7 +402,23 @@ const error = useError()
 const errorModal = ref()
 const minecraftAuthErrorModal = ref()
 
-const install = useInstall()
+const {
+	contentInstallInstances,
+	contentInstallLoaders,
+	contentInstallGameVersions,
+	contentInstallLoading,
+	contentInstallDefaultTab,
+	contentInstallPreferredLoader,
+	contentInstallPreferredGameVersion,
+	contentInstallReleaseGameVersions,
+	handleInstallToInstance,
+	handleCreateAndInstall,
+	handleCancel: handleContentInstallCancel,
+	setContentInstallModal,
+	setInstallConfirmModal: setContentInstallConfirmModal,
+	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
+} = setupContentInstall({ router, handleError })
+
 const modInstallModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
@@ -481,9 +497,9 @@ onMounted(() => {
 	error.setErrorModal(errorModal.value)
 	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
 
-	install.setIncompatibilityWarningModal(incompatibilityWarningModal)
-	install.setInstallConfirmModal(installConfirmModal)
-	install.setModInstallModal(modInstallModal)
+	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
+	setContentInstallConfirmModal(installConfirmModal.value)
+	setContentInstallModal(modInstallModal.value)
 })
 
 const accounts = ref(null)
@@ -1150,7 +1166,20 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<NotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
-	<ModInstallModal ref="modInstallModal" />
+	<ContentInstallModal
+		ref="modInstallModal"
+		:instances="contentInstallInstances"
+		:compatible-loaders="contentInstallLoaders"
+		:game-versions="contentInstallGameVersions"
+		:loading="contentInstallLoading"
+		:default-tab="contentInstallDefaultTab"
+		:preferred-loader="contentInstallPreferredLoader"
+		:preferred-game-version="contentInstallPreferredGameVersion"
+		:release-game-versions="contentInstallReleaseGameVersions"
+		@install="handleInstallToInstance"
+		@create-and-install="handleCreateAndInstall"
+		@cancel="handleContentInstallCancel"
+	/>
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 	<InstallConfirmModal ref="installConfirmModal" />
 </template>

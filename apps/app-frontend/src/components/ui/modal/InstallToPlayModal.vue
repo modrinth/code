@@ -77,7 +77,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import { get_organization, get_team, get_version } from '@/helpers/cache.js'
-import { install } from '@/store/install.js'
+import { install } from '@/composables/content-install'
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project

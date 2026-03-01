@@ -168,6 +168,20 @@ const {
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
 
+const activeLoader = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'mod_loader')
+	if (filter) return filter.option
+	if (projectType.value === 'datapack' || projectType.value === 'resourcepack') return 'vanilla'
+	return instance.value?.loader ?? null
+})
+
+const activeGameVersion = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'game_version')
+	if (filter) return filter.option
+	return instance.value?.game_version ?? null
+})
+
+
 const previousFilterState = ref('')
 
 const offline = ref(!navigator.onLine)
@@ -520,6 +534,8 @@ previousFilterState.value = JSON.stringify({
 					:project-type="projectType"
 					:project="result"
 					:instance="instance"
+					:active-loader="activeLoader"
+					:active-game-version="activeGameVersion"
 					:categories="[
 						...categories.filter(
 							(cat) =>

@@ -5,6 +5,8 @@ export { default as ConfirmBulkUpdateModal } from './modals/ConfirmBulkUpdateMod
 export { default as ConfirmDeletionModal } from './modals/ConfirmDeletionModal.vue'
 export { default as ConfirmReinstallModal } from './modals/ConfirmReinstallModal.vue'
 export { default as ConfirmUnlinkModal } from './modals/ConfirmUnlinkModal.vue'
+export type { ContentInstallInstance } from './modals/ContentInstallModal.vue'
+export { default as ContentInstallModal } from './modals/ContentInstallModal.vue'
 /**
  * @deprecated Use `ContentCardTable` with `ContentCardItem` instead.
  * This alias is kept for backwards compatibility and will be removed in a future version.

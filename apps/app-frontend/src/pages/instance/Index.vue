@@ -37,7 +37,7 @@
 					<div class="flex gap-2">
 						<ButtonStyled
 							v-if="
-								['installing', 'pack_installing', 'minecraft_installing'].includes(
+								['installing', 'pack_installing', 'pack_installed', 'not_installed', 'minecraft_installing'].includes(
 									instance.install_stage,
 								)
 							"

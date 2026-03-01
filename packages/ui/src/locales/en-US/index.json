@@ -533,6 +533,63 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
   },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} compatible {count, plural, one {instance} other {instances}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Existing instance"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "No compatible instances found"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "Game version"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Select game version"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Install project"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "Hide snapshots"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Install"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installed"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "Installing..."
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Instance type"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Loader"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Name"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Enter instance name"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "New instance"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Remove icon"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Search instance"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Select icon"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "Show all versions"
+  },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Back"
   },

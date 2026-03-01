@@ -169,7 +169,7 @@ import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { install as installVersion } from '@/store/install.js'
+import { install as installVersion } from '@/composables/content-install'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)

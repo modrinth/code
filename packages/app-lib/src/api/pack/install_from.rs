@@ -1,4 +1,5 @@
 use crate::State;
+use crate::api::profile;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
@@ -223,6 +224,24 @@ pub async fn generate_pack_from_version_id(
     })?;
     emit_loading(&loading_bar, 10.0, None)?;
 
+    // Update profile with correct loader and game version from the API version metadata,
+    // so the UI shows accurate info while the pack file is still downloading.
+    if let Some(game_version) = version.game_versions.first() {
+        let loader = version
+            .loaders
+            .first()
+            .map(|l| ModLoader::from_string(l))
+            .unwrap_or(ModLoader::Vanilla);
+        let game_version = game_version.clone();
+        let profile_path_clone = profile_path.clone();
+        profile::edit(&profile_path_clone, |prof| {
+            prof.game_version.clone_from(&game_version);
+            prof.loader = loader;
+            async { Ok(()) }
+        })
+        .await?;
+    }
+
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
             Some((file.url.clone(), file.hashes.get("sha1")))
@@ -289,6 +308,11 @@ pub async fn generate_pack_from_version_id(
         None
     };
     emit_loading(&loading_bar, 10.0, None)?;
+
+    // Set the icon immediately so the UI shows it during download.
+    if let Some(ref icon_path) = icon {
+        let _ = profile::edit_icon(&profile_path, Some(icon_path.as_path())).await;
+    }
 
     Ok(CreatePack {
         file,

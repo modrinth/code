@@ -67,7 +67,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { install as installVersion } from '@/store/install.js'
+import { install as installVersion } from '@/composables/content-install'
+
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
@@ -99,6 +100,14 @@ const props = defineProps({
 		type: String,
 		default: undefined,
 	},
+	activeLoader: {
+		type: String,
+		default: null,
+	},
+	activeGameVersion: {
+		type: String,
+		default: null,
+	},
 })
 
 const emit = defineEmits(['open', 'install'])
@@ -112,12 +121,18 @@ async function install() {
 		null,
 		props.instance ? props.instance.path : null,
 		'SearchCard',
-		() => {
+		(versionId) => {
 			installing.value = false
-			emit('install', props.project.project_id ?? props.project.id)
+			if (versionId) {
+				emit('install', props.project.project_id ?? props.project.id)
+			}
 		},
 		(profile) => {
 			router.push(`/instance/${profile}`)
+		},
+		{
+			preferredLoader: props.activeLoader ?? undefined,
+			preferredGameVersion: props.activeGameVersion ?? undefined,
 		},
 	).catch(handleError)
 }

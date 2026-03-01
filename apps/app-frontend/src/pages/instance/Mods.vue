@@ -683,6 +683,8 @@ watch(
 	async (newStage, oldStage) => {
 		if (oldStage !== 'installed' && newStage === 'installed') {
 			await initProjects('must_revalidate')
+		} else if (oldStage === 'not_installed' && newStage === 'pack_installing') {
+			await initProjects()
 		}
 	},
 )
