@@ -23,7 +23,7 @@ const reupload: Stage = {
 				'reupload_insufficient_fork',
 				'reupload_request_proof',
 				'reupload_identity_verification',
-				'reupload_request_proof_server'
+				'reupload_request_proof_server',
 			],
 			relevantExtraInput: [
 				{
@@ -54,7 +54,7 @@ const reupload: Stage = {
 				'reupload_insufficient_fork',
 				'reupload_request_proof',
 				'reupload_identity_verification',
-				'reupload_request_proof_server'
+				'reupload_request_proof_server',
 			],
 		} as ButtonAction,
 		{
@@ -71,7 +71,7 @@ const reupload: Stage = {
 				'reupload_reupload',
 				'reupload_request_proof',
 				'reupload_identity_verification',
-				'reupload_request_proof_server'
+				'reupload_request_proof_server',
 			],
 		} as ButtonAction,
 		{
@@ -88,7 +88,7 @@ const reupload: Stage = {
 				'reupload_unclear_fork',
 				'reupload_insufficient_fork',
 				'reupload_identity_verification',
-				'reupload_request_proof_server'
+				'reupload_request_proof_server',
 			],
 		},
 		{
@@ -112,7 +112,7 @@ const reupload: Stage = {
 				'reupload_reupload',
 				'reupload_insufficient_fork',
 				'reupload_request_proof',
-				'reupload_request_proof_server'
+				'reupload_request_proof_server',
 			],
 		},
 		{
@@ -123,8 +123,7 @@ const reupload: Stage = {
 			suggestedStatus: 'rejected',
 			severity: 'high',
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/reupload/custom_server.md?raw')).default,
+			message: async () => (await import('../messages/reupload/custom_server.md?raw')).default,
 			disablesActions: [
 				'reupload_reupload',
 				'reupload_unclear_fork',

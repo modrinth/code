@@ -112,8 +112,7 @@ const statusAlerts: Stage = {
 			label: `Serverpack`,
 			weight: -999999,
 			shouldShow: (project) => project.project_type === 'modpack',
-			message: async () =>
-				(await import('../messages/status-alerts/serverpack.md?raw')).default,
+			message: async () => (await import('../messages/status-alerts/serverpack.md?raw')).default,
 		} as ButtonAction,
 	],
 }
