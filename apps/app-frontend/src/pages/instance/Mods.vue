@@ -120,13 +120,13 @@
 								<template #share-markdown> <CodeIcon /> Markdown links </template>
 							</OverflowMenu>
 						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => m.disabled && !isBaseContent(m))">
+						<ButtonStyled v-if="selectedProjects.some((m) => m.disabled)">
 							<button @click="enableAll()"><CheckCircleIcon /> Enable</button>
 						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => !m.disabled && !isBaseContent(m))">
+						<ButtonStyled v-if="selectedProjects.some((m) => !m.disabled)">
 							<button @click="disableAll()"><SlashIcon /> Disable</button>
 						</ButtonStyled>
-						<ButtonStyled v-if="selectedProjects.some((m) => !isBaseContent(m))" color="red">
+						<ButtonStyled color="red">
 							<button @click="deleteSelected()"><TrashIcon /> Remove</button>
 						</ButtonStyled>
 					</div>
@@ -177,12 +177,11 @@
 					</ButtonStyled>
 					<div v-else class="w-[36px]"></div>
 					<Toggle
-						v-if="!isBaseContent(item.data)"
 						class="!mx-2"
 						:model-value="!item.data.disabled"
 						@update:model-value="toggleDisableMod(item.data)"
 					/>
-					<ButtonStyled v-if="!isBaseContent(item.data)" type="transparent" circular>
+					<ButtonStyled type="transparent" circular>
 						<button v-tooltip="'Remove'" @click="removeMod(item)">
 							<TrashIcon />
 						</button>
@@ -280,13 +279,10 @@ import {
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
 import type {
-	Dependency,
-	FileDependency,
 	Organization,
 	Project,
-	ProjectDependency,
 	TeamMember,
-	Version,
+	Version
 } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
@@ -363,37 +359,6 @@ const isPackLocked = computed(() => {
 	return props.instance.linked_data && props.instance.linked_data.locked
 })
 
-const baseProjectIds = ref<Set<string>>(new Set())
-const baseFileNames = ref<Set<string>>(new Set())
-
-async function fetchBaseProjectIds() {
-	const versionId = props.instance.linked_data?.version_id
-	if (!versionId) return
-	try {
-		const version = await get_version(versionId, 'bypass')
-		if (version?.dependencies) {
-			baseProjectIds.value = new Set(
-				version.dependencies
-					.filter((d: Dependency) => 'project_id' in d && d.project_id)
-					.map((d: Dependency) => (d as ProjectDependency).project_id as string),
-			)
-			baseFileNames.value = new Set(
-				version.dependencies
-					.filter((d: Dependency) => 'file_name' in d && d.file_name)
-					.map((d: Dependency) => decodeURIComponent((d as FileDependency).file_name as string)),
-			)
-		}
-	} catch {
-		// Ignore - base content check will be permissive
-	}
-}
-
-const isBaseContent = (project: ProjectListEntry) => {
-	if (!props.isServerInstance) return false
-	if (project.id && baseProjectIds.value.has(project.id)) return true
-	if (baseFileNames.value.has(decodeURIComponent(project.file_name))) return true
-	return false
-}
 const canUpdatePack = computed(() => {
 	if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
 	return props.instance.linked_data.version_id !== props.versions[0].id
@@ -514,12 +479,6 @@ const initProjects = async (cacheBehaviour?: CacheBehaviour) => {
 		)
 	}
 	selectionMap.value = newSelectionMap
-
-	baseProjectIds.value = new Set()
-	baseFileNames.value = new Set()
-	if (props.isServerInstance) {
-		await fetchBaseProjectIds()
-	}
 }
 await initProjects()
 
@@ -646,27 +605,18 @@ const search = computed(() => {
 		return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
 	})
 
-	const baseSort = (a: ProjectListEntry, b: ProjectListEntry) => {
-		if (!props.isServerInstance) return 0
-		const aBase = isBaseContent(a) ? 1 : 0
-		const bBase = isBaseContent(b) ? 1 : 0
-		return aBase - bBase
-	}
-
 	switch (sortColumn.value) {
 		case 'Updated':
 			return filtered.slice().sort((a, b) => {
-				const base = baseSort(a, b)
-				if (base !== 0) return base
 				const updated = a.updated.isAfter(b.updated) ? 1 : -1
 				return ascending.value ? -updated : updated
 			})
 		default:
-			return filtered.slice().sort((a, b) => {
-				const base = baseSort(a, b)
-				if (base !== 0) return base
-				return ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
-			})
+			return filtered
+				.slice()
+				.sort((a, b) =>
+					ascending.value ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name),
+				)
 	}
 })
 

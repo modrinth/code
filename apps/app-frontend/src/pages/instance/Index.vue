@@ -64,7 +64,7 @@
 
 							<ServerRegion v-if="minecraftServer?.country" :region="minecraftServer?.country" />
 
-							<ServerPing :ping="ping" />
+							<ServerPing v-if="ping" :ping="ping" />
 
 							<div
 								v-if="modpackContentProjectV3 && (minecraftServer?.country || ping)"
@@ -318,6 +318,7 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, get_projects, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
+import { get_server_status } from '@/helpers/worlds'
 import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
@@ -354,9 +355,9 @@ const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
-const playersOnline = computed(() => javaServerPingData.value?.players_online ?? 0)
 const statusOnline = computed(() => !!javaServerPingData.value)
-const ping = computed(() => Math.trunc(Number(javaServerPingData.value?.latency.nanos) / 1000000))
+const playersOnline = ref<number | undefined>(undefined)
+const ping = ref<number | undefined>(undefined)
 
 async function fetchInstance() {
 	isServerInstance.value = false
@@ -364,6 +365,7 @@ async function fetchInstance() {
 	modpackContentProjectV3.value = null
 	modrinthVersions.value = []
 	hasContent.value = true
+	ping.value = undefined
 
 	instance.value = await get(route.params.id as string).catch(handleError)
 
@@ -381,6 +383,21 @@ async function fetchInstance() {
 				)
 				if (linkedProjectV3.value?.minecraft_server != null) {
 					isServerInstance.value = true
+
+					const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
+					if (serverAddress) {
+						get_server_status(serverAddress)
+							.then((status) => {
+								if (status.ping != null) {
+									ping.value = status.ping
+									playersOnline.value = status.players?.online
+								}
+							})
+							.catch((err) => {
+								console.error(`Failed to ping server ${serverAddress}:`, err)
+							})
+					}
+
 					await fetchModpackContent()
 					const projects = await get_projects(instance.value!.path).catch(() => ({}))
 					hasContent.value = Object.keys(projects).length > 0

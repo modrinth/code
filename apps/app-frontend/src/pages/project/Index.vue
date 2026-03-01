@@ -90,7 +90,7 @@
 								:options="[
 									{
 										id: 'open-in-browser',
-										link: `https://modrinth.com/${data.project_type}/${data.slug}`,
+										link: `https://modrinth.com/project/${data.slug}`,
 										external: true,
 									},
 									{
