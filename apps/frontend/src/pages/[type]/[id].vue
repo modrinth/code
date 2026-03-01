@@ -856,7 +856,6 @@
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCreators
-						v-if="!isServerProject"
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"

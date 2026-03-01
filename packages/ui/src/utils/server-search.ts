@@ -158,6 +158,15 @@ export function useServerSearch(opts: {
 			})
 		}
 
+		const featuresFilter = categoryFilters['server_category_minecraft_server_features']
+		if (featuresFilter) {
+			featuresFilter.options.sort((a, b) => {
+				if (a.id === 'pokemon') return -1
+				if (b.id === 'pokemon') return 1
+				return 0
+			})
+		}
+
 		return [
 			{
 				id: 'server_content_type',
@@ -173,8 +182,8 @@ export function useServerSearch(opts: {
 				],
 			},
 			...[
-				'minecraft_server_gameplay',
 				'minecraft_server_features',
+				'minecraft_server_gameplay',
 				'minecraft_server_meta',
 				'minecraft_server_community',
 			]
