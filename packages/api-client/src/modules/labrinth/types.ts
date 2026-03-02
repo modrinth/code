@@ -915,8 +915,8 @@ export namespace Labrinth {
 
 			export interface SearchResults {
 				hits: ResultSearchProject[]
-				offset: number
-				limit: number
+				page: number
+				hits_per_page: number
 				total_hits: number
 			}
 		}

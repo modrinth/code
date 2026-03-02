@@ -381,9 +381,19 @@ const {
 	},
 	{
 		watch: false,
-		transform: (hits) => {
+		transform: (
+			hits: Labrinth.Search.v2.SearchResults | Labrinth.Search.v3.SearchResults,
+		): Labrinth.Search.v2.SearchResults => {
 			noLoad.value = false
-			return hits as Labrinth.Search.v2.SearchResults
+			if ('hits_per_page' in hits) {
+				return {
+					hits: hits.hits as unknown as Labrinth.Search.v2.ResultSearchProject[],
+					total_hits: hits.total_hits,
+					limit: hits.hits_per_page,
+					offset: (hits.page - 1) * hits.hits_per_page,
+				}
+			}
+			return hits
 		},
 	},
 )
