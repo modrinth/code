@@ -481,6 +481,7 @@ pub async fn project_edit_internal(
         if status.is_searchable()
             && !project_item.inner.webhook_sent
             && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
+            && project_item.inner.components.minecraft_server.is_none()
         {
             crate::util::webhook::send_discord_webhook(
                 project_item.inner.id.into(),
