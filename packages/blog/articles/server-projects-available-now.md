@@ -11,7 +11,11 @@ Server Projects are coming to Modrinth, and they’re not just a typical server 
 
 We genuinely believe modded is the future of large-scale multiplayer Minecraft, so let's jump in!
 
-![[Video] Server discovery in app > play > join server](Server%20projects%20blog/image.png)
+<div class="video-wrapper mb-8">
+	<video autoplay loop muted playsinline>
+		<source src="./server-discovery-in-app.mp4" type="video/mp4" />
+	</video>
+</div>
 
 ### TL;DR
 
