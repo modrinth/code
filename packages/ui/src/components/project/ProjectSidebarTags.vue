@@ -21,5 +21,8 @@ const props = defineProps<{
 	}
 }>()
 
-const allTags = computed(() => [...props.project.categories, ...props.project.additional_categories])
+const allTags = computed(() => [
+	...props.project.categories,
+	...props.project.additional_categories,
+])
 </script>

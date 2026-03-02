@@ -106,8 +106,8 @@ const props = defineProps({
 	},
 })
 
-const filteredGallery = computed(() =>
-	props.project.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
+const filteredGallery = computed(
+	() => props.project.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
 )
 
 const expandedGalleryItem = ref(null)

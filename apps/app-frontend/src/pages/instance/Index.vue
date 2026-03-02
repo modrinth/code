@@ -341,7 +341,7 @@ window.addEventListener('online', () => {
 })
 
 const instance = ref<GameInstance>()
-const modrinthVersions = ref<any[]>([])
+const modrinthVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const playing = ref(false)
 const loading = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
@@ -379,7 +379,8 @@ async function fetchInstance() {
 			if (linkedProjectV3.value && linkedProjectV3.value.versions) {
 				const versions = await get_version_many(linkedProjectV3.value.versions, 'must_revalidate')
 				modrinthVersions.value = versions.sort(
-					(a: any, b: any) => dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
+					(a: Labrinth.Versions.v2.Version, b: Labrinth.Versions.v2.Version) =>
+						dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
 				if (linkedProjectV3.value?.minecraft_server != null) {
 					isServerInstance.value = true
@@ -403,7 +404,7 @@ async function fetchInstance() {
 					hasContent.value = Object.keys(projects).length > 0
 				}
 			}
-		} catch (error: any) {
+		} catch (error: Error) {
 			handleError(error)
 		}
 	}
@@ -586,23 +587,27 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 	}
 }
 
-const unlistenProfiles = await profile_listener(async (event: any) => {
-	if (event.profile_path_id === route.params.id) {
-		if (event.event === 'removed') {
-			await router.push({
-				path: '/',
-			})
-			return
+const unlistenProfiles = await profile_listener(
+	async (event: { profile_path_id: string; event: string }) => {
+		if (event.profile_path_id === route.params.id) {
+			if (event.event === 'removed') {
+				await router.push({
+					path: '/',
+				})
+				return
+			}
+			instance.value = await get(route.params.id as string).catch(handleError)
 		}
-		instance.value = await get(route.params.id as string).catch(handleError)
-	}
-})
+	},
+)
 
-const unlistenProcesses = await process_listener((e: any) => {
-	if (e.event === 'finished' && e.profile_path_id === route.params.id) {
-		playing.value = false
-	}
-})
+const unlistenProcesses = await process_listener(
+	(e: { event: string; profile_path_id: string }) => {
+		if (e.event === 'finished' && e.profile_path_id === route.params.id) {
+			playing.value = false
+		}
+	},
+)
 
 const icon = computed(() =>
 	instance.value?.icon_path ? convertFileSrc(instance.value.icon_path) : null,

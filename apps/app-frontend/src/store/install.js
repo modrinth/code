@@ -382,7 +382,7 @@ const syncServerAsWorld = async (
 	}
 }
 
-const joinServer = async (profilePath, serverAddress, serverProjectId) => {
+const joinServer = async (profilePath, serverAddress) => {
 	if (!serverAddress) return
 	await start_join_server(profilePath, serverAddress)
 }

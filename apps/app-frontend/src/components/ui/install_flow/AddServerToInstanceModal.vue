@@ -1,10 +1,12 @@
 <script setup>
+import { CheckIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
-	CheckIcon,
-	PlusIcon,
-	SearchIcon,
-} from '@modrinth/assets'
-import { Admonition, Avatar, ButtonStyled, injectNotificationManager, StyledInput } from '@modrinth/ui'
+	Admonition,
+	Avatar,
+	ButtonStyled,
+	injectNotificationManager,
+	StyledInput,
+} from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { computed, ref } from 'vue'
 
@@ -41,9 +43,7 @@ defineExpose({
 
 			try {
 				const worlds = await get_profile_worlds(profile.path)
-				profile.added = worlds.some(
-					(w) => w.type === 'server' && w.address === serverAddress.value,
-				)
+				profile.added = worlds.some((w) => w.type === 'server' && w.address === serverAddress.value)
 			} catch {
 				// Ignore - will show as not added
 			}
@@ -59,12 +59,7 @@ defineExpose({
 async function addServer(profile) {
 	profile.adding = true
 	try {
-		await add_server_to_profile(
-			profile.path,
-			serverName.value,
-			serverAddress.value,
-			'prompt',
-		)
+		await add_server_to_profile(profile.path, serverName.value, serverAddress.value, 'prompt')
 		profile.added = true
 
 		trackEvent('AddServerToInstance', {
@@ -108,19 +103,10 @@ async function addServer(profile) {
 						{{ profile.name }}
 					</router-link>
 					<ButtonStyled>
-						<button
-							:disabled="profile.added || profile.adding"
-							@click="addServer(profile)"
-						>
+						<button :disabled="profile.added || profile.adding" @click="addServer(profile)">
 							<PlusIcon v-if="!profile.added && !profile.adding" />
 							<CheckIcon v-else-if="profile.added" />
-							{{
-								profile.adding
-									? 'Adding...'
-									: profile.added
-										? 'Added'
-										: 'Add'
-							}}
+							{{ profile.adding ? 'Adding...' : profile.added ? 'Added' : 'Add' }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -133,4 +119,3 @@ async function addServer(profile) {
 		</div>
 	</ModalWrapper>
 </template>
-

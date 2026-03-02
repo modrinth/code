@@ -83,7 +83,7 @@ function pickLink() {
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 
-		if (route.path === (typeof link.href === 'string' ? link.href : (link.href as any).path)) {
+		if (route.path === (typeof link.href === 'string' ? link.href : link.href.path)) {
 			index = i
 			break
 		} else if (link.subpages && link.subpages.some((subpage) => route.path.includes(subpage))) {

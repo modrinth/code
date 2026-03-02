@@ -278,12 +278,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { ContentItem } from '@modrinth/ui/src/components/content/ContentListItem.vue'
-import type {
-	Organization,
-	Project,
-	TeamMember,
-	Version
-} from '@modrinth/utils'
+import type { Organization, Project, TeamMember, Version } from '@modrinth/utils'
 import { formatProjectType } from '@modrinth/utils'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { useStorage } from '@vueuse/core'

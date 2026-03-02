@@ -76,7 +76,11 @@
 							diff.project?.title &&
 							(getFilename(diff.newVersion) || getFilename(diff.currentVersion) || diff.fileName)
 						"
-						v-tooltip="getFilename(diff.newVersion) || getFilename(diff.currentVersion) || decodeURIComponent(diff.fileName || '')""
+						v-tooltip="
+							getFilename(diff.newVersion) ||
+							getFilename(diff.currentVersion) ||
+							decodeURIComponent(diff.fileName || '')
+						"
 						class="text-xs truncate text-right"
 					>
 						{{
@@ -305,7 +309,8 @@ async function computeDependencyDiffs(
 			const aDate = a.newVersion?.date_published || a.currentVersion?.date_published || ''
 			const bDate = b.newVersion?.date_published || b.currentVersion?.date_published || ''
 			return dayjs(bDate).valueOf() - dayjs(aDate).valueOf()
-		}).filter((d) => d.project || d.fileName) // filter out any diffs that couldn't be matched to a project or file
+		})
+		.filter((d) => d.project || d.fileName) // filter out any diffs that couldn't be matched to a project or file
 	return mappedDiffs
 }
 

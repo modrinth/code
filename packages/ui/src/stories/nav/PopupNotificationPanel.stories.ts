@@ -54,7 +54,7 @@ export const Default: StoryObj = {
 			const showWarning = () => {
 				popupManager.addPopupNotification({
 					title: 'Update available',
-					text: 'Modrinth App v2.1.0 is available now! Since you\'re on a metered network, we didn\'t automatically download it.',
+					text: "Modrinth App v2.1.0 is available now! Since you're on a metered network, we didn't automatically download it.",
 					type: 'warning',
 					autoCloseMs: null,
 					buttons: [
@@ -111,7 +111,15 @@ export const Default: StoryObj = {
 				popupManager.clearAllNotifications()
 			}
 
-			return { showSuccess, showError, showWarning, showInfo, showNoButtons, showPermanent, clearAll }
+			return {
+				showSuccess,
+				showError,
+				showWarning,
+				showInfo,
+				showNoButtons,
+				showPermanent,
+				clearAll,
+			}
 		},
 		template: /* html */ `
 			<div>
