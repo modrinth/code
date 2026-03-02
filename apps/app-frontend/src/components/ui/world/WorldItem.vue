@@ -25,6 +25,7 @@ import {
 	defineMessages,
 	OverflowMenu,
 	SmartClickable,
+	TagItem,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -45,6 +46,7 @@ import type {
 	World,
 } from '@/helpers/worlds.ts'
 import { getWorldIdentifier, isLinkedWorld, set_world_display_status } from '@/helpers/worlds.ts'
+import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -205,6 +207,14 @@ const messages = defineMessages({
 					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
 						{{ world.name }}
 					</div>
+					<TagItem
+						v-if="linked"
+						v-tooltip="formatMessage(messages.linkedServer)"
+						class="border !border-solid border-blue bg-highlight-blue text-xs"
+						:style="`--_color: var(--color-blue)`"
+					>
+						<LockIcon aria-hidden="true" class="h-5 w-5" />
+					</TagItem>
 					<div
 						v-if="world.type === 'singleplayer'"
 						class="text-sm text-secondary flex items-center gap-1 font-semibold"
