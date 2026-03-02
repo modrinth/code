@@ -46,27 +46,6 @@
 						<label for="java-address">
 							<span class="label__title !m-0 !text-contrast">Java address</span>
 						</label>
-						<div class="flex items-center gap-1.5">
-							<div
-								v-if="javaPingResult !== null && !javaPingLoading"
-								class="flex items-center gap-1.5"
-								:class="javaPingResult.online ? 'text-green' : 'text-orange'"
-							>
-								<CheckIcon v-if="javaPingResult.online" class="h-4 w-4" />
-								<TriangleAlertIcon v-else class="h-4 w-4" />
-								{{
-									javaPingResult.online
-										? `Server is online! ${javaPingResult.latency ? `Latency: ${javaPingResult.latency}ms` : ``}`
-										: 'Cannot ping server'
-								}}
-							</div>
-							<ButtonStyled v-if="javaAddress" circular type="transparent" size="small">
-								<button :disabled="javaPingLoading" @click="pingJavaServer">
-									<SpinnerIcon v-if="javaPingLoading" class="animate-spin" />
-									<RefreshCwIcon v-else class="" />
-								</button>
-							</ButtonStyled>
-						</div>
 					</div>
 					<div
 						class="mt-2 flex items-center gap-2"
@@ -95,6 +74,43 @@
 							input-class="text-center"
 							autocomplete="off"
 						/>
+					</div>
+					<div
+						class="mt-2 flex gap-1.5"
+						:class="{
+							'items-center': javaPingResult?.online,
+							'items-start': javaPingResult && !javaPingResult.online,
+						}"
+					>
+						<ButtonStyled
+							v-if="javaAddress"
+							circular
+							type="transparent"
+							size="small"
+							color="oranges"
+						>
+							<button :disabled="javaPingLoading" @click="pingJavaServer">
+								<SpinnerIcon v-if="javaPingLoading" class="animate-spin" />
+								<RefreshCwIcon v-else />
+							</button>
+						</ButtonStyled>
+						<div
+							v-if="javaPingResult !== null && !javaPingLoading && javaPingResult.online"
+							class="flex items-center gap-1.5 text-green"
+						>
+							Server is online!
+							<template v-if="javaPingResult.latency">
+								Latency: {{ javaPingResult.latency }}ms
+							</template>
+						</div>
+						<div
+							v-else-if="javaPingResult !== null && !javaPingLoading"
+							class="flex items-center gap-1.5 text-orange"
+						>
+							Cannot ping server. It may be blocked by your host since we’re pinging from a
+							datacenter. Try refreshing a few times. If it still doesn’t respond, please contact
+							support.
+						</div>
 					</div>
 				</div>
 
@@ -143,7 +159,7 @@
 </template>
 
 <script setup>
-import { CheckIcon, RefreshCwIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
+import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
