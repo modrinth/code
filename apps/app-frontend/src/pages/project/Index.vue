@@ -438,6 +438,7 @@ async function fetchProjectData() {
 								? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
 								: undefined,
 						onclickDownload: primaryFile?.url ? () => openUrl(primaryFile.url) : undefined,
+						showCustomModpackTooltip: modpackProject.id === project.id,
 					}
 				}
 			}

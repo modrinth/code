@@ -1661,14 +1661,21 @@ const serverRequiredContent = computed(() => {
 		name: serverModpackProject.value.name,
 		versionNumber: serverModpackVersion.value?.version_number ?? '',
 		icon: serverModpackProject.value.icon_url,
-		onclickName: () => navigateTo(`/modpack/${serverModpackProject.value.slug}`),
-		onclickVersion: () =>
-			navigateTo(
-				`/modpack/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
-			),
+		onclickName:
+			serverModpackProject.value.id !== projectId.value
+				? () => navigateTo(`/modpack/${serverModpackProject.value.slug}`)
+				: undefined,
+		onclickVersion:
+			serverModpackProject.value.id !== projectId.value
+				? () =>
+						navigateTo(
+							`/modpack/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
+						)
+				: undefined,
 		onclickDownload: primaryFile?.url
 			? () => navigateTo(primaryFile.url, { external: true })
 			: undefined,
+		showCustomModpackTooltip: serverModpackProject.value.id === projectId.value,
 	}
 })
 

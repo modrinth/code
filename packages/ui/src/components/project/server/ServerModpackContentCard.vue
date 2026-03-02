@@ -4,7 +4,7 @@
 			<Avatar :src="icon" size="34px" class="!rounded-xl !shadow-none" />
 			<div class="flex flex-col items-start overflow-hidden">
 				<div
-					v-tooltip="name"
+					v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : name"
 					class="truncate font-semibold text-sm max-w-full"
 					:class="onclickName ? 'hover:underline cursor-pointer' : ''"
 					@click="onclickName"
@@ -42,5 +42,6 @@ defineProps<{
 	onclickName?: () => void
 	onclickVersion?: () => void
 	onclickDownload?: () => void
+	showCustomModpackTooltip?: boolean
 }>()
 </script>

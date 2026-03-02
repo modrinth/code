@@ -25,6 +25,7 @@
 				:onclick-name="requiredContent.onclickName"
 				:onclick-version="requiredContent.onclickVersion"
 				:onclick-download="requiredContent.onclickDownload"
+				:show-custom-modpack-tooltip="requiredContent.showCustomModpackTooltip"
 			/>
 		</section>
 		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
@@ -92,6 +93,7 @@ interface RequiredContent {
 	onclickName?: () => void
 	onclickVersion?: () => void
 	onclickDownload?: () => void
+	showCustomModpackTooltip?: boolean
 }
 
 interface Props {
