@@ -173,7 +173,7 @@ impl ServerPingQueue {
                 AND components ? 'minecraft_java_server'
             "#,
             &ProjectStatus::iterator()
-                .filter(|s| s.is_searchable())
+                .filter(|s| s.is_approved())
                 .map(|s| s.to_string())
                 .collect::<Vec<_>>()
         )
