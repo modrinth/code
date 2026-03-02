@@ -58,6 +58,7 @@ pub async fn count_download(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await
     .ok()
