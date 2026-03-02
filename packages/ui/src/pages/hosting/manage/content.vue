@@ -13,7 +13,6 @@ import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
-	ContentOwner,
 } from '../../../components/instances/types'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import {
@@ -133,9 +132,14 @@ function friendlyAddonName(addon: Archon.Content.v1.Addon): string {
 	return cleanName
 }
 
+const modpackAddons = ref<Archon.Content.v1.Addon[]>([])
+
 const addonLookup = computed(() => {
 	const map = new Map<string, Archon.Content.v1.Addon>()
 	for (const addon of contentQuery.data.value?.addons ?? []) {
+		map.set(addon.filename, addon)
+	}
+	for (const addon of modpackAddons.value) {
 		map.set(addon.filename, addon)
 	}
 	return map
@@ -360,6 +364,7 @@ async function handleViewModpackContent() {
 		const data = await client.archon.content_v1.getAddons(serverId, worldId.value!, {
 			from_modpack: true,
 		})
+		modpackAddons.value = data.addons ?? []
 		const items = (data.addons ?? []).map(addonToContentItem)
 		modpackContentModal.value?.show(items)
 	} catch (err) {
@@ -374,7 +379,16 @@ async function handleViewModpackContent() {
 async function handleModpackContentToggle(item: ContentItem) {
 	const addon = addonLookup.value.get(item.file_name)
 	if (!addon) return
-	await toggleMutation.mutateAsync({ addon })
+	modpackContentModal.value?.updateItem(item.file_name, { disabled: true })
+	try {
+		await toggleMutation.mutateAsync({ addon })
+		modpackAddons.value = modpackAddons.value.map((a) =>
+			a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
+		)
+		modpackContentModal.value?.updateItem(item.file_name, { enabled: !item.enabled, disabled: false })
+	} catch {
+		modpackContentModal.value?.updateItem(item.file_name, { disabled: false })
+	}
 }
 
 function handleModpackUnlink() {

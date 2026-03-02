@@ -104,6 +104,7 @@ export interface ModpackContentModalState {
 const modal = ref<InstanceType<typeof NewModal>>()
 const scrollContainer = ref<HTMLElement | null>(null)
 const items = ref<ContentItem[]>([])
+const disabledIds = ref(new Set<string>())
 const loading = ref(false)
 const searchQuery = ref('')
 const selectedFilters = ref<string[]>([])
@@ -225,6 +226,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		disabled: disabledIds.value.has(item.file_name),
 	})),
 )
 
@@ -267,6 +269,7 @@ function show(contentItems: ContentItem[]) {
 	searchQuery.value = ''
 	selectedFilters.value = []
 	selectedIds.value = []
+	disabledIds.value = new Set()
 	loading.value = false
 	modal.value?.show()
 }
@@ -306,7 +309,26 @@ async function restore(state: ModpackContentModalState) {
 	}
 }
 
-defineExpose({ show, showLoading, hide, getState, restore })
+function updateItem(fileName: string, updates: Partial<ContentItem> & { disabled?: boolean }) {
+	if (updates.disabled !== undefined) {
+		const newSet = new Set(disabledIds.value)
+		if (updates.disabled) {
+			newSet.add(fileName)
+		} else {
+			newSet.delete(fileName)
+		}
+		disabledIds.value = newSet
+	}
+	const { disabled: _, ...itemUpdates } = updates
+	if (Object.keys(itemUpdates).length > 0) {
+		const index = items.value.findIndex((i) => i.file_name === fileName)
+		if (index !== -1) {
+			items.value[index] = { ...items.value[index], ...itemUpdates }
+		}
+	}
+}
+
+defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 </script>
 
 <template>
