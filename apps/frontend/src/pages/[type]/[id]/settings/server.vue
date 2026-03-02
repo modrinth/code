@@ -51,7 +51,7 @@
 						class="mt-2 flex items-center gap-2"
 						@focusout="
 							() => {
-								if (!lastPingAddressChanged) return
+								if (!lastPingAddressChanged && javaPingResult) return
 								pingJavaServer()
 							}
 						"
@@ -76,6 +76,7 @@
 						/>
 					</div>
 					<div
+						v-if="javaAddress"
 						class="mt-2 flex gap-1.5"
 						:class="{
 							'items-center': javaPingResult?.online,
@@ -83,33 +84,41 @@
 						}"
 					>
 						<ButtonStyled
-							v-if="javaAddress"
+							v-if="(javaAddress && javaPingResult) || javaPingLoading"
 							circular
 							type="transparent"
 							size="small"
 							color="oranges"
 						>
-							<button :disabled="javaPingLoading" @click="pingJavaServer">
+							<button
+								v-tooltip="'Refresh ping'"
+								:disabled="javaPingLoading"
+								@click="pingJavaServer"
+							>
 								<SpinnerIcon v-if="javaPingLoading" class="animate-spin" />
 								<RefreshCwIcon v-else />
 							</button>
 						</ButtonStyled>
 						<div
 							v-if="javaPingResult !== null && !javaPingLoading && javaPingResult.online"
-							class="flex items-center gap-1.5 text-green"
+							class="mt-0.5 flex items-center gap-1.5 text-green"
 						>
 							Server is online!
 							<template v-if="javaPingResult.latency">
 								Latency: {{ javaPingResult.latency }}ms
 							</template>
 						</div>
-						<div
-							v-else-if="javaPingResult !== null && !javaPingLoading"
-							class="flex items-center gap-1.5 text-orange"
-						>
+						<div v-else-if="javaPingResult !== null && !javaPingLoading" class="mt-0.5 text-orange">
 							Cannot ping server. It may be blocked by your host since we’re pinging from a
-							datacenter. Try refreshing a few times. If it still doesn’t respond, please contact
-							support.
+							datacenter. Try refreshing a few times. If it still doesn’t respond, please
+							<a
+								class="inline underline"
+								href="https://support.modrinth.com"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								contact support</a
+							>.
 						</div>
 					</div>
 				</div>
@@ -164,6 +173,7 @@ import {
 	ButtonStyled,
 	Combobox,
 	injectModrinthClient,
+	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 	UnsavedChangesPopup,
@@ -172,7 +182,10 @@ import { Multiselect } from 'vue-multiselect'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
+const PING_TIMEOUT_MS = 5000
+
 const client = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
 const javaAddress = ref('')
@@ -194,6 +207,15 @@ const lastPingAddressChanged = computed(() => {
 	)
 })
 
+let pingDebounceTimer = null
+
+watch([javaAddress, javaPort], () => {
+	clearTimeout(pingDebounceTimer)
+	pingDebounceTimer = setTimeout(() => {
+		pingJavaServer()
+	}, 500)
+})
+
 const hasPermission = computed(() => {
 	const EDIT_DETAILS = 1 << 2
 	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
@@ -212,10 +234,15 @@ async function pingJavaServer() {
 	const port = javaPort.value || 25565
 
 	try {
-		await client.labrinth.server_ping_internal.pingMinecraftJava({
-			address,
-			port,
-		})
+		await Promise.race([
+			client.labrinth.server_ping_internal.pingMinecraftJava({
+				address,
+				port,
+			}),
+			new Promise((_, reject) =>
+				setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS),
+			),
+		])
 		javaPingResult.value = { online: true, latency: null }
 	} catch {
 		javaPingResult.value = { online: false, latency: null }
@@ -447,6 +474,15 @@ function resetChanges() {
 }
 
 async function handleSave() {
+	if (javaAddress.value.trim() && !javaPingResult.value?.online) {
+		addNotification({
+			title: 'Cannot save',
+			text: 'The Java server must be reachable before saving. Please ensure the ping succeeds.',
+			type: 'error',
+		})
+		return
+	}
+
 	saving.value = true
 	try {
 		const hasV3Changes = Object.keys(v3PatchData.value).length > 0
