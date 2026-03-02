@@ -11,7 +11,7 @@
 		<div class="flex w-full flex-col gap-6">
 			<CreateLimitAlert v-model="hasHitLimit" type="project" />
 
-			<div v-if="showTypeSelector" class="flex flex-col gap-2.5">
+			<div class="flex flex-col gap-2.5">
 				<label for="project-type">
 					<span class="text-md font-semibold text-contrast">
 						{{ formatMessage(messages.typeLabel) }}
@@ -154,7 +154,6 @@ interface VisibilityOption {
 }
 interface ShowOptions {
 	type?: 'server' | 'project'
-	showTypeSelector?: boolean
 }
 
 const { addNotification } = injectNotificationManager()
@@ -264,7 +263,6 @@ const slug = ref('')
 const description = ref('')
 const manualSlug = ref(false)
 const projectType = ref<ProjectTypes>('project')
-const showTypeSelector = ref(false)
 const projectTypeOptions = computed<ComboboxOption<ProjectTypes>[]>(() => [
 	{
 		value: 'project',
@@ -459,7 +457,6 @@ async function show(event?: MouseEvent, options?: ShowOptions) {
 	manualSlug.value = false
 	owner.value = 'self'
 	projectType.value = options?.type ?? 'project'
-	showTypeSelector.value = options?.showTypeSelector ?? false
 	await fetchOrganizations()
 	modal.value?.show(event)
 }

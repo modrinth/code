@@ -161,7 +161,7 @@
 				<div class="input-group">
 					<button
 						class="iconified-button brand-button"
-						@click="$refs.modal_creation.show($event, { showTypeSelector: true })"
+						@click="$refs.modal_creation.show($event)"
 					>
 						<PlusIcon />
 						{{ formatMessage(commonMessages.createAProjectButton) }}
