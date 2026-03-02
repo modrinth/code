@@ -109,8 +109,8 @@
 							</template>
 						</div>
 						<div v-else-if="javaPingResult !== null && !javaPingLoading" class="mt-0.5 text-orange">
-							Cannot ping server. It may be blocked by your host since we’re pinging from a
-							datacenter. Try refreshing a few times. If it still doesn’t respond, please
+							We couldn’t ping this server. It may be blocked by your host so try refreshing a few
+							times. If it still doesn’t respond please
 							<a
 								class="inline underline"
 								href="https://support.modrinth.com"
