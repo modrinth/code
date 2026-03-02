@@ -583,9 +583,12 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 		return {
 			name: project_name,
 			icon: project_icon,
-			onclick: () => {
-				router.push(`/project/${project_id}`)
-			},
+			onclick:
+				project_id !== project.project_id
+					? () => {
+							router.push(`/project/${project_id}`)
+						}
+					: undefined,
 			showCustomModpackTooltip: project_id === project.project_id,
 		}
 	}
