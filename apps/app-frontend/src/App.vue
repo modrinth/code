@@ -414,7 +414,7 @@ const modrinthLoginFlowWaitModal = ref()
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
 	if (creds && creds.user_id) {
-		creds.user = await get_user(creds.user_id).catch(handleError)
+		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
 	}
 	credentials.value = creds ?? null
 }
