@@ -14,10 +14,10 @@
 </template>
 
 <script lang="ts" setup>
+import { PackageIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
 
-import { PackageIcon } from '@modrinth/assets'
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import type { ComboboxOption } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
