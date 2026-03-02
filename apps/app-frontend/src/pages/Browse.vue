@@ -660,7 +660,13 @@ previousFilterState.value = JSON.stringify({
 				button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
 				content-class="mb-3"
 				inner-panel-class="ml-2 mr-3"
-				:open-by-default="true"
+				:open-by-default="
+					![
+						'server_category_minecraft_server_meta',
+						'server_category_minecraft_server_community',
+						'server_game_version',
+					].includes(filterType.id)
+				"
 			>
 				<template #header>
 					<h3 class="text-base m-0">{{ filterType.formatted_name }}</h3>
