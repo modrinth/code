@@ -348,7 +348,7 @@ onBeforeUnmount(() => {
 .info-card {
 	position: absolute;
 	top: 3.5rem;
-	right: 100%;
+	right: 2rem;
 	z-index: 9;
 	width: 20rem;
 	background-color: var(--color-raised-bg);
