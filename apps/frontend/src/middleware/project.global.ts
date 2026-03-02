@@ -14,6 +14,7 @@ const PROJECT_TYPES = [
 	'resourcepack',
 	'modpack',
 	'server',
+	'minecraft_java_server',
 ]
 
 export default defineNuxtRouteMiddleware(async (to) => {
