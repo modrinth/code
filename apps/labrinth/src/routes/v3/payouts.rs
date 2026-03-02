@@ -440,6 +440,7 @@ pub async fn calculate_fees(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {
@@ -472,6 +473,7 @@ pub async fn create_payout(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {

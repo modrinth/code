@@ -1,3 +1,4 @@
+use crate::auth::validate::get_user_from_bearer_token;
 use crate::auth::{AuthenticationError, get_user_from_headers};
 use crate::database::models::DBUserId;
 use crate::database::models::session_item::DBSession;
@@ -12,7 +13,7 @@ use crate::routes::ApiError;
 use actix_web::http::header::AUTHORIZATION;
 use actix_web::web::{Data, ServiceConfig, scope};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
@@ -88,6 +89,7 @@ pub async fn issue_session(
     user_id: DBUserId,
     transaction: &mut PgTransaction<'_>,
     redis: &RedisPool,
+    session_expires: Option<DateTime<Utc>>,
 ) -> Result<DBSession, AuthenticationError> {
     let metadata = get_session_metadata(&req).await?;
 
@@ -108,6 +110,8 @@ pub async fn issue_session(
         country: metadata.country,
         ip: metadata.ip,
         user_agent: metadata.user_agent,
+        expires: None,
+        session_expires,
     }
     .insert(transaction)
     .await?;
@@ -212,15 +216,6 @@ pub async fn refresh(
     redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Scopes::empty(),
-    )
-    .await?
-    .1;
     let session = req
         .headers()
         .get(AUTHORIZATION)
@@ -228,6 +223,25 @@ pub async fn refresh(
         .ok_or_else(|| {
             ApiError::Authentication(AuthenticationError::InvalidCredentials)
         })?;
+
+    // We should ensure that the authorization given is a session token, and not some other type of token (like a PAT), since this endpoint is only for refreshing sessions.
+    // This is done by checking the prefix of the token, which should be "mra_" for session tokens.
+    if !session.starts_with("mra_") {
+        return Err(ApiError::Authentication(
+            AuthenticationError::InvalidCredentials,
+        ));
+    }
+
+    let current_user = get_user_from_bearer_token(
+        &req,
+        Some(session),
+        &**pool,
+        &redis,
+        &session_queue,
+        true, // Allow expired sessions, since we want to allow refreshing expired sessions
+    )
+    .await?
+    .1;
 
     let session = DBSession::get(session, &**pool, &redis).await?;
 
@@ -243,9 +257,14 @@ pub async fn refresh(
         let mut transaction = pool.begin().await?;
 
         DBSession::remove(session.id, &mut transaction).await?;
-        let new_session =
-            issue_session(req, session.user_id, &mut transaction, &redis)
-                .await?;
+        let new_session = issue_session(
+            req,
+            session.user_id,
+            &mut transaction,
+            &redis,
+            Some(session.refresh_expires),
+        )
+        .await?;
         transaction.commit().await?;
         DBSession::clear_cache(
             vec![(
