@@ -10,7 +10,7 @@ use {
     crate::{
         AccountId, Blockchain, CounterpartyId, CurrencyCode, FiatAccountType,
         FiatAmount, FiatAndRailCode, PayoutMethodId, TokenAmount,
-        TransactionId, WalletDetails,
+        WalletDetails,
     },
     chrono::{DateTime, Utc},
     derive_more::{Deref, Display, Error, From},
@@ -357,7 +357,7 @@ pub enum FiatPayoutStatus {
         failure_reason: String,
         refund_completed_at: DateTime<Utc>,
         refund_initiated_at: DateTime<Utc>,
-        refund_transaction_id: TransactionId,
+        refund_transaction_id: String,
     },
 }
 
