@@ -17,6 +17,7 @@
 import { useDebounceFn } from '@vueuse/core'
 import { defineAsyncComponent, h, ref, watch } from 'vue'
 
+import { PackageIcon } from '@modrinth/assets'
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import type { ComboboxOption } from '../base/Combobox.vue'
 import Combobox from '../base/Combobox.vue'
@@ -81,16 +82,18 @@ function hitToOption(hit: SearchHit): ComboboxOption<string> {
 	return {
 		label: hit.title,
 		value: hit.project_id,
-		icon: defineAsyncComponent(() =>
-			Promise.resolve({
-				setup: () => () =>
-					h('img', {
-						src: hit.icon_url,
-						alt: hit.title,
-						class: 'h-5 w-5 rounded',
+		icon: hit.icon_url
+			? defineAsyncComponent(() =>
+					Promise.resolve({
+						setup: () => () =>
+							h('img', {
+								src: hit.icon_url,
+								alt: hit.title,
+								class: 'h-5 w-5 rounded',
+							}),
 					}),
-			}),
-		),
+				)
+			: PackageIcon,
 	}
 }
 

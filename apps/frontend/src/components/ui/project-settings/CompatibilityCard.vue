@@ -55,7 +55,7 @@
 
 			<div
 				v-if="content"
-				class="flex justify-between rounded-2xl border border-solid border-surface-5 p-4"
+				class="flex justify-between gap-4 rounded-2xl border border-solid border-surface-5 p-4"
 			>
 				<!-- kind = vanilla -->
 				<div
