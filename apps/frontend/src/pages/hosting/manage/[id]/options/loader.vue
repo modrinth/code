@@ -1,7 +1,9 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
-		<template v-if="server">
-			<template v-if="isLinked">
+		<div v-if="!server || addonsQuery.isLoading.value" class="flex items-center justify-center py-12">
+			<SpinnerIcon class="size-8 animate-spin text-secondary" />
+		</div>
+		<template v-else-if="isLinked">
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">Installation info</span>
 					<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
@@ -39,11 +41,25 @@
 							>
 								{{ modpack.title ?? modpack.spec.project_id }}
 							</AutoLink>
-							<div
-								v-if="modpack.version_number"
-								class="flex items-center gap-2 text-sm font-medium text-primary"
-							>
-								<span>{{ modpack.version_number }}</span>
+							<div class="flex items-center gap-2 text-sm text-secondary">
+								<AutoLink
+									v-if="modpack.owner"
+									:to="modpack.owner.type === 'organization' ? `/organization/${modpack.owner.id}` : `/user/${modpack.owner.id}`"
+									class="flex items-center gap-1.5 hover:underline"
+								>
+									<Avatar
+										:src="modpack.owner.icon_url"
+										:alt="modpack.owner.name"
+										size="1.25rem"
+										:circle="modpack.owner.type === 'user'"
+										no-shadow
+									/>
+									<span class="font-medium">{{ modpack.owner.name }}</span>
+								</AutoLink>
+								<template v-if="modpack.owner && modpack.version_number">
+									&middot;
+								</template>
+								<span v-if="modpack.version_number" class="font-medium">{{ modpack.version_number }}</span>
 							</div>
 						</div>
 					</div>
@@ -52,7 +68,7 @@
 							<button
 								class="!shadow-none"
 								:disabled="isInstalling"
-								@click="modpackVersionModal?.show()"
+								@click="handleChangeModpackVersion"
 							>
 								<ArrowLeftRightIcon class="size-5" />
 								Change version
@@ -241,7 +257,6 @@
 					</div>
 				</div>
 			</template>
-		</template>
 	</div>
 	<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
 	<ServerSetupModal
@@ -249,21 +264,30 @@
 		@reinstall="emit('reinstall', $event)"
 		@browse-modpacks="onBrowseModpacks"
 	/>
-	<PlatformChangeModpackVersionModal
-		ref="modpackVersionModal"
-		:project="modpackProjectForModal"
-		:versions="versions ?? []"
-		:current-version="modpackCurrentVersionForModal"
-		:current-version-id="modpack?.spec.version_id"
-		:server-status="server?.status"
-		@reinstall="emit('reinstall')"
+	<ContentUpdaterModal
+		v-if="updatingModpack"
+		ref="contentUpdaterModal"
+		:versions="updatingProjectVersions"
+		:current-game-version="currentGameVersion"
+		:current-loader="currentLoader"
+		:current-version-id="modpack?.spec.version_id ?? ''"
+		:is-app="false"
+		:is-modpack="true"
+		:project-icon-url="modpack?.icon_url ?? undefined"
+		:project-name="modpack?.title ?? modpack?.spec.project_id ?? 'Modpack'"
+		:loading="loadingVersions"
+		:loading-changelog="loadingChangelog"
+		@update="handleUpdaterConfirm"
+		@cancel="resetUpdateState"
+		@version-select="handleUpdaterVersionSelect"
+		@version-hover="handleUpdaterVersionHover"
 	/>
 	<ConfirmRepairModal ref="repairModal" server @repair="handleRepair" />
 	<ConfirmReinstallModal ref="reinstallModal" @reinstall="handleReinstallConfirm" />
 </template>
 
 <script setup lang="ts">
-import type { Archon, LauncherMeta } from '@modrinth/api-client'
+import type { Archon, Labrinth, LauncherMeta } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -288,6 +312,7 @@ import {
 	ConfirmReinstallModal,
 	ConfirmRepairModal,
 	ConfirmUnlinkModal,
+	ContentUpdaterModal,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -295,9 +320,7 @@ import {
 	ServerSetupModal,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
-
-import PlatformChangeModpackVersionModal from '~/components/ui/servers/PlatformChangeModpackVersionModal.vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 const client = injectModrinthClient()
 const { server, serverId, worldId } = injectModrinthServerContext()
@@ -321,6 +344,14 @@ const addonsQuery = useQuery({
 const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 const isLinked = computed(() => !!modpack.value)
 
+const modpackVersionsQuery = useQuery({
+	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpack.value?.spec.project_id]),
+	queryFn: () => client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+		include_changelog: false,
+	}),
+	enabled: computed(() => !!modpack.value?.spec.project_id),
+})
+
 function capitalize(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -342,31 +373,113 @@ const installationInfo = computed(() => {
 	return rows
 })
 
-const versionsQuery = useQuery({
-	queryKey: computed(() => [
-		'content',
-		'loader',
-		'versions',
-		modpack.value?.spec.project_id ?? null,
-	]),
-	queryFn: () => client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id),
-	enabled: computed(() => !!modpack.value?.spec.project_id),
-})
 
-const versions = computed(() => versionsQuery.data.value ?? [])
+async function handleChangeModpackVersion() {
+	if (!modpack.value?.spec.project_id) return
 
-const modpackProjectForModal = computed(() => {
-	if (!modpack.value) return null
-	return {
-		id: modpack.value.spec.project_id,
-		title: modpack.value.title ?? modpack.value.spec.project_id,
+	updatingModpack.value = true
+	loadingChangelog.value = false
+
+	const cached = modpackVersionsQuery.data.value
+	if (cached) {
+		const sorted = [...cached].sort(
+			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+		)
+		updatingProjectVersions.value = sorted
+		loadingVersions.value = false
+	} else {
+		updatingProjectVersions.value = []
+		loadingVersions.value = true
 	}
-})
 
-const modpackCurrentVersionForModal = computed(() => {
-	if (!modpack.value) return null
-	return { version_number: modpack.value.version_number ?? '' }
-})
+	await nextTick()
+
+	contentUpdaterModal.value?.show(modpack.value.spec.version_id ?? undefined)
+
+	if (!cached) {
+		try {
+			const fetchedVersions = await client.labrinth.versions_v2.getProjectVersions(
+				modpack.value.spec.project_id,
+				{ include_changelog: false },
+			)
+			fetchedVersions.sort(
+				(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+			)
+			updatingProjectVersions.value = fetchedVersions
+		} catch (err) {
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : 'Failed to load versions',
+			})
+		} finally {
+			loadingVersions.value = false
+		}
+	}
+}
+
+async function handleUpdaterVersionSelect(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog !== undefined) return
+	loadingChangelog.value = true
+	try {
+		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
+		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
+		if (index !== -1) {
+			const newVersions = [...updatingProjectVersions.value]
+			newVersions[index] = fullVersion
+			updatingProjectVersions.value = newVersions
+		}
+	} catch {
+		// Silently fail on changelog fetch
+	} finally {
+		loadingChangelog.value = false
+	}
+}
+
+async function handleUpdaterVersionHover(version: Labrinth.Versions.v2.Version) {
+	if (version.changelog !== undefined) return
+	try {
+		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
+		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
+		if (index !== -1) {
+			const newVersions = [...updatingProjectVersions.value]
+			newVersions[index] = fullVersion
+			updatingProjectVersions.value = newVersions
+		}
+	} catch {
+		// Silently fail on hover prefetch
+	}
+}
+
+function resetUpdateState() {
+	updatingModpack.value = false
+	updatingProjectVersions.value = []
+	loadingVersions.value = false
+	loadingChangelog.value = false
+}
+
+async function handleUpdaterConfirm(selectedVersion: Labrinth.Versions.v2.Version) {
+	if (!modpack.value) return
+	try {
+		await client.archon.content_v1.installContent(serverId, worldId.value!, {
+			content_variant: 'modpack',
+			spec: {
+				platform: 'modrinth',
+				project_id: modpack.value.spec.project_id,
+				version_id: selectedVersion.id,
+			},
+			soft_override: true,
+		})
+		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		emit('reinstall')
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : 'Failed to change modpack version',
+		})
+	} finally {
+		resetUpdateState()
+	}
+}
 
 function onBrowseModpacks() {
 	navigateTo({
@@ -377,9 +490,17 @@ function onBrowseModpacks() {
 
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
-const modpackVersionModal = ref()
+const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
 const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
+
+const updatingModpack = ref(false)
+const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
+const loadingVersions = ref(false)
+const loadingChangelog = ref(false)
+
+const currentGameVersion = computed(() => addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '')
+const currentLoader = computed(() => addonsQuery.data.value?.modloader ?? server.value?.loader ?? '')
 
 const availablePlatforms = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 

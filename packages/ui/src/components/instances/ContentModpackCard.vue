@@ -138,7 +138,7 @@ const collapsedOptions = computed(() => {
 								class="shrink-0 font-medium text-secondary !decoration-secondary whitespace-nowrap"
 								:class="versionLink ? 'hover:underline' : ''"
 							>
-								v{{ version.version_number }}
+								{{ version.version_number }}
 							</AutoLink>
 						</template>
 						<template v-if="version?.date_published">

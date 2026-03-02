@@ -189,13 +189,13 @@ export class ArchonContentV1Module extends AbstractModule {
 		})
 	}
 
-	/** GET /v1/:server_id/worlds/:world_id/addons/modpack/update */
+	/** GET /v1/:server_id/worlds/:world_id/content/modpack/update */
 	public async getModpackUpdate(
 		serverId: string,
 		worldId: string,
 	): Promise<Archon.Content.v1.ModpackFields> {
 		return this.client.request<Archon.Content.v1.ModpackFields>(
-			`/servers/${serverId}/worlds/${worldId}/addons/modpack/update`,
+			`/servers/${serverId}/worlds/${worldId}/content/modpack/update`,
 			{
 				api: 'archon',
 				version: 1,
@@ -204,10 +204,10 @@ export class ArchonContentV1Module extends AbstractModule {
 		)
 	}
 
-	/** POST /v1/:server_id/worlds/:world_id/addons/modpack/update */
+	/** POST /v1/:server_id/worlds/:world_id/content/modpack/update */
 	public async updateModpack(serverId: string, worldId: string): Promise<void> {
 		await this.client.request<void>(
-			`/servers/${serverId}/worlds/${worldId}/addons/modpack/update`,
+			`/servers/${serverId}/worlds/${worldId}/content/modpack/update`,
 			{
 				api: 'archon',
 				version: 1,

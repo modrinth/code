@@ -70,12 +70,20 @@ export namespace Archon {
 				version_id: string
 			}
 
+			export type ModpackOwner = {
+				id: string
+				name: string
+				type: 'user' | 'organization'
+				icon_url: string | null
+			}
+
 			export type ModpackFields = {
 				spec: ModpackSpec
 				has_update: boolean
 				title: string | null
 				description: string | null
 				icon_url: string | null
+				owner: ModpackOwner | null
 				version_number: string | null
 				date_published: string | null
 				downloads: number | null
