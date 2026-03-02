@@ -368,9 +368,7 @@ const syncServerAsWorld = async (
 			}
 		}
 
-		const existingServer = worlds.find(
-			(w) => w.type === 'server' && w.address === serverAddress,
-		)
+		const existingServer = worlds.find((w) => w.type === 'server' && w.address === serverAddress)
 		if (existingServer) {
 			// Re-link and sync existing server (link may have been lost by Minecraft rewriting servers.dat)
 			if (serverProjectId || existingServer.name !== serverName) {
