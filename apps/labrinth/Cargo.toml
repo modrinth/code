@@ -12,7 +12,6 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = { workspace = true }
 actix-files = { workspace = true }
-elytra-ping = { workspace = true }
 actix-http = { workspace = true }
 actix-multipart = { workspace = true }
 actix-rt = { workspace = true }
@@ -45,6 +44,7 @@ deadpool-redis.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
+elytra-ping = { workspace = true }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
