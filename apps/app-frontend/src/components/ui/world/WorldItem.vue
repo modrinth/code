@@ -46,6 +46,7 @@ import type {
 	World,
 } from '@/helpers/worlds.ts'
 import { getWorldIdentifier, isLinkedWorld, set_world_display_status } from '@/helpers/worlds.ts'
+
 import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
 const { formatMessage } = useVIntl()
