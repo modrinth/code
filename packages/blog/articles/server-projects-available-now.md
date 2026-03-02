@@ -1,7 +1,7 @@
 ---
-title: Server Projects — available now
-summary: Introducing Modrinth's first new project type in over three years!
-date: 2026-03-01T15:00:00+00:00
+title: Introducing Server Projects
+summary: A new project type made for seamless modded multiplayer on Modrinth.
+date: 2026-03-02T15:00:00+00:00
 authors: ['AJfd8YH6', '6EjnV9Uf', 'xSQqYYIN']
 ---
 
@@ -9,18 +9,16 @@ Big news: we’re shipping our first new project type in years!
 
 Server Projects are coming to Modrinth, and they’re not just a typical server list. They’re deeply integrated into the platform and app in ways that make playing seamless.
 
-We genuinely believe modded is the future of large-scale multiplayer Minecraft so lets jump in!
+We genuinely believe modded is the future of large-scale multiplayer Minecraft, so let's jump in!
 
 ![[Video] Server discovery in app > play > join server](Server%20projects%20blog/image.png)
 
-[Video] Server discovery in app > play > join server
-
-### Tl;dr
+### TL;DR
 
 - New Server Project type
 - Three compatibility types: vanilla, modded (published pack), or modded (uploaded pack)
-- Joining a server from App downloads the require content and launches you directly into the server
-- New linked server instance type and receive updates from server
+- Joining a server from the app downloads the required content and launches you directly into the server
+- New linked server instance type that receives updates from the server
 - Server Projects are not eligible for payouts
 
 ## Design Goals
@@ -37,9 +35,9 @@ Additionally, modpack discovery has become noisy on Modrinth. Servers fork popul
 
 ## Project Creation
 
-Server projects are different from other project types because they don’t always have uploaded files. Instead, servers define their compatibility, which can include specifying any required content.
+Server Projects are different from other project types because they don’t always have uploaded files. Instead, servers define their compatibility, which can include specifying any required content.
 
-For the initial release we support two compatibility models: vanilla and required modpack. We also have ideas to expand this with a minimum requirements model in the future. Authors would define the required mod and version needed to join and could recommend modpacks that work as-well.
+For the initial release, we support two compatibility models: vanilla and required modpack. We also have ideas to expand this with a minimum requirements model in the future. Authors would define the required mod and version needed to join and could recommend modpacks that work as well.
 
 When setting up your server project, you define this in the Server Compatibility section. It comes in three types:
 
@@ -47,11 +45,13 @@ When setting up your server project, you define this in the Server Compatibility
 - Modded server (published Modrinth pack)
 - Modded server (uploaded custom pack)
 
-Each type defines different requirements to join. Vanilla servers specify supported and recommended Minecraft versions. Modded servers either link a Modrinth pack or upload a custom pack, which enforces the version and mod loader required.
+Each type defines different requirements to join. Vanilla servers specify supported and recommended Minecraft versions. Modded servers either link a Modrinth pack or upload a custom pack, which enforces the required version and mod loader.
 
-![[Video] Compatibility type config](Server%20projects%20blog/image.png)
-
-[Video] Compatibility type config
+<div class="video-wrapper mb-8">
+	<video autoplay loop muted playsinline>
+		<source src="./compatability-type-config.mp4" type="video/mp4" />
+	</video>
+</div>
 
 Server Projects also introduce some new fields used for discovery and project pages:
 
@@ -66,7 +66,7 @@ Additionally, Server Projects are the only project type **not eligible for payou
 
 ## Project Discovery
 
-Server projects use two new discovery metrics instead of downloads to help surface new servers over time. These are:
+Server Projects use two new discovery metrics instead of downloads to help surface new servers over time. These are:
 
 - **Players online:** The live player count reported by the server.
 - **Verified plays:** Joins from the Modrinth App in the last two weeks.
@@ -88,14 +88,14 @@ Additionally, Server Projects are different from other project types because the
 
 ## Joining a Server
 
-Joining a server is where this all comes together. While in the App, clicking play on a server triggers different flows depending on the server type:
+Joining a server is where this all comes together. While in the app, clicking play on a server triggers different flows depending on the server type:
 
 1. Vanilla servers immediately create a Fabric instance in the app using the recommended version set by the author.
-2. Modded servers show a modal which displays the required content. Clicking install creates an instance with the that content.
+2. Modded servers show a modal which displays the required content. Clicking install creates an instance with that content.
 
 ![Required content modal](./joining-a-server.webp)
 
-Once installation finishes, you’ll see a completion toast which when clicked skips the multiplayer screen and loaders you directly to the server. After the initial setup, clicking play always boots straight into the server.
+Once installation finishes, you’ll see a completion toast that, when clicked, skips the multiplayer screen and loads you directly into the server. After the initial setup, clicking play always boots straight into the server.
 
 Additionally, if you click play from the website, we’ll deep link into the app if it’s installed.
 
@@ -111,7 +111,7 @@ Key differences:
 
 ### Server Project Updates
 
-When a server updates its compatibility, such as publishing a new modpack version, that update is distributed to all linked instances. The next time a player launches, they’re prompted to accept the changes before joining. This keeps the server and and associated instances in sync.
+When a server updates its compatibility, such as publishing a new modpack version, that update is distributed to all linked instances. The next time a player launches, they’re prompted to accept the changes before joining. This keeps the server and associated instances in sync.
 
 ![Update available modal](./server-project-updates.webp)
 

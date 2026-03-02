@@ -1,10 +1,10 @@
 {
 	"articles": [
 		{
-			"title": "Server Projects — available now",
-			"summary": "Introducing Modrinth's first new project type in over three years!",
-			"thumbnail": "https://modrinth.com/news/default.webp",
-			"date": "2026-03-01T15:00:00.000Z",
+			"title": "Introducing Server Projects",
+			"summary": "A new project type made for seamless modded multiplayer on Modrinth.",
+			"thumbnail": "https://modrinth.com/news/article/server-projects-available-now/thumbnail.webp",
+			"date": "2026-03-02T15:00:00.000Z",
 			"link": "https://modrinth.com/news/article/server-projects-available-now"
 		},
 		{
