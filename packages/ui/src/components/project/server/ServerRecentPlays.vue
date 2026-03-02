@@ -15,7 +15,9 @@ defineProps<{
 </script>
 <template>
 	<StatItem
-		v-tooltip="`${formatNumber(recentPlays, true)} recent plays from Modrinth in the past month`"
+		v-tooltip="
+			`${formatNumber(recentPlays, true)} recent play${recentPlays === 1 ? '' : 's'} from Modrinth in the past 2 weeks`
+		"
 		class="smart-clickable:allow-pointer-events"
 	>
 		<PlayIcon />
