@@ -48,6 +48,7 @@ import {
 	list as listInstances,
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import type { GameInstance } from '@/helpers/types'
 import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
@@ -227,7 +228,7 @@ async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchPro
 	const packs = await listInstances()
 	const newRunning: Record<string, string> = {}
 	for (const hit of hits) {
-		const inst = packs.find((p: any) => p.linked_data?.project_id === hit.project_id)
+		const inst = packs.find((p: GameInstance) => p.linked_data?.project_id === hit.project_id)
 		if (inst) {
 			const processes = await get_by_profile_path(inst.path).catch(() => [])
 			if (Array.isArray(processes) && processes.length > 0) {
@@ -257,17 +258,19 @@ function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProje
 	installStore.showAddServerToInstanceModal(project.name, address)
 }
 
-const unlistenProcesses = await process_listener((e: any) => {
-	if (e.event === 'finished') {
-		const projectId = Object.entries(runningServerProjects.value).find(
-			([, path]) => path === e.profile_path_id,
-		)?.[0]
-		if (projectId) {
-			const { [projectId]: _, ...rest } = runningServerProjects.value
-			runningServerProjects.value = rest
+const unlistenProcesses = await process_listener(
+	(e: { event: string; profile_path_id: string }) => {
+		if (e.event === 'finished') {
+			const projectId = Object.entries(runningServerProjects.value).find(
+				([, path]) => path === e.profile_path_id,
+			)?.[0]
+			if (projectId) {
+				const { [projectId]: _, ...rest } = runningServerProjects.value
+				runningServerProjects.value = rest
+			}
 		}
-	}
-})
+	},
+)
 
 onUnmounted(() => {
 	unlistenProcesses()
@@ -590,7 +593,8 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 }
 
 const options = ref(null)
-const handleRightClick = (event: any, result: any) => {
+// @ts-expect-error - no event types
+const handleRightClick = (event, result) => {
 	// @ts-ignore
 	options.value?.showMenu(event, result, [
 		{
@@ -601,7 +605,8 @@ const handleRightClick = (event: any, result: any) => {
 		},
 	])
 }
-const handleOptionsClick = (args: any) => {
+// @ts-expect-error - no event types
+const handleOptionsClick = (args) => {
 	switch (args.option) {
 		case 'open_link':
 			openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)

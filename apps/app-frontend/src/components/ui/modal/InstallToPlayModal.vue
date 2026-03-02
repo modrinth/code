@@ -27,7 +27,7 @@
 					/>
 					<div class="flex flex-col gap-0.5">
 						<span class="font-semibold text-contrast">
-							<template v-if="usingCustomModpack">
+							<template v-if="usingCustomModpack && modpackVersion">
 								{{ modpackVersion.name }}
 							</template>
 							<template v-else>
@@ -65,7 +65,7 @@
 
 	<ModpackContentModal
 		ref="modpackContentModal"
-		:modpack-name="project?.title ?? ''"
+		:modpack-name="project?.name ?? ''"
 		:modpack-icon-url="project?.icon_url ?? undefined"
 	/>
 </template>
@@ -87,50 +87,22 @@ import {
 import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
-import {
-	get_organization,
-	get_project,
-	get_project_many,
-	get_team,
-	get_version,
-	get_version_many,
-} from '@/helpers/cache.js'
+import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { installServerProject, useInstall } from '@/store/install.js'
 
 import type { ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)
-const modpackVersion = ref<any>(null)
-const project = ref<any>(null)
-const requiredContentProject = ref<any>(null)
-const organization = ref<any>(null)
-const teamMembers = ref<any[]>([])
+const modpackVersion = ref<Labrinth.Versions.v2.Version | null>(null)
+const project = ref<Labrinth.Projects.v3.Project | null>(null)
+const requiredContentProject = ref<Labrinth.Projects.v2.Project | null>(null)
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
 const installStore = useInstall()
 
 const usingCustomModpack = computed(() => {
 	return requiredContentProject.value?.id === project.value?.id
-})
-
-const sharedBy = computed(() => {
-	if (organization.value) {
-		return {
-			name: organization.value.name,
-			icon_url: organization.value.icon_url,
-		}
-	}
-	if (teamMembers.value?.length) {
-		const owner = teamMembers.value.find((member: { is_owner: boolean }) => member.is_owner)
-		if (owner) {
-			return {
-				name: owner.user.username,
-				icon_url: owner.user.avatar_url,
-			}
-		}
-	}
-	return null
 })
 
 const loaderDisplay = computed(() => {
@@ -148,17 +120,11 @@ async function fetchData(versionId: string) {
 	if (modpackVersion.value?.project_id) {
 		requiredContentProject.value = await get_project(modpackVersion.value.project_id, 'bypass')
 	}
-
-	if (project.value?.organization) {
-		organization.value = await get_organization(project.value.organization, 'bypass')
-	} else if (project.value?.team_id) {
-		teamMembers.value = await get_team(project.value.team_id, 'bypass')
-	}
 }
 
 async function handleAccept() {
 	hide()
-	const serverProjectId = project.value.id
+	const serverProjectId = project.value?.id
 	installStore.startInstallingServer(serverProjectId)
 	try {
 		await installServerProject(serverProjectId)
@@ -200,35 +166,41 @@ async function openViewContents() {
 		const versions: Labrinth.Versions.v2.Version[] =
 			versionIds.length > 0 ? await get_version_many(versionIds, 'must_revalidate') : []
 
-		const projectMap = new Map(projects.map((p: any) => [p.id, p]))
+		const projectMap = new Map(projects.map((p: Labrinth.Projects.v2.Project) => [p.id, p]))
 
-		const contentItems: ContentItem[] = deps.map((dep: any): ContentItem => {
-			const depProject = dep.project_id ? projectMap.get(dep.project_id) : null
-			const depVersion = dep.version_id ? versions.find((v: any) => v.id === dep.version_id) : null
+		const contentItems: ContentItem[] = deps.map(
+			(dep: Labrinth.Versions.v2.Dependency): ContentItem => {
+				const depProject = dep.project_id ? projectMap.get(dep.project_id) : null
+				// @ts-expect-error - version_id is missing from the type for some reason
+				const depVersion = dep.version_id
+					? // @ts-expect-error - version_id is missing from the type for some reason
+						versions.find((v: Labrinth.Versions.v2.Version) => v.id === dep.version_id)
+					: null
 
-			return {
-				file_name: dep.file_name ?? depProject?.title ?? 'Unknown',
-				project_type: depProject?.project_type ?? 'mod',
-				has_update: false,
-				update_version_id: null,
-				project: {
-					id: depProject?.id ?? dep.project_id ?? dep.file_name ?? 'unknown',
-					slug: depProject?.slug ?? dep.project_id ?? 'unknown',
-					title: depProject?.title ?? dep.file_name ?? 'Unknown',
-					icon_url: depProject?.icon_url ?? null,
-				},
-				...(depVersion
-					? {
-							version: {
-								id: depVersion.id,
-								file_name: depVersion.files?.[0]?.filename ?? dep.file_name,
-								version_number: depVersion.version_number ?? undefined,
-								date_published: depVersion.date_published ?? undefined,
-							},
-						}
-					: {}),
-			}
-		})
+				return {
+					file_name: dep.file_name ?? depProject?.title ?? 'Unknown',
+					project_type: depProject?.project_type ?? 'mod',
+					has_update: false,
+					update_version_id: null,
+					project: {
+						id: depProject?.id ?? dep.project_id ?? dep.file_name ?? 'unknown',
+						slug: depProject?.slug ?? dep.project_id ?? 'unknown',
+						title: depProject?.title ?? dep.file_name ?? 'Unknown',
+						icon_url: depProject?.icon_url ?? undefined,
+					},
+					...(depVersion
+						? {
+								version: {
+									id: depVersion.id,
+									file_name: depVersion.files?.[0]?.filename ?? dep.file_name,
+									version_number: depVersion.version_number ?? undefined,
+									date_published: depVersion.date_published ?? undefined,
+								},
+							}
+						: {}),
+				}
+			},
+		)
 		modpackContentModal.value?.show(contentItems)
 	} catch (err) {
 		console.error('Failed to load modpack contents:', err)
@@ -246,8 +218,6 @@ async function show(
 	modpackVersionId.value = modpackVersionIdVal
 	modpackVersion.value = null
 	requiredContentProject.value = null
-	organization.value = null
-	teamMembers.value = []
 	onInstallComplete.value = callback
 
 	if (modpackVersionIdVal) await fetchData(modpackVersionIdVal)

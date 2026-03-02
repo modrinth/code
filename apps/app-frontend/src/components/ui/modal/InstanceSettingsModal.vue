@@ -26,6 +26,7 @@ import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_project_v3 } from '@/helpers/cache'
 
+import type { Labrinth } from '@modrinth/api-client'
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
@@ -40,7 +41,7 @@ watch(
 		isMinecraftServer.value = false
 		if (instance.linked_data?.project_id) {
 			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
-				.then((project: any) => {
+				.then((project: Labrinth.Projects.v3.Project | undefined) => {
 					if (project?.minecraft_server != null) {
 						isMinecraftServer.value = true
 					}
