@@ -137,7 +137,7 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<{
+defineProps<{
 	project: {
 		issues_url: string
 		source_url: string

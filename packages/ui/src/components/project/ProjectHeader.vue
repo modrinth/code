@@ -78,7 +78,7 @@ import ProjectStatusBadge from './ProjectStatusBadge.vue'
 const router = useRouter()
 const { formatMessage } = useVIntl()
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		project: Project
 		member?: boolean
