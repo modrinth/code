@@ -1,6 +1,84 @@
 <template>
 	<div>
-		<section class="universal-card">
+		<!-- Server Project Links -->
+		<section v-if="isServerProject" class="universal-card">
+			<h2>External links</h2>
+			<div class="adjacent-input">
+				<label id="server-website" title="Your server's website.">
+					<span class="label__title">Website</span>
+					<span class="label__description">Your server's official website.</span>
+				</label>
+				<input
+					id="server-website"
+					v-model="siteUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-store" title="Your server's store page.">
+					<span class="label__title">Store</span>
+					<span class="label__description">A link to your server's store or shop.</span>
+				</label>
+				<input
+					id="server-store"
+					v-model="storeUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label
+					id="server-wiki"
+					title="A page containing information, documentation, and help for the server."
+				>
+					<span class="label__title">Wiki page</span>
+					<span class="label__description"
+						>A page containing information, documentation, and help for the server.</span
+					>
+				</label>
+				<input
+					id="server-wiki"
+					v-model="serverWikiUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="adjacent-input">
+				<label id="server-discord" title="An invitation link to your Discord server.">
+					<span class="label__title">Discord</span>
+					<span class="label__description">An invitation link to your Discord server.</span>
+				</label>
+				<input
+					id="server-discord"
+					v-model="serverDiscordUrl"
+					type="url"
+					placeholder="Enter a valid URL"
+					maxlength="2048"
+					:disabled="!hasPermission"
+				/>
+			</div>
+			<div class="button-group">
+				<button
+					type="button"
+					class="iconified-button brand-button"
+					:disabled="!hasServerChanges"
+					@click="saveServerChanges()"
+				>
+					<SaveIcon />
+					Save changes
+				</button>
+			</div>
+		</section>
+
+		<!-- Standard Project Links -->
+		<section v-if="!isServerProject" class="universal-card">
 			<h2>External links</h2>
 			<div class="adjacent-input">
 				<label
@@ -174,16 +252,50 @@
 <script setup>
 import { SaveIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { commonLinkDomains, isCommonUrl, isDiscordUrl, isLinkShortener } from '@modrinth/moderation'
-import { DropdownSelect, injectProjectPageContext, StyledInput } from '@modrinth/ui'
+import {
+	DropdownSelect,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+	StyledInput,
+} from '@modrinth/ui'
 
 const tags = useGeneratedState()
 
-const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+const {
+	projectV2: project,
+	projectV3,
+	currentMember,
+	patchProject,
+	invalidate,
+} = injectProjectPageContext()
+const { labrinth } = injectModrinthClient()
+const { addNotification } = injectNotificationManager()
 
 const issuesUrl = ref(project.value.issues_url)
 const sourceUrl = ref(project.value.source_url)
 const wikiUrl = ref(project.value.wiki_url)
 const discordUrl = ref(project.value.discord_url)
+
+// Server project links
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+const siteUrl = ref(projectV3.value?.link_urls?.site?.url ?? '')
+const storeUrl = ref(projectV3.value?.link_urls?.store?.url ?? '')
+const serverWikiUrl = ref(projectV3.value?.link_urls?.wiki?.url ?? '')
+const serverDiscordUrl = ref(projectV3.value?.link_urls?.discord?.url ?? '')
+
+watch(
+	projectV3,
+	(newVal) => {
+		if (newVal) {
+			siteUrl.value = newVal.link_urls?.site?.url ?? ''
+			storeUrl.value = newVal.link_urls?.store?.url ?? ''
+			serverWikiUrl.value = newVal.link_urls?.wiki?.url ?? ''
+			serverDiscordUrl.value = newVal.link_urls?.discord?.url ?? ''
+		}
+	},
+	{ immediate: true },
+)
 
 const isIssuesUrlCommon = computed(() => {
 	if (!issuesUrl.value || issuesUrl.value.trim().length === 0) return true
@@ -281,6 +393,56 @@ const hasChanges = computed(() => {
 	return Object.keys(patchData.value).length > 0
 })
 
+// Server project links
+const serverPatchData = computed(() => {
+	const data = {}
+	const originalSite = projectV3.value?.link_urls?.site?.url ?? ''
+	const originalStore = projectV3.value?.link_urls?.store?.url ?? ''
+	const originalWiki = projectV3.value?.link_urls?.wiki?.url ?? ''
+	const originalDiscord = projectV3.value?.link_urls?.discord?.url ?? ''
+
+	if (checkDifference(siteUrl.value, originalSite)) {
+		data.site = siteUrl.value === '' ? null : siteUrl.value?.trim()
+	}
+	if (checkDifference(storeUrl.value, originalStore)) {
+		data.store = storeUrl.value === '' ? null : storeUrl.value?.trim()
+	}
+	if (checkDifference(serverWikiUrl.value, originalWiki)) {
+		data.wiki = serverWikiUrl.value === '' ? null : serverWikiUrl.value?.trim()
+	}
+	if (checkDifference(serverDiscordUrl.value, originalDiscord)) {
+		data.discord = serverDiscordUrl.value === '' ? null : serverDiscordUrl.value?.trim()
+	}
+	return data
+})
+
+const hasServerChanges = computed(() => {
+	return Object.keys(serverPatchData.value).length > 0
+})
+
+async function saveServerChanges() {
+	const linkUpdates = serverPatchData.value
+	if (Object.keys(linkUpdates).length === 0) return
+
+	try {
+		await labrinth.projects_v3.edit(project.value.id, {
+			link_urls: linkUpdates,
+		})
+		await invalidate()
+		addNotification({
+			title: 'Links updated',
+			text: 'Your server links have been updated.',
+			type: 'success',
+		})
+	} catch (err) {
+		addNotification({
+			title: 'Failed to update links',
+			text: err.data?.description ?? String(err),
+			type: 'error',
+		})
+	}
+}
+
 async function saveChanges() {
 	if (patchData.value && (await patchProject(patchData.value))) {
 		donationLinks.value = JSON.parse(JSON.stringify(project.value.donation_urls))
@@ -321,13 +483,7 @@ function updateDonationLinks() {
 }
 
 function checkDifference(newLink, existingLink) {
-	if (newLink === '' && existingLink !== null) {
-		return true
-	}
-	if (!newLink && !existingLink) {
-		return false
-	}
-	return newLink !== existingLink
+	return newLink != existingLink
 }
 </script>
 <style lang="scss" scoped>

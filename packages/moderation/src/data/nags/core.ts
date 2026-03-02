@@ -37,7 +37,8 @@ export const coreNags: Nag[] = [
 			defaultMessage: 'At least one version is required for a project to be submitted for review.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => context.versions.length < 1,
+		shouldShow: (context: NagContext) =>
+			context.versions.length < 1 && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/versions',
 			title: defineMessage({
@@ -147,6 +148,7 @@ export const coreNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) => {
+			if (!!context.projectV3?.minecraft_server) return false
 			const featuredGalleryImage = context.project.gallery?.find((img) => img.featured)
 			return context.project?.gallery?.length === 0 || !featuredGalleryImage
 		},
@@ -157,58 +159,6 @@ export const coreNags: Nag[] = [
 				defaultMessage: 'Visit gallery page',
 			}),
 			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-gallery',
-		},
-	},
-	{
-		id: 'select-tags',
-		title: defineMessage({
-			id: 'nags.select-tags.title',
-			defaultMessage: 'Select tags',
-		}),
-		description: defineMessage({
-			id: 'nags.select-tags.description',
-			defaultMessage:
-				'Select the tags that correctly apply to your project to help the right users find it.',
-		}),
-		status: 'suggestion',
-		shouldShow: (context: NagContext) =>
-			context.project.versions.length > 0 && context.project.categories.length < 1,
-		link: {
-			path: 'settings/tags',
-			title: defineMessage({
-				id: 'nags.settings.tags.title',
-				defaultMessage: 'Visit tag settings',
-			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-tags',
-		},
-	},
-	{
-		id: 'add-links',
-		title: defineMessage({
-			id: 'nags.add-links.title',
-			defaultMessage: 'Add external links',
-		}),
-		description: defineMessage({
-			id: 'nags.add-links.description',
-			defaultMessage:
-				'Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite.',
-		}),
-		status: 'suggestion',
-		shouldShow: (context: NagContext) =>
-			!(
-				context.project.issues_url ||
-				context.project.source_url ||
-				context.project.wiki_url ||
-				context.project.discord_url ||
-				context.project.donation_urls?.length
-			),
-		link: {
-			path: 'settings/links',
-			title: defineMessage({
-				id: 'nags.settings.links.title',
-				defaultMessage: 'Visit links settings',
-			}),
-			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
 		},
 	},
 	{
@@ -232,7 +182,8 @@ export const coreNags: Nag[] = [
 			)
 		},
 		status: 'required',
-		shouldShow: (context: NagContext) => context.project.license.id === 'LicenseRef-Unknown',
+		shouldShow: (context: NagContext) =>
+			context.project.license.id === 'LicenseRef-Unknown' && !context.projectV3?.minecraft_server,
 		link: {
 			path: 'settings/license',
 			title: defineMessage({
