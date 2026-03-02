@@ -126,7 +126,7 @@
     "message": "∞ * ∞ Mo"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 Mo"
+    "message": "moins de 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -825,7 +825,7 @@
     "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Clique pour lire comment Modrinth gère votre revenu."
+    "message": "Cliquez pour lire comment Modrinth gère votre revenu."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Estimé pour {date}"
@@ -1068,7 +1068,7 @@
     "message": "Grenouille"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une une couverture étendue."
+    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une couverture étendue."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Payer mensuellement"
@@ -1215,7 +1215,7 @@
     "message": "Déjà trouvé ce dont vous avez besoin ?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
+    "message": "Essayez un <orange>serveur 3 Go</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "En savoir plus"
@@ -2979,7 +2979,7 @@
     "message": "Ouvre les liens externes dans un nouvel onglet"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons \"Obtenir Modrinth App\" de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+    "message": "Cache les boutons « Obtenir Modrinth App » de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Cache les publicités de Modrinth App"
@@ -3105,7 +3105,7 @@
     "message": "Aucun environnement choisi"
   },
   "version.environment.unknown.description": {
-    "message": "L'environnement \"{environment}\" na pas été reconnu."
+    "message": "L'environnement « {environment} » na pas été reconnu."
   },
   "version.environment.unknown.title": {
     "message": "Environnement Inconnue"

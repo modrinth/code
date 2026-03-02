@@ -699,7 +699,7 @@
     "message": "RUC-Nummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "RUC-Nummer eingeben"
+    "message": "RUC Nummer eingeben"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Steueridentifikationsnummer"
@@ -1446,7 +1446,7 @@
     "message": "Dein Avatar"
   },
   "layout.banner.account-action": {
-    "message": "Konto-Aktion benötigt"
+    "message": "Kontoaktion erforderlich"
   },
   "layout.banner.add-email.button": {
     "message": "Kontoeinstellungen besuchen"
@@ -1713,7 +1713,7 @@
     "message": "Litauen"
   },
   "muralpay.country.lu": {
-    "message": "Luxenburg"
+    "message": "Luxemburg"
   },
   "muralpay.country.lv": {
     "message": "Lettland"

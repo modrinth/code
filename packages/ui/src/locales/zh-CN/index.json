@@ -33,7 +33,7 @@
     "defaultMessage": "查看分析"
   },
   "badge.beta": {
-    "defaultMessage": "测试版"
+    "defaultMessage": "Beta 测试版"
   },
   "badge.beta-release": {
     "defaultMessage": "测试发行版"
@@ -1203,7 +1203,7 @@
     "defaultMessage": "开始"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "适合 15–25 名玩家使用，加模组包或重度添加模组。"
+    "defaultMessage": "适合 15–25 名玩家使用，加整合包或重度添加模组。"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
@@ -1545,7 +1545,7 @@
     "defaultMessage": "Canvas"
   },
   "tag.loader.datapack": {
-    "defaultMessage": "Data Pack"
+    "defaultMessage": "数据包"
   },
   "tag.loader.fabric": {
     "defaultMessage": "Fabric"
@@ -1572,13 +1572,13 @@
     "defaultMessage": "LiteLoader"
   },
   "tag.loader.minecraft": {
-    "defaultMessage": "Resource Pack"
+    "defaultMessage": "资源包"
   },
   "tag.loader.modloader": {
     "defaultMessage": "Risugami's ModLoader"
   },
   "tag.loader.mrpack": {
-    "defaultMessage": "Modpack"
+    "defaultMessage": "整合包"
   },
   "tag.loader.neoforge": {
     "defaultMessage": "NeoForge"
@@ -1611,7 +1611,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Vanilla Shader"
+    "defaultMessage": "原版着色器"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

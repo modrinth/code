@@ -48,7 +48,7 @@
     "message": "{count} removidos"
   },
   "app.modal.update-to-play.update-required": {
-    "message": "Atualização necessitada"
+    "message": "Atualização necessária"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Uma atualização é necessária para jogar {name}. Por favor atualiza para a versão mais recente para iniciar o jogo."

@@ -6,7 +6,7 @@
     "defaultMessage": "建立新的聯盟代碼"
   },
   "affiliate.create.title.description": {
-    "defaultMessage": "為你的聯盟連結命名，以便你知道流量的來源了！"
+    "defaultMessage": "為您的聯盟連結命名，以便您知道流量的來源了！"
   },
   "affiliate.create.title.label": {
     "defaultMessage": "聯盟連結的標題"
@@ -171,7 +171,7 @@
     "defaultMessage": "私人"
   },
   "form.label.address-line": {
-    "defaultMessage": "地址行 1"
+    "defaultMessage": "地址行"
   },
   "form.label.address-line-2": {
     "defaultMessage": "地址行 2（可選）"
@@ -564,7 +564,7 @@
     "defaultMessage": "不通過"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "已隱藏"
+    "defaultMessage": "已擱置"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "將程式碼複製到剪貼簿"

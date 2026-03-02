@@ -12,7 +12,7 @@
     "message": "Telepítés"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "# mod"
+    "message": "{count} # mod"
   },
   "app.modal.install-to-play.server-requires-mods": {
     "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a telepítés gombra, hogy beállítsd a szükséges fájlokat a Modrinthból."

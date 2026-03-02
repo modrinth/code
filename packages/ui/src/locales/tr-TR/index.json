@@ -1356,7 +1356,7 @@
     "defaultMessage": "64x"
   },
   "tag.category.8x-": {
-    "defaultMessage": "8x ya da altı"
+    "defaultMessage": "8x ve altı"
   },
   "tag.category.adventure": {
     "defaultMessage": "Macera"
@@ -1368,19 +1368,19 @@
     "defaultMessage": "Ses"
   },
   "tag.category.blocks": {
-    "defaultMessage": "Bloklar"
+    "defaultMessage": "Blok"
   },
   "tag.category.bloom": {
     "defaultMessage": "Parıltı"
   },
   "tag.category.cartoon": {
-    "defaultMessage": "Çizgi"
+    "defaultMessage": "Çizimsi"
   },
   "tag.category.challenging": {
     "defaultMessage": "Zorlayıcı"
   },
   "tag.category.colored-lighting": {
-    "defaultMessage": "Renkli ışıklandırma"
+    "defaultMessage": "Renkli Işık"
   },
   "tag.category.combat": {
     "defaultMessage": "Savaş"
@@ -1398,10 +1398,10 @@
     "defaultMessage": "Ekonomi"
   },
   "tag.category.entities": {
-    "defaultMessage": ""
+    "defaultMessage": "Varlık"
   },
   "tag.category.environment": {
-    "defaultMessage": ""
+    "defaultMessage": "Çevre"
   },
   "tag.category.equipment": {
     "defaultMessage": "Ekipman"
@@ -1410,10 +1410,10 @@
     "defaultMessage": "Fantazi"
   },
   "tag.category.foliage": {
-    "defaultMessage": ""
+    "defaultMessage": "Yeşillik"
   },
   "tag.category.fonts": {
-    "defaultMessage": "Yazı Tipleri"
+    "defaultMessage": "Font"
   },
   "tag.category.food": {
     "defaultMessage": "Yiyecek"
@@ -1422,16 +1422,16 @@
     "defaultMessage": "Oyun Mekaniği"
   },
   "tag.category.gui": {
-    "defaultMessage": "GUI"
+    "defaultMessage": "Arayüz"
   },
   "tag.category.high": {
     "defaultMessage": "Yüksek"
   },
   "tag.category.items": {
-    "defaultMessage": "Öğeler"
+    "defaultMessage": "Eşya"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Ortaya karışık"
+    "defaultMessage": "Çok Türlü"
   },
   "tag.category.library": {
     "defaultMessage": "Kütüphane"
@@ -1440,7 +1440,7 @@
     "defaultMessage": "Hafif"
   },
   "tag.category.locale": {
-    "defaultMessage": "Yerel"
+    "defaultMessage": "Yerelleştirme"
   },
   "tag.category.low": {
     "defaultMessage": "Düşük"
@@ -1458,16 +1458,16 @@
     "defaultMessage": "Mini Oyun"
   },
   "tag.category.mobs": {
-    "defaultMessage": "Yaratıklar"
+    "defaultMessage": "Yaratık"
   },
   "tag.category.modded": {
-    "defaultMessage": "Modlanmış"
+    "defaultMessage": "Modlu"
   },
   "tag.category.models": {
     "defaultMessage": "Modeller"
   },
   "tag.category.multiplayer": {
-    "defaultMessage": "Çok oyunculu"
+    "defaultMessage": "Çok Oyunculu"
   },
   "tag.category.optimization": {
     "defaultMessage": "Optimizasyon"
@@ -1482,16 +1482,16 @@
     "defaultMessage": "Patates"
   },
   "tag.category.quests": {
-    "defaultMessage": "Görevler"
+    "defaultMessage": "Görevli"
   },
   "tag.category.realistic": {
     "defaultMessage": "Gerçekçi"
   },
   "tag.category.reflections": {
-    "defaultMessage": "Yansımalar"
+    "defaultMessage": "Yansıma"
   },
   "tag.category.screenshot": {
-    "defaultMessage": "Ekran görüntüsü"
+    "defaultMessage": "Ekran Görüntüsü"
   },
   "tag.category.semi-realistic": {
     "defaultMessage": "Yarı Gerçekçi"
@@ -1500,7 +1500,7 @@
     "defaultMessage": "Gölgeler"
   },
   "tag.category.simplistic": {
-    "defaultMessage": ""
+    "defaultMessage": "Basit"
   },
   "tag.category.social": {
     "defaultMessage": "Sosyal"
@@ -1512,19 +1512,19 @@
     "defaultMessage": "Teknoloji"
   },
   "tag.category.themed": {
-    "defaultMessage": ""
+    "defaultMessage": "Temalı"
   },
   "tag.category.transportation": {
     "defaultMessage": "Ulaşım"
   },
   "tag.category.tweaks": {
-    "defaultMessage": "İnce Ayarlar"
+    "defaultMessage": "İnce Ayar"
   },
   "tag.category.utility": {
-    "defaultMessage": "Alet Edavat"
+    "defaultMessage": "Araç Gereç"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Vanilla gibi"
+    "defaultMessage": "Vanilla Gibi"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Dünya Oluşumu"
@@ -1542,7 +1542,7 @@
     "defaultMessage": "BungeeCord"
   },
   "tag.loader.canvas": {
-    "defaultMessage": "Tuval"
+    "defaultMessage": "Canvas"
   },
   "tag.loader.datapack": {
     "defaultMessage": "Veri Paketi"
@@ -1575,7 +1575,7 @@
     "defaultMessage": "Kaynak Paketi"
   },
   "tag.loader.modloader": {
-    "defaultMessage": "Risugami'nin Mod Yükleyicisi"
+    "defaultMessage": "Risugami's ModLoader"
   },
   "tag.loader.mrpack": {
     "defaultMessage": "Mod paketi"
@@ -1611,7 +1611,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Vanilla Gölgelendirici"
+    "defaultMessage": "Vanilla Shader"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

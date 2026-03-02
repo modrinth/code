@@ -576,7 +576,7 @@
     "message": "Gotowe! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
-    "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z o.o.)."
+    "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z.o.o. )."
   },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Podmiot zagraniczny"
@@ -630,7 +630,7 @@
     "message": "Podmiot gospodarczy"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z o.o."
+    "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z.o.o."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Czy wypłacasz jako osoba prywatna, czy jako podmiot gospodarczy?"
@@ -765,7 +765,7 @@
     "message": "Dostępne nominały"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "Bilans Twojego konta o wartości {usdBalance} jest warty {localBalance}."
+    "message": "Bilans Twojego konta o wartości {usdBalance} jest wart {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Znajdź karty podarunkowe o podobnej wartości."
@@ -924,7 +924,7 @@
     "message": "Wymagana weryfikacja e-maila"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą."
+    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Wypłata nie powiodła się"

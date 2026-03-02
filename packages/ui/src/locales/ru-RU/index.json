@@ -789,7 +789,7 @@
     "defaultMessage": "Обновлён {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Вступить в Discord"
+    "defaultMessage": "Вступить в Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
@@ -813,7 +813,7 @@
     "defaultMessage": "Сообщить о проблеме"
   },
   "project.about.links.source": {
-    "defaultMessage": "Посмотреть исходники"
+    "defaultMessage": "Исходный код"
   },
   "project.about.links.title": {
     "defaultMessage": "Ссылки"
@@ -1437,7 +1437,7 @@
     "defaultMessage": "Библиотеки"
   },
   "tag.category.lightweight": {
-    "defaultMessage": "Лёгкие"
+    "defaultMessage": "Облегчённые"
   },
   "tag.category.locale": {
     "defaultMessage": "Языки"
@@ -1461,7 +1461,7 @@
     "defaultMessage": "Мобы"
   },
   "tag.category.modded": {
-    "defaultMessage": "Модифицированные"
+    "defaultMessage": "Модовые"
   },
   "tag.category.models": {
     "defaultMessage": "Модели"

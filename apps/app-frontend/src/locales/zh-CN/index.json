@@ -24,7 +24,7 @@
     "message": "共享实例"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "共享服务端实例"
+    "message": "共享的服务端实例"
   },
   "app.modal.update-to-play.added-count": {
     "message": "添加了 {count} 项"
@@ -162,7 +162,7 @@
     "message": "删除好友"
   },
   "friends.friend.request-sent": {
-    "message": "已发送好友请求"
+    "message": "已发送好友申请"
   },
   "friends.friend.view-profile": {
     "message": "查看个人资料"
@@ -222,10 +222,10 @@
     "message": "名称"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft 世界"
+    "message": "Minecraft 存档"
   },
   "instance.edit-world.reset-icon": {
-    "message": "重置图标"
+    "message": "重设图标"
   },
   "instance.edit-world.title": {
     "message": "编辑存档"
@@ -477,7 +477,7 @@
     "message": "该实例已关联至整合包，因此无法单独更新模组，也无法更改模组加载器和 Minecraft 版本。解除关联后，该实例将无法重新关联至整合包。"
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "取消整合包关联"
+    "message": "解除整合包关联"
   },
   "instance.settings.tabs.java": {
     "message": "Java 及内存"
@@ -486,7 +486,7 @@
     "message": "环境变量"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "钩子"
+    "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java 参数"
