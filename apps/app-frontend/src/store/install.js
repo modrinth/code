@@ -361,14 +361,29 @@ const syncServerAsWorld = async (
 						serverName,
 						serverAddress,
 						linkedWorld.pack_status,
+						serverProjectId,
 					)
 				}
 				return
 			}
 		}
 
-		const alreadyExists = worlds.some((w) => w.type === 'server' && w.address === serverAddress)
-		if (!alreadyExists) {
+		const existingServer = worlds.find(
+			(w) => w.type === 'server' && w.address === serverAddress,
+		)
+		if (existingServer) {
+			// Re-link and sync existing server (link may have been lost by Minecraft rewriting servers.dat)
+			if (serverProjectId || existingServer.name !== serverName) {
+				await edit_server_in_profile(
+					profilePath,
+					existingServer.index,
+					serverName,
+					serverAddress,
+					existingServer.pack_status,
+					serverProjectId ?? undefined,
+				)
+			}
+		} else {
 			await add_server_to_profile(
 				profilePath,
 				serverName,

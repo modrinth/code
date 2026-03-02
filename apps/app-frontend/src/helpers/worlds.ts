@@ -158,6 +158,7 @@ export async function edit_server_in_profile(
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
+	linkedProjectId?: string,
 ): Promise<void> {
 	return await invoke('plugin:worlds|edit_server_in_profile', {
 		path,
@@ -165,6 +166,7 @@ export async function edit_server_in_profile(
 		name,
 		address,
 		packStatus,
+		linkedProjectId,
 	})
 }
 

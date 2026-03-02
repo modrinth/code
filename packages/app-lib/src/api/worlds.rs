@@ -743,6 +743,7 @@ pub async fn edit_server_in_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    linked_project_id: Option<String>,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
     let server =
@@ -758,6 +759,9 @@ pub async fn edit_server_in_profile(
     server.name = name;
     server.ip = address;
     server.accept_textures = pack_status.into();
+    if let Some(id) = linked_project_id {
+        server.linked_project_id = Some(id);
+    }
     servers_data::write(profile_path, &servers).await?;
     Ok(())
 }

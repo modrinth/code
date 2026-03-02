@@ -171,10 +171,18 @@ pub async fn edit_server_in_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    linked_project_id: Option<String>,
 ) -> Result<()> {
     let path = get_full_path(path).await?;
-    worlds::edit_server_in_profile(&path, index, name, address, pack_status)
-        .await?;
+    worlds::edit_server_in_profile(
+        &path,
+        index,
+        name,
+        address,
+        pack_status,
+        linked_project_id,
+    )
+    .await?;
     Ok(())
 }
 
