@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import type { GameVersionTag, PlatformTag } from '@modrinth/utils'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
@@ -18,6 +19,8 @@ const loaders: PlatformTag[] = [
 ]
 
 const tags = { gameVersions, loaders }
+
+type Project = Labrinth.Projects.v3.Project
 
 const meta = {
 	title: 'Sidebar/ProjectSidebarServerInfo',
@@ -43,12 +46,13 @@ export const Default: Story = {
 					recommended_game_version: '1.21.4',
 					supported_game_versions: ['1.21.4', '1.21.3', '1.21.1'],
 				},
+				ping: null,
 			},
 			minecraft_server: {
 				country: 'US',
 				languages: ['English'],
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		ping: 42,
 	},
@@ -61,13 +65,15 @@ export const WithRequiredContent: Story = {
 				address: 'mc.modrinth.com',
 				content: {
 					kind: 'modpack',
+					version_id: 'abc123',
 				},
+				ping: null,
 			},
 			minecraft_server: {
 				country: 'DE',
 				languages: ['English', 'German'],
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		requiredContent: {
 			name: 'Better MC [FABRIC] - BMC4',
@@ -96,13 +102,15 @@ export const WithRequiredContentDownload: Story = {
 				address: 'mc.modrinth.com',
 				content: {
 					kind: 'modpack',
+					version_id: 'abc123',
 				},
+				ping: null,
 			},
 			minecraft_server: {
 				country: 'DE',
 				languages: ['English', 'German'],
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		requiredContent: {
 			name: 'Better MC [FABRIC] - BMC4',
@@ -131,9 +139,11 @@ export const IPOnly: Story = {
 				address: 'play.hypixel.net',
 				content: {
 					kind: 'vanilla',
+					supported_game_versions: [],
 				},
+				ping: null,
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 	},
 }
@@ -148,8 +158,9 @@ export const OfflineServer: Story = {
 					recommended_game_version: '1.21.4',
 					supported_game_versions: ['1.21.4'],
 				},
+				ping: null,
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		ping: 0,
 	},
@@ -165,12 +176,13 @@ export const HighLatency: Story = {
 					recommended_game_version: '1.21.4',
 					supported_game_versions: ['1.21.4', '1.21.1'],
 				},
+				ping: null,
 			},
 			minecraft_server: {
 				country: 'JP',
 				languages: ['Japanese', 'English'],
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		ping: 350,
 	},
@@ -186,12 +198,13 @@ export const WithLanguages: Story = {
 					recommended_game_version: '1.21.4',
 					supported_game_versions: ['1.21.4'],
 				},
+				ping: null,
 			},
 			minecraft_server: {
 				country: 'FR',
 				languages: ['French', 'English', 'Spanish', 'German', 'Portuguese'],
 			},
-		} as any,
+		} as unknown as Project,
 		tags,
 		ping: 28,
 	},

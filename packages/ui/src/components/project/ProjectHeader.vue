@@ -65,7 +65,6 @@
 <script setup lang="ts">
 import { DownloadIcon, HeartIcon, TagsIcon } from '@modrinth/assets'
 import { capitalizeString, formatNumber, type Project } from '@modrinth/utils'
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useVIntl } from '../../composables'
@@ -88,6 +87,4 @@ const props = withDefaults(
 		member: false,
 	},
 )
-
-const isServerProject = computed(() => Object.keys(props.project).includes('minecraft_server'))
 </script>
