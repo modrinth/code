@@ -1091,7 +1091,6 @@ const user = await useUser()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
-const router = useNativeRouter()
 
 const { locale, formatMessage } = useVIntl()
 

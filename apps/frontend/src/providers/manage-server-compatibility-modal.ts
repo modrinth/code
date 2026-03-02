@@ -167,8 +167,9 @@ export function createServerCompatibilityContext(
 					if (!customModpackFile.value) break
 
 					// Upload the modpack file as a new version
-					let uploadedVersion: Labrinth.Versions.v3.Version
-					uploadedVersion = await uploadCustomModpackFile(customModpackFile.value)
+					const uploadedVersion: Labrinth.Versions.v3.Version = await uploadCustomModpackFile(
+						customModpackFile.value,
+					)
 
 					// Patch the project to point to the newly uploaded version
 					try {

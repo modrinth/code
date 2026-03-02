@@ -24,7 +24,6 @@ import {
 	DropdownSelect,
 	injectModrinthClient,
 	injectNotificationManager,
-	OpenInAppModal,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -39,7 +38,7 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue, type Mod as InstallableMod } from '@modrinth/utils'
 import { useQueryClient } from '@tanstack/vue-query'
-import { templateRef, useThrottleFn, useTimeoutFn } from '@vueuse/core'
+import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, type Reactive, watch } from 'vue'
 
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
@@ -105,7 +104,6 @@ const resultsDisplayMode = computed<DisplayMode>(() =>
 const server = ref<Reactive<ModrinthServer>>()
 const serverHideInstalled = ref(false)
 const eraseDataOnInstall = ref(false)
-const serverInAppModal = templateRef('openInAppModal')
 
 const PERSISTENT_QUERY_PARAMS = ['sid', 'shi']
 
@@ -510,19 +508,6 @@ const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) =>
 	}
 	return undefined
 }
-
-function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject) {
-	serverInAppModal.value?.show({
-		serverProject: {
-			name: project.name,
-			slug: project.slug ?? '',
-			numPlayers: project.minecraft_java_server?.ping?.data?.players_online,
-			icon: project.icon_url ?? '',
-			statusOnline: !!project.minecraft_java_server?.ping?.data,
-			region: project.minecraft_server?.country,
-		},
-	})
-}
 </script>
 <template>
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
@@ -642,7 +627,13 @@ function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject
 					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
 					content-class="mb-4 mx-3"
 					inner-panel-class="p-1"
-					:open-by-default="!['server_category_minecraft_server_meta', 'server_category_minecraft_server_community', 'server_game_version'].includes(filterType.id)"
+					:open-by-default="
+						![
+							'server_category_minecraft_server_meta',
+							'server_category_minecraft_server_community',
+							'server_game_version',
+						].includes(filterType.id)
+					"
 				>
 					<template #header>
 						<h3 class="m-0 text-lg">{{ filterType.formatted_name }}</h3>
@@ -909,8 +900,6 @@ function handleServerProjectPlay(project: Labrinth.Search.v3.ResultSearchProject
 			</div>
 		</div>
 	</section>
-
-	<OpenInAppModal ref="openInAppModal" />
 </template>
 <style lang="scss" scoped>
 .normal-page__content {

@@ -145,20 +145,19 @@
 <script setup>
 import { CheckIcon, RefreshCwIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import {
-ButtonStyled, 
+	ButtonStyled,
 	Combobox,
 	injectModrinthClient,
-	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
-	UnsavedChangesPopup} from '@modrinth/ui'
+	UnsavedChangesPopup,
+} from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const client = injectModrinthClient()
-const { addNotification } = injectNotificationManager()
-const { projectV2: project, projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
+const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
 const javaAddress = ref('')
 const javaPort = ref(25565)
@@ -195,7 +194,6 @@ async function pingJavaServer() {
 	javaPingResult.value = null
 
 	const port = javaPort.value || 25565
-	const query = port !== 25565 ? `${address}:${port}` : address
 
 	try {
 		await client.labrinth.server_ping_internal.pingMinecraftJava({
