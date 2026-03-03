@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 // 1 day
 const DEFAULT_ID: &str = "0";
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum CacheValueType {
     Project,
@@ -136,32 +136,23 @@ impl CacheValueType {
 #[allow(clippy::large_enum_variant)]
 pub enum CacheValue {
     Project(Project),
-
-    ProjectV3(ProjectV3),
-
     Version(Version),
-
     User(User),
-
     Team(Vec<TeamMember>),
-
     Organization(Organization),
-
     File(CachedFile),
-
     LoaderManifest(CachedLoaderManifest),
     MinecraftManifest(daedalus::minecraft::VersionManifest),
-
     Categories(Vec<Category>),
     ReportTypes(Vec<String>),
     Loaders(Vec<Loader>),
     GameVersions(Vec<GameVersion>),
     DonationPlatforms(Vec<DonationPlatform>),
-
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
     SearchResultsV3(SearchResultsV3),
+    ProjectV3(ProjectV3),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -789,6 +780,16 @@ impl CachedEntry {
                 });
 
                 if let Some(data) = parsed_data {
+                    if data.get_type() != type_ {
+                        return Err(crate::ErrorKind::OtherError(format!(
+                            "Cache type mismatch for id {}: expected {:?}, got {:?}",
+                            row.id,
+                            type_,
+                            data.get_type()
+                        ))
+                        .as_error());
+                    }
+
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
