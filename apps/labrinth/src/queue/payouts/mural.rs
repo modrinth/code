@@ -397,7 +397,7 @@ mod tests {
                     token_amount: dec!(10.00),
                     token_symbol: "USDC".into(),
                 },
-                details: PayoutDetails::Fiat(FiatPayoutDetails {
+                details: PayoutDetails::Fiat(Box::new(FiatPayoutDetails {
                     fiat_and_rail_code: FiatAndRailCode::Usd,
                     fiat_payout_status: FiatPayoutStatus::Pending {
                         initiated_at: chrono::Utc::now(),
@@ -417,7 +417,7 @@ mod tests {
                         token_symbol: "USDC".into(),
                     },
                     developer_fee: None,
-                }),
+                })),
                 recipient_info: PayoutRecipientInfo::Inline {
                     name: "John Smith".into(),
                     details: InlineRecipientDetails::Fiat {
