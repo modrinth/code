@@ -298,9 +298,9 @@ async fn ingest_report_deserialized(
             report_id,
             issue_type: "__dummy".into(),
         }
-        .insert(&mut transaction)
+        .upsert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert dummy Delphi report issue")?;
+        .wrap_internal_err("failed to upsert dummy Delphi report issue")?;
 
         ReportIssueDetail {
             id: DelphiReportIssueDetailsId(0), // This will be set by the database
@@ -326,9 +326,9 @@ async fn ingest_report_deserialized(
             report_id,
             issue_type,
         }
-        .insert(&mut transaction)
+        .upsert(&mut transaction)
         .await
-        .wrap_internal_err("failed to insert Delphi report issue")?;
+        .wrap_internal_err("failed to upsert Delphi report issue")?;
 
         // This is required to handle the case where the same Delphi version is re-run on the same file
         ReportIssueDetail::remove_all_by_issue_id(issue_id, &mut transaction)

@@ -43,10 +43,6 @@ pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
         .into_iter()
         .map(|file_id| FileId(file_id.cast_unsigned()));
 
-    // if we don't delete reports now, when we insert the new reports,
-    // they will conflict with the existing ones
-    delete_project_reports(pool, &project_ids).await?;
-
     try_join_all(file_ids.map(|file_id| async move {
         super::run(pool, DelphiRunParameters { file_id })
             .await
@@ -83,18 +79,18 @@ async fn fetch_delphi_version() -> Result<i32> {
 }
 
 async fn fetch_stored_delphi_version(pool: &PgPool) -> Result<Option<i32>> {
-    sqlx::query_scalar::<_, Option<i32>>(
-        "SELECT MAX(delphi_version) FROM delphi_reports",
-    )
-    .fetch_one(pool)
-    .await
-    .wrap_err("failed to fetch latest stored Delphi version")
+    let row =
+        sqlx::query_scalar!("SELECT MAX(delphi_version) FROM delphi_reports")
+            .fetch_one(pool)
+            .await
+            .wrap_err("failed to fetch latest stored Delphi version")?;
+    Ok(row)
 }
 
 async fn fetch_unreviewed_tech_review_project_ids(
     pool: &PgPool,
 ) -> Result<Vec<i64>> {
-    sqlx::query_scalar::<_, i64>(
+    sqlx::query_scalar!(
         r#"
         SELECT DISTINCT m.id
         FROM mods m
@@ -130,7 +126,7 @@ async fn fetch_project_file_ids(
     pool: &PgPool,
     project_ids: &[i64],
 ) -> Result<Vec<i64>> {
-    sqlx::query_scalar::<_, i64>(
+    sqlx::query_scalar!(
         r#"
         SELECT DISTINCT dr.file_id
         FROM delphi_reports dr
@@ -143,26 +139,4 @@ async fn fetch_project_file_ids(
     .fetch_all(pool)
     .await
     .wrap_err("failed to fetch file ids for tech review Delphi rescan")
-}
-
-async fn delete_project_reports(
-    pool: &PgPool,
-    project_ids: &[i64],
-) -> Result<()> {
-    sqlx::query(
-        r#"
-        DELETE FROM delphi_reports dr
-        USING files f, versions v
-        WHERE
-            dr.file_id = f.id
-            AND f.version_id = v.id
-            AND v.mod_id = ANY($1::bigint[])
-        "#,
-    )
-    .bind(project_ids)
-    .execute(pool)
-    .await
-    .wrap_err("failed to delete existing Delphi reports before rescan")?;
-
-    Ok(())
 }
