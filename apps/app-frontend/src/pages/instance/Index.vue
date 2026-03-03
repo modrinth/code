@@ -67,7 +67,7 @@
 							<ServerPing v-if="ping" :ping="ping" />
 
 							<div
-								v-if="modpackContentProjectV3 && (minecraftServer?.country || ping)"
+								v-if="minecraftServer?.country || ping"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
@@ -312,13 +312,13 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
-import { finish_install, get, get_full_path, get_projects, kill, run } from '@/helpers/profile'
+import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status } from '@/helpers/worlds'
+import { get_server_status, getServerLatency } from '@/helpers/worlds'
 import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
@@ -348,9 +348,7 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
-const hasContent = ref(true)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
-const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
 
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
@@ -362,9 +360,7 @@ const ping = ref<number | undefined>(undefined)
 async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
-	modpackContentProjectV3.value = null
 	modrinthVersions.value = []
-	hasContent.value = true
 	ping.value = undefined
 
 	instance.value = await get(route.params.id as string).catch(handleError)
@@ -382,46 +378,29 @@ async function fetchInstance() {
 					(a: Labrinth.Versions.v2.Version, b: Labrinth.Versions.v2.Version) =>
 						dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
-				if (linkedProjectV3.value?.minecraft_server != null) {
-					isServerInstance.value = true
+			}
 
-					const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
-					if (serverAddress) {
-						get_server_status(serverAddress)
-							.then((status) => {
-								if (status.ping != null) {
-									ping.value = status.ping
-									playersOnline.value = status.players?.online
-								}
-							})
-							.catch((err) => {
-								console.error(`Failed to ping server ${serverAddress}:`, err)
-							})
+			if (linkedProjectV3.value?.minecraft_server != null) {
+				isServerInstance.value = true
+
+				const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
+				if (serverAddress) {
+					try {
+						const status = await get_server_status(serverAddress)
+						const latency = await getServerLatency(serverAddress)
+						ping.value = latency
+						playersOnline.value = status.players?.online
+					} catch (err) {
+						console.error(`Failed to ping server ${serverAddress}:`, err)
 					}
-
-					await fetchModpackContent()
-					const projects = await get_projects(instance.value!.path).catch(() => ({}))
-					hasContent.value = Object.keys(projects).length > 0
 				}
 			}
-		} catch (error: Error) {
-			handleError(error)
+		} catch (error) {
+			handleError(error as Error)
 		}
 	}
 
 	await updatePlayState()
-}
-
-async function fetchModpackContent() {
-	modpackContentProjectV3.value = null
-	const versionId = instance.value?.linked_data?.version_id
-	if (!versionId) return
-
-	const contentVersion = await get_version(versionId, 'must_revalidate')
-	const projectId = contentVersion?.project_id
-	if (projectId) {
-		modpackContentProjectV3.value = await get_project_v3(projectId, 'must_revalidate')
-	}
 }
 
 async function updatePlayState() {

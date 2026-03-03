@@ -156,6 +156,7 @@ export interface ComboboxOption<T> {
 	href?: string
 	target?: string
 	action?: () => void
+	searchTerms?: string[]
 }
 
 const DROPDOWN_VIEWPORT_MARGIN = 8
@@ -272,7 +273,9 @@ const filteredOptions = computed(() => {
 	const query = searchQuery.value.toLowerCase()
 	return optionsWithKeys.value.filter((opt) => {
 		if (isDivider(opt)) return false
-		return opt.label.toLowerCase().includes(query)
+		if (opt.label.toLowerCase().includes(query)) return true
+		if (opt.searchTerms?.some((term) => term.toLowerCase().includes(query))) return true
+		return false
 	})
 })
 

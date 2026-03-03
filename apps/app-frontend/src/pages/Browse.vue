@@ -49,7 +49,7 @@ import {
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { get_server_status } from '@/helpers/worlds'
+import { getServerLatency } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
 
@@ -287,17 +287,18 @@ const {
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	for (const hit of hits) {
-		const address = hit.minecraft_java_server?.address
-		if (!address) continue
-		get_server_status(address)
-			.then((status) => {
-				serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
-			})
-			.catch((err) => {
+	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
+	await Promise.all(
+		pingsToFetch.map(async (hit) => {
+			const address = hit.minecraft_java_server!.address!
+			try {
+				const latency = await getServerLatency(address)
+				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
+			} catch (err) {
 				console.error(`Failed to ping server ${address}:`, err)
-			})
-	}
+			}
+		}),
+	)
 }
 
 const previousFilterState = ref('')

@@ -54,7 +54,7 @@ impl ServerPingQueue {
 
                     let mut retries = ENV.SERVER_PING_RETRIES;
                     let result = loop {
-                        match ping_server(&address, port).await {
+                        match ping_server(&address, port, None).await {
                             Ok(ping) => {
                                 info!(?ping, "Received successful ping");
                                 break Ok(ping);
@@ -252,39 +252,15 @@ impl ServerPingQueue {
 pub async fn ping_server(
     address: &str,
     port: u16,
+    timeout: Option<Duration>,
 ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
     let start = Instant::now();
-    let timeout = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
+    let default_duration = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
+    let timeout = timeout
+        .map(|duration| duration.min(default_duration))
+        .unwrap_or(default_duration);
 
-    let task1 = async move {
-        let conn = async_minecraft_ping::ConnectionConfig::build(address)
-            .with_port(port)
-            .connect()
-            .await
-            .wrap_err("failed to connect to server")?;
-
-        let status = conn
-            .status()
-            .await
-            .wrap_err("failed to get server status")?
-            .status;
-
-        debug!("Successful ping with `async_minecraft_ping`");
-        eyre::Ok(exp::minecraft::JavaServerPingData {
-            latency: start.elapsed(),
-            version_name: status.version.name,
-            version_protocol: status.version.protocol,
-            description: match status.description {
-                ServerDescription::Plain(text)
-                | ServerDescription::Object { text } => text,
-            },
-            players_online: status.players.online,
-            players_max: status.players.max,
-        })
-    };
-    let task1 = tokio::time::timeout(timeout, task1);
-
-    let task2 = async move {
+    let task_ep = async move {
         fn map_component(c: elytra_ping::parse::TextComponent) -> String {
             match c {
                 elytra_ping::parse::TextComponent::Plain(t) => t,
@@ -303,7 +279,6 @@ pub async fn ping_server(
             elytra_ping::ping_or_timeout((address.to_string(), port), timeout)
                 .await?;
 
-        debug!("Successful ping with `elytra_ping`");
         eyre::Ok(exp::minecraft::JavaServerPingData {
             latency,
             version_name: result
@@ -326,15 +301,55 @@ pub async fn ping_server(
         })
     };
 
-    async move {
-        if let Ok(t) = task1
-            .await
-            .wrap_err("failed to ping with `async_minecraft_ping`")?
-        {
-            return Ok(t);
-        }
+    let task_amp = async move {
+        let task = async move {
+            let conn = async_minecraft_ping::ConnectionConfig::build(address)
+                .with_port(port)
+                .with_srv_lookup()
+                .connect()
+                .await
+                .wrap_err("failed to connect to server")?;
 
-        task2.await.wrap_err("failed to ping with `elytra_ping`")
+            let status = conn
+                .status()
+                .await
+                .wrap_err("failed to get server status")?
+                .status;
+
+            eyre::Ok(exp::minecraft::JavaServerPingData {
+                latency: start.elapsed(),
+                version_name: status.version.name,
+                version_protocol: status.version.protocol,
+                description: match status.description {
+                    ServerDescription::Plain(text)
+                    | ServerDescription::Object { text } => text,
+                },
+                players_online: status.players.online,
+                players_max: status.players.max,
+            })
+        };
+
+        tokio::time::timeout(timeout, task)
+            .await
+            .map_err(eyre::Error::new)
+            .flatten()
+    };
+
+    async move {
+        let (result_ep, result_amp) = (task_ep.await, task_amp.await);
+
+        let result_ep = result_ep
+            .inspect(|_| debug!("Successful ping with `elytra_ping`"))
+            .inspect_err(|err| {
+                debug!("Failed to ping with `elytra_ping`: {err:#}")
+            });
+        let result_amp = result_amp
+            .inspect(|_| debug!("Successful ping with `async_minecraft_ping`"))
+            .inspect_err(|err| {
+                debug!("Failed to ping with `async_minecraft_ping`: {err:#}")
+            });
+
+        result_ep.or(result_amp)
     }
     .await
 }
@@ -359,11 +374,20 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        let _status = ping_server("mc.hypixel.net", 25565).await.unwrap();
+        let _status = ping_server("mc.hypixel.net", 25565, None).await.unwrap();
     }
 
     #[actix_rt::test]
     async fn test_ping_server_invalid_address() {
-        _ = ping_server("invalid.invalid", 25565).await.unwrap_err();
+        _ = ping_server("invalid.invalid", 25565, None)
+            .await
+            .unwrap_err();
+    }
+
+    #[actix_rt::test]
+    async fn test_ping_zero_timeout() {
+        _ = ping_server("hypixel.net", 25565, Some(Duration::ZERO))
+            .await
+            .unwrap_err();
     }
 }
