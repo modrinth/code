@@ -46,7 +46,8 @@
 										? 'bg-brand-highlight'
 										: 'bg-transparent hover:bg-button-bg',
 								]"
-								@mouseenter="emit('versionHover', version)"
+								@mouseenter="handleVersionMouseEnter(version)"
+								@mouseleave="handleVersionMouseLeave"
 								@click="handleVersionSelect(version)"
 							>
 								<div class="flex items-center justify-between w-full gap-2">
@@ -229,6 +230,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
+import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '../../../composables/i18n'
@@ -471,7 +473,23 @@ function formatLoaderGameVersion(version: Labrinth.Versions.v2.Version): string 
 	return `${loader} ${gameVersion}`
 }
 
+let prefetchTimeout: ReturnType<typeof useTimeoutFn> | null = null
+const HOVER_DURATION_TO_PREFETCH_MS = 500
+function handleVersionMouseEnter(version: Labrinth.Versions.v2.Version) {
+	prefetchTimeout = useTimeoutFn(
+		() => emit('versionHover', version),
+		HOVER_DURATION_TO_PREFETCH_MS,
+		{ immediate: false },
+	)
+	prefetchTimeout.start()
+}
+
+function handleVersionMouseLeave() {
+	if (prefetchTimeout) prefetchTimeout.stop()
+}
+
 function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
+	if (prefetchTimeout) prefetchTimeout.stop()
 	selectedVersion.value = version
 	// Emit event so parent can fetch full version data with changelog
 	emit('versionSelect', version)
