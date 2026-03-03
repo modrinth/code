@@ -666,6 +666,7 @@ previousFilterState.value = JSON.stringify({
 						'server_category_minecraft_server_meta',
 						'server_category_minecraft_server_community',
 						'server_game_version',
+						'server_status',
 					].includes(filterType.id)
 				"
 			>
