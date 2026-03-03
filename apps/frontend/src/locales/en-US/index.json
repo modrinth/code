@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Create project"
   },
+  "create.project.create-server-project": {
+    "message": "Create server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Missing fields: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },
   "create.project.name-placeholder": {
     "message": "Enter project name..."
+  },
+  "create.project.owner-description": {
+    "message": "Set the project owner as yourself or an organization you're a member of."
+  },
+  "create.project.owner-label": {
+    "message": "Owner"
+  },
+  "create.project.server-project-title": {
+    "message": "Creating a server project"
   },
   "create.project.summary-description": {
     "message": "A sentence or two that describes your project."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Creating a project"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Project"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "New project"
   },
+  "layout.action.new-server-project": {
+    "message": "New server"
+  },
+  "layout.action.publish": {
+    "message": "Publish"
+  },
   "layout.action.reports": {
     "message": "Review reports"
   },
@@ -2131,6 +2161,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project-type.server.plural": {
+    "message": "Servers"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shaders"

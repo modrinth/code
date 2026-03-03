@@ -13,45 +13,47 @@
 			{{ project.description }}
 		</template>
 		<template #stats>
-			<div
-				v-tooltip="
-					capitalizeString(
-						formatMessage(commonMessages.projectDownloads, {
-							count: project.downloads,
-						}),
-					)
-				"
-				class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold cursor-help"
-			>
-				<DownloadIcon class="h-6 w-6 text-secondary" />
-				{{ formatCompactNumber(project.downloads) }}
-			</div>
-			<div
-				v-tooltip="
-					capitalizeString(
-						formatMessage(commonMessages.projectFollowers, {
-							count: project.followers,
-						}),
-					)
-				"
-				class="flex items-center gap-2 border-0 border-solid border-divider pr-4 cursor-help"
-				:class="{ 'md:border-r': project.categories.length > 0 }"
-			>
-				<HeartIcon class="h-6 w-6 text-secondary" />
-				<span class="font-semibold">
-					{{ formatCompactNumber(project.followers) }}
-				</span>
-			</div>
-			<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
-				<TagsIcon class="h-6 w-6 text-secondary" />
-				<div class="flex flex-wrap gap-2">
-					<TagItem
-						v-for="(category, index) in project.categories"
-						:key="index"
-						:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
-					>
-						<FormattedTag :tag="category" />
-					</TagItem>
+			<div class="flex items-center gap-3">
+				<div
+					v-tooltip="
+						capitalizeString(
+							formatMessage(commonMessages.projectDownloads, {
+								count: project.downloads,
+							}),
+						)
+					"
+					class="flex items-center gap-2 font-semibold cursor-help"
+				>
+					<DownloadIcon class="h-6 w-6 text-secondary" />
+					{{ formatCompactNumber(project.downloads) }}
+				</div>
+				<div
+					v-tooltip="
+						capitalizeString(
+							formatMessage(commonMessages.projectFollowers, {
+								count: project.followers,
+							}),
+						)
+					"
+					class="flex items-center gap-2 cursor-help"
+					:class="{ 'md:border-r': project.categories.length > 0 }"
+				>
+					<HeartIcon class="h-6 w-6 text-secondary" />
+					<span class="font-semibold">
+						{{ formatCompactNumber(project.followers) }}
+					</span>
+				</div>
+				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
+					<TagsIcon class="h-6 w-6 text-secondary" />
+					<div class="flex flex-wrap gap-2">
+						<TagItem
+							v-for="(category, index) in project.categories"
+							:key="index"
+							:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
+						>
+							<FormattedTag :tag="category" />
+						</TagItem>
+					</div>
 				</div>
 			</div>
 		</template>
