@@ -312,7 +312,7 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_follow_srv_record() {
-        _ = ping_server("hypixel.net", None).await.unwrap_err();
+        _ = ping_server("hypixel.net", None).await.unwrap();
     }
 
     #[actix_rt::test]
