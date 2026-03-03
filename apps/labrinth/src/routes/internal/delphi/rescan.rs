@@ -126,7 +126,7 @@ async fn fetch_project_file_ids(
     pool: &PgPool,
     project_ids: &[i64],
 ) -> Result<Vec<i64>> {
-    sqlx::query_scalar!(
+    let rows = sqlx::query_scalar!(
         r#"
         SELECT DISTINCT dr.file_id
         FROM delphi_reports dr
@@ -134,9 +134,11 @@ async fn fetch_project_file_ids(
         INNER JOIN versions v ON v.id = f.version_id
         WHERE v.mod_id = ANY($1::bigint[])
         "#,
+        project_ids,
     )
-    .bind(project_ids)
     .fetch_all(pool)
     .await
-    .wrap_err("failed to fetch file ids for tech review Delphi rescan")
+    .wrap_err("failed to fetch file ids for tech review Delphi rescan")?;
+
+    Ok(rows.into_iter().flatten().collect())
 }
