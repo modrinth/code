@@ -59,19 +59,9 @@
 						<StyledInput
 							id="java-address"
 							v-model="javaAddress"
-							placeholder="Enter address"
+							placeholder="E.g. play.modrinth.gg or play.modrinth.gg:25565"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
-							autocomplete="off"
-						/>
-						<StyledInput
-							v-model="javaPort"
-							type="number"
-							:min="1"
-							:max="65535"
-							:disabled="!hasPermission"
-							wrapper-class="w-24"
-							input-class="text-center"
 							autocomplete="off"
 						/>
 					</div>
@@ -135,19 +125,9 @@
 						<StyledInput
 							id="bedrock-address"
 							v-model="bedrockAddress"
-							placeholder="Enter address"
+							placeholder="E.g. play.modrinth.gg or play.modrinth.gg:19132"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
-							autocomplete="off"
-						/>
-						<StyledInput
-							v-model="bedrockPort"
-							type="number"
-							:min="1"
-							:max="65535"
-							:disabled="!hasPermission"
-							wrapper-class="w-24"
-							input-class="text-center"
 							autocomplete="off"
 						/>
 					</div>
@@ -189,7 +169,6 @@ const { addNotification } = injectNotificationManager()
 const { projectV3, currentMember, patchProjectV3 } = injectProjectPageContext()
 
 const javaAddress = ref('')
-const javaPort = ref(25565)
 const bedrockAddress = ref('')
 const bedrockPort = ref(19132)
 const region = ref('')
@@ -198,18 +177,15 @@ const languages = ref([])
 const javaPingLoading = ref(false)
 const javaPingResult = ref(null)
 
-const lastPingedAddress = ref({ address: '', port: null })
+const lastPingedAddress = ref('')
 
 const lastPingAddressChanged = computed(() => {
-	return (
-		javaAddress.value.trim() !== lastPingedAddress.value.address ||
-		javaPort.value !== lastPingedAddress.value.port
-	)
+	return javaAddress.value.trim() !== lastPingedAddress.value
 })
 
 let pingDebounceTimer = null
 
-watch([javaAddress, javaPort], () => {
+watch(javaAddress, () => {
 	clearTimeout(pingDebounceTimer)
 	pingDebounceTimer = setTimeout(() => {
 		pingJavaServer()
@@ -231,17 +207,12 @@ async function pingJavaServer() {
 	javaPingLoading.value = true
 	javaPingResult.value = null
 
-	const port = javaPort.value || 25565
-
 	try {
 		await Promise.race([
 			client.labrinth.server_ping_internal.pingMinecraftJava({
 				address,
-				// timeout on backend
-				timeout_ms: PING_TIMEOUT_MS
-				// port, // TODO remove
+				timeout_ms: PING_TIMEOUT_MS,
 			}),
-			// and timeout on frontend
 			new Promise((_, reject) =>
 				setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS),
 			),
@@ -251,14 +222,13 @@ async function pingJavaServer() {
 		javaPingResult.value = { online: false, latency: null }
 	} finally {
 		javaPingLoading.value = false
-		lastPingedAddress.value = { address, port }
+		lastPingedAddress.value = address
 	}
 }
 
 function initFromProjectV3(v3) {
 	if (!v3) return
 	javaAddress.value = v3.minecraft_java_server?.address ?? ''
-	javaPort.value = v3.minecraft_java_server?.port ?? 25565
 	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
 	region.value = v3.minecraft_server?.region ?? ''
@@ -336,12 +306,10 @@ const languageOptions = [
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =
-		javaAddress.value.trim() !== (projectV3.value?.minecraft_java_server?.address ?? '') ||
-		javaPort.value !== (projectV3.value?.minecraft_java_server?.port ?? 25565)
+		javaAddress.value.trim() !== (projectV3.value?.minecraft_java_server?.address ?? '')
 	if (addressChanged) {
 		return {
 			address: javaAddress.value.trim(),
-			port: javaPort.value,
 		}
 	}
 
@@ -350,13 +318,9 @@ const javaServerPatchData = computed(() => {
 
 const bedrockServerPatchData = computed(() => {
 	const origBedrock = projectV3.value?.minecraft_bedrock_server
-	if (
-		bedrockAddress.value !== (origBedrock?.address ?? '') ||
-		bedrockPort.value !== (origBedrock?.port ?? 19132)
-	) {
+	if (bedrockAddress.value !== (origBedrock?.address ?? '')) {
 		return {
 			address: bedrockAddress.value.trim(),
-			port: bedrockPort.value,
 		}
 	}
 
@@ -399,7 +363,6 @@ const saving = ref(false)
 
 const original = computed(() => ({
 	javaAddress: projectV3.value?.minecraft_java_server?.address ?? '',
-	javaPort: projectV3.value?.minecraft_java_server?.port ?? 25565,
 	bedrockAddress: projectV3.value?.minecraft_bedrock_server?.address ?? '',
 	bedrockPort: projectV3.value?.minecraft_bedrock_server?.port ?? 19132,
 	region: projectV3.value?.minecraft_server?.region ?? '',
@@ -408,7 +371,6 @@ const original = computed(() => ({
 
 const modified = computed(() => ({
 	javaAddress: javaAddress.value,
-	javaPort: javaPort.value,
 	bedrockAddress: bedrockAddress.value,
 	bedrockPort: bedrockPort.value,
 	region: region.value,
@@ -417,7 +379,6 @@ const modified = computed(() => ({
 
 function resetChanges() {
 	javaAddress.value = projectV3.value?.minecraft_java_server?.address ?? ''
-	javaPort.value = projectV3.value?.minecraft_java_server?.port ?? 25565
 	bedrockAddress.value = projectV3.value?.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = projectV3.value?.minecraft_bedrock_server?.port ?? 19132
 	region.value = projectV3.value?.minecraft_server?.region ?? ''

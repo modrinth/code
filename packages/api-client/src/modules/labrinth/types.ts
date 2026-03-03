@@ -432,7 +432,6 @@ export namespace Labrinth {
 
 			export interface MinecraftJavaServer {
 				address?: string
-				port?: number
 				content?: ModpackContent | VanillaContent
 				verified_plays_4w?: number | null
 				verified_plays_2w?: number | null
@@ -441,7 +440,6 @@ export namespace Labrinth {
 
 			export interface MinecraftBedrockServer {
 				address?: string
-				port?: number
 			}
 
 			export interface CreateServerProjectRequest {
