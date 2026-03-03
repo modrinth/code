@@ -184,7 +184,6 @@
 								{
 									id: 'servers',
 									action: '/discover/servers',
-									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
