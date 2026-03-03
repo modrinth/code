@@ -404,6 +404,7 @@ async function fetchInstance() {
 }
 
 async function updatePlayState() {
+	if (!route.params.id) return
 	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
