@@ -297,7 +297,7 @@ pub struct Payout {
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum PayoutDetails {
-    Fiat(FiatPayoutDetails),
+    Fiat(Box<FiatPayoutDetails>),
     Blockchain(BlockchainPayoutDetails),
 }
 
