@@ -1001,6 +1001,10 @@ const navRoutes = computed(() => [
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
 		href: '/discover/modpacks',
 	},
+	{
+		label: formatMessage(getProjectTypeMessage('server', true)),
+		href: '/discover/servers',
+	},
 ])
 
 const userMenuOptions = computed(() => {
