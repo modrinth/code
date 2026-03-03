@@ -337,7 +337,7 @@ const isEditing = ref(false)
 
 const addonsQuery = useQuery({
 	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
-	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!),
+	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -484,7 +484,7 @@ async function handleUpdaterConfirm(selectedVersion: Labrinth.Versions.v2.Versio
 function onBrowseModpacks() {
 	navigateTo({
 		path: '/discover/modpacks',
-		query: { sid: serverId, from: 'content', wid: worldId.value },
+		query: { sid: serverId, from: 'reset-server', wid: worldId.value },
 	})
 }
 

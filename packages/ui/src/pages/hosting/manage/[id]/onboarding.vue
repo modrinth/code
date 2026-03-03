@@ -181,6 +181,8 @@ const onCreate = async (config: CreationFlowContextValue) => {
 
 	let request: Archon.Content.v1.InstallWorldContent
 
+	const properties = config.buildProperties()
+
 	if (config.setupType.value === 'modpack' && config.modpackSelection.value) {
 		request = {
 			content_variant: 'modpack',
@@ -190,6 +192,7 @@ const onCreate = async (config: CreationFlowContextValue) => {
 				version_id: config.modpackSelection.value.versionId,
 			},
 			soft_override: false,
+			properties,
 		}
 	} else {
 		const loader = config.selectedLoader.value
@@ -199,10 +202,9 @@ const onCreate = async (config: CreationFlowContextValue) => {
 			version: config.selectedLoaderVersion.value ?? '',
 			game_version: config.selectedGameVersion.value ?? undefined,
 			soft_override: false,
+			properties,
 		}
 	}
-
-	// TODO: POST server.properties fields (worldName, gamemode, difficulty, seed, etc.) once the endpoint is available
 
 	try {
 		await client.archon.content_v1.installContent(serverId, worldId.value!, request)

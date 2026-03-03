@@ -1,3 +1,5 @@
+import type { Labrinth } from '../labrinth/types'
+
 export namespace Archon {
 	export namespace Content {
 		export namespace v1 {
@@ -15,6 +17,7 @@ export namespace Archon {
 			export type AddonVersion = {
 				id: string
 				name: string | null
+				environment?: Labrinth.Projects.v3.Environment | null
 			}
 
 			export type Addon = {
@@ -90,11 +93,45 @@ export namespace Archon {
 				followers: number | null
 			}
 
+			export type KnownPropertiesFields = {
+				allow_cheats?: string | null
+				allow_flight?: string | null
+				difficulty?: string | null
+				enforce_whitelist?: string | null
+				force_gamemode?: string | null
+				gamemode?: string | null
+				generate_structures?: string | null
+				generator_settings?: string | null
+				hardcore?: string | null
+				level_seed?: string | null
+				level_type?: string | null
+				max_players?: string | null
+				max_tick_time?: string | null
+				motd?: string | null
+				pause_when_empty_seconds?: string | null
+				player_idle_timeout?: string | null
+				require_resource_pack?: string | null
+				resource_pack?: string | null
+				resource_pack_id?: string | null
+				resource_pack_sha1?: string | null
+				simulation_distance?: string | null
+				spawn_protection?: string | null
+				sync_chunk_writes?: string | null
+				view_distance?: string | null
+				white_list?: string | null
+			}
+
+			export type PropertiesFields = {
+				known: KnownPropertiesFields
+				custom?: Record<string, string>
+			}
+
 			export type InstallWorldContent =
 				| {
 						content_variant: 'modpack'
 						spec: ModpackSpec
 						soft_override: boolean
+						properties?: PropertiesFields | null
 				  }
 				| {
 						content_variant: 'bare'
@@ -102,6 +139,7 @@ export namespace Archon {
 						version: string
 						game_version?: string
 						soft_override: boolean
+						properties?: PropertiesFields | null
 				  }
 		}
 	}

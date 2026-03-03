@@ -1,3 +1,4 @@
+import type { Archon } from '@modrinth/api-client'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
@@ -7,7 +8,7 @@ import type { MultiStageModal, StageConfigInput } from '../../base'
 import type { ComboboxOption } from '../../base/Combobox.vue'
 import { stageConfigs } from './stages'
 
-export type FlowType = 'world' | 'server-onboarding' | 'instance'
+export type FlowType = 'world' | 'server-onboarding' | 'reset-server' | 'instance'
 export type SetupType = 'modpack' | 'custom' | 'vanilla'
 export type Gamemode = 'survival' | 'creative' | 'hardcore'
 export type Difficulty = 'peaceful' | 'easy' | 'normal' | 'hard'
@@ -30,6 +31,7 @@ export interface ModpackSearchHit {
 export const flowTypeHeadings: Record<FlowType, string> = {
 	world: 'Create world',
 	'server-onboarding': 'Set up server',
+	'reset-server': 'Reset server',
 	instance: 'Create instance',
 }
 
@@ -110,6 +112,7 @@ export interface CreationFlowContextValue {
 	setImportMode: () => void
 	browseModpacks: () => void
 	finish: () => void
+	buildProperties: () => Archon.Content.v1.PropertiesFields
 }
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
@@ -272,6 +275,26 @@ export function createCreationFlowContext(
 		emit.create(contextValue)
 	}
 
+	function buildProperties(): Archon.Content.v1.PropertiesFields {
+		const isHardcore = gamemode.value === 'hardcore'
+		const known: Archon.Content.v1.KnownPropertiesFields = {
+			gamemode: isHardcore ? 'survival' : gamemode.value,
+			hardcore: isHardcore ? 'true' : 'false',
+			difficulty: difficulty.value,
+			level_seed: worldSeed.value || null,
+			level_type: worldTypeOption.value,
+			generate_structures: String(generateStructures.value),
+		}
+
+		if (generatorSettingsMode.value === 'flat') {
+			known.generator_settings = ''
+		} else if (generatorSettingsMode.value === 'custom' && generatorSettingsCustom.value) {
+			known.generator_settings = generatorSettingsCustom.value
+		}
+
+		return { known }
+	}
+
 	const resolvedStageConfigs = disableClose
 		? stageConfigs.map((stage) => ({ ...stage, disableClose: true }))
 		: stageConfigs
@@ -326,6 +349,7 @@ export function createCreationFlowContext(
 		setImportMode,
 		browseModpacks,
 		finish,
+		buildProperties,
 	}
 
 	return contextValue

@@ -10,6 +10,7 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
+import { isClientOnlyEnvironment } from '../../../composables/content/content-filtering'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
@@ -226,6 +227,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
+		isClientOnly: isClientOnlyEnvironment(item.environment),
 		disabled: disabledIds.value.has(item.file_name),
 	})),
 )

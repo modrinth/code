@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon } from '@modrinth/assets'
+import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -26,6 +26,7 @@ interface Props {
 	owner?: ContentOwner
 	enabled?: boolean
 	hasUpdate?: boolean
+	isClientOnly?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
 	owner: undefined,
 	enabled: undefined,
 	hasUpdate: false,
+	isClientOnly: false,
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
@@ -91,18 +93,25 @@ const fileNameRef = ref<HTMLElement | null>(null)
 					class="shrink-0 rounded-2xl border border-surface-5"
 				/>
 				<div class="flex min-w-0 flex-col gap-0.5">
-					<AutoLink
-						:target="
-							typeof projectLink === 'string' && projectLink.startsWith('http')
-								? '_blank'
-								: undefined
-						"
-						:to="projectLink"
-						class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
-						:class="{ 'hover:underline': projectLink }"
-					>
-						{{ project.title }}
-					</AutoLink>
+					<div class="flex min-w-0 items-center gap-1">
+						<AutoLink
+							:target="
+								typeof projectLink === 'string' && projectLink.startsWith('http')
+									? '_blank'
+									: undefined
+							"
+							:to="projectLink"
+							class="truncate font-semibold leading-6 text-contrast !decoration-contrast"
+							:class="{ 'hover:underline': projectLink }"
+						>
+							{{ project.title }}
+						</AutoLink>
+						<TriangleAlertIcon
+							v-if="isClientOnly"
+							v-tooltip="'This is a client-side mod and may cause issues if enabled'"
+							class="size-4 shrink-0 text-orange"
+						/>
+					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
 						<AutoLink

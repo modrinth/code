@@ -1,7 +1,7 @@
 <template>
 	<CreationFlowModal
 		ref="creationFlowRef"
-		type="server-onboarding"
+		type="reset-server"
 		:available-loaders="serverLoaders"
 		:show-snapshot-toggle="true"
 		:disable-close="props.initialSetup"
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ModrinthApiError } from '@modrinth/api-client'
+import type { Archon, ModrinthApiError } from '@modrinth/api-client'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import { injectModrinthClient } from '../../providers/api-client'
@@ -39,14 +39,9 @@ const { addNotification } = injectNotificationManager()
 
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 
-const loaderApiNames: Record<string, string> = {
-	fabric: 'Fabric',
-	neoforge: 'NeoForge',
-	forge: 'Forge',
-	quilt: 'Quilt',
-	paper: 'Paper',
-	purpur: 'Purpur',
-	vanilla: 'Vanilla',
+function toApiLoader(loader: string): Archon.Content.v1.Modloader {
+	if (loader === 'neoforge') return 'neo_forge'
+	return loader as Archon.Content.v1.Modloader
 }
 
 const props = defineProps<{
@@ -74,42 +69,46 @@ const uploadedBytes = ref(0)
 const totalBytes = ref(0)
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
-	const hardReset = props.initialSetup ? true : ctx.hardReset.value
-
 	try {
 		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
-			await handleMrpackUpload(ctx.modpackFile.value, hardReset)
+			await handleMrpackUpload(ctx.modpackFile.value)
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
-			await client.archon.servers_v0.reinstall(
+			await client.archon.content_v1.installContent(
 				serverContext.serverId,
+				serverContext.worldId.value!,
 				{
-					project_id: ctx.modpackSelection.value.projectId,
-					version_id: ctx.modpackSelection.value.versionId,
+					content_variant: 'modpack',
+					spec: {
+						platform: 'modrinth',
+						project_id: ctx.modpackSelection.value.projectId,
+						version_id: ctx.modpackSelection.value.versionId,
+					},
+					soft_override: false,
+					properties: ctx.buildProperties(),
 				},
-				hardReset,
 			)
 
 			emitReinstall()
 		} else {
 			const loader = ctx.selectedLoader.value
-			const apiLoaderName = loader
-				? (loaderApiNames[loader] ?? loader.charAt(0).toUpperCase() + loader.slice(1))
-				: 'Vanilla'
 			const loaderVersion =
-				apiLoaderName === 'Vanilla' ? '' : (ctx.selectedLoaderVersion.value ?? '')
+				!loader || loader === 'vanilla' ? '' : (ctx.selectedLoaderVersion.value ?? '')
 
-			await client.archon.servers_v0.reinstall(
+			await client.archon.content_v1.installContent(
 				serverContext.serverId,
+				serverContext.worldId.value!,
 				{
-					loader: apiLoaderName,
-					loader_version: loaderVersion,
-					game_version: ctx.selectedGameVersion.value ?? '',
+					content_variant: 'bare',
+					loader: toApiLoader(loader ?? 'vanilla'),
+					version: loaderVersion,
+					game_version: ctx.selectedGameVersion.value ?? undefined,
+					soft_override: false,
+					properties: ctx.buildProperties(),
 				},
-				hardReset,
 			)
 
 			emitReinstall({
-				loader: apiLoaderName,
+				loader: loader ?? 'vanilla',
 				lVersion: loaderVersion,
 				mVersion: ctx.selectedGameVersion.value,
 			})
@@ -135,7 +134,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	}
 }
 
-async function handleMrpackUpload(file: File, hardReset: boolean) {
+async function handleMrpackUpload(file: File) {
 	uploadedBytes.value = 0
 	totalBytes.value = file.size
 
@@ -147,7 +146,7 @@ async function handleMrpackUpload(file: File, hardReset: boolean) {
 		const handle = await client.archon.servers_v0.reinstallFromMrpack(
 			serverContext.serverId,
 			file,
-			hardReset,
+			true,
 		)
 
 		handle.onProgress(({ loaded, total }) => {

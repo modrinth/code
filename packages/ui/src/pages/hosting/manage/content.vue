@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContentPageLayout from '../../../components/instances/ContentPageLayout.vue'
+import ConfirmLeaveModal from '../../../components/instances/modals/ConfirmLeaveModal.vue'
 import ConfirmUnlinkModal from '../../../components/instances/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../components/instances/modals/ContentUpdaterModal.vue'
 import ModpackContentModal from '../../../components/instances/modals/ModpackContentModal.vue'
@@ -259,13 +260,52 @@ const uploadState = ref<UploadState>({
 	isUploading: false,
 	currentFileName: null,
 	currentFileProgress: 0,
+	uploadedBytes: 0,
+	totalBytes: 0,
 	completedFiles: 0,
 	totalFiles: 0,
 })
 
+const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const modpackUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal>>()
+
+let activeUploadCancel: (() => void) | null = null
+
+const isUploading = computed(() => uploadState.value.isUploading)
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+	if (isUploading.value) {
+		e.preventDefault()
+		return ''
+	}
+}
+
+if (typeof window !== 'undefined') {
+	watch(isUploading, (uploading) => {
+		if (uploading) {
+			window.addEventListener('beforeunload', handleBeforeUnload)
+		} else {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	})
+
+	onBeforeUnmount(() => {
+		window.removeEventListener('beforeunload', handleBeforeUnload)
+	})
+
+	onBeforeRouteLeave(async () => {
+		if (isUploading.value) {
+			const shouldLeave = (await confirmLeaveModal.value?.prompt()) ?? false
+			if (shouldLeave) {
+				activeUploadCancel?.()
+			}
+			return shouldLeave
+		}
+		return true
+	})
+}
 
 const updatingProject = ref<ContentItem | null>(null)
 const updatingModpack = ref(false)
@@ -298,28 +338,39 @@ function handleUploadFiles() {
 			isUploading: true,
 			currentFileName: null,
 			currentFileProgress: 0,
+			uploadedBytes: 0,
+			totalBytes: files.reduce((sum, f) => sum + f.size, 0),
 			completedFiles: 0,
 			totalFiles: files.length,
 		}
 
+		const handle = client.kyros.content_v1.uploadAddonFile(wid, files, {
+			onProgress: (p) => {
+				uploadState.value.currentFileProgress = p.progress
+				uploadState.value.uploadedBytes = p.loaded
+				uploadState.value.totalBytes = p.total
+			},
+		})
+		activeUploadCancel = () => handle.cancel()
+
 		try {
-			await client.kyros.content_v1.uploadAddonFile(wid, files, {
-				onProgress: (p) => {
-					uploadState.value.currentFileProgress = p.progress
-				},
-			}).promise
+			await handle.promise
 			uploadState.value.completedFiles = files.length
 			await contentQuery.refetch()
 		} catch (err) {
+			if (err instanceof Error && err.message === 'Upload cancelled') return
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToUpload),
 			})
 		} finally {
+			activeUploadCancel = null
 			uploadState.value = {
 				isUploading: false,
 				currentFileName: null,
 				currentFileProgress: 0,
+				uploadedBytes: 0,
+				totalBytes: 0,
 				completedFiles: 0,
 				totalFiles: 0,
 			}
@@ -355,6 +406,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 		project_type: addon.kind,
 		has_update: addon.has_update,
 		update_version_id: null,
+		environment: addon.version?.environment ?? undefined,
 	}
 }
 
@@ -527,7 +579,17 @@ function resetUpdateState() {
 async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	try {
 		if (updatingModpack.value) {
-			await client.archon.content_v1.updateModpack(serverId, worldId.value!)
+			const mp = contentQuery.data.value?.modpack
+			if (!mp) return
+			await client.archon.content_v1.installContent(serverId, worldId.value!, {
+				content_variant: 'modpack',
+				spec: {
+					platform: 'modrinth',
+					project_id: mp.spec.project_id,
+					version_id: selectedVersion.id,
+				},
+				soft_override: true,
+			})
 		} else if (updatingProject.value) {
 			const addon = addonLookup.value.get(updatingProject.value.file_name)
 			if (addon) {
@@ -567,6 +629,7 @@ provideContentManager({
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
 	uploadState,
+	showClientOnlyFilter: true,
 	deletionContext: 'server',
 	backupLink: `/hosting/manage/${serverId}/backups`,
 	hasUpdateSupport: true,
@@ -630,4 +693,5 @@ provideContentManager({
 			/>
 		</template>
 	</ContentPageLayout>
+	<ConfirmLeaveModal ref="confirmLeaveModal" />
 </template>

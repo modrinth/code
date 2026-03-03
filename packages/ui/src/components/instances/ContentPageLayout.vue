@@ -19,12 +19,12 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { formatProjectType } from '@modrinth/utils'
+import { formatBytes, formatProjectType } from '@modrinth/utils'
 import { computed, ref } from 'vue'
 
 import { useBulkOperation } from '../../composables/content/bulk-operations'
 import { useChangingItems } from '../../composables/content/changing-items'
-import { useContentFilters } from '../../composables/content/content-filtering'
+import { isClientOnlyEnvironment, useContentFilters } from '../../composables/content/content-filtering'
 import { useContentSearch } from '../../composables/content/content-search'
 import { useContentSelection } from '../../composables/content/content-selection'
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -32,7 +32,6 @@ import { injectContentManager } from '../../providers/content-manager'
 import { commonMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
-import Collapsible from '../base/Collapsible.vue'
 import EmptyState from '../base/EmptyState.vue'
 import FloatingActionBar from '../base/FloatingActionBar.vue'
 import OverflowMenu from '../base/OverflowMenu.vue'
@@ -179,7 +178,7 @@ const ctx = injectContentManager()
 const uploadOverallProgress = computed(() => {
 	const state = ctx.uploadState?.value
 	if (!state || !state.isUploading || state.totalFiles === 0) return 0
-	return (state.completedFiles + state.currentFileProgress) / state.totalFiles
+	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
 })
 
 type SortMode = 'alphabetical' | 'date-added'
@@ -223,6 +222,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 	{
 		showTypeFilters: true,
 		showUpdateFilter: ctx.hasUpdateSupport,
+		showClientOnlyFilter: ctx.showClientOnlyFilter ?? false,
 		isPackLocked: ctx.isPackLocked,
 		formatProjectType,
 	},
@@ -258,6 +258,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			...base,
 			disabled: isChanging(base.id) || ctx.isBusy.value,
 			hasUpdate: !ctx.isPackLocked.value && item.has_update,
+			isClientOnly: isClientOnlyEnvironment(item.environment),
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	}),
@@ -448,11 +449,15 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				@unlink="ctx.unlinkModpack ? confirmUnlinkModal?.show() : undefined"
 			/>
 
-			<Collapsible
-				v-if="ctx.uploadState?.value?.isUploading"
-				:collapsed="!ctx.uploadState.value.isUploading"
+			<Transition
+				enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+				enter-from-class="opacity-0 max-h-0"
+				enter-to-class="opacity-100 max-h-40"
+				leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+				leave-from-class="opacity-100 max-h-40"
+				leave-to-class="opacity-0 max-h-0"
 			>
-				<Admonition type="info" show-actions-underneath>
+				<Admonition v-if="ctx.uploadState?.value?.isUploading" type="info" show-actions-underneath>
 					<template #icon>
 						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 					</template>
@@ -464,12 +469,16 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							})
 						}}
 					</template>
-					{{ ctx.uploadState?.value?.currentFileName }}
+					<span class="text-secondary">
+						{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
+						/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }}
+						({{ Math.round(uploadOverallProgress * 100) }}%)
+					</span>
 					<template #actions>
 						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
 					</template>
 				</Admonition>
-			</Collapsible>
+			</Transition>
 
 			<template v-if="ctx.items.value.length > 0">
 				<div class="flex flex-col gap-4">

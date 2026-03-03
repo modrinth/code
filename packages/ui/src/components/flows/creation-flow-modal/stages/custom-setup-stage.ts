@@ -33,7 +33,10 @@ export const stageConfig: StageConfigInput<CreationFlowContextValue> = {
 	}),
 	rightButtonConfig: (ctx) => {
 		const isInstance = ctx.flowType === 'instance'
-		const goesToNextStage = ctx.flowType === 'world' || ctx.flowType === 'server-onboarding'
+		const goesToNextStage =
+			ctx.flowType === 'world' ||
+			ctx.flowType === 'server-onboarding' ||
+			ctx.flowType === 'reset-server'
 		const disabled = isForwardBlocked(ctx)
 
 		if (isInstance) {

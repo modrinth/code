@@ -28,6 +28,8 @@ export interface UploadState {
 	isUploading: boolean
 	currentFileName: string | null
 	currentFileProgress: number
+	uploadedBytes: number
+	totalBytes: number
 	completedFiles: number
 	totalFiles: number
 }
@@ -79,6 +81,9 @@ export interface ContentManagerContext {
 
 	// Upload progress (optional)
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
+
+	// Show client-only environment filter pill
+	showClientOnlyFilter?: boolean
 
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'

@@ -4,7 +4,7 @@
 			{{
 				ctx.flowType === 'instance'
 					? 'Choose instance type'
-					: ctx.flowType === 'server-onboarding'
+					: ctx.flowType === 'server-onboarding' || ctx.flowType === 'reset-server'
 						? 'Select installation type'
 						: 'Select world type'
 			}}
@@ -59,6 +59,9 @@
 					@click="setSetupType('vanilla')"
 				/>
 			</div>
+			<span v-if="ctx.flowType === 'reset-server'" class="text-sm text-secondary">
+				We will automatically create a backup before your server is reset.
+			</span>
 		</template>
 	</div>
 </template>

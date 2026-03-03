@@ -34,7 +34,6 @@ import {
 	SearchSidebarFilter,
 	type SortType,
 	StyledInput,
-	Toggle,
 	useDebugLogger,
 	useSearch,
 	useVIntl,
@@ -142,7 +141,6 @@ const serverIcon = computed(() => {
 })
 
 const serverHideInstalled = ref(false)
-const eraseDataOnInstall = ref(false)
 
 // TanStack Query for server content list
 const contentQueryKey = computed(() => ['content', 'list', currentServerId.value ?? ''] as const)
@@ -357,50 +355,44 @@ async function serverInstall(project: InstallableSearchResult) {
 	try {
 		const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
 
-		const version = versions.find(
-			(x) =>
-				x.game_versions.includes(serverData.value!.mc_version!) &&
-				x.loaders.includes(serverData.value!.loader!.toLowerCase()),
-		)
-
-		if (!version) {
-			handleError(
-				new Error(
-					`No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
-				),
-			)
-			project.installing = false
-			return
-		}
-
 		if (projectType.value?.id === 'modpack') {
-			if (fromContext.value === 'onboarding') {
-				// Show creation flow modal overlay on discovery page
-				const modalInstance = onboardingModalRef.value
-				if (modalInstance) {
-					onboardingInstallingProject.value = project
-					modalInstance.show()
-					await nextTick()
-					const ctx = modalInstance.ctx
-					ctx.setupType.value = 'modpack'
-					ctx.modpackSelection.value = {
-						projectId: project.project_id,
-						versionId: version.id,
-						name: project.title,
-						iconUrl: project.icon_url ?? undefined,
-					}
-					ctx.modal.value?.setStage('final-config')
-				}
+			const version = versions[0]
+			if (!version) {
+				handleError(new Error('No version found for this modpack'))
+				project.installing = false
 				return
 			}
-			await client.archon.content_v1.installContent(currentServerId.value, currentWorldId.value!, {
-				content_variant: 'modpack',
-				spec: { platform: 'modrinth', project_id: project.project_id, version_id: version.id },
-				soft_override: !eraseDataOnInstall.value,
-			})
-			project.installed = true
-			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
+			const modalInstance = onboardingModalRef.value
+			if (modalInstance) {
+				onboardingInstallingProject.value = project
+				modalInstance.show()
+				await nextTick()
+				const ctx = modalInstance.ctx
+				ctx.setupType.value = 'modpack'
+				ctx.modpackSelection.value = {
+					projectId: project.project_id,
+					versionId: version.id,
+					name: project.title,
+					iconUrl: project.icon_url ?? undefined,
+				}
+				ctx.modal.value?.setStage('final-config')
+			}
+			return
 		} else if (projectType.value?.id === 'mod' || projectType.value?.id === 'plugin') {
+			const version = versions.find(
+				(x) =>
+					x.game_versions.includes(serverData.value!.mc_version!) &&
+					x.loaders.includes(serverData.value!.loader!.toLowerCase()),
+			)
+			if (!version) {
+				handleError(
+					new Error(
+						`No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
+					),
+				)
+				project.installing = false
+				return
+			}
 			await installContentMutation.mutateAsync({
 				serverId: currentServerId.value,
 				projectId: version.project_id,
@@ -538,9 +530,9 @@ const description = computed(
 const serverBackUrl = computed(() => {
 	if (!serverData.value) return ''
 	const id = serverData.value.server_id
-	return fromContext.value === 'onboarding'
-		? `/hosting/manage/${id}?resumeModal=setup-type`
-		: `/hosting/manage/${id}/content`
+	if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
+	if (fromContext.value === 'reset-server') return `/hosting/manage/${id}/options/loader`
+	return `/hosting/manage/${id}/content`
 })
 
 // Onboarding modpack flow: show creation flow modal overlay on discovery page
@@ -558,7 +550,7 @@ function onOnboardingBack() {
 	onboardingModalRef.value?.hide()
 }
 
-async function onOnboardingCreate(config: CreationFlowContextValue) {
+async function onModpackFlowCreate(config: CreationFlowContextValue) {
 	if (!currentServerId.value || !config.modpackSelection.value) return
 
 	try {
@@ -570,10 +562,16 @@ async function onOnboardingCreate(config: CreationFlowContextValue) {
 				version_id: config.modpackSelection.value.versionId,
 			},
 			soft_override: false,
+			properties: config.buildProperties(),
 		} satisfies Archon.Content.v1.InstallWorldContent)
-		await client.archon.servers_v1.endIntro(currentServerId.value)
-		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
-		navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+
+		if (fromContext.value === 'onboarding') {
+			await client.archon.servers_v1.endIntro(currentServerId.value)
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
+			navigateTo(`/hosting/manage/${currentServerId.value}/content`)
+		} else {
+			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
+		}
 	} catch (e) {
 		handleError(new Error(`Error installing modpack: ${e}`))
 		config.loading.value = false
@@ -622,11 +620,13 @@ useSeoMeta({
 			<ButtonStyled>
 				<button @click="navigateTo(serverBackUrl)">
 					<LeftArrowIcon />
-					{{ fromContext === 'onboarding' ? 'Back to setup' : 'Back to server' }}
+					{{ fromContext === 'onboarding' ? 'Back to setup' : fromContext === 'reset-server' ? 'Cancel reset' : 'Back to server' }}
 				</button>
 			</ButtonStyled>
 		</div>
-		<h1 class="m-0 text-xl font-extrabold leading-none text-contrast">Install content to server</h1>
+		<h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
+			{{ fromContext === 'reset-server' ? 'Select modpack to install after reset' : 'Install content to server' }}
+		</h1>
 	</Teleport>
 
 	<aside
@@ -661,23 +661,7 @@ useSeoMeta({
 					</button>
 				</ButtonStyled>
 			</div>
-			<div
-				v-if="serverData && projectType?.id === 'modpack'"
-				class="card-shadow rounded-2xl bg-bg-raised"
-			>
-				<div class="flex flex-row items-center gap-2 px-6 py-4 text-contrast">
-					<h3 class="m-0 text-lg">Options</h3>
-				</div>
-				<div class="flex flex-row items-center justify-between gap-2 px-6">
-					<label for="erase-data-on-install"> Erase all data on install </label>
-					<Toggle id="erase-data-on-install" v-model="eraseDataOnInstall" class="flex-none" />
-				</div>
-				<div class="px-6 py-4 text-sm">
-					If enabled, existing mods, worlds, and configurations, will be deleted before installing
-					the selected modpack.
-				</div>
-			</div>
-			<div
+				<div
 				v-if="serverData && projectType?.id !== 'modpack'"
 				class="card-shadow rounded-2xl bg-bg-raised p-4"
 			>
@@ -906,15 +890,15 @@ useSeoMeta({
 	</section>
 
 	<CreationFlowModal
-		v-if="currentServerId && fromContext === 'onboarding' && projectType?.id === 'modpack'"
+		v-if="currentServerId && projectType?.id === 'modpack'"
 		ref="onboardingModalRef"
-		type="server-onboarding"
+		:type="fromContext === 'reset-server' ? 'reset-server' : 'server-onboarding'"
 		:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 		:show-snapshot-toggle="true"
 		:on-back="onOnboardingBack"
 		@hide="onOnboardingHide"
 		@browse-modpacks="() => {}"
-		@create="onOnboardingCreate"
+		@create="onModpackFlowCreate"
 	/>
 </template>
 <style lang="scss" scoped>

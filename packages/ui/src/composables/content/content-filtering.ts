@@ -3,6 +3,12 @@ import { computed, ref, watch } from 'vue'
 
 import type { ContentItem } from '../../components/instances/types'
 
+const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'client_only_server_optional', 'singleplayer_only'])
+
+export function isClientOnlyEnvironment(env?: string | null): boolean {
+	return !!env && CLIENT_ONLY_ENVIRONMENTS.has(env)
+}
+
 export interface FilterOption {
 	id: string
 	label: string
@@ -11,6 +17,7 @@ export interface FilterOption {
 export interface ContentFilterConfig {
 	showTypeFilters?: boolean
 	showUpdateFilter?: boolean
+	showClientOnlyFilter?: boolean
 	isPackLocked?: Ref<boolean>
 	formatProjectType?: (type: string) => string
 }
@@ -41,6 +48,13 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'updates', label: 'Updates' })
 		}
 
+		if (
+			config?.showClientOnlyFilter &&
+			items.value.some((m) => isClientOnlyEnvironment(m.environment))
+		) {
+			options.push({ id: 'client-only', label: 'Client-only' })
+		}
+
 		if (items.value.some((m) => !m.enabled)) {
 			options.push({ id: 'disabled', label: 'Disabled' })
 		}
@@ -69,6 +83,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			for (const filter of selectedFilters.value) {
 				if (filter === 'updates' && item.has_update) return true
 				if (filter === 'disabled' && !item.enabled) return true
+				if (filter === 'client-only' && isClientOnlyEnvironment(item.environment)) return true
 				if (item.project_type === filter) return true
 			}
 			return false

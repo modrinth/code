@@ -31,6 +31,7 @@ export interface ContentCardTableItem {
 	enabled?: boolean
 	disabled?: boolean
 	hasUpdate?: boolean
+	isClientOnly?: boolean
 	overflowOptions?: OverflowMenuOption[]
 }
 
@@ -50,6 +51,7 @@ export interface ContentItem extends Omit<
 	has_update: boolean
 	update_version_id: string | null
 	date_added?: string
+	environment?: string
 }
 
 export type ContentModpackCardProject = Pick<

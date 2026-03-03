@@ -228,6 +228,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:owner="item.owner"
 					:enabled="item.enabled"
 					:has-update="item.hasUpdate"
+					:is-client-only="item.isClientOnly"
 					:overflow-options="item.overflowOptions"
 					:disabled="item.disabled"
 					:show-checkbox="showSelection"
