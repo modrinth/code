@@ -2523,6 +2523,13 @@ const navLinks = computed(() => {
 	const routeType = route.params.type || project.value.project_type
 	const projectUrl = `/${routeType}/${project.value.slug ? project.value.slug : project.value.id}`
 
+	const galleryCount =
+		routeType === 'server'
+			? project.value.gallery.filter((item) => item.name === '__mc_server_banner__').length
+			: project.value.gallery.length
+
+	console.log('galleryCount', galleryCount, !!currentMember.value)
+
 	return [
 		{
 			label: formatMessage(messages.descriptionTab),
@@ -2531,7 +2538,7 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.galleryTab),
 			href: `${projectUrl}/gallery`,
-			shown: project.value.gallery.length > 0 || !!currentMember.value,
+			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),

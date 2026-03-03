@@ -328,7 +328,7 @@ export const installServerProject = async (serverProjectId) => {
 	})
 	await edit_icon(profilePath, originalIconPath)
 
-	await syncServerAsWorld(profilePath, project.title, serverAddress, serverProjectId)
+	await syncServerProjectAsWorld(profilePath, project.title, serverAddress, serverProjectId)
 }
 
 export const getServerAddress = (javaServer) => {
@@ -337,7 +337,7 @@ export const getServerAddress = (javaServer) => {
 	return port !== 25565 ? `${address}:${port}` : address
 }
 
-const syncServerAsWorld = async (
+const syncServerProjectAsWorld = async (
 	profilePath,
 	serverName,
 	serverAddress,
@@ -405,7 +405,7 @@ const findInstalledInstance = async (projectId) => {
 	return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
 }
 
-const createVanillaInstance = async (project, gameVersion, serverAddress) => {
+const createVanillaServerInstance = async (project, gameVersion, serverAddress) => {
 	const profilePath = await create(
 		project.title,
 		gameVersion,
@@ -420,7 +420,8 @@ const createVanillaInstance = async (project, gameVersion, serverAddress) => {
 		},
 	)
 
-	await syncServerAsWorld(profilePath, project.title, serverAddress, project.id)
+	//
+	await syncServerProjectAsWorld(profilePath, project.title, serverAddress, project.id)
 
 	return profilePath
 }
@@ -514,6 +515,7 @@ export const playServerProject = async (projectId) => {
 
 	if (projectV3?.minecraft_server == null) {
 		console.warn('playServerProject failed: project is not a server project')
+		return
 	}
 
 	const content = projectV3?.minecraft_java_server?.content
@@ -529,7 +531,7 @@ export const playServerProject = async (projectId) => {
 		if (installStore.installingServerProjects.includes(projectId)) return
 		installStore.startInstallingServer(projectId)
 		try {
-			const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
+			const path = await createVanillaServerInstance(project, recommendedGameVersion, serverAddress)
 			if (path) {
 				instance = await get(path)
 				showModpackInstallSuccess(installStore, instance, serverAddress)
@@ -543,8 +545,6 @@ export const playServerProject = async (projectId) => {
 		installStore.showInstallToPlayModal(projectV3, modpackVersionId, async () => {
 			const newInstance = await findInstalledInstance(project.id)
 			if (!newInstance) return
-			// Ensure the server is in the worlds list after modpack install
-			await syncServerAsWorld(newInstance.path, project.title, serverAddress, project.id)
 			showModpackInstallSuccess(installStore, newInstance, serverAddress)
 		})
 		return
@@ -552,7 +552,7 @@ export const playServerProject = async (projectId) => {
 
 	if (!instance) return
 
-	await syncServerAsWorld(instance.path, project.title, serverAddress, project.id)
+	await syncServerProjectAsWorld(instance.path, project.title, serverAddress, project.id)
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
