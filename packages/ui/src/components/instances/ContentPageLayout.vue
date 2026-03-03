@@ -444,9 +444,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				:has-update="ctx.modpack.value.hasUpdate"
 				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
 				:disabled-text="ctx.modpack.value.disabledText"
-				@update="ctx.updateModpack?.()"
-				@content="ctx.viewModpackContent?.()"
-				@unlink="ctx.unlinkModpack ? confirmUnlinkModal?.show() : undefined"
+				v-on="{
+					...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
+					...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
+					...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
+				}"
 			/>
 
 			<Transition

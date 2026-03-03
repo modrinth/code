@@ -153,6 +153,7 @@ const router = useRouter()
 const props = defineProps<{
 	instance: GameInstance
 	versions: Labrinth.Versions.v2.Version[]
+	isServerInstance?: boolean
 }>()
 
 const loading = ref(true)
@@ -606,7 +607,7 @@ provideContentManager({
 	hasUpdateSupport: true,
 	updateItem: handleUpdate,
 	bulkUpdateItem: updateProject,
-	updateModpack: handleModpackUpdate,
+	updateModpack: props.isServerInstance ? undefined : handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairProfile,
 	getOverflowOptions,
