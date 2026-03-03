@@ -242,8 +242,6 @@ vars! {
     ANROK_API_URL: String;
     ANROK_API_KEY: String;
 
-    COMPLIANCE_PAYOUT_THRESHOLD: String;
-
     PAYOUT_ALERT_SLACK_WEBHOOK: String;
     CLOUDFLARE_INTEGRATION: bool = false;
 

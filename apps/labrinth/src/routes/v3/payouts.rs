@@ -11,6 +11,7 @@ use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::globals::tax_compliance_payout_threshold;
 use crate::util::avalara1099;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
@@ -1114,10 +1115,6 @@ async fn update_compliance_status(
             compliance_api_check_failed,
         }))
     }
-}
-
-fn tax_compliance_payout_threshold() -> Option<Decimal> {
-    ENV.COMPLIANCE_PAYOUT_THRESHOLD.parse().ok()
 }
 
 #[derive(Deserialize)]
