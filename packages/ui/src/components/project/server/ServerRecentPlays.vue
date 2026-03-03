@@ -18,7 +18,7 @@ defineProps<{
 		v-tooltip="
 			`${formatNumber(recentPlays, true)} recent play${recentPlays === 1 ? '' : 's'} from Modrinth in the past 2 weeks`
 		"
-		class="smart-clickable:allow-pointer-events"
+		class="smart-clickable:allow-pointer-events w-max"
 	>
 		<PlayIcon />
 		{{
