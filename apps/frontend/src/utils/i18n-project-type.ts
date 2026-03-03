@@ -41,6 +41,14 @@ const projectTypeMessages = defineMessages({
 		id: 'project-type.resourcepack.plural',
 		defaultMessage: 'Resource Packs',
 	},
+	server: {
+		id: 'project-type.server.singular',
+		defaultMessage: 'Server',
+	},
+	servers: {
+		id: 'project-type.server.plural',
+		defaultMessage: 'Servers',
+	},
 	shader: {
 		id: 'project-type.shader.singular',
 		defaultMessage: 'Shader',

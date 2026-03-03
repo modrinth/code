@@ -11,6 +11,18 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-02T16:45:00-08:00`,
+		product: 'app',
+		version: '0.11.0',
+		body: `## Introducing Server Projects
+
+- Added new Server Project type
+  - Three compatibility types: vanilla, modded (published pack), or modded (uploaded pack)
+- Added new linked server instance type that receives updates from the server
+  - Joining a server from the app downloads the required content and launches you directly into the server
+`,
+	},
+	{
 		date: `2026-02-16T12:40:00-08:00`,
 		product: 'web',
 		body: `## Improvements

@@ -4,7 +4,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative cursor-pointer flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text hover:bg-button-bgHover active:bg-button-bgActive"
+			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-button-bg px-4 py-2.5 text-left transition-all duration-200 text-button-text"
 			:class="[
 				triggerClasses,
 				{
@@ -12,6 +12,7 @@
 					'rounded-b-none': shouldRoundBottomCorners,
 					'rounded-t-none': shouldRoundTopCorners,
 					'cursor-not-allowed opacity-50': disabled,
+					'cursor-pointer hover:bg-button-bgHover active:bg-button-bgActive': !disabled,
 				},
 			]"
 			:aria-expanded="isOpen"
@@ -99,12 +100,21 @@
 							<slot :name="`option-${item.value}`" :item="item">
 								<div class="flex items-center gap-2">
 									<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-									<span
-										class="font-semibold leading-tight"
-										:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
-									>
-										{{ item.label }}
-									</span>
+									<div class="flex flex-col gap-1.5">
+										<span
+											class="font-semibold leading-tight"
+											:class="item.value === modelValue ? 'text-contrast' : 'text-primary'"
+										>
+											{{ item.label }}
+										</span>
+										<span
+											v-if="item.subLabel"
+											class="text-sm"
+											:class="item.value === modelValue ? 'text-contrast' : 'text-secondary'"
+										>
+											{{ item.subLabel }}
+										</span>
+									</div>
 								</div>
 							</slot>
 						</component>
@@ -138,6 +148,7 @@ import StyledInput from './StyledInput.vue'
 export interface ComboboxOption<T> {
 	value: T
 	label: string
+	subLabel?: string
 	icon?: Component
 	disabled?: boolean
 	class?: string

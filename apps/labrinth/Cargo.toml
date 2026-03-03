@@ -21,6 +21,7 @@ actix-ws = { workspace = true }
 arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
+async-minecraft-ping = { workspace = true }
 async-stripe = { workspace = true, features = [
   "billing",
   "checkout",
@@ -43,6 +44,7 @@ deadpool-redis.workspace = true
 derive_more = { workspace = true, features = ["deref", "deref_mut"] }
 dotenvy = { workspace = true }
 either = { workspace = true }
+elytra-ping = { workspace = true }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
