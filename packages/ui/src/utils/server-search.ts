@@ -96,6 +96,7 @@ export const SERVER_SORT_TYPES: SortType[] = [
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
 	server_game_version: 'minecraft_java_server.content.supported_game_versions',
+	server_status: 'minecraft_java_server.ping.data',
 	server_region: 'minecraft_server.region',
 	server_language: 'minecraft_server.languages',
 }
@@ -118,7 +119,7 @@ export function useServerSearch(opts: {
 	const route = useRoute()
 
 	const serverCurrentSortType = ref<SortType>(SERVER_SORT_TYPES[0])
-	const serverCurrentFilters = ref<FilterValue[]>([])
+	const serverCurrentFilters = ref<FilterValue[]>([{ type: 'server_status', option: 'online' }])
 	const serverToggledGroups = ref<string[]>([])
 
 	const serverFilterTypes = computed<FilterType[]>(() => {
@@ -225,6 +226,19 @@ export function useServerSearch(opts: {
 					value: l.code,
 				})),
 			},
+			{
+				id: 'server_status',
+				formatted_name: 'Status',
+				supported_project_types: ['server'],
+				display: 'all',
+				query_param: 'sst',
+				supports_negative_filter: false,
+				searchable: false,
+				options: [
+					{ id: 'online', formatted_name: 'Online', method: 'or', value: 'online' },
+					{ id: 'offline', formatted_name: 'Offline', method: 'or', value: 'offline' },
+				],
+			},
 		]
 	})
 
@@ -235,6 +249,18 @@ export function useServerSearch(opts: {
 			const field = getFilterField(filterType.id)
 			if (!field) continue
 			const matched = serverCurrentFilters.value.filter((f) => f.type === filterType.id)
+			if (matched.length === 0) continue
+
+			if (filterType.id === 'server_status') {
+				const selected = matched[0]?.option
+				if (selected === 'online') {
+					parts.push(`${field} EXISTS`)
+				} else if (selected === 'offline') {
+					parts.push(`${field} NOT EXISTS`)
+				}
+				continue
+			}
+
 			const included = matched.filter((f) => !f.negative)
 			const excluded = matched.filter((f) => f.negative)
 			if (included.length > 0) {
