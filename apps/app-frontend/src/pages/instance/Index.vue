@@ -58,16 +58,16 @@
 							<ServerOnlinePlayers :online="playersOnline ?? 0" :status-online="statusOnline" />
 
 							<div
-								v-if="playersOnline !== undefined && (minecraftServer?.country || ping)"
+								v-if="playersOnline !== undefined && (minecraftServer?.region || ping)"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
-							<ServerRegion v-if="minecraftServer?.country" :region="minecraftServer?.country" />
+							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
 
 							<ServerPing v-if="ping" :ping="ping" />
 
 							<div
-								v-if="minecraftServer?.country || ping"
+								v-if="minecraftServer?.region || ping"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 

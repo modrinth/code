@@ -15,7 +15,7 @@ export const serverProjectsNags: Nag[] = [
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
-			!!context.projectV3?.minecraft_server && !context.projectV3?.minecraft_server.country,
+			!!context.projectV3?.minecraft_server && !context.projectV3?.minecraft_server.region,
 		link: {
 			path: 'settings/server',
 			title: defineMessage({

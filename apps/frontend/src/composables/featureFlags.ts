@@ -38,7 +38,6 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	newProjectGeneralSettings: false,
 	newProjectEnvironmentSettings: true,
 	hideRussiaCensorshipBanner: false,
-	serverDiscovery: true,
 	disablePrettyProjectUrlRedirects: false,
 	hidePreviewBanner: false,
 	i18nDebug: false,
