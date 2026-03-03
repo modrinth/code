@@ -1763,9 +1763,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Account number"
   },
-  "muralpay.field.branch-code": {
-    "message": "Branch code"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1792,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX phone"
+  },
+  "muralpay.field.random-key": {
+    "message": "Random key"
   },
   "muralpay.field.routing-number": {
     "message": "Routing number"
@@ -1856,9 +1856,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Enter account number"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Enter branch code"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Enter 18-digit CLABE"
   },
@@ -1870,6 +1867,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Enter PIX email"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Enter random key"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Enter 9-digit routing number"

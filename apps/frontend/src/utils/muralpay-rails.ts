@@ -357,11 +357,14 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 			{
 				name: 'branchCode',
 				type: 'text',
-				label: defineMessage({ id: 'muralpay.field.branch-code', defaultMessage: 'Branch code' }),
+				label: defineMessage({
+					id: 'muralpay.field.random-key',
+					defaultMessage: 'Random key',
+				}),
 				required: true,
 				placeholder: defineMessage({
-					id: 'muralpay.placeholder.enter-branch-code',
-					defaultMessage: 'Enter branch code',
+					id: 'muralpay.placeholder.enter-random-key',
+					defaultMessage: 'Enter random key',
 				}),
 				autocomplete: 'off',
 				dependsOn: {
@@ -383,10 +386,6 @@ export const MURALPAY_RAILS: Record<string, RailConfig> = {
 					defaultMessage: 'Brazilian tax identification number',
 				}),
 				autocomplete: 'off',
-				dependsOn: {
-					field: 'pixAccountType',
-					value: 'DOCUMENT',
-				},
 			},
 		],
 	},
