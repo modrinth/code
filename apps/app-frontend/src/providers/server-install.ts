@@ -323,6 +323,7 @@ export function createServerInstall(opts: {
 
 		if (projectV3?.minecraft_server == null) {
 			console.warn('playServerProject failed: project is not a server project')
+			return
 		}
 
 		const content = projectV3?.minecraft_java_server?.content
@@ -352,7 +353,6 @@ export function createServerInstall(opts: {
 			installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
-				await syncServerAsWorld(newInstance.path, project.title, serverAddress, project.id)
 				showModpackInstallSuccess(newInstance, serverAddress)
 			})
 			return

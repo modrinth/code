@@ -261,7 +261,7 @@ import {
 	list as listInstances,
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { get_server_status } from '@/helpers/worlds'
+import { getServerLatency } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -393,15 +393,11 @@ async function fetchProjectData() {
 	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
 	if (serverAddress) {
 		serverPing.value = undefined
-		get_server_status(serverAddress)
-			.then((status) => {
-				if (status.ping != null) {
-					serverPing.value = status.ping
-				}
-			})
-			.catch((err) => {
-				console.error(`Failed to ping server ${serverAddress}:`, err)
-			})
+		try {
+			serverPing.value = await getServerLatency(serverAddress)
+		} catch (error) {
+			console.error(`Failed to ping server ${serverAddress}:`, error)
+		}
 	}
 
 	// Fetch server sidebar data (modpack version + project)

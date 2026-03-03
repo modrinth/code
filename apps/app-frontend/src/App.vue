@@ -86,7 +86,6 @@ import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
 import { get_user } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
-import { useFetch } from '@/helpers/fetch.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
@@ -315,11 +314,7 @@ async function setupApp() {
 		}),
 	)
 
-	useFetch(
-		`https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
-		'criticalAnnouncements',
-		true,
-	)
+	fetch(`https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`)
 		.then((response) => response.json())
 		.then((res) => {
 			if (res && res.header && res.body) {
@@ -332,22 +327,20 @@ async function setupApp() {
 			)
 		})
 
-	useFetch(`https://modrinth.com/news/feed/articles.json`, 'news', true)
+	fetch(`https://modrinth.com/news/feed/articles.json`)
 		.then((response) => response.json())
 		.then((res) => {
 			if (res && res.articles) {
-				// Format expected by NewsArticleCard component.
 				news.value = res.articles
 					.map((article) => ({
 						...article,
 						path: article.link,
-						thumbnail: article.thumbnail,
-						title: article.title,
-						summary: article.summary,
-						date: article.date,
 					}))
 					.slice(0, 4)
 			}
+		})
+		.catch((error) => {
+			console.error('Failed to fetch news articles', error)
 		})
 
 	get_opening_command().then(handleCommand)
