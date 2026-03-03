@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	install_to_existing_profile,
 	create_profile_and_install as packInstall,
+	install_to_existing_profile,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,

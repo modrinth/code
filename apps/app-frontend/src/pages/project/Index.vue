@@ -401,7 +401,7 @@ async function fetchProjectData() {
 		try {
 			serverPing.value = await getServerLatency(serverAddress)
 		} catch (error) {
-			console.error(`Failed to ping server ${serverAddress}:`, err)
+			console.error(`Failed to ping server ${serverAddress}:`, error)
 		}
 	}
 
