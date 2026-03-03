@@ -643,10 +643,10 @@ dependencies = [
 [[package]]
 name = "async-minecraft-ping"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "668b459c14dd8d9ef21e296af3f2a3651ff7dc3536e092fb0b09e528daaa6d89"
+source = "git+https://github.com/jsvana/async-minecraft-ping?rev=56a64a8a59de854fb81cc0f9f66c2285873d960c#56a64a8a59de854fb81cc0f9f66c2285873d960c"
 dependencies = [
  "async-trait",
+ "hickory-resolver 0.24.4",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -3808,6 +3808,30 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "hickory-proto"
+version = "0.24.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92652067c9ce6f66ce53cc38d1169daa36e6e7eb7dd3b63b5103bd9d97117248"
+dependencies = [
+ "async-trait",
+ "cfg-if",
+ "data-encoding",
+ "enum-as-inner",
+ "futures-channel",
+ "futures-io",
+ "futures-util",
+ "idna 1.1.0",
+ "ipnet",
+ "once_cell",
+ "rand 0.8.5",
+ "thiserror 1.0.69",
+ "tinyvec",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "hickory-proto"
 version = "0.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8a6fe56c0038198998a6f217ca4e7ef3a5e51f46163bd6dd60b5c71ca6c6502"
@@ -3833,13 +3857,34 @@ dependencies = [
 
 [[package]]
 name = "hickory-resolver"
+version = "0.24.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cbb117a1ca520e111743ab2f6688eddee69db4e0ea242545a604dce8a66fd22e"
+dependencies = [
+ "cfg-if",
+ "futures-util",
+ "hickory-proto 0.24.4",
+ "ipconfig",
+ "lru-cache",
+ "once_cell",
+ "parking_lot",
+ "rand 0.8.5",
+ "resolv-conf",
+ "smallvec",
+ "thiserror 1.0.69",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "hickory-resolver"
 version = "0.25.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc62a9a99b0bfb44d2ab95a7208ac952d31060efc16241c87eaf36406fecf87a"
 dependencies = [
  "cfg-if",
  "futures-util",
- "hickory-proto",
+ "hickory-proto 0.25.2",
  "ipconfig",
  "moka",
  "once_cell",
@@ -10086,7 +10131,7 @@ dependencies = [
  "fs4",
  "futures",
  "heck 0.5.0",
- "hickory-resolver",
+ "hickory-resolver 0.25.2",
  "indicatif",
  "itertools 0.14.0",
  "notify",

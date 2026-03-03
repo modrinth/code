@@ -305,6 +305,7 @@ pub async fn ping_server(
         let task = async move {
             let conn = async_minecraft_ping::ConnectionConfig::build(address)
                 .with_port(port)
+                .with_srv_lookup()
                 .connect()
                 .await
                 .wrap_err("failed to connect to server")?;
