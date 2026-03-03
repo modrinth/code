@@ -90,8 +90,8 @@ Project-specific skill files with detailed patterns. Use them when the task matc
 ### Output handling
 - DO NOT pipe output through `head`, `tail`, `less`, or `more`
 - NEVER use `| head -n X` or `| tail -n X` to truncate output
-- Run commands directly without pipes when possible
-- If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
+- IMPORTANT: Run commands directly without pipes when possible
+- IMPORTANT: If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
 - ALWAYS read the full output — never pipe through filters
 
 ### General
