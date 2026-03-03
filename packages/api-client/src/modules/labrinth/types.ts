@@ -408,9 +408,13 @@ export namespace Labrinth {
 
 			export interface MinecraftServer {
 				max_players?: number
-				country?: string
+				region?: string
 				active_version?: string | null
 				languages?: string[]
+				/**
+				 * deprecated, use region instead
+				 */
+				country?: string
 			}
 
 			export interface ModpackContent {

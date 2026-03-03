@@ -55,10 +55,10 @@
 				</TagItem>
 			</div>
 		</section>
-		<section v-if="props.ping !== undefined || country" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Country</h3>
+		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
+			<h3 class="text-primary text-base m-0">Region</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
-				<ServerRegion v-if="country" :region="country" />
+				<ServerRegion v-if="region" :region="region" />
 				<ServerPing :ping="props.ping" :status-online="props.statusOnline" />
 			</div>
 		</section>
@@ -120,7 +120,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const ipAddress = computed(() => props.projectV3?.minecraft_java_server?.address ?? '')
 const languages = computed(() => props.projectV3?.minecraft_server?.languages ?? [])
-const country = computed(() => props.projectV3?.minecraft_server?.country)
+const region = computed(() => props.projectV3?.minecraft_server?.region)
 
 const recommendedVersions = computed(() => {
 	if (props.recommendedVersion) return [props.recommendedVersion]

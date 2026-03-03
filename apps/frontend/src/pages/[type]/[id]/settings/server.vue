@@ -4,17 +4,17 @@
 			<div class="flex flex-col gap-6">
 				<div class="text-2xl font-semibold text-contrast">Server details</div>
 
-				<!-- Country -->
+				<!-- Region -->
 				<div class="max-w-[600px]">
-					<label for="server-country">
-						<span class="label__title">Country</span>
+					<label for="server-region">
+						<span class="label__title">Region</span>
 					</label>
 					<Combobox
-						id="server-country"
-						v-model="country"
-						:options="countryOptions"
+						id="server-region"
+						v-model="region"
+						:options="regionOptions"
 						searchable
-						placeholder="Select country"
+						placeholder="Select region"
 						:disabled="!hasPermission"
 					/>
 				</div>
@@ -192,7 +192,7 @@ const javaAddress = ref('')
 const javaPort = ref(25565)
 const bedrockAddress = ref('')
 const bedrockPort = ref(19132)
-const country = ref('')
+const region = ref('')
 const languages = ref([])
 
 const javaPingLoading = ref(false)
@@ -258,7 +258,7 @@ function initFromProjectV3(v3) {
 	javaPort.value = v3.minecraft_java_server?.port ?? 25565
 	bedrockAddress.value = v3.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = v3.minecraft_bedrock_server?.port ?? 19132
-	country.value = v3.minecraft_server?.country ?? ''
+	region.value = v3.minecraft_server?.region ?? ''
 	languages.value = v3.minecraft_server?.languages ?? []
 
 	pingJavaServer()
@@ -278,78 +278,15 @@ if (projectV3.value) {
 	)
 }
 
-const countryOptions = [
-	{ value: 'US', label: 'United States' },
-	{ value: 'CA', label: 'Canada' },
-	{
-		value: 'EU',
-		label: 'Europe',
-		searchTerms: [
-			'Germany',
-			'France',
-			'Netherlands',
-			'Finland',
-			'Sweden',
-			'Denmark',
-			'Poland',
-			'Czech Republic',
-			'Romania',
-			'Austria',
-			'Belgium',
-			'Ireland',
-			'Spain',
-			'Italy',
-			'Portugal',
-			'Lithuania',
-			'Latvia',
-			'Estonia',
-			'Bulgaria',
-			'Croatia',
-			'Hungary',
-			'Slovakia',
-			'Greece',
-			'Luxembourg',
-			'Malta',
-			'Cyprus',
-			'Slovenia',
-			'Great Britain',
-			'United Kingdom',
-		],
-	},
-	{ value: 'NO', label: 'Norway' },
-	{ value: 'CH', label: 'Switzerland' },
-	{ value: 'RU', label: 'Russia' },
-	{ value: 'UA', label: 'Ukraine' },
-	{ value: 'RS', label: 'Serbia' },
-	{ value: 'TR', label: 'Turkey' },
-	{ value: 'IL', label: 'Israel' },
-	{ value: 'AE', label: 'United Arab Emirates' },
-	{ value: 'SA', label: 'Saudi Arabia' },
-	{ value: 'IN', label: 'India' },
-	{ value: 'SG', label: 'Singapore' },
-	{ value: 'JP', label: 'Japan' },
-	{ value: 'KR', label: 'South Korea' },
-	{ value: 'CN', label: 'China' },
-	{ value: 'HK', label: 'Hong Kong' },
-	{ value: 'TW', label: 'Taiwan' },
-	{ value: 'AU', label: 'Australia' },
-	{ value: 'NZ', label: 'New Zealand' },
-	{ value: 'BR', label: 'Brazil' },
-	{ value: 'AR', label: 'Argentina' },
-	{ value: 'CL', label: 'Chile' },
-	{ value: 'CO', label: 'Colombia' },
-	{ value: 'MX', label: 'Mexico' },
-	{ value: 'ZA', label: 'South Africa' },
-	{ value: 'NG', label: 'Nigeria' },
-	{ value: 'KE', label: 'Kenya' },
-	{ value: 'EG', label: 'Egypt' },
-	{ value: 'MY', label: 'Malaysia' },
-	{ value: 'TH', label: 'Thailand' },
-	{ value: 'VN', label: 'Vietnam' },
-	{ value: 'PH', label: 'Philippines' },
-	{ value: 'ID', label: 'Indonesia' },
-	{ value: 'PK', label: 'Pakistan' },
-	{ value: 'BD', label: 'Bangladesh' },
+const regionOptions = [
+	{ value: 'us_east', label: 'US East' },
+	{ value: 'us_west', label: 'US West' },
+	{ value: 'europe', label: 'Europe' },
+	{ value: 'asia', label: 'Asia' },
+	{ value: 'australia', label: 'Australia' },
+	{ value: 'south_america', label: 'South America' },
+	{ value: 'middle_east', label: 'Middle East' },
+	{ value: 'russia', label: 'Russia' },
 ]
 
 const languageOptions = [
@@ -425,15 +362,15 @@ const bedrockServerPatchData = computed(() => {
 
 const serverPatchData = computed(() => {
 	const origServer = projectV3.value?.minecraft_server
-	const countryChanged = country.value && country.value !== origServer?.country
+	const regionChanged = region.value && region.value !== origServer?.region
 	const languagesChanged =
 		JSON.stringify([...languages.value].sort()) !==
 		JSON.stringify([...(origServer?.languages ?? [])].sort())
 
-	if (countryChanged || languagesChanged) {
+	if (regionChanged || languagesChanged) {
 		return {
 			...origServer,
-			...(countryChanged ? { country: country.value } : {}),
+			...(regionChanged ? { region: region.value } : {}),
 			...(languagesChanged ? { languages: languages.value } : {}),
 		}
 	}
@@ -462,7 +399,7 @@ const original = computed(() => ({
 	javaPort: projectV3.value?.minecraft_java_server?.port ?? 25565,
 	bedrockAddress: projectV3.value?.minecraft_bedrock_server?.address ?? '',
 	bedrockPort: projectV3.value?.minecraft_bedrock_server?.port ?? 19132,
-	country: projectV3.value?.minecraft_server?.country ?? '',
+	region: projectV3.value?.minecraft_server?.region ?? '',
 	languages: projectV3.value?.minecraft_server?.languages ?? [],
 }))
 
@@ -471,7 +408,7 @@ const modified = computed(() => ({
 	javaPort: javaPort.value,
 	bedrockAddress: bedrockAddress.value,
 	bedrockPort: bedrockPort.value,
-	country: country.value,
+	region: region.value,
 	languages: languages.value,
 }))
 
@@ -480,7 +417,7 @@ function resetChanges() {
 	javaPort.value = projectV3.value?.minecraft_java_server?.port ?? 25565
 	bedrockAddress.value = projectV3.value?.minecraft_bedrock_server?.address ?? ''
 	bedrockPort.value = projectV3.value?.minecraft_bedrock_server?.port ?? 19132
-	country.value = projectV3.value?.minecraft_server?.country ?? ''
+	region.value = projectV3.value?.minecraft_server?.region ?? ''
 	languages.value = projectV3.value?.minecraft_server?.languages ?? []
 }
 

@@ -55,25 +55,15 @@ const SERVER_CATEGORY_ICON_MAP: Record<string, string> = {
 	'world-resets': 'refresh-ccw',
 }
 
-export const SERVER_COUNTRIES = [
-	{ code: 'US', name: 'United States' },
-	{ code: 'GB', name: 'United Kingdom' },
-	{ code: 'DE', name: 'Germany' },
-	{ code: 'FR', name: 'France' },
-	{ code: 'NL', name: 'Netherlands' },
-	{ code: 'PL', name: 'Poland' },
-	{ code: 'RU', name: 'Russia' },
-	{ code: 'BR', name: 'Brazil' },
-	{ code: 'CA', name: 'Canada' },
-	{ code: 'AU', name: 'Australia' },
-	{ code: 'SE', name: 'Sweden' },
-	{ code: 'FI', name: 'Finland' },
-	{ code: 'SG', name: 'Singapore' },
-	{ code: 'JP', name: 'Japan' },
-	{ code: 'KR', name: 'South Korea' },
-	{ code: 'TR', name: 'Turkey' },
-	{ code: 'IN', name: 'India' },
-	{ code: 'ZA', name: 'South Africa' },
+export const SERVER_REGIONS = [
+	{ code: 'us_east', name: 'US East' },
+	{ code: 'us_west', name: 'US West' },
+	{ code: 'europe', name: 'Europe' },
+	{ code: 'asia', name: 'Asia' },
+	{ code: 'australia', name: 'Australia' },
+	{ code: 'south_america', name: 'South America' },
+	{ code: 'middle_east', name: 'Middle East' },
+	{ code: 'russia', name: 'Russia' },
 ]
 
 export const SERVER_LANGUAGES = [
@@ -106,7 +96,7 @@ export const SERVER_SORT_TYPES: SortType[] = [
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
 	server_game_version: 'minecraft_java_server.content.supported_game_versions',
-	server_country: 'minecraft_server.country',
+	server_region: 'minecraft_server.region',
 	server_language: 'minecraft_server.languages',
 }
 
@@ -206,18 +196,18 @@ export function useServerSearch(opts: {
 				})),
 			},
 			{
-				id: 'server_country',
-				formatted_name: 'Country',
+				id: 'server_region',
+				formatted_name: 'Region',
 				supported_project_types: ['server'],
-				display: 'scrollable',
-				query_param: 'sco',
+				display: 'all',
+				query_param: 'sr',
 				supports_negative_filter: true,
-				searchable: true,
-				options: SERVER_COUNTRIES.map((c) => ({
-					id: c.code,
-					formatted_name: c.name,
+				searchable: false,
+				options: SERVER_REGIONS.map((r) => ({
+					id: r.code,
+					formatted_name: r.name,
 					method: 'or' as const,
-					value: c.code,
+					value: r.code,
 				})),
 			},
 			{
