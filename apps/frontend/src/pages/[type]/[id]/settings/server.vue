@@ -237,8 +237,11 @@ async function pingJavaServer() {
 		await Promise.race([
 			client.labrinth.server_ping_internal.pingMinecraftJava({
 				address,
-				port,
+				// timeout on backend
+				timeout_ms: PING_TIMEOUT_MS
+				// port, // TODO remove
 			}),
+			// and timeout on frontend
 			new Promise((_, reject) =>
 				setTimeout(() => reject(new Error('Ping timed out')), PING_TIMEOUT_MS),
 			),
