@@ -315,7 +315,7 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
-import { finish_install, get, get_full_path, get_projects, kill, run } from '@/helpers/profile'
+import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { get_server_status } from '@/helpers/worlds'
@@ -348,7 +348,6 @@ const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
 const isServerInstance = ref(false)
-const hasContent = ref(true)
 const linkedProjectV3 = ref<Labrinth.Projects.v3.Project>()
 const modpackContentProjectV3 = ref<Labrinth.Projects.v3.Project | null>(null)
 const selected = ref<unknown[]>([])
@@ -364,7 +363,6 @@ async function fetchInstance() {
 	linkedProjectV3.value = undefined
 	modpackContentProjectV3.value = null
 	modrinthVersions.value = []
-	hasContent.value = true
 	ping.value = undefined
 
 	instance.value = await get(route.params.id as string).catch(handleError)
@@ -400,12 +398,10 @@ async function fetchInstance() {
 					}
 
 					await fetchModpackContent()
-					const projects = await get_projects(instance.value!.path).catch(() => ({}))
-					hasContent.value = Object.keys(projects).length > 0
 				}
 			}
-		} catch (error: Error) {
-			handleError(error)
+		} catch (error) {
+			handleError(error as Error)
 		}
 	}
 
