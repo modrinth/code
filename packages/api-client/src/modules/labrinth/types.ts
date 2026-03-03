@@ -821,7 +821,7 @@ export namespace Labrinth {
 		export namespace Internal {
 			export type MinecraftJavaPingRequest = {
 				address: string
-				port: number
+				timeout_ms?: number
 			}
 		}
 	}

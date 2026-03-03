@@ -32,6 +32,7 @@ mod tests {
             minecraft_server: Some(ServerProject {
                 max_players: None,
                 country: None,
+                region: None,
                 languages: vec![],
                 active_version: None,
             }),
