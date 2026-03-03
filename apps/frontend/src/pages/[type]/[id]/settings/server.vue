@@ -48,7 +48,7 @@
 						</label>
 					</div>
 					<div
-						class="mt-2 flex items-center gap-2"
+						class="mt-2 flex items-center gap-2 text-sm"
 						@focusout="
 							() => {
 								if (!lastPingAddressChanged && javaPingResult) return
@@ -59,7 +59,7 @@
 						<StyledInput
 							id="java-address"
 							v-model="javaAddress"
-							placeholder="E.g. play.modrinth.gg or play.modrinth.gg:25565"
+							placeholder="Enter address"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
 							autocomplete="off"
@@ -111,6 +111,17 @@
 							>.
 						</div>
 					</div>
+					<div v-else class="mt-2 text-sm">
+						If you have [SRV records]
+						<InfoIcon
+							v-tooltip="{
+								content:
+									'The address you enter here may have DNS SRV records _minecraft._tcp.{your domain} which point to your Minecraft server address and port.',
+								popperClass: 'max-w-xs',
+							}"
+						/>, you do not need to add a port. Otherwise if you have a port which isn't 25565, you
+						can include it as :12345
+					</div>
 				</div>
 
 				<!-- Bedrock Address -->
@@ -125,7 +136,7 @@
 						<StyledInput
 							id="bedrock-address"
 							v-model="bedrockAddress"
-							placeholder="E.g. play.modrinth.gg or play.modrinth.gg:19132"
+							placeholder="Enter address"
 							:disabled="!hasPermission"
 							wrapper-class="flex-grow"
 							autocomplete="off"
@@ -148,7 +159,7 @@
 </template>
 
 <script setup>
-import { RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
+import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
