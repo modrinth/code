@@ -120,12 +120,15 @@ pub fn app_setup(
             let redis_pool_ref = redis_pool_ref.clone();
             let search_config_ref = search_config_ref.clone();
             async move {
-                background_task::index_search(
+                if let Err(e) = background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
                     search_config_ref,
                 )
-                .await;
+                .await
+                {
+                    warn!("Local project indexing failed: {e:#}");
+                }
             }
         });
 
@@ -135,7 +138,11 @@ pub fn app_setup(
         scheduler.run(Duration::from_secs(60 * 5), move || {
             let pool_ref = pool_ref.clone();
             async move {
-                background_task::release_scheduled(pool_ref).await;
+                if let Err(e) =
+                    background_task::release_scheduled(pool_ref).await
+                {
+                    warn!("Syncing scheduled releases failed: {e:#}");
+                }
             }
         });
 
@@ -147,7 +154,9 @@ pub fn app_setup(
             let pool_ref = pool_ref.clone();
             let redis = redis_pool_ref.clone();
             async move {
-                update_versions(pool_ref, redis).await;
+                if let Err(e) = update_versions(pool_ref, redis).await {
+                    warn!("Version update failed: {e:#}");
+                }
             }
         });
 
@@ -159,7 +168,12 @@ pub fn app_setup(
             let client_ref = client_ref.clone();
             let redis_ref = redis_pool_ref.clone();
             async move {
-                background_task::payouts(pool_ref, client_ref, redis_ref).await;
+                if let Err(e) =
+                    background_task::payouts(pool_ref, client_ref, redis_ref)
+                        .await
+                {
+                    warn!("Payout task failed: {e:#}");
+                }
             }
         });
 

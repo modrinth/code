@@ -69,7 +69,10 @@ onUnmounted(() => {
 			<SpinnerIcon class="animate-spin w-4 h-4" />
 		</div>
 	</NavButton>
-	<div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-divider"></div>
+	<div
+		v-if="instances && recentInstances.length > 0"
+		class="h-px w-6 mx-auto my-2 bg-divider"
+	></div>
 </template>
 
 <style scoped lang="scss"></style>

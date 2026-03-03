@@ -1,5 +1,6 @@
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::queue::analytics::cache::cache_analytics;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::email::EmailQueue;
 use crate::queue::payouts::{
@@ -11,7 +12,8 @@ use crate::search::indexing::index_projects;
 use crate::util::anrok;
 use crate::{database, search};
 use clap::ValueEnum;
-use tracing::{error, info, warn};
+use eyre::WrapErr;
+use tracing::info;
 
 #[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq)]
 #[clap(rename_all = "kebab_case")]
@@ -25,6 +27,12 @@ pub enum BackgroundTask {
     IndexSubscriptions,
     Migrations,
     Mail,
+    /// Queries server project analytics (e.g. number of verified plays in last
+    /// 2 weeks for server projects) and caches them in Redis.
+    CacheAnalytics,
+    /// Attempts to ping Minecraft Java servers as if we were a client, to
+    /// collect info on if they're online, game version, description, etc.
+    PingMinecraftJavaServers,
 }
 
 impl BackgroundTask {
@@ -40,7 +48,7 @@ impl BackgroundTask {
         anrok_client: anrok::Client,
         email_queue: EmailQueue,
         mural_client: muralpay::Client,
-    ) {
+    ) -> eyre::Result<()> {
         use BackgroundTask::*;
         match self {
             Migrations => run_migrations().await,
@@ -62,7 +70,7 @@ impl BackgroundTask {
                 )
                 .await;
 
-                update_bank_balances(pool).await;
+                update_bank_balances(pool).await
             }
             IndexSubscriptions => {
                 index_subscriptions(
@@ -71,71 +79,69 @@ impl BackgroundTask {
                     stripe_client,
                     anrok_client,
                 )
-                .await
+                .await;
+                Ok(())
             }
-            Mail => {
-                run_email(email_queue).await;
+            Mail => run_email(email_queue).await,
+            CacheAnalytics => {
+                cache_analytics(&pool, &redis_pool, &clickhouse).await
+            }
+            PingMinecraftJavaServers => {
+                ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }
         }
     }
 }
 
-pub async fn run_email(email_queue: EmailQueue) {
+pub async fn run_email(email_queue: EmailQueue) -> eyre::Result<()> {
     // Only index for 5 emails at a time, to reduce transaction length,
     // for a total of 100 emails.
     for _ in 0..20 {
         let then = std::time::Instant::now();
 
-        match email_queue.index(5).await {
-            Ok(true) => {
-                info!(
-                    "Indexed email queue in {}ms",
-                    then.elapsed().as_millis()
-                );
-            }
-            Ok(false) => {
-                info!("No more emails to index");
-                break;
-            }
-            Err(error) => {
-                error!(%error, "Failed to index email queue");
-            }
+        let indexed = email_queue
+            .index(5)
+            .await
+            .wrap_err("failed to index email queue")?;
+        if indexed {
+            info!("Indexed email queue in {}ms", then.elapsed().as_millis());
+        } else {
+            info!("No more emails to index");
+            break;
         }
     }
+
+    Ok(())
 }
 
-pub async fn update_bank_balances(pool: PgPool) {
+pub async fn update_bank_balances(pool: PgPool) -> eyre::Result<()> {
     let payouts_queue = PayoutsQueue::new();
 
-    match insert_bank_balances_and_webhook(&payouts_queue, &pool).await {
-        Ok(_) => info!("Bank balances updated successfully"),
-        Err(error) => error!(%error, "Bank balances update failed"),
-    }
+    insert_bank_balances_and_webhook(&payouts_queue, &pool)
+        .await
+        .wrap_err("failed to update bank balances")?;
+    info!("Bank balances updated successfully");
+    Ok(())
 }
 
-pub async fn run_migrations() {
-    database::check_for_migrations()
-        .await
-        .expect("An error occurred while running migrations.");
+pub async fn run_migrations() -> eyre::Result<()> {
+    database::check_for_migrations().await?;
+    Ok(())
 }
 
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
     search_config: search::SearchConfig,
-) {
+) -> eyre::Result<()> {
     info!("Indexing local database");
-    let result = index_projects(ro_pool, redis_pool, &search_config).await;
-    if let Err(e) = result {
-        warn!("Local project indexing failed: {:?}", e);
-    }
-    info!("Done indexing local database");
+    index_projects(ro_pool, redis_pool, &search_config).await
 }
 
-pub async fn release_scheduled(pool: PgPool) {
+pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {
     info!("Releasing scheduled versions/projects!");
 
-    let projects_results = sqlx::query!(
+    sqlx::query!(
         "
         UPDATE mods
         SET status = requested_status
@@ -143,14 +149,11 @@ pub async fn release_scheduled(pool: PgPool) {
         ",
         crate::models::projects::ProjectStatus::Scheduled.as_str(),
     )
-        .execute(&pool)
-        .await;
+    .execute(&pool)
+    .await
+    .wrap_err("failed syncing scheduled releases for projects")?;
 
-    if let Err(e) = projects_results {
-        warn!("Syncing scheduled releases for projects failed: {:?}", e);
-    }
-
-    let versions_results = sqlx::query!(
+    sqlx::query!(
         "
         UPDATE versions
         SET status = requested_status
@@ -158,78 +161,96 @@ pub async fn release_scheduled(pool: PgPool) {
         ",
         crate::models::projects::VersionStatus::Scheduled.as_str(),
     )
-        .execute(&pool)
-        .await;
-
-    if let Err(e) = versions_results {
-        warn!("Syncing scheduled releases for versions failed: {:?}", e);
-    }
+    .execute(&pool)
+    .await
+    .wrap_err("failed syncing scheduled releases for versions")?;
 
     info!("Finished releasing scheduled versions/projects");
+    Ok(())
 }
 
-pub async fn update_versions(pool: PgPool, redis_pool: RedisPool) {
+pub async fn update_versions(
+    pool: PgPool,
+    redis_pool: RedisPool,
+) -> eyre::Result<()> {
     info!("Indexing game versions list from Mojang");
-    let result = version_updater::update_versions(&pool, &redis_pool).await;
-    if let Err(e) = result {
-        warn!("Version update failed: {}", e);
-    }
+    version_updater::update_versions(&pool, &redis_pool)
+        .await
+        .wrap_err("failed to update game versions")?;
     info!("Done indexing game versions");
+    Ok(())
 }
 
 pub async fn payouts(
     pool: PgPool,
     clickhouse: clickhouse::Client,
     redis_pool: RedisPool,
-) {
+) -> eyre::Result<()> {
     info!("Started running payouts");
-    let result = process_payout(&pool, &clickhouse).await;
-    if let Err(e) = result {
-        warn!("Payouts run failed: {e:#?}");
-    }
+    process_payout(&pool, &clickhouse)
+        .await
+        .wrap_err("payout processing failed")?;
 
-    let result = index_payouts_notifications(&pool, &redis_pool).await;
-    if let Err(e) = result {
-        warn!("Payouts notifications indexing failed: {e:#?}");
-    }
+    index_payouts_notifications(&pool, &redis_pool)
+        .await
+        .wrap_err("payout notifications indexing failed")?;
 
-    let result = process_affiliate_payouts(&pool).await;
-    if let Err(e) = result {
-        warn!("Affiliate payouts run failed: {e:#?}");
-    }
+    process_affiliate_payouts(&pool)
+        .await
+        .wrap_err("affiliate payouts processing failed")?;
 
-    let result = remove_payouts_for_refunded_charges(&pool).await;
-    if let Err(e) = result {
-        warn!("Removing affiliate payouts for refunded charges failed: {e:#?}");
-    }
+    remove_payouts_for_refunded_charges(&pool)
+        .await
+        .wrap_err("removing payouts for refunded charges failed")?;
 
     info!("Done running payouts");
+    Ok(())
 }
 
-pub async fn sync_payout_statuses(pool: PgPool, mural: muralpay::Client) {
+pub async fn sync_payout_statuses(
+    pool: PgPool,
+    mural: muralpay::Client,
+) -> eyre::Result<()> {
     // Mural sets a max limit of 100 for search payouts endpoint
     const LIMIT: u32 = 100;
 
     info!("Started syncing payout statuses");
 
-    let result = crate::queue::payouts::mural::sync_pending_payouts_from_mural(
+    crate::queue::payouts::mural::sync_pending_payouts_from_mural(
         &pool, &mural, LIMIT,
     )
-    .await;
-    if let Err(e) = result {
-        warn!("Failed to sync pending payouts from Mural: {e:?}");
-    }
+    .await
+    .wrap_err("failed to sync pending payouts from Mural")?;
 
-    let result =
-        crate::queue::payouts::mural::sync_failed_mural_payouts_to_labrinth(
-            &pool, &mural, LIMIT,
-        )
-        .await;
-    if let Err(e) = result {
-        warn!("Failed to sync failed Mural payouts to Labrinth: {e:?}");
-    }
+    crate::queue::payouts::mural::sync_failed_mural_payouts_to_labrinth(
+        &pool, &mural, LIMIT,
+    )
+    .await
+    .wrap_err("failed to sync failed Mural payouts to Labrinth")?;
 
     info!("Done syncing payout statuses");
+    Ok(())
+}
+
+pub async fn ping_minecraft_java_servers(
+    pool: PgPool,
+    redis_pool: RedisPool,
+    clickhouse: clickhouse::Client,
+) -> eyre::Result<()> {
+    info!("Started pinging Minecraft Java servers");
+
+    let server_ping_queue = crate::queue::server_ping::ServerPingQueue::new(
+        pool, redis_pool, clickhouse,
+    );
+
+    server_ping_queue
+        .ping_minecraft_java_servers()
+        .await
+        .wrap_err("failed to ping Minecraft Java servers")?;
+    info!("Successfully pinged Minecraft Java servers");
+
+    info!("Done pinging Minecraft Java servers");
+    Ok(())
 }
 
 mod version_updater {
