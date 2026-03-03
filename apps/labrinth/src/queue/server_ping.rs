@@ -256,8 +256,17 @@ pub async fn ping_server(
         .map(|duration| duration.min(default_duration))
         .unwrap_or(default_duration);
 
+    let (address, port) = match address.rsplit_once(':') {
+        Some((addr, port)) => {
+            let port = port.parse::<u16>().wrap_err("invalid port number")?;
+            (addr, port)
+        }
+        None => (address, 25565),
+    };
+
     let task = async move {
         let conn = async_minecraft_ping::ConnectionConfig::build(address)
+            .with_port(port)
             .with_srv_lookup()
             .connect()
             .await
