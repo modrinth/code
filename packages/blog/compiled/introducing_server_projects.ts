@@ -7,6 +7,6 @@ export const article = {
   slug: "introducing-server-projects",
   authors: ["AJfd8YH6","6EjnV9Uf","xSQqYYIN"],
   unlisted: false,
-  thumbnail: false,
+  thumbnail: true,
   
 };
