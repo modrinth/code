@@ -11,11 +11,12 @@ use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::globals::tax_compliance_payout_threshold;
 use crate::util::avalara1099;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
-use chrono::{DateTime, Datelike, Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use hex::ToHex;
 use hmac::{Hmac, Mac};
 use modrinth_util::decimal::Decimal2dp;
@@ -1114,32 +1115,6 @@ async fn update_compliance_status(
             compliance_api_check_failed,
         }))
     }
-}
-
-fn tax_compliance_payout_threshold() -> Option<Decimal> {
-    let globals = &crate::routes::internal::globals::GLOBALS;
-    let current_year = Utc::now().year() as u16;
-    let thresholds = &globals.tax_compliance_thresholds;
-
-    if thresholds.is_empty() {
-        return None;
-    }
-
-    let mut years: Vec<u16> = thresholds.keys().copied().collect();
-    years.sort();
-
-    let value = if current_year <= years[0] {
-        thresholds[&years[0]]
-    } else if current_year >= *years.last().unwrap() {
-        thresholds[years.last().unwrap()]
-    } else {
-        thresholds
-            .get(&current_year)
-            .copied()
-            .unwrap_or_else(|| thresholds[years.last().unwrap()])
-    };
-
-    Some(Decimal::from(value))
 }
 
 #[derive(Deserialize)]
