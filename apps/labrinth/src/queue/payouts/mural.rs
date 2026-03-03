@@ -352,13 +352,16 @@ pub async fn sync_failed_mural_payouts_to_labrinth(
 }
 
 fn payout_should_be_failed(payout: &muralpay::Payout) -> bool {
+    let muralpay::PayoutDetails::Fiat(b) = &payout.details else {
+        return false;
+    };
     matches!(
-        payout.details,
-        muralpay::PayoutDetails::Fiat(muralpay::FiatPayoutDetails {
+        **b,
+        muralpay::FiatPayoutDetails {
             fiat_payout_status: muralpay::FiatPayoutStatus::Failed { .. }
                 | muralpay::FiatPayoutStatus::Refunded { .. },
             ..
-        })
+        }
     )
 }
 
