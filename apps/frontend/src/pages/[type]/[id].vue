@@ -1188,7 +1188,7 @@ const serverProject = computed(() => ({
 	numPlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online,
 	icon: project.value.icon_url,
 	statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
-	region: projectV3.value?.minecraft_server?.country,
+	region: projectV3.value?.minecraft_server?.region,
 }))
 
 function handlePlayServerProject() {
@@ -2527,8 +2527,6 @@ const navLinks = computed(() => {
 		routeType === 'server'
 			? project.value.gallery.filter((item) => item.name === '__mc_server_banner__').length
 			: project.value.gallery.length
-
-	console.log('galleryCount', galleryCount, !!currentMember.value)
 
 	return [
 		{

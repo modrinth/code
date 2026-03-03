@@ -172,7 +172,6 @@ pub async fn init_client_with_database(
                 recorded DateTime64(4),
                 project_id UInt64,
                 address String,
-                port UInt16,
                 online Bool,
                 latency_ms Nullable(UInt32),
                 description Nullable(String),
@@ -214,6 +213,16 @@ pub async fn init_client_with_database(
             "
             ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
             ADD COLUMN IF NOT EXISTS minecraft_uuid UUID
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
+            DROP COLUMN IF EXISTS port
             "
         ))
         .execute()

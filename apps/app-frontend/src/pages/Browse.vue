@@ -666,6 +666,7 @@ previousFilterState.value = JSON.stringify({
 						'server_category_minecraft_server_meta',
 						'server_category_minecraft_server_community',
 						'server_game_version',
+						'server_status',
 					].includes(filterType.id)
 				"
 			>
@@ -810,7 +811,7 @@ previousFilterState.value = JSON.stringify({
 						:tags="project.categories"
 						:link="`/project/${project.slug ?? project.project_id}`"
 						:server-online-players="project.minecraft_java_server?.ping?.data?.players_online ?? 0"
-						:server-region-code="project.minecraft_server?.country"
+						:server-region="project.minecraft_server?.region"
 						:server-recent-plays="project.minecraft_java_server?.verified_plays_4w ?? 0"
 						:server-modpack-content="getServerModpackContent(project)"
 						:server-ping="serverPings[project.project_id]"

@@ -642,6 +642,7 @@ const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) =>
 							'server_category_minecraft_server_meta',
 							'server_category_minecraft_server_community',
 							'server_game_version',
+							'server_status',
 						].includes(filterType.id)
 					"
 				>
@@ -800,7 +801,7 @@ const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) =>
 								project.minecraft_java_server?.ping?.data?.players_online ?? 0
 							"
 							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
-							:server-region-code="project.minecraft_server?.country"
+							:server-region="project.minecraft_server?.region"
 							:server-status-online="!!project.minecraft_java_server?.ping?.data"
 							:server-modpack-content="getServerModpackContent(project)"
 							:layout="

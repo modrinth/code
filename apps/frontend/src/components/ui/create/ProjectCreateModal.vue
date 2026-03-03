@@ -417,11 +417,9 @@ async function createProject() {
 				},
 				minecraft_java_server: {
 					address: '',
-					port: 25565,
 				},
 				minecraft_bedrock_server: {
 					address: '',
-					port: 19132,
 				},
 			})
 			createdProjectId = result.id

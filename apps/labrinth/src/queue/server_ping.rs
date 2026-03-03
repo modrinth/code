@@ -15,7 +15,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
-use tracing::{Instrument, debug, info, info_span, trace, warn};
+use tracing::{Instrument, info, info_span, trace, warn};
 
 pub struct ServerPingQueue {
     pub db: PgPool,
@@ -44,17 +44,16 @@ impl ServerPingQueue {
         let pings = server_projects
             .into_iter()
             .map(|(project_id, java_server)| {
-                let address = java_server.address.to_string();
-                let port = java_server.port;
-                let span = info_span!("ping", %project_id, %address, %port);
+                let span = info_span!("ping", %project_id, address = %java_server.address);
 
                 let active_pings = active_pings.clone();
+                let address = java_server.address;
                 let task = async move {
                     let _permit = active_pings.acquire().await.expect("semaphore should not be closed now");
 
                     let mut retries = ENV.SERVER_PING_RETRIES;
                     let result = loop {
-                        match ping_server(&address, port, None).await {
+                        match ping_server(&address, None).await {
                             Ok(ping) => {
                                 info!(?ping, "Received successful ping");
                                 break Ok(ping);
@@ -73,8 +72,7 @@ impl ServerPingQueue {
 
                     (project_id, exp::minecraft::JavaServerPing {
                         when: Utc::now(),
-                        address: address.to_string(),
-                        port,
+                        address,
                         data: result.ok(),
                     })
                 };
@@ -108,7 +106,6 @@ impl ServerPingQueue {
                         / 100_000,
                     project_id: project_id.0,
                     address: ping.address.clone(),
-                    port: ping.port,
                     latency_ms: data.map(|d| d.latency.as_millis() as u32),
                     description: data.map(|d| d.description.clone()),
                     version_name: data.map(|d| d.version_name.clone()),
@@ -251,7 +248,6 @@ impl ServerPingQueue {
 
 pub async fn ping_server(
     address: &str,
-    port: u16,
     timeout: Option<Duration>,
 ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
     let start = Instant::now();
@@ -260,97 +256,45 @@ pub async fn ping_server(
         .map(|duration| duration.min(default_duration))
         .unwrap_or(default_duration);
 
-    let task_ep = async move {
-        fn map_component(c: elytra_ping::parse::TextComponent) -> String {
-            match c {
-                elytra_ping::parse::TextComponent::Plain(t) => t,
-                elytra_ping::parse::TextComponent::Fancy(t) => {
-                    t.text.unwrap_or_default()
-                }
-                elytra_ping::parse::TextComponent::Extra(e) => e
-                    .into_iter()
-                    .map(map_component)
-                    .collect::<Vec<String>>()
-                    .join(""),
-            }
+    let (address, port) = match address.rsplit_once(':') {
+        Some((addr, port)) => {
+            let port = port.parse::<u16>().wrap_err("invalid port number")?;
+            (addr, port)
         }
+        None => (address, 25565),
+    };
 
-        let (result, latency) =
-            elytra_ping::ping_or_timeout((address.to_string(), port), timeout)
-                .await?;
+    let task = async move {
+        let conn = async_minecraft_ping::ConnectionConfig::build(address)
+            .with_port(port)
+            .with_srv_lookup()
+            .connect()
+            .await
+            .wrap_err("failed to connect to server")?;
+
+        let status = conn
+            .status()
+            .await
+            .wrap_err("failed to get server status")?
+            .status;
 
         eyre::Ok(exp::minecraft::JavaServerPingData {
-            latency,
-            version_name: result
-                .version
-                .as_ref()
-                .map(|v| v.name.to_string())
-                .unwrap_or_default(),
-            version_protocol: result
-                .version
-                .as_ref()
-                .map(|v| v.protocol.cast_unsigned())
-                .unwrap_or_default(),
-            description: map_component(result.description),
-            players_online: result
-                .players
-                .as_ref()
-                .map(|p| p.online)
-                .unwrap_or(0),
-            players_max: result.players.as_ref().map(|p| p.max).unwrap_or(0),
+            latency: start.elapsed(),
+            version_name: status.version.name,
+            version_protocol: status.version.protocol,
+            description: match status.description {
+                ServerDescription::Plain(text)
+                | ServerDescription::Object { text } => text,
+            },
+            players_online: status.players.online,
+            players_max: status.players.max,
         })
     };
 
-    let task_amp = async move {
-        let task = async move {
-            let conn = async_minecraft_ping::ConnectionConfig::build(address)
-                .with_port(port)
-                .connect()
-                .await
-                .wrap_err("failed to connect to server")?;
-
-            let status = conn
-                .status()
-                .await
-                .wrap_err("failed to get server status")?
-                .status;
-
-            eyre::Ok(exp::minecraft::JavaServerPingData {
-                latency: start.elapsed(),
-                version_name: status.version.name,
-                version_protocol: status.version.protocol,
-                description: match status.description {
-                    ServerDescription::Plain(text)
-                    | ServerDescription::Object { text } => text,
-                },
-                players_online: status.players.online,
-                players_max: status.players.max,
-            })
-        };
-
-        tokio::time::timeout(timeout, task)
-            .await
-            .map_err(eyre::Error::new)
-            .flatten()
-    };
-
-    async move {
-        let (result_ep, result_amp) = (task_ep.await, task_amp.await);
-
-        let result_ep = result_ep
-            .inspect(|_| debug!("Successful ping with `elytra_ping`"))
-            .inspect_err(|err| {
-                debug!("Failed to ping with `elytra_ping`: {err:#}")
-            });
-        let result_amp = result_amp
-            .inspect(|_| debug!("Successful ping with `async_minecraft_ping`"))
-            .inspect_err(|err| {
-                debug!("Failed to ping with `async_minecraft_ping`: {err:#}")
-            });
-
-        result_ep.or(result_amp)
-    }
-    .await
+    tokio::time::timeout(timeout, task)
+        .await
+        .map_err(eyre::Error::new)
+        .flatten()
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -358,7 +302,6 @@ struct ServerPingRecord {
     recorded: i64,
     project_id: u64,
     address: String,
-    port: u16,
     latency_ms: Option<u32>,
     description: Option<String>,
     version_name: Option<String>,
@@ -373,19 +316,22 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        let _status = ping_server("mc.hypixel.net", 25565, None).await.unwrap();
+        let _status = ping_server("mc.hypixel.net", None).await.unwrap();
+    }
+
+    #[actix_rt::test]
+    async fn test_follow_srv_record() {
+        _ = ping_server("hypixel.net", None).await.unwrap();
     }
 
     #[actix_rt::test]
     async fn test_ping_server_invalid_address() {
-        _ = ping_server("invalid.invalid", 25565, None)
-            .await
-            .unwrap_err();
+        _ = ping_server("invalid.invalid", None).await.unwrap_err();
     }
 
     #[actix_rt::test]
     async fn test_ping_zero_timeout() {
-        _ = ping_server("hypixel.net", 25565, Some(Duration::ZERO))
+        _ = ping_server("mc.hypixel.net", Some(Duration::ZERO))
             .await
             .unwrap_err();
     }

@@ -408,9 +408,13 @@ export namespace Labrinth {
 
 			export interface MinecraftServer {
 				max_players?: number
-				country?: string
+				region?: string
 				active_version?: string | null
 				languages?: string[]
+				/**
+				 * deprecated, use region instead
+				 */
+				country?: string
 			}
 
 			export interface ModpackContent {
@@ -428,7 +432,6 @@ export namespace Labrinth {
 
 			export interface MinecraftJavaServer {
 				address?: string
-				port?: number
 				content?: ModpackContent | VanillaContent
 				verified_plays_4w?: number | null
 				verified_plays_2w?: number | null
@@ -437,7 +440,6 @@ export namespace Labrinth {
 
 			export interface MinecraftBedrockServer {
 				address?: string
-				port?: number
 			}
 
 			export interface CreateServerProjectRequest {
@@ -817,7 +819,7 @@ export namespace Labrinth {
 		export namespace Internal {
 			export type MinecraftJavaPingRequest = {
 				address: string
-				port: number
+				timeout_ms?: number
 			}
 		}
 	}

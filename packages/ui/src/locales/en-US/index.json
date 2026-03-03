@@ -992,9 +992,6 @@
   "project.server.ping.ms": {
     "defaultMessage": "{ping} ms"
   },
-  "project.server.region.alt": {
-    "defaultMessage": "Region: {regionCode}"
-  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
   },
