@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO payouts_values_notifications (date_available, user_id, notified)\n                 VALUES ($1, $2, FALSE)\n                 ON CONFLICT (date_available, user_id) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6678cd4c51771cfaae2be8021ba66908ea41a06ba858dc5b523aef6aae27b850"
+}
