@@ -11,6 +11,7 @@ import { article as creator_withdrawals_overhaul } from "./creator_withdrawals_o
 import { article as design_refresh } from "./design_refresh";
 import { article as download_adjustment } from "./download_adjustment";
 import { article as free_server_medal } from "./free_server_medal";
+import { article as introducing_server_projects } from "./introducing_server_projects";
 import { article as knossos_v2_1_0 } from "./knossos_v2_1_0";
 import { article as licensing_guide } from "./licensing_guide";
 import { article as modpack_changes } from "./modpack_changes";
@@ -25,7 +26,6 @@ import { article as plugins_resource_packs } from "./plugins_resource_packs";
 import { article as pride_campaign_2025 } from "./pride_campaign_2025";
 import { article as redesign } from "./redesign";
 import { article as russian_censorship } from "./russian_censorship";
-import { article as server_projects_available_now } from "./server_projects_available_now";
 import { article as skins_now_in_modrinth_app } from "./skins_now_in_modrinth_app";
 import { article as standing_by_our_values } from "./standing_by_our_values";
 import { article as standing_by_our_values_russian } from "./standing_by_our_values_russian";
@@ -48,6 +48,7 @@ export const articles = [
   design_refresh,
   download_adjustment,
   free_server_medal,
+  introducing_server_projects,
   knossos_v2_1_0,
   licensing_guide,
   modpack_changes,
@@ -62,7 +63,6 @@ export const articles = [
   pride_campaign_2025,
   redesign,
   russian_censorship,
-  server_projects_available_now,
   skins_now_in_modrinth_app,
   standing_by_our_values,
   standing_by_our_values_russian,
