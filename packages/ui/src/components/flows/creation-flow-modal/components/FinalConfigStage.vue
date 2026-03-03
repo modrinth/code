@@ -1,6 +1,9 @@
 <template>
 	<div class="space-y-6">
-		<div v-if="ctx.flowType !== 'server-onboarding' && ctx.flowType !== 'reset-server'" class="flex flex-col gap-2">
+		<div
+			v-if="ctx.flowType !== 'server-onboarding' && ctx.flowType !== 'reset-server'"
+			class="flex flex-col gap-2"
+		>
 			<span class="font-semibold text-contrast">World name</span>
 			<StyledInput v-model="worldName" placeholder="Enter world name" />
 		</div>

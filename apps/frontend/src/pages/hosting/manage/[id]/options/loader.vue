@@ -1,262 +1,269 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
-		<div v-if="!server || addonsQuery.isLoading.value" class="flex items-center justify-center py-12">
+		<div
+			v-if="!server || addonsQuery.isLoading.value"
+			class="flex items-center justify-center py-12"
+		>
 			<SpinnerIcon class="size-8 animate-spin text-secondary" />
 		</div>
 		<template v-else-if="isLinked">
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Installation info</span>
-					<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-						<div
-							v-for="row in installationInfo"
-							:key="row.label"
-							class="flex items-center justify-between"
-						>
-							<span class="text-primary">{{ row.label }}</span>
-							<span class="font-semibold text-contrast">{{ row.value }}</span>
-						</div>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Installed modpack</span>
-					<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
-						<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
-							<div
-								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
-							>
-								<Avatar
-									v-if="modpack.icon_url"
-									:src="modpack.icon_url"
-									:alt="modpack.title ?? 'Modpack'"
-									size="100%"
-									no-shadow
-								/>
-							</div>
-						</AutoLink>
-						<div class="flex flex-col gap-1">
-							<AutoLink
-								:to="`/project/${modpack.spec.project_id}`"
-								class="font-semibold text-contrast hover:underline"
-							>
-								{{ modpack.title ?? modpack.spec.project_id }}
-							</AutoLink>
-							<div class="flex items-center gap-2 text-sm text-secondary">
-								<AutoLink
-									v-if="modpack.owner"
-									:to="modpack.owner.type === 'organization' ? `/organization/${modpack.owner.id}` : `/user/${modpack.owner.id}`"
-									class="flex items-center gap-1.5 hover:underline"
-								>
-									<Avatar
-										:src="modpack.owner.icon_url"
-										:alt="modpack.owner.name"
-										size="1.25rem"
-										:circle="modpack.owner.type === 'user'"
-										no-shadow
-									/>
-									<span class="font-medium">{{ modpack.owner.name }}</span>
-								</AutoLink>
-								<template v-if="modpack.owner && modpack.version_number">
-									&middot;
-								</template>
-								<span v-if="modpack.version_number" class="font-medium">{{ modpack.version_number }}</span>
-							</div>
-						</div>
-					</div>
-					<div class="flex flex-wrap gap-2">
-						<ButtonStyled>
-							<button
-								class="!shadow-none"
-								:disabled="isInstalling"
-								@click="handleChangeModpackVersion"
-							>
-								<ArrowLeftRightIcon class="size-5" />
-								Change version
-							</button>
-						</ButtonStyled>
-						<ButtonStyled color="orange">
-							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
-								<HammerIcon class="size-5" />
-								Repair
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Linked instance</span>
-					<span class="text-primary">
-						Unlinking permanently disconnects this instance from the modpack project, allowing you
-						to change the loader and Minecraft version, but you won't receive future updates.
-					</span>
-					<div>
-						<ButtonStyled color="orange">
-							<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
-								<UnlinkIcon class="size-5" />
-								Unlink modpack
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Re-install modpack</span>
-					<span class="text-primary">
-						Re-installing the modpack resets the instance's content to its original state, removing
-						any mods or content you have added.
-					</span>
-					<div>
-						<ButtonStyled color="red">
-							<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
-								<DownloadIcon class="size-5" />
-								Re-install modpack
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Reset server</span>
-					<span class="text-primary">
-						Removes all data on your server, including your worlds, mods, and configuration files.
-						Backups will remain and can be restored.
-					</span>
-					<div>
-						<ButtonStyled color="red">
-							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
-								<RotateCounterClockwiseIcon class="size-5" />
-								Reset server
-							</button>
-						</ButtonStyled>
-					</div>
-				</div>
-			</template>
-
-			<template v-else>
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Installation info</span>
-
-					<div v-if="!isEditing" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-						<div
-							v-for="row in installationInfo"
-							:key="row.label"
-							class="flex items-center justify-between"
-						>
-							<span class="text-primary">{{ row.label }}</span>
-							<span class="font-semibold text-contrast">{{ row.value }}</span>
-						</div>
-					</div>
-
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Installation info</span>
+				<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
 					<div
-						v-else
-						class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+						v-for="row in installationInfo"
+						:key="row.label"
+						class="flex items-center justify-between"
 					>
-						<div class="flex flex-col gap-2.5">
-							<span class="font-semibold text-contrast">Platform</span>
-							<Chips v-model="selectedPlatform" :items="availablePlatforms" />
-						</div>
+						<span class="text-primary">{{ row.label }}</span>
+						<span class="font-semibold text-contrast">{{ row.value }}</span>
+					</div>
+				</div>
+			</div>
 
-						<div class="flex flex-col gap-2.5">
-							<span class="font-semibold text-contrast">Game version</span>
-							<Combobox
-								v-model="selectedGameVersion"
-								:options="gameVersionOptions"
-								searchable
-								sync-with-selection
-								placeholder="Select version"
-								search-placeholder="Search game version..."
-								:display-value="selectedGameVersion || 'Select version'"
-							>
-								<template v-if="hasSnapshots" #dropdown-footer>
-									<button
-										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
-										@mousedown.prevent
-										@click="showSnapshots = !showSnapshots"
-									>
-										<EyeOffIcon v-if="showSnapshots" class="size-4" />
-										<EyeIcon v-else class="size-4" />
-										{{ showSnapshots ? 'Hide snapshots' : 'Show all versions' }}
-									</button>
-								</template>
-							</Combobox>
-						</div>
-
-						<div v-if="selectedPlatform !== 'vanilla'" class="flex flex-col gap-2.5">
-							<span class="font-semibold text-contrast"> {{ formattedLoaderName }} version </span>
-							<Combobox
-								v-model="selectedLoaderVersion"
-								searchable
-								sync-with-selection
-								:placeholder="loaderVersionDisplayValue"
-								search-placeholder="Search version..."
-								:options="loaderVersionOptions"
-								:display-value="loaderVersionDisplayValue"
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Installed modpack</span>
+				<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
+					<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
+						<div
+							class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+						>
+							<Avatar
+								v-if="modpack.icon_url"
+								:src="modpack.icon_url"
+								:alt="modpack.title ?? 'Modpack'"
+								size="100%"
+								no-shadow
 							/>
 						</div>
-
-						<div class="flex flex-wrap gap-2">
-							<ButtonStyled color="brand">
-								<button
-									class="!shadow-none"
-									:disabled="!isValid || !hasChanges || isSaving"
-									@click="handleSave"
-								>
-									<SpinnerIcon v-if="isSaving" class="animate-spin" />
-									<SaveIcon v-else />
-									{{ isSaving ? 'Saving...' : 'Save' }}
-								</button>
-							</ButtonStyled>
-							<ButtonStyled type="outlined">
-								<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
-									<XIcon />
-									Cancel
-								</button>
-							</ButtonStyled>
+					</AutoLink>
+					<div class="flex flex-col gap-1">
+						<AutoLink
+							:to="`/project/${modpack.spec.project_id}`"
+							class="font-semibold text-contrast hover:underline"
+						>
+							{{ modpack.title ?? modpack.spec.project_id }}
+						</AutoLink>
+						<div class="flex items-center gap-2 text-sm text-secondary">
+							<AutoLink
+								v-if="modpack.owner"
+								:to="
+									modpack.owner.type === 'organization'
+										? `/organization/${modpack.owner.id}`
+										: `/user/${modpack.owner.id}`
+								"
+								class="flex items-center gap-1.5 hover:underline"
+							>
+								<Avatar
+									:src="modpack.owner.icon_url"
+									:alt="modpack.owner.name"
+									size="1.25rem"
+									:circle="modpack.owner.type === 'user'"
+									no-shadow
+								/>
+								<span class="font-medium">{{ modpack.owner.name }}</span>
+							</AutoLink>
+							<template v-if="modpack.owner && modpack.version_number"> &middot; </template>
+							<span v-if="modpack.version_number" class="font-medium">{{
+								modpack.version_number
+							}}</span>
 						</div>
 					</div>
 				</div>
+				<div class="flex flex-wrap gap-2">
+					<ButtonStyled>
+						<button
+							class="!shadow-none"
+							:disabled="isInstalling"
+							@click="handleChangeModpackVersion"
+						>
+							<ArrowLeftRightIcon class="size-5" />
+							Change version
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
+							<HammerIcon class="size-5" />
+							Repair
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
 
-				<template v-if="!isEditing">
-					<div class="flex items-start gap-2">
-						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
-						<span class="text-primary">
-							We don't recommend editing your installation settings after installing content. If you
-							want to edit them reset your server.
-						</span>
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Linked instance</span>
+				<span class="text-primary">
+					Unlinking permanently disconnects this instance from the modpack project, allowing you to
+					change the loader and Minecraft version, but you won't receive future updates.
+				</span>
+				<div>
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
+							<UnlinkIcon class="size-5" />
+							Unlink modpack
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Re-install modpack</span>
+				<span class="text-primary">
+					Re-installing the modpack resets the instance's content to its original state, removing
+					any mods or content you have added.
+				</span>
+				<div>
+					<ButtonStyled color="red">
+						<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
+							<DownloadIcon class="size-5" />
+							Re-install modpack
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Reset server</span>
+				<span class="text-primary">
+					Removes all data on your server, including your worlds, mods, and configuration files.
+					Backups will remain and can be restored.
+				</span>
+				<div>
+					<ButtonStyled color="red">
+						<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+							<RotateCounterClockwiseIcon class="size-5" />
+							Reset server
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</template>
+
+		<template v-else>
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Installation info</span>
+
+				<div v-if="!isEditing" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+					<div
+						v-for="row in installationInfo"
+						:key="row.label"
+						class="flex items-center justify-between"
+					>
+						<span class="text-primary">{{ row.label }}</span>
+						<span class="font-semibold text-contrast">{{ row.value }}</span>
+					</div>
+				</div>
+
+				<div
+					v-else
+					class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
+				>
+					<div class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast">Platform</span>
+						<Chips v-model="selectedPlatform" :items="availablePlatforms" />
+					</div>
+
+					<div class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast">Game version</span>
+						<Combobox
+							v-model="selectedGameVersion"
+							:options="gameVersionOptions"
+							searchable
+							sync-with-selection
+							placeholder="Select version"
+							search-placeholder="Search game version..."
+							:display-value="selectedGameVersion || 'Select version'"
+						>
+							<template v-if="hasSnapshots" #dropdown-footer>
+								<button
+									class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+									@mousedown.prevent
+									@click="showSnapshots = !showSnapshots"
+								>
+									<EyeOffIcon v-if="showSnapshots" class="size-4" />
+									<EyeIcon v-else class="size-4" />
+									{{ showSnapshots ? 'Hide snapshots' : 'Show all versions' }}
+								</button>
+							</template>
+						</Combobox>
+					</div>
+
+					<div v-if="selectedPlatform !== 'vanilla'" class="flex flex-col gap-2.5">
+						<span class="font-semibold text-contrast"> {{ formattedLoaderName }} version </span>
+						<Combobox
+							v-model="selectedLoaderVersion"
+							searchable
+							sync-with-selection
+							:placeholder="loaderVersionDisplayValue"
+							search-placeholder="Search version..."
+							:options="loaderVersionOptions"
+							:display-value="loaderVersionDisplayValue"
+						/>
 					</div>
 
 					<div class="flex flex-wrap gap-2">
-						<ButtonStyled color="orange">
-							<button class="!shadow-none" :disabled="isInstalling" @click="isEditing = true">
-								<PencilIcon class="size-5" />
-								Edit
+						<ButtonStyled color="brand">
+							<button
+								class="!shadow-none"
+								:disabled="!isValid || !hasChanges || isSaving"
+								@click="handleSave"
+							>
+								<SpinnerIcon v-if="isSaving" class="animate-spin" />
+								<SaveIcon v-else />
+								{{ isSaving ? 'Saving...' : 'Save' }}
 							</button>
 						</ButtonStyled>
-						<ButtonStyled>
-							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
-								Reset server
-								<ChevronRightIcon class="size-5" />
-							</button>
-						</ButtonStyled>
-					</div>
-				</template>
-
-				<div class="flex flex-col gap-2.5">
-					<span class="text-lg font-semibold text-contrast">Repair server</span>
-					<span class="text-primary">
-						Reinstalls the loader and Minecraft dependencies without deleting your content. This may
-						resolve issues if your server is not starting correctly.
-					</span>
-					<div>
-						<ButtonStyled color="orange">
-							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
-								<HammerIcon class="size-5" />
-								Repair
+						<ButtonStyled type="outlined">
+							<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
+								<XIcon />
+								Cancel
 							</button>
 						</ButtonStyled>
 					</div>
 				</div>
+			</div>
+
+			<template v-if="!isEditing">
+				<div class="flex items-start gap-2">
+					<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+					<span class="text-primary">
+						We don't recommend editing your installation settings after installing content. If you
+						want to edit them reset your server.
+					</span>
+				</div>
+
+				<div class="flex flex-wrap gap-2">
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isInstalling" @click="isEditing = true">
+							<PencilIcon class="size-5" />
+							Edit
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+							Reset server
+							<ChevronRightIcon class="size-5" />
+						</button>
+					</ButtonStyled>
+				</div>
 			</template>
+
+			<div class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Repair server</span>
+				<span class="text-primary">
+					Reinstalls the loader and Minecraft dependencies without deleting your content. This may
+					resolve issues if your server is not starting correctly.
+				</span>
+				<div>
+					<ButtonStyled color="orange">
+						<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
+							<HammerIcon class="size-5" />
+							Repair
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+		</template>
 	</div>
 	<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
 	<ServerSetupModal
@@ -337,7 +344,8 @@ const isEditing = ref(false)
 
 const addonsQuery = useQuery({
 	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
-	queryFn: () => client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
+	queryFn: () =>
+		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
 })
 
@@ -346,9 +354,10 @@ const isLinked = computed(() => !!modpack.value)
 
 const modpackVersionsQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpack.value?.spec.project_id]),
-	queryFn: () => client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
-		include_changelog: false,
-	}),
+	queryFn: () =>
+		client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+			include_changelog: false,
+		}),
 	enabled: computed(() => !!modpack.value?.spec.project_id),
 })
 
@@ -372,7 +381,6 @@ const installationInfo = computed(() => {
 	}
 	return rows
 })
-
 
 async function handleChangeModpackVersion() {
 	if (!modpack.value?.spec.project_id) return
@@ -499,8 +507,12 @@ const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
 
-const currentGameVersion = computed(() => addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '')
-const currentLoader = computed(() => addonsQuery.data.value?.modloader ?? server.value?.loader ?? '')
+const currentGameVersion = computed(
+	() => addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+)
+const currentLoader = computed(
+	() => addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
+)
 
 const availablePlatforms = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
 

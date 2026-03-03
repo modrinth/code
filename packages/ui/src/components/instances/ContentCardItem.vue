@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { DownloadIcon, MoreVerticalIcon, OrganizationIcon, TrashIcon, TriangleAlertIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	MoreVerticalIcon,
+	OrganizationIcon,
+	TrashIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 

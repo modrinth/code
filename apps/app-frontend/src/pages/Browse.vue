@@ -50,13 +50,14 @@ import {
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { get_server_status } from '@/helpers/worlds'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { injectServerInstall } from '@/providers/server-install'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const { installingServerProjects, playServerProject, showAddServerToInstanceModal } = injectServerInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
 
 const router = useRouter()
 const route = useRoute()
@@ -866,18 +867,12 @@ previousFilterState.value = JSON.stringify({
 								</ButtonStyled>
 								<ButtonStyled v-else color="brand" type="outlined">
 									<button
-										:disabled="
-											(installingServerProjects as string[]).includes(
-												project.project_id,
-											)
-										"
+										:disabled="(installingServerProjects as string[]).includes(project.project_id)"
 										@click="() => handlePlayServerProject(project.project_id)"
 									>
 										<PlayIcon />
 										{{
-											(installingServerProjects as string[]).includes(
-												project.project_id,
-											)
+											(installingServerProjects as string[]).includes(project.project_id)
 												? 'Installing...'
 												: 'Play'
 										}}

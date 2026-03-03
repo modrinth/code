@@ -197,7 +197,7 @@ export namespace Labrinth {
 				body: string
 				requested_status: v2.ProjectStatus
 				initial_versions: unknown[]
-				team_members: any[]
+				team_members: unknown[]
 				categories: string[]
 				client_side: string
 				server_side: string

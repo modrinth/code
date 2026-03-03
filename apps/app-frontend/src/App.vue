@@ -106,9 +106,9 @@ import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
+import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
-import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { useLoading, useTheming } from '@/store/state'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'

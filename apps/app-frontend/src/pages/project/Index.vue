@@ -72,11 +72,7 @@
 								@click="handleClickPlay"
 							>
 								<PlayIcon />
-								{{
-									data && installingServerProjects.includes(data.id)
-										? 'Installing...'
-										: 'Play'
-								}}
+								{{ data && installingServerProjects.includes(data.id) ? 'Installing...' : 'Play' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular type="transparent">
@@ -265,9 +261,9 @@ import {
 	list as listInstances,
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_server_status } from '@/helpers/worlds'
 import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
-import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
@@ -281,7 +277,8 @@ const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
-const { installingServerProjects, playServerProject, showAddServerToInstanceModal } = injectServerInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])

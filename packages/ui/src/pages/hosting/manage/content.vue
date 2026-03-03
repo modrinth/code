@@ -84,9 +84,10 @@ const modpackProjectId = computed(() => contentQuery.data.value?.modpack?.spec.p
 
 const modpackVersionsQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
-	queryFn: () => client.labrinth.versions_v2.getProjectVersions(modpackProjectId.value!, {
-		include_changelog: false,
-	}),
+	queryFn: () =>
+		client.labrinth.versions_v2.getProjectVersions(modpackProjectId.value!, {
+			include_changelog: false,
+		}),
 	enabled: computed(() => !!modpackProjectId.value),
 })
 
@@ -117,13 +118,18 @@ const modpack = computed<ContentModpackData | null>(() => {
 			date_published: mp.date_published ?? '',
 		} as ContentModpackCardVersion,
 		versionLink: `/project/${project?.slug ?? mp.spec.project_id}/version/${mp.spec.version_id}`,
-		owner: mp.owner ? {
-			id: mp.owner.id,
-			name: mp.owner.name,
-			avatar_url: mp.owner.icon_url ?? undefined,
-			type: mp.owner.type,
-			link: mp.owner.type === 'organization' ? `/organization/${mp.owner.id}` : `/user/${mp.owner.id}`,
-		} : undefined,
+		owner: mp.owner
+			? {
+					id: mp.owner.id,
+					name: mp.owner.name,
+					avatar_url: mp.owner.icon_url ?? undefined,
+					type: mp.owner.type,
+					link:
+						mp.owner.type === 'organization'
+							? `/organization/${mp.owner.id}`
+							: `/user/${mp.owner.id}`,
+				}
+			: undefined,
 		categories: (project?.display_categories ?? []).map((name) => ({
 			name,
 			icon: name,
@@ -446,7 +452,10 @@ async function handleModpackContentToggle(item: ContentItem) {
 		modpackAddons.value = modpackAddons.value.map((a) =>
 			a.filename === addon.filename ? { ...a, disabled: !addon.disabled } : a,
 		)
-		modpackContentModal.value?.updateItem(item.file_name, { enabled: !item.enabled, disabled: false })
+		modpackContentModal.value?.updateItem(item.file_name, {
+			enabled: !item.enabled,
+			disabled: false,
+		})
 	} catch {
 		modpackContentModal.value?.updateItem(item.file_name, { disabled: false })
 	}

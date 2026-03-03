@@ -620,12 +620,22 @@ useSeoMeta({
 			<ButtonStyled>
 				<button @click="navigateTo(serverBackUrl)">
 					<LeftArrowIcon />
-					{{ fromContext === 'onboarding' ? 'Back to setup' : fromContext === 'reset-server' ? 'Cancel reset' : 'Back to server' }}
+					{{
+						fromContext === 'onboarding'
+							? 'Back to setup'
+							: fromContext === 'reset-server'
+								? 'Cancel reset'
+								: 'Back to server'
+					}}
 				</button>
 			</ButtonStyled>
 		</div>
 		<h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
-			{{ fromContext === 'reset-server' ? 'Select modpack to install after reset' : 'Install content to server' }}
+			{{
+				fromContext === 'reset-server'
+					? 'Select modpack to install after reset'
+					: 'Install content to server'
+			}}
 		</h1>
 	</Teleport>
 

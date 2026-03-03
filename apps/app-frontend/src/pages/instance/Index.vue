@@ -323,8 +323,8 @@ import { finish_install, get, get_full_path, get_projects, kill, run } from '@/h
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { get_server_status } from '@/helpers/worlds'
-import { handleSevereError } from '@/store/error.js'
 import { injectServerInstall } from '@/providers/server-install'
+import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 
 dayjs.extend(duration)

@@ -1,4 +1,5 @@
 import { defineMessage } from '@modrinth/ui'
+
 import type { Nag, NagContext } from '../../types/nags'
 
 export const serverProjectsNags: Nag[] = [

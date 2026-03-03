@@ -10,10 +10,10 @@ import {
 	SpinnerIcon,
 } from '@modrinth/assets'
 import { formatProjectType } from '@modrinth/utils'
-import { isClientOnlyEnvironment } from '../../../composables/content/content-filtering'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
+import { isClientOnlyEnvironment } from '../../../composables/content/content-filtering'
 import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { commonMessages } from '../../../utils/common-messages'
 import Avatar from '../../base/Avatar.vue'

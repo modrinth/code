@@ -24,7 +24,10 @@ import { computed, ref } from 'vue'
 
 import { useBulkOperation } from '../../composables/content/bulk-operations'
 import { useChangingItems } from '../../composables/content/changing-items'
-import { isClientOnlyEnvironment, useContentFilters } from '../../composables/content/content-filtering'
+import {
+	isClientOnlyEnvironment,
+	useContentFilters,
+} from '../../composables/content/content-filtering'
 import { useContentSearch } from '../../composables/content/content-search'
 import { useContentSelection } from '../../composables/content/content-selection'
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -473,8 +476,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</template>
 					<span class="text-secondary">
 						{{ formatBytes(ctx.uploadState?.value?.uploadedBytes ?? 0) }}
-						/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }}
-						({{ Math.round(uploadOverallProgress * 100) }}%)
+						/ {{ formatBytes(ctx.uploadState?.value?.totalBytes ?? 0) }} ({{
+							Math.round(uploadOverallProgress * 100)
+						}}%)
 					</span>
 					<template #actions>
 						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
@@ -509,7 +513,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						<div class="flex gap-2">
 							<ButtonStyled color="brand">
 								<button
-									v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+									v-tooltip="
+										ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined
+									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 flex items-center gap-2"
 									@click="ctx.browse"
@@ -520,7 +526,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</ButtonStyled>
 							<ButtonStyled type="outlined">
 								<button
-									v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+									v-tooltip="
+										ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined
+									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 !border-button-bg !border-[1px]"
 									@click="ctx.uploadFiles"

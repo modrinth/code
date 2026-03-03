@@ -6,23 +6,19 @@ import type { Router } from 'vue-router'
 
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import { install_to_existing_profile } from '@/helpers/pack.js'
-import {
-	create,
-	edit,
-	edit_icon,
-	get,
-	install as installProfile,
-	list,
-} from '@/helpers/profile.js'
+import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
+import type { GameInstance } from '@/helpers/types'
 import {
 	add_server_to_profile,
 	edit_server_in_profile,
 	get_profile_worlds,
+	type ServerWorld,
 	start_join_server,
 } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error.js'
 import { getServerAddress } from '@/store/install.js'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ModalRef<TShow extends (...args: any[]) => void = () => void> {
 	show: TShow
 	hide: () => void
@@ -46,7 +42,7 @@ export interface ServerInstallContext {
 	) => void
 	setUpdateToPlayModal: (
 		ref: ModalRef<
-			(instance: any, activeVersionId: string | null, callback?: () => void) => void
+			(instance: GameInstance, activeVersionId: string | null, callback?: () => void) => void
 		>,
 	) => void
 	setAddServerToInstanceModal: (
@@ -75,7 +71,7 @@ export function createServerInstall(opts: {
 		) => void
 	> | null = null
 	let updateToPlayModalRef: ModalRef<
-		(instance: any, activeVersionId: string | null, callback?: () => void) => void
+		(instance: GameInstance, activeVersionId: string | null, callback?: () => void) => void
 	> | null = null
 	let addServerToInstanceModalRef: ModalRef<
 		(serverName: string, serverAddress: string) => void
@@ -88,9 +84,7 @@ export function createServerInstall(opts: {
 	}
 
 	function stopInstallingServer(projectId: string) {
-		installingServerProjects.value = installingServerProjects.value.filter(
-			(id) => id !== projectId,
-		)
+		installingServerProjects.value = installingServerProjects.value.filter((id) => id !== projectId)
 	}
 
 	function isServerInstalling(projectId: string) {
@@ -106,11 +100,10 @@ export function createServerInstall(opts: {
 		if (!profilePath || !serverAddress) return
 		try {
 			const worlds = await get_profile_worlds(profilePath)
+			const servers = worlds.filter((w): w is ServerWorld => w.type === 'server')
 
 			if (serverProjectId) {
-				const linkedWorld = worlds.find(
-					(w: any) => w.type === 'server' && w.linked_project_id === serverProjectId,
-				)
+				const linkedWorld = servers.find((w) => w.linked_project_id === serverProjectId)
 				if (linkedWorld) {
 					if (linkedWorld.address !== serverAddress || linkedWorld.name !== serverName) {
 						await edit_server_in_profile(
@@ -126,9 +119,7 @@ export function createServerInstall(opts: {
 				}
 			}
 
-			const existingServer = worlds.find(
-				(w: any) => w.type === 'server' && w.address === serverAddress,
-			)
+			const existingServer = servers.find((w) => w.address === serverAddress)
 			if (existingServer) {
 				if (serverProjectId || existingServer.name !== serverName) {
 					await edit_server_in_profile(
@@ -161,7 +152,7 @@ export function createServerInstall(opts: {
 
 	async function findInstalledInstance(projectId: string) {
 		const packs = await list()
-		return packs.find((pack: any) => pack.linked_data?.project_id === projectId) ?? null
+		return packs.find((pack) => pack.linked_data?.project_id === projectId) ?? null
 	}
 
 	async function createVanillaInstance(
@@ -188,14 +179,14 @@ export function createServerInstall(opts: {
 		return profilePath
 	}
 
-	async function updateVanillaGameVersion(instance: any, targetGameVersion: string) {
+	async function updateVanillaGameVersion(instance: GameInstance, targetGameVersion: string) {
 		if (instance.game_version === targetGameVersion) return
 
 		await edit(instance.path, { game_version: targetGameVersion })
 		await installProfile(instance.path, false)
 	}
 
-	function showModpackInstallSuccess(project: any, serverAddress: string | null) {
+	function showModpackInstallSuccess(project: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
 			title: 'Install complete',
 			text: `${project.name} is installed and ready to play.`,
@@ -218,15 +209,14 @@ export function createServerInstall(opts: {
 					: []),
 				{
 					label: 'Instance',
-					action: () =>
-						opts.router.push(`/instance/${encodeURIComponent(project.path)}`),
+					action: () => opts.router.push(`/instance/${encodeURIComponent(project.path)}`),
 				},
 			],
 			autoCloseMs: null,
 		})
 	}
 
-	function showUpdateSuccess(instance: any, serverAddress: string | null) {
+	function showUpdateSuccess(instance: GameInstance, serverAddress: string | null) {
 		opts.popupNotificationManager.addPopupNotification({
 			title: 'Update complete',
 			text: `${instance.name} has been updated and is ready to play.`,
@@ -238,8 +228,7 @@ export function createServerInstall(opts: {
 								label: 'Launch game',
 								action: async () => {
 									try {
-										if (serverAddress)
-											await start_join_server(instance.path, serverAddress)
+										if (serverAddress) await start_join_server(instance.path, serverAddress)
 									} catch (err) {
 										handleSevereError(err, { profilePath: instance.path })
 									}
@@ -250,8 +239,7 @@ export function createServerInstall(opts: {
 					: []),
 				{
 					label: 'Instance',
-					action: () =>
-						opts.router.push(`/instance/${encodeURIComponent(instance.path)}`),
+					action: () => opts.router.push(`/instance/${encodeURIComponent(instance.path)}`),
 				},
 			],
 			autoCloseMs: null,
@@ -350,11 +338,7 @@ export function createServerInstall(opts: {
 			if (installingServerProjects.value.includes(projectId)) return
 			startInstallingServer(projectId)
 			try {
-				const path = await createVanillaInstance(
-					project,
-					recommendedGameVersion,
-					serverAddress,
-				)
+				const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
 				if (path) {
 					instance = await get(path)
 					showModpackInstallSuccess(instance, serverAddress)
@@ -368,12 +352,7 @@ export function createServerInstall(opts: {
 			installToPlayModalRef?.show(projectV3, modpackVersionId, async () => {
 				const newInstance = await findInstalledInstance(project.id)
 				if (!newInstance) return
-				await syncServerAsWorld(
-					newInstance.path,
-					project.title,
-					serverAddress,
-					project.id,
-				)
+				await syncServerAsWorld(newInstance.path, project.title, serverAddress, project.id)
 				showModpackInstallSuccess(newInstance, serverAddress)
 			})
 			return
