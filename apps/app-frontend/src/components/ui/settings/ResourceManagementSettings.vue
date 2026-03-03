@@ -33,6 +33,7 @@ async function purgeCache() {
 		'user',
 		'team',
 		'organization',
+		'file',
 		'loader_manifest',
 		'minecraft_manifest',
 		'categories',
@@ -40,8 +41,10 @@ async function purgeCache() {
 		'loaders',
 		'game_versions',
 		'donation_platforms',
+		'file_hash',
 		'file_update',
 		'search_results',
+		'search_results_v3',
 	]).catch(handleError)
 }
 
