@@ -35,6 +35,7 @@ export async function create(
 	loaderVersion: string | null,
 	icon: string | null,
 	skipInstall: boolean,
+	linkedData?: { project_id: string; version_id: string; locked: boolean } | null,
 ): Promise<string> {
 	// Trim string name to avoid "Unable to find directory"
 	name = name.trim()
@@ -45,6 +46,7 @@ export async function create(
 		loaderVersion,
 		icon,
 		skipInstall,
+		linkedData,
 	})
 }
 
@@ -252,8 +254,8 @@ export async function get_pack_export_candidates(profilePath: string): Promise<s
 
 // Run Minecraft using a pathed profile
 // Returns PID of child
-export async function run(path: string): Promise<unknown> {
-	return await invoke('plugin:profile|profile_run', { path })
+export async function run(path: string, serverAddress: string | null = null): Promise<unknown> {
+	return await invoke('plugin:profile|profile_run', { path, serverAddress })
 }
 
 export async function kill(path: string): Promise<void> {

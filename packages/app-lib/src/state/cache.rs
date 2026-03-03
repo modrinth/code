@@ -19,6 +19,7 @@ const DEFAULT_ID: &str = "0";
 #[serde(rename_all = "snake_case")]
 pub enum CacheValueType {
     Project,
+    ProjectV3,
     Version,
     User,
     Team,
@@ -34,6 +35,7 @@ pub enum CacheValueType {
     FileHash,
     FileUpdate,
     SearchResults,
+    SearchResultsV3,
     ModpackFiles,
     /// Cached list of versions for a project (without changelogs for fast loading)
     ProjectVersions,
@@ -43,6 +45,7 @@ impl CacheValueType {
     pub fn as_str(&self) -> &'static str {
         match self {
             CacheValueType::Project => "project",
+            CacheValueType::ProjectV3 => "project_v3",
             CacheValueType::Version => "version",
             CacheValueType::User => "user",
             CacheValueType::Team => "team",
@@ -58,6 +61,7 @@ impl CacheValueType {
             CacheValueType::FileHash => "file_hash",
             CacheValueType::FileUpdate => "file_update",
             CacheValueType::SearchResults => "search_results",
+            CacheValueType::SearchResultsV3 => "search_results_v3",
             CacheValueType::ModpackFiles => "modpack_files",
             CacheValueType::ProjectVersions => "project_versions",
         }
@@ -66,6 +70,7 @@ impl CacheValueType {
     pub fn from_string(val: &str) -> CacheValueType {
         match val {
             "project" => CacheValueType::Project,
+            "project_v3" => CacheValueType::ProjectV3,
             "version" => CacheValueType::Version,
             "user" => CacheValueType::User,
             "team" => CacheValueType::Team,
@@ -81,6 +86,7 @@ impl CacheValueType {
             "file_hash" => CacheValueType::FileHash,
             "file_update" => CacheValueType::FileUpdate,
             "search_results" => CacheValueType::SearchResults,
+            "search_results_v3" => CacheValueType::SearchResultsV3,
             "modpack_files" => CacheValueType::ModpackFiles,
             "project_versions" => CacheValueType::ProjectVersions,
             _ => CacheValueType::Project,
@@ -112,6 +118,7 @@ impl CacheValueType {
     pub fn case_sensitive_alias(&self) -> Option<bool> {
         match self {
             CacheValueType::Project
+            | CacheValueType::ProjectV3
             | CacheValueType::User
             | CacheValueType::Organization => Some(false),
 
@@ -129,6 +136,7 @@ impl CacheValueType {
             | CacheValueType::LoaderManifest
             | CacheValueType::FileUpdate
             | CacheValueType::SearchResults
+            | CacheValueType::SearchResultsV3
             | CacheValueType::ModpackFiles
             | CacheValueType::ProjectVersions => None,
         }
@@ -155,6 +163,8 @@ pub struct CachedProjectVersions {
 pub enum CacheValue {
     Project(Project),
 
+    ProjectV3(ProjectV3),
+
     Version(Version),
 
     User(User),
@@ -177,6 +187,7 @@ pub enum CacheValue {
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
+    SearchResultsV3(SearchResultsV3),
     ModpackFiles(CachedModpackFiles),
     ProjectVersions(CachedProjectVersions),
 }
@@ -218,6 +229,23 @@ pub struct SearchEntry {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultsV3 {
+    pub search: String,
+    pub result: SearchResultV3,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultV3 {
+    pub hits: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub offset: u32,
+    #[serde(default)]
+    pub limit: u32,
+    #[serde(default)]
+    pub total_hits: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -290,6 +318,15 @@ pub struct Project {
     pub donation_urls: Option<Vec<DonationLink>>,
     pub gallery: Vec<GalleryItem>,
     pub color: Option<u32>,
+}
+
+/// Uses serde_json::Value for flexibility since the v3. properly typed in frontend
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ProjectV3 {
+    pub id: String,
+    pub slug: Option<String>,
+    #[serde(flatten)]
+    pub extra: serde_json::Value,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -466,6 +503,7 @@ impl CacheValue {
     pub fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
+            CacheValue::ProjectV3(_) => CacheValueType::ProjectV3,
             CacheValue::Version(_) => CacheValueType::Version,
             CacheValue::User(_) => CacheValueType::User,
             CacheValue::Team { .. } => CacheValueType::Team,
@@ -485,6 +523,7 @@ impl CacheValue {
             CacheValue::FileHash(_) => CacheValueType::FileHash,
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
             CacheValue::SearchResults(_) => CacheValueType::SearchResults,
+            CacheValue::SearchResultsV3(_) => CacheValueType::SearchResultsV3,
             CacheValue::ModpackFiles(_) => CacheValueType::ModpackFiles,
             CacheValue::ProjectVersions(_) => CacheValueType::ProjectVersions,
         }
@@ -493,6 +532,7 @@ impl CacheValue {
     fn get_key(&self) -> String {
         match self {
             CacheValue::Project(project) => project.id.clone(),
+            CacheValue::ProjectV3(project) => project.id.clone(),
             CacheValue::Version(version) => version.id.clone(),
             CacheValue::User(user) => user.id.clone(),
             CacheValue::Team(members) => members
@@ -527,6 +567,7 @@ impl CacheValue {
                 )
             }
             CacheValue::SearchResults(search) => search.search.clone(),
+            CacheValue::SearchResultsV3(search) => search.search.clone(),
             CacheValue::ModpackFiles(files) => files.version_id.clone(),
             CacheValue::ProjectVersions(pv) => pv.project_id.clone(),
         }
@@ -535,6 +576,7 @@ impl CacheValue {
     fn get_alias(&self) -> Option<String> {
         match self {
             CacheValue::Project(project) => project.slug.clone(),
+            CacheValue::ProjectV3(project) => project.slug.clone(),
             CacheValue::User(user) => Some(user.username.clone()),
             CacheValue::Organization(org) => Some(org.slug.clone()),
 
@@ -554,6 +596,7 @@ impl CacheValue {
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileUpdate(_)
             | CacheValue::SearchResults(_)
+            | CacheValue::SearchResultsV3(_)
             | CacheValue::ModpackFiles(_)
             | CacheValue::ProjectVersions(_) => None,
         }
@@ -655,6 +698,7 @@ macro_rules! impl_cache_method_singular {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
@@ -663,7 +707,8 @@ impl_cache_methods!(
     (LoaderManifest, CachedLoaderManifest),
     (FileHash, CachedFileHash),
     (FileUpdate, CachedFileUpdate),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 impl_cache_method_singular!(
@@ -986,6 +1031,14 @@ impl CachedEntry {
                     env!("MODRINTH_API_URL"),
                     "projects",
                     CacheValue::Project
+                )
+            }
+            CacheValueType::ProjectV3 => {
+                fetch_original_values!(
+                    ProjectV3,
+                    env!("MODRINTH_API_URL_V3"),
+                    "projects",
+                    CacheValue::ProjectV3
                 )
             }
             CacheValueType::Version => {
@@ -1495,6 +1548,48 @@ impl CachedEntry {
                 }
 
                 values
+            }
+            CacheValueType::SearchResultsV3 => {
+                let fetch_urls = keys
+                    .iter()
+                    .map(|x| {
+                        (
+                            x.key().to_string(),
+                            format!(
+                                "{}search{}",
+                                env!("MODRINTH_API_URL_V3"),
+                                x.key()
+                            ),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                futures::future::try_join_all(fetch_urls.iter().map(
+                    |(_, url)| {
+                        fetch_json(
+                            Method::GET,
+                            url,
+                            None,
+                            None,
+                            fetch_semaphore,
+                            pool,
+                        )
+                    },
+                ))
+                .await?
+                .into_iter()
+                .enumerate()
+                .map(|(index, result)| {
+                    (
+                        CacheValue::SearchResultsV3(SearchResultsV3 {
+                            search: fetch_urls[index].0.to_string(),
+                            result,
+                        })
+                        .get_entry(),
+                        true,
+                    )
+                })
+                .collect()
             }
         })
     }

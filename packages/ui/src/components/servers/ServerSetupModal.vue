@@ -8,6 +8,7 @@
 		:is-initial-setup="props.initialSetup"
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
+		:fade="props.initialSetup ? undefined : 'danger'"
 		@create="onFlowComplete"
 		@hide="$emit('hide')"
 		@browse-modpacks="$emit('browse-modpacks')"

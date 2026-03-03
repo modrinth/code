@@ -397,6 +397,14 @@ export const commonMessages = defineMessages({
 		id: 'project.follower-count-tooltip',
 		defaultMessage: '{count} {count, plural, one {followers} other {followers}}',
 	},
+	projectOnlinePlayerCount: {
+		id: 'project.online-player-count',
+		defaultMessage: '{count} {count, plural, one {online} other {online}}',
+	},
+	projectRecentPlays: {
+		id: 'project.recent-plays',
+		defaultMessage: '{count} {count, plural, one {recent play} other {recent plays}}',
+	},
 })
 
 export const formFieldLabels = defineMessages({
@@ -669,6 +677,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.analytics.title',
 		defaultMessage: 'Analytics',
 	},
+	content: {
+		id: 'project.settings.content.title',
+		defaultMessage: 'Content',
+	},
 	description: {
 		id: 'project.settings.description.title',
 		defaultMessage: 'Description',
@@ -712,6 +724,10 @@ export const commonProjectSettingsMessages = defineMessages({
 	upload: {
 		id: 'project.settings.upload.title',
 		defaultMessage: 'Upload',
+	},
+	server: {
+		id: 'project.settings.server.title',
+		defaultMessage: 'Server',
 	},
 	versions: {
 		id: 'project.settings.versions.title',

@@ -12,19 +12,23 @@ import { defineComponent, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
+import PopupNotificationPanel from '../src/components/nav/PopupNotificationPanel.vue'
 import {
 	buildLocaleMessages,
 	createMessageCompiler,
 	type CrowdinMessages,
 } from '../src/composables/i18n'
 import {
+	AbstractPopupNotificationManager,
 	AbstractWebNotificationManager,
 	I18N_INJECTION_KEY,
 	type I18nContext,
 	type NotificationPanelLocation,
+	type PopupNotification,
 	provideFilePicker,
 	provideModrinthClient,
 	provideNotificationManager,
+	providePopupNotificationManager,
 	provideTags,
 	type WebNotification,
 } from '../src/providers'
@@ -82,6 +86,29 @@ class StorybookNotificationManager extends AbstractWebNotificationManager {
 	}
 }
 
+class StorybookPopupNotificationManager extends AbstractPopupNotificationManager {
+	private readonly state = ref<PopupNotification[]>([])
+
+	public getNotifications(): PopupNotification[] {
+		return this.state.value
+	}
+
+	protected addNotificationToStorage(notification: PopupNotification): void {
+		this.state.value.push(notification)
+	}
+
+	protected removeNotificationFromStorage(id: string | number): void {
+		const index = this.state.value.findIndex((n) => n.id === id)
+		if (index > -1) {
+			this.state.value.splice(index, 1)
+		}
+	}
+
+	protected clearAllNotificationsFromStorage(): void {
+		this.state.value.splice(0)
+	}
+}
+
 setup((app) => {
 	app.use(i18n)
 
@@ -121,6 +148,7 @@ setup((app) => {
 const StorybookProvider = defineComponent({
 	setup(_, { slots }) {
 		provideNotificationManager(new StorybookNotificationManager())
+		providePopupNotificationManager(new StorybookPopupNotificationManager())
 
 		const modrinthClient = new GenericModrinthClient({
 			userAgent: 'modrinth-storybook/1.0.0',
@@ -167,10 +195,11 @@ const preview: Preview = {
 			defaultTheme: 'dark',
 		}),
 		(story) => ({
-			components: { story, StorybookProvider, NotificationPanel },
+			components: { story, StorybookProvider, NotificationPanel, PopupNotificationPanel },
 			template: /*html*/ `
 				<StorybookProvider>
 					<NotificationPanel />
+					<PopupNotificationPanel />
 					<story />
 				</StorybookProvider>
 			`,

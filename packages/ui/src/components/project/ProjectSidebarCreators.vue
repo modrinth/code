@@ -29,9 +29,7 @@
 			>
 				<Avatar :src="member.user.avatar_url" :alt="member.user.username" size="32px" circle />
 				<div class="flex flex-col">
-					<span
-						class="grid grid-cols-[1fr_auto] w-full flex-nowrap items-center gap-1 group-hover:underline"
-					>
+					<span class="flex w-full flex-nowrap items-center gap-1 group-hover:underline">
 						<span class="min-w-0 overflow-hidden truncate">{{ member.user.username }}</span>
 						<CrownIcon
 							v-if="member.is_owner"
@@ -86,7 +84,9 @@ const props = defineProps<{
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
 const sortedMembers = computed(() => {
-	const acceptedMembers = props.members.filter((x) => x.accepted === undefined || x.accepted)
+	const acceptedMembers = (props.members ?? []).filter(
+		(x) => x.accepted === undefined || x.accepted,
+	)
 	const owner = acceptedMembers.find((x) =>
 		props.organization
 			? props.organization.members.some(

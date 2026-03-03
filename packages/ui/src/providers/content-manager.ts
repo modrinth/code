@@ -46,6 +46,8 @@ export interface ContentManagerContext {
 
 	// Guards
 	isBusy: Ref<boolean> | ComputedRef<boolean>
+	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
+	disableAddContentTooltip?: string
 
 	// Identity & labelling
 	getItemId: (item: ContentItem) => string

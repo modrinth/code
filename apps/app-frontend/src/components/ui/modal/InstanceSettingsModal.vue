@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	CodeIcon,
@@ -17,7 +18,7 @@ import {
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
@@ -25,6 +26,7 @@ import InstallationSettings from '@/components/ui/instance_settings/Installation
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info } from '@/helpers/profile'
 
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
@@ -33,7 +35,26 @@ const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()
 
-const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
+const isMinecraftServer = ref(false)
+
+watch(
+	() => props.instance,
+	(instance) => {
+		isMinecraftServer.value = false
+		if (instance.linked_data?.project_id) {
+			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
+				.then((project: Labrinth.Projects.v3.Project | undefined) => {
+					if (project?.minecraft_server != null) {
+						isMinecraftServer.value = true
+					}
+				})
+				.catch(() => {})
+		}
+	},
+	{ immediate: true },
+)
+
+const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 	{
 		name: defineMessage({
 			id: 'instance.settings.tabs.general',
@@ -74,7 +95,7 @@ const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
 		icon: CodeIcon,
 		content: HooksSettings,
 	},
-]
+])
 
 const queryClient = useQueryClient()
 const modal = ref()
@@ -107,6 +128,10 @@ defineExpose({ show })
 			</span>
 		</template>
 
-		<TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props }))" />
+		<TabbedModal
+			:tabs="
+				tabs.map((tab) => ({ ...tab, props: { ...props, isMinecraftServer: isMinecraftServer } }))
+			"
+		/>
 	</ModalWrapper>
 </template>

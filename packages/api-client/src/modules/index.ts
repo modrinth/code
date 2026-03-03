@@ -12,8 +12,10 @@ import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
+import { LabrinthServerPingInternalModule } from './labrinth/server-ping/internal'
 import { LabrinthStateModule } from './labrinth/state'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
+import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
 import { LauncherMetaManifestV0Module } from './launcher-meta/v0'
 import { PaperVersionsV3Module } from './paper/v3'
 import { PurpurVersionsV2Module } from './purpur/v2'
@@ -42,8 +44,10 @@ export const MODULE_REGISTRY = {
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
+	labrinth_server_ping_internal: LabrinthServerPingInternalModule,
 	labrinth_state: LabrinthStateModule,
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
+	labrinth_threads_v3: LabrinthThreadsV3Module,
 	labrinth_versions_v2: LabrinthVersionsV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 	paper_versions_v3: PaperVersionsV3Module,

@@ -469,6 +469,15 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.unlink.button',
 		defaultMessage: 'Unlink modpack',
 	},
+	unlinkServerDescription: {
+		id: 'instance.settings.tabs.installation.unlink-server.description',
+		defaultMessage:
+			"Unlinking permanently disconnects this instance from the server project. You won't receive future server updates, and server information like player count won't be shown.",
+	},
+	unlinkServerButton: {
+		id: 'instance.settings.tabs.installation.unlink-server.button',
+		defaultMessage: 'Unlink server',
+	},
 	reinstallModpackTitle: {
 		id: 'instance.settings.tabs.installation.reinstall.title',
 		defaultMessage: 'Re-install modpack',
@@ -566,7 +575,7 @@ const messages = defineMessages({
 					</div>
 				</div>
 				<div class="flex flex-wrap gap-2">
-					<ButtonStyled>
+					<ButtonStyled v-if="!props.isMinecraftServer">
 						<button class="!shadow-none" :disabled="isBusy" @click="handleModpackUpdate">
 							<ArrowLeftRightIcon class="size-5" />
 							{{ formatMessage(messages.changeVersionButton) }}
@@ -608,19 +617,29 @@ const messages = defineMessages({
 					{{ formatMessage(messages.linkedInstanceTitle) }}
 				</span>
 				<span class="text-primary">
-					{{ formatMessage(messages.unlinkDescription) }}
+					{{
+						formatMessage(
+							props.isMinecraftServer
+								? messages.unlinkServerDescription
+								: messages.unlinkDescription,
+						)
+					}}
 				</span>
 				<div>
 					<ButtonStyled color="orange">
 						<button class="!shadow-none" :disabled="isBusy" @click="confirmUnlinkModal?.show()">
 							<UnlinkIcon class="size-5" />
-							{{ formatMessage(messages.unlinkButton) }}
+							{{
+								formatMessage(
+									props.isMinecraftServer ? messages.unlinkServerButton : messages.unlinkButton,
+								)
+							}}
 						</button>
 					</ButtonStyled>
 				</div>
 			</div>
 
-			<div class="flex flex-col gap-2.5">
+			<div v-if="!props.isMinecraftServer" class="flex flex-col gap-2.5">
 				<span class="text-lg font-semibold text-contrast">
 					{{ formatMessage(messages.reinstallModpackTitle) }}
 				</span>

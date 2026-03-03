@@ -7,6 +7,7 @@ import {
 	ImageIcon,
 	InfoIcon,
 	LinkIcon,
+	ServerIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -36,6 +37,8 @@ const {
 
 const flags = useFeatureFlags()
 
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
 const navItems = computed(() => {
 	const base = `${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
 
@@ -57,25 +60,35 @@ const navItems = computed(() => {
 					icon: InfoIcon,
 				}
 			: null,
+		isServerProject.value && {
+			link: `/${base}/settings/server`,
+			label: formatMessage(commonProjectSettingsMessages.server),
+			icon: ServerIcon,
+		},
 		{
 			link: `/${base}/settings/tags`,
 			label: formatMessage(commonProjectSettingsMessages.tags),
 			icon: TagsIcon,
 		},
-		{
+		!isServerProject.value && {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
 		},
-		{
+		!isServerProject.value && {
 			link: `/${base}/settings/versions`,
 			label: formatMessage(commonProjectSettingsMessages.versions),
 			icon: VersionIcon,
 		},
-		{
+		!isServerProject.value && {
 			link: `/${base}/settings/license`,
 			label: formatMessage(commonProjectSettingsMessages.license),
 			icon: BookTextIcon,
+		},
+		isServerProject.value && {
+			link: `/${base}/settings/description`,
+			label: formatMessage(commonProjectSettingsMessages.description),
+			icon: AlignLeftIcon,
 		},
 		{
 			link: `/${base}/settings/gallery`,
@@ -92,13 +105,13 @@ const navItems = computed(() => {
 			label: formatMessage(commonProjectSettingsMessages.members),
 			icon: UsersIcon,
 		},
-		{
+		!isServerProject.value && {
 			link: `/${base}/settings/analytics`,
 			label: formatMessage(commonProjectSettingsMessages.analytics),
 			icon: ChartIcon,
 		},
-		{ type: 'heading', label: 'moderation', shown: showEnvironment },
-		{
+		!isServerProject.value && { type: 'heading', label: 'moderation', shown: showEnvironment },
+		!isServerProject.value && {
 			link: `/${base}/settings/environment`,
 			label: formatMessage(commonProjectSettingsMessages.environment),
 			icon: GlobeIcon,
@@ -125,14 +138,16 @@ watch(route, () => {
 	<div class="mb-8 flex w-full flex-col gap-4">
 		<ModerationProjectNags
 			v-if="
-				(currentMember && project.status === 'draft') ||
-				tags.rejectedStatuses.includes(project.status)
+				projectV3 &&
+				((currentMember && project.status === 'draft') ||
+					tags.rejectedStatuses.includes(project.status))
 			"
 			:project="project"
-			:versions="versions"
+			:project-v3="projectV3"
+			:versions="versions ?? undefined"
 			:current-member="currentMember"
 			:collapsed="collapsedChecklist"
-			:route-name="route.name"
+			:route-name="route.name as string"
 			:tags="tags"
 			@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
 			@set-processing="setProcessing"

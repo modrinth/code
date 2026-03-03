@@ -7,6 +7,7 @@
 		:closable="true"
 		:close-on-click-outside="closeOnClickOutside"
 		:width="resolvedMaxWidth"
+		:fade="fade"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
@@ -74,6 +75,7 @@
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
 						class="!border-surface-5 !shadow-none"
+						:class="leftButtonConfig.buttonClass"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"
 					>
@@ -84,6 +86,7 @@
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
 					<button
 						class="!shadow-none"
+						:class="rightButtonConfig.buttonClass"
 						:disabled="rightButtonConfig.disabled || rightButtonConfig.loading"
 						@click="rightButtonConfig.onClick"
 					>
@@ -127,6 +130,7 @@ export interface StageButtonConfig {
 	disabled?: boolean
 	loading?: boolean
 	iconClass?: string | null
+	buttonClass?: string | null
 	onClick?: () => void
 }
 
@@ -138,6 +142,7 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
+	// Determines whether this stage shows the progress bar
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	disableClose?: MaybeCtxFn<T, boolean>
@@ -159,6 +164,7 @@ const props = withDefaults(
 		context: T
 		breadcrumbs?: boolean
 		fitContent?: boolean
+		fade?: 'standard' | 'warning' | 'danger'
 		disableProgress?: boolean
 		closeOnClickOutside?: boolean
 	}>(),

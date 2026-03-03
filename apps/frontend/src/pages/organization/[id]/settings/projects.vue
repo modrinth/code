@@ -159,7 +159,7 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">Projects</h2>
 				<div class="input-group">
-					<button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
+					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
 						<PlusIcon />
 						{{ formatMessage(commonMessages.createAProjectButton) }}
 					</button>

@@ -661,7 +661,7 @@ useSeoMeta({
 					</button>
 				</ButtonStyled>
 			</div>
-				<div
+			<div
 				v-if="serverData && projectType?.id !== 'modpack'"
 				class="card-shadow rounded-2xl bg-bg-raised p-4"
 			>

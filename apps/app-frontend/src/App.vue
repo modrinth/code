@@ -38,15 +38,17 @@ import {
 	NewsArticleCard,
 	NotificationPanel,
 	OverflowMenu,
+	PopupNotificationPanel,
 	ProgressSpinner,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
+	providePopupNotificationManager,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
+import { formatBytes, renderString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
@@ -64,18 +66,19 @@ import AccountsCard from '@/components/ui/AccountsCard.vue'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
+import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
+import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import UpdateAvailableToast from '@/components/ui/UpdateAvailableToast.vue'
-import UpdateToast from '@/components/ui/UpdateToast.vue'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -105,17 +108,23 @@ import {
 } from '@/providers/download-progress.ts'
 import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
+import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { useLoading, useTheming } from '@/store/state'
 
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
+import { AppPopupNotificationManager } from './providers/app-popup-notifications'
 
 const themeStore = useTheming()
 
 const notificationManager = new AppNotificationManager()
 provideNotificationManager(notificationManager)
 const { handleError, addNotification } = notificationManager
+
+const popupNotificationManager = new AppPopupNotificationManager()
+providePopupNotificationManager(popupNotificationManager)
+const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
@@ -421,9 +430,20 @@ const {
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
 } = contentInstall
 
+const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
+provideServerInstall(serverInstall)
+const {
+	setInstallToPlayModal: setServerInstallToPlayModal,
+	setUpdateToPlayModal: setServerUpdateToPlayModal,
+	setAddServerToInstanceModal: setServerAddServerToInstanceModal,
+} = serverInstall
+
 const modInstallModal = ref()
+const addServerToInstanceModal = ref()
 const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
+const installToPlayModal = ref()
+const updateToPlayModal = ref()
 
 const credentials = ref()
 
@@ -432,7 +452,7 @@ const modrinthLoginFlowWaitModal = ref()
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
 	if (creds && creds.user_id) {
-		creds.user = await get_user(creds.user_id).catch(handleError)
+		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
 	}
 	credentials.value = creds ?? null
 }
@@ -502,6 +522,9 @@ onMounted(() => {
 	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
 	setContentInstallConfirmModal(installConfirmModal.value)
 	setContentInstallModal(modInstallModal.value)
+	setServerAddServerToInstanceModal(addServerToInstanceModal.value)
+	setServerInstallToPlayModal(installToPlayModal.value)
+	setServerUpdateToPlayModal(updateToPlayModal.value)
 })
 
 const accounts = ref(null)
@@ -519,6 +542,9 @@ async function handleCommand(e) {
 				source: 'CreationModalFileDrop',
 			})
 		}
+	} else if (e.event === 'InstallServer') {
+		await router.push(`/project/${e.id}`)
+		await playServerProject(e.id).catch(handleError)
 	} else {
 		// Other commands are URL-based (deep linking)
 		urlModal.value.show(e)
@@ -537,14 +563,60 @@ const downloadPercent = computed(() => Math.trunc(appUpdateDownload.progress.val
 const metered = ref(true)
 const finishedDownloading = ref(false)
 const restarting = ref(false)
-const updateToastDismissed = ref(false)
 const availableUpdate = ref(null)
 const updateSize = ref(null)
 const updatesEnabled = ref(true)
+
+const updatePopupMessages = defineMessages({
+	updateAvailable: {
+		id: 'app.update-popup.title',
+		defaultMessage: 'Update available',
+	},
+	downloadComplete: {
+		id: 'app.update-popup.download-complete',
+		defaultMessage: 'Download complete',
+	},
+	body: {
+		id: 'app.update-popup.body',
+		defaultMessage:
+			'Modrinth App v{version} is ready to install! Reload to update now, or automatically when you close Modrinth App.',
+	},
+	meteredBody: {
+		id: 'app.update-popup.body.metered',
+		defaultMessage: `Modrinth App v{version} is available now! Since you're on a metered network, we didn't automatically download it.`,
+	},
+	downloadedBody: {
+		id: 'app.update-popup.body.download-complete',
+		defaultMessage: `Modrinth App v{version} has finished downloading. Reload to update now, or automatically when you close Modrinth App.`,
+	},
+	linuxBody: {
+		id: 'app.update-popup.body.linux',
+		defaultMessage:
+			'Modrinth App v{version} is available. Use your package manager to update for the latest features and fixes!',
+	},
+	reload: {
+		id: 'app.update-popup.reload',
+		defaultMessage: 'Reload',
+	},
+	download: {
+		id: 'app.update-popup.download',
+		defaultMessage: 'Download ({size})',
+	},
+	changelog: {
+		id: 'app.update-popup.changelog',
+		defaultMessage: 'Changelog',
+	},
+})
+
 async function checkUpdates() {
 	if (!(await areUpdatesEnabled())) {
 		console.log('Skipping update check as updates are disabled in this build or environment')
 		updatesEnabled.value = false
+
+		if (os.value === 'Linux' && !isDevEnvironment.value) {
+			checkLinuxUpdates()
+			setInterval(checkLinuxUpdates, 5 * 60 * 1000)
+		}
 		return
 	}
 
@@ -564,7 +636,6 @@ async function checkUpdates() {
 
 		appUpdateDownload.progress.value = 0
 		finishedDownloading.value = false
-		updateToastDismissed.value = false
 
 		console.log(`Update ${update.version} is available.`)
 
@@ -574,6 +645,28 @@ async function checkUpdates() {
 			downloadUpdate(update)
 		} else {
 			console.log(`Metered connection detected, not auto-downloading update.`)
+			getUpdateSize(update.rid).then((size) => {
+				updateSize.value = size
+				addPopupNotification({
+					title: formatMessage(updatePopupMessages.updateAvailable),
+					text: formatMessage(updatePopupMessages.meteredBody, { version: update.version }),
+					type: 'info',
+					autoCloseMs: null,
+					buttons: [
+						{
+							label: formatMessage(updatePopupMessages.download, {
+								size: formatBytes(updateSize.value ?? 0),
+							}),
+							action: () => downloadAvailableUpdate(),
+							color: 'brand',
+						},
+						{
+							label: formatMessage(updatePopupMessages.changelog),
+							action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+						},
+					],
+				})
+			})
 		}
 
 		getUpdateSize(update.rid).then((size) => (updateSize.value = size))
@@ -590,8 +683,26 @@ async function checkUpdates() {
 	)
 }
 
-async function showUpdateToast() {
-	updateToastDismissed.value = false
+async function checkLinuxUpdates() {
+	try {
+		const [response, currentVersion] = await Promise.all([
+			fetch('https://launcher-files.modrinth.com/updates.json'),
+			getVersion(),
+		])
+		const updates = await response.json()
+		const latestVersion = updates?.version
+
+		if (latestVersion && latestVersion !== currentVersion) {
+			addPopupNotification({
+				title: formatMessage(updatePopupMessages.updateAvailable),
+				text: formatMessage(updatePopupMessages.linuxBody, { version: latestVersion }),
+				type: 'info',
+				autoCloseMs: null,
+			})
+		}
+	} catch (e) {
+		console.error('Failed to check for updates:', e)
+	}
 }
 
 async function downloadAvailableUpdate() {
@@ -617,6 +728,26 @@ async function downloadUpdate(versionToDownload) {
 				unlistenUpdateDownload = null
 			})
 			console.log('Finished downloading!')
+
+			addPopupNotification({
+				title: formatMessage(updatePopupMessages.downloadComplete),
+				text: formatMessage(updatePopupMessages.downloadedBody, {
+					version: versionToDownload.version,
+				}),
+				type: 'success',
+				autoCloseMs: null,
+				buttons: [
+					{
+						label: formatMessage(updatePopupMessages.reload),
+						action: () => installUpdate(),
+						color: 'brand',
+					},
+					{
+						label: formatMessage(updatePopupMessages.changelog),
+						action: () => openUrl('https://modrinth.com/news/changelog?filter=app'),
+					},
+				],
+			})
 		})
 		unlistenUpdateDownload = await subscribeToDownloadProgress(
 			appUpdateDownload,
@@ -790,25 +921,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		class="app-grid-layout experimental-styles-within relative"
 		:class="{ 'disable-advanced-rendering': !themeStore.advancedRendering }"
 	>
-		<Suspense>
-			<Transition name="toast">
-				<UpdateToast
-					v-if="
-						!!availableUpdate &&
-						!updateToastDismissed &&
-						!restarting &&
-						(finishedDownloading || metered)
-					"
-					:version="availableUpdate.version"
-					:size="updateSize"
-					:metered="metered"
-					@close="updateToastDismissed = true"
-					@restart="installUpdate"
-					@download="downloadAvailableUpdate"
-				/>
-				<UpdateAvailableToast v-else-if="!updatesEnabled && os === 'Linux' && !isDevEnvironment" />
-			</Transition>
-		</Suspense>
 		<Transition name="fade">
 			<div
 				v-if="restarting"
@@ -889,14 +1001,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<div class="flex flex-grow"></div>
 			<Transition name="nav-button-animated">
-				<div
-					v-if="
-						availableUpdate &&
-						updateToastDismissed &&
-						!restarting &&
-						(finishedDownloading || metered)
-					"
-				>
+				<div v-if="availableUpdate && !restarting && (finishedDownloading || metered)">
 					<NavButton
 						v-tooltip.right="
 							formatMessage(
@@ -910,13 +1015,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 								},
 							)
 						"
-						:to="
-							finishedDownloading
-								? installUpdate
-								: downloadProgress > 0 && downloadProgress < 1
-									? showUpdateToast
-									: downloadAvailableUpdate
-						"
+						:to="finishedDownloading ? installUpdate : downloadAvailableUpdate"
 					>
 						<ProgressSpinner
 							v-if="downloadProgress > 0 && downloadProgress < 1"
@@ -935,7 +1034,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<SettingsIcon />
 			</NavButton>
 			<OverflowMenu
-				v-if="credentials"
+				v-if="credentials?.user"
 				v-tooltip.right="`Modrinth account`"
 				class="w-12 h-12 text-primary rounded-full flex items-center justify-center text-2xl transition-all bg-transparent hover:bg-button-bg hover:text-contrast border-0 cursor-pointer"
 				:options="[
@@ -951,14 +1050,14 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				]"
 				placement="right-end"
 			>
-				<Avatar :src="credentials.user.avatar_url" alt="" size="32px" circle />
+				<Avatar :src="credentials?.user?.avatar_url" alt="" size="32px" circle />
 				<template #view-profile>
 					<UserIcon />
 					<span class="inline-flex items-center gap-1">
 						Signed in as
 						<span class="inline-flex items-center gap-1 text-contrast font-semibold">
-							<Avatar :src="credentials.user.avatar_url" alt="" size="20px" circle />
-							{{ credentials.user.username }}
+							<Avatar :src="credentials?.user?.avatar_url" alt="" size="20px" circle />
+							{{ credentials?.user?.username }}
 						</span>
 					</span>
 					<ExternalIcon />
@@ -1166,6 +1265,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	<URLConfirmModal ref="urlModal" />
 	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
+	<PopupNotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal
@@ -1182,8 +1282,11 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@create-and-install="handleCreateAndInstall"
 		@cancel="handleContentInstallCancel"
 	/>
+	<AddServerToInstanceModal ref="addServerToInstanceModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 	<InstallConfirmModal ref="installConfirmModal" />
+	<InstallToPlayModal ref="installToPlayModal" />
+	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>
 
 <style lang="scss" scoped>
@@ -1412,36 +1515,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	transform: translateY(10rem) scale(0.8) scaleY(1.6);
 }
 
-.toast-enter-active {
-	transition: opacity 0.25s linear;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-	opacity: 0;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-	.toast-enter-active,
 	.nav-button-animated-enter-active {
 		transition: all 0.5s cubic-bezier(0.15, 1.4, 0.64, 0.96);
 	}
 
-	.toast-leave-active,
 	.nav-button-animated-leave-active {
 		transition: all 0.25s ease;
-	}
-
-	.toast-enter-from {
-		scale: 0.5;
-		translate: 0 -10rem;
-		opacity: 0;
-	}
-
-	.toast-leave-to {
-		scale: 0.96;
-		translate: 20rem 0;
-		opacity: 0;
 	}
 
 	.nav-button-animated-enter-active {
@@ -1507,7 +1587,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 
 	.info-card {
-		right: 8rem;
+		right: 22rem;
 	}
 
 	.profile-card {

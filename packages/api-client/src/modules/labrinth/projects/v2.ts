@@ -135,4 +135,109 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			method: 'GET',
 		})
 	}
+
+	/**
+	 * Create a gallery image for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param file - Image file to upload
+	 * @param options - Gallery image options
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.createGalleryImage('sodium', imageFile, {
+	 *   featured: true,
+	 *   title: 'Screenshot 1',
+	 *   description: 'Main menu with Sodium enabled'
+	 * })
+	 * ```
+	 */
+	public async createGalleryImage(
+		id: string,
+		file: Blob,
+		options: {
+			ext: string
+			featured: boolean
+			title?: string
+			description?: string
+			ordering?: number
+		},
+	): Promise<void> {
+		const params: Record<string, string> = {
+			ext: options.ext,
+			featured: String(options.featured),
+		}
+		if (options.title) params.title = options.title
+		if (options.description) params.description = options.description
+		if (options.ordering !== undefined) params.ordering = String(options.ordering)
+
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			params,
+			body: file,
+		})
+	}
+
+	/**
+	 * Edit a gallery image for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param url - URL of the existing gallery image to edit
+	 * @param options - Gallery image options to update
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.editGalleryImage('sodium', 'https://cdn.modrinth.com/...', {
+	 *   featured: false,
+	 *   title: 'Updated title'
+	 * })
+	 * ```
+	 */
+	public async editGalleryImage(
+		id: string,
+		url: string,
+		options: {
+			featured: boolean
+			title?: string
+			description?: string
+			ordering?: number
+		},
+	): Promise<void> {
+		const params: Record<string, string> = {
+			url,
+			featured: String(options.featured),
+		}
+		if (options.title) params.title = options.title
+		if (options.description) params.description = options.description
+		if (options.ordering !== undefined) params.ordering = String(options.ordering)
+
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			params,
+		})
+	}
+
+	/**
+	 * Delete a gallery image from a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param url - URL of the gallery image to delete
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.deleteGalleryImage('sodium', 'https://cdn.modrinth.com/...')
+	 * ```
+	 */
+	public async deleteGalleryImage(id: string, url: string): Promise<void> {
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'DELETE',
+			params: { url },
+		})
+	}
 }

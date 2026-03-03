@@ -3,6 +3,7 @@
 		ref="modal"
 		:stages="ctx.stageConfigs"
 		:context="ctx"
+		:fade="fade"
 		disable-progress
 		@hide="$emit('hide')"
 	/>
@@ -30,6 +31,7 @@ const props = withDefaults(
 		initialLoader?: string
 		initialGameVersion?: string
 		onBack?: (() => void) | null
+		fade?: 'standard' | 'warning' | 'danger'
 	}>(),
 	{
 		type: 'world',

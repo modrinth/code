@@ -507,7 +507,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						<div class="flex gap-2">
 							<ButtonStyled color="brand">
 								<button
-									:disabled="ctx.isBusy.value"
+									v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 flex items-center gap-2"
 									@click="ctx.browse"
 								>
@@ -517,7 +518,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</ButtonStyled>
 							<ButtonStyled type="outlined">
 								<button
-									:disabled="ctx.isBusy.value"
+									v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 !border-button-bg !border-[1px]"
 									@click="ctx.uploadFiles"
 								>
@@ -623,7 +625,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<template #actions>
 					<ButtonStyled type="outlined">
 						<button
-							:disabled="ctx.isBusy.value"
+							v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 !border-button-bg !border-[1px]"
 							@click="ctx.uploadFiles"
 						>
@@ -633,7 +636,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button
-							:disabled="ctx.isBusy.value"
+							v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 flex items-center gap-2"
 							@click="ctx.browse"
 						>

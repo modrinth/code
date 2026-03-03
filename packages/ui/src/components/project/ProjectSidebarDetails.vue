@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
-			<div>
+			<div v-if="!props.hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>
 					<IntlFormatted :message-id="messages.licensed">
@@ -107,6 +107,7 @@ const props = defineProps<{
 	}
 	linkTarget: string
 	hasVersions: boolean
+	hideLicense?: boolean
 }>()
 
 const createdDate = computed(() =>

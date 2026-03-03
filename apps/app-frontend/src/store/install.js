@@ -52,9 +52,9 @@ export const installVersionDependencies = async (profile, version) => {
 		} else {
 			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
 
-			const depProject = await get_project(dep.project_id, 'must_revalidate')
+			const depProject = await get_project(dep.project_id, 'bypass')
 
-			const depVersions = (await get_version_many(depProject.versions, 'must_revalidate')).sort(
+			const depVersions = (await get_version_many(depProject.versions, 'bypass')).sort(
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),
 			)
 
@@ -64,4 +64,10 @@ export const installVersionDependencies = async (profile, version) => {
 			}
 		}
 	}
+}
+
+export const getServerAddress = (javaServer) => {
+	if (!javaServer) return null
+	const { address, port } = javaServer
+	return port !== 25565 ? `${address}:${port}` : address
 }
