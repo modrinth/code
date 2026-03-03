@@ -283,7 +283,7 @@ const countryOptions = [
 	{ value: 'CA', label: 'Canada' },
 	{
 		value: 'EU',
-		label: 'European Union',
+		label: 'Europe',
 		searchTerms: [
 			'Germany',
 			'France',
@@ -312,9 +312,10 @@ const countryOptions = [
 			'Malta',
 			'Cyprus',
 			'Slovenia',
+			'Great Britain',
+			'United Kingdom',
 		],
 	},
-	{ value: 'GB', label: 'United Kingdom' },
 	{ value: 'NO', label: 'Norway' },
 	{ value: 'CH', label: 'Switzerland' },
 	{ value: 'RU', label: 'Russia' },
