@@ -109,5 +109,12 @@ mod tests {
 
         let second = tax_compliance_payout_threshold_for_year(2026);
         assert_eq!(second, Some(Decimal::from(2000_u64)));
+
+        let second = tax_compliance_payout_threshold_for_year(2027);
+        assert_eq!(second, Some(Decimal::from(2000_u64)));
+
+        TAX_COMPLIANCE_CACHE.store(None);
+        let second = tax_compliance_payout_threshold_for_year(2027);
+        assert_eq!(second, Some(Decimal::from(2000_u64)));
     }
 }
