@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { PlayIcon } from '@modrinth/assets'
 
-import { formatNumber } from '../../../../../utils'
-import { useVIntl } from '../../../composables'
+import { useCompactNumber, useVIntl } from '../../../composables'
 import { commonMessages } from '../../../utils'
 import { StatItem } from '../../base'
 
 const { formatMessage } = useVIntl()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
 
 defineProps<{
 	recentPlays: number
@@ -16,16 +16,20 @@ defineProps<{
 <template>
 	<StatItem
 		v-tooltip="
-			`${formatNumber(recentPlays, true)} recent play${recentPlays === 1 ? '' : 's'} from Modrinth in the past 2 weeks`
+			formatMessage(commonMessages.projectRecentPlaysTooltip, {
+				count: formatCompactNumber(recentPlays),
+				countPlural: formatCompactNumberPlural(recentPlays),
+			})
 		"
 		class="smart-clickable:allow-pointer-events"
 	>
 		<PlayIcon />
 		{{
 			hideLabel
-				? formatNumber(recentPlays, true)
+				? formatCompactNumber(recentPlays)
 				: formatMessage(commonMessages.projectRecentPlays, {
-						count: formatNumber(recentPlays, true),
+						count: formatCompactNumber(recentPlays),
+						countPlural: formatCompactNumberPlural(recentPlays),
 					})
 		}}
 	</StatItem>

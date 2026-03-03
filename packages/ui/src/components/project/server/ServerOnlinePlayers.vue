@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { OnlineIndicatorIcon } from '@modrinth/assets'
 
-import { formatNumber } from '../../../../../utils'
-import { useVIntl } from '../../../composables'
+import { useCompactNumber, useFormatNumber, useVIntl } from '../../../composables'
 import { commonMessages } from '../../../utils'
 import { StatItem } from '../../base'
 
 const { formatMessage } = useVIntl()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
+const formatNumber = useFormatNumber()
 
 defineProps<{
 	online: number
@@ -16,7 +17,12 @@ defineProps<{
 </script>
 <template>
 	<StatItem
-		v-tooltip="`${formatNumber(online, true)} players online`"
+		v-tooltip="
+			formatMessage(commonMessages.projectOnlinePlayerCountTooltip, {
+				count: formatCompactNumber(online),
+				countPlural: formatCompactNumberPlural(online),
+			})
+		"
 		class="smart-clickable:allow-pointer-events"
 	>
 		<OnlineIndicatorIcon
@@ -29,10 +35,8 @@ defineProps<{
 		/>
 		{{
 			hideLabel
-				? formatNumber(online, false)
-				: formatMessage(commonMessages.projectOnlinePlayerCount, {
-						count: formatNumber(online, false),
-					})
+				? formatNumber(online)
+				: formatMessage(commonMessages.projectOnlinePlayerCount, { count: online })
 		}}
 	</StatItem>
 </template>

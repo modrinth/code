@@ -391,11 +391,20 @@ export const commonMessages = defineMessages({
 	},
 	projectOnlinePlayerCount: {
 		id: 'project.online-player-count',
-		defaultMessage: '{count} {count, plural, one {online} other {online}}',
+		defaultMessage: '{count, number} online',
+	},
+	projectOnlinePlayerCountTooltip: {
+		id: 'project.online-player-count.tooltip',
+		defaultMessage: '{count} {countPlural, plural, one {player} other {players}} online',
 	},
 	projectRecentPlays: {
 		id: 'project.recent-plays',
-		defaultMessage: '{count} {count, plural, one {recent play} other {recent plays}}',
+		defaultMessage: '{count} {countPlural, plural, one {recent play} other {recent plays}}',
+	},
+	projectRecentPlaysTooltip: {
+		id: 'project.recent-plays.tooltip',
+		defaultMessage:
+			'{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks',
 	},
 })
 

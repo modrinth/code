@@ -360,10 +360,10 @@
     "defaultMessage": "No projects match your search."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count} projects"
+    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
   "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} selected"
+    "defaultMessage": "{count, number} selected"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
@@ -990,13 +990,19 @@
     "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
+    "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {player} other {players}} online"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.server.region.alt": {
     "defaultMessage": "Region: {regionCode}"
