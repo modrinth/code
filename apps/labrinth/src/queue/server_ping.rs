@@ -54,7 +54,7 @@ impl ServerPingQueue {
 
                     let mut retries = ENV.SERVER_PING_RETRIES;
                     let result = loop {
-                        match ping_server(&address, port).await {
+                        match ping_server(&address, port, None).await {
                             Ok(ping) => {
                                 info!(?ping, "Received successful ping");
                                 break Ok(ping);
@@ -252,9 +252,13 @@ impl ServerPingQueue {
 pub async fn ping_server(
     address: &str,
     port: u16,
+    timeout: Option<Duration>,
 ) -> eyre::Result<exp::minecraft::JavaServerPingData> {
     let start = Instant::now();
-    let timeout = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
+    let default_duration = Duration::from_millis(ENV.SERVER_PING_TIMEOUT_MS);
+    let timeout = timeout
+        .map(|duration| duration.min(default_duration))
+        .unwrap_or(default_duration);
 
     let task_ep = async move {
         fn map_component(c: elytra_ping::parse::TextComponent) -> String {
@@ -369,11 +373,20 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_ping_server_success() {
-        let _status = ping_server("mc.hypixel.net", 25565).await.unwrap();
+        let _status = ping_server("mc.hypixel.net", 25565, None).await.unwrap();
     }
 
     #[actix_rt::test]
     async fn test_ping_server_invalid_address() {
-        _ = ping_server("invalid.invalid", 25565).await.unwrap_err();
+        _ = ping_server("invalid.invalid", 25565, None)
+            .await
+            .unwrap_err();
+    }
+
+    #[actix_rt::test]
+    async fn test_ping_zero_timeout() {
+        _ = ping_server("hypixel.net", 25565, Some(Duration::ZERO))
+            .await
+            .unwrap_err();
     }
 }
