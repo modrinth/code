@@ -472,11 +472,8 @@ const markBackupCancelled = (backupId: string) => {
 }
 
 // Parthenon state event
-const serverReadiness = ref<Archon.Websocket.v0.ReadinessState | null>(null)
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
-const isSyncingContent = computed(
-	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
-)
+const isSyncingContent = computed(() => syncProgress.value != null)
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -714,7 +711,6 @@ const handlePowerState = (data: Archon.Websocket.v0.WSPowerStateEvent) => {
 }
 
 const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
-	serverReadiness.value = data.readiness
 	syncProgress.value = data.progress
 
 	// Sync power state from the state event
@@ -739,11 +735,11 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 		startUptimeUpdates()
 	}
 
-	// Update installing status from readiness
+	// Update installing status from progress presence
 	if (serverData.value) {
-		if (data.readiness === 'sync_content') {
+		if (data.progress != null) {
 			serverData.value.status = 'installing'
-		} else if (serverData.value.status === 'installing' && data.readiness === 'ready') {
+		} else if (serverData.value.status === 'installing') {
 			serverData.value.status = 'available'
 		}
 	}

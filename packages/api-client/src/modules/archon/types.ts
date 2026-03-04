@@ -537,7 +537,6 @@ export namespace Archon {
 			export type WSStateEvent = {
 				event: 'state'
 				debug: string
-				readiness: ReadinessState
 				power_variant: FlattenedPowerState
 				exit_code?: number | null
 				was_oom?: boolean
