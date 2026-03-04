@@ -59,9 +59,10 @@
 								v-if="playersOnline !== undefined"
 								:online="playersOnline"
 								:status-online="statusOnline"
+								hide-label
 							/>
 
-							<ServerRecentPlays :recent-plays="recentPlays ?? 0" />
+							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
 
 							<div
 								v-if="
