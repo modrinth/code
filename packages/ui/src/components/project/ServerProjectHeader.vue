@@ -24,7 +24,7 @@
 						<TagItem
 							v-for="(category, index) in project.categories"
 							:key="index"
-							:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
+							:action="() => router.push(`/discover/servers?sc=${category}`)"
 						>
 							<FormattedTag :tag="category" />
 						</TagItem>
