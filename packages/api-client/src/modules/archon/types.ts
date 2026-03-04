@@ -56,6 +56,7 @@ export namespace Archon {
 
 			export type UpdateAddonRequest = {
 				filename: string
+				version_id?: string | null
 			}
 
 			export type Modloader =

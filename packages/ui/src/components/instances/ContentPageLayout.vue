@@ -384,8 +384,10 @@ function handleUpdateById(id: string) {
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
 
+const hasBulkUpdateSupport = computed(() => !!(ctx.bulkUpdateItem || ctx.bulkUpdateItems))
+
 function promptUpdateAll() {
-	if (!ctx.bulkUpdateItem) return
+	if (!hasBulkUpdateSupport.value) return
 	const items = ctx.items.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
@@ -393,7 +395,7 @@ function promptUpdateAll() {
 }
 
 function promptUpdateSelected() {
-	if (!ctx.bulkUpdateItem) return
+	if (!hasBulkUpdateSupport.value) return
 	const items = selectedItems.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
@@ -402,9 +404,21 @@ function promptUpdateSelected() {
 
 async function confirmBulkUpdate() {
 	const items = pendingBulkUpdateItems.value
-	if (items.length === 0 || !ctx.bulkUpdateItem) return
+	if (items.length === 0 || !hasBulkUpdateSupport.value) return
 
-	await runBulk('update', items, ctx.bulkUpdateItem)
+	if (ctx.bulkUpdateItems) {
+		isBulkOperating.value = true
+		bulkOperation.value = 'update'
+		try {
+			await ctx.bulkUpdateItems(items)
+		} finally {
+			isBulkOperating.value = false
+			bulkOperation.value = null
+			bulkWaiting.value = false
+		}
+	} else if (ctx.bulkUpdateItem) {
+		await runBulk('update', items, ctx.bulkUpdateItem)
+	}
 	clearSelection()
 	pendingBulkUpdateItems.value = []
 }
@@ -579,7 +593,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 						<div class="flex items-center gap-2">
 							<ButtonStyled
-								v-if="ctx.bulkUpdateItem && !ctx.isPackLocked.value && hasOutdatedProjects"
+								v-if="hasBulkUpdateSupport && !ctx.isPackLocked.value && hasOutdatedProjects"
 								color="green"
 								type="transparent"
 								color-fill="text"
@@ -681,7 +695,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<div class="ml-auto flex items-center gap-0.5">
 					<ButtonStyled
 						v-if="
-							ctx.bulkUpdateItem &&
+							hasBulkUpdateSupport &&
 							!ctx.isPackLocked.value &&
 							selectedItems.some((m) => m.has_update)
 						"

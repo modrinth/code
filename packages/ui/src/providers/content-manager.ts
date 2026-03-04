@@ -69,6 +69,7 @@ export interface ContentManagerContext {
 	hasUpdateSupport: boolean
 	updateItem?: (id: string) => void
 	bulkUpdateItem?: (item: ContentItem) => Promise<void>
+	bulkUpdateItems?: (items: ContentItem[]) => Promise<void>
 
 	// Modpack actions (optional)
 	updateModpack?: () => void

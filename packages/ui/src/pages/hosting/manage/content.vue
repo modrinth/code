@@ -477,6 +477,18 @@ async function handleModpackUnlinkConfirm() {
 	}
 }
 
+async function handleBulkUpdate(items: ContentItem[]) {
+	const addons = items
+		.filter((item) => item.has_update)
+		.map((item) => ({
+			filename: item.file_name,
+			version_id: item.update_version_id ?? undefined,
+		}))
+	if (addons.length === 0) return
+	await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
+	await queryClient.invalidateQueries({ queryKey: queryKey.value })
+}
+
 async function handleUpdateItem(fileNameKey: string) {
 	const item = contentItems.value.find((i) => i.file_name === fileNameKey)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
@@ -613,6 +625,7 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 			if (addon) {
 				await client.archon.content_v1.updateAddon(serverId, worldId.value!, {
 					filename: addon.filename,
+					version_id: selectedVersion.id,
 				})
 			}
 		}
@@ -652,6 +665,7 @@ provideContentManager({
 	backupLink: `/hosting/manage/${serverId}/backups`,
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
+	bulkUpdateItems: handleBulkUpdate,
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,

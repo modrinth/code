@@ -189,6 +189,23 @@ export class ArchonContentV1Module extends AbstractModule {
 		})
 	}
 
+	/** POST /v1/:server_id/worlds/:world_id/addons/update-many */
+	public async updateAddons(
+		serverId: string,
+		worldId: string,
+		addons: Archon.Content.v1.UpdateAddonRequest[],
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/addons/update-many`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+				body: { addons },
+			},
+		)
+	}
+
 	/** GET /v1/:server_id/worlds/:world_id/content/modpack/update */
 	public async getModpackUpdate(
 		serverId: string,
