@@ -51,7 +51,7 @@
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
 						<ServerDetails
 							v-if="isServerProject"
-							:region="serverRegionCode"
+							:region="serverRegion"
 							:online-players="serverOnlinePlayers"
 							:recent-plays="serverRecentPlays"
 							:ping="serverPing"
@@ -136,7 +136,7 @@
 				<div class="flex items-center gap-2 w-full">
 					<ServerDetails
 						v-if="isServerProject"
-						:region="serverRegionCode"
+						:region="serverRegion"
 						:online-players="serverOnlinePlayers"
 						:status-online="serverStatusOnline"
 						:recent-plays="serverRecentPlays"
@@ -216,7 +216,7 @@ const props = defineProps<{
 	dateUpdated?: string
 	datePublished?: string
 	displayedDate?: 'updated' | 'published'
-	serverRegionCode?: string
+	serverRegion?: string
 	serverOnlinePlayers?: number
 	serverStatusOnline?: boolean
 	serverRecentPlays?: number

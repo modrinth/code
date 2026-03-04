@@ -49,7 +49,7 @@ import {
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { get_server_status } from '@/helpers/worlds'
+import { getServerLatency } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
 
@@ -287,17 +287,18 @@ const {
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	for (const hit of hits) {
-		const address = hit.minecraft_java_server?.address
-		if (!address) continue
-		get_server_status(address)
-			.then((status) => {
-				serverPings.value = { ...serverPings.value, [hit.project_id]: status.ping }
-			})
-			.catch((err) => {
+	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
+	await Promise.all(
+		pingsToFetch.map(async (hit) => {
+			const address = hit.minecraft_java_server!.address!
+			try {
+				const latency = await getServerLatency(address)
+				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
+			} catch (err) {
 				console.error(`Failed to ping server ${address}:`, err)
-			})
-	}
+			}
+		}),
+	)
 }
 
 const previousFilterState = ref('')
@@ -665,6 +666,7 @@ previousFilterState.value = JSON.stringify({
 						'server_category_minecraft_server_meta',
 						'server_category_minecraft_server_community',
 						'server_game_version',
+						'server_status',
 					].includes(filterType.id)
 				"
 			>
@@ -809,8 +811,8 @@ previousFilterState.value = JSON.stringify({
 						:tags="project.categories"
 						:link="`/project/${project.slug ?? project.project_id}`"
 						:server-online-players="project.minecraft_java_server?.ping?.data?.players_online ?? 0"
-						:server-region-code="project.minecraft_server?.country"
-						:server-recent-plays="project.minecraft_java_server?.verified_plays_4w ?? 0"
+						:server-region="project.minecraft_server?.region"
+						:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
 						:server-modpack-content="getServerModpackContent(project)"
 						:server-ping="serverPings[project.project_id]"
 						:server-status-online="!!project.minecraft_java_server?.ping?.data"

@@ -146,7 +146,9 @@
 										(e) => {
 											const input = e.target
 											if (input.files?.length) {
-												if (fileIsValid(input.files[0], { maxSize: 524288, alertOnInvalid: true }))
+												if (
+													fileIsValid(input.files[0], { maxSize: 524288000, alertOnInvalid: true })
+												)
 													showBannerPreview(Array.from(input.files))
 											}
 										}

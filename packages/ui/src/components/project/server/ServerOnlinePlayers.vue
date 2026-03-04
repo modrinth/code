@@ -23,7 +23,7 @@ defineProps<{
 				countPlural: formatCompactNumberPlural(online),
 			})
 		"
-		class="smart-clickable:allow-pointer-events"
+		class="smart-clickable:allow-pointer-events w-max"
 	>
 		<OnlineIndicatorIcon
 			:style="{

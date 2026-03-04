@@ -9,13 +9,9 @@ const changelogEntry = computed(() =>
 	route.params.date
 		? getChangelog().find((x) => {
 				if (x.product === route.params.product) {
-					console.log('Found matching product!')
-
 					if (x.version && x.version === route.params.date) {
-						console.log('Found matching version!')
 						return x
 					} else if (x.date.unix() === Number(route.params.date as string)) {
-						console.log('Found matching date!')
 						return x
 					}
 				}

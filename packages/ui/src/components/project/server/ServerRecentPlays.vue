@@ -21,7 +21,7 @@ defineProps<{
 				countPlural: formatCompactNumberPlural(recentPlays),
 			})
 		"
-		class="smart-clickable:allow-pointer-events"
+		class="smart-clickable:allow-pointer-events w-max"
 	>
 		<PlayIcon />
 		{{

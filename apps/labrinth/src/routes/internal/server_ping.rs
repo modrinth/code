@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use actix_web::{HttpRequest, post, web};
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +19,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct PingRequest {
     pub address: String,
-    pub port: u16,
+    pub timeout_ms: Option<u64>,
 }
 
 #[utoipa::path]
@@ -38,7 +40,8 @@ pub async fn ping_minecraft_java(
     )
     .await?;
 
-    server_ping::ping_server(&request.address, request.port)
+    let timeout = request.timeout_ms.map(Duration::from_millis);
+    server_ping::ping_server(&request.address, timeout)
         .await
         .wrap_request_err("failed to ping server")?;
 

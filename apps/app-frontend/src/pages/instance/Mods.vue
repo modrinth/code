@@ -355,6 +355,7 @@ const isPackLocked = computed(() => {
 })
 
 const canUpdatePack = computed(() => {
+	if (props.isServerInstance) return false
 	if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
 	return props.instance.linked_data.version_id !== props.versions[0].id
 })

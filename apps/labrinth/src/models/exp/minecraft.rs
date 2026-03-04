@@ -101,6 +101,15 @@ component::define! {
         #[validate(length(min = 2, max = 2))]
         pub country: Option<String>,
         #[base(serde(default))]
+        #[edit(serde(
+            default,
+            skip_serializing_if = "Option::is_none",
+            with = "serde_with::rust::double_option"
+        ))]
+        #[create(optional)]
+        /// Geographical region which this server is hosted in.
+        pub region: Option<ServerRegion>,
+        #[base(serde(default))]
         #[edit(serde(default))]
         #[create(default)]
         /// Languages which the owners of this server prefer.
@@ -129,11 +138,6 @@ component::define! {
         /// Address (IP or domain name) of the Bedrock server, excluding port.
         #[validate(length(max = 255))]
         pub address: String,
-        #[base()]
-        #[edit(serde(default))]
-        #[create(required)]
-        /// Port which the server runs on.
-        pub port: u16,
     }
 }
 
@@ -167,8 +171,6 @@ pub struct JavaServerProject {
     /// Address (IP or domain name) of the Java server, excluding port.
     #[validate(length(max = 255))]
     pub address: String,
-    /// Port which the server runs on.
-    pub port: u16,
     /// What game content this server is using.
     #[serde(default)]
     pub content: ServerContent,
@@ -180,15 +182,12 @@ pub struct JavaServerProjectEdit {
     #[serde(default)]
     pub address: Option<String>,
     #[serde(default)]
-    pub port: Option<u16>,
-    #[serde(default)]
     pub content: Option<ServerContent>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct JavaServerProjectQuery {
     pub address: String,
-    pub port: u16,
     pub content: ServerContentQuery,
     pub ping: Option<JavaServerPing>,
     pub verified_plays_2w: Option<u64>,
@@ -229,7 +228,6 @@ impl ComponentQuery for JavaServerProjectQuery {
         let analytics = context.minecraft_server_analytics.get(&project_id);
         Ok(Self {
             address: serial.address,
-            port: serial.port,
             content: match serial.content {
                 ServerContent::Vanilla {
                     supported_game_versions,
@@ -276,7 +274,6 @@ impl ComponentEdit for JavaServerProjectEdit {
     fn create(self) -> Result<Self::Component> {
         Ok(JavaServerProject {
             address: self.address.wrap_err("missing `address`")?,
-            port: self.port.wrap_err("missing `port`")?,
             content: self.content.unwrap_or_default(),
         })
     }
@@ -284,9 +281,6 @@ impl ComponentEdit for JavaServerProjectEdit {
     async fn apply_to(self, component: &mut Self::Component) -> Result<()> {
         if let Some(address) = self.address {
             component.address = address;
-        }
-        if let Some(port) = self.port {
-            component.port = port;
         }
         if let Some(content) = self.content {
             component.content = content;
@@ -347,6 +341,29 @@ impl Default for ServerContent {
     }
 }
 
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Serialize,
+    Deserialize,
+    utoipa::ToSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ServerRegion {
+    UsEast,
+    UsWest,
+    Europe,
+    Asia,
+    Australia,
+    SouthAmerica,
+    MiddleEast,
+    Russia,
+}
+
 /// Recorded ping attempt that Labrinth made to a Minecraft Java server project.
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct JavaServerPing {
@@ -354,8 +371,6 @@ pub struct JavaServerPing {
     pub when: DateTime<Utc>,
     /// Address of the server at the time of the ping.
     pub address: String,
-    /// Port of the server at the time of the ping.
-    pub port: u16,
     /// If the ping was successful, info on the ping response.
     pub data: Option<JavaServerPingData>,
 }

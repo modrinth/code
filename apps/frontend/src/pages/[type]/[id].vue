@@ -1191,7 +1191,7 @@ const serverProject = computed(() => ({
 	numPlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online,
 	icon: project.value.icon_url,
 	statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
-	region: projectV3.value?.minecraft_server?.country,
+	region: projectV3.value?.minecraft_server?.region,
 }))
 
 function handlePlayServerProject() {
@@ -2526,6 +2526,11 @@ const navLinks = computed(() => {
 	const routeType = route.params.type || project.value.project_type
 	const projectUrl = `/${routeType}/${project.value.slug ? project.value.slug : project.value.id}`
 
+	const galleryCount =
+		routeType === 'server'
+			? project.value.gallery.filter((item) => item.name === '__mc_server_banner__').length
+			: project.value.gallery.length
+
 	return [
 		{
 			label: formatMessage(messages.descriptionTab),
@@ -2534,7 +2539,7 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.galleryTab),
 			href: `${projectUrl}/gallery`,
-			shown: project.value.gallery.length > 0 || !!currentMember.value,
+			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),

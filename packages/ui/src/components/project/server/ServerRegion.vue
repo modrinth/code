@@ -1,26 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { defineMessage, useVIntl } from '../../../composables'
+import { TagItem } from '../../base'
 
 const { region } = defineProps<{
 	region: string
 }>()
 
-const { formatMessage } = useVIntl()
+const regionNames: Record<string, string> = {
+	us_east: 'US East',
+	us_west: 'US West',
+	europe: 'Europe',
+	asia: 'Asia',
+	australia: 'Australia',
+	south_america: 'South America',
+	middle_east: 'Middle East',
+	russia: 'Russia',
+}
 
-const alt = defineMessage({
-	id: 'project.server.region.alt',
-	defaultMessage: 'Region: {regionCode}',
-})
-
-const regionLower = computed(() => region.toLowerCase())
+const regionName = computed(() => regionNames[region] ?? region)
 </script>
 <template>
-	<img
-		v-tooltip="`Server hosted in ${region}`"
-		:src="`https://flagcdn.com/${regionLower}.svg`"
-		:alt="formatMessage(alt, { regionCode: regionLower })"
-		class="h-4 aspect-[3/2] border-[1px] border-surface-5 border-solid shrink-0 rounded-[3px] object-cover smart-clickable:allow-pointer-events"
-	/>
+	<TagItem>{{ regionName }}</TagItem>
 </template>

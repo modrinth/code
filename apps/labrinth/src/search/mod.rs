@@ -274,9 +274,9 @@ pub fn get_sort_index(
         "relevance" => (
             projects_name,
             &[
-                "downloads:desc",
                 "minecraft_java_server.verified_plays_2w:desc",
                 "minecraft_java_server.ping.data.players_online:desc",
+                "downloads:desc",
             ],
         ),
         "downloads" => (projects_filtered_name, &["downloads:desc"]),
