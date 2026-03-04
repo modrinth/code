@@ -1,78 +1,60 @@
 <template>
 	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<div
+		<Admonition
 			v-if="inspectingError && isConnected && !isWsAuthIncorrect"
 			data-pyro-servers-inspecting-error
-			class="flex justify-between rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+			type="critical"
+			:header="`${serverData?.name} shut down unexpectedly.`"
+			dismissible
+			@dismiss="clearError"
 		>
-			<div class="flex w-full justify-between gap-2">
-				<div v-if="inspectingError.analysis.problems.length" class="flex flex-row gap-4">
-					<IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
-
-					<div class="flex flex-col gap-2">
-						<div class="font-semibold">
-							{{ serverData?.name }} shut down unexpectedly. We've automatically analyzed the logs
-							and found the following problems:
-						</div>
-
-						<li
-							v-for="problem in inspectingError.analysis.problems"
-							:key="problem.message"
-							class="list-none"
+			<template v-if="inspectingError.analysis.problems.length">
+				<p class="m-0 text-sm opacity-80">
+					We automatically analyzed the logs and found the following:
+				</p>
+				<div class="mt-2 flex flex-col gap-2">
+					<div
+						v-for="problem in inspectingError.analysis.problems"
+						:key="problem.message"
+						class="rounded-xl bg-raised-bg/30 px-3 py-2"
+					>
+						<p class="m-0 text-sm font-semibold">{{ problem.message }}</p>
+						<ul
+							v-if="problem.solutions.length"
+							class="m-0 ml-4 mt-1.5 flex flex-col gap-1"
 						>
-							<h4 class="m-0 text-sm font-normal sm:text-lg sm:font-semibold">
-								{{ problem.message }}
-							</h4>
-							<ul class="m-0 ml-6">
-								<li v-for="solution in problem.solutions" :key="solution.message">
-									<span class="m-0 text-sm font-normal">{{ solution.message }}</span>
-								</li>
-							</ul>
-						</li>
+							<li
+								v-for="solution in problem.solutions"
+								:key="solution.message"
+								class="text-sm opacity-80"
+							>
+								{{ solution.message }}
+							</li>
+						</ul>
 					</div>
 				</div>
-				<div v-else-if="props.serverPowerState === 'crashed'" class="flex flex-row gap-4">
-					<IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
-
-					<div class="flex flex-col gap-2">
-						<div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
-						<div class="font-normal">
-							<template v-if="props.powerStateDetails?.oom_killed">
-								The server stopped because it ran out of memory. There may be a memory leak caused
-								by a mod or plugin, or you may need to upgrade your Modrinth Server.
-							</template>
-							<template v-else-if="props.powerStateDetails?.exit_code !== undefined">
-								We could not automatically determine the specific cause of the crash, but your
-								server exited with code
-								{{ props.powerStateDetails.exit_code }}.
-								{{
-									props.powerStateDetails.exit_code === 1
-										? 'There may be a mod or plugin causing the issue, or an issue with your server configuration.'
-										: ''
-								}}
-							</template>
-							<template v-else> We could not determine the specific cause of the crash. </template>
-							<div class="mt-2">You can try restarting the server.</div>
-						</div>
-					</div>
-				</div>
-				<div v-else class="flex flex-row gap-4">
-					<IssuesIcon class="hidden h-8 w-8 text-red sm:block" />
-
-					<div class="flex flex-col gap-2">
-						<div class="font-semibold">{{ serverData?.name }} shut down unexpectedly.</div>
-						<div class="font-normal">
-							We could not find any specific problems, but you can try restarting the server.
-						</div>
-					</div>
-				</div>
-				<ButtonStyled color="red" @click="clearError">
-					<button>
-						<XIcon />
-					</button>
-				</ButtonStyled>
-			</div>
-		</div>
+			</template>
+			<template v-else-if="props.serverPowerState === 'crashed'">
+				<template v-if="props.powerStateDetails?.oom_killed">
+					The server stopped because it ran out of memory. There may be a memory leak
+					caused by a mod or plugin, or you may need to upgrade your Modrinth Server.
+				</template>
+				<template v-else-if="props.powerStateDetails?.exit_code !== undefined">
+					Your server exited with code {{ props.powerStateDetails.exit_code }}.
+					<template v-if="props.powerStateDetails.exit_code === 1">
+						There may be a mod or plugin causing the issue, or an issue with your server
+						configuration.
+					</template>
+				</template>
+				<template v-else>
+					We could not determine the specific cause of the crash.
+				</template>
+				<p class="m-0 mt-2">You can try restarting the server.</p>
+			</template>
+			<template v-else>
+				We could not find any specific problems, but you can try restarting the server.
+			</template>
+		</Admonition>
 
 		<div class="flex flex-col-reverse gap-6 md:flex-col">
 			<ServerStats
@@ -181,8 +163,8 @@
 </template>
 
 <script setup lang="ts">
-import { IssuesIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient, injectModrinthServerContext } from '@modrinth/ui'
+import { TerminalSquareIcon } from '@modrinth/assets'
+import { Admonition, injectModrinthClient, injectModrinthServerContext } from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
 import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'

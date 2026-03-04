@@ -127,6 +127,26 @@ export namespace Archon {
 				custom?: Record<string, string>
 			}
 
+			export type PatchPropertiesFields = {
+				known?: KnownPropertiesFields
+				custom?: Record<string, string | null>
+			}
+
+			export type JreVendor = 'temurin' | 'corretto' | 'graal'
+
+			export type RuntimeOptions = {
+				java_version: number | null
+				jre_vendor: JreVendor | null
+				original_invocation: string | null
+				startup_command: string | null
+			}
+
+			export type PatchRuntimeOptions = {
+				java_version?: number | null
+				jre_vendor?: JreVendor | null
+				startup_command?: string | null
+			}
+
 			export type InstallWorldContent =
 				| {
 						content_variant: 'modpack'

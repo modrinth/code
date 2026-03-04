@@ -916,7 +916,7 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 			try {
 				await Promise.all([
 					queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-					queryClient.invalidateQueries({ queryKey: ['servers', 'startup', serverId] }),
+					queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
 					queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
 				])
 			} catch (err: unknown) {

@@ -1,12 +1,12 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
 		<div
-			v-if="!server || addonsQuery.isLoading.value"
+			v-if="!server"
 			class="flex items-center justify-center py-12"
 		>
 			<SpinnerIcon class="size-8 animate-spin text-secondary" />
 		</div>
-		<template v-else-if="isLinked">
+		<template v-else>
 			<div class="flex flex-col gap-2.5">
 				<span class="text-lg font-semibold text-contrast">Installation info</span>
 				<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
@@ -21,6 +21,14 @@
 				</div>
 			</div>
 
+			<div
+				v-if="addonsQuery.isLoading.value"
+				class="flex items-center justify-center py-6"
+			>
+				<SpinnerIcon class="size-6 animate-spin text-secondary" />
+			</div>
+
+			<template v-else-if="isLinked">
 			<div class="flex flex-col gap-2.5">
 				<span class="text-lg font-semibold text-contrast">Installed modpack</span>
 				<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
@@ -140,22 +148,9 @@
 		</template>
 
 		<template v-else>
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Installation info</span>
-
-				<div v-if="!isEditing" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
-					<div
-						v-for="row in installationInfo"
-						:key="row.label"
-						class="flex items-center justify-between"
-					>
-						<span class="text-primary">{{ row.label }}</span>
-						<span class="font-semibold text-contrast">{{ row.value }}</span>
-					</div>
-				</div>
-
+			<div v-if="isEditing" class="flex flex-col gap-2.5">
+				<span class="text-lg font-semibold text-contrast">Edit installation</span>
 				<div
-					v-else
 					class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
 				>
 					<div class="flex flex-col gap-2.5">
@@ -263,6 +258,7 @@
 					</ButtonStyled>
 				</div>
 			</div>
+		</template>
 		</template>
 	</div>
 	<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
@@ -765,17 +761,29 @@ async function handleReinstallConfirm() {
 }
 
 async function handleUnlinkConfirm() {
+	const previousData = addonsQuery.data.value
+	if (previousData) {
+		queryClient.setQueryData(['content', 'list', 'v1', serverId], {
+			...previousData,
+			modpack: null,
+		})
+	}
+
 	try {
 		await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
-		])
 	} catch (err) {
+		if (previousData) {
+			queryClient.setQueryData(['content', 'list', 'v1', serverId], previousData)
+		}
 		addNotification({
 			type: 'error',
 			text: err instanceof Error ? err.message : 'Failed to unlink modpack',
 		})
+	} finally {
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+		])
 	}
 }
 

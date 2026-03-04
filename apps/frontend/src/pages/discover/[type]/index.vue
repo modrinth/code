@@ -158,6 +158,13 @@ watch(serverContentError, (error) => {
 	}
 })
 
+// Re-run search when server content loads so "Hide installed" filter applies
+watch(serverContentData, () => {
+	if (serverHideInstalled.value) {
+		updateSearchResults()
+	}
+})
+
 // Install content mutation
 const installContentMutation = useMutation({
 	mutationFn: ({

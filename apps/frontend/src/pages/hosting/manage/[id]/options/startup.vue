@@ -16,7 +16,7 @@
 						</label>
 						<ButtonStyled>
 							<button
-								:disabled="isStartupLoading || invocation === defaultInvocation"
+								:disabled="isStartupLoading || startupCommand === defaultStartupCommand"
 								class="!w-full sm:!w-auto"
 								@click="resetToDefault"
 							>
@@ -28,7 +28,7 @@
 					<div class="relative">
 						<StyledInput
 							id="startup-command-field"
-							v-model="invocation"
+							v-model="startupCommand"
 							multiline
 							resize="vertical"
 							input-class="min-h-[270px] font-[family-name:var(--mono-font)]"
@@ -53,19 +53,27 @@
 								different Java version to work properly.
 							</span>
 						</div>
-						<div class="flex items-center gap-2">
-							<Toggle id="show-all-versions" v-model="showAllVersions" class="flex-none" />
-							<label for="show-all-versions" class="text-sm">Show all Java versions</label>
-						</div>
-						<div class="relative">
+						<div class="relative max-w-xs">
 							<Combobox
 								:id="'java-version-field'"
-								v-model="jdkVersion"
+								v-model="javaVersion"
 								name="java-version"
-								:options="displayedJdkVersions"
-								:display-value="jdkVersionLabel ?? 'Java Version'"
+								:options="displayedJavaVersions"
+								:display-value="javaVersionLabel ?? 'Java Version'"
 								:disabled="isStartupLoading"
-							/>
+							>
+								<template #dropdown-footer>
+									<button
+										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										@mousedown.prevent
+										@click="showAllVersions = !showAllVersions"
+									>
+										<EyeOffIcon v-if="showAllVersions" class="size-4" />
+										<EyeIcon v-else class="size-4" />
+										{{ showAllVersions ? 'Hide extra versions' : 'Show all versions' }}
+									</button>
+								</template>
+							</Combobox>
 							<div
 								v-if="isStartupLoading"
 								class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
@@ -79,13 +87,13 @@
 							<span class="text-lg font-bold text-contrast">Runtime</span>
 							<span> The Java runtime your server will use. </span>
 						</div>
-						<div class="relative">
+						<div class="relative max-w-xs">
 							<Combobox
 								:id="'runtime-field'"
-								v-model="jdkBuild"
+								v-model="jreVendor"
 								name="runtime"
-								:options="JDK_BUILDS"
-								:display-value="jdkBuildLabel ?? 'Runtime'"
+								:options="JRE_VENDORS"
+								:display-value="jreVendorLabel ?? 'Runtime'"
 								:disabled="isStartupLoading"
 							/>
 							<div
@@ -110,7 +118,8 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
+import type { Archon } from '@modrinth/api-client'
+import { EyeIcon, EyeOffIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
@@ -118,60 +127,60 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 	StyledInput,
-	Toggle,
 } from '@modrinth/ui'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 
 const { addNotification } = injectNotificationManager()
-const { server, serverId } = injectModrinthServerContext()
+const { server, serverId, worldId } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
-const STARTUP_QUERY_KEY = ['servers', 'startup', serverId] as const
+const startupQueryKey = computed(() => ['servers', 'startup', 'v1', serverId, worldId.value])
 
 const { data: startupData, isLoading: isStartupLoading } = useQuery({
-	queryKey: STARTUP_QUERY_KEY,
-	queryFn: () => client.archon.servers_v0.getStartupConfig(serverId),
+	queryKey: startupQueryKey,
+	queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
+	enabled: computed(() => worldId.value !== null),
 })
 
-const JDK_VERSIONS = [
-	{ value: 'lts8', label: 'Java 8' },
-	{ value: 'lts11', label: 'Java 11' },
-	{ value: 'lts17', label: 'Java 17' },
-	{ value: 'lts21', label: 'Java 21' },
+const JAVA_VERSIONS = [
+	{ value: 8, label: 'Java 8' },
+	{ value: 11, label: 'Java 11' },
+	{ value: 17, label: 'Java 17' },
+	{ value: 21, label: 'Java 21' },
 ]
 
-const JDK_BUILDS = [
+const JRE_VENDORS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
 	{ value: 'corretto', label: 'Corretto' },
 	{ value: 'temurin', label: 'Temurin' },
 	{ value: 'graal', label: 'GraalVM' },
 ]
 
 // Saved state derived directly from query
-const savedInvocation = computed(() => startupData.value?.invocation ?? '')
-const savedJdkVersion = computed(() => startupData.value?.jdk_version)
-const savedJdkBuild = computed(() => startupData.value?.jdk_build)
-const defaultInvocation = computed(
-	() => startupData.value?.original_invocation ?? savedInvocation.value,
+const savedStartupCommand = computed(() => startupData.value?.startup_command ?? '')
+const savedJavaVersion = computed(() => startupData.value?.java_version ?? undefined)
+const savedJreVendor = computed(() => startupData.value?.jre_vendor ?? undefined)
+const defaultStartupCommand = computed(
+	() => startupData.value?.original_invocation ?? savedStartupCommand.value,
 )
 
-// Local form state (stores API keys directly)
-const invocation = ref('')
-const jdkVersion = ref<string>()
-const jdkBuild = ref<string>()
+// Local form state
+const startupCommand = ref('')
+const javaVersion = ref<number>()
+const jreVendor = ref<Archon.Content.v1.JreVendor>()
 
 // Display labels for comboboxes
-const jdkVersionLabel = computed(
-	() => JDK_VERSIONS.find((v) => v.value === jdkVersion.value)?.label,
+const javaVersionLabel = computed(
+	() => JAVA_VERSIONS.find((v) => v.value === javaVersion.value)?.label,
 )
-const jdkBuildLabel = computed(() => JDK_BUILDS.find((v) => v.value === jdkBuild.value)?.label)
+const jreVendorLabel = computed(() => JRE_VENDORS.find((v) => v.value === jreVendor.value)?.label)
 
 function syncFormFromData() {
-	invocation.value = savedInvocation.value
-	jdkVersion.value = savedJdkVersion.value
-	jdkBuild.value = savedJdkBuild.value
+	startupCommand.value = savedStartupCommand.value
+	javaVersion.value = savedJavaVersion.value
+	jreVendor.value = savedJreVendor.value
 }
 
 watch(
@@ -186,39 +195,39 @@ watch(
 
 const hasUnsavedChanges = computed(
 	() =>
-		invocation.value !== savedInvocation.value ||
-		jdkVersion.value !== savedJdkVersion.value ||
-		jdkBuild.value !== savedJdkBuild.value,
+		startupCommand.value !== savedStartupCommand.value ||
+		javaVersion.value !== savedJavaVersion.value ||
+		jreVendor.value !== savedJreVendor.value,
 )
 
 // Java version filtering
 const showAllVersions = ref(false)
 
-const displayedJdkVersions = computed(() => {
-	if (showAllVersions.value) return JDK_VERSIONS
+const displayedJavaVersions = computed(() => {
+	if (showAllVersions.value) return JAVA_VERSIONS
 
 	const mcVersion = server.value?.mc_version ?? ''
-	if (!mcVersion) return JDK_VERSIONS
+	if (!mcVersion) return JAVA_VERSIONS
 
 	const [, minor] = mcVersion.split('.').map(Number)
 
-	if (minor >= 20) return JDK_VERSIONS.filter((v) => v.value === 'lts21')
-	if (minor >= 17) return JDK_VERSIONS.filter((v) => ['lts17', 'lts21'].includes(v.value))
-	if (minor >= 12) return JDK_VERSIONS
-	if (minor >= 6) return JDK_VERSIONS.filter((v) => ['lts8', 'lts11'].includes(v.value))
-	return JDK_VERSIONS.filter((v) => v.value === 'lts8')
+	if (minor >= 20) return JAVA_VERSIONS.filter((v) => v.value === 21)
+	if (minor >= 17) return JAVA_VERSIONS.filter((v) => [17, 21].includes(v.value))
+	if (minor >= 12) return JAVA_VERSIONS
+	if (minor >= 6) return JAVA_VERSIONS.filter((v) => [8, 11].includes(v.value))
+	return JAVA_VERSIONS.filter((v) => v.value === 8)
 })
 
 // Save mutation
 const { mutate: saveStartup, isPending } = useMutation({
 	mutationFn: () =>
-		client.archon.servers_v0.updateStartupConfig(serverId, {
-			invocation: invocation.value || null,
-			jdk_version: jdkVersion.value || null,
-			jdk_build: jdkBuild.value || null,
+		client.archon.options_v1.patchStartup(serverId, worldId.value!, {
+			startup_command: startupCommand.value || null,
+			java_version: javaVersion.value ?? null,
+			jre_vendor: jreVendor.value ?? null,
 		}),
 	onSuccess: async () => {
-		await queryClient.invalidateQueries({ queryKey: STARTUP_QUERY_KEY })
+		await queryClient.invalidateQueries({ queryKey: startupQueryKey.value })
 		syncFormFromData()
 		addNotification({
 			type: 'success',
@@ -241,6 +250,6 @@ function resetStartup() {
 }
 
 function resetToDefault() {
-	invocation.value = defaultInvocation.value
+	startupCommand.value = defaultStartupCommand.value
 }
 </script>

@@ -60,7 +60,13 @@
 				/>
 			</div>
 			<span v-if="ctx.flowType === 'reset-server'" class="text-sm text-secondary">
-				We will automatically create a backup before your server is reset.
+				We recommend creating a
+				<AutoLink
+					:to="`/hosting/manage/${serverId}/backups`"
+					class="font-semibold text-link hover:underline"
+					@click="ctx.modal.value?.hide()"
+				>backup</AutoLink>
+				before proceeding so you can restore your world if anything breaks.
 			</span>
 		</template>
 	</div>
@@ -69,9 +75,13 @@
 <script setup lang="ts">
 import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets'
 
+import { injectModrinthServerContext } from '../../../../providers/server-context'
+import AutoLink from '../../../base/AutoLink.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
 const { setSetupType } = ctx
+const serverContext = injectModrinthServerContext(null)
+const serverId = serverContext?.serverId
 </script>
