@@ -1,8 +1,7 @@
 use crate::database::models::DelphiReportIssueDetailsId;
+use crate::env::ENV;
 use crate::file_hosting::FileHostingError;
-use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
-use crate::util::env::parse_strings_from_var;
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
@@ -16,7 +15,7 @@ pub mod v2;
 pub mod v2_reroute;
 pub mod v3;
 
-mod analytics;
+pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
@@ -40,10 +39,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
             .wrap(
                 Cors::default()
                     .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins =
-                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
-                                .unwrap_or_default();
-
+                        let allowed_origins = &ENV.ANALYTICS_ALLOWED_ORIGINS;
                         allowed_origins.contains(&"*".to_string())
                             || allowed_origins.contains(
                                 &origin
@@ -60,8 +56,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                     ])
                     .max_age(3600),
             )
-            .service(page_view_ingest)
-            .service(playtime_ingest),
+            .configure(analytics::config),
     );
     cfg.service(
         web::scope("api/v1")
@@ -219,9 +214,9 @@ impl ApiError {
                 }
             },
             description: match self {
-                Self::Internal(e) => format!("{e:#?}"),
-                Self::Request(e) => format!("{e:#?}"),
-                Self::Auth(e) => format!("{e:#?}"),
+                Self::Internal(e) => format!("{e:#}"),
+                Self::Request(e) => format!("{e:#}"),
+                Self::Auth(e) => format!("{e:#}"),
                 _ => self.to_string(),
             },
             details: match self {

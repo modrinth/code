@@ -8,6 +8,7 @@ use crate::database::models::{
     DBOrganization, DBProject, DBUser, DatabaseError,
 };
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::v3::notifications::NotificationBody;
 use crate::routes::ApiError;
 use crate::util::error::Context;
@@ -96,10 +97,18 @@ pub struct MailingIdentity {
 impl MailingIdentity {
     pub fn from_env() -> dotenvy::Result<Self> {
         Ok(Self {
-            from_name: dotenvy::var("SMTP_FROM_NAME")?,
-            from_address: dotenvy::var("SMTP_FROM_ADDRESS")?,
-            reply_name: dotenvy::var("SMTP_REPLY_TO_NAME").ok(),
-            reply_address: dotenvy::var("SMTP_REPLY_TO_ADDRESS").ok(),
+            from_name: ENV.SMTP_FROM_NAME.clone(),
+            from_address: ENV.SMTP_FROM_ADDRESS.clone(),
+            reply_name: if ENV.SMTP_REPLY_TO_NAME.is_empty() {
+                None
+            } else {
+                Some(ENV.SMTP_REPLY_TO_NAME.clone())
+            },
+            reply_address: if ENV.SMTP_REPLY_TO_ADDRESS.is_empty() {
+                None
+            } else {
+                Some(ENV.SMTP_REPLY_TO_ADDRESS.clone())
+            },
         })
     }
 }
@@ -558,9 +567,7 @@ async fn collect_template_variables(
         NotificationBody::ResetPassword { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                dotenvy::var("SITE_URL")?,
-                dotenvy::var("SITE_RESET_PASSWORD_PATH")?,
-                flow
+                ENV.SITE_URL, ENV.SITE_RESET_PASSWORD_PATH, flow
             );
 
             map.insert(RESETPASSWORD_URL, url);
@@ -571,9 +578,7 @@ async fn collect_template_variables(
         NotificationBody::VerifyEmail { flow } => {
             let url = format!(
                 "{}/{}?flow={}",
-                dotenvy::var("SITE_URL")?,
-                dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,
-                flow
+                ENV.SITE_URL, ENV.SITE_VERIFY_EMAIL_PATH, flow
             );
 
             map.insert(VERIFYEMAIL_URL, url);
@@ -603,11 +608,7 @@ async fn collect_template_variables(
         }
 
         NotificationBody::PaymentFailed { amount, service } => {
-            let url = format!(
-                "{}/{}",
-                dotenvy::var("SITE_URL")?,
-                dotenvy::var("SITE_BILLING_PATH")?,
-            );
+            let url = format!("{}/{}", ENV.SITE_URL, ENV.SITE_BILLING_PATH,);
 
             let mut map = HashMap::new();
             map.insert(PAYMENTFAILED_AMOUNT, amount.clone());
@@ -748,8 +749,7 @@ async fn dynamic_email_body(
     key: &str,
 ) -> Result<String, ApiError> {
     get_or_set_cached_dynamic_html(redis, key, || async {
-        let site_url = dotenvy::var("SITE_URL")
-            .wrap_internal_err("SITE_URL is not set")?;
+        let site_url = &ENV.SITE_URL;
         let site_url = site_url.trim_end_matches('/');
 
         let url = format!("{site_url}/_internal/templates/email/dynamic");

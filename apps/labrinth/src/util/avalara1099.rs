@@ -1,4 +1,5 @@
 use crate::database::models::{DBUserId, users_compliance::FormType};
+use crate::env::ENV;
 use crate::routes::ApiError;
 use ariadne::ids::base62_impl::to_base62;
 use chrono::Datelike;
@@ -131,10 +132,10 @@ fn team_request(
     method: reqwest::Method,
     route: &str,
 ) -> Result<(reqwest::RequestBuilder, String), ApiError> {
-    let key = dotenvy::var("AVALARA_1099_API_KEY")?;
-    let url = dotenvy::var("AVALARA_1099_API_URL")?;
-    let team = dotenvy::var("AVALARA_1099_API_TEAM_ID")?;
-    let company = dotenvy::var("AVALARA_1099_COMPANY_ID")?;
+    let key = &ENV.AVALARA_1099_API_KEY;
+    let url = &ENV.AVALARA_1099_API_URL;
+    let team = &ENV.AVALARA_1099_API_TEAM_ID;
+    let company = &ENV.AVALARA_1099_COMPANY_ID;
 
     let url = url.trim_end_matches('/');
 
@@ -144,8 +145,8 @@ fn team_request(
         client
             .request(method, format!("{url}/v1/{team}{route}"))
             .header(reqwest::header::USER_AGENT, "Modrinth")
-            .bearer_auth(&key),
-        company,
+            .bearer_auth(key),
+        company.to_string(),
     ))
 }
 

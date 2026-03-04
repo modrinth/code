@@ -26,6 +26,9 @@ const licenseStage: Stage = {
 	icon: BookTextIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
 	navigate: '/settings/license',
+	shouldShow(project, projectV3) {
+		return !projectV3?.minecraft_server
+	},
 	actions: [
 		{
 			id: 'license_invalid_link',

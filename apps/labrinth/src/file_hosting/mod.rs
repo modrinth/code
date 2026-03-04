@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use async_trait::async_trait;
 use thiserror::Error;
 
@@ -62,4 +64,26 @@ pub trait FileHost {
         file_name: &str,
         file_publicity: FileHostPublicity,
     ) -> Result<DeleteFileData, FileHostingError>;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum FileHostKind {
+    S3,
+    Local,
+}
+
+#[derive(Debug, Error)]
+#[error("invalid file host kind")]
+pub struct InvalidFileHostKind;
+
+impl FromStr for FileHostKind {
+    type Err = InvalidFileHostKind;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "s3" => Self::S3,
+            "local" => Self::Local,
+            _ => return Err(InvalidFileHostKind),
+        })
+    }
 }

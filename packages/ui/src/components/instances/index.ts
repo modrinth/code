@@ -7,6 +7,7 @@ export { default as ContentCardTable } from './ContentCardTable.vue'
 export { default as ContentCard } from './ContentCardItem.vue'
 export { default as ContentModpackCard } from './ContentModpackCard.vue'
 // export { default as ContentUpdaterModal } from './modals/ContentUpdaterModal.vue'
+export { default as ModpackContentModal } from './modals/ModpackContentModal.vue'
 export type {
 	ContentCardProject,
 	ContentCardTableItem,

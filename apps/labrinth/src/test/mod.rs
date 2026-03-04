@@ -1,8 +1,9 @@
+use crate::env::ENV;
 use crate::queue::email::EmailQueue;
 use crate::util::anrok;
 use crate::util::gotenberg::GotenbergClient;
 use crate::{LabrinthConfig, file_hosting};
-use crate::{check_env_vars, clickhouse};
+use crate::{clickhouse, env};
 use std::sync::Arc;
 
 pub mod api_common;
@@ -22,12 +23,8 @@ pub mod search;
 // If making a test, you should probably use environment::TestEnvironment::build() (which calls this)
 pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
     println!("Setting up labrinth config");
-
     dotenvy::dotenv().ok();
-
-    if check_env_vars() {
-        println!("Some environment variables are missing!");
-    }
+    env::init().expect("failed to initialize environment variables");
 
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 
@@ -39,8 +36,7 @@ pub async fn setup(db: &database::TemporaryDatabase) -> LabrinthConfig {
         Arc::new(file_hosting::MockHost::new());
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =
