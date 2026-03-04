@@ -214,7 +214,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			ref="listContainer"
 			class="relative w-full"
 			:class="flat ? '' : 'rounded-b-[20px]'"
-			:style="{ minHeight: `${totalHeight}px` }"
+			:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
 		>
 			<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
 				<ContentCardItem

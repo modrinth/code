@@ -409,6 +409,7 @@ async function confirmBulkUpdate() {
 	if (ctx.bulkUpdateItems) {
 		isBulkOperating.value = true
 		bulkOperation.value = 'update'
+		bulkWaiting.value = true
 		try {
 			await ctx.bulkUpdateItems(items)
 		} finally {
@@ -833,7 +834,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
-			v-if="ctx.bulkUpdateItem"
+			v-if="hasBulkUpdateSupport"
 			ref="confirmBulkUpdateModal"
 			:count="pendingBulkUpdateItems.length"
 			@update="confirmBulkUpdate"

@@ -296,7 +296,10 @@
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<InstallingBanner
-						v-if="(serverData.status === 'installing' || isSyncingContent) && syncProgress?.phase !== 'Analyzing'"
+						v-if="
+							(serverData.status === 'installing' || isSyncingContent) &&
+							syncProgress?.phase !== 'Analyzing'
+						"
 						data-pyro-server-installing
 						class="mb-4"
 						:progress="syncProgress"
@@ -366,6 +369,7 @@ import {
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
@@ -473,7 +477,21 @@ const markBackupCancelled = (backupId: string) => {
 
 // Parthenon state event
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
-const isSyncingContent = computed(() => syncProgress.value != null)
+const isSyncingContent = ref(false)
+const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
+	() => (isSyncingContent.value = false),
+	1000,
+	{ immediate: false },
+)
+
+watch(syncProgress, (progress) => {
+	if (progress != null) {
+		cancelSyncHide()
+		isSyncingContent.value = true
+	} else if (isSyncingContent.value) {
+		startSyncHide()
+	}
+})
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -741,6 +759,8 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			serverData.value.status = 'installing'
 		} else if (serverData.value.status === 'installing') {
 			serverData.value.status = 'available'
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+			queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 		}
 	}
 }
