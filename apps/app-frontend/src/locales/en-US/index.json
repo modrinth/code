@@ -398,6 +398,15 @@
   "instance.settings.tabs.installation": {
     "message": "Installation"
   },
+  "instance.settings.tabs.installation.aria.select-game-version": {
+    "message": "Select game version"
+  },
+  "instance.settings.tabs.installation.aria.select-loader-version": {
+    "message": "Select {loader} version"
+  },
+  "instance.settings.tabs.installation.aria.select-platform": {
+    "message": "Select platform"
+  },
   "instance.settings.tabs.installation.cancel.button": {
     "message": "Cancel"
   },

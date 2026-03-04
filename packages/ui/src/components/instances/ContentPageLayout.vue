@@ -174,6 +174,10 @@ const messages = defineMessages({
 		id: 'content.page-layout.uploading-files',
 		defaultMessage: 'Uploading files ({completed}/{total})',
 	},
+	sortByLabel: {
+		id: 'content.page-layout.sort.label',
+		defaultMessage: 'Sort by {mode}',
+	},
 })
 
 const ctx = injectContentManager()
@@ -431,6 +435,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 	<div class="flex flex-col gap-4 pb-6">
 		<div
 			v-if="ctx.loading.value"
+			role="status"
+			aria-live="polite"
 			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
 		>
 			<SpinnerIcon class="animate-spin" />
@@ -476,6 +482,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				leave-active-class="transition-all duration-200 ease-in overflow-hidden"
 				leave-from-class="opacity-100 max-h-40"
 				leave-to-class="opacity-0 max-h-0"
+				aria-live="polite"
 			>
 				<Admonition v-if="ctx.uploadState?.value?.isUploading" type="info" show-actions-underneath>
 					<template #icon>
@@ -565,6 +572,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										? 'border-green bg-brand-highlight text-brand'
 										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
 								"
+								:aria-pressed="selectedFilters.length === 0"
 								@click="selectedFilters = []"
 							>
 								{{ formatMessage(commonMessages.allProjectType) }}
@@ -578,6 +586,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										? 'border-green bg-brand-highlight text-brand'
 										: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
 								"
+								:aria-pressed="selectedFilters.includes(option.id)"
 								@click="toggleFilter(option.id)"
 							>
 								{{ option.label }}
@@ -585,7 +594,12 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<div class="ml-4 mx-0.5 h-5 w-px bg-surface-5" />
 
 							<ButtonStyled type="transparent" hover-color-fill="none">
-								<button @click="cycleSortMode">
+								<button
+									:aria-label="
+										formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+									"
+									@click="cycleSortMode"
+								>
 									<ArrowUpDownIcon />
 									{{ sortLabels[sortMode]() }}
 								</button>
@@ -674,7 +688,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</EmptyState>
 		</template>
 
-		<FloatingActionBar :shown="selectedItems.length > 0 || isBulkOperating">
+		<FloatingActionBar
+			:shown="selectedItems.length > 0 || isBulkOperating"
+			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
+		>
 			<template v-if="!isBulkOperating">
 				<div class="flex items-center gap-0.5">
 					<span class="px-4 py-2.5 text-base font-semibold text-contrast">
@@ -784,7 +801,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</template>
 
 			<template v-else>
-				<div class="flex flex-1 flex-col gap-2">
+				<div class="flex flex-1 flex-col gap-2" aria-live="polite">
 					<span class="text-sm font-medium text-contrast">
 						<template v-if="bulkWaiting">
 							{{

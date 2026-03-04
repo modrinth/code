@@ -365,6 +365,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 					<FilterIcon class="size-5 text-secondary shrink-0" />
 					<div class="flex flex-wrap items-center gap-1.5">
 						<button
+							:aria-pressed="selectedFilters.length === 0"
 							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
 							:class="
 								selectedFilters.length === 0
@@ -378,6 +379,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 						<button
 							v-for="option in filterOptions"
 							:key="option.id"
+							:aria-pressed="selectedFilters.includes(option.id)"
 							class="rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-colors"
 							:class="
 								selectedFilters.includes(option.id)
@@ -439,6 +441,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 								v-if="props.enableToggle"
 								:model-value="allSelected"
 								:indeterminate="someSelected"
+								:aria-label="formatMessage(commonMessages.selectAllLabel)"
 								class="shrink-0"
 								@update:model-value="toggleSelectAll"
 							/>

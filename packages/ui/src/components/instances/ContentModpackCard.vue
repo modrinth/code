@@ -252,14 +252,14 @@ const collapsedOptions = computed(() => {
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap gap-2">
-				<div
+				<button
 					v-for="cat in categories"
 					:key="cat.name"
-					class="px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
+					class="cursor-pointer px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
 					@click="cat.action"
 				>
 					{{ cat.name }}
-				</div>
+				</button>
 			</div>
 		</div>
 	</div>

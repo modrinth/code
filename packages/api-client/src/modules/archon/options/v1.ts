@@ -27,14 +27,11 @@ export class ArchonOptionsV1Module extends AbstractModule {
 		worldId: string,
 		body: Archon.Content.v1.PatchRuntimeOptions,
 	): Promise<void> {
-		await this.client.request(
-			`/servers/${serverId}/worlds/${worldId}/options/startup`,
-			{
-				api: 'archon',
-				version: 1,
-				method: 'PATCH',
-				body,
-			},
-		)
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}/options/startup`, {
+			api: 'archon',
+			version: 1,
+			method: 'PATCH',
+			body,
+		})
 	}
 }

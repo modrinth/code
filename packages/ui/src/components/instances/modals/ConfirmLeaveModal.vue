@@ -1,9 +1,13 @@
 <template>
-	<NewModal ref="modal" header="Leave page?" fade="warning" max-width="500px">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.leavePageTitle)"
+		fade="warning"
+		max-width="500px"
+	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="critical" header="Upload in progress">
-				Files are still being uploaded. Leaving this page will cancel the upload and your changes
-				may be lost.
+			<Admonition type="critical" :header="formatMessage(messages.uploadInProgress)">
+				{{ formatMessage(messages.leavePageBody) }}
 			</Admonition>
 		</div>
 
@@ -12,13 +16,13 @@
 				<ButtonStyled type="outlined">
 					<button class="!border !border-surface-4" @click="cancel">
 						<XIcon />
-						Stay on page
+						{{ formatMessage(messages.stayOnPageButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="red">
 					<button @click="leave">
 						<RightArrowIcon />
-						Leave page
+						{{ formatMessage(messages.leavePageButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -30,9 +34,36 @@
 import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import Admonition from '../../base/Admonition.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import NewModal from '../../modal/NewModal.vue'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	leavePageTitle: {
+		id: 'instances.confirm-leave-modal.title',
+		defaultMessage: 'Leave page?',
+	},
+	uploadInProgress: {
+		id: 'instances.confirm-leave-modal.upload-in-progress',
+		defaultMessage: 'Upload in progress',
+	},
+	leavePageBody: {
+		id: 'instances.confirm-leave-modal.body',
+		defaultMessage:
+			'Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost.',
+	},
+	stayOnPageButton: {
+		id: 'instances.confirm-leave-modal.stay',
+		defaultMessage: 'Stay on page',
+	},
+	leavePageButton: {
+		id: 'instances.confirm-leave-modal.leave',
+		defaultMessage: 'Leave page',
+	},
+})
 
 const modal = ref<InstanceType<typeof NewModal>>()
 let resolvePromise: ((value: boolean) => void) | null = null

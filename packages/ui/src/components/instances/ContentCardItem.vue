@@ -73,6 +73,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 <template>
 	<div
+		role="row"
 		class="flex h-[74px] items-center justify-between gap-4 px-3"
 		:class="{ 'opacity-50': disabled }"
 	>
@@ -86,6 +87,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
 				:disabled="disabled"
+				:aria-label="`Select ${project.title}`"
 				class="shrink-0"
 				@update:model-value="selected = $event"
 			/>
@@ -114,7 +116,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 						</AutoLink>
 						<TriangleAlertIcon
 							v-if="isClientOnly"
-							v-tooltip="'This is a client-side mod and may cause issues if enabled'"
+							v-tooltip="formatMessage(commonMessages.clientOnlyWarning)"
 							class="size-4 shrink-0 text-orange"
 						/>
 					</div>
@@ -227,6 +229,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 				v-if="enabled !== undefined"
 				:model-value="enabled"
 				:disabled="disabled"
+				:aria-label="project.title"
 				small
 				class="mr-2 my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"

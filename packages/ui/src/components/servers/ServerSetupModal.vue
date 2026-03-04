@@ -14,10 +14,14 @@
 		@browse-modpacks="$emit('browse-modpacks')"
 	/>
 
-	<NewModal ref="uploadModal" header="Uploading modpack" :closable="false">
+	<NewModal
+		ref="uploadModal"
+		:header="formatMessage(messages.uploadingModpackHeader)"
+		:closable="false"
+	>
 		<div class="flex flex-col gap-4 md:w-[400px]">
 			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
-			<p class="m-0 text-sm text-secondary">Please don't close this page while uploading.</p>
+			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.uploadWarningText) }}</p>
 		</div>
 	</NewModal>
 </template>
@@ -26,6 +30,7 @@
 import type { Archon, ModrinthApiError } from '@modrinth/api-client'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
@@ -33,6 +38,35 @@ import { AppearingProgressBar } from '../base'
 import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
 import { NewModal } from '../modal'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	uploadingModpackHeader: {
+		id: 'servers.setup.uploading-modpack.header',
+		defaultMessage: 'Uploading modpack',
+	},
+	uploadWarningText: {
+		id: 'servers.setup.upload-warning',
+		defaultMessage: "Please don't close this page while uploading.",
+	},
+	rateLimitTitle: {
+		id: 'servers.setup.rate-limit.title',
+		defaultMessage: 'Cannot reinstall server',
+	},
+	rateLimitText: {
+		id: 'servers.setup.rate-limit.text',
+		defaultMessage: 'You are being rate limited. Please try again later.',
+	},
+	reinstallFailedTitle: {
+		id: 'servers.setup.reinstall-failed.title',
+		defaultMessage: 'Reinstall Failed',
+	},
+	reinstallFailedText: {
+		id: 'servers.setup.reinstall-failed.text',
+		defaultMessage: 'An unexpected error occurred while reinstalling. Please try again later.',
+	},
+})
 
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
@@ -119,14 +153,14 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	} catch (error) {
 		if ((error as ModrinthApiError).statusCode === 429) {
 			addNotification({
-				title: 'Cannot reinstall server',
-				text: 'You are being rate limited. Please try again later.',
+				title: formatMessage(messages.rateLimitTitle),
+				text: formatMessage(messages.rateLimitText),
 				type: 'error',
 			})
 		} else {
 			addNotification({
-				title: 'Reinstall Failed',
-				text: 'An unexpected error occurred while reinstalling. Please try again later.',
+				title: formatMessage(messages.reinstallFailedTitle),
+				text: formatMessage(messages.reinstallFailedText),
 				type: 'error',
 			})
 		}

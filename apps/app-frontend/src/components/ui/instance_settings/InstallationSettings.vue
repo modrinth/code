@@ -516,6 +516,18 @@ const messages = defineMessages({
 		id: 'instance.settings.tabs.installation.hide-snapshots',
 		defaultMessage: 'Hide snapshots',
 	},
+	selectPlatformAriaLabel: {
+		id: 'instance.settings.tabs.installation.aria.select-platform',
+		defaultMessage: 'Select platform',
+	},
+	selectGameVersionAriaLabel: {
+		id: 'instance.settings.tabs.installation.aria.select-game-version',
+		defaultMessage: 'Select game version',
+	},
+	selectLoaderVersionAriaLabel: {
+		id: 'instance.settings.tabs.installation.aria.select-loader-version',
+		defaultMessage: 'Select {loader} version',
+	},
 })
 </script>
 
@@ -708,7 +720,11 @@ const messages = defineMessages({
 						<span class="font-semibold text-contrast">
 							{{ formatMessage(messages.platform) }}
 						</span>
-						<Chips v-model="loader" :items="platforms" />
+						<Chips
+							v-model="loader"
+							:items="platforms"
+							:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
+						/>
 					</div>
 
 					<div class="flex flex-col gap-2.5">
@@ -723,6 +739,7 @@ const messages = defineMessages({
 							placeholder="Select version"
 							search-placeholder="Search game version..."
 							:display-value="gameVersion || 'Select version'"
+							:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
 						>
 							<template v-if="hasSnapshots" #dropdown-footer>
 								<button
@@ -754,6 +771,11 @@ const messages = defineMessages({
 							search-placeholder="Search version..."
 							:options="loaderVersionOptions"
 							:display-value="loaderVersionLabel"
+							:aria-label="
+								formatMessage(messages.selectLoaderVersionAriaLabel, {
+									loader: formattedLoaderName,
+								})
+							"
 						/>
 					</div>
 

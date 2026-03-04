@@ -65,7 +65,8 @@
 					:to="`/hosting/manage/${serverId}/backups`"
 					class="font-semibold text-link hover:underline"
 					@click="ctx.modal.value?.hide()"
-				>backup</AutoLink>
+					>backup</AutoLink
+				>
 				before proceeding so you can restore your world if anything breaks.
 			</span>
 		</template>

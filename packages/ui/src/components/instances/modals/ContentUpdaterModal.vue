@@ -36,10 +36,12 @@
 						}}</span>
 					</div>
 					<template v-else>
-						<div class="flex flex-col gap-1.5">
+						<div class="flex flex-col gap-1.5" role="listbox">
 							<button
 								v-for="version in filteredVersions"
 								:key="version.id"
+								role="option"
+								:aria-selected="selectedVersion?.id === version.id"
 								class="flex items-center h-10 px-4 py-2.5 rounded-xl border-none cursor-pointer transition-colors"
 								:class="[
 									selectedVersion?.id === version.id
@@ -48,6 +50,7 @@
 								]"
 								@mouseenter="handleVersionMouseEnter(version)"
 								@mouseleave="handleVersionMouseLeave"
+								@focus="emit('versionHover', version)"
 								@click="handleVersionSelect(version)"
 							>
 								<div class="flex items-center justify-between w-full gap-2">
@@ -98,6 +101,11 @@
 						<ButtonStyled type="transparent" :circular="true">
 							<button
 								class="flex items-center gap-1.5"
+								:aria-label="
+									hideIncompatibleState
+										? formatMessage(messages.showIncompatible)
+										: formatMessage(messages.hideIncompatible)
+								"
 								@click="hideIncompatibleState = !hideIncompatibleState"
 							>
 								<EyeIcon v-if="hideIncompatibleState" class="h-6 w-6" />
@@ -115,7 +123,7 @@
 
 			<div class="w-px bg-divider" />
 
-			<div class="flex-1 flex flex-col min-w-0 relative">
+			<div class="flex-1 flex flex-col min-w-0 relative" aria-live="polite">
 				<template v-if="selectedVersion">
 					<div class="bg-bg p-4">
 						<div class="flex flex-col gap-1.5">

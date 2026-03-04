@@ -23,6 +23,7 @@ import {
 	provideContentManager,
 } from '../../../providers'
 import type { ContentModpackData, UploadState } from '../../../providers/content-manager'
+import { commonMessages } from '../../../utils/common-messages'
 
 const { formatMessage } = useVIntl()
 
@@ -46,6 +47,14 @@ const messages = defineMessages({
 	failedToLoadModpackContent: {
 		id: 'hosting.content.failed-to-load-modpack-content',
 		defaultMessage: 'Failed to load modpack content',
+	},
+	failedToLoadVersions: {
+		id: 'hosting.content.failed-to-load-versions',
+		defaultMessage: 'Failed to load versions',
+	},
+	failedToUpdate: {
+		id: 'hosting.content.failed-to-update',
+		defaultMessage: 'Failed to update',
 	},
 })
 
@@ -404,7 +413,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 		},
 		version: {
 			id: addon.version?.id ?? addon.filename,
-			version_number: addon.version?.name ?? 'Unknown',
+			version_number: addon.version?.name ?? formatMessage(commonMessages.unknownLabel),
 			file_name: addon.filename,
 		},
 		owner: addon.owner
@@ -514,7 +523,7 @@ async function handleUpdateItem(fileNameKey: string) {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to load versions',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
 		})
 	} finally {
 		loadingVersions.value = false
@@ -557,7 +566,7 @@ async function handleModpackUpdate() {
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : 'Failed to load versions',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
 			})
 		} finally {
 			loadingVersions.value = false
@@ -633,7 +642,7 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to update',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToUpdate),
 		})
 	} finally {
 		resetUpdateState()
@@ -713,7 +722,7 @@ provideContentManager({
 				"
 				:project-name="
 					updatingModpack
-						? (modpack?.project.title ?? 'Modpack')
+						? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
 						: (updatingProject?.project?.title ?? updatingProject?.file_name)
 				"
 				:loading="loadingVersions"

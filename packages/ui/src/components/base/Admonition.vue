@@ -11,7 +11,7 @@
 			type="highlight-colored-text"
 			:color="buttonColors[type]"
 		>
-			<button aria-label="Dismiss" @click="$emit('dismiss')" class="absolute top-3 right-3">
+			<button aria-label="Dismiss" class="absolute top-3 right-3" @click="$emit('dismiss')">
 				<XIcon class="h-4 w-4" />
 			</button>
 		</ButtonStyled>

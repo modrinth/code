@@ -1,14 +1,13 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
-		<div
-			v-if="!server"
-			class="flex items-center justify-center py-12"
-		>
+		<div v-if="!server" class="flex items-center justify-center py-12">
 			<SpinnerIcon class="size-8 animate-spin text-secondary" />
 		</div>
 		<template v-else>
 			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Installation info</span>
+				<span class="text-lg font-semibold text-contrast">{{
+					formatMessage(commonMessages.installationInfoTitle)
+				}}</span>
 				<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
 					<div
 						v-for="row in installationInfo"
@@ -21,244 +20,272 @@
 				</div>
 			</div>
 
-			<div
-				v-if="addonsQuery.isLoading.value"
-				class="flex items-center justify-center py-6"
-			>
+			<div v-if="addonsQuery.isLoading.value" class="flex items-center justify-center py-6">
 				<SpinnerIcon class="size-6 animate-spin text-secondary" />
 			</div>
 
 			<template v-else-if="isLinked">
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Installed modpack</span>
-				<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
-					<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
-						<div
-							class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
-						>
-							<Avatar
-								v-if="modpack.icon_url"
-								:src="modpack.icon_url"
-								:alt="modpack.title ?? 'Modpack'"
-								size="100%"
-								no-shadow
-							/>
-						</div>
-					</AutoLink>
-					<div class="flex flex-col gap-1">
-						<AutoLink
-							:to="`/project/${modpack.spec.project_id}`"
-							class="font-semibold text-contrast hover:underline"
-						>
-							{{ modpack.title ?? modpack.spec.project_id }}
-						</AutoLink>
-						<div class="flex items-center gap-2 text-sm text-secondary">
-							<AutoLink
-								v-if="modpack.owner"
-								:to="
-									modpack.owner.type === 'organization'
-										? `/organization/${modpack.owner.id}`
-										: `/user/${modpack.owner.id}`
-								"
-								class="flex items-center gap-1.5 hover:underline"
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(commonMessages.installedModpackTitle)
+					}}</span>
+					<div v-if="modpack" class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3">
+						<AutoLink :to="`/project/${modpack.spec.project_id}`" class="shrink-0">
+							<div
+								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
 							>
 								<Avatar
-									:src="modpack.owner.icon_url"
-									:alt="modpack.owner.name"
-									size="1.25rem"
-									:circle="modpack.owner.type === 'user'"
+									v-if="modpack.icon_url"
+									:src="modpack.icon_url"
+									:alt="modpack.title ?? formatMessage(commonMessages.modpackLabel)"
+									size="100%"
 									no-shadow
 								/>
-								<span class="font-medium">{{ modpack.owner.name }}</span>
+							</div>
+						</AutoLink>
+						<div class="flex flex-col gap-1">
+							<AutoLink
+								:to="`/project/${modpack.spec.project_id}`"
+								class="font-semibold text-contrast hover:underline"
+							>
+								{{ modpack.title ?? modpack.spec.project_id }}
 							</AutoLink>
-							<template v-if="modpack.owner && modpack.version_number"> &middot; </template>
-							<span v-if="modpack.version_number" class="font-medium">{{
-								modpack.version_number
-							}}</span>
+							<div class="flex items-center gap-2 text-sm text-secondary">
+								<AutoLink
+									v-if="modpack.owner"
+									:to="
+										modpack.owner.type === 'organization'
+											? `/organization/${modpack.owner.id}`
+											: `/user/${modpack.owner.id}`
+									"
+									class="flex items-center gap-1.5 hover:underline"
+								>
+									<Avatar
+										:src="modpack.owner.icon_url"
+										:alt="modpack.owner.name"
+										size="1.25rem"
+										:circle="modpack.owner.type === 'user'"
+										no-shadow
+									/>
+									<span class="font-medium">{{ modpack.owner.name }}</span>
+								</AutoLink>
+								<template v-if="modpack.owner && modpack.version_number"> &middot; </template>
+								<span v-if="modpack.version_number" class="font-medium">{{
+									modpack.version_number
+								}}</span>
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="flex flex-wrap gap-2">
-					<ButtonStyled>
-						<button
-							class="!shadow-none"
-							:disabled="isInstalling"
-							@click="handleChangeModpackVersion"
-						>
-							<ArrowLeftRightIcon class="size-5" />
-							Change version
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="orange">
-						<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
-							<HammerIcon class="size-5" />
-							Repair
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Linked instance</span>
-				<span class="text-primary">
-					Unlinking permanently disconnects this instance from the modpack project, allowing you to
-					change the loader and Minecraft version, but you won't receive future updates.
-				</span>
-				<div>
-					<ButtonStyled color="orange">
-						<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
-							<UnlinkIcon class="size-5" />
-							Unlink modpack
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Re-install modpack</span>
-				<span class="text-primary">
-					Re-installing the modpack resets the instance's content to its original state, removing
-					any mods or content you have added.
-				</span>
-				<div>
-					<ButtonStyled color="red">
-						<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
-							<DownloadIcon class="size-5" />
-							Re-install modpack
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Reset server</span>
-				<span class="text-primary">
-					Removes all data on your server, including your worlds, mods, and configuration files.
-					Backups will remain and can be restored.
-				</span>
-				<div>
-					<ButtonStyled color="red">
-						<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
-							<RotateCounterClockwiseIcon class="size-5" />
-							Reset server
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</template>
-
-		<template v-else>
-			<div v-if="isEditing" class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Edit installation</span>
-				<div
-					class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4"
-				>
-					<div class="flex flex-col gap-2.5">
-						<span class="font-semibold text-contrast">Platform</span>
-						<Chips v-model="selectedPlatform" :items="availablePlatforms" />
-					</div>
-
-					<div class="flex flex-col gap-2.5">
-						<span class="font-semibold text-contrast">Game version</span>
-						<Combobox
-							v-model="selectedGameVersion"
-							:options="gameVersionOptions"
-							searchable
-							sync-with-selection
-							placeholder="Select version"
-							search-placeholder="Search game version..."
-							:display-value="selectedGameVersion || 'Select version'"
-						>
-							<template v-if="hasSnapshots" #dropdown-footer>
-								<button
-									class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
-									@mousedown.prevent
-									@click="showSnapshots = !showSnapshots"
-								>
-									<EyeOffIcon v-if="showSnapshots" class="size-4" />
-									<EyeIcon v-else class="size-4" />
-									{{ showSnapshots ? 'Hide snapshots' : 'Show all versions' }}
-								</button>
-							</template>
-						</Combobox>
-					</div>
-
-					<div v-if="selectedPlatform !== 'vanilla'" class="flex flex-col gap-2.5">
-						<span class="font-semibold text-contrast"> {{ formattedLoaderName }} version </span>
-						<Combobox
-							v-model="selectedLoaderVersion"
-							searchable
-							sync-with-selection
-							:placeholder="loaderVersionDisplayValue"
-							search-placeholder="Search version..."
-							:options="loaderVersionOptions"
-							:display-value="loaderVersionDisplayValue"
-						/>
-					</div>
-
 					<div class="flex flex-wrap gap-2">
-						<ButtonStyled color="brand">
+						<ButtonStyled>
 							<button
 								class="!shadow-none"
-								:disabled="!isValid || !hasChanges || isSaving"
-								@click="handleSave"
+								:disabled="isInstalling"
+								@click="handleChangeModpackVersion"
 							>
-								<SpinnerIcon v-if="isSaving" class="animate-spin" />
-								<SaveIcon v-else />
-								{{ isSaving ? 'Saving...' : 'Save' }}
+								<ArrowLeftRightIcon class="size-5" />
+								{{ formatMessage(commonMessages.changeVersionButton) }}
 							</button>
 						</ButtonStyled>
-						<ButtonStyled type="outlined">
-							<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
-								<XIcon />
-								Cancel
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
+								<HammerIcon class="size-5" />
+								{{ formatMessage(commonMessages.repairButton) }}
 							</button>
 						</ButtonStyled>
 					</div>
 				</div>
-			</div>
 
-			<template v-if="!isEditing">
-				<div class="flex items-start gap-2">
-					<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.linkedInstanceTitle)
+					}}</span>
 					<span class="text-primary">
-						We don't recommend editing your installation settings after installing content. If you
-						want to edit them reset your server.
+						{{ formatMessage(messages.unlinkDescription) }}
 					</span>
+					<div>
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="unlinkModal?.show()">
+								<UnlinkIcon class="size-5" />
+								{{ formatMessage(commonMessages.unlinkModpackButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 
-				<div class="flex flex-wrap gap-2">
-					<ButtonStyled color="orange">
-						<button class="!shadow-none" :disabled="isInstalling" @click="isEditing = true">
-							<PencilIcon class="size-5" />
-							Edit
-						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
-							Reset server
-							<ChevronRightIcon class="size-5" />
-						</button>
-					</ButtonStyled>
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.reinstallModpackTitle)
+					}}</span>
+					<span class="text-primary">
+						{{ formatMessage(messages.reinstallModpackDescription) }}
+					</span>
+					<div>
+						<ButtonStyled color="red">
+							<button class="!shadow-none" :disabled="isInstalling" @click="reinstallModal?.show()">
+								<DownloadIcon class="size-5" />
+								{{ formatMessage(commonMessages.reinstallModpackButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.resetServerTitle)
+					}}</span>
+					<span class="text-primary">
+						{{ formatMessage(messages.resetServerDescription) }}
+					</span>
+					<div>
+						<ButtonStyled color="red">
+							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+								<RotateCounterClockwiseIcon class="size-5" />
+								{{ formatMessage(commonMessages.resetServerButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
 				</div>
 			</template>
 
-			<div class="flex flex-col gap-2.5">
-				<span class="text-lg font-semibold text-contrast">Repair server</span>
-				<span class="text-primary">
-					Reinstalls the loader and Minecraft dependencies without deleting your content. This may
-					resolve issues if your server is not starting correctly.
-				</span>
-				<div>
-					<ButtonStyled color="orange">
-						<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
-							<HammerIcon class="size-5" />
-							Repair
-						</button>
-					</ButtonStyled>
+			<template v-else>
+				<div v-if="isEditing" class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.editInstallationTitle)
+					}}</span>
+					<div class="flex flex-col gap-3 rounded-[20px] border border-solid border-surface-5 p-4">
+						<div class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast">{{
+								formatMessage(commonMessages.platformLabel)
+							}}</span>
+							<Chips
+								v-model="selectedPlatform"
+								:items="availablePlatforms"
+								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
+							/>
+						</div>
+
+						<div class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast">{{
+								formatMessage(commonMessages.gameVersionLabel)
+							}}</span>
+							<Combobox
+								v-model="selectedGameVersion"
+								:options="gameVersionOptions"
+								searchable
+								sync-with-selection
+								:placeholder="formatMessage(commonMessages.selectVersionPlaceholder)"
+								:search-placeholder="formatMessage(messages.searchGameVersionPlaceholder)"
+								:display-value="
+									selectedGameVersion || formatMessage(commonMessages.selectVersionPlaceholder)
+								"
+								:aria-label="formatMessage(messages.selectGameVersionAriaLabel)"
+							>
+								<template v-if="hasSnapshots" #dropdown-footer>
+									<button
+										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										@mousedown.prevent
+										@click="showSnapshots = !showSnapshots"
+									>
+										<EyeOffIcon v-if="showSnapshots" class="size-4" />
+										<EyeIcon v-else class="size-4" />
+										{{
+											showSnapshots
+												? formatMessage(commonMessages.hideSnapshotsButton)
+												: formatMessage(commonMessages.showAllVersionsButton)
+										}}
+									</button>
+								</template>
+							</Combobox>
+						</div>
+
+						<div v-if="selectedPlatform !== 'vanilla'" class="flex flex-col gap-2.5">
+							<span class="font-semibold text-contrast">{{
+								formatMessage(messages.loaderVersionLabel, { loader: formattedLoaderName })
+							}}</span>
+							<Combobox
+								v-model="selectedLoaderVersion"
+								searchable
+								sync-with-selection
+								:placeholder="loaderVersionDisplayValue"
+								:search-placeholder="formatMessage(commonMessages.searchVersionPlaceholder)"
+								:options="loaderVersionOptions"
+								:display-value="loaderVersionDisplayValue"
+								:aria-label="
+									formatMessage(messages.selectLoaderVersionAriaLabel, {
+										loader: formattedLoaderName,
+									})
+								"
+							/>
+						</div>
+
+						<div class="flex flex-wrap gap-2">
+							<ButtonStyled color="brand">
+								<button
+									class="!shadow-none"
+									:disabled="!isValid || !hasChanges || isSaving"
+									@click="handleSave"
+								>
+									<SpinnerIcon v-if="isSaving" class="animate-spin" />
+									<SaveIcon v-else />
+									{{
+										isSaving
+											? formatMessage(messages.savingLabel)
+											: formatMessage(commonMessages.saveButton)
+									}}
+								</button>
+							</ButtonStyled>
+							<ButtonStyled type="outlined">
+								<button class="!border !border-surface-5 !shadow-none" @click="cancelEditing">
+									<XIcon />
+									{{ formatMessage(commonMessages.cancelButton) }}
+								</button>
+							</ButtonStyled>
+						</div>
+					</div>
 				</div>
-			</div>
-		</template>
+
+				<template v-if="!isEditing">
+					<div class="flex items-start gap-2">
+						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+						<span class="text-primary">
+							{{ formatMessage(messages.editWarning) }}
+						</span>
+					</div>
+
+					<div class="flex flex-wrap gap-2">
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="isEditing = true">
+								<PencilIcon class="size-5" />
+								{{ formatMessage(commonMessages.editButton) }}
+							</button>
+						</ButtonStyled>
+						<ButtonStyled>
+							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
+								{{ formatMessage(commonMessages.resetServerButton) }}
+								<ChevronRightIcon class="size-5" />
+							</button>
+						</ButtonStyled>
+					</div>
+				</template>
+
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">{{
+						formatMessage(messages.repairServerTitle)
+					}}</span>
+					<span class="text-primary">
+						{{ formatMessage(messages.repairServerDescription) }}
+					</span>
+					<div>
+						<ButtonStyled color="orange">
+							<button class="!shadow-none" :disabled="isInstalling" @click="repairModal?.show()">
+								<HammerIcon class="size-5" />
+								{{ formatMessage(commonMessages.repairButton) }}
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</template>
 		</template>
 	</div>
 	<ConfirmUnlinkModal ref="unlinkModal" server @unlink="handleUnlinkConfirm" />
@@ -277,7 +304,9 @@
 		:is-app="false"
 		:is-modpack="true"
 		:project-icon-url="modpack?.icon_url ?? undefined"
-		:project-name="modpack?.title ?? modpack?.spec.project_id ?? 'Modpack'"
+		:project-name="
+			modpack?.title ?? modpack?.spec.project_id ?? formatMessage(commonMessages.modpackLabel)
+		"
 		:loading="loadingVersions"
 		:loading-changelog="loadingChangelog"
 		@update="handleUpdaterConfirm"
@@ -312,15 +341,18 @@ import {
 	ButtonStyled,
 	Chips,
 	Combobox,
+	commonMessages,
 	ConfirmReinstallModal,
 	ConfirmRepairModal,
 	ConfirmUnlinkModal,
 	ContentUpdaterModal,
+	defineMessages,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	injectTags,
 	ServerSetupModal,
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -330,6 +362,103 @@ const { server, serverId, worldId } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const tags = injectTags()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	editInstallationTitle: {
+		id: 'hosting.loader.edit-installation',
+		defaultMessage: 'Edit installation',
+	},
+	linkedInstanceTitle: {
+		id: 'hosting.loader.linked-instance',
+		defaultMessage: 'Linked instance',
+	},
+	unlinkDescription: {
+		id: 'hosting.loader.unlink-description',
+		defaultMessage:
+			"Unlinking permanently disconnects this instance from the modpack project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+	},
+	reinstallModpackTitle: {
+		id: 'hosting.loader.reinstall-modpack',
+		defaultMessage: 'Re-install modpack',
+	},
+	reinstallModpackDescription: {
+		id: 'hosting.loader.reinstall-modpack-description',
+		defaultMessage:
+			"Re-installing the modpack resets the instance's content to its original state, removing any mods or content you have added.",
+	},
+	resetServerTitle: {
+		id: 'hosting.loader.reset-server',
+		defaultMessage: 'Reset server',
+	},
+	resetServerDescription: {
+		id: 'hosting.loader.reset-server-description',
+		defaultMessage:
+			'Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored.',
+	},
+	repairServerTitle: {
+		id: 'hosting.loader.repair-server',
+		defaultMessage: 'Repair server',
+	},
+	repairServerDescription: {
+		id: 'hosting.loader.repair-server-description',
+		defaultMessage:
+			'Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly.',
+	},
+	editWarning: {
+		id: 'hosting.loader.edit-warning',
+		defaultMessage:
+			"We don't recommend editing your installation settings after installing content. If you want to edit them reset your server.",
+	},
+	loaderVersionLabel: {
+		id: 'hosting.loader.loader-version',
+		defaultMessage: '{loader} version',
+	},
+	searchGameVersionPlaceholder: {
+		id: 'hosting.loader.search-game-version',
+		defaultMessage: 'Search game version...',
+	},
+	savingLabel: {
+		id: 'hosting.loader.saving',
+		defaultMessage: 'Saving...',
+	},
+	failedToLoadVersions: {
+		id: 'hosting.loader.failed-to-load-versions',
+		defaultMessage: 'Failed to load versions',
+	},
+	failedToChangeVersion: {
+		id: 'hosting.loader.failed-to-change-version',
+		defaultMessage: 'Failed to change modpack version',
+	},
+	failedToSaveSettings: {
+		id: 'hosting.loader.failed-to-save-settings',
+		defaultMessage: 'Failed to save installation settings',
+	},
+	failedToRepair: {
+		id: 'hosting.loader.failed-to-repair',
+		defaultMessage: 'Failed to repair server',
+	},
+	failedToReinstall: {
+		id: 'hosting.loader.failed-to-reinstall',
+		defaultMessage: 'Failed to reinstall modpack',
+	},
+	failedToUnlink: {
+		id: 'hosting.loader.failed-to-unlink',
+		defaultMessage: 'Failed to unlink modpack',
+	},
+	selectPlatformAriaLabel: {
+		id: 'hosting.loader.aria.select-platform',
+		defaultMessage: 'Select platform',
+	},
+	selectGameVersionAriaLabel: {
+		id: 'hosting.loader.aria.select-game-version',
+		defaultMessage: 'Select game version',
+	},
+	selectLoaderVersionAriaLabel: {
+		id: 'hosting.loader.aria.select-loader-version',
+		defaultMessage: 'Select {loader} version',
+	},
+})
 
 const emit = defineEmits<{
 	reinstall: [any?]
@@ -363,17 +492,21 @@ function capitalize(str: string): string {
 
 const installationInfo = computed(() => {
 	const addons = addonsQuery.data.value
-	const rawLoader = addons?.modloader ?? server.value?.loader ?? 'Unknown'
+	const unknownStr = formatMessage(commonMessages.unknownLabel)
+	const rawLoader = addons?.modloader ?? server.value?.loader ?? unknownStr
 	const loader = capitalize(rawLoader)
-	const gameVersion = addons?.game_version ?? server.value?.mc_version ?? 'Unknown'
-	const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? 'Unknown'
+	const gameVersion = addons?.game_version ?? server.value?.mc_version ?? unknownStr
+	const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? unknownStr
 
 	const rows = [
-		{ label: 'Platform', value: loader },
-		{ label: 'Game version', value: gameVersion },
+		{ label: formatMessage(commonMessages.platformLabel), value: loader },
+		{ label: formatMessage(commonMessages.gameVersionLabel), value: gameVersion },
 	]
 	if (loader && loader !== 'Vanilla') {
-		rows.push({ label: `${loader} version`, value: loaderVersion })
+		rows.push({
+			label: formatMessage(messages.loaderVersionLabel, { loader }),
+			value: loaderVersion,
+		})
 	}
 	return rows
 })
@@ -413,7 +546,7 @@ async function handleChangeModpackVersion() {
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : 'Failed to load versions',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
 			})
 		} finally {
 			loadingVersions.value = false
@@ -478,7 +611,7 @@ async function handleUpdaterConfirm(selectedVersion: Labrinth.Versions.v2.Versio
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to change modpack version',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
 		})
 	} finally {
 		resetUpdateState()
@@ -617,7 +750,7 @@ const loaderVersionDisplayValue = computed(() => {
 	const idx = selectedLoaderVersion.value
 	return idx >= 0 && loaderVersionEntries.value[idx]
 		? loaderVersionEntries.value[idx].id
-		: 'Select version'
+		: formatMessage(commonMessages.selectVersionPlaceholder)
 })
 
 const formattedLoaderName = computed(() => {
@@ -688,7 +821,7 @@ async function handleSave() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to save installation settings',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToSaveSettings),
 		})
 	} finally {
 		isSaving.value = false
@@ -711,7 +844,7 @@ async function handleRepair() {
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : 'Failed to repair server',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
 			})
 		}
 	} else {
@@ -732,7 +865,7 @@ async function handleRepair() {
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : 'Failed to repair server',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
 			})
 		}
 	}
@@ -755,7 +888,7 @@ async function handleReinstallConfirm() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to reinstall modpack',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
 		})
 	}
 }
@@ -777,7 +910,7 @@ async function handleUnlinkConfirm() {
 		}
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : 'Failed to unlink modpack',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToUnlink),
 		})
 	} finally {
 		await Promise.all([

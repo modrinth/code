@@ -3,6 +3,7 @@ import { onUnmounted, watch } from 'vue'
 
 const props = defineProps<{
 	shown: boolean
+	ariaLabel?: string
 }>()
 
 watch(
@@ -20,8 +21,14 @@ onUnmounted(() => {
 
 <template>
 	<Transition name="floating-action-bar" appear>
-		<div v-if="shown" class="floating-action-bar drop-shadow-2xl fixed z-10 p-4 bottom-0">
+		<div
+			v-if="shown"
+			class="floating-action-bar drop-shadow-2xl fixed z-10 p-4 bottom-0"
+			aria-live="polite"
+		>
 			<div
+				role="toolbar"
+				:aria-label="ariaLabel"
 				class="flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
 			>
 				<slot />

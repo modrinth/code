@@ -16,13 +16,10 @@
 					<div
 						v-for="problem in inspectingError.analysis.problems"
 						:key="problem.message"
-						class="rounded-xl bg-raised-bg/30 px-3 py-2"
+						class="bg-raised-bg/30 rounded-xl px-3 py-2"
 					>
 						<p class="m-0 text-sm font-semibold">{{ problem.message }}</p>
-						<ul
-							v-if="problem.solutions.length"
-							class="m-0 ml-4 mt-1.5 flex flex-col gap-1"
-						>
+						<ul v-if="problem.solutions.length" class="m-0 ml-4 mt-1.5 flex flex-col gap-1">
 							<li
 								v-for="solution in problem.solutions"
 								:key="solution.message"
@@ -36,8 +33,8 @@
 			</template>
 			<template v-else-if="props.serverPowerState === 'crashed'">
 				<template v-if="props.powerStateDetails?.oom_killed">
-					The server stopped because it ran out of memory. There may be a memory leak
-					caused by a mod or plugin, or you may need to upgrade your Modrinth Server.
+					The server stopped because it ran out of memory. There may be a memory leak caused by a
+					mod or plugin, or you may need to upgrade your Modrinth Server.
 				</template>
 				<template v-else-if="props.powerStateDetails?.exit_code !== undefined">
 					Your server exited with code {{ props.powerStateDetails.exit_code }}.
@@ -46,9 +43,7 @@
 						configuration.
 					</template>
 				</template>
-				<template v-else>
-					We could not determine the specific cause of the crash.
-				</template>
+				<template v-else> We could not determine the specific cause of the crash. </template>
 				<p class="m-0 mt-2">You can try restarting the server.</p>
 			</template>
 			<template v-else>

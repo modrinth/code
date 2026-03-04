@@ -137,12 +137,14 @@ function handleSort(column: ContentCardTableSortColumn) {
 
 <template>
 	<div
+		role="table"
 		class="@container border border-solid border-surface-4 shadow-sm overflow-clip"
 		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
 	>
 		<div
 			v-if="!hideHeader"
 			ref="stickyHeaderRef"
+			role="rowgroup"
 			class="sticky top-0 z-10 flex h-12 items-center justify-between gap-4 bg-surface-3 px-3"
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
@@ -152,6 +154,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			]"
 		>
 			<div
+				role="row"
 				class="flex min-w-0 items-center gap-4"
 				:class="
 					hasAnyActions
@@ -163,12 +166,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 					v-if="showSelection"
 					:model-value="allSelected"
 					:indeterminate="someSelected"
+					:aria-label="formatMessage(commonMessages.selectAllLabel)"
 					class="shrink-0"
 					@update:model-value="toggleSelectAll"
 				/>
 
 				<button
 					v-if="sortable"
+					role="columnheader"
+					:aria-sort="
+						sortBy === 'project' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'
+					"
 					class="flex items-center gap-1.5 font-semibold text-secondary"
 					@click="handleSort('project')"
 				>
@@ -179,7 +187,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 						class="size-4"
 					/>
 				</button>
-				<span v-else class="font-semibold text-secondary">{{
+				<span v-else role="columnheader" class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.projectLabel)
 				}}</span>
 			</div>
@@ -187,6 +195,10 @@ function handleSort(column: ContentCardTableSortColumn) {
 			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
 				<button
 					v-if="sortable"
+					role="columnheader"
+					:aria-sort="
+						sortBy === 'version' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'
+					"
 					class="flex items-center gap-1.5 font-semibold text-secondary"
 					@click="handleSort('version')"
 				>
@@ -197,12 +209,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 						class="size-4"
 					/>
 				</button>
-				<span v-else class="font-semibold text-secondary">{{
+				<span v-else role="columnheader" class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.versionLabel)
 				}}</span>
 			</div>
 
-			<div v-if="hasAnyActions" class="min-w-[160px] shrink-0 text-right">
+			<div v-if="hasAnyActions" role="columnheader" class="min-w-[160px] shrink-0 text-right">
 				<span class="font-semibold text-secondary">{{
 					formatMessage(commonMessages.actionsLabel)
 				}}</span>
@@ -212,6 +224,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 		<div
 			v-if="items.length > 0 && virtualized"
 			ref="listContainer"
+			role="rowgroup"
 			class="relative w-full"
 			:class="flat ? '' : 'rounded-b-[20px]'"
 			:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
@@ -255,7 +268,12 @@ function handleSort(column: ContentCardTableSortColumn) {
 			</div>
 		</div>
 
-		<div v-else-if="items.length > 0" ref="listContainer" :class="flat ? '' : 'rounded-b-[20px]'">
+		<div
+			v-else-if="items.length > 0"
+			ref="listContainer"
+			role="rowgroup"
+			:class="flat ? '' : 'rounded-b-[20px]'"
+		>
 			<ContentCardItem
 				v-for="(item, index) in items"
 				:key="item.id"

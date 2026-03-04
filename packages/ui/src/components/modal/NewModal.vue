@@ -29,7 +29,12 @@
 			}"
 		>
 			<div
+				ref="modalBodyRef"
+				role="dialog"
+				aria-modal="true"
+				:aria-labelledby="headerId"
 				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+				@keydown="handleKeyDown"
 			>
 				<div
 					v-if="!hideHeader"
@@ -38,13 +43,18 @@
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" class="text-2xl font-semibold text-contrast">
+							<span v-if="header" :id="headerId" class="text-2xl font-semibold text-contrast">
 								{{ header }}
 							</span>
 						</slot>
 					</div>
 					<ButtonStyled v-if="closable" circular>
-						<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
+						<button
+							v-tooltip="closeLabel"
+							:aria-label="closeLabel"
+							:disabled="disableClose"
+							@click="hide"
+						>
 							<XIcon aria-hidden="true" />
 						</button>
 					</ButtonStyled>
@@ -55,7 +65,12 @@
 					class="absolute top-4 right-4 z-10"
 					circular
 				>
-					<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
+					<button
+						v-tooltip="closeLabel"
+						:aria-label="closeLabel"
+						:disabled="disableClose"
+						@click="hide"
+					>
 						<XIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
@@ -123,12 +138,16 @@
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
 
+import { useVIntl } from '../../composables/i18n'
 import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import { injectModalBehavior } from '../../providers'
+import { commonMessages } from '../../utils/common-messages'
 import ButtonStyled from '../base/ButtonStyled.vue'
+
+const { formatMessage } = useVIntl()
 
 const modalBehavior = injectModalBehavior(null)
 const {
@@ -196,22 +215,36 @@ const computedFade = computed(() => {
 	return 'standard'
 })
 
+const modalId = `modal-${Math.random().toString(36).slice(2, 9)}`
+const headerId = `${modalId}-header`
+const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
+
 const open = ref(false)
 const visible = ref(false)
+const modalBodyRef = ref<HTMLElement | null>(null)
+let previousFocusEl: Element | null = null
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
+
+const FOCUSABLE_SELECTOR =
+	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+function getFocusableElements(): HTMLElement[] {
+	if (!modalBodyRef.value) return []
+	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+}
 
 function show(event?: MouseEvent) {
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
 	open.value = true
+	previousFocusEl = document.activeElement
 	pushModal()
 	if (wasEmpty) modalBehavior?.onShow?.()
 
 	document.body.style.overflow = 'hidden'
 	window.addEventListener('mousedown', updateMousePosition)
-	window.addEventListener('keydown', handleKeyDown)
 	if (event) {
 		updateMousePosition(event)
 	} else {
@@ -220,6 +253,14 @@ function show(event?: MouseEvent) {
 	}
 	setTimeout(() => {
 		visible.value = true
+		nextTick(() => {
+			const focusable = getFocusableElements()
+			if (focusable.length > 0) {
+				focusable[0].focus()
+			} else {
+				modalBodyRef.value?.focus()
+			}
+		})
 	}, 50)
 }
 
@@ -233,7 +274,10 @@ function hide() {
 		document.body.style.overflow = ''
 	}
 	window.removeEventListener('mousedown', updateMousePosition)
-	window.removeEventListener('keydown', handleKeyDown)
+	if (previousFocusEl instanceof HTMLElement) {
+		previousFocusEl.focus()
+	}
+	previousFocusEl = null
 	setTimeout(() => {
 		open.value = false
 	}, 300)
@@ -257,7 +301,6 @@ onUnmounted(() => {
 	if (open.value) {
 		popModal()
 		window.removeEventListener('mousedown', updateMousePosition)
-		window.removeEventListener('keydown', handleKeyDown)
 		if (modalStackSize() === 0) {
 			document.body.style.overflow = ''
 			modalBehavior?.onHide?.()
@@ -271,6 +314,27 @@ function handleKeyDown(event: KeyboardEvent) {
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2
+		return
+	}
+
+	if (event.key === 'Tab') {
+		const focusable = getFocusableElements()
+		if (focusable.length === 0) return
+
+		const first = focusable[0]
+		const last = focusable[focusable.length - 1]
+
+		if (event.shiftKey) {
+			if (document.activeElement === first) {
+				event.preventDefault()
+				last.focus()
+			}
+		} else {
+			if (document.activeElement === last) {
+				event.preventDefault()
+				first.focus()
+			}
+		}
 	}
 }
 </script>
