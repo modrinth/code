@@ -1718,9 +1718,9 @@ impl CachedEntry {
             CacheValueType::ModpackFiles => {
                 CacheValue::ModpackFiles(parse(data, id, "modpack_files")?)
             }
-            CacheValueType::ProjectVersions => {
-                CacheValue::ProjectVersions(parse(data, id, "project_versions")?)
-            }
+            CacheValueType::ProjectVersions => CacheValue::ProjectVersions(
+                parse(data, id, "project_versions")?,
+            ),
         };
 
         Ok(value)
@@ -1821,24 +1821,21 @@ impl CachedEntry {
     pub async fn get_modpack_files(
         version_id: &str,
         pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Option<CachedModpackFiles>> {
-        let type_str = CacheValueType::ModpackFiles.as_str();
-
-        let result = sqlx::query!(
-            r#"
-            SELECT data as "data?: sqlx::types::Json<CacheValue>"
-            FROM cache
-            WHERE data_type = $1 AND id = $2
-            "#,
-            type_str,
-            version_id
+        let entry = Self::get(
+            CacheValueType::ModpackFiles,
+            version_id,
+            None,
+            pool,
+            fetch_semaphore,
         )
-        .fetch_optional(pool)
         .await?;
 
-        if let Some(row) = result
-            && let Some(sqlx::types::Json(CacheValue::ModpackFiles(files))) =
-                row.data
+        if let Some(CachedEntry {
+            data: Some(CacheValue::ModpackFiles(files)),
+            ..
+        }) = entry
         {
             return Ok(Some(files));
         }

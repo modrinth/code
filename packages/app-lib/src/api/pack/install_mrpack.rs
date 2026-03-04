@@ -149,8 +149,17 @@ pub async fn install_zipped_mrpack_files(
             file_hashes.push(hash);
         }
 
+        tracing::info!(
+            "Caching {} modpack file hashes for version {}",
+            file_hashes.len(),
+            version_id
+        );
         CachedEntry::cache_modpack_files(version_id, file_hashes, &state.pool)
             .await?;
+    } else {
+        tracing::warn!(
+            "No version_id available, skipping modpack file hash caching"
+        );
     }
 
     // Sets generated profile attributes to the pack ones (using profile::edit)

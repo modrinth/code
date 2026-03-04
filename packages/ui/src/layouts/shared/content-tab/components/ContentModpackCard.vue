@@ -11,21 +11,24 @@ import {
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import Avatar from '#ui/components/base/Avatar.vue'
+import BulletDivider from '#ui/components/base/BulletDivider.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import OverflowMenu, {
+	type Option as OverflowMenuOption,
+} from '#ui/components/base/OverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
+import { useRelativeTime } from '#ui/composables/how-ago'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
 import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 	ContentOwner,
 } from '../types'
-import { useRelativeTime } from '#ui/composables/how-ago'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
-import AutoLink from '#ui/components/base/AutoLink.vue'
-import Avatar from '#ui/components/base/Avatar.vue'
-import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import OverflowMenu, { type Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
-import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
 
 const { formatMessage } = useVIntl()
 

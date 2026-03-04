@@ -34,10 +34,10 @@
 import { RightArrowIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 const { formatMessage } = useVIntl()
 

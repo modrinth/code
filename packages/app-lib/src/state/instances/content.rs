@@ -122,6 +122,11 @@ pub async fn get_linked_modpack_info(
         return Ok(None);
     };
 
+    // Vanilla server projects have linked_data with an empty version_id
+    if linked_data.version_id.is_empty() {
+        return Ok(None);
+    }
+
     // Fetch project, version, and all project versions in parallel
     let (project, version, all_versions) = tokio::try_join!(
         CachedEntry::get_project(
@@ -281,17 +286,37 @@ pub async fn get_content_items(
     let modpack_hashes: HashSet<String> = if let Some(ref linked_data) =
         profile.linked_data
     {
-        match get_modpack_file_hashes(
-            &linked_data.version_id,
-            pool,
-            fetch_semaphore,
-        )
-        .await
-        {
-            Ok(hashes) => hashes,
-            Err(e) => {
-                tracing::warn!("Failed to fetch modpack file hashes: {}", e);
-                HashSet::new()
+        if linked_data.version_id.is_empty() {
+            HashSet::new()
+        } else {
+            tracing::info!(
+                "Fetching modpack file hashes for version_id={}, project_id={}",
+                linked_data.version_id,
+                linked_data.project_id
+            );
+            match get_modpack_file_hashes(
+                &linked_data.version_id,
+                pool,
+                fetch_semaphore,
+            )
+            .await
+            {
+                Ok(hashes) => {
+                    tracing::info!(
+                        "Got {} modpack file hashes for version {}",
+                        hashes.len(),
+                        linked_data.version_id
+                    );
+                    hashes
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Failed to fetch modpack file hashes for version {}: {}",
+                        linked_data.version_id,
+                        e
+                    );
+                    HashSet::new()
+                }
             }
         }
     } else {
@@ -730,13 +755,19 @@ async fn get_modpack_file_hashes(
     fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<HashSet<String>> {
     if let Some(cached) =
-        CachedEntry::get_modpack_files(version_id, pool).await?
+        CachedEntry::get_modpack_files(version_id, pool, fetch_semaphore)
+            .await?
     {
+        tracing::info!(
+            "Cache hit: {} modpack file hashes for version {}",
+            cached.file_hashes.len(),
+            version_id
+        );
         return Ok(cached.file_hashes.into_iter().collect());
     }
 
-    tracing::debug!(
-        "Modpack files not cached, downloading mrpack for version {}",
+    tracing::warn!(
+        "Cache miss: modpack files not cached, downloading mrpack for version {}",
         version_id
     );
 

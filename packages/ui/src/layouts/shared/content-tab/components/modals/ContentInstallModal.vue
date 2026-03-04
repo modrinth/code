@@ -209,9 +209,6 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { injectFilePicker } from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
@@ -219,6 +216,9 @@ import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectFilePicker } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 const { formatMessage } = useVIntl()
 

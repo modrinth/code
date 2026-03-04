@@ -1,5 +1,3 @@
-export { default as ContentCardLayout } from './layout.vue'
-export { default as ContentPageLayout } from './layout.vue'
 export { default as ContentCardItem } from './components/ContentCardItem.vue'
 export { default as ContentCard } from './components/ContentCardItem.vue'
 export { default as ContentCardTable } from './components/ContentCardTable.vue'
@@ -15,5 +13,7 @@ export { default as ContentInstallModal } from './components/modals/ContentInsta
 export { default as ContentUpdaterModal } from './components/modals/ContentUpdaterModal.vue'
 export type { ModpackContentModalState } from './components/modals/ModpackContentModal.vue'
 export { default as ModpackContentModal } from './components/modals/ModpackContentModal.vue'
+export { default as ContentCardLayout } from './layout.vue'
+export { default as ContentPageLayout } from './layout.vue'
 export * from './providers'
 export * from './types'

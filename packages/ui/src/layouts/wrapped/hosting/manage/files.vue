@@ -297,10 +297,7 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
-import {
-	getFileExtension,
-	isEditableFile as isEditableFileCheck,
-} from '#ui/utils/file-extensions'
+import { getFileExtension, isEditableFile as isEditableFileCheck } from '#ui/utils/file-extensions'
 
 defineProps<{
 	showDebugInfo?: boolean

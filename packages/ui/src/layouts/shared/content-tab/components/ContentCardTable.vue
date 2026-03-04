@@ -2,16 +2,17 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import { computed, getCurrentInstance, ref, toRef } from 'vue'
 
+import Checkbox from '#ui/components/base/Checkbox.vue'
+import { useVIntl } from '#ui/composables/i18n'
+import { useStickyObserver } from '#ui/composables/sticky-observer'
+import { useVirtualScroll } from '#ui/composables/virtual-scroll'
+import { commonMessages } from '#ui/utils/common-messages'
+
 import type {
 	ContentCardTableItem,
 	ContentCardTableSortColumn,
 	ContentCardTableSortDirection,
 } from '../types'
-import { useVIntl } from '#ui/composables/i18n'
-import { useStickyObserver } from '#ui/composables/sticky-observer'
-import { useVirtualScroll } from '#ui/composables/virtual-scroll'
-import { commonMessages } from '#ui/utils/common-messages'
-import Checkbox from '#ui/components/base/Checkbox.vue'
 import ContentCardItem from './ContentCardItem.vue'
 
 const { formatMessage } = useVIntl()

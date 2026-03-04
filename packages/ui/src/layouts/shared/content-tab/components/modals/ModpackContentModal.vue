@@ -13,9 +13,6 @@ import { formatProjectType } from '@modrinth/utils'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
-import { isClientOnlyEnvironment } from '../../composables/content-filtering'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -23,8 +20,12 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
-import ContentCardTable from '../ContentCardTable.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+import { isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
+import ContentCardTable from '../ContentCardTable.vue'
 
 const { formatMessage } = useVIntl()
 

@@ -9,14 +9,6 @@ import {
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
-import type {
-	ContentCardProject,
-	ContentCardVersion,
-	ContentOwner,
-} from '../types'
-import { useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
-import { truncatedTooltip } from '#ui/utils/truncate'
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
@@ -25,6 +17,11 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
 import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
+import { useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+import { truncatedTooltip } from '#ui/utils/truncate'
+
+import type { ContentCardProject, ContentCardVersion, ContentOwner } from '../types'
 
 const { formatMessage } = useVIntl()
 

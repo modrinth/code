@@ -73,6 +73,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, EyeIcon, XIcon } from '@modrinth/assets'
+import type { ContentItem } from '@modrinth/ui'
 import {
 	Admonition,
 	Avatar,
@@ -89,8 +90,6 @@ import { computed, ref } from 'vue'
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { injectServerInstall } from '@/providers/server-install'
-
-import type { ContentItem } from '@modrinth/ui'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)

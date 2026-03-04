@@ -31,6 +31,7 @@ import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentModpackCard from './components/ContentModpackCard.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
