@@ -26,6 +26,7 @@
 				:project-v3="projectV3"
 				class="project-sidebar-section"
 			/>
+			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarCreators
 				:organization="null"
 				:members="members"
@@ -34,7 +35,6 @@
 				link-target="_blank"
 				class="project-sidebar-section"
 			/>
-			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarDetails
 				:project="data"
 				:has-versions="versions.length > 0"
