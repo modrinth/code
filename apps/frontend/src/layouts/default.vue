@@ -148,6 +148,18 @@
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
 					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
+						:highlighted="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+						:highlighted-style="
+							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/servers">
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</template>
 				<template v-else>
 					<ButtonStyled
