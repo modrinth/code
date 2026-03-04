@@ -526,11 +526,11 @@ export namespace Archon {
 
 			export type FlattenedPowerState = 'not_ready' | 'starting' | 'running' | 'stopping' | 'idle'
 
-			export type SyncInstallPhase = 'install_modloader' | 'install_modpack' | 'install_addons'
+			export type SyncInstallPhase = 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'
 
 			export type SyncContentProgress = {
 				started_at: string
-				phase: SyncInstallPhase | null
+				phase: SyncInstallPhase
 				percent: number
 			}
 

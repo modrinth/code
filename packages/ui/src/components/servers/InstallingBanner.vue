@@ -40,7 +40,7 @@ import Admonition from '../base/Admonition.vue'
 import ProgressBar from '../base/ProgressBar.vue'
 
 export interface SyncProgress {
-	phase: 'install_modloader' | 'install_modpack' | 'install_addons' | null
+	phase: 'Analyzing' | 'InstallingPack' | 'InstallingLoader' | 'Addons'
 	percent: number
 }
 
@@ -49,13 +49,12 @@ const props = defineProps<{
 }>()
 
 const phaseLabel = computed(() => {
-	if (!props.progress) return 'Installing...'
-	switch (props.progress.phase) {
-		case 'install_modloader':
+	switch (props.progress?.phase) {
+		case 'InstallingLoader':
 			return 'Installing mod loader...'
-		case 'install_modpack':
+		case 'InstallingPack':
 			return 'Installing modpack...'
-		case 'install_addons':
+		case 'Addons':
 			return 'Installing addons...'
 		default:
 			return 'Installing...'

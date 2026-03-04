@@ -287,7 +287,7 @@
 					Hang on, we're reconnecting to your server.
 				</div>
 
-				<!-- <Transition
+				<Transition
 					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
 					enter-from-class="opacity-0 max-h-0"
 					enter-to-class="opacity-100 max-h-40"
@@ -296,7 +296,7 @@
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<InstallingBanner
-						v-if="serverData.status === 'installing' || isSyncingContent"
+						v-if="(serverData.status === 'installing' || isSyncingContent) && syncProgress?.phase !== 'Analyzing'"
 						data-pyro-server-installing
 						class="mb-4"
 						:progress="syncProgress"
@@ -305,7 +305,7 @@
 							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
 						</template>
 					</InstallingBanner>
-				</Transition> -->
+				</Transition>
 				<NuxtPage
 					:route="route"
 					:is-connected="isConnected"
@@ -357,6 +357,7 @@ import {
 	ErrorInformationCard,
 	injectModrinthClient,
 	injectNotificationManager,
+	InstallingBanner,
 	provideModrinthServerContext,
 	ServerIcon,
 	ServerInfoLabels,
@@ -473,9 +474,9 @@ const markBackupCancelled = (backupId: string) => {
 // Parthenon state event
 const serverReadiness = ref<Archon.Websocket.v0.ReadinessState | null>(null)
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
-// const isSyncingContent = computed(
-// 	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
-// )
+const isSyncingContent = computed(
+	() => serverReadiness.value === 'sync_content' && syncProgress.value != null,
+)
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
