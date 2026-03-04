@@ -75,8 +75,8 @@
 						>
 							<div class="category-selector__label">
 								<component
-									:is="getCategoryIcon(category.name)"
-									v-if="header !== 'resolutions' && getCategoryIcon(category.name)"
+									:is="getTagIcon(category.name)"
+									v-if="header !== 'resolutions' && getTagIcon(category.name)"
 									aria-hidden="true"
 									class="icon"
 								/>
@@ -111,8 +111,8 @@
 					>
 						<div class="category-selector__label">
 							<component
-								:is="getCategoryIcon(category.name)"
-								v-if="category.header !== 'resolutions' && getCategoryIcon(category.name)"
+								:is="getTagIcon(category.name)"
+								v-if="category.header !== 'resolutions' && getTagIcon(category.name)"
 								aria-hidden="true"
 								class="icon"
 							/>
@@ -135,7 +135,12 @@
 </template>
 
 <script setup lang="ts">
-import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
+import {
+	getCategoryIcon,
+	SERVER_CATEGORY_ICON_MAP,
+	StarIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
 import {
 	Checkbox,
 	formatCategory,
@@ -166,6 +171,13 @@ const formatCategoryName = (categoryName: string) => {
 }
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
+const getTagIcon = (categoryName: string) => {
+	const iconName = isServerProject.value
+		? (SERVER_CATEGORY_ICON_MAP[categoryName] ?? categoryName)
+		: categoryName
+	return getCategoryIcon(iconName)
+}
 
 const matchesProjectType = (x: Category) =>
 	x.project_type === project.value.actualProjectType ||
@@ -232,6 +244,14 @@ const categoryLists = computed(() => {
 			lists[header].push(x)
 		}
 	})
+	const featuresKey = 'minecraft_server_features'
+	if (lists[featuresKey]) {
+		lists[featuresKey].sort((a, b) => {
+			if (a.name === 'pokemon') return -1
+			if (b.name === 'pokemon') return 1
+			return 0
+		})
+	}
 	return lists
 })
 
@@ -333,6 +353,7 @@ const toggleFeaturedCategory = (category: Category) => {
 		.category-selector__label {
 			display: flex;
 			align-items: center;
+			text-align: left;
 
 			.icon {
 				height: 1rem;
