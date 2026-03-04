@@ -33,8 +33,8 @@ defineProps<{
 			:recent-plays="recentPlays"
 			:hide-label="hideRecentPlaysLabel"
 		/>
-		<ServerRegion v-if="region" :region="region" />
 		<ServerPing v-if="ping && statusOnline" :ping="ping" />
+		<ServerRegion v-if="region" :region="region" />
 		<ServerModpackContent
 			v-if="modpackContent"
 			:name="modpackContent.name"

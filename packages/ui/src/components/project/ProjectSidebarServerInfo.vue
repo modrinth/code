@@ -58,8 +58,8 @@
 		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Region</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
-				<ServerRegion v-if="region" :region="region" />
 				<ServerPing :ping="props.ping" :status-online="props.statusOnline" />
+				<ServerRegion v-if="region" :region="region" />
 			</div>
 		</section>
 		<section v-if="languages.length > 0" class="flex flex-col gap-2">

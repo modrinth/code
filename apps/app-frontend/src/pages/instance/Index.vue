@@ -72,9 +72,9 @@
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
-							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
 							<ServerPing v-if="ping" :ping="ping" />
+
+							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
 
 							<div
 								v-if="minecraftServer?.region || ping"

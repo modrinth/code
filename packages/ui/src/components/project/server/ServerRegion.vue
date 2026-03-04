@@ -21,5 +21,5 @@ const regionNames: Record<string, string> = {
 const regionName = computed(() => regionNames[region] ?? region)
 </script>
 <template>
-	<TagItem>{{ regionName }}</TagItem>
+	<TagItem v-tooltip="`Server hosted in ${regionName}`">{{ regionName }}</TagItem>
 </template>
