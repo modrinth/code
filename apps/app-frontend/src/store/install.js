@@ -68,6 +68,6 @@ export const installVersionDependencies = async (profile, version) => {
 
 export const getServerAddress = (javaServer) => {
 	if (!javaServer) return null
-	const { address, port } = javaServer
-	return port !== 25565 ? `${address}:${port}` : address
+	const { address } = javaServer
+	return address
 }

@@ -356,8 +356,11 @@ function handleAddServerToInstance() {
 }
 
 async function fetchProjectData() {
-	const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
-	projectV3.value = await get_project_v3(route.params.id, 'must_revalidate').catch(handleError)
+	const [project, projectV3Result] = await Promise.all([
+		get_project(route.params.id, 'must_revalidate').catch(handleError),
+		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
+	])
+	projectV3.value = projectV3Result
 
 	if (!project) {
 		handleError('Error loading project')
@@ -387,67 +390,74 @@ async function fetchProjectData() {
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server != null
-
-	// Ping server for latency
-	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
+
+	breadcrumbs.setName('Project', data.value.title)
+
+	fetchDeferredServerData(project)
+}
+
+function fetchDeferredServerData(project) {
+	const serverAddress = projectV3.value?.minecraft_java_server?.address
 	if (serverAddress) {
 		serverPing.value = undefined
-		try {
-			serverPing.value = await getServerLatency(serverAddress)
-		} catch (error) {
-			console.error(`Failed to ping server ${serverAddress}:`, error)
-		}
+		getServerLatency(serverAddress)
+			.then((latency) => {
+				serverPing.value = latency
+			})
+			.catch((error) => {
+				console.error(`Failed to ping server ${serverAddress}:`, error)
+			})
 	}
 
-	// Fetch server sidebar data (modpack version + project)
 	const content = projectV3.value?.minecraft_java_server?.content
 	if (content?.kind === 'modpack' && content.version_id) {
-		const modpackVersion = await get_version(content.version_id, 'bypass').catch(handleError)
-		if (modpackVersion) {
-			serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
-			serverModpackLoaders.value = modpackVersion.mrpack_loaders ?? []
-			if (modpackVersion.project_id) {
-				const modpackProject = await get_project_v3(
-					modpackVersion.project_id,
-					'must_revalidate',
-				).catch(handleError)
-				if (modpackProject) {
-					const primaryFile =
-						modpackVersion.files?.find((f) => f.primary) ?? modpackVersion.files?.[0]
+		get_version(content.version_id, 'bypass')
+			.catch(handleError)
+			.then(async (modpackVersion) => {
+				if (!modpackVersion) return
+				serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
+				serverModpackLoaders.value = modpackVersion.mrpack_loaders ?? []
+				if (modpackVersion.project_id) {
+					const modpackProject = await get_project_v3(
+						modpackVersion.project_id,
+						'must_revalidate',
+					).catch(handleError)
+					if (modpackProject) {
+						const primaryFile =
+							modpackVersion.files?.find((f) => f.primary) ?? modpackVersion.files?.[0]
 
-					serverRequiredContent.value = {
-						name: modpackProject.name,
-						versionNumber: modpackVersion.version_number ?? '',
-						icon: modpackProject.icon_url,
-						onclickName:
-							modpackProject.id !== project.id
-								? () => router.push(`/project/${modpackProject.id}`)
-								: undefined,
-						onclickVersion:
-							modpackProject.id !== project.id
-								? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
-								: undefined,
-						onclickDownload: primaryFile?.url ? () => openUrl(primaryFile.url) : undefined,
-						showCustomModpackTooltip: modpackProject.id === project.id,
+						serverRequiredContent.value = {
+							name: modpackProject.name,
+							versionNumber: modpackVersion.version_number ?? '',
+							icon: modpackProject.icon_url,
+							onclickName:
+								modpackProject.id !== project.id
+									? () => router.push(`/project/${modpackProject.id}`)
+									: undefined,
+							onclickVersion:
+								modpackProject.id !== project.id
+									? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
+									: undefined,
+							onclickDownload: primaryFile?.url ? () => openUrl(primaryFile.url) : undefined,
+							showCustomModpackTooltip: modpackProject.id === project.id,
+						}
 					}
 				}
-			}
-		}
+			})
 	} else if (content?.kind === 'vanilla') {
 		serverRecommendedVersion.value = content.recommended_game_version ?? null
 		const supported = content.supported_game_versions ?? []
 		serverSupportedVersions.value = supported.filter((v) => !!v)
 	}
 
-	breadcrumbs.setName('Project', data.value.title)
-
-	await updateServerPlayState()
+	updateServerPlayState()
 }
 
 await fetchProjectData()
 
-const unlistenProcesses = await process_listener((e) => {
+let unlistenProcesses
+process_listener((e) => {
 	if (
 		e.event === 'finished' &&
 		serverInstancePath.value &&
@@ -455,10 +465,12 @@ const unlistenProcesses = await process_listener((e) => {
 	) {
 		serverPlaying.value = false
 	}
+}).then((unlisten) => {
+	unlistenProcesses = unlisten
 })
 
 onUnmounted(() => {
-	unlistenProcesses()
+	unlistenProcesses?.()
 })
 
 watch(

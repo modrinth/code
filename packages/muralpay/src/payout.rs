@@ -554,9 +554,12 @@ pub enum FiatAndRailDetails {
     Brl {
         symbol: BrlSymbol,
         pix_account_type: PixAccountType,
-        pix_email: String,
-        pix_phone: String,
-        branch_code: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pix_email: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pix_phone: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        branch_code: Option<String>,
         document_number: String,
     },
     #[serde(rename_all = "camelCase")]
