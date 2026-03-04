@@ -4,8 +4,8 @@ import { fn } from 'storybook/test'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
-import ContentCardTable from '../../components/instances/ContentCardTable.vue'
-import type { ContentCardTableItem } from '../../components/instances/types'
+import ContentCardTable from '../../layouts/shared/content-tab/components/ContentCardTable.vue'
+import type { ContentCardTableItem } from '../../layouts/shared/content-tab/types'
 
 // Sample data
 const sodiumItem: ContentCardTableItem = {

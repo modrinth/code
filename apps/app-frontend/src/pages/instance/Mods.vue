@@ -64,7 +64,7 @@ import {
 	provideContentManager,
 	useVIntl,
 } from '@modrinth/ui'
-import ContentPageLayout from '@modrinth/ui/src/components/instances/ContentPageLayout.vue'
+import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
