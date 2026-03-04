@@ -69,7 +69,7 @@
 				</NuxtLink>
 			</div>
 			<div
-				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
+				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-1' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
