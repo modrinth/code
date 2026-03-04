@@ -58,7 +58,11 @@
 		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Region</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
-				<ServerPing :ping="props.ping" :status-online="props.statusOnline" />
+				<ServerPing
+					v-if="projectV3?.status !== 'draft'"
+					:ping="props.ping"
+					:status-online="props.statusOnline"
+				/>
 				<ServerRegion v-if="region" :region="region" />
 			</div>
 		</section>

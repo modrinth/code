@@ -15,6 +15,7 @@
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
 				<ServerDetails
+					v-if="projectV3?.status !== 'draft'"
 					:online-players="playersOnline"
 					:status-online="statusOnline"
 					:recent-plays="javaServer?.verified_plays_2w ?? 0"
