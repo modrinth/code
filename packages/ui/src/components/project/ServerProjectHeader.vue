@@ -17,7 +17,7 @@
 				<ServerDetails
 					:online-players="playersOnline"
 					:status-online="statusOnline"
-					:recent-plays="javaServer?.verified_plays_4w ?? 0"
+					:recent-plays="javaServer?.verified_plays_2w ?? 0"
 				/>
 				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
 					<div class="flex gap-2">

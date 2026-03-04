@@ -47,7 +47,7 @@
 								/>
 								<router-link
 									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary"
+									class="hover:underline text-primary truncate"
 								>
 									{{ linkedProjectV3.name }}
 								</router-link>
@@ -55,10 +55,20 @@
 						</template>
 
 						<template v-else>
-							<ServerOnlinePlayers :online="playersOnline ?? 0" :status-online="statusOnline" />
+							<ServerOnlinePlayers
+								v-if="playersOnline !== undefined"
+								:online="playersOnline"
+								:status-online="statusOnline"
+								hide-label
+							/>
+
+							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
 
 							<div
-								v-if="playersOnline !== undefined && (minecraftServer?.region || ping)"
+								v-if="
+									(playersOnline !== undefined || recentPlays !== undefined) &&
+									(minecraftServer?.region || ping)
+								"
 								class="w-1.5 h-1.5 rounded-full bg-surface-5"
 							></div>
 
@@ -84,7 +94,7 @@
 								/>
 								<router-link
 									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary"
+									class="hover:underline text-primary truncate"
 								>
 									{{ linkedProjectV3.name }}
 								</router-link>
@@ -297,6 +307,7 @@ import {
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
+	ServerRecentPlays,
 	ServerRegion,
 } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
@@ -354,6 +365,9 @@ const selected = ref<unknown[]>([])
 const minecraftServer = computed(() => linkedProjectV3.value?.minecraft_server)
 const javaServerPingData = computed(() => linkedProjectV3.value?.minecraft_java_server?.ping?.data)
 const statusOnline = computed(() => !!javaServerPingData.value)
+const recentPlays = computed(
+	() => linkedProjectV3.value?.minecraft_java_server?.verified_plays_2w ?? undefined,
+)
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
 
@@ -362,6 +376,7 @@ async function fetchInstance() {
 	linkedProjectV3.value = undefined
 	modrinthVersions.value = []
 	ping.value = undefined
+	playersOnline.value = undefined
 
 	instance.value = await get(route.params.id as string).catch(handleError)
 
@@ -372,6 +387,10 @@ async function fetchInstance() {
 				'must_revalidate',
 			)
 
+			if (linkedProjectV3.value?.minecraft_server != null) {
+				isServerInstance.value = true
+			}
+
 			if (linkedProjectV3.value && linkedProjectV3.value.versions) {
 				const versions = await get_version_many(linkedProjectV3.value.versions, 'must_revalidate')
 				modrinthVersions.value = versions.sort(
@@ -379,31 +398,32 @@ async function fetchInstance() {
 						dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
 				)
 			}
-
-			if (linkedProjectV3.value?.minecraft_server != null) {
-				isServerInstance.value = true
-
-				const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
-				if (serverAddress) {
-					try {
-						const status = await get_server_status(serverAddress)
-						const latency = await getServerLatency(serverAddress)
-						ping.value = latency
-						playersOnline.value = status.players?.online
-					} catch (err) {
-						console.error(`Failed to ping server ${serverAddress}:`, err)
-					}
-				}
-			}
 		} catch (error) {
 			handleError(error as Error)
 		}
 	}
 
-	await updatePlayState()
+	fetchDeferredData()
+}
+
+function fetchDeferredData() {
+	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
+	if (isServerInstance.value && serverAddress) {
+		Promise.all([get_server_status(serverAddress), getServerLatency(serverAddress)])
+			.then(([status, latency]) => {
+				ping.value = latency
+				playersOnline.value = status.players?.online
+			})
+			.catch((err) => {
+				console.error(`Failed to ping server ${serverAddress}:`, err)
+			})
+	}
+
+	updatePlayState()
 }
 
 async function updatePlayState() {
+	if (!route.params.id) return
 	const runningProcesses = await get_by_profile_path(route.params.id as string).catch(handleError)
 
 	playing.value = Array.isArray(runningProcesses) && runningProcesses.length > 0
