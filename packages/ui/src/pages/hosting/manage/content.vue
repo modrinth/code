@@ -136,7 +136,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 			project_type: 'modpack',
 			header: 'categories',
 		})) as ContentModpackCardCategory[],
-		hasUpdate: mp.has_update,
+		hasUpdate: !!mp.has_update,
 	}
 })
 
@@ -419,8 +419,8 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,
-		has_update: addon.has_update,
-		update_version_id: null,
+		has_update: !!addon.has_update,
+		update_version_id: addon.has_update,
 		environment: addon.version?.environment ?? undefined,
 	}
 }

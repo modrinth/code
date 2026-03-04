@@ -27,7 +27,7 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
-				has_update: boolean
+				has_update: string | null
 				name: string | null
 				project_id: string | null
 				version: AddonVersion | null
@@ -82,7 +82,7 @@ export namespace Archon {
 
 			export type ModpackFields = {
 				spec: ModpackSpec
-				has_update: boolean
+				has_update: string | null
 				title: string | null
 				description: string | null
 				icon_url: string | null
