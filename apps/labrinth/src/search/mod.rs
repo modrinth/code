@@ -1,4 +1,5 @@
 use crate::database::redis::RedisPool;
+use crate::models::exp;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::{database::PgPool, env::ENV};
@@ -66,6 +67,31 @@ impl FromStr for SearchBackendKind {
     }
 }
 
+// todo: indexes
+/*
+"relevance" => (
+    projects_name,
+    &[
+        "minecraft_java_server.verified_plays_2w:desc",
+        "minecraft_java_server.ping.data.players_online:desc",
+        "downloads:desc",
+    ],
+),
+"downloads" => (projects_filtered_name, &["downloads:desc"]),
+"follows" => (projects_name, &["follows:desc"]),
+"updated" | "date_modified" => (projects_name, &["date_modified:desc"]),
+"newest" | "date_created" => (projects_name, &["date_created:desc"]),
+"minecraft_java_server.verified_plays_2w" => (
+    projects_name,
+    &["minecraft_java_server.verified_plays_2w:desc"],
+),
+"minecraft_java_server.ping.data.players_online" => (
+    projects_name,
+    &["minecraft_java_server.ping.data.players_online:desc"],
+),
+i => return Err(SearchError::InvalidIndex(i.to_string())),
+ */
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     pub version_id: String,
@@ -99,6 +125,8 @@ pub struct UploadSearchProject {
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
+    #[serde(flatten)]
+    pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
@@ -139,6 +167,8 @@ pub struct ResultSearchProject {
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
+    pub components: exp::ProjectQuery,
+    #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
@@ -151,5 +181,20 @@ pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
         SearchBackendKind::Elasticsearch => {
             Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::normalize_filter_aliases;
+
+    #[test]
+    fn normalizes_component_filter_aliases() {
+        assert_eq!(
+            normalize_filter_aliases(
+                "components.minecraft_java_server.content = vanilla AND components.minecraft_server.country = US"
+            ),
+            "minecraft_java_server.content.kind = vanilla AND minecraft_server.country = US"
+        );
     }
 }

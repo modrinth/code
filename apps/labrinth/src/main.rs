@@ -168,20 +168,20 @@ async fn app() -> std::io::Result<()> {
 
     if let Some(task) = args.run_background_task {
         info!("Running task {task:?} and exiting");
-        return task
-            .run(
-                pool,
-                ro_pool.into_inner(),
-                redis_pool,
-                search_backend,
-                clickhouse,
-                stripe_client,
-                anrok_client.clone(),
-                email_queue,
-                muralpay,
-            )
-            .await
-            .map_err(io::Error::other);
+        task.run(
+            pool,
+            ro_pool.into_inner(),
+            redis_pool,
+            search_config,
+            clickhouse,
+            stripe_client,
+            anrok_client.clone(),
+            email_queue,
+            muralpay,
+        )
+        .await
+        .map_err(std::io::Error::other)?;
+        return Ok(());
     }
 
     let prometheus = PrometheusMetricsBuilder::new("labrinth")

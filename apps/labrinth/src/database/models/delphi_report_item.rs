@@ -182,6 +182,27 @@ pub struct DelphiReportIssueResult {
 }
 
 impl DBDelphiReportIssue {
+    pub async fn upsert(
+        &self,
+        transaction: &mut PgTransaction<'_>,
+    ) -> Result<DelphiReportIssueId, DatabaseError> {
+        Ok(DelphiReportIssueId(
+            sqlx::query_scalar!(
+                "
+                INSERT INTO delphi_report_issues (report_id, issue_type)
+                VALUES ($1, $2)
+                ON CONFLICT (report_id, issue_type) DO UPDATE SET
+                    issue_type = EXCLUDED.issue_type
+                RETURNING id
+                ",
+                self.report_id as DelphiReportId,
+                self.issue_type,
+            )
+            .fetch_one(&mut *transaction)
+            .await?,
+        ))
+    }
+
     pub async fn insert(
         &self,
         transaction: &mut PgTransaction<'_>,

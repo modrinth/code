@@ -9,6 +9,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::SearchBackend;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
@@ -57,6 +58,7 @@ pub async fn count_download(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await
     .ok()
@@ -158,6 +160,6 @@ pub async fn force_reindex(
     search_backend
         .index_projects(pool.as_ref().clone(), redis.clone())
         .await
-        .map_err(ApiError::Internal)?;
+        .wrap_internal_err("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
 }

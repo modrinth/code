@@ -19,6 +19,7 @@ use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
@@ -102,6 +103,15 @@ pub fn app_setup(
 
     let scheduler = scheduler::Scheduler::new();
 
+    {
+        let pool_ref = pool.clone();
+        actix_rt::spawn(async move {
+            if let Err(err) = rescan_projects_in_queue(&pool_ref).await {
+                warn!("Delphi rescan failed: {err:#}");
+            }
+        });
+    }
+
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
         GCRAParameters::new(300, 300),
@@ -138,7 +148,11 @@ pub fn app_setup(
         scheduler.run(Duration::from_secs(60 * 5), move || {
             let pool_ref = pool_ref.clone();
             async move {
-                background_task::release_scheduled(pool_ref).await;
+                if let Err(e) =
+                    background_task::release_scheduled(pool_ref).await
+                {
+                    warn!("Syncing scheduled releases failed: {e:#}");
+                }
             }
         });
 
@@ -150,7 +164,9 @@ pub fn app_setup(
             let pool_ref = pool_ref.clone();
             let redis = redis_pool_ref.clone();
             async move {
-                update_versions(pool_ref, redis).await;
+                if let Err(e) = update_versions(pool_ref, redis).await {
+                    warn!("Version update failed: {e:#}");
+                }
             }
         });
 
@@ -162,7 +178,12 @@ pub fn app_setup(
             let client_ref = client_ref.clone();
             let redis_ref = redis_pool_ref.clone();
             async move {
-                background_task::payouts(pool_ref, client_ref, redis_ref).await;
+                if let Err(e) =
+                    background_task::payouts(pool_ref, client_ref, redis_ref)
+                        .await
+                {
+                    warn!("Payout task failed: {e:#}");
+                }
             }
         });
 

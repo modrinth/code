@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Add an icon"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Add the IP address and port Java Edition players can use to join your server."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Add a Java address"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as a website, store, or a Discord invite."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Add external links"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite."
   },
@@ -122,6 +134,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Select correct resolution"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Select what versions your server supports, choose a Modpack, or upload your own."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Select compatibility"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Let players know what country your server is located in."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Select a country"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "List the language or languages supported by your server."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Select a language"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Select the license your {type, select, mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is distributed under."
   },
@@ -133,6 +163,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Select tags"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Visit server settings"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Visit description settings"
@@ -172,6 +205,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Clean up the name"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Please reduce to {maxTagCount} or fewer to make sure your server appears in relevant search results."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Select accurate tags"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "You've selected {tagCount, plural, one {# tag} other {# tags}}. Consider reducing to {maxTagCount} or fewer to make sure your project appears in relevant search results."

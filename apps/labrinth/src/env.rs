@@ -251,8 +251,6 @@ vars! {
     ANROK_API_URL: String;
     ANROK_API_KEY: String;
 
-    COMPLIANCE_PAYOUT_THRESHOLD: String;
-
     PAYOUT_ALERT_SLACK_WEBHOOK: String;
     CLOUDFLARE_INTEGRATION: bool = false;
 
@@ -286,4 +284,10 @@ vars! {
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "";
+
+    // server pinging
+    SERVER_PING_MAX_CONCURRENT: usize = 16usize;
+    SERVER_PING_RETRIES: usize = 3usize;
+    SERVER_PING_MIN_INTERVAL_SEC: u64 = 30u64 * 60;
+    SERVER_PING_TIMEOUT_MS: u64 = 3u64 * 1000;
 }
