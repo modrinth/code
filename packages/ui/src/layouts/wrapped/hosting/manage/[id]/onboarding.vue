@@ -155,15 +155,18 @@ const onCreate = async (config: CreationFlowContextValue) => {
 		totalBytes.value = config.modpackFile.value.size
 
 		try {
-			const handle = await client.archon.servers_v0.reinstallFromMrpack(
-				serverId,
+			const handle = client.kyros.content_v1.uploadModpackFile(
+				worldId.value!,
 				config.modpackFile.value,
-				false,
+				config.buildProperties(),
+				{
+					softOverride: true,
+					onProgress: ({ loaded, total }) => {
+						uploadedBytes.value = loaded
+						totalBytes.value = total
+					},
+				},
 			)
-			handle.onProgress(({ loaded, total }) => {
-				uploadedBytes.value = loaded
-				totalBytes.value = total
-			})
 			await handle.promise
 			server.value.status = 'installing'
 			await finalizeSetup()

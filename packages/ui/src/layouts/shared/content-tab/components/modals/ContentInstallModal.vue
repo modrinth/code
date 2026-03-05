@@ -219,6 +219,7 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectFilePicker } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
+import { formatLoaderLabel } from '#ui/utils/loaders'
 
 const { formatMessage } = useVIntl()
 
@@ -300,19 +301,6 @@ const messages = defineMessages({
 		defaultMessage: 'Hide snapshots',
 	},
 })
-
-const loaderDisplayNames: Record<string, string> = {
-	fabric: 'Fabric',
-	quilt: 'Quilt',
-	forge: 'Forge',
-	neoforge: 'NeoForge',
-	paper: 'Paper',
-	purpur: 'Purpur',
-	vanilla: 'Vanilla',
-}
-
-const formatLoaderLabel = (item: string) =>
-	loaderDisplayNames[item] ?? item.charAt(0).toUpperCase() + item.slice(1)
 
 export interface ContentInstallInstance {
 	id: string

@@ -601,6 +601,10 @@ const unlistenProfiles = await profile_listener(
 				return
 			}
 			instance.value = await get(route.params.id as string).catch(handleError)
+			if (!instance.value?.linked_data?.project_id) {
+				linkedProjectV3.value = undefined
+				isServerInstance.value = false
+			}
 		}
 	},
 )

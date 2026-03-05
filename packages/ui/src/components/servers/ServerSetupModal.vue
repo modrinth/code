@@ -106,7 +106,7 @@ const totalBytes = ref(0)
 async function onFlowComplete(ctx: CreationFlowContextValue) {
 	try {
 		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
-			await handleMrpackUpload(ctx.modpackFile.value)
+			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
 			await client.archon.content_v1.installContent(
 				serverContext.serverId,
@@ -169,7 +169,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 	}
 }
 
-async function handleMrpackUpload(file: File) {
+async function handleMrpackUpload(file: File, properties: Archon.Content.v1.PropertiesFields) {
 	uploadedBytes.value = 0
 	totalBytes.value = file.size
 
@@ -178,16 +178,18 @@ async function handleMrpackUpload(file: File) {
 	uploadModal.value?.show()
 
 	try {
-		const handle = await client.archon.servers_v0.reinstallFromMrpack(
-			serverContext.serverId,
+		const handle = client.kyros.content_v1.uploadModpackFile(
+			serverContext.worldId.value!,
 			file,
-			true,
+			properties,
+			{
+				softOverride: false,
+				onProgress: ({ loaded, total }) => {
+					uploadedBytes.value = loaded
+					totalBytes.value = total
+				},
+			},
 		)
-
-		handle.onProgress(({ loaded, total }) => {
-			uploadedBytes.value = loaded
-			totalBytes.value = total
-		})
 
 		await handle.promise
 		emitReinstall()
