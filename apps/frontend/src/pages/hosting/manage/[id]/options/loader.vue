@@ -11,11 +11,7 @@
 					</span>
 					<div>
 						<ButtonStyled color="red">
-							<button
-								class="!shadow-none"
-								:disabled="isInstalling"
-								@click="setupModal?.show()"
-							>
+							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
 								<RotateCounterClockwiseIcon class="size-5" />
 								{{ formatMessage(commonMessages.resetServerButton) }}
 							</button>
@@ -26,11 +22,7 @@
 
 			<template #unlinked-extra-buttons>
 				<ButtonStyled>
-					<button
-						class="!shadow-none"
-						:disabled="isInstalling"
-						@click="setupModal?.show()"
-					>
+					<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
 						{{ formatMessage(commonMessages.resetServerButton) }}
 						<ChevronRightIcon class="size-5" />
 					</button>
@@ -49,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, Labrinth, LauncherMeta } from '@modrinth/api-client'
+import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { ChevronRightIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -214,8 +206,7 @@ provideInstallationSettings({
 		const rawLoader = addons?.modloader ?? server.value?.loader ?? unknownStr
 		const loader = formatLoaderLabel(rawLoader)
 		const gameVersion = addons?.game_version ?? server.value?.mc_version ?? unknownStr
-		const loaderVersion =
-			addons?.modloader_version ?? server.value?.loader_version ?? unknownStr
+		const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? unknownStr
 
 		const rows = [
 			{ label: formatMessage(commonMessages.platformLabel), value: loader },
@@ -264,9 +255,7 @@ provideInstallationSettings({
 		if (loader && loader !== 'vanilla' && !['paper', 'purpur'].includes(loader)) {
 			const manifest = manifestQuery.data.value?.gameVersions
 			if (manifest) {
-				const hasPlaceholder = manifest.some(
-					(x) => x.id === '${modrinth.gameVersion}',
-				)
+				const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
 				if (!hasPlaceholder) {
 					const supportedVersions = new Set(
 						manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
@@ -296,12 +285,8 @@ provideInstallationSettings({
 		if (hasPlaceholder) {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
 		}
-		const supportedVersions = new Set(
-			manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
-		)
-		const supported = tags.gameVersions.value.filter((v) =>
-			supportedVersions.has(v.version),
-		)
+		const supportedVersions = new Set(manifest.filter((x) => x.loaders.length > 0).map((x) => x.id))
+		const supported = tags.gameVersions.value.filter((v) => supportedVersions.has(v.version))
 		return supported.some((v) => v.version_type !== 'release')
 	},
 
@@ -320,10 +305,7 @@ provideInstallationSettings({
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text:
-					err instanceof Error
-						? err.message
-						: formatMessage(messages.failedToSaveSettings),
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToSaveSettings),
 			})
 			throw err
 		}
@@ -347,18 +329,14 @@ provideInstallationSettings({
 			} catch (err) {
 				addNotification({
 					type: 'error',
-					text:
-						err instanceof Error
-							? err.message
-							: formatMessage(messages.failedToRepair),
+					text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
 				})
 			}
 		} else {
 			const addons = addonsQuery.data.value
 			const currentLoader = addons?.modloader ?? server.value?.loader
 			const currentGameVersion = addons?.game_version ?? server.value?.mc_version
-			const currentLoaderVersion =
-				addons?.modloader_version ?? server.value?.loader_version
+			const currentLoaderVersion = addons?.modloader_version ?? server.value?.loader_version
 			if (!currentLoader || !currentGameVersion) return
 			try {
 				await client.archon.content_v1.installContent(serverId, worldId.value!, {
@@ -374,10 +352,7 @@ provideInstallationSettings({
 			} catch (err) {
 				addNotification({
 					type: 'error',
-					text:
-						err instanceof Error
-							? err.message
-							: formatMessage(messages.failedToRepair),
+					text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
 				})
 			}
 		}
@@ -402,10 +377,7 @@ provideInstallationSettings({
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text:
-					err instanceof Error
-						? err.message
-						: formatMessage(messages.failedToReinstall),
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
 			})
 		}
 	},
@@ -423,17 +395,11 @@ provideInstallationSettings({
 			await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
 		} catch (err) {
 			if (previousData) {
-				queryClient.setQueryData(
-					['content', 'list', 'v1', serverId],
-					previousData,
-				)
+				queryClient.setQueryData(['content', 'list', 'v1', serverId], previousData)
 			}
 			addNotification({
 				type: 'error',
-				text:
-					err instanceof Error
-						? err.message
-						: formatMessage(messages.failedToUnlink),
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToUnlink),
 			})
 		} finally {
 			await Promise.all([
@@ -451,17 +417,13 @@ provideInstallationSettings({
 
 	async fetchModpackVersions() {
 		try {
-			return await client.labrinth.versions_v2.getProjectVersions(
-				modpack.value!.spec.project_id,
-				{ include_changelog: false },
-			)
+			return await client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+				include_changelog: false,
+			})
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text:
-					err instanceof Error
-						? err.message
-						: formatMessage(messages.failedToLoadVersions),
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
 			})
 			throw err
 		}
@@ -494,10 +456,7 @@ provideInstallationSettings({
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text:
-					err instanceof Error
-						? err.message
-						: formatMessage(messages.failedToChangeVersion),
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
 			})
 		}
 	},
@@ -510,8 +469,7 @@ provideInstallationSettings({
 			modpack.value?.title ??
 			modpack.value?.spec.project_id ??
 			formatMessage(commonMessages.modpackLabel),
-		currentGameVersion:
-			addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
+		currentGameVersion: addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
 		currentLoader: addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
 	})),
 

@@ -578,6 +578,9 @@
   "installation-settings.search-game-version": {
     "defaultMessage": "Search game version..."
   },
+  "installation-settings.unlink": {
+    "defaultMessage": "Unlink"
+  },
   "installation-settings.unlink.instance-description": {
     "defaultMessage": "Unlinking permanently disconnects this instance from the modpack project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
   },

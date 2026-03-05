@@ -1292,21 +1292,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server."
   },
-  "hosting.loader.aria.select-game-version": {
-    "message": "Select game version"
-  },
-  "hosting.loader.aria.select-loader-version": {
-    "message": "Select {loader} version"
-  },
-  "hosting.loader.aria.select-platform": {
-    "message": "Select platform"
-  },
-  "hosting.loader.edit-installation": {
-    "message": "Edit installation"
-  },
-  "hosting.loader.edit-warning": {
-    "message": "We don't recommend editing your installation settings after installing content. If you want to edit them reset your server."
-  },
   "hosting.loader.failed-to-change-version": {
     "message": "Failed to change modpack version"
   },
@@ -1325,38 +1310,14 @@
   "hosting.loader.failed-to-unlink": {
     "message": "Failed to unlink modpack"
   },
-  "hosting.loader.linked-instance": {
-    "message": "Linked instance"
-  },
   "hosting.loader.loader-version": {
     "message": "{loader} version"
-  },
-  "hosting.loader.reinstall-modpack": {
-    "message": "Re-install modpack"
-  },
-  "hosting.loader.reinstall-modpack-description": {
-    "message": "Re-installing the modpack resets the instance's content to its original state, removing any mods or content you have added."
-  },
-  "hosting.loader.repair-server": {
-    "message": "Repair server"
-  },
-  "hosting.loader.repair-server-description": {
-    "message": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
   },
   "hosting.loader.reset-server": {
     "message": "Reset server"
   },
   "hosting.loader.reset-server-description": {
     "message": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
-  },
-  "hosting.loader.saving": {
-    "message": "Saving..."
-  },
-  "hosting.loader.search-game-version": {
-    "message": "Search game version..."
-  },
-  "hosting.loader.unlink-description": {
-    "message": "Unlinking permanently disconnects this instance from the modpack project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
   },
   "hosting.plan.out-of-stock": {
     "message": "Out of stock"
