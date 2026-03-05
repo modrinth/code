@@ -41,7 +41,17 @@ const statusAlerts: Stage = {
 			suggestedStatus: 'flagged',
 			disablesActions: ['status_corrections_applied', 'status_account_issues'],
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
-			message: async () => (await import('../messages/status-alerts/private.md?raw')).default,
+			message: async () => (await import('../messages/status-alerts/private/private.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'status_private_use-server',
+			type: 'button',
+			label: 'Private community',
+			weight: -999999,
+			suggestedStatus: 'flagged',
+			disablesActions: ['status_corrections_applied', 'status_account_issues'],
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
+			message: async () => (await import('../messages/status-alerts/private/private-server.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'status_server_use',
