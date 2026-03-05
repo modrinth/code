@@ -60,24 +60,23 @@
 						</template>
 
 						<template v-else>
-							<ServerOnlinePlayers
-								v-if="playersOnline !== undefined"
-								:online="playersOnline"
-								:status-online="statusOnline"
-								hide-label
-							/>
-
-							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-
-							<div
-								v-if="
-									(playersOnline !== undefined || recentPlays !== undefined) &&
-									(minecraftServer?.region || ping)
-								"
-								class="w-1.5 h-1.5 rounded-full bg-surface-5"
-							></div>
-
-							<ServerPing v-if="ping" :ping="ping" />
+							<template v-if="loadingServerPing">
+								<ServerOnlinePlayers
+									v-if="playersOnline !== undefined"
+									:online="playersOnline"
+									:status-online="statusOnline"
+									hide-label
+								/>
+								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
+								<div
+									v-if="
+										(playersOnline !== undefined || recentPlays !== undefined) &&
+										(minecraftServer?.region || ping)
+									"
+									class="w-1.5 h-1.5 rounded-full bg-surface-5"
+								></div>
+								<ServerPing v-if="ping" :ping="ping" />
+							</template>
 
 							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
 
@@ -375,6 +374,7 @@ const recentPlays = computed(
 )
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
+const loadingServerPing = ref(false)
 
 async function fetchInstance() {
 	isServerInstance.value = false
@@ -382,6 +382,7 @@ async function fetchInstance() {
 	modrinthVersions.value = []
 	ping.value = undefined
 	playersOnline.value = undefined
+	loadingServerPing.value = false
 
 	instance.value = await get(route.params.id as string).catch(handleError)
 
@@ -414,14 +415,26 @@ async function fetchInstance() {
 function fetchDeferredData() {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		Promise.all([get_server_status(serverAddress), getServerLatency(serverAddress)])
-			.then(([status, latency]) => {
-				ping.value = latency
-				playersOnline.value = status.players?.online
+		Promise.allSettled([get_server_status(serverAddress), getServerLatency(serverAddress)])
+			.then(([statusResult, latencyResult]) => {
+				console.log(statusResult)
+				if (statusResult.status === 'fulfilled') {
+					playersOnline.value = statusResult.value.players?.online
+				} else {
+					console.error(`Failed to fetch server status for ${serverAddress}:`, statusResult.reason)
+				}
+
+				if (latencyResult.status === 'fulfilled') {
+					ping.value = latencyResult.value
+				} else {
+					console.error(`Failed to ping server ${serverAddress}:`, latencyResult.reason)
+				}
 			})
-			.catch((err) => {
-				console.error(`Failed to ping server ${serverAddress}:`, err)
+			.finally(() => {
+				loadingServerPing.value = true
 			})
+	} else {
+		loadingServerPing.value = true
 	}
 
 	updatePlayState()
