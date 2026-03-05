@@ -387,13 +387,13 @@ pub struct JavaServerPingData {
     /// Reported version name of the server.
     pub version_name: String,
     /// Reported version protocol number of the server.
-    pub version_protocol: u32,
+    pub version_protocol: i32,
     /// Description/MOTD of the server as shown in the server list.
     pub description: String,
     /// Number of players online at the time.
-    pub players_online: u32,
+    pub players_online: i32,
     /// Maximum number of players allowed on the server.
-    pub players_max: u32,
+    pub players_max: i32,
 }
 
 component::relations! {
