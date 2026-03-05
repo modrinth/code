@@ -72,7 +72,9 @@ export const sortedCategories = (tags, formatCategoryName, locale) => {
 		const aServerIdx = SERVER_HEADER_ORDER.indexOf(a.header)
 		const bServerIdx = SERVER_HEADER_ORDER.indexOf(b.header)
 		if (aServerIdx !== -1 || bServerIdx !== -1) {
-			return (aServerIdx === -1 ? Infinity : aServerIdx) - (bServerIdx === -1 ? Infinity : bServerIdx)
+			return (
+				(aServerIdx === -1 ? Infinity : aServerIdx) - (bServerIdx === -1 ? Infinity : bServerIdx)
+			)
 		}
 
 		const headerCompare = a.header.localeCompare(b.header)

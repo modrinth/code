@@ -1,4 +1,5 @@
 import type { AbstractModrinthClient } from '@modrinth/api-client'
+
 import { STALE_TIME } from './project'
 
 export const versionQueryOptions = {

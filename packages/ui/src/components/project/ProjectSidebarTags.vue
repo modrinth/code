@@ -14,10 +14,10 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
-import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
