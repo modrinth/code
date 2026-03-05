@@ -226,7 +226,7 @@ function parseServerPort(port: string): number | null {
 
 /**
  * Normalization converts addresses to a canonical form (lowercase-host:port, default port 25565)
-*/
+ */
 export function normalizeServerAddress(address: string): string {
 	const trimmedAddress = address.trim()
 	if (!trimmedAddress) return ''
@@ -273,7 +273,10 @@ export function resolveManagedServerWorld(
 	const normalizedManagedAddress = normalizeServerAddress(managedAddress)
 	if (!normalizedManagedAddress) return null
 
-	const servers = worlds.filter(isServerWorld).slice().sort((a, b) => a.index - b.index)
+	const servers = worlds
+		.filter(isServerWorld)
+		.slice()
+		.sort((a, b) => a.index - b.index)
 
 	const exactMatch = servers.find(
 		(server) =>
@@ -283,9 +286,8 @@ export function resolveManagedServerWorld(
 	if (exactMatch) return exactMatch
 
 	return (
-		servers.find(
-			(server) => normalizeServerAddress(server.address) === normalizedManagedAddress,
-		) ?? null
+		servers.find((server) => normalizeServerAddress(server.address) === normalizedManagedAddress) ??
+		null
 	)
 }
 
