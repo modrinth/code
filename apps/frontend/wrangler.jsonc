@@ -50,8 +50,8 @@
 			"vars": {
 				"ENVIRONMENT": "staging",
 				"SENTRY_ENVIRONMENT": "staging",
-				"BASE_URL": "https://staging-api.modrinth.com/v2/",
-				"BROWSER_BASE_URL": "https://staging-api.modrinth.com/v2/",
+				"BASE_URL": "https://api.modrinth.com/v2/",
+				"BROWSER_BASE_URL": "https://api.modrinth.com/v2/",
 				"PYRO_BASE_URL": "https://staging-archon.modrinth.com/",
 				"STRIPE_PUBLISHABLE_KEY": "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b"
 			},
