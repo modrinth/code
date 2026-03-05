@@ -79,7 +79,7 @@
 								}}
 							</button>
 						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
+						<ButtonStyled size="large" circular>
 							<button v-tooltip="'Add server to instance'" @click="handleAddServerToInstance">
 								<PlusIcon />
 							</button>
