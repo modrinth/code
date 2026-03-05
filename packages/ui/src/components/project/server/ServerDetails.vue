@@ -21,7 +21,7 @@ defineProps<{
 }>()
 </script>
 <template>
-	<div class="empty:hidden flex items-center gap-2">
+	<div class="empty:hidden flex items-center gap-2 flex-wrap gap-y-1">
 		<ServerOnlinePlayers
 			v-if="onlinePlayers !== undefined"
 			:online="onlinePlayers"

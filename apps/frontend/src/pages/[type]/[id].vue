@@ -443,7 +443,27 @@
 						"
 					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="lg:!hidden"
+								circular
+							>
+								<nuxt-link
+									v-tooltip="'Edit project'"
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="!font-bold"
+								>
+									<SettingsIcon aria-hidden="true" />
+								</nuxt-link>
+							</ButtonStyled>
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="max-lg:!hidden"
+							>
 								<nuxt-link
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
 									class="!font-bold"
@@ -501,7 +521,11 @@
 									v-if="!isServerProject"
 									size="large"
 									circular
-									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
 								>
 									<button
 										:aria-label="formatMessage(commonMessages.downloadButton)"
@@ -515,7 +539,11 @@
 									v-else
 									size="large"
 									circular
-									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
 								>
 									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
 										<PlayIcon aria-hidden="true" />
