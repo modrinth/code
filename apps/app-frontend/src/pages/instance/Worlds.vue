@@ -26,7 +26,7 @@
 		:description="`'${worldToDelete?.name}' will be **permanently deleted**, and there will be no way to recover it.`"
 		@proceed="proceedDeleteWorld"
 	/>
-	<div v-if="worlds.length > 0" class="flex flex-col gap-4">
+	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 		<div class="flex flex-wrap gap-2 items-center">
 			<StyledInput
 				v-model="searchFilter"
@@ -152,10 +152,12 @@ import type { GameInstance } from '@/helpers/types'
 import {
 	delete_world,
 	get_profile_protocol_version,
+	getServerDomainKey,
 	getWorldIdentifier,
 	handleDefaultProfileUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
+	normalizeServerAddress,
 	type ProfileEvent,
 	type ProtocolVersion,
 	refreshServerData,
@@ -452,12 +454,48 @@ const supportsWorldQuickPlay = computed(() =>
 	hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
 
+const dedupedWorlds = computed(() => {
+	const visibleWorlds: World[] = []
+	const serverIndexByDomain = new Map<string, number>()
+
+	for (const world of worlds.value) {
+		if (world.type !== 'server') {
+			visibleWorlds.push(world)
+			continue
+		}
+
+		const domainKey =
+			getServerDomainKey(world.address) ||
+			normalizeServerAddress(world.address) ||
+			`server-${world.index}`
+		const existingIndex = serverIndexByDomain.get(domainKey)
+
+		if (existingIndex == null) {
+			serverIndexByDomain.set(domainKey, visibleWorlds.length)
+			visibleWorlds.push(world)
+			continue
+		}
+
+		// replace world with managed world if applicable
+		const existingWorld = visibleWorlds[existingIndex]
+		if (
+			existingWorld?.type === 'server' &&
+			!isManagedServerWorld(existingWorld) &&
+			isManagedServerWorld(world)
+		) {
+			visibleWorlds[existingIndex] = world
+		}
+	}
+
+	return visibleWorlds
+})
+
 const filterOptions = computed(() => {
 	const options: FilterBarOption[] = []
 
-	const hasServer = worlds.value.some((x) => x.type === 'server')
+	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
 
-	if (worlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
+	if (dedupedWorlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
 		options.push({
 			id: 'singleplayer',
 			message: messages.singleplayer,
@@ -471,13 +509,13 @@ const filterOptions = computed(() => {
 	if (hasServer) {
 		// add available filter if there's any offline ("unavailable") servers AND there's any singleplayer worlds or available servers
 		if (
-			worlds.value.some(
+			dedupedWorlds.value.some(
 				(x) =>
 					x.type === 'server' &&
 					!serverData.value[x.address]?.status &&
 					!serverData.value[x.address]?.refreshing,
 			) &&
-			worlds.value.some(
+			dedupedWorlds.value.some(
 				(x) =>
 					x.type === 'singleplayer' ||
 					(x.type === 'server' &&
@@ -496,7 +534,7 @@ const filterOptions = computed(() => {
 })
 
 const filteredWorlds = computed(() =>
-	worlds.value.filter((x) => {
+	dedupedWorlds.value.filter((x) => {
 		const availableFilter = filters.value.includes('available')
 		const typeFilter = filters.value.includes('server') || filters.value.includes('singleplayer')
 

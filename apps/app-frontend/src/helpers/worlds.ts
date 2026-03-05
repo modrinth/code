@@ -224,20 +224,51 @@ function parseServerPort(port: string): number | null {
 	return Number.isInteger(parsed) && parsed > 0 && parsed <= 65535 ? parsed : null
 }
 
+function parseServerHost(address: string): string {
+	const trimmedAddress = address.trim()
+	if (!trimmedAddress) return ''
+
+	if (trimmedAddress.startsWith('[')) {
+		const closingBracket = trimmedAddress.indexOf(']')
+		if (closingBracket > 0) {
+			return trimmedAddress.slice(1, closingBracket).trim().toLowerCase()
+		}
+	}
+
+	const firstColon = trimmedAddress.indexOf(':')
+	const lastColon = trimmedAddress.lastIndexOf(':')
+
+	if (firstColon !== -1 && firstColon === lastColon) {
+		return trimmedAddress.slice(0, firstColon).trim().toLowerCase()
+	}
+
+	return trimmedAddress.toLowerCase()
+}
+
+function isIPv4Host(host: string): boolean {
+	const segments = host.split('.')
+	if (segments.length !== 4) return false
+
+	return segments.every((segment) => {
+		if (!/^\d+$/.test(segment)) return false
+		const value = Number.parseInt(segment, 10)
+		return value >= 0 && value <= 255
+	})
+}
+
 /**
  * Normalization converts addresses to a canonical form (lowercase-host:port, default port 25565)
  */
 export function normalizeServerAddress(address: string): string {
 	const trimmedAddress = address.trim()
-	if (!trimmedAddress) return ''
-
-	let host = trimmedAddress
+	const host = parseServerHost(trimmedAddress)
+	if (!host) return ''
 	let port = DEFAULT_MINECRAFT_SERVER_PORT
 
+	// ipv6 address
 	if (trimmedAddress.startsWith('[')) {
 		const closingBracket = trimmedAddress.indexOf(']')
 		if (closingBracket > 0) {
-			host = trimmedAddress.slice(1, closingBracket)
 			const suffix = trimmedAddress.slice(closingBracket + 1)
 			if (suffix.startsWith(':')) {
 				const parsedPort = parseServerPort(suffix.slice(1))
@@ -246,21 +277,41 @@ export function normalizeServerAddress(address: string): string {
 				}
 			}
 		}
+
+		// ipv4 address or hostname
 	} else {
 		const firstColon = trimmedAddress.indexOf(':')
 		const lastColon = trimmedAddress.lastIndexOf(':')
 		if (firstColon !== -1 && firstColon === lastColon) {
-			host = trimmedAddress.slice(0, firstColon)
 			const parsedPort = parseServerPort(trimmedAddress.slice(firstColon + 1))
 			if (parsedPort != null) {
 				port = parsedPort
-			} else {
-				host = trimmedAddress
 			}
 		}
 	}
 
-	return `${host.trim().toLowerCase()}:${port}`
+	return `${host}:${port}`
+}
+
+/**
+ * Domain key used for deduping server entries by removing a single leading subdomain.
+ * Example: test.cobblemon.gg and cobblemon.gg map to cobblemon.gg
+ */
+export function getServerDomainKey(address: string): string {
+	const normalizedAddress = normalizeServerAddress(address)
+	if (!normalizedAddress) return ''
+
+	const separator = normalizedAddress.lastIndexOf(':')
+	if (separator <= 0 || separator === normalizedAddress.length - 1) return normalizedAddress
+
+	const host = normalizedAddress.slice(0, separator).replace(/\.+$/, '')
+	if (!host) return normalizedAddress
+	if (host.includes(':') || isIPv4Host(host)) return normalizedAddress
+
+	const segments = host.split('.').filter(Boolean)
+	if (segments.length <= 2) return host
+
+	return segments.slice(1).join('.')
 }
 
 export function resolveManagedServerWorld(
