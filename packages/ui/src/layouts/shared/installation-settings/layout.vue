@@ -490,9 +490,6 @@ const messages = defineMessages({
 	</div>
 
 	<!-- Modals -->
-	<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
-	<ConfirmReinstallModal ref="reinstallModal" @reinstall="ctx.reinstallModpack()" />
-	<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="ctx.unlinkModpack()" />
 	<Teleport to="body">
 		<ContentUpdaterModal
 			v-if="form.updatingModpack.value"
@@ -512,6 +509,10 @@ const messages = defineMessages({
 			@version-select="form.handleUpdaterVersionSelect"
 			@version-hover="form.handleUpdaterVersionHover"
 		/>
+		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
+		<ConfirmReinstallModal ref="reinstallModal" @reinstall="ctx.reinstallModpack()" />
+		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="ctx.unlinkModpack()" />
+
+		<slot name="extra-modals" />
 	</Teleport>
-	<slot name="extra-modals" />
 </template>

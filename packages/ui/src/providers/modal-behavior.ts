@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 
-import { createContext } from './index'
+import { createContext } from './create-context'
 
 export interface ModalBehavior {
 	noblur: Ref<boolean>

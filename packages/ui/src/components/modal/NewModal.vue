@@ -244,6 +244,7 @@ function show(event?: MouseEvent) {
 	if (wasEmpty) modalBehavior?.onShow?.()
 
 	document.body.style.overflow = 'hidden'
+	window.addEventListener('keydown', handleWindowKeyDown)
 	window.addEventListener('mousedown', updateMousePosition)
 	if (event) {
 		updateMousePosition(event)
@@ -273,6 +274,7 @@ function hide() {
 		modalBehavior?.onHide?.()
 		document.body.style.overflow = ''
 	}
+	window.removeEventListener('keydown', handleWindowKeyDown)
 	window.removeEventListener('mousedown', updateMousePosition)
 	if (previousFocusEl instanceof HTMLElement) {
 		previousFocusEl.focus()
@@ -300,6 +302,7 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 onUnmounted(() => {
 	if (open.value) {
 		popModal()
+		window.removeEventListener('keydown', handleWindowKeyDown)
 		window.removeEventListener('mousedown', updateMousePosition)
 		if (modalStackSize() === 0) {
 			document.body.style.overflow = ''
@@ -308,15 +311,16 @@ onUnmounted(() => {
 	}
 })
 
-function handleKeyDown(event: KeyboardEvent) {
+function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2
-		return
 	}
+}
 
+function handleKeyDown(event: KeyboardEvent) {
 	if (event.key === 'Tab') {
 		const focusable = getFocusableElements()
 		if (focusable.length === 0) return
