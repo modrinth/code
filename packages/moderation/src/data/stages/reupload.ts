@@ -24,6 +24,7 @@ const reupload: Stage = {
 				'reupload_request_proof',
 				'reupload_identity_verification',
 				'reupload_request_proof_server',
+				'reupload_identity_verification_server'
 			],
 			relevantExtraInput: [
 				{
@@ -55,6 +56,7 @@ const reupload: Stage = {
 				'reupload_request_proof',
 				'reupload_identity_verification',
 				'reupload_request_proof_server',
+				'reupload_identity_verification_server'
 			],
 		} as ButtonAction,
 		{
@@ -72,6 +74,7 @@ const reupload: Stage = {
 				'reupload_request_proof',
 				'reupload_identity_verification',
 				'reupload_request_proof_server',
+				'reupload_identity_verification_server'
 			],
 		} as ButtonAction,
 		{
@@ -89,6 +92,7 @@ const reupload: Stage = {
 				'reupload_insufficient_fork',
 				'reupload_identity_verification',
 				'reupload_request_proof_server',
+				'reupload_identity_verification_server'
 			],
 		},
 		{
@@ -100,11 +104,35 @@ const reupload: Stage = {
 			severity: 'high',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/reupload/identity_verification.md?raw')).default,
+				(await import('../messages/reupload/identity-verification/identity_verification.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'Where else can the project be found?',
 					variable: 'PLATFORM',
+					required: true,
+				},
+			],
+			disablesActions: [
+				'reupload_reupload',
+				'reupload_insufficient_fork',
+				'reupload_request_proof',
+				'reupload_request_proof_server',
+			],
+		},
+		{
+			id: 'reupload_identity_verification_server',
+			type: 'button',
+			label: 'Verify Identity',
+			weight: 1100,
+			suggestedStatus: 'rejected',
+			severity: 'high',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
+			message: async () =>
+				(await import('../messages/reupload/identity-verification/identity_verification-server.md?raw')).default,
+			relevantExtraInput: [
+				{
+					label: 'known public contact method',
+					variable: 'CONTACT',
 					required: true,
 				},
 			],
