@@ -79,14 +79,10 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) =>
-			!context.projectV3?.minecraft_server &&
-			!(
-				context.project.issues_url ||
-				context.project.source_url ||
-				context.project.wiki_url ||
-				context.project.discord_url ||
-				context.project.donation_urls?.length
-			),
+		{
+
+			return !context.projectV3?.minecraft_server && Object.keys(context.projectV3?.link_urls ?? {}).length === 0
+		},
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
@@ -109,13 +105,30 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) => {
-			return !(
-				context.projectV3?.link_urls?.site?.url ||
-				context.projectV3?.link_urls?.store?.url ||
-				context.projectV3?.link_urls?.discord?.url ||
-				context.projectV3?.link_urls?.wiki?.url
-			)
+			return !!context.projectV3?.minecraft_server && Object.keys(context.projectV3?.link_urls ?? {}).length === 0
 		},
+		link: {
+			path: 'settings/links',
+			title: defineMessage({
+				id: 'nags.settings.links.title',
+				defaultMessage: 'Visit links settings',
+			}),
+			shouldShow: (context: NagContext) => context.currentRoute !== 'type-id-settings-links',
+		},
+	},
+	{
+		id: 'identical-links',
+		title: defineMessage({
+			id: 'nags.identical-links.title',
+			defaultMessage: 'Identical Links',
+		}),
+		description: defineMessage({
+			id: 'nags.identical-links.description',
+			defaultMessage:
+				'Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type.',
+		}),
+		status: 'required',
+		shouldShow: (context: NagContext) => new Set(Object.values(context.projectV3?.link_urls ?? {}).map(link => link.url)).size !== Object.values(context.projectV3?.link_urls ?? {}).map(link => link.url).length,
 		link: {
 			path: 'settings/links',
 			title: defineMessage({
