@@ -151,7 +151,6 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<usize> {
     let path = get_full_path(path).await?;
     Ok(worlds::add_server_to_profile(
@@ -159,7 +158,6 @@ pub async fn add_server_to_profile(
         name,
         address,
         pack_status,
-        linked_project_id,
     )
     .await?)
 }
@@ -171,7 +169,6 @@ pub async fn edit_server_in_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<()> {
     let path = get_full_path(path).await?;
     worlds::edit_server_in_profile(
@@ -180,7 +177,6 @@ pub async fn edit_server_in_profile(
         name,
         address,
         pack_status,
-        linked_project_id,
     )
     .await?;
     Ok(())

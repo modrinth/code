@@ -62,6 +62,7 @@
 				v-for="world in filteredWorlds"
 				:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
 				:world="world"
+				:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
 				:highlighted="highlightedWorld === getWorldIdentifier(world)"
 				:supports-server-quick-play="supportsServerQuickPlay"
 				:supports-world-quick-play="supportsWorldQuickPlay"
@@ -80,13 +81,13 @@
 				@refresh="() => refreshServer((world as ServerWorld).address)"
 				@edit="
 					() =>
-						isLinkedWorld(world)
-							? undefined
-							: world.type === 'server'
-								? editServerModal?.show(world)
-								: editWorldModal?.show(world)
+						world.type === 'singleplayer'
+							? editWorldModal?.show(world)
+							: isManagedServerWorld(world)
+								? undefined
+								: editServerModal?.show(world)
 				"
-				@delete="() => !isLinkedWorld(world) && promptToRemoveWorld(world)"
+				@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
 				@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
 			/>
 		</div>
@@ -144,6 +145,7 @@ import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
@@ -154,7 +156,6 @@ import {
 	handleDefaultProfileUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
-	isLinkedWorld,
 	type ProfileEvent,
 	type ProtocolVersion,
 	refreshServerData,
@@ -162,6 +163,7 @@ import {
 	refreshWorld,
 	refreshWorlds,
 	remove_server_from_profile,
+	resolveManagedServerWorld,
 	type ServerData,
 	type ServerWorld,
 	showWorldInFolder,
@@ -171,7 +173,11 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import { playServerProject } from '@/store/install'
+import {
+	ensureManagedServerWorldExists,
+	getServerAddress,
+	playServerProject,
+} from '@/store/install'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
@@ -225,6 +231,69 @@ const linuxRefreshCount = ref(0)
 const protocolVersion = ref<ProtocolVersion | null>(
 	await get_profile_protocol_version(instance.value.path),
 )
+const managedServerName = ref<string | null>(null)
+const managedServerAddress = ref<string | null>(null)
+
+const managedServerWorld = computed(() =>
+	resolveManagedServerWorld(worlds.value, managedServerName.value, managedServerAddress.value),
+)
+
+function isManagedServerWorld(world: World): world is ServerWorld {
+	return world.type === 'server' && managedServerWorld.value?.index === world.index
+}
+
+async function refreshManagedServerMetadata() {
+	await ensureManagedServerWorldExists(
+		instance.value.path,
+		managedServerName.value,
+		managedServerAddress.value,
+	)
+
+	const projectId = instance.value.linked_data?.project_id
+	if (!projectId) {
+		managedServerName.value = null
+		managedServerAddress.value = null
+		return
+	}
+
+	try {
+		const [project, projectV3] = await Promise.all([
+			get_project(projectId, 'bypass'),
+			get_project_v3(projectId, 'bypass'),
+		])
+
+		if (projectV3?.minecraft_server == null) {
+			managedServerName.value = null
+			managedServerAddress.value = null
+			return
+		}
+
+		const serverAddress = getServerAddress(projectV3.minecraft_java_server)
+		if (!serverAddress) {
+			managedServerName.value = null
+			managedServerAddress.value = null
+			return
+		}
+
+		managedServerName.value = project.title
+		managedServerAddress.value = serverAddress
+	} catch (err) {
+		console.error(
+			`Failed to resolve managed server metadata for profile: ${instance.value.path}`,
+			err,
+		)
+		managedServerName.value = null
+		managedServerAddress.value = null
+	}
+}
+
+watch(
+	() => instance.value.linked_data?.project_id,
+	async () => {
+		await refreshManagedServerMetadata()
+	},
+	{ immediate: true },
+)
 
 const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
 	if (e.profile_path_id !== instance.value.path) return
@@ -257,6 +326,7 @@ async function refreshAllWorlds() {
 		console.log(`Already refreshing, cancelling refresh.`)
 		return
 	}
+	await refreshManagedServerMetadata()
 
 	refreshingAll.value = true
 
@@ -334,8 +404,11 @@ async function joinWorld(world: World) {
 	startingInstance.value = true
 	worldPlaying.value = world
 	if (world.type === 'server') {
-		if (isLinkedWorld(world)) {
-			playServerProject(world.linked_project_id)
+		const managedProjectId = instance.value.linked_data?.project_id
+		if (managedProjectId && isManagedServerWorld(world)) {
+			await playServerProject(managedProjectId).catch(handleJoinError)
+			startingInstance.value = false
+			return
 		}
 		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
 	} else if (world.type === 'singleplayer') {

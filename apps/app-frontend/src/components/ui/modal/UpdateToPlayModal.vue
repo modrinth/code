@@ -187,10 +187,11 @@ type ProjectInfo = {
 
 const { formatMessage } = useVIntl()
 const installStore = useInstall()
+type UpdateCompleteCallback = () => void | Promise<void>
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instance = ref<GameInstance | null>(null)
-const onUpdateComplete = ref<() => void>(() => {})
+const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
@@ -356,7 +357,7 @@ async function handleUpdate() {
 	try {
 		if (modpackVersionId.value && instance.value) {
 			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
-			onUpdateComplete.value()
+			await onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
@@ -380,7 +381,7 @@ function handleDecline() {
 function show(
 	instanceVal: GameInstance,
 	modpackVersionIdVal: string | null = null,
-	callback: () => void = () => {},
+	callback: UpdateCompleteCallback = () => {},
 	e?: MouseEvent,
 ) {
 	instance.value = instanceVal

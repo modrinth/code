@@ -4,8 +4,8 @@ import { defineStore } from 'pinia'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version, get_version_many } from '@/helpers/cache.js'
 import {
-	create_profile_and_install as packInstall,
 	install_to_existing_profile,
+	create_profile_and_install as packInstall,
 } from '@/helpers/pack.js'
 import {
 	add_project_from_version,
@@ -21,8 +21,8 @@ import {
 } from '@/helpers/profile.js'
 import {
 	add_server_to_profile,
-	edit_server_in_profile,
 	get_profile_worlds,
+	resolveManagedServerWorld,
 	start_join_server,
 } from '@/helpers/worlds.ts'
 import router from '@/routes.js'
@@ -328,7 +328,7 @@ export const installServerProject = async (serverProjectId) => {
 	})
 	await edit_icon(profilePath, originalIconPath)
 
-	await syncServerProjectAsWorld(profilePath, project.title, serverAddress, serverProjectId)
+	await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
 }
 
 export const getServerAddress = (javaServer) => {
@@ -337,61 +337,16 @@ export const getServerAddress = (javaServer) => {
 	return address
 }
 
-const syncServerProjectAsWorld = async (
-	profilePath,
-	serverName,
-	serverAddress,
-	serverProjectId = null,
-) => {
+export const ensureManagedServerWorldExists = async (profilePath, serverName, serverAddress) => {
 	if (!profilePath || !serverAddress) return
 	try {
 		const worlds = await get_profile_worlds(profilePath)
-
-		if (serverProjectId) {
-			// Check if a linked world for this project already exists
-			const linkedWorld = worlds.find(
-				(w) => w.type === 'server' && w.linked_project_id === serverProjectId,
-			)
-			if (linkedWorld) {
-				// Sync linked world data with project details
-				if (linkedWorld.address !== serverAddress || linkedWorld.name !== serverName) {
-					await edit_server_in_profile(
-						profilePath,
-						linkedWorld.index,
-						serverName,
-						serverAddress,
-						linkedWorld.pack_status,
-						serverProjectId,
-					)
-				}
-				return
-			}
-		}
-
-		const existingServer = worlds.find((w) => w.type === 'server' && w.address === serverAddress)
-		if (existingServer) {
-			// Re-link and sync existing server (link may have been lost by Minecraft rewriting servers.dat)
-			if (serverProjectId || existingServer.name !== serverName) {
-				await edit_server_in_profile(
-					profilePath,
-					existingServer.index,
-					serverName,
-					serverAddress,
-					existingServer.pack_status,
-					serverProjectId ?? undefined,
-				)
-			}
-		} else {
-			await add_server_to_profile(
-				profilePath,
-				serverName,
-				serverAddress,
-				'prompt',
-				serverProjectId ?? undefined,
-			)
+		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
+		if (!managedWorld) {
+			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
 		}
 	} catch (err) {
-		console.error('Failed to add server to instance worlds:', err)
+		console.error('Failed to ensure managed server world exists:', err)
 	}
 }
 
@@ -420,8 +375,7 @@ const createVanillaServerInstance = async (project, gameVersion, serverAddress) 
 		},
 	)
 
-	//
-	await syncServerProjectAsWorld(profilePath, project.title, serverAddress, project.id)
+	await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
 
 	return profilePath
 }
@@ -552,7 +506,7 @@ export const playServerProject = async (projectId) => {
 
 	if (!instance) return
 
-	await syncServerProjectAsWorld(instance.path, project.title, serverAddress, project.id)
+	await ensureManagedServerWorldExists(instance.path, project.title, serverAddress)
 
 	// Update existing instance if needed
 	if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {

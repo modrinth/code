@@ -30,7 +30,6 @@ export type ServerWorld = BaseWorld & {
 	index: number
 	address: string
 	pack_status: ServerPackStatus
-	linked_project_id?: string
 }
 
 export type World = SingleplayerWorld | ServerWorld
@@ -141,14 +140,12 @@ export async function add_server_to_profile(
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
-	linkedProjectId?: string,
 ): Promise<number> {
 	return await invoke('plugin:worlds|add_server_to_profile', {
 		path,
 		name,
 		address,
 		packStatus,
-		linkedProjectId,
 	})
 }
 
@@ -158,7 +155,6 @@ export async function edit_server_in_profile(
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
-	linkedProjectId?: string,
 ): Promise<void> {
 	return await invoke('plugin:worlds|edit_server_in_profile', {
 		path,
@@ -166,7 +162,6 @@ export async function edit_server_in_profile(
 		name,
 		address,
 		packStatus,
-		linkedProjectId,
 	})
 }
 
@@ -204,11 +199,6 @@ export function getWorldIdentifier(world: World) {
 
 export function sortWorlds(worlds: World[]) {
 	worlds.sort((a, b) => {
-		const aLinked = isLinkedWorld(a)
-		const bLinked = isLinkedWorld(b)
-		if (aLinked !== bLinked) {
-			return aLinked ? -1 : 1
-		}
 		if (!a.last_played) {
 			return 1
 		}
@@ -227,8 +217,76 @@ export function isServerWorld(world: World): world is ServerWorld {
 	return world.type === 'server'
 }
 
-export function isLinkedWorld(world: World): boolean {
-	return world.type === 'server' && !!world.linked_project_id
+const DEFAULT_MINECRAFT_SERVER_PORT = 25565
+
+function parseServerPort(port: string): number | null {
+	const parsed = Number.parseInt(port, 10)
+	return Number.isInteger(parsed) && parsed > 0 && parsed <= 65535 ? parsed : null
+}
+
+/**
+ * Normalization converts addresses to a canonical form (lowercase-host:port, default port 25565)
+*/
+export function normalizeServerAddress(address: string): string {
+	const trimmedAddress = address.trim()
+	if (!trimmedAddress) return ''
+
+	let host = trimmedAddress
+	let port = DEFAULT_MINECRAFT_SERVER_PORT
+
+	if (trimmedAddress.startsWith('[')) {
+		const closingBracket = trimmedAddress.indexOf(']')
+		if (closingBracket > 0) {
+			host = trimmedAddress.slice(1, closingBracket)
+			const suffix = trimmedAddress.slice(closingBracket + 1)
+			if (suffix.startsWith(':')) {
+				const parsedPort = parseServerPort(suffix.slice(1))
+				if (parsedPort != null) {
+					port = parsedPort
+				}
+			}
+		}
+	} else {
+		const firstColon = trimmedAddress.indexOf(':')
+		const lastColon = trimmedAddress.lastIndexOf(':')
+		if (firstColon !== -1 && firstColon === lastColon) {
+			host = trimmedAddress.slice(0, firstColon)
+			const parsedPort = parseServerPort(trimmedAddress.slice(firstColon + 1))
+			if (parsedPort != null) {
+				port = parsedPort
+			} else {
+				host = trimmedAddress
+			}
+		}
+	}
+
+	return `${host.trim().toLowerCase()}:${port}`
+}
+
+export function resolveManagedServerWorld(
+	worlds: World[],
+	managedName: string | null | undefined,
+	managedAddress: string | null | undefined,
+): ServerWorld | null {
+	if (!managedName || !managedAddress) return null
+
+	const normalizedManagedAddress = normalizeServerAddress(managedAddress)
+	if (!normalizedManagedAddress) return null
+
+	const servers = worlds.filter(isServerWorld).slice().sort((a, b) => a.index - b.index)
+
+	const exactMatch = servers.find(
+		(server) =>
+			server.name === managedName &&
+			normalizeServerAddress(server.address) === normalizedManagedAddress,
+	)
+	if (exactMatch) return exactMatch
+
+	return (
+		servers.find(
+			(server) => normalizeServerAddress(server.address) === normalizedManagedAddress,
+		) ?? null
+	)
 }
 
 export async function getServerLatency(
