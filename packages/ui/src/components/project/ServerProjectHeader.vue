@@ -1,7 +1,7 @@
 <template>
-	<ContentPageHeader>
+	<ContentPageHeader disable-line-clamp>
 		<template #icon>
-			<Avatar :src="project.icon_url" :alt="project.title" size="96px" />
+			<Avatar :src="project.icon_url" :alt="project.title" size="108px" />
 		</template>
 		<template #title>
 			{{ project.title }}

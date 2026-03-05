@@ -12,7 +12,11 @@
 								</h1>
 								<slot name="title-suffix" />
 							</div>
-							<p v-if="$slots.summary" class="m-0 line-clamp-2 max-w-[40rem] empty:hidden">
+							<p
+								v-if="$slots.summary"
+								class="m-0 max-w-[40rem] empty:hidden"
+								:class="[disableLineClamp ? '' : 'line-clamp-2']"
+							>
 								<slot name="summary" />
 							</p>
 						</div>
@@ -39,3 +43,11 @@
 		</div>
 	</div>
 </template>
+
+<script setup lang="ts">
+interface Props {
+	disableLineClamp?: boolean
+}
+
+const { disableLineClamp } = defineProps<Props>()
+</script>
