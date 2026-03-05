@@ -329,7 +329,7 @@ const userOption = computed(() => ({
 						h('img', {
 							src: auth.value.user?.avatar_url,
 							alt: 'User Avatar',
-							class: 'h-5 w-5 rounded',
+							class: 'h-5 w-5 rounded-full',
 						}),
 				}),
 			)
