@@ -333,7 +333,7 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status, getServerLatency } from '@/helpers/worlds'
+import { get_server_status } from '@/helpers/worlds'
 import { handleSevereError } from '@/store/error.js'
 import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
@@ -415,20 +415,13 @@ async function fetchInstance() {
 function fetchDeferredData() {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		Promise.allSettled([get_server_status(serverAddress), getServerLatency(serverAddress)])
-			.then(([statusResult, latencyResult]) => {
-				console.log(statusResult)
-				if (statusResult.status === 'fulfilled') {
-					playersOnline.value = statusResult.value.players?.online
-				} else {
-					console.error(`Failed to fetch server status for ${serverAddress}:`, statusResult.reason)
-				}
-
-				if (latencyResult.status === 'fulfilled') {
-					ping.value = latencyResult.value
-				} else {
-					console.error(`Failed to ping server ${serverAddress}:`, latencyResult.reason)
-				}
+		get_server_status(serverAddress)
+			.then((status) => {
+				playersOnline.value = status.players?.online
+				ping.value = status.ping
+			})
+			.catch((error) => {
+				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
 			})
 			.finally(() => {
 				loadingServerPing.value = true
