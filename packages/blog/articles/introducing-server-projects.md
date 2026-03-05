@@ -1,7 +1,7 @@
 ---
 title: Introducing Server Projects
 summary: A new project type made for seamless modded multiplayer on Modrinth.
-date: 2026-03-02T15:00:00+00:00
+date: 2026-03-03T17:30:00-08:00
 authors: ['AJfd8YH6', '6EjnV9Uf', 'xSQqYYIN']
 ---
 
