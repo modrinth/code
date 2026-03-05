@@ -2,7 +2,12 @@
 	<div v-if="instance">
 		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
-			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+			<InstanceSettingsModal
+				ref="settingsModal"
+				:instance="instance"
+				:offline="offline"
+				@unlinked="fetchInstance"
+			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<ContentPageHeader>
 				<template #icon>
