@@ -1,8 +1,5 @@
 import MarkdownIt from 'markdown-it'
-import xss from 'xss'
-
-// @ts-expect-error xss types don't reflect CJS default export shape
-const { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } = xss
+import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
 export const configuredXss = new FilterXSS({
 	whiteList: {

@@ -3,10 +3,7 @@ import { computed, type ComputedRef } from 'vue'
 import { injectI18n } from '../providers/i18n'
 import { LOCALES } from './i18n.ts'
 
-export type Formatter = (
-	value: Date | number | null | string | undefined,
-	options?: FormatOptions,
-) => string
+export type Formatter = (value: Date | number | null | undefined, options?: FormatOptions) => string
 
 export interface FormatOptions {
 	roundingMode?: 'halfExpand' | 'floor' | 'ceil'
@@ -29,7 +26,7 @@ export function useRelativeTime(): Formatter {
 		formatters.set(locale.value, formatterRef)
 	}
 
-	return (value: Date | number | null | string | undefined) => {
+	return (value: Date | number | null | undefined) => {
 		if (value == null) {
 			return ''
 		}

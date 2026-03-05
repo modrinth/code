@@ -9,10 +9,6 @@ function isLoader(tag: string) {
 	return getTagMessage(tag, 'loader') !== undefined
 }
 
-function uniqueSorted(tags?: string[]) {
-	return tags ? sortTagsForDisplay([...new Set(tags)]) : undefined
-}
-
 const props = withDefaults(
 	defineProps<{
 		tags: string[]
@@ -29,8 +25,10 @@ const props = withDefaults(
 	},
 )
 
-const sortedTags = computed(() => uniqueSorted(props.tags))
-const sortedExtraTags = computed(() => uniqueSorted(props.extraTags))
+const sortedTags = computed(() => (props.tags ? sortTagsForDisplay(props.tags) : undefined))
+const sortedExtraTags = computed(() =>
+	props.extraTags ? sortTagsForDisplay(props.extraTags) : undefined,
+)
 const filteredTags = computed(() => {
 	if (!sortedTags.value) {
 		return undefined
@@ -42,10 +40,8 @@ const filteredTags = computed(() => {
 
 const visibleTags = computed(() => filteredTags.value?.slice(0, props.maxTags))
 const overflowTags = computed(() => [
-	...new Set([
-		...(props.tags.filter((x) => !visibleTags.value?.includes(x)) ?? []),
-		...(sortedExtraTags.value?.filter((x) => !visibleTags.value?.includes(x)) ?? []),
-	]),
+	...(props.tags.filter((x) => !visibleTags.value?.includes(x)) ?? []),
+	...(sortedExtraTags.value ?? []),
 ])
 </script>
 

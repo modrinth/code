@@ -58,8 +58,6 @@ pub use moderation_lock_item::{DBModerationLock, ModerationLockWithUser};
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
-    #[error(transparent)]
-    Internal(#[from] eyre::Report),
     #[error("Error while interacting with the database: {0}")]
     Database(#[from] sqlx::Error),
     #[error("Error while trying to generate random ID")]

@@ -40,7 +40,6 @@ export function useSavable<T extends Record<string, unknown>>(
 		saving.value = true
 		try {
 			await save(changes.value)
-			currentValues.value = data()
 		} finally {
 			saving.value = false
 		}

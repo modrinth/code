@@ -99,8 +99,7 @@ pub async fn collection_create(
         &mut transaction,
         &redis,
     )
-    .await
-    .wrap_internal_err("failed to fetch created projects")?
+    .await?
     .into_iter()
     .map(|x| x.inner.id.into())
     .collect::<Vec<ProjectId>>();

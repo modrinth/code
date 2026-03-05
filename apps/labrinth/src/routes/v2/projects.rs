@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::SearchBackend;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -53,9 +53,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, SearchError> {
+    search_backend: web::Data<dyn SearchBackend>,
+) -> Result<HttpResponse, ApiError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
     // in the API calls except that 'versions:x' is now 'game_versions:x'
@@ -100,7 +99,10 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_for_project(&info, &config, &redis).await?;
+    let results = search_backend
+        .search_for_project(&info)
+        .await
+        .map_err(ApiError::Internal)?;
 
     let results = LegacySearchResults::from(results);
 
@@ -215,7 +217,7 @@ pub async fn project_get(
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
     // Call V3 project creation
-    let project = match v3::projects::project_get_internal(
+    let response = v3::projects::project_get(
         req,
         info,
         pool.clone(),
@@ -223,21 +225,23 @@ pub async fn project_get(
         session_queue,
     )
     .await
-    {
-        Ok(resp) => resp.0,
-        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
-        Err(err) => return Err(err),
-    };
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
-    let version_item = match project.versions.first() {
-        Some(vid) => {
-            version_item::DBVersion::get((*vid).into(), &**pool, &redis).await?
+    match v2_reroute::extract_ok_json::<Project>(response).await {
+        Ok(project) => {
+            let version_item = match project.versions.first() {
+                Some(vid) => {
+                    version_item::DBVersion::get((*vid).into(), &**pool, &redis)
+                        .await?
+                }
+                None => None,
+            };
+            let project = LegacyProject::from(project, version_item);
+            Ok(HttpResponse::Ok().json(project))
         }
-        None => None,
-    };
-    let project = LegacyProject::from(project, version_item);
-    Ok(HttpResponse::Ok().json(project))
+        Err(response) => Ok(response),
+    }
 }
 
 //checks the validity of a project id or slug
@@ -248,7 +252,7 @@ pub async fn project_get_check(
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns an id only, do not need to convert
-    v3::projects::project_get_check_internal(info, pool, redis)
+    v3::projects::project_get_check(info, pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
@@ -268,7 +272,7 @@ pub async fn dependency_list(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: tests, probably
-    let response = v3::projects::dependency_list_internal(
+    let response = v3::projects::dependency_list(
         req,
         info,
         pool.clone(),
@@ -410,7 +414,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -511,20 +515,16 @@ pub async fn project_edit(
         moderation_message_body: v2_new_project.moderation_message_body,
         monetization_status: v2_new_project.monetization_status,
         side_types_migration_review_status: None, // Not to be exposed in v2
-        // None of the below is present in v2
-        loader_fields: HashMap::new(),
-        minecraft_server: None,
-        minecraft_java_server: None,
-        minecraft_bedrock_server: None,
+        loader_fields: HashMap::new(), // Loader fields are not a thing in v2
     };
 
     // This returns 204 or failure so we don't need to do anything with it
     let project_id = info.clone().0;
-    let mut response = v3::projects::project_edit_internal(
+    let mut response = v3::projects::project_edit(
         req.clone(),
         info,
         pool.clone(),
-        search_config,
+        search_backend,
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
@@ -757,7 +757,7 @@ pub async fn project_icon_edit(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_icon_edit_internal(
+    v3::projects::project_icon_edit(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
         info,
@@ -781,7 +781,7 @@ pub async fn delete_project_icon(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::delete_project_icon_internal(
+    v3::projects::delete_project_icon(
         req,
         info,
         pool,
@@ -817,7 +817,7 @@ pub async fn add_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::add_gallery_item_internal(
+    v3::projects::add_gallery_item(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
         web::Query(v3::projects::GalleryCreateQuery {
@@ -868,7 +868,7 @@ pub async fn edit_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::edit_gallery_item_internal(
+    v3::projects::edit_gallery_item(
         req,
         web::Query(v3::projects::GalleryEditQuery {
             url: item.url,
@@ -900,7 +900,7 @@ pub async fn delete_gallery_item(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::delete_gallery_item_internal(
+    v3::projects::delete_gallery_item(
         req,
         web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
         pool,
@@ -918,16 +918,16 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_delete_internal(
+    v3::projects::project_delete(
         req,
         info,
         pool,
         redis,
-        search_config,
+        search_backend,
         session_queue,
     )
     .await
@@ -944,7 +944,7 @@ pub async fn project_follow(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_follow_internal(req, info, pool, redis, session_queue)
+    v3::projects::project_follow(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }
@@ -958,13 +958,7 @@ pub async fn project_unfollow(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_unfollow_internal(
-        req,
-        info,
-        pool,
-        redis,
-        session_queue,
-    )
-    .await
-    .or_else(v2_reroute::flatten_404_error)
+    v3::projects::project_unfollow(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }

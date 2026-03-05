@@ -340,12 +340,15 @@ pub async fn fetch_mirrors(
 
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
-pub async fn post_json(
+pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
     exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-) -> crate::Result<()> {
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
     let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
@@ -356,8 +359,10 @@ pub async fn post_json(
         req = req.header("Authorization", &creds.session);
     }
 
-    req.send().await?.error_for_status()?;
-    Ok(())
+    let result = req.send().await?.error_for_status()?;
+
+    let value = result.json().await?;
+    Ok(value)
 }
 
 pub async fn read_json<T>(

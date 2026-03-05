@@ -26,12 +26,11 @@ use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::SearchConfig;
-use crate::search::indexing::remove_documents;
+use crate::search::SearchBackend;
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, get, web};
+use actix_web::{HttpRequest, HttpResponse, web};
 use ariadne::ids::base62_impl::parse_base62;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -57,8 +56,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 // Given a project ID/slug and a version slug
-#[utoipa::path]
-#[get("/{project_id}/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
@@ -179,7 +176,7 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<models::projects::Version>, ApiError> {
+) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     version_get_helper(req, id, pool, redis, session_queue).await
 }
@@ -190,7 +187,7 @@ pub async fn version_get_helper(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<web::Json<models::projects::Version>, ApiError> {
+) -> Result<HttpResponse, ApiError> {
     let version_data =
         database::models::DBVersion::get(id.into(), &**pool, &redis).await?;
 
@@ -208,7 +205,9 @@ pub async fn version_get_helper(
     if let Some(data) = version_data
         && is_visible_version(&data.inner, &user_option, &pool, &redis).await?
     {
-        return Ok(web::Json(models::projects::Version::from(data)));
+        return Ok(
+            HttpResponse::Ok().json(models::projects::Version::from(data))
+        );
     }
 
     Err(ApiError::NotFound)
@@ -733,28 +732,7 @@ pub struct VersionListFilters {
     pub include_changelog: bool,
 }
 
-#[utoipa::path]
-#[get("/{project_id}/version")]
-async fn version_list(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    web::Query(filters): web::Query<VersionListFilters>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    version_list_internal(
-        req,
-        info,
-        web::Query(filters),
-        pool,
-        redis,
-        session_queue,
-    )
-    .await
-}
-
-pub async fn version_list_internal(
+pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
@@ -915,7 +893,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1022,10 +1000,10 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
-    remove_documents(&[version.inner.id.into()], &search_config)
+    search_backend
+        .remove_documents(&[version.inner.id.into()])
         .await
         .wrap_internal_err("failed to remove documents")?;
-
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {

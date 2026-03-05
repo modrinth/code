@@ -45,37 +45,49 @@
 	</svg>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue'
+<script setup>
+import { computed, ref, watch } from 'vue'
 
 const pixelated = ref(false)
-const img = useTemplateRef<HTMLImageElement>('img')
+const img = ref(null)
 const failed = ref(false)
 
-const props = withDefaults(
-	defineProps<{
-		src?: string | null
-		alt?: string
-		size?: string
-		circle?: boolean
-		noShadow?: boolean
-		loading?: 'eager' | 'lazy'
-		raised?: boolean
-		tintBy?: string | null
-	}>(),
-	{
-		src: null,
-		alt: '',
-		size: '2rem',
-		circle: false,
-		noShadow: false,
-		loading: 'eager',
-		raised: false,
-		tintBy: null,
+const props = defineProps({
+	src: {
+		type: String,
+		default: null,
 	},
-)
+	alt: {
+		type: String,
+		default: '',
+	},
+	size: {
+		type: String,
+		default: '2rem',
+	},
+	circle: {
+		type: Boolean,
+		default: false,
+	},
+	noShadow: {
+		type: Boolean,
+		default: false,
+	},
+	loading: {
+		type: String,
+		default: 'eager',
+	},
+	raised: {
+		type: Boolean,
+		default: false,
+	},
+	tintBy: {
+		type: String,
+		default: null,
+	},
+})
 
-const LEGACY_PRESETS: Record<string, string> = {
+const LEGACY_PRESETS = {
 	xxs: '1.25rem',
 	xs: '2.5rem',
 	sm: '3rem',
@@ -113,7 +125,7 @@ const tint = computed(() => {
 	}
 })
 
-function hash(str: string): number {
+function hash(str) {
 	let hash = 0
 	for (let i = 0, len = str.length; i < len; i++) {
 		const chr = str.charCodeAt(i)

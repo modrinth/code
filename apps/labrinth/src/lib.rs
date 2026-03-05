@@ -19,7 +19,6 @@ use crate::database::{PgPool, ReadOnlyPgPool};
 use crate::env::ENV;
 use crate::queue::billing::{index_billing, index_subscriptions};
 use crate::queue::moderation::AutomatedModerationQueue;
-use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
@@ -57,7 +56,7 @@ pub struct LabrinthConfig {
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
-    pub search_config: search::SearchConfig,
+    pub search_backend: web::Data<dyn search::SearchBackend>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -76,7 +75,7 @@ pub fn app_setup(
     pool: PgPool,
     ro_pool: ReadOnlyPgPool,
     redis_pool: RedisPool,
-    search_config: search::SearchConfig,
+    search_backend: actix_web::web::Data<dyn search::SearchBackend>,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     stripe_client: stripe::Client,
@@ -103,15 +102,6 @@ pub fn app_setup(
 
     let scheduler = scheduler::Scheduler::new();
 
-    {
-        let pool_ref = pool.clone();
-        actix_rt::spawn(async move {
-            if let Err(err) = rescan_projects_in_queue(&pool_ref).await {
-                warn!("Delphi rescan failed: {err:#}");
-            }
-        });
-    }
-
     let limiter = web::Data::new(AsyncRateLimiter::new(
         redis_pool.clone(),
         GCRAParameters::new(300, 300),
@@ -123,21 +113,21 @@ pub fn app_setup(
         let local_index_interval =
             Duration::from_secs(ENV.LOCAL_INDEX_INTERVAL);
         let pool_ref = pool.clone();
-        let search_config_ref = search_config.clone();
         let redis_pool_ref = redis_pool.clone();
+        let search_backend_ref = search_backend.clone();
         scheduler.run(local_index_interval, move || {
             let pool_ref = pool_ref.clone();
             let redis_pool_ref = redis_pool_ref.clone();
-            let search_config_ref = search_config_ref.clone();
+            let search_backend = search_backend_ref.clone();
             async move {
-                if let Err(e) = background_task::index_search(
+                if let Err(err) = background_task::index_search(
                     pool_ref,
                     redis_pool_ref,
-                    search_config_ref,
+                    search_backend,
                 )
                 .await
                 {
-                    warn!("Local project indexing failed: {e:#}");
+                    warn!("Failed to index search: {err:?}");
                 }
             }
         });
@@ -148,11 +138,7 @@ pub fn app_setup(
         scheduler.run(Duration::from_secs(60 * 5), move || {
             let pool_ref = pool_ref.clone();
             async move {
-                if let Err(e) =
-                    background_task::release_scheduled(pool_ref).await
-                {
-                    warn!("Syncing scheduled releases failed: {e:#}");
-                }
+                background_task::release_scheduled(pool_ref).await;
             }
         });
 
@@ -164,9 +150,7 @@ pub fn app_setup(
             let pool_ref = pool_ref.clone();
             let redis = redis_pool_ref.clone();
             async move {
-                if let Err(e) = update_versions(pool_ref, redis).await {
-                    warn!("Version update failed: {e:#}");
-                }
+                update_versions(pool_ref, redis).await;
             }
         });
 
@@ -178,12 +162,7 @@ pub fn app_setup(
             let client_ref = client_ref.clone();
             let redis_ref = redis_pool_ref.clone();
             async move {
-                if let Err(e) =
-                    background_task::payouts(pool_ref, client_ref, redis_ref)
-                        .await
-                {
-                    warn!("Payout task failed: {e:#}");
-                }
+                background_task::payouts(pool_ref, client_ref, redis_ref).await;
             }
         });
 
@@ -293,7 +272,7 @@ pub fn app_setup(
         file_host,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        search_config,
+        search_backend,
         session_queue,
         payouts_queue: web::Data::new(PayoutsQueue::new()),
         analytics_queue,
@@ -331,7 +310,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.ro_pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
-    .app_data(web::Data::new(labrinth_config.search_config.clone()))
+    .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())

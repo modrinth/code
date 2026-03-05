@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Component, computed, nextTick, ref } from 'vue'
+import { type Component, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
@@ -12,15 +12,12 @@ export type Tab<Props> = {
 	content: Component<Props>
 	props?: Props
 	badge?: MessageDescriptor
-	shown?: boolean
 }
 
-const props = defineProps<{
+defineProps<{
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	tabs: Tab<any>[]
 }>()
-
-const visibleTabs = computed(() => props.tabs.filter((tab) => tab.shown !== false))
 
 const selectedTab = ref(0)
 
@@ -41,7 +38,7 @@ defineExpose({ selectedTab, setTab })
 			class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
 		>
 			<button
-				v-for="(tab, index) in visibleTabs"
+				v-for="(tab, index) in tabs"
 				:key="index"
 				:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all ${selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
 				@click="() => setTab(index)"
@@ -78,10 +75,7 @@ defineExpose({ selectedTab, setTab })
 				class="w-[600px] h-[500px] overflow-y-auto px-4"
 				@scroll="checkScrollState"
 			>
-				<component
-					:is="visibleTabs[selectedTab].content"
-					v-bind="visibleTabs[selectedTab].props ?? {}"
-				/>
+				<component :is="tabs[selectedTab].content" v-bind="tabs[selectedTab].props ?? {}" />
 			</div>
 
 			<Transition

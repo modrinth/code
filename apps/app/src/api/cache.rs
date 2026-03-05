@@ -30,13 +30,11 @@ macro_rules! impl_cache_methods {
 
 impl_cache_methods!(
     (Project, Project),
-    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
     (Organization, Organization),
-    (SearchResults, SearchResults),
-    (SearchResultsV3, SearchResultsV3)
+    (SearchResults, SearchResults)
 );
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -44,8 +42,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             get_project,
             get_project_many,
-            get_project_v3,
-            get_project_v3_many,
             get_version,
             get_version_many,
             get_user,
@@ -56,8 +52,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_organization_many,
             get_search_results,
             get_search_results_many,
-            get_search_results_v3,
-            get_search_results_v3_many,
             purge_cache_types,
         ])
         .build()

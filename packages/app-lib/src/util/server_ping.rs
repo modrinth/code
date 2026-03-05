@@ -69,7 +69,7 @@ pub async fn get_server_status(
 mod modern {
     use super::ServerStatus;
     use crate::ErrorKind;
-    use std::time::Instant;
+    use chrono::Utc;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::{TcpStream, ToSocketAddrs};
 
@@ -79,7 +79,6 @@ mod modern {
         protocol_version: Option<u32>,
     ) -> crate::Result<ServerStatus> {
         let mut stream = TcpStream::connect(address).await?;
-        stream.set_nodelay(true)?;
         handshake(&mut stream, original_address, protocol_version).await?;
         let mut result = status_body(&mut stream).await?;
         result.ping = ping(&mut stream).await.ok();
@@ -156,9 +155,9 @@ mod modern {
     }
 
     async fn ping(stream: &mut TcpStream) -> crate::Result<i64> {
-        let ping_magic = chrono::Utc::now().timestamp_millis();
+        let start_time = Utc::now();
+        let ping_magic = start_time.timestamp_millis();
 
-        let start_time = Instant::now();
         stream.write_all(&[0x09, 0x01]).await?;
         stream.write_i64(ping_magic).await?;
         stream.flush().await?;
@@ -173,7 +172,8 @@ mod modern {
             .into());
         }
 
-        Ok(start_time.elapsed().as_millis() as i64)
+        let response_time = Utc::now();
+        Ok((response_time - start_time).num_milliseconds())
     }
 
     mod varint {

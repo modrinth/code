@@ -1079,7 +1079,6 @@ pub async fn init(
             &**client,
             &redis,
             &session_queue,
-            false,
         )
         .await
         .ok()
@@ -1115,7 +1114,6 @@ pub async fn init(
             &**client,
             &redis,
             &session_queue,
-            false,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -1310,8 +1308,7 @@ pub async fn auth_callback(
             };
 
             let session =
-                issue_session(req, user_id, &mut transaction, &redis, None)
-                    .await?;
+                issue_session(req, user_id, &mut transaction, &redis).await?;
             transaction.commit().await?;
 
             let redirect_url = format!(
@@ -1536,8 +1533,7 @@ pub async fn create_account_with_password(
     .insert(&mut transaction)
     .await?;
 
-    let session =
-        issue_session(req, user_id, &mut transaction, &redis, None).await?;
+    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
     let res = crate::models::sessions::Session::from(session, true, None);
 
     let mailbox: Mailbox = new_account.email.parse().map_err(|_| {
@@ -1631,7 +1627,7 @@ pub async fn login_password(
     } else {
         let mut transaction = pool.begin().await?;
         let session =
-            issue_session(req, user.id, &mut transaction, &redis, None).await?;
+            issue_session(req, user.id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1761,7 +1757,7 @@ pub async fn login_2fa(
         DBFlow::remove(&login.flow, &redis).await?;
 
         let session =
-            issue_session(req, user_id, &mut transaction, &redis, None).await?;
+            issue_session(req, user_id, &mut transaction, &redis).await?;
         let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
@@ -1949,7 +1945,6 @@ pub async fn remove_2fa(
         &**pool,
         &redis,
         &session_queue,
-        false,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -2155,7 +2150,6 @@ pub async fn change_password(
             &**pool,
             &redis,
             &session_queue,
-            false,
         )
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;

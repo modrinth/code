@@ -6,7 +6,7 @@
 			@click="() => (forceOpen ? undefined : toggledOpen ? close() : open())"
 		>
 			<slot name="button" :open="isOpen">
-				<div class="flex items-center gap-1 w-full text-contrast">
+				<div class="flex items-center gap-1 w-full">
 					<slot name="title" :open="isOpen" />
 					<DropdownIcon
 						v-if="!forceOpen"

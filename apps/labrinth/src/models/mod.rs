@@ -1,5 +1,4 @@
 pub mod error;
-pub mod exp;
 pub mod v2;
 pub mod v3;
 

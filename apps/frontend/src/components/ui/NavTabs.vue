@@ -1,6 +1,5 @@
 <template>
 	<nav
-		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'card-shadow': mode === 'navigation' }"
@@ -300,14 +299,7 @@ watch(
 	},
 )
 
-watch(
-	() => props.links,
-	async () => {
-		await nextTick()
-		updateActiveTab()
-	},
-	{ deep: true },
-)
+watch(() => props.links, updateActiveTab, { deep: true })
 </script>
 
 <style scoped>

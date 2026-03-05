@@ -11,7 +11,6 @@ use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::routes::internal::globals::tax_compliance_payout_threshold;
 use crate::util::avalara1099;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
@@ -441,7 +440,6 @@ pub async fn calculate_fees(
         &**pool,
         &redis,
         &session_queue,
-        false,
     )
     .await?
     .ok_or_else(|| {
@@ -474,7 +472,6 @@ pub async fn create_payout(
         &**pool,
         &redis,
         &session_queue,
-        false,
     )
     .await?
     .ok_or_else(|| {
@@ -1115,6 +1112,10 @@ async fn update_compliance_status(
             compliance_api_check_failed,
         }))
     }
+}
+
+fn tax_compliance_payout_threshold() -> Option<Decimal> {
+    ENV.COMPLIANCE_PAYOUT_THRESHOLD.parse().ok()
 }
 
 #[derive(Deserialize)]

@@ -52,12 +52,10 @@
 				<h3 class="info-title">
 					{{ loadingBar.title }}
 				</h3>
-				<div class="flex flex-col gap-2 w-full">
-					<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
-					<div class="row">
-						{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
-						{{ loadingBar.message }}
-					</div>
+				<ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
+				<div class="row">
+					{{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}%
+					{{ loadingBar.message }}
 				</div>
 			</div>
 		</Card>
@@ -348,7 +346,7 @@ onBeforeUnmount(() => {
 .info-card {
 	position: absolute;
 	top: 3.5rem;
-	right: 2rem;
+	right: 0.5rem;
 	z-index: 9;
 	width: 20rem;
 	background-color: var(--color-raised-bg);
@@ -422,7 +420,7 @@ onBeforeUnmount(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	gap: 0.75rem;
+	gap: 0.5rem;
 	margin: 0;
 	padding: 0;
 }

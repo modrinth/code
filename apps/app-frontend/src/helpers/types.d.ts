@@ -139,5 +139,4 @@ type AppSettings = {
 export type InstanceSettingsTabProps = {
 	instance: GameInstance
 	offline?: boolean
-	isMinecraftServer?: boolean
 }

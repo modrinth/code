@@ -26,7 +26,6 @@ export interface ProjectPageContext {
 
 	// Mutation functions
 	patchProject: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
-	patchProjectV3: (data: Record<string, unknown>, quiet?: boolean) => Promise<boolean>
 	patchIcon: (icon: File) => Promise<boolean>
 	setProcessing: () => Promise<void>
 	createGalleryItem: (

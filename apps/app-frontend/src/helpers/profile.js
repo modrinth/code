@@ -18,15 +18,7 @@ import { install_to_existing_profile } from '@/helpers/pack.js'
     - icon is a path to an image file, which will be copied into the profile directory
 */
 
-export async function create(
-	name,
-	gameVersion,
-	modloader,
-	loaderVersion,
-	icon,
-	skipInstall,
-	linkedData,
-) {
+export async function create(name, gameVersion, modloader, loaderVersion, icon, skipInstall) {
 	//Trim string name to avoid "Unable to find directory"
 	name = name.trim()
 	return await invoke('plugin:profile-create|profile_create', {
@@ -36,7 +28,6 @@ export async function create(
 		loaderVersion,
 		icon,
 		skipInstall,
-		linkedData,
 	})
 }
 
@@ -183,8 +174,8 @@ export async function get_pack_export_candidates(profilePath) {
 
 // Run Minecraft using a pathed profile
 // Returns PID of child
-export async function run(path, serverAddress = null) {
-	return await invoke('plugin:profile|profile_run', { path, serverAddress })
+export async function run(path) {
+	return await invoke('plugin:profile|profile_run', { path })
 }
 
 export async function kill(path) {

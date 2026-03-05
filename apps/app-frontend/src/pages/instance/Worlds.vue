@@ -80,13 +80,9 @@
 				@refresh="() => refreshServer((world as ServerWorld).address)"
 				@edit="
 					() =>
-						isLinkedWorld(world)
-							? undefined
-							: world.type === 'server'
-								? editServerModal?.show(world)
-								: editWorldModal?.show(world)
+						world.type === 'server' ? editServerModal?.show(world) : editWorldModal?.show(world)
 				"
-				@delete="() => !isLinkedWorld(world) && promptToRemoveWorld(world)"
+				@delete="() => promptToRemoveWorld(world)"
 				@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
 			/>
 		</div>
@@ -154,7 +150,6 @@ import {
 	handleDefaultProfileUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
-	isLinkedWorld,
 	type ProfileEvent,
 	type ProtocolVersion,
 	refreshServerData,
@@ -171,7 +166,6 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import { playServerProject } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
@@ -334,9 +328,6 @@ async function joinWorld(world: World) {
 	startingInstance.value = true
 	worldPlaying.value = world
 	if (world.type === 'server') {
-		if (isLinkedWorld(world)) {
-			playServerProject(world.linked_project_id)
-		}
 		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)

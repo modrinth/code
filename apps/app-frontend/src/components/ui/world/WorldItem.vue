@@ -25,7 +25,6 @@ import {
 	defineMessages,
 	OverflowMenu,
 	SmartClickable,
-	TagItem,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -45,9 +44,7 @@ import type {
 	SingleplayerWorld,
 	World,
 } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, isLinkedWorld, set_world_display_status } from '@/helpers/worlds.ts'
-
-import { LockIcon } from '../../../../../../packages/assets/generated-icons'
+import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -120,7 +117,6 @@ const serverIncompatible = computed(
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
-const linked = computed(() => isLinkedWorld(props.world))
 
 const messages = defineMessages({
 	hardcore: {
@@ -175,10 +171,6 @@ const messages = defineMessages({
 		id: 'instance.worlds.dont_show_on_home',
 		defaultMessage: `Don't show on Home`,
 	},
-	linkedServer: {
-		id: 'instance.worlds.linked_server',
-		defaultMessage: 'Managed by server project',
-	},
 })
 </script>
 <template>
@@ -208,14 +200,6 @@ const messages = defineMessages({
 					<div class="text-lg text-contrast font-bold truncate smart-clickable:underline-on-hover">
 						{{ world.name }}
 					</div>
-					<TagItem
-						v-if="linked"
-						v-tooltip="formatMessage(messages.linkedServer)"
-						class="border !border-solid border-blue bg-highlight-blue text-xs"
-						:style="`--_color: var(--color-blue)`"
-					>
-						<LockIcon aria-hidden="true" class="h-5 w-5" />
-					</TagItem>
 					<div
 						v-if="world.type === 'singleplayer'"
 						class="text-sm text-secondary flex items-center gap-1 font-semibold"
@@ -412,12 +396,8 @@ const messages = defineMessages({
 								id: 'edit',
 								action: () => emit('edit'),
 								shown: !instancePath,
-								disabled: locked || linked,
-								tooltip: locked
-									? formatMessage(messages.worldInUse)
-									: linked
-										? formatMessage(messages.linkedServer)
-										: undefined,
+								disabled: locked,
+								tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
 							},
 							{
 								id: 'open-folder',
@@ -452,12 +432,8 @@ const messages = defineMessages({
 								hoverFilled: true,
 								action: () => emit('delete'),
 								shown: !instancePath,
-								disabled: locked || linked,
-								tooltip: locked
-									? formatMessage(messages.worldInUse)
-									: linked
-										? formatMessage(messages.linkedServer)
-										: undefined,
+								disabled: locked,
+								tooltip: locked ? formatMessage(messages.worldInUse) : undefined,
 							},
 						]"
 					>

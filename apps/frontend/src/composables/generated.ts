@@ -92,11 +92,6 @@ export const useGeneratedState = () =>
 				id: 'modpack',
 				display: 'modpack',
 			},
-			{
-				actual: 'server',
-				id: 'server',
-				display: 'server',
-			},
 		],
 		loaderData: {
 			pluginLoaders: ['bukkit', 'spigot', 'paper', 'purpur', 'sponge', 'folia'],

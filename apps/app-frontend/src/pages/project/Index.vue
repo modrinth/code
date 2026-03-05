@@ -1,31 +1,13 @@
 <template>
-	<div v-if="data">
+	<div>
+		<InstallToPlayModal ref="installToPlayModal" :project="data" />
 		<Teleport to="#sidebar-teleport-target">
 			<ProjectSidebarCompatibility
-				v-if="!isServerProject"
 				:project="data"
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
-				:v3-metadata="projectV3"
 				class="project-sidebar-section"
 			/>
-			<ProjectSidebarServerInfo
-				v-if="isServerProject"
-				:project-v3="projectV3"
-				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
-				:required-content="serverRequiredContent"
-				:recommended-version="serverRecommendedVersion"
-				:supported-versions="serverSupportedVersions"
-				:loaders="serverModpackLoaders"
-				:ping="serverPing"
-				:status-online="serverStatusOnline"
-				class="project-sidebar-section"
-			/>
-			<ProjectSidebarLinks
-				link-target="_blank"
-				:project="data"
-				:project-v3="projectV3"
-				class="project-sidebar-section"
-			/>
+			<ProjectSidebarLinks link-target="_blank" :project="data" class="project-sidebar-section" />
 			<ProjectSidebarCreators
 				:organization="null"
 				:members="members"
@@ -34,16 +16,17 @@
 				link-target="_blank"
 				class="project-sidebar-section"
 			/>
-			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarDetails
 				:project="data"
 				:has-versions="versions.length > 0"
 				:link-target="`_blank`"
-				:hide-license="isServerProject"
 				class="project-sidebar-section"
 			/>
 		</Teleport>
 		<div class="flex flex-col gap-4 p-6">
+			<ButtonStyled v-if="themeStore.featureFlags.server_project_qa">
+				<button @click="installToPlayModal.show()">Install to play modal</button>
+			</ButtonStyled>
 			<InstanceIndicator v-if="instance" :instance="instance" />
 			<template v-if="data">
 				<Teleport
@@ -52,67 +35,7 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ServerProjectHeader
-					v-if="isServerProject"
-					:project="data"
-					:project-v3="projectV3"
-					:ping="serverPing"
-					@contextmenu.prevent.stop="handleRightClick"
-				>
-					<template #actions>
-						<ButtonStyled v-if="serverPlaying" size="large" color="red">
-							<button @click="handleStopServer">
-								<StopCircleIcon />
-								Stop
-							</button>
-						</ButtonStyled>
-						<ButtonStyled v-else size="large" color="brand">
-							<button
-								:disabled="data && installStore.installingServerProjects.includes(data.id)"
-								@click="handleClickPlay"
-							>
-								<PlayIcon />
-								{{
-									data && installStore.installingServerProjects.includes(data.id)
-										? 'Installing...'
-										: 'Play'
-								}}
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<button v-tooltip="'Add server to instance'" @click="handleAddServerToInstance">
-								<PlusIcon />
-							</button>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:tooltip="`More options`"
-								:options="[
-									{
-										id: 'open-in-browser',
-										link: `https://modrinth.com/project/${data.slug}`,
-										external: true,
-									},
-									{
-										divider: true,
-									},
-									{
-										id: 'report',
-										color: 'red',
-										hoverFilled: true,
-										link: `https://modrinth.com/report?item=project&itemID=${data.id}`,
-									},
-								]"
-								aria-label="More options"
-							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #open-in-browser> <ExternalIcon /> Open in browser </template>
-								<template #report> <ReportIcon /> Report </template>
-							</OverflowMenu>
-						</ButtonStyled>
-					</template>
-				</ServerProjectHeader>
-				<ProjectHeader v-else :project="data" @contextmenu.prevent.stop="handleRightClick">
+				<ProjectHeader :project="data" @contextmenu.prevent.stop="handleRightClick">
 					<template #actions>
 						<ButtonStyled size="large" color="brand">
 							<button
@@ -180,7 +103,6 @@
 								query: instanceFilters,
 							},
 							subpages: ['version'],
-							shown: projectV3?.minecraft_server == null,
 						},
 						{
 							label: 'Gallery',
@@ -190,7 +112,6 @@
 					]"
 				/>
 				<RouterView
-					v-if="route.path.startsWith('/project')"
 					:project="data"
 					:versions="versions"
 					:members="members"
@@ -221,10 +142,7 @@ import {
 	GlobeIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	PlayIcon,
-	PlusIcon,
 	ReportIcon,
-	StopCircleIcon,
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -236,43 +154,22 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
-	ProjectSidebarServerInfo,
-	ProjectSidebarTags,
-	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
+import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
-import {
-	get_project,
-	get_project_v3,
-	get_team,
-	get_version,
-	get_version_many,
-} from '@/helpers/cache.js'
-import { process_listener } from '@/helpers/events'
-import { get_by_profile_path } from '@/helpers/process'
-import {
-	get as getInstance,
-	get_projects as getInstanceProjects,
-	kill,
-	list as listInstances,
-} from '@/helpers/profile'
+import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
-import { getServerLatency } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import {
-	getServerAddress,
-	install as installVersion,
-	playServerProject,
-	useInstall,
-} from '@/store/install.js'
+import { install as installVersion } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
@@ -283,7 +180,6 @@ const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
-const installStore = useInstall()
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
@@ -294,16 +190,8 @@ const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
-const isServerProject = ref(false)
-const projectV3 = shallowRef(null)
-const serverRequiredContent = shallowRef(null)
-const serverRecommendedVersion = shallowRef(null)
-const serverSupportedVersions = shallowRef([])
-const serverModpackLoaders = shallowRef([])
-const serverPing = ref(undefined)
-const serverStatusOnline = ref(false)
-const serverInstancePath = ref(null)
-const serverPlaying = ref(false)
+
+const installToPlayModal = ref()
 
 const instanceFilters = computed(() => {
 	if (!instance.value) {
@@ -328,44 +216,8 @@ const [allLoaders, allGameVersions] = await Promise.all([
 	get_game_versions().catch(handleError).then(ref),
 ])
 
-async function handleClickPlay() {
-	if (!isServerProject.value) return
-	await playServerProject(data.value.id).catch(handleError)
-	await updateServerPlayState()
-}
-
-async function updateServerPlayState() {
-	if (!isServerProject.value || !data.value) return
-	const packs = await listInstances()
-	const inst = packs.find((p) => p.linked_data?.project_id === data.value.id)
-	if (inst) {
-		serverInstancePath.value = inst.path
-		const processes = await get_by_profile_path(inst.path).catch(() => [])
-		serverPlaying.value = Array.isArray(processes) && processes.length > 0
-	} else {
-		serverInstancePath.value = null
-		serverPlaying.value = false
-	}
-}
-
-async function handleStopServer() {
-	if (!serverInstancePath.value) return
-	await kill(serverInstancePath.value).catch(() => {})
-	serverPlaying.value = false
-}
-
-function handleAddServerToInstance() {
-	const address = getServerAddress(projectV3.value?.minecraft_java_server)
-	if (!address || !data.value) return
-	installStore.showAddServerToInstanceModal(data.value.title, address)
-}
-
 async function fetchProjectData() {
-	const [project, projectV3Result] = await Promise.all([
-		get_project(route.params.id, 'must_revalidate').catch(handleError),
-		get_project_v3(route.params.id, 'must_revalidate').catch(handleError),
-	])
-	projectV3.value = projectV3Result
+	const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
 	if (!project) {
 		handleError('Error loading project')
@@ -393,90 +245,10 @@ async function fetchProjectData() {
 			installedVersion.value = installedFile.metadata.version_id
 		}
 	}
-
-	isServerProject.value = projectV3.value?.minecraft_server != null
-	serverStatusOnline.value = !!projectV3.value?.minecraft_java_server?.ping?.data
-
 	breadcrumbs.setName('Project', data.value.title)
-
-	fetchDeferredServerData(project)
-}
-
-function fetchDeferredServerData(project) {
-	const serverAddress = projectV3.value?.minecraft_java_server?.address
-	if (serverAddress) {
-		serverPing.value = undefined
-		getServerLatency(serverAddress)
-			.then((latency) => {
-				serverPing.value = latency
-			})
-			.catch((error) => {
-				console.error(`Failed to ping server ${serverAddress}:`, error)
-			})
-	}
-
-	const content = projectV3.value?.minecraft_java_server?.content
-	if (content?.kind === 'modpack' && content.version_id) {
-		get_version(content.version_id, 'bypass')
-			.catch(handleError)
-			.then(async (modpackVersion) => {
-				if (!modpackVersion) return
-				serverRecommendedVersion.value = modpackVersion.game_versions?.[0] ?? null
-				serverModpackLoaders.value = modpackVersion.mrpack_loaders ?? []
-				if (modpackVersion.project_id) {
-					const modpackProject = await get_project_v3(
-						modpackVersion.project_id,
-						'must_revalidate',
-					).catch(handleError)
-					if (modpackProject) {
-						const primaryFile =
-							modpackVersion.files?.find((f) => f.primary) ?? modpackVersion.files?.[0]
-
-						serverRequiredContent.value = {
-							name: modpackProject.name,
-							versionNumber: modpackVersion.version_number ?? '',
-							icon: modpackProject.icon_url,
-							onclickName:
-								modpackProject.id !== project.id
-									? () => router.push(`/project/${modpackProject.id}`)
-									: undefined,
-							onclickVersion:
-								modpackProject.id !== project.id
-									? () => router.push(`/project/${modpackProject.id}/version/${modpackVersion.id}`)
-									: undefined,
-							onclickDownload: primaryFile?.url ? () => openUrl(primaryFile.url) : undefined,
-							showCustomModpackTooltip: modpackProject.id === project.id,
-						}
-					}
-				}
-			})
-	} else if (content?.kind === 'vanilla') {
-		serverRecommendedVersion.value = content.recommended_game_version ?? null
-		const supported = content.supported_game_versions ?? []
-		serverSupportedVersions.value = supported.filter((v) => !!v)
-	}
-
-	updateServerPlayState()
 }
 
 await fetchProjectData()
-
-let unlistenProcesses
-process_listener((e) => {
-	if (
-		e.event === 'finished' &&
-		serverInstancePath.value &&
-		e.profile_path_id === serverInstancePath.value
-	) {
-		serverPlaying.value = false
-	}
-}).then((unlisten) => {
-	unlistenProcesses = unlisten
-})
-
-onUnmounted(() => {
-	unlistenProcesses?.()
-})
 
 watch(
 	() => route.params.id,

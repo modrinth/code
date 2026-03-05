@@ -31,10 +31,7 @@
 				that apply.
 			</p>
 
-			<p
-				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
-				class="known-errors"
-			>
+			<p v-if="project.versions.length === 0" class="known-errors">
 				Please upload a version first in order to select tags!
 			</p>
 			<template v-else>
@@ -159,28 +156,24 @@ interface Category {
 const tags = useGeneratedState()
 const { formatMessage, locale } = useVIntl()
 
-const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
+const { projectV2: project, patchProject } = injectProjectPageContext()
 
 const formatCategoryName = (categoryName: string) => {
 	return formatCategory(formatMessage, categoryName)
 }
 
-const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
-
-const matchesProjectType = (x: Category) =>
-	x.project_type === project.value.actualProjectType ||
-	(x.project_type === 'minecraft_java_server' && isServerProject.value)
-
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
-				matchesProjectType(x) &&
+				x.project_type === project.value.actualProjectType &&
 				(project.value.categories.includes(x.name) ||
 					project.value.additional_categories.includes(x.name)),
 		) as Category[],
 		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
-			(x: Category) => matchesProjectType(x) && project.value.categories.includes(x.name),
+			(x: Category) =>
+				x.project_type === project.value.actualProjectType &&
+				project.value.categories.includes(x.name),
 		) as Category[],
 	}),
 	async () => {
@@ -224,7 +217,7 @@ const { saved, current, saving, reset, save } = useSavable(
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
-		if (matchesProjectType(x)) {
+		if (x.project_type === project.value.actualProjectType) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []
@@ -237,13 +230,7 @@ const categoryLists = computed(() => {
 
 const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length
-	if (projectV3?.value?.minecraft_server != null) {
-		if (tagCount > 18) {
-			return `You've selected ${tagCount} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.`
-		} else if (tagCount > 12) {
-			return `You've selected ${tagCount} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.`
-		}
-	} else if (tagCount > 8) {
+	if (tagCount > 8) {
 		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
 	}
 	return null

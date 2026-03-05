@@ -20,7 +20,6 @@ pub async fn profile_create(
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
     icon: Option<String>,           // the icon for the profile
     skip_install: Option<bool>,
-    linked_data: Option<LinkedData>,
 ) -> Result<String> {
     let res = profile::create::profile_create(
         name,
@@ -28,7 +27,7 @@ pub async fn profile_create(
         modloader,
         loader_version,
         icon,
-        linked_data,
+        None,
         skip_install,
     )
     .await?;

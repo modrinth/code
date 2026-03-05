@@ -218,7 +218,7 @@ const onDeleteOrganization = useClientTry(async () => {
 				multiline
 				:maxlength="256"
 				:disabled="!hasPermission"
-				resize="vertical"
+				wrapper-class="summary-input"
 			/>
 		</div>
 		<div class="universal-card">
@@ -245,3 +245,10 @@ const onDeleteOrganization = useClientTry(async () => {
 		/>
 	</div>
 </template>
+
+<style scoped lang="scss">
+.summary-input {
+	min-height: 8rem;
+	max-width: 24rem;
+}
+</style>

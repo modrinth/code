@@ -8,7 +8,6 @@ members = [
   "packages/app-lib",
   "packages/ariadne",
   "packages/daedalus",
-  "packages/labrinth-derive",
   "packages/modrinth-log",
   "packages/modrinth-maxmind",
   "packages/modrinth-util",
@@ -33,7 +32,6 @@ arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
-async-minecraft-ping = { git = "https://github.com/jsvana/async-minecraft-ping", rev = "56a64a8a59de854fb81cc0f9f66c2285873d960c" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",
@@ -60,7 +58,6 @@ color-eyre = "0.6.5"
 color-thief = "0.2.2"
 const_format = "0.2.34"
 daedalus = { path = "packages/daedalus" }
-darling = { version = "0.23" }
 dashmap = "6.1.0"
 data-url = "0.3.2"
 deadpool-redis = { git = "https://github.com/modrinth/deadpool", rev = "db5fb00b036ecc8fe5f18853c559b745ffe47bde", version = "0.22.1" }
@@ -72,6 +69,7 @@ dotenv-build = "0.1.1"
 dotenvy = "0.15.7"
 dunce = "1.0.5"
 either = "1.15.0"
+elasticsearch = "9.1.0-alpha.1"
 encoding_rs = "0.8.35"
 enumset = "1.1.10"
 eyre = "0.6.12"
@@ -124,11 +122,9 @@ paste = "1.0.15"
 path-util = { path = "packages/path-util" }
 phf = { version = "0.13.1", features = ["macros"] }
 png = "0.18.0"
-proc-macro2 = { version = "1.0" }
 prometheus = "0.14.0"
 quartz_nbt = "0.2.9"
 quick-xml = "0.38.3"
-quote = { version = "1.0" }
 rand = "=0.8.5"  # Locked on 0.8 until argon2 and p256 update to 0.9
 rand_chacha = "=0.3.1"  # Locked on 0.3 until we can update rand to 0.9
 redis = "0.32.7"
@@ -171,14 +167,13 @@ spdx = "0.12.0"
 sqlx = { version = "0.8.6", default-features = false }
 sqlx-tracing = { path = "packages/sqlx-tracing" }
 strum = "0.27.2"
-syn = { version = "2.0" }
 sysinfo = { version = "0.37.2", default-features = false }
 tar = "0.4.44"
 tauri = "2.8.5"
 tauri-build = "2.4.1"
 tauri-plugin-deep-link = "2.4.3"
 tauri-plugin-dialog = "2.4.0"
-tauri-plugin-http = "2.5.7"
+tauri-plugin-http = "2.5.2"
 tauri-plugin-opener = "2.5.0"
 tauri-plugin-os = "2.3.1"
 tauri-plugin-single-instance = "2.3.4"

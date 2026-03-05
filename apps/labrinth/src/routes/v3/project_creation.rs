@@ -10,7 +10,6 @@ use crate::database::models::{self, DBUser, image_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostPublicity, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::exp;
 use crate::models::ids::{ImageId, OrganizationId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -22,7 +21,6 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
-use crate::search::indexing::IndexingError;
 use crate::util::guards::admin_key_guard;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
@@ -44,24 +42,16 @@ use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
 
-mod new;
-
-pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(project_create)
-        .service(project_create_with_id)
-        .configure(new::config);
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(project_create).service(project_create_with_id);
 }
 
 #[derive(Error, Debug)]
 pub enum CreateError {
-    #[error("Environment Error")]
-    EnvError(#[from] dotenvy::Error),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
-    IndexingError(#[from] IndexingError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -98,39 +88,13 @@ pub enum CreateError {
     LimitReached,
 }
 
-impl From<crate::routes::ApiError> for CreateError {
-    fn from(value: crate::routes::ApiError) -> Self {
-        match value {
-            crate::routes::ApiError::Database(err) => Self::DatabaseError(err),
-            crate::routes::ApiError::SqlxDatabase(err) => {
-                Self::SqlxDatabaseError(err)
-            }
-            crate::routes::ApiError::Authentication(err) => {
-                Self::Unauthorized(err)
-            }
-            crate::routes::ApiError::CustomAuthentication(err) => {
-                Self::CustomAuthenticationError(err)
-            }
-            crate::routes::ApiError::InvalidInput(err)
-            | crate::routes::ApiError::Validation(err) => {
-                Self::InvalidInput(err)
-            }
-            err => Self::DatabaseError(models::DatabaseError::SchemaError(
-                err.to_string(),
-            )),
-        }
-    }
-}
-
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
-            CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -158,10 +122,8 @@ impl actix_web::ResponseError for CreateError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
-                CreateError::EnvError(..) => "environment_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -291,8 +253,7 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[utoipa::path]
-#[post("")]
+#[post("/project")]
 pub async fn project_create(
     req: HttpRequest,
     payload: Multipart,
@@ -357,8 +318,7 @@ pub async fn project_create_internal(
 /// Allows creating a project with a specific ID.
 ///
 /// This is a testing endpoint only accessible behind an admin key.
-#[utoipa::path]
-#[post("/{id}", guard = "admin_key_guard")]
+#[post("/project/{id}", guard = "admin_key_guard")]
 pub async fn project_create_with_id(
     req: HttpRequest,
     mut payload: Multipart,
@@ -901,7 +861,6 @@ async fn project_create_inner(
                 .collect(),
             color: icon_data.and_then(|x| x.2),
             monetization_status: MonetizationStatus::Monetized,
-            components: exp::ProjectSerial::default(),
         };
         let project_builder = project_builder_actual.clone();
 
@@ -1024,7 +983,6 @@ async fn project_create_inner(
             side_types_migration_review_status:
                 SideTypesMigrationReviewStatus::Reviewed,
             fields: HashMap::new(), // Fields instantiate to empty
-            components: exp::ProjectQuery::default(),
         };
 
         Ok(HttpResponse::Ok().json(response))
@@ -1109,7 +1067,6 @@ async fn create_initial_version(
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
         ordering: version_data.ordering,
-        components: exp::VersionSerial::default(),
     };
 
     Ok(version)

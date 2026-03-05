@@ -8,7 +8,7 @@ const undefinedProjectStage: Stage = {
 	icon: XIcon,
 	guidance_url: 'https://modrinth.com/legal/rules#miscellaneous',
 	navigate: '/versions',
-	shouldShow: (project, projectV3) => project.versions.length === 0 && !projectV3?.minecraft_server,
+	shouldShow: (project) => project.versions.length === 0,
 	actions: [
 		{
 			id: 'undefined_no_versions',

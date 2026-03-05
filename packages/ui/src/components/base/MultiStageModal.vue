@@ -7,7 +7,6 @@
 		:closable="true"
 		:close-on-click-outside="false"
 		:width="resolvedMaxWidth"
-		:fade="fade"
 		:disable-close="resolveCtxFn(currentStage.disableClose, context)"
 	>
 		<template #title>
@@ -75,7 +74,6 @@
 				<ButtonStyled v-if="leftButtonConfig" type="outlined">
 					<button
 						class="!border-surface-5"
-						:class="leftButtonConfig.buttonClass"
 						:disabled="leftButtonConfig.disabled"
 						@click="leftButtonConfig.onClick"
 					>
@@ -84,11 +82,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="rightButtonConfig" :color="rightButtonConfig.color">
-					<button
-						:disabled="rightButtonConfig.disabled"
-						:class="rightButtonConfig.buttonClass"
-						@click="rightButtonConfig.onClick"
-					>
+					<button :disabled="rightButtonConfig.disabled" @click="rightButtonConfig.onClick">
 						<component
 							:is="rightButtonConfig.icon"
 							v-if="rightButtonConfig.iconPosition === 'before'"
@@ -120,7 +114,6 @@ export interface StageButtonConfig {
 	color?: InstanceType<typeof ButtonStyled>['$props']['color']
 	disabled?: boolean
 	iconClass?: string | null
-	buttonClass?: string | null
 	onClick?: () => void
 }
 
@@ -132,7 +125,6 @@ export interface StageConfigInput<T> {
 	title: MaybeCtxFn<T, string>
 	skip?: MaybeCtxFn<T, boolean>
 	hideStageInBreadcrumb?: MaybeCtxFn<T, boolean>
-	// Determines whether this stage shows the progress bar
 	nonProgressStage?: MaybeCtxFn<T, boolean>
 	cannotNavigateForward?: MaybeCtxFn<T, boolean>
 	disableClose?: MaybeCtxFn<T, boolean>
@@ -153,7 +145,6 @@ const props = defineProps<{
 	context: T
 	breadcrumbs?: boolean
 	fitContent?: boolean
-	fade?: 'standard' | 'warning' | 'danger'
 }>()
 
 const modal = useTemplateRef<InstanceType<typeof NewModal>>('modal')

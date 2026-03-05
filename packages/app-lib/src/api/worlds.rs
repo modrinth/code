@@ -12,8 +12,7 @@ pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State, launcher};
-use async_minecraft_ping::ServerDescription;
+use crate::{ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -24,12 +23,10 @@ use futures::StreamExt;
 use quartz_nbt::{NbtCompound, NbtTag};
 use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
-use serde_json::value::RawValue;
 use std::cmp::Reverse;
 use std::io::Cursor;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
-use std::time::Instant;
 use tokio::io::AsyncWriteExt;
 use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
@@ -142,8 +139,6 @@ pub enum WorldDetails {
         index: usize,
         address: String,
         pack_status: ServerPackStatus,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        linked_project_id: Option<String>,
     },
 }
 
@@ -428,7 +423,6 @@ async fn get_server_worlds_in_profile(
                 index,
                 address: server.ip,
                 pack_status: server.accept_textures.into(),
-                linked_project_id: server.linked_project_id,
             },
         };
         worlds.push(world);
@@ -718,7 +712,6 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
     let insert_index = servers
@@ -733,7 +726,6 @@ pub async fn add_server_to_profile(
             accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
-            linked_project_id,
         },
     );
     servers_data::write(profile_path, &servers).await?;
@@ -746,7 +738,6 @@ pub async fn edit_server_in_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
     let server =
@@ -762,9 +753,6 @@ pub async fn edit_server_in_profile(
     server.name = name;
     server.ip = address;
     server.accept_textures = pack_status.into();
-    if let Some(id) = linked_project_id {
-        server.linked_project_id = Some(id);
-    }
     servers_data::write(profile_path, &servers).await?;
     Ok(())
 }
@@ -804,8 +792,6 @@ mod servers_data {
         pub name: String,
         #[serde(skip_serializing_if = "Option::is_none")]
         pub accept_textures: Option<bool>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        pub linked_project_id: Option<String>,
     }
 
     pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
@@ -917,18 +903,6 @@ pub async fn get_server_status(
     address: &str,
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
-    tracing::debug!(
-        "Pinging {address} with protocol version {protocol_version:?}"
-    );
-
-    get_server_status_old(address, protocol_version).await
-    // get_server_status_new(address, protocol_version).await
-}
-
-async fn get_server_status_old(
-    address: &str,
-    protocol_version: Option<ProtocolVersion>,
-) -> Result<ServerStatus> {
     let (original_host, original_port) = parse_server_address(address)?;
     let (host, port) =
         resolve_server_address(original_host, original_port).await?;
@@ -941,88 +915,4 @@ async fn get_server_status_old(
         protocol_version,
     )
     .await
-}
-
-async fn _get_server_status_new(
-    address: &str,
-    protocol_version: Option<ProtocolVersion>,
-) -> Result<ServerStatus> {
-    let (address, port) = match address.rsplit_once(':') {
-        Some((addr, port)) => {
-            let port = port.parse::<u16>().map_err(|_err| {
-                Error::from(ErrorKind::InputError("invalid port number".into()))
-            })?;
-            (addr, port)
-        }
-        None => (address, 25565),
-    };
-
-    let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
-        .with_port(port)
-        .with_srv_lookup();
-
-    if let Some(version) = protocol_version {
-        builder = builder.with_protocol_version(version.version as usize)
-    }
-
-    let conn = builder.connect().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to connect to server".into()))
-    })?;
-
-    let ping_conn = conn.status().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to get server status".into()))
-    })?;
-    let status = &ping_conn.status;
-    let description = match &status.description {
-        ServerDescription::Plain(text) => {
-            serde_json::value::to_raw_value(&text).ok()
-        }
-        ServerDescription::Object { text } => {
-            // TODO: `text` always seems to be empty?
-            RawValue::from_string(text.clone()).ok()
-        }
-    };
-
-    let players = ServerPlayers {
-        max: status.players.max.cast_signed(),
-        online: status.players.online.cast_signed(),
-        sample: status
-            .players
-            .sample
-            .as_ref()
-            .map(|sample| {
-                sample
-                    .iter()
-                    .map(|player| ServerGameProfile {
-                        id: player.id.clone(),
-                        name: player.name.clone(),
-                    })
-                    .collect()
-            })
-            .unwrap_or_default(),
-    };
-    let version = ServerVersion {
-        name: status.version.name.clone(),
-        protocol: status.version.protocol,
-        legacy: false,
-    };
-    let favicon = status.favicon.as_ref().and_then(|url| url.parse().ok());
-
-    let latency = {
-        let start = Instant::now();
-        let ping_magic = Utc::now().timestamp_millis().cast_unsigned();
-        ping_conn.ping(ping_magic).await.map_err(|_err| {
-            Error::from(ErrorKind::InputError("failed to do ping".into()))
-        })?;
-        start.elapsed().as_millis() as i64
-    };
-
-    Ok(ServerStatus {
-        description,
-        players: Some(players),
-        version: Some(version),
-        favicon,
-        enforces_secure_chat: false,
-        ping: Some(latency),
-    })
 }

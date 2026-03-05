@@ -1,7 +1,5 @@
 <template>
 	<nav
-		v-if="filteredLinks.length > 1"
-		ref="scrollContainer"
 		class="card-shadow experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
 	>
 		<RouterLink
@@ -16,17 +14,13 @@
 			<span class="text-nowrap">{{ link.label }}</span>
 		</RouterLink>
 		<div
-			:class="[
-				'pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1',
-				subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected',
-				{ 'navtabs-transition': transitionsEnabled },
-			]"
+			:class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${subpageSelected ? 'bg-button-bg' : 'bg-button-bgSelected'}`"
 			:style="{
 				left: sliderLeftPx,
 				top: sliderTopPx,
 				right: sliderRightPx,
 				bottom: sliderBottomPx,
-				opacity: sliderReady && activeIndex !== -1 ? 1 : 0,
+				opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
 			}"
 			aria-hidden="true"
 		></div>
@@ -34,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -53,16 +47,13 @@ const props = defineProps<{
 	query?: string
 }>()
 
-const scrollContainer = ref<HTMLElement | null>(null)
 const sliderLeft = ref(4)
 const sliderTop = ref(4)
 const sliderRight = ref(4)
 const sliderBottom = ref(4)
 const activeIndex = ref(-1)
+const oldIndex = ref(-1)
 const subpageSelected = ref(false)
-const sliderReady = ref(false)
-const transitionsEnabled = ref(false)
-const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
 
 const filteredLinks = computed(() =>
 	props.links.filter((x) => (x.shown === undefined ? true : x.shown)),
@@ -71,11 +62,6 @@ const sliderLeftPx = computed(() => `${sliderLeft.value}px`)
 const sliderTopPx = computed(() => `${sliderTop.value}px`)
 const sliderRightPx = computed(() => `${sliderRight.value}px`)
 const sliderBottomPx = computed(() => `${sliderBottom.value}px`)
-
-const leftDelay = computed(() => sliderDelays.value.left)
-const rightDelay = computed(() => sliderDelays.value.right)
-const topDelay = computed(() => sliderDelays.value.top)
-const bottomDelay = computed(() => sliderDelays.value.bottom)
 
 function pickLink() {
 	let index = -1
@@ -97,54 +83,57 @@ function pickLink() {
 	if (activeIndex.value !== -1) {
 		startAnimation()
 	} else {
+		oldIndex.value = -1
 		sliderLeft.value = 0
 		sliderRight.value = 0
 	}
 }
 
-function getTabElement(index: number): HTMLElement | null {
-	if (index === -1) return null
-	const container = scrollContainer.value
-	if (!container) return null
-	const tabs = container.querySelectorAll('.button-animation')
-	return (tabs[index] as HTMLElement) ?? null
-}
+const tabLinkElements = ref()
 
 function startAnimation() {
-	const el = getTabElement(activeIndex.value)
-	if (!el?.offsetParent) return
+	const el = tabLinkElements.value[activeIndex.value].$el
 
-	const parent = el.offsetParent as HTMLElement
+	if (!el || !el.offsetParent) return
+
 	const newValues = {
 		left: el.offsetLeft,
 		top: el.offsetTop,
-		right: parent.offsetWidth - el.offsetLeft - el.offsetWidth,
-		bottom: parent.offsetHeight - el.offsetTop - el.offsetHeight,
+		right: el.offsetParent.offsetWidth - el.offsetLeft - el.offsetWidth,
+		bottom: el.offsetParent.offsetHeight - el.offsetTop - el.offsetHeight,
 	}
 
-	const isInitialPosition = sliderLeft.value === 4 && sliderRight.value === 4
-
-	if (isInitialPosition) {
+	if (sliderLeft.value === 4 && sliderRight.value === 4) {
 		sliderLeft.value = newValues.left
 		sliderRight.value = newValues.right
 		sliderTop.value = newValues.top
 		sliderBottom.value = newValues.bottom
-		sliderReady.value = true
-		requestAnimationFrame(() => {
-			transitionsEnabled.value = true
-		})
 	} else {
-		const STAGGER_DELAY = '200ms'
-		sliderDelays.value = {
-			left: newValues.left < sliderLeft.value ? '0ms' : STAGGER_DELAY,
-			right: newValues.left < sliderLeft.value ? STAGGER_DELAY : '0ms',
-			top: newValues.top < sliderTop.value ? '0ms' : STAGGER_DELAY,
-			bottom: newValues.top < sliderTop.value ? STAGGER_DELAY : '0ms',
+		const delay = 200
+
+		if (newValues.left < sliderLeft.value) {
+			sliderLeft.value = newValues.left
+			setTimeout(() => {
+				sliderRight.value = newValues.right
+			}, delay)
+		} else {
+			sliderRight.value = newValues.right
+			setTimeout(() => {
+				sliderLeft.value = newValues.left
+			}, delay)
 		}
-		sliderLeft.value = newValues.left
-		sliderRight.value = newValues.right
-		sliderTop.value = newValues.top
-		sliderBottom.value = newValues.bottom
+
+		if (newValues.top < sliderTop.value) {
+			sliderTop.value = newValues.top
+			setTimeout(() => {
+				sliderBottom.value = newValues.bottom
+			}, delay)
+		} else {
+			sliderBottom.value = newValues.bottom
+			setTimeout(() => {
+				sliderTop.value = newValues.top
+			}, delay)
+		}
 	}
 }
 
@@ -157,17 +146,7 @@ onUnmounted(() => {
 	window.removeEventListener('resize', pickLink)
 })
 
-watch(
-	filteredLinks,
-	async () => {
-		await nextTick()
-		pickLink()
-	},
-	{ deep: true },
-)
-
-watch(route, async () => {
-	await nextTick()
+watch(route, () => {
 	pickLink()
 })
 </script>
@@ -175,10 +154,7 @@ watch(route, async () => {
 .navtabs-transition {
 	/* Delay on opacity is to hide any jankiness as the page loads */
 	transition:
-		left 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
-		right 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
-		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
-		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay),
+		all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s,
 		opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
 }
 </style>
