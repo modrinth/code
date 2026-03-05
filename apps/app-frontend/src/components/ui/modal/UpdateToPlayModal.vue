@@ -316,6 +316,7 @@ async function computeDependencyDiffs(
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
 	if (!inst.linked_data) return null
+	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
 
 	try {
 		// For server projects, linked_data.project_id is the server project but
@@ -327,8 +328,8 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 		// Compute dependency diffs between current and latest version
 		if (instanceModpackVersion && modpackVersion.value) {
 			return await computeDependencyDiffs(
-				modpackVersion.value.dependencies || [],
 				instanceModpackVersion.dependencies || [],
+				modpackVersion.value.dependencies || [],
 			)
 		}
 	} catch (error) {
