@@ -386,7 +386,9 @@ const allBulkEditableProjectsSelected = computed(
 )
 
 function toggleAllBulkEditableProjects() {
-	selectedProjects.value = allBulkEditableProjectsSelected.value ? [] : bulkEditableProjects.value.slice()
+	selectedProjects.value = allBulkEditableProjectsSelected.value
+		? []
+		: bulkEditableProjects.value.slice()
 }
 
 function toggleProjectSelection(project) {

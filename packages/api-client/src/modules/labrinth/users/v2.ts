@@ -18,13 +18,10 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	 * ```
 	 */
 	public async getProjects(idOrUsername: string): Promise<Labrinth.Projects.v2.Project[]> {
-		return this.client.request<Labrinth.Projects.v2.Project[]>(
-			`/user/${idOrUsername}/projects`,
-			{
-				api: 'labrinth',
-				version: 2,
-				method: 'GET',
-			},
-		)
+		return this.client.request<Labrinth.Projects.v2.Project[]>(`/user/${idOrUsername}/projects`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
 	}
 }
