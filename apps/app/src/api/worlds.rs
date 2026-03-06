@@ -153,13 +153,10 @@ pub async fn add_server_to_profile(
     pack_status: ServerPackStatus,
 ) -> Result<usize> {
     let path = get_full_path(path).await?;
-    Ok(worlds::add_server_to_profile(
-        &path,
-        name,
-        address,
-        pack_status,
+    Ok(
+        worlds::add_server_to_profile(&path, name, address, pack_status)
+            .await?,
     )
-    .await?)
 }
 
 #[tauri::command]
@@ -171,14 +168,8 @@ pub async fn edit_server_in_profile(
     pack_status: ServerPackStatus,
 ) -> Result<()> {
     let path = get_full_path(path).await?;
-    worlds::edit_server_in_profile(
-        &path,
-        index,
-        name,
-        address,
-        pack_status,
-    )
-    .await?;
+    worlds::edit_server_in_profile(&path, index, name, address, pack_status)
+        .await?;
     Ok(())
 }
 
