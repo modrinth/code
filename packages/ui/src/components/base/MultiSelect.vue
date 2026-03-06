@@ -103,15 +103,15 @@
 					@mousedown.prevent.stop
 					@keydown="handleDropdownKeydown"
 				>
-					<div v-if="searchable" class="p-3 pb-0">
+					<div v-if="searchable">
 						<StyledInput
 							ref="searchInputRef"
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							type="text"
 							:placeholder="searchPlaceholder"
-							wrapper-class="w-full"
-							input-class="!outline-none border-none"
+							wrapper-class="w-full bg-surface-4 border-0 border-b border-solid border-surface-5 py-1.5"
+							input-class="focus:ring-0"
 							@input="handleSearchInput"
 							@keydown="handleSearchKeydown"
 						/>
@@ -120,12 +120,12 @@
 					<div
 						v-if="filteredOptions.length > 0 || includeSelectAllOption"
 						ref="optionsContainerRef"
-						class="flex flex-col gap-0.5 overflow-y-auto p-3"
+						class="flex flex-col overflow-y-auto"
 						:style="{ maxHeight: `${maxHeight}px` }"
 					>
 						<span
 							v-if="includeSelectAllOption"
-							class="flex items-center gap-2.5 cursor-pointer rounded-xl p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 sticky top-0 z-10 bg-surface-4 border-0 border-b border-solid border-surface-5 -mt-0.5 mb-0.5"
+							class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 sticky top-0 z-10 bg-surface-4 border-0 border-b border-solid border-surface-5"
 							:class="{ 'bg-surface-5': focusedIndex === -2 }"
 							:data-focused="focusedIndex === -2"
 							role="option"
@@ -158,7 +158,7 @@
 								:aria-selected="isSelected(item.value)"
 								:aria-disabled="item.disabled || undefined"
 								:data-focused="focusedIndex === index"
-								class="flex items-center gap-2.5 cursor-pointer rounded-xl p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
+								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
 								:class="[
 									item.class,
 									{
