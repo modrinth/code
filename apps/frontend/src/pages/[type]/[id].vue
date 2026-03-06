@@ -116,7 +116,7 @@
 					</div>
 				</template>
 				<template #default>
-					<div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+					<div class="mx-auto flex max-w-[44rem] flex-col gap-4 md:w-[30rem]">
 						<div
 							v-if="
 								project.project_type !== 'plugin' ||

@@ -14,7 +14,7 @@
 							</div>
 							<p
 								v-if="$slots.summary"
-								class="m-0 max-w-[40rem] empty:hidden"
+								class="m-0 max-w-[44rem] empty:hidden"
 								:class="[disableLineClamp ? '' : 'line-clamp-2']"
 							>
 								<slot name="summary" />
