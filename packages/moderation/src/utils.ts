@@ -237,6 +237,19 @@ export function arrayOrNone(arr: string[]): string {
 	return arr.length > 0 ? arr.join(', ') : 'None'
 }
 
+export function formatProjectTypes(type: string, lower: boolean = false) {
+	let value = type
+		.replaceAll('mod', 'Mod')
+		.replaceAll('resourcepack', 'Resource Pack')
+		.replaceAll('datapack', 'Data Pack')
+		.replaceAll('plugin', 'Plugin')
+		.replaceAll('shader', 'Shaders')
+		.replaceAll('minecraft_java_server', 'Server')
+		.replaceAll('minecraft_server', 'Server')
+	if (lower) value = value.toLowerCase()
+	return value
+}
+
 export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
@@ -382,6 +395,8 @@ export function flattenProjectV3Variables(
 
 	vars['PROJECT_V3_REVIEW_STATUS'] = projectV3.side_types_migration_review_status
 	vars['PROJECT_V3_TYPES'] = projectV3.project_types.join(', ')
+	vars['PROJECT_TYPE_FORMATTED'] = formatProjectTypes(projectV3.project_types[0])
+	vars['PROJECT_TYPES_FORMATTED'] = formatProjectTypes(projectV3.project_types.join(' / '))
 
 	vars['PROJECT_SITE_URL'] = projectV3.link_urls?.site?.url || 'None'
 	vars['PROJECT_STORE_URL'] = projectV3.link_urls?.store?.url || 'None'
