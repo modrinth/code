@@ -989,8 +989,149 @@
   "project.recent-plays": {
     "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
   },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabic"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgarian"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengali"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Czech"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Danish"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "German"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Greek"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "English"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Spanish"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonian"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finnish"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "French"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Hebrew"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Croatian"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Hungarian"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonesian"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italian"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Japanese"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Korean"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Lithuanian"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Latvian"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Malay"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Dutch"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norwegian"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polish"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portuguese"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Romanian"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Russian"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovak"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbian"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Swedish"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thai"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipino"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turkish"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukrainian"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamese"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Chinese"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australia"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europe"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Middle East"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Russia"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "South America"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "US East"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "US West"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
@@ -1226,8 +1367,32 @@
   "search.filter_type.project_id": {
     "defaultMessage": "Project ID"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Type"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Language"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Region"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Status"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Modded"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanilla"
+  },
+  "search.server_status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "search.server_status.online": {
+    "defaultMessage": "Online"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
@@ -1587,7 +1752,7 @@
     "defaultMessage": "Kitchen Sink"
   },
   "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Library"
@@ -1671,7 +1836,7 @@
     "defaultMessage": "Plots"
   },
   "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Potato"
@@ -1680,10 +1845,10 @@
     "defaultMessage": "Prison"
   },
   "tag.category.pve": {
-    "defaultMessage": "PVE"
+    "defaultMessage": "PvE"
   },
   "tag.category.pvp": {
-    "defaultMessage": "PVP"
+    "defaultMessage": "PvP"
   },
   "tag.category.questing": {
     "defaultMessage": "Questing"

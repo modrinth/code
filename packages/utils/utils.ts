@@ -72,6 +72,9 @@ export const sortedCategories = (tags, formatCategoryName, locale) => {
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
 
+		if (a.name === 'pokemon') return -1
+		if (b.name === 'pokemon') return 1
+
 		const aFormatted = formatCategoryName(a.name)
 		const bFormatted = formatCategoryName(b.name)
 		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })

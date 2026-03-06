@@ -1,8 +1,10 @@
+import type { Labrinth } from '@modrinth/api-client'
 import { getCategoryIcon } from '@modrinth/assets'
+import { sortedCategories } from '@modrinth/utils'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useVIntl } from '../composables/i18n'
+import { defineMessage, useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
@@ -55,34 +57,82 @@ const SERVER_CATEGORY_ICON_MAP: Record<string, string> = {
 	'world-resets': 'refresh-ccw',
 }
 
-export const SERVER_REGIONS = [
-	{ code: 'us_east', name: 'US East' },
-	{ code: 'us_west', name: 'US West' },
-	{ code: 'europe', name: 'Europe' },
-	{ code: 'asia', name: 'Asia' },
-	{ code: 'australia', name: 'Australia' },
-	{ code: 'south_america', name: 'South America' },
-	{ code: 'middle_east', name: 'Middle East' },
-	{ code: 'russia', name: 'Russia' },
+export const SERVER_REGIONS = {
+	us_east: defineMessage({ id: 'project.server.region.us_east', defaultMessage: 'US East' }),
+	us_west: defineMessage({ id: 'project.server.region.us_west', defaultMessage: 'US West' }),
+	europe: defineMessage({ id: 'project.server.region.europe', defaultMessage: 'Europe' }),
+	asia: defineMessage({ id: 'project.server.region.asia', defaultMessage: 'Asia' }),
+	australia: defineMessage({ id: 'project.server.region.australia', defaultMessage: 'Australia' }),
+	south_america: defineMessage({
+		id: 'project.server.region.south_america',
+		defaultMessage: 'South America',
+	}),
+	middle_east: defineMessage({
+		id: 'project.server.region.middle_east',
+		defaultMessage: 'Middle East',
+	}),
+	russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
+}
+
+const searchableLanguages = [
+	'en',
+	'de',
+	'fr',
+	'es',
+	'pt',
+	'ru',
+	'zh',
+	'ja',
+	'ko',
+	'nl',
+	'pl',
+	'it',
+	'tr',
+	'sv',
+	'fi',
 ]
 
-export const SERVER_LANGUAGES = [
-	{ code: 'en', name: 'English' },
-	{ code: 'de', name: 'German' },
-	{ code: 'fr', name: 'French' },
-	{ code: 'es', name: 'Spanish' },
-	{ code: 'pt', name: 'Portuguese' },
-	{ code: 'ru', name: 'Russian' },
-	{ code: 'zh', name: 'Chinese' },
-	{ code: 'ja', name: 'Japanese' },
-	{ code: 'ko', name: 'Korean' },
-	{ code: 'nl', name: 'Dutch' },
-	{ code: 'pl', name: 'Polish' },
-	{ code: 'it', name: 'Italian' },
-	{ code: 'tr', name: 'Turkish' },
-	{ code: 'sv', name: 'Swedish' },
-	{ code: 'fi', name: 'Finnish' },
-]
+export const SERVER_LANGUAGES = {
+	en: defineMessage({ id: 'project.server.language.en', defaultMessage: 'English' }),
+	es: defineMessage({ id: 'project.server.language.es', defaultMessage: 'Spanish' }),
+	pt: defineMessage({ id: 'project.server.language.pt', defaultMessage: 'Portuguese' }),
+	fr: defineMessage({ id: 'project.server.language.fr', defaultMessage: 'French' }),
+	de: defineMessage({ id: 'project.server.language.de', defaultMessage: 'German' }),
+	it: defineMessage({ id: 'project.server.language.it', defaultMessage: 'Italian' }),
+	nl: defineMessage({ id: 'project.server.language.nl', defaultMessage: 'Dutch' }),
+	ru: defineMessage({ id: 'project.server.language.ru', defaultMessage: 'Russian' }),
+	uk: defineMessage({ id: 'project.server.language.uk', defaultMessage: 'Ukrainian' }),
+	pl: defineMessage({ id: 'project.server.language.pl', defaultMessage: 'Polish' }),
+	cs: defineMessage({ id: 'project.server.language.cs', defaultMessage: 'Czech' }),
+	sk: defineMessage({ id: 'project.server.language.sk', defaultMessage: 'Slovak' }),
+	hu: defineMessage({ id: 'project.server.language.hu', defaultMessage: 'Hungarian' }),
+	ro: defineMessage({ id: 'project.server.language.ro', defaultMessage: 'Romanian' }),
+	bg: defineMessage({ id: 'project.server.language.bg', defaultMessage: 'Bulgarian' }),
+	hr: defineMessage({ id: 'project.server.language.hr', defaultMessage: 'Croatian' }),
+	sr: defineMessage({ id: 'project.server.language.sr', defaultMessage: 'Serbian' }),
+	el: defineMessage({ id: 'project.server.language.el', defaultMessage: 'Greek' }),
+	tr: defineMessage({ id: 'project.server.language.tr', defaultMessage: 'Turkish' }),
+	ar: defineMessage({ id: 'project.server.language.ar', defaultMessage: 'Arabic' }),
+	he: defineMessage({ id: 'project.server.language.he', defaultMessage: 'Hebrew' }),
+	hi: defineMessage({ id: 'project.server.language.hi', defaultMessage: 'Hindi' }),
+	bn: defineMessage({ id: 'project.server.language.bn', defaultMessage: 'Bengali' }),
+	ur: defineMessage({ id: 'project.server.language.ur', defaultMessage: 'Urdu' }),
+	zh: defineMessage({ id: 'project.server.language.zh', defaultMessage: 'Chinese' }),
+	ja: defineMessage({ id: 'project.server.language.ja', defaultMessage: 'Japanese' }),
+	ko: defineMessage({ id: 'project.server.language.ko', defaultMessage: 'Korean' }),
+	th: defineMessage({ id: 'project.server.language.th', defaultMessage: 'Thai' }),
+	vi: defineMessage({ id: 'project.server.language.vi', defaultMessage: 'Vietnamese' }),
+	id: defineMessage({ id: 'project.server.language.id', defaultMessage: 'Indonesian' }),
+	ms: defineMessage({ id: 'project.server.language.ms', defaultMessage: 'Malay' }),
+	tl: defineMessage({ id: 'project.server.language.tl', defaultMessage: 'Filipino' }),
+	sv: defineMessage({ id: 'project.server.language.sv', defaultMessage: 'Swedish' }),
+	no: defineMessage({ id: 'project.server.language.no', defaultMessage: 'Norwegian' }),
+	da: defineMessage({ id: 'project.server.language.da', defaultMessage: 'Danish' }),
+	fi: defineMessage({ id: 'project.server.language.fi', defaultMessage: 'Finnish' }),
+	lt: defineMessage({ id: 'project.server.language.lt', defaultMessage: 'Lithuanian' }),
+	lv: defineMessage({ id: 'project.server.language.lv', defaultMessage: 'Latvian' }),
+	et: defineMessage({ id: 'project.server.language.et', defaultMessage: 'Estonian' }),
+}
 
 export const SERVER_SORT_TYPES: SortType[] = [
 	{ display: 'Relevance', name: 'relevance' },
@@ -114,7 +164,10 @@ export function useServerSearch(opts: {
 }) {
 	const { tags, query, maxResults, currentPage } = opts
 
-	const { formatMessage } = useVIntl()
+	const { formatMessage, locale } = useVIntl()
+	const formatCategoryName = (categoryName: string) => {
+		return formatCategory(formatMessage, categoryName)
+	}
 
 	const route = useRoute()
 
@@ -124,8 +177,8 @@ export function useServerSearch(opts: {
 
 	const serverFilterTypes = computed<FilterType[]>(() => {
 		const categoryFilters: Record<string, FilterType> = {}
-		for (const c of (tags.value?.categories ?? []).filter(
-			(c) => c.project_type === 'minecraft_java_server',
+		for (const c of sortedCategories(tags.value, formatCategoryName, locale.value).filter(
+			(c: Labrinth.Tags.v2.Category) => c.project_type === 'minecraft_java_server',
 		)) {
 			const filterTypeId = `server_category_${c.header}`
 			if (!categoryFilters[filterTypeId]) {
@@ -149,27 +202,57 @@ export function useServerSearch(opts: {
 			})
 		}
 
-		const featuresFilter = categoryFilters['server_category_minecraft_server_features']
-		if (featuresFilter) {
-			featuresFilter.options.sort((a, b) => {
-				if (a.id === 'pokemon') return -1
-				if (b.id === 'pokemon') return 1
-				return 0
+		const sortedRegions = Object.entries(SERVER_REGIONS).sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+
+		const sortedLanguages = Object.entries(SERVER_LANGUAGES)
+			.filter(([code, _]) => searchableLanguages.includes(code))
+			.sort(([_, a], [__, b]) => {
+				const aFormatted = formatMessage(a)
+				const bFormatted = formatMessage(b)
+				return aFormatted.localeCompare(bFormatted, locale.value)
 			})
-		}
 
 		return [
 			{
 				id: 'server_content_type',
-				formatted_name: 'Type',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.server_content_type',
+						defaultMessage: 'Type',
+					}),
+				),
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sct',
 				supports_negative_filter: false,
 				searchable: false,
 				options: [
-					{ id: 'vanilla', formatted_name: 'Vanilla', method: 'or', value: 'vanilla' },
-					{ id: 'modpack', formatted_name: 'Modded', method: 'or', value: 'modpack' },
+					{
+						id: 'vanilla',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.server_content_type.vanilla',
+								defaultMessage: 'Vanilla',
+							}),
+						),
+						method: 'or',
+						value: 'vanilla',
+					},
+					{
+						id: 'modpack',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.server_content_type.modpack',
+								defaultMessage: 'Modded',
+							}),
+						),
+						method: 'or',
+						value: 'modpack',
+					},
 				],
 			},
 			...[
@@ -182,7 +265,12 @@ export function useServerSearch(opts: {
 				.filter(Boolean),
 			{
 				id: 'server_game_version',
-				formatted_name: 'Game Version',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.game_version',
+						defaultMessage: 'Game version',
+					}),
+				),
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sgv',
@@ -198,45 +286,80 @@ export function useServerSearch(opts: {
 			},
 			{
 				id: 'server_region',
-				formatted_name: 'Region',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.server_region',
+						defaultMessage: 'Region',
+					}),
+				),
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sr',
 				supports_negative_filter: true,
 				searchable: false,
-				options: SERVER_REGIONS.map((r) => ({
-					id: r.code,
-					formatted_name: r.name,
+				options: sortedRegions.map(([code, name]) => ({
+					id: code,
+					formatted_name: formatMessage(name),
 					method: 'or' as const,
-					value: r.code,
+					value: code,
 				})),
 			},
 			{
 				id: 'server_language',
-				formatted_name: 'Language',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.server_language',
+						defaultMessage: 'Language',
+					}),
+				),
 				supported_project_types: ['server'],
 				display: 'scrollable',
 				query_param: 'sl',
 				supports_negative_filter: false,
 				searchable: true,
-				options: SERVER_LANGUAGES.map((l) => ({
-					id: l.code,
-					formatted_name: l.name,
+				options: sortedLanguages.map(([code, name]) => ({
+					id: code,
+					formatted_name: formatMessage(name),
 					method: 'or' as const,
-					value: l.code,
+					value: code,
 				})),
 			},
 			{
 				id: 'server_status',
-				formatted_name: 'Status',
+				formatted_name: formatMessage(
+					defineMessage({
+						id: 'search.filter_type.server_status',
+						defaultMessage: 'Status',
+					}),
+				),
 				supported_project_types: ['server'],
 				display: 'all',
 				query_param: 'sst',
 				supports_negative_filter: false,
 				searchable: false,
 				options: [
-					{ id: 'online', formatted_name: 'Online', method: 'or', value: 'online' },
-					{ id: 'offline', formatted_name: 'Offline', method: 'or', value: 'offline' },
+					{
+						id: 'online',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.server_status.online',
+								defaultMessage: 'Online',
+							}),
+						),
+						method: 'or',
+						value: 'online',
+					},
+					{
+						id: 'offline',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.server_status.offline',
+								defaultMessage: 'Offline',
+							}),
+						),
+						method: 'or',
+						value: 'offline',
+					},
 				],
 			},
 		]
