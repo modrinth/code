@@ -8,6 +8,16 @@
 					<span class="label__title">Website</span>
 					<span class="label__description">Your server's official website.</span>
 				</label>
+				<TriangleAlertIcon
+					v-if="isServerSiteLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerSiteDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
 				<input
 					id="server-website"
 					v-model="siteUrl"
@@ -22,6 +32,16 @@
 					<span class="label__title">Store</span>
 					<span class="label__description">A link to your server's store or shop.</span>
 				</label>
+				<TriangleAlertIcon
+					v-if="isServerStoreLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerStoreDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
 				<input
 					id="server-store"
 					v-model="storeUrl"
@@ -41,6 +61,16 @@
 						>A page containing information, documentation, and help for the server.</span
 					>
 				</label>
+				<TriangleAlertIcon
+					v-if="isServerWikiLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="isServerWikiDiscordUrl"
+					v-tooltip="`Discord invites are not appropriate for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
 				<input
 					id="server-wiki"
 					v-model="serverWikiUrl"
@@ -55,6 +85,16 @@
 					<span class="label__title">Discord</span>
 					<span class="label__description">An invitation link to your Discord server.</span>
 				</label>
+				<TriangleAlertIcon
+					v-if="isServerDiscordLinkShortener"
+					v-tooltip="`Use of link shorteners is prohibited.`"
+					class="size-6 animate-pulse text-orange"
+				/>
+				<TriangleAlertIcon
+					v-else-if="!isServerDiscordUrlCommon"
+					v-tooltip="`You're using a link which isn't common for this link type.`"
+					class="size-6 animate-pulse text-orange"
+				/>
 				<input
 					id="server-discord"
 					v-model="serverDiscordUrl"
@@ -335,6 +375,32 @@ const isWikiLinkShortener = computed(() => {
 })
 const isDiscordLinkShortener = computed(() => {
 	return isLinkShortener(discordUrl.value)
+})
+
+const isServerSiteDiscordUrl = computed(() => {
+	return isDiscordUrl(siteUrl.value)
+})
+const isServerStoreDiscordUrl = computed(() => {
+	return isDiscordUrl(storeUrl.value)
+})
+const isServerWikiDiscordUrl = computed(() => {
+	return isDiscordUrl(serverWikiUrl.value)
+})
+const isServerSiteLinkShortener = computed(() => {
+	return isLinkShortener(siteUrl.value)
+})
+const isServerStoreLinkShortener = computed(() => {
+	return isLinkShortener(storeUrl.value)
+})
+const isServerWikiLinkShortener = computed(() => {
+	return isLinkShortener(serverWikiUrl.value)
+})
+const isServerDiscordLinkShortener = computed(() => {
+	return isLinkShortener(serverDiscordUrl.value)
+})
+const isServerDiscordUrlCommon = computed(() => {
+	if (!serverDiscordUrl.value || serverDiscordUrl.value.trim().length === 0) return true
+	return isCommonUrl(serverDiscordUrl.value, commonLinkDomains.discord)
 })
 
 const rawDonationLinks = JSON.parse(JSON.stringify(project.value.donation_urls))
