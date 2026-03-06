@@ -179,9 +179,13 @@ const getTagIcon = (categoryName: string) => {
 	return getCategoryIcon(iconName)
 }
 
-const matchesProjectType = (x: Category) =>
-	x.project_type === project.value.actualProjectType ||
-	(x.project_type === 'minecraft_java_server' && isServerProject.value)
+const matchesProjectType = (x: Category) => {
+	if (isServerProject.value) {
+		return x.project_type === 'minecraft_java_server'
+	} else {
+		return x.project_type === project.value.actualProjectType
+	}
+}
 
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
