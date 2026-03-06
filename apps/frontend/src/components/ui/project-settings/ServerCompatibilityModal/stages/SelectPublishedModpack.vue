@@ -15,6 +15,8 @@
 						search-placeholder="Search by name or paste ID..."
 						loading-message="Loading..."
 						no-results-message="No results found"
+						include-user-unlisted-projects
+						:user-id="auth?.user?.id"
 					/>
 				</div>
 
@@ -85,6 +87,7 @@ const currentProjectId = computed(() => projectV3.value?.id)
 const { selectedProjectId, selectedVersionId } = injectServerCompatibilityContext()
 const { labrinth } = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const auth = (await useAuth()) as { user?: { id: string } }
 
 interface VersionInfo {
 	id: string
