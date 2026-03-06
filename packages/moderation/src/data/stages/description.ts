@@ -17,7 +17,8 @@ const description: Stage = {
 			weight: 400,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/description/insufficient/insufficient.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'Please elaborate on how the author can improve their description.',
@@ -39,12 +40,11 @@ const description: Stage = {
 			weight: 401,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			shouldShow: (project, projectV3) => project.project_type === 'modpack' && !projectV3?.minecraft_server,
+			shouldShow: (project, projectV3) =>
+				project.project_type === 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
 				(await import('../messages/description/insufficient/insufficient-packs.md?raw')).default,
-			disablesActions: [
-				'description_insufficient',
-			],
+			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_insufficient_projects',
@@ -53,12 +53,11 @@ const description: Stage = {
 			weight: 401,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			shouldShow: (project, projectV3) => project.project_type !== 'modpack' && !projectV3?.minecraft_server,
+			shouldShow: (project, projectV3) =>
+				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
 				(await import('../messages/description/insufficient/insufficient-projects.md?raw')).default,
-			disablesActions: [
-				'description_insufficient',
-			],
+			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_insufficient_servers',
@@ -70,9 +69,7 @@ const description: Stage = {
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
 			message: async () =>
 				(await import('../messages/description/insufficient/insufficient-servers.md?raw')).default,
-			disablesActions: [
-				'description_insufficient',
-			],
+			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_non_english',
@@ -82,7 +79,9 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !projectV3?.minecraft_java_server,
-			message: async () => (await import('../messages/description/accessability/non-english/non-english.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/accessability/non-english/non-english.md?raw'))
+					.default,
 		} as ButtonAction,
 		{
 			id: 'description_non_english-server',
@@ -92,7 +91,10 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
-			message: async () => (await import('../messages/description/accessability/non-english/non-english-server.md?raw')).default,
+			message: async () =>
+				(
+					await import('../messages/description/accessability/non-english/non-english-server.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_unfinished',
@@ -110,7 +112,8 @@ const description: Stage = {
 			weight: 404,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/description/accessability/headers-as-body.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/accessability/headers-as-body.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_image_only',
@@ -119,7 +122,8 @@ const description: Stage = {
 			weight: 405,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/description/accessability/image-only.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/accessability/image-only.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_non_standard_text',

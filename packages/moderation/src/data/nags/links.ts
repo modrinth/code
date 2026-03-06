@@ -78,10 +78,11 @@ export const linksNags: Nag[] = [
 				'Add any relevant links targeted outside of Modrinth, such as source code, an issue tracker, or a Discord invite.',
 		}),
 		status: 'suggestion',
-		shouldShow: (context: NagContext) =>
-		{
-
-			return !context.projectV3?.minecraft_server && Object.keys(context.projectV3?.link_urls ?? {}).length === 0
+		shouldShow: (context: NagContext) => {
+			return (
+				!context.projectV3?.minecraft_server &&
+				Object.keys(context.projectV3?.link_urls ?? {}).length === 0
+			)
 		},
 		link: {
 			path: 'settings/links',
@@ -105,7 +106,10 @@ export const linksNags: Nag[] = [
 		}),
 		status: 'suggestion',
 		shouldShow: (context: NagContext) => {
-			return !!context.projectV3?.minecraft_server && Object.keys(context.projectV3?.link_urls ?? {}).length === 0
+			return (
+				!!context.projectV3?.minecraft_server &&
+				Object.keys(context.projectV3?.link_urls ?? {}).length === 0
+			)
 		},
 		link: {
 			path: 'settings/links',
@@ -128,7 +132,9 @@ export const linksNags: Nag[] = [
 				'Some of your external links appear to be identical. Each link should be entered only once and with the appropriate link type.',
 		}),
 		status: 'required',
-		shouldShow: (context: NagContext) => new Set(Object.values(context.projectV3?.link_urls ?? {}).map(link => link.url)).size !== Object.values(context.projectV3?.link_urls ?? {}).map(link => link.url).length,
+		shouldShow: (context: NagContext) =>
+			new Set(Object.values(context.projectV3?.link_urls ?? {}).map((link) => link.url)).size !==
+			Object.values(context.projectV3?.link_urls ?? {}).map((link) => link.url).length,
 		link: {
 			path: 'settings/links',
 			title: defineMessage({

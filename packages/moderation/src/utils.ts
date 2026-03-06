@@ -335,7 +335,7 @@ export function flattenProjectVariables(
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_ENVIRONMENT_FLINK`] =
-		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)` 	// Depreciated
+		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)` // Depreciated
 	vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
 	vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
 	vars[`PROJECT_DESCRIPTION_LINK`] =
@@ -358,9 +358,11 @@ export function flattenProjectVariables(
 	vars[`PROJECT_MODERATION_FLINK`] =
 		`[moderation tab](https://modrinth.com/project/${project.id}/moderation)`
 	vars[`PROJECT_SERVER_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
-	vars[`PROJECT_SERVER_SETTINGS_FLINK`] = `[Server Settings](https://modrinth.com/project/${project.id}/settings/server)`
+	vars[`PROJECT_SERVER_SETTINGS_FLINK`] =
+		`[Server Settings](https://modrinth.com/project/${project.id}/settings/server)`
 	vars[`PROJECT_LANGUAGE_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
-	vars[`PROJECT_LANGUAGE_SETTINGS_FLINK`] = `[Language Settings](https://modrinth.com/project/${project.id}/settings/server)`
+	vars[`PROJECT_LANGUAGE_SETTINGS_FLINK`] =
+		`[Language Settings](https://modrinth.com/project/${project.id}/settings/server)`
 
 	return vars
 }
