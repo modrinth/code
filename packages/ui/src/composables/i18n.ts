@@ -60,8 +60,8 @@ export const LOCALES: LocaleDefinition[] = [
 	},
 	{
 		code: 'de-DE',
-		name: 'Deutsch',
-		translatedName: defineMessage({ id: 'locale.de-DE', defaultMessage: 'German' }),
+		name: 'Deutsch (Deutschland)',
+		translatedName: defineMessage({ id: 'locale.de-DE', defaultMessage: 'German (Germany)' }),
 	},
 	{
 		code: 'en-US',
