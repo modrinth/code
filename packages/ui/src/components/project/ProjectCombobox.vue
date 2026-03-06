@@ -101,6 +101,7 @@ watch(
 
 			userProjectHits.value = projects
 				.filter((p) => !projectTypeSet || projectTypeSet.has(p.project_type as ProjectType))
+				.filter((p) => p.status === 'unlisted')
 				.map((p) => ({
 					project_id: p.id,
 					title: p.title,
