@@ -110,7 +110,7 @@
 							:icon="SearchIcon"
 							type="text"
 							:placeholder="searchPlaceholder"
-							wrapper-class="w-full bg-surface-4 border-0 border-b border-solid border-surface-5 py-1.5"
+							wrapper-class="w-full bg-surface-4 border-0 border-b border-solid border-surface-5 py-2"
 							input-class="focus:ring-0"
 							@input="handleSearchInput"
 							@keydown="handleSearchKeydown"
