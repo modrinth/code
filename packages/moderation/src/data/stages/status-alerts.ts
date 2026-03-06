@@ -58,7 +58,7 @@ const statusAlerts: Stage = {
 			type: 'button',
 			label: 'Server use',
 			weight: -999999,
-			shouldShow: (project) => project.project_type === 'modpack',
+			shouldShow: (project, projectV3) => project.project_type === 'modpack' && !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/status-alerts/serverpack.md?raw')).default,
 		} as ButtonAction,
 		{
