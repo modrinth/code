@@ -117,8 +117,8 @@ export const LOCALES: LocaleDefinition[] = [
 	},
 	{
 		code: 'it-IT',
-		name: 'Italiano',
-		translatedName: defineMessage({ id: 'locale.it-IT', defaultMessage: 'Italian' }),
+		name: 'Italiano (Italia)',
+		translatedName: defineMessage({ id: 'locale.it-IT', defaultMessage: 'Italian (Italy)' }),
 		numeric: 'always',
 	},
 	{
