@@ -69,16 +69,14 @@ const SERVER_HEADER_ORDER = [
 
 export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
-		const aServerIdx = SERVER_HEADER_ORDER.indexOf(a.header)
-		const bServerIdx = SERVER_HEADER_ORDER.indexOf(b.header)
-		if (aServerIdx !== -1 || bServerIdx !== -1) {
-			return (
-				(aServerIdx === -1 ? Infinity : aServerIdx) - (bServerIdx === -1 ? Infinity : bServerIdx)
-			)
-		}
-
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
+			const aServerIdx = SERVER_HEADER_ORDER.indexOf(a.header)
+			const bServerIdx = SERVER_HEADER_ORDER.indexOf(b.header)
+			if (aServerIdx !== -1 && bServerIdx !== -1) {
+				return aServerIdx - bServerIdx
+			}
+
 			return headerCompare
 		}
 

@@ -9,20 +9,20 @@ import type { FilterType, FilterValue, SortType, Tags } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
 export const SERVER_REGIONS = {
-    us_east: defineMessage({ id: 'project.server.region.us_east', defaultMessage: 'US East' }),
-    us_west: defineMessage({ id: 'project.server.region.us_west', defaultMessage: 'US West' }),
-    europe: defineMessage({ id: 'project.server.region.europe', defaultMessage: 'Europe' }),
-    asia: defineMessage({ id: 'project.server.region.asia', defaultMessage: 'Asia' }),
-    australia: defineMessage({ id: 'project.server.region.australia', defaultMessage: 'Australia' }),
-    south_america: defineMessage({
-        id: 'project.server.region.south_america',
-        defaultMessage: 'South America',
-    }),
-    middle_east: defineMessage({
-        id: 'project.server.region.middle_east',
-        defaultMessage: 'Middle East',
-    }),
-    russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
+	us_east: defineMessage({ id: 'project.server.region.us_east', defaultMessage: 'US East' }),
+	us_west: defineMessage({ id: 'project.server.region.us_west', defaultMessage: 'US West' }),
+	europe: defineMessage({ id: 'project.server.region.europe', defaultMessage: 'Europe' }),
+	asia: defineMessage({ id: 'project.server.region.asia', defaultMessage: 'Asia' }),
+	australia: defineMessage({ id: 'project.server.region.australia', defaultMessage: 'Australia' }),
+	south_america: defineMessage({
+		id: 'project.server.region.south_america',
+		defaultMessage: 'South America',
+	}),
+	middle_east: defineMessage({
+		id: 'project.server.region.middle_east',
+		defaultMessage: 'Middle East',
+	}),
+	russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
 }
 
 const searchableLanguages = [
