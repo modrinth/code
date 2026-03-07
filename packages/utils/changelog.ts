@@ -10,6 +10,16 @@ export type VersionEntry = {
 }
 
 const VERSIONS: VersionEntry[] = [
+// 	{
+// 		date: `TBD`,
+// 		product: 'app',
+// 		version: '0.11.3',
+// 		body: `- Added warning banner for installing content to server instance.
+// - Fixed server instance pinging to be less jumpy and only ping once in instance.
+// - Fixed unlinking instance not giving sufficient feedback.
+// - Improved the identification of server project worlds for tracking.
+// - Fixed many other visual issues with server projects.`,
+// 	},
 	{
 		date: `2026-03-06T18:40:00-08:00`,
 		product: 'web',
@@ -17,10 +27,6 @@ const VERSIONS: VersionEntry[] = [
 - Added the ability to search your own unlisted projects when selecting required content for a server project.
 - Added support for bulk editing of links of server projects.
 - Fixed server project tags in project settings having missing icons or unformatted names.
-- Added warning banner for installing content to server instance.
-- Fixed server instance pinging to be less jumpy and only ping once in instance.
-- Fixed unlinking instance not giving sufficient feedback.
-- Improved the identification of server project worlds for tracking.
 - Fixed many other visual issues with server projects.`,
 	},
 	{
