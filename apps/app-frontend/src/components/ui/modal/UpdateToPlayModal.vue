@@ -189,10 +189,11 @@ type ProjectInfo = {
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const installStore = useInstall()
+type UpdateCompleteCallback = () => void | Promise<void>
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instance = ref<GameInstance | null>(null)
-const onUpdateComplete = ref<() => void>(() => {})
+const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
@@ -318,6 +319,7 @@ async function computeDependencyDiffs(
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
 	if (!inst.linked_data) return null
+	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
 
 	try {
 		// For server projects, linked_data.project_id is the server project but
@@ -329,8 +331,8 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 		// Compute dependency diffs between current and latest version
 		if (instanceModpackVersion && modpackVersion.value) {
 			return await computeDependencyDiffs(
-				modpackVersion.value.dependencies || [],
 				instanceModpackVersion.dependencies || [],
+				modpackVersion.value.dependencies || [],
 			)
 		}
 	} catch (error) {
@@ -357,7 +359,7 @@ async function handleUpdate() {
 	try {
 		if (modpackVersionId.value && instance.value) {
 			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
-			onUpdateComplete.value()
+			await onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
@@ -381,7 +383,7 @@ function handleDecline() {
 function show(
 	instanceVal: GameInstance,
 	modpackVersionIdVal: string | null = null,
-	callback: () => void = () => {},
+	callback: UpdateCompleteCallback = () => {},
 	e?: MouseEvent,
 ) {
 	instance.value = instanceVal

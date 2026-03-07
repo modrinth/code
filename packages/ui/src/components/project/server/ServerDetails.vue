@@ -21,7 +21,7 @@ defineProps<{
 }>()
 </script>
 <template>
-	<div class="empty:hidden flex items-center gap-2">
+	<div class="empty:hidden flex items-center gap-2 flex-wrap gap-y-1">
 		<ServerOnlinePlayers
 			v-if="onlinePlayers !== undefined"
 			:online="onlinePlayers"
@@ -33,8 +33,8 @@ defineProps<{
 			:recent-plays="recentPlays"
 			:hide-label="hideRecentPlaysLabel"
 		/>
-		<ServerRegion v-if="region" :region="region" />
 		<ServerPing v-if="ping && statusOnline" :ping="ping" />
+		<ServerRegion v-if="region" :region="region" />
 		<ServerModpackContent
 			v-if="modpackContent"
 			:name="modpackContent.name"

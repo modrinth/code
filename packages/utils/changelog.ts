@@ -11,16 +11,34 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-03-02T16:45:00-08:00`,
+		date: `2026-03-06T19:10:00-08:00`,
 		product: 'app',
-		version: '0.11.0',
-		body: `## Introducing Server Projects
-
+		version: '0.11.3',
+		body: `## Improvements
+- Added warning banner for installing content to server instance.
+- Fixed server instance pinging to be less jumpy and only ping once in instance.
+- Fixed unlinking instance not giving sufficient feedback.
+- Improved the identification of server project worlds for tracking.
+- Fixed many other visual issues with server projects.`,
+	},
+	{
+		date: `2026-03-06T18:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Added the ability to search your own unlisted projects when selecting required content for a server project.
+- Added support for bulk editing of links of server projects.
+- Fixed server project tags in project settings having missing icons or unformatted names.
+- Fixed many other visual issues with server projects.`,
+	},
+	{
+		date: `2026-03-03T17:30:00-08:00`,
+		product: 'app',
+		version: '0.11.2',
+		body: `## [Introducing Server Projects](/news/article/introducing-server-projects)
 - Added new Server Project type
   - Three compatibility types: vanilla, modded (published pack), or modded (uploaded pack)
 - Added new linked server instance type that receives updates from the server
-  - Joining a server from the app downloads the required content and launches you directly into the server
-`,
+  - Joining a server from the app downloads the required content and launches you directly into the server.`,
 	},
 	{
 		date: `2026-02-16T12:40:00-08:00`,

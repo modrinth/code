@@ -21,7 +21,7 @@ const pingClass = computed(() => {
 	if (props.ping === undefined) {
 		return 'border-brand bg-highlight-green text-brand'
 	}
-	if (props.ping < 100) {
+	if (props.ping < 150) {
 		return 'border-brand bg-highlight-green text-brand'
 	}
 	if (props.ping < 250) {

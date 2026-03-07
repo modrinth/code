@@ -47,7 +47,7 @@ import type {
 	SingleplayerWorld,
 	World,
 } from '@/helpers/worlds.ts'
-import { getWorldIdentifier, isLinkedWorld, set_world_display_status } from '@/helpers/worlds.ts'
+import { getWorldIdentifier, set_world_display_status } from '@/helpers/worlds.ts'
 
 import { LockIcon } from '../../../../../../packages/assets/generated-icons'
 
@@ -88,6 +88,8 @@ const props = withDefaults(
 			message: MessageDescriptor
 		}
 
+		managed?: boolean
+
 		// Instance
 		instancePath?: string
 		instanceName?: string
@@ -106,6 +108,7 @@ const props = withDefaults(
 		renderedMotd: undefined,
 
 		gameMode: undefined,
+		managed: false,
 
 		instancePath: undefined,
 		instanceName: undefined,
@@ -127,7 +130,7 @@ const serverIncompatible = computed(
 )
 
 const locked = computed(() => props.world.type === 'singleplayer' && props.world.locked)
-const linked = computed(() => isLinkedWorld(props.world))
+const managed = computed(() => props.managed)
 
 const messages = defineMessages({
 	hardcore: {
@@ -216,7 +219,7 @@ const messages = defineMessages({
 						{{ world.name }}
 					</div>
 					<TagItem
-						v-if="linked"
+						v-if="managed"
 						v-tooltip="formatMessage(messages.linkedServer)"
 						class="border !border-solid border-blue bg-highlight-blue text-xs"
 						:style="`--_color: var(--color-blue)`"
@@ -417,10 +420,10 @@ const messages = defineMessages({
 								id: 'edit',
 								action: () => emit('edit'),
 								shown: !instancePath,
-								disabled: locked || linked,
+								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)
-									: linked
+									: managed
 										? formatMessage(messages.linkedServer)
 										: undefined,
 							},
@@ -457,10 +460,10 @@ const messages = defineMessages({
 								hoverFilled: true,
 								action: () => emit('delete'),
 								shown: !instancePath,
-								disabled: locked || linked,
+								disabled: locked || managed,
 								tooltip: locked
 									? formatMessage(messages.worldInUse)
-									: linked
+									: managed
 										? formatMessage(messages.linkedServer)
 										: undefined,
 							},

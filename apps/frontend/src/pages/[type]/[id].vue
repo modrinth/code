@@ -116,7 +116,7 @@
 					</div>
 				</template>
 				<template #default>
-					<div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+					<div class="mx-auto flex max-w-[44rem] flex-col gap-4 md:w-[30rem]">
 						<div
 							v-if="
 								project.project_type !== 'plugin' ||
@@ -443,7 +443,27 @@
 						"
 					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="lg:!hidden"
+								circular
+							>
+								<nuxt-link
+									v-tooltip="'Edit project'"
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="!font-bold"
+								>
+									<SettingsIcon aria-hidden="true" />
+								</nuxt-link>
+							</ButtonStyled>
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="max-lg:!hidden"
+							>
 								<nuxt-link
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
 									class="!font-bold"
@@ -501,7 +521,11 @@
 									v-if="!isServerProject"
 									size="large"
 									circular
-									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
 								>
 									<button
 										:aria-label="formatMessage(commonMessages.downloadButton)"
@@ -515,7 +539,11 @@
 									v-else
 									size="large"
 									circular
-									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
 								>
 									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
 										<PlayIcon aria-hidden="true" />
@@ -1068,6 +1096,7 @@ import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
@@ -1633,52 +1662,41 @@ const serverModpackVersionId = computed(() => {
 })
 
 const { data: serverModpackVersion, isPending: serverModpackVersionPending } = useQuery({
-	queryKey: computed(() => ['sidebar-modpack-version', serverModpackVersionId.value]),
+	queryKey: computed(() => ['version', 'v3', serverModpackVersionId.value]),
 	queryFn: () => client.labrinth.versions_v3.getVersion(serverModpackVersionId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!serverModpackVersionId.value),
 })
 
-const serverModpackProjectId = computed(() => serverModpackVersion.value?.project_id ?? null)
-
-const { data: serverModpackProject, isPending: serverModpackProjectPending } = useQuery({
-	queryKey: computed(() => ['sidebar-modpack-project', serverModpackProjectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(serverModpackProjectId.value),
-	staleTime: STALE_TIME,
-	enabled: computed(() => !!serverModpackProjectId.value),
-})
-
 const serverDataLoaded = computed(() => {
 	if (!projectV3.value) return false
 	if (serverModpackVersionId.value && serverModpackVersionPending.value) return false
-	if (serverModpackProjectId.value && serverModpackProjectPending.value) return false
 	return true
 })
 
 const serverRequiredContent = computed(() => {
-	if (!serverModpackProject.value) return null
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content || content.kind !== 'modpack') return null
 	const primaryFile =
 		serverModpackVersion.value?.files?.find((f) => f.primary) ??
 		serverModpackVersion.value?.files?.[0]
 	return {
-		name: serverModpackProject.value.name,
+		name: content.project_name ?? '',
 		versionNumber: serverModpackVersion.value?.version_number ?? '',
-		icon: serverModpackProject.value.icon_url,
+		icon: content.project_icon,
 		onclickName:
-			serverModpackProject.value.id !== projectId.value
-				? () => navigateTo(`/modpack/${serverModpackProject.value.slug}`)
+			content.project_id && content.project_id !== projectId.value
+				? () => navigateTo(`/project/${content.project_id}`)
 				: undefined,
 		onclickVersion:
-			serverModpackProject.value.id !== projectId.value
+			content.project_id && content.project_id !== projectId.value
 				? () =>
-						navigateTo(
-							`/modpack/${serverModpackProject.value.slug}/version/${serverModpackVersion.value?.id}`,
-						)
+						navigateTo(`/project/${content.project_id}/version/${serverModpackVersion.value?.id}`)
 				: undefined,
 		onclickDownload: primaryFile?.url
 			? () => navigateTo(primaryFile.url, { external: true })
 			: undefined,
-		showCustomModpackTooltip: serverModpackProject.value.id === projectId.value,
+		showCustomModpackTooltip: content.project_id === projectId.value,
 	}
 })
 
@@ -1711,6 +1729,11 @@ const serverSupportedVersions = computed(() => {
 const serverModpackLoaders = computed(() => {
 	if (!serverModpackVersion.value) return []
 	return serverModpackVersion.value.mrpack_loaders ?? []
+})
+
+watch(serverModpackVersionId, (versionId) => {
+	if (!versionId) return
+	queryClient.prefetchQuery(versionQueryOptions.v3(versionId, client))
 })
 
 // Members
