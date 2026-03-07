@@ -270,7 +270,7 @@
     "defaultMessage": "Performance impact"
   },
   "header.category.resolutions": {
-    "defaultMessage": "Resolutions"
+    "defaultMessage": "Resolution"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -477,7 +477,7 @@
     "defaultMessage": "Password"
   },
   "label.played": {
-    "defaultMessage": "Played {time}"
+    "defaultMessage": "Played {ago}"
   },
   "label.project": {
     "defaultMessage": "Project"
@@ -915,13 +915,13 @@
     "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Required on both the client and server."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client and server, required on both"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Most functionality is client-side, but installing it on the server enables enhanced functionality."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client and server, optional on server"
@@ -933,7 +933,7 @@
     "defaultMessage": "Client-side only"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially. Installing it on both leads to the best experience."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client and server, best when installed on both"
@@ -945,19 +945,19 @@
     "defaultMessage": "Client and server, optional on both"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients. Only works on dedicated servers."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Server-side only"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Most functionality is server-side, but installing it on the client enables enhanced functionality."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client and server, optional on client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients. Also works on the internal server in singleplayer."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Server-side only, works in singleplayer too"
@@ -981,7 +981,7 @@
     "defaultMessage": "Unknown environment"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {followers} other {followers}}"
+    "defaultMessage": "{count} {count, plural, one {follower} other {followers}}"
   },
   "project.online-player-count": {
     "defaultMessage": "{count} {count, plural, one {online} other {online}}"
