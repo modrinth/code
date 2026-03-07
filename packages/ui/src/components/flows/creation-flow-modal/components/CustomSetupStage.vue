@@ -102,6 +102,7 @@ import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+
 import { injectFilePicker, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'

@@ -252,7 +252,10 @@
     "defaultMessage": "Unlinking will merge all mods, resource packs and or plugins associated with this modpack with your own mods."
   },
   "content.confirm-unlink.server-warning-body": {
-    "defaultMessage": "We will automatically create a backup if you continue."
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your world if anything breaks."
+  },
+  "content.confirm-unlink.server-warning-body-backup": {
+    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks."
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
@@ -601,6 +604,9 @@
   },
   "instance.confirm-reinstall.warning-body": {
     "defaultMessage": "We recommend creating a backup before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them."
+  },
+  "instance.confirm-reinstall.warning-body-backup": {
+    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them."
   },
   "instance.confirm-repair.admonition-body": {
     "defaultMessage": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."

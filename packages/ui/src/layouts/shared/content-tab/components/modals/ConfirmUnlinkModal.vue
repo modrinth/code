@@ -86,11 +86,13 @@ const messages = defineMessages({
 	},
 	serverWarningBody: {
 		id: 'content.confirm-unlink.server-warning-body',
-		defaultMessage: 'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
+		defaultMessage:
+			'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
 	},
 	serverWarningBodyBackup: {
 		id: 'content.confirm-unlink.server-warning-body-backup',
-		defaultMessage: 'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
+		defaultMessage:
+			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
 	},
 	unlinkButton: {
 		id: 'content.confirm-unlink.unlink-button',

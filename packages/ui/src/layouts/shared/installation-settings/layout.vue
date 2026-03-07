@@ -523,8 +523,17 @@ const messages = defineMessages({
 			@version-hover="form.handleUpdaterVersionHover"
 		/>
 		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
-		<ConfirmReinstallModal ref="reinstallModal" :backup-link="ctx.backupLink" @reinstall="ctx.reinstallModpack()" />
-		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" :backup-link="ctx.backupLink" @unlink="ctx.unlinkModpack()" />
+		<ConfirmReinstallModal
+			ref="reinstallModal"
+			:backup-link="ctx.backupLink"
+			@reinstall="ctx.reinstallModpack()"
+		/>
+		<ConfirmUnlinkModal
+			ref="unlinkModal"
+			:server="ctx.isServer"
+			:backup-link="ctx.backupLink"
+			@unlink="ctx.unlinkModpack()"
+		/>
 
 		<slot name="extra-modals" />
 	</Teleport>

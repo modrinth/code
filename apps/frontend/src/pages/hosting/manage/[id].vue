@@ -777,12 +777,17 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			updateServerData({ status: 'installing' })
 		} else if (data.progress != null) {
 			hasSeenInstallProgress = true
-		} else if (data.progress == null && serverData.value.status === 'installing' && hasSeenInstallProgress) {
+		} else if (
+			data.progress == null &&
+			serverData.value.status === 'installing' &&
+			hasSeenInstallProgress
+		) {
 			debug('[id.vue] handleState: progress null + was installing, applying optimistic update')
 
 			// Apply optimistic update with user's chosen values (since handleInstallationResult may never fire)
 			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
-			if (newLoader.value) patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+			if (newLoader.value)
+				patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
 			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
 			if (newMCVersion.value) patch.mc_version = newMCVersion.value
 
@@ -986,7 +991,8 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 
 			// Optimistically update with the values the user chose during reset
 			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
-			if (newLoader.value) patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+			if (newLoader.value)
+				patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
 			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
 			if (newMCVersion.value) patch.mc_version = newMCVersion.value
 

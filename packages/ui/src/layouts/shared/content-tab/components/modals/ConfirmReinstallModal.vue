@@ -5,9 +5,7 @@
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<span class="text-primary">
-				<IntlFormatted
-					:message-id="backupLink ? messages.warningBodyBackup : messages.warningBody"
-				>
+				<IntlFormatted :message-id="backupLink ? messages.warningBodyBackup : messages.warningBody">
 					<template #backup="{ children }">
 						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
 							<component :is="() => children" />

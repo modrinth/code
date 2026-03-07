@@ -76,7 +76,11 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 						readyStateLabel: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][readyState],
 						type: (event as Event).type,
 					})
-					reject(new Error(`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`))
+					reject(
+						new Error(
+							`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
+						),
+					)
 				}
 			} catch (error) {
 				reject(error)

@@ -37,6 +37,7 @@ import { CompassIcon, ImportIcon } from '@modrinth/assets'
 import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+
 import { injectFilePicker, injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Combobox from '../../../base/Combobox.vue'
@@ -50,7 +51,10 @@ const filePicker = injectFilePicker()
 const searchLoading = ref(false)
 
 function proceedWithModpack() {
-	debug('proceedWithModpack:', { flowType: ctx.flowType, modpackSelection: ctx.modpackSelection.value })
+	debug('proceedWithModpack:', {
+		flowType: ctx.flowType,
+		modpackSelection: ctx.modpackSelection.value,
+	})
 	if (ctx.flowType === 'instance') {
 		ctx.finish()
 	} else {

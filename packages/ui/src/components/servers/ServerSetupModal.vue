@@ -31,6 +31,7 @@ import type { Archon, ModrinthApiError } from '@modrinth/api-client'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'

@@ -32,7 +32,7 @@ const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
 const props = defineProps<InstanceSettingsTabProps>()
-const emit = defineEmits<{
+const _emit = defineEmits<{
 	unlinked: []
 }>()
 

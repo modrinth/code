@@ -77,6 +77,7 @@
 import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+
 import { injectModrinthServerContext } from '../../../../providers/server-context'
 import AutoLink from '../../../base/AutoLink.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'

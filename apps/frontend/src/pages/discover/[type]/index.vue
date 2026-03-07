@@ -86,7 +86,7 @@ const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject)
 	prefetchTimeout.start()
 }
 
-const handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
+const _handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
 	const slug = result.slug || result.project_id
 
 	prefetchTimeout = useTimeoutFn(

@@ -707,7 +707,12 @@ provideContentManager({
 <template>
 	<ContentPageLayout>
 		<template #modals>
-			<ConfirmUnlinkModal ref="modpackUnlinkModal" server :backup-link="`/hosting/manage/${serverId}/backups`" @unlink="handleModpackUnlinkConfirm" />
+			<ConfirmUnlinkModal
+				ref="modpackUnlinkModal"
+				server
+				:backup-link="`/hosting/manage/${serverId}/backups`"
+				@unlink="handleModpackUnlinkConfirm"
+			/>
 			<ModpackContentModal
 				ref="modpackContentModal"
 				:modpack-name="modpack?.project.title"
