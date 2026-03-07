@@ -28,6 +28,15 @@ const ruleFollowing: Stage = {
 				},
 			],
 		} as ButtonAction,
+		{
+			id: 'paid_access_server',
+			type: 'button',
+			label: 'Paid access server',
+			weight: 0,
+			suggestedStatus: 'rejected',
+			severity: 'critical',
+			message: async () => (await import('../messages/paid-access-server.md?raw')).default,
+		},
 	],
 }
 

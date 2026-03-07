@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { getCategoryIcon } from '@modrinth/assets'
+import { getCategoryIcon, SERVER_CATEGORY_ICON_MAP } from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -8,70 +8,21 @@ import { defineMessage, useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
-const SERVER_CATEGORY_ICON_MAP: Record<string, string> = {
-	'adventure-mode': 'compass',
-	anarchy: 'skull',
-	'battle-royale': 'target',
-	bedwars: 'bed-double',
-	bosses: 'crown',
-	classes: 'badge',
-	competitive: 'trophy',
-	'creative-mode': 'palette',
-	'creator-community': 'clapperboard',
-	crossplay: 'gamepad-2',
-	'custom-content': 'blocks',
-	dungeons: 'castle',
-	factions: 'flag',
-	gens: 'pickaxe',
-	'hardcore-mode': 'heart-crack',
-	'keep-inventory': 'backpack',
-	kitpvp: 'sword',
-	lifesteal: 'heart-pulse',
-	media: 'film',
-	microgames: 'grid-3x3',
-	minigames: 'dices',
-	mmo: 'globe',
-	network: 'network',
-	'offline-mode': 'wifi-off',
-	oneblock: 'square',
-	op: 'zap',
-	parkour: 'footprints',
-	'personal-worlds': 'house',
-	plots: 'map-pinned',
-	pokemon: 'paw-print',
-	prison: 'lock',
-	pve: 'shield',
-	pvp: 'swords',
-	questing: 'scroll-text',
-	racing: 'gauge',
-	'recording-smp': 'camera',
-	roleplay: 'theater',
-	rpg: 'wand-sparkles',
-	skyblock: 'cloud',
-	smp: 'users',
-	'survival-mode': 'tree-pine',
-	teams: 'handshake',
-	technical: 'terminal',
-	towns: 'building-2',
-	whitelisted: 'badge-check',
-	'world-resets': 'refresh-ccw',
-}
-
 export const SERVER_REGIONS = {
-	us_east: defineMessage({ id: 'project.server.region.us_east', defaultMessage: 'US East' }),
-	us_west: defineMessage({ id: 'project.server.region.us_west', defaultMessage: 'US West' }),
-	europe: defineMessage({ id: 'project.server.region.europe', defaultMessage: 'Europe' }),
-	asia: defineMessage({ id: 'project.server.region.asia', defaultMessage: 'Asia' }),
-	australia: defineMessage({ id: 'project.server.region.australia', defaultMessage: 'Australia' }),
-	south_america: defineMessage({
-		id: 'project.server.region.south_america',
-		defaultMessage: 'South America',
-	}),
-	middle_east: defineMessage({
-		id: 'project.server.region.middle_east',
-		defaultMessage: 'Middle East',
-	}),
-	russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
+    us_east: defineMessage({ id: 'project.server.region.us_east', defaultMessage: 'US East' }),
+    us_west: defineMessage({ id: 'project.server.region.us_west', defaultMessage: 'US West' }),
+    europe: defineMessage({ id: 'project.server.region.europe', defaultMessage: 'Europe' }),
+    asia: defineMessage({ id: 'project.server.region.asia', defaultMessage: 'Asia' }),
+    australia: defineMessage({ id: 'project.server.region.australia', defaultMessage: 'Australia' }),
+    south_america: defineMessage({
+        id: 'project.server.region.south_america',
+        defaultMessage: 'South America',
+    }),
+    middle_east: defineMessage({
+        id: 'project.server.region.middle_east',
+        defaultMessage: 'Middle East',
+    }),
+    russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
 }
 
 const searchableLanguages = [

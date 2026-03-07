@@ -13,7 +13,7 @@
 			{{ project.description }}
 		</template>
 		<template #stats>
-			<div class="flex items-center gap-3">
+			<div class="flex items-center gap-3 flex-wrap gap-y-0">
 				<div
 					v-tooltip="
 						capitalizeString(

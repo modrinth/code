@@ -1,7 +1,7 @@
 <template>
-	<ContentPageHeader>
+	<ContentPageHeader disable-line-clamp>
 		<template #icon>
-			<Avatar :src="project.icon_url" :alt="project.title" size="96px" />
+			<Avatar :src="project.icon_url" :alt="project.title" size="108px" />
 		</template>
 		<template #title>
 			{{ project.title }}
@@ -15,6 +15,7 @@
 		<template #stats>
 			<div class="flex items-center gap-3 gap-y-1 flex-wrap">
 				<ServerDetails
+					v-if="projectV3?.status !== 'draft'"
 					:online-players="playersOnline"
 					:status-online="statusOnline"
 					:recent-plays="javaServer?.verified_plays_2w ?? 0"
@@ -24,7 +25,7 @@
 						<TagItem
 							v-for="(category, index) in project.categories"
 							:key="index"
-							:action="() => router.push(`/${project.project_type}s?f=categories:${category}`)"
+							:action="() => router.push(`/discover/servers?sc=${category}`)"
 						>
 							<FormattedTag :tag="category" />
 						</TagItem>

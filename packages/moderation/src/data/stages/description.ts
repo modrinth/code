@@ -17,7 +17,8 @@ const description: Stage = {
 			weight: 400,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/description/insufficient.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient.md?raw')).default,
 			relevantExtraInput: [
 				{
 					label: 'Please elaborate on how the author can improve their description.',
@@ -25,6 +26,11 @@ const description: Stage = {
 					large: true,
 					required: true,
 				},
+			],
+			disablesActions: [
+				'description_insufficient_packs',
+				'description_insufficient_projects',
+				'description_insufficient_servers',
 			],
 		} as ButtonAction,
 		{
@@ -34,9 +40,11 @@ const description: Stage = {
 			weight: 401,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			shouldShow: (project) => project.project_type === 'modpack',
+			shouldShow: (project, projectV3) =>
+				project.project_type === 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/description/insufficient-packs.md?raw')).default,
+				(await import('../messages/description/insufficient/insufficient-packs.md?raw')).default,
+			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_insufficient_projects',
@@ -45,9 +53,23 @@ const description: Stage = {
 			weight: 401,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			shouldShow: (project) => project.project_type !== 'modpack',
+			shouldShow: (project, projectV3) =>
+				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
 			message: async () =>
-				(await import('../messages/description/insufficient-projects.md?raw')).default,
+				(await import('../messages/description/insufficient/insufficient-projects.md?raw')).default,
+			disablesActions: ['description_insufficient'],
+		} as ButtonAction,
+		{
+			id: 'description_insufficient_servers',
+			type: 'button',
+			label: 'Insufficient',
+			weight: 401,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient-servers.md?raw')).default,
+			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_non_english',
@@ -56,7 +78,23 @@ const description: Stage = {
 			weight: 402,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/description/non-english.md?raw')).default,
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_java_server,
+			message: async () =>
+				(await import('../messages/description/accessability/non-english/non-english.md?raw'))
+					.default,
+		} as ButtonAction,
+		{
+			id: 'description_non_english-server',
+			type: 'button',
+			label: 'Non-english',
+			weight: 402,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
+			message: async () =>
+				(
+					await import('../messages/description/accessability/non-english/non-english-server.md?raw')
+				).default,
 		} as ButtonAction,
 		{
 			id: 'description_unfinished',
@@ -74,7 +112,8 @@ const description: Stage = {
 			weight: 404,
 			suggestedStatus: 'flagged',
 			severity: 'low',
-			message: async () => (await import('../messages/description/headers-as-body.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/accessability/headers-as-body.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_image_only',
@@ -83,7 +122,8 @@ const description: Stage = {
 			weight: 405,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
-			message: async () => (await import('../messages/description/image-only.md?raw')).default,
+			message: async () =>
+				(await import('../messages/description/accessability/image-only.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_non_standard_text',
@@ -93,7 +133,7 @@ const description: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
-				(await import('../messages/description/non-standard-text.md?raw')).default,
+				(await import('../messages/description/accessability/non-standard-text.md?raw')).default,
 		} as ButtonAction,
 		{
 			id: 'description_clarity',

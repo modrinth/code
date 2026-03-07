@@ -49,6 +49,14 @@ const projectTypeMessages = defineMessages({
 		id: 'project-type.server.plural',
 		defaultMessage: 'Servers',
 	},
+	minecraft_java_server: {
+		id: 'project-type.minecraft_java_server.singular',
+		defaultMessage: 'Server',
+	},
+	minecraft_java_servers: {
+		id: 'project-type.minecraft_java_server.plural',
+		defaultMessage: 'Servers',
+	},
 	shader: {
 		id: 'project-type.shader.singular',
 		defaultMessage: 'Shader',

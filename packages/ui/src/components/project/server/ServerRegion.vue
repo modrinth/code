@@ -19,5 +19,5 @@ const regionName = computed(() => {
 })
 </script>
 <template>
-	<TagItem>{{ regionName }}</TagItem>
+	<TagItem v-tooltip="`Server hosted in ${regionName}`">{{ regionName }}</TagItem>
 </template>
