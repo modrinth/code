@@ -90,7 +90,7 @@
     "defaultMessage": "Raccourcir les en-têtes"
   },
   "nags.minecraft-title-clause.description": {
-    "defaultMessage": "Les projets ne doivent pas utiliser la marque Minecraft ni inclure \"Minecraft\" comme élément principal du nom."
+    "defaultMessage": "Les projets ne doivent pas utiliser la marque Minecraft ni inclure « Minecraft » comme élément principal du nom."
   },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Éviter la violation de marque"

@@ -501,7 +501,7 @@
     "defaultMessage": "מפקח"
   },
   "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "צוות מודרינט"
+    "defaultMessage": "צוות Modrinth"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "בהמתנה"
@@ -718,6 +718,12 @@
   },
   "project.about.links.wiki": {
     "defaultMessage": "בקרו בויקי"
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "צד לקוח בלבד"
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "צד שרת בלבד"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "אנליטיקה"

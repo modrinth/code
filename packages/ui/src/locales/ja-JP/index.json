@@ -356,6 +356,9 @@
   "instances.updater-modal.warning.web": {
     "defaultMessage": "更新がワールドで安全である保証ができません。全ての中間更新ログを確認し、バックアップを検討してください。"
   },
+  "label.actions": {
+    "defaultMessage": "アクション"
+  },
   "label.available": {
     "defaultMessage": "{amount}つが利用可能。"
   },
@@ -584,14 +587,32 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "対応していません"
   },
+  "payment-method.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
+  },
+  "payment-method.card_display": {
+    "defaultMessage": "末尾 {last_four} の {card_brand}"
+  },
+  "payment-method.cashapp": {
+    "defaultMessage": "Cash App"
+  },
   "payment-method.charity": {
     "defaultMessage": "寄付"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "寄付"
   },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
   "payment-method.discover": {
     "defaultMessage": "発見"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
   },
   "payment-method.gift-card": {
     "defaultMessage": "ギフトカード"
@@ -607,6 +628,15 @@
   },
   "payment-method.paypal": {
     "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "不明な支払い方法"
   },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
@@ -1304,6 +1334,21 @@
   "settings.sessions.title": {
     "defaultMessage": "セッション"
   },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
   "tag.category.512x+": {
     "defaultMessage": "512x以上"
   },
@@ -1466,6 +1511,9 @@
   "tag.category.technology": {
     "defaultMessage": "技術"
   },
+  "tag.category.themed": {
+    "defaultMessage": "テーマ別"
+  },
   "tag.category.transportation": {
     "defaultMessage": "運送"
   },
@@ -1481,11 +1529,47 @@
   "tag.category.worldgen": {
     "defaultMessage": "ワールド生成"
   },
+  "tag.loader.babric": {
+    "defaultMessage": ""
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
   "tag.loader.datapack": {
     "defaultMessage": "データパック"
   },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
   "tag.loader.geyser": {
     "defaultMessage": "Geyser拡張機能"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Java Agent"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
   },
   "tag.loader.minecraft": {
     "defaultMessage": "リソースパック"
@@ -1495,6 +1579,45 @@
   },
   "tag.loader.mrpack": {
     "defaultMessage": "MODパック"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} {time, time, short}"

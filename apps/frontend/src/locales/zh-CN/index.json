@@ -24,7 +24,7 @@
     "message": "下载 RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "下载应用，请到 Flathub"
+    "message": "在 Flathub 上获取"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -192,7 +192,7 @@
     "message": "下载适用于 {os} 的 Modrinth App"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "一张截图，显示 Cobblemon 实例的主屏幕页面。"
+    "message": "Cobblemon 整合包主菜单屏幕截图。"
   },
   "app-marketing.hero.more-download-options": {
     "message": "更多下载选项"
@@ -1998,7 +1998,7 @@
     "message": "收藏夹"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {次下载}}"
+    "message": "{count}{count, plural, other {次下载}}"
   },
   "profile.label.joined": {
     "message": "加入于"

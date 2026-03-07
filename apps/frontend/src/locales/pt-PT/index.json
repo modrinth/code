@@ -1146,7 +1146,7 @@
     "message": "Começar"
   },
   "hosting-marketing.hero.button.manage-your-servers": {
-    "message": "Gerencie seus servidores"
+    "message": "Gere os teus servidores"
   },
   "hosting-marketing.hero.button.start-a-new-server": {
     "message": "Começar um novo servidor"
@@ -2283,7 +2283,7 @@
     "message": "Moderação"
   },
   "project.navigation.changelog": {
-    "message": "Alterações"
+    "message": "Lista de alterações"
   },
   "project.notification.icon-updated.message": {
     "message": "O ícone do teu projeto foi atualizado."
@@ -2793,7 +2793,7 @@
     "message": "Criar app"
   },
   "settings.applications.button.delete": {
-    "message": "Excluir"
+    "message": "Apagar"
   },
   "settings.applications.button.edit": {
     "message": "Editar"
@@ -2835,7 +2835,7 @@
     "message": "Insere a descrição da aplicação..."
   },
   "settings.applications.field.icon": {
-    "message": "Icone"
+    "message": "Ícone"
   },
   "settings.applications.field.name": {
     "message": "Nome"
@@ -2856,7 +2856,7 @@
     "message": "URL"
   },
   "settings.applications.field.url.placeholder": {
-    "message": "hhtps://example.com"
+    "message": "https://example.com"
   },
   "settings.applications.modal.header": {
     "message": "Informação da Aplicação"

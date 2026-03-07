@@ -393,7 +393,7 @@
     "message": "Nessun progetto nella raccolta"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>#</stat> {type}}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aggiornata {ago}"
@@ -555,7 +555,7 @@
     "message": "Crea nuova"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cerca fra le tue raccolte"
@@ -1272,7 +1272,7 @@
     "message": "Non disponibile"
   },
   "hosting.plan.select-plan": {
-    "message": "Scegli un piano"
+    "message": "Scegli questo piano"
   },
   "landing.button.discover-mods": {
     "message": "Esplora mod"
@@ -1998,7 +1998,7 @@
     "message": "Raccolta"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nessun} one {Un} other {#}} download"
+    "message": "{count, plural, =0 {Nessun} one {Un} other {{count}}} download"
   },
   "profile.label.joined": {
     "message": "Account creato"
@@ -2019,7 +2019,7 @@
     "message": "Organizzazioni"
   },
   "profile.label.projects": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -2031,7 +2031,7 @@
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {Nessun} one {<stat>Un</stat>} other {<stat>#</stat>}} follower del progetto"
+    "message": "<stat>{count, plural, =0 {Nessun} one {Un} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"

@@ -15,7 +15,7 @@
     "defaultMessage": "Dumagdag ng mga tumpak na link na nakatudla sa labas ng Modritnh, katulad ng source code, issue tracker, o isang anyaya sa Discord."
   },
   "nags.add-links.title": {
-    "defaultMessage": "Magdagdag ng mga external na link"
+    "defaultMessage": "Magdagdag ng link palabas"
   },
   "nags.all-tags-selected.description": {
     "defaultMessage": "Pinili mo ang lahat ng {totalAvailableTags, plural, one {# magagamit na tag} other {# na magagamit na tag}}. Pinapawalam-bisa lamang nito ang paggamit ng mga tag, kung saan naglalayong matulungang mahanap ng mga tagagamit ang mga tutumpak na proyekto. Mangyaring piliin lamang ang mga tag na tutumpak sa proyekto mo."
@@ -78,7 +78,7 @@
     "defaultMessage": "Maglagay ng wastong link ng lisensiya"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang paraan ng paglilihid ng link na maaaring tumuro sa link sa labas o ng lisensiya ay pinagbabawal, mangyaring gumamit lamang ng wastong buong taas na mga link."
+    "defaultMessage": "Ang paggamit ng pangikli ng link o iba pang paraan ng paglilihid ng link na maaaring tumuro sa link palabas o link ng lisensiya ay pinagbabawal, mangyaring gumamit lamang ng mga buong-ganapang taas na link."
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Huwag gumamit ng pangikli ng link"
@@ -192,10 +192,10 @@
     "defaultMessage": "Mag-upload ng bersiyon"
   },
   "nags.verify-external-links.description": {
-    "defaultMessage": "Ilan sa iyong mga link palabas ay maaaring gumagamit ng domain na hindi naaangkop sa uri ng link."
+    "defaultMessage": "Ang ilan sa iyong mga link palabas ay maaaring gumagamit ng domain na hindi naaangkop sa uri ng link."
   },
   "nags.verify-external-links.title": {
-    "defaultMessage": "Patunayan ang mga external na link"
+    "defaultMessage": "Patunayan ang mga link palabas"
   },
   "nags.versions.title": {
     "defaultMessage": "Bisitahin ang pahina ng mga bersiyon"

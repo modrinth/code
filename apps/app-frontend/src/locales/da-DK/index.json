@@ -32,6 +32,9 @@
   "app.modal.update-to-play.header": {
     "message": "Opdater for at spille"
   },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
   "app.modal.update-to-play.removed-count": {
     "message": "{count} fjernet"
   },

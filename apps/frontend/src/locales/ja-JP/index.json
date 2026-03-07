@@ -564,7 +564,7 @@
     "message": "コレクション"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
-    "message": "ダウンロード {formType}"
+    "message": "{formType} をダウンロード"
   },
   "dashboard.creator-tax-form-modal.confirmation.success": {
     "message": "{formType}の納税申告書類の提出が完了しました"
@@ -1235,6 +1235,30 @@
   "hosting-marketing.why.all-on-modrinth.description": {
     "message": "あなたのサーバー、MOD、プレイヤーなどはすべてModrinthにあります。プラットフォームを切り替える必要はありません。"
   },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "当社のインフラは過負荷になることがありません。つまり、Modrinthでホストされている各サーバーは常に最高のパフォーマンスで稼働します。"
+  },
+  "hosting-marketing.why.description": {
+    "message": "Modrinthの数千ものModpackから選ぶか、自分だけのModpackを作成しよう。プレイの準備ができたら、友達を招待しよう。"
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "モダンで信頼性の高いホスティングを体験"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hostingのサーバーは、<contrast>高性能AMD CPUおよびDDR5 RAM</contrast>を採用し、カスタムソフトウェアにより安定したパフォーマンスを提供します。"
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "なぜModrinth Hostingなのか？"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Vanilla、Fabric、Forge、Quilt、NeoForgeから選択してください。Modrinth上で動作するものは、あなたのサーバーでも実行可能です。"
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "品切れ"
+  },
+  "hosting.plan.select-plan": {
+    "message": "プランを選択"
+  },
   "landing.button.discover-mods": {
     "message": "modを探索する"
   },
@@ -1421,8 +1445,17 @@
   "layout.banner.build-fail.title": {
     "message": "ビルド時にAPIからステートを生成できませんでした。"
   },
+  "layout.banner.preview.description": {
+    "message": "公式のModrinthウェブサイトにアクセスしたい場合は、<link>https://modrinth.com</link> をご覧ください。このプレビュー環境はModrinthスタッフによるテスト目的で使用されています。<branch-link>{owner}/{branch}</branch-link> @ {commit} を基に構築されています。"
+  },
+  "layout.banner.preview.title": {
+    "message": "これはModrinthウェブサイトのプレビューデプロイです。"
+  },
   "layout.banner.staging.description": {
     "message": "ステージング環境は、本番のModrinthデータベースとは完全に分離されています。これはテストやデバッグ目的で使用され、本番環境よりも新しい、開発中のModrinthバックエンドやフロントエンドのバージョンで動作している可能性があります。"
+  },
+  "layout.banner.staging.title": {
+    "message": "Modrinthのステージング環境を表示しています。"
   },
   "layout.banner.subscription-payment-failed.button": {
     "message": "請求の情報を更新"
@@ -1432,6 +1465,9 @@
   },
   "layout.banner.tax.action": {
     "message": "納税申告書を記入"
+  },
+  "layout.banner.tax.description": {
+    "message": "Modrinthからの今年の引き出し額は、すでに{threshold}を超えています。税法を遵守するため、税務フォームを提出いただく必要があります。このフォームが提出されるまで、引き出しは一時停止されます。"
   },
   "layout.banner.tax.title": {
     "message": "納税申告書が必要"
@@ -1682,6 +1718,9 @@
   "muralpay.document-type.passport": {
     "message": "パスポート"
   },
+  "muralpay.document-type.resident-id": {
+    "message": "住民ID"
+  },
   "muralpay.document-type.ruc": {
     "message": "RUC"
   },
@@ -1706,8 +1745,14 @@
   "muralpay.field.bank-account-number": {
     "message": "口座番号"
   },
+  "muralpay.field.branch-code": {
+    "message": "ブレンチ番号"
+  },
   "muralpay.field.country": {
     "message": "国"
+  },
+  "muralpay.field.iban": {
+    "message": ""
   },
   "muralpay.field.phone-number": {
     "message": "電話番号"
@@ -1748,11 +1793,44 @@
   "muralpay.placeholder.wallet-address-eth": {
     "message": "0x..."
   },
+  "muralpay.rail.fiat-ars.name": {
+    "message": "銀行振込（ARS）"
+  },
+  "muralpay.rail.fiat-clp.name": {
+    "message": "銀行振込（CLP）"
+  },
+  "muralpay.rail.fiat-cop.name": {
+    "message": "銀行振込（COP）"
+  },
+  "muralpay.rail.fiat-crc.name": {
+    "message": "銀行振込（CRC）"
+  },
+  "muralpay.rail.fiat-eur.name": {
+    "message": "銀行振込（EUR）"
+  },
+  "muralpay.rail.fiat-mxn.name": {
+    "message": "銀行振込（MXN）"
+  },
+  "muralpay.rail.fiat-pen.name": {
+    "message": "銀行振込（PEN）"
+  },
+  "muralpay.rail.fiat-usd-peru.name": {
+    "message": "銀行振込（USD - Peru）"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "銀行振込（USD）"
+  },
+  "muralpay.rail.fiat-zar.name": {
+    "message": "銀行振込（ZAR）"
+  },
   "profile.bio.fallback.creator": {
     "message": "Modrinthの作成者。"
   },
   "profile.bio.fallback.user": {
     "message": "Modrinthのユーザー。"
+  },
+  "profile.button.edit-role": {
+    "message": "ロールを編集"
   },
   "profile.button.info": {
     "message": "ユーザー情報を表示"
@@ -1766,8 +1844,17 @@
   "profile.details.label.email-verified": {
     "message": "メールアドレス認証済み"
   },
+  "profile.details.tooltip.email-not-verified": {
+    "message": "メールアドレス未認証"
+  },
+  "profile.details.tooltip.email-verified": {
+    "message": "メールアドレス認証済み"
+  },
   "profile.error.not-found": {
     "message": "ユーザーが見つかりませんでした"
+  },
+  "profile.label.affiliate": {
+    "message": "アフィリエイト"
   },
   "profile.label.badges": {
     "message": "バッジ"
@@ -1823,11 +1910,23 @@
   "project-moderation-nags.required": {
     "message": "必須"
   },
+  "project-moderation-nags.resubmit-for-review": {
+    "message": "レビューを再提出する"
+  },
   "project-moderation-nags.resubmit-for-review-desc": {
     "message": "あなたのプロジェクトはModrinthのスタッフにより{status, select, rejected {却下} withheld {保留} other {{status}}}されました。ほとんどの場合、スタッフからのメッセージに対応した後、再審査を申請することができます。"
   },
+  "project-moderation-nags.submit-for-review": {
+    "message": "レビューを提出する"
+  },
   "project-moderation-nags.submit-for-review-button": {
     "message": "レビューを提出する"
+  },
+  "project-moderation-nags.suggestion": {
+    "message": "提案"
+  },
+  "project-moderation-nags.visit-moderation-page": {
+    "message": "モデレーションページを表示する"
   },
   "project-moderation-nags.warning": {
     "message": "警告"
@@ -1856,14 +1955,47 @@
   "project-type.modpack.singular": {
     "message": "Modパック"
   },
+  "project-type.plugin.plural": {
+    "message": "プラグイン"
+  },
+  "project-type.plugin.singular": {
+    "message": "プラグイン"
+  },
+  "project-type.project.plural": {
+    "message": "プロジェクト"
+  },
+  "project-type.project.singular": {
+    "message": "プロジェクト"
+  },
   "project-type.resourcepack.plural": {
+    "message": "リソースパック"
+  },
+  "project-type.resourcepack.singular": {
     "message": "リソースパック"
   },
   "project-type.shader.plural": {
     "message": "シェーダー"
   },
+  "project-type.shader.singular": {
+    "message": "シェーダー"
+  },
   "project.about.details.created": {
     "message": "{date}に作成"
+  },
+  "project.about.details.licensed": {
+    "message": "ライセンス: {license}"
+  },
+  "project.about.details.published": {
+    "message": "{date} に公開"
+  },
+  "project.about.details.submitted": {
+    "message": "提出時刻: {date}"
+  },
+  "project.about.details.title": {
+    "message": "詳細"
+  },
+  "project.about.details.updated": {
+    "message": "{date} に更新"
   },
   "project.actions.create-server": {
     "message": "サーバーを作成"
@@ -1874,8 +2006,14 @@
   "project.actions.dont-show-again": {
     "message": "再度表示しない"
   },
+  "project.actions.review-project": {
+    "message": "プロジェクトを評価"
+  },
   "project.actions.servers-promo.description": {
     "message": "Modrinth Hostingは手間を掛けず、簡単に友達と遊べます！"
+  },
+  "project.actions.servers-promo.pricing": {
+    "message": "{price}<small> / 月</small>から"
   },
   "project.actions.servers-promo.title": {
     "message": "サーバーを作成"
@@ -1885,6 +2023,12 @@
   },
   "project.collections.none-found": {
     "message": "コレクションを見つかりませんでした。"
+  },
+  "project.description.title": {
+    "message": "概要"
+  },
+  "project.details.licensed": {
+    "message": "ライセンス"
   },
   "project.download.game-version": {
     "message": "ゲームバージョン: {version}"
@@ -1901,11 +2045,23 @@
   "project.download.install-with-app": {
     "message": "Modrinth App でインストール"
   },
+  "project.download.no-app": {
+    "message": "Modrinthアプリをお持ちでないですか？"
+  },
+  "project.download.no-versions-available": {
+    "message": "{gameVersion} および {platform} 向けのバージョンは利用できません。"
+  },
   "project.download.platform": {
     "message": "プラットフォーム: {platform}"
   },
   "project.download.platform-error": {
     "message": "エラー: プラットフォームが見つかりませんq"
+  },
+  "project.download.platform-tooltip": {
+    "message": "{title}は{platform}でのみ利用可能です"
+  },
+  "project.download.platform-unsupported-tooltip": {
+    "message": "{title}は{gameVersion}の{platform}に対応していません"
   },
   "project.download.search-game-versions": {
     "message": "ゲームバージョンを検索..."
@@ -1934,8 +2090,14 @@
   "project.gallery.title": {
     "message": "ギャラリー"
   },
+  "project.license.loading": {
+    "message": "ライセンスの文を読み込み中"
+  },
   "project.license.title": {
     "message": "ライセンス"
+  },
+  "project.moderation.title": {
+    "message": "管理"
   },
   "project.navigation.changelog": {
     "message": "変更履歴"
@@ -1946,8 +2108,29 @@
   "project.notification.icon-updated.title": {
     "message": "プロジェクトアイコンが更新されました"
   },
+  "project.notification.updated.message": {
+    "message": "プロジェクトが更新されました。"
+  },
   "project.notification.updated.title": {
     "message": "プロジェクトが更新されました"
+  },
+  "project.settings.general.name.description": {
+    "message": "接頭辞、接尾辞、括弧書き、追加の説明は避けてください。プロジェクトの実際の名称のみを記載してください。"
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "例: Nether Overhaul 2"
+  },
+  "project.settings.general.name.placeholder.2": {
+    "message": "例: Construction Equipment"
+  },
+  "project.settings.general.name.placeholder.3": {
+    "message": "例: Beter than Caving"
+  },
+  "project.settings.general.name.placeholder.4": {
+    "message": "例: Enhanced Portals"
+  },
+  "project.settings.general.name.placeholder.5": {
+    "message": "例: Dangerous Mobs"
   },
   "project.settings.general.name.title": {
     "message": "名前"
@@ -1966,6 +2149,45 @@
   },
   "project.versions.title": {
     "message": "バージョン"
+  },
+  "report.already-reported": {
+    "message": "既に {title} をレポートしています"
+  },
+  "report.go-to-report": {
+    "message": "レポートする"
+  },
+  "report.not-for.bug-reports": {
+    "message": "バグの報告"
+  },
+  "report.not-for.bug-reports.description": {
+    "message": "バグの報告は、<issues-link>issue tracker</issues-link>にて行えます。"
+  },
+  "report.not-for.dmca": {
+    "message": "DMCAテイクダウン"
+  },
+  "report.not-for.dmca.description": {
+    "message": "<policy-link>著作権ポリシー</policy-link>をご覧ください。"
+  },
+  "scopes.analytics.description": {
+    "message": "アナリティクスデータにアクセス"
+  },
+  "scopes.category.analytics": {
+    "message": "アナリティクス"
+  },
+  "scopes.category.collections": {
+    "message": "コレクション"
+  },
+  "scopes.category.notifications": {
+    "message": "通知"
+  },
+  "scopes.category.organizations": {
+    "message": "組織"
+  },
+  "scopes.category.reports": {
+    "message": "レポート"
+  },
+  "scopes.category.threads": {
+    "message": "スレッド"
   },
   "scopes.collectionCreate.description": {
     "message": "コレクションを作成"
@@ -2003,6 +2225,12 @@
   "scopes.projectCreate.label": {
     "message": "プロジェクトの作成"
   },
+  "scopes.projectRead.description": {
+    "message": "あなたの全プロジェクトの読み取り"
+  },
+  "scopes.versionRead.description": {
+    "message": "全バージョンの読み取り"
+  },
   "servers.notice.id": {
     "message": "ID"
   },
@@ -2011,6 +2239,27 @@
   },
   "servers.plan.small.name": {
     "message": "少"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "このアプリケーションを完全に削除し、すべてのアクセストークンを無効化します。（この操作は元に戻せません！）"
+  },
+  "settings.applications.description.intro": {
+    "message": "アプリケーションを使用することで、Modrinthのユーザーをご自身の製品で認証できます。\n詳細については<docs-link>ModrinthのAPIドキュメント</docs-link>をご覧ください。"
+  },
+  "settings.applications.field.description": {
+    "message": "概要"
+  },
+  "settings.applications.field.icon": {
+    "message": "アイコン"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "アプリケーション名を入力…"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
   },
   "settings.billing.payment_method.card_expiry": {
     "message": "有効期限：{year}年{month}月"
@@ -2027,6 +2276,9 @@
   "settings.display.theme.title": {
     "message": "テーマ"
   },
+  "settings.pats.description": {
+    "message": "PATを使用してModrinth APIにアクセスできます。\n詳細は<doc-link>Modrinth APIドキュメント</doc-link>を参照してください。\nPATはいつでも作成・取り消し可能です。"
+  },
   "settings.pats.modal.create.action": {
     "message": "PATを作成"
   },
@@ -2042,11 +2294,29 @@
   "settings.pats.token.never-used": {
     "message": "未使用"
   },
+  "settings.profile.bio.description": {
+    "message": "あなたのことをみんなに知ってもらうための簡単な自己紹介。"
+  },
   "settings.profile.bio.title": {
     "message": "自己紹介"
   },
+  "settings.profile.description": {
+    "message": "あなたのプロフィール情報は、Modrinth上および<docs-link>Modrinth API</docs-link>を通じて一般公開されます。"
+  },
+  "settings.profile.profile-info": {
+    "message": "プロフィール情報"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "プロフィール写真"
+  },
+  "settings.profile.username.description": {
+    "message": "大文字・小文字を区別しない、プロフィールを識別するための固有の名前。"
+  },
   "settings.sessions.created-ago": {
     "message": "{ago}に作成"
+  },
+  "settings.sessions.description": {
+    "message": "現在、お使いのModrinthアカウントでログインしているデバイスは以下の通りです。各デバイスから個別にログアウトできます。\n\nもし覚えのないログイン履歴があった場合は、そのデバイスからログアウトし、すぐにModrinthアカウントのパスワードを変更してください。"
   },
   "settings.sessions.unknown-os": {
     "message": "不明なOS"

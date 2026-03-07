@@ -18,7 +18,7 @@
     "message": "這個伺服器需要模組才能遊玩。請點選安裝，以從 Modrinth 設定所需的檔案。"
   },
   "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} 今天與你共用了這個實例。"
+    "message": "{name} 今天與您共用了這個實例。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
@@ -84,16 +84,16 @@
     "message": "資源管理"
   },
   "app.update-toast.body": {
-    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在您關閉 Modrinth App 時自動更新。"
   },
   "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在您關閉 Modrinth App 時自動更新。"
   },
   "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} 現已推出。請使用你的套件管理員進行更新，以取得最新的功能與修正！"
+    "message": "Modrinth App v{version} 現已推出。請使用您的套件管理員進行更新，以取得最新的功能與修正！"
   },
   "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+    "message": "Modrinth App v{version} 現已推出！由於您正使用計量付費的網路，我們沒有自動下載它。"
   },
   "app.update-toast.changelog": {
     "message": "更新日誌"
@@ -135,7 +135,7 @@
     "message": "新增好友"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} 個好友邀請"
+    "message": "{count}個好友邀請"
   },
   "friends.add-friend.submit": {
     "message": "送出好友邀請"
@@ -150,7 +150,7 @@
     "message": "輸入 Modrinth 使用者名稱..."
   },
   "friends.add-friend.username.title": {
-    "message": "你好友的 Modrinth 使用者名稱是什麼？"
+    "message": "您好友的 Modrinth 使用者名稱是什麼？"
   },
   "friends.add-friends-to-share": {
     "message": "<link>新增好友</link>即可查看他們正在玩什麼！"
@@ -258,7 +258,7 @@
     "message": "刪除實例"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "這將從裝置上永久刪除實例，包含你的世界、設定與所有已安裝內容。請注意，一旦刪除，將無法復原。"
+    "message": "這將從裝置上永久刪除實例，包含您的世界、設定與所有已安裝內容。請注意，一旦刪除，將無法復原。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "刪除中..."
@@ -294,7 +294,7 @@
     "message": "建立新的群組"
   },
   "instance.settings.tabs.general.library-groups.description": {
-    "message": "實例庫群組讓你可以將實例整理到實例庫中的不同分類。"
+    "message": "實例庫群組讓您可以將實例整理到實例庫中的不同分類。"
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
     "message": "輸入群組名稱"

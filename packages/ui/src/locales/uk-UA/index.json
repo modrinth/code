@@ -111,7 +111,7 @@
     "defaultMessage": "Видалити"
   },
   "button.remove-image": {
-    "defaultMessage": "Вилучити зображення"
+    "defaultMessage": "Видалити зображення"
   },
   "button.report": {
     "defaultMessage": "Поскаржитися"
@@ -150,7 +150,7 @@
     "defaultMessage": "Оновити"
   },
   "button.upload-image": {
-    "defaultMessage": "Завантажити фото"
+    "defaultMessage": "Завантажити зображення"
   },
   "changelog.justNow": {
     "defaultMessage": "Щойно"
@@ -339,7 +339,7 @@
     "defaultMessage": "Версій не знайдено"
   },
   "instances.updater-modal.search-placeholder": {
-    "defaultMessage": "Пошук версій…"
+    "defaultMessage": "Пошук версії…"
   },
   "instances.updater-modal.select-version": {
     "defaultMessage": "Виберіть версію, щоб переглянути її журнал змін"
@@ -549,7 +549,7 @@
     "defaultMessage": "Повернено"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Успіх"
+    "defaultMessage": "Пройдено"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Заплановано"
@@ -810,7 +810,7 @@
     "defaultMessage": "Підтримати на PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Сповістити про проблеми"
+    "defaultMessage": "Звітувати проблеми"
   },
   "project.about.links.source": {
     "defaultMessage": "Вихідний код"
@@ -1290,7 +1290,7 @@
     "defaultMessage": "Ретро"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Синхронізувати з системою"
+    "defaultMessage": "Системна"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Колірна тема"

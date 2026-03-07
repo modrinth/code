@@ -351,7 +351,7 @@
     "defaultMessage": "Zaktualizuj do v{version}"
   },
   "instances.updater-modal.warning.app": {
-    "defaultMessage": ""
+    "defaultMessage": "Nie możemy zapewnić, że aktualizacje są bezpieczne dla twojej instalacji. Przejrzyj dziennik zmian wszystkich wersji między starą a aktualną i rozważ zrobienie kopii zapasowej."
   },
   "instances.updater-modal.warning.web": {
     "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twoich światów. Przejrzyj dzienniki zmian dla wszystkich wersji między starą a aktualną i rozważ zrobienie kopii zapasowej."
@@ -756,7 +756,7 @@
     "defaultMessage": "Tryb jednoosobowy"
   },
   "project.about.compatibility.environments.singleplayer-only": {
-    "defaultMessage": "Tylko w trybie jednoosobowym"
+    "defaultMessage": "Tylko tryb jednoosobowy"
   },
   "project.about.compatibility.game.minecraftJava": {
     "defaultMessage": "Minecraft: Java Edition"
@@ -876,7 +876,7 @@
     "defaultMessage": "Działa tylko w trybie jednoosobowym albo kiedy nie ma połączenia z serwerem."
   },
   "project.environment.singleplayer-only.title": {
-    "defaultMessage": "Tylko w trybie jednoosobowym"
+    "defaultMessage": "Tylko tryb jednoosobowy"
   },
   "project.environment.tag.not-applicable": {
     "defaultMessage": "Nie dotyczy"
@@ -966,7 +966,7 @@
     "defaultMessage": "Działa tylko w trybie dla jednego gracza lub gdy nie ma połączenia z serwerem."
   },
   "project.settings.environment.singleplayer.title": {
-    "defaultMessage": "Tylko dla jednego gracza"
+    "defaultMessage": "Tylko tryb jednoosobowy"
   },
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"

@@ -18,13 +18,13 @@
     "defaultMessage": "新增外部連結"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你已選取了全部 {totalAvailableTags} 個可用標籤。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+    "defaultMessage": "您已選取了全部共{totalAvailableTags}個可用標籤。這違背了標籤的初衷，標籤是為了在幫助使用者找到相關專案。請僅選取與您的專案相關的標籤。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "選取準確的標籤"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述目前只有 {length} 個字元。建議至少達到 {minChars} 個字元，才能寫出一段既實用又吸引人的摘要。"
+    "defaultMessage": "您的描述目前只有{length}個字元。建議至少達到{minChars}個字元，才能寫出一段既實用又吸引人的摘要。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -45,7 +45,7 @@
     "defaultMessage": "編輯標題"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "精選圖庫圖片通常是你的專案給人留下第一印象的關鍵。"
+    "defaultMessage": "精選圖庫圖片通常是您的專案給人留下第一印象的關鍵。"
   },
   "nags.feature-gallery-image.title": {
     "defaultMessage": "精選圖庫圖片"
@@ -54,7 +54,7 @@
     "defaultMessage": "前往圖庫頁面"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "你的{type, select, mod {模組} plugin {插件} other {專案}}使用了要求必須公開原始碼的授權條款。請為每個額外版本提供原始碼連結或原始碼檔案，或者考慮使用不同的授權條款。"
+    "defaultMessage": "您的{type, select, mod {模組} plugin {插件} other {專案}}使用了要求必須公開原始碼的授權條款。請為每個額外版本提供原始碼連結或原始碼檔案，或者考慮使用不同的授權條款。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
@@ -69,22 +69,22 @@
     "defaultMessage": "授權條款網址無效。"
   },
   "nags.invalid-license-url.description.domain": {
-    "defaultMessage": "你的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到你的授權條款檔案，而非社群媒體、遊戲平臺等。"
+    "defaultMessage": "您的授權條款網址指向 {domain}，這不適合用來提供授權條款資訊。授權條款網址應直接連結到您的授權條款檔案，而非社群媒體、遊戲平臺等。"
   },
   "nags.invalid-license-url.description.malformed": {
-    "defaultMessage": "你的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"
+    "defaultMessage": "您的授權條款網址似乎格式不正確。請提供有效的授權條款網址。"
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "新增有效授權條款連結"
   },
   "nags.link-shortener-usage.description": {
-    "defaultMessage": "禁止在你的外部連結或授權條款連結中使用短網址或其他方法來隱藏連結的實際指向，請只使用適當的完整連結。"
+    "defaultMessage": "禁止在您的外部連結或授權條款連結中使用短網址或其他方法來隱藏連結的實際指向，請只使用適當的完整連結。"
   },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count} 個標題字數過多。標題的作用是作為區塊標題，應保持簡潔，避免使用完整的長句子。"
+    "defaultMessage": "您的標題字數過多 (共 {count} 個字)。標題的作用是作為區塊標題，應保持簡潔，避免使用完整的長句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "標題請簡短扼要"
@@ -96,13 +96,13 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "你的部分圖片缺少替代文字，這對協助工具（尤其是視障使用者）來說非常重要。"
+    "defaultMessage": "您的部分圖片缺少替代文字，這對協助工具（尤其是視障使用者）來說非常重要。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
   },
   "nags.misused-discord-link-description": {
-    "defaultMessage": "Discord 邀請連結不可用於其他連結類型。請只將你的 Discord 連結放至 Discord 邀請連結欄位。"
+    "defaultMessage": "Discord 邀請連結不可用於其他連結類型。請只將您的 Discord 連結放至 Discord 邀請連結欄位。"
   },
   "nags.misused-discord-link.title": {
     "defaultMessage": "移動 Discord 邀請連結"
@@ -117,19 +117,19 @@
     "defaultMessage": "檢查回饋"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你已選取了 {count} 個解析度標籤 ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
+    "defaultMessage": "您已選取了 {count} 個解析度標籤 ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
   },
   "nags.select-license.description": {
-    "defaultMessage": "選擇你的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
+    "defaultMessage": "選擇您的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
   },
   "nags.select-license.title": {
     "defaultMessage": "選擇授權條款"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "請選擇適用於你的專案的正確標籤，以協助目標使用者找到它。"
+    "defaultMessage": "請選擇適用於您的專案的正確標籤，以協助目標使用者找到它。"
   },
   "nags.select-tags.title": {
     "defaultMessage": "選擇標籤"
@@ -150,7 +150,7 @@
     "defaultMessage": "前往一般設定"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "你的摘要不能與你的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
+    "defaultMessage": "您的摘要不能與您的專案名稱相同。撰寫一段既實用又吸引人的摘要非常重要。"
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "讓摘要與眾不同"

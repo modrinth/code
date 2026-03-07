@@ -30,19 +30,19 @@
     "defaultMessage": "Verleng de beschrijving"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "Pas beschrijving aan"
+    "defaultMessage": "Pas de beschrijving aan"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Pas licentie aan"
+    "defaultMessage": "Pas de licentie aan"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Pas samenvatting aan"
+    "defaultMessage": "Pas de samenvatting aan"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Pas tags aan"
+    "defaultMessage": "Pas de tags aan"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Pas titel aan"
+    "defaultMessage": "Pas de titel aan"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "De uitgelichte galerij foto is hoe vaak je project zijn eerste indruk maakt."
@@ -51,7 +51,7 @@
     "defaultMessage": "Licht een foto uit"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Bezoek galerij pagina"
+    "defaultMessage": "Bezoek de galerij pagina"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
