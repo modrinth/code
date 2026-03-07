@@ -293,7 +293,7 @@ export function useServerSearch(opts: {
 						id: 'online',
 						formatted_name: formatMessage(
 							defineMessage({
-								id: 'search.server_status.online',
+								id: 'project.server.status.online',
 								defaultMessage: 'Online',
 							}),
 						),
@@ -304,7 +304,7 @@ export function useServerSearch(opts: {
 						id: 'offline',
 						formatted_name: formatMessage(
 							defineMessage({
-								id: 'search.server_status.offline',
+								id: 'project.server.status.offline',
 								defaultMessage: 'Offline',
 							}),
 						),

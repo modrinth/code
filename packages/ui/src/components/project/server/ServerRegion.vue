@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useVIntl } from '../../../composables'
+import { defineMessage, useVIntl } from '../../../composables'
 import { SERVER_REGIONS } from '../../../utils'
 import { TagItem } from '../../base'
 
@@ -11,6 +11,11 @@ const { region } = defineProps<{
 
 const { formatMessage } = useVIntl()
 
+const tooltip = defineMessage({
+	id: 'project.server.region.tooltip',
+	defaultMessage: 'Server hosted in {regionName}',
+})
+
 const regionName = computed(() => {
 	const name = SERVER_REGIONS[region]
 	if (name) return formatMessage(name)
@@ -19,5 +24,5 @@ const regionName = computed(() => {
 })
 </script>
 <template>
-	<TagItem v-tooltip="`Server hosted in ${regionName}`">{{ regionName }}</TagItem>
+	<TagItem v-tooltip="formatMessage(tooltip, { regionName })">{{ regionName }}</TagItem>
 </template>

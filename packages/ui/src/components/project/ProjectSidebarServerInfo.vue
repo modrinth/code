@@ -4,7 +4,7 @@
 
 		<div
 			v-if="ipAddress"
-			v-tooltip="`Copy Java IP: ${ipAddress}`"
+			v-tooltip="formatMessage(messages.ipTooltip, { ipAddress })"
 			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all active:scale-95"
 			@click="handleCopyIP"
 		>
@@ -17,7 +17,7 @@
 		</div>
 
 		<section v-if="requiredContent" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Required content</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.requiredContent) }}</h3>
 			<ServerModpackContentCard
 				:name="requiredContent.name"
 				:version-number="requiredContent.versionNumber ?? ''"
@@ -29,14 +29,16 @@
 			/>
 		</section>
 		<section v-if="recommendedVersions.length" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Minecraft: Java Edition</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem
 					v-for="version in formatVersionsForDisplay(recommendedVersions, tags.gameVersions)"
 					:key="`recommended-tag-${version}`"
 				>
 					{{ version }}
-					<template v-if="supportedVersions.length > 0"> (Recommended) </template>
+					<template v-if="supportedVersions.length > 0">
+						{{ formatMessage(messages.recommendedVersion) }}
+					</template>
 				</TagItem>
 				<TagItem
 					v-for="version in formatVersionsForDisplay(supportedVersionsList, tags.gameVersions)"
@@ -56,7 +58,7 @@
 			</div>
 		</section>
 		<section v-if="props.ping !== undefined || region" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Region</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.region) }}</h3>
 			<div class="flex flex-wrap gap-1.5 items-center">
 				<ServerPing
 					v-if="projectV3?.status !== 'draft'"
@@ -67,7 +69,7 @@
 			</div>
 		</section>
 		<section v-if="languages.length > 0" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">Languages</h3>
+			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.languages) }}</h3>
 			<div class="flex flex-wrap gap-1.5">
 				<TagItem v-for="language in languages" :key="`${language}`">
 					{{ SERVER_LANGUAGES[language] ? formatMessage(SERVER_LANGUAGES[language]) : language }}
@@ -185,9 +187,29 @@ const messages = defineMessages({
 		id: `project.about.server.title`,
 		defaultMessage: 'Server details',
 	},
-	latency: {
-		id: `project.about.server.latency`,
-		defaultMessage: 'Latency',
+	ipTooltip: {
+		id: `project.about.server.ip.tooltip`,
+		defaultMessage: 'Copy Java IP: {ipAddress}',
+	},
+	requiredContent: {
+		id: `project.about.server.requiredContent`,
+		defaultMessage: 'Required content',
+	},
+	minecraftJava: {
+		id: `project.about.compatibility.game.minecraftJava`,
+		defaultMessage: 'Minecraft: Java Edition',
+	},
+	recommendedVersion: {
+		id: `project.about.server.recommendedVersion`,
+		defaultMessage: '(Recommended)',
+	},
+	region: {
+		id: `project.about.server.region`,
+		defaultMessage: 'Region',
+	},
+	languages: {
+		id: `project.about.server.languages`,
+		defaultMessage: 'Languages',
 	},
 })
 </script>

@@ -329,9 +329,6 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Unlink modpack"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Back"
-  },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copy link"
   },
@@ -556,9 +553,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Keep files updated when the server changes"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Close"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Get Modrinth App"
@@ -839,6 +833,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibility"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organization"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Project owner"
   },
@@ -905,11 +902,29 @@
   "project.about.server.copiedText": {
     "defaultMessage": "IP address copied to clipboard"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Latency"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Download modpack"
+  },
+  "project.about.server.ip.tooltip": {
+    "defaultMessage": "Copy Java IP: {ipAddress}"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Languages"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Recommended)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Region"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Required content"
   },
   "project.about.server.title": {
     "defaultMessage": "Server details"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Tags"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
@@ -988,6 +1003,9 @@
   },
   "project.recent-plays": {
     "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
+  },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "This project uses a custom modpack"
   },
   "project.server.language.ar": {
     "defaultMessage": "Arabic"
@@ -1127,11 +1145,23 @@
   "project.server.region.south_america": {
     "defaultMessage": "South America"
   },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Server hosted in {regionName}"
+  },
   "project.server.region.us_east": {
     "defaultMessage": "US East"
   },
   "project.server.region.us_west": {
     "defaultMessage": "US West"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Server is offline"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
@@ -1387,12 +1417,6 @@
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
-  },
-  "search.server_status.offline": {
-    "defaultMessage": "Offline"
-  },
-  "search.server_status.online": {
-    "defaultMessage": "Online"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
