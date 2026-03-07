@@ -147,10 +147,10 @@
     "defaultMessage": "Select compatibility"
   },
   "nags.select-country.description": {
-    "defaultMessage": "Let players know what country your server is located in."
+    "defaultMessage": "Let players know what region your server is located in."
   },
   "nags.select-country.title": {
-    "defaultMessage": "Select a country"
+    "defaultMessage": "Select a region"
   },
   "nags.select-language.description": {
     "defaultMessage": "List the language or languages supported by your server."
