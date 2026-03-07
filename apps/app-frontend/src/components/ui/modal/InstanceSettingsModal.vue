@@ -32,8 +32,12 @@ import type { InstanceSettingsTabProps } from '../../../helpers/types'
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
 const isMinecraftServer = ref(false)
+const handleUnlinked = () => emit('unlinked')
 
 watch(
 	() => props.instance,
@@ -121,7 +125,14 @@ defineExpose({ show })
 
 		<TabbedModal
 			:tabs="
-				tabs.map((tab) => ({ ...tab, props: { ...props, isMinecraftServer: isMinecraftServer } }))
+				tabs.map((tab) => ({
+					...tab,
+					props: {
+						...props,
+						isMinecraftServer,
+						onUnlinked: handleUnlinked,
+					},
+				}))
 			"
 		/>
 	</ModalWrapper>

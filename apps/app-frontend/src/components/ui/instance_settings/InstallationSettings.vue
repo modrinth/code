@@ -49,6 +49,9 @@ const modalConfirmUnpair = ref()
 const modalConfirmReinstall = ref()
 
 const props = defineProps<InstanceSettingsTabProps>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
 const loader = ref(props.instance.loader)
 const gameVersion = ref(props.instance.game_version)
@@ -273,7 +276,7 @@ async function unpairProfile() {
 	modpackProject.value = null
 	modpackVersion.value = null
 	modpackVersions.value = null
-	modalConfirmUnpair.value.hide()
+	emit('unlinked')
 }
 
 async function repairModpack() {
