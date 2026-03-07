@@ -1,6 +1,6 @@
 <template>
 	<div v-if="allTags.length > 0" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">Tags</h2>
+		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-wrap gap-1">
 			<TagItem
 				v-for="tag in allTags"
@@ -16,6 +16,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { defineMessages, useVIntl } from '../../composables'
 import FormattedTag from '../base/FormattedTag.vue'
 import TagItem from '../base/TagItem.vue'
 
@@ -41,6 +42,15 @@ const props = defineProps<{
 		actualProjectType?: string
 	}
 }>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	title: {
+		id: 'project.about.tags.title',
+		defaultMessage: 'Tags',
+	},
+})
 
 const allTags = computed(() => [
 	...props.project.categories,

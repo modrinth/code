@@ -168,12 +168,16 @@ import {
 	injectProjectPageContext,
 	StyledInput,
 	UnsavedChangesPopup,
+	useVIntl,
 } from '@modrinth/ui'
+import { SERVER_LANGUAGES, SERVER_REGIONS } from '@modrinth/ui/src/utils/server-search.ts'
 import { Multiselect } from 'vue-multiselect'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const PING_TIMEOUT_MS = 5000
+
+const { formatMessage, locale } = useVIntl()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -262,58 +266,31 @@ if (projectV3.value) {
 	)
 }
 
-const regionOptions = [
-	{ value: 'us_east', label: 'US East' },
-	{ value: 'us_west', label: 'US West' },
-	{ value: 'europe', label: 'Europe' },
-	{ value: 'asia', label: 'Asia' },
-	{ value: 'australia', label: 'Australia' },
-	{ value: 'south_america', label: 'South America' },
-	{ value: 'middle_east', label: 'Middle East' },
-	{ value: 'russia', label: 'Russia' },
-]
+const regionOptions = computed(() =>
+	Object.entries(SERVER_REGIONS)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
-const languageOptions = [
-	{ value: 'en', label: 'English' },
-	{ value: 'es', label: 'Spanish' },
-	{ value: 'pt', label: 'Portuguese' },
-	{ value: 'fr', label: 'French' },
-	{ value: 'de', label: 'German' },
-	{ value: 'it', label: 'Italian' },
-	{ value: 'nl', label: 'Dutch' },
-	{ value: 'ru', label: 'Russian' },
-	{ value: 'uk', label: 'Ukrainian' },
-	{ value: 'pl', label: 'Polish' },
-	{ value: 'cs', label: 'Czech' },
-	{ value: 'sk', label: 'Slovak' },
-	{ value: 'hu', label: 'Hungarian' },
-	{ value: 'ro', label: 'Romanian' },
-	{ value: 'bg', label: 'Bulgarian' },
-	{ value: 'hr', label: 'Croatian' },
-	{ value: 'sr', label: 'Serbian' },
-	{ value: 'el', label: 'Greek' },
-	{ value: 'tr', label: 'Turkish' },
-	{ value: 'ar', label: 'Arabic' },
-	{ value: 'he', label: 'Hebrew' },
-	{ value: 'hi', label: 'Hindi' },
-	{ value: 'bn', label: 'Bengali' },
-	{ value: 'ur', label: 'Urdu' },
-	{ value: 'zh', label: 'Chinese' },
-	{ value: 'ja', label: 'Japanese' },
-	{ value: 'ko', label: 'Korean' },
-	{ value: 'th', label: 'Thai' },
-	{ value: 'vi', label: 'Vietnamese' },
-	{ value: 'id', label: 'Indonesian' },
-	{ value: 'ms', label: 'Malay' },
-	{ value: 'tl', label: 'Filipino' },
-	{ value: 'sv', label: 'Swedish' },
-	{ value: 'no', label: 'Norwegian' },
-	{ value: 'da', label: 'Danish' },
-	{ value: 'fi', label: 'Finnish' },
-	{ value: 'lt', label: 'Lithuanian' },
-	{ value: 'lv', label: 'Latvian' },
-	{ value: 'et', label: 'Estonian' },
-]
+const languageOptions = computed(() =>
+	Object.entries(SERVER_LANGUAGES)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =

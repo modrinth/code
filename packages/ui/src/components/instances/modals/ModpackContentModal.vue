@@ -68,10 +68,6 @@ const messages = defineMessages({
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
-	backButton: {
-		id: 'instances.modpack-content-modal.back-button',
-		defaultMessage: 'Back',
-	},
 	allFilter: {
 		id: 'instances.modpack-content-modal.filter-all',
 		defaultMessage: 'All',
