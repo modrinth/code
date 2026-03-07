@@ -14,12 +14,15 @@ pub mod cache;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";
 const VIEWS_NAMESPACE: &str = "views";
+const MINECRAFT_SERVER_PLAYS_NAMESPACE: &str = "minecraft_server_plays";
+const MINECRAFT_SERVER_PLAYS_EXPIRY: u64 = 86_400; // 24 hours
+const MINECRAFT_SERVER_PLAYS_LIMIT: u32 = 5;
 
 pub struct AnalyticsQueue {
     views_queue: DashMap<(u64, u64), Vec<PageView>>,
     downloads_queue: DashMap<(u64, u64), Download>,
     playtime_queue: DashSet<Playtime>,
-    minecraft_server_plays_queue: DashSet<MinecraftServerPlay>,
+    minecraft_server_plays_queue: DashMap<(u64, u64), MinecraftServerPlay>,
     affiliate_code_clicks_queue: DashMap<(u64, u64), Vec<AffiliateCodeClick>>,
 }
 
@@ -36,7 +39,7 @@ impl AnalyticsQueue {
             views_queue: DashMap::with_capacity(1000),
             downloads_queue: DashMap::with_capacity(1000),
             playtime_queue: DashSet::with_capacity(1000),
-            minecraft_server_plays_queue: DashSet::with_capacity(1000),
+            minecraft_server_plays_queue: DashMap::with_capacity(1000),
             affiliate_code_clicks_queue: DashMap::with_capacity(1000),
         }
     }
@@ -60,7 +63,9 @@ impl AnalyticsQueue {
     }
 
     pub fn add_minecraft_server_play(&self, play: MinecraftServerPlay) {
-        self.minecraft_server_plays_queue.insert(play);
+        let ip_stripped = crate::util::ip::strip_ip(play.ip);
+        self.minecraft_server_plays_queue
+            .insert((ip_stripped, play.project_id), play);
     }
 
     pub fn add_affiliate_code_click(&self, click: AffiliateCodeClick) {
@@ -118,11 +123,67 @@ impl AnalyticsQueue {
         }
 
         if !minecraft_server_plays_queue.is_empty() {
+            let mut plays_keys = Vec::new();
+            let raw_plays = DashMap::new();
+
+            for (index, (key, play)) in
+                minecraft_server_plays_queue.into_iter().enumerate()
+            {
+                plays_keys.push(key);
+                raw_plays.insert(index, play);
+            }
+
+            let mut redis =
+                redis.pool.get().await.map_err(DatabaseError::RedisPool)?;
+
+            let results = cmd("MGET")
+                .arg(
+                    plays_keys
+                        .iter()
+                        .map(|x| {
+                            format!(
+                                "{}:{}-{}",
+                                MINECRAFT_SERVER_PLAYS_NAMESPACE, x.0, x.1
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<Vec<Option<u32>>>(&mut redis)
+                .await
+                .map_err(DatabaseError::CacheError)?;
+
+            let mut pipe = redis::pipe();
+            for (idx, count) in results.into_iter().enumerate() {
+                let key = &plays_keys[idx];
+
+                let new_count = if let Some(count) = count {
+                    if count >= MINECRAFT_SERVER_PLAYS_LIMIT {
+                        raw_plays.remove(&idx);
+                        continue;
+                    }
+                    count + 1
+                } else {
+                    1
+                };
+
+                pipe.atomic().set_ex(
+                    format!(
+                        "{}:{}-{}",
+                        MINECRAFT_SERVER_PLAYS_NAMESPACE, key.0, key.1
+                    ),
+                    new_count,
+                    MINECRAFT_SERVER_PLAYS_EXPIRY,
+                );
+            }
+            pipe.query_async::<()>(&mut *redis)
+                .await
+                .map_err(DatabaseError::CacheError)?;
+
             let mut plays = client
                 .insert::<MinecraftServerPlay>(MINECRAFT_SERVER_PLAYS)
                 .await?;
 
-            for play in minecraft_server_plays_queue {
+            for (_, play) in raw_plays {
                 plays.write(&play).await?;
             }
 

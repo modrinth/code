@@ -1,6 +1,7 @@
 use crate::auth::get_user_from_headers;
-use crate::database::PgPool;
+use crate::database::models::DBProject;
 use crate::database::redis::RedisPool;
+use crate::database::PgPool;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
 use crate::models::ids::ProjectId;
@@ -262,11 +263,41 @@ async fn minecraft_server_play_ingest(
     .ok();
 
     let project_id = play_input.project_id;
+
+    if DBProject::get(&project_id.to_string(), &**pool, &redis)
+        .await?
+        .is_none()
+    {
+        return Err(ApiError::NotFound);
+    }
+
+    let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
+    let headers = req
+        .headers()
+        .into_iter()
+        .map(|(key, val)| {
+            (
+                key.to_string().to_lowercase(),
+                val.to_str().unwrap_or_default().to_string(),
+            )
+        })
+        .collect::<HashMap<String, String>>();
+
+    let ip = crate::util::ip::convert_to_ip_v6(
+        if let Some(header) = headers.get("cf-connecting-ip") {
+            header
+        } else {
+            conn_info.as_deref().unwrap_or_default()
+        },
+    )
+    .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
+
     let row = MinecraftServerPlay {
         recorded: get_current_tenths_of_ms(),
         user_id: user.map(|u| u.id.0).unwrap_or(0),
         project_id: project_id.0,
         minecraft_uuid: play_input.minecraft_uuid,
+        ip,
     };
 
     analytics_queue.add_minecraft_server_play(row);

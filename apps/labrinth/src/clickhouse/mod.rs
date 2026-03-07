@@ -221,6 +221,16 @@ pub async fn init_client_with_database(
     client
         .query(&format!(
             "
+            ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS ip IPv6 DEFAULT toIPv6('::')
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
             ALTER TABLE {database}.{MINECRAFT_JAVA_SERVER_PINGS} {cluster_line}
             DROP COLUMN IF EXISTS port
             "
