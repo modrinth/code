@@ -57,14 +57,30 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 				}
 
 				ws.onclose = (event) => {
+					console.debug(`[WebSocket] Closed for server ${serverId}:`, {
+						code: event.code,
+						reason: event.reason,
+						wasClean: event.wasClean,
+					})
 					if (event.code !== NORMAL_CLOSURE) {
 						this.scheduleReconnect(serverId, auth)
 					}
 				}
 
-				ws.onerror = (error) => {
-					console.error(`[WebSocket] Error for server ${serverId}:`, error)
-					reject(new Error(`WebSocket connection failed for server ${serverId}`))
+				ws.onerror = (event) => {
+					const url = ws.url
+					const readyState = ws.readyState
+					console.error(`[WebSocket] Error for server ${serverId}:`, {
+						url,
+						readyState,
+						readyStateLabel: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][readyState],
+						type: (event as Event).type,
+					})
+					reject(
+						new Error(
+							`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
+						),
+					)
 				}
 			} catch (error) {
 				reject(error)

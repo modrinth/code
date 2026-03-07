@@ -146,7 +146,7 @@ import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
-import { useInstall } from '@/store/install.js'
+import { injectServerInstall } from '@/providers/server-install'
 
 type Dependency = Labrinth.Versions.v3.Dependency
 type Version = Labrinth.Versions.v2.Version
@@ -186,7 +186,7 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
-const installStore = useInstall()
+const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -353,7 +353,7 @@ watch(
 async function handleUpdate() {
 	hide()
 	const serverProjectId = instance.value?.linked_data?.project_id
-	if (serverProjectId) installStore.startInstallingServer(serverProjectId)
+	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
 		if (modpackVersionId.value && instance.value) {
 			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
@@ -362,7 +362,7 @@ async function handleUpdate() {
 	} catch (error) {
 		console.error('Error updating instance:', error)
 	} finally {
-		if (serverProjectId) installStore.stopInstallingServer(serverProjectId)
+		if (serverProjectId) stopInstallingServer(serverProjectId)
 	}
 }
 

@@ -1,8 +1,10 @@
 <template>
-	<div class="chips">
+	<div class="chips" role="radiogroup" :aria-label="ariaLabel">
 		<Button
 			v-for="item in items"
 			:key="formatLabel(item)"
+			role="radio"
+			:aria-checked="selected === item"
 			class="btn !brightness-100 hover:!brightness-125"
 			:class="{
 				selected: selected === item,
@@ -29,6 +31,7 @@ const props = withDefaults(
 		neverEmpty?: boolean
 		capitalize?: boolean
 		size?: 'standard' | 'small'
+		ariaLabel?: string
 	}>(),
 	{
 		neverEmpty: true,

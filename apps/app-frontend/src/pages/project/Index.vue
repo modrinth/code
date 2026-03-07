@@ -68,15 +68,11 @@
 						</ButtonStyled>
 						<ButtonStyled v-else size="large" color="brand">
 							<button
-								:disabled="data && installStore.installingServerProjects.includes(data.id)"
+								:disabled="data && installingServerProjects.includes(data.id)"
 								@click="handleClickPlay"
 							>
 								<PlayIcon />
-								{{
-									data && installStore.installingServerProjects.includes(data.id)
-										? 'Installing...'
-										: 'Play'
-								}}
+								{{ data && installingServerProjects.includes(data.id) ? 'Installing...' : 'Play' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
@@ -266,24 +262,23 @@ import {
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerLatency } from '@/helpers/worlds'
+import { injectContentInstall } from '@/providers/content-install'
+import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import {
-	getServerAddress,
-	install as installVersion,
-	playServerProject,
-	useInstall,
-} from '@/store/install.js'
+import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
-const installStore = useInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
@@ -357,7 +352,7 @@ async function handleStopServer() {
 function handleAddServerToInstance() {
 	const address = getServerAddress(projectV3.value?.minecraft_java_server)
 	if (!address || !data.value) return
-	installStore.showAddServerToInstanceModal(data.value.title, address)
+	showAddServerToInstanceModal(data.value.title, address)
 }
 
 async function fetchProjectData() {

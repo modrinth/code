@@ -175,13 +175,11 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import {
-	ensureManagedServerWorldExists,
-	getServerAddress,
-	playServerProject,
-} from '@/store/install'
+import { injectServerInstall } from '@/providers/server-install'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()

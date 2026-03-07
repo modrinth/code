@@ -152,10 +152,7 @@
 					<div class="font-bold">This does not affect your backups, which are stored off-site.</div>
 				</div>
 
-				<BackupWarning
-					v-if="!initialSetup"
-					:backup-link="`/hosting/manage/${props.server?.serverId}/backups`"
-				/>
+				<BackupWarning v-if="!initialSetup" :backup-link="`/hosting/manage/${serverId}/backups`" />
 			</div>
 
 			<div class="mt-4 flex justify-start gap-4">
@@ -205,6 +202,8 @@ import {
 	BackupWarning,
 	ButtonStyled,
 	Combobox,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
 	Toggle,
@@ -213,12 +212,13 @@ import {
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
 
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoaderIcon from './icons/LoaderIcon.vue'
 import LoadingIcon from './icons/LoadingIcon.vue'
 
+const { server, serverId } = injectModrinthServerContext()
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -236,7 +236,6 @@ type VersionMap = Record<string, LoaderVersion[]>
 type VersionCache = Record<string, any>
 
 const props = defineProps<{
-	server: ModrinthServer
 	currentLoader: Loaders | undefined
 	backupInProgress?: BackupInProgressReason
 	initialSetup?: boolean
@@ -472,11 +471,14 @@ const handleReinstall = async () => {
 	isLoading.value = true
 
 	try {
-		await props.server.general?.reinstall(
-			true,
-			selectedLoader.value,
-			selectedMCVersion.value,
-			selectedLoader.value === 'Vanilla' ? '' : selectedLoaderVersion.value,
+		await client.archon.servers_v0.reinstall(
+			serverId,
+			{
+				loader: selectedLoader.value,
+				loader_version:
+					selectedLoader.value === 'Vanilla' ? undefined : selectedLoaderVersion.value || undefined,
+				game_version: selectedMCVersion.value,
+			},
 			props.initialSetup ? true : hardReset.value,
 		)
 
@@ -507,7 +509,7 @@ const handleReinstall = async () => {
 }
 
 const onShow = () => {
-	selectedMCVersion.value = props.server.general?.mc_version || ''
+	selectedMCVersion.value = server.value?.mc_version || ''
 	if (isSnapshotSelected.value) {
 		showSnapshots.value = true
 	}
@@ -530,7 +532,7 @@ const show = (loader: Loaders) => {
 		selectedLoaderVersion.value = ''
 	}
 	selectedLoader.value = loader
-	selectedMCVersion.value = props.server.general?.mc_version || ''
+	selectedMCVersion.value = server.value?.mc_version || ''
 	versionSelectModal.value?.show()
 }
 const hide = () => versionSelectModal.value?.hide()

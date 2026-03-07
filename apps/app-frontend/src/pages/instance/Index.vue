@@ -110,9 +110,13 @@
 					<div class="flex gap-2">
 						<ButtonStyled
 							v-if="
-								['installing', 'pack_installing', 'minecraft_installing'].includes(
-									instance.install_stage,
-								)
+								[
+									'installing',
+									'pack_installing',
+									'pack_installed',
+									'not_installed',
+									'minecraft_installing',
+								].includes(instance.install_stage)
 							"
 							color="brand"
 							size="large"
@@ -334,14 +338,15 @@ import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { get_server_status } from '@/helpers/worlds'
+import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const route = useRoute()
 
 const router = useRouter()
@@ -607,6 +612,10 @@ const unlistenProfiles = await profile_listener(
 				return
 			}
 			instance.value = await get(route.params.id as string).catch(handleError)
+			if (!instance.value?.linked_data?.project_id) {
+				linkedProjectV3.value = undefined
+				isServerInstance.value = false
+			}
 		}
 	},
 )

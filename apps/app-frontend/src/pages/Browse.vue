@@ -51,12 +51,14 @@ import {
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { getServerLatency } from '@/helpers/worlds'
+import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
+import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const installStore = useInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
 
 const router = useRouter()
 const route = useRoute()
@@ -108,6 +110,10 @@ const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
+// Non-reactive snapshot used by instanceFilters to avoid triggering a search
+// refresh when an item is installed mid-browse (which causes content shift).
+// Synced before each search triggered by filter/page/query changes.
+let newlyInstalledSnapshot: string[] = []
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -185,7 +191,7 @@ const instanceFilters = computed(() => {
 				.filter((x) => x.metadata)
 				.map((x) => x.metadata.project_id)
 
-			installedMods.push(...newlyInstalled.value)
+			installedMods.push(...newlyInstalledSnapshot)
 
 			installedMods
 				?.map((x) => ({
@@ -220,6 +226,19 @@ const {
 	// Functions
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
+
+const activeLoader = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'mod_loader')
+	if (filter) return filter.option
+	if (projectType.value === 'datapack' || projectType.value === 'resourcepack') return 'vanilla'
+	return instance.value?.loader ?? null
+})
+
+const activeGameVersion = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'game_version')
+	if (filter) return filter.option
+	return instance.value?.game_version ?? null
+})
 
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 const serverPings = shallowRef<Record<string, number | undefined>>({})
@@ -256,7 +275,7 @@ async function handlePlayServerProject(projectId: string) {
 function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
 	const address = getServerAddress(project.minecraft_java_server)
 	if (!address) return
-	installStore.showAddServerToInstanceModal(project.name, address)
+	showAddServerToInstanceModal(project.name, address)
 }
 
 const unlistenProcesses = await process_listener(
@@ -346,6 +365,7 @@ watch(effectiveRequestParams, async () => {
 async function refreshSearch() {
 	if (isRefreshing.value) return
 	isRefreshing.value = true
+	newlyInstalledSnapshot = [...newlyInstalled.value]
 
 	try {
 		const isServer = projectType.value === 'server'
@@ -854,18 +874,12 @@ previousFilterState.value = JSON.stringify({
 								</ButtonStyled>
 								<ButtonStyled v-else color="brand" type="outlined">
 									<button
-										:disabled="
-											(installStore.installingServerProjects as string[]).includes(
-												project.project_id,
-											)
-										"
+										:disabled="(installingServerProjects as string[]).includes(project.project_id)"
 										@click="() => handlePlayServerProject(project.project_id)"
 									>
 										<PlayIcon />
 										{{
-											(installStore.installingServerProjects as string[]).includes(
-												project.project_id,
-											)
+											(installingServerProjects as string[]).includes(project.project_id)
 												? 'Installing...'
 												: 'Play'
 										}}
@@ -882,6 +896,19 @@ previousFilterState.value = JSON.stringify({
 						:project-type="projectType"
 						:project="result"
 						:instance="instance ?? undefined"
+						:active-loader="activeLoader ?? undefined"
+						:active-game-version="activeGameVersion ?? undefined"
+						:categories="[
+							...(categories ?? []).filter(
+								(cat) =>
+									result?.display_categories.includes(cat.name) && cat.project_type === projectType,
+							),
+							...(loaders ?? []).filter(
+								(loader) =>
+									result?.display_categories.includes(loader.name) &&
+									loader.supported_project_types?.includes(projectType),
+							),
+						]"
 						:installed="result.installed || newlyInstalled.includes(result.project_id || '')"
 						@install="
 							(id) => {

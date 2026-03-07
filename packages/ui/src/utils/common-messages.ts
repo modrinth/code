@@ -337,6 +337,82 @@ export const commonMessages = defineMessages({
 		id: 'label.yes',
 		defaultMessage: 'Yes',
 	},
+	platformLabel: {
+		id: 'label.platform',
+		defaultMessage: 'Platform',
+	},
+	gameVersionLabel: {
+		id: 'label.game-version',
+		defaultMessage: 'Game version',
+	},
+	selectVersionPlaceholder: {
+		id: 'input.select-version.placeholder',
+		defaultMessage: 'Select version',
+	},
+	searchVersionPlaceholder: {
+		id: 'input.search-version.placeholder',
+		defaultMessage: 'Search version...',
+	},
+	unknownLabel: {
+		id: 'label.unknown',
+		defaultMessage: 'Unknown',
+	},
+	modpackLabel: {
+		id: 'label.modpack',
+		defaultMessage: 'Modpack',
+	},
+	repairButton: {
+		id: 'button.repair',
+		defaultMessage: 'Repair',
+	},
+	repairingButton: {
+		id: 'button.repairing',
+		defaultMessage: 'Repairing...',
+	},
+	showAllVersionsButton: {
+		id: 'button.show-all-versions',
+		defaultMessage: 'Show all versions',
+	},
+	hideSnapshotsButton: {
+		id: 'button.hide-snapshots',
+		defaultMessage: 'Hide snapshots',
+	},
+	installationInfoTitle: {
+		id: 'label.installation-info',
+		defaultMessage: 'Installation info',
+	},
+	installedModpackTitle: {
+		id: 'label.installed-modpack',
+		defaultMessage: 'Installed modpack',
+	},
+	changeVersionButton: {
+		id: 'button.change-version',
+		defaultMessage: 'Change version',
+	},
+	unlinkModpackButton: {
+		id: 'button.unlink-modpack',
+		defaultMessage: 'Unlink modpack',
+	},
+	reinstallModpackButton: {
+		id: 'button.reinstall-modpack',
+		defaultMessage: 'Re-install modpack',
+	},
+	resetServerButton: {
+		id: 'button.reset-server',
+		defaultMessage: 'Reset server',
+	},
+	clientOnlyWarning: {
+		id: 'label.client-only-warning',
+		defaultMessage: 'This is a client-side mod and may cause issues if enabled',
+	},
+	selectAllLabel: {
+		id: 'label.select-all',
+		defaultMessage: 'Select all',
+	},
+	selectionActionsLabel: {
+		id: 'label.selection-actions',
+		defaultMessage: 'Selection actions',
+	},
 	updateAvailableLabel: {
 		id: 'label.update-available',
 		defaultMessage: 'Update available',
@@ -368,6 +444,10 @@ export const commonMessages = defineMessages({
 	noItemsLabel: {
 		id: 'label.no-items',
 		defaultMessage: 'No items',
+	},
+	switchVersionButton: {
+		id: 'button.switch-version',
+		defaultMessage: 'Switch version',
 	},
 	projectCreated: {
 		id: 'project.about.details.created',

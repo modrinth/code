@@ -1292,6 +1292,33 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Failed to change modpack version"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Failed to load versions"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Failed to reinstall modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Failed to repair server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Failed to save installation settings"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Failed to unlink modpack"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader} version"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Reset server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Out of stock"
   },
