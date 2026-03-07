@@ -396,7 +396,9 @@ export function flattenProjectV3Variables(
 	vars['PROJECT_V3_REVIEW_STATUS'] = projectV3.side_types_migration_review_status
 	vars['PROJECT_V3_TYPES'] = projectV3.project_types.join(', ')
 	vars['PROJECT_TYPE_FORMATTED'] = formatProjectTypes(projectV3.project_types[0])
+	vars['PROJECT_TYPE_FORMATTED_LOWER'] = formatProjectTypes(projectV3.project_types[0], true)
 	vars['PROJECT_TYPES_FORMATTED'] = formatProjectTypes(projectV3.project_types.join(' / '))
+	vars['PROJECT_TYPES_FORMATTED_LOWER'] = formatProjectTypes(projectV3.project_types.join(' / '), true)
 
 	vars['PROJECT_SITE_URL'] = projectV3.link_urls?.site?.url || 'None'
 	vars['PROJECT_STORE_URL'] = projectV3.link_urls?.store?.url || 'None'
