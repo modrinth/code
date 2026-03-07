@@ -860,6 +860,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		<ConfirmUnlinkModal
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
+			:server="ctx.deletionContext === 'server'"
+			:backup-link="ctx.backupLink"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

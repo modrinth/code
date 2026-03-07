@@ -17,12 +17,7 @@
 		</div>
 		<div class="flex gap-3">
 			<ButtonStyled type="outlined">
-				<button
-					v-tooltip="isServerFlow ? 'Coming soon!' : undefined"
-					:disabled="isServerFlow"
-					class="flex-1 !border-surface-4"
-					@click="triggerFileInput"
-				>
+				<button class="flex-1 !border-surface-4" @click="triggerFileInput">
 					<ImportIcon />
 					Import modpack
 				</button>
@@ -39,24 +34,23 @@
 
 <script setup lang="ts">
 import { CompassIcon, ImportIcon } from '@modrinth/assets'
-import { useDebounceFn } from '@vueuse/core'
-import { computed, defineAsyncComponent, h, ref, watch } from 'vue'
+import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { injectFilePicker, injectModrinthClient } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
+const debug = useDebugLogger('ModpackStage')
 const ctx = injectCreationFlowContext()
 const { labrinth } = injectModrinthClient()
 const filePicker = injectFilePicker()
 
-const isServerFlow = computed(
-	() => ctx.flowType === 'server-onboarding' || ctx.flowType === 'world',
-)
 const searchLoading = ref(false)
 
 function proceedWithModpack() {
+	debug('proceedWithModpack:', { flowType: ctx.flowType, modpackSelection: ctx.modpackSelection.value })
 	if (ctx.flowType === 'instance') {
 		ctx.finish()
 	} else {
@@ -66,14 +60,10 @@ function proceedWithModpack() {
 
 const search = async (query: string) => {
 	query = query.trim()
-	if (!query) {
-		searchLoading.value = false
-		return
-	}
 
 	try {
 		const results = await labrinth.projects_v2.search({
-			query,
+			query: query || undefined,
 			facets: [['project_type:modpack']],
 			limit: 10,
 		})
@@ -107,12 +97,15 @@ const search = async (query: string) => {
 	searchLoading.value = false
 }
 
-const throttledSearch = useDebounceFn(search, 500)
-
 const handleSearch = async (query: string) => {
 	searchLoading.value = true
-	await throttledSearch(query)
+	await search(query)
 }
+
+onMounted(() => {
+	ctx.modpackSearchProjectId.value = undefined
+	search('')
+})
 
 // When a project is selected via search, fetch its latest version and auto-proceed
 watch(

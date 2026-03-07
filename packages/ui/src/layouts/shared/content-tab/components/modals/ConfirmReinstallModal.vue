@@ -5,7 +5,15 @@
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<span class="text-primary">
-				{{ formatMessage(messages.warningBody) }}
+				<IntlFormatted
+					:message-id="backupLink ? messages.warningBodyBackup : messages.warningBody"
+				>
+					<template #backup="{ children }">
+						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
+							<component :is="() => children" />
+						</RouterLink>
+					</template>
+				</IntlFormatted>
 			</span>
 		</div>
 
@@ -34,6 +42,7 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -59,11 +68,20 @@ const messages = defineMessages({
 		defaultMessage:
 			'We recommend creating a backup before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them.',
 	},
+	warningBodyBackup: {
+		id: 'instance.confirm-reinstall.warning-body-backup',
+		defaultMessage:
+			'We recommend creating a <backup>backup</backup> before proceeding. If your worlds depend on additional installed content, reinstalling will likely break them.',
+	},
 	reinstallButton: {
 		id: 'instance.confirm-reinstall.reinstall-button',
 		defaultMessage: 'Reinstall modpack',
 	},
 })
+
+defineProps<{
+	backupLink?: string
+}>()
 
 const emit = defineEmits<{
 	(e: 'reinstall'): void

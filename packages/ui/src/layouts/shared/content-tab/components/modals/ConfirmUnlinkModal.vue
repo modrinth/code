@@ -5,7 +5,21 @@
 				{{ formatMessage(server ? messages.serverAdmonitionBody : messages.admonitionBody) }}
 			</Admonition>
 			<span class="text-primary">
-				{{ formatMessage(server ? messages.serverWarningBody : messages.warningBody) }}
+				<IntlFormatted
+					:message-id="
+						server
+							? backupLink
+								? messages.serverWarningBodyBackup
+								: messages.serverWarningBody
+							: messages.warningBody
+					"
+				>
+					<template #backup="{ children }">
+						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
+							<component :is="() => children" />
+						</RouterLink>
+					</template>
+				</IntlFormatted>
 			</span>
 		</div>
 
@@ -34,12 +48,14 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 defineProps<{
 	server?: boolean
+	backupLink?: string
 }>()
 
 const { formatMessage } = useVIntl()
@@ -70,7 +86,11 @@ const messages = defineMessages({
 	},
 	serverWarningBody: {
 		id: 'content.confirm-unlink.server-warning-body',
-		defaultMessage: 'We will automatically create a backup if you continue.',
+		defaultMessage: 'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
+	},
+	serverWarningBodyBackup: {
+		id: 'content.confirm-unlink.server-warning-body-backup',
+		defaultMessage: 'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
 	},
 	unlinkButton: {
 		id: 'content.confirm-unlink.unlink-button',

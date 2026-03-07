@@ -140,8 +140,8 @@ const messages = defineMessages({
 		</div>
 
 		<template v-else>
-			<!-- Installation Info (hidden while editing in unlinked state) -->
-			<div v-if="ctx.isLinked.value || !form.isEditing.value" class="flex flex-col gap-2.5">
+			<!-- Installation Info (linked state) -->
+			<div v-if="ctx.isLinked.value" class="flex flex-col gap-2.5">
 				<span class="text-lg font-semibold text-contrast">
 					{{ formatMessage(commonMessages.installationInfoTitle) }}
 				</span>
@@ -422,8 +422,21 @@ const messages = defineMessages({
 					</div>
 				</div>
 
-				<!-- Non-editing: warning + edit button -->
-				<template v-if="!form.isEditing.value">
+				<!-- Non-editing: installation info + warning + edit button -->
+				<div v-if="!form.isEditing.value" class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">
+						{{ formatMessage(commonMessages.installationInfoTitle) }}
+					</span>
+					<div class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+						<div
+							v-for="row in ctx.installationInfo.value"
+							:key="row.label"
+							class="flex items-center justify-between"
+						>
+							<span class="text-primary">{{ row.label }}</span>
+							<span class="font-semibold text-contrast">{{ row.value }}</span>
+						</div>
+					</div>
 					<div class="flex items-start gap-2">
 						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
 						<span class="text-primary">
@@ -447,10 +460,10 @@ const messages = defineMessages({
 						</ButtonStyled>
 						<slot name="unlinked-extra-buttons" />
 					</div>
-				</template>
+				</div>
 
 				<!-- Repair section -->
-				<div class="flex flex-col gap-2.5">
+				<div v-if="ctx.currentPlatform.value !== 'vanilla'" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(
@@ -510,8 +523,8 @@ const messages = defineMessages({
 			@version-hover="form.handleUpdaterVersionHover"
 		/>
 		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
-		<ConfirmReinstallModal ref="reinstallModal" @reinstall="ctx.reinstallModpack()" />
-		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="ctx.unlinkModpack()" />
+		<ConfirmReinstallModal ref="reinstallModal" :backup-link="ctx.backupLink" @reinstall="ctx.reinstallModpack()" />
+		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" :backup-link="ctx.backupLink" @unlink="ctx.unlinkModpack()" />
 
 		<slot name="extra-modals" />
 	</Teleport>

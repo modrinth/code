@@ -49,6 +49,7 @@ export interface InstallationSettingsContext {
 
 	isServer: boolean
 	isApp: boolean
+	backupLink?: string
 
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
 	showModpackVersionActions?: boolean

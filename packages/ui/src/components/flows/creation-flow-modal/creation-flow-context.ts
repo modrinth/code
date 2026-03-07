@@ -2,6 +2,7 @@ import type { Archon } from '@modrinth/api-client'
 import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } from 'vue'
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { createContext } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
 import type { MultiStageModal, StageConfigInput } from '../../base'
@@ -140,6 +141,7 @@ export function createCreationFlowContext(
 	},
 	options: CreationFlowOptions = {},
 ): CreationFlowContextValue {
+	const debug = useDebugLogger('CreationFlow')
 	const availableLoaders = options.availableLoaders ?? ['fabric', 'neoforge', 'forge', 'quilt']
 	const showSnapshotToggle = options.showSnapshotToggle ?? false
 	const disableClose = options.disableClose ?? false
@@ -248,6 +250,7 @@ export function createCreationFlowContext(
 	}
 
 	function setSetupType(type: SetupType) {
+		debug('setSetupType:', type)
 		isImportMode.value = false
 		setupType.value = type
 		if (type === 'modpack') {
@@ -271,6 +274,14 @@ export function createCreationFlowContext(
 	}
 
 	function finish() {
+		debug('finish() called, state:', {
+			setupType: setupType.value,
+			selectedLoader: selectedLoader.value,
+			selectedGameVersion: selectedGameVersion.value,
+			selectedLoaderVersion: selectedLoaderVersion.value,
+			modpackSelection: modpackSelection.value,
+			hasModpackFile: !!modpackFile.value,
+		})
 		loading.value = true
 		emit.create(contextValue)
 	}

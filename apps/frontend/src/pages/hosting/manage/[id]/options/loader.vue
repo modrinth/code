@@ -55,11 +55,13 @@ import {
 	InstallationSettingsLayout,
 	provideInstallationSettings,
 	ServerSetupModal,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 
+const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
 const { server, serverId, worldId } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
@@ -111,8 +113,19 @@ const emit = defineEmits<{
 	reinstall: [any?]
 }>()
 
-const isInstalling = computed(() => server.value?.status === 'installing')
+const isInstalling = computed(() => {
+	const val = server.value?.status === 'installing'
+	debug('isInstalling:', val, 'server.status:', server.value?.status)
+	return val
+})
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
+
+async function invalidateServerState() {
+	await Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
+	])
+}
 
 const addonsQuery = useQuery({
 	queryKey: computed(() => ['content', 'list', 'v1', serverId]),
@@ -208,6 +221,21 @@ provideInstallationSettings({
 		const gameVersion = addons?.game_version ?? server.value?.mc_version ?? unknownStr
 		const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? unknownStr
 
+		debug('installationInfo computed:', {
+			'addons?.modloader': addons?.modloader,
+			'server.loader': server.value?.loader,
+			rawLoader,
+			loader,
+			'addons?.game_version': addons?.game_version,
+			'server.mc_version': server.value?.mc_version,
+			gameVersion,
+			'addons?.modloader_version': addons?.modloader_version,
+			'server.loader_version': server.value?.loader_version,
+			loaderVersion,
+			'addonsQuery.isLoading': addonsQuery.isLoading.value,
+			'addonsQuery.isFetching': addonsQuery.isFetching.value,
+		})
+
 		const rows = [
 			{ label: formatMessage(commonMessages.platformLabel), value: loader },
 			{ label: formatMessage(commonMessages.gameVersionLabel), value: gameVersion },
@@ -220,7 +248,11 @@ provideInstallationSettings({
 		}
 		return rows
 	}),
-	isLinked: computed(() => !!modpack.value),
+	isLinked: computed(() => {
+		const val = !!modpack.value
+		debug('isLinked:', val, 'modpack:', modpack.value?.spec?.project_id)
+		return val
+	}),
 	isBusy: isInstalling,
 	modpack: computed(() => {
 		if (!modpack.value) return null
@@ -301,7 +333,7 @@ provideInstallationSettings({
 			}
 
 			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+			await invalidateServerState()
 		} catch (err) {
 			addNotification({
 				type: 'error',
@@ -323,9 +355,7 @@ provideInstallationSettings({
 					},
 					soft_override: true,
 				})
-				await queryClient.invalidateQueries({
-					queryKey: ['servers', 'detail', serverId],
-				})
+				await invalidateServerState()
 			} catch (err) {
 				addNotification({
 					type: 'error',
@@ -346,9 +376,7 @@ provideInstallationSettings({
 					game_version: currentGameVersion,
 					soft_override: true,
 				})
-				await queryClient.invalidateQueries({
-					queryKey: ['servers', 'detail', serverId],
-				})
+				await invalidateServerState()
 			} catch (err) {
 				addNotification({
 					type: 'error',
@@ -370,9 +398,7 @@ provideInstallationSettings({
 				},
 				soft_override: false,
 			})
-			await queryClient.invalidateQueries({
-				queryKey: ['servers', 'detail', serverId],
-			})
+			await invalidateServerState()
 			emit('reinstall')
 		} catch (err) {
 			addNotification({
@@ -449,9 +475,7 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			await queryClient.invalidateQueries({
-				queryKey: ['servers', 'detail', serverId],
-			})
+			await invalidateServerState()
 			emit('reinstall')
 		} catch (err) {
 			addNotification({
@@ -475,26 +499,21 @@ provideInstallationSettings({
 
 	isServer: true,
 	isApp: false,
+	backupLink: `/hosting/manage/${serverId}/backups`,
 })
 
 watch(
 	() => server.value?.status,
-	async (newStatus, oldStatus) => {
+	(newStatus, oldStatus) => {
+		debug('status watcher:', oldStatus, '->', newStatus, {
+			'server.loader': server.value?.loader,
+			'server.mc_version': server.value?.mc_version,
+			'server.loader_version': server.value?.loader_version,
+		})
 		if (oldStatus === 'installing' && newStatus === 'available') {
+			debug('status installing->available, resetting editing refs')
 			editingPlatform.value = server.value?.loader?.toLowerCase() ?? 'vanilla'
 			editingGameVersion.value = server.value?.mc_version ?? ''
-
-			await Promise.all([
-				queryClient.invalidateQueries({
-					queryKey: ['content', 'list', 'v1', serverId],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: ['content', 'loader', 'versions'],
-				}),
-				queryClient.invalidateQueries({
-					queryKey: ['servers', 'detail', serverId],
-				}),
-			])
 		}
 	},
 )

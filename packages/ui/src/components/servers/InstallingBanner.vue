@@ -51,7 +51,7 @@ const props = defineProps<{
 const phaseLabel = computed(() => {
 	switch (props.progress?.phase) {
 		case 'InstallingLoader':
-			return 'Installing mod loader...'
+			return 'Installing platform...'
 		case 'InstallingPack':
 			return 'Installing modpack...'
 		case 'Addons':
@@ -106,6 +106,7 @@ onUnmounted(() => {
 	height: 20px;
 	display: flex;
 	align-items: center;
+	white-space: nowrap;
 	color: var(--color-secondary-text);
 	opacity: 0;
 	transform: scale(0.9);

@@ -181,7 +181,7 @@ watch(serverContentError, (error) => {
 // Re-run search when server content loads so "Hide installed" filter applies
 watch(serverContentData, () => {
 	if (serverHideInstalled.value) {
-		updateSearchResults()
+		updateSearchResults(1, false)
 	}
 })
 
@@ -202,7 +202,7 @@ const installContentMutation = useMutation({
 		}),
 	onSuccess: () => {
 		if (currentServerId.value) {
-			queryClient.invalidateQueries({ queryKey: ['content', 'list', currentServerId.value] })
+			queryClient.refetchQueries({ queryKey: ['content', 'list', currentServerId.value] })
 		}
 	},
 })
@@ -380,11 +380,9 @@ async function serverInstall(project: InstallableSearchResult) {
 	}
 	project.installing = true
 	try {
-		const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
-
 		if (projectType.value?.id === 'modpack') {
-			const version = versions[0]
-			if (!version) {
+			const versionId = project.latest_version
+			if (!versionId) {
 				handleError(new Error('No version found for this modpack'))
 				project.installing = false
 				return
@@ -398,23 +396,31 @@ async function serverInstall(project: InstallableSearchResult) {
 				ctx.setupType.value = 'modpack'
 				ctx.modpackSelection.value = {
 					projectId: project.project_id,
-					versionId: version.id,
+					versionId,
 					name: project.title,
 					iconUrl: project.icon_url ?? undefined,
 				}
 				ctx.modal.value?.setStage('final-config')
 			}
 			return
-		} else if (projectType.value?.id === 'mod' || projectType.value?.id === 'plugin') {
-			const version = versions.find(
-				(x) =>
-					x.game_versions.includes(serverData.value!.mc_version!) &&
-					x.loaders.includes(serverData.value!.loader!.toLowerCase()),
-			)
+		} else if (
+			projectType.value?.id === 'mod' ||
+			projectType.value?.id === 'plugin' ||
+			projectType.value?.id === 'datapack'
+		) {
+			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id)
+			const isDatapack = projectType.value?.id === 'datapack'
+			const version = versions.find((x) => {
+				if (!x.game_versions.includes(serverData.value!.mc_version!)) return false
+				if (isDatapack) return true
+				return x.loaders.includes(serverData.value!.loader!.toLowerCase())
+			})
 			if (!version) {
 				handleError(
 					new Error(
-						`No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
+						isDatapack
+							? `No compatible version found for ${serverData.value!.mc_version}`
+							: `No compatible version found for ${serverData.value!.mc_version} / ${serverData.value!.loader}`,
 					),
 				)
 				project.installing = false

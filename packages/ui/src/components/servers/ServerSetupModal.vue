@@ -30,6 +30,7 @@
 import type { Archon, ModrinthApiError } from '@modrinth/api-client'
 import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
@@ -68,6 +69,7 @@ const messages = defineMessages({
 	},
 })
 
+const debug = useDebugLogger('ServerSetupModal')
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
@@ -104,10 +106,22 @@ const uploadedBytes = ref(0)
 const totalBytes = ref(0)
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
+	debug('onFlowComplete:', {
+		setupType: ctx.setupType.value,
+		hasModpackFile: !!ctx.modpackFile.value,
+		modpackSelection: ctx.modpackSelection.value,
+		selectedLoader: ctx.selectedLoader.value,
+		selectedGameVersion: ctx.selectedGameVersion.value,
+		selectedLoaderVersion: ctx.selectedLoaderVersion.value,
+		worldId: serverContext.worldId.value,
+	})
+
 	try {
 		if (ctx.setupType.value === 'modpack' && ctx.modpackFile.value) {
+			debug('onFlowComplete: mrpack upload path')
 			await handleMrpackUpload(ctx.modpackFile.value, ctx.buildProperties())
 		} else if (ctx.setupType.value === 'modpack' && ctx.modpackSelection.value) {
+			debug('onFlowComplete: modpack selection path, calling installContent')
 			await client.archon.content_v1.installContent(
 				serverContext.serverId,
 				serverContext.worldId.value!,
@@ -122,12 +136,19 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 					properties: ctx.buildProperties(),
 				},
 			)
-
+			debug('onFlowComplete: modpack installContent returned, emitting reinstall')
 			emitReinstall()
 		} else {
 			const loader = ctx.selectedLoader.value
 			const loaderVersion =
 				!loader || loader === 'vanilla' ? '' : (ctx.selectedLoaderVersion.value ?? '')
+
+			debug('onFlowComplete: bare install path', {
+				loader,
+				loaderVersion,
+				gameVersion: ctx.selectedGameVersion.value,
+				apiLoader: toApiLoader(loader ?? 'vanilla'),
+			})
 
 			await client.archon.content_v1.installContent(
 				serverContext.serverId,
@@ -142,6 +163,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 				},
 			)
 
+			debug('onFlowComplete: bare installContent returned, emitting reinstall')
 			emitReinstall({
 				loader: loader ?? 'vanilla',
 				lVersion: loaderVersion,
@@ -151,6 +173,7 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 
 		creationFlowRef.value?.hide()
 	} catch (error) {
+		debug('onFlowComplete: ERROR', error)
 		if ((error as ModrinthApiError).statusCode === 429) {
 			addNotification({
 				title: formatMessage(messages.rateLimitTitle),
@@ -199,6 +222,7 @@ async function handleMrpackUpload(file: File, properties: Archon.Content.v1.Prop
 }
 
 function emitReinstall(args?: { loader: string; lVersion: string; mVersion: string | null }) {
+	debug('emitReinstall:', args)
 	emit('reinstall', args)
 }
 

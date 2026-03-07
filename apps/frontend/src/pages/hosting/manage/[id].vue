@@ -358,6 +358,7 @@ import {
 	ButtonStyled,
 	defineMessage,
 	ErrorInformationCard,
+	formatLoaderLabel,
 	injectModrinthClient,
 	injectNotificationManager,
 	InstallingBanner,
@@ -366,6 +367,7 @@ import {
 	ServerInfoLabels,
 	ServerNotice,
 	ServerOnboardingPanelPage,
+	useDebugLogger,
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -403,6 +405,7 @@ const createdAt = ref(
 	auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
 )
 
+const debug = useDebugLogger('ServerManage')
 const route = useNativeRoute()
 const router = useRouter()
 const serverId = route.params.id as string
@@ -411,6 +414,14 @@ const { data: serverData, error: serverQueryError } = useQuery({
 	queryKey: ['servers', 'detail', serverId],
 	queryFn: () => client.archon.servers_v0.get(serverId)!,
 })
+
+function updateServerData(patch: Partial<Archon.Servers.v0.Server>) {
+	if (!serverData.value) return
+	queryClient.setQueryData(['servers', 'detail', serverId], {
+		...serverData.value,
+		...patch,
+	})
+}
 
 const serverError = computed(() => {
 	const err = serverQueryError.value
@@ -729,6 +740,11 @@ const handlePowerState = (data: Archon.Websocket.v0.WSPowerStateEvent) => {
 }
 
 const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
+	debug('[id.vue] handleState received:', {
+		power_variant: data.power_variant,
+		progress: data.progress,
+		serverStatus: serverData.value?.status,
+	})
 	syncProgress.value = data.progress
 
 	// Sync power state from the state event
@@ -755,12 +771,42 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 
 	// Update installing status from progress presence
 	if (serverData.value) {
-		if (data.progress != null) {
-			serverData.value.status = 'installing'
-		} else if (serverData.value.status === 'installing') {
-			serverData.value.status = 'available'
-			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-			queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+		if (data.progress != null && serverData.value.status !== 'installing') {
+			debug('[id.vue] handleState: progress != null, setting status to installing')
+			hasSeenInstallProgress = true
+			updateServerData({ status: 'installing' })
+		} else if (data.progress != null) {
+			hasSeenInstallProgress = true
+		} else if (data.progress == null && serverData.value.status === 'installing' && hasSeenInstallProgress) {
+			debug('[id.vue] handleState: progress null + was installing, applying optimistic update')
+
+			// Apply optimistic update with user's chosen values (since handleInstallationResult may never fire)
+			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
+			if (newLoader.value) patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
+			if (newMCVersion.value) patch.mc_version = newMCVersion.value
+
+			debug('[id.vue] handleState: optimistic patch:', patch)
+			updateServerData(patch)
+
+			hasSeenInstallProgress = false
+			newLoader.value = null
+			newLoaderVersion.value = null
+			newMCVersion.value = null
+
+			// Delay invalidation to let postinstall webhook update the DB
+			setTimeout(async () => {
+				debug('[id.vue] handleState: delayed invalidation firing')
+				try {
+					await Promise.all([
+						queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
+						queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+					])
+				} catch (err: unknown) {
+					console.error('Error refreshing data after installation:', err)
+				}
+			}, 2000)
 		}
 	}
 }
@@ -882,8 +928,11 @@ const handleNewMod = () => {
 const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
 const newMCVersion = ref<string | null>(null)
+let hasSeenInstallProgress = false
 
 const onReinstall = async (potentialArgs: any) => {
+	debug('[id.vue] onReinstall called with:', potentialArgs)
+
 	if (serverData.value?.flows?.intro) {
 		await client.archon.servers_v1.endIntro(serverId)
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
@@ -891,7 +940,9 @@ const onReinstall = async (potentialArgs: any) => {
 
 	if (!serverData.value) return
 
-	serverData.value.status = 'installing'
+	debug('[id.vue] onReinstall: setting serverData.status to installing')
+	hasSeenInstallProgress = false
+	updateServerData({ status: 'installing' })
 
 	if (potentialArgs?.loader) {
 		newLoader.value = potentialArgs.loader
@@ -903,30 +954,71 @@ const onReinstall = async (potentialArgs: any) => {
 		newMCVersion.value = potentialArgs.mVersion
 	}
 
+	debug('[id.vue] onReinstall: stored refs:', {
+		newLoader: newLoader.value,
+		newLoaderVersion: newLoaderVersion.value,
+		newMCVersion: newMCVersion.value,
+	})
+
 	error.value = null
 	errorTitle.value = 'Error'
 	errorMessage.value = 'An unexpected error occurred.'
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
+	debug('[id.vue] handleInstallationResult received:', data)
 	switch (data.result) {
 		case 'ok': {
+			debug('[id.vue] handleInstallationResult: ok received')
 			if (!serverData.value) break
 
-			try {
-				await Promise.all([
-					queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-					queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
-					queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
-				])
-			} catch (err: unknown) {
-				console.error('Error refreshing data after installation:', err)
-			}
+			debug('[id.vue] handleInstallationResult: stored refs:', {
+				newLoader: newLoader.value,
+				newLoaderVersion: newLoaderVersion.value,
+				newMCVersion: newMCVersion.value,
+			})
+			debug('[id.vue] handleInstallationResult: current serverData:', {
+				status: serverData.value.status,
+				loader: serverData.value.loader,
+				loader_version: serverData.value.loader_version,
+				mc_version: serverData.value.mc_version,
+			})
+
+			// Optimistically update with the values the user chose during reset
+			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
+			if (newLoader.value) patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
+			if (newMCVersion.value) patch.mc_version = newMCVersion.value
+
+			debug('[id.vue] handleInstallationResult: updateServerData with:', patch)
+			updateServerData(patch)
 
 			newLoader.value = null
 			newLoaderVersion.value = null
 			newMCVersion.value = null
 			error.value = null
+
+			// Delay invalidation to let postinstall webhook update the DB
+			debug('[id.vue] handleInstallationResult: scheduling delayed invalidation (2s)')
+			setTimeout(async () => {
+				debug('[id.vue] handleInstallationResult: delayed invalidation firing now')
+				try {
+					await Promise.all([
+						queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
+						queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+					])
+					debug('[id.vue] handleInstallationResult: delayed invalidation complete, serverData:', {
+						status: serverData.value?.status,
+						loader: serverData.value?.loader,
+						loader_version: serverData.value?.loader_version,
+						mc_version: serverData.value?.mc_version,
+					})
+				} catch (err: unknown) {
+					console.error('Error refreshing data after installation:', err)
+				}
+			}, 2000)
+
 			break
 		}
 		case 'err': {
@@ -1299,7 +1391,7 @@ function initializeServer() {
 				]
 			})
 			.catch((error) => {
-				console.error('Failed to connect WebSocket:', error)
+				debug('[id.vue] Failed to connect WebSocket:', error)
 				isConnected.value = false
 				isLoading.value = false
 			})

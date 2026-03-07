@@ -101,6 +101,7 @@
 import { EyeIcon, EyeOffIcon, UploadIcon, XIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { injectFilePicker, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
@@ -112,6 +113,7 @@ import type { LoaderVersionType } from '../creation-flow-context'
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize, formatLoaderLabel } from '../shared'
 
+const debug = useDebugLogger('CustomSetupStage')
 const ctx = injectCreationFlowContext()
 const {
 	selectedLoader,
@@ -136,6 +138,7 @@ const effectiveLoaders = computed(() => {
 
 // Pre-select loader and game version from initial values
 onMounted(() => {
+	debug('mounted, initialLoader:', ctx.initialLoader, 'initialGameVersion:', ctx.initialGameVersion)
 	if (!selectedLoader.value) {
 		if (ctx.initialLoader) {
 			selectedLoader.value = ctx.initialLoader
@@ -146,6 +149,7 @@ onMounted(() => {
 	if (ctx.initialGameVersion && !selectedGameVersion.value) {
 		selectedGameVersion.value = ctx.initialGameVersion
 	}
+	debug('after init:', { loader: selectedLoader.value, gameVersion: selectedGameVersion.value })
 })
 
 const tags = injectTags()
@@ -395,9 +399,9 @@ function autoSelectLoaderVersion() {
 	} else if (loaderVersionType.value === 'latest') {
 		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
 	} else if (loaderVersionType.value === 'other' && !selectedLoaderVersion.value) {
-		// Pre-fill with latest when selection was cleared (e.g. loader switch)
 		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
 	}
+	debug('autoSelectLoaderVersion:', selectedLoaderVersion.value, 'type:', loaderVersionType.value)
 }
 
 const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {

@@ -76,13 +76,20 @@
 <script setup lang="ts">
 import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { injectModrinthServerContext } from '../../../../providers/server-context'
 import AutoLink from '../../../base/AutoLink.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
+const debug = useDebugLogger('SetupTypeStage')
 const ctx = injectCreationFlowContext()
-const { setSetupType } = ctx
+const { setSetupType: _setSetupType } = ctx
+
+function setSetupType(type: 'modpack' | 'custom' | 'vanilla') {
+	debug('selected:', type)
+	_setSetupType(type)
+}
 const serverContext = injectModrinthServerContext(null)
 const serverId = serverContext?.serverId
 </script>

@@ -104,6 +104,7 @@
 import { EyeIcon, EyeOffIcon, SettingsIcon } from '@modrinth/assets'
 import { computed, watch } from 'vue'
 
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
@@ -114,6 +115,7 @@ import type { Difficulty, Gamemode, GeneratorSettingsMode } from '../creation-fl
 import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize } from '../shared'
 
+const debug = useDebugLogger('FinalConfigStage')
 const ctx = injectCreationFlowContext()
 const {
 	worldName,
@@ -126,6 +128,8 @@ const {
 	generatorSettingsCustom,
 	selectedGameVersion,
 } = ctx
+
+debug('mounted, setupType:', ctx.setupType.value, 'loader:', ctx.selectedLoader.value, 'gameVersion:', ctx.selectedGameVersion.value, 'loaderVersion:', ctx.selectedLoaderVersion.value)
 
 // Game version options for vanilla flow
 const tags = injectTags()

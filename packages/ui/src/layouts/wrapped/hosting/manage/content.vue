@@ -81,7 +81,9 @@ const serverId = route.params.id as string
 
 const type = computed(() => {
 	const loader = server.value?.loader?.toLowerCase()
-	return loader === 'paper' || loader === 'purpur' ? 'plugin' : 'mod'
+	if (loader === 'paper' || loader === 'purpur') return 'plugin'
+	if (loader === 'vanilla') return 'datapack'
+	return 'mod'
 })
 
 const queryKey = computed(() => ['content', 'list', 'v1', serverId])
@@ -355,7 +357,7 @@ function handleUploadFiles() {
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true
-	input.accept = '.jar'
+	input.accept = type.value === 'datapack' ? '.zip' : '.jar'
 	input.onchange = async () => {
 		if (!input.files) return
 		const files = Array.from(input.files)
@@ -682,25 +684,30 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	mapToTableItem: (item) => ({
-		id: item.file_name,
-		project: item.project,
-		projectLink: item.project?.id ? `/mod/${item.project.id}` : undefined,
-		version: item.version,
-		versionLink:
-			item.project?.id && item.version?.id
-				? `/mod/${item.project.id}/version/${item.version.id}`
+	mapToTableItem: (item) => {
+		const projectType = item.project_type ?? type.value
+		return {
+			id: item.file_name,
+			project: item.project,
+			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
+			version: item.version,
+			versionLink:
+				item.project?.id && item.version?.id
+					? `/${projectType}/${item.project.id}/version/${item.version.id}`
+					: undefined,
+			owner: item.owner
+				? { ...item.owner, link: `/${item.owner.type}/${item.owner.id}` }
 				: undefined,
-		owner: item.owner ? { ...item.owner, link: `/${item.owner.type}/${item.owner.id}` } : undefined,
-		enabled: item.enabled,
-	}),
+			enabled: item.enabled,
+		}
+	},
 })
 </script>
 
 <template>
 	<ContentPageLayout>
 		<template #modals>
-			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
+			<ConfirmUnlinkModal ref="modpackUnlinkModal" server :backup-link="`/hosting/manage/${serverId}/backups`" @unlink="handleModpackUnlinkConfirm" />
 			<ModpackContentModal
 				ref="modpackContentModal"
 				:modpack-name="modpack?.project.title"
