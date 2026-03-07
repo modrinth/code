@@ -641,6 +641,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "client_side",
     "server_side",
     "minecraft_server.country",
+    "minecraft_server.region",
     "minecraft_server.languages",
     "minecraft_java_server.content.kind",
     "minecraft_java_server.content.supported_game_versions",

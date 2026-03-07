@@ -176,9 +176,9 @@ pub async fn init_client_with_database(
                 latency_ms Nullable(UInt32),
                 description Nullable(String),
                 version_name Nullable(String),
-                version_protocol Nullable(UInt32),
-                players_online Nullable(UInt32),
-                players_max Nullable(UInt32)
+                version_protocol Nullable(Int32),
+                players_online Nullable(Int32),
+                players_max Nullable(Int32)
             )
             ENGINE = {engine}
             {ttl}
