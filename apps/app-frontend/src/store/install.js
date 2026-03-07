@@ -2,6 +2,11 @@ import dayjs from 'dayjs'
 
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import { add_project_from_version, check_installed } from '@/helpers/profile.js'
+import {
+	add_server_to_profile,
+	get_profile_worlds,
+	resolveManagedServerWorld,
+} from '@/helpers/worlds.ts'
 
 export const findPreferredVersion = (versions, project, instance) => {
 	// When `project` is passed in from this stack trace:
@@ -70,4 +75,17 @@ export const getServerAddress = (javaServer) => {
 	if (!javaServer) return null
 	const { address } = javaServer
 	return address
+}
+
+export const ensureManagedServerWorldExists = async (profilePath, serverName, serverAddress) => {
+	if (!profilePath || !serverAddress) return
+	try {
+		const worlds = await get_profile_worlds(profilePath)
+		const managedWorld = resolveManagedServerWorld(worlds, serverName, serverAddress)
+		if (!managedWorld) {
+			await add_server_to_profile(profilePath, serverName, serverAddress, 'prompt')
+		}
+	} catch (err) {
+		console.error('Failed to ensure managed server world exists:', err)
+	}
 }

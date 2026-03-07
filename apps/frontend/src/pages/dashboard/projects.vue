@@ -207,12 +207,8 @@
 					<div class="grid-table__row grid-table__header">
 						<div>
 							<Checkbox
-								:model-value="selectedProjects === projects"
-								@update:model-value="
-									selectedProjects === projects
-										? (selectedProjects = [])
-										: (selectedProjects = projects)
-								"
+								:model-value="allBulkEditableProjectsSelected"
+								@update:model-value="toggleAllBulkEditableProjects()"
 							/>
 						</div>
 						<div>Icon</div>
@@ -225,13 +221,10 @@
 					<div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
 						<div>
 							<Checkbox
-								:disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+								v-tooltip="getBulkEditDisabledTooltip(project)"
+								:disabled="isProjectBulkEditDisabled(project)"
 								:model-value="selectedProjects.includes(project)"
-								@update:model-value="
-									selectedProjects.includes(project)
-										? (selectedProjects = selectedProjects.filter((it) => it !== project))
-										: selectedProjects.push(project)
-								"
+								@update:model-value="toggleProjectSelection(project)"
 							/>
 						</div>
 						<div>
@@ -374,6 +367,50 @@ const editLinks = reactive({
 
 const editLinksModal = ref(null)
 const modal_creation = ref(null)
+
+function isProjectBulkEditDisabled(project) {
+	return (
+		(project.permissions & EDIT_DETAILS) === EDIT_DETAILS ||
+		project.project_type === 'minecraft_java_server'
+	)
+}
+
+const bulkEditableProjects = computed(() =>
+	projects.value.filter((project) => !isProjectBulkEditDisabled(project)),
+)
+
+const allBulkEditableProjectsSelected = computed(
+	() =>
+		bulkEditableProjects.value.length > 0 &&
+		bulkEditableProjects.value.every((project) => selectedProjects.value.includes(project)),
+)
+
+function toggleAllBulkEditableProjects() {
+	selectedProjects.value = allBulkEditableProjectsSelected.value
+		? []
+		: bulkEditableProjects.value.slice()
+}
+
+function toggleProjectSelection(project) {
+	if (isProjectBulkEditDisabled(project)) {
+		return
+	}
+
+	if (selectedProjects.value.includes(project)) {
+		selectedProjects.value = selectedProjects.value.filter((it) => it !== project)
+		return
+	}
+
+	selectedProjects.value = [...selectedProjects.value, project]
+}
+
+function getBulkEditDisabledTooltip(project) {
+	if (project.project_type === 'minecraft_java_server') {
+		return 'Server projects do not support bulk editing'
+	}
+
+	return ''
+}
 
 function updateSort(list, sort, desc) {
 	let sortedArray = list

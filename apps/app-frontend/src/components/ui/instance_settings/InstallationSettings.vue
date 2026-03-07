@@ -32,6 +32,9 @@ const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
 const props = defineProps<InstanceSettingsTabProps>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
 const [
 	fabric_versions,

@@ -1,59 +1,10 @@
-import { getCategoryIcon } from '@modrinth/assets'
+import { getCategoryIcon, SERVER_CATEGORY_ICON_MAP } from '@modrinth/assets'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
-
-const SERVER_CATEGORY_ICON_MAP: Record<string, string> = {
-	'adventure-mode': 'compass',
-	anarchy: 'skull',
-	'battle-royale': 'target',
-	bedwars: 'bed-double',
-	bosses: 'crown',
-	classes: 'badge',
-	competitive: 'trophy',
-	'creative-mode': 'palette',
-	'creator-community': 'clapperboard',
-	crossplay: 'gamepad-2',
-	'custom-content': 'blocks',
-	dungeons: 'castle',
-	factions: 'flag',
-	gens: 'pickaxe',
-	'hardcore-mode': 'heart-crack',
-	'keep-inventory': 'backpack',
-	kitpvp: 'sword',
-	lifesteal: 'heart-pulse',
-	media: 'film',
-	microgames: 'grid-3x3',
-	minigames: 'dices',
-	mmo: 'globe',
-	network: 'network',
-	'offline-mode': 'wifi-off',
-	oneblock: 'square',
-	op: 'zap',
-	parkour: 'footprints',
-	'personal-worlds': 'house',
-	plots: 'map-pinned',
-	pokemon: 'paw-print',
-	prison: 'lock',
-	pve: 'shield',
-	pvp: 'swords',
-	questing: 'scroll-text',
-	racing: 'gauge',
-	'recording-smp': 'camera',
-	roleplay: 'theater',
-	rpg: 'wand-sparkles',
-	skyblock: 'cloud',
-	smp: 'users',
-	'survival-mode': 'tree-pine',
-	teams: 'handshake',
-	technical: 'terminal',
-	towns: 'building-2',
-	whitelisted: 'badge-check',
-	'world-resets': 'refresh-ccw',
-}
 
 export const SERVER_REGIONS = [
 	{ code: 'us_east', name: 'US East' },

@@ -1,7 +1,7 @@
 <!-- @deprecated Use ConfirmModal from @modrinth/ui directly. Ads/noblur now handled by injectModalBehavior. -->
 <script setup lang="ts">
 import { ConfirmModal } from '@modrinth/ui'
-import { ref } from 'vue'
+import { useTemplateRef } from 'vue'
 
 defineProps({
 	confirmationText: {
@@ -46,14 +46,14 @@ defineProps({
 })
 
 const emit = defineEmits(['proceed'])
-const modal = ref(null)
+const modal = useTemplateRef('modal')
 
 defineExpose({
 	show: () => {
-		modal.value.show()
+		modal.value?.show()
 	},
 	hide: () => {
-		modal.value.hide()
+		modal.value?.hide()
 	},
 })
 

@@ -2159,6 +2159,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servers"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -3016,6 +3022,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Resource Packs page"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Servers page"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaders page"

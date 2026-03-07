@@ -11,6 +11,7 @@ import {
 } from '@modrinth/assets'
 import type { ProjectType, SortType, Tags } from '@modrinth/ui'
 import {
+	Admonition,
 	ButtonStyled,
 	Checkbox,
 	defineMessages,
@@ -744,6 +745,10 @@ previousFilterState.value = JSON.stringify({
 		<template v-if="instance">
 			<InstanceIndicator :instance="instance" />
 			<h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
+			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
+				Adding content can break compatibility when joining the server. Any added content will also
+				be lost when you update the server instance content.
+			</Admonition>
 		</template>
 		<NavTabs :links="selectableProjectTypes" />
 		<StyledInput

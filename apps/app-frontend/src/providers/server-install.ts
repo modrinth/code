@@ -8,15 +8,9 @@ import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import { install_to_existing_profile } from '@/helpers/pack.js'
 import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
 import type { GameInstance } from '@/helpers/types'
-import {
-	add_server_to_profile,
-	edit_server_in_profile,
-	get_profile_worlds,
-	type ServerWorld,
-	start_join_server,
-} from '@/helpers/worlds.ts'
+import { start_join_server } from '@/helpers/worlds.ts'
 import { handleSevereError } from '@/store/error.js'
-import { getServerAddress } from '@/store/install.js'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install.js'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface ModalRef<TShow extends (...args: any[]) => void = () => void> {
@@ -89,60 +83,6 @@ export function createServerInstall(opts: {
 
 	function isServerInstalling(projectId: string) {
 		return installingServerProjects.value.includes(projectId)
-	}
-
-	async function syncServerAsWorld(
-		profilePath: string,
-		serverName: string,
-		serverAddress: string | null,
-		serverProjectId: string | null = null,
-	) {
-		if (!profilePath || !serverAddress) return
-		try {
-			const worlds = await get_profile_worlds(profilePath)
-			const servers = worlds.filter((w): w is ServerWorld => w.type === 'server')
-
-			if (serverProjectId) {
-				const linkedWorld = servers.find((w) => w.linked_project_id === serverProjectId)
-				if (linkedWorld) {
-					if (linkedWorld.address !== serverAddress || linkedWorld.name !== serverName) {
-						await edit_server_in_profile(
-							profilePath,
-							linkedWorld.index,
-							serverName,
-							serverAddress,
-							linkedWorld.pack_status,
-							serverProjectId,
-						)
-					}
-					return
-				}
-			}
-
-			const existingServer = servers.find((w) => w.address === serverAddress)
-			if (existingServer) {
-				if (serverProjectId || existingServer.name !== serverName) {
-					await edit_server_in_profile(
-						profilePath,
-						existingServer.index,
-						serverName,
-						serverAddress,
-						existingServer.pack_status,
-						serverProjectId ?? undefined,
-					)
-				}
-			} else {
-				await add_server_to_profile(
-					profilePath,
-					serverName,
-					serverAddress,
-					'prompt',
-					serverProjectId ?? undefined,
-				)
-			}
-		} catch (err) {
-			console.error('Failed to add server to instance worlds:', err)
-		}
 	}
 
 	async function joinServer(profilePath: string, serverAddress: string | null) {
@@ -304,7 +244,7 @@ export function createServerInstall(opts: {
 		})
 		await edit_icon(profilePath, originalIconPath)
 
-		await syncServerAsWorld(profilePath, project.title, serverAddress, serverProjectId)
+		await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
 	}
 
 	/**
@@ -360,7 +300,7 @@ export function createServerInstall(opts: {
 
 		if (!instance) return
 
-		await syncServerAsWorld(instance.path, project.title, serverAddress, project.id)
+		await ensureManagedServerWorldExists(instance.path, project.title, serverAddress)
 
 		// Update existing instance if needed
 		if (isModpack && instance.linked_data?.version_id !== modpackVersionId) {
