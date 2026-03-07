@@ -433,14 +433,11 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<component
-						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
+					<ProjectHeader
 						v-if="projectV3Loaded"
-						v-bind="
-							isServerProject
-								? { project, projectV3, member: !!currentMember }
-								: { project, member: !!currentMember }
-						"
+						:project="project"
+						:project-v3="projectV3"
+						:member="!!currentMember"
 					>
 						<template #actions>
 							<ButtonStyled
@@ -800,7 +797,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-					</component>
+					</ProjectHeader>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -1071,7 +1068,6 @@ import {
 	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
-	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,
