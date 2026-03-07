@@ -16,6 +16,7 @@ import { LabrinthServerPingInternalModule } from './labrinth/server-ping/interna
 import { LabrinthStateModule } from './labrinth/state'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
+import { LabrinthUsersV2Module } from './labrinth/users/v2'
 
 type ModuleConstructor = new (client: AbstractModrinthClient) => AbstractModule
 
@@ -44,6 +45,7 @@ export const MODULE_REGISTRY = {
 	labrinth_state: LabrinthStateModule,
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
 	labrinth_threads_v3: LabrinthThreadsV3Module,
+	labrinth_users_v2: LabrinthUsersV2Module,
 	labrinth_versions_v3: LabrinthVersionsV3Module,
 } as const satisfies Record<string, ModuleConstructor>
 

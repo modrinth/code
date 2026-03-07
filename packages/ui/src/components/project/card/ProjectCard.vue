@@ -49,16 +49,21 @@
 				</div>
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
-						<ServerDetails
-							v-if="isServerProject"
-							:region="serverRegion"
-							:online-players="serverOnlinePlayers"
-							:recent-plays="serverRecentPlays"
-							:ping="serverPing"
-							:status-online="serverStatusOnline"
-							:hide-online-players-label="true"
-							:hide-recent-plays-label="true"
-						/>
+						<template v-if="isServerProject">
+							<ServerOnlinePlayers
+								v-if="serverOnlinePlayers !== undefined"
+								:online="serverOnlinePlayers"
+								:status-online="serverStatusOnline"
+								:hide-label="true"
+							/>
+							<ServerRecentPlays
+								v-if="serverRecentPlays !== undefined"
+								:recent-plays="serverRecentPlays"
+								:hide-label="true"
+							/>
+							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
+							<ServerRegion v-if="serverRegion" :region="serverRegion" />
+						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"
@@ -134,16 +139,21 @@
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
 				<div class="flex items-center gap-2 w-full">
-					<ServerDetails
-						v-if="isServerProject"
-						:region="serverRegion"
-						:online-players="serverOnlinePlayers"
-						:status-online="serverStatusOnline"
-						:recent-plays="serverRecentPlays"
-						:ping="serverPing"
-						:hide-online-players-label="true"
-						:hide-recent-plays-label="true"
-					/>
+					<template v-if="isServerProject">
+						<ServerOnlinePlayers
+							v-if="serverOnlinePlayers !== undefined"
+							:online="serverOnlinePlayers"
+							:status-online="serverStatusOnline"
+							:hide-label="true"
+						/>
+						<ServerRecentPlays
+							v-if="serverRecentPlays !== undefined"
+							:recent-plays="serverRecentPlays"
+							:hide-label="true"
+						/>
+						<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
+						<ServerRegion v-if="serverRegion" :region="serverRegion" />
+					</template>
 					<div class="flex items-center gap-1">
 						<ProjectCardEnvironment
 							v-if="environment"
@@ -181,8 +191,11 @@ import { computed } from 'vue'
 import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
-import ServerDetails from '../server/ServerDetails.vue'
 import ServerModpackContent from '../server/ServerModpackContent.vue'
+import ServerOnlinePlayers from '../server/ServerOnlinePlayers.vue'
+import ServerPing from '../server/ServerPing.vue'
+import ServerRecentPlays from '../server/ServerRecentPlays.vue'
+import ServerRegion from '../server/ServerRegion.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
