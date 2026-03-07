@@ -654,6 +654,10 @@ export const commonSettingsMessages = defineMessages({
 		id: 'settings.language.title',
 		defaultMessage: 'Language',
 	},
+	notifications: {
+		id: 'settings.notifications.title',
+		defaultMessage: 'Email notifications',
+	},
 	pats: {
 		id: 'settings.pats.title',
 		defaultMessage: 'Personal access tokens',

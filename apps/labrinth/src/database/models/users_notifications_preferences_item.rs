@@ -108,4 +108,31 @@ impl UserNotificationPreference {
 
         Ok(())
     }
+
+    pub async fn upsert(
+        user_id: DBUserId,
+        channel: NotificationChannel,
+        notification_type: NotificationType,
+        enabled: bool,
+        exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
+    ) -> Result<(), DatabaseError> {
+        sqlx::query!(
+            "
+            INSERT INTO users_notifications_preferences (
+                user_id, channel, notification_type, enabled
+            )
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (COALESCE(user_id, -1), channel, notification_type)
+            DO UPDATE SET enabled = $4
+            ",
+            user_id.0,
+            channel.as_str(),
+            notification_type.as_str(),
+            enabled,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
 }
