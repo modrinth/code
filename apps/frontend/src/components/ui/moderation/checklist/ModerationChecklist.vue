@@ -148,6 +148,7 @@
 								placeholder="No message generated."
 								:disabled="false"
 								:heading-buttons="false"
+								:on-image-upload="onUploadHandler"
 							/>
 							<StyledInput
 								v-else
@@ -288,6 +289,7 @@
 												:max-height="300"
 												:disabled="false"
 												:heading-buttons="false"
+												:on-image-upload="onUploadHandler"
 												@input="persistState"
 											/>
 										</template>
@@ -485,6 +487,7 @@ import { useGeneratedState } from '~/composables/generated'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useModerationStore } from '~/store/moderation.ts'
 
+import { useImageUpload } from '~/composables/image-upload.ts'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 
@@ -674,6 +677,14 @@ const modpackJudgements = ref<ModerationJudgements>({})
 const isModpackPermissionsStage = computed(() => {
 	return currentStageObj.value.id === 'modpack-permissions'
 })
+
+async function onUploadHandler(file: File) {
+	const response = await useImageUpload(file, {
+		context: 'thread_message',
+		projectID: projectV2.value.id,
+	})
+	return response.url
+}
 
 const useSimpleEditor = ref(false)
 const message = ref('')
