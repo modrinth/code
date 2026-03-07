@@ -640,6 +640,8 @@ impl Profile {
                             && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
+                            && !(project_type == ProjectType::ShaderPack
+                                && file_name.ends_with(".txt"))
                         {
                             let file_size = subdirectory
                                 .metadata()
@@ -934,6 +936,8 @@ impl Profile {
                     if subdirectory.is_file()
                         && let Some(file_name) =
                             subdirectory.file_name().and_then(|x| x.to_str())
+                        && !(project_type == ProjectType::ShaderPack
+                            && file_name.ends_with(".txt"))
                     {
                         let file_size = subdirectory
                             .metadata()
