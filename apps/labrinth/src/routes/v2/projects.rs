@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::SearchBackend;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -53,9 +53,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, SearchError> {
+) -> Result<HttpResponse, ApiError> {
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
     // in the API calls except that 'versions:x' is now 'game_versions:x'
@@ -100,7 +100,10 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_for_project(&info, &config, &redis).await?;
+    let results = search_backend
+        .search_for_project(&info, &redis)
+        .await
+        .map_err(ApiError::Internal)?;
 
     let results = LegacySearchResults::from(results);
 
@@ -410,7 +413,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -524,7 +527,7 @@ pub async fn project_edit(
         req.clone(),
         info,
         pool.clone(),
-        search_config,
+        search_backend,
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
@@ -918,7 +921,7 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
@@ -927,7 +930,7 @@ pub async fn project_delete(
         info,
         pool,
         redis,
-        search_config,
+        search_backend,
         session_queue,
     )
     .await

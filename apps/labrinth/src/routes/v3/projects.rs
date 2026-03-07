@@ -30,8 +30,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
-use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::{SearchBackend, SearchResults};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -292,7 +291,7 @@ async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -302,7 +301,7 @@ async fn project_edit(
         req,
         info,
         pool,
-        search_config,
+        search_backend,
         web::Json(new_project),
         redis,
         session_queue,
@@ -315,7 +314,7 @@ pub async fn project_edit_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1115,16 +1114,16 @@ pub async fn project_edit_internal(
         project_item.inner.status.is_searchable(),
         new_project.status.map(|status| status.is_searchable()),
     ) {
-        remove_documents(
-            &project_item
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-            &search_config,
-        )
-        .await
-        .wrap_internal_err("failed to remove documents")?;
+        search_backend
+            .remove_documents(
+                &project_item
+                    .versions
+                    .into_iter()
+                    .map(|x| x.into())
+                    .collect::<Vec<_>>(),
+            )
+            .await
+            .wrap_internal_err("failed to remove documents")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1180,10 +1179,13 @@ pub async fn edit_project_categories(
 
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config, &redis).await?;
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend
+        .search_for_project(&info, &redis)
+        .await
+        .map_err(ApiError::Internal)?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
@@ -1197,7 +1199,7 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(web::Json(results))
 }
 
 //checks the validity of a project id or slug
@@ -2460,7 +2462,7 @@ pub async fn project_delete_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
@@ -2572,16 +2574,16 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    remove_documents(
-        &project
-            .versions
-            .into_iter()
-            .map(|x| x.into())
-            .collect::<Vec<_>>(),
-        &search_config,
-    )
-    .await
-    .wrap_internal_err("failed to remove project version documents")?;
+    search_backend
+        .remove_documents(
+            &project
+                .versions
+                .into_iter()
+                .map(|x| x.into())
+                .collect::<Vec<_>>(),
+        )
+        .await
+        .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
         Ok(())
