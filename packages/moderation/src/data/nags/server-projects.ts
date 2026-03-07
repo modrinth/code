@@ -6,11 +6,11 @@ export const serverProjectsNags: Nag[] = [
 		id: 'select-country',
 		title: defineMessage({
 			id: 'nags.select-country.title',
-			defaultMessage: 'Select a country',
+			defaultMessage: 'Select a region',
 		}),
 		description: defineMessage({
 			id: 'nags.select-country.description',
-			defaultMessage: 'Let players know what country your server is located in.',
+			defaultMessage: 'Let players know what region your server is located in.',
 		}),
 		status: 'required',
 		shouldShow: (context: NagContext) =>
