@@ -132,7 +132,7 @@
 				class="flex flex-col gap-3 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
 				:class="{ 'mt-3': !!$slots.actions }"
 			>
-				<div class="flex items-center gap-3">
+				<div v-if="downloads !== undefined || followers !== undefined" class="flex items-center gap-3">
 					<ProjectCardStats :downloads="downloads" :followers="followers" />
 				</div>
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
@@ -151,10 +151,12 @@
 							:recent-plays="serverRecentPlays"
 							:hide-label="true"
 						/>
-						<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
-						<ServerRegion v-if="serverRegion" :region="serverRegion" />
 					</template>
 					<div class="flex items-center gap-1">
+						<template v-if="isServerProject">
+							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
+							<ServerRegion v-if="serverRegion" :region="serverRegion" />
+						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"
