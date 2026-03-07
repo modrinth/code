@@ -180,9 +180,11 @@
 										count: formatCompactNumber(projects?.length || 0),
 										type: formatMessage(
 											commonProjectTypeSentenceMessages[
-												projectTypes.length === 1 ? projectTypes[0] : 'project'
+												projectTypes.length === 1 && projects?.length > 1
+													? projectTypes[0]
+													: 'project'
 											],
-											{ count: projects?.length || 0 },
+											{ count: formatCompactNumberPlural(projects?.length || 0) },
 										),
 									}"
 								>
@@ -247,7 +249,7 @@
 			>
 				<div class="flex flex-col gap-2">
 					<span
-						v-tooltip="dayjs(collection.created).format('MMMM D, YYYY [at] h:mm A')"
+						v-tooltip="formatDateTime(collection.created)"
 						class="flex w-fit items-center gap-2"
 					>
 						<CalendarIcon aria-hidden="true" />
@@ -259,7 +261,7 @@
 					</span>
 					<span
 						v-if="showUpdatedDate"
-						v-tooltip="dayjs(collection.updated).format('MMMM D, YYYY [at] h:mm A')"
+						v-tooltip="formatDateTime(collection.updated)"
 						class="flex w-fit items-center gap-2"
 					>
 						<UpdatedIcon aria-hidden="true" />
@@ -409,6 +411,8 @@ import {
 	RadioButtons,
 	SidebarCard,
 	StyledInput,
+	useCompactNumber,
+	useFormatDateTime,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
@@ -424,7 +428,11 @@ const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const formatCompactNumber = useCompactNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const route = useNativeRoute()
 const router = useRouter()
@@ -490,8 +498,7 @@ const messages = defineMessages({
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',
-		defaultMessage:
-			'{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}',
+		defaultMessage: '{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}',
 	},
 	removeProjectButton: {
 		id: 'collection.button.remove-project',

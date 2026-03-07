@@ -77,10 +77,6 @@ export const commonMessages = defineMessages({
 		id: 'label.dashboard',
 		defaultMessage: 'Dashboard',
 	},
-	dateAtTimeTooltip: {
-		id: 'tooltip.date-at-time',
-		defaultMessage: '{date, date, long} at {time, time, short}',
-	},
 	declineButton: {
 		id: 'button.decline',
 		defaultMessage: 'Decline',
@@ -387,19 +383,28 @@ export const commonMessages = defineMessages({
 	},
 	projectDownloads: {
 		id: 'project.download-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+		defaultMessage: '{count, number} {count, plural, one {download} other {downloads}}',
 	},
 	projectFollowers: {
 		id: 'project.follower-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {followers} other {followers}}',
+		defaultMessage: '{count, number} {count, plural, one {follower} other {followers}}',
 	},
 	projectOnlinePlayerCount: {
 		id: 'project.online-player-count',
-		defaultMessage: '{count} {count, plural, one {online} other {online}}',
+		defaultMessage: '{count, number} online',
+	},
+	projectOnlinePlayerCountTooltip: {
+		id: 'project.online-player-count.tooltip',
+		defaultMessage: '{count} {countPlural, plural, one {player} other {players}} online',
 	},
 	projectRecentPlays: {
 		id: 'project.recent-plays',
-		defaultMessage: '{count} {count, plural, one {recent play} other {recent plays}}',
+		defaultMessage: '{count} {countPlural, plural, one {recent play} other {recent plays}}',
+	},
+	projectRecentPlaysTooltip: {
+		id: 'project.recent-plays.tooltip',
+		defaultMessage:
+			'{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks',
 	},
 })
 
