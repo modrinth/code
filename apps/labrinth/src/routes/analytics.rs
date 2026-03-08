@@ -245,7 +245,8 @@ struct MinecraftProfile {
 #[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
-    minecraft_access_token: String,
+    minecraft_access_token: Option<String>,
+    minecraft_uuid: Option<Uuid>,
 }
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
@@ -282,22 +283,31 @@ async fn minecraft_server_play_ingest(
         )));
     }
 
-    let profile_response = HTTP_CLIENT
-        .get("https://api.minecraftservices.com/minecraft/profile")
-        .bearer_auth(&play_input.minecraft_access_token)
-        .send()
-        .await
-        .wrap_request_err("failed to contact Minecraft services")?;
+    let minecraft_uuid = if let Some(token) = &play_input.minecraft_access_token
+    {
+        let profile_response = HTTP_CLIENT
+            .get("https://api.minecraftservices.com/minecraft/profile")
+            .bearer_auth(token)
+            .send()
+            .await
+            .wrap_request_err("failed to contact Minecraft services")?;
 
-    if !profile_response.status().is_success() {
-        return Err(ApiError::Request(eyre!("invalid Minecraft access token")));
-    }
+        if !profile_response.status().is_success() {
+            return Err(ApiError::Request(eyre!(
+                "invalid Minecraft access token"
+            )));
+        }
 
-    let minecraft_uuid = profile_response
-        .json::<MinecraftProfile>()
-        .await
-        .wrap_request_err("invalid Minecraft profile response")?
-        .id;
+        profile_response
+            .json::<MinecraftProfile>()
+            .await
+            .wrap_request_err("invalid Minecraft profile response")?
+            .id
+    } else {
+        play_input
+            .minecraft_uuid
+            .wrap_request_err("missing `minecraft_uuid`")?
+    };
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
     let headers = req
