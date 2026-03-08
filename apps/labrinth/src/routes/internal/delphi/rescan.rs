@@ -2,8 +2,10 @@ use eyre::{Result, WrapErr, eyre};
 use futures::future::try_join_all;
 use tracing::info;
 
-use super::{DELPHI_CLIENT, DelphiRunParameters};
-use crate::{database::PgPool, env::ENV, models::ids::FileId};
+use super::DelphiRunParameters;
+use crate::{
+    database::PgPool, env::ENV, models::ids::FileId, util::http::HTTP_CLIENT,
+};
 
 pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
     let delphi_version = fetch_delphi_version().await?;
@@ -61,7 +63,7 @@ pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
 }
 
 async fn fetch_delphi_version() -> Result<i32> {
-    let response = DELPHI_CLIENT
+    let response = HTTP_CLIENT
         .get(format!("{}/version", ENV.DELPHI_URL))
         .send()
         .await

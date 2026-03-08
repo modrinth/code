@@ -1,11 +1,10 @@
-use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
+use std::{collections::HashMap, fmt::Write, time::Instant};
 
-use crate::database::PgPool;
 use crate::env::ENV;
+use crate::{database::PgPool, util::http::HTTP_CLIENT};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
-use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use tokio::sync::Mutex;
 use tracing::info;
@@ -45,21 +44,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(issue_type_schema),
     );
 }
-
-static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
-    reqwest::Client::builder()
-        .default_headers({
-            HeaderMap::from_iter([(
-                USER_AGENT,
-                HeaderValue::from_static(concat!(
-                    "Labrinth/",
-                    env!("COMPILATION_DATE")
-                )),
-            )])
-        })
-        .build()
-        .unwrap()
-});
 
 /// Type of [`DelphiReportIssueDetails::key`].
 ///
@@ -389,7 +373,7 @@ pub async fn run(
         run_parameters.file_id.0
     );
 
-    DELPHI_CLIENT
+    HTTP_CLIENT
         .post(&ENV.DELPHI_URL)
         .json(&serde_json::json!({
             "url": file_data.url,
@@ -556,7 +540,7 @@ async fn issue_type_schema(
         cache_entry => Ok(HttpResponse::Ok().json(
             &cache_entry
                 .insert((
-                    DELPHI_CLIENT
+                    HTTP_CLIENT
                         .get(format!("{}/schema", ENV.DELPHI_URL))
                         .send()
                         .await

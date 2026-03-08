@@ -1,7 +1,7 @@
 use crate::auth::get_user_from_headers;
+use crate::database::PgPool;
 use crate::database::models::DBProject;
 use crate::database::redis::RedisPool;
-use crate::database::PgPool;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
 use crate::models::ids::ProjectId;
@@ -10,8 +10,11 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
+use crate::util::http::HTTP_CLIENT;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
+use eyre::eyre;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
@@ -255,7 +258,7 @@ async fn minecraft_server_play_ingest(
     play_input: web::Json<MinecraftJavaServerPlayInput>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -274,34 +277,26 @@ async fn minecraft_server_play_ingest(
         .ok_or(ApiError::NotFound)?;
 
     if project.components.minecraft_server.is_none() {
-        return Err(ApiError::InvalidInput(
-            "Project is not a Minecraft server project".into(),
-        ));
+        return Err(ApiError::Request(eyre!(
+            "not a `minecraft_server` project"
+        )));
     }
 
-    let profile_response = reqwest::Client::new()
+    let profile_response = HTTP_CLIENT
         .get("https://api.minecraftservices.com/minecraft/profile")
         .bearer_auth(&play_input.minecraft_access_token)
         .send()
         .await
-        .map_err(|_| {
-            ApiError::InvalidInput(
-                "Failed to contact Minecraft services".into(),
-            )
-        })?;
+        .wrap_request_err("failed to contact Minecraft services")?;
 
     if !profile_response.status().is_success() {
-        return Err(ApiError::InvalidInput(
-            "Invalid Minecraft access token".into(),
-        ));
+        return Err(ApiError::Request(eyre!("invalid Minecraft access token")));
     }
 
     let minecraft_uuid = profile_response
         .json::<MinecraftProfile>()
         .await
-        .map_err(|_| {
-            ApiError::InvalidInput("Invalid Minecraft profile response".into())
-        })?
+        .wrap_request_err("invalid Minecraft profile response")?
         .id;
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
@@ -335,5 +330,5 @@ async fn minecraft_server_play_ingest(
 
     analytics_queue.add_minecraft_server_play(row);
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(())
 }
