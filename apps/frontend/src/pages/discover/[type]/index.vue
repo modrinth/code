@@ -381,7 +381,11 @@ async function serverInstall(project: InstallableSearchResult) {
 	project.installing = true
 	try {
 		if (projectType.value?.id === 'modpack') {
-			const versionId = project.latest_version
+			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
+				include_changelog: false,
+				limit: 1,
+			})
+			const versionId = versions[0]?.id ?? project.latest_version
 			if (!versionId) {
 				handleError(new Error('No version found for this modpack'))
 				project.installing = false

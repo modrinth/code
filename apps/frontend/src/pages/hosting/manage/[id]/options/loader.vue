@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
 		<InstallationSettingsLayout>
-			<template #linked-extra>
+			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
 						formatMessage(messages.resetServerTitle)
@@ -20,15 +20,6 @@
 				</div>
 			</template>
 
-			<template #unlinked-extra-buttons>
-				<ButtonStyled>
-					<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
-						{{ formatMessage(commonMessages.resetServerButton) }}
-						<ChevronRightIcon class="size-5" />
-					</button>
-				</ButtonStyled>
-			</template>
-
 			<template #extra-modals>
 				<ServerSetupModal
 					ref="setupModal"
@@ -42,7 +33,7 @@
 
 <script setup lang="ts">
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
-import { ChevronRightIcon, RotateCounterClockwiseIcon } from '@modrinth/assets'
+import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,

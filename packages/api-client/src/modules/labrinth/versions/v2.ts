@@ -38,6 +38,12 @@ export class LabrinthVersionsV2Module extends AbstractModule {
 		if (options?.include_changelog === false) {
 			params.include_changelog = 'false'
 		}
+		if (options?.limit != null) {
+			params.limit = String(options.limit)
+		}
+		if (options?.offset != null) {
+			params.offset = String(options.offset)
+		}
 
 		return this.client.request<Labrinth.Versions.v2.Version[]>(`/project/${id}/version`, {
 			api: 'labrinth',

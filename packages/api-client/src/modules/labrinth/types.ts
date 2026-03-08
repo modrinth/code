@@ -622,6 +622,8 @@ export namespace Labrinth {
 				game_versions?: string[]
 				loaders?: string[]
 				include_changelog?: boolean
+				limit?: number
+				offset?: number
 			}
 		}
 
@@ -638,6 +640,8 @@ export namespace Labrinth {
 				game_versions?: string[]
 				loaders?: string[]
 				include_changelog?: boolean
+				limit?: number
+				offset?: number
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

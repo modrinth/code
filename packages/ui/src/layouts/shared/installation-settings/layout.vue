@@ -306,8 +306,7 @@ const messages = defineMessages({
 					</div>
 				</div>
 
-				<slot name="linked-extra" />
-			</template>
+				</template>
 
 			<!-- NOT LINKED -->
 			<template v-else>
@@ -498,7 +497,10 @@ const messages = defineMessages({
 						</ButtonStyled>
 					</div>
 				</div>
-			</template>
+
+				</template>
+
+			<slot name="extra" />
 		</template>
 	</div>
 
