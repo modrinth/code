@@ -15,7 +15,7 @@ type AnalyticsEventMap = {
 	PageView: { path: string; fromPath: string; failed: unknown }
 	InstanceCreate: { source: string }
 	InstanceCreateStart: { source: string }
-	InstancePlay: InstanceProperties & { source: string }
+	InstanceStart: InstanceProperties & { source: string }
 	InstanceStop: Partial<InstanceProperties> & { source?: string }
 	InstanceDuplicate: InstanceProperties
 	InstanceRepair: InstanceProperties
