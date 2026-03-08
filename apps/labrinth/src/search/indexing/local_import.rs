@@ -15,13 +15,18 @@ use crate::database::models::{
     DBProjectId, DBVersionId, LoaderFieldEnumId, LoaderFieldEnumValueId,
     LoaderFieldId,
 };
+use crate::database::redis::RedisPool;
+use crate::models::exp;
+use crate::models::ids::ProjectId;
 use crate::models::projects::from_duplicate_version_fields;
 use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
+use crate::util::error::Context;
 
 pub async fn index_local(
     pool: &PgPool,
+    redis: &RedisPool,
     cursor: i64,
     limit: i64,
 ) -> Result<(Vec<UploadSearchProject>, i64), IndexingError> {
@@ -40,18 +45,20 @@ pub async fn index_local(
         slug: Option<String>,
         color: Option<i32>,
         license: String,
+        components: exp::ProjectSerial,
     }
 
     let db_projects = sqlx::query!(
-        "
+        r#"
         SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
-        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color
+        m.icon_url icon_url, m.updated updated, m.approved approved, m.published, m.license license, m.slug slug, m.color,
+        m.components AS "components: sqlx::types::Json<exp::ProjectSerial>"
         FROM mods m
         WHERE m.status = ANY($1) AND m.id > $3
         GROUP BY m.id
         ORDER BY m.id ASC
         LIMIT $2;
-        ",
+        "#,
         &*crate::models::projects::ProjectStatus::iterator()
         .filter(|x| x.is_searchable())
         .map(|x| x.to_string())
@@ -73,12 +80,21 @@ pub async fn index_local(
                 slug: m.slug,
                 color: m.color,
                 license: m.license,
+                components: m.components.0,
             }
         })
         .try_collect::<Vec<PartialProject>>()
         .await?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
+    let project_components = db_projects
+        .iter()
+        .map(|project| (ProjectId::from(project.id), &project.components))
+        .collect::<Vec<_>>();
+    let project_query_context =
+        exp::project::fetch_query_context(&project_components, pool, redis)
+            .await
+            .wrap_err("failed to fetch query context")?;
 
     let Some(largest) = project_ids.iter().max() else {
         return Ok((vec![], i64::MAX));
@@ -336,7 +352,12 @@ pub async fn index_local(
                     .collect();
                 let mut loader_fields =
                     from_duplicate_version_fields(version_fields);
-                let project_types = version.project_types;
+                let mut project_types = version.project_types;
+
+                exp::compat::correct_project_types(
+                    &project.components,
+                    &mut project_types,
+                );
 
                 let mut version_loaders = version.loaders;
 
@@ -389,6 +410,15 @@ pub async fn index_local(
                         .insert("server_side".to_string(), vec![server_side]);
                 }
 
+                let components = project
+                    .components
+                    .clone()
+                    .into_query(
+                        ProjectId::from(project.id),
+                        &project_query_context,
+                    )
+                    .wrap_err("failed to populate query components")?;
+
                 let usp = UploadSearchProject {
                     version_id: crate::models::ids::VersionId::from(version.id)
                         .to_string(),
@@ -418,6 +448,7 @@ pub async fn index_local(
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
                     loaders: project_loaders.clone(),
+                    components,
                 };
 
                 uploads.push(usp);

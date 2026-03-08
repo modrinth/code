@@ -257,6 +257,10 @@ const projectListLayouts = defineMessages({
 		id: 'settings.display.project-list-layouts.modpack',
 		defaultMessage: 'Modpacks page',
 	},
+	server: {
+		id: 'settings.display.project-list-layouts.server',
+		defaultMessage: 'Servers page',
+	},
 	user: {
 		id: 'settings.display.project-list-layouts.user',
 		defaultMessage: 'User profile pages',

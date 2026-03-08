@@ -94,17 +94,20 @@ const LOCALE_CODES = new Set(LOCALES.map((l) => l.code))
  * Usage: buildLocaleMessages(import.meta.glob('./locales/* /index.json', { eager: true }))
  */
 export function buildLocaleMessages(
-	modules: Record<string, { default: CrowdinMessages }>,
+	...allModules: Record<string, { default: CrowdinMessages }>[]
 ): Record<string, Record<string, string>> {
 	const messages: Record<string, Record<string, string>> = {}
-	for (const [path, module] of Object.entries(modules)) {
-		// Extract locale code from path like './locales/en-US/index.json' or './src/locales/en-US/index.json'
-		const match = path.match(/\/([^/]+)\/index\.json$/)
-		if (match) {
-			const locale = match[1]
-			// Only include locales that are in our LOCALES list
-			if (LOCALE_CODES.has(locale)) {
-				messages[locale] = transformCrowdinMessages(module.default)
+	for (const modules of allModules) {
+		for (const [path, module] of Object.entries(modules)) {
+			// Extract locale code from path like './locales/en-US/index.json' or './src/locales/en-US/index.json'
+			const match = path.match(/\/([^/]+)\/index\.json$/)
+			if (match) {
+				const locale = match[1]
+				// Only include locales that are in our LOCALES list
+				if (LOCALE_CODES.has(locale)) {
+					const mergedMessages = messages[locale] ?? {}
+					messages[locale] = Object.assign(mergedMessages, transformCrowdinMessages(module.default))
+				}
 			}
 		}
 	}

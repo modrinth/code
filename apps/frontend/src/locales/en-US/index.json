@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Create project"
   },
+  "create.project.create-server-project": {
+    "message": "Create server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Missing fields: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },
   "create.project.name-placeholder": {
     "message": "Enter project name..."
+  },
+  "create.project.owner-description": {
+    "message": "Set the project owner as yourself or an organization you're a member of."
+  },
+  "create.project.owner-label": {
+    "message": "Owner"
+  },
+  "create.project.server-project-title": {
+    "message": "Creating a server project"
   },
   "create.project.summary-description": {
     "message": "A sentence or two that describes your project."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Creating a project"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Project"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "New project"
   },
+  "layout.action.new-server-project": {
+    "message": "New server"
+  },
+  "layout.action.publish": {
+    "message": "Publish"
+  },
   "layout.action.reports": {
     "message": "Review reports"
   },
@@ -1775,9 +1805,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Account number"
   },
-  "muralpay.field.branch-code": {
-    "message": "Branch code"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1807,6 +1834,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX phone"
+  },
+  "muralpay.field.random-key": {
+    "message": "Random key"
   },
   "muralpay.field.routing-number": {
     "message": "Routing number"
@@ -1868,9 +1898,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Enter account number"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Enter branch code"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Enter 18-digit CLABE"
   },
@@ -1882,6 +1909,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Enter PIX email"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Enter random key"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Enter 9-digit routing number"
@@ -2114,6 +2144,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servers"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2143,6 +2179,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project-type.server.plural": {
+    "message": "Servers"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2965,6 +3007,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Resource Packs page"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Servers page"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaders page"

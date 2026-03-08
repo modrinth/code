@@ -2,7 +2,8 @@ use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::models::analytics::{PageView, Playtime};
+use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
+use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
@@ -16,6 +17,7 @@ use std::net::Ipv4Addr;
 use std::sync::Arc;
 use tracing::trace;
 use url::Url;
+use uuid::Uuid;
 
 pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",
@@ -39,6 +41,13 @@ pub const FILTERED_HEADERS: &[&str] = &[
     "x-vercel-ip-latitude",
     "x-vercel-ip-country",
 ];
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(page_view_ingest)
+        .service(playtime_ingest)
+        .service(minecraft_server_play_ingest);
+}
+
 #[derive(Deserialize)]
 pub struct UrlInput {
     url: String,
@@ -46,7 +55,7 @@ pub struct UrlInput {
 
 //this route should be behind the cloudflare WAF to prevent non-browsers from calling it
 #[post("view")]
-pub async fn page_view_ingest(
+async fn page_view_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -167,7 +176,7 @@ pub struct PlaytimeInput {
 }
 
 #[post("playtime")]
-pub async fn playtime_ingest(
+async fn playtime_ingest(
     req: HttpRequest,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
@@ -220,6 +229,47 @@ pub async fn playtime_ingest(
             });
         }
     }
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
+#[derive(Deserialize)]
+pub struct MinecraftJavaServerPlayInput {
+    project_id: ProjectId,
+    minecraft_uuid: Uuid,
+}
+
+pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
+
+#[post("minecraft-server-play")]
+async fn minecraft_server_play_ingest(
+    req: HttpRequest,
+    analytics_queue: web::Data<Arc<AnalyticsQueue>>,
+    session_queue: web::Data<AuthQueue>,
+    play_input: web::Json<MinecraftJavaServerPlayInput>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::empty(),
+    )
+    .await
+    .map(|(_, user)| user)
+    .ok();
+
+    let project_id = play_input.project_id;
+    let row = MinecraftServerPlay {
+        recorded: get_current_tenths_of_ms(),
+        user_id: user.map(|u| u.id.0).unwrap_or(0),
+        project_id: project_id.0,
+        minecraft_uuid: play_input.minecraft_uuid,
+    };
+
+    analytics_queue.add_minecraft_server_play(row);
 
     Ok(HttpResponse::NoContent().finish())
 }
