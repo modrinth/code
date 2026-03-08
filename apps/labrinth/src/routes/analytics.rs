@@ -296,7 +296,7 @@ async fn minecraft_server_play_ingest(
             ])
             .send()
             .await
-            .wrap_request_err("failed to contact Mojang session server")?;
+            .wrap_internal_err("failed to contact Mojang session server")?;
 
         if has_joined.status() == reqwest::StatusCode::NO_CONTENT
             || !has_joined.status().is_success()
@@ -309,7 +309,7 @@ async fn minecraft_server_play_ingest(
         let profile = has_joined
             .json::<MinecraftProfile>()
             .await
-            .wrap_request_err("invalid Mojang session response")?;
+            .wrap_internal_err("invalid Mojang session response")?;
 
         if profile.name != *username {
             return Err(ApiError::Request(eyre!(
