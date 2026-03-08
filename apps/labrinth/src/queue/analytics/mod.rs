@@ -22,7 +22,7 @@ pub struct AnalyticsQueue {
     views_queue: DashMap<(u64, u64), Vec<PageView>>,
     downloads_queue: DashMap<(u64, u64), Download>,
     playtime_queue: DashSet<Playtime>,
-    minecraft_server_plays_queue: DashMap<(u64, u64), MinecraftServerPlay>,
+    minecraft_server_plays_queue: DashMap<(u128, u64), MinecraftServerPlay>,
     affiliate_code_clicks_queue: DashMap<(u64, u64), Vec<AffiliateCodeClick>>,
 }
 
@@ -63,9 +63,8 @@ impl AnalyticsQueue {
     }
 
     pub fn add_minecraft_server_play(&self, play: MinecraftServerPlay) {
-        let ip_stripped = crate::util::ip::strip_ip(play.ip);
         self.minecraft_server_plays_queue
-            .insert((ip_stripped, play.project_id), play);
+            .insert((play.minecraft_uuid.as_u128(), play.project_id), play);
     }
 
     pub fn add_affiliate_code_click(&self, click: AffiliateCodeClick) {

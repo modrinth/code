@@ -235,9 +235,14 @@ async fn playtime_ingest(
 }
 
 #[derive(Deserialize)]
+struct MinecraftProfile {
+    id: Uuid,
+}
+
+#[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
-    minecraft_uuid: Uuid,
+    minecraft_access_token: String,
 }
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
@@ -264,12 +269,38 @@ async fn minecraft_server_play_ingest(
 
     let project_id = play_input.project_id;
 
-    if DBProject::get(&project_id.to_string(), &**pool, &redis)
+    let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
         .await?
-        .is_none()
-    {
-        return Err(ApiError::NotFound);
+        .ok_or(ApiError::NotFound)?;
+
+    if project.components.minecraft_server.is_none() {
+        return Ok(HttpResponse::NoContent().finish());
     }
+
+    let profile_response = reqwest::Client::new()
+        .get("https://api.minecraftservices.com/minecraft/profile")
+        .bearer_auth(&play_input.minecraft_access_token)
+        .send()
+        .await
+        .map_err(|_| {
+            ApiError::InvalidInput(
+                "Failed to contact Minecraft services".into(),
+            )
+        })?;
+
+    if !profile_response.status().is_success() {
+        return Err(ApiError::InvalidInput(
+            "Invalid Minecraft access token".into(),
+        ));
+    }
+
+    let minecraft_uuid = profile_response
+        .json::<MinecraftProfile>()
+        .await
+        .map_err(|_| {
+            ApiError::InvalidInput("Invalid Minecraft profile response".into())
+        })?
+        .id;
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
     let headers = req
@@ -296,7 +327,7 @@ async fn minecraft_server_play_ingest(
         recorded: get_current_tenths_of_ms(),
         user_id: user.map(|u| u.id.0).unwrap_or(0),
         project_id: project_id.0,
-        minecraft_uuid: play_input.minecraft_uuid,
+        minecraft_uuid,
         ip,
     };
 
