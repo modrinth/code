@@ -284,38 +284,35 @@ async fn minecraft_server_play_ingest(
         )));
     }
 
-    let minecraft_uuid =
-        if let (Some(username), Some(server_id)) =
-            (&play_input.username, &play_input.server_id)
-        {
-            let has_joined = HTTP_CLIENT
-                .get(
-                    "https://sessionserver.mojang.com/session/minecraft/hasJoined",
-                )
-                .query(&[
-                    ("username", username.as_str()),
-                    ("serverId", server_id.as_str()),
-                ])
-                .send()
-                .await
-                .wrap_request_err("failed to contact Mojang session server")?;
+    let minecraft_uuid = if let (Some(username), Some(server_id)) =
+        (&play_input.username, &play_input.server_id)
+    {
+        let has_joined = HTTP_CLIENT
+            .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
+            .query(&[
+                ("username", username.as_str()),
+                ("serverId", server_id.as_str()),
+            ])
+            .send()
+            .await
+            .wrap_request_err("failed to contact Mojang session server")?;
 
-            if !has_joined.status().is_success() {
-                return Err(ApiError::Request(eyre!(
-                    "Minecraft session verification failed"
-                )));
-            }
+        if !has_joined.status().is_success() {
+            return Err(ApiError::Request(eyre!(
+                "Minecraft session verification failed"
+            )));
+        }
 
-            has_joined
-                .json::<MinecraftProfile>()
-                .await
-                .wrap_request_err("invalid Mojang session response")?
-                .id
-        } else {
-            play_input
-                .minecraft_uuid
-                .wrap_request_err("missing `minecraft_uuid`")?
-        };
+        has_joined
+            .json::<MinecraftProfile>()
+            .await
+            .wrap_request_err("invalid Mojang session response")?
+            .id
+    } else {
+        play_input
+            .minecraft_uuid
+            .wrap_request_err("missing `minecraft_uuid`")?
+    };
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
     let headers = req
