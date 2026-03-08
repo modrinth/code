@@ -43,7 +43,7 @@ pub struct ServerGameProfile {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ServerVersion {
     pub name: String,
-    pub protocol: u32,
+    pub protocol: i32,
     #[serde(skip_deserializing)]
     pub legacy: bool,
 }
