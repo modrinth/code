@@ -245,7 +245,8 @@ struct MinecraftProfile {
 #[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
-    minecraft_access_token: Option<String>,
+    username: Option<String>,
+    server_id: Option<String>,
     minecraft_uuid: Option<Uuid>,
 }
 
@@ -283,31 +284,38 @@ async fn minecraft_server_play_ingest(
         )));
     }
 
-    let minecraft_uuid = if let Some(token) = &play_input.minecraft_access_token
-    {
-        let profile_response = HTTP_CLIENT
-            .get("https://api.minecraftservices.com/minecraft/profile")
-            .bearer_auth(token)
-            .send()
-            .await
-            .wrap_request_err("failed to contact Minecraft services")?;
+    let minecraft_uuid =
+        if let (Some(username), Some(server_id)) =
+            (&play_input.username, &play_input.server_id)
+        {
+            let has_joined = HTTP_CLIENT
+                .get(
+                    "https://sessionserver.mojang.com/session/minecraft/hasJoined",
+                )
+                .query(&[
+                    ("username", username.as_str()),
+                    ("serverId", server_id.as_str()),
+                ])
+                .send()
+                .await
+                .wrap_request_err("failed to contact Mojang session server")?;
 
-        if !profile_response.status().is_success() {
-            return Err(ApiError::Request(eyre!(
-                "invalid Minecraft access token"
-            )));
-        }
+            if !has_joined.status().is_success() {
+                return Err(ApiError::Request(eyre!(
+                    "Minecraft session verification failed"
+                )));
+            }
 
-        profile_response
-            .json::<MinecraftProfile>()
-            .await
-            .wrap_request_err("invalid Minecraft profile response")?
-            .id
-    } else {
-        play_input
-            .minecraft_uuid
-            .wrap_request_err("missing `minecraft_uuid`")?
-    };
+            has_joined
+                .json::<MinecraftProfile>()
+                .await
+                .wrap_request_err("invalid Mojang session response")?
+                .id
+        } else {
+            play_input
+                .minecraft_uuid
+                .wrap_request_err("missing `minecraft_uuid`")?
+        };
 
     let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
     let headers = req
