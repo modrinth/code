@@ -239,14 +239,20 @@ export function arrayOrNone(arr: string[]): string {
 
 export function formatProjectTypes(type: string, lower: boolean = false) {
 	let value = type
-		.replaceAll('mod', 'Mod')
-		.replaceAll('resourcepack', 'Resource Pack')
-		.replaceAll('datapack', 'Data Pack')
-		.replaceAll('plugin', 'Plugin')
-		.replaceAll('shader', 'Shaders')
-		.replaceAll('minecraft_java_server', 'Server')
-		.replaceAll('minecraft_server', 'Server')
-	if (lower) value = value.toLowerCase()
+	try {
+		value = value
+			.replaceAll('mod', 'Mod')
+			.replaceAll('resourcepack', 'Resource Pack')
+			.replaceAll('datapack', 'Data Pack')
+			.replaceAll('plugin', 'Plugin')
+			.replaceAll('shader', 'Shaders')
+			.replaceAll('minecraft_java_server', 'Server')
+			.replaceAll('minecraft_server', 'Server')
+	} catch {
+		return 'No project type'
+	}
+
+	if (lower === true) value = value.toLowerCase()
 	return value
 }
 
