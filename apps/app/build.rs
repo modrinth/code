@@ -29,6 +29,8 @@ fn main() {
                     .commands(&[
                         "get_project",
                         "get_project_many",
+                        "get_project_v3",
+                        "get_project_v3_many",
                         "get_version",
                         "get_version_many",
                         "get_user",
@@ -39,6 +41,8 @@ fn main() {
                         "get_organization_many",
                         "get_search_results",
                         "get_search_results_many",
+                        "get_search_results_v3",
+                        "get_search_results_v3_many",
                         "purge_cache_types",
                     ])
                     .default_permission(

@@ -1,8 +1,11 @@
+use actix_http::StatusCode;
+use actix_web::test;
 use ariadne::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Duration, Utc};
 use common::permissions::PermissionsTest;
 use common::permissions::PermissionsTestContext;
 use common::{
+    api_common::Api,
     api_v3::ApiV3,
     database::*,
     environment::{TestEnvironment, with_test_environment},
@@ -241,6 +244,29 @@ pub async fn permissions_analytics_revenue() {
 
             // Cleanup test db
             test_env.cleanup().await;
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+pub async fn analytics_minecraft_server_play_ingest() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<ApiV3>| async move {
+            let api = &test_env.api;
+            let project_id = test_env.dummy.project_alpha.project_id.clone();
+
+            let req = test::TestRequest::post()
+                .uri("/analytics/minecraft-server-play")
+                .append_header(("Authorization", USER_USER_PAT.unwrap()))
+                .set_json(serde_json::json!({
+                    "project_id": project_id,
+                    "minecraft_uuid": "12345678-1234-5678-1234-567812345678"
+                }))
+                .to_request();
+            let resp = api.call(req).await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
         },
     )
     .await;

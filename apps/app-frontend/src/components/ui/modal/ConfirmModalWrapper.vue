@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ConfirmModal } from '@modrinth/ui'
-import { ref } from 'vue'
+import { useTemplateRef } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { useTheming } from '@/store/theme.ts'
@@ -49,16 +49,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['proceed'])
-const modal = ref(null)
+const modal = useTemplateRef('modal')
 
 defineExpose({
 	show: () => {
 		hide_ads_window()
-		modal.value.show()
+		modal.value?.show()
 	},
 	hide: () => {
 		onModalHide()
-		modal.value.hide()
+		modal.value?.hide()
 	},
 })
 

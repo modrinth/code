@@ -69,7 +69,8 @@
 				</NuxtLink>
 			</div>
 			<div
-				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
+				class="col-span-2 row-start-2 flex flex-wrap justify-center lg:col-span-1 lg:row-start-auto"
+				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
@@ -148,6 +149,18 @@
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
 					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
+						:highlighted="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+						:highlighted-style="
+							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/servers">
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</template>
 				<template v-else>
 					<ButtonStyled
@@ -184,7 +197,6 @@
 								{
 									id: 'servers',
 									action: '/discover/servers',
-									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
@@ -399,6 +411,10 @@
 								action: (event) => $refs.modal_creation.show(event),
 							},
 							{
+								id: 'new-server-project',
+								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
+							},
+							{
 								id: 'new-collection',
 								action: (event) => $refs.modal_collection_creation.show(event),
 							},
@@ -410,9 +426,12 @@
 						]"
 					>
 						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+						{{ formatMessage(messages.publish) }}
 						<template #new-project>
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+						</template>
+						<template #new-server-project>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
 						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 						<template #new-collection>
@@ -835,6 +854,10 @@ const messages = defineMessages({
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
+	publish: {
+		id: 'layout.action.publish',
+		defaultMessage: 'Publish',
+	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
 		defaultMessage: 'Project review',
@@ -866,6 +889,10 @@ const messages = defineMessages({
 	newProject: {
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
+	},
+	newServerProject: {
+		id: 'layout.action.new-server-project',
+		defaultMessage: 'New server',
 	},
 	newCollection: {
 		id: 'layout.action.new-collection',
@@ -986,6 +1013,10 @@ const navRoutes = computed(() => [
 	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
 		href: '/discover/modpacks',
+	},
+	{
+		label: formatMessage(getProjectTypeMessage('server', true)),
+		href: '/discover/servers',
 	},
 ])
 

@@ -249,10 +249,22 @@ impl AutomatedModerationQueue {
                                 mod_messages.messages.push(ModerationMessage::NoSideTypes);
                             }
 
-                            if project.inner.license == "LicenseRef-Unknown" || project.inner.license == "LicenseRef-" {
-                                mod_messages.messages.push(ModerationMessage::MissingLicense);
-                            } else if project.inner.license.starts_with("LicenseRef-") && project.inner.license != "LicenseRef-All-Rights-Reserved" && project.inner.license_url.is_none() {
-                                mod_messages.messages.push(ModerationMessage::MissingCustomLicenseUrl { license: project.inner.license.clone() });
+                            if project.inner.components.minecraft_server.is_none() {
+                                let license = &project.inner.license;
+                                if license == "LicenseRef-Unknown" || license == "LicenseRef-" {
+                                    mod_messages
+                                        .messages
+                                        .push(ModerationMessage::MissingLicense);
+                                } else if license.starts_with("LicenseRef-")
+                                    && license != "LicenseRef-All-Rights-Reserved"
+                                    && project.inner.license_url.is_none()
+                                {
+                                    mod_messages.messages.push(
+                                        ModerationMessage::MissingCustomLicenseUrl {
+                                            license: project.inner.license.clone(),
+                                        },
+                                    );
+                                }
                             }
 
                             if (project.project_types.contains(&"resourcepack".to_string()) || project.project_types.contains(&"shader".to_string())) &&
@@ -616,19 +628,21 @@ impl AutomatedModerationQueue {
                                 }
                             }
 
-                            if !mod_messages.is_empty() {
-                                let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
-                                    .is_none_or(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity));
+							if !mod_messages.is_empty() {
+								let is_server_project =
+									project.inner.components.minecraft_server.is_some();
+								let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
+									.is_none_or(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity));
 
                                 let mut transaction = pool.begin().await?;
                                 let id = ThreadMessageBuilder {
                                     author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
-                                    body: MessageBody::Text {
-                                        body: mod_messages.markdown(true),
-                                        private: false,
-                                        replying_to: None,
-                                        associated_images: vec![],
-                                    },
+									body: MessageBody::Text {
+										body: mod_messages.markdown(true),
+										private: is_server_project,
+										replying_to: None,
+										associated_images: vec![],
+									},
                                     thread_id: project.thread_id,
                                     hide_identity: false,
                                 }
@@ -642,7 +656,7 @@ impl AutomatedModerationQueue {
                                 )
                                     .await?;
 
-                                if mod_messages.should_reject(first_time) {
+							if mod_messages.should_reject(first_time) && !is_server_project {
                                     ThreadMessageBuilder {
                                         author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                         body: MessageBody::StatusChange {

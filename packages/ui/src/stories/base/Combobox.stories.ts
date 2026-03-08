@@ -1,11 +1,3 @@
-import {
-	DownloadIcon,
-	HeartIcon,
-	SettingsIcon,
-	ShareIcon,
-	TrashIcon,
-	UserIcon,
-} from '@modrinth/assets'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import Combobox from '../../components/base/Combobox.vue'
@@ -53,60 +45,26 @@ export const Disabled: Story = {
 	},
 }
 
-export const IconSlot: Story = {
+export const WithSubLabels: Story = {
 	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ type: 'divider' },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-			{ value: 'profile', label: 'Profile', icon: UserIcon },
-			{ type: 'divider' },
-			{ value: 'delete', label: 'Delete', icon: TrashIcon, disabled: true },
-		],
-		placeholder: 'Select an action',
-		listbox: false,
-	},
-}
-
-export const IconSlotSearchable: Story = {
-	args: {
-		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-			{ value: 'profile', label: 'Profile', icon: UserIcon },
-			{ value: 'delete', label: 'Delete', icon: TrashIcon },
-		],
-		placeholder: 'Select an action',
-		searchable: true,
-		searchPlaceholder: 'Search actions...',
-	},
-}
-
-export const WithSelectedOption: Story = {
-	args: {
-		options: [
-			{ value: '1', label: 'Option 1' },
-			{ value: '2', label: 'Option 2' },
-			{ value: '3', label: 'Option 3' },
-		],
 		modelValue: '2',
+		options: [
+			{ value: '1', label: 'Fabric', subLabel: 'Lightweight modding toolchain' },
+			{ value: '2', label: 'Forge', subLabel: 'The original Minecraft modding API' },
+			{ value: '3', label: 'NeoForge', subLabel: 'Community-driven Forge fork' },
+			{ value: '4', label: 'Quilt', subLabel: 'The mod-loader that cares' },
+		],
 	},
 }
 
-export const WithSelectedOptionAndIcon: Story = {
+export const MixedSubLabels: Story = {
 	args: {
 		options: [
-			{ value: 'download', label: 'Download', icon: DownloadIcon },
-			{ value: 'share', label: 'Share', icon: ShareIcon },
-			{ value: 'favorite', label: 'Add to favorites', icon: HeartIcon },
-			{ value: 'settings', label: 'Settings', icon: SettingsIcon },
-			{ value: 'profile', label: 'Profile', icon: UserIcon },
+			{ value: '1', label: 'Minecraft', subLabel: 'The base game' },
+			{ value: '2', label: 'Fabric' },
+			{ value: '3', label: 'Forge', subLabel: 'Supports most mods' },
+			{ value: '4', label: 'NeoForge' },
+			{ value: '5', label: 'Quilt', subLabel: 'Fabric-compatible' },
 		],
-		modelValue: 'favorite',
-		showIconInSelected: true,
 	},
 }

@@ -15,10 +15,11 @@ use std::path::{Path, PathBuf};
 // 1 day
 const DEFAULT_ID: &str = "0";
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum CacheValueType {
     Project,
+    ProjectV3,
     Version,
     User,
     Team,
@@ -34,12 +35,14 @@ pub enum CacheValueType {
     FileHash,
     FileUpdate,
     SearchResults,
+    SearchResultsV3,
 }
 
 impl CacheValueType {
     pub fn as_str(&self) -> &'static str {
         match self {
             CacheValueType::Project => "project",
+            CacheValueType::ProjectV3 => "project_v3",
             CacheValueType::Version => "version",
             CacheValueType::User => "user",
             CacheValueType::Team => "team",
@@ -55,12 +58,14 @@ impl CacheValueType {
             CacheValueType::FileHash => "file_hash",
             CacheValueType::FileUpdate => "file_update",
             CacheValueType::SearchResults => "search_results",
+            CacheValueType::SearchResultsV3 => "search_results_v3",
         }
     }
 
     pub fn from_string(val: &str) -> CacheValueType {
         match val {
             "project" => CacheValueType::Project,
+            "project_v3" => CacheValueType::ProjectV3,
             "version" => CacheValueType::Version,
             "user" => CacheValueType::User,
             "team" => CacheValueType::Team,
@@ -76,6 +81,7 @@ impl CacheValueType {
             "file_hash" => CacheValueType::FileHash,
             "file_update" => CacheValueType::FileUpdate,
             "search_results" => CacheValueType::SearchResults,
+            "search_results_v3" => CacheValueType::SearchResultsV3,
             _ => CacheValueType::Project,
         }
     }
@@ -102,6 +108,7 @@ impl CacheValueType {
     pub fn case_sensitive_alias(&self) -> Option<bool> {
         match self {
             CacheValueType::Project
+            | CacheValueType::ProjectV3
             | CacheValueType::User
             | CacheValueType::Organization => Some(false),
 
@@ -118,39 +125,47 @@ impl CacheValueType {
             | CacheValueType::File
             | CacheValueType::LoaderManifest
             | CacheValueType::FileUpdate
-            | CacheValueType::SearchResults => None,
+            | CacheValueType::SearchResults
+            | CacheValueType::SearchResultsV3 => None,
         }
     }
 }
 
+// De/serialization strategy:
+// - on serialize:
+//   - in the `cache` table, save the `data_type` (variant of this value) alongside
+//     the data
+//   - data column contains the serialized form of the INNER value (i.e. for a
+//     `CacheValue::Project`, we serialize it as a `Project,` NOT as a `CacheValue`)
+//   - this way, we do not tag the data using serde in any way
+// - on deserialize:
+//   - use the `data_type` to figure out what type of value to deser as
+//   - then wrap that in a `CacheValue`
+//
+// do NOT use `#[serde(untagged)]` here, since then a value of one variant can be
+// deser'd as a value of another variant, if it comes before it in the enum
+// definition list.
 #[derive(Serialize, Deserialize, Clone, Debug)]
-#[serde(untagged)]
 #[allow(clippy::large_enum_variant)]
 pub enum CacheValue {
     Project(Project),
-
     Version(Version),
-
     User(User),
-
     Team(Vec<TeamMember>),
-
     Organization(Organization),
-
     File(CachedFile),
-
     LoaderManifest(CachedLoaderManifest),
     MinecraftManifest(daedalus::minecraft::VersionManifest),
-
     Categories(Vec<Category>),
     ReportTypes(Vec<String>),
     Loaders(Vec<Loader>),
     GameVersions(Vec<GameVersion>),
     DonationPlatforms(Vec<DonationPlatform>),
-
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
     SearchResults(SearchResults),
+    SearchResultsV3(SearchResultsV3),
+    ProjectV3(ProjectV3),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -190,6 +205,23 @@ pub struct SearchEntry {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultsV3 {
+    pub search: String,
+    pub result: SearchResultV3,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResultV3 {
+    pub hits: Vec<serde_json::Value>,
+    #[serde(default)]
+    pub offset: u32,
+    #[serde(default)]
+    pub limit: u32,
+    #[serde(default)]
+    pub total_hits: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -262,6 +294,15 @@ pub struct Project {
     pub donation_urls: Option<Vec<DonationLink>>,
     pub gallery: Vec<GalleryItem>,
     pub color: Option<u32>,
+}
+
+/// Uses serde_json::Value for flexibility since the v3. properly typed in frontend
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ProjectV3 {
+    pub id: String,
+    pub slug: Option<String>,
+    #[serde(flatten)]
+    pub extra: serde_json::Value,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -437,6 +478,7 @@ impl CacheValue {
     pub fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
+            CacheValue::ProjectV3(_) => CacheValueType::ProjectV3,
             CacheValue::Version(_) => CacheValueType::Version,
             CacheValue::User(_) => CacheValueType::User,
             CacheValue::Team { .. } => CacheValueType::Team,
@@ -456,12 +498,14 @@ impl CacheValue {
             CacheValue::FileHash(_) => CacheValueType::FileHash,
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
             CacheValue::SearchResults(_) => CacheValueType::SearchResults,
+            CacheValue::SearchResultsV3(_) => CacheValueType::SearchResultsV3,
         }
     }
 
     fn get_key(&self) -> String {
         match self {
             CacheValue::Project(project) => project.id.clone(),
+            CacheValue::ProjectV3(project) => project.id.clone(),
             CacheValue::Version(version) => version.id.clone(),
             CacheValue::User(user) => user.id.clone(),
             CacheValue::Team(members) => members
@@ -496,12 +540,14 @@ impl CacheValue {
                 )
             }
             CacheValue::SearchResults(search) => search.search.clone(),
+            CacheValue::SearchResultsV3(search) => search.search.clone(),
         }
     }
 
     fn get_alias(&self) -> Option<String> {
         match self {
             CacheValue::Project(project) => project.slug.clone(),
+            CacheValue::ProjectV3(project) => project.slug.clone(),
             CacheValue::User(user) => Some(user.username.clone()),
             CacheValue::Organization(org) => Some(org.slug.clone()),
 
@@ -520,8 +566,50 @@ impl CacheValue {
             | CacheValue::File { .. }
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileUpdate(_)
-            | CacheValue::SearchResults(_) => None,
+            | CacheValue::SearchResults(_)
+            | CacheValue::SearchResultsV3(_) => None,
         }
+    }
+
+    fn to_json_value(&self) -> crate::Result<serde_json::Value> {
+        let value = match self {
+            CacheValue::Project(project) => serde_json::to_value(project),
+            CacheValue::ProjectV3(project) => serde_json::to_value(project),
+            CacheValue::Version(version) => serde_json::to_value(version),
+            CacheValue::User(user) => serde_json::to_value(user),
+            CacheValue::Team(members) => serde_json::to_value(members),
+            CacheValue::Organization(org) => serde_json::to_value(org),
+            CacheValue::File(file) => serde_json::to_value(file),
+            CacheValue::LoaderManifest(loader) => serde_json::to_value(loader),
+            CacheValue::MinecraftManifest(manifest) => {
+                serde_json::to_value(manifest)
+            }
+            CacheValue::Categories(categories) => {
+                serde_json::to_value(categories)
+            }
+            CacheValue::ReportTypes(report_types) => {
+                serde_json::to_value(report_types)
+            }
+            CacheValue::Loaders(loaders) => serde_json::to_value(loaders),
+            CacheValue::GameVersions(versions) => {
+                serde_json::to_value(versions)
+            }
+            CacheValue::DonationPlatforms(platforms) => {
+                serde_json::to_value(platforms)
+            }
+            CacheValue::FileHash(hash) => serde_json::to_value(hash),
+            CacheValue::FileUpdate(update) => serde_json::to_value(update),
+            CacheValue::SearchResults(search) => serde_json::to_value(search),
+            CacheValue::SearchResultsV3(search) => serde_json::to_value(search),
+        }
+        .map_err(|err| {
+            crate::ErrorKind::OtherError(format!(
+                "Failed to serialize cache value: {err}"
+            ))
+            .as_error()
+        })?;
+
+        Ok(value)
     }
 }
 
@@ -620,6 +708,7 @@ macro_rules! impl_cache_method_singular {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
@@ -628,7 +717,8 @@ impl_cache_methods!(
     (LoaderManifest, CachedLoaderManifest),
     (FileHash, CachedFileHash),
     (FileUpdate, CachedFileUpdate),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 impl_cache_method_singular!(
@@ -714,15 +804,11 @@ impl CachedEntry {
             .await?;
 
             for row in query {
-                let row_exists = row.data.is_some();
-                let parsed_data = row
-                    .data
-                    .and_then(|x| serde_json::from_value::<CacheValue>(x).ok());
-
-                // If data is corrupted/failed to parse ignore it
-                if row_exists && parsed_data.is_none() {
-                    continue;
-                }
+                let parsed_data = if let Some(data) = row.data.clone() {
+                    Some(Self::deserialize_cache_value(type_, data, &row.id)?)
+                } else {
+                    None
+                };
 
                 if row.expires <= Utc::now().timestamp() {
                     if cache_behaviour == CacheBehaviour::MustRevalidate {
@@ -744,6 +830,16 @@ impl CachedEntry {
                 });
 
                 if let Some(data) = parsed_data {
+                    if data.get_type() != type_ {
+                        return Err(crate::ErrorKind::OtherError(format!(
+                            "Cache type mismatch for id {}: expected {:?}, got {:?}",
+                            row.id,
+                            type_,
+                            data.get_type()
+                        ))
+                        .as_error());
+                    }
+
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
@@ -951,6 +1047,14 @@ impl CachedEntry {
                     env!("MODRINTH_API_URL"),
                     "projects",
                     CacheValue::Project
+                )
+            }
+            CacheValueType::ProjectV3 => {
+                fetch_original_values!(
+                    ProjectV3,
+                    env!("MODRINTH_API_URL_V3"),
+                    "projects",
+                    CacheValue::ProjectV3
                 )
             }
             CacheValueType::Version => {
@@ -1411,14 +1515,147 @@ impl CachedEntry {
                 })
                 .collect()
             }
+            CacheValueType::SearchResultsV3 => {
+                let fetch_urls = keys
+                    .iter()
+                    .map(|x| {
+                        (
+                            x.key().to_string(),
+                            format!(
+                                "{}search{}",
+                                env!("MODRINTH_API_URL_V3"),
+                                x.key()
+                            ),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                futures::future::try_join_all(fetch_urls.iter().map(
+                    |(_, url)| {
+                        fetch_json(
+                            Method::GET,
+                            url,
+                            None,
+                            None,
+                            fetch_semaphore,
+                            pool,
+                        )
+                    },
+                ))
+                .await?
+                .into_iter()
+                .enumerate()
+                .map(|(index, result)| {
+                    (
+                        CacheValue::SearchResultsV3(SearchResultsV3 {
+                            search: fetch_urls[index].0.to_string(),
+                            result,
+                        })
+                        .get_entry(),
+                        true,
+                    )
+                })
+                .collect()
+            }
         })
+    }
+
+    fn deserialize_cache_value(
+        type_: CacheValueType,
+        data: serde_json::Value,
+        id: &str,
+    ) -> crate::Result<CacheValue> {
+        fn parse<T: DeserializeOwned>(
+            data: serde_json::Value,
+            id: &str,
+            label: &str,
+        ) -> crate::Result<T> {
+            serde_json::from_value::<T>(data.clone()).map_err(|err| {
+                crate::ErrorKind::OtherError(format!(
+                    "Failed to deserialize cache {label} for id {id}: {err}\n\ndata:\n{}",
+                    serde_json::to_string_pretty(&data).unwrap(),
+                ))
+                .as_error()
+            })
+        }
+
+        let value = match type_ {
+            CacheValueType::Project => {
+                CacheValue::Project(parse(data, id, "project")?)
+            }
+            CacheValueType::ProjectV3 => {
+                CacheValue::ProjectV3(parse(data, id, "project_v3")?)
+            }
+            CacheValueType::Version => {
+                CacheValue::Version(parse(data, id, "version")?)
+            }
+            CacheValueType::User => CacheValue::User(parse(data, id, "user")?),
+            CacheValueType::Team => CacheValue::Team(parse(data, id, "team")?),
+            CacheValueType::Organization => {
+                CacheValue::Organization(parse(data, id, "organization")?)
+            }
+            CacheValueType::File => CacheValue::File(parse(data, id, "file")?),
+            CacheValueType::LoaderManifest => {
+                CacheValue::LoaderManifest(parse(data, id, "loader_manifest")?)
+            }
+            CacheValueType::MinecraftManifest => CacheValue::MinecraftManifest(
+                parse(data, id, "minecraft_manifest")?,
+            ),
+            CacheValueType::Categories => {
+                CacheValue::Categories(parse(data, id, "categories")?)
+            }
+            CacheValueType::ReportTypes => {
+                CacheValue::ReportTypes(parse(data, id, "report_types")?)
+            }
+            CacheValueType::Loaders => {
+                CacheValue::Loaders(parse(data, id, "loaders")?)
+            }
+            CacheValueType::GameVersions => {
+                CacheValue::GameVersions(parse(data, id, "game_versions")?)
+            }
+            CacheValueType::DonationPlatforms => CacheValue::DonationPlatforms(
+                parse(data, id, "donation_platforms")?,
+            ),
+            CacheValueType::FileHash => {
+                CacheValue::FileHash(parse(data, id, "file_hash")?)
+            }
+            CacheValueType::FileUpdate => {
+                CacheValue::FileUpdate(parse(data, id, "file_update")?)
+            }
+            CacheValueType::SearchResults => {
+                CacheValue::SearchResults(parse(data, id, "search_results")?)
+            }
+            CacheValueType::SearchResultsV3 => CacheValue::SearchResultsV3(
+                parse(data, id, "search_results_v3")?,
+            ),
+        };
+
+        Ok(value)
     }
 
     pub(crate) async fn upsert_many(
         items: &[Self],
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
-        let items = serde_json::to_string(items)?;
+        let items = items
+            .iter()
+            .map(|item| {
+                let data = item
+                    .data
+                    .as_ref()
+                    .map(|value| value.to_json_value())
+                    .transpose()?;
+
+                Ok(serde_json::json!({
+                    "id": item.id,
+                    "data_type": item.type_.as_str(),
+                    "alias": item.alias,
+                    "data": data,
+                    "expires": item.expires,
+                }))
+            })
+            .collect::<crate::Result<Vec<_>>>()?;
+        let items = serde_json::to_string(&items)?;
 
         sqlx::query!(
             "

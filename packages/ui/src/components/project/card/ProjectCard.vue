@@ -49,6 +49,21 @@
 				</div>
 				<div class="mt-auto flex flex-col gap-3 flex-wrap overflow-hidden justify-between grow">
 					<div class="flex items-center gap-1 flex-wrap overflow-hidden">
+						<template v-if="isServerProject">
+							<ServerOnlinePlayers
+								v-if="serverOnlinePlayers !== undefined"
+								:online="serverOnlinePlayers"
+								:status-online="serverStatusOnline"
+								:hide-label="true"
+							/>
+							<ServerRecentPlays
+								v-if="serverRecentPlays !== undefined"
+								:recent-plays="serverRecentPlays"
+								:hide-label="true"
+							/>
+							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
+							<ServerRegion v-if="serverRegion" :region="serverRegion" />
+						</template>
 						<ProjectCardEnvironment
 							v-if="environment"
 							:client-side="environment.clientSide"
@@ -59,7 +74,15 @@
 							:tags="tags"
 							:exclude-loaders="excludeLoaders"
 							:deprioritized-tags="deprioritizedTags"
-							:max-tags="6 + (!!environment ? 0 : 1)"
+							:max-tags="(maxTags || 6) + (!!environment ? 0 : 1)"
+						/>
+						<ServerModpackContent
+							v-if="serverModpackContent"
+							:name="serverModpackContent.name"
+							:icon="serverModpackContent.icon"
+							:onclick="serverModpackContent.onclick"
+							:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
+							class="text-primary"
 						/>
 					</div>
 					<div
@@ -115,19 +138,44 @@
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
-				<div class="flex items-center gap-1 flex-wrap">
-					<ProjectCardEnvironment
-						v-if="environment"
-						:client-side="environment.clientSide"
-						:server-side="environment.serverSide"
-					/>
-					<ProjectCardTags
-						v-if="tags"
-						:tags="tags"
-						:extra-tags="extraTags"
-						:exclude-loaders="excludeLoaders"
-						:deprioritized-tags="deprioritizedTags"
-						:max-tags="(!!$slots.actions ? 4 : 5) + (!!environment ? 0 : 1)"
+				<div class="flex items-center gap-2 w-full">
+					<template v-if="isServerProject">
+						<ServerOnlinePlayers
+							v-if="serverOnlinePlayers !== undefined"
+							:online="serverOnlinePlayers"
+							:status-online="serverStatusOnline"
+							:hide-label="true"
+						/>
+						<ServerRecentPlays
+							v-if="serverRecentPlays !== undefined"
+							:recent-plays="serverRecentPlays"
+							:hide-label="true"
+						/>
+						<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
+						<ServerRegion v-if="serverRegion" :region="serverRegion" />
+					</template>
+					<div class="flex items-center gap-1">
+						<ProjectCardEnvironment
+							v-if="environment"
+							:client-side="environment.clientSide"
+							:server-side="environment.serverSide"
+						/>
+						<ProjectCardTags
+							v-if="tags"
+							:tags="tags"
+							:extra-tags="extraTags"
+							:exclude-loaders="excludeLoaders"
+							:deprioritized-tags="deprioritizedTags"
+							:max-tags="(maxTags || (!!$slots.actions ? 4 : 5)) + (!!environment ? 0 : 1)"
+						/>
+					</div>
+					<ServerModpackContent
+						v-if="serverModpackContent"
+						:name="serverModpackContent.name"
+						:icon="serverModpackContent.icon"
+						:onclick="serverModpackContent.onclick"
+						:show-custom-modpack-tooltip="serverModpackContent.showCustomModpackTooltip"
+						class="text-primary"
 					/>
 				</div>
 			</div>
@@ -136,14 +184,18 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from '@modrinth/ui'
 import type { ProjectStatus } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { AutoLink } from '../../base'
+import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
+import ServerModpackContent from '../server/ServerModpackContent.vue'
+import ServerOnlinePlayers from '../server/ServerOnlinePlayers.vue'
+import ServerPing from '../server/ServerPing.vue'
+import ServerRecentPlays from '../server/ServerRecentPlays.vue'
+import ServerRegion from '../server/ServerRegion.vue'
 import ProjectCardAuthor from './ProjectCardAuthor.vue'
 import ProjectCardDate from './ProjectCardDate.vue'
 import ProjectCardEnvironment, {
@@ -177,10 +229,23 @@ const props = defineProps<{
 	dateUpdated?: string
 	datePublished?: string
 	displayedDate?: 'updated' | 'published'
+	serverRegion?: string
+	serverOnlinePlayers?: number
+	serverStatusOnline?: boolean
+	serverRecentPlays?: number
+	serverPing?: number
+	serverModpackContent?: {
+		name: string
+		icon?: string
+		onclick?: () => void
+		showCustomModpackTooltip?: boolean
+	}
+	isServerProject?: boolean
 	banner?: string
 	color?: string | number
 	environment?: ProjectCardEnvironmentProps
 	status?: ProjectStatus
+	maxTags?: number
 }>()
 
 const baseCardStyle =
