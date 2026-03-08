@@ -237,9 +237,10 @@ async fn playtime_ingest(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 struct MinecraftProfile {
     id: Uuid,
+    name: String,
 }
 
 #[derive(Deserialize)]
@@ -305,11 +306,18 @@ async fn minecraft_server_play_ingest(
             )));
         }
 
-        has_joined
+        let profile = has_joined
             .json::<MinecraftProfile>()
             .await
-            .wrap_request_err("invalid Mojang session response")?
-            .id
+            .wrap_request_err("invalid Mojang session response")?;
+
+        if profile.name != *username {
+            return Err(ApiError::Request(eyre!(
+                "returned Mojang profile name does not match username"
+            )));
+        }
+
+        profile.id
     } else {
         play_input
             .minecraft_uuid
