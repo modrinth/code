@@ -274,7 +274,9 @@ async fn minecraft_server_play_ingest(
         .ok_or(ApiError::NotFound)?;
 
     if project.components.minecraft_server.is_none() {
-        return Ok(HttpResponse::NoContent().finish());
+        return Err(ApiError::InvalidInput(
+            "Project is not a Minecraft server project".into(),
+        ));
     }
 
     let profile_response = reqwest::Client::new()
