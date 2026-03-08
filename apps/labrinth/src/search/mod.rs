@@ -209,6 +209,8 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
+    /// Unix timestamp of the publication date of the version
+    pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
 
@@ -277,19 +279,38 @@ pub fn get_sort_index(
                 "minecraft_java_server.verified_plays_2w:desc",
                 "minecraft_java_server.ping.data.players_online:desc",
                 "downloads:desc",
+                "version_published_timestamp:desc",
             ],
         ),
-        "downloads" => (projects_filtered_name, &["downloads:desc"]),
-        "follows" => (projects_name, &["follows:desc"]),
-        "updated" | "date_modified" => (projects_name, &["date_modified:desc"]),
-        "newest" | "date_created" => (projects_name, &["date_created:desc"]),
+        "downloads" => (
+            projects_filtered_name,
+            &["downloads:desc", "version_published_timestamp:desc"],
+        ),
+        "follows" => (
+            projects_name,
+            &["follows:desc", "version_published_timestamp:desc"],
+        ),
+        "updated" | "date_modified" => (
+            projects_name,
+            &["date_modified:desc", "version_published_timestamp:desc"],
+        ),
+        "newest" | "date_created" => (
+            projects_name,
+            &["date_created:desc", "version_published_timestamp:desc"],
+        ),
         "minecraft_java_server.verified_plays_2w" => (
             projects_name,
-            &["minecraft_java_server.verified_plays_2w:desc"],
+            &[
+                "minecraft_java_server.verified_plays_2w:desc",
+                "version_published_timestamp:desc",
+            ],
         ),
         "minecraft_java_server.ping.data.players_online" => (
             projects_name,
-            &["minecraft_java_server.ping.data.players_online:desc"],
+            &[
+                "minecraft_java_server.ping.data.players_online:desc",
+                "version_published_timestamp:desc",
+            ],
         ),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
