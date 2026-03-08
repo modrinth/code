@@ -297,7 +297,9 @@ async fn minecraft_server_play_ingest(
             .await
             .wrap_request_err("failed to contact Mojang session server")?;
 
-        if !has_joined.status().is_success() {
+        if has_joined.status() == reqwest::StatusCode::NO_CONTENT
+            || !has_joined.status().is_success()
+        {
             return Err(ApiError::Request(eyre!(
                 "Minecraft session verification failed"
             )));
