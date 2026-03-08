@@ -132,7 +132,10 @@
 				class="flex flex-col gap-3 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
 				:class="{ 'mt-3': !!$slots.actions }"
 			>
-				<div v-if="downloads !== undefined || followers !== undefined" class="flex items-center gap-3">
+				<div
+					v-if="downloads !== undefined || followers !== undefined"
+					class="flex items-center gap-3"
+				>
 					<ProjectCardStats :downloads="downloads" :followers="followers" />
 				</div>
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
