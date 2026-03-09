@@ -9,7 +9,7 @@ use crate::state::{
 use crate::util::io;
 use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
 pub use crate::util::protocol_version::ProtocolVersion;
-use crate::util::server_ping::{
+pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
 use crate::{Context, ErrorKind, Result, State, launcher};
