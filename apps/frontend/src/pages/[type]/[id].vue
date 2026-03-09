@@ -945,7 +945,7 @@
 									{{
 										capitalizeString(
 											formatMessage(commonMessages.projectFollowers, {
-												count: formatNumber(project.followers, false),
+												count: project.followers,
 											}),
 										)
 									}}
@@ -1101,7 +1101,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { capitalizeString, formatNumber, formatProjectType, renderString } from '@modrinth/utils'
+import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
