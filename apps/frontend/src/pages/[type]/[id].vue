@@ -898,6 +898,7 @@
 						:project="project"
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
+						:show-followers="isServerProject"
 						class="card flex-card experimental-styles-within"
 					/>
 					<div class="card flex-card experimental-styles-within">
@@ -932,6 +933,18 @@
 								</div>
 							</div>
 
+							<div v-if="isServerProject" class="details-list__item">
+								<HeartIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(
+											formatMessage(commonMessages.projectFollowers, {
+												count: formatNumber(project.followers, false),
+											}),
+										)
+									}}
+								</div>
+							</div>
 							<div
 								v-if="project.approved"
 								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
@@ -940,9 +953,11 @@
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.published, {
-											date: publishedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.published, {
+												date: publishedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -954,7 +969,9 @@
 							>
 								<CalendarIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
+									}}
 								</div>
 							</div>
 
@@ -966,9 +983,11 @@
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.submitted, {
-											date: submittedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.submitted, {
+												date: submittedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -980,7 +999,9 @@
 							>
 								<VersionIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									}}
 								</div>
 							</div>
 						</div>
@@ -1076,7 +1097,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import {
+	capitalizeString,
+	formatNumber,
+	formatPrice,
+	formatProjectType,
+	renderString,
+} from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
