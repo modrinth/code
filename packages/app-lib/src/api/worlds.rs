@@ -13,7 +13,6 @@ pub use crate::util::server_ping::{
 };
 use crate::util::{io, server_ping};
 use crate::{Error, ErrorKind, Result, State, launcher};
-use async_minecraft_ping::ServerDescription;
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -910,8 +909,8 @@ pub async fn get_server_status(
         "Pinging {address} with protocol version {protocol_version:?}"
     );
 
-    get_server_status_old(address, protocol_version).await
-    // get_server_status_new(address, protocol_version).await
+    // get_server_status_old(address, protocol_version).await
+    get_server_status_new(address, protocol_version).await
 }
 
 async fn get_server_status_old(
@@ -932,19 +931,12 @@ async fn get_server_status_old(
     .await
 }
 
-async fn _get_server_status_new(
+async fn get_server_status_new(
     address: &str,
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
-    let (address, port) = match address.rsplit_once(':') {
-        Some((addr, port)) => {
-            let port = port.parse::<u16>().map_err(|_err| {
-                Error::from(ErrorKind::InputError("invalid port number".into()))
-            })?;
-            (addr, port)
-        }
-        None => (address, 25565),
-    };
+    let (address, port) = async_minecraft_ping::parse_host_and_port(address)
+        .map_err(|err| Error::from(ErrorKind::InputError(err.to_string())))?;
 
     let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
         .with_port(port)
@@ -962,15 +954,11 @@ async fn _get_server_status_new(
         Error::from(ErrorKind::InputError("failed to get server status".into()))
     })?;
     let status = &ping_conn.status;
-    let description = match &status.description {
-        ServerDescription::Plain(text) => {
-            serde_json::value::to_raw_value(&text).ok()
-        }
-        ServerDescription::Object { text } => {
-            // TODO: `text` always seems to be empty?
-            RawValue::from_string(text.clone()).ok()
-        }
-    };
+    let description = RawValue::from_string(
+        serde_json::to_string(&status.description)
+            .expect("serializing should not fail"),
+    )
+    .expect("converting to `RawValue` should not fail");
 
     let players = ServerPlayers {
         max: status.players.max,
@@ -1007,7 +995,7 @@ async fn _get_server_status_new(
     };
 
     Ok(ServerStatus {
-        description,
+        description: Some(description),
         players: Some(players),
         version: Some(version),
         favicon,

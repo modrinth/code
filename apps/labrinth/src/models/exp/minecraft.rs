@@ -389,7 +389,7 @@ pub struct JavaServerPingData {
     /// Reported version protocol number of the server.
     pub version_protocol: i32,
     /// Description/MOTD of the server as shown in the server list.
-    pub description: String,
+    pub description: serde_json::Value,
     /// Number of players online at the time.
     pub players_online: i32,
     /// Maximum number of players allowed on the server.

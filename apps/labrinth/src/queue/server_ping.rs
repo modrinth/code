@@ -6,7 +6,6 @@ use crate::models::exp;
 use crate::models::ids::ProjectId;
 use crate::models::projects::ProjectStatus;
 use crate::{database::PgPool, util::error::Context};
-use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
 use serde::Serialize;
@@ -282,10 +281,7 @@ pub async fn ping_server(
             latency: start.elapsed(),
             version_name: status.version.name,
             version_protocol: status.version.protocol,
-            description: match status.description {
-                ServerDescription::Plain(text)
-                | ServerDescription::Object { text } => text,
-            },
+            description: status.description,
             players_online: status.players.online,
             players_max: status.players.max,
         })
@@ -303,7 +299,7 @@ struct ServerPingRecord {
     project_id: u64,
     address: String,
     latency_ms: Option<u32>,
-    description: Option<String>,
+    description: Option<serde_json::Value>,
     version_name: Option<String>,
     version_protocol: Option<i32>,
     players_online: Option<i32>,

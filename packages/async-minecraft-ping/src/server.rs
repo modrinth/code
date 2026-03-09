@@ -69,14 +69,6 @@ pub struct ServerPlayers {
     pub sample: Option<Vec<ServerPlayer>>,
 }
 
-/// Contains the server's MOTD.
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-pub enum ServerDescription {
-    Plain(String),
-    Object { text: String },
-}
-
 /// The decoded JSON response from a status query over
 /// ServerListPing.
 #[derive(Debug, Deserialize)]
@@ -88,7 +80,7 @@ pub struct StatusResponse {
     pub players: ServerPlayers,
 
     /// Single-field struct containing the server's MOTD.
-    pub description: ServerDescription,
+    pub description: serde_json::Value,
 
     /// Optional field containing a path to the server's
     /// favicon.
@@ -324,20 +316,6 @@ impl PingConnection {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_server_description_plain() {
-        let json = r#""A Minecraft Server""#;
-        let desc: ServerDescription = serde_json::from_str(json).unwrap();
-        assert!(matches!(desc, ServerDescription::Plain(s) if s == "A Minecraft Server"));
-    }
-
-    #[test]
-    fn test_server_description_object() {
-        let json = r#"{"text":"A Minecraft Server"}"#;
-        let desc: ServerDescription = serde_json::from_str(json).unwrap();
-        assert!(matches!(desc, ServerDescription::Object { text } if text == "A Minecraft Server"));
-    }
 
     #[test]
     fn test_status_response_minimal() {
