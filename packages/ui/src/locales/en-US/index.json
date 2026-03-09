@@ -209,9 +209,6 @@
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
   },
-  "content.confirm-bulk-update.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
-  },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again."
   },
@@ -223,12 +220,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-deletion.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {variant, select, server {world} other {worlds}} if anything breaks."
-  },
-  "content.confirm-deletion.warning-body-backup": {
-    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your {variant, select, server {world} other {worlds}} if anything breaks."
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Any mods or content you added on top of the modpack will be deleted."
@@ -242,12 +233,6 @@
   "content.confirm-modpack-update.header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} modpack"
   },
-  "content.confirm-modpack-update.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
-  },
-  "content.confirm-modpack-update.warning-body-backup": {
-    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
-  },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Mods and content will be merged with what you added on top of the modpack, and it will stop receiving updates."
   },
@@ -260,11 +245,20 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
   },
-  "content.confirm-unlink.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Creating backup..."
   },
-  "content.confirm-unlink.warning-body-backup": {
-    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Backup created successfully"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Backup creation failed. You can still proceed."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Create backup"
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
   },
   "content.modpack-card.updating": {
     "defaultMessage": "Updating..."
@@ -601,12 +595,6 @@
   },
   "instance.confirm-reinstall.reinstall-button": {
     "defaultMessage": "Reinstall modpack"
-  },
-  "instance.confirm-reinstall.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
-  },
-  "instance.confirm-reinstall.warning-body-backup": {
-    "defaultMessage": "We recommend creating a <backup>backup</backup> before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
   },
   "instance.confirm-repair.body": {
     "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}."

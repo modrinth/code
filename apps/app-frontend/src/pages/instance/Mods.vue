@@ -14,6 +14,12 @@
 				enable-toggle
 				@update:enabled="handleModpackContentToggle"
 			/>
+			<ConfirmModpackUpdateModal
+				ref="modpackUpdateConfirmModal"
+				:downgrade="isModpackUpdateDowngrade"
+				@confirm="handleModpackUpdateConfirm"
+				@cancel="handleModpackUpdateCancel"
+			/>
 			<ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 			<ContentUpdaterModal
 				v-if="updatingProject || updatingModpack"
@@ -50,6 +56,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	ConfirmModpackUpdateModal,
 	type ContentItem,
 	type ContentModpackCardCategory,
 	type ContentModpackCardProject,
@@ -174,12 +181,15 @@ const shareModal = ref<InstanceType<typeof ShareModalWrapper> | null>()
 const exportModal = ref(null)
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 const modpackContentModal = ref<InstanceType<typeof ModpackContentModal> | null>()
+const modpackUpdateConfirmModal = ref<InstanceType<typeof ConfirmModpackUpdateModal> | null>()
 
 const updatingProject = ref<ContentItem | null>(null)
 const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
 const updatingModpack = ref(false)
+const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
+const isModpackUpdateDowngrade = ref(false)
 
 async function handleBrowseContent() {
 	if (!props.instance) return
@@ -407,18 +417,39 @@ function resetUpdateState() {
 	loadingChangelog.value = false
 }
 
+function handleModpackUpdateRequest(selectedVersion: Labrinth.Versions.v2.Version) {
+	pendingModpackUpdateVersion.value = selectedVersion
+	const currentVersionId = props.instance?.linked_data?.version_id
+	const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+	isModpackUpdateDowngrade.value = currentVersion
+		? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+		: false
+	modpackUpdateConfirmModal.value?.show()
+}
+
+async function handleModpackUpdateConfirm() {
+	if (!pendingModpackUpdateVersion.value || !props.instance?.path) return
+
+	const version = pendingModpackUpdateVersion.value
+	pendingModpackUpdateVersion.value = null
+
+	isModpackUpdating.value = true
+	try {
+		await update_managed_modrinth_version(props.instance.path, version.id)
+		await initProjects()
+	} finally {
+		isModpackUpdating.value = false
+		resetUpdateState()
+	}
+}
+
+function handleModpackUpdateCancel() {
+	pendingModpackUpdateVersion.value = null
+}
+
 async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	if (updatingModpack.value) {
-		if (!props.instance?.path) return
-
-		isModpackUpdating.value = true
-		try {
-			await update_managed_modrinth_version(props.instance.path, selectedVersion.id)
-			await initProjects()
-		} finally {
-			isModpackUpdating.value = false
-			resetUpdateState()
-		}
+		handleModpackUpdateRequest(selectedVersion)
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 

@@ -737,11 +737,7 @@ provideContentManager({
 <template>
 	<ContentPageLayout>
 		<template #modals>
-			<ConfirmUnlinkModal
-				ref="modpackUnlinkModal"
-				server
-				@unlink="handleModpackUnlinkConfirm"
-			/>
+			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
 			<ModpackContentModal
 				ref="modpackContentModal"
 				:modpack-name="modpack?.project.title"

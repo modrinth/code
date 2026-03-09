@@ -581,11 +581,7 @@ const messages = defineMessages({
 			:server="ctx.isServer"
 			@reinstall="ctx.reinstallModpack()"
 		/>
-		<ConfirmUnlinkModal
-			ref="unlinkModal"
-			:server="ctx.isServer"
-			@unlink="ctx.unlinkModpack()"
-		/>
+		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="ctx.unlinkModpack()" />
 
 		<slot name="extra-modals" />
 	</Teleport>

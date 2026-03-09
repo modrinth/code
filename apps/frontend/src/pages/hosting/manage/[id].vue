@@ -506,7 +506,9 @@ watch(syncProgress, (progress) => {
 	}
 })
 
-const isSyncingContent = computed(() => syncProgressActive.value || isAwaitingPostInstallRefresh.value)
+const isSyncingContent = computed(
+	() => syncProgressActive.value || isAwaitingPostInstallRefresh.value,
+)
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -964,8 +966,7 @@ const onReinstallFailed = () => {
 
 function applyOptimisticCompletion() {
 	const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
-	if (newLoader.value)
-		patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+	if (newLoader.value) patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
 	if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
 	if (newMCVersion.value) patch.mc_version = newMCVersion.value
 
@@ -975,7 +976,11 @@ function applyOptimisticCompletion() {
 	const addonsQueries = queryClient.getQueriesData<Archon.Content.v1.Addons>({
 		queryKey: ['content', 'list', 'v1', serverId],
 	})
-	debug('[id.vue] applyOptimisticCompletion: found', addonsQueries.length, 'addons queries to patch')
+	debug(
+		'[id.vue] applyOptimisticCompletion: found',
+		addonsQueries.length,
+		'addons queries to patch',
+	)
 	for (const [key, data] of addonsQueries) {
 		if (!data) continue
 		const addonsPatch: Record<string, string> = {}
@@ -994,7 +999,9 @@ function applyOptimisticCompletion() {
 }
 
 async function invalidateAfterInstall() {
-	debug('[id.vue] invalidateAfterInstall: setting isAwaitingPostInstallRefresh=true, scheduling 2s delayed invalidation')
+	debug(
+		'[id.vue] invalidateAfterInstall: setting isAwaitingPostInstallRefresh=true, scheduling 2s delayed invalidation',
+	)
 	isAwaitingPostInstallRefresh.value = true
 	setTimeout(async () => {
 		debug('[id.vue] invalidateAfterInstall: delayed invalidation firing now')

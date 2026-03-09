@@ -1313,6 +1313,12 @@
   "hosting.loader.loader-version": {
     "message": "{loader} version"
   },
+  "hosting.loader.repair-started-text": {
+    "message": "Your server installation has been repaired."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Repair completed"
+  },
   "hosting.loader.reset-server": {
     "message": "Reset server"
   },

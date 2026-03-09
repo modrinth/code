@@ -381,7 +381,12 @@ provideInstallationSettings({
 
 	async reinstallModpack() {
 		if (!modpack.value) return
-		debug('reinstallModpack: called, project:', modpack.value.spec.project_id, 'version:', modpack.value.spec.version_id)
+		debug(
+			'reinstallModpack: called, project:',
+			modpack.value.spec.project_id,
+			'version:',
+			modpack.value.spec.version_id,
+		)
 		debug('reinstallModpack: emitting reinstall before API call')
 		emit('reinstall')
 		try {
@@ -448,9 +453,12 @@ provideInstallationSettings({
 	async fetchModpackVersions() {
 		debug('fetchModpackVersions: called, project:', modpack.value?.spec.project_id)
 		try {
-			const versions = await client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
-				include_changelog: false,
-			})
+			const versions = await client.labrinth.versions_v2.getProjectVersions(
+				modpack.value!.spec.project_id,
+				{
+					include_changelog: false,
+				},
+			)
 			debug('fetchModpackVersions: got', versions.length, 'versions')
 			return versions
 		} catch (err) {
