@@ -484,10 +484,10 @@ import {
 import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
 
 import { useGeneratedState } from '~/composables/generated'
+import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useModerationStore } from '~/store/moderation.ts'
 
-import { useImageUpload } from '~/composables/image-upload.ts'
 import KeybindsModal from './ChecklistKeybindsModal.vue'
 import ModpackPermissionsFlow from './ModpackPermissionsFlow.vue'
 
