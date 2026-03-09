@@ -100,11 +100,14 @@
 					:style="dropdownStyle"
 					role="listbox"
 					aria-multiselectable="true"
-					@mousedown.prevent.stop
+					@mousedown.stop
 					@keydown="handleDropdownKeydown"
 				>
-					<div class="border-0 border-solid border-b border-b-surface-5 empty:hidden pt-1.5">
-						<div v-if="searchable" class="px-3 py-1.5">
+					<div class="empty:hidden pt-1.5">
+						<div
+							v-if="searchable"
+							class="px-3 py-1.5 border-0 border-solid border-b border-b-surface-5"
+						>
 							<StyledInput
 								ref="searchInputRef"
 								v-model="searchQuery"
@@ -112,7 +115,6 @@
 								type="text"
 								:placeholder="searchPlaceholder"
 								wrapper-class="w-full bg-surface-4"
-								input-class="focus:ring-0"
 								@input="handleSearchInput"
 								@keydown="handleSearchKeydown"
 							/>
@@ -120,9 +122,9 @@
 
 						<div
 							v-if="filteredOptions.length > 0 || includeSelectAllOption"
-							class="flex flex-col gap-2 bg-surface-4"
+							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5"
 						>
-							<div v-if="includeSelectAllOption" class="sticky top-0 z-10 bg-surface-4 px-3 py-1.5">
+							<div v-if="includeSelectAllOption" class="sticky top-0 z-10 bg-surface-4 px-3">
 								<span
 									class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
 									:class="{ 'bg-surface-5': focusedIndex === -2 }"
