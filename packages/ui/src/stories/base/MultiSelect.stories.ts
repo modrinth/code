@@ -77,6 +77,16 @@ export const TwoTagRows: Story = {
 	},
 }
 
+export const NoOptions: Story = {
+	args: {
+		...Default.args,
+		options: [],
+		modelValue: [],
+		searchable: true,
+		noOptionsMessage: 'No options available',
+	},
+}
+
 export const Empty: Story = {
 	args: {
 		...Default.args,

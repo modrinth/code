@@ -121,10 +121,10 @@
 						</div>
 
 						<div
-							v-if="filteredOptions.length > 0 || includeSelectAllOption"
+							v-if="filteredOptions.length > 0 || shouldShowSelectAll"
 							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5 empty:hidden"
 						>
-							<div v-if="includeSelectAllOption" class="sticky top-0 z-10 bg-surface-4 px-3">
+							<div v-if="shouldShowSelectAll" class="sticky top-0 z-10 bg-surface-4 px-3">
 								<span
 									class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
 									:class="{ 'bg-surface-5': focusedIndex === -2 }"
@@ -204,8 +204,14 @@
 							</span>
 						</template>
 					</div>
-					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+					<div
+						v-else-if="isNoOptionsState && noOptionsMessage"
+						class="p-4 mb-2 text-center text-sm text-secondary"
+					>
 						{{ noOptionsMessage }}
+					</div>
+					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
+						{{ noResultsMessage }}
 					</div>
 
 					<slot name="dropdown-footer"></slot>
@@ -259,6 +265,7 @@ const props = withDefaults(
 		triggerClass?: string
 		forceDirection?: 'up' | 'down'
 		noOptionsMessage?: string
+		noResultsMessage?: string
 		disableSearchFilter?: boolean
 		includeSelectAllOption?: boolean
 		selectAllLabel?: string
@@ -272,7 +279,8 @@ const props = withDefaults(
 		showChevron: true,
 		clearable: true,
 		maxHeight: DEFAULT_MAX_HEIGHT,
-		noOptionsMessage: 'No results found',
+		noOptionsMessage: 'No options available',
+		noResultsMessage: 'No results found',
 		includeSelectAllOption: false,
 		selectAllLabel: 'Select all',
 		maxTagRows: 1,
@@ -350,6 +358,9 @@ const filteredOptions = computed(() => {
 		return false
 	})
 })
+
+const isNoOptionsState = computed(() => props.options.length === 0 && !searchQuery.value)
+const shouldShowSelectAll = computed(() => props.includeSelectAllOption && props.options.length > 0)
 
 function isSelected(value: T) {
 	return props.modelValue.includes(value)
@@ -485,7 +496,7 @@ async function openDropdown() {
 		;(searchInputRef.value as unknown as { focus: () => void }).focus()
 	}
 
-	focusedIndex.value = props.includeSelectAllOption ? -2 : 0
+	focusedIndex.value = shouldShowSelectAll.value ? -2 : filteredOptions.value.length > 0 ? 0 : -1
 	startPositionTracking()
 }
 
@@ -546,7 +557,7 @@ function focusPreviousOption() {
 	const length = filteredOptions.value.length
 	if (length === 0) return
 
-	if (focusedIndex.value <= 0 && props.includeSelectAllOption) {
+	if (focusedIndex.value <= 0 && shouldShowSelectAll.value) {
 		focusedIndex.value = -2
 		return
 	}
@@ -630,7 +641,7 @@ function handleSearchInput() {
 	if (!isOpen.value) {
 		openDropdown()
 	}
-	focusedIndex.value = props.includeSelectAllOption ? -2 : 0
+	focusedIndex.value = shouldShowSelectAll.value ? -2 : filteredOptions.value.length > 0 ? 0 : -1
 }
 
 function handleWindowResize() {
