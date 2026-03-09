@@ -391,9 +391,9 @@ pub struct JavaServerPingData {
     /// Description/MOTD of the server as shown in the server list.
     pub description: Option<serde_json::Value>,
     /// Number of players online at the time.
-    pub players_online: i32,
+    pub players_online: Option<i32>,
     /// Maximum number of players allowed on the server.
-    pub players_max: i32,
+    pub players_max: Option<i32>,
 }
 
 component::relations! {
