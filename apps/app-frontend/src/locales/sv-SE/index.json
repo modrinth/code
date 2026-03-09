@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Innehåll krävs"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installera för att spela"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# moddar}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Servern kräver moddar för att du ska kunna spela. Tryck på installera för att sätta upp dem nödvändiga filerna från Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Modpaket som krävs"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} delade denna instans med dig idag."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Servern kräver moddar för att du ska kunna spela. Klicka på Installera för att sätta upp dem nödvändiga filerna från Modrinth, och starta sedan på servern direkt."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Delad instans"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Delad serverinstans"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Visa innehåll"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} tillagda"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Resurshantering"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} är redo att laddas ner! Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} har laddats ner. Ladda om för att uppdatera nu, eller automatiskt när du stänger Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} är tillgänglig. Använd din pakethanterare för att uppdatera och få tillgång till de senaste funktionerna och buggfixarna!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} är nu tillgänglig! Eftersom du använder ett nätverk med datatrafikbegränsningar har vi inte laddat ner det automatiskt."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Ändringslogg"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Ladda ner ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Ladda ner"
+  "app.update-popup.download-complete": {
+    "message": "Nedladdning slutförd"
   },
-  "app.update-toast.downloading": {
-    "message": "Laddar ner..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Ladda om"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Uppdatering tillgänglig"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Nedladdning slutförd"
   },
   "app.update.complete-toast.text": {
     "message": "Tryck här för att visa ändringsloggen."
@@ -243,7 +243,7 @@
     "message": "Namn"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "Minecraft Server"
+    "message": "Minecraft-server"
   },
   "instance.server-modal.resource-pack": {
     "message": "Resurs pack"
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(okänd version)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Denna instans är länkad till en server, vilket betyder att du inte kan ändra Minecraft-version. Att avlänka kommer koppla bort instansen från servern permanent."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Denna instans är länkad till en server, vilket innebär att moddar inte kan uppdateras och mod-loader eller Minecraft-version inte kan ändras. Att avlänka kommer koppla bort instansen från servern permanent."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Avlänka från server"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Ta bort koppling till instans"
   },
@@ -474,7 +483,7 @@
     "message": "Är du säker att du vill ta bort koppling till denna instans?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Denna instans är kopplad till ett modpaket, vilket innebär att moddar inte kan uppdateras och mod-loader eller Minecraft version inte kan ändras. Att ta bort kopplingen kommer permanent att koppla bort denna instans från modpaketet."
+    "message": "Denna instans är länkad till ett modpaket, vilket innebär att moddar inte kan uppdateras och mod-loader eller Minecraft-version inte kan ändras. Att avlänka kommer koppla bort instansen från modpaketet permanent."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Ta bort koppling från modpack"
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Servern är inkompatibel"
   },
+  "instance.worlds.linked_server": {
+    "message": "Hanteras av serverprojekt"
+  },
   "instance.worlds.no_contact": {
     "message": "Servern kunde inte kontaktas"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Synkronisera med instansen"
+  },
+  "search.filter.locked.server": {
+    "message": "Tillhandahållet av servern"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Endast klient-sido moddar kan läggas till i serverinstansen"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Spelversion tillhandahålls av servern"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader tillhandahålls av servern"
   }
 }
