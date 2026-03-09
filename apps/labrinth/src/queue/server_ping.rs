@@ -106,7 +106,12 @@ impl ServerPingQueue {
                     project_id: project_id.0,
                     address: ping.address.clone(),
                     latency_ms: data.map(|d| d.latency.as_millis() as u32),
-                    description: data.map(|d| d.description.clone()),
+                    description: data.and_then(|d| {
+                        d.description.as_ref().map(|d| {
+                            serde_json::to_string(&d)
+                                .expect("serialization should not fail")
+                        })
+                    }),
                     version_name: data.map(|d| d.version_name.clone()),
                     version_protocol: data.map(|d| d.version_protocol),
                     players_online: data.map(|d| d.players_online),
@@ -287,7 +292,7 @@ struct ServerPingRecord {
     project_id: u64,
     address: String,
     latency_ms: Option<u32>,
-    description: Option<serde_json::Value>,
+    description: Option<String>,
     version_name: Option<String>,
     version_protocol: Option<i32>,
     players_online: Option<i32>,
