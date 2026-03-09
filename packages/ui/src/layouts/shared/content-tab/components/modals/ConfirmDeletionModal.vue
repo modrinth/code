@@ -4,49 +4,36 @@
 		:header="formatMessage(messages.header, { count, itemType })"
 		:fade="variant === 'server' ? 'warning' : 'danger'"
 		max-width="500px"
+		:disable-close="disableClose"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition
 				:type="variant === 'server' ? 'warning' : 'critical'"
 				:header="formatMessage(messages.admonitionHeader)"
 			>
-				{{
-					formatMessage(
-						variant === 'server' ? messages.admonitionBodyServer : messages.admonitionBody,
-					)
-				}}
+				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
-			<span class="text-primary">
-				<IntlFormatted
-					:message-id="
-						variant === 'server'
-							? backupLink
-								? messages.warningBodyServerBackup
-								: messages.warningBodyServer
-							: backupLink
-								? messages.warningBodyInstanceBackup
-								: messages.warningBodyInstance
-					"
-				>
-					<template #backup="{ children }">
-						<RouterLink :to="backupLink!" class="text-link hover:underline" @click="modal?.hide()">
-							<component :is="() => children" />
-						</RouterLink>
-					</template>
-				</IntlFormatted>
-			</span>
+			<InlineBackupCreator
+				backup-name="Before deletion"
+				@update:disable-close="disableClose = $event"
+				@update:buttons-disabled="buttonsDisabled = $event"
+			/>
 		</div>
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button class="!border !border-surface-4" @click="modal?.hide()">
+					<button
+						class="!border !border-surface-4"
+						:disabled="buttonsDisabled"
+						@click="modal?.hide()"
+					>
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled :color="variant === 'server' ? 'orange' : 'red'">
-					<button @click="confirm">
+					<button :disabled="buttonsDisabled" @click="confirm">
 						<TrashIcon />
 						{{ formatMessage(messages.deleteButton, { count, itemType }) }}
 					</button>
@@ -62,10 +49,11 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import IntlFormatted from '#ui/components/base/IntlFormatted.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+
+import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -81,32 +69,7 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'content.confirm-deletion.admonition-body',
 		defaultMessage:
-			'Deleting a mod can permanently affect your worlds and may cause missing content or unexpected issues when loading again.',
-	},
-	admonitionBodyServer: {
-		id: 'content.confirm-deletion.admonition-body-server',
-		defaultMessage:
 			'Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again.',
-	},
-	warningBodyInstance: {
-		id: 'content.confirm-deletion.warning-body-instance',
-		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your worlds if anything breaks.',
-	},
-	warningBodyInstanceBackup: {
-		id: 'content.confirm-deletion.warning-body-instance-backup',
-		defaultMessage:
-			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your worlds if anything breaks.',
-	},
-	warningBodyServer: {
-		id: 'content.confirm-deletion.warning-body-server',
-		defaultMessage:
-			'We recommend creating a backup before proceeding so you can restore your world if anything breaks.',
-	},
-	warningBodyServerBackup: {
-		id: 'content.confirm-deletion.warning-body-server-backup',
-		defaultMessage:
-			'We recommend creating a <backup>backup</backup> before proceeding so you can restore your world if anything breaks.',
 	},
 	deleteButton: {
 		id: 'content.confirm-deletion.delete-button',
@@ -119,7 +82,6 @@ withDefaults(
 		count: number
 		itemType: string
 		variant?: 'instance' | 'server'
-		backupLink?: string
 	}>(),
 	{
 		variant: 'instance',
@@ -131,6 +93,8 @@ const emit = defineEmits<{
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
+const disableClose = ref(false)
+const buttonsDisabled = ref(false)
 
 function show() {
 	modal.value?.show()

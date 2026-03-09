@@ -403,7 +403,8 @@ export const commonMessages = defineMessages({
 	},
 	clientOnlyWarning: {
 		id: 'label.client-only-warning',
-		defaultMessage: 'This is a client-side mod and may cause issues if enabled',
+		defaultMessage:
+			"This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict.",
 	},
 	selectAllLabel: {
 		id: 'label.select-all',

@@ -124,19 +124,7 @@ watch(
 
 		const hit = ctx.modpackSearchHits.value[projectId]
 
-		// If the hit has a latestVersion, use it directly
-		if (hit?.latestVersion) {
-			ctx.modpackSelection.value = {
-				projectId,
-				versionId: hit.latestVersion,
-				name: hit.title,
-				iconUrl: hit.iconUrl,
-			}
-			proceedWithModpack()
-			return
-		}
-
-		// Otherwise fetch versions and use the first one
+		// Always fetch the actual latest version from the API since search index can be stale
 		try {
 			const versions = await labrinth.versions_v3.getProjectVersions(projectId)
 			if (versions.length > 0) {

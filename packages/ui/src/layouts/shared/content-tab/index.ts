@@ -5,6 +5,7 @@ export { default as ContentModpackCard } from './components/ContentModpackCard.v
 export { default as ConfirmBulkUpdateModal } from './components/modals/ConfirmBulkUpdateModal.vue'
 export { default as ConfirmDeletionModal } from './components/modals/ConfirmDeletionModal.vue'
 export { default as ConfirmLeaveModal } from './components/modals/ConfirmLeaveModal.vue'
+export { default as ConfirmModpackUpdateModal } from './components/modals/ConfirmModpackUpdateModal.vue'
 export { default as ConfirmReinstallModal } from './components/modals/ConfirmReinstallModal.vue'
 export { default as ConfirmRepairModal } from './components/modals/ConfirmRepairModal.vue'
 export { default as ConfirmUnlinkModal } from './components/modals/ConfirmUnlinkModal.vue'

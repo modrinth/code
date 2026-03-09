@@ -13,6 +13,7 @@ import {
 import { commonMessages } from '#ui/utils/common-messages'
 
 import ConfirmLeaveModal from '../../../shared/content-tab/components/modals/ConfirmLeaveModal.vue'
+import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
 import ModpackContentModal from '../../../shared/content-tab/components/modals/ModpackContentModal.vue'
@@ -343,6 +344,10 @@ const updatingProjectVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const loadingVersions = ref(false)
 const loadingChangelog = ref(false)
 
+const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
+const pendingModpackUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
+const isModpackUpdateDowngrade = ref(false)
+
 const currentGameVersion = computed(() => contentQuery.data.value?.game_version ?? '')
 const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
 
@@ -621,7 +626,22 @@ function resetUpdateState() {
 	loadingChangelog.value = false
 }
 
-async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+	if (updatingModpack.value) {
+		const currentVersionId = contentQuery.data.value?.modpack?.spec.version_id
+		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+		isModpackUpdateDowngrade.value = currentVersion
+			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+			: false
+		pendingModpackUpdateVersion.value = selectedVersion
+		modpackUpdateModal.value?.show()
+		return
+	}
+
+	performUpdate(selectedVersion)
+}
+
+async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
@@ -655,6 +675,17 @@ async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) 
 	}
 }
 
+function handleModpackUpdateConfirm() {
+	if (pendingModpackUpdateVersion.value) {
+		performUpdate(pendingModpackUpdateVersion.value)
+		pendingModpackUpdateVersion.value = null
+	}
+}
+
+function handleModpackUpdateCancel() {
+	pendingModpackUpdateVersion.value = null
+}
+
 provideContentManager({
 	items: contentItems,
 	loading: computed(() => contentQuery.isLoading.value),
@@ -677,7 +708,6 @@ provideContentManager({
 	uploadState,
 	showClientOnlyFilter: props.showClientOnlyFilter,
 	deletionContext: 'server',
-	backupLink: `/hosting/manage/${serverId}/backups`,
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
 	bulkUpdateItems: handleBulkUpdate,
@@ -710,7 +740,6 @@ provideContentManager({
 			<ConfirmUnlinkModal
 				ref="modpackUnlinkModal"
 				server
-				:backup-link="`/hosting/manage/${serverId}/backups`"
 				@unlink="handleModpackUnlinkConfirm"
 			/>
 			<ModpackContentModal
@@ -750,5 +779,12 @@ provideContentManager({
 			/>
 		</template>
 	</ContentPageLayout>
+	<ConfirmModpackUpdateModal
+		ref="modpackUpdateModal"
+		:downgrade="isModpackUpdateDowngrade"
+		server
+		@confirm="handleModpackUpdateConfirm"
+		@cancel="handleModpackUpdateCancel"
+	/>
 	<ConfirmLeaveModal ref="confirmLeaveModal" />
 </template>

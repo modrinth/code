@@ -1,15 +1,12 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(server ? messages.serverHeader : messages.header)"
-		fade="warning"
+		:header="formatMessage(messages.header, { type: server ? 'server' : 'instance' })"
 		max-width="500px"
 	>
-		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-				{{ formatMessage(server ? messages.serverAdmonitionBody : messages.admonitionBody) }}
-			</Admonition>
-		</div>
+		<span class="text-primary">
+			{{ formatMessage(messages.body, { type: server ? 'server' : 'instance' }) }}
+		</span>
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
@@ -19,7 +16,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
-				<ButtonStyled color="orange">
+				<ButtonStyled color="green">
 					<button @click="confirm">
 						<HammerIcon />
 						{{ formatMessage(messages.repairButton) }}
@@ -34,7 +31,6 @@
 import { HammerIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -49,25 +45,12 @@ const { formatMessage } = useVIntl()
 const messages = defineMessages({
 	header: {
 		id: 'instance.confirm-repair.header',
-		defaultMessage: 'Repair instance',
+		defaultMessage: 'Repair {type, select, server {server} other {instance}}',
 	},
-	serverHeader: {
-		id: 'instance.confirm-repair.server-header',
-		defaultMessage: 'Repair server',
-	},
-	admonitionHeader: {
-		id: 'instance.confirm-repair.admonition-header',
-		defaultMessage: 'Repair warning',
-	},
-	admonitionBody: {
-		id: 'instance.confirm-repair.admonition-body',
+	body: {
+		id: 'instance.confirm-repair.body',
 		defaultMessage:
-			'Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods.',
-	},
-	serverAdmonitionBody: {
-		id: 'instance.confirm-repair.server-admonition-body',
-		defaultMessage:
-			'Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly.',
+			'Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}.',
 	},
 	repairButton: {
 		id: 'instance.confirm-repair.repair-button',

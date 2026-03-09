@@ -848,20 +848,19 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-link="ctx.backupLink"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
 			v-if="hasBulkUpdateSupport"
 			ref="confirmBulkUpdateModal"
 			:count="pendingBulkUpdateItems.length"
+			:server="ctx.deletionContext === 'server'"
 			@update="confirmBulkUpdate"
 		/>
 		<ConfirmUnlinkModal
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
-			:backup-link="ctx.backupLink"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

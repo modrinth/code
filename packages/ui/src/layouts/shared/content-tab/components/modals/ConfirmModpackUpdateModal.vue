@@ -1,17 +1,22 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="formatMessage(messages.header)"
+		:header="formatMessage(messages.header, { action: downgrade ? 'downgrade' : 'update' })"
 		fade="warning"
 		max-width="500px"
 		:disable-close="disableClose"
 	>
 		<div class="flex flex-col gap-6">
-			<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
+			<Admonition
+				type="warning"
+				:header="
+					formatMessage(messages.admonitionHeader, { action: downgrade ? 'downgrade' : 'update' })
+				"
+			>
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<InlineBackupCreator
-				backup-name="Before unlink"
+				:backup-name="downgrade ? 'Before modpack downgrade' : 'Before modpack update'"
 				@update:disable-close="disableClose = $event"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
@@ -23,16 +28,18 @@
 					<button
 						class="!border !border-surface-4"
 						:disabled="buttonsDisabled"
-						@click="modal?.hide()"
+						@click="handleCancel"
 					>
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
-					<button :disabled="buttonsDisabled" @click="confirm">
-						<UnlinkIcon />
-						{{ formatMessage(server ? messages.header : messages.unlinkButton) }}
+					<button :disabled="buttonsDisabled" @click="handleConfirm">
+						<DownloadIcon />
+						{{
+							formatMessage(messages.confirmButton, { action: downgrade ? 'downgrade' : 'update' })
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -41,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { UnlinkIcon, XIcon } from '@modrinth/assets'
+import { DownloadIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -53,6 +60,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
 defineProps<{
+	downgrade?: boolean
 	server?: boolean
 }>()
 
@@ -60,26 +68,25 @@ const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	header: {
-		id: 'content.confirm-unlink.header',
-		defaultMessage: 'Unlink modpack',
+		id: 'content.confirm-modpack-update.header',
+		defaultMessage: '{action, select, downgrade {Downgrade} other {Update}} modpack',
 	},
 	admonitionHeader: {
-		id: 'content.confirm-unlink.admonition-header',
-		defaultMessage: 'Unlinking modpack',
+		id: 'content.confirm-modpack-update.admonition-header',
+		defaultMessage: '{action, select, downgrade {Downgrade} other {Update}} warning',
 	},
 	admonitionBody: {
-		id: 'content.confirm-unlink.admonition-body',
-		defaultMessage:
-			'Mods and content will be merged with what you added on top of the modpack, and it will stop receiving updates.',
+		id: 'content.confirm-modpack-update.admonition-body',
+		defaultMessage: 'Any mods or content you added on top of the modpack will be deleted.',
 	},
-	unlinkButton: {
-		id: 'content.confirm-unlink.unlink-button',
-		defaultMessage: 'Unlink',
+	confirmButton: {
+		id: 'content.confirm-modpack-update.confirm-button',
+		defaultMessage: '{action, select, downgrade {Downgrade} other {Update}} modpack',
 	},
 })
 
 const emit = defineEmits<{
-	(e: 'unlink'): void
+	(e: 'confirm' | 'cancel'): void
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
@@ -90,9 +97,14 @@ function show() {
 	modal.value?.show()
 }
 
-function confirm() {
+function handleConfirm() {
 	modal.value?.hide()
-	emit('unlink')
+	emit('confirm')
+}
+
+function handleCancel() {
+	modal.value?.hide()
+	emit('cancel')
 }
 
 defineExpose({

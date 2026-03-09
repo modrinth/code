@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	CircleAlertIcon,
@@ -22,6 +23,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
@@ -37,9 +39,34 @@ const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
+const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
+const pendingUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
+const isUpdateDowngrade = ref(false)
+
 const form = useInstallationForm(ctx, contentUpdaterModal)
 
 const showModpackVersionActions = ctx.showModpackVersionActions ?? true
+
+function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version) {
+	pendingUpdateVersion.value = version
+	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
+	const currentVersion = form.updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+	isUpdateDowngrade.value = currentVersion
+		? new Date(version.date_published) < new Date(currentVersion.date_published)
+		: false
+	modpackUpdateModal.value?.show()
+}
+
+function handleModpackUpdateConfirm() {
+	if (pendingUpdateVersion.value) {
+		form.handleUpdaterConfirm(pendingUpdateVersion.value)
+		pendingUpdateVersion.value = null
+	}
+}
+
+function handleModpackUpdateCancel() {
+	pendingUpdateVersion.value = null
+}
 
 const messages = defineMessages({
 	linkedInstanceTitle: {
@@ -53,21 +80,16 @@ const messages = defineMessages({
 	reinstallModpackDescription: {
 		id: 'installation-settings.reinstall-modpack.description',
 		defaultMessage:
-			"Re-installing the modpack resets the instance's content to its original state, removing any mods or content you have added.",
+			"Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added.",
 	},
 	editInstallationTitle: {
 		id: 'installation-settings.edit-installation.title',
 		defaultMessage: 'Edit installation',
 	},
-	unlinkInstanceDescription: {
-		id: 'installation-settings.unlink.instance-description',
+	unlinkDescription: {
+		id: 'installation-settings.unlink.description',
 		defaultMessage:
-			"Unlinking permanently disconnects this instance from the modpack project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
-	},
-	unlinkServerDescription: {
-		id: 'installation-settings.unlink.server-description',
-		defaultMessage:
-			"Unlinking permanently disconnects this instance from the server project. You won't receive future server updates, and server information like player count won't be shown.",
+			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {type, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
 	},
 	repairInstanceTitle: {
 		id: 'installation-settings.repair.instance-title',
@@ -227,21 +249,6 @@ const messages = defineMessages({
 								{{ formatMessage(commonMessages.changeVersionButton) }}
 							</button>
 						</ButtonStyled>
-						<ButtonStyled color="orange">
-							<button
-								class="!shadow-none"
-								:disabled="ctx.isBusy.value"
-								@click="repairModal?.show()"
-							>
-								<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
-								<HammerIcon v-else class="size-5" />
-								{{
-									ctx.repairing?.value
-										? formatMessage(commonMessages.repairingButton)
-										: formatMessage(commonMessages.repairButton)
-								}}
-							</button>
-						</ButtonStyled>
 					</div>
 				</div>
 
@@ -252,11 +259,9 @@ const messages = defineMessages({
 					</span>
 					<span class="text-primary">
 						{{
-							formatMessage(
-								ctx.isServer && !showModpackVersionActions
-									? messages.unlinkServerDescription
-									: messages.unlinkInstanceDescription,
-							)
+							formatMessage(messages.unlinkDescription, {
+								type: ctx.isServer && !showModpackVersionActions ? 'server' : 'instance',
+							})
 						}}
 					</span>
 					<div>
@@ -285,7 +290,11 @@ const messages = defineMessages({
 						{{ formatMessage(messages.reinstallModpackTitle) }}
 					</span>
 					<span class="text-primary">
-						{{ formatMessage(messages.reinstallModpackDescription) }}
+						{{
+							formatMessage(messages.reinstallModpackDescription, {
+								type: ctx.isServer ? 'server' : 'instance',
+							})
+						}}
 					</span>
 					<div>
 						<ButtonStyled color="red">
@@ -306,7 +315,43 @@ const messages = defineMessages({
 					</div>
 				</div>
 
-				</template>
+				<!-- Repair -->
+				<div class="flex flex-col gap-2.5">
+					<span class="text-lg font-semibold text-contrast">
+						{{
+							formatMessage(
+								ctx.isServer ? messages.repairServerTitle : messages.repairInstanceTitle,
+							)
+						}}
+					</span>
+					<span class="text-primary">
+						{{
+							formatMessage(
+								ctx.isServer
+									? messages.repairServerDescription
+									: messages.repairInstanceDescription,
+							)
+						}}
+					</span>
+					<div>
+						<ButtonStyled>
+							<button
+								class="!shadow-none"
+								:disabled="ctx.isBusy.value"
+								@click="repairModal?.show()"
+							>
+								<SpinnerIcon v-if="ctx.repairing?.value" class="animate-spin" />
+								<HammerIcon v-else class="size-5" />
+								{{
+									ctx.repairing?.value
+										? formatMessage(commonMessages.repairingButton)
+										: formatMessage(commonMessages.repairButton)
+								}}
+							</button>
+						</ButtonStyled>
+					</div>
+				</div>
+			</template>
 
 			<!-- NOT LINKED -->
 			<template v-else>
@@ -480,7 +525,7 @@ const messages = defineMessages({
 						}}
 					</span>
 					<div>
-						<ButtonStyled color="orange">
+						<ButtonStyled>
 							<button
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
@@ -497,8 +542,7 @@ const messages = defineMessages({
 						</ButtonStyled>
 					</div>
 				</div>
-
-				</template>
+			</template>
 
 			<slot name="extra" />
 		</template>
@@ -519,21 +563,27 @@ const messages = defineMessages({
 			:project-name="ctx.updaterModalProps.value.projectName"
 			:loading="form.loadingVersions.value"
 			:loading-changelog="form.loadingChangelog.value"
-			@update="form.handleUpdaterConfirm"
+			@update="handleModpackUpdateRequest"
 			@cancel="form.resetUpdateState()"
 			@version-select="form.handleUpdaterVersionSelect"
 			@version-hover="form.handleUpdaterVersionHover"
 		/>
+		<ConfirmModpackUpdateModal
+			ref="modpackUpdateModal"
+			:downgrade="isUpdateDowngrade"
+			:server="ctx.isServer"
+			@confirm="handleModpackUpdateConfirm"
+			@cancel="handleModpackUpdateCancel"
+		/>
 		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
 		<ConfirmReinstallModal
 			ref="reinstallModal"
-			:backup-link="ctx.backupLink"
+			:server="ctx.isServer"
 			@reinstall="ctx.reinstallModpack()"
 		/>
 		<ConfirmUnlinkModal
 			ref="unlinkModal"
 			:server="ctx.isServer"
-			:backup-link="ctx.backupLink"
 			@unlink="ctx.unlinkModpack()"
 		/>
 

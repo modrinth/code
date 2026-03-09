@@ -97,6 +97,7 @@ Project-specific skill files with detailed patterns. Use them when the task matc
 ### General
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
 - For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
+- When editing, if the file has tabs USE TABS in edit tool - do not go back and forth identifying tabs in the file.
 
 ## Skills
 

@@ -92,9 +92,6 @@ export interface ContentManagerContext {
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
 
-	// Backup link (shown in deletion modal for server variant)
-	backupLink?: string
-
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
 }

@@ -490,7 +490,6 @@ provideInstallationSettings({
 
 	isServer: true,
 	isApp: false,
-	backupLink: `/hosting/manage/${serverId}/backups`,
 })
 
 watch(

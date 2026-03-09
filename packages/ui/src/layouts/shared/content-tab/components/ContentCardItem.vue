@@ -6,6 +6,7 @@ import {
 	TrashIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
@@ -115,11 +116,14 @@ const fileNameRef = ref<HTMLElement | null>(null)
 						>
 							{{ project.title }}
 						</AutoLink>
-						<TriangleAlertIcon
-							v-if="isClientOnly"
-							v-tooltip="formatMessage(commonMessages.clientOnlyWarning)"
-							class="size-4 shrink-0 text-orange"
-						/>
+						<Tooltip v-if="isClientOnly">
+							<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
+							<template #popper>
+								<div class="max-w-[18rem] text-sm">
+									{{ formatMessage(commonMessages.clientOnlyWarning) }}
+								</div>
+							</template>
+						</Tooltip>
 					</div>
 
 					<div class="flex min-w-0 items-center gap-1">
