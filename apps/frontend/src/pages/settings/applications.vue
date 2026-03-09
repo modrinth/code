@@ -339,7 +339,7 @@ const messages = defineMessages({
 	},
 	redirectUrisLabel: {
 		id: 'settings.applications.field.redirect-uris',
-		defaultMessage: 'Redirect uris',
+		defaultMessage: 'Redirect URIs',
 	},
 	redirectUriPlaceholder: {
 		id: 'settings.applications.field.redirect-uri.placeholder',
@@ -351,7 +351,7 @@ const messages = defineMessages({
 	},
 	addRedirectUri: {
 		id: 'settings.applications.button.add-redirect-uri',
-		defaultMessage: 'Add a redirect uri',
+		defaultMessage: 'Add a redirect URI',
 	},
 	cancel: {
 		id: 'settings.applications.button.cancel',

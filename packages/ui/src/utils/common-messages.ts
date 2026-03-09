@@ -195,7 +195,7 @@ export const commonMessages = defineMessages({
 	},
 	playedLabel: {
 		id: 'label.played',
-		defaultMessage: 'Played {time}',
+		defaultMessage: 'Played {ago}',
 	},
 	privateLabel: {
 		id: 'collections.label.private',

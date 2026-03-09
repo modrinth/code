@@ -156,7 +156,7 @@ onUnmounted(() => {
 						<template v-if="last_played">
 							{{
 								formatMessage(commonMessages.playedLabel, {
-									time: formatRelativeTime(last_played.toISOString?.()),
+									ago: formatRelativeTime(last_played.toISOString?.()),
 								})
 							}}
 						</template>
