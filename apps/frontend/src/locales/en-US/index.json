@@ -554,6 +554,18 @@
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Create your first collection to get started!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "You don't have any collections yet"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "No collections match your search"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Try adjusting your filters or search terms."
+  },
   "dashboard.collections.label.projects-count": {
     "message": "{count, plural, one {{count} project} other {{count} projects}}"
   },

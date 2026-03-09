@@ -3,6 +3,7 @@
 		<CollectionCreateModal ref="modal_creation" />
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
 		<div class="mb-3 flex flex-col gap-3">
+			<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
 			<StyledInput
 				id="search-input"
 				v-model="filterQuery"
@@ -121,14 +122,16 @@
 			<BoxIcon class="mx-auto h-12 w-12 text-secondary opacity-50" aria-hidden="true" />
 			<p class="mt-4 text-lg font-medium text-contrast">
 				{{
-					filterQuery ? 'No collections match your search' : "You don't have any collections yet"
+					filterQuery
+						? formatMessage(messages.emptyNoMatch)
+						: formatMessage(messages.emptyNoCollections)
 				}}
 			</p>
 			<p class="text-sm text-secondary">
 				{{
 					filterQuery
-						? 'Try adjusting your filters or search terms.'
-						: 'Create your first collection to get started!'
+						? formatMessage(messages.emptyNoMatchHint)
+						: formatMessage(messages.emptyGetStartedHint)
 				}}
 			</p>
 		</div>
@@ -180,6 +183,22 @@ const messages = defineMessages({
 		id: 'dashboard.collections.label.search-input',
 		defaultMessage: 'Search your collections',
 	},
+	emptyNoMatch: {
+		id: 'dashboard.collections.empty.no-match',
+		defaultMessage: 'No collections match your search',
+	},
+	emptyNoCollections: {
+		id: 'dashboard.collections.empty.no-collections',
+		defaultMessage: "You don't have any collections yet",
+	},
+	emptyNoMatchHint: {
+		id: 'dashboard.collections.empty.no-match-hint',
+		defaultMessage: 'Try adjusting your filters or search terms.',
+	},
+	emptyGetStartedHint: {
+		id: 'dashboard.collections.empty.get-started-hint',
+		defaultMessage: 'Create your first collection to get started!',
+	},
 })
 
 definePageMeta({
@@ -205,7 +224,8 @@ const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/col
 
 const route = useNativeRoute()
 const router = useNativeRouter()
-const sortBy = ref(route.query.s || 'updated')
+const validSortOptions = ['updated', 'created', 'name']
+const sortBy = ref(validSortOptions.includes(route.query.s) ? route.query.s : 'updated')
 
 const orderedCollections = computed(() => {
 	if (!collections.value) return []
@@ -279,27 +299,6 @@ watch(sortBy, (newVal) => {
 					color: var(--color-secondary);
 				}
 			}
-		}
-	}
-}
-
-.search-row {
-	.flex-wrap {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: var(--gap-sm);
-	}
-
-	@media screen and (max-width: 768px) {
-		.md\:flex-grow-0 {
-			flex-grow: 1;
-		}
-	}
-
-	.iconified-input {
-		input {
-			height: 3rem !important;
 		}
 	}
 }
