@@ -896,17 +896,17 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visit wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Copy Java server address"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Copied!"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "IP address copied to clipboard"
+    "defaultMessage": "Server address copied to clipboard"
   },
   "project.about.server.downloadModpack": {
     "defaultMessage": "Download modpack"
-  },
-  "project.about.server.ip.tooltip": {
-    "defaultMessage": "Copy Java IP: {ipAddress}"
   },
   "project.about.server.languages": {
     "defaultMessage": "Languages"

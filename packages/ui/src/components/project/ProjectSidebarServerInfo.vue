@@ -4,7 +4,7 @@
 
 		<div
 			v-if="ipAddress"
-			v-tooltip="formatMessage(messages.ipTooltip, { ipAddress })"
+			v-tooltip="formatMessage(messages.addressTooltip)"
 			class="bg-button-bg flex gap-2 justify-between rounded-2xl items-center px-3 pr-1.5 h-12 cursor-pointer hover:bg-button-bg-hover hover:brightness-125 transition-all active:scale-95"
 			@click="handleCopyIP"
 		>
@@ -181,15 +181,15 @@ const messages = defineMessages({
 	},
 	copiedText: {
 		id: `project.about.server.copiedText`,
-		defaultMessage: 'IP address copied to clipboard',
+		defaultMessage: 'Server address copied to clipboard',
 	},
 	title: {
 		id: `project.about.server.title`,
 		defaultMessage: 'Server details',
 	},
-	ipTooltip: {
-		id: `project.about.server.ip.tooltip`,
-		defaultMessage: 'Copy Java IP: {ipAddress}',
+	addressTooltip: {
+		id: `project.about.server.address.tooltip`,
+		defaultMessage: 'Copy Java server address',
 	},
 	requiredContent: {
 		id: `project.about.server.requiredContent`,
