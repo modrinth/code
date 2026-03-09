@@ -23,6 +23,7 @@ use serde_json::json;
 use tracing::{info, warn};
 
 use std::collections::{HashMap, HashSet};
+use std::time::Duration;
 
 use crate::data::Settings;
 use crate::server_address::ServerAddress;
@@ -748,6 +749,7 @@ async fn run_credentials(
                     "selectedProfile": credentials.offline_profile.id.simple().to_string(),
                     "serverId": &server_id,
                 }))
+                .timeout(Duration::from_secs(5))
                 .send()
                 .await;
 
