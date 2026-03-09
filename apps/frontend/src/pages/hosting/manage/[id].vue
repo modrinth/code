@@ -319,6 +319,7 @@
 					:power-state-details="powerStateDetails"
 					:backup-in-progress="backupInProgress"
 					@reinstall="onReinstall"
+					@reinstall-failed="onReinstallFailed"
 				/>
 			</div>
 		</template>
@@ -488,9 +489,10 @@ const markBackupCancelled = (backupId: string) => {
 
 // Parthenon state event
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
-const isSyncingContent = ref(false)
+const syncProgressActive = ref(false)
+const isAwaitingPostInstallRefresh = ref(false)
 const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
-	() => (isSyncingContent.value = false),
+	() => (syncProgressActive.value = false),
 	1000,
 	{ immediate: false },
 )
@@ -498,11 +500,13 @@ const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
 watch(syncProgress, (progress) => {
 	if (progress != null) {
 		cancelSyncHide()
-		isSyncingContent.value = true
-	} else if (isSyncingContent.value) {
+		syncProgressActive.value = true
+	} else if (syncProgressActive.value) {
 		startSyncHide()
 	}
 })
+
+const isSyncingContent = computed(() => syncProgressActive.value || isAwaitingPostInstallRefresh.value)
 
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
@@ -529,6 +533,7 @@ provideModrinthServerContext({
 	isServerRunning,
 	backupsState,
 	markBackupCancelled,
+	isSyncingContent,
 	fsAuth,
 	fsOps,
 	fsQueuedOps,
@@ -783,35 +788,9 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			hasSeenInstallProgress
 		) {
 			debug('[id.vue] handleState: progress null + was installing, applying optimistic update')
-
-			// Apply optimistic update with user's chosen values (since handleInstallationResult may never fire)
-			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
-			if (newLoader.value)
-				patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
-			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
-			if (newMCVersion.value) patch.mc_version = newMCVersion.value
-
-			debug('[id.vue] handleState: optimistic patch:', patch)
-			updateServerData(patch)
-
 			hasSeenInstallProgress = false
-			newLoader.value = null
-			newLoaderVersion.value = null
-			newMCVersion.value = null
-
-			// Delay invalidation to let postinstall webhook update the DB
-			setTimeout(async () => {
-				debug('[id.vue] handleState: delayed invalidation firing')
-				try {
-					await Promise.all([
-						queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
-						queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
-					])
-				} catch (err: unknown) {
-					console.error('Error refreshing data after installation:', err)
-				}
-			}, 2000)
+			applyOptimisticCompletion()
+			invalidateAfterInstall()
 		}
 	}
 }
@@ -968,6 +947,71 @@ const onReinstall = async (potentialArgs: any) => {
 	error.value = null
 	errorTitle.value = 'Error'
 	errorMessage.value = 'An unexpected error occurred.'
+
+	// Immediately refetch so loader.vue has fresh data (buttons stay locked via isSyncingContent)
+	debug('[id.vue] onReinstall: triggering immediate invalidation for loader.vue')
+	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
+}
+
+const onReinstallFailed = () => {
+	debug('[id.vue] onReinstallFailed: reverting status to available')
+	updateServerData({ status: 'available' })
+	newLoader.value = null
+	newLoaderVersion.value = null
+	newMCVersion.value = null
+}
+
+function applyOptimisticCompletion() {
+	const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
+	if (newLoader.value)
+		patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
+	if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
+	if (newMCVersion.value) patch.mc_version = newMCVersion.value
+
+	debug('[id.vue] applyOptimisticCompletion: patch:', patch)
+	updateServerData(patch)
+
+	const addonsQueries = queryClient.getQueriesData<Archon.Content.v1.Addons>({
+		queryKey: ['content', 'list', 'v1', serverId],
+	})
+	debug('[id.vue] applyOptimisticCompletion: found', addonsQueries.length, 'addons queries to patch')
+	for (const [key, data] of addonsQueries) {
+		if (!data) continue
+		const addonsPatch: Record<string, string> = {}
+		if (newLoader.value) addonsPatch.modloader = newLoader.value
+		if (newLoaderVersion.value) addonsPatch.modloader_version = newLoaderVersion.value
+		if (newMCVersion.value) addonsPatch.game_version = newMCVersion.value
+		if (Object.keys(addonsPatch).length > 0) {
+			debug('[id.vue] applyOptimisticCompletion: patching addons cache:', addonsPatch)
+			queryClient.setQueryData(key, { ...data, ...addonsPatch })
+		}
+	}
+
+	newLoader.value = null
+	newLoaderVersion.value = null
+	newMCVersion.value = null
+}
+
+async function invalidateAfterInstall() {
+	debug('[id.vue] invalidateAfterInstall: setting isAwaitingPostInstallRefresh=true, scheduling 2s delayed invalidation')
+	isAwaitingPostInstallRefresh.value = true
+	setTimeout(async () => {
+		debug('[id.vue] invalidateAfterInstall: delayed invalidation firing now')
+		try {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+				queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
+				queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
+			])
+			debug('[id.vue] invalidateAfterInstall: delayed invalidation complete')
+		} catch (err: unknown) {
+			console.error('Error refreshing data after installation:', err)
+		} finally {
+			debug('[id.vue] invalidateAfterInstall: setting isAwaitingPostInstallRefresh=false')
+			isAwaitingPostInstallRefresh.value = false
+		}
+	}, 2000)
 }
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
@@ -989,41 +1033,9 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 				mc_version: serverData.value.mc_version,
 			})
 
-			// Optimistically update with the values the user chose during reset
-			const patch: Partial<Archon.Servers.v0.Server> = { status: 'available' }
-			if (newLoader.value)
-				patch.loader = formatLoaderLabel(newLoader.value) as Archon.Servers.v0.Loader
-			if (newLoaderVersion.value) patch.loader_version = newLoaderVersion.value
-			if (newMCVersion.value) patch.mc_version = newMCVersion.value
-
-			debug('[id.vue] handleInstallationResult: updateServerData with:', patch)
-			updateServerData(patch)
-
-			newLoader.value = null
-			newLoaderVersion.value = null
-			newMCVersion.value = null
+			applyOptimisticCompletion()
 			error.value = null
-
-			// Delay invalidation to let postinstall webhook update the DB
-			debug('[id.vue] handleInstallationResult: scheduling delayed invalidation (2s)')
-			setTimeout(async () => {
-				debug('[id.vue] handleInstallationResult: delayed invalidation firing now')
-				try {
-					await Promise.all([
-						queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
-						queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', serverId] }),
-						queryClient.invalidateQueries({ queryKey: ['content', 'list'] }),
-					])
-					debug('[id.vue] handleInstallationResult: delayed invalidation complete, serverData:', {
-						status: serverData.value?.status,
-						loader: serverData.value?.loader,
-						loader_version: serverData.value?.loader_version,
-						mc_version: serverData.value?.mc_version,
-					})
-				} catch (err: unknown) {
-					console.error('Error refreshing data after installation:', err)
-				}
-			}, 2000)
+			invalidateAfterInstall()
 
 			break
 		}

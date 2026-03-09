@@ -15,14 +15,13 @@
 				leave-to-class="opacity-0 max-h-0"
 			>
 				<div
-					v-if="!backup.isBackingUp.value && !backup.backupComplete.value && !backup.backupFailed.value"
+					v-if="
+						!backup.isBackingUp.value && !backup.backupComplete.value && !backup.backupFailed.value
+					"
 				>
-					<ButtonStyled type="outlined">
-						<button
-							class="!border !border-surface-5 !shadow-none"
-							@click="backup.startBackup()"
-						>
-							<SaveIcon class="size-5" />
+					<ButtonStyled>
+						<button class="!shadow-none" @click="backup.startBackup()">
+							<PlusIcon class="size-5" />
 							{{ formatMessage(messages.createBackup) }}
 						</button>
 					</ButtonStyled>
@@ -86,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, SaveIcon } from '@modrinth/assets'
+import { CheckCircleIcon, PlusIcon } from '@modrinth/assets'
 import { watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'

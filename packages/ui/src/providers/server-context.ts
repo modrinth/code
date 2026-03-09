@@ -33,6 +33,9 @@ export interface ModrinthServerContext {
 	readonly backupsState: Reactive<BackupsState>
 	markBackupCancelled: (backupId: string) => void
 
+	// Content sync state
+	readonly isSyncingContent: Ref<boolean>
+
 	// Filesystem state
 	readonly fsAuth: Ref<FilesystemAuth | null>
 	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>

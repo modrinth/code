@@ -54,7 +54,7 @@ import { computed, ref, watch } from 'vue'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
-const { server, serverId, worldId } = injectModrinthServerContext()
+const { server, serverId, worldId, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const tags = injectTags()
@@ -86,6 +86,14 @@ const messages = defineMessages({
 		id: 'hosting.loader.failed-to-save-settings',
 		defaultMessage: 'Failed to save installation settings',
 	},
+	repairStartedTitle: {
+		id: 'hosting.loader.repair-started-title',
+		defaultMessage: 'Repair completed',
+	},
+	repairStartedText: {
+		id: 'hosting.loader.repair-started-text',
+		defaultMessage: 'Your server installation has been repaired.',
+	},
 	failedToRepair: {
 		id: 'hosting.loader.failed-to-repair',
 		defaultMessage: 'Failed to repair server',
@@ -102,20 +110,30 @@ const messages = defineMessages({
 
 const emit = defineEmits<{
 	reinstall: [any?]
+	'reinstall-failed': []
 }>()
 
 const isInstalling = computed(() => {
-	const val = server.value?.status === 'installing'
-	debug('isInstalling:', val, 'server.status:', server.value?.status)
+	const val = server.value?.status === 'installing' || isSyncingContent.value
+	debug(
+		'isInstalling:',
+		val,
+		'server.status:',
+		server.value?.status,
+		'isSyncingContent:',
+		isSyncingContent.value,
+	)
 	return val
 })
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 
 async function invalidateServerState() {
+	debug('invalidateServerState: starting')
 	await Promise.all([
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
 		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', serverId] }),
 	])
+	debug('invalidateServerState: complete')
 }
 
 const addonsQuery = useQuery({
@@ -314,6 +332,9 @@ provideInstallationSettings({
 	},
 
 	async save(platform, gameVersion, loaderVersionId) {
+		debug('save: called with', { platform, gameVersion, loaderVersionId })
+		debug('save: emitting reinstall before API call')
+		emit('reinstall', { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion })
 		try {
 			const request: Archon.Content.v1.InstallWorldContent = {
 				content_variant: 'bare',
@@ -323,9 +344,13 @@ provideInstallationSettings({
 				soft_override: true,
 			}
 
+			debug('save: calling installContent', request)
 			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			await invalidateServerState()
+			debug('save: installContent succeeded, invalidating')
+			invalidateServerState()
 		} catch (err) {
+			debug('save: installContent failed, emitting reinstall-failed', err)
+			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToSaveSettings),
@@ -335,50 +360,30 @@ provideInstallationSettings({
 	},
 
 	async repair() {
-		if (modpack.value) {
-			try {
-				await client.archon.content_v1.installContent(serverId, worldId.value!, {
-					content_variant: 'modpack',
-					spec: {
-						platform: 'modrinth',
-						project_id: modpack.value.spec.project_id,
-						version_id: modpack.value.spec.version_id,
-					},
-					soft_override: true,
-				})
-				await invalidateServerState()
-			} catch (err) {
-				addNotification({
-					type: 'error',
-					text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
-				})
-			}
-		} else {
-			const addons = addonsQuery.data.value
-			const currentLoader = addons?.modloader ?? server.value?.loader
-			const currentGameVersion = addons?.game_version ?? server.value?.mc_version
-			const currentLoaderVersion = addons?.modloader_version ?? server.value?.loader_version
-			if (!currentLoader || !currentGameVersion) return
-			try {
-				await client.archon.content_v1.installContent(serverId, worldId.value!, {
-					content_variant: 'bare',
-					loader: toApiLoader(currentLoader),
-					version: currentLoaderVersion ?? '',
-					game_version: currentGameVersion,
-					soft_override: true,
-				})
-				await invalidateServerState()
-			} catch (err) {
-				addNotification({
-					type: 'error',
-					text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
-				})
-			}
+		debug('repair: called')
+		try {
+			await client.archon.content_v1.repair(serverId, worldId.value!)
+			debug('repair: API succeeded, invalidating')
+			await invalidateServerState()
+			addNotification({
+				type: 'success',
+				title: formatMessage(messages.repairStartedTitle),
+				text: formatMessage(messages.repairStartedText),
+			})
+		} catch (err) {
+			debug('repair: failed', err)
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToRepair),
+			})
 		}
 	},
 
 	async reinstallModpack() {
 		if (!modpack.value) return
+		debug('reinstallModpack: called, project:', modpack.value.spec.project_id, 'version:', modpack.value.spec.version_id)
+		debug('reinstallModpack: emitting reinstall before API call')
+		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
@@ -389,9 +394,11 @@ provideInstallationSettings({
 				},
 				soft_override: false,
 			})
-			await invalidateServerState()
-			emit('reinstall')
+			debug('reinstallModpack: installContent succeeded, invalidating')
+			invalidateServerState()
 		} catch (err) {
+			debug('reinstallModpack: failed, emitting reinstall-failed', err)
+			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
@@ -400,8 +407,10 @@ provideInstallationSettings({
 	},
 
 	async unlinkModpack() {
+		debug('unlinkModpack: called')
 		const previousData = addonsQuery.data.value
 		if (previousData) {
+			debug('unlinkModpack: optimistically removing modpack from cache')
 			queryClient.setQueryData(['content', 'list', 'v1', serverId], {
 				...previousData,
 				modpack: null,
@@ -410,7 +419,9 @@ provideInstallationSettings({
 
 		try {
 			await client.archon.content_v1.unlinkModpack(serverId, worldId.value!)
+			debug('unlinkModpack: API succeeded')
 		} catch (err) {
+			debug('unlinkModpack: failed, reverting cache', err)
 			if (previousData) {
 				queryClient.setQueryData(['content', 'list', 'v1', serverId], previousData)
 			}
@@ -419,6 +430,7 @@ provideInstallationSettings({
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToUnlink),
 			})
 		} finally {
+			debug('unlinkModpack: invalidating queries')
 			await Promise.all([
 				queryClient.invalidateQueries({
 					queryKey: ['servers', 'detail', serverId],
@@ -427,17 +439,22 @@ provideInstallationSettings({
 					queryKey: ['content', 'list', 'v1', serverId],
 				}),
 			])
+			debug('unlinkModpack: invalidation complete')
 		}
 	},
 
 	getCachedModpackVersions: () => modpackVersionsQuery.data.value ?? null,
 
 	async fetchModpackVersions() {
+		debug('fetchModpackVersions: called, project:', modpack.value?.spec.project_id)
 		try {
-			return await client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+			const versions = await client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
 				include_changelog: false,
 			})
+			debug('fetchModpackVersions: got', versions.length, 'versions')
+			return versions
 		} catch (err) {
+			debug('fetchModpackVersions: failed', err)
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
@@ -447,15 +464,20 @@ provideInstallationSettings({
 	},
 
 	async getVersionChangelog(versionId) {
+		debug('getVersionChangelog: called, versionId:', versionId)
 		try {
 			return await client.labrinth.versions_v2.getVersion(versionId)
 		} catch {
+			debug('getVersionChangelog: failed for', versionId)
 			return null
 		}
 	},
 
 	async onModpackVersionConfirm(version) {
 		if (!modpack.value) return
+		debug('onModpackVersionConfirm: called, version:', version.id)
+		debug('onModpackVersionConfirm: emitting reinstall before API call')
+		emit('reinstall')
 		try {
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
@@ -466,9 +488,11 @@ provideInstallationSettings({
 				},
 				soft_override: true,
 			})
-			await invalidateServerState()
-			emit('reinstall')
+			debug('onModpackVersionConfirm: installContent succeeded, invalidating')
+			invalidateServerState()
 		} catch (err) {
+			debug('onModpackVersionConfirm: failed, emitting reinstall-failed', err)
+			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
 				text: err instanceof Error ? err.message : formatMessage(messages.failedToChangeVersion),
@@ -509,6 +533,7 @@ watch(
 )
 
 function onBrowseModpacks() {
+	debug('onBrowseModpacks: navigating to modpack discovery')
 	navigateTo({
 		path: '/discover/modpacks',
 		query: { sid: serverId, from: 'reset-server', wid: worldId.value },
