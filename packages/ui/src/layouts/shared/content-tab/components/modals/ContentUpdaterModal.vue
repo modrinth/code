@@ -527,6 +527,9 @@ function show(initialVersionId?: string) {
 			selectedVersion.value = props.versions[0]
 		}
 		pendingInitialVersionId.value = undefined
+		if (selectedVersion.value) {
+			emit('versionSelect', selectedVersion.value)
+		}
 	} else {
 		selectedVersion.value = null
 		pendingInitialVersionId.value = initialVersionId
