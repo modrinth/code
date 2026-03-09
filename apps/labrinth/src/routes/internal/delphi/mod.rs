@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fmt::Write, time::Instant};
 
 use crate::env::ENV;
-use crate::{database::PgPool, util::http::HTTP_CLIENT};
+use crate::{database::PgPool, util::http::HttpClient};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
@@ -351,6 +351,7 @@ async fn ingest_report_deserialized(
 pub async fn run(
     exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     run_parameters: DelphiRunParameters,
+    http: &reqwest::Client,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = sqlx::query!(
         r#"
@@ -373,8 +374,7 @@ pub async fn run(
         run_parameters.file_id.0
     );
 
-    HTTP_CLIENT
-        .post(&ENV.DELPHI_URL)
+    http.post(&ENV.DELPHI_URL)
         .json(&serde_json::json!({
             "url": file_data.url,
             "project_id": ProjectId(file_data.project_id.0 as u64),
@@ -473,6 +473,7 @@ async fn _run(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     run_parameters: web::Query<DelphiRunParameters>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -483,7 +484,7 @@ async fn _run(
     )
     .await?;
 
-    run(&**pool, run_parameters.into_inner()).await
+    run(&**pool, run_parameters.into_inner(), &http).await
 }
 
 #[get("version")]
@@ -515,6 +516,7 @@ async fn issue_type_schema(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -540,8 +542,7 @@ async fn issue_type_schema(
         cache_entry => Ok(HttpResponse::Ok().json(
             &cache_entry
                 .insert((
-                    HTTP_CLIENT
-                        .get(format!("{}/schema", ENV.DELPHI_URL))
+                    http.get(format!("{}/schema", ENV.DELPHI_URL))
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())

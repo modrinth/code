@@ -11,7 +11,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
 use crate::util::error::Context;
-use crate::util::http::HTTP_CLIENT;
+use crate::util::http::HttpClient;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
 use eyre::eyre;
@@ -261,6 +261,7 @@ async fn minecraft_server_play_ingest(
     play_input: web::Json<MinecraftJavaServerPlayInput>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
+    http: web::Data<HttpClient>,
 ) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -288,7 +289,7 @@ async fn minecraft_server_play_ingest(
     let minecraft_uuid = if let (Some(username), Some(server_id)) =
         (&play_input.username, &play_input.server_id)
     {
-        let has_joined = HTTP_CLIENT
+        let has_joined = http
             .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
             .query(&[
                 ("username", username.as_str()),

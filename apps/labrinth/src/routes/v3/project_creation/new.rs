@@ -29,7 +29,9 @@ use crate::{
     },
     queue::session::AuthQueue,
     routes::ApiError,
-    util::{error::Context, validate::validation_errors_to_string},
+    util::{
+        error::Context, http::HttpClient, validate::validation_errors_to_string,
+    },
 };
 
 pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -116,6 +118,7 @@ pub async fn create(
     db: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
     web::Json(create): web::Json<ProjectCreate>,
 ) -> Result<web::Json<ProjectId>, CreateError> {
     // check that the user can make a project
@@ -302,13 +305,13 @@ pub async fn create(
     };
 
     project_builder
-        .insert(&mut txn)
+        .insert(&mut txn, &http)
         .await
         .wrap_internal_err("failed to insert project")?;
 
     if let Some(version_builder) = version_builder {
         version_builder
-            .insert(&mut txn)
+            .insert(&mut txn, &http)
             .await
             .wrap_internal_err("failed to insert initial version")?;
     }
