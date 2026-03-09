@@ -114,8 +114,8 @@ impl ServerPingQueue {
                     }),
                     version_name: data.map(|d| d.version_name.clone()),
                     version_protocol: data.map(|d| d.version_protocol),
-                    players_online: data.map(|d| d.players_online),
-                    players_max: data.map(|d| d.players_max),
+                    players_online: data.and_then(|d| d.players_online),
+                    players_max: data.and_then(|d| d.players_max),
                 };
 
                 ch.write(&row)
@@ -260,10 +260,7 @@ pub async fn ping_server(
         .map(|duration| duration.min(default_duration))
         .unwrap_or(default_duration);
 
-    let (address, port) = async_minecraft_ping::parse_host_and_port(address)?;
-
     let conn = async_minecraft_ping::ConnectionConfig::build(address)
-        .with_port(port)
         .with_srv_lookup()
         .with_timeout(timeout)
         .connect()

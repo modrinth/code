@@ -22,8 +22,8 @@ pub struct ServerStatus {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ServerPlayers {
-    pub max: i32,
-    pub online: i32,
+    pub max: Option<i32>,
+    pub online: Option<i32>,
     #[serde(default)]
     pub sample: Vec<ServerGameProfile>,
 }

@@ -929,17 +929,12 @@ pub async fn get_server_status(
 //         protocol_version,
 //     )
 //     .await
-}
 
 async fn get_server_status_new(
     address: &str,
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
-    let (address, port) = async_minecraft_ping::parse_host_and_port(address)
-        .wrap_err("failed to parse address")?;
-
     let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
-        .with_port(port)
         .with_srv_lookup();
 
     if let Some(version) = protocol_version {

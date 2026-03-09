@@ -255,8 +255,8 @@ mod legacy {
             }),
             description: parts.next().and_then(|x| to_raw_value(x).ok()),
             players: Some(ServerPlayers {
-                online: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
-                max: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
+                online: parts.next().and_then(|x| x.parse().ok()),
+                max: parts.next().and_then(|x| x.parse().ok()),
                 sample: vec![],
             }),
             favicon: None,
