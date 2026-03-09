@@ -8,9 +8,11 @@ import {
 	TagItem,
 	useFormatDateTime,
 	useRelativeTime,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
 
+const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
