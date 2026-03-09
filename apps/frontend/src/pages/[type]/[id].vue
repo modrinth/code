@@ -100,12 +100,12 @@
 					() => {
 						debug('on-show fired')
 						loadVersions()
-						navigateTo({ query: route.query, hash: '#download' })
+						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 					}
 				"
 				:on-hide="
 					() => {
-						navigateTo({ query: route.query, hash: '' })
+						navigateTo({ query: route.query, hash: '' }, { replace: true })
 					}
 				"
 			>
@@ -243,18 +243,21 @@
 														platformAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -344,18 +347,21 @@
 														gameVersionAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -1009,7 +1015,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
