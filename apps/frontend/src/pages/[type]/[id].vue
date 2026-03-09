@@ -613,7 +613,7 @@
 											<IntlFormatted
 												:message-id="messages.serversPromoPricing"
 												:values="{
-													price: formatPrice(locale, 500, 'USD', true),
+													price: formatPrice(500, 'USD', true),
 												}"
 											>
 												<template #small="{ children }">
@@ -945,7 +945,7 @@
 									{{
 										capitalizeString(
 											formatMessage(commonMessages.projectFollowers, {
-												count: formatNumber(project.followers, false),
+												count: project.followers,
 											}),
 										)
 									}}
@@ -953,7 +953,7 @@
 							</div>
 							<div
 								v-if="project.approved"
-								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.approved)"
 								class="details-list__item"
 							>
 								<CalendarIcon aria-hidden="true" />
@@ -968,11 +968,7 @@
 								</div>
 							</div>
 
-							<div
-								v-else
-								v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-								class="details-list__item"
-							>
+							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
@@ -983,7 +979,7 @@
 
 							<div
 								v-if="project.status === 'processing' && project.queued"
-								v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.queued)"
 								class="details-list__item"
 							>
 								<ScaleIcon aria-hidden="true" />
@@ -1000,7 +996,7 @@
 
 							<div
 								v-if="versions.length > 0 && project.updated"
-								v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.updated)"
 								class="details-list__item"
 							>
 								<VersionIcon aria-hidden="true" />
@@ -1099,17 +1095,13 @@ import {
 	StyledInput,
 	TagItem,
 	useDebugLogger,
+	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import {
-	capitalizeString,
-	formatNumber,
-	formatPrice,
-	formatProjectType,
-	renderString,
-} from '@modrinth/utils'
+import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -1150,7 +1142,12 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
-const { locale, formatMessage } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const debug = useDebugLogger('DownloadModal')
 

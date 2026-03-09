@@ -36,10 +36,7 @@
 					{{ formatMessage(commonMessages.projectFollowers, { count: project.followers }) }}
 				</div>
 			</div>
-			<div
-				v-if="project.approved"
-				v-tooltip="dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
-			>
+			<div v-if="project.approved" v-tooltip="formatDateTime(project.approved)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -49,7 +46,7 @@
 					}}
 				</div>
 			</div>
-			<div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
+			<div v-else v-tooltip="formatDateTime(project.published)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -59,7 +56,7 @@
 			</div>
 			<div
 				v-if="project.status === 'processing' && project.queued"
-				v-tooltip="dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+				v-tooltip="formatDateTime(project.queued)"
 			>
 				<ScaleIcon aria-hidden="true" />
 				<div>
@@ -70,10 +67,7 @@
 					}}
 				</div>
 			</div>
-			<div
-				v-if="hasVersions && project.updated"
-				v-tooltip="dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
-			>
+			<div v-if="hasVersions && project.updated" v-tooltip="formatDateTime(project.updated)">
 				<VersionIcon aria-hidden="true" />
 				<div>
 					{{
@@ -95,16 +89,19 @@ import {
 	VersionIcon,
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { useRelativeTime } from '../../composables'
+import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import { IntlFormatted } from '../base'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const props = defineProps<{
 	project: Labrinth.Projects.v2.Project
