@@ -122,7 +122,7 @@
 
 						<div
 							v-if="filteredOptions.length > 0 || includeSelectAllOption"
-							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5"
+							class="flex flex-col gap-2 bg-surface-4 border-0 border-solid border-b border-b-surface-5 py-1.5 empty:hidden"
 						>
 							<div v-if="includeSelectAllOption" class="sticky top-0 z-10 bg-surface-4 px-3">
 								<span
