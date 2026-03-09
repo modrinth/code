@@ -44,6 +44,7 @@ import { computed, type Reactive, watch } from 'vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
 import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
@@ -71,6 +72,25 @@ const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject)
 	const slug = result.slug || result.project_id
 	prefetchTimeout = useTimeoutFn(
 		() => queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient)),
+		HOVER_DURATION_TO_PREFETCH_MS,
+		{ immediate: false },
+	)
+	prefetchTimeout.start()
+}
+
+const handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
+	const slug = result.slug || result.project_id
+
+	prefetchTimeout = useTimeoutFn(
+		async () => {
+			queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient))
+			queryClient.prefetchQuery(projectQueryOptions.v3(slug, modrinthClient))
+
+			const content = result.minecraft_java_server?.content
+			if (content?.kind === 'modpack' && content.version_id) {
+				queryClient.prefetchQuery(versionQueryOptions.v3(content.version_id, modrinthClient))
+			}
+		},
 		HOVER_DURATION_TO_PREFETCH_MS,
 		{ immediate: false },
 	)
@@ -810,6 +830,8 @@ const getServerModpackContent = (hit: Labrinth.Search.v3.ResultSearchProject) =>
 							:max-tags="2"
 							is-server-project
 							exclude-loaders
+							@mouseenter="handleServerProjectMouseEnter(project)"
+							@mouseleave="handleProjectHoverEnd"
 						>
 						</ProjectCard>
 					</template>

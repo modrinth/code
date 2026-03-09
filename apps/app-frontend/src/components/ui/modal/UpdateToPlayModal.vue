@@ -14,7 +14,7 @@
 
 				<div v-if="diffs.length" class="flex flex-col gap-2">
 					<span v-if="publishedDate" class="text-contrast font-semibold">{{
-						formatMessage(messages.publishedDate, { date: publishedDate })
+						formatDate(publishedDate)
 					}}</span>
 					<div class="flex gap-2">
 						<div v-if="removedCount" class="flex gap-1 items-center">
@@ -136,6 +136,7 @@ import {
 	commonMessages,
 	defineMessages,
 	NewModal,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -186,11 +187,13 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const installStore = useInstall()
+type UpdateCompleteCallback = () => void | Promise<void>
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const instance = ref<GameInstance | null>(null)
-const onUpdateComplete = ref<() => void>(() => {})
+const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
 const modpackVersionId = ref<string | null>(null)
 const modpackVersion = ref<Version | null>(null)
@@ -316,6 +319,7 @@ async function computeDependencyDiffs(
 
 async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
 	if (!inst.linked_data) return null
+	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
 
 	try {
 		// For server projects, linked_data.project_id is the server project but
@@ -327,8 +331,8 @@ async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[
 		// Compute dependency diffs between current and latest version
 		if (instanceModpackVersion && modpackVersion.value) {
 			return await computeDependencyDiffs(
-				modpackVersion.value.dependencies || [],
 				instanceModpackVersion.dependencies || [],
+				modpackVersion.value.dependencies || [],
 			)
 		}
 	} catch (error) {
@@ -355,7 +359,7 @@ async function handleUpdate() {
 	try {
 		if (modpackVersionId.value && instance.value) {
 			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
-			onUpdateComplete.value()
+			await onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
@@ -379,7 +383,7 @@ function handleDecline() {
 function show(
 	instanceVal: GameInstance,
 	modpackVersionIdVal: string | null = null,
-	callback: () => void = () => {},
+	callback: UpdateCompleteCallback = () => {},
 	e?: MouseEvent,
 ) {
 	instance.value = instanceVal
@@ -406,10 +410,6 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
 			'An update is required to play {name}. Please update to the latest version to launch the game.',
-	},
-	publishedDate: {
-		id: 'app.modal.update-to-play.published-date',
-		defaultMessage: '{date, date, long}',
 	},
 	removedCount: {
 		id: 'app.modal.update-to-play.removed-count',

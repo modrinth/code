@@ -22,6 +22,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::routes::internal::delphi::rescan::rescan_projects_in_queue;
 use crate::util::anrok;
 use crate::util::archon::ArchonClient;
+use crate::util::http::HttpClient;
 use crate::util::ratelimit::{AsyncRateLimiter, GCRAParameters};
 use sync::friends::handle_pubsub;
 
@@ -69,6 +70,7 @@ pub struct LabrinthConfig {
     pub email_queue: web::Data<EmailQueue>,
     pub archon_client: web::Data<ArchonClient>,
     pub gotenberg_client: GotenbergClient,
+    pub http_client: web::Data<HttpClient>,
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -103,10 +105,14 @@ pub fn app_setup(
 
     let scheduler = scheduler::Scheduler::new();
 
+    let http_client = web::Data::new(HttpClient::new());
     {
         let pool_ref = pool.clone();
+        let http_ref = http_client.clone();
         actix_rt::spawn(async move {
-            if let Err(err) = rescan_projects_in_queue(&pool_ref).await {
+            if let Err(err) =
+                rescan_projects_in_queue(&pool_ref, &http_ref).await
+            {
                 warn!("Delphi rescan failed: {err:#}");
             }
         });
@@ -303,6 +309,7 @@ pub fn app_setup(
         stripe_client,
         anrok_client,
         gotenberg_client,
+        http_client,
         archon_client: web::Data::new(
             ArchonClient::from_env()
                 .expect("ARCHON_URL and PYRO_API_KEY must be set"),
@@ -333,6 +340,7 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(labrinth_config.search_backend.clone())
     .app_data(web::Data::new(labrinth_config.gotenberg_client.clone()))
+    .app_data(labrinth_config.http_client.clone())
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(labrinth_config.email_queue.clone())

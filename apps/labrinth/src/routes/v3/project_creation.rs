@@ -23,6 +23,7 @@ use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
 use crate::util::guards::admin_key_guard;
+use crate::util::http::HttpClient;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -291,6 +292,7 @@ pub async fn project_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         req,
@@ -299,6 +301,7 @@ pub async fn project_create(
         redis,
         file_host,
         session_queue,
+        http,
     )
     .await
 }
@@ -310,6 +313,7 @@ pub async fn project_create_internal(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -326,6 +330,7 @@ pub async fn project_create_internal(
         &client,
         &redis,
         &session_queue,
+        &http,
         project_id,
     )
     .await;
@@ -357,6 +362,7 @@ pub async fn project_create_with_id(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -373,6 +379,7 @@ pub async fn project_create_with_id(
         &client,
         &redis,
         &session_queue,
+        &http,
         project_id,
     )
     .await;
@@ -434,6 +441,7 @@ async fn project_create_inner(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    http: &reqwest::Client,
     project_id: ProjectId,
 ) -> Result<HttpResponse, CreateError> {
     // The currently logged in user
@@ -898,7 +906,9 @@ async fn project_create_inner(
 
         let now = Utc::now();
 
-        let id = project_builder_actual.insert(&mut *transaction).await?;
+        let id = project_builder_actual
+            .insert(&mut *transaction, http)
+            .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {

@@ -49,6 +49,9 @@ const modalConfirmUnpair = ref()
 const modalConfirmReinstall = ref()
 
 const props = defineProps<InstanceSettingsTabProps>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
 const loader = ref(props.instance.loader)
 const gameVersion = ref(props.instance.game_version)
@@ -273,7 +276,7 @@ async function unpairProfile() {
 	modpackProject.value = null
 	modpackVersion.value = null
 	modpackVersions.value = null
-	modalConfirmUnpair.value.hide()
+	emit('unlinked')
 }
 
 async function repairModpack() {
@@ -453,7 +456,7 @@ const messages = defineMessages({
 	unlinkInstanceConfirmDescription: {
 		id: 'instance.settings.tabs.installation.unlink.confirm.description',
 		defaultMessage:
-			'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal.',
+			'If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal instance.',
 	},
 	reinstallModpackConfirmTitle: {
 		id: 'instance.settings.tabs.installation.reinstall.confirm.title',

@@ -21,7 +21,7 @@ const links: Stage = {
 		),
 	text: async (project, projectV3) => {
 		let text
-		if (!!projectV3?.minecraft_server)
+		if (projectV3?.minecraft_server)
 			text = (await import('../messages/checklist-text/links/server.md?raw')).default
 		else text = (await import('../messages/checklist-text/links/base.md?raw')).default
 

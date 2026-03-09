@@ -1,9 +1,66 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft verificatie servers zijn mogelijk offline. Check je internetverbinding en probeer opnieuw later."
+    "message": "Minecraft authenticatie servers zijn mogelijk offline. Controleer je internetverbinding en probeer opnieuw later."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "Content vereist"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Installeer om te spelen"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installeer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one {# mod}other {# mods}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Vereist modpack"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Deze server vereist mods om te spelen. Klik op Installeer om de vereiste bestanden van Modrinth in te stellen, en start direct in de server."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Gedeelde instantie"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Gedeelde server instantie"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Toon content"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} toegevoegd"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "Toegevoegd"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "Verwijderd"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "Geüpdatet"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Update om te spelen"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} verwijderd"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Update vereist"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Een update is vereist om {name} te spelen. Update naar de laatste versie om het spel te starten."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} geüpdatet"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Ontwikkelaarsmodus ingeschakeld."
@@ -32,32 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Bronnenbeheer"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} is klaar om geïnstalleerd te worden! Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} is klaar met downloaden. Herlaad om nu te updaten, of automatisch wanneer je de Modrinth App afsluit."
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} is beschikbaar. Gebruik je pakketbeheerder om te updaten voor de laatste functies en oplossingen!"
+  },
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} is nu beschikbaar! Omdat je nu op een netwerk met datalimiet zit, is de download niet automatisch gestart."
   },
-  "app.update-toast.changelog": {
-    "message": "Wijzigingenlogboek"
+  "app.update-popup.changelog": {
+    "message": "Wijzigingen"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Download ({size})"
   },
-  "app.update-toast.downloading": {
-    "message": "Aan het downloaden..."
+  "app.update-popup.download-complete": {
+    "message": "Downloaden voltooid"
   },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Herlaad"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Update beschikbaar"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Downloaden voltooid"
   },
   "app.update.complete-toast.text": {
     "message": "Klik hier om het wijzigingenlogboek te bekijken."
@@ -407,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(Onherkende versie)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Deze instantie is gekoppeld aan een server, wat betekent dat je de Minecraft versie niet kunt wijzigen. Ontkoppelen zal deze instantie definitief van de server loskoppelen."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Deze instantie is gekoppeld aan een server, wat betekent dat mods niet kunnen worden bijgewerkt en je de modloader of Minecraft-versie niet kunt wijzigen. Ontkoppelen zal deze instantie definitief van de server loskoppelen."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Ontkoppel van server"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Ontkoppel exemplaar"
   },
@@ -494,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Server is niet compatibel"
   },
+  "instance.worlds.linked_server": {
+    "message": "Beheerd door serverproject"
+  },
   "instance.worlds.no_contact": {
     "message": "Server kon niet worden bereikt"
   },
@@ -529,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Synchroniseer installatie"
+  },
+  "search.filter.locked.server": {
+    "message": "Aangeleverd door de server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Alleen client-side mods kunnen toegevoegd worden aan de server instantie"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Spel versie is gegeven door de server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader is gegeven door de server"
   }
 }

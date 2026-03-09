@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { formatPrice } from '@modrinth/utils'
 import { computed, provide } from 'vue'
 
+import { useFormatPrice } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import OptionGroup from '../base/OptionGroup.vue'
 import ModalBasedServerPlan from './ModalBasedServerPlan.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 
-const { formatMessage, locale } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 const props = defineProps<{
 	availableProducts: Labrinth.Billing.Internal.Product[]
@@ -209,7 +210,7 @@ provide('selectedInterval', selectedInterval)
 						<span class="text-2xl font-semibold text-contrast">Custom</span>
 					</div>
 					<span class="m-0 text-lg font-bold text-contrast">
-						{{ formatPrice(locale, customStartingPrice, currency, true) }}
+						{{ formatPrice(customStartingPrice, currency, true) }}
 						<span class="text-sm font-semibold text-secondary">
 							/ month<template v-if="selectedInterval !== 'monthly'"
 								>, billed {{ selectedInterval }}</template
@@ -221,7 +222,7 @@ provide('selectedInterval', selectedInterval)
 				<div class="flex flex-col gap-2">
 					<div class="flex items-center gap-3">
 						<span v-if="customPricePerGb" class="text-sm text-secondary">
-							From {{ formatPrice(locale, customPricePerGb, currency, true) }} / GB
+							From {{ formatPrice(customPricePerGb, currency, true) }} / GB
 						</span>
 					</div>
 				</div>

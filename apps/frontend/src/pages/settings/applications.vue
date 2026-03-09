@@ -182,7 +182,7 @@
 						<div>
 							{{
 								formatMessage(messages.createdOn, {
-									date: new Date(app.created).toLocaleDateString(),
+									date: formatDate(new Date(app.created)),
 								})
 							}}
 						</div>
@@ -257,6 +257,7 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	StyledInput,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -272,6 +273,7 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime()
 
 definePageMeta({
 	middleware: 'auth',
@@ -337,7 +339,7 @@ const messages = defineMessages({
 	},
 	redirectUrisLabel: {
 		id: 'settings.applications.field.redirect-uris',
-		defaultMessage: 'Redirect uris',
+		defaultMessage: 'Redirect URIs',
 	},
 	redirectUriPlaceholder: {
 		id: 'settings.applications.field.redirect-uri.placeholder',
@@ -349,7 +351,7 @@ const messages = defineMessages({
 	},
 	addRedirectUri: {
 		id: 'settings.applications.button.add-redirect-uri',
-		defaultMessage: 'Add a redirect uri',
+		defaultMessage: 'Add a redirect URI',
 	},
 	cancel: {
 		id: 'settings.applications.button.cancel',

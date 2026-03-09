@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Tambah ikon"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Tambahkan alamat IP dan port yang boleh digunakan oleh pemain Edisi Java untuk menyertai pelayan anda."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Tambah alamat Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Modrinth, seperti laman sesawang, kedai atau jemputan Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Tambah pautan luaran"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Tambahkan sebarang pautan berkaitan yang disasarkan di luar Modrinth, seperti kod sumber, penjejak isu atau jemputan Discord."
   },
@@ -122,6 +134,15 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang betul"
   },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Pilih keserasian"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Senaraikan bahasa-bahasa yang disokong oleh pelayan anda."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Pilih bahasa"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Pilih lesen yang digunakan untuk pengedaran {type, select, mod {mod} modpack {pek mod} resourcepack {pek sumber} shader {pembayang} plugin {pemalam} datapack {pek data} other {projek}} anda."
   },
@@ -133,6 +154,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Pilih tag"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Lawat tetapan pelayan"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Lawat tetapan keterangan"
@@ -172,6 +196,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Bersihkan nama"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan pelayan anda dipaparkan dalam hasil carian yang berkaitan."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Pilih tag yang tepat"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Anda telah memilih sebanyak {tagCount, plural, other {# tag}} Pertimbangkan untuk mengurangkannya kepada kurang atau sama dengan {maxTagCount} untuk memastikan projek anda dipaparkan dalam hasil carian yang berkaitan."

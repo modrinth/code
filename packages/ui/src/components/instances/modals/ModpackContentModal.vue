@@ -50,7 +50,7 @@ const messages = defineMessages({
 	},
 	searchPlaceholder: {
 		id: 'instances.modpack-content-modal.search-placeholder',
-		defaultMessage: 'Search {count} projects',
+		defaultMessage: 'Search {count, number} {count, plural, one {project} other {projects}}',
 	},
 	loading: {
 		id: 'instances.modpack-content-modal.loading',
@@ -82,7 +82,7 @@ const messages = defineMessages({
 	},
 	selectedCount: {
 		id: 'instances.modpack-content-modal.selected-count',
-		defaultMessage: '{count} selected',
+		defaultMessage: '{count, number} selected',
 	},
 	enable: {
 		id: 'instances.modpack-content-modal.enable',

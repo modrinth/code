@@ -10,6 +10,7 @@ import {
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
+import { useCompactNumber } from '../../composables'
 import { useRelativeTime } from '../../composables/how-ago'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
@@ -66,11 +67,7 @@ const hasContentListener = computed(() => typeof instance?.vnode.props?.onConten
 const hasUnlinkListener = computed(() => typeof instance?.vnode.props?.onUnlink === 'function')
 
 const formatTimeAgo = useRelativeTime()
-
-const formatCompact = (n: number | undefined) => {
-	if (n === undefined) return ''
-	return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 }).format(n)
-}
+const { formatCompactNumber } = useCompactNumber()
 </script>
 
 <template>
@@ -165,12 +162,12 @@ const formatCompact = (n: number | undefined) => {
 		<div class="flex flex-wrap items-center gap-3">
 			<div v-if="project.downloads !== undefined" class="flex items-center gap-2 text-secondary">
 				<DownloadIcon class="size-5" />
-				<span class="font-medium">{{ formatCompact(project.downloads) }}</span>
+				<span class="font-medium">{{ formatCompactNumber(project.downloads) }}</span>
 			</div>
 
 			<div v-if="project.followers !== undefined" class="flex items-center gap-2 text-secondary">
 				<HeartIcon class="size-5" />
-				<span class="font-medium">{{ formatCompact(project.followers) }}</span>
+				<span class="font-medium">{{ formatCompactNumber(project.followers) }}</span>
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap gap-2">

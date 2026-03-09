@@ -92,7 +92,6 @@ impl BackgroundTask {
                 ping_minecraft_java_servers(pool, redis_pool, clickhouse).await
             }
         }
-        Ok(())
     }
 }
 

@@ -39,7 +39,7 @@
     "message": "Download options"
   },
   "app-marketing.download.terms": {
-    "message": "By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
+    "message": "By downloading Modrinth App, you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Download Modrinth App (Beta)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App performs better than many of the leading mod managers, using just 150mb of RAM!"
+    "message": "Modrinth App performs better than many of the leading mod managers, using just 150 MB of RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "No projects in collection yet"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Updated {ago}"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Create new"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Create your first collection to get started!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "You don't have any collections yet"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "No collections match your search"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Try adjusting your filters or search terms."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} project} other {{count} projects}}"
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Search your collections"
@@ -657,7 +669,7 @@
     "message": "A business entity refers to a registered organization such as a corporation, partnership, or LLC."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Are you a withdrawing as an individual or business?"
+    "message": "Are you withdrawing as an individual or a business?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Private individual"
@@ -1131,7 +1143,7 @@
     "message": "Do Modrinth Hosting servers have DDoS protection?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17Tbps capacity in some locations."
+    "message": "Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17 Tbps capacity in some locations."
   },
   "hosting-marketing.faq.heading": {
     "message": "Frequently Asked Questions"
@@ -1239,7 +1251,7 @@
     "message": "Know exactly what you need?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>"
+    "message": "Try a free <orange>3 GB server</orange> for 5 days powered by <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Learn more"
@@ -1425,7 +1437,7 @@
     "message": "For Players"
   },
   "landing.section.for-players.tagline": {
-    "message": "Discover over {count} creations"
+    "message": "Discover over {count, number} creations"
   },
   "landing.subheading": {
     "message": "Discover, play, and share Minecraft content through our open-source platform built for the community."
@@ -2028,7 +2040,7 @@
     "message": "Collection"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {downloads}}"
+    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Joined"
@@ -2049,7 +2061,7 @@
     "message": "Organizations"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {project} other {projects}}"
+    "message": "{count} {countPlural, plural, one {project} other {projects}}"
   },
   "profile.label.saving": {
     "message": "Saving..."
@@ -2131,6 +2143,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Data Pack"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servers"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
   },
   "project-type.mod.plural": {
     "message": "Mods"
@@ -2667,7 +2685,7 @@
     "message": "Write reports"
   },
   "scopes.sessionAccess.description": {
-    "message": "Access modrinth-issued sessions"
+    "message": "Access Modrinth-issued sessions"
   },
   "scopes.sessionAccess.label": {
     "message": "Access sessions"
@@ -2820,7 +2838,7 @@
     "message": "Add more"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Add a redirect uri"
+    "message": "Add a redirect URI"
   },
   "settings.applications.button.cancel": {
     "message": "Cancel"
@@ -2883,7 +2901,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Redirect uris"
+    "message": "Redirect URIs"
   },
   "settings.applications.field.scopes": {
     "message": "Scopes"
@@ -2990,6 +3008,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Resource Packs page"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Servers page"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaders page"
   },
@@ -3042,7 +3063,7 @@
     "message": "Create a PAT"
   },
   "settings.pats.description": {
-    "message": "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time."
+    "message": "PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Create PAT"

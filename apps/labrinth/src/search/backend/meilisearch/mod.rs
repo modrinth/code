@@ -9,7 +9,7 @@ use crate::search::{
 };
 use crate::util::error::Context;
 use async_trait::async_trait;
-use eyre::eyre;
+use eyre::{Result, eyre};
 use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
 use itertools::Itertools;
@@ -51,10 +51,10 @@ impl BatchClient {
         &'a self,
         task_name: &str,
         generator: G,
-    ) -> Result<Vec<T>, indexing::IndexingError>
+    ) -> Result<Vec<T>>
     where
         G: Fn(&'a Client) -> Fut,
-        Fut: Future<Output = Result<T, indexing::IndexingError>> + 'a,
+        Fut: Future<Output = Result<T>> + 'a,
     {
         let mut tasks = FuturesOrdered::new();
         for (idx, client) in self.clients.iter().enumerate() {
@@ -143,21 +143,61 @@ impl Meilisearch {
     fn get_sort_index(
         &self,
         index: &str,
+        new_filters: Option<&str>,
     ) -> Result<(String, &'static [&'static str]), ApiError> {
         let projects_name = self.config.get_index_name("projects", false);
         let projects_filtered_name =
             self.config.get_index_name("projects_filtered", false);
+
+        // TODO: this is a dumb hack, the frontend should pass the project type it's filtering directly
+        let is_server = new_filters.is_some_and(|f| {
+            f.contains("project_types = minecraft_java_server")
+        });
+
         Ok(match index {
-            "relevance" => (projects_name, &["downloads:desc"]),
-            "downloads" => (projects_filtered_name, &["downloads:desc"]),
-            "follows" => (projects_name, &["follows:desc"]),
-            "updated" => (projects_name, &["date_modified:desc"]),
-            "newest" => (projects_name, &["date_created:desc"]),
-            _ => {
-                return Err(ApiError::Request(eyre!(
-                    "invalid index `{index}`"
-                )));
-            }
+            "relevance" => (
+                projects_name,
+                if is_server {
+                    &[
+                        "minecraft_java_server.verified_plays_2w:desc",
+                        "minecraft_java_server.ping.data.players_online:desc",
+                        "version_published_timestamp:desc",
+                    ]
+                } else {
+                    &["downloads:desc", "version_published_timestamp:desc"]
+                },
+            ),
+            "downloads" => (
+                projects_filtered_name,
+                &["downloads:desc", "version_published_timestamp:desc"],
+            ),
+            "follows" => (
+                projects_name,
+                &["follows:desc", "version_published_timestamp:desc"],
+            ),
+            "updated" | "date_modified" => (
+                projects_name,
+                &["date_modified:desc", "version_published_timestamp:desc"],
+            ),
+            "newest" | "date_created" => (
+                projects_name,
+                &["date_created:desc", "version_published_timestamp:desc"],
+            ),
+            "minecraft_java_server.verified_plays_2w" => (
+                projects_name,
+                &[
+                    "minecraft_java_server.verified_plays_2w:desc",
+                    "version_published_timestamp:desc",
+                ],
+            ),
+            "minecraft_java_server.ping.data.players_online" => (
+                projects_name,
+                &[
+                    "minecraft_java_server.ping.data.players_online:desc",
+                    "version_published_timestamp:desc",
+                ],
+            ),
+            i => return Err(ApiError::Request(eyre!("invalid index '{i}'"))),
         })
     }
 }
@@ -167,7 +207,7 @@ impl SearchBackend for Meilisearch {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> eyre::Result<SearchResults> {
+    ) -> Result<SearchResults, ApiError> {
         let offset: usize = info
             .offset
             .as_deref()
@@ -183,7 +223,8 @@ impl SearchBackend for Meilisearch {
             .wrap_request_err("invalid limit")?
             .min(100);
 
-        let (index_name, sort_name) = self.get_sort_index(index)?;
+        let (index_name, sort_name) =
+            self.get_sort_index(index, info.new_filters.as_deref())?;
         let client = self
             .config
             .make_loadbalanced_read_client()

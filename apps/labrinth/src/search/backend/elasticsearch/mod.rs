@@ -587,7 +587,7 @@ impl SearchBackend for Elasticsearch {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> eyre::Result<SearchResults> {
+    ) -> Result<SearchResults, ApiError> {
         let offset = info
             .offset
             .as_deref()
@@ -677,15 +677,14 @@ impl SearchBackend for Elasticsearch {
 
         if let Err(err) = response.error_for_status_code_ref() {
             let err = eyre!(err);
-            match response.json::<Value>().await {
-                Ok(json) => {
-                    return Err(err.wrap_err(eyre!(
-                        "search request failed: {}",
-                        serde_json::to_string_pretty(&json).unwrap()
-                    )));
-                }
-                Err(_) => return Err(err.wrap_err("search request failed")),
-            }
+            let err = match response.json::<Value>().await {
+                Ok(json) => err.wrap_err(eyre!(
+                    "search request failed: {}",
+                    serde_json::to_string_pretty(&json).unwrap()
+                )),
+                Err(_) => err.wrap_err("search request failed"),
+            };
+            return Err(ApiError::Internal(err));
         }
 
         let response_body = response.json::<Value>().await.wrap_internal_err(
@@ -727,6 +726,7 @@ impl SearchBackend for Elasticsearch {
                     loaders: source.loaders,
                     project_loader_fields: source.project_loader_fields,
                     loader_fields: source.loader_fields,
+                    components: source.components,
                 })
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
@@ -749,7 +749,7 @@ impl SearchBackend for Elasticsearch {
     async fn index_projects(
         &self,
         ro_pool: PgPool,
-        _redis: RedisPool,
+        redis: RedisPool,
     ) -> eyre::Result<()> {
         let projects_alias = self.config.get_index_name("projects");
         let filtered_alias = self.config.get_index_name("projects_filtered");
@@ -787,6 +787,7 @@ impl SearchBackend for Elasticsearch {
         loop {
             let (uploads, next_cursor) = index_local(
                 &ro_pool,
+                &redis,
                 cursor,
                 ENV.ELASTICSEARCH_INDEX_CHUNK_SIZE,
             )

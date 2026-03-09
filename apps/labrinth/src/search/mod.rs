@@ -2,6 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
+use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
@@ -19,7 +20,7 @@ pub trait SearchBackend: Send + Sync {
     async fn search_for_project(
         &self,
         info: &SearchRequest,
-    ) -> eyre::Result<SearchResults>;
+    ) -> Result<SearchResults, ApiError>;
 
     async fn index_projects(
         &self,
@@ -118,6 +119,8 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
+    /// Unix timestamp of the publication date of the version
+    pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
 
