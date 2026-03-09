@@ -60,7 +60,7 @@
 						</div>
 					</template>
 				</Menu>
-				<span v-if="selectedOptions.length === 0" class="py-1 text-secondary">
+				<span v-if="selectedOptions.length === 0" class="py-1 px-1.5 text-secondary">
 					{{ placeholder }}
 				</span>
 			</div>
@@ -103,14 +103,14 @@
 					@mousedown.prevent.stop
 					@keydown="handleDropdownKeydown"
 				>
-					<div v-if="searchable">
+					<div v-if="searchable" class="px-3 pt-3">
 						<StyledInput
 							ref="searchInputRef"
 							v-model="searchQuery"
 							:icon="SearchIcon"
 							type="text"
 							:placeholder="searchPlaceholder"
-							wrapper-class="w-full bg-surface-4 border-0 border-b border-solid border-surface-5 py-2"
+							wrapper-class="w-full bg-surface-4"
 							input-class="focus:ring-0"
 							@input="handleSearchInput"
 							@keydown="handleSearchKeydown"
@@ -119,80 +119,86 @@
 
 					<div
 						v-if="filteredOptions.length > 0 || includeSelectAllOption"
-						ref="optionsContainerRef"
-						class="flex flex-col overflow-y-auto"
-						:style="{ maxHeight: `${maxHeight}px` }"
+						class="flex flex-col gap-2 py-3 bg-surface-4"
 					>
-						<span
-							v-if="includeSelectAllOption"
-							class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 sticky top-0 z-10 bg-surface-4 border-0 border-b border-solid border-surface-5"
-							:class="{ 'bg-surface-5': focusedIndex === -2 }"
-							:data-focused="focusedIndex === -2"
-							role="option"
-							:aria-selected="isAllSelected"
-							tabindex="-1"
-							@click="toggleSelectAll"
-							@mouseenter="focusedIndex = -2"
-						>
+						<div v-if="includeSelectAllOption" class="sticky top-0 z-10 bg-surface-4 px-3">
 							<span
-								class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0 checkbox-shadow"
-								:class="[
-									isAllSelected
-										? 'bg-brand border-button-border text-brand-inverted'
-										: 'bg-surface-2 border-surface-5',
-									isIndeterminate ? 'text-primary' : '',
-								]"
-							>
-								<MinusIcon v-if="isIndeterminate" aria-hidden="true" stroke-width="3" />
-								<CheckIcon v-else-if="isAllSelected" aria-hidden="true" stroke-width="3" />
-							</span>
-							<span class="font-semibold leading-tight text-primary">
-								{{ selectAllLabel }}
-							</span>
-						</span>
-
-						<template v-for="(item, index) in filteredOptions" :key="String(item.value)">
-							<span
-								:ref="(el: any) => setOptionRef(el as HTMLElement, index)"
+								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
+								:class="{ 'bg-surface-5': focusedIndex === -2 }"
+								:data-focused="focusedIndex === -2"
 								role="option"
-								:aria-selected="isSelected(item.value)"
-								:aria-disabled="item.disabled || undefined"
-								:data-focused="focusedIndex === index"
-								class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5"
-								:class="[
-									item.class,
-									{
-										'bg-surface-5': focusedIndex === index,
-										'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
-									},
-								]"
+								:aria-selected="isAllSelected"
 								tabindex="-1"
-								@click="toggleOption(item)"
-								@mouseenter="!item.disabled && (focusedIndex = index)"
+								@click="toggleSelectAll"
+								@mouseenter="focusedIndex = -2"
 							>
 								<span
 									class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0 checkbox-shadow"
-									:class="
-										isSelected(item.value)
+									:class="[
+										isAllSelected
 											? 'bg-brand border-button-border text-brand-inverted'
-											: 'bg-surface-2 border-surface-5'
-									"
+											: 'bg-surface-2 border-surface-5',
+										isIndeterminate ? 'text-primary' : '',
+									]"
 								>
-									<CheckIcon v-if="isSelected(item.value)" aria-hidden="true" stroke-width="3" />
+									<MinusIcon v-if="isIndeterminate" aria-hidden="true" stroke-width="3" />
+									<CheckIcon v-else-if="isAllSelected" aria-hidden="true" stroke-width="3" />
 								</span>
-								<slot :name="`option-${item.value}`" :item="item">
-									<div class="flex items-center gap-2">
-										<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
-										<span
-											class="font-semibold leading-tight"
-											:class="isSelected(item.value) ? 'text-contrast' : 'text-primary'"
-										>
-											{{ item.label }}
-										</span>
-									</div>
-								</slot>
+								<span class="font-semibold leading-tight text-primary">
+									{{ selectAllLabel }}
+								</span>
 							</span>
-						</template>
+						</div>
+
+						<div
+							v-if="filteredOptions.length > 0"
+							ref="optionsContainerRef"
+							class="flex flex-col gap-2 overflow-y-auto px-3"
+							:style="{ maxHeight: `${maxHeight}px` }"
+						>
+							<template v-for="(item, index) in filteredOptions" :key="String(item.value)">
+								<span
+									:ref="(el: any) => setOptionRef(el as HTMLElement, index)"
+									role="option"
+									:aria-selected="isSelected(item.value)"
+									:aria-disabled="item.disabled || undefined"
+									:data-focused="focusedIndex === index"
+									class="flex items-center gap-2.5 cursor-pointer p-3 text-left transition-colors duration-150 text-contrast hover:bg-surface-5 focus:bg-surface-5 rounded-xl"
+									:class="[
+										item.class,
+										{
+											'bg-surface-5': focusedIndex === index,
+											'cursor-not-allowed opacity-50 pointer-events-none': item.disabled,
+										},
+									]"
+									tabindex="-1"
+									@click="toggleOption(item)"
+									@mouseenter="!item.disabled && (focusedIndex = index)"
+								>
+									<span
+										class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid shrink-0 checkbox-shadow"
+										:class="
+											isSelected(item.value)
+												? 'bg-brand border-button-border text-brand-inverted'
+												: 'bg-surface-2 border-surface-5'
+										"
+									>
+										<CheckIcon v-if="isSelected(item.value)" aria-hidden="true" stroke-width="3" />
+									</span>
+									<slot :name="`option-${item.value}`" :item="item">
+										<div class="flex items-center gap-2">
+											<component :is="item.icon" v-if="item.icon" class="h-5 w-5" />
+											<span
+												class="font-semibold leading-tight"
+												:class="isSelected(item.value) ? 'text-contrast' : 'text-primary'"
+											>
+												{{ item.label }}
+											</span>
+										</div>
+									</slot>
+								</span>
+							</template>
+						</div>
 					</div>
 
 					<div v-else-if="searchQuery" class="p-4 mb-2 text-center text-sm text-secondary">
