@@ -106,7 +106,7 @@
 					<div class="empty:hidden pt-1.5">
 						<div
 							v-if="searchable"
-							class="px-3 py-1.5 border-0 border-solid border-b border-b-surface-5"
+							class="px-3 py-1.5 pb-2.5 border-0 border-solid border-b border-b-surface-5"
 						>
 							<StyledInput
 								ref="searchInputRef"
