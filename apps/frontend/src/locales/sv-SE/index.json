@@ -168,7 +168,7 @@
     "message": "Inte som någon annan launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth-appen är helt integrerad med webbsidan, så att du kan använda alla dina favoritprojekt i appen!"
+    "message": "Modrinth App är helt integrerad med webbsidan, så att du kan använda alla dina favoritprojekt i appen!"
   },
   "app-marketing.features.website.title": {
     "message": "Webbsidaintegrering"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Skapa projekt"
   },
+  "create.project.create-server-project": {
+    "message": "Skapa server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Saknade fält: {fields}"
+  },
   "create.project.name-label": {
     "message": "Namn"
   },
   "create.project.name-placeholder": {
     "message": "Ange projektnamn..."
+  },
+  "create.project.owner-description": {
+    "message": "Sätt projektägaren som dig själv eller en organisation du är medlem i."
+  },
+  "create.project.owner-label": {
+    "message": "Ägare"
+  },
+  "create.project.server-project-title": {
+    "message": "Skapar ett serverprojekt"
   },
   "create.project.summary-description": {
     "message": "En mening eller två som beskriver ditt projekt."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Skapar ett projekt"
+  },
+  "create.project.type-label": {
+    "message": "Typ"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -659,6 +683,9 @@
   "dashboard.creator-withdraw-modal.method-selection.select-method": {
     "message": "Välj uttagsmetod"
   },
+  "dashboard.creator-withdraw-modal.method-selection.tax-limit-warning": {
+    "message": "Din uttagsgräns är <b>{amount}</b>, <tax-link>fyll i en skatteblanket</tax-link> för att ta ut mer."
+  },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Kontoägare"
   },
@@ -697,6 +724,12 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
     "message": "Ange RUC-nummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": "Skatteregistreringsnummer"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": "Ange skatteregistreringsnummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.network": {
     "message": "Nätverk"
@@ -1001,11 +1034,20 @@
   "hosting-marketing.faq.increase-storage.answer": {
     "message": "Ja. Lagringen din server har tillgång till kan ökas utan några ytterligare kostnader. Om du vill ha mer lagringsutrymme, kontakta Modrinths support."
   },
+  "hosting-marketing.faq.location": {
+    "message": "Var finns Modrinth Hostings servrar? Kan jag välja region?"
+  },
   "hosting-marketing.faq.location.answer": {
     "message": "Vi har för närvarande servrar tillgängliga i Nordamerika, Europa och Sydostasien som du kan välja mellan vid köpet. Fler regioner kommer att läggas till i framtiden! Om du vill byta region, vänligen kontakta supporten."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Vilka Minecraft versioner och loaders kan användas?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "Modrinth Hosting kan köra alla versioner av Minecraft: Java Edition ända bak till version 1.2.5, samt snapshots."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "Vi stöder också ett brett utbud av mod- och plugin-laddare, inklusive Fabric, Quilt, Forge och NeoForge för mods, samt Paper och Purpur för plugins. Tillgängligheten beror på om mod- eller plugin-laddaren stöder den valda Minecraft-versionen."
   },
   "hosting-marketing.get-started": {
     "message": "Kom igång"
@@ -1025,6 +1067,15 @@
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting är det lättaste sättet att hosta din egna Minecraft: Java Edition server. Installera och spela dina favoritmoddar och modpaket smidigt, allt inom Modrinth-plattformen."
   },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Lägg till din egen domän till din server, reservera upp till 15 portar för moddar som kräver dem och mycket mer."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Säkerhetskopior inkluderas"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Varje server kommer med 15 säkerhetskopior som lagras säkert utanför anläggningen."
+  },
   "hosting-marketing.included.custom-url": {
     "message": "Anpassad URL"
   },
@@ -1034,8 +1085,20 @@
   "hosting-marketing.included.file-manager.description": {
     "message": "Sök, hantera, redigera och ladda upp filer direkt till din server med lätthet."
   },
+  "hosting-marketing.included.heading": {
+    "message": "Kommer med alla funktioner du behöver."
+  },
   "hosting-marketing.included.help": {
     "message": "Hjälp när du behöver det"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Kontakta Modrinth-teamet för hjälp med din server när som helst."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "En kraftfull konsol, serveregenskapshanterare och mycket mer"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting kommer med kraftfulla verktyg för att hantera din server."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP åtkomst"
@@ -1067,14 +1130,44 @@
   "hosting-marketing.why.all-on-modrinth": {
     "message": "Hantera allt på Modrinth"
   },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Din server, moddar, spelare och mycket mer finns på Modrinth. Du behöver inte växla mellan olika plattformar."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Jämnt snabb"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Vår infrastruktur är aldrig överbelastad, vilket innebär att varje server som hostas av Modrinth alltid körs med full prestanda."
+  },
   "hosting-marketing.why.description": {
     "message": "Välj från tusentals modpaket på Modrinth eller skapa ditt egna. Bjud in dina vänner när du är redo att spela."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Hitta ett modpaket. Nu är det en server."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Upplev modern, trygg hosting"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth Hostings servrar är hostade på <contrast>högpresterande AMD-processorer med DDR5 RAM</contrast> och körs på specialanpassad programvara för att säkerställa att din server fungerar smidigt."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Spela där dina moddar finns"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting integrerar mod- och modpack-installationsprocessen sömlöst i din server."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Varför Modrinth Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "Alla dina favoritmoddar"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Välja mellan Vanilla, Fabric, Forge; Quilt och NeoForge. Om det finns på Modrinth så kan din server köra det."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Ej i lager"
   },
   "hosting.plan.select-plan": {
     "message": "Välj plan"
@@ -1083,7 +1176,7 @@
     "message": "Upptäck moddar"
   },
   "landing.button.go-to-dashboard": {
-    "message": "Gå till dashboarden"
+    "message": "Öppna instrumentpanelen"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "Få den bästa möjliga modupplevelsen med kontinuerliga uppdateringar från Modrinthteamet"
@@ -1235,8 +1328,20 @@
   "layout.action.new-project": {
     "message": "Nytt projekt"
   },
+  "layout.action.new-server-project": {
+    "message": "Ny server"
+  },
+  "layout.action.publish": {
+    "message": "Skapa"
+  },
+  "layout.action.reports": {
+    "message": "Granska rapporter"
+  },
   "layout.action.review-projects": {
     "message": "Projektgranskning"
+  },
+  "layout.action.tech-review": {
+    "message": "Teknikgranskning"
   },
   "layout.avatar.alt": {
     "message": "Din avatar"
@@ -1401,7 +1506,7 @@
     "message": "Funktionsflaggor"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Installera Modrinth appen"
+    "message": "Installera Modrinth App"
   },
   "layout.nav.home": {
     "message": "Hem"
@@ -1730,6 +1835,9 @@
   "project-type.datapack.singular": {
     "message": "Datapaket"
   },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Moddar"
   },
@@ -1759,6 +1867,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resurspaket"
+  },
+  "project-type.server.plural": {
+    "message": "Servrar"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -1830,7 +1944,7 @@
     "message": "{title} stöttar inte {gameVersion} för {platform}"
   },
   "project.download.install-with-app": {
-    "message": "Installera med Modrinth appen"
+    "message": "Installera med Modrinth App"
   },
   "project.download.no-app": {
     "message": "Har du inte Modrinth appen?"
@@ -1925,6 +2039,12 @@
   "project.notification.updated.title": {
     "message": "Projekt uppdaterat"
   },
+  "project.settings.general.name.description": {
+    "message": "Undvik prefix, suffix, parenteser och beskrivningar—endast projektets riktiga namn."
+  },
+  "project.settings.general.name.placeholder.1": {
+    "message": "t.ex. Nether Overhaul 2"
+  },
   "project.settings.general.name.placeholder.2": {
     "message": "ex. Bygg föremål"
   },
@@ -1942,6 +2062,9 @@
   },
   "project.settings.general.tagline.description": {
     "message": "Sammanfatta ditt projekt i bara en mening."
+  },
+  "project.settings.general.tagline.placeholder.5": {
+    "message": "t.ex. Lägger till kraftfulla bossversioner av normala mobs att stöta på under natten."
   },
   "project.settings.general.url.title": {
     "message": "URL"
@@ -1991,6 +2114,39 @@
   "report.submit": {
     "message": "Skicka rapport"
   },
+  "scopes.category.analytics": {
+    "message": "Statistik"
+  },
+  "scopes.category.collections": {
+    "message": "Samlingar"
+  },
+  "scopes.category.notifications": {
+    "message": "Notifikationer"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisationer"
+  },
+  "scopes.category.pats": {
+    "message": "PAT:s"
+  },
+  "scopes.category.projects": {
+    "message": "Projekt"
+  },
+  "scopes.category.reports": {
+    "message": "Rapporter"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessioner"
+  },
+  "scopes.category.threads": {
+    "message": "Trådar"
+  },
+  "scopes.category.user-account": {
+    "message": "Användarkonto"
+  },
+  "scopes.category.versions": {
+    "message": "Versioner"
+  },
   "scopes.collectionCreate.description": {
     "message": "Skapa samlingar"
   },
@@ -2014,6 +2170,18 @@
   },
   "scopes.collectionWrite.label": {
     "message": "Skriv samlingar"
+  },
+  "scopes.notificationRead.description": {
+    "message": "Läs dina notiser"
+  },
+  "scopes.notificationRead.label": {
+    "message": "Läs notiser"
+  },
+  "scopes.notificationWrite.description": {
+    "message": "Visa/Radera dina notiser"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Skriv notiser"
   },
   "scopes.organizationCreate.description": {
     "message": "Skapa organisationer"
@@ -2062,6 +2230,9 @@
   },
   "scopes.patWrite.label": {
     "message": "Skriva PATs"
+  },
+  "scopes.payoutsRead.description": {
+    "message": "Läs din data för utdragningar"
   },
   "scopes.projectCreate.description": {
     "message": "Skapa nya projekt"
@@ -2186,6 +2357,9 @@
   "scopes.versionWrite.label": {
     "message": "Skriv versioner"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Shaderpaket för äldre versioner fungerar troligen på nyare versioner med endast små problem."
+  },
   "search.filter.locked.server": {
     "message": "Tillhandahållet av servern"
   },
@@ -2225,8 +2399,32 @@
   "servers.plan.small.name": {
     "message": "Liten"
   },
+  "settings.applications.about": {
+    "message": "Om"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Lägg till mer"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Avbryt"
+  },
+  "settings.applications.button.create": {
+    "message": "Skapa app"
+  },
+  "settings.applications.button.delete": {
+    "message": "Ta bort"
+  },
   "settings.applications.button.edit": {
     "message": "Redigera"
+  },
+  "settings.applications.button.new": {
+    "message": "Ny applikation"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Spara ändringar"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Ladda upp ikon"
   },
   "settings.applications.client-id": {
     "message": "Klient ID"
@@ -2234,8 +2432,41 @@
   "settings.applications.client-secret": {
     "message": "Klienthemlighet"
   },
+  "settings.applications.created-on": {
+    "message": "Skapad {date}"
+  },
+  "settings.applications.field.description": {
+    "message": "Beskrivning"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Ange applikationens namn..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://exempel.se/auth/callback"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Omfattning"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://exempel.se"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ett fel inträffade"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Ditt applikations ikon har blivit uppdaterad."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Ikon uppdaterad"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Avbryt prenumeration"
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Är du säker på att du vill avbryta din prenumeration?"
   },
   "settings.billing.modal.delete.action": {
     "message": "Ta bort denna betalningsmetod"
@@ -2300,6 +2531,21 @@
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Öppna externa länkar i en ny flik"
   },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Döljer \"Installera Modrinth App\" knappen från primär navigering. Modrinth App-sidan kan fortfarande hittas på landningssidan eller i sidfoten."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Dölj \"Installera Modrinth\" knapp"
+  },
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Justerar sidofältet till vänster om sidans innehåll."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Justerar filtrets sidofält till höger om sökresultaten."
+  },
+  "settings.display.theme.description": {
+    "message": "Välj färgtema för Modrinth på denna enhet."
+  },
   "settings.display.theme.title": {
     "message": "Färgtema"
   },
@@ -2320,6 +2566,9 @@
   },
   "settings.pats.modal.delete.action": {
     "message": "Ta bort denna token"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Detta kommer radera nyckeln förevigt (asså förevigt)."
   },
   "settings.pats.modal.edit.title": {
     "message": "Redigera personliga åtkomstnyckeln"
@@ -2369,6 +2618,9 @@
   "settings.sessions.current-session": {
     "message": "Nuvarande session"
   },
+  "settings.sessions.description": {
+    "message": "Här är alla enheter som är inloggade på ditt Modrinth konto. Du kan logga ut från var och en individuellt.\n\nOm du ser en enhet som du inte känner igen loggar du ut från enheten och ändrar lösenordet på ditt Modrinth konto omedelbart."
+  },
   "settings.sessions.last-accessed-ago": {
     "message": "Användes {ago}"
   },
@@ -2383,5 +2635,11 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Visa alla nyheter"
+  },
+  "version.environment.none.description": {
+    "message": "Miljön för denna version har inte specificerats."
+  },
+  "version.environment.unknown.description": {
+    "message": "Miljön: \"{environment}\" känns inte igen."
   }
 }

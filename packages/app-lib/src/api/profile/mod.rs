@@ -23,6 +23,7 @@ use serde_json::json;
 use tracing::{info, warn};
 
 use std::collections::{HashMap, HashSet};
+use std::time::Duration;
 
 use crate::data::Settings;
 use crate::server_address::ServerAddress;
@@ -744,25 +745,54 @@ async fn run_credentials(
     if let Some(linked_data) = &profile.linked_data {
         let project_id = &linked_data.project_id;
         if !project_id.trim().is_empty() {
-            let result = fetch::post_json(
-                concat!(
-                    env!("MODRINTH_API_BASE_URL"),
-                    "analytics/minecraft-server-play"
-                ),
-                json!({
-                    "project_id": &linked_data.project_id,
-                    "minecraft_uuid": credentials.offline_profile.id,
-                }),
-                &state.api_semaphore,
-                &state.pool,
-            )
-            .await;
+            let server_id = uuid::Uuid::new_v4().to_string();
 
-            match result {
-                Ok(()) => {
-                    info!("Tracked server play for '{project_id}' in analytics")
+            let join_result = fetch::REQWEST_CLIENT
+                .post("https://sessionserver.mojang.com/session/minecraft/join")
+                .json(&json!({
+                    "accessToken": &credentials.access_token,
+                    "selectedProfile": credentials.offline_profile.id.simple().to_string(),
+                    "serverId": &server_id,
+                }))
+                .timeout(Duration::from_secs(5))
+                .send()
+                .await;
+
+            match join_result {
+                Ok(resp) if resp.status().is_success() => {
+                    let result = fetch::post_json(
+                        concat!(
+                            env!("MODRINTH_API_BASE_URL"),
+                            "analytics/minecraft-server-play"
+                        ),
+                        json!({
+                            "project_id": &linked_data.project_id,
+                            "username": &credentials.offline_profile.name,
+                            "server_id": &server_id,
+                        }),
+                        &state.api_semaphore,
+                        &state.pool,
+                    )
+                    .await;
+
+                    match result {
+                        Ok(()) => {
+                            info!(
+                                "Tracked server play for '{project_id}' in analytics"
+                            )
+                        }
+                        Err(err) => {
+                            warn!("Failed to report server play: {err:?}")
+                        }
+                    }
                 }
-                Err(err) => warn!("Failed to report server play: {err:?}"),
+                Ok(resp) => warn!(
+                    "Failed to join Mojang session server: HTTP {}",
+                    resp.status()
+                ),
+                Err(err) => {
+                    warn!("Failed to join Mojang session server: {err:?}")
+                }
             }
         }
     }

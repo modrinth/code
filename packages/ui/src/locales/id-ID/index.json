@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Fitur"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Komunitas"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Fitur"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Tata Permainan"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Dampak kinerja"
   },
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "Lepas kaitan paket mod"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Kembali"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Salin tautan"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Matikan"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Paket mod ini tidak termasuk konten tambahan."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Konten tidak ditemukan"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Hidupkan"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Semua"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Konten paket mod"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Sedang memuat konten..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Tidak ada proyek yang cocok dengan pencarian Anda."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Cari {count} proyek"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} dipilih"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Saat ini"
@@ -499,6 +547,30 @@
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Menambah metode pembayaran"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Konten yang diperlukan terpasang secara otomatis"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Permainan diluncurkan langsung menuju server"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Berkas-berkas selalu diperbarui ketika server berubah"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Tutup"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Dapatkan Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App akan buka secara otomatis..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Membuka Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Mengapa harus Modrinth App?"
   },
   "notification.error.title": {
     "defaultMessage": "Terjadi kesalahan"
@@ -812,14 +884,32 @@
   "project.about.links.issues": {
     "defaultMessage": "Laporkan masalah"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Kunjungi situs web"
+  },
   "project.about.links.source": {
     "defaultMessage": "Lihat sumber"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Kunjungi halaman toko"
   },
   "project.about.links.title": {
     "defaultMessage": "Tautan"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Kunjungi wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Disalin!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Alamat IP telah disalin ke papan klip"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latensi"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Perincian server"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, other {unduhan}}"
@@ -893,8 +983,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, other {pengikut}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, other {pemain daring}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "Baru saja dimainkan sebanyak {count} {count, plural, other {kali}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analisis"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Konten"
   },
   "project.settings.description.title": {
     "defaultMessage": "Keterangan"
@@ -1003,6 +1105,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Tidak ada izin"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tag"
@@ -1361,11 +1466,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Pertualangan"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Mode Petualangan"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarki"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Suasana"
   },
   "tag.category.audio": {
     "defaultMessage": "Bunyi-bunyian"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Tempur Ramai"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Perang Katil"
   },
   "tag.category.blocks": {
     "defaultMessage": "Balok-Balok"
@@ -1373,11 +1490,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Cahaya Mekar"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Perlawanan Bos"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Kartun"
   },
   "tag.category.challenging": {
     "defaultMessage": "Menantang"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Tempur Kelas"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Cahaya Berwarna"
@@ -1385,14 +1508,32 @@
   "tag.category.combat": {
     "defaultMessage": "Pertempuran"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Kompetitif"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Pencorak Inti"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Mode Kreatif"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Komunitas Kreator"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Lintas Platform"
   },
   "tag.category.cursed": {
     "defaultMessage": "Di Luar Nalar"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Konten Tersuai"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Hiasan"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Terungku"
   },
   "tag.category.economy": {
     "defaultMessage": "Keuangan"
@@ -1405,6 +1546,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Perlengkapan"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Tempur Faksi"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Fantasi"
@@ -1421,8 +1565,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Mekanisme Permainan"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Generasi"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Mode Menantang"
   },
   "tag.category.high": {
     "defaultMessage": "Tinggi"
@@ -1430,11 +1580,20 @@
   "tag.category.items": {
     "defaultMessage": "Benda-Benda"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Persediaan Tersimpan"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Aneka Macam"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "KitPvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Pustaka"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Rebut Nyawa"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Ringan"
@@ -1451,11 +1610,23 @@
   "tag.category.management": {
     "defaultMessage": "Pengelolaan"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Sedang"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Permainan Mikro"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Permainan Kecil"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Permainan Kecil"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Makhluk-Makhluk"
@@ -1469,8 +1640,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Bermain Bersama"
   },
+  "tag.category.network": {
+    "defaultMessage": "Jaringan"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Mode Luring"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Balok Tunggal"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Pengoptimalan"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkur"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Perunutan Sinar"
@@ -1478,17 +1664,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Dunia Pribadi"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Petak"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokemon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Kentang"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Penjara"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Misi-misian"
   },
   "tag.category.quests": {
     "defaultMessage": "Misi"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Balapan"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistis"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Perekaman Permainan Sintas Bersama"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Berkilau"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Permainan Peran"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Tangkapan Layar"
@@ -1502,17 +1721,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Sederhana"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "Permainan Sintas Bersama"
+  },
   "tag.category.social": {
     "defaultMessage": "Sosial"
   },
   "tag.category.storage": {
     "defaultMessage": "Penyimpanan"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Mode Sintas"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Regu-reguan"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Teknis"
+  },
   "tag.category.technology": {
     "defaultMessage": "Teknologi"
   },
   "tag.category.themed": {
     "defaultMessage": "Bertema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Kota"
   },
   "tag.category.transportation": {
     "defaultMessage": "Transportasi"
@@ -1525,6 +1762,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Mendekati Vanila"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Berdaftar Putih"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Peresetan Dunia"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Pembuatan Dunia"

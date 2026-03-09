@@ -285,7 +285,7 @@
     "message": "Tworząc konto, wyrażasz zgodę na <terms-link>Warunki</terms-link> i <privacy-policy-link>Politykę Prywatności</privacy-policy-link> Modrinth."
   },
   "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Hasła różnią się!"
+    "message": "Hasła się różnią!"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Masz już konto?"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Utwórz projekt"
   },
+  "create.project.create-server-project": {
+    "message": "Utwórz serwer"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Brakujące pola: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nazwa"
   },
   "create.project.name-placeholder": {
     "message": "Wprowadź nazwę projektu..."
+  },
+  "create.project.owner-description": {
+    "message": "Ustaw siebie lub organizację, do której należysz, jako właściciela serwera."
+  },
+  "create.project.owner-label": {
+    "message": "Właściciel"
+  },
+  "create.project.server-project-title": {
+    "message": "Tworzenie serwera"
   },
   "create.project.summary-description": {
     "message": "Zdanie lub dwa o Twoim projekcie."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Tworzenie projektu"
+  },
+  "create.project.type-label": {
+    "message": "Rodzaj"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Serwer"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -576,7 +600,7 @@
     "message": "Gotowe! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
-    "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z o.o.)."
+    "message": "Podmiot zagraniczny oznacza podmiot gospodarczy zorganizowany poza Stanami Zjednoczonymi (na przykład korporacja spoza Stanów Zjednoczonych, spółka osobowa bądź sp. z.o.o. )."
   },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Podmiot zagraniczny"
@@ -630,7 +654,7 @@
     "message": "Podmiot gospodarczy"
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
-    "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z o.o."
+    "message": "Podmiot gospodarczy to na przykład korporacja, spółka osobowa bądź sp. z.o.o."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
     "message": "Czy wypłacasz jako osoba prywatna, czy jako podmiot gospodarczy?"
@@ -765,7 +789,7 @@
     "message": "Dostępne nominały"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "Bilans Twojego konta o wartości {usdBalance} jest warty {localBalance}."
+    "message": "Bilans Twojego konta o wartości {usdBalance} jest wart {localBalance}."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "Znajdź karty podarunkowe o podobnej wartości."
@@ -924,7 +948,7 @@
     "message": "Wymagana weryfikacja e-maila"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą."
+    "message": "Nie udało się przesłać prośby o wypłatę, sprawdź podane dane lub skontaktuj się z obsługą"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "Wypłata nie powiodła się"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Nowy projekt"
   },
+  "layout.action.new-server-project": {
+    "message": "Nowy serwer"
+  },
+  "layout.action.publish": {
+    "message": "Opublikuj"
+  },
   "layout.action.reports": {
     "message": "Przeglądaj zgłoszenia"
   },
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numer konta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Kod oddziału"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Tel. PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Losowo wygenerowany klucz"
   },
   "muralpay.field.routing-number": {
     "message": "Numer rozliczeniowy"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Wprowadź numer konta"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Wprowadź kod oddziału"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Wprowadź 18-cyfrowe CLABE"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Wprowadź e-mail PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Wprowadź losowo wygenerowany kod"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Wprowadź 9-cyfrowy numer rozliczeniowy"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Paczka danych"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Serwery"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Serwer"
+  },
   "project-type.mod.plural": {
     "message": "Mody"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Paczka zasobów"
+  },
+  "project-type.server.plural": {
+    "message": "Serwery"
+  },
+  "project-type.server.singular": {
+    "message": "Serwer"
   },
   "project-type.shader.plural": {
     "message": "Shadery"
@@ -2953,6 +2995,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Strona paczek zasobów"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Strony serwerów"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Strona shaderów"
