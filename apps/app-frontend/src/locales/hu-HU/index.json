@@ -5,26 +5,32 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Szükséges tartalom"
+  },
   "app.modal.install-to-play.header": {
-    "message": "Töltsd le a játékhoz"
+    "message": "Telepítés a játékhoz"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Telepítés"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "# mod"
+    "message": "{count, plural,one {# mod}other {# modok}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Szükséges modcsomag"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a telepítés gombra, hogy beállítsd a szükséges fájlokat a Modrinthból."
-  },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} ma megosztotta veled ezt a profilt."
+    "message": "Ehhez a szerverhez modok szükségesek a játékhoz. Kattints a Telepítés gombra, hogy telepítsd a szükséges fájlokat a Modrinth-ról, majd indítsd el közvetlenül a szervert."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Megosztott profil"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Megosztott szerverprofil"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Tartalom megjelenítése"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} hozzáadva"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Erőforráskezelés"
   },
-  "app.update-toast.body": {
-    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez indítsa újra a programot, vagy zárja be a Modrinth App alkalmazást, és a frissítés automatikusan megtörténik."
+  "app.update-popup.body": {
+    "message": "A Modrinth App v{version} telepítésre kész! Frissítéshez Töltsd újra az oldalt, vagy a Modrinth App bezárásakor automatikusan frissül."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez indítsa újra az alkalmazást, vagy zárja be a Modrinth App alkalmazást, és a frissítés automatikusan megtörténik."
+  "app.update-popup.body.download-complete": {
+    "message": "A Modrinth App v{version} letöltése befejeződött. Frissítéshez Töltsd újra az oldalt, vagy a Modrinth App bezárásakor automatikusan frissül."
   },
-  "app.update-toast.body.linux": {
-    "message": "A Modrinth alkalmazás v{version} elérhető. Használd a csomagkezelődet a legújabb funkciók és hibajavítások telepítéséhez!"
+  "app.update-popup.body.linux": {
+    "message": "A Modrinth App v{version} elérhető. Használd a csomagkezelőt a legújabb funkciók és javítások frissítéséhez!"
   },
-  "app.update-toast.body.metered": {
-    "message": "A Modrinth App v{version} már elérhető! Mivel díjköteles hálózaton vagy, így nem töltöttük le automatikusan."
+  "app.update-popup.body.metered": {
+    "message": "A Modrinth App v{version} már elérhető! Mivel mérhető hálózaton vagy, nem töltöttük le automatikusan."
   },
-  "app.update-toast.changelog": {
-    "message": "Változtatások"
+  "app.update-popup.changelog": {
+    "message": "Változásnapló"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Letöltés ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Letöltés"
+  "app.update-popup.download-complete": {
+    "message": "Letöltés sikeres"
   },
-  "app.update-toast.downloading": {
-    "message": "Letöltés..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Újratöltés"
   },
-  "app.update-toast.title": {
-    "message": "Frissítések elérhetőek"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Letöltés befejezve"
+  "app.update-popup.title": {
+    "message": "Frissítés elérhető"
   },
   "app.update.complete-toast.text": {
     "message": "Kattints ide a változások megtekintéséhez."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(ismeretlen verzió)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Ez az profil egy szerverhez van kapcsolva, ami azt jelenti, hogy nem lehet megváltoztatni a Minecraft verzióját. A kapcsolás megszüntetése véglegesen leválasztja ezt az profilt a szerverről."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Ez az profil egy szerverhez van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetők, és nem lehet megváltoztatni a modbetöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a profilt a szerverről."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Leválasztás a szerverről"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Profil leválasztása"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "A Szerver nem kompatibilis"
   },
+  "instance.worlds.linked_server": {
+    "message": "Szerverprojekt által kezelt"
+  },
   "instance.worlds.no_contact": {
     "message": "Nem lehet kapcsolatot létesíteni a szerverrel"
   },
@@ -567,7 +579,7 @@
     "message": "Szerver"
   },
   "instance.worlds.type.singleplayer": {
-    "message": "Egyjátékosmód"
+    "message": "Egyjátékos"
   },
   "instance.worlds.view_instance": {
     "message": "Profil megtekintése"
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Profil szinkronizálása"
+  },
+  "search.filter.locked.server": {
+    "message": "A szerver biztosítja"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Csak kliensoldali modok adhatók hozzá a szerverprofilhoz"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "A játékverziót a szerver biztosítja"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "A betöltőt a szerver biztosítja"
   }
 }

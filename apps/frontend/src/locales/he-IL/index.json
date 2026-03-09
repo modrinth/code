@@ -506,6 +506,9 @@
   "create.project.title": {
     "message": "יוצר פרויקט"
   },
+  "create.project.type-server": {
+    "message": "שרת"
+  },
   "create.project.url-label": {
     "message": "URL"
   },
