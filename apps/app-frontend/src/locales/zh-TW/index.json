@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "無法連線到驗證伺服器"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "所需內容"
+  },
   "app.modal.install-to-play.header": {
     "message": "安裝以遊玩"
   },
@@ -12,19 +15,22 @@
     "message": "安裝"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count} 個模組"
+    "message": "{count, plural, one {# 個模組} other {# 個模組}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "所需模組包"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "這個伺服器需要模組才能遊玩。請點選安裝，以從 Modrinth 設定所需的檔案。"
-  },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} 今天與你共用了這個實例。"
+    "message": "這個伺服器需要模組才能遊玩。請點選「安裝」以從 Modrinth 設定所需的檔案，完成後即可直接加入伺服器。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共用實例"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "共用伺服器實例"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "檢視內容"
   },
   "app.modal.update-to-play.added-count": {
     "message": "新增了 {count} 個"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "資源管理"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} 安裝已準備就緒！重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} 已準備好安裝！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} 已完成下載。重新載入立即更新，或是在你關閉 Modrinth App 時自動更新。"
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} 現已推出。請使用你的套件管理員進行更新，以取得最新的功能與修正！"
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} 現已推出。請使用套件管理員進行更新，以取得最新的功能與修正！"
   },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} 現已推出！由於你正使用計量付費的網路，我們沒有自動下載它。"
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} 現已推出！由於你目前使用的是計量付費網路，我們並未自動下載更新。"
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "更新日誌"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "下載 ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "下載"
+  "app.update-popup.download-complete": {
+    "message": "下載完成"
   },
-  "app.update-toast.downloading": {
-    "message": "下載中..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "重新載入"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "有可用的更新"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "下載完成"
   },
   "app.update.complete-toast.text": {
     "message": "按這裡查看更新日誌。"
@@ -135,7 +135,7 @@
     "message": "新增好友"
   },
   "friends.action.view-friend-requests": {
-    "message": "{count} 個好友邀請"
+    "message": "{count} 位好友的 {count, plural, one {邀請} other {邀請}}"
   },
   "friends.add-friend.submit": {
     "message": "送出好友邀請"
@@ -147,7 +147,7 @@
     "message": "這可能與對方的 Minecraft 使用者名稱不同！"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "輸入 Modrinth 使用者名稱..."
+    "message": "請輸入 Modrinth 用戶名稱……"
   },
   "friends.add-friend.username.title": {
     "message": "你好友的 Modrinth 使用者名稱是什麼？"
@@ -186,7 +186,7 @@
     "message": "沒有符合「{query}」的好友"
   },
   "friends.search-friends-placeholder": {
-    "message": "搜尋好友..."
+    "message": "搜尋好友……"
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -339,7 +339,7 @@
     "message": "用於啟動 Minecraft 的包裝指令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "輸入包裝指令..."
+    "message": "輸入包裝指令……"
   },
   "instance.settings.tabs.installation": {
     "message": "安裝"
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "（未知的版本）"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "這個實例已連結至伺服器，這代表你無法變更 Minecraft 版本。取消連結將會永久中斷這個實例與伺服器的連線。"
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "這個實例已連結至伺服器，這代表模組無法被更新，且你無法變更模組載入器或 Minecraft 版本。取消連結將會永久中斷這個實例與伺服器的連線。"
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "從伺服器取消連結"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "取消連結實例"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "伺服器不相容"
   },
+  "instance.worlds.linked_server": {
+    "message": "由伺服器專案管理"
+  },
   "instance.worlds.no_contact": {
     "message": "伺服器沒有回應"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "與實例同步"
+  },
+  "search.filter.locked.server": {
+    "message": "由伺服器提供"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "只有用戶端模組可以被加到伺服器實例"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "遊戲版本由伺服器提供"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "載入器由伺服器提供"
   }
 }

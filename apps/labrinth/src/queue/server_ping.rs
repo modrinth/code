@@ -305,9 +305,9 @@ struct ServerPingRecord {
     latency_ms: Option<u32>,
     description: Option<String>,
     version_name: Option<String>,
-    version_protocol: Option<u32>,
-    players_online: Option<u32>,
-    players_max: Option<u32>,
+    version_protocol: Option<i32>,
+    players_online: Option<i32>,
+    players_max: Option<i32>,
 }
 
 #[cfg(test)]

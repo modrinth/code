@@ -33,7 +33,7 @@ arc-swap = "1.7.1"
 argon2 = { version = "0.5.3", features = ["std"] }
 ariadne = { path = "packages/ariadne" }
 async-compression = { version = "0.4.32", default-features = false }
-async-minecraft-ping = { git = "https://github.com/jsvana/async-minecraft-ping", rev = "56a64a8a59de854fb81cc0f9f66c2285873d960c" }
+async-minecraft-ping = { path = "packages/async-minecraft-ping" }
 async-recursion = "1.1.1"
 async-stripe = { version = "0.41.0", default-features = false, features = [
   "runtime-tokio-hyper-rustls",

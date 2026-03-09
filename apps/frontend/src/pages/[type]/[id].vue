@@ -433,14 +433,11 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<component
-						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
+					<ProjectHeader
 						v-if="projectV3Loaded"
-						v-bind="
-							isServerProject
-								? { project, projectV3, member: !!currentMember }
-								: { project, member: !!currentMember }
-						"
+						:project="project"
+						:project-v3="projectV3"
+						:member="!!currentMember"
 					>
 						<template #actions>
 							<ButtonStyled
@@ -800,7 +797,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-					</component>
+					</ProjectHeader>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -901,6 +898,7 @@
 						:project="project"
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
+						:show-followers="isServerProject"
 						class="card flex-card experimental-styles-within"
 					/>
 					<div class="card flex-card experimental-styles-within">
@@ -935,6 +933,18 @@
 								</div>
 							</div>
 
+							<div v-if="isServerProject" class="details-list__item">
+								<HeartIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(
+											formatMessage(commonMessages.projectFollowers, {
+												count: formatNumber(project.followers, false),
+											}),
+										)
+									}}
+								</div>
+							</div>
 							<div
 								v-if="project.approved"
 								v-tooltip="formatDateTime(project.approved)"
@@ -943,9 +953,11 @@
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.published, {
-											date: publishedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.published, {
+												date: publishedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -953,7 +965,9 @@
 							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
 								<CalendarIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
+									}}
 								</div>
 							</div>
 
@@ -965,9 +979,11 @@
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.submitted, {
-											date: submittedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.submitted, {
+												date: submittedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -979,7 +995,9 @@
 							>
 								<VersionIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									}}
 								</div>
 							</div>
 						</div>
@@ -1067,7 +1085,6 @@ import {
 	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
-	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,
@@ -1078,7 +1095,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatProjectType, renderString } from '@modrinth/utils'
+import { capitalizeString, formatNumber, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'

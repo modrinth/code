@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
-			<div v-if="!props.hideLicense">
+			<div v-if="!hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>
 					<IntlFormatted :message-id="messages.licensed">
@@ -28,6 +28,12 @@
 							<span v-else>{{ licenseIdDisplay }}</span>
 						</template>
 					</IntlFormatted>
+				</div>
+			</div>
+			<div v-if="showFollowers">
+				<HeartIcon aria-hidden="true" />
+				<div>
+					{{ formatMessage(commonMessages.projectFollowers, { count: project.followers }) }}
 				</div>
 			</div>
 			<div v-if="project.approved" v-tooltip="formatDateTime(project.approved)">
@@ -73,7 +79,15 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { BookTextIcon, CalendarIcon, ExternalIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import {
+	BookTextIcon,
+	CalendarIcon,
+	ExternalIcon,
+	HeartIcon,
+	ScaleIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 import { computed } from 'vue'
 
@@ -90,21 +104,11 @@ const formatDateTime = useFormatDateTime({
 })
 
 const props = defineProps<{
-	project: {
-		id: string
-		published: string
-		updated: string
-		approved: string
-		queued: string
-		status: string
-		license: {
-			id: string
-			url: string
-		}
-	}
+	project: Labrinth.Projects.v2.Project
 	linkTarget: string
 	hasVersions: boolean
 	hideLicense?: boolean
+	showFollowers?: boolean
 }>()
 
 const createdDate = computed(() =>

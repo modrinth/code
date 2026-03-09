@@ -84,7 +84,7 @@ const play = async (event: MouseEvent) => {
 	await run(props.instance.path)
 		.catch((err) => handleSevereError(err, { profilePath: props.instance.path }))
 		.finally(() => {
-			trackEvent('InstancePlay', {
+			trackEvent('InstanceStart', {
 				loader: props.instance.loader,
 				game_version: props.instance.game_version,
 				source: 'InstanceItem',

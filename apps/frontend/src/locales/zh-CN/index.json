@@ -24,7 +24,7 @@
     "message": "下载 RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "下载应用，请到 Flathub"
+    "message": "在 Flathub 上获取"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -192,7 +192,7 @@
     "message": "下载适用于 {os} 的 Modrinth App"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "一张截图，显示 Cobblemon 实例的主屏幕页面。"
+    "message": "Cobblemon 整合包主菜单屏幕截图。"
   },
   "app-marketing.hero.more-download-options": {
     "message": "更多下载选项"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "创建项目"
   },
+  "create.project.create-server-project": {
+    "message": "创建服务器"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "缺少字段：{fields}"
+  },
   "create.project.name-label": {
     "message": "名称"
   },
   "create.project.name-placeholder": {
     "message": "输入项目名称…"
+  },
+  "create.project.owner-description": {
+    "message": "将项目所有者设置为你自己或你所属的组织。"
+  },
+  "create.project.owner-label": {
+    "message": "所有者"
+  },
+  "create.project.server-project-title": {
+    "message": "创建服务器项目"
   },
   "create.project.summary-description": {
     "message": "一两句话描述你的项目。"
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "创建项目"
+  },
+  "create.project.type-label": {
+    "message": "类型"
+  },
+  "create.project.type-project": {
+    "message": "项目"
+  },
+  "create.project.type-server": {
+    "message": "服务器"
   },
   "create.project.url-label": {
     "message": "URL链接"
@@ -990,7 +1014,7 @@
     "message": "你在找的页面似乎不存在。"
   },
   "error.generic.404.title": {
-    "message": "页面不存在"
+    "message": "未找到页面"
   },
   "error.generic.451.subtitle": {
     "message": "由于法律原因，例如政府审查或正在进行的法律诉讼，本页面已被屏蔽。"
@@ -1041,7 +1065,7 @@
     "message": "为什么？"
   },
   "error.project.404.title": {
-    "message": "项目不存在"
+    "message": "未找到项目"
   },
   "error.user.404.list_item.1": {
     "message": "你可能输错了这个用户的用户名。"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "新建项目"
   },
+  "layout.action.new-server-project": {
+    "message": "新建服务器"
+  },
+  "layout.action.publish": {
+    "message": "发布"
+  },
   "layout.action.reports": {
     "message": "审查举报"
   },
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "账号"
   },
-  "muralpay.field.branch-code": {
-    "message": "分行代码"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX 手机号"
+  },
+  "muralpay.field.random-key": {
+    "message": "随机密钥"
   },
   "muralpay.field.routing-number": {
     "message": "路由号码"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "输入账户号码"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "输入分行代码"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "输入 18 位 CLABE"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "输入 PIX 邮箱"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "输入随机密钥"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "输入 9 位路由号码"
@@ -1998,7 +2028,7 @@
     "message": "收藏夹"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {次下载}}"
+    "message": "{count}{count, plural, other {次下载}}"
   },
   "profile.label.joined": {
     "message": "加入于"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "数据包"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "服务器"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "服务器"
+  },
   "project-type.mod.plural": {
     "message": "模组"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "资源包"
+  },
+  "project-type.server.plural": {
+    "message": "服务器"
+  },
+  "project-type.server.singular": {
+    "message": "服务器"
   },
   "project-type.shader.plural": {
     "message": "光影包"
@@ -2262,7 +2304,7 @@
     "message": "加载项目数据时出错{message}"
   },
   "project.error.page-not-found": {
-    "message": "找不到该页面"
+    "message": "未找到该页面"
   },
   "project.error.project-not-found": {
     "message": "未找到项目"
@@ -2953,6 +2995,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "资源包页面"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "服务器页面"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "光影包页面"

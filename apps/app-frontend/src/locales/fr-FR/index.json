@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossible de contacter les serveurs d'authentification"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Contenu requis"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installer pour jouer"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ce serveur nécessite des mods pour pouvoir y jouer. Cliquez sur installer pour mettre les fichiers de Modrinth en place."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Modpack requis"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} a partagé cette instance avec vous aujourd'hui."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ce serveur a besoin de mods pour jouer. Cliquez sur Installer pour mettre en place les fichiers requis depuis Modrinth, puis lancez directement dans le serveur."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instance partagée"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Instance serveur partagée"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Voir le contenu"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} {count, plural, one {# ajouté} other {# ajoutés}}"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestion des ressources"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} est prête à être installée ! Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Le téléchargement de Modrinth App v{version} est terminé ! Relancez l'application pour mettre à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
   },
-  "app.update-toast.body.linux": {
-    "message": "Modrith App v{version} est disponible. Utilisez votre gestionnaire de paquets pour obtenir les derniers changements et corrections de bugs !"
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} est disponible. Utilisez votre gestionnaire de paquets pour mettre à jour les dernières fonctionnalités et corrections de bogues !"
   },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} est disponible dès maintenant ! Lorsque vous êtes sur un réseau limité ou en données mobiles, nous ne téléchargerons pas les mises à jour automatiquement."
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} est disponible maintenant ! Puisque vous êtes sur un réseau métré, nous ne l'avons pas téléchargé automatiquement."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Journal des modifications"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Télécharger ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Télécharger"
+  "app.update-popup.download-complete": {
+    "message": "Téléchargement terminé"
   },
-  "app.update-toast.downloading": {
-    "message": "Téléchargement..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Recharger"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Mise à jour disponible"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Téléchargement terminé"
   },
   "app.update.complete-toast.text": {
     "message": "Cliquez ici pour voir les changements récents."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(version inconnue)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Cette instance est liée à un modpack, ce qui veut dire que vous ne pouvez pas changer la version de Minecraft. Délier déconnectera cette instance du serveur en permanence."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Cette instance est liée à un serveur, ce qui veut dire que les mods ne peuvent pas être mis à jour et que vous ne pouvez pas changer de mod loader ou de version de Minecraft. Délier déconnectera cette instance du serveur en permanence."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Délier du serveur"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Délier l'instance"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Le serveur est incompatible"
   },
+  "instance.worlds.linked_server": {
+    "message": "Géré par le projet du serveur"
+  },
   "instance.worlds.no_contact": {
     "message": "Le serveur n'a pas pu être contacté"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Synchroniser avec l'instance"
+  },
+  "search.filter.locked.server": {
+    "message": "Fournis par le serveur"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Seuls les mods client peuvent être ajoutés à l'instance du serveur"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Version du jeu est procurée par le serveur"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader est procuré par le serveur"
   }
 }

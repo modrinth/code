@@ -32,33 +32,6 @@
   "app.settings.tabs.resource-management": {
     "message": "Quản lý tài nguyên"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth phiên bản v{version} đã sẵn sằng! Chạy lại để cập nhật ngay bây giờ, hoặc cập nhật tự động khi bạn đóng Modrinth."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth phiên bản v{version} đã tải xuống hoàn tất. Chạy lại để cập nhật ngay bây giờ, hoặc tự động cập nhật khi bạn thoát Modrinth."
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth phiên bản v{version} đang có sẵn! Do mạng của bạn đang tính phí theo dung lượng và có định mức, chúng tôi không tải phiên bản này tự động."
-  },
-  "app.update-toast.changelog": {
-    "message": "Nhật ký thay đổi"
-  },
-  "app.update-toast.download": {
-    "message": "Tải xuống ({size})"
-  },
-  "app.update-toast.downloading": {
-    "message": "Đang tải xuống..."
-  },
-  "app.update-toast.reload": {
-    "message": "Tải lại"
-  },
-  "app.update-toast.title": {
-    "message": "Có bản cập nhật mới"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Đã tải xuống xong"
-  },
   "app.update.complete-toast.text": {
     "message": "Nháy vào đây để xem nhật kí thay đổi."
   },

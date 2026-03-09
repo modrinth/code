@@ -12,7 +12,7 @@
     "defaultMessage": "Заголовок партнерського посилання"
   },
   "affiliate.create.title.placeholder": {
-    "defaultMessage": "напр., YouTube"
+    "defaultMessage": "як-от YouTube"
   },
   "affiliate.create.user.description": {
     "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
@@ -111,7 +111,7 @@
     "defaultMessage": "Видалити"
   },
   "button.remove-image": {
-    "defaultMessage": "Вилучити зображення"
+    "defaultMessage": "Видалити зображення"
   },
   "button.report": {
     "defaultMessage": "Поскаржитися"
@@ -150,7 +150,7 @@
     "defaultMessage": "Оновити"
   },
   "button.upload-image": {
-    "defaultMessage": "Завантажити фото"
+    "defaultMessage": "Завантажити зображення"
   },
   "changelog.justNow": {
     "defaultMessage": "Щойно"
@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Особливість"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Спільнота"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Особливості"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Ігровий процес"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Властивості"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Вплив на продуктивність"
   },
@@ -317,6 +329,42 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Відв’язати збірку"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Назад"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Копіювати посилання"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Вимкнути"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Збірка не включає додатковий уміст."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Умісту не знайдено"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Увімкнути"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Усі"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Уміст збірки"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Завантаження вмісту…"
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Пошук серед проєктів ({count})"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} вибрано"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"
   },
@@ -339,7 +387,7 @@
     "defaultMessage": "Версій не знайдено"
   },
   "instances.updater-modal.search-placeholder": {
-    "defaultMessage": "Пошук версій…"
+    "defaultMessage": "Пошук версії…"
   },
   "instances.updater-modal.select-version": {
     "defaultMessage": "Виберіть версію, щоб переглянути її журнал змін"
@@ -500,6 +548,30 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "Додавання способу оплати"
   },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Автоматично встановлюється потрібний уміст"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Запуск гри з підключенням до сервера"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Зберігання файлів оновленими, попри зміни сервера"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Закрити"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Отримати Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App відкриється автоматично…"
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Відкриття Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Навіщо використовувати Modrinth App"
+  },
   "notification.error.title": {
     "defaultMessage": "Виникла помилка"
   },
@@ -549,7 +621,7 @@
     "defaultMessage": "Повернено"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Успіх"
+    "defaultMessage": "Пройдено"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Заплановано"
@@ -810,16 +882,34 @@
     "defaultMessage": "Підтримати на PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Сповістити про проблеми"
+    "defaultMessage": "Звітувати проблеми"
+  },
+  "project.about.links.site": {
+    "defaultMessage": "Відвідати вебсайт"
   },
   "project.about.links.source": {
     "defaultMessage": "Вихідний код"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Відвідати крамницю"
   },
   "project.about.links.title": {
     "defaultMessage": "Посилання"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Відвідати вікі"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Скопійовано!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP-адресу скопійовано до буфера обміну"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Затримка"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Подробиці сервера"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {завантаження} few {завантаження} other {завантажень}}"
@@ -893,8 +983,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {відстежує} other {відстежують}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {у мережі} other {у мережі}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, one {нещодавно грав} other {нещодавно грали}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} мс"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Аналітика"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Уміст"
   },
   "project.settings.description.title": {
     "defaultMessage": "Опис"
@@ -1003,6 +1105,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Немає дозволу"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Сервер"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Теґи"
@@ -1290,7 +1395,7 @@
     "defaultMessage": "Ретро"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Синхронізувати з системою"
+    "defaultMessage": "Системна"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Колірна тема"
@@ -1361,11 +1466,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Пригоди"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Режим пригод"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Анархія"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Атмосфера"
   },
   "tag.category.audio": {
     "defaultMessage": "Звуки"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Королівська битва"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Бед-варс"
   },
   "tag.category.blocks": {
     "defaultMessage": "Блоки"
@@ -1373,11 +1490,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Сяяння"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Боси"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Художні"
   },
   "tag.category.challenging": {
     "defaultMessage": "Зі складністю"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Класи"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Кольорове світло"
@@ -1385,14 +1508,32 @@
   "tag.category.combat": {
     "defaultMessage": "Бої"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Змагання"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Базові шейдери"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Режим творчости"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Спільнота творців"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Міжплатформова гра"
   },
   "tag.category.cursed": {
     "defaultMessage": "Дивне"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Власний уміст"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Оздоблення"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Підземелля"
   },
   "tag.category.economy": {
     "defaultMessage": "Економіка"
@@ -1405,6 +1546,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Спорядження"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Фракції"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Фентезі"
@@ -1421,8 +1565,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Ігрові механіки"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Гени"
+  },
   "tag.category.gui": {
     "defaultMessage": "Інтерфейс"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Режим гардкору"
   },
   "tag.category.high": {
     "defaultMessage": "Високий"
@@ -1430,11 +1580,20 @@
   "tag.category.items": {
     "defaultMessage": "Предмети"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Збереження інвентарю"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Усе підряд"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Комплект PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Бібліотека"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Крадіжка життя"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Легка"
@@ -1451,11 +1610,23 @@
   "tag.category.management": {
     "defaultMessage": "Управління"
   },
+  "tag.category.media": {
+    "defaultMessage": "Медіа"
+  },
   "tag.category.medium": {
     "defaultMessage": "Середній"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Мікроігри"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Мінігра"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Мініігри"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "ММО"
   },
   "tag.category.mobs": {
     "defaultMessage": "Моби"
@@ -1469,8 +1640,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Гри в мережі"
   },
+  "tag.category.network": {
+    "defaultMessage": "Мережа"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Поза мережею"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "One Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Оптимізація"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Паркур"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Трасування шляхів"
@@ -1478,17 +1664,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Особисті світи"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Ділянки"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Покемон"
+  },
   "tag.category.potato": {
     "defaultMessage": "Картопля"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "В'язниця"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Проходження"
   },
   "tag.category.quests": {
     "defaultMessage": "Завдання"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Перегони"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Реалізм"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Запис SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Відбиття"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Рольова гра"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Для знімка екрана"
@@ -1502,17 +1721,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Простий"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Взаємодія"
   },
   "tag.category.storage": {
     "defaultMessage": "Сховище"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Режим виживання"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Команди"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Технічний"
+  },
   "tag.category.technology": {
     "defaultMessage": "Технології"
   },
   "tag.category.themed": {
     "defaultMessage": "Тематичне"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Міста"
   },
   "tag.category.transportation": {
     "defaultMessage": "Пересування"
@@ -1525,6 +1762,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Як стандартна гра"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Білий список"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Скидання світу"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Генерація світу"

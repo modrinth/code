@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Потрібний уміст"
+  },
   "app.modal.install-to-play.header": {
     "message": "Установлення для гри"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модів}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб завантажити необхідні файли з Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Потрібна збірка"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} ділиться цим профілем з вами."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для гри на цьому сервері потрібні моди. Натисніть «Установити», щоб налаштувати необхідні файли з Modrinth, а потім запустіть безпосередньо на сервері."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Профіль"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Серверний профіль"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Дивитися вміст"
   },
   "app.modal.update-to-play.added-count": {
     "message": "Додано {count}"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Керування ресурсами"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте Modrinth App."
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} готовий до встановлення! Перезапустіть, щоб оновити зараз. Або, оновлення буде здійснено автоматично, коли закриєте застосунок Modrinth."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити застосунок, або оновлення відбудеться автоматично після закриття Modrinth App."
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} завантажено. Перезапустіть зараз, щоб оновити його, або це відбудеться автоматично після закриття Modrinth App."
   },
-  "app.update-toast.body.linux": {
-    "message": "Доступна версія Modrinth App {version}. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} вже доступно. Скористайтеся вашим менеджером пакетів, щоб отримати найновіші функції та виправлення!"
   },
-  "app.update-toast.body.metered": {
-    "message": "Версія {version} Modrinth App доступна для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили її автоматично."
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} доступний для завантаження! Оскільки ви на лімітному з’єднанні, ми не завантажили його автоматично."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Журнал змін"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Завантажити ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Завантажити"
-  },
-  "app.update-toast.downloading": {
-    "message": "Завантаження…"
-  },
-  "app.update-toast.reload": {
-    "message": "Перезапустити"
-  },
-  "app.update-toast.title": {
-    "message": "Доступне оновлення"
-  },
-  "app.update-toast.title.download-complete": {
+  "app.update-popup.download-complete": {
     "message": "Завантаження завершено"
+  },
+  "app.update-popup.reload": {
+    "message": "Перезавантажити"
+  },
+  "app.update-popup.title": {
+    "message": "Доступне оновлення"
   },
   "app.update.complete-toast.text": {
     "message": "Натисніть тут, щоб переглянути журнал змін."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(невідома версія)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Цей профіль пов’язаний із сервером, що означає, що ви не можете змінити версію Minecraft. Від’єднання назавжди від’єднає цей профіль від сервера."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Цей профіль пов’язаний із сервером, що означає, що моди не можна оновлювати, і ви не можете змінити завантажувач модів або версію Minecraft. Від’єднання назавжди від’єднає цей профіль від сервера."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Від'єднати від сервера"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Відв’язати профіль"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Сервер несумісний"
   },
+  "instance.worlds.linked_server": {
+    "message": "Керується серверним проєктом"
+  },
   "instance.worlds.no_contact": {
     "message": "Не вдалося зв’язатися зі сервером"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Синхронізувати з профілем"
+  },
+  "search.filter.locked.server": {
+    "message": "Надано сервером"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "До профілю сервера можна додавати лише клієнтські моди"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Версія гри надана сервером"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Завантажувач наданий сервером"
   }
 }

@@ -176,9 +176,9 @@ pub async fn init_client_with_database(
                 latency_ms Nullable(UInt32),
                 description Nullable(String),
                 version_name Nullable(String),
-                version_protocol Nullable(UInt32),
-                players_online Nullable(UInt32),
-                players_max Nullable(UInt32)
+                version_protocol Nullable(Int32),
+                players_online Nullable(Int32),
+                players_max Nullable(Int32)
             )
             ENGINE = {engine}
             {ttl}
@@ -213,6 +213,16 @@ pub async fn init_client_with_database(
             "
             ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
             ADD COLUMN IF NOT EXISTS minecraft_uuid UUID
+            "
+        ))
+        .execute()
+        .await?;
+
+    client
+        .query(&format!(
+            "
+            ALTER TABLE {database}.{MINECRAFT_SERVER_PLAYS} {cluster_line}
+            ADD COLUMN IF NOT EXISTS ip IPv6 DEFAULT toIPv6('::')
             "
         ))
         .execute()
