@@ -9,6 +9,7 @@ import { install_to_existing_profile } from '@/helpers/pack.js'
 import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
 import type { GameInstance } from '@/helpers/types'
 import { start_join_server } from '@/helpers/worlds.ts'
+import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install.js'
 
@@ -139,6 +140,11 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										await joinServer(project.path, serverAddress)
+										trackEvent('InstanceStart', {
+											loader: project.loader,
+											game_version: project.game_version,
+											source: 'ServerProject',
+										})
 									} catch (err) {
 										handleSevereError(err, { profilePath: project.path })
 									}
@@ -169,6 +175,11 @@ export function createServerInstall(opts: {
 								action: async () => {
 									try {
 										if (serverAddress) await start_join_server(instance.path, serverAddress)
+										trackEvent('InstanceStart', {
+											loader: instance.loader,
+											game_version: instance.game_version,
+											source: 'ServerProject',
+										})
 									} catch (err) {
 										handleSevereError(err, { profilePath: instance.path })
 									}
@@ -324,6 +335,11 @@ export function createServerInstall(opts: {
 		// Join server
 		try {
 			await joinServer(instance.path, serverAddress)
+			trackEvent('InstanceStart', {
+				loader: instance.loader,
+				game_version: instance.game_version,
+				source: 'ServerProject',
+			})
 		} catch (err) {
 			handleSevereError(err, { profilePath: instance.path })
 		}

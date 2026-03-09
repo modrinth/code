@@ -973,8 +973,8 @@ async fn _get_server_status_new(
     };
 
     let players = ServerPlayers {
-        max: status.players.max.cast_signed(),
-        online: status.players.online.cast_signed(),
+        max: status.players.max,
+        online: status.players.online,
         sample: status
             .players
             .sample

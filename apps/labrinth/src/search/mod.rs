@@ -209,6 +209,8 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
+    /// Unix timestamp of the publication date of the version
+    pub version_published_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
 
@@ -266,30 +268,58 @@ pub struct ResultSearchProject {
 pub fn get_sort_index(
     config: &SearchConfig,
     index: &str,
+    new_filters: Option<&str>,
 ) -> Result<(String, &'static [&'static str]), SearchError> {
     let projects_name = config.get_index_name("projects", false);
     let projects_filtered_name =
         config.get_index_name("projects_filtered", false);
+
+    // TODO: this is a dumb hack, the frontend should pass the project type it's filtering directly
+    let is_server = new_filters
+        .is_some_and(|f| f.contains("project_types = minecraft_java_server"));
+
     Ok(match index {
         "relevance" => (
             projects_name,
-            &[
-                "minecraft_java_server.verified_plays_2w:desc",
-                "minecraft_java_server.ping.data.players_online:desc",
-                "downloads:desc",
-            ],
+            if is_server {
+                &[
+                    "minecraft_java_server.verified_plays_2w:desc",
+                    "minecraft_java_server.ping.data.players_online:desc",
+                    "version_published_timestamp:desc",
+                ]
+            } else {
+                &["downloads:desc", "version_published_timestamp:desc"]
+            },
         ),
-        "downloads" => (projects_filtered_name, &["downloads:desc"]),
-        "follows" => (projects_name, &["follows:desc"]),
-        "updated" | "date_modified" => (projects_name, &["date_modified:desc"]),
-        "newest" | "date_created" => (projects_name, &["date_created:desc"]),
+        "downloads" => (
+            projects_filtered_name,
+            &["downloads:desc", "version_published_timestamp:desc"],
+        ),
+        "follows" => (
+            projects_name,
+            &["follows:desc", "version_published_timestamp:desc"],
+        ),
+        "updated" | "date_modified" => (
+            projects_name,
+            &["date_modified:desc", "version_published_timestamp:desc"],
+        ),
+        "newest" | "date_created" => (
+            projects_name,
+            &["date_created:desc", "version_published_timestamp:desc"],
+        ),
         "minecraft_java_server.verified_plays_2w" => (
             projects_name,
-            &["minecraft_java_server.verified_plays_2w:desc"],
+            &[
+                "minecraft_java_server.verified_plays_2w:desc",
+                "version_published_timestamp:desc",
+            ],
         ),
         "minecraft_java_server.ping.data.players_online" => (
             projects_name,
-            &["minecraft_java_server.ping.data.players_online:desc"],
+            &[
+                "minecraft_java_server.ping.data.players_online:desc",
+                "version_published_timestamp:desc",
+            ],
         ),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
@@ -334,7 +364,7 @@ pub async fn search_for_project(
         .parse::<usize>()?
         .min(100);
 
-    let sort = get_sort_index(config, index)?;
+    let sort = get_sort_index(config, index, info.new_filters.as_deref())?;
     let client = config.make_loadbalanced_read_client()?;
     let meilisearch_index = client.get_index(sort.0).await?;
 
