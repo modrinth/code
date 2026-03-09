@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT EXISTS(\n            SELECT 1\n            FROM delphi_issue_details_with_statuses didws\n            INNER JOIN delphi_report_issues dri ON dri.id = didws.issue_id\n            WHERE\n                didws.project_id = $1\n                AND didws.status = 'pending'\n                -- see delphi.rs todo comment\n                AND dri.issue_type != '__dummy'\n        ) AS \"is_in_tech_review!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_in_tech_review!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "8c80f3158fb5772adc8542cdf5419437bb8cd65723a32e587022d0c8decba68d"
+}

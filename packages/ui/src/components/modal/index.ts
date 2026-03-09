@@ -1,6 +1,8 @@
 export { default as ConfirmModal } from './ConfirmModal.vue'
 export { default as Modal } from './Modal.vue'
 export { default as NewModal } from './NewModal.vue'
+export type { ServerProject as OpenInAppModalServerProject } from './OpenInAppModal.vue'
+export { default as OpenInAppModal } from './OpenInAppModal.vue'
 export { default as ShareModal } from './ShareModal.vue'
 export type { Tab as TabbedModalTab } from './TabbedModal.vue'
 export { default as TabbedModal } from './TabbedModal.vue'

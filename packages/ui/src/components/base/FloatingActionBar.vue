@@ -8,21 +8,21 @@ const props = defineProps<{
 watch(
 	() => props.shown,
 	(shown) => {
-		document.body.classList.toggle('floating-action-bar-shown', shown)
+		document?.body.classList.toggle('floating-action-bar-shown', shown)
 	},
 	{ immediate: true },
 )
 
 onUnmounted(() => {
-	document.body.classList.remove('floating-action-bar-shown')
+	document?.body.classList.remove('floating-action-bar-shown')
 })
 </script>
 
 <template>
 	<Transition name="floating-action-bar" appear>
-		<div v-if="shown" class="floating-action-bar fixed w-full z-10 left-0 p-4 bottom-0">
+		<div v-if="shown" class="floating-action-bar fixed w-full z-10 left-0 p-10 bottom-0">
 			<div
-				class="flex items-center gap-2 rounded-2xl bg-bg-raised border-2 border-divider border-solid mx-auto max-w-[77rem] p-4"
+				class="flex items-center gap-2 rounded-2xl bg-bg-raised border-2 border-divider border-solid mx-auto max-w-[75rem] p-4"
 			>
 				<slot />
 			</div>

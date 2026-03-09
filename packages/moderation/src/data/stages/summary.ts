@@ -48,6 +48,16 @@ const summary: Stage = {
 			severity: 'medium',
 			message: async () => (await import('../messages/summary/non-english.md?raw')).default,
 		} as ButtonAction,
+		{
+			id: 'summary_repeat_ip',
+			type: 'button',
+			label: 'Repeat of IP',
+			weight: 303,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_server,
+			message: async () => (await import('../messages/summary/repeat-ip.md?raw')).default,
+		},
 	],
 }
 

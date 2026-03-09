@@ -4,6 +4,7 @@ use crate::database::PgPool;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::{PackFile, PackFileHash, PackFormat};
@@ -248,10 +249,22 @@ impl AutomatedModerationQueue {
                                 mod_messages.messages.push(ModerationMessage::NoSideTypes);
                             }
 
-                            if project.inner.license == "LicenseRef-Unknown" || project.inner.license == "LicenseRef-" {
-                                mod_messages.messages.push(ModerationMessage::MissingLicense);
-                            } else if project.inner.license.starts_with("LicenseRef-") && project.inner.license != "LicenseRef-All-Rights-Reserved" && project.inner.license_url.is_none() {
-                                mod_messages.messages.push(ModerationMessage::MissingCustomLicenseUrl { license: project.inner.license.clone() });
+                            if project.inner.components.minecraft_server.is_none() {
+                                let license = &project.inner.license;
+                                if license == "LicenseRef-Unknown" || license == "LicenseRef-" {
+                                    mod_messages
+                                        .messages
+                                        .push(ModerationMessage::MissingLicense);
+                                } else if license.starts_with("LicenseRef-")
+                                    && license != "LicenseRef-All-Rights-Reserved"
+                                    && project.inner.license_url.is_none()
+                                {
+                                    mod_messages.messages.push(
+                                        ModerationMessage::MissingCustomLicenseUrl {
+                                            license: project.inner.license.clone(),
+                                        },
+                                    );
+                                }
                             }
 
                             if (project.project_types.contains(&"resourcepack".to_string()) || project.project_types.contains(&"shader".to_string())) &&
@@ -454,7 +467,7 @@ impl AutomatedModerationQueue {
 
                                     let client = reqwest::Client::new();
                                     let res = client
-                                        .post(format!("{}/v1/fingerprints", dotenvy::var("FLAME_ANVIL_URL")?))
+                                        .post(format!("{}/v1/fingerprints", ENV.FLAME_ANVIL_URL))
                                         .json(&serde_json::json!({
                                         "fingerprints": hashes.iter().filter_map(|x| x.3).collect::<Vec<u32>>()
                                     }))
@@ -553,11 +566,11 @@ impl AutomatedModerationQueue {
                                         continue;
                                     }
 
-                                    let flame_projects  = if flame_files.is_empty() {
-                                        Vec::new()
-                                    } else {
-                                        let res = client
-                                            .post(format!("{}v1/mods", dotenvy::var("FLAME_ANVIL_URL")?))
+                                        let flame_projects  = if flame_files.is_empty() {
+                                            Vec::new()
+                                        } else {
+                                            let res = client
+                                                .post(format!("{}v1/mods", ENV.FLAME_ANVIL_URL))
                                             .json(&serde_json::json!({
                                                 "modIds": flame_files.iter().map(|x| x.1).collect::<Vec<_>>()
                                             }))
@@ -615,19 +628,21 @@ impl AutomatedModerationQueue {
                                 }
                             }
 
-                            if !mod_messages.is_empty() {
-                                let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
-                                    .is_none_or(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity));
+							if !mod_messages.is_empty() {
+								let is_server_project =
+									project.inner.components.minecraft_server.is_some();
+								let first_time = database::models::DBThread::get(project.thread_id, &pool).await?
+									.is_none_or(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::DBUserId(AUTOMOD_ID)) || x.hide_identity));
 
                                 let mut transaction = pool.begin().await?;
                                 let id = ThreadMessageBuilder {
                                     author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
-                                    body: MessageBody::Text {
-                                        body: mod_messages.markdown(true),
-                                        private: false,
-                                        replying_to: None,
-                                        associated_images: vec![],
-                                    },
+									body: MessageBody::Text {
+										body: mod_messages.markdown(true),
+										private: is_server_project,
+										replying_to: None,
+										associated_images: vec![],
+									},
                                     thread_id: project.thread_id,
                                     hide_identity: false,
                                 }
@@ -641,7 +656,7 @@ impl AutomatedModerationQueue {
                                 )
                                     .await?;
 
-                                if mod_messages.should_reject(first_time) {
+							if mod_messages.should_reject(first_time) && !is_server_project {
                                     ThreadMessageBuilder {
                                         author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                         body: MessageBody::StatusChange {
@@ -664,16 +679,16 @@ impl AutomatedModerationQueue {
                                         .insert_many(members.into_iter().map(|x| x.user_id).collect(), &mut transaction, &redis)
                                         .await?;
 
-                                    if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
+                                    if !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
                                         crate::util::webhook::send_slack_project_webhook(
                                             project.inner.id.into(),
                                             &pool,
                                             &redis,
-                                            webhook_url,
+                                            &ENV.MODERATION_SLACK_WEBHOOK,
                                             Some(
                                                 format!(
                                                     "*<{}/user/AutoMod|AutoMod>* changed project status from *{}* to *Rejected*",
-                                                    dotenvy::var("SITE_URL")?,
+                                                    ENV.SITE_URL,
                                                     &project.inner.status.as_friendly_str(),
                                                 )
                                                     .to_string(),

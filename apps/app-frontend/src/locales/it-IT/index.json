@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossibile raggiungere i server di autenticazione"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Contenuto richiesto"
+  },
   "app.modal.install-to-play.header": {
     "message": "Installa per continuare"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} mod"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Questo server necessita di alcune mod. Clicca installa per scaricarle direttamente da Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Pacchetto di mod richiesto"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} ha condiviso questa istanza con te oggi."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Questo server richiede alcune mod. Clicca Installa per scaricarle direttamente da Modrinth, poi sarai pronto a giocare."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Istanza condivisa"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Istanza del server condivisa"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Mostra contenuti"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count, plural, one {# aggiunta} other {# aggiunte}}"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestione delle risorse"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} è pronta per essere installata! Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} è stata scaricata. Ricarica per aggiornare ora, o avverrà in automatico alla chiusura dell'app."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} è disponibile. Usa il tuo gestore di pacchetti per aggiornare e ricevere le novità più recenti!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} è ora disponibile! Poiché sei su una rete a consumo, non l'abbiamo scaricata automaticamente."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Novità"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Scarica ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Scarica"
+  "app.update-popup.download-complete": {
+    "message": "Download completato"
   },
-  "app.update-toast.downloading": {
-    "message": "Scaricando..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Ricarica"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Aggiornamento disponibile"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Download completato"
   },
   "app.update.complete-toast.text": {
     "message": "Consulta qui le ultime novità in inglese."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(versione sconosciuta)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Questa istanza è collegata a un server, cioè non puoi cambiare la versione di Minecraft. Lo scollegamento disconnetterà definitivamente questa istanza dal server."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Questa istanza è collegata a un server, perciò le mod non possono essere aggiornate manualmente, e non puoi cambiare loader di mod né versione di Minecraft. Lo scollegamento disconnetterà definitivamente questa istanza dal server."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Scollega dal server"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Scollega istanza"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Server non è compatibile"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gestito dal server"
+  },
   "instance.worlds.no_contact": {
     "message": "Impossibile contattare il server"
   },
@@ -576,15 +588,27 @@
     "message": "Mondo già in uso"
   },
   "search.filter.locked.instance": {
-    "message": "Fornito dall'istanza"
+    "message": "Determinato dall'istanza"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "La versione del gioco è fornita dall'istanza"
+    "message": "La versione del gioco è determinata dall'istanza"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Il loader è fornito dall'istanza"
+    "message": "Il loader è determinato dall'istanza"
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizza con l'istanza"
+  },
+  "search.filter.locked.server": {
+    "message": "Determinato dal server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Solo mod lato client possono essere aggiunte all'istanza del server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La versione del gioco è determinata dal server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Il loader è determinato dal server"
   }
 }

@@ -26,7 +26,7 @@
 		:description="`'${worldToDelete?.name}' will be **permanently deleted**, and there will be no way to recover it.`"
 		@proceed="proceedDeleteWorld"
 	/>
-	<div v-if="worlds.length > 0" class="flex flex-col gap-4">
+	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 		<div class="flex flex-wrap gap-2 items-center">
 			<StyledInput
 				v-model="searchFilter"
@@ -62,6 +62,7 @@
 				v-for="world in filteredWorlds"
 				:key="`world-${world.type}-${world.type == 'singleplayer' ? world.path : `${world.address}-${world.index}`}`"
 				:world="world"
+				:managed="world.type === 'server' ? isManagedServerWorld(world) : false"
 				:highlighted="highlightedWorld === getWorldIdentifier(world)"
 				:supports-server-quick-play="supportsServerQuickPlay"
 				:supports-world-quick-play="supportsWorldQuickPlay"
@@ -80,9 +81,13 @@
 				@refresh="() => refreshServer((world as ServerWorld).address)"
 				@edit="
 					() =>
-						world.type === 'server' ? editServerModal?.show(world) : editWorldModal?.show(world)
+						world.type === 'singleplayer'
+							? editWorldModal?.show(world)
+							: isManagedServerWorld(world)
+								? undefined
+								: editServerModal?.show(world)
 				"
-				@delete="() => promptToRemoveWorld(world)"
+				@delete="() => !isManagedServerWorld(world) && promptToRemoveWorld(world)"
 				@open-folder="(world: SingleplayerWorld) => showWorldInFolder(instance.path, world.path)"
 			/>
 		</div>
@@ -140,16 +145,20 @@ import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { trackEvent } from '@/helpers/analytics'
+import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import {
 	delete_world,
 	get_profile_protocol_version,
+	getServerDomainKey,
 	getWorldIdentifier,
 	handleDefaultProfileUpdateEvent,
 	hasServerQuickPlaySupport,
 	hasWorldQuickPlaySupport,
+	normalizeServerAddress,
 	type ProfileEvent,
 	type ProtocolVersion,
 	refreshServerData,
@@ -157,6 +166,7 @@ import {
 	refreshWorld,
 	refreshWorlds,
 	remove_server_from_profile,
+	resolveManagedServerWorld,
 	type ServerData,
 	type ServerWorld,
 	showWorldInFolder,
@@ -166,6 +176,11 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
+import {
+	ensureManagedServerWorldExists,
+	getServerAddress,
+	playServerProject,
+} from '@/store/install'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
@@ -219,6 +234,69 @@ const linuxRefreshCount = ref(0)
 const protocolVersion = ref<ProtocolVersion | null>(
 	await get_profile_protocol_version(instance.value.path),
 )
+const managedServerName = ref<string | null>(null)
+const managedServerAddress = ref<string | null>(null)
+
+const managedServerWorld = computed(() =>
+	resolveManagedServerWorld(worlds.value, managedServerName.value, managedServerAddress.value),
+)
+
+function isManagedServerWorld(world: World): world is ServerWorld {
+	return world.type === 'server' && managedServerWorld.value?.index === world.index
+}
+
+async function refreshManagedServerMetadata() {
+	await ensureManagedServerWorldExists(
+		instance.value.path,
+		managedServerName.value,
+		managedServerAddress.value,
+	)
+
+	const projectId = instance.value.linked_data?.project_id
+	if (!projectId) {
+		managedServerName.value = null
+		managedServerAddress.value = null
+		return
+	}
+
+	try {
+		const [project, projectV3] = await Promise.all([
+			get_project(projectId, 'bypass'),
+			get_project_v3(projectId, 'bypass'),
+		])
+
+		if (projectV3?.minecraft_server == null) {
+			managedServerName.value = null
+			managedServerAddress.value = null
+			return
+		}
+
+		const serverAddress = getServerAddress(projectV3.minecraft_java_server)
+		if (!serverAddress) {
+			managedServerName.value = null
+			managedServerAddress.value = null
+			return
+		}
+
+		managedServerName.value = project.title
+		managedServerAddress.value = serverAddress
+	} catch (err) {
+		console.error(
+			`Failed to resolve managed server metadata for profile: ${instance.value.path}`,
+			err,
+		)
+		managedServerName.value = null
+		managedServerAddress.value = null
+	}
+}
+
+watch(
+	() => instance.value.linked_data?.project_id,
+	async () => {
+		await refreshManagedServerMetadata()
+	},
+	{ immediate: true },
+)
 
 const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
 	if (e.profile_path_id !== instance.value.path) return
@@ -251,6 +329,7 @@ async function refreshAllWorlds() {
 		console.log(`Already refreshing, cancelling refresh.`)
 		return
 	}
+	await refreshManagedServerMetadata()
 
 	refreshingAll.value = true
 
@@ -328,7 +407,23 @@ async function joinWorld(world: World) {
 	startingInstance.value = true
 	worldPlaying.value = world
 	if (world.type === 'server') {
+		const managedProjectId = instance.value.linked_data?.project_id
+		if (managedProjectId && isManagedServerWorld(world)) {
+			await playServerProject(managedProjectId).catch(handleJoinError)
+			trackEvent('InstanceStart', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+				source: 'WorldsPage',
+			})
+			startingInstance.value = false
+			return
+		}
 		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
+		trackEvent('InstanceStart', {
+			loader: instance.value.loader,
+			game_version: instance.value.game_version,
+			source: 'WorldsPage',
+		})
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)
 	}
@@ -370,12 +465,48 @@ const supportsWorldQuickPlay = computed(() =>
 	hasWorldQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
 
+const dedupedWorlds = computed(() => {
+	const visibleWorlds: World[] = []
+	const serverIndexByDomain = new Map<string, number>()
+
+	for (const world of worlds.value) {
+		if (world.type !== 'server') {
+			visibleWorlds.push(world)
+			continue
+		}
+
+		const domainKey =
+			getServerDomainKey(world.address) ||
+			normalizeServerAddress(world.address) ||
+			`server-${world.index}`
+		const existingIndex = serverIndexByDomain.get(domainKey)
+
+		if (existingIndex == null) {
+			serverIndexByDomain.set(domainKey, visibleWorlds.length)
+			visibleWorlds.push(world)
+			continue
+		}
+
+		// replace world with managed world if applicable
+		const existingWorld = visibleWorlds[existingIndex]
+		if (
+			existingWorld?.type === 'server' &&
+			!isManagedServerWorld(existingWorld) &&
+			isManagedServerWorld(world)
+		) {
+			visibleWorlds[existingIndex] = world
+		}
+	}
+
+	return visibleWorlds
+})
+
 const filterOptions = computed(() => {
 	const options: FilterBarOption[] = []
 
-	const hasServer = worlds.value.some((x) => x.type === 'server')
+	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
 
-	if (worlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
+	if (dedupedWorlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
 		options.push({
 			id: 'singleplayer',
 			message: messages.singleplayer,
@@ -389,13 +520,13 @@ const filterOptions = computed(() => {
 	if (hasServer) {
 		// add available filter if there's any offline ("unavailable") servers AND there's any singleplayer worlds or available servers
 		if (
-			worlds.value.some(
+			dedupedWorlds.value.some(
 				(x) =>
 					x.type === 'server' &&
 					!serverData.value[x.address]?.status &&
 					!serverData.value[x.address]?.refreshing,
 			) &&
-			worlds.value.some(
+			dedupedWorlds.value.some(
 				(x) =>
 					x.type === 'singleplayer' ||
 					(x.type === 'server' &&
@@ -414,7 +545,7 @@ const filterOptions = computed(() => {
 })
 
 const filteredWorlds = computed(() =>
-	worlds.value.filter((x) => {
+	dedupedWorlds.value.filter((x) => {
 		const availableFilter = filters.value.includes('available')
 		const typeFilter = filters.value.includes('server') || filters.value.includes('singleplayer')
 

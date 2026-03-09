@@ -80,6 +80,17 @@
 				@update:model-value="$emit('update:searchQuery', $event)"
 			/>
 
+			<ButtonStyled v-if="showRefreshButton" type="outlined">
+				<button
+					type="button"
+					class="flex h-10 items-center gap-2 !border-[1px] !border-surface-5"
+					@click="$emit('refresh')"
+				>
+					<RefreshCwIcon aria-hidden="true" class="h-5 w-5" />
+					Refresh
+				</button>
+			</ButtonStyled>
+
 			<ButtonStyled type="outlined">
 				<OverflowMenu
 					:dropdown-id="`create-new-${baseId}`"
@@ -178,6 +189,7 @@ const props = defineProps<{
 	editingFilePath?: string
 	isEditingImage?: boolean
 	searchQuery: string
+	showRefreshButton?: boolean
 	baseId: string
 }>()
 
@@ -190,6 +202,7 @@ defineEmits<{
 	upload: []
 	uploadZip: []
 	unzipFromUrl: [cf: boolean]
+	refresh: []
 	save: []
 	saveAs: []
 	saveRestart: []

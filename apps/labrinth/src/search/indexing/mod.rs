@@ -5,8 +5,11 @@ use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::search::{SearchConfig, UploadSearchProject};
+use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
+use eyre::eyre;
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
 use local_import::index_local;
@@ -19,6 +22,8 @@ use tracing::{Instrument, error, info, info_span, instrument};
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
+    #[error(transparent)]
+    Internal(#[from] eyre::Report),
     #[error("Error while connecting to the MeiliSearch database")]
     Indexing(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
@@ -41,20 +46,19 @@ pub enum IndexingError {
 const MEILISEARCH_CHUNK_SIZE: usize = 50000; // 10_000_000
 
 fn search_operation_timeout() -> std::time::Duration {
-    let default_ms = 5 * 60 * 1000; // 5 minutes
-    let ms = dotenvy::var("SEARCH_OPERATION_TIMEOUT")
-        .ok()
-        .and_then(|v| v.parse::<u64>().ok())
-        .unwrap_or(default_ms);
-    std::time::Duration::from_millis(ms)
+    std::time::Duration::from_millis(ENV.SEARCH_OPERATION_TIMEOUT)
 }
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
     config: &SearchConfig,
-) -> Result<(), IndexingError> {
-    let mut indexes = get_indexes_for_indexing(config, false, false).await?;
-    let indexes_next = get_indexes_for_indexing(config, true, false).await?;
+) -> eyre::Result<()> {
+    let mut indexes = get_indexes_for_indexing(config, false, false)
+        .await
+        .wrap_err("failed to get current indexes")?;
+    let indexes_next = get_indexes_for_indexing(config, true, false)
+        .await
+        .wrap_err("failed to get next indexes")?;
 
     for list in &mut indexes {
         for alt_list in &indexes_next {
@@ -62,7 +66,9 @@ pub async fn remove_documents(
         }
     }
 
-    let client = config.make_batch_client()?;
+    let client = config
+        .make_batch_client()
+        .wrap_err("failed to create batch client")?;
     let client = &client;
 
     let ids_base62 = ids.iter().map(|x| to_base62(x.0)).collect::<Vec<_>>();
@@ -75,13 +81,19 @@ pub async fn remove_documents(
             deletion_tasks.push_back(async move {
                 index
                     .delete_documents(ids_base62_ref)
-                    .await?
+                    .await
+                    .wrap_err_with(|| {
+                        eyre!("failed to request to delete documents {ids_base62_ref:?}")
+                    })?
                     .wait_for_completion(
                         &owned_client,
                         None,
                         Some(Duration::from_secs(15)),
                     )
                     .await
+                    .wrap_err_with(|| {
+                        eyre!("failed to delete documents {ids_base62_ref:?}")
+                    })
             });
         }
     });
@@ -97,31 +109,38 @@ pub async fn index_projects(
     ro_pool: PgPool,
     redis: RedisPool,
     config: &SearchConfig,
-) -> Result<(), IndexingError> {
+) -> eyre::Result<()> {
     info!("Indexing projects.");
 
     info!("Ensuring current indexes exists");
     // First, ensure current index exists (so no error happens- current index should be worst-case empty, not missing)
-    get_indexes_for_indexing(config, false, false).await?;
+    get_indexes_for_indexing(config, false, false)
+        .await
+        .wrap_err("failed to get indexes for indexing")?;
 
     info!("Deleting surplus indexes");
     // Then, delete the next index if it still exists
-    let indices = get_indexes_for_indexing(config, true, false).await?;
+    let indices = get_indexes_for_indexing(config, true, false)
+        .await
+        .wrap_err("failed to get next indexes to delete")?;
     for client_indices in indices {
         for index in client_indices {
-            index.delete().await?;
+            index.delete().await.wrap_err("failed to delete an index")?;
         }
     }
 
     info!("Recreating next index");
     // Recreate the next index for indexing
-    let indices = get_indexes_for_indexing(config, true, true).await?;
+    let indices = get_indexes_for_indexing(config, true, true)
+        .await
+        .wrap_internal_err("failed to recreate next index")?;
 
     let all_loader_fields =
         crate::database::models::loader_fields::LoaderField::get_fields_all(
             &ro_pool, &redis,
         )
-        .await?
+        .await
+        .wrap_internal_err("failed to get all loader fields")?
         .into_iter()
         .map(|x| x.field)
         .collect::<Vec<_>>();
@@ -137,7 +156,7 @@ pub async fn index_projects(
         idx += 1;
 
         let (uploads, next_cursor) =
-            index_local(&ro_pool, cursor, 10000).await?;
+            index_local(&ro_pool, &redis, cursor, 10000).await?;
         total += uploads.len();
 
         if uploads.is_empty() {
@@ -589,6 +608,10 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery_items",
     "loaders", // search uses loaders as categories- this is purely for the Project model.
     "project_loader_fields",
+    "minecraft_mod",
+    "minecraft_server",
+    "minecraft_java_server",
+    "minecraft_bedrock_server",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
@@ -606,6 +629,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "created_timestamp",
     "date_modified",
     "modified_timestamp",
+    "version_published_timestamp",
     "project_id",
     "open_source",
     "color",
@@ -617,7 +641,23 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     // V2 legacy fields for logical consistency
     "client_side",
     "server_side",
+    "minecraft_server.country",
+    "minecraft_server.region",
+    "minecraft_server.languages",
+    "minecraft_java_server.content.kind",
+    "minecraft_java_server.content.supported_game_versions",
+    "minecraft_java_server.content.recommended_game_version",
+    "minecraft_java_server.verified_plays_2w",
+    "minecraft_java_server.ping.data",
+    "minecraft_java_server.ping.data.players_online",
 ];
 
-const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =
-    &["downloads", "follows", "date_created", "date_modified"];
+const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
+    "downloads",
+    "follows",
+    "date_created",
+    "date_modified",
+    "version_published_timestamp",
+    "minecraft_java_server.verified_plays_2w",
+    "minecraft_java_server.ping.data.players_online",
+];

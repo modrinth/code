@@ -14,12 +14,6 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural,one  {#mód} other  {#módy}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Tento server k hraní vyžaduje módy. Klikni na instalovat pro získání potřebných módů z Modrinth."
-  },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} dnes s vámi sdílel tuto instanci."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Sdílená instance"
   },
@@ -82,39 +76,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Správa zdrojů"
-  },
-  "app.update-toast.body": {
-    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
-  },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} je k dispozici. Aktualizujte pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
-  },
-  "app.update-toast.changelog": {
-    "message": "Seznam změn"
-  },
-  "app.update-toast.download": {
-    "message": "Stahování ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "Stáhnout"
-  },
-  "app.update-toast.downloading": {
-    "message": "Stahování..."
-  },
-  "app.update-toast.reload": {
-    "message": "Načíst znovu"
-  },
-  "app.update-toast.title": {
-    "message": "Aktualizace je k dispozici"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Stahování bylo dokončeno"
   },
   "app.update.complete-toast.text": {
     "message": "Kliknutím sem zobrazíte seznam změn."

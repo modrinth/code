@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede acceder a los servidores de autenticación"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Contenido requerido"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instala para jugar"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requiere mods para jugar. Haz clic en instalar para configurar los archivos necesarios desde Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Modpack requerido"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} compartió esta instancia contigo hoy."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requiere mods para poder jugar. Haz click en Instalar para configurar los archivos requeridos desde Modrinth, después se ejecutará para entrar directamente al servidor."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instancia compartida"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Instancia de servidor compartida"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Ver contenidos"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} agregados"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Gestión de recursos"
   },
-  "app.update-toast.body": {
-    "message": "¡Modrinth App v{version} lista para instalar! Actualiza ahora o automáticamente al cerrar la aplicación."
+  "app.update-popup.body": {
+    "message": "¡Modrinth App v{version} está lista para instalarse! Actualiza ahora o automáticamente al cerrar la Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la aplicación Modrinth."
+  "app.update-popup.body.download-complete": {
+    "message": "La descarga de la Modrinth App v{version} ha finalizado. Actualiza ahora o automáticamente al cerrar la Modrinth App."
   },
-  "app.update-toast.body.linux": {
-    "message": "La aplicación Modrinth v{version} ya está disponible. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
+  "app.update-popup.body.linux": {
+    "message": "La Modrinth App v{version} está disponible. ¡Usa tu gestor de paquetes para actualizarla y tener las últimas funciones y corrección de errores!"
   },
-  "app.update-toast.body.metered": {
-    "message": "¡Modrinth App v{version} ya está disponible! Como estás en una red con límite de datos, no se descargó automáticamente."
+  "app.update-popup.body.metered": {
+    "message": "¡La Modrinth App v{version} ya está disponible! Al estar usando una red de datos límitada, no la hemos descargado automáticamente."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Registro de cambios"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Descargar ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Descargar"
+  "app.update-popup.download-complete": {
+    "message": "Descarga completada"
   },
-  "app.update-toast.downloading": {
-    "message": "Descargando..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Recargar"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Actualización disponible"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Descarga completada"
   },
   "app.update.complete-toast.text": {
     "message": "Haz clic aquí para ver el registro de cambios."
@@ -297,7 +297,7 @@
     "message": "Los grupos de la librería te ayudan a organizar tus instancias en diferentes secciones en tu librería."
   },
   "instance.settings.tabs.general.library-groups.enter-name": {
-    "message": "Ingresa el nombre del grupo"
+    "message": "Escribe nombre del grupo"
   },
   "instance.settings.tabs.general.name": {
     "message": "Nombre"
@@ -306,7 +306,7 @@
     "message": "Hooks de inicio"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
-    "message": "Hooks de inicio personalizados"
+    "message": "Hooks personalizados"
   },
   "instance.settings.tabs.hooks.description": {
     "message": "Los hooks permiten que usuarios avanzados ejecuten comandos del sistema antes y despues de lanzar el juego."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(versión desconocida)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Esta instancia está vinculada a un servidor, lo que significa que no puedes cambiar la versión de Minecraft. Desvincularla la desconectará permanentemente del servidor."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Esta instancia está vinculada a un servidor, lo que significa que los mods no pueden actualizarse y no puedes cambiar el mod loader ni la versión de Minecraft. Desvincularla la desconectará permanentemente del servidor."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Desvincular del servidor"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Desvincular instancia"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "El servidor es incompatible"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gestionado por el proyecto del servidor"
+  },
   "instance.worlds.no_contact": {
     "message": "No se pudo conectar al servidor"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
+  },
+  "search.filter.locked.server": {
+    "message": "Proporcionado por el servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Solo se puede añadir mods que sean del lado del cliente a la instancia del servidor"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "La versión del juego es proporcionada por el servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "El loader es proporcionado por el servidor"
   }
 }

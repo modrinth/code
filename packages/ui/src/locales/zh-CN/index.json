@@ -33,7 +33,7 @@
     "defaultMessage": "查看分析"
   },
   "badge.beta": {
-    "defaultMessage": "测试版"
+    "defaultMessage": "Beta 测试版"
   },
   "badge.beta-release": {
     "defaultMessage": "测试发行版"
@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "功能特点"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "社区"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "特色"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "游戏机制"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "元素"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "性能要求"
   },
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "取消整合包关联"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "返回"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "复制连接"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "禁用"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "这个整合包不包含任何额外内容。"
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "未找到内容"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "启用"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "全部"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "整合包内容"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "加载内容……"
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "没有符合搜索条件的项目。"
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "搜索{count}个项目"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "已选择{count}个"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "当前"
@@ -429,7 +477,7 @@
     "defaultMessage": "密码"
   },
   "label.played": {
-    "defaultMessage": "{time}游玩"
+    "defaultMessage": "上次游玩 {time}"
   },
   "label.project": {
     "defaultMessage": "项目"
@@ -494,11 +542,131 @@
   "label.yes": {
     "defaultMessage": "是"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "捷克语"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "丹麦语"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "德语（瑞士）"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "德语（德国）"
+  },
+  "locale.en-US": {
+    "defaultMessage": "英语 （美国）"
+  },
+  "locale.es-419": {
+    "defaultMessage": "西班牙语（拉丁美洲）"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "西班牙语（西班牙）"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "芬兰语"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "菲律宾语"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "法语"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "希伯来语"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "匈牙利语"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "印度尼西亚语"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "意大利语（意大利）"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "日语"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "韩语"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "马来语"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "荷兰语"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "书面挪威语"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "波兰语"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "葡萄牙语（巴西）"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "葡萄牙语（葡萄牙）"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "罗马尼亚语"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "俄语"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "塞尔维亚语（拉丁语）"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "瑞典语"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "泰语"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "土耳其语"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "乌克兰语"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "越南语"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "中文（简体）"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "中文（繁体）"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "添加支付方式"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "添加支付方式"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "自动安装所需要的内容"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "直接将游戏启动到服务器"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "服务器更改时保持文件更新"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "关闭"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "获取 Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App 将自动打开……"
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "正在打开 Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "为何使用 Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "发生错误"
@@ -699,10 +867,10 @@
     "defaultMessage": "插件"
   },
   "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural, other {插件}}"
+    "defaultMessage": "{count, plural, one {插件} other {插件集}}"
   },
   "project-type.project.capital": {
-    "defaultMessage": "项目"
+    "defaultMessage": "{count, plural, one {项目} other {项目集}}"
   },
   "project-type.project.category": {
     "defaultMessage": "项目"
@@ -812,14 +980,32 @@
   "project.about.links.issues": {
     "defaultMessage": "报告问题"
   },
+  "project.about.links.site": {
+    "defaultMessage": "访问网站"
+  },
   "project.about.links.source": {
     "defaultMessage": "查看源代码"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "访问商店页面"
   },
   "project.about.links.title": {
     "defaultMessage": "相关链接"
   },
   "project.about.links.wiki": {
     "defaultMessage": "前往 Wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "已复制！"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP 地址已复制到剪贴板"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "延迟"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "服务器详情"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, other {次下载}}"
@@ -893,8 +1079,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, other {人关注}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {人在线} other {人在线}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count}人最近游玩"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} 毫秒"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "分析"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "内容"
   },
   "project.settings.description.title": {
     "defaultMessage": "描述"
@@ -1003,6 +1201,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "没有权限"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "服务器"
   },
   "project.settings.tags.title": {
     "defaultMessage": "标签"
@@ -1203,7 +1404,7 @@
     "defaultMessage": "开始"
   },
   "servers.purchase.step.plan.large.desc": {
-    "defaultMessage": "适合 15–25 名玩家使用，加模组包或重度添加模组。"
+    "defaultMessage": "适合 15–25 名玩家使用，加整合包或重度添加模组。"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "适合 6–15 名玩家使用，加多个模组。"
@@ -1361,11 +1562,23 @@
   "tag.category.adventure": {
     "defaultMessage": "冒险"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "冒险模式"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "无政府"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "大气效果"
   },
   "tag.category.audio": {
     "defaultMessage": "音频"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "大逃杀"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "起床战争"
   },
   "tag.category.blocks": {
     "defaultMessage": "方块"
@@ -1373,11 +1586,17 @@
   "tag.category.bloom": {
     "defaultMessage": "泛光"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Boss战"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "卡通"
   },
   "tag.category.challenging": {
     "defaultMessage": "挑战"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "职业"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "彩色光照"
@@ -1385,14 +1604,32 @@
   "tag.category.combat": {
     "defaultMessage": "战斗"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "竞技"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "核心着色器"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "创造模式"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "创作者社区"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "跨平台"
   },
   "tag.category.cursed": {
     "defaultMessage": "邪门"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "自定义内容"
+  },
   "tag.category.decoration": {
     "defaultMessage": "装饰"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "地牢"
   },
   "tag.category.economy": {
     "defaultMessage": "经济"
@@ -1405,6 +1642,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "装备"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "阵营"
   },
   "tag.category.fantasy": {
     "defaultMessage": "精美"
@@ -1419,10 +1659,16 @@
     "defaultMessage": "食物"
   },
   "tag.category.game-mechanics": {
-    "defaultMessage": "游戏机制"
+    "defaultMessage": "机制"
+  },
+  "tag.category.gens": {
+    "defaultMessage": "世代"
   },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "极限模式"
   },
   "tag.category.high": {
     "defaultMessage": "高"
@@ -1430,11 +1676,20 @@
   "tag.category.items": {
     "defaultMessage": "物品"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "保留物品栏"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "水槽"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "套装 PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "库"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "轻量"
@@ -1451,11 +1706,23 @@
   "tag.category.management": {
     "defaultMessage": "管理"
   },
+  "tag.category.media": {
+    "defaultMessage": "媒体"
+  },
   "tag.category.medium": {
     "defaultMessage": "中"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "微型游戏"
+  },
   "tag.category.minigame": {
     "defaultMessage": "小游戏"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "小游戏"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "大型多人在线游戏(MMO)"
   },
   "tag.category.mobs": {
     "defaultMessage": "生物"
@@ -1469,8 +1736,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "多人"
   },
+  "tag.category.network": {
+    "defaultMessage": "网络"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "离线模式"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "单方块"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "优化"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "跑酷"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "路径追踪"
@@ -1478,17 +1760,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "个人世界"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "地皮"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "宝可梦"
+  },
   "tag.category.potato": {
     "defaultMessage": "土豆"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "监狱"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "任务"
   },
   "tag.category.quests": {
     "defaultMessage": "任务"
   },
+  "tag.category.racing": {
+    "defaultMessage": "赛车"
+  },
   "tag.category.realistic": {
     "defaultMessage": "写实风格"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "录制型SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "反射"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "角色扮演"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "仅供截图"
@@ -1502,17 +1817,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "极简风格"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "空岛生存"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "社交"
   },
   "tag.category.storage": {
     "defaultMessage": "存储"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "生存模式"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "团队"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "技术性"
+  },
   "tag.category.technology": {
     "defaultMessage": "科技"
   },
   "tag.category.themed": {
     "defaultMessage": "主题风格"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "城镇"
   },
   "tag.category.transportation": {
     "defaultMessage": "交通"
@@ -1526,8 +1859,14 @@
   "tag.category.vanilla-like": {
     "defaultMessage": "原版风格"
   },
+  "tag.category.whitelisted": {
+    "defaultMessage": "需要白名单"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "世界重置"
+  },
   "tag.category.worldgen": {
-    "defaultMessage": "世界生成"
+    "defaultMessage": "地形"
   },
   "tag.loader.babric": {
     "defaultMessage": "Babric"
@@ -1545,7 +1884,7 @@
     "defaultMessage": "Canvas"
   },
   "tag.loader.datapack": {
-    "defaultMessage": "Data Pack"
+    "defaultMessage": "数据包"
   },
   "tag.loader.fabric": {
     "defaultMessage": "Fabric"
@@ -1572,13 +1911,13 @@
     "defaultMessage": "LiteLoader"
   },
   "tag.loader.minecraft": {
-    "defaultMessage": "Resource Pack"
+    "defaultMessage": "资源包"
   },
   "tag.loader.modloader": {
     "defaultMessage": "Risugami's ModLoader"
   },
   "tag.loader.mrpack": {
-    "defaultMessage": "Modpack"
+    "defaultMessage": "整合包"
   },
   "tag.loader.neoforge": {
     "defaultMessage": "NeoForge"
@@ -1611,7 +1950,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Vanilla Shader"
+    "defaultMessage": "原版着色器"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"
