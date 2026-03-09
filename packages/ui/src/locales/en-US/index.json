@@ -539,6 +539,102 @@
   "label.yes": {
     "defaultMessage": "Yes"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Czech"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Danish"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "German (Switzerland)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "German (Germany)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "English (United States)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spanish (Latin America)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spanish (Spain)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finnish"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipino"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "French"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebrew"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Hungarian"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesian"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italian (Italy)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japanese"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Korean"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malay"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Dutch"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norwegian Bokmål"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polish"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portuguese (Brazil)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portuguese (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Romanian"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russian"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbian (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Swedish"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thai"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turkish"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukrainian"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamese"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chinese (Simplified)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chinese (Traditional)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
   },

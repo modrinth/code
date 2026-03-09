@@ -501,7 +501,7 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
-	trackEvent('InstancePlay', {
+	trackEvent('InstanceStart', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
