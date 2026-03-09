@@ -288,6 +288,7 @@
 					}
 				}),
 			]"
+			replace
 		/>
 
 		<ProjectCardList
