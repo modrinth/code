@@ -579,7 +579,6 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "icon_url",
     "date_created",
     "date_modified",
-    "version_published_timestamp",
     "latest_version",
     "license",
     "gallery",
