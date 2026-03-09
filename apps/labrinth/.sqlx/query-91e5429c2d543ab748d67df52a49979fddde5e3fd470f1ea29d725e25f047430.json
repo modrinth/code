@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE users_redeemals\n\t\t\t\tSET user_id = $1\n\t\t\t\tWHERE user_id = $2\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "91e5429c2d543ab748d67df52a49979fddde5e3fd470f1ea29d725e25f047430"
+}
