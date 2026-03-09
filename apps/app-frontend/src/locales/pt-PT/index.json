@@ -14,12 +14,6 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {mod} other {mods}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requer mods para jogares. Clica instalar para transferir os ficheiros necessários do Modrinth."
-  },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} partilhou esta instância contigo hoje."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância partilhada"
   },
@@ -48,7 +42,7 @@
     "message": "{count} removidos"
   },
   "app.modal.update-to-play.update-required": {
-    "message": "Atualização necessitada"
+    "message": "Atualização necessária"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Uma atualização é necessária para jogar {name}. Por favor atualiza para a versão mais recente para iniciar o jogo."
@@ -82,39 +76,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
-  },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
-  },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} está disponível. Usa o teu gestor de pacotes para atualizar e receber as correções e recursos mais recentes!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
-  },
-  "app.update-toast.changelog": {
-    "message": "Lista de alterações"
-  },
-  "app.update-toast.download": {
-    "message": "Transferir ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "Transferir"
-  },
-  "app.update-toast.downloading": {
-    "message": "A transferir..."
-  },
-  "app.update-toast.reload": {
-    "message": "Recarregar"
-  },
-  "app.update-toast.title": {
-    "message": "Atualização disponível"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Transferência concluída"
   },
   "app.update.complete-toast.text": {
     "message": "Clica aqui para ver a lista de alterações."

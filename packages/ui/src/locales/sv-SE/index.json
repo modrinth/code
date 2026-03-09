@@ -252,7 +252,19 @@
     "defaultMessage": "Kategori"
   },
   "header.category.feature": {
-    "defaultMessage": "Framhäv"
+    "defaultMessage": "Funktion"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Community"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Funktioner"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Spelstil"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
   },
   "header.category.performance-impact": {
     "defaultMessage": "Prestandapåverkan"
@@ -302,8 +314,59 @@
   "instances.modpack-card.unlink": {
     "defaultMessage": "Avkoppla modpaket"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Tillbaka"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Kopiera länk"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Avaktivera"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Inget innehåll hittades"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Aktivera"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Allt"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Modpaketets innehåll"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Laddar innehåll..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Inga projekt matchar din sökning."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Sök {count} projekt"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} valda"
+  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuvarande"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Inkompatibel"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Nedgradera till v{version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Uppdatera version"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Dölj inkompatibla"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Ingen ändringslogg tillgänglig för denna version."
   },
   "instances.updater-modal.no-versions": {
     "defaultMessage": "Inga versioner hittades"
@@ -314,11 +377,20 @@
   "instances.updater-modal.select-version": {
     "defaultMessage": "Välj en version för att läsa dess ändringslogg"
   },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Visa inkompatibla"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Uppdatera till v{version}"
+  },
   "instances.updater-modal.warning.app": {
     "defaultMessage": "Vi kan inte garantera att uppdateringar är säkra för din instans. Granska ändringsloggen för alla mellanliggande versioner och överväg att göra en säkerhetskopia."
   },
   "instances.updater-modal.warning.web": {
     "defaultMessage": "Vi kan inte garantera att uppdateringar är säkra för dina världar. Granska ändringsloggen för alla mellanliggande versioner och överväg att göra en säkerhetskopia."
+  },
+  "label.actions": {
+    "defaultMessage": "Åtgärder"
   },
   "label.available": {
     "defaultMessage": "{amount} tillgängligt."
@@ -407,6 +479,9 @@
   "label.saved": {
     "defaultMessage": "Sparad"
   },
+  "label.scopes": {
+    "defaultMessage": "Omfattning"
+  },
   "label.search": {
     "defaultMessage": "Sök"
   },
@@ -424,6 +499,9 @@
   },
   "label.sort-by": {
     "defaultMessage": "Sortera efter"
+  },
+  "label.success": {
+    "defaultMessage": "Lyckades"
   },
   "label.title": {
     "defaultMessage": "Titel"
@@ -454,6 +532,30 @@
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Lägg till en betalningsmetod"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Installera krävt innehåll automatiskt"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Starta spelet direkt i servern"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Håll filer uppdaterade när servern ändras"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Stäng"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Installera Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App kommer att öppnas automatiskt..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Öppnar Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Varför använda Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "Ett fel inträffade"
@@ -506,8 +608,14 @@
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Schemalagd"
   },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Granskas"
+  },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Olistad"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Tillhandahållen"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "Kopiera kod till urklipp"
@@ -524,11 +632,35 @@
   "omorphia.component.environment-indicator.label.server": {
     "defaultMessage": "Server"
   },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "En {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Ostöttad"
+  },
+  "payment-method.amazon_pay": {
+    "defaultMessage": "Amazon Pay"
+  },
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
+  },
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} som slutar i {last_four}"
+  },
+  "payment-method.cashapp": {
+    "defaultMessage": "Cash App"
+  },
   "payment-method.charity": {
     "defaultMessage": "Välgörenhet"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "Välgörenheter"
+  },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Utforska"
   },
   "payment-method.gift-card": {
     "defaultMessage": "Presentkort"
@@ -536,8 +668,29 @@
   "payment-method.gift-card-plural": {
     "defaultMessage": "Presentkort"
   },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal Internationellt"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "Okänd betalningsmetod"
+  },
   "payment-method.venmo": {
     "defaultMessage": "Venmo"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-card.environment.client": {
     "defaultMessage": "Klient"
@@ -553,6 +706,9 @@
   },
   "project-type.all": {
     "defaultMessage": "Alla"
+  },
+  "project-type.datapack.capital": {
+    "defaultMessage": "{count, plural, one {Datapaket} other {Datapaket}}"
   },
   "project-type.datapack.category": {
     "defaultMessage": "Datapaket"
@@ -586,6 +742,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {plugins}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Projekt} other {Projekt}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Projekt"
@@ -632,6 +791,9 @@
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Endast dedikerade servrar"
   },
+  "project.about.compatibility.environments.server-side": {
+    "defaultMessage": "Server-sida"
+  },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Enspelarläge"
   },
@@ -672,7 +834,7 @@
     "defaultMessage": "Gå med i Discord Servern"
   },
   "project.about.links.donate.bmac": {
-    "defaultMessage": "Köp en kaffe till mig"
+    "defaultMessage": "Buy Me a Coffee"
   },
   "project.about.links.donate.generic": {
     "defaultMessage": "Donera"
@@ -692,14 +854,32 @@
   "project.about.links.issues": {
     "defaultMessage": "Rapportera problem"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Gå till webbsidan"
+  },
   "project.about.links.source": {
     "defaultMessage": "Visa källa"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Gå till butiksidan"
   },
   "project.about.links.title": {
     "defaultMessage": "Länkar"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Besök wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Kopierat!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP-adress kopierat till urklipp"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latens"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Serverdetaljer"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {nedladdning} other {nedladdningar}}"
@@ -749,6 +929,9 @@
   "project.environment.server-only.description": {
     "defaultMessage": "All funktionalitet görs på servern och är kompatibel med vanilla klienter."
   },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Endast server-sida, fungerar även i singleplayer"
+  },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Fungerar bara i Enspelarläge eller när du inte är ansluten till en Flerspelarserver."
   },
@@ -764,8 +947,14 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Okänd miljö"
   },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Statistik"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Innehåll"
   },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivning"
@@ -797,11 +986,20 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Klient endast"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Ditt projekt saknar miljömetadata, vänligen välj den passande inställningen nedan."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Vänligen välj en miljö för ditt projekt"
+  },
   "project.settings.environment.notice.multiple-environments.title": {
     "defaultMessage": "Ditt projekt har flera miljöer"
   },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Granska valen nedan"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Endast mod- eller modpaketprojekt kan ha miljödata."
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Dedikerad server endast"
@@ -850,6 +1048,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Ingen behörighet"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Taggar"
@@ -1104,7 +1305,7 @@
     "defaultMessage": "Auktoriserade appar"
   },
   "settings.billing.title": {
-    "defaultMessage": "Fakturering och prenumerationer"
+    "defaultMessage": "Prenumerationer"
   },
   "settings.display.theme.dark": {
     "defaultMessage": "Mörkt"
@@ -1143,10 +1344,13 @@
     "defaultMessage": "app"
   },
   "settings.language.platform.site": {
-    "defaultMessage": "sida"
+    "defaultMessage": "webbsida"
   },
   "settings.language.title": {
     "defaultMessage": "Språk"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Om du ändrar språket på {platform}n kan vissa delar av innehållet visas på engelska om det inte finns någon översättning tillgänglig. {platform}n är ännu inte helt översatt, så vissa delar av innehållet kan fortfarande vara på engelska för vissa språk."
   },
   "settings.profile.title": {
     "defaultMessage": "Offentlig profil"
@@ -1154,17 +1358,104 @@
   "settings.sessions.title": {
     "defaultMessage": "Sessioner"
   },
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x eller högre"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x eller lägre"
+  },
   "tag.category.adventure": {
     "defaultMessage": "Äventyr"
+  },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Äventyrsläge"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarki"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosfär"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Ljud"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Block"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Bloom"
+  },
+  "tag.category.bosses": {
+    "defaultMessage": "Bossar"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Tecknat"
   },
   "tag.category.challenging": {
     "defaultMessage": "Utmanande"
   },
+  "tag.category.classes": {
+    "defaultMessage": "Klasser"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Färgat ljus"
+  },
   "tag.category.combat": {
     "defaultMessage": "Strid"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Tävlingsinriktat"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Kärnshaders"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Kreativt läge"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Förbannat"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Dekoration"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Ekonomi"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entiteter"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Miljö"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Utrustning"
+  },
   "tag.category.fantasy": {
-    "defaultMessage": "Fantasy"
+    "defaultMessage": "Fantasi"
   },
   "tag.category.foliage": {
     "defaultMessage": "Växtlighet"
@@ -1188,7 +1479,7 @@
     "defaultMessage": "Föremål"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Allt mellan himmel och jord"
+    "defaultMessage": "Köksvask"
   },
   "tag.category.library": {
     "defaultMessage": "Bibliotek"
@@ -1196,8 +1487,20 @@
   "tag.category.lightweight": {
     "defaultMessage": "Resurs-snålt"
   },
+  "tag.category.locale": {
+    "defaultMessage": "Lokalt"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Låg"
+  },
   "tag.category.magic": {
     "defaultMessage": "Magi"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Hantering"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Medel"
   },
   "tag.category.minigame": {
     "defaultMessage": "Minispel"
@@ -1216,6 +1519,15 @@
   },
   "tag.category.optimization": {
     "defaultMessage": "Optimering"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Vägspårning"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Potatis"
@@ -1280,6 +1592,9 @@
   "tag.loader.bungeecord": {
     "defaultMessage": "BungeeCord"
   },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canvas"
+  },
   "tag.loader.datapack": {
     "defaultMessage": "Datapack"
   },
@@ -1301,11 +1616,59 @@
   "tag.loader.java-agent": {
     "defaultMessage": "Java Agent"
   },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
   "tag.loader.minecraft": {
     "defaultMessage": "Resurspaket"
   },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
   "tag.loader.mrpack": {
     "defaultMessage": "Modpaket"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Quilt"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Sponge"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Vanilla Shader"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Waterfall"
   },
   "tooltip.date-at-time": {
     "defaultMessage": "{date, date, long} vid {time, time, short}"

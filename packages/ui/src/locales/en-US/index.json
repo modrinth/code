@@ -270,7 +270,7 @@
     "defaultMessage": "Performance impact"
   },
   "header.category.resolutions": {
-    "defaultMessage": "Resolutions"
+    "defaultMessage": "Resolution"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -360,10 +360,10 @@
     "defaultMessage": "No projects match your search."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Search {count} projects"
+    "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
   "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} selected"
+    "defaultMessage": "{count, number} selected"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
@@ -477,7 +477,7 @@
     "defaultMessage": "Password"
   },
   "label.played": {
-    "defaultMessage": "Played {time}"
+    "defaultMessage": "Played {ago}"
   },
   "label.project": {
     "defaultMessage": "Project"
@@ -541,6 +541,102 @@
   },
   "label.yes": {
     "defaultMessage": "Yes"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "Czech"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Danish"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "German (Switzerland)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "German (Germany)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "English (United States)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spanish (Latin America)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spanish (Spain)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finnish"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipino"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "French"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebrew"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Hungarian"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesian"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italian (Italy)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japanese"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Korean"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malay"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Dutch"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norwegian Bokmål"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polish"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portuguese (Brazil)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portuguese (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Romanian"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russian"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbian (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Swedish"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thai"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turkish"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukrainian"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamese"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chinese (Simplified)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chinese (Traditional)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Add payment method"
@@ -721,6 +817,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Published {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Updated {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
@@ -912,16 +1014,16 @@
     "defaultMessage": "Server details"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {download} other {downloads}}"
+    "defaultMessage": "{count, number} {count, plural, one {download} other {downloads}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Required on both the client and server."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client and server, required on both"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Most functionality is client-side, but installing it on the server enables enhanced functionality."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client and server, optional on server"
@@ -933,7 +1035,7 @@
     "defaultMessage": "Client-side only"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Has some functionality on both the client and server, even if only partially. Installing it on both leads to the best experience."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client and server, best when installed on both"
@@ -945,19 +1047,19 @@
     "defaultMessage": "Client and server, optional on both"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients. Only works on dedicated servers."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Server-side only"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Has some functionality on both the client and server, even if only partially."
+    "defaultMessage": "Most functionality is server-side, but installing it on the client enables enhanced functionality."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client and server, optional on client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients."
+    "defaultMessage": "All functionality is done server-side and is compatible with vanilla clients. Also works on the internal server in singleplayer."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Server-side only, works in singleplayer too"
@@ -981,16 +1083,22 @@
     "defaultMessage": "Unknown environment"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {followers} other {followers}}"
+    "defaultMessage": "{count, number} {count, plural, one {follower} other {followers}}"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
+    "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {player} other {players}} online"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {recent play} other {recent plays}}"
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
@@ -1861,9 +1969,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} at {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "You have unsaved changes."

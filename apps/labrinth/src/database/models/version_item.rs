@@ -135,6 +135,7 @@ impl VersionFileBuilder {
         self,
         version_id: DBVersionId,
         transaction: &mut PgTransaction<'_>,
+        http: &reqwest::Client,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
@@ -173,6 +174,7 @@ impl VersionFileBuilder {
             DelphiRunParameters {
                 file_id: file_id.into(),
             },
+            http,
         )
         .await
         {
@@ -193,6 +195,7 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        http: &reqwest::Client,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
             id: self.version_id,
@@ -233,7 +236,7 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction).await?;
+            file.insert(version_id, transaction, http).await?;
         }
 
         DependencyBuilder::insert_many(

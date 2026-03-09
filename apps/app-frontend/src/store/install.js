@@ -404,6 +404,11 @@ const showModpackInstallSuccess = (installStore, project, serverAddress) => {
 										serverAddress,
 										project.linked_data?.project_id ?? null,
 									)
+									trackEvent('InstanceStart', {
+										loader: project.loader,
+										game_version: project.game_version,
+										source: 'ServerProject',
+									})
 								} catch (err) {
 									handleSevereError(err, { profilePath: project.path })
 								}
@@ -434,6 +439,11 @@ const showUpdateSuccess = (installStore, instance, serverAddress) => {
 							action: async () => {
 								try {
 									if (serverAddress) await start_join_server(instance.path, serverAddress)
+									trackEvent('InstanceStart', {
+										loader: instance.loader,
+										game_version: instance.game_version,
+										source: 'ServerProject',
+									})
 								} catch (err) {
 									handleSevereError(err, { profilePath: instance.path })
 								}
@@ -530,6 +540,11 @@ export const playServerProject = async (projectId) => {
 	// join server
 	try {
 		await joinServer(instance.path, serverAddress, project.id)
+		trackEvent('InstanceStart', {
+			loader: instance.loader,
+			game_version: instance.game_version,
+			source: 'ServerProject',
+		})
 	} catch (err) {
 		handleSevereError(err, { profilePath: instance.path })
 	}

@@ -14,12 +14,6 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "השרת דורש מודים כדי לשחק. התקנה מגדירה את הקבצים הדרושים מModrinth."
-  },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} שיתף איתך את ההתקנה הזאת היום."
-  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
   },
@@ -82,39 +76,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "ניהול משאבים"
-  },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} מוכנה להורדה!\nיש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
-  },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} זמין. יש להשתמש במנהל חבילות שלך כדי לעדכן בשביל התכונות החדשות ותיקונים!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} זמינה עכשיו! בגלל החיבור לפי שימוש, לא הורדנו אותה אוטומטית."
-  },
-  "app.update-toast.changelog": {
-    "message": "יומן שינויים"
-  },
-  "app.update-toast.download": {
-    "message": "הורדה ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "הורד"
-  },
-  "app.update-toast.downloading": {
-    "message": "מוריד..."
-  },
-  "app.update-toast.reload": {
-    "message": "רענן"
-  },
-  "app.update-toast.title": {
-    "message": "עדכונים זמינים"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "הורדה הושלמה"
   },
   "app.update.complete-toast.text": {
     "message": "לחיצה כדי לראות את יומן השינויים."

@@ -76,11 +76,11 @@
 							</div>
 						</div>
 						<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-secondary">
-							<span v-tooltip="dayjs(batch.created_at).format('MMMM D, YYYY [at] h:mm A')">
+							<span v-tooltip="formatDateTime(batch.created_at)">
 								Created {{ formatRelativeTime(batch.created_at) }}
 							</span>
 							<span>•</span>
-							<span v-tooltip="dayjs(batch.scheduled_at).format('MMMM D, YYYY [at] h:mm A')">
+							<span v-tooltip="formatDateTime(batch.scheduled_at)">
 								Scheduled {{ formatRelativeTime(batch.scheduled_at) }}
 							</span>
 							<template v-if="batch.provision_options?.region">
@@ -116,6 +116,7 @@ import {
 	injectNotificationManager,
 	Pagination,
 	TagItem,
+	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import type { User } from '@modrinth/utils'
@@ -127,6 +128,10 @@ import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 
 const { addNotification } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 // Types
 interface ProvisionOptions {

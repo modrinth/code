@@ -614,6 +614,9 @@
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Přihlásit přes PayPal"
   },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": ""
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Odměna"
   },

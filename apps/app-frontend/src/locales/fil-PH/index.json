@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Nangangailangan ng kontento"
+  },
   "app.modal.install-to-play.header": {
     "message": "Mag-install upang malaro"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# mod} other {# na mod}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Ang server na ito ay nangangailangan ng mga mod upang malaro. Pindutin ang install upang mahanda ang mga kinakailangang file galing sa Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Kinailangan na modpack"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "Ibinahagi ngayong araw ni {name} ang instansiyang ito sa iyo."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Modrinth, matapos ay ilunsad nang diretso sa server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Binahaging instansiya"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Binahaging instansiyang pang-server"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Tingnan ang mga kontento"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} nadagdag"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Pamamahala ng paglalaan"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Ang Modrinth App v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Changelog"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "I-download ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "I-download"
+  "app.update-popup.download-complete": {
+    "message": "Nakumpleto ang pagdownload"
   },
-  "app.update-toast.downloading": {
-    "message": "Nagda-download..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Mag-reload"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "May bagong update"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Nakumpleto ang pagdownload"
   },
   "app.update.complete-toast.text": {
     "message": "Dito pumindot upang matingnan ang changelog."
@@ -309,7 +309,7 @@
     "message": "Mga custom na launch hook"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
+    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exist"
@@ -414,7 +414,7 @@
     "message": "Sigurado ka bang gusto mong i-reinstall ang instansiyang ito?"
   },
   "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mare-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods at kontentong idinagdag mo sa orihinal na modpack."
+    "message": "Mare-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mod at kontentong idinagdag mo sa orihinal na modpack."
   },
   "instance.settings.tabs.installation.reinstall.title": {
     "message": "I-reinstall ang modpack"
@@ -463,6 +463,15 @@
   },
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(hindi kilalang bersiyon)"
+  },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Ang instansiyang ito ay naka-link sa isang server, ibig sabihin ay hindi mo mapapalitan ang bersiyon ng Minecraft. Permanenteng madi-diskonekta ang instansiyang ito sa server kung mag-unlink."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Ang instansiyang ito ay naka-link sa isang server, ibig sabihin ang mga mod ay hindi mai-update at hindi mo mapapalitan ang mod loader at ang bersiyon ng Minecraft. Permanenteng madi-diskonekta ang instansiyang ito sa server kung mag-unlink."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "I-unlink sa server"
   },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "I-unlink sa instansiya"
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Hindi magkatugma sa server"
   },
+  "instance.worlds.linked_server": {
+    "message": "Pinamamahala ng proyektong server"
+  },
   "instance.worlds.no_contact": {
     "message": "Hindi makontak ang server"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Maki-sync sa instansiya"
+  },
+  "search.filter.locked.server": {
+    "message": "Handog ng server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Ang bersiyon ng laro ay handog ng server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Ang loader ay handog na ng server"
   }
 }
