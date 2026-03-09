@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::net::TcpStream;
 
@@ -34,7 +34,7 @@ impl From<protocol::ProtocolError> for ServerError {
 }
 
 /// Contains information about the server version.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ServerVersion {
     /// The server's Minecraft version, i.e. "1.15.2".
     pub name: String,
@@ -44,7 +44,7 @@ pub struct ServerVersion {
 }
 
 /// Contains information about a player.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ServerPlayer {
     /// The player's in-game name.
     pub name: String,
@@ -55,7 +55,7 @@ pub struct ServerPlayer {
 
 /// Contains information about the currently online
 /// players.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ServerPlayers {
     /// The configured maximum number of players for the
     /// server.
@@ -71,7 +71,7 @@ pub struct ServerPlayers {
 
 /// The decoded JSON response from a status query over
 /// ServerListPing.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatusResponse {
     /// Information about the server's version.
     pub version: ServerVersion,
@@ -80,7 +80,7 @@ pub struct StatusResponse {
     pub players: ServerPlayers,
 
     /// Single-field struct containing the server's MOTD.
-    pub description: serde_json::Value,
+    pub description: Option<serde_json::Value>,
 
     /// Optional field containing a path to the server's
     /// favicon.

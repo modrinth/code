@@ -6,13 +6,13 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
+use crate::util::io;
 use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
 pub use crate::util::protocol_version::ProtocolVersion;
-pub use crate::util::server_ping::{
+use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
-use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State, launcher};
+use crate::{Context, ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -913,22 +913,22 @@ pub async fn get_server_status(
     get_server_status_new(address, protocol_version).await
 }
 
-async fn get_server_status_old(
-    address: &str,
-    protocol_version: Option<ProtocolVersion>,
-) -> Result<ServerStatus> {
-    let (original_host, original_port) = parse_server_address(address)?;
-    let (host, port) =
-        resolve_server_address(original_host, original_port).await?;
-    tracing::debug!(
-        "Pinging {address} with protocol version {protocol_version:?}"
-    );
-    server_ping::get_server_status(
-        &(&host as &str, port),
-        (original_host, original_port),
-        protocol_version,
-    )
-    .await
+// async fn _get_server_status_old(
+//     address: &str,
+//     protocol_version: Option<ProtocolVersion>,
+// ) -> Result<ServerStatus> {
+//     let (original_host, original_port) = parse_server_address(address)?;
+//     let (host, port) =
+//         resolve_server_address(original_host, original_port).await?;
+//     tracing::debug!(
+//         "Pinging {address} with protocol version {protocol_version:?}"
+//     );
+//     server_ping::get_server_status(
+//         &(&host as &str, port),
+//         (original_host, original_port),
+//         protocol_version,
+//     )
+//     .await
 }
 
 async fn get_server_status_new(
@@ -936,7 +936,7 @@ async fn get_server_status_new(
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
     let (address, port) = async_minecraft_ping::parse_host_and_port(address)
-        .map_err(|err| Error::from(ErrorKind::InputError(err.to_string())))?;
+        .wrap_err("failed to parse address")?;
 
     let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
         .with_port(port)
@@ -946,19 +946,22 @@ async fn get_server_status_new(
         builder = builder.with_protocol_version(version.version as usize)
     }
 
-    let conn = builder.connect().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to connect to server".into()))
-    })?;
+    let conn = builder
+        .connect()
+        .await
+        .wrap_err("failed to connect to server")?;
 
-    let ping_conn = conn.status().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to get server status".into()))
-    })?;
+    let ping_conn = conn
+        .status()
+        .await
+        .wrap_err("failed to get server status")?;
     let status = &ping_conn.status;
-    let description = RawValue::from_string(
-        serde_json::to_string(&status.description)
-            .expect("serializing should not fail"),
-    )
-    .expect("converting to `RawValue` should not fail");
+    let description = status.description.as_ref().map(|d| {
+        let json =
+            serde_json::to_string(d).expect("serializing should not fail");
+        RawValue::from_string(json)
+            .expect("converting to `RawValue` should not fail")
+    });
 
     let players = ServerPlayers {
         max: status.players.max,
@@ -988,14 +991,15 @@ async fn get_server_status_new(
     let latency = {
         let start = Instant::now();
         let ping_magic = Utc::now().timestamp_millis().cast_unsigned();
-        ping_conn.ping(ping_magic).await.map_err(|_err| {
-            Error::from(ErrorKind::InputError("failed to do ping".into()))
-        })?;
+        ping_conn
+            .ping(ping_magic)
+            .await
+            .wrap_err("failed to do ping")?;
         start.elapsed().as_millis() as i64
     };
 
     Ok(ServerStatus {
-        description: Some(description),
+        description,
         players: Some(players),
         version: Some(version),
         favicon,

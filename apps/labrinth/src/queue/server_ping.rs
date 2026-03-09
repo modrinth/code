@@ -255,42 +255,30 @@ pub async fn ping_server(
         .map(|duration| duration.min(default_duration))
         .unwrap_or(default_duration);
 
-    let (address, port) = match address.rsplit_once(':') {
-        Some((addr, port)) => {
-            let port = port.parse::<u16>().wrap_err("invalid port number")?;
-            (addr, port)
-        }
-        None => (address, 25565),
-    };
+    let (address, port) = async_minecraft_ping::parse_host_and_port(address)?;
 
-    let task = async move {
-        let conn = async_minecraft_ping::ConnectionConfig::build(address)
-            .with_port(port)
-            .with_srv_lookup()
-            .connect()
-            .await
-            .wrap_err("failed to connect to server")?;
-
-        let status = conn
-            .status()
-            .await
-            .wrap_err("failed to get server status")?
-            .status;
-
-        eyre::Ok(exp::minecraft::JavaServerPingData {
-            latency: start.elapsed(),
-            version_name: status.version.name,
-            version_protocol: status.version.protocol,
-            description: status.description,
-            players_online: status.players.online,
-            players_max: status.players.max,
-        })
-    };
-
-    tokio::time::timeout(timeout, task)
+    let conn = async_minecraft_ping::ConnectionConfig::build(address)
+        .with_port(port)
+        .with_srv_lookup()
+        .with_timeout(timeout)
+        .connect()
         .await
-        .map_err(eyre::Error::new)
-        .flatten()
+        .wrap_err("failed to connect to server")?;
+
+    let status = conn
+        .status()
+        .await
+        .wrap_err("failed to get server status")?
+        .status;
+
+    eyre::Ok(exp::minecraft::JavaServerPingData {
+        latency: start.elapsed(),
+        version_name: status.version.name,
+        version_protocol: status.version.protocol,
+        description: status.description,
+        players_online: status.players.online,
+        players_max: status.players.max,
+    })
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
