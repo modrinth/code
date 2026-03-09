@@ -629,6 +629,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "created_timestamp",
     "date_modified",
     "modified_timestamp",
+    "version_published_timestamp",
     "project_id",
     "open_source",
     "color",
@@ -656,6 +657,7 @@ const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
     "follows",
     "date_created",
     "date_modified",
+    "version_published_timestamp",
     "minecraft_java_server.verified_plays_2w",
     "minecraft_java_server.ping.data.players_online",
 ];
