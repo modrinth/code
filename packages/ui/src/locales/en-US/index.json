@@ -530,63 +530,6 @@
   "input.view.list": {
     "defaultMessage": "Rows view"
   },
-  "installation-settings.aria.select-game-version": {
-    "defaultMessage": "Select game version"
-  },
-  "installation-settings.aria.select-loader-version": {
-    "defaultMessage": "Select {loader} version"
-  },
-  "installation-settings.aria.select-platform": {
-    "defaultMessage": "Select platform"
-  },
-  "installation-settings.edit-installation.title": {
-    "defaultMessage": "Edit installation"
-  },
-  "installation-settings.edit.warning-instance": {
-    "defaultMessage": "We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues."
-  },
-  "installation-settings.edit.warning-server": {
-    "defaultMessage": "We don't recommend editing your installation settings after installing content. If you want to edit them reset your server."
-  },
-  "installation-settings.linked-instance.title": {
-    "defaultMessage": "Linked {projectType, select, server {server project} other {modpack}}"
-  },
-  "installation-settings.loader-version": {
-    "defaultMessage": "{loader} version"
-  },
-  "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."
-  },
-  "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Re-install modpack"
-  },
-  "installation-settings.reinstalling-modpack": {
-    "defaultMessage": "Reinstalling modpack"
-  },
-  "installation-settings.repair.instance-description": {
-    "defaultMessage": "Reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
-  },
-  "installation-settings.repair.instance-title": {
-    "defaultMessage": "Repair instance"
-  },
-  "installation-settings.repair.server-description": {
-    "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
-  },
-  "installation-settings.repair.server-title": {
-    "defaultMessage": "Repair server"
-  },
-  "installation-settings.saving": {
-    "defaultMessage": "Saving..."
-  },
-  "installation-settings.search-game-version": {
-    "defaultMessage": "Search game version..."
-  },
-  "installation-settings.unlink": {
-    "defaultMessage": "Unlink"
-  },
-  "installation-settings.unlink.description": {
-    "defaultMessage": "Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
-  },
   "instance.confirm-reinstall.admonition-body": {
     "defaultMessage": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation."
   },
