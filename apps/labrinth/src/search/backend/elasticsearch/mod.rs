@@ -4,6 +4,10 @@ use crate::env::ENV;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
+use crate::search::backend::{
+    SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
+    parse_search_request,
+};
 use crate::search::indexing::index_local;
 use crate::search::{
     ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
@@ -301,35 +305,83 @@ impl Elasticsearch {
         Ok(Self { config, client })
     }
 
-    fn get_sort_index(&self, index: &str) -> Result<(String, Value), ApiError> {
-        let projects_name = self.config.get_index_name("projects");
-        let projects_filtered_name =
-            self.config.get_index_name("projects_filtered");
-        Ok(match index {
-            "relevance" => (
-                projects_name,
-                json!([{ "_score": { "order": "desc" } }, { "downloads": { "order": "desc" } }]),
-            ),
-            "downloads" => (
-                projects_filtered_name,
-                json!([{ "downloads": { "order": "desc" } }]),
-            ),
-            "follows" => {
-                (projects_name, json!([{ "follows": { "order": "desc" } }]))
+    fn get_sort_index(
+        &self,
+        index: &str,
+        new_filters: Option<&str>,
+    ) -> Result<(String, Value), ApiError> {
+        let sort = parse_search_index(index, new_filters)?;
+        let index_name = match sort.index_name {
+            SearchIndexName::Projects => self.config.get_index_name("projects"),
+            SearchIndexName::ProjectsFiltered => {
+                self.config.get_index_name("projects_filtered")
             }
-            "updated" => (
-                projects_name,
-                json!([{ "date_modified": { "order": "desc" } }]),
+        };
+
+        Ok(match sort.index {
+            SearchIndex::Relevance => (
+                index_name,
+                json!([
+                    { "_score": { "order": "desc" } },
+                    { "downloads": { "order": "desc" } },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
             ),
-            "newest" => (
-                projects_name,
-                json!([{ "date_created": { "order": "desc" } }]),
+            SearchIndex::Downloads => (
+                index_name,
+                json!([
+                    { "downloads": { "order": "desc" } },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
             ),
-            _ => {
-                return Err(ApiError::Request(eyre!(
-                    "invalid index `{index}`"
-                )));
-            }
+            SearchIndex::Follows => (
+                index_name,
+                json!([
+                    { "follows": { "order": "desc" } },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
+            ),
+            SearchIndex::Updated => (
+                index_name,
+                json!([
+                    { "date_modified": { "order": "desc" } },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
+            ),
+            SearchIndex::Newest => (
+                index_name,
+                json!([
+                    { "date_created": { "order": "desc" } },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
+            ),
+            SearchIndex::MinecraftJavaServerVerifiedPlays2w => (
+                index_name,
+                json!([
+                    {
+                        "minecraft_java_server.verified_plays_2w": {
+                            "order": "desc"
+                        }
+                    },
+                    {
+                        "minecraft_java_server.ping.data.players_online": {
+                            "order": "desc"
+                        }
+                    },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
+            ),
+            SearchIndex::MinecraftJavaServerPlayersOnline => (
+                index_name,
+                json!([
+                    {
+                        "minecraft_java_server.ping.data.players_online": {
+                            "order": "desc"
+                        }
+                    },
+                    { "version_published_timestamp": { "order": "desc" } }
+                ]),
+            ),
         })
     }
 
@@ -567,18 +619,9 @@ impl Elasticsearch {
     }
 
     fn meili_like_filters(info: &SearchRequest) -> Option<Cow<'_, str>> {
-        let raw = if let Some(filters) = info.new_filters.as_deref() {
-            Some(filters.to_string())
-        } else {
-            match (info.filters.as_deref(), info.version.as_deref()) {
-                (Some(f), Some(v)) => Some(format!("({f}) AND ({v})")),
-                (Some(f), None) => Some(f.to_string()),
-                (None, Some(v)) => Some(v.to_string()),
-                (None, None) => None,
-            }
-        }?;
+        let raw = combined_search_filters(info)?;
 
-        Some(Cow::Owned(Self::normalize_meili_filter_syntax(&raw)))
+        Some(Self::normalize_meili_filter_syntax(&raw).into())
     }
 }
 
@@ -588,26 +631,12 @@ impl SearchBackend for Elasticsearch {
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
-        let offset = info
-            .offset
-            .as_deref()
-            .unwrap_or("0")
-            .parse::<usize>()
-            .wrap_request_err("invalid offset")?;
-        let limit = info
-            .limit
-            .as_deref()
-            .unwrap_or("10")
-            .parse::<usize>()
-            .wrap_request_err("invalid limit")?
-            .min(100);
-        let hits_per_page = if limit == 0 { 1 } else { limit };
-        let page = offset / hits_per_page + 1;
-        let index = info.index.as_deref().unwrap_or("relevance");
-        let (index_name, sort) = self.get_sort_index(index)?;
+        let parsed = parse_search_request(info)?;
+        let (index_name, sort) =
+            self.get_sort_index(parsed.index, info.new_filters.as_deref())?;
 
         let mut must = Vec::new();
-        let query_text = info.query.as_deref().unwrap_or_default().trim();
+        let query_text = parsed.query.trim();
         if query_text.is_empty() {
             must.push(json!({"match_all": {}}));
         } else {
@@ -649,8 +678,8 @@ impl SearchBackend for Elasticsearch {
         let response = self
             .client
             .search(SearchParts::Index(&[index_name.as_str()]))
-            .from(offset as i64)
-            .size(hits_per_page as i64)
+            .from(parsed.offset as i64)
+            .size(parsed.hits_per_page as i64)
             .track_total_hits(true)
             .body(json!({
                 "query": {
@@ -698,36 +727,11 @@ impl SearchBackend for Elasticsearch {
             .into_iter()
             .filter_map(|hit| hit.get("_source").cloned())
             .map(|source| -> Result<ResultSearchProject, ApiError> {
-                let source =
-                    serde_json::from_value::<UploadSearchProject>(source)
-                        .wrap_internal_err(
-                            "failed to deserialize Elasticsearch hit",
-                        )?;
-
-                Ok(ResultSearchProject {
-                    version_id: source.version_id,
-                    project_id: source.project_id,
-                    project_types: source.project_types,
-                    slug: source.slug,
-                    author: source.author,
-                    name: source.name,
-                    summary: source.summary,
-                    categories: source.categories,
-                    display_categories: source.display_categories,
-                    downloads: source.downloads,
-                    follows: source.follows,
-                    icon_url: source.icon_url,
-                    date_created: source.date_created.to_rfc3339(),
-                    date_modified: source.date_modified.to_rfc3339(),
-                    license: source.license,
-                    gallery: source.gallery,
-                    featured_gallery: source.featured_gallery,
-                    color: source.color,
-                    loaders: source.loaders,
-                    project_loader_fields: source.project_loader_fields,
-                    loader_fields: source.loader_fields,
-                    components: source.components,
-                })
+                serde_json::from_value::<UploadSearchProject>(source)
+                    .wrap_internal_err(
+                        "failed to deserialize Elasticsearch hit",
+                    )
+                    .map(Into::into)
             })
             .collect::<Result<Vec<_>, ApiError>>()?;
 
@@ -740,8 +744,8 @@ impl SearchBackend for Elasticsearch {
 
         Ok(SearchResults {
             hits,
-            page,
-            hits_per_page,
+            page: parsed.page,
+            hits_per_page: parsed.hits_per_page,
             total_hits,
         })
     }

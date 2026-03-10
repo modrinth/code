@@ -216,6 +216,35 @@ pub struct ResultSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
+impl From<UploadSearchProject> for ResultSearchProject {
+    fn from(source: UploadSearchProject) -> Self {
+        Self {
+            version_id: source.version_id,
+            project_id: source.project_id,
+            project_types: source.project_types,
+            slug: source.slug,
+            author: source.author,
+            name: source.name,
+            summary: source.summary,
+            categories: source.categories,
+            display_categories: source.display_categories,
+            downloads: source.downloads,
+            follows: source.follows,
+            icon_url: source.icon_url,
+            date_created: source.date_created.to_rfc3339(),
+            date_modified: source.date_modified.to_rfc3339(),
+            license: source.license,
+            gallery: source.gallery,
+            featured_gallery: source.featured_gallery,
+            color: source.color,
+            loaders: source.loaders,
+            project_loader_fields: source.project_loader_fields,
+            components: source.components,
+            loader_fields: source.loader_fields,
+        }
+    }
+}
+
 pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
     match ENV.SEARCH_BACKEND {
         SearchBackendKind::Meilisearch => {

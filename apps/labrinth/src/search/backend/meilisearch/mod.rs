@@ -4,12 +4,16 @@ use crate::env::ENV;
 use crate::models::ids::VersionId;
 use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
+use crate::search::backend::{
+    SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
+    parse_search_request,
+};
 use crate::search::{
     ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
 };
 use crate::util::error::Context;
 use async_trait::async_trait;
-use eyre::{Result, eyre};
+use eyre::Result;
 use futures::TryStreamExt;
 use futures::stream::FuturesOrdered;
 use itertools::Itertools;
@@ -17,7 +21,6 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::tasks::{Task, TasksCancelQuery};
 use serde::Serialize;
 use serde_json::Value;
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::time::Duration;
@@ -145,59 +148,52 @@ impl Meilisearch {
         index: &str,
         new_filters: Option<&str>,
     ) -> Result<(String, &'static [&'static str]), ApiError> {
-        let projects_name = self.config.get_index_name("projects", false);
-        let projects_filtered_name =
-            self.config.get_index_name("projects_filtered", false);
+        let sort = parse_search_index(index, new_filters)?;
+        let index_name = match sort.index_name {
+            SearchIndexName::Projects => {
+                self.config.get_index_name("projects", false)
+            }
+            SearchIndexName::ProjectsFiltered => {
+                self.config.get_index_name("projects_filtered", false)
+            }
+        };
 
-        // TODO: this is a dumb hack, the frontend should pass the project type it's filtering directly
-        let is_server = new_filters.is_some_and(|f| {
-            f.contains("project_types = minecraft_java_server")
-        });
-
-        Ok(match index {
-            "relevance" => (
-                projects_name,
-                if is_server {
-                    &[
-                        "minecraft_java_server.verified_plays_2w:desc",
-                        "minecraft_java_server.ping.data.players_online:desc",
-                        "version_published_timestamp:desc",
-                    ]
-                } else {
-                    &["downloads:desc", "version_published_timestamp:desc"]
-                },
-            ),
-            "downloads" => (
-                projects_filtered_name,
+        Ok(match sort.index {
+            SearchIndex::Relevance => (
+                index_name,
                 &["downloads:desc", "version_published_timestamp:desc"],
             ),
-            "follows" => (
-                projects_name,
+            SearchIndex::Downloads => (
+                index_name,
+                &["downloads:desc", "version_published_timestamp:desc"],
+            ),
+            SearchIndex::Follows => (
+                index_name,
                 &["follows:desc", "version_published_timestamp:desc"],
             ),
-            "updated" | "date_modified" => (
-                projects_name,
+            SearchIndex::Updated => (
+                index_name,
                 &["date_modified:desc", "version_published_timestamp:desc"],
             ),
-            "newest" | "date_created" => (
-                projects_name,
+            SearchIndex::Newest => (
+                index_name,
                 &["date_created:desc", "version_published_timestamp:desc"],
             ),
-            "minecraft_java_server.verified_plays_2w" => (
-                projects_name,
+            SearchIndex::MinecraftJavaServerVerifiedPlays2w => (
+                index_name,
                 &[
                     "minecraft_java_server.verified_plays_2w:desc",
+                    "minecraft_java_server.ping.data.players_online:desc",
                     "version_published_timestamp:desc",
                 ],
             ),
-            "minecraft_java_server.ping.data.players_online" => (
-                projects_name,
+            SearchIndex::MinecraftJavaServerPlayersOnline => (
+                index_name,
                 &[
                     "minecraft_java_server.ping.data.players_online:desc",
                     "version_published_timestamp:desc",
                 ],
             ),
-            i => return Err(ApiError::Request(eyre!("invalid index '{i}'"))),
         })
     }
 }
@@ -208,23 +204,10 @@ impl SearchBackend for Meilisearch {
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
-        let offset: usize = info
-            .offset
-            .as_deref()
-            .unwrap_or("0")
-            .parse()
-            .wrap_request_err("invalid offset")?;
-        let index = info.index.as_deref().unwrap_or("relevance");
-        let limit = info
-            .limit
-            .as_deref()
-            .unwrap_or("10")
-            .parse::<usize>()
-            .wrap_request_err("invalid limit")?
-            .min(100);
+        let parsed = parse_search_request(info)?;
 
         let (index_name, sort_name) =
-            self.get_sort_index(index, info.new_filters.as_deref())?;
+            self.get_sort_index(parsed.index, info.new_filters.as_deref())?;
         let client = self
             .config
             .make_loadbalanced_read_client()
@@ -236,16 +219,12 @@ impl SearchBackend for Meilisearch {
 
         let mut filter_string = String::new();
 
-        let hits_per_page = if limit == 0 { 1 } else { limit };
-
-        let page = offset / hits_per_page + 1;
-
         let results = {
             let mut query = meilisearch_index.search();
             query
-                .with_page(page)
-                .with_hits_per_page(hits_per_page)
-                .with_query(info.query.as_deref().unwrap_or_default())
+                .with_page(parsed.page)
+                .with_hits_per_page(parsed.hits_per_page)
+                .with_query(parsed.query)
                 .with_sort(sort_name);
 
             if let Some(new_filters) = info.new_filters.as_deref() {
@@ -260,13 +239,8 @@ impl SearchBackend for Meilisearch {
                     None
                 };
 
-                let filters: Cow<_> =
-                    match (info.filters.as_deref(), info.version.as_deref()) {
-                        (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
-                        (Some(f), None) => f.into(),
-                        (None, Some(v)) => v.into(),
-                        (None, None) => "".into(),
-                    };
+                let filters =
+                    combined_search_filters(info).unwrap_or_else(|| "".into());
 
                 if let Some(facets) = facets {
                     let facets: Vec<Vec<Vec<String>>> =
