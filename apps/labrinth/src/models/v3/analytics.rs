@@ -86,4 +86,5 @@ pub struct MinecraftServerPlay {
     pub project_id: u64,
     #[serde(with = "clickhouse::serde::uuid")]
     pub minecraft_uuid: Uuid,
+    pub ip: Ipv6Addr,
 }

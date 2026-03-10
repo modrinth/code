@@ -1,6 +1,36 @@
 {
+  "affiliate.create.button": {
+    "defaultMessage": "إنشاء رابط تسويق بالعمولة"
+  },
+  "affiliate.create.header": {
+    "defaultMessage": "إنشاء رمز تسويق بالعمولة جديد"
+  },
+  "affiliate.create.title.description": {
+    "defaultMessage": "أعطِ رابط الإحالة الخاص بك اسمًا حتى تعرف من أين يأتي الناس!"
+  },
+  "affiliate.create.title.label": {
+    "defaultMessage": "عنوان رابط الإحالة"
+  },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "مثل اليوتيوب"
+  },
+  "affiliate.create.user.description": {
+    "defaultMessage": "اسم المستخدم الذي سيتم من خلاله إنشاء رمز الإحالة الخاص بـ"
+  },
   "affiliate.create.user.placeholder": {
     "defaultMessage": "ادخل اسم المستخدم..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "صنعت من قبل {user}"
+  },
+  "affiliate.creating.button": {
+    "defaultMessage": "إنشاء رابط تسويق بالعمولة..."
+  },
+  "affiliate.revoke": {
+    "defaultMessage": "إلغاء رابط الإحالة"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "عرض التحليلات"
   },
   "badge.beta": {
     "defaultMessage": "تجريبي"
@@ -11,6 +41,12 @@
   "badge.new": {
     "defaultMessage": "جديد"
   },
+  "button.accept": {
+    "defaultMessage": "اقبل"
+  },
+  "button.affiliate-links": {
+    "defaultMessage": "روابط تابعة"
+  },
   "button.analytics": {
     "defaultMessage": "تحليل"
   },
@@ -19,6 +55,12 @@
   },
   "button.cancel": {
     "defaultMessage": "إلغاء"
+  },
+  "button.clear": {
+    "defaultMessage": "امسح"
+  },
+  "button.close": {
+    "defaultMessage": "اقفل"
   },
   "button.continue": {
     "defaultMessage": "استمر"
@@ -32,6 +74,9 @@
   "button.create-a-project": {
     "defaultMessage": "إنشاء مشروع"
   },
+  "button.decline": {
+    "defaultMessage": "رفض"
+  },
   "button.download": {
     "defaultMessage": "تنزيل"
   },
@@ -43,6 +88,9 @@
   },
   "button.follow": {
     "defaultMessage": "متابعة"
+  },
+  "button.max": {
+    "defaultMessage": "حد اقصى"
   },
   "button.more-options": {
     "defaultMessage": "مزيد من الخيارات"
@@ -71,6 +119,9 @@
   "button.reset": {
     "defaultMessage": "إعادة ضبط"
   },
+  "button.retry": {
+    "defaultMessage": "الإعادة"
+  },
   "button.save": {
     "defaultMessage": "حفظ"
   },
@@ -95,6 +146,9 @@
   "button.unfollow": {
     "defaultMessage": "إلغاء المتابعة"
   },
+  "button.update": {
+    "defaultMessage": "تحديث"
+  },
   "button.upload-image": {
     "defaultMessage": "رفع صورة"
   },
@@ -107,8 +161,119 @@
   "changelog.product.app": {
     "defaultMessage": "تطبيق"
   },
+  "changelog.product.hosting": {
+    "defaultMessage": "المضيف"
+  },
   "changelog.product.web": {
     "defaultMessage": "موقع إلكتروني"
+  },
+  "collections.label.private": {
+    "defaultMessage": "خاص"
+  },
+  "form.label.address-line": {
+    "defaultMessage": "خط عنوان"
+  },
+  "form.label.address-line-2": {
+    "defaultMessage": "خط عنوان 2 (تختياري)"
+  },
+  "form.label.amount": {
+    "defaultMessage": "مبلغ"
+  },
+  "form.label.bank-name": {
+    "defaultMessage": "اسم البنك"
+  },
+  "form.label.business-name": {
+    "defaultMessage": "اسم العمل"
+  },
+  "form.label.city": {
+    "defaultMessage": "مدينة"
+  },
+  "form.label.country": {
+    "defaultMessage": "بلد"
+  },
+  "form.label.date-of-birth": {
+    "defaultMessage": "تاريخ ازدياد"
+  },
+  "form.label.email": {
+    "defaultMessage": "ايميل"
+  },
+  "form.label.first-name": {
+    "defaultMessage": "اسم شخصي"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "اسم عائلي"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "كود ZIP"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "ولاية/مقاطعة"
+  },
+  "form.placeholder.address": {
+    "defaultMessage": "ضع عنوان"
+  },
+  "form.placeholder.address-2": {
+    "defaultMessage": "شقة، جناح، إلخ."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "ضع مبلغ"
+  },
+  "form.placeholder.bank-name": {
+    "defaultMessage": "ضع اسم البنك"
+  },
+  "form.placeholder.bank-name-dropdown": {
+    "defaultMessage": "اختر اسم البنك"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "ضع اسم العمل"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "ضع مدينة"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "اختر بلد"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "ضع ايميلك"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "ضع اسمك شخصي"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "ضع اسمك عائلي"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "أدخل الرمز البريدي"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "ضع المقاطعة او ولاية "
+  },
+  "header.category.category": {
+    "defaultMessage": "محتوى"
+  },
+  "header.category.feature": {
+    "defaultMessage": "مستقبل"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "زيادة FPS"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "جود"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "تصل سرعة المعالجة إلى {cpus} وحدة معالجة مركزية"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "تتيح خاصية زيادة سرعة المعالج لخادمك استخدام خيوط معالجة إضافية مؤقتًا للمساعدة في تخفيف ارتفاعات معدل المعاملات في الثانية. انقر هنا لمزيد من المعلومات."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} جيجابايت من ذاكرة الوصول العشوائي"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB مساحة تخزين"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} وحدات المعالجة المركزية المشتركة"
   },
   "icon-select.edit": {
     "defaultMessage": "تعديل الأيقونة"
@@ -149,11 +314,68 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "وضع لعبة غير معروف"
   },
+  "instances.modpack-card.unlink": {
+    "defaultMessage": "إلغاء الربط من حزمة المودات"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "حاضِر"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "غير متوافق"
+  },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "جار تنزيل الإصدار {version}"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "تحديث الإصدار"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "إخفاء غير المتوافق"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "لم يتم توفير سجل التغييرات لهذا الإصدار."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "لم يتم العثور على أي إصدارات"
+  },
+  "instances.updater-modal.search-placeholder": {
+    "defaultMessage": "البحث عن إصدار..."
+  },
+  "instances.updater-modal.select-version": {
+    "defaultMessage": "اختر إصدارًا لعرض سجل التغييرات الخاص به"
+  },
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "عرض غير المتوافق"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "حدث إلى v{version}"
+  },
+  "instances.updater-modal.warning.app": {
+    "defaultMessage": "لا يمكننا ضمان سلامة التحديثات للـinstance. راجع سجل التغييرات لجميع الإصدارات الوسيطة، وفكّر في إنشاء نسخة احتياطية. "
+  },
+  "instances.updater-modal.warning.web": {
+    "defaultMessage": "لا يمكننا ضمان سلامة التحديثات لعوالمك. راجع سجل التغييرات لجميع الإصدارات الوسيطة، وفكّر في إنشاء نسخة احتياطية. "
+  },
+  "label.actions": {
+    "defaultMessage": "الأفعال"
+  },
+  "label.available": {
+    "defaultMessage": " {amount} موجود."
+  },
+  "label.changelog": {
+    "defaultMessage": "أخر تغيرات"
+  },
   "label.changes-saved": {
     "defaultMessage": "تم حفظ التغييرات"
   },
   "label.collections": {
     "defaultMessage": "مجموعات"
+  },
+  "label.confirm-password": {
+    "defaultMessage": "تأكيد كلمة مرور"
+  },
+  "label.content": {
+    "defaultMessage": "محتوى"
   },
   "label.created-ago": {
     "defaultMessage": "تم الإنشاء منذ {ago}"
@@ -167,8 +389,20 @@
   "label.description": {
     "defaultMessage": "الوصف"
   },
+  "label.details": {
+    "defaultMessage": "تفاصيل"
+  },
+  "label.email": {
+    "defaultMessage": "عنوان"
+  },
+  "label.email-username": {
+    "defaultMessage": "عنوان أو اسم مستخدم"
+  },
   "label.error": {
     "defaultMessage": "خطأ"
+  },
+  "label.filter-by": {
+    "defaultMessage": "فرز بـ"
   },
   "label.followed-projects": {
     "defaultMessage": "المشاريع التي تتابعها"
@@ -178,6 +412,12 @@
   },
   "label.moderation": {
     "defaultMessage": "الإشراف"
+  },
+  "label.no": {
+    "defaultMessage": "لا"
+  },
+  "label.no-items": {
+    "defaultMessage": "لا أغراض"
   },
   "label.notifications": {
     "defaultMessage": "الإشعارات"
@@ -191,17 +431,26 @@
   "label.played": {
     "defaultMessage": "تم اللعب لمدة {time}"
   },
+  "label.project": {
+    "defaultMessage": "مشروع"
+  },
   "label.public": {
     "defaultMessage": "عام"
   },
   "label.rejected": {
     "defaultMessage": "مرفوض"
   },
+  "label.rewards-program-terms-agreement": {
+    "defaultMessage": "أوافق على <terms-link> شروط برنامج المكافآت</terms-link>"
+  },
   "label.saved": {
     "defaultMessage": "محفوظ"
   },
   "label.scopes": {
     "defaultMessage": "نطاقات"
+  },
+  "label.search": {
+    "defaultMessage": "ابحث"
   },
   "label.server": {
     "defaultMessage": "خادم"
@@ -215,17 +464,35 @@
   "label.singleplayer": {
     "defaultMessage": "اللعب الفردي"
   },
+  "label.sort-by": {
+    "defaultMessage": "فرز حسب"
+  },
+  "label.success": {
+    "defaultMessage": "نجاح"
+  },
   "label.title": {
     "defaultMessage": "العنوان"
   },
   "label.unlisted": {
     "defaultMessage": "غير مدرج"
   },
+  "label.update-available": {
+    "defaultMessage": "تحديث متوفر"
+  },
+  "label.username": {
+    "defaultMessage": "اسم مستخدم"
+  },
+  "label.version": {
+    "defaultMessage": "الإصدار"
+  },
   "label.visibility": {
     "defaultMessage": "الرؤية"
   },
   "label.visit-your-profile": {
     "defaultMessage": "زيارة ملفك الشخصي"
+  },
+  "label.yes": {
+    "defaultMessage": "نعم"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "إضافة طريقة دفع"
@@ -281,6 +548,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "مُعاد"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "يمر"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "مجدول"
   },
@@ -289,6 +559,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "غير مدرج"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "يفشل"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "محجوز"
@@ -313,6 +586,69 @@
   },
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "غير مدعوم"
+  },
+  "payment-method.amazon_pay": {
+    "defaultMessage": " Amazon Pay"
+  },
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
+  },
+  "payment-method.card_display": {
+    "defaultMessage": "{card_brand} ينتهي بـ {last_four}"
+  },
+  "payment-method.cashapp": {
+    "defaultMessage": "Cash App"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "صدقة"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "الجمعيات الخيرية"
+  },
+  "payment-method.diners": {
+    "defaultMessage": "Diners Club"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "يكتشف"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "بطاقة هدايا"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "بطاقات الهدايا"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal International"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPayUnionPay"
+  },
+  "payment-method.unknown": {
+    "defaultMessage": "طريقة دفع غير معروفة"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Virtual Visa"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Virtual Visas"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
   },
   "project-type.all": {
     "defaultMessage": "الكل"

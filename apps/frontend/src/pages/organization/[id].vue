@@ -19,7 +19,7 @@
 								</nuxt-link>
 							</h2>
 							<span>
-								{{ formatNumber(acceptedMembers?.length || 0) }}
+								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
 								member<template v-if="acceptedMembers?.length !== 1">s</template>
 							</span>
 						</div>
@@ -89,7 +89,7 @@
 							projects
 						</div>
 						<div
-							v-tooltip="sumDownloads.toLocaleString()"
+							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
@@ -184,7 +184,7 @@
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" />
+					<NavTabs :links="navLinks" replace />
 				</div>
 				<ProjectCardList v-if="projects && projects.length > 0">
 					<template
@@ -293,10 +293,11 @@ import {
 	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
+	useCompactNumber,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
-import { formatNumber } from '@modrinth/utils'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -318,7 +319,8 @@ type ProjectV3 = Labrinth.Projects.v3.Project & {
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatCompactNumber = useCompactNumber(true)
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
 const user = await useUser()

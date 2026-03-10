@@ -14,7 +14,7 @@
 
 				<div v-if="diffs.length" class="flex flex-col gap-2">
 					<span v-if="publishedDate" class="text-contrast font-semibold">{{
-						formatMessage(messages.publishedDate, { date: publishedDate })
+						formatDate(publishedDate)
 					}}</span>
 					<div class="flex gap-2">
 						<div v-if="removedCount" class="flex gap-1 items-center">
@@ -136,6 +136,7 @@ import {
 	commonMessages,
 	defineMessages,
 	NewModal,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -186,6 +187,7 @@ type ProjectInfo = {
 }
 
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 const { startInstallingServer, stopInstallingServer } = injectServerInstall()
 type UpdateCompleteCallback = () => void | Promise<void>
 
@@ -408,10 +410,6 @@ const messages = defineMessages({
 		id: 'app.modal.update-to-play.update-required-description',
 		defaultMessage:
 			'An update is required to play {name}. Please update to the latest version to launch the game.',
-	},
-	publishedDate: {
-		id: 'app.modal.update-to-play.published-date',
-		defaultMessage: '{date, date, long}',
 	},
 	removedCount: {
 		id: 'app.modal.update-to-play.removed-count',

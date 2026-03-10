@@ -41,6 +41,9 @@
   "badge.new": {
     "defaultMessage": "Mới"
   },
+  "button.accept": {
+    "defaultMessage": "Chấp nhận"
+  },
   "button.affiliate-links": {
     "defaultMessage": "Liên kết affiliate"
   },

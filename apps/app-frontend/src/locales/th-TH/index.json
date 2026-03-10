@@ -59,39 +59,6 @@
   "app.settings.tabs.resource-management": {
     "message": "การจัดการทรัพยากร"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} พร้อมติดตั้งแล้ว! รีโหลดเพื่ออัปเดตทันที หรือจะอัปเดตอัตโนมัติเมื่อคุณปิดแอป"
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} ดาวน์โหลดเสร็จแล้ว! รีโหลดเพื่ออัปเดตทันที หรือจะอัปเดตอัตโนมัติเมื่อคุณปิดแอป"
-  },
-  "app.update-toast.body.linux": {
-    "message": "แอป Modrinth v{version} มีให้อัปเดตแล้ว. ใช้ Package Manager ของคุณเพื่ออัปเดตให้มีฟีเจอร์ใหม่และแก้ไข!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} พร้อมให้ดาวน์โหลดแล้ว! เนื่องจากคุณกำลังใช้งานเครือข่ายที่มีการคิดค่าใช้จ่ายตามปริมาณข้อมูล ระบบจึงไม่ได้ดาวน์โหลดอัตโนมัติ"
-  },
-  "app.update-toast.changelog": {
-    "message": "บันทึกการเปลี่ยนแปลง"
-  },
-  "app.update-toast.download": {
-    "message": "ดาวน์โหลด ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "ดาวน์โหลด"
-  },
-  "app.update-toast.downloading": {
-    "message": "กำลังดาวน์โหลด...."
-  },
-  "app.update-toast.reload": {
-    "message": "รีโหลด"
-  },
-  "app.update-toast.title": {
-    "message": "อัพเดตพร้อมแล้ว"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "ดาวน์โหลดเรียบร้อยแล้ว"
-  },
   "app.update.complete-toast.text": {
     "message": "คลิกที่นี่เพื่อดูบันทึกการเปลี่ยนแปลง"
   },

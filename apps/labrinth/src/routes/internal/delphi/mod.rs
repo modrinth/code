@@ -1,11 +1,10 @@
-use std::{collections::HashMap, fmt::Write, sync::LazyLock, time::Instant};
+use std::{collections::HashMap, fmt::Write, time::Instant};
 
-use crate::database::PgPool;
 use crate::env::ENV;
+use crate::{database::PgPool, util::http::HttpClient};
 use actix_web::{HttpRequest, HttpResponse, get, post, web};
 use chrono::{DateTime, Utc};
 use eyre::eyre;
-use reqwest::header::{HeaderMap, HeaderValue, USER_AGENT};
 use serde::Deserialize;
 use tokio::sync::Mutex;
 use tracing::info;
@@ -45,21 +44,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(issue_type_schema),
     );
 }
-
-static DELPHI_CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
-    reqwest::Client::builder()
-        .default_headers({
-            HeaderMap::from_iter([(
-                USER_AGENT,
-                HeaderValue::from_static(concat!(
-                    "Labrinth/",
-                    env!("COMPILATION_DATE")
-                )),
-            )])
-        })
-        .build()
-        .unwrap()
-});
 
 /// Type of [`DelphiReportIssueDetails::key`].
 ///
@@ -367,6 +351,7 @@ async fn ingest_report_deserialized(
 pub async fn run(
     exec: impl crate::database::Executor<'_, Database = sqlx::Postgres>,
     run_parameters: DelphiRunParameters,
+    http: &reqwest::Client,
 ) -> Result<HttpResponse, ApiError> {
     let file_data = sqlx::query!(
         r#"
@@ -389,8 +374,7 @@ pub async fn run(
         run_parameters.file_id.0
     );
 
-    DELPHI_CLIENT
-        .post(&ENV.DELPHI_URL)
+    http.post(&ENV.DELPHI_URL)
         .json(&serde_json::json!({
             "url": file_data.url,
             "project_id": ProjectId(file_data.project_id.0 as u64),
@@ -489,6 +473,7 @@ async fn _run(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     run_parameters: web::Query<DelphiRunParameters>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -499,7 +484,7 @@ async fn _run(
     )
     .await?;
 
-    run(&**pool, run_parameters.into_inner()).await
+    run(&**pool, run_parameters.into_inner(), &http).await
 }
 
 #[get("version")]
@@ -531,6 +516,7 @@ async fn issue_type_schema(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         &req,
@@ -556,8 +542,7 @@ async fn issue_type_schema(
         cache_entry => Ok(HttpResponse::Ok().json(
             &cache_entry
                 .insert((
-                    DELPHI_CLIENT
-                        .get(format!("{}/schema", ENV.DELPHI_URL))
+                    http.get(format!("{}/schema", ENV.DELPHI_URL))
                         .send()
                         .await
                         .and_then(|res| res.error_for_status())
