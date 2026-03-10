@@ -5,6 +5,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
 use daedalus::modded::PartialVersionInfo;
+use dashmap::DashMap;
 use futures::io::Cursor;
 use indexmap::IndexMap;
 use itertools::Itertools;
@@ -195,8 +196,8 @@ async fn fetch(
     forge_versions: Vec<ForgeVersion>,
     semaphore: Arc<Semaphore>,
 ) -> Result<FetchResult, Error> {
-    let mut upload_files = HashMap::new();
-    let mut mirror_artifacts = HashMap::<String, MirrorArtifact>::new();
+    let upload_files = DashMap::new();
+    let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
     let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
@@ -235,8 +236,8 @@ async fn fetch(
             loader: &ForgeVersion,
             maven_url: &str,
             mod_loader: &str,
-            upload_files: &mut HashMap<String, UploadFile>,
-            mirror_artifacts: &mut HashMap<String, MirrorArtifact>,
+            upload_files: &DashMap<String, UploadFile>,
+            mirror_artifacts: &DashMap<String, MirrorArtifact>,
         ) -> Result<PartialVersionInfo, Error> {
             tracing::trace!(
                 "Reading forge installer for {}",
@@ -471,8 +472,8 @@ async fn fetch(
                     mut zip: ZipFileReader,
                     mut lib: daedalus::minecraft::Library,
                     maven_url: &str,
-                    upload_files: &mut HashMap<String, UploadFile>,
-                    mirror_artifacts: &mut HashMap<String, MirrorArtifact>,
+                    upload_files: &DashMap<String, UploadFile>,
+                    mirror_artifacts: &DashMap<String, MirrorArtifact>,
                 ) -> Result<daedalus::minecraft::Library, Error>
                 {
                     let artifact_path = get_path_from_artifact(&lib.name)?;
@@ -537,10 +538,8 @@ async fn fetch(
                     Ok(lib)
                 }
 
-                let mut libraries =
-                    Vec::with_capacity(version_info.libraries.len());
-                for lib in version_info.libraries {
-                    libraries.push(
+                version_info.libraries = futures::future::try_join_all(
+                    version_info.libraries.into_iter().map(|lib| {
                         mirror_forge_library(
                             zip.clone(),
                             lib,
@@ -548,10 +547,9 @@ async fn fetch(
                             upload_files,
                             mirror_artifacts,
                         )
-                        .await?,
-                    );
-                }
-                version_info.libraries = libraries;
+                    }),
+                )
+                .await?;
 
                 // In Minecraft Forge modern installers, processors are run during the install process. Some processors
                 // are extracted from the installer JAR. This function finds these files, extracts them, and uploads them
@@ -573,7 +571,7 @@ async fn fetch(
                         zip: &mut ZipFileReader,
                         key: &str,
                         value: &str,
-                        upload_files: &mut HashMap<String, UploadFile>,
+                        upload_files: &DashMap<String, UploadFile>,
                         libs: &mut Vec<daedalus::minecraft::Library>,
                         mod_loader: &str,
                         version: &ForgeVersion,
@@ -687,23 +685,24 @@ async fn fetch(
             }
         }
 
-        let mut forge_version_infos =
-            Vec::with_capacity(forge_installers.len());
-        for (index, raw) in forge_installers.into_iter().enumerate() {
-            let loader = fetch_versions[index];
+        let forge_version_infos = futures::future::try_join_all(
+            forge_installers
+                .into_iter()
+                .enumerate()
+                .map(|(index, raw)| {
+                    let loader = fetch_versions[index];
 
-            forge_version_infos.push(
-                read_forge_installer(
-                    raw,
-                    loader,
-                    maven_url,
-                    mod_loader,
-                    &mut upload_files,
-                    &mut mirror_artifacts,
-                )
-                .await?,
-            );
-        }
+                    read_forge_installer(
+                        raw,
+                        loader,
+                        maven_url,
+                        mod_loader,
+                        &upload_files,
+                        &mirror_artifacts,
+                    )
+                }),
+        )
+        .await?;
 
         let serialized_version_manifests = forge_version_infos
             .iter()

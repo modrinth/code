@@ -3,8 +3,8 @@ use crate::{
     Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
 };
 use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
+use dashmap::DashMap;
 use serde::Deserialize;
-use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
@@ -51,8 +51,8 @@ async fn fetch(
     skip_versions: &[&str],
     semaphore: Arc<Semaphore>,
 ) -> Result<FetchResult, Error> {
-    let mut upload_files = HashMap::new();
-    let mut mirror_artifacts = HashMap::<String, MirrorArtifact>::new();
+    let upload_files = DashMap::new();
+    let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
     let modrinth_manifest = fetch_json::<Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
@@ -118,7 +118,7 @@ async fn fetch(
                 None,
                 vec![maven_url.to_string()],
                 false,
-                &mut mirror_artifacts,
+                &mirror_artifacts,
             )?;
         }
     }
@@ -169,7 +169,7 @@ async fn fetch(
                                     .unwrap_or_else(|| maven_url.to_string()),
                             ],
                             false,
-                            &mut mirror_artifacts,
+                            &mirror_artifacts,
                         )?;
                     } else {
                         lib.name = new_name;

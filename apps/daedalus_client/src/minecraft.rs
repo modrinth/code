@@ -7,14 +7,14 @@ use daedalus::minecraft::{
     Library, PartialLibrary, VERSION_MANIFEST_URL, VersionInfo,
     VersionManifest, merge_partial_library,
 };
+use dashmap::DashMap;
 use serde::Deserialize;
-use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
-    let mut upload_files = HashMap::new();
+    let upload_files = DashMap::new();
     let modrinth_manifest = fetch_json::<VersionManifest>(
         &format_url(&format!(
             "minecraft/v{}/manifest.json",
@@ -168,7 +168,7 @@ pub async fn fetch(semaphore: Arc<Semaphore>) -> Result<FetchResult, Error> {
 
     Ok(FetchResult {
         upload_files,
-        mirror_artifacts: HashMap::new(),
+        mirror_artifacts: DashMap::new(),
     })
 }
 

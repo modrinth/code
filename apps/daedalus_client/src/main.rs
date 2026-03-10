@@ -3,7 +3,7 @@ use crate::util::{
     upload_url_to_bucket_mirrors,
 };
 use daedalus::get_path_from_artifact;
-use std::collections::{HashMap, HashSet};
+use dashmap::{DashMap, DashSet};
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 use tracing_error::ErrorLayer;
@@ -75,38 +75,35 @@ async fn main() -> Result<()> {
         mirror_artifacts,
     } = fetch_result;
 
-    futures::future::try_join_all(upload_files.iter().map(
-        |(path, upload_file)| {
-            upload_file_to_bucket(
-                path.clone(),
-                upload_file.file.clone(),
-                upload_file.content_type.clone(),
-                &semaphore,
-            )
-        },
-    ))
+    futures::future::try_join_all(upload_files.iter().map(|entry| {
+        upload_file_to_bucket(
+            entry.key().clone(),
+            entry.value().file.clone(),
+            entry.value().content_type.clone(),
+            &semaphore,
+        )
+    }))
     .await?;
 
-    futures::future::try_join_all(mirror_artifacts.iter().map(
-        |(path, mirror)| {
-            upload_url_to_bucket_mirrors(
-                format!("maven/{path}"),
-                mirror
-                    .mirrors
-                    .iter()
-                    .map(|mirror| {
-                        if mirror.entire_url {
-                            mirror.path.clone()
-                        } else {
-                            format!("{}{path}", mirror.path)
-                        }
-                    })
-                    .collect(),
-                mirror.sha1.clone(),
-                &semaphore,
-            )
-        },
-    ))
+    futures::future::try_join_all(mirror_artifacts.iter().map(|entry| {
+        upload_url_to_bucket_mirrors(
+            format!("maven/{}", entry.key()),
+            entry
+                .value()
+                .mirrors
+                .iter()
+                .map(|mirror| {
+                    if mirror.entire_url {
+                        mirror.path.clone()
+                    } else {
+                        format!("{}{}", mirror.path, entry.key())
+                    }
+                })
+                .collect(),
+            entry.value().sha1.clone(),
+            &semaphore,
+        )
+    }))
     .await?;
 
     if dotenvy::var("CLOUDFLARE_INTEGRATION")
@@ -161,13 +158,13 @@ pub struct UploadFile {
 
 #[derive(Default)]
 pub struct FetchResult {
-    pub upload_files: HashMap<String, UploadFile>,
-    pub mirror_artifacts: HashMap<String, MirrorArtifact>,
+    pub upload_files: DashMap<String, UploadFile>,
+    pub mirror_artifacts: DashMap<String, MirrorArtifact>,
 }
 
 pub struct MirrorArtifact {
     pub sha1: Option<String>,
-    pub mirrors: HashSet<Mirror>,
+    pub mirrors: DashSet<Mirror>,
 }
 
 #[derive(Clone, Eq, PartialEq, Hash)]
@@ -177,22 +174,26 @@ pub struct Mirror {
 }
 
 fn merge_fetch_result(fetch_result: &mut FetchResult, fetched: FetchResult) {
-    fetch_result.upload_files.extend(fetched.upload_files);
+    for (path, upload_file) in fetched.upload_files {
+        fetch_result.upload_files.insert(path, upload_file);
+    }
 
     for (artifact_path, fetched_mirror_artifact) in fetched.mirror_artifacts {
-        let val = fetch_result
+        let mut val = fetch_result
             .mirror_artifacts
             .entry(artifact_path)
             .or_insert(MirrorArtifact {
                 sha1: fetched_mirror_artifact.sha1.clone(),
-                mirrors: HashSet::new(),
+                mirrors: DashSet::new(),
             });
 
         if val.sha1.is_none() {
             val.sha1 = fetched_mirror_artifact.sha1;
         }
 
-        val.mirrors.extend(fetched_mirror_artifact.mirrors);
+        for mirror in fetched_mirror_artifact.mirrors {
+            val.mirrors.insert(mirror);
+        }
     }
 }
 
@@ -202,13 +203,13 @@ pub fn insert_mirrored_artifact(
     sha1: Option<String>,
     mirrors: Vec<String>,
     entire_url: bool,
-    mirror_artifacts: &mut HashMap<String, MirrorArtifact>,
+    mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<()> {
-    let val = mirror_artifacts
+    let mut val = mirror_artifacts
         .entry(get_path_from_artifact(artifact)?)
         .or_insert(MirrorArtifact {
             sha1: sha1.clone(),
-            mirrors: HashSet::new(),
+            mirrors: DashSet::new(),
         });
 
     if val.sha1.is_none() {
