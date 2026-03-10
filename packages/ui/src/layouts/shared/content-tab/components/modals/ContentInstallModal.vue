@@ -30,11 +30,11 @@
 				/>
 				<ButtonStyled type="outlined" circular>
 					<button
-						v-tooltip="`${hideIncompatible ? 'Show' : 'Hide'} incompatible`"
+						v-tooltip="`${hideUninstallable ? 'Show' : 'Hide'} unavailable`"
 						class="!border-surface-4 !border"
-						@click="hideIncompatible = !hideIncompatible"
+						@click="hideUninstallable = !hideUninstallable"
 					>
-						<EyeIcon v-if="hideIncompatible" />
+						<EyeIcon v-if="hideUninstallable" />
 						<EyeOffIcon v-else />
 					</button>
 				</ButtonStyled>
@@ -53,20 +53,23 @@
 				<div
 					v-for="inst in filteredInstances"
 					:key="inst.id"
-					class="flex h-10 items-center justify-between rounded-lg px-2"
+					class="flex items-center justify-between rounded-lg px-2 py-1.5"
 					:class="
 						!inst.compatible ? 'opacity-40' : inst.installed ? 'opacity-60' : 'hover:bg-surface-3'
 					"
 				>
-					<div
+					<button
 						v-tooltip="
 							!inst.compatible ? 'This instance is not compatible with this project' : undefined
 						"
-						class="flex items-center gap-2 overflow-hidden"
+						class="flex min-w-0 cursor-pointer items-center gap-2.5 overflow-hidden border-0 bg-transparent p-0 text-left"
+						@click="emit('navigate', inst)"
 					>
-						<Avatar :src="inst.iconUrl ?? undefined" size="20px" rounded="md" />
-						<span class="truncate font-semibold text-contrast">{{ inst.name }}</span>
-					</div>
+						<Avatar :src="inst.iconUrl ?? undefined" size="2rem" rounded="md" />
+						<span class="truncate font-semibold text-contrast hover:underline">{{
+							inst.name
+						}}</span>
+					</button>
 					<ButtonStyled v-if="inst.installed" :disabled="true">
 						<button>
 							<CheckIcon />
@@ -333,6 +336,7 @@ const emit = defineEmits<{
 			gameVersion: string
 		},
 	]
+	navigate: [instance: ContentInstallInstance]
 	cancel: []
 }>()
 
@@ -351,19 +355,19 @@ const tabLabels: Record<Tab, () => string> = {
 const formatTabLabel = (item: Tab) => tabLabels[item]()
 
 const searchFilter = ref('')
-const hideIncompatible = ref(true)
+const hideUninstallable = ref(true)
 
 const filteredInstances = computed(() => {
 	let list = props.instances
-	if (hideIncompatible.value) list = list.filter((i) => i.compatible)
+	if (hideUninstallable.value) list = list.filter((i) => i.compatible && !i.installed)
 	if (searchFilter.value) {
 		const query = searchFilter.value.toLowerCase()
 		list = list.filter((i) => i.name.toLowerCase().includes(query))
 	}
+	const score = (i: ContentInstallInstance) => (!i.compatible ? 2 : i.installed ? 1 : 0)
 	return list.slice().sort((a, b) => {
-		const aScore = a.installed ? 1 : 0
-		const bScore = b.installed ? 1 : 0
-		if (aScore !== bScore) return aScore - bScore
+		const diff = score(a) - score(b)
+		if (diff !== 0) return diff
 		return a.name.localeCompare(b.name)
 	})
 })
@@ -408,8 +412,8 @@ function removeIcon() {
 function resetState() {
 	tab.value = props.defaultTab ?? 'existing'
 	searchFilter.value = ''
-	hideIncompatible.value = true
-	instanceName.value = ''
+	hideUninstallable.value = true
+	instanceName.value = `New instance (${props.instances.length + 1})`
 	iconPath.value = null
 	iconPreviewUrl.value = null
 	selectedLoader.value = props.preferredLoader ?? props.compatibleLoaders[0] ?? null

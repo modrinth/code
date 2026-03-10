@@ -30,6 +30,18 @@ export interface ModpackSearchHit {
 	latestVersion?: string
 }
 
+export interface ModpackSearchResult {
+	hits: {
+		project_id: string
+		title: string
+		icon_url: string
+		latest_version?: string
+	}[]
+	total_hits: number
+	offset: number
+	limit: number
+}
+
 export const flowTypeHeadings: Record<FlowType, string> = {
 	world: 'Create world',
 	'server-onboarding': 'Set up server',
@@ -109,12 +121,16 @@ export interface CreationFlowContextValue {
 	onBack: (() => void) | null
 
 	// Methods
-	reset: () => void
+	reset: (instanceCount?: number) => void
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
 	browseModpacks: () => void
 	finish: () => void
 	buildProperties: () => Archon.Content.v1.PropertiesFields
+
+	// Platform-provided search
+	searchModpacks: (query: string, limit?: number) => Promise<ModpackSearchResult>
+	getProjectVersions: (projectId: string) => Promise<{ id: string }[]>
 }
 
 export const [injectCreationFlowContext, provideCreationFlowContext] =
@@ -122,6 +138,7 @@ export const [injectCreationFlowContext, provideCreationFlowContext] =
 
 // TODO: replace with actual world count from the world list once available
 let worldCounter = 0
+let instanceCounter = 0
 
 export interface CreationFlowOptions {
 	availableLoaders?: string[]
@@ -131,6 +148,8 @@ export interface CreationFlowOptions {
 	initialLoader?: string
 	initialGameVersion?: string
 	onBack?: () => void
+	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
+	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 }
 
 export function createCreationFlowContext(
@@ -208,11 +227,15 @@ export function createCreationFlowContext(
 		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
 
-	function reset() {
+	function reset(instanceCount?: number) {
 		setupType.value = null
 		isImportMode.value = false
 		worldCounter++
 		worldName.value = flowType === 'world' ? `World ${worldCounter}` : ''
+		if (instanceCount != null) {
+			instanceCounter = instanceCount
+		}
+		instanceCounter++
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
 		worldSeed.value = ''
@@ -222,7 +245,7 @@ export function createCreationFlowContext(
 		generatorSettingsCustom.value = ''
 
 		// Instance-specific
-		instanceName.value = ''
+		instanceName.value = flowType === 'instance' ? `New instance (${instanceCounter})` : ''
 		instanceIconUrl.value = null
 		instanceIcon.value = null
 		instanceIconPath.value = null
@@ -307,6 +330,9 @@ export function createCreationFlowContext(
 		return { known }
 	}
 
+	const searchModpacks = options.searchModpacks!
+	const getProjectVersions = options.getProjectVersions!
+
 	const resolvedStageConfigs = disableClose
 		? stageConfigs.map((stage) => ({ ...stage, disableClose: true }))
 		: stageConfigs
@@ -362,6 +388,8 @@ export function createCreationFlowContext(
 		browseModpacks,
 		finish,
 		buildProperties,
+		searchModpacks,
+		getProjectVersions,
 	}
 
 	return contextValue

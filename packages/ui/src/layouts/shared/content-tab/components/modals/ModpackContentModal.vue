@@ -471,7 +471,11 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 							hide-delete
 							hide-header
 							flat
-							@update:enabled="(id, val) => handleEnabledChange(id, val)"
+							v-on="
+								props.enableToggle
+									? { 'update:enabled': (id: string, val: boolean) => handleEnabledChange(id, val) }
+									: {}
+							"
 						/>
 					</div>
 				</div>

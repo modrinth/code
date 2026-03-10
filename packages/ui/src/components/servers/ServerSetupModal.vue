@@ -9,6 +9,8 @@
 		:initial-loader="initialLoader"
 		:initial-game-version="initialGameVersion"
 		:fade="props.initialSetup ? undefined : 'danger'"
+		:search-modpacks="searchModpacks"
+		:get-project-versions="getProjectVersions"
 		@create="onFlowComplete"
 		@hide="$emit('hide')"
 		@browse-modpacks="$emit('browse-modpacks')"
@@ -76,6 +78,19 @@ const serverContext = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 
 const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']
+
+async function searchModpacks(query: string, limit: number = 10) {
+	return client.labrinth.projects_v2.search({
+		query: query || undefined,
+		facets: [['project_type:modpack']],
+		limit,
+	})
+}
+
+async function getProjectVersions(projectId: string) {
+	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
+	return versions.map((v) => ({ id: v.id }))
+}
 
 function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 	if (loader === 'neoforge') return 'neo_forge'

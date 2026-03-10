@@ -145,8 +145,13 @@ provideModalBehavior({
 	onHide: () => show_ads_window(),
 })
 
-const { installationModal, handleCreate, handleBrowseModpacks } =
-	setupProviders(notificationManager)
+const {
+	installationModal,
+	handleCreate,
+	handleBrowseModpacks,
+	searchModpacks,
+	getProjectVersions,
+} = setupProviders(notificationManager)
 
 const news = ref([])
 const availableSurvey = ref(false)
@@ -417,6 +422,7 @@ const {
 	releaseGameVersions: contentInstallReleaseGameVersions,
 	handleInstallToInstance,
 	handleCreateAndInstall,
+	handleNavigate: handleContentInstallNavigate,
 	handleCancel: handleContentInstallCancel,
 	setContentInstallModal,
 	setInstallConfirmModal: setContentInstallConfirmModal,
@@ -939,6 +945,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			ref="installationModal"
 			type="instance"
 			show-snapshot-toggle
+			:search-modpacks="searchModpacks"
+			:get-project-versions="getProjectVersions"
 			@create="handleCreate"
 			@browse-modpacks="handleBrowseModpacks"
 		/>
@@ -1273,6 +1281,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		:release-game-versions="contentInstallReleaseGameVersions"
 		@install="handleInstallToInstance"
 		@create-and-install="handleCreateAndInstall"
+		@navigate="handleContentInstallNavigate"
 		@cancel="handleContentInstallCancel"
 	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />

@@ -16,6 +16,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get,
             profile_get_many,
             profile_get_projects,
+            profile_get_installed_project_ids,
             profile_get_content_items,
             profile_get_dependencies_as_content_items,
             profile_get_linked_modpack_info,
@@ -25,6 +26,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get_mod_full_path,
             profile_list,
             profile_check_installed,
+            profile_check_installed_batch,
             profile_install,
             profile_update_all,
             profile_update_project,
@@ -73,6 +75,14 @@ pub async fn profile_get_projects(
     cache_behaviour: Option<CacheBehaviour>,
 ) -> Result<DashMap<String, ProfileFile>> {
     let res = profile::get_projects(path, cache_behaviour).await?;
+    Ok(res)
+}
+
+#[tauri::command]
+pub async fn profile_get_installed_project_ids(
+    path: &str,
+) -> Result<Vec<String>> {
+    let res = profile::get_installed_project_ids(path).await?;
     Ok(res)
 }
 
@@ -184,6 +194,28 @@ pub async fn profile_check_installed(
     } else {
         Ok(false)
     }
+}
+
+#[tauri::command]
+pub async fn profile_check_installed_batch(
+    project_id: &str,
+) -> Result<HashMap<String, bool>> {
+    let profiles = profile::list().await?;
+    let mut result = HashMap::new();
+    for p in profiles {
+        let installed =
+            if let Ok(projects) = profile::get_projects(&p.path, None).await {
+                projects.into_iter().any(|(_, pf)| {
+                    pf.metadata
+                        .as_ref()
+                        .map_or(false, |m| m.project_id == project_id)
+                })
+            } else {
+                false
+            };
+        result.insert(p.path.clone(), installed);
+    }
+    Ok(result)
 }
 
 /// Installs/Repairs a profile

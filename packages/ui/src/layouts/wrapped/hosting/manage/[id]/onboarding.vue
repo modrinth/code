@@ -54,6 +54,8 @@
 			type="server-onboarding"
 			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
 			:show-snapshot-toggle="true"
+			:search-modpacks="searchModpacks"
+			:get-project-versions="getProjectVersions"
 			@hide="() => {}"
 			@browse-modpacks="onBrowseModpacks"
 			@create="onCreate"
@@ -75,6 +77,19 @@ import { injectModrinthServerContext } from '#ui/providers'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+
+async function searchModpacks(query: string, limit: number = 10) {
+	return client.labrinth.projects_v2.search({
+		query: query || undefined,
+		facets: [['project_type:modpack']],
+		limit,
+	})
+}
+
+async function getProjectVersions(projectId: string) {
+	const versions = await client.labrinth.versions_v3.getProjectVersions(projectId)
+	return versions.map((v) => ({ id: v.id }))
+}
 const { serverId, worldId, server } = injectModrinthServerContext()
 const route = useRoute()
 const router = useRouter()

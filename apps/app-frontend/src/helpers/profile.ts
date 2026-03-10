@@ -79,6 +79,11 @@ export async function get_projects(
 	return await invoke('plugin:profile|profile_get_projects', { path, cacheBehaviour })
 }
 
+// Get just the installed project IDs for a profile (lightweight, skips update checks)
+export async function get_installed_project_ids(path: string): Promise<string[]> {
+	return await invoke('plugin:profile|profile_get_installed_project_ids', { path })
+}
+
 // Get content items with rich metadata for a profile
 // Returns content items filtered to exclude modpack files (if linked),
 // sorted alphabetically by project name
@@ -156,6 +161,10 @@ export async function list(): Promise<GameInstance[]> {
 
 export async function check_installed(path: string, projectId: string): Promise<boolean> {
 	return await invoke('plugin:profile|profile_check_installed', { path, projectId })
+}
+
+export async function check_installed_batch(projectId: string): Promise<Record<string, boolean>> {
+	return await invoke('plugin:profile|profile_check_installed_batch', { projectId })
 }
 
 // Installs/Repairs a profile

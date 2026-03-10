@@ -12,6 +12,7 @@ import {
 	Avatar,
 	commonMessages,
 	defineMessage,
+	NewModal,
 	TabbedModal,
 	type TabbedModalTab,
 	useVIntl,
@@ -25,7 +26,6 @@ import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info } from '@/helpers/profile'
 
@@ -117,7 +117,11 @@ function show() {
 defineExpose({ show })
 </script>
 <template>
-	<ModalWrapper ref="modal">
+	<NewModal
+		ref="modal"
+		:max-width="'min(928px, calc(95vw - 10rem))'"
+		:width="'min(928px, calc(95vw - 10rem))'"
+	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
 				<Avatar
@@ -144,5 +148,5 @@ defineExpose({ show })
 				}))
 			"
 		/>
-	</ModalWrapper>
+	</NewModal>
 </template>

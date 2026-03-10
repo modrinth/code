@@ -90,8 +90,8 @@ importers:
         specifier: ^2.2.1
         version: 2.4.2
       '@tauri-apps/plugin-http':
-        specifier: ^2.5.0
-        version: 2.5.4
+        specifier: ~2.5.7
+        version: 2.5.7
       '@tauri-apps/plugin-opener':
         specifier: ^2.2.6
         version: 2.5.2
@@ -3833,6 +3833,9 @@ packages:
   '@taplo/lib@0.5.0':
     resolution: {integrity: sha512-+xIqpQXJco3T+VGaTTwmhxLa51qpkQxCjRwezjFZgr+l21ExlywJFcDfTrNmL6lG6tqb0h8GyJKO3UPGPtSCWg==}
 
+  '@tauri-apps/api@2.10.1':
+    resolution: {integrity: sha512-hKL/jWf293UDSUN09rR69hrToyIXBb8CjGaWC7gfinvnQrBVvnLr08FeFi38gxtugAVyVcTa5/FD/Xnkb1siBw==}
+
   '@tauri-apps/api@2.9.1':
     resolution: {integrity: sha512-IGlhP6EivjXHepbBic618GOmiWe4URJiIeZFlB7x3czM0yDHHYviH1Xvoiv4FefdkQtn6v7TuwWCRfOGdnVUGw==}
 
@@ -3912,6 +3915,9 @@ packages:
 
   '@tauri-apps/plugin-http@2.5.4':
     resolution: {integrity: sha512-/i4U/9za3mrytTgfRn5RHneKubZE/dwRmshYwyMvNRlkWjvu1m4Ma72kcbVJMZFGXpkbl+qLyWMGrihtWB76Zg==}
+
+  '@tauri-apps/plugin-http@2.5.7':
+    resolution: {integrity: sha512-+F2lEH/c9b0zSsOXKq+5hZNcd9F4IIKCK1T17RqMwpCmVnx2aoqY8yIBccCd25HTYUb3j6NPVbRax/m00hKG8A==}
 
   '@tauri-apps/plugin-opener@2.5.2':
     resolution: {integrity: sha512-ei/yRRoCklWHImwpCcDK3VhNXx+QXM9793aQ64YxpqVF0BDuuIlXhZgiAkc15wnPVav+IbkYhmDJIv5R326Mew==}
@@ -12621,6 +12627,8 @@ snapshots:
     dependencies:
       '@taplo/core': 0.2.0
 
+  '@tauri-apps/api@2.10.1': {}
+
   '@tauri-apps/api@2.9.1': {}
 
   '@tauri-apps/cli-darwin-arm64@2.5.0':
@@ -12677,6 +12685,10 @@ snapshots:
   '@tauri-apps/plugin-http@2.5.4':
     dependencies:
       '@tauri-apps/api': 2.9.1
+
+  '@tauri-apps/plugin-http@2.5.7':
+    dependencies:
+      '@tauri-apps/api': 2.10.1
 
   '@tauri-apps/plugin-opener@2.5.2':
     dependencies:

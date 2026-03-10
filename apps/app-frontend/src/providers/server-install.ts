@@ -4,12 +4,12 @@ import { createContext } from '@modrinth/ui'
 import { type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
+import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3, get_version } from '@/helpers/cache.js'
 import { install_to_existing_profile } from '@/helpers/pack.js'
 import { create, edit, edit_icon, get, install as installProfile, list } from '@/helpers/profile.js'
 import type { GameInstance } from '@/helpers/types'
 import { start_join_server } from '@/helpers/worlds.ts'
-import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install.js'
 
@@ -104,8 +104,8 @@ export function createServerInstall(opts: {
 		const profilePath = await create(
 			project.title,
 			gameVersion,
-			'fabric',
-			'latest',
+			'vanilla',
+			null,
 			project.icon_url,
 			false,
 			{
@@ -115,7 +115,7 @@ export function createServerInstall(opts: {
 			},
 		)
 
-		await syncServerAsWorld(profilePath, project.title, serverAddress, project.id)
+		await ensureManagedServerWorldExists(profilePath, project.title, serverAddress)
 
 		return profilePath
 	}

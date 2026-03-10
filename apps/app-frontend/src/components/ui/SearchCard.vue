@@ -39,7 +39,8 @@
 					class="shrink-0 no-wrap"
 					@click.stop="install()"
 				>
-					<template v-if="!installed">
+					<SpinnerIcon v-if="installing" class="animate-spin" />
+					<template v-else-if="!installed">
 						<DownloadIcon v-if="modpack || instance" />
 						<PlusIcon v-else />
 					</template>
@@ -60,7 +61,7 @@
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, PlusIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'

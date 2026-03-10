@@ -3,16 +3,20 @@ import { provide, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
+import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
-import { create } from '@/helpers/profile.js'
+import { create, list } from '@/helpers/profile.js'
 
 export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
 	const { handleError } = notificationManager
 	const router = useRouter()
 
 	const installationModal = useTemplateRef('installationModal')
-	provide('showCreationModal', () => installationModal.value?.show())
+	provide('showCreationModal', async () => {
+		const instances = await list().catch(handleError)
+		installationModal.value?.show(instances?.length ?? 0)
+	})
 
 	async function handleCreate(config: CreationFlowContextValue) {
 		installationModal.value?.hide()
@@ -81,9 +85,26 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 		router.push('/browse/modpack')
 	}
 
+	async function searchModpacks(query: string, limit: number = 10) {
+		const params = [`facets=[["project_type:modpack"]]`, `limit=${limit}`]
+		if (query) {
+			params.push(`query=${encodeURIComponent(query)}`)
+		}
+		const raw = await get_search_results(`?${params.join('&')}`)
+		if (raw?.result) return raw.result
+		return { hits: [], offset: 0, limit, total_hits: 0 }
+	}
+
+	async function getProjectVersions(projectId: string) {
+		const versions = await get_project_versions(projectId)
+		return versions ?? []
+	}
+
 	return {
 		installationModal,
 		handleCreate,
 		handleBrowseModpacks,
+		searchModpacks,
+		getProjectVersions,
 	}
 }

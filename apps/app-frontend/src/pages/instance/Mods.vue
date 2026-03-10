@@ -11,7 +11,7 @@
 				ref="modpackContentModal"
 				:modpack-name="linkedModpackProject?.title"
 				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
-				enable-toggle
+				:enable-toggle="!props.isServerInstance"
 				@update:enabled="handleModpackContentToggle"
 			/>
 			<ConfirmModpackUpdateModal

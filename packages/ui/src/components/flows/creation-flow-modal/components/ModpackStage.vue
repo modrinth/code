@@ -38,14 +38,13 @@ import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker, injectModrinthClient } from '../../../../providers'
+import { injectFilePicker } from '../../../../providers'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Combobox from '../../../base/Combobox.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
 const debug = useDebugLogger('ModpackStage')
 const ctx = injectCreationFlowContext()
-const { labrinth } = injectModrinthClient()
 const filePicker = injectFilePicker()
 
 const searchLoading = ref(false)
@@ -64,12 +63,19 @@ function proceedWithModpack() {
 
 const search = async (query: string) => {
 	query = query.trim()
+	debug('search() called:', { query, trimmed: query })
 
 	try {
-		const results = await labrinth.projects_v2.search({
+		debug('search() calling API...', {
 			query: query || undefined,
 			facets: [['project_type:modpack']],
 			limit: 10,
+		})
+		const results = await ctx.searchModpacks(query, 10)
+		debug('search() API returned:', {
+			totalHits: results.total_hits,
+			hitCount: results.hits.length,
+			firstHit: results.hits[0]?.title,
 		})
 
 		ctx.modpackSearchHits.value = {}
@@ -95,18 +101,26 @@ const search = async (query: string) => {
 				}),
 			),
 		}))
-	} catch {
+		debug('search() options set:', {
+			optionCount: ctx.modpackSearchOptions.value.length,
+			labels: ctx.modpackSearchOptions.value.map((o) => o.label),
+		})
+	} catch (err) {
+		debug('search() ERROR:', err)
 		ctx.modpackSearchOptions.value = []
 	}
 	searchLoading.value = false
+	debug('search() done, searchLoading:', searchLoading.value)
 }
 
 const handleSearch = async (query: string) => {
+	debug('handleSearch() called:', { query })
 	searchLoading.value = true
 	await search(query)
 }
 
 onMounted(() => {
+	debug('onMounted() firing, resetting and calling search("")')
 	ctx.modpackSearchProjectId.value = undefined
 	search('')
 })
@@ -126,7 +140,7 @@ watch(
 
 		// Always fetch the actual latest version from the API since search index can be stale
 		try {
-			const versions = await labrinth.versions_v3.getProjectVersions(projectId)
+			const versions = await ctx.getProjectVersions(projectId)
 			if (versions.length > 0) {
 				const version = versions[0]
 				ctx.modpackSelection.value = {

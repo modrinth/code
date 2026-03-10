@@ -18,6 +18,7 @@ import {
 	createCreationFlowContext,
 	type CreationFlowContextValue,
 	type FlowType,
+	type ModpackSearchResult,
 	provideCreationFlowContext,
 } from './creation-flow-context'
 
@@ -32,6 +33,8 @@ const props = withDefaults(
 		initialGameVersion?: string
 		onBack?: (() => void) | null
 		fade?: 'standard' | 'warning' | 'danger'
+		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
+		getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
 	}>(),
 	{
 		type: 'world',
@@ -67,12 +70,14 @@ const ctx = createCreationFlowContext(
 		initialLoader: props.initialLoader,
 		initialGameVersion: props.initialGameVersion,
 		onBack: props.onBack ?? undefined,
+		searchModpacks: props.searchModpacks,
+		getProjectVersions: props.getProjectVersions,
 	},
 )
 provideCreationFlowContext(ctx)
 
-function show() {
-	ctx.reset()
+function show(instanceCount?: number) {
+	ctx.reset(instanceCount)
 	modal.value?.setStage(0)
 	modal.value?.show()
 }

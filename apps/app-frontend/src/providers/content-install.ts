@@ -7,11 +7,11 @@ import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_project_v3_many, get_version_many } from '@/helpers/cache.js'
 import { create_profile_and_install as packInstall } from '@/helpers/pack'
 import {
 	add_project_from_version,
-	check_installed,
+	check_installed_batch,
 	create,
 	get,
 	get_projects,
@@ -81,6 +81,7 @@ export interface ContentInstallContext {
 		loader: string
 		gameVersion: string
 	}) => Promise<void>
+	handleNavigate: (instance: ContentInstallInstance) => void
 	handleCancel: () => void
 	setContentInstallModal: (ref: ModalRef) => void
 	setInstallConfirmModal: (ref: InstallConfirmModalRef) => void
@@ -133,7 +134,6 @@ export function createContentInstall(opts: {
 		currentCallback = onInstall
 
 		instances.value = []
-		loading.value = true
 		defaultTab.value = 'existing'
 
 		const loaderSet = new Set<string>()
@@ -175,24 +175,36 @@ export function createContentInstall(opts: {
 				? hints.preferredGameVersion
 				: null
 
-		await nextTick()
-		modalRef?.show()
-		trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
-
 		try {
-			const profiles = await list()
-			const newProfileMap: Record<string, GameInstance> = {}
-			const installedChecks = await Promise.all(
-				profiles.map((profile) => check_installed(profile.path, project.id)),
-			)
+			let profiles = await list()
 
-			const newInstances: ContentInstallInstance[] = profiles.map((profile, i: number) => {
+			const linkedProjectIds = profiles
+				.filter((p) => p.linked_data?.project_id)
+				.map((p) => p.linked_data!.project_id)
+			if (linkedProjectIds.length > 0) {
+				const linkedProjects = await get_project_v3_many(linkedProjectIds, 'must_revalidate').catch(
+					() => [],
+				)
+				const serverProjectIds = new Set(
+					linkedProjects
+						.filter((p: { id: string; minecraft_server?: unknown }) => p?.minecraft_server != null)
+						.map((p: { id: string }) => p.id),
+				)
+				profiles = profiles.filter(
+					(p) => !p.linked_data?.project_id || !serverProjectIds.has(p.linked_data.project_id),
+				)
+			}
+
+			const newProfileMap: Record<string, GameInstance> = {}
+			const installedMap = await check_installed_batch(project.id)
+
+			const newInstances: ContentInstallInstance[] = profiles.map((profile) => {
 				newProfileMap[profile.path] = profile
 				return {
 					id: profile.path,
 					name: profile.name,
 					iconUrl: profile.icon_path ? convertFileSrc(profile.icon_path) : null,
-					installed: installedChecks[i],
+					installed: installedMap[profile.path] ?? false,
 					compatible: versions.some((v) => isVersionCompatible(v, project, profile)),
 					installing: false,
 				}
@@ -206,9 +218,11 @@ export function createContentInstall(opts: {
 			}
 		} catch (err) {
 			opts.handleError(err)
-		} finally {
-			loading.value = false
 		}
+
+		await nextTick()
+		modalRef?.show()
+		trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
 	}
 
 	async function handleInstallToInstance(instance: ContentInstallInstance) {
@@ -240,8 +254,6 @@ export function createContentInstall(opts: {
 				source: 'ProjectInstallModal',
 			})
 			currentCallback(version.id)
-			modalRef?.hide()
-			await opts.router.push(`/instance/${encodeURIComponent(instance.id)}/`)
 		} catch (err) {
 			if (storeInstance) storeInstance.installing = false
 			opts.handleError(err)
@@ -299,6 +311,11 @@ export function createContentInstall(opts: {
 		} catch (err) {
 			opts.handleError(err)
 		}
+	}
+
+	function handleNavigate(instance: ContentInstallInstance) {
+		modalRef?.hide()
+		opts.router.push(`/instance/${encodeURIComponent(instance.id)}/`)
 	}
 
 	function handleCancel() {
@@ -404,6 +421,7 @@ export function createContentInstall(opts: {
 		releaseGameVersions,
 		handleInstallToInstance,
 		handleCreateAndInstall,
+		handleNavigate,
 		handleCancel,
 		setContentInstallModal(ref: ModalRef) {
 			modalRef = ref

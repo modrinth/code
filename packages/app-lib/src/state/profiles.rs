@@ -2,7 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -407,6 +407,14 @@ macro_rules! select_profiles_with_predicate {
             $param
         )
     };
+}
+
+struct InitialScanFile {
+    path: String,
+    file_name: String,
+    project_type: ProjectType,
+    size: u64,
+    cache_key: String,
 }
 
 impl Profile {
@@ -911,15 +919,125 @@ impl Profile {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<DashMap<String, ProfileFile>> {
-        let path = crate::api::profile::get_full_path(&self.path).await?;
+        let (keys, file_hashes) =
+            self.scan_and_hash(pool, fetch_semaphore).await?;
 
-        struct InitialScanFile {
-            path: String,
-            file_name: String,
-            project_type: ProjectType,
-            size: u64,
-            cache_key: String,
+        let file_updates = file_hashes
+            .iter()
+            .map(|x| Self::get_cache_key(x, self))
+            .collect::<Vec<_>>();
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+        let file_updates_ref =
+            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+        let (file_info, file_updates) = tokio::try_join!(
+            CachedEntry::get_file_many(
+                &file_hashes_ref,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            ),
+            CachedEntry::get_file_update_many(
+                &file_updates_ref,
+                cache_behaviour,
+                pool,
+                fetch_semaphore,
+            )
+        )?;
+
+        let mut keys_by_path: std::collections::HashMap<
+            String,
+            InitialScanFile,
+        > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
+
+        let mut file_info_by_hash: std::collections::HashMap<
+            String,
+            CachedFile,
+        > = file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+
+        let files = DashMap::new();
+
+        for hash in file_hashes {
+            let file = file_info_by_hash.remove(&hash.hash);
+            let trimmed = hash.path.trim_end_matches(".disabled");
+
+            if let Some(initial_file) = keys_by_path.remove(trimmed) {
+                let path = format!(
+                    "{}/{}",
+                    initial_file.project_type.get_folder(),
+                    initial_file.file_name
+                );
+
+                let update_version_id = if let Some(metadata) = &file {
+                    let update_ids: Vec<String> = file_updates
+                        .iter()
+                        .filter(|x| x.hash == hash.hash)
+                        .map(|x| x.update_version_id.clone())
+                        .collect();
+
+                    if !update_ids.contains(&metadata.version_id) {
+                        update_ids.into_iter().next()
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+
+                let file = ProfileFile {
+                    update_version_id,
+                    hash: hash.hash,
+                    file_name: initial_file.file_name,
+                    size: initial_file.size,
+                    metadata: file.map(|x| FileMetadata {
+                        project_id: x.project_id,
+                        version_id: x.version_id,
+                    }),
+                    project_type: initial_file.project_type,
+                };
+                files.insert(path, file);
+            }
         }
+
+        Ok(files)
+    }
+
+    pub async fn get_installed_project_ids(
+        &self,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<Vec<String>> {
+        let (_keys, file_hashes) =
+            self.scan_and_hash(pool, fetch_semaphore).await?;
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+
+        let file_info = CachedEntry::get_file_many(
+            &file_hashes_ref,
+            None,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+
+        let project_ids: Vec<String> = file_info
+            .into_iter()
+            .map(|f| f.project_id)
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
+        Ok(project_ids)
+    }
+
+    async fn scan_and_hash(
+        &self,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<(Vec<InitialScanFile>, Vec<CachedFileHash>)> {
+        let path = crate::api::profile::get_full_path(&self.path).await?;
 
         let mut keys = vec![];
 
@@ -971,80 +1089,7 @@ impl Profile {
         )
         .await?;
 
-        let file_updates = file_hashes
-            .iter()
-            .map(|x| Self::get_cache_key(x, self))
-            .collect::<Vec<_>>();
-
-        let file_hashes_ref =
-            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
-        let file_updates_ref =
-            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
-        let (mut file_info, file_updates) = tokio::try_join!(
-            CachedEntry::get_file_many(
-                &file_hashes_ref,
-                cache_behaviour,
-                pool,
-                fetch_semaphore,
-            ),
-            CachedEntry::get_file_update_many(
-                &file_updates_ref,
-                cache_behaviour,
-                pool,
-                fetch_semaphore,
-            )
-        )?;
-
-        let files = DashMap::new();
-
-        for hash in file_hashes {
-            let info_index = file_info.iter().position(|x| x.hash == hash.hash);
-            let file = info_index.map(|x| file_info.remove(x));
-
-            if let Some(initial_file_index) = keys
-                .iter()
-                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
-            {
-                let initial_file = keys.remove(initial_file_index);
-
-                let path = format!(
-                    "{}/{}",
-                    initial_file.project_type.get_folder(),
-                    initial_file.file_name
-                );
-
-                let update_version_id = if let Some(metadata) = &file {
-                    let update_ids: Vec<String> = file_updates
-                        .iter()
-                        .filter(|x| x.hash == hash.hash)
-                        .map(|x| x.update_version_id.clone())
-                        .collect();
-
-                    if !update_ids.contains(&metadata.version_id) {
-                        update_ids.into_iter().next()
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                };
-
-                let file = ProfileFile {
-                    update_version_id,
-                    hash: hash.hash,
-                    file_name: initial_file.file_name,
-                    size: initial_file.size,
-                    metadata: file.map(|x| FileMetadata {
-                        project_id: x.project_id,
-                        version_id: x.version_id,
-                    }),
-                    project_type: initial_file.project_type,
-                };
-                files.insert(path, file);
-            }
-        }
-
-        Ok(files)
+        Ok((keys, file_hashes))
     }
 
     fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {

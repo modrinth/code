@@ -93,6 +93,23 @@ pub async fn get_projects(
     }
 }
 
+#[tracing::instrument]
+pub async fn get_installed_project_ids(
+    path: &str,
+) -> crate::Result<Vec<String>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let ids = profile
+            .get_installed_project_ids(&state.pool, &state.api_semaphore)
+            .await?;
+        Ok(ids)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
 /// Get content items with rich metadata for a profile
 ///
 /// Returns content items filtered to exclude modpack files (if linked),

@@ -149,17 +149,41 @@ pub async fn get_linked_modpack_info(
         ),
     )?;
 
-    let project = project.ok_or_else(|| {
-        crate::ErrorKind::InputError(format!(
-            "Linked modpack project {} not found",
-            linked_data.project_id
-        ))
-    })?;
-
     let version = version.ok_or_else(|| {
         crate::ErrorKind::InputError(format!(
             "Linked modpack version {} not found",
             linked_data.version_id
+        ))
+    })?;
+
+    // For server instances, linked_data.project_id is the server project,
+    // but the version may belong to a different (modpack) project.
+    // If so, fetch the actual modpack project for display and update checking.
+    let (project, all_versions) =
+        if version.project_id != linked_data.project_id {
+            let (modpack_project, modpack_versions) = tokio::try_join!(
+                CachedEntry::get_project(
+                    &version.project_id,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                ),
+                CachedEntry::get_project_versions(
+                    &version.project_id,
+                    cache_behaviour,
+                    pool,
+                    fetch_semaphore,
+                ),
+            )?;
+            (modpack_project.or(project), modpack_versions)
+        } else {
+            (project, all_versions)
+        };
+
+    let project = project.ok_or_else(|| {
+        crate::ErrorKind::InputError(format!(
+            "Linked modpack project {} not found",
+            linked_data.project_id
         ))
     })?;
 

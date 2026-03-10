@@ -44,7 +44,7 @@ import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
-	get_projects as getInstanceProjects,
+	get_installed_project_ids as getInstalledProjectIds,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
@@ -99,14 +99,8 @@ type Instance = {
 	}
 }
 
-type InstanceProject = {
-	metadata: {
-		project_id: string
-	}
-}
-
 const instance: Ref<Instance | null> = ref(null)
-const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
+const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
@@ -117,24 +111,21 @@ let newlyInstalledSnapshot: string[] = []
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
-await updateInstanceContext()
+await initInstanceContext()
 
-watch(
-	() => [route.query.i, route.query.ai, route.path],
-	() => {
-		updateInstanceContext()
-	},
-)
-
-async function updateInstanceContext() {
+async function initInstanceContext() {
 	if (route.query.i) {
-		;[instance.value, instanceProjects.value] = await Promise.all([
-			getInstance(route.query.i).catch(handleError),
-			getInstanceProjects(route.query.i).catch(handleError),
-		])
-		newlyInstalled.value = []
+		instance.value = await getInstance(route.query.i).catch(handleError)
 
-		isServerInstance.value = false
+		// Load installed project IDs in background — the page and initial search render immediately.
+		// When this resolves, instanceFilters recomputes and triggers a search refresh
+		// that applies the "hide installed" negative filters and marks installed badges.
+		getInstalledProjectIds(route.query.i)
+			.then((ids) => {
+				installedProjectIds.value = ids
+			})
+			.catch(handleError)
+
 		if (instance.value?.linked_data?.project_id) {
 			const projectV3 = await get_project_v3(
 				instance.value.linked_data.project_id,
@@ -148,11 +139,6 @@ async function updateInstanceContext() {
 
 	if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
 		instanceHideInstalled.value = route.query.ai === 'true'
-	}
-
-	if (instance.value && instance.value.path !== route.query.i && route.path.startsWith('/browse')) {
-		instance.value = null
-		instanceHideInstalled.value = false
 	}
 }
 
@@ -186,15 +172,11 @@ const instanceFilters = computed(() => {
 			})
 		}
 
-		if (instanceHideInstalled.value && instanceProjects.value) {
-			const installedMods = Object.values(instanceProjects.value)
-				.filter((x) => x.metadata)
-				.map((x) => x.metadata.project_id)
+		if (instanceHideInstalled.value && installedProjectIds.value) {
+			const allInstalled = [...installedProjectIds.value, ...newlyInstalledSnapshot]
 
-			installedMods.push(...newlyInstalledSnapshot)
-
-			installedMods
-				?.map((x) => ({
+			allInstalled
+				.map((x) => ({
 					type: 'project_id',
 					option: `project_id:${x}`,
 					negative: true,
@@ -322,7 +304,7 @@ async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 }
 
 const previousFilterState = ref('')
-const isRefreshing = ref(false)
+let searchVersion = 0
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -356,15 +338,18 @@ const effectiveRequestParams = computed(() => {
 	return projectType.value === 'server' ? serverRequestParams.value : requestParams.value
 })
 
-watch(effectiveRequestParams, async () => {
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(effectiveRequestParams, () => {
 	if (!route.params.projectType) return
-	await nextTick()
-	refreshSearch()
+	if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+	searchDebounceTimer = setTimeout(() => {
+		refreshSearch()
+	}, 200)
 })
 
 async function refreshSearch() {
-	if (isRefreshing.value) return
-	isRefreshing.value = true
+	const version = ++searchVersion
 	newlyInstalledSnapshot = [...newlyInstalled.value]
 
 	try {
@@ -374,6 +359,8 @@ async function refreshSearch() {
 			const rawResults = (await get_search_results_v3(serverRequestParams.value)) as {
 				result: Labrinth.Search.v3.SearchResults
 			} | null
+
+			if (version !== searchVersion) return
 
 			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
 			const hits = searchResults.hits ?? []
@@ -392,6 +379,8 @@ async function refreshSearch() {
 				result: SearchResults
 			} | null
 
+			if (version !== searchVersion) return
+
 			if (!rawResults) {
 				rawResults = {
 					result: {
@@ -403,16 +392,14 @@ async function refreshSearch() {
 				}
 			}
 			if (instance.value) {
-				const installedProjectIds = new Set([
+				const allInstalledIds = new Set([
 					...newlyInstalled.value,
-					...Object.values(instanceProjects.value ?? {})
-						.filter((x) => x.metadata)
-						.map((x) => x.metadata.project_id),
+					...(installedProjectIds.value ?? []),
 				])
 
 				rawResults.result.hits = rawResults.result.hits.map((val) => ({
 					...val,
-					installed: installedProjectIds.has(val.project_id),
+					installed: allInstalledIds.has(val.project_id),
 				}))
 			}
 			results.value = rawResults.result
@@ -466,11 +453,13 @@ async function refreshSearch() {
 			.join('&')
 		const newUrl = `${route.path}${queryString ? '?' + queryString : ''}`
 		window.history.replaceState(window.history.state, '', newUrl)
+
+		loading.value = false
 	} catch (err) {
 		console.error('Error refreshing search:', err)
-	} finally {
-		loading.value = false
-		isRefreshing.value = false
+		if (version === searchVersion) {
+			loading.value = false
+		}
 	}
 }
 
@@ -515,7 +504,8 @@ const selectableProjectTypes = computed(() => {
 		if (
 			availableGameVersions.value &&
 			availableGameVersions.value.findIndex((x) => x.version === instance.value?.game_version) <=
-				availableGameVersions.value.findIndex((x) => x.version === '1.13')
+				availableGameVersions.value.findIndex((x) => x.version === '1.13') &&
+			!isServerInstance.value
 		) {
 			dataPacks = true
 		}

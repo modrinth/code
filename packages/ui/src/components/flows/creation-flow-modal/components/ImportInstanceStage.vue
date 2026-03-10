@@ -65,11 +65,6 @@
 			</div>
 		</div>
 
-		<!-- Empty state -->
-		<div v-else-if="!loading" class="flex items-center justify-center py-8 text-secondary text-sm">
-			No launcher instances detected
-		</div>
-
 		<!-- Loading state -->
 		<div v-if="loading" class="flex items-center justify-center py-8 text-secondary text-sm">
 			Detecting launcher instances...

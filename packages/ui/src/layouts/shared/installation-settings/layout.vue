@@ -71,7 +71,7 @@ function handleModpackUpdateCancel() {
 const messages = defineMessages({
 	linkedInstanceTitle: {
 		id: 'installation-settings.linked-instance.title',
-		defaultMessage: 'Linked instance',
+		defaultMessage: 'Linked {projectType, select, server {server project} other {modpack}}',
 	},
 	reinstallModpackTitle: {
 		id: 'installation-settings.reinstall-modpack.title',
@@ -89,7 +89,7 @@ const messages = defineMessages({
 	unlinkDescription: {
 		id: 'installation-settings.unlink.description',
 		defaultMessage:
-			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {type, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
+			"Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates.",
 	},
 	repairInstanceTitle: {
 		id: 'installation-settings.repair.instance-title',
@@ -255,12 +255,17 @@ const messages = defineMessages({
 				<!-- Unlink -->
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
-						{{ formatMessage(messages.linkedInstanceTitle) }}
+						{{
+							formatMessage(messages.linkedInstanceTitle, {
+								projectType: showModpackVersionActions ? 'modpack' : 'server',
+							})
+						}}
 					</span>
 					<span class="text-primary">
 						{{
 							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer && !showModpackVersionActions ? 'server' : 'instance',
+								type: ctx.isServer ? 'server' : 'instance',
+								projectType: showModpackVersionActions ? 'modpack' : 'server',
 							})
 						}}
 					</span>
