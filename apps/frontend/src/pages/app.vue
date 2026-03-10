@@ -380,7 +380,7 @@ const messages = defineMessages({
 	performantDescription: {
 		id: 'app-marketing.features.performance.description',
 		defaultMessage:
-			'Modrinth App performs better than many of the leading mod managers, using just 150mb of RAM!',
+			'Modrinth App performs better than many of the leading mod managers, using just 150 MB of RAM!',
 	},
 	websiteIntegration: {
 		id: 'app-marketing.features.website.title',
@@ -485,7 +485,7 @@ const messages = defineMessages({
 	downloadTerms: {
 		id: 'app-marketing.download.terms',
 		defaultMessage:
-			'By downloading Modrinth App you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>.',
+			'By downloading Modrinth App, you agree to our <terms-link>Terms</terms-link> and <privacy-link>Privacy Policy</privacy-link>.',
 	},
 	linuxDisclaimer: {
 		id: 'app-marketing.download.linux-disclaimer',

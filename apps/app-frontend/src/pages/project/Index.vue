@@ -40,6 +40,7 @@
 				:has-versions="versions.length > 0"
 				:link-target="`_blank`"
 				:hide-license="isServerProject"
+				:show-followers="isServerProject"
 				class="project-sidebar-section"
 			/>
 		</Teleport>
@@ -52,14 +53,14 @@
 				>
 					<ProjectBackgroundGradient :project="data" />
 				</Teleport>
-				<ServerProjectHeader
-					v-if="isServerProject"
+				<ProjectHeader
+					v-else
 					:project="data"
 					:project-v3="projectV3"
 					:ping="serverPing"
 					@contextmenu.prevent.stop="handleRightClick"
 				>
-					<template #actions>
+					<template v-if="isServerProject" #actions>
 						<ButtonStyled v-if="serverPlaying" size="large" color="red">
 							<button @click="handleStopServer">
 								<StopCircleIcon />
@@ -111,9 +112,7 @@
 							</OverflowMenu>
 						</ButtonStyled>
 					</template>
-				</ServerProjectHeader>
-				<ProjectHeader v-else :project="data" @contextmenu.prevent.stop="handleRightClick">
-					<template #actions>
+					<template v-else #actions>
 						<ButtonStyled size="large" color="brand">
 							<button
 								v-tooltip="installed ? `This project is already installed` : null"
@@ -238,7 +237,6 @@ import {
 	ProjectSidebarLinks,
 	ProjectSidebarServerInfo,
 	ProjectSidebarTags,
-	ServerProjectHeader,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'

@@ -100,12 +100,12 @@
 					() => {
 						debug('on-show fired')
 						loadVersions()
-						navigateTo({ query: route.query, hash: '#download' })
+						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 					}
 				"
 				:on-hide="
 					() => {
-						navigateTo({ query: route.query, hash: '' })
+						navigateTo({ query: route.query, hash: '' }, { replace: true })
 					}
 				"
 			>
@@ -243,18 +243,21 @@
 														platformAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -344,18 +347,21 @@
 														gameVersionAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -433,14 +439,11 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<component
-						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
+					<ProjectHeader
 						v-if="projectV3Loaded"
-						v-bind="
-							isServerProject
-								? { project, projectV3, member: !!currentMember }
-								: { project, member: !!currentMember }
-						"
+						:project="project"
+						:project-v3="projectV3"
+						:member="!!currentMember"
 					>
 						<template #actions>
 							<ButtonStyled
@@ -800,7 +803,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-					</component>
+					</ProjectHeader>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -901,6 +904,7 @@
 						:project="project"
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
+						:show-followers="isServerProject"
 						class="card flex-card experimental-styles-within"
 					/>
 					<div class="card flex-card experimental-styles-within">
@@ -935,6 +939,18 @@
 								</div>
 							</div>
 
+							<div v-if="isServerProject" class="details-list__item">
+								<HeartIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(
+											formatMessage(commonMessages.projectFollowers, {
+												count: formatNumber(project.followers, false),
+											}),
+										)
+									}}
+								</div>
+							</div>
 							<div
 								v-if="project.approved"
 								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
@@ -943,9 +959,11 @@
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.published, {
-											date: publishedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.published, {
+												date: publishedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -957,7 +975,9 @@
 							>
 								<CalendarIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
+									}}
 								</div>
 							</div>
 
@@ -969,9 +989,11 @@
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.submitted, {
-											date: submittedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.submitted, {
+												date: submittedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
@@ -983,7 +1005,9 @@
 							>
 								<VersionIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									}}
 								</div>
 							</div>
 						</div>
@@ -991,7 +1015,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -1071,7 +1095,6 @@ import {
 	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
-	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,
@@ -1080,7 +1103,13 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import {
+	capitalizeString,
+	formatNumber,
+	formatPrice,
+	formatProjectType,
+	renderString,
+} from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'

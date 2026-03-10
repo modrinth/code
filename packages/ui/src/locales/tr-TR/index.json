@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Özellikler"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Topluluk"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Özellikler"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Oynanış"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Performansa etkisi"
   },
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "Mod paketi bağını kopar"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Geri"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Bağlantıyı kopyala"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Devre dışı"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "İçerik bulunamadı"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Etkin"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Tümü"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Mod paketi içeriği"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "İçerik yükleniyor..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Aramanızla eşleşen proje yok."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "{count} adet proje ara"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} adet seçildi"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
@@ -494,11 +542,131 @@
   "label.yes": {
     "defaultMessage": "Evet"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Çekçe"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Danca"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Almanca (İsviçre)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Almanca (Almanya)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "İngilizce (Amerikan)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "İspanyolca (Latin Amerika)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "İspanyolca (İspanya)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Fince"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipince"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Fransızca"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "İbranice"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Macarca"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Endonezyaca"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "İtalyanca (İtalya)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japonca"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Korece"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malezyaca"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Flemenkçe"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norveççe"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Lehçe"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portekizce (Brazilya)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portekizce (Portekiz)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Romence"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Rusça"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Sırpça (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "İsveççe"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Taica"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Türkçe"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukraynaca"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamca"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Çince (Basitleştirilmiş)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Çince (Geleneksel)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Ödeme yöntemi ekle"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Ödeme yöntemi ekleme"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Gerekli içerikleri otomatik olarak indir"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Oyunu direk sunucuda başlat"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Sunucu değiştiğinde dosyaları güncel tut"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Kapat"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Modrinth Uygulaması Edin"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App otomatik olarak açılacak..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Modrinth App açılıyor"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Neden Modrinth App kullanmalısın"
   },
   "notification.error.title": {
     "defaultMessage": "Bir hata oluştu"
@@ -812,14 +980,32 @@
   "project.about.links.issues": {
     "defaultMessage": "Sorunları bildir"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Websiteyi ziyaret et"
+  },
   "project.about.links.source": {
     "defaultMessage": "Kaynak göster"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Mağazayı ziyaret et"
   },
   "project.about.links.title": {
     "defaultMessage": "Bağlantılar"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Wikiye git"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Kopyalandı!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP adresi panoya kopyalandı"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Gecikme"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Sunucu detayları"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} indirme"
@@ -893,8 +1079,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} takipçi"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count}{count, plural,one {çevrim içi}other {çevrim içi}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count}{count, plural,one {yakın zamanda}other {yakın zamanda}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Veriler"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "İçerik"
   },
   "project.settings.description.title": {
     "defaultMessage": "Açıklama"
@@ -1003,6 +1201,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "İzin yok"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Sunucu"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Etiketler"
@@ -1356,10 +1557,16 @@
     "defaultMessage": "64x"
   },
   "tag.category.8x-": {
-    "defaultMessage": "8x ya da altı"
+    "defaultMessage": "8x ve altı"
   },
   "tag.category.adventure": {
     "defaultMessage": "Macera"
+  },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Macera modu"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarşi"
   },
   "tag.category.atmosphere": {
     "defaultMessage": "Atmosfer"
@@ -1367,53 +1574,86 @@
   "tag.category.audio": {
     "defaultMessage": "Ses"
   },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
+  },
   "tag.category.blocks": {
-    "defaultMessage": "Bloklar"
+    "defaultMessage": "Blok"
   },
   "tag.category.bloom": {
     "defaultMessage": "Parıltı"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Bosslar"
+  },
   "tag.category.cartoon": {
-    "defaultMessage": "Çizgi"
+    "defaultMessage": "Çizimsi"
   },
   "tag.category.challenging": {
     "defaultMessage": "Zorlayıcı"
   },
+  "tag.category.classes": {
+    "defaultMessage": "Sınıflar"
+  },
   "tag.category.colored-lighting": {
-    "defaultMessage": "Renkli ışıklandırma"
+    "defaultMessage": "Renkli Işık"
   },
   "tag.category.combat": {
     "defaultMessage": "Savaş"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Rekabetçi"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": ""
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Yaratıcılık modu"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Üretici Topluluğu"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Crossplay"
   },
   "tag.category.cursed": {
     "defaultMessage": "Lanetli"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Özel İçerik"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Dekorasyon"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Zindanlar"
   },
   "tag.category.economy": {
     "defaultMessage": "Ekonomi"
   },
   "tag.category.entities": {
-    "defaultMessage": ""
+    "defaultMessage": "Varlık"
   },
   "tag.category.environment": {
-    "defaultMessage": ""
+    "defaultMessage": "Çevre"
   },
   "tag.category.equipment": {
     "defaultMessage": "Ekipman"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Factions"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Fantazi"
   },
   "tag.category.foliage": {
-    "defaultMessage": ""
+    "defaultMessage": "Yeşillik"
   },
   "tag.category.fonts": {
-    "defaultMessage": "Yazı Tipleri"
+    "defaultMessage": "Font"
   },
   "tag.category.food": {
     "defaultMessage": "Yiyecek"
@@ -1421,26 +1661,41 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Oyun Mekaniği"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Gens"
+  },
   "tag.category.gui": {
-    "defaultMessage": "GUI"
+    "defaultMessage": "Arayüz"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Hardcore modu"
   },
   "tag.category.high": {
     "defaultMessage": "Yüksek"
   },
   "tag.category.items": {
-    "defaultMessage": "Öğeler"
+    "defaultMessage": "Eşya"
+  },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Envanteri koru"
   },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Ortaya karışık"
+    "defaultMessage": "Çok Türlü"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PVP"
   },
   "tag.category.library": {
     "defaultMessage": "Kütüphane"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Hafif"
   },
   "tag.category.locale": {
-    "defaultMessage": "Yerel"
+    "defaultMessage": "Yerelleştirme"
   },
   "tag.category.low": {
     "defaultMessage": "Düşük"
@@ -1451,26 +1706,53 @@
   "tag.category.management": {
     "defaultMessage": "Yönetim"
   },
+  "tag.category.media": {
+    "defaultMessage": "Medya"
+  },
   "tag.category.medium": {
     "defaultMessage": "Orta"
+  },
+  "tag.category.microgames": {
+    "defaultMessage": "Mikro oyunlar"
   },
   "tag.category.minigame": {
     "defaultMessage": "Mini Oyun"
   },
+  "tag.category.minigames": {
+    "defaultMessage": "Mini oyunlar"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
+  },
   "tag.category.mobs": {
-    "defaultMessage": "Yaratıklar"
+    "defaultMessage": "Yaratık"
   },
   "tag.category.modded": {
-    "defaultMessage": "Modlanmış"
+    "defaultMessage": "Modlu"
   },
   "tag.category.models": {
     "defaultMessage": "Modeller"
   },
   "tag.category.multiplayer": {
-    "defaultMessage": "Çok oyunculu"
+    "defaultMessage": "Çok Oyunculu"
+  },
+  "tag.category.network": {
+    "defaultMessage": "Ağ"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Çevrim dışı mod"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Tek Blok"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
   },
   "tag.category.optimization": {
     "defaultMessage": "Optimizasyon"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkur"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Yol İzleme"
@@ -1478,20 +1760,53 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Kişisel Dünyalar"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Arsalar"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokemon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Patates"
   },
+  "tag.category.prison": {
+    "defaultMessage": "Prison"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Görev yapmak"
+  },
   "tag.category.quests": {
-    "defaultMessage": "Görevler"
+    "defaultMessage": "Görevli"
+  },
+  "tag.category.racing": {
+    "defaultMessage": "Yarış"
   },
   "tag.category.realistic": {
     "defaultMessage": "Gerçekçi"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Kayıt alınan SMP"
+  },
   "tag.category.reflections": {
-    "defaultMessage": "Yansımalar"
+    "defaultMessage": "Yansıma"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Rol yapma"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
-    "defaultMessage": "Ekran görüntüsü"
+    "defaultMessage": "Ekran Görüntüsü"
   },
   "tag.category.semi-realistic": {
     "defaultMessage": "Yarı Gerçekçi"
@@ -1500,7 +1815,13 @@
     "defaultMessage": "Gölgeler"
   },
   "tag.category.simplistic": {
-    "defaultMessage": ""
+    "defaultMessage": "Basit"
+  },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
   },
   "tag.category.social": {
     "defaultMessage": "Sosyal"
@@ -1508,23 +1829,41 @@
   "tag.category.storage": {
     "defaultMessage": "Depolama"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Hayatta kalma modu"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Takımlar"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Teknik"
+  },
   "tag.category.technology": {
     "defaultMessage": "Teknoloji"
   },
   "tag.category.themed": {
-    "defaultMessage": ""
+    "defaultMessage": "Temalı"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Şehirler"
   },
   "tag.category.transportation": {
     "defaultMessage": "Ulaşım"
   },
   "tag.category.tweaks": {
-    "defaultMessage": "İnce Ayarlar"
+    "defaultMessage": "İnce Ayar"
   },
   "tag.category.utility": {
-    "defaultMessage": "Alet Edavat"
+    "defaultMessage": "Araç Gereç"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Vanilla gibi"
+    "defaultMessage": "Vanilla Gibi"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Beyaz Listelenmiş"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Dünya sıfırlanması"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Dünya Oluşumu"
@@ -1542,7 +1881,7 @@
     "defaultMessage": "BungeeCord"
   },
   "tag.loader.canvas": {
-    "defaultMessage": "Tuval"
+    "defaultMessage": "Canvas"
   },
   "tag.loader.datapack": {
     "defaultMessage": "Veri Paketi"
@@ -1575,7 +1914,7 @@
     "defaultMessage": "Kaynak Paketi"
   },
   "tag.loader.modloader": {
-    "defaultMessage": "Risugami'nin Mod Yükleyicisi"
+    "defaultMessage": "Risugami's ModLoader"
   },
   "tag.loader.mrpack": {
     "defaultMessage": "Mod paketi"
@@ -1611,7 +1950,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "Vanilla Gölgelendirici"
+    "defaultMessage": "Vanilla Shader"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

@@ -1,6 +1,6 @@
 {
   "nags.add-description.description": {
-    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk omschrijft, is vereist."
+    "defaultMessage": "Een beschrijving die het doel en de functie van het project duidelijk weergeeft is vereist."
   },
   "nags.add-description.title": {
     "defaultMessage": "Voeg een beschrijving toe"
@@ -10,6 +10,18 @@
   },
   "nags.add-icon.title": {
     "defaultMessage": "Voeg een icoon toe"
+  },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Voeg het IP adres en poort toe die Java Editie spelers kunnen gebruiken om je server te joinen."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Voeg een Java adres toe"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals een website, winkel of Discord invite."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Voeg externe links toe"
   },
   "nags.add-links.description": {
     "defaultMessage": "Voeg relevante links buiten Modrinth toe, zoals code, een probleemtracker of een Discord uitnodiging."
@@ -30,19 +42,19 @@
     "defaultMessage": "Verleng de beschrijving"
   },
   "nags.edit-description.title": {
-    "defaultMessage": "Pas beschrijving aan"
+    "defaultMessage": "Pas de beschrijving aan"
   },
   "nags.edit-license.title": {
-    "defaultMessage": "Pas licentie aan"
+    "defaultMessage": "Pas de licentie aan"
   },
   "nags.edit-summary.title": {
-    "defaultMessage": "Pas samenvatting aan"
+    "defaultMessage": "Pas de samenvatting aan"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Pas tags aan"
+    "defaultMessage": "Pas de tags aan"
   },
   "nags.edit-title.title": {
-    "defaultMessage": "Pas titel aan"
+    "defaultMessage": "Pas de titel aan"
   },
   "nags.feature-gallery-image.description": {
     "defaultMessage": "De uitgelichte galerij foto is hoe vaak je project zijn eerste indruk maakt."
@@ -51,7 +63,7 @@
     "defaultMessage": "Licht een foto uit"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Bezoek galerij pagina"
+    "defaultMessage": "Bezoek de galerij pagina"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "Je {type, select,mod {mod}plugin {plugin}other {project}} gebruikt een licentie die vereist dat de source code beschikbaar is. Gelieve de source code link of source bestanden for elke extra versie te verstrekken, of overweeg een andere licentie te gebruiken."
@@ -122,6 +134,18 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Selecteer juiste resolutie"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Selecteer welke versies je server ondersteunt, kies een Modpack, of upload je eigen."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Select compatibiliteit"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Geef een lijst van de taal of talen die je server ondersteunt."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Selecteer een taal"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Selecteer de licentie waaronder je {type, select,mod {mod} modpack {modpack} resourcepack {resource pack} shader {shader} plugin {plugin} datapack {data pack} other {project}} is gedistibrueerd."
   },
@@ -133,6 +157,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Selecteer tags"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Toon server instellingen"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Bekijk beschrijving instellingen"
@@ -172,6 +199,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Maak de naam duidelijk"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Je hebt {tagCount, plural, one {# tag} other {# tags}} geselecteerd. Verminder het naar {maxTagCount} of minder om zeker te weten dat je server verschijnt in relevante zoekresultaten."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Selecteer relevante tags"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": ""

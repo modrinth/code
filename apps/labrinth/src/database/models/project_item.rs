@@ -187,6 +187,7 @@ impl ProjectBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        http: &reqwest::Client,
     ) -> Result<DBProjectId, DatabaseError> {
         let project_struct = DBProject {
             id: self.project_id,
@@ -234,7 +235,7 @@ impl ProjectBuilder {
 
         for mut version in self.initial_versions {
             version.project_id = self.project_id;
-            version.insert(&mut *transaction).await?;
+            version.insert(&mut *transaction, http).await?;
         }
 
         LinkUrl::insert_many_projects(

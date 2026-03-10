@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível acessar os servidores de autenticação"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Conteúdo necessário"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instale para jogar"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}\n"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Este servidor requer mods para jogar. Clique em Instalar para configurar os arquivos necessários a partir do Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Pacote de mods necessário"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} compartilhou esta instância com você hoje."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requer mods para jogar. Clique em Instalar para configurar os arquivos necessários a partir do Modrinth, e iniciar diretamente no servidor."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância compartilhada"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Instância de servidor compartilhada"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Ver conteúdos"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} adicionado"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Gerenciamento de recursos"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "O Modrinth App v{version} está pronto para ser instalado! Você pode recarregar para atualizar agora ou a atualização será feita automaticamente ao fechar o Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "O Modrinth App v{version} baixado. Recarregue para atualizar agora ou a atualização será aplicada automaticamente ao fechar o Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "O Modrinth App v{version} está disponível. Use seu gerenciador de pacotes para atualizar e obter os recursos e correções mais recentes!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "O Modrinth App v{version} já está disponível! Como você está em uma rede limitada, não o baixamos automaticamente."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Mudanças"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Baixar ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Baixar"
-  },
-  "app.update-toast.downloading": {
-    "message": "Baixando..."
-  },
-  "app.update-toast.reload": {
-    "message": "Atualizar"
-  },
-  "app.update-toast.title": {
-    "message": "Atualização disponível"
-  },
-  "app.update-toast.title.download-complete": {
+  "app.update-popup.download-complete": {
     "message": "Download concluído"
+  },
+  "app.update-popup.reload": {
+    "message": "Recarregar"
+  },
+  "app.update-popup.title": {
+    "message": "Atualização disponível"
   },
   "app.update.complete-toast.text": {
     "message": "Clique aqui para ver as mudanças."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(versão desconhecida)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Esta instância está vinculada a um servidor, o que significa que você não pode alterar a versão do Minecraft. Ao desvincular, esta instância será permanentemente desconectada do servidor."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Esta instância está vinculada a um servidor, o que significa que mods não podem ser atualizados e você não pode alterar o carregador de mods ou a versão do Minecraft. Desvincular desconectará permanentemente esta instância do servidor."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Desvincular do servidor"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Desvincular instância"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Servidor incompatível"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gerenciado pelo projeto do servidor"
+  },
   "instance.worlds.no_contact": {
     "message": "Não foi possível conectar-se ao servidor"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar com a instância"
+  },
+  "search.filter.locked.server": {
+    "message": "Fornecido pelo servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Apenas mods do lado do cliente podem ser adicionados à instância do servidor"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "A versão do jogo é fornecida pelo servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "O carregador é fornecido pelo servidor"
   }
 }

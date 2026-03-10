@@ -30,6 +30,7 @@
 						:editing-file-path="editingFile?.path"
 						:is-editing-image="fileEditorRef?.isEditingImage"
 						:search-query="searchQuery"
+						:show-refresh-button="showRefreshButton"
 						:base-id="baseId"
 						@navigate="navigateToSegment"
 						@navigate-home="() => navigateToSegment(-1)"
@@ -39,6 +40,7 @@
 						@upload="initiateFileUpload"
 						@upload-zip="() => {}"
 						@unzip-from-url="showUnzipFromUrlModal"
+						@refresh="refreshList"
 						@save="() => fileEditorRef?.saveFileContent(true)"
 						@save-as="() => fileEditorRef?.saveFileContent(false)"
 						@save-restart="() => fileEditorRef?.saveAndRestart()"
@@ -303,6 +305,7 @@ import {
 
 defineProps<{
 	showDebugInfo?: boolean
+	showRefreshButton?: boolean
 }>()
 
 const notifications = injectNotificationManager()

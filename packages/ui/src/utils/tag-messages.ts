@@ -598,7 +598,7 @@ export function sortTagsForDisplay(tags: string[]): string[] {
 export const categoryHeaderMessages = defineMessages({
 	resolutions: {
 		id: 'header.category.resolutions',
-		defaultMessage: 'Resolutions',
+		defaultMessage: 'Resolution',
 	},
 	categories: {
 		id: 'header.category.category',

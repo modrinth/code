@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Создать проект"
   },
+  "create.project.create-server-project": {
+    "message": "Создать сервер"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Не заполнены поля: {fields}"
+  },
   "create.project.name-label": {
     "message": "Название"
   },
   "create.project.name-placeholder": {
     "message": "Введите название проекта..."
+  },
+  "create.project.owner-description": {
+    "message": "Укажите себя или организацию, в которой вы состоите."
+  },
+  "create.project.owner-label": {
+    "message": "Владелец"
+  },
+  "create.project.server-project-title": {
+    "message": "Создание серверного проекта"
   },
   "create.project.summary-description": {
     "message": "Пара предложений про проект."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Создание проекта"
+  },
+  "create.project.type-label": {
+    "message": "Тип"
+  },
+  "create.project.type-project": {
+    "message": "Проект"
+  },
+  "create.project.type-server": {
+    "message": "Сервер"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -681,7 +705,7 @@
     "message": "Номер национального удостоверения"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Введите номер национального удостоверения"
+    "message": "Введите номер национального удостоверения личности"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Номер загранпаспорта"
@@ -1089,7 +1113,7 @@
     "message": "Как работают с высокой нагрузкой на CPU?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "Когда сервер испытывает высокую нагрузку, ему временно выделяются дополнительные потоки CPU. Это помогает показателю TPS не упасть ниже 20 и обеспечивает максимально плавный игровой процесс. Из‑за своей кратковременности такие потоки могут не отображаться в отчётах Spark и других инструментах профилирования."
+    "message": "Когда ваш сервер испытывает высокую нагрузку, мы временно предоставляем ему доступ к дополнительным потокам CPU, чтобы уменьшить лаги и нестабильность. Это помогает предотвратить падение TPS ниже 20 и обеспечить максимально плавную работу. Поскольку эти дополнительные потоки доступны только на короткое время во время периодов высокой нагрузки, они могут не отображаться в отчётах Spark или других инструментах профилирования."
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Какие процессоры используются на серверах Modrinth Hosting?"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Новый проект"
   },
+  "layout.action.new-server-project": {
+    "message": "Новый сервер"
+  },
+  "layout.action.publish": {
+    "message": "Опубликовать"
+  },
   "layout.action.reports": {
     "message": "Рассмотреть жалобы"
   },
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Номер счёта"
   },
-  "muralpay.field.branch-code": {
-    "message": "Код филиала"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Телефон PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Случайный ключ"
   },
   "muralpay.field.routing-number": {
     "message": "Маршрутный номер"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Введите номер счёта"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Введите код филиала"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Введите 18‑значный CLABE"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Введите электронную почту PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Введите случайный ключ"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Введите 9‑значный маршрутный номер"
@@ -2085,7 +2115,7 @@
     "message": "Предложение"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Связаться с модератором"
+    "message": "Связаться с модератором"
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
@@ -2101,6 +2131,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Набор данных"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Серверы"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Сервер"
   },
   "project-type.mod.plural": {
     "message": "Моды"
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Набор ресурсов"
+  },
+  "project-type.server.plural": {
+    "message": "Серверы"
+  },
+  "project-type.server.singular": {
+    "message": "Сервер"
   },
   "project-type.shader.plural": {
     "message": "Шейдеры"
@@ -2370,7 +2412,7 @@
     "message": "Вернуться к {item, select, project {проекту} version {версии} user {пользователю} other {контенту}}"
   },
   "report.body.description": {
-    "message": "При необходимости прикрепите ссылки и изображения. Пустые и неполные жалобы закрываются без рассмотрения."
+    "message": "При желании прикрепите ссылки и изображения. Неполные жалобы закрываются без рассмотрения."
   },
   "report.body.title": {
     "message": "Добавьте подробности к жалобе"
@@ -2954,6 +2996,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Страница наборов ресурсов"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Страница серверов"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Страница шейдеров"
   },
@@ -3075,7 +3120,7 @@
     "message": "Завершить сеанс"
   },
   "settings.sessions.created-ago": {
-    "message": "Запущен {ago}"
+    "message": "Создано {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Текущий сеанс"
@@ -3084,7 +3129,7 @@
     "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Активность: {ago}"
+    "message": "Последняя активность {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"

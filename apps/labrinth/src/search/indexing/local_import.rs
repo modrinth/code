@@ -436,6 +436,9 @@ pub async fn index_local(
                     created_timestamp: project.approved.timestamp(),
                     date_modified: project.updated,
                     modified_timestamp: project.updated.timestamp(),
+                    version_published_timestamp: version
+                        .date_published
+                        .timestamp(),
                     license: license.clone(),
                     slug: project.slug.clone(),
                     // TODO
@@ -464,31 +467,37 @@ struct PartialVersion {
     loaders: Vec<String>,
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
+    date_published: DateTime<Utc>,
 }
 
 async fn index_versions(
     pool: &PgPool,
     project_ids: Vec<i64>,
 ) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>, IndexingError> {
-    let versions: HashMap<DBProjectId, Vec<DBVersionId>> = sqlx::query!(
-        "
-        SELECT v.id, v.mod_id
+    let versions: HashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> =
+        sqlx::query!(
+            "
+        SELECT v.id, v.mod_id, v.date_published
         FROM versions v
         WHERE mod_id = ANY($1)
         ",
-        &project_ids,
-    )
-    .fetch(pool)
-    .try_fold(
-        HashMap::new(),
-        |mut acc: HashMap<DBProjectId, Vec<DBVersionId>>, m| {
-            acc.entry(DBProjectId(m.mod_id))
-                .or_default()
-                .push(DBVersionId(m.id));
-            async move { Ok(acc) }
-        },
-    )
-    .await?;
+            &project_ids,
+        )
+        .fetch(pool)
+        .try_fold(
+            HashMap::new(),
+            |mut acc: HashMap<
+                DBProjectId,
+                Vec<(DBVersionId, DateTime<Utc>)>,
+            >,
+             m| {
+                acc.entry(DBProjectId(m.mod_id))
+                    .or_default()
+                    .push((DBVersionId(m.id), m.date_published));
+                async move { Ok(acc) }
+            },
+        )
+        .await?;
 
     // Get project types, loaders
     #[derive(Default)]
@@ -500,7 +509,7 @@ async fn index_versions(
     let all_version_ids = versions
         .iter()
         .flat_map(|(_, version_ids)| version_ids.iter())
-        .map(|x| x.0)
+        .map(|(version_id, _)| version_id.0)
         .collect::<Vec<i64>>();
 
     let loaders_ptypes: DashMap<DBVersionId, VersionLoaderData> = sqlx::query!(
@@ -567,7 +576,7 @@ async fn index_versions(
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =
         HashMap::new();
     for (project_id, version_ids) in &versions {
-        for version_id in version_ids {
+        for (version_id, date_published) in version_ids {
             // Extract version-specific data fetched
             // We use 'remove' as every version is only in the map once
             let version_loader_data = loaders_ptypes
@@ -588,6 +597,7 @@ async fn index_versions(
                     loaders: version_loader_data.loaders,
                     project_types: version_loader_data.project_types,
                     version_fields,
+                    date_published: *date_published,
                 });
         }
     }

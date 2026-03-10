@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Особенности"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Сообщество"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Особенности"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Геймплей"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Мета"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Требования"
   },
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "Отвязать сборку"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Назад"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Копировать ссылку"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Отключить"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "В сборке нет дополнительного контента."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Сборка пуста"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Включить"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Всё"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Содержимое сборки"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Загрузка содержимого..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Не найдены проекты, соответствующие запросу."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Поиск по {count, number} {count, plural, one {проекту} other {проектам}}"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "Выбрано: {count, number}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Текущая"
@@ -494,11 +542,131 @@
   "label.yes": {
     "defaultMessage": "Да"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Чешский"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Датский"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Немецкий (Швейцария)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Немецкий (Германия)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Английский (США)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Испанский (Латинская Америка)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Испанский (Испания)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Финский"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Филиппинский"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Французский"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Иврит"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Венгерский"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Индонезийский"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Итальянский (Италия)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Японский"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Корейский"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Малайский"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Нидерландский"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Норвежский букмол"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Польский"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Португальский (Бразилия)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Португальский (Португалия)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Румынский"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Русский"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Сербский (латиница)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Шведский"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Тайский"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Турецкий"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Украинский"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Вьетнамский"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Китайский (упрощённый)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Китайский (традиционный)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Добавить способ оплаты"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Добавление способа оплаты"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Автоустановка необходимого контента"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Вход на сервер сразу после запуска игры"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Обновление сборки при изменениях на сервере"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Закрыть"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Скачать Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App откроется автоматически..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Открытие Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Преимущества Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "Произошла ошибка"
@@ -789,7 +957,7 @@
     "defaultMessage": "Обновлён {date}"
   },
   "project.about.links.discord": {
-    "defaultMessage": "Вступить в Discord"
+    "defaultMessage": "Вступить в Discord"
   },
   "project.about.links.donate.bmac": {
     "defaultMessage": "Buy Me a Coffee"
@@ -812,14 +980,32 @@
   "project.about.links.issues": {
     "defaultMessage": "Сообщить о проблеме"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Перейти на сайт"
+  },
   "project.about.links.source": {
-    "defaultMessage": "Посмотреть исходники"
+    "defaultMessage": "Исходный код"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Перейти в магазин"
   },
   "project.about.links.title": {
     "defaultMessage": "Ссылки"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Перейти в вики"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Скопировано!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Адрес сервера скопирован в буфер обмена"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Задержка"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "О сервере"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
@@ -893,8 +1079,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {подписчик} few {подписчика} other {подписчиков}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {играет} other {играют}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, one {недавний запуск} few {недавних запуска} other {недавних запусков}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} мс"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Аналитика"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Контент"
   },
   "project.settings.description.title": {
     "defaultMessage": "Описание"
@@ -1003,6 +1201,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Недостаточно разрешений"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Сервер"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Теги"
@@ -1361,11 +1562,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Приключения"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Режим приключений"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Анархия"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Атмосфера"
   },
   "tag.category.audio": {
     "defaultMessage": "Звуки"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Королевская битва"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
   },
   "tag.category.blocks": {
     "defaultMessage": "Блоки"
@@ -1373,11 +1586,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Свечение"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Боссы"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Мультяшные"
   },
   "tag.category.challenging": {
     "defaultMessage": "Испытания"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Классы"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Цветное освещение"
@@ -1385,14 +1604,32 @@
   "tag.category.combat": {
     "defaultMessage": "Бой"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Соревновательные"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Шейдеры"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Творческий режим"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Сообщество авторов"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Кроссплатформенные"
   },
   "tag.category.cursed": {
     "defaultMessage": "Странные"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Собственный контент"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Оформление"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Подземелья"
   },
   "tag.category.economy": {
     "defaultMessage": "Экономика"
@@ -1405,6 +1642,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Снаряжение"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Кланы"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Фэнтези"
@@ -1421,8 +1661,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Игровые механики"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Автодобыча"
+  },
   "tag.category.gui": {
     "defaultMessage": "Интерфейс"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Хардкор"
   },
   "tag.category.high": {
     "defaultMessage": "Высокие"
@@ -1430,14 +1676,23 @@
   "tag.category.items": {
     "defaultMessage": "Предметы"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Сохранение инвентаря"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Всё подряд"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Библиотеки"
   },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
+  },
   "tag.category.lightweight": {
-    "defaultMessage": "Лёгкие"
+    "defaultMessage": "Легковесные"
   },
   "tag.category.locale": {
     "defaultMessage": "Языки"
@@ -1451,17 +1706,29 @@
   "tag.category.management": {
     "defaultMessage": "Управление"
   },
+  "tag.category.media": {
+    "defaultMessage": "Медиа"
+  },
   "tag.category.medium": {
     "defaultMessage": "Средние"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Микроигры"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Мини-игры"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Мини-игры"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "ММО"
   },
   "tag.category.mobs": {
     "defaultMessage": "Мобы"
   },
   "tag.category.modded": {
-    "defaultMessage": "Модифицированные"
+    "defaultMessage": "Модовые"
   },
   "tag.category.models": {
     "defaultMessage": "Модели"
@@ -1469,8 +1736,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Сетевая игра"
   },
+  "tag.category.network": {
+    "defaultMessage": "Сеть"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Без лицензии"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "One Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "Чрезмерная сила"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Оптимизация"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Паркур"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Трассировка пути"
@@ -1478,17 +1760,50 @@
   "tag.category.pbr": {
     "defaultMessage": "Поддержка PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Личные миры"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Участки"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Покемоны"
+  },
   "tag.category.potato": {
     "defaultMessage": "Калькулятор"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Тюрьма"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Квесты"
   },
   "tag.category.quests": {
     "defaultMessage": "Квесты"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Гонки"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Реализм"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "SMP с видеозаписью"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Отражения"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Ролевая игра"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Суперкомпьютер"
@@ -1502,17 +1817,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Простые"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Социальные"
   },
   "tag.category.storage": {
     "defaultMessage": "Хранение"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Режим выживания"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Команды"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Технические"
+  },
   "tag.category.technology": {
     "defaultMessage": "Технологии"
   },
   "tag.category.themed": {
     "defaultMessage": "Тематические"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Города"
   },
   "tag.category.transportation": {
     "defaultMessage": "Передвижение"
@@ -1525,6 +1858,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Ванильный вид"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Приватные"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Вайпы"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Генерация мира"
