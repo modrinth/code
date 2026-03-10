@@ -100,10 +100,7 @@ pub async fn project_search(
         ..info
     };
 
-    let results = search_backend
-        .search_for_project(&info, &redis)
-        .await
-        .map_err(ApiError::Internal)?;
+    let results = search_backend.search_for_project(&info, &redis).await?;
 
     let results = LegacySearchResults::from(results);
 

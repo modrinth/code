@@ -17,7 +17,6 @@ use labrinth::utoipa_app_config;
 use labrinth::{app_config, env};
 use labrinth::{clickhouse, database, file_hosting};
 use std::ffi::CStr;
-use std::io;
 use std::sync::Arc;
 use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
@@ -172,7 +171,7 @@ async fn app() -> std::io::Result<()> {
             pool,
             ro_pool.into_inner(),
             redis_pool,
-            search_config,
+            search_backend,
             clickhouse,
             stripe_client,
             anrok_client.clone(),

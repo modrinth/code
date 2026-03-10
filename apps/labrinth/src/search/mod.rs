@@ -1,9 +1,12 @@
 use crate::database::redis::RedisPool;
 use crate::models::exp;
-use crate::models::ids::VersionId;
+use crate::models::exp::minecraft::JavaServerPing;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::SearchRequest;
+use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
+use ariadne::ids::base62_impl::parse_base62;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -18,6 +21,18 @@ pub mod indexing;
 #[async_trait]
 pub trait SearchBackend: Send + Sync {
     async fn search_for_project(
+        &self,
+        info: &SearchRequest,
+        redis: &RedisPool,
+    ) -> Result<SearchResults, ApiError> {
+        let mut results = self.search_for_project_raw(info).await?;
+        hydrate_search_results(&mut results.hits, redis)
+            .await
+            .map_err(ApiError::Internal)?;
+        Ok(results)
+    }
+
+    async fn search_for_project_raw(
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError>;
@@ -36,6 +51,57 @@ pub trait SearchBackend: Send + Sync {
         &self,
         filter: &TasksCancelFilter,
     ) -> eyre::Result<()>;
+}
+
+async fn hydrate_search_results(
+    hits: &mut [ResultSearchProject],
+    redis_pool: &RedisPool,
+) -> eyre::Result<()> {
+    // Minecraft Java servers should fetch the latest player count that we have
+    // from Redis, rather than the (pretty stale) data from search backend
+    // TODO: this block should be made generic over the component type,
+    // for now we can hardcode MC java servers tho
+
+    let project_ids = hits
+        .iter()
+        .filter(|hit| hit.components.minecraft_java_server.is_some())
+        .filter_map(|hit| parse_base62(&hit.project_id).ok().map(ProjectId))
+        .collect::<Vec<_>>();
+
+    let pings_by_project_id = if project_ids.is_empty() {
+        HashMap::new()
+    } else {
+        let mut redis = redis_pool.connect().await?;
+        let ping_results = redis
+            .get_many_deserialized_from_json::<JavaServerPing>(
+                server_ping::REDIS_NAMESPACE,
+                &project_ids
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>(),
+            )
+            .await?;
+
+        ping_results
+            .into_iter()
+            .enumerate()
+            .filter_map(|(idx, ping)| ping.map(|ping| (project_ids[idx], ping)))
+            .collect::<HashMap<_, _>>()
+    };
+
+    for hit in hits {
+        let Some(java_server) = hit.components.minecraft_java_server.as_mut()
+        else {
+            continue;
+        };
+        if let Ok(project_id) = parse_base62(&hit.project_id).map(ProjectId) {
+            java_server.ping = pings_by_project_id.get(&project_id).cloned();
+        } else {
+            java_server.ping = None;
+        }
+    }
+
+    Ok(())
 }
 
 #[derive(Deserialize, Serialize, ToSchema)]
@@ -67,31 +133,6 @@ impl FromStr for SearchBackendKind {
         })
     }
 }
-
-// todo: indexes
-/*
-"relevance" => (
-    projects_name,
-    &[
-        "minecraft_java_server.verified_plays_2w:desc",
-        "minecraft_java_server.ping.data.players_online:desc",
-        "downloads:desc",
-    ],
-),
-"downloads" => (projects_filtered_name, &["downloads:desc"]),
-"follows" => (projects_name, &["follows:desc"]),
-"updated" | "date_modified" => (projects_name, &["date_modified:desc"]),
-"newest" | "date_created" => (projects_name, &["date_created:desc"]),
-"minecraft_java_server.verified_plays_2w" => (
-    projects_name,
-    &["minecraft_java_server.verified_plays_2w:desc"],
-),
-"minecraft_java_server.ping.data.players_online" => (
-    projects_name,
-    &["minecraft_java_server.ping.data.players_online:desc"],
-),
-i => return Err(SearchError::InvalidIndex(i.to_string())),
- */
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
@@ -184,20 +225,5 @@ pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
         SearchBackendKind::Elasticsearch => {
             Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::normalize_filter_aliases;
-
-    #[test]
-    fn normalizes_component_filter_aliases() {
-        assert_eq!(
-            normalize_filter_aliases(
-                "components.minecraft_java_server.content = vanilla AND components.minecraft_server.country = US"
-            ),
-            "minecraft_java_server.content.kind = vanilla AND minecraft_server.country = US"
-        );
     }
 }

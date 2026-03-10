@@ -204,7 +204,7 @@ impl Meilisearch {
 
 #[async_trait]
 impl SearchBackend for Meilisearch {
-    async fn search_for_project(
+    async fn search_for_project_raw(
         &self,
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {

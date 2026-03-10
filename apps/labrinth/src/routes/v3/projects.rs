@@ -1182,10 +1182,7 @@ pub async fn project_search(
     search_backend: web::Data<dyn SearchBackend>,
     redis: web::Data<RedisPool>,
 ) -> Result<web::Json<SearchResults>, ApiError> {
-    let results = search_backend
-        .search_for_project(&info, &redis)
-        .await
-        .map_err(ApiError::Internal)?;
+    let results = search_backend.search_for_project(&info, &redis).await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
@@ -2443,7 +2440,7 @@ async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
     project_delete_internal(
@@ -2451,7 +2448,7 @@ async fn project_delete(
         info,
         pool,
         redis,
-        search_config,
+        search_backend,
         session_queue,
     )
     .await

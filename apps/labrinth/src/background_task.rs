@@ -55,7 +55,7 @@ impl BackgroundTask {
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
-                return index_search(ro_pool, redis_pool, search_backend).await;
+                index_search(ro_pool, redis_pool, search_backend).await
             }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
