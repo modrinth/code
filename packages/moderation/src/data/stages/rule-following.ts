@@ -48,9 +48,14 @@ const ruleFollowing: Stage = {
 			suggestedStatus: 'flagged',
 			severity: 'low',
 			shouldShow(project, projectV3) {
-				return !!projectV3?.minecraft_server && !!projectV3?.minecraft_server?.languages?.length && projectV3?.minecraft_server?.languages?.length > 4
+				return (
+					!!projectV3?.minecraft_server &&
+					!!projectV3?.minecraft_server?.languages?.length &&
+					projectV3?.minecraft_server?.languages?.length > 4
+				)
 			},
-			message: async () => (await import('../messages/misc-metadata/excessive_languages-server.md?raw')).default,
+			message: async () =>
+				(await import('../messages/misc-metadata/excessive_languages-server.md?raw')).default,
 		},
 	],
 }

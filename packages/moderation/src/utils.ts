@@ -415,6 +415,5 @@ export function flattenProjectV3Variables(
 	vars['PROJECT_LANGUAGES'] = projectV3.minecraft_server?.languages?.toString() || 'None'
 	vars['PROJECT_LANGUAGE_COUNT'] = (projectV3.minecraft_server?.languages?.length || 0).toString()
 
-
 	return vars
 }
