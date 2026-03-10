@@ -285,20 +285,16 @@
 				you can transfer management to one of them.
 			</p>
 			<div v-if="!organization" class="input-group">
-				<Multiselect
+				<Combobox
 					id="organization-picker"
-					v-model="selectedOrganization"
+					v-model="selectedOrganizationId"
 					class="large-multiselect"
-					track-by="id"
-					label="name"
-					open-direction="top"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:options="organizations || []"
-					:disabled="!currentMember?.is_owner || organizations?.length === 0"
+					:options="organizationOptions"
+					:searchable="true"
+					force-direction="up"
+					:disabled="!currentMember?.is_owner || organizationOptions.length === 0"
 				/>
-				<button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
+				<button class="btn btn-primary" :disabled="!selectedOrganizationId" @click="onAddToOrg">
 					<CheckIcon />
 					Transfer management
 				</button>
@@ -544,13 +540,13 @@ import {
 	Badge,
 	Card,
 	Checkbox,
+	Combobox,
 	ConfirmModal,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
-import { Multiselect } from 'vue-multiselect'
 
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
@@ -600,13 +596,20 @@ initMembers()
 
 const currentUsername = ref('')
 const openTeamMembers = ref([])
-const selectedOrganization = ref(null)
+const selectedOrganizationId = ref('')
 
 const { data: organizations } = useAsyncData('organizations', () => {
 	return useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
 		apiVersion: 3,
 	})
 })
+
+const organizationOptions = computed(() =>
+	(organizations.value ?? []).map((organization) => ({
+		value: organization.id,
+		label: organization.name,
+	})),
+)
 
 const UPLOAD_VERSION = 1 << 0
 const DELETE_VERSION = 1 << 1
@@ -620,9 +623,9 @@ const VIEW_ANALYTICS = 1 << 8
 const VIEW_PAYOUTS = 1 << 9
 
 const onAddToOrg = useClientTry(async () => {
-	if (!selectedOrganization.value) return
+	if (!selectedOrganizationId.value) return
 
-	await useBaseFetch(`organization/${selectedOrganization.value.id}/projects`, {
+	await useBaseFetch(`organization/${selectedOrganizationId.value}/projects`, {
 		method: 'POST',
 		body: JSON.stringify({
 			project_id: project.value.id,

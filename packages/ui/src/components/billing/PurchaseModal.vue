@@ -325,92 +325,15 @@
 					</div>
 				</div>
 				<p class="my-2 text-lg font-bold">Pay for it with</p>
-				<multiselect
-					v-model="selectedPaymentMethod"
+				<Combobox
+					v-model="selectedPaymentMethodId"
 					placeholder="Payment method"
-					label="id"
-					track-by="id"
-					:options="selectablePaymentMethods"
-					:option-height="104"
-					:show-labels="false"
+					:options="selectablePaymentMethodOptions"
 					:searchable="false"
-					:close-on-select="true"
-					:allow-empty="false"
-					open-direction="top"
+					:show-icon-in-selected="true"
+					force-direction="up"
 					class="max-w-[20rem]"
-					@select="selectPaymentMethod"
-				>
-					<!-- eslint-disable-next-line vue/no-template-shadow -->
-					<template #singleLabel="props">
-						<div class="flex items-center gap-2">
-							<CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
-							<CurrencyIcon v-else-if="props.option.type === 'cashapp'" class="h-8 w-8" />
-							<PayPalIcon v-else-if="props.option.type === 'paypal'" class="h-8 w-8" />
-
-							<span v-if="props.option.type === 'card'">
-								{{
-									formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
-										card_brand:
-											formatMessage(paymentMethodMessages[props.option.card.brand]) ??
-											formatMessage(paymentMethodMessages.unknown),
-										last_four: props.option.card.last4,
-									})
-								}}
-							</span>
-							<template v-else>
-								{{
-									formatMessage(paymentMethodMessages[props.option.type]) ??
-									formatMessage(paymentMethodMessages.unknown)
-								}}
-							</template>
-
-							<span v-if="props.option.type === 'cashapp' && props.option.cashapp.cashtag">
-								({{ props.option.cashapp.cashtag }})
-							</span>
-							<span v-else-if="props.option.type === 'paypal' && props.option.paypal.payer_email">
-								({{ props.option.paypal.payer_email }})
-							</span>
-						</div>
-					</template>
-					<!-- eslint-disable-next-line vue/no-template-shadow -->
-					<template #option="props">
-						<div class="flex items-center gap-2">
-							<template v-if="props.option.id === 'new'">
-								<PlusIcon class="h-8 w-8" />
-								<span class="text-secondary">Add payment method</span>
-							</template>
-							<template v-else>
-								<CardIcon v-if="props.option.type === 'card'" class="h-8 w-8" />
-								<CurrencyIcon v-else-if="props.option.type === 'cashapp'" class="h-8 w-8" />
-								<PayPalIcon v-else-if="props.option.type === 'paypal'" class="h-8 w-8" />
-
-								<span v-if="props.option.type === 'card'">
-									{{
-										formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
-											card_brand:
-												formatMessage(paymentMethodMessages[props.option.card.brand]) ??
-												formatMessage(paymentMethodMessages.unknown),
-											last_four: props.option.card.last4,
-										})
-									}}
-								</span>
-								<template v-else>
-									{{
-										formatMessage(paymentMethodMessages[props.option.type]) ??
-										formatMessage(paymentMethodMessages.unknown)
-									}}
-								</template>
-
-								<span v-if="props.option.type === 'cashapp'">
-									({{ props.option.cashapp.cashtag }})
-								</span>
-								<span v-else-if="props.option.type === 'paypal'">
-									({{ props.option.paypal.payer_email }})
-								</span>
-							</template>
-						</div>
-					</template>
-				</multiselect>
+				/>
 			</div>
 			<p class="m-0 mt-9 text-sm text-secondary">
 				<strong>By clicking "Subscribe", you are purchasing a recurring subscription.</strong>
@@ -548,12 +471,12 @@ import {
 import { calculateSavings, createStripeElements, formatPrice, getCurrency } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
-import { Multiselect } from 'vue-multiselect'
 
 import { useVIntl } from '../../composables/i18n'
 import { paymentMethodMessages } from '../../utils/common-messages'
 import Admonition from '../base/Admonition.vue'
 import Checkbox from '../base/Checkbox.vue'
+import Combobox from '../base/Combobox.vue'
 import Slider from '../base/Slider.vue'
 import StyledInput from '../base/StyledInput.vue'
 import AnimatedLogo from '../brand/AnimatedLogo.vue'
@@ -781,6 +704,67 @@ const selectablePaymentMethods = computed(() => {
 	}
 
 	return values
+})
+
+function formatPaymentMethodLabel(paymentMethod) {
+	if (!paymentMethod) {
+		return formatMessage(paymentMethodMessages.unknown)
+	}
+
+	if (paymentMethod.id === 'new') {
+		return 'Add payment method'
+	}
+
+	if (paymentMethod.type === 'card') {
+		return formatMessage(paymentMethodMessages.paymentMethodCardDisplay, {
+			card_brand:
+				formatMessage(paymentMethodMessages[paymentMethod.card?.brand]) ??
+				formatMessage(paymentMethodMessages.unknown),
+			last_four: paymentMethod.card?.last4 ?? '****',
+		})
+	}
+
+	const typeLabel =
+		formatMessage(paymentMethodMessages[paymentMethod.type]) ??
+		formatMessage(paymentMethodMessages.unknown)
+	let suffix = ''
+
+	if (paymentMethod.type === 'cashapp' && paymentMethod.cashapp?.cashtag) {
+		suffix = ` (${paymentMethod.cashapp.cashtag})`
+	} else if (paymentMethod.type === 'paypal' && paymentMethod.paypal?.payer_email) {
+		suffix = ` (${paymentMethod.paypal.payer_email})`
+	}
+
+	return `${typeLabel}${suffix}`
+}
+
+function getPaymentMethodIcon(paymentMethod) {
+	if (paymentMethod.id === 'new') return PlusIcon
+	if (paymentMethod.type === 'card') return CardIcon
+	if (paymentMethod.type === 'cashapp') return CurrencyIcon
+	if (paymentMethod.type === 'paypal') return PayPalIcon
+	return undefined
+}
+
+const selectablePaymentMethodOptions = computed(() =>
+	selectablePaymentMethods.value.map((paymentMethod) => ({
+		value: paymentMethod.id,
+		label: formatPaymentMethodLabel(paymentMethod),
+		icon: getPaymentMethodIcon(paymentMethod),
+	})),
+)
+
+const selectedPaymentMethodId = computed({
+	get: () => selectedPaymentMethod.value?.id ?? null,
+	set: (value) => {
+		if (!value) return
+
+		const paymentMethod = selectablePaymentMethods.value.find((method) => method.id === value)
+		if (paymentMethod) {
+			selectedPaymentMethod.value = paymentMethod
+			void selectPaymentMethod(paymentMethod)
+		}
+	},
 })
 
 const primaryPaymentMethodId = computed(() => {

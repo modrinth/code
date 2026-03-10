@@ -295,7 +295,7 @@ export const commonMessages = defineMessages({
 	},
 	sortByLabel: {
 		id: 'label.sort-by',
-		defaultMessage: 'Sort by',
+		defaultMessage: 'Sort by: ',
 	},
 	stopButton: {
 		id: 'button.stop',

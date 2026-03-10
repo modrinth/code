@@ -36,15 +36,13 @@
 			<div class="input-row">
 				<p class="input-label">Game version</p>
 				<div class="flex gap-4 items-center">
-					<multiselect
+					<Combobox
 						v-model="game_version"
 						class="selector"
-						:options="game_versions"
-						:multiple="false"
+						:options="gameVersionOptions"
 						:searchable="true"
 						placeholder="Select game version"
-						open-direction="top"
-						:show-labels="false"
+						force-direction="up"
 					/>
 					<Checkbox v-model="showSnapshots" class="shrink-0" label="Show all versions" />
 				</div>
@@ -56,14 +54,13 @@
 			<div v-if="loader_version === 'other' && loader !== 'vanilla'">
 				<div v-if="game_version" class="input-row">
 					<p class="input-label">Select version</p>
-					<multiselect
+					<Combobox
 						v-model="specified_loader_version"
 						class="selector"
-						:options="selectable_versions"
+						:options="selectableVersionOptions"
 						:searchable="true"
 						placeholder="Select loader version"
-						open-direction="top"
-						:show-labels="false"
+						force-direction="up"
 					/>
 				</div>
 				<div v-else class="input-row">
@@ -199,6 +196,7 @@ import {
 	Button,
 	Checkbox,
 	Chips,
+	Combobox,
 	injectNotificationManager,
 	StyledInput,
 } from '@modrinth/ui'
@@ -206,7 +204,6 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
-import Multiselect from 'vue-multiselect'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
@@ -331,6 +328,13 @@ const game_versions = computed(() => {
 		.map((item) => item.id)
 })
 
+const gameVersionOptions = computed(() =>
+	game_versions.value.map((version) => ({
+		value: version,
+		label: version,
+	})),
+)
+
 const modal = ref(null)
 
 const check_valid = computed(() => {
@@ -408,6 +412,13 @@ const selectable_versions = computed(() => {
 	}
 	return []
 })
+
+const selectableVersionOptions = computed(() =>
+	selectable_versions.value.map((version) => ({
+		value: version,
+		label: version,
+	})),
+)
 
 const openFile = async () => {
 	const newProject = await open({ multiple: false })
