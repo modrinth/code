@@ -589,7 +589,7 @@ const messages = defineMessages({
 			ref="repairModal"
 			:server="ctx.isServer"
 			@repair="
-				form.cancelEditing();
+				form.cancelEditing()
 				ctx.repair()
 			"
 		/>
@@ -597,7 +597,7 @@ const messages = defineMessages({
 			ref="reinstallModal"
 			:server="ctx.isServer"
 			@reinstall="
-				form.cancelEditing();
+				form.cancelEditing()
 				ctx.reinstallModpack()
 			"
 		/>
@@ -605,7 +605,7 @@ const messages = defineMessages({
 			ref="unlinkModal"
 			:server="ctx.isServer"
 			@unlink="
-				form.cancelEditing();
+				form.cancelEditing()
 				ctx.unlinkModpack()
 			"
 		/>

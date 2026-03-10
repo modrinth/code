@@ -6,9 +6,7 @@
 
 		<div v-if="backup.available">
 			<!-- Button / Loading state -->
-			<ButtonStyled
-				v-if="!backup.backupComplete.value && !backup.backupFailed.value"
-			>
+			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
 				<button
 					v-tooltip="
 						backup.externalBackupInProgress.value
@@ -21,11 +19,7 @@
 				>
 					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
 					<PlusIcon v-else class="size-5" />
-					{{
-						formatMessage(
-							backup.isBackingUp.value ? messages.backingUp : messages.createBackup,
-						)
-					}}
+					{{ formatMessage(backup.isBackingUp.value ? messages.backingUp : messages.createBackup) }}
 				</button>
 			</ButtonStyled>
 

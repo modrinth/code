@@ -254,6 +254,9 @@
   "content.inline-backup.backup-failed": {
     "defaultMessage": "Backup creation failed. You can still proceed."
   },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "A backup is in progress, it's recommended to wait for it to finish before performing this action."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
   },

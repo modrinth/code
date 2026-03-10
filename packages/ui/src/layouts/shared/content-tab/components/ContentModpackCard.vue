@@ -52,7 +52,7 @@ interface Props {
 	disabledText?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
 	projectLink: undefined,
 	version: undefined,
 	versionLink: undefined,

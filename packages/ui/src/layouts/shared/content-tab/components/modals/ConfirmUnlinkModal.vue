@@ -20,10 +20,7 @@
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button
-						class="!border !border-surface-4"
-						@click="modal?.hide()"
-					>
+					<button class="!border !border-surface-4" @click="modal?.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>

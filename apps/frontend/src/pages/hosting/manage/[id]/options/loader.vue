@@ -24,7 +24,7 @@
 				<ServerSetupModal
 					ref="setupModal"
 					@reinstall="
-						installationSettingsLayout?.cancelEditing();
+						installationSettingsLayout?.cancelEditing()
 						emit('reinstall', $event)
 					"
 					@browse-modpacks="onBrowseModpacks"
