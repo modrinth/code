@@ -13,7 +13,7 @@ const props = defineProps<{
 const messages = defineMessages({
 	ping: {
 		id: 'project.server.ping.ms',
-		defaultMessage: '{ping} ms',
+		defaultMessage: '{ping, number} ms',
 	},
 	online: {
 		id: 'project.server.status.online',

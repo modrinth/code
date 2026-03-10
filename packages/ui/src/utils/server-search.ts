@@ -25,24 +25,6 @@ export const SERVER_REGIONS = {
 	russia: defineMessage({ id: 'project.server.region.russia', defaultMessage: 'Russia' }),
 }
 
-const searchableLanguages = [
-	'en',
-	'de',
-	'fr',
-	'es',
-	'pt',
-	'ru',
-	'zh',
-	'ja',
-	'ko',
-	'nl',
-	'pl',
-	'it',
-	'tr',
-	'sv',
-	'fi',
-]
-
 export const SERVER_LANGUAGES = {
 	en: defineMessage({ id: 'project.server.language.en', defaultMessage: 'English' }),
 	es: defineMessage({ id: 'project.server.language.es', defaultMessage: 'Spanish' }),
@@ -83,6 +65,40 @@ export const SERVER_LANGUAGES = {
 	lt: defineMessage({ id: 'project.server.language.lt', defaultMessage: 'Lithuanian' }),
 	lv: defineMessage({ id: 'project.server.language.lv', defaultMessage: 'Latvian' }),
 	et: defineMessage({ id: 'project.server.language.et', defaultMessage: 'Estonian' }),
+	af: defineMessage({ id: 'project.server.language.af', defaultMessage: 'Afrikaans' }),
+	am: defineMessage({ id: 'project.server.language.am', defaultMessage: 'Amharic' }),
+	az: defineMessage({ id: 'project.server.language.az', defaultMessage: 'Azerbaijani' }),
+	be: defineMessage({ id: 'project.server.language.be', defaultMessage: 'Belarusian' }),
+	bs: defineMessage({ id: 'project.server.language.bs', defaultMessage: 'Bosnian' }),
+	ca: defineMessage({ id: 'project.server.language.ca', defaultMessage: 'Catalan' }),
+	eo: defineMessage({ id: 'project.server.language.eo', defaultMessage: 'Esperanto' }),
+	eu: defineMessage({ id: 'project.server.language.eu', defaultMessage: 'Basque' }),
+	fa: defineMessage({ id: 'project.server.language.fa', defaultMessage: 'Persian' }),
+	ga: defineMessage({ id: 'project.server.language.ga', defaultMessage: 'Irish' }),
+	gl: defineMessage({ id: 'project.server.language.gl', defaultMessage: 'Galician' }),
+	hy: defineMessage({ id: 'project.server.language.hy', defaultMessage: 'Armenian' }),
+	is: defineMessage({ id: 'project.server.language.is', defaultMessage: 'Icelandic' }),
+	ka: defineMessage({ id: 'project.server.language.ka', defaultMessage: 'Georgian' }),
+	kk: defineMessage({ id: 'project.server.language.kk', defaultMessage: 'Kazakh' }),
+	km: defineMessage({ id: 'project.server.language.km', defaultMessage: 'Khmer' }),
+	kn: defineMessage({ id: 'project.server.language.kn', defaultMessage: 'Kannada' }),
+	lo: defineMessage({ id: 'project.server.language.lo', defaultMessage: 'Lao' }),
+	mk: defineMessage({ id: 'project.server.language.mk', defaultMessage: 'Macedonian' }),
+	ml: defineMessage({ id: 'project.server.language.ml', defaultMessage: 'Malayalam' }),
+	mn: defineMessage({ id: 'project.server.language.mn', defaultMessage: 'Mongolian' }),
+	mr: defineMessage({ id: 'project.server.language.mr', defaultMessage: 'Marathi' }),
+	my: defineMessage({ id: 'project.server.language.my', defaultMessage: 'Burmese' }),
+	ne: defineMessage({ id: 'project.server.language.ne', defaultMessage: 'Nepali' }),
+	pa: defineMessage({ id: 'project.server.language.pa', defaultMessage: 'Punjabi' }),
+	si: defineMessage({ id: 'project.server.language.si', defaultMessage: 'Sinhala' }),
+	sl: defineMessage({ id: 'project.server.language.sl', defaultMessage: 'Slovenian' }),
+	sq: defineMessage({ id: 'project.server.language.sq', defaultMessage: 'Albanian' }),
+	sw: defineMessage({ id: 'project.server.language.sw', defaultMessage: 'Swahili' }),
+	ta: defineMessage({ id: 'project.server.language.ta', defaultMessage: 'Tamil' }),
+	te: defineMessage({ id: 'project.server.language.te', defaultMessage: 'Telugu' }),
+	uz: defineMessage({ id: 'project.server.language.uz', defaultMessage: 'Uzbek' }),
+	yo: defineMessage({ id: 'project.server.language.yo', defaultMessage: 'Yoruba' }),
+	zu: defineMessage({ id: 'project.server.language.zu', defaultMessage: 'Zulu' }),
 }
 
 export const SERVER_SORT_TYPES: SortType[] = [
@@ -159,13 +175,11 @@ export function useServerSearch(opts: {
 			return aFormatted.localeCompare(bFormatted, locale.value)
 		})
 
-		const sortedLanguages = Object.entries(SERVER_LANGUAGES)
-			.filter(([code, _]) => searchableLanguages.includes(code))
-			.sort(([_, a], [__, b]) => {
-				const aFormatted = formatMessage(a)
-				const bFormatted = formatMessage(b)
-				return aFormatted.localeCompare(bFormatted, locale.value)
-			})
+		const sortedLanguages = Object.entries(SERVER_LANGUAGES).sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
 
 		return [
 			{

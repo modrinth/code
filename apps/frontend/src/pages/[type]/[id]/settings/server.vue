@@ -166,11 +166,12 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	SERVER_LANGUAGES,
+	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
-import { SERVER_LANGUAGES, SERVER_REGIONS } from '@modrinth/ui/src/utils/server-search.ts'
 import { Multiselect } from 'vue-multiselect'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'

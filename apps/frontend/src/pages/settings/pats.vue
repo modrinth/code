@@ -119,16 +119,7 @@
 						<CopyCode :text="pat.access_token" />
 					</template>
 					<template v-else>
-						<span
-							v-tooltip="
-								pat.last_used
-									? formatMessage(commonMessages.dateAtTimeTooltip, {
-											date: new Date(pat.last_used),
-											time: new Date(pat.last_used),
-										})
-									: null
-							"
-						>
+						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
 							<template v-if="pat.last_used">
 								{{
 									formatMessage(tokenMessages.lastUsed, {
@@ -139,14 +130,7 @@
 							<template v-else>{{ formatMessage(tokenMessages.neverUsed) }}</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.expires),
-									time: new Date(pat.expires),
-								})
-							"
-						>
+						<span v-tooltip="formatDateTime(pat.expires)">
 							<template v-if="new Date(pat.expires) > new Date()">
 								{{
 									formatMessage(tokenMessages.expiresIn, {
@@ -163,14 +147,7 @@
 							</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.created),
-									time: new Date(pat.created),
-								})
-							"
-						>
+						<span v-tooltip="formatDateTime(pat.created)">
 							{{
 								formatMessage(commonMessages.createdAgoLabel, {
 									ago: formatRelativeTime(pat.created),
@@ -222,6 +199,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -240,6 +218,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const createModalMessages = defineMessages({
 	createTitle: {

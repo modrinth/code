@@ -90,8 +90,15 @@ import {
 	GenericListIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Combobox, defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	Combobox,
+	defineMessages,
+	useFormatDateTime,
+	useFormatMoney,
+	useVIntl,
+} from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
@@ -99,6 +106,12 @@ import { useGeneratedState } from '~/composables/generated'
 import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatMonth = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+})
+
 const generatedState = useGeneratedState()
 
 useHead({
@@ -152,7 +165,7 @@ function getPeriodLabel(date) {
 	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
 		return 'Last month'
 	} else {
-		return txnDate.format('MMMM YYYY')
+		return capitalizeString(formatMonth(txnDate.toDate()))
 	}
 }
 

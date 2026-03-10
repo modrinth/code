@@ -27,20 +27,20 @@
 						v-tooltip="
 							capitalizeString(
 								formatMessage(commonMessages.projectDownloads, {
-									count: formatNumber(project.downloads, false),
+									count: project.downloads,
 								}),
 							)
 						"
 						class="flex items-center gap-2 font-semibold cursor-help"
 					>
 						<DownloadIcon class="h-6 w-6 text-secondary" />
-						{{ formatNumber(project.downloads) }}
+						{{ formatCompactNumber(project.downloads) }}
 					</div>
 					<div
 						v-tooltip="
 							capitalizeString(
 								formatMessage(commonMessages.projectFollowers, {
-									count: formatNumber(project.followers, false),
+									count: project.followers,
 								}),
 							)
 						"
@@ -49,7 +49,7 @@
 					>
 						<HeartIcon class="h-6 w-6 text-secondary" />
 						<span class="font-semibold">
-							{{ formatNumber(project.followers) }}
+							{{ formatCompactNumber(project.followers) }}
 						</span>
 					</div>
 				</template>
@@ -74,11 +74,11 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, HeartIcon } from '@modrinth/assets'
-import { capitalizeString, formatNumber, type Project } from '@modrinth/utils'
+import { capitalizeString, type Project } from '@modrinth/utils'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useVIntl } from '../../composables'
+import { useCompactNumber, useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
@@ -89,6 +89,7 @@ import ServerDetails from './server/ServerDetails.vue'
 
 const router = useRouter()
 const { formatMessage } = useVIntl()
+const { formatCompactNumber } = useCompactNumber()
 
 const props = withDefaults(
 	defineProps<{
