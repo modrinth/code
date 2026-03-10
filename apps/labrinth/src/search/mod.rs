@@ -175,6 +175,16 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SearchHitMetadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Vec<Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub explanation: Option<Value>,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
@@ -214,6 +224,8 @@ pub struct ResultSearchProject {
     pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search_metadata: Option<SearchHitMetadata>,
 }
 
 impl From<UploadSearchProject> for ResultSearchProject {
@@ -241,6 +253,7 @@ impl From<UploadSearchProject> for ResultSearchProject {
             project_loader_fields: source.project_loader_fields,
             components: source.components,
             loader_fields: source.loader_fields,
+            search_metadata: None,
         }
     }
 }

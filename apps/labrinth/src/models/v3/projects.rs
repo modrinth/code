@@ -1029,6 +1029,8 @@ pub struct SearchRequest {
     pub offset: Option<String>,
     pub index: Option<String>,
     pub limit: Option<String>,
+    #[serde(default)]
+    pub show_metadata: bool,
 
     pub new_filters: Option<String>,
 

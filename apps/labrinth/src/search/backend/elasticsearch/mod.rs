@@ -10,8 +10,8 @@ use crate::search::backend::{
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
-    UploadSearchProject,
+    ResultSearchProject, SearchBackend, SearchHitMetadata, SearchResults,
+    TasksCancelFilter, UploadSearchProject,
 };
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
@@ -634,6 +634,7 @@ impl SearchBackend for Elasticsearch {
         let parsed = parse_search_request(info)?;
         let (index_name, sort) =
             self.get_sort_index(parsed.index, info.new_filters.as_deref())?;
+        let include_metadata = info.show_metadata;
 
         let mut must = Vec::new();
         let query_text = parsed.query.trim();
@@ -692,6 +693,9 @@ impl SearchBackend for Elasticsearch {
                     "field": "project_id"
                 },
                 "sort": sort,
+                "track_scores": include_metadata,
+                "explain": include_metadata,
+                "profile": include_metadata,
                 "aggs": {
                     "unique_projects": {
                         "cardinality": {
@@ -725,15 +729,47 @@ impl SearchBackend for Elasticsearch {
             .cloned()
             .unwrap_or_default()
             .into_iter()
-            .filter_map(|hit| hit.get("_source").cloned())
-            .map(|source| -> Result<ResultSearchProject, ApiError> {
+            .map(|hit| -> Result<Option<ResultSearchProject>, ApiError> {
+                let Some(source) = hit.get("_source").cloned() else {
+                    return Ok(None);
+                };
+
+                let score = if include_metadata {
+                    hit.get("_score").and_then(Value::as_f64)
+                } else {
+                    None
+                };
+                let sort = if include_metadata {
+                    hit.get("sort").and_then(Value::as_array).cloned()
+                } else {
+                    None
+                };
+                let explanation = if include_metadata {
+                    hit.get("_explanation").cloned()
+                } else {
+                    None
+                };
+
                 serde_json::from_value::<UploadSearchProject>(source)
                     .wrap_internal_err(
                         "failed to deserialize Elasticsearch hit",
                     )
-                    .map(Into::into)
+                    .map(|project| {
+                        let mut result: ResultSearchProject = project.into();
+                        if include_metadata {
+                            result.search_metadata = Some(SearchHitMetadata {
+                                score,
+                                sort,
+                                explanation,
+                            });
+                        }
+                        Some(result)
+                    })
             })
-            .collect::<Result<Vec<_>, ApiError>>()?;
+            .collect::<Result<Vec<_>, ApiError>>()?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>();
 
         let total_hits = response_body.get("aggregations")
             .and_then(|aggs| aggs.get("unique_projects"))
@@ -1061,6 +1097,7 @@ mod tests {
             offset: Some("0".to_string()),
             index: Some("relevance".to_string()),
             limit: Some("20".to_string()),
+            show_metadata: false,
             new_filters: None,
             facets: Some(facets.to_string()),
             filters: Some(filter_query.to_string()),
