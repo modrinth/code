@@ -2,6 +2,7 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 
 import {
+	injectAppBackup,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -9,28 +10,69 @@ import {
 
 export function useInlineBackup(backupName: string | (() => string)) {
 	const serverCtx = injectModrinthServerContext(null)
+	const appBackup = injectAppBackup(null)
 
 	if (!serverCtx) {
+		if (appBackup) {
+			const isBackingUp = ref(false)
+			const backupFailed = ref(false)
+			const backupComplete = ref(false)
+
+			return {
+				available: true as const,
+				isBackingUp,
+				isCancelling: ref(false),
+				backupFailed,
+				backupComplete,
+				backupCancelled: ref(false),
+				externalBackupInProgress: computed(() => false),
+				startBackup: async () => {
+					isBackingUp.value = true
+					backupFailed.value = false
+					backupComplete.value = false
+					try {
+						await appBackup.createBackup()
+						backupComplete.value = true
+					} catch {
+						backupFailed.value = true
+					} finally {
+						isBackingUp.value = false
+					}
+				},
+				cancelBackup: async () => {},
+			}
+		}
+
 		return {
 			available: false as const,
 			isBackingUp: ref(false),
+			isCancelling: ref(false),
 			backupFailed: ref(false),
 			backupComplete: ref(false),
+			backupCancelled: ref(false),
+			externalBackupInProgress: ref(false),
 			startBackup: async () => {},
-			disableClose: computed(() => false),
+			cancelBackup: async () => {},
 		}
 	}
 
 	const client = injectModrinthClient()
 	const { addNotification } = injectNotificationManager()
-	const { serverId, worldId, backupsState } = serverCtx
+	const { serverId, worldId, backupsState, markBackupCancelled } = serverCtx
 
 	const isBackingUp = ref(false)
 	const backupFailed = ref(false)
 	const backupComplete = ref(false)
+	const backupCancelled = ref(false)
+	const isCancelling = ref(false)
 	const createdBackupId = ref<string | null>(null)
 
-	const disableClose = computed(() => isBackingUp.value)
+	const externalBackupInProgress = computed(() => {
+		for (const [id, entry] of backupsState.entries()) {
+			if (id !== createdBackupId.value && entry.create?.state === 'ongoing') return true
+		}
+		return false
+	})
 
 	// Watch backupsState for websocket progress events from Kyros
 	watch(
@@ -44,7 +86,11 @@ export function useInlineBackup(backupName: string | (() => string)) {
 			if (entry.create.state === 'done') {
 				isBackingUp.value = false
 				backupComplete.value = true
-			} else if (entry.create.state === 'failed' || entry.create.state === 'cancelled') {
+			} else if (entry.create.state === 'cancelled') {
+				isBackingUp.value = false
+				isCancelling.value = false
+				backupCancelled.value = true
+			} else if (entry.create.state === 'failed') {
 				isBackingUp.value = false
 				backupFailed.value = true
 			}
@@ -97,6 +143,8 @@ export function useInlineBackup(backupName: string | (() => string)) {
 		isBackingUp.value = true
 		backupFailed.value = false
 		backupComplete.value = false
+		backupCancelled.value = false
+		isCancelling.value = false
 		createdBackupId.value = null
 
 		try {
@@ -116,6 +164,25 @@ export function useInlineBackup(backupName: string | (() => string)) {
 				title: 'Error creating backup',
 				text: isRateLimit ? "You're creating backups too fast." : message,
 			})
+		}
+	}
+
+	async function cancelBackup() {
+		if (!worldId.value || !createdBackupId.value || !isBackingUp.value) return
+
+		isCancelling.value = true
+		stopPolling()
+		markBackupCancelled(createdBackupId.value)
+
+		try {
+			await client.archon.backups_v1.delete(serverId, worldId.value, createdBackupId.value)
+			addNotification({
+				type: 'info',
+				title: 'Backup cancelled',
+				text: 'The backup has been cancelled. You can create a new one or proceed without a backup.',
+			})
+		} catch {
+			isCancelling.value = false
 		}
 	}
 
@@ -151,9 +218,12 @@ export function useInlineBackup(backupName: string | (() => string)) {
 	return {
 		available: true as const,
 		isBackingUp,
+		isCancelling,
 		backupFailed,
 		backupComplete,
+		backupCancelled,
+		externalBackupInProgress,
 		startBackup,
-		disableClose,
+		cancelBackup,
 	}
 }

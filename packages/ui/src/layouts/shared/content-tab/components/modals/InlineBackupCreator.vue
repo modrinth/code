@@ -4,92 +4,53 @@
 			{{ formatMessage(messages.warningBody, { type: backup.available ? 'server' : 'instance' }) }}
 		</span>
 
-		<div v-if="backup.available" class="overflow-hidden">
-			<!-- Create backup button -->
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-14"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-14"
-				leave-to-class="opacity-0 max-h-0"
+		<div v-if="backup.available">
+			<!-- Button / Loading state -->
+			<ButtonStyled
+				v-if="!backup.backupComplete.value && !backup.backupFailed.value"
 			>
-				<div
-					v-if="
-						!backup.isBackingUp.value && !backup.backupComplete.value && !backup.backupFailed.value
+				<button
+					v-tooltip="
+						backup.externalBackupInProgress.value
+							? formatMessage(messages.backupInProgress)
+							: undefined
 					"
+					class="!shadow-none"
+					:disabled="backup.isBackingUp.value || backup.externalBackupInProgress.value"
+					@click="backup.startBackup()"
 				>
-					<ButtonStyled>
-						<button class="!shadow-none" @click="backup.startBackup()">
-							<PlusIcon class="size-5" />
-							{{ formatMessage(messages.createBackup) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</Transition>
-
-			<!-- Progress bar -->
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-14"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-14"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<div v-if="backup.isBackingUp.value">
-					<ProgressBar
-						:progress="0"
-						color="brand"
-						full-width
-						waiting
-						:label="formatMessage(messages.backingUp)"
-						label-class="text-sm font-medium text-secondary"
-					/>
-				</div>
-			</Transition>
+					<SpinnerIcon v-if="backup.isBackingUp.value" class="size-5 animate-spin" />
+					<PlusIcon v-else class="size-5" />
+					{{
+						formatMessage(
+							backup.isBackingUp.value ? messages.backingUp : messages.createBackup,
+						)
+					}}
+				</button>
+			</ButtonStyled>
 
 			<!-- Success -->
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-14"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-14"
-				leave-to-class="opacity-0 max-h-0"
+			<div
+				v-else-if="backup.backupComplete.value"
+				class="flex items-center gap-1.5 text-sm font-medium text-green"
 			>
-				<div
-					v-if="backup.backupComplete.value"
-					class="flex items-center gap-1.5 text-sm font-medium text-green"
-				>
-					<CheckCircleIcon class="size-5" />
-					{{ formatMessage(messages.backupComplete) }}
-				</div>
-			</Transition>
+				<CheckCircleIcon class="size-5" />
+				{{ formatMessage(messages.backupComplete) }}
+			</div>
 
 			<!-- Failed -->
-			<Transition
-				enter-active-class="transition-all duration-300 ease-out"
-				enter-from-class="opacity-0 max-h-0"
-				enter-to-class="opacity-100 max-h-14"
-				leave-active-class="transition-all duration-200 ease-in"
-				leave-from-class="opacity-100 max-h-14"
-				leave-to-class="opacity-0 max-h-0"
-			>
-				<div v-if="backup.backupFailed.value" class="text-sm text-red">
-					{{ formatMessage(messages.backupFailed) }}
-				</div>
-			</Transition>
+			<div v-else-if="backup.backupFailed.value" class="text-sm text-red">
+				{{ formatMessage(messages.backupFailed) }}
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, PlusIcon } from '@modrinth/assets'
+import { CheckCircleIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
 import { watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 
 import { useInlineBackup } from '../../composables/use-inline-backup'
@@ -99,7 +60,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-	(e: 'update:disableClose' | 'update:buttonsDisabled', value: boolean): void
+	(e: 'update:buttonsDisabled', value: boolean): void
 }>()
 
 const { formatMessage } = useVIntl()
@@ -109,10 +70,14 @@ const backup = useInlineBackup(() => props.backupName)
 watch(
 	() => backup.isBackingUp.value,
 	(backing) => {
-		emit('update:disableClose', backing)
 		emit('update:buttonsDisabled', backing)
 	},
 )
+
+defineExpose({
+	cancelBackup: backup.cancelBackup,
+	isBackingUp: backup.isBackingUp,
+})
 
 const messages = defineMessages({
 	warningBody: {
@@ -135,6 +100,11 @@ const messages = defineMessages({
 	backupFailed: {
 		id: 'content.inline-backup.backup-failed',
 		defaultMessage: 'Backup creation failed. You can still proceed.',
+	},
+	backupInProgress: {
+		id: 'content.inline-backup.backup-in-progress',
+		defaultMessage:
+			"A backup is in progress, it's recommended to wait for it to finish before performing this action.",
 	},
 })
 </script>

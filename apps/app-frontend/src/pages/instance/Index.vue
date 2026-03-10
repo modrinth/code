@@ -249,6 +249,7 @@
 							:versions="modrinthVersions"
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
+							:open-settings="() => settingsModal?.show(1)"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>

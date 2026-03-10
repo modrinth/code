@@ -4,7 +4,7 @@
 		:header="formatMessage(messages.header, { action: downgrade ? 'downgrade' : 'update' })"
 		fade="warning"
 		max-width="500px"
-		:disable-close="disableClose"
+		:on-hide="() => backupCreator?.cancelBackup()"
 	>
 		<div class="flex flex-col gap-6">
 			<Admonition
@@ -16,8 +16,8 @@
 				{{ formatMessage(messages.admonitionBody) }}
 			</Admonition>
 			<InlineBackupCreator
+				ref="backupCreator"
 				:backup-name="downgrade ? 'Before modpack downgrade' : 'Before modpack update'"
-				@update:disable-close="disableClose = $event"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -27,7 +27,6 @@
 				<ButtonStyled type="outlined">
 					<button
 						class="!border !border-surface-4"
-						:disabled="buttonsDisabled"
 						@click="handleCancel"
 					>
 						<XIcon />
@@ -90,7 +89,7 @@ const emit = defineEmits<{
 }>()
 
 const modal = ref<InstanceType<typeof NewModal>>()
-const disableClose = ref(false)
+const backupCreator = ref<InstanceType<typeof InlineBackupCreator>>()
 const buttonsDisabled = ref(false)
 
 function show() {

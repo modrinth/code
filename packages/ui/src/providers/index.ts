@@ -1,4 +1,5 @@
 export * from './api-client'
+export * from './app-backup'
 export * from './content-manager'
 export { createContext } from './create-context'
 export * from './file-picker'

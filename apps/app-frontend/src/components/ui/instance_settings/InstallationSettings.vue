@@ -6,6 +6,7 @@ import {
 	formatLoaderLabel,
 	injectNotificationManager,
 	InstallationSettingsLayout,
+	provideAppBackup,
 	provideInstallationSettings,
 	useVIntl,
 } from '@modrinth/ui'
@@ -17,9 +18,11 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_version } from '@/helpers/cache'
 import { get_loader_versions } from '@/helpers/metadata'
 import {
+	duplicate,
 	edit,
 	get_linked_modpack_info,
 	install,
+	list,
 	update_managed_modrinth_version,
 	update_repair_modrinth,
 } from '@/helpers/profile'
@@ -96,6 +99,20 @@ function getManifest(loader: string) {
 	}
 	return map[loader]
 }
+
+provideAppBackup({
+	async createBackup() {
+		const allProfiles = await list()
+		const prefix = `${props.instance.name} - Backup #`
+		const existingNums = allProfiles
+			.filter((p) => p.name.startsWith(prefix))
+			.map((p) => parseInt(p.name.slice(prefix.length), 10))
+			.filter((n) => !isNaN(n))
+		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
+		const newPath = await duplicate(props.instance.path)
+		await edit(newPath, { name: `${prefix}${nextNum}` })
+	},
+})
 
 provideInstallationSettings({
 	loading: ref(false),

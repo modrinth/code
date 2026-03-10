@@ -68,6 +68,7 @@ import {
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
+	provideAppBackup,
 	provideContentManager,
 	useVIntl,
 } from '@modrinth/ui'
@@ -85,11 +86,13 @@ import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	duplicate,
 	edit,
 	get,
 	get_content_items,
 	get_linked_modpack_content,
 	get_linked_modpack_info,
+	list,
 	remove_project,
 	toggle_disable_project,
 	update_managed_modrinth_version,
@@ -161,6 +164,7 @@ const props = defineProps<{
 	instance: GameInstance
 	versions: Labrinth.Versions.v2.Version[]
 	isServerInstance?: boolean
+	openSettings?: () => void
 }>()
 
 const loading = ref(true)
@@ -594,6 +598,20 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 	loading.value = false
 }
 
+provideAppBackup({
+	async createBackup() {
+		const allProfiles = await list()
+		const prefix = `${props.instance.name} - Backup #`
+		const existingNums = allProfiles
+			.filter((p) => p.name.startsWith(prefix))
+			.map((p) => parseInt(p.name.slice(prefix.length), 10))
+			.filter((n) => !isNaN(n))
+		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
+		const newPath = await duplicate(props.instance.path)
+		await edit(newPath, { name: `${prefix}${nextNum}` })
+	},
+})
+
 provideContentManager({
 	items: projects,
 	loading,
@@ -641,6 +659,7 @@ provideContentManager({
 	updateModpack: props.isServerInstance ? undefined : handleModpackUpdate,
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairProfile,
+	openSettings: props.openSettings,
 	getOverflowOptions,
 	shareItems: handleShareItems,
 	mapToTableItem: (item) => ({

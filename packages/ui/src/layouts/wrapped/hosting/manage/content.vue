@@ -714,6 +714,7 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
+	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		return {

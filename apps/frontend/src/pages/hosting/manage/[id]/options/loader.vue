@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
-		<InstallationSettingsLayout>
+		<InstallationSettingsLayout ref="installationSettingsLayout">
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
@@ -23,7 +23,10 @@
 			<template #extra-modals>
 				<ServerSetupModal
 					ref="setupModal"
-					@reinstall="emit('reinstall', $event)"
+					@reinstall="
+						installationSettingsLayout?.cancelEditing();
+						emit('reinstall', $event)
+					"
 					@browse-modpacks="onBrowseModpacks"
 				/>
 			</template>
@@ -125,6 +128,7 @@ const isInstalling = computed(() => {
 	)
 	return val
 })
+const installationSettingsLayout = ref<InstanceType<typeof InstallationSettingsLayout>>()
 const setupModal = ref<InstanceType<typeof ServerSetupModal>>()
 
 async function invalidateServerState() {

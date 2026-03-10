@@ -5,8 +5,8 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
+	SettingsIcon,
 	SpinnerIcon,
-	TransferIcon,
 } from '@modrinth/assets'
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -67,11 +67,13 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
 	update: []
 	content: []
+	settings: []
 }>()
 
 const instance = getCurrentInstance()
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
 const hasContentListener = computed(() => typeof instance?.vnode.props?.onContent === 'function')
+const hasSettingsListener = computed(() => typeof instance?.vnode.props?.onSettings === 'function')
 
 const formatTimeAgo = useRelativeTime()
 
@@ -86,16 +88,16 @@ const collapsedOptions = computed(() => {
 		action: () => void
 		color?: 'standard' | 'red' | 'brand' | 'orange' | 'green' | 'blue' | 'purple'
 	}[] = []
-	if (hasUpdateListener.value && !props.hasUpdate) {
-		options.push({
-			id: 'update',
-			action: () => emit('update'),
-		})
-	}
 	if (hasContentListener.value) {
 		options.push({
 			id: 'content',
 			action: () => emit('content'),
+		})
+	}
+	if (hasSettingsListener.value) {
+		options.push({
+			id: 'settings',
+			action: () => emit('settings'),
 		})
 	}
 	return options
@@ -168,23 +170,14 @@ const collapsedOptions = computed(() => {
 					<!-- Expanded actions visible at >= 700px -->
 					<div class="hidden @[700px]:flex items-center gap-2">
 						<ButtonStyled
-							v-if="hasUpdateListener"
-							:type="hasUpdate ? 'transparent' : 'outlined'"
-							:color="hasUpdate ? 'green' : undefined"
-							:color-fill="hasUpdate ? 'text' : undefined"
+							v-if="hasUpdateListener && hasUpdate"
+							type="transparent"
+							color="green"
+							color-fill="text"
 						>
-							<button
-								class="flex items-center gap-2"
-								:class="[hasUpdate ? '' : '!border !border-surface-4']"
-								@click="emit('update')"
-							>
-								<DownloadIcon v-if="hasUpdate" class="!text-green" />
-								<TransferIcon v-else />
-								<span class="font-semibold">{{
-									formatMessage(
-										hasUpdate ? commonMessages.updateButton : commonMessages.switchVersionButton,
-									)
-								}}</span>
+							<button class="flex items-center gap-2" @click="emit('update')">
+								<DownloadIcon class="!text-green" />
+								<span class="font-semibold">{{ formatMessage(commonMessages.updateButton) }}</span>
 							</button>
 						</ButtonStyled>
 
@@ -192,6 +185,12 @@ const collapsedOptions = computed(() => {
 							<button class="!shadow-none" @click="emit('content')">
 								<BoxesIcon />
 								{{ formatMessage(commonMessages.contentLabel) }}
+							</button>
+						</ButtonStyled>
+
+						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
+							<button class="!border !border-surface-4" @click="emit('settings')">
+								<SettingsIcon />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -214,13 +213,13 @@ const collapsedOptions = computed(() => {
 							btn-class="!border-surface-4 !border"
 						>
 							<MoreVerticalIcon class="size-5" />
-							<template #update>
-								<TransferIcon class="size-5" />
-								{{ formatMessage(commonMessages.switchVersionButton) }}
-							</template>
 							<template #content>
 								<BoxesIcon class="size-5" />
 								{{ formatMessage(commonMessages.contentLabel) }}
+							</template>
+							<template #settings>
+								<SettingsIcon class="size-5" />
+								{{ formatMessage(commonMessages.settingsLabel) }}
 							</template>
 						</TeleportOverflowMenu></ButtonStyled
 					>

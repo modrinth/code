@@ -19,7 +19,7 @@ import {
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
@@ -103,8 +103,9 @@ const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 
 const queryClient = useQueryClient()
 const modal = ref()
+const tabbedModal = useTemplateRef('tabbedModal')
 
-function show() {
+function show(tabIndex?: number) {
 	if (props.instance.linked_data?.project_id) {
 		queryClient.prefetchQuery({
 			queryKey: ['linkedModpackInfo', props.instance.path],
@@ -112,6 +113,9 @@ function show() {
 		})
 	}
 	modal.value.show()
+	if (tabIndex !== undefined) {
+		nextTick(() => tabbedModal.value?.setTab(tabIndex))
+	}
 }
 
 defineExpose({ show })
@@ -137,6 +141,7 @@ defineExpose({ show })
 		</template>
 
 		<TabbedModal
+			ref="tabbedModal"
 			:tabs="
 				tabs.map((tab) => ({
 					...tab,

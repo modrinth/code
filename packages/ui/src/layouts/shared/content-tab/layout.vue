@@ -473,6 +473,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
 					...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
 					...(ctx.unlinkModpack ? { unlink: () => confirmUnlinkModal?.show() } : {}),
+					...(ctx.openSettings ? { settings: () => ctx.openSettings?.() } : {}),
 				}"
 			/>
 

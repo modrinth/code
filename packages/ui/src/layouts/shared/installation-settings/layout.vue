@@ -59,6 +59,7 @@ function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version) {
 
 function handleModpackUpdateConfirm() {
 	if (pendingUpdateVersion.value) {
+		form.cancelEditing()
 		form.handleUpdaterConfirm(pendingUpdateVersion.value)
 		pendingUpdateVersion.value = null
 	}
@@ -67,6 +68,10 @@ function handleModpackUpdateConfirm() {
 function handleModpackUpdateCancel() {
 	pendingUpdateVersion.value = null
 }
+
+defineExpose({
+	cancelEditing: () => form.cancelEditing(),
+})
 
 const messages = defineMessages({
 	linkedInstanceTitle: {
@@ -580,13 +585,30 @@ const messages = defineMessages({
 			@confirm="handleModpackUpdateConfirm"
 			@cancel="handleModpackUpdateCancel"
 		/>
-		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="ctx.repair()" />
+		<ConfirmRepairModal
+			ref="repairModal"
+			:server="ctx.isServer"
+			@repair="
+				form.cancelEditing();
+				ctx.repair()
+			"
+		/>
 		<ConfirmReinstallModal
 			ref="reinstallModal"
 			:server="ctx.isServer"
-			@reinstall="ctx.reinstallModpack()"
+			@reinstall="
+				form.cancelEditing();
+				ctx.reinstallModpack()
+			"
 		/>
-		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="ctx.unlinkModpack()" />
+		<ConfirmUnlinkModal
+			ref="unlinkModal"
+			:server="ctx.isServer"
+			@unlink="
+				form.cancelEditing();
+				ctx.unlinkModpack()
+			"
+		/>
 
 		<slot name="extra-modals" />
 	</Teleport>

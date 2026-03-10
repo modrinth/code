@@ -76,6 +76,7 @@ export interface ContentManagerContext {
 	updateModpack?: () => void
 	viewModpackContent?: () => void
 	unlinkModpack?: () => void
+	openSettings?: () => void
 
 	// Per-item overflow menu (optional)
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
