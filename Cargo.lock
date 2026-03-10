@@ -2178,7 +2178,6 @@ dependencies = [
  "bytes",
  "chrono",
  "daedalus",
- "dashmap",
  "dotenvy",
  "futures",
  "indexmap 2.11.4",

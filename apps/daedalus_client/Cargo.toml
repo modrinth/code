@@ -15,7 +15,6 @@ async_zip = { workspace = true, features = [
 bytes = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
 daedalus = { workspace = true }
-dashmap = { workspace = true }
 dotenvy = { workspace = true }
 futures = { workspace = true }
 indexmap = { workspace = true, features = ["serde"] }
