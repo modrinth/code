@@ -35,7 +35,22 @@ const ruleFollowing: Stage = {
 			weight: 0,
 			suggestedStatus: 'rejected',
 			severity: 'critical',
+			shouldShow(project, projectV3) {
+				return !!projectV3?.minecraft_server
+			},
 			message: async () => (await import('../messages/paid-access-server.md?raw')).default,
+		},
+		{
+			id: 'excessive_languages',
+			type: 'button',
+			label: 'Excessive languages',
+			weight: 0,
+			suggestedStatus: 'flagged',
+			severity: 'low',
+			shouldShow(project, projectV3) {
+				return !!projectV3?.minecraft_server && !!projectV3?.minecraft_server?.languages?.length && projectV3?.minecraft_server?.languages?.length > 4
+			},
+			message: async () => (await import('../messages/misc-metadata/excessive_languages-server.md?raw')).default,
 		},
 	],
 }
