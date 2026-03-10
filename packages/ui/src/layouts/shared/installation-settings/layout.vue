@@ -69,6 +69,21 @@ function handleModpackUpdateCancel() {
 	pendingUpdateVersion.value = null
 }
 
+function handleRepair() {
+	form.cancelEditing()
+	ctx.repair()
+}
+
+function handleReinstall() {
+	form.cancelEditing()
+	ctx.reinstallModpack()
+}
+
+function handleUnlink() {
+	form.cancelEditing()
+	ctx.unlinkModpack()
+}
+
 defineExpose({
 	cancelEditing: () => form.cancelEditing(),
 })
@@ -588,26 +603,17 @@ const messages = defineMessages({
 		<ConfirmRepairModal
 			ref="repairModal"
 			:server="ctx.isServer"
-			@repair="
-				form.cancelEditing()
-				ctx.repair()
-			"
+			@repair="handleRepair"
 		/>
 		<ConfirmReinstallModal
 			ref="reinstallModal"
 			:server="ctx.isServer"
-			@reinstall="
-				form.cancelEditing()
-				ctx.reinstallModpack()
-			"
+			@reinstall="handleReinstall"
 		/>
 		<ConfirmUnlinkModal
 			ref="unlinkModal"
 			:server="ctx.isServer"
-			@unlink="
-				form.cancelEditing()
-				ctx.unlinkModpack()
-			"
+			@unlink="handleUnlink"
 		/>
 
 		<slot name="extra-modals" />
