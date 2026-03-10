@@ -1,5 +1,5 @@
-use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
+use crate::search::SearchRequest;
 use crate::util::error::Context;
 use eyre::eyre;
 use std::borrow::Cow;

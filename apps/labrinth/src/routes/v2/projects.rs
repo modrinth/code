@@ -4,7 +4,7 @@ use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::projects::{
-    Link, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
+    Link, MonetizationStatus, Project, ProjectStatus, Version,
 };
 use crate::models::v2::projects::{
     DonationLink, LegacyProject, LegacySideType, LegacyVersion,
@@ -14,7 +14,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{ApiError, v2_reroute, v3};
-use crate::search::SearchBackend;
+use crate::search::{SearchBackend, SearchRequest};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

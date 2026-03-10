@@ -1,6 +1,6 @@
 mod common;
-mod elasticsearch;
-mod meilisearch;
+pub mod elasticsearch;
+pub mod meilisearch;
 
 pub use common::{
     ParsedSearchRequest, SearchIndex, SearchIndexName, SearchSort,

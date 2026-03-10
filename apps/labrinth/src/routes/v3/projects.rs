@@ -20,8 +20,7 @@ use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectStatus, SearchRequest,
-    SideTypesMigrationReviewStatus,
+    MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -30,7 +29,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
-use crate::search::{SearchBackend, SearchResults};
+use crate::search::{SearchBackend, SearchQuery, SearchRequest, SearchResults};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -47,6 +46,7 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("search", web::get().to(project_search));
+    cfg.service(project_search_post);
     cfg.route("projects", web::get().to(projects_get));
     cfg.route("projects", web::patch().to(projects_edit));
     cfg.route("projects_random", web::get().to(random_projects_get));
@@ -1178,11 +1178,13 @@ pub async fn edit_project_categories(
 // }
 
 pub async fn project_search(
-    web::Query(info): web::Query<SearchRequest>,
+    web::Query(info): web::Query<SearchQuery>,
     search_backend: web::Data<dyn SearchBackend>,
     redis: web::Data<RedisPool>,
 ) -> Result<web::Json<SearchResults>, ApiError> {
-    let results = search_backend.search_for_project(&info, &redis).await?;
+    let results = search_backend
+        .search_for_project(&SearchRequest::from(info), &redis)
+        .await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
@@ -1196,6 +1198,17 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
+    Ok(web::Json(results))
+}
+
+// for more complicated search queries
+#[post("/search")]
+pub async fn project_search_post(
+    web::Json(info): web::Json<SearchRequest>,
+    search_backend: web::Data<dyn SearchBackend>,
+    redis: web::Data<RedisPool>,
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend.search_for_project(&info, &redis).await?;
     Ok(web::Json(results))
 }
 

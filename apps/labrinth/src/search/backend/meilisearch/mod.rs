@@ -2,14 +2,14 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::VersionId;
-use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
 use crate::search::backend::{
     SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
     parse_search_request,
 };
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchResults, TasksCancelFilter,
+    ResultSearchProject, SearchBackend, SearchRequest, SearchResults,
+    TasksCancelFilter,
 };
 use crate::util::error::Context;
 use async_trait::async_trait;
@@ -312,15 +312,63 @@ impl SearchBackend for Meilisearch {
                 }
             }
 
-            query.execute::<ResultSearchProject>().await?
+            if info.show_metadata {
+                query.with_show_ranking_score(true);
+                query.with_show_ranking_score_details(true);
+                query.execute().await?
+            } else {
+                query.execute::<ResultSearchProject>().await?
+            }
         };
 
-        Ok(SearchResults {
-            hits: results.hits.into_iter().map(|r| r.result).collect(),
-            page: results.page.unwrap_or_default(),
-            hits_per_page: results.hits_per_page.unwrap_or_default(),
-            total_hits: results.total_hits.unwrap_or_default(),
-        })
+        if info.show_metadata {
+            let hits = results
+                .hits
+                .into_iter()
+                .map(|hit| {
+                    let metadata = serde_json::to_value(&hit)
+                        .ok()
+                        .and_then(|value| value.as_object().cloned())
+                        .map(|mut value| {
+                            value.remove("_formatted");
+                            value.remove("_matchesPosition");
+                            value.remove("_federation");
+                            let result = value.remove("result");
+                            let metadata = Value::Object(value);
+                            (result, metadata)
+                        });
+
+                    let (result, metadata) =
+                        metadata.unwrap_or((None, Value::Null));
+                    let mut result = result
+                        .and_then(|value| {
+                            serde_json::from_value::<ResultSearchProject>(value)
+                                .ok()
+                        })
+                        .unwrap_or(hit.result);
+
+                    if !metadata.is_null() {
+                        result.search_metadata = Some(metadata);
+                    }
+
+                    result
+                })
+                .collect();
+
+            Ok(SearchResults {
+                hits,
+                page: results.page.unwrap_or_default(),
+                hits_per_page: results.hits_per_page.unwrap_or_default(),
+                total_hits: results.total_hits.unwrap_or_default(),
+            })
+        } else {
+            Ok(SearchResults {
+                hits: results.hits.into_iter().map(|r| r.result).collect(),
+                page: results.page.unwrap_or_default(),
+                hits_per_page: results.hits_per_page.unwrap_or_default(),
+                total_hits: results.total_hits.unwrap_or_default(),
+            })
+        }
     }
 
     async fn index_projects(

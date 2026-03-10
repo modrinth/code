@@ -1020,22 +1020,3 @@ impl FileType {
 )]
 #[serde(transparent)]
 pub struct Loader(pub String);
-
-// These fields must always succeed parsing; deserialize errors aren't
-// processed correctly (don't return JSON errors)
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SearchRequest {
-    pub query: Option<String>,
-    pub offset: Option<String>,
-    pub index: Option<String>,
-    pub limit: Option<String>,
-    #[serde(default)]
-    pub show_metadata: bool,
-
-    pub new_filters: Option<String>,
-
-    // TODO: Deprecated values below. WILL BE REMOVED V3!
-    pub facets: Option<String>,
-    pub filters: Option<String>,
-    pub version: Option<String>,
-}

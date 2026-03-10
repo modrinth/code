@@ -2,7 +2,6 @@ use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::ids::VersionId;
-use crate::models::projects::SearchRequest;
 use crate::routes::ApiError;
 use crate::search::backend::{
     SearchIndex, SearchIndexName, combined_search_filters, parse_search_index,
@@ -10,7 +9,7 @@ use crate::search::backend::{
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchHitMetadata, SearchResults,
+    ResultSearchProject, SearchBackend, SearchRequest, SearchResults,
     TasksCancelFilter, UploadSearchProject,
 };
 use crate::util::error::Context;
@@ -35,7 +34,7 @@ use elasticsearch::{
 use eyre::eyre;
 use regex::Regex;
 use reqwest::StatusCode;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -76,7 +75,89 @@ pub struct Elasticsearch {
     pub client: EsClient,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct RequestConfig {
+    #[serde(default)]
+    pub multi_match: MultiMatchConfig,
+    #[serde(default)]
+    pub sort: Vec<Value>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct MultiMatchConfig {
+    #[serde(default = "default_multi_match_type", rename = "type")]
+    pub ty: String,
+    #[serde(default = "default_multi_match_fields")]
+    pub fields: Vec<String>,
+    #[serde(flatten, default)]
+    pub extra: HashMap<String, Value>,
+}
+
+impl Default for MultiMatchConfig {
+    fn default() -> Self {
+        Self {
+            ty: default_multi_match_type(),
+            fields: default_multi_match_fields(),
+            extra: HashMap::new(),
+        }
+    }
+}
+
+fn default_multi_match_type() -> String {
+    "bool_prefix".to_string()
+}
+
+fn default_multi_match_fields() -> Vec<String> {
+    vec![
+        "name^8".to_string(),
+        "name._2gram^8".to_string(),
+        "name._3gram^8".to_string(),
+        "slug^8".to_string(),
+        "slug._2gram^8".to_string(),
+        "slug._3gram^8".to_string(),
+        "author^2".to_string(),
+        "author._2gram^2".to_string(),
+        "author._3gram^2".to_string(),
+        "summary^3".to_string(),
+        "summary._2gram^3".to_string(),
+        "summary._3gram^3".to_string(),
+    ]
+}
+
 impl Elasticsearch {
+    fn multi_match_query(
+        query_text: &str,
+        request_config: &RequestConfig,
+    ) -> Value {
+        let mut multi_match = serde_json::Map::from_iter([
+            ("query".to_string(), Value::String(query_text.to_string())),
+            (
+                "type".to_string(),
+                Value::String(request_config.multi_match.ty.clone()),
+            ),
+            (
+                "fields".to_string(),
+                Value::Array(
+                    request_config
+                        .multi_match
+                        .fields
+                        .clone()
+                        .into_iter()
+                        .map(Value::String)
+                        .collect(),
+                ),
+            ),
+        ]);
+
+        for (key, value) in &request_config.multi_match.extra {
+            if key != "query" {
+                multi_match.insert(key.clone(), value.clone());
+            }
+        }
+
+        json!({ "multi_match": Value::Object(multi_match) })
+    }
+
     fn escape_query_string_value(value: &str) -> String {
         const RESERVED: [char; 21] = [
             '+', '-', '=', '&', '|', '>', '<', '!', '(', ')', '{', '}', '[',
@@ -309,6 +390,7 @@ impl Elasticsearch {
         &self,
         index: &str,
         new_filters: Option<&str>,
+        request_config: &RequestConfig,
     ) -> Result<(String, Value), ApiError> {
         let sort = parse_search_index(index, new_filters)?;
         let index_name = match sort.index_name {
@@ -318,7 +400,7 @@ impl Elasticsearch {
             }
         };
 
-        Ok(match sort.index {
+        let default_sort = match sort.index {
             SearchIndex::Relevance => (
                 index_name,
                 json!([
@@ -382,7 +464,13 @@ impl Elasticsearch {
                     { "version_published_timestamp": { "order": "desc" } }
                 ]),
             ),
-        })
+        };
+
+        if request_config.sort.is_empty() {
+            Ok(default_sort)
+        } else {
+            Ok((default_sort.0, Value::Array(request_config.sort.clone())))
+        }
     }
 
     async fn ensure_index(&self, index_name: &str) -> Result<(), ApiError> {
@@ -632,8 +720,12 @@ impl SearchBackend for Elasticsearch {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
         let parsed = parse_search_request(info)?;
-        let (index_name, sort) =
-            self.get_sort_index(parsed.index, info.new_filters.as_deref())?;
+        let request_config = &info.elasticsearch_config;
+        let (index_name, sort) = self.get_sort_index(
+            parsed.index,
+            info.new_filters.as_deref(),
+            request_config,
+        )?;
         let include_metadata = info.show_metadata;
 
         let mut must = Vec::new();
@@ -641,26 +733,7 @@ impl SearchBackend for Elasticsearch {
         if query_text.is_empty() {
             must.push(json!({"match_all": {}}));
         } else {
-            must.push(json!({
-                "multi_match": {
-                    "query": query_text,
-                    "type": "bool_prefix",
-                    "fields": [
-                        "name^8",
-                        "name._2gram^8",
-                        "name._3gram^8",
-                        "slug^8",
-                        "slug._2gram^8",
-                        "slug._3gram^8",
-                        "author^2",
-                        "author._2gram^2",
-                        "author._3gram^2",
-                        "summary^3",
-                        "summary._2gram^3",
-                        "summary._3gram^3"
-                    ]
-                }
-            }));
+            must.push(Self::multi_match_query(query_text, request_config));
         }
 
         let mut filter = Self::facets_filter_clauses(info.facets.as_deref())?;
@@ -734,21 +807,24 @@ impl SearchBackend for Elasticsearch {
                     return Ok(None);
                 };
 
-                let score = if include_metadata {
-                    hit.get("_score").and_then(Value::as_f64)
-                } else {
-                    None
-                };
-                let sort = if include_metadata {
-                    hit.get("sort").and_then(Value::as_array).cloned()
-                } else {
-                    None
-                };
-                let explanation = if include_metadata {
-                    hit.get("_explanation").cloned()
-                } else {
-                    None
-                };
+                let metadata = include_metadata.then(|| {
+                    let mut metadata = serde_json::Map::new();
+
+                    if let Some(score) = hit.get("_score") {
+                        metadata.insert("_score".to_string(), score.clone());
+                    }
+                    if let Some(sort) = hit.get("sort") {
+                        metadata.insert("sort".to_string(), sort.clone());
+                    }
+                    if let Some(explanation) = hit.get("_explanation") {
+                        metadata.insert(
+                            "_explanation".to_string(),
+                            explanation.clone(),
+                        );
+                    }
+
+                    Value::Object(metadata)
+                });
 
                 serde_json::from_value::<UploadSearchProject>(source)
                     .wrap_internal_err(
@@ -756,13 +832,7 @@ impl SearchBackend for Elasticsearch {
                     )
                     .map(|project| {
                         let mut result: ResultSearchProject = project.into();
-                        if include_metadata {
-                            result.search_metadata = Some(SearchHitMetadata {
-                                score,
-                                sort,
-                                explanation,
-                            });
-                        }
+                        result.search_metadata = metadata;
                         Some(result)
                     })
             })
@@ -1081,7 +1151,7 @@ impl SearchBackend for Elasticsearch {
 #[cfg(test)]
 mod tests {
     use super::Elasticsearch;
-    use crate::models::projects::SearchRequest;
+    use crate::search::{SearchRequest, backend::elasticsearch::RequestConfig};
     use serde_json::json;
 
     #[test]
@@ -1098,6 +1168,7 @@ mod tests {
             index: Some("relevance".to_string()),
             limit: Some("20".to_string()),
             show_metadata: false,
+            elasticsearch_config: RequestConfig::default(),
             new_filters: None,
             facets: Some(facets.to_string()),
             filters: Some(filter_query.to_string()),

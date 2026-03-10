@@ -2,7 +2,6 @@ use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
 use crate::models::ids::{ProjectId, VersionId};
-use crate::models::projects::SearchRequest;
 use crate::queue::server_ping;
 use crate::routes::ApiError;
 use crate::{database::PgPool, env::ENV};
@@ -17,6 +16,56 @@ use utoipa::ToSchema;
 
 pub mod backend;
 pub mod indexing;
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SearchQuery {
+    pub query: Option<String>,
+    pub offset: Option<String>,
+    pub index: Option<String>,
+    pub limit: Option<String>,
+
+    pub new_filters: Option<String>,
+
+    pub facets: Option<String>,
+    pub filters: Option<String>,
+    pub version: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SearchRequest {
+    pub query: Option<String>,
+    pub offset: Option<String>,
+    pub index: Option<String>,
+    pub limit: Option<String>,
+    #[serde(default)]
+    pub show_metadata: bool,
+    #[serde(default)]
+    pub elasticsearch_config: backend::elasticsearch::RequestConfig,
+
+    pub new_filters: Option<String>,
+
+    pub facets: Option<String>,
+    pub filters: Option<String>,
+    pub version: Option<String>,
+}
+
+impl From<SearchQuery> for SearchRequest {
+    fn from(query: SearchQuery) -> Self {
+        Self {
+            query: query.query,
+            offset: query.offset,
+            index: query.index,
+            limit: query.limit,
+            show_metadata: false,
+            elasticsearch_config:
+                backend::elasticsearch::RequestConfig::default(),
+            new_filters: query.new_filters,
+            facets: query.facets,
+            filters: query.filters,
+            version: query.version,
+        }
+    }
+}
 
 #[async_trait]
 pub trait SearchBackend: Send + Sync {
@@ -175,16 +224,6 @@ pub struct UploadSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SearchHitMetadata {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub score: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<Vec<Value>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub explanation: Option<Value>,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchResults {
     pub hits: Vec<ResultSearchProject>,
@@ -225,7 +264,7 @@ pub struct ResultSearchProject {
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub search_metadata: Option<SearchHitMetadata>,
+    pub search_metadata: Option<Value>,
 }
 
 impl From<UploadSearchProject> for ResultSearchProject {
