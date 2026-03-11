@@ -553,72 +553,12 @@ pub struct MeilisearchFieldSpec {
 impl SearchField {
     pub const fn meilisearch_spec(self) -> MeilisearchFieldSpec {
         match self {
-            SearchField::VersionId => MeilisearchFieldSpec {
-                path: "version_id",
-                filterable: false,
-            },
-            SearchField::Summary => MeilisearchFieldSpec {
-                path: "summary",
-                filterable: false,
-            },
-            SearchField::Slug => MeilisearchFieldSpec {
-                path: "slug",
-                filterable: false,
-            },
-            SearchField::DisplayCategories => MeilisearchFieldSpec {
-                path: "display_categories",
-                filterable: false,
-            },
-            SearchField::Loaders => MeilisearchFieldSpec {
-                path: "loaders",
-                filterable: false,
-            },
             SearchField::Categories => MeilisearchFieldSpec {
                 path: "categories",
                 filterable: true,
             },
-            SearchField::License => MeilisearchFieldSpec {
-                path: "license",
-                filterable: true,
-            },
             SearchField::ProjectTypes => MeilisearchFieldSpec {
                 path: "project_types",
-                filterable: true,
-            },
-            SearchField::Downloads => MeilisearchFieldSpec {
-                path: "downloads",
-                filterable: true,
-            },
-            SearchField::Follows => MeilisearchFieldSpec {
-                path: "follows",
-                filterable: true,
-            },
-            SearchField::Author => MeilisearchFieldSpec {
-                path: "author",
-                filterable: true,
-            },
-            SearchField::Name => MeilisearchFieldSpec {
-                path: "name",
-                filterable: true,
-            },
-            SearchField::DateCreated => MeilisearchFieldSpec {
-                path: "date_created",
-                filterable: true,
-            },
-            SearchField::CreatedTimestamp => MeilisearchFieldSpec {
-                path: "created_timestamp",
-                filterable: true,
-            },
-            SearchField::DateModified => MeilisearchFieldSpec {
-                path: "date_modified",
-                filterable: true,
-            },
-            SearchField::ModifiedTimestamp => MeilisearchFieldSpec {
-                path: "modified_timestamp",
-                filterable: true,
-            },
-            SearchField::VersionPublishedTimestamp => MeilisearchFieldSpec {
-                path: "version_published_timestamp",
                 filterable: true,
             },
             SearchField::ProjectId => MeilisearchFieldSpec {
@@ -629,20 +569,8 @@ impl SearchField {
                 path: "open_source",
                 filterable: true,
             },
-            SearchField::Color => MeilisearchFieldSpec {
-                path: "color",
-                filterable: true,
-            },
-            SearchField::Environment => MeilisearchFieldSpec {
-                path: "environment",
-                filterable: true,
-            },
             SearchField::GameVersions => MeilisearchFieldSpec {
                 path: "game_versions",
-                filterable: true,
-            },
-            SearchField::MrpackLoaders => MeilisearchFieldSpec {
-                path: "mrpack_loaders",
                 filterable: true,
             },
             SearchField::ClientSide => MeilisearchFieldSpec {
@@ -651,10 +579,6 @@ impl SearchField {
             },
             SearchField::ServerSide => MeilisearchFieldSpec {
                 path: "server_side",
-                filterable: true,
-            },
-            SearchField::MinecraftServerCountry => MeilisearchFieldSpec {
-                path: "minecraft_server.country",
                 filterable: true,
             },
             SearchField::MinecraftServerRegion => MeilisearchFieldSpec {
@@ -677,38 +601,10 @@ impl SearchField {
                     filterable: true,
                 }
             }
-            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
-                MeilisearchFieldSpec {
-                    path: "minecraft_java_server.content.recommended_game_version",
-                    filterable: true,
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays2w => {
-                MeilisearchFieldSpec {
-                    path: "minecraft_java_server.verified_plays_2w",
-                    filterable: true,
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays4w => {
-                MeilisearchFieldSpec {
-                    path: "minecraft_java_server.verified_plays_4w",
-                    filterable: false,
-                }
-            }
-            SearchField::MinecraftJavaServerIsOnline => MeilisearchFieldSpec {
-                path: "minecraft_java_server.is_online",
-                filterable: false,
-            },
             SearchField::MinecraftJavaServerPingData => MeilisearchFieldSpec {
                 path: "minecraft_java_server.ping.data",
                 filterable: true,
             },
-            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
-                MeilisearchFieldSpec {
-                    path: "minecraft_java_server.ping.data.players_online",
-                    filterable: true,
-                }
-            }
         }
     }
 }

@@ -132,73 +132,13 @@ pub struct ElasticsearchFieldSpec {
 impl SearchField {
     pub fn elasticsearch_spec(self) -> ElasticsearchFieldSpec {
         match self {
-            SearchField::VersionId => ElasticsearchFieldSpec {
-                path: "version_id",
-                mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::Summary => ElasticsearchFieldSpec {
-                path: "summary",
-                mapping: json!({ "type": "search_as_you_type" }),
-            },
-            SearchField::Slug => ElasticsearchFieldSpec {
-                path: "slug",
-                mapping: json!({ "type": "search_as_you_type", "fields": { "keyword": { "type": "keyword" } } }),
-            },
-            SearchField::DisplayCategories => ElasticsearchFieldSpec {
-                path: "display_categories",
-                mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::Loaders => ElasticsearchFieldSpec {
-                path: "loaders",
-                mapping: json!({ "type": "keyword" }),
-            },
             SearchField::Categories => ElasticsearchFieldSpec {
                 path: "categories",
-                mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::License => ElasticsearchFieldSpec {
-                path: "license",
                 mapping: json!({ "type": "keyword" }),
             },
             SearchField::ProjectTypes => ElasticsearchFieldSpec {
                 path: "project_types",
                 mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::Downloads => ElasticsearchFieldSpec {
-                path: "downloads",
-                mapping: json!({ "type": "integer" }),
-            },
-            SearchField::Follows => ElasticsearchFieldSpec {
-                path: "follows",
-                mapping: json!({ "type": "integer" }),
-            },
-            SearchField::Author => ElasticsearchFieldSpec {
-                path: "author",
-                mapping: json!({ "type": "search_as_you_type", "fields": { "keyword": { "type": "keyword" } } }),
-            },
-            SearchField::Name => ElasticsearchFieldSpec {
-                path: "name",
-                mapping: json!({ "type": "search_as_you_type" }),
-            },
-            SearchField::DateCreated => ElasticsearchFieldSpec {
-                path: "date_created",
-                mapping: json!({ "type": "date" }),
-            },
-            SearchField::CreatedTimestamp => ElasticsearchFieldSpec {
-                path: "created_timestamp",
-                mapping: json!({ "type": "long" }),
-            },
-            SearchField::DateModified => ElasticsearchFieldSpec {
-                path: "date_modified",
-                mapping: json!({ "type": "date" }),
-            },
-            SearchField::ModifiedTimestamp => ElasticsearchFieldSpec {
-                path: "modified_timestamp",
-                mapping: json!({ "type": "long" }),
-            },
-            SearchField::VersionPublishedTimestamp => ElasticsearchFieldSpec {
-                path: "version_published_timestamp",
-                mapping: json!({ "type": "long" }),
             },
             SearchField::ProjectId => ElasticsearchFieldSpec {
                 path: "project_id",
@@ -208,20 +148,8 @@ impl SearchField {
                 path: "open_source",
                 mapping: json!({ "type": "boolean" }),
             },
-            SearchField::Color => ElasticsearchFieldSpec {
-                path: "color",
-                mapping: json!({ "type": "long" }),
-            },
-            SearchField::Environment => ElasticsearchFieldSpec {
-                path: "environment",
-                mapping: json!({ "type": "keyword" }),
-            },
             SearchField::GameVersions => ElasticsearchFieldSpec {
                 path: "game_versions",
-                mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::MrpackLoaders => ElasticsearchFieldSpec {
-                path: "mrpack_loaders",
                 mapping: json!({ "type": "keyword" }),
             },
             SearchField::ClientSide => ElasticsearchFieldSpec {
@@ -230,10 +158,6 @@ impl SearchField {
             },
             SearchField::ServerSide => ElasticsearchFieldSpec {
                 path: "server_side",
-                mapping: json!({ "type": "keyword" }),
-            },
-            SearchField::MinecraftServerCountry => ElasticsearchFieldSpec {
-                path: "minecraft_server.country",
                 mapping: json!({ "type": "keyword" }),
             },
             SearchField::MinecraftServerRegion => ElasticsearchFieldSpec {
@@ -256,40 +180,10 @@ impl SearchField {
                     mapping: json!({ "type": "keyword" }),
                 }
             }
-            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
-                ElasticsearchFieldSpec {
-                    path: "minecraft_java_server.content.recommended_game_version",
-                    mapping: json!({ "type": "keyword" }),
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays2w => {
-                ElasticsearchFieldSpec {
-                    path: "minecraft_java_server.verified_plays_2w",
-                    mapping: json!({ "type": "long" }),
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays4w => {
-                ElasticsearchFieldSpec {
-                    path: "minecraft_java_server.verified_plays_4w",
-                    mapping: json!({ "type": "long" }),
-                }
-            }
-            SearchField::MinecraftJavaServerIsOnline => {
-                ElasticsearchFieldSpec {
-                    path: "minecraft_java_server.is_online",
-                    mapping: json!({ "type": "boolean" }),
-                }
-            }
             SearchField::MinecraftJavaServerPingData => {
                 ElasticsearchFieldSpec {
                     path: "minecraft_java_server.ping.data",
                     mapping: json!({ "type": "object" }),
-                }
-            }
-            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
-                ElasticsearchFieldSpec {
-                    path: "minecraft_java_server.ping.data.players_online",
-                    mapping: json!({ "type": "long" }),
                 }
             }
         }
@@ -300,12 +194,82 @@ static ELASTICSEARCH_PROPERTIES: LazyLock<serde_json::Map<String, Value>> =
     LazyLock::new(|| {
         use strum::IntoEnumIterator;
 
-        let mut properties = serde_json::Map::new();
+        let mut properties = serde_json::Map::from_iter([
+            ("version_id".to_string(), json!({ "type": "keyword" })),
+            (
+                "slug".to_string(),
+                json!({
+                    "type": "search_as_you_type",
+                    "fields": { "keyword": { "type": "keyword" } }
+                }),
+            ),
+            (
+                "author".to_string(),
+                json!({
+                    "type": "search_as_you_type",
+                    "fields": { "keyword": { "type": "keyword" } }
+                }),
+            ),
+            ("name".to_string(), json!({ "type": "search_as_you_type" })),
+            (
+                "summary".to_string(),
+                json!({ "type": "search_as_you_type" }),
+            ),
+            (
+                "display_categories".to_string(),
+                json!({ "type": "keyword" }),
+            ),
+            ("downloads".to_string(), json!({ "type": "integer" })),
+            ("follows".to_string(), json!({ "type": "integer" })),
+            ("date_created".to_string(), json!({ "type": "date" })),
+            ("created_timestamp".to_string(), json!({ "type": "long" })),
+            ("date_modified".to_string(), json!({ "type": "date" })),
+            ("modified_timestamp".to_string(), json!({ "type": "long" })),
+            (
+                "version_published_timestamp".to_string(),
+                json!({ "type": "long" }),
+            ),
+            ("license".to_string(), json!({ "type": "keyword" })),
+            ("loaders".to_string(), json!({ "type": "keyword" })),
+            ("color".to_string(), json!({ "type": "long" })),
+            ("environment".to_string(), json!({ "type": "keyword" })),
+            ("mrpack_loaders".to_string(), json!({ "type": "keyword" })),
+            (
+                "minecraft_server.country".to_string(),
+                json!({ "type": "keyword" }),
+            ),
+        ]);
 
         for field in SearchField::iter() {
             let spec = field.elasticsearch_spec();
             insert_nested_mapping(&mut properties, spec.path, spec.mapping);
         }
+
+        insert_nested_mapping(
+            &mut properties,
+            "minecraft_java_server.content.recommended_game_version",
+            json!({ "type": "keyword" }),
+        );
+        insert_nested_mapping(
+            &mut properties,
+            "minecraft_java_server.verified_plays_2w",
+            json!({ "type": "long" }),
+        );
+        insert_nested_mapping(
+            &mut properties,
+            "minecraft_java_server.verified_plays_4w",
+            json!({ "type": "long" }),
+        );
+        insert_nested_mapping(
+            &mut properties,
+            "minecraft_java_server.is_online",
+            json!({ "type": "boolean" }),
+        );
+        insert_nested_mapping(
+            &mut properties,
+            "minecraft_java_server.ping.data.players_online",
+            json!({ "type": "long" }),
+        );
 
         let minecraft_java_server = properties
             .remove("minecraft_java_server")

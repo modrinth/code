@@ -245,51 +245,9 @@ pub struct TypesenseFieldSpec {
 impl SearchField {
     pub const fn typesense_spec(self) -> TypesenseFieldSpec {
         match self {
-            SearchField::VersionId => TypesenseFieldSpec {
-                path: "version_id",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: false,
-            },
-            SearchField::Summary => TypesenseFieldSpec {
-                path: "summary",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: false,
-            },
-            SearchField::Slug => TypesenseFieldSpec {
-                path: "slug",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: false,
-            },
-            SearchField::DisplayCategories => TypesenseFieldSpec {
-                path: "display_categories",
-                ty: "string[]",
-                facet: true,
-                sort: false,
-                optional: true,
-            },
-            SearchField::Loaders => TypesenseFieldSpec {
-                path: "loaders",
-                ty: "string[]",
-                facet: false,
-                sort: false,
-                optional: true,
-            },
             SearchField::Categories => TypesenseFieldSpec {
                 path: "categories",
                 ty: "string[]",
-                facet: true,
-                sort: false,
-                optional: true,
-            },
-            SearchField::License => TypesenseFieldSpec {
-                path: "license",
-                ty: "string",
                 facet: true,
                 sort: false,
                 optional: true,
@@ -299,69 +257,6 @@ impl SearchField {
                 ty: "string[]",
                 facet: true,
                 sort: false,
-                optional: true,
-            },
-            SearchField::Downloads => TypesenseFieldSpec {
-                path: "downloads",
-                ty: "int32",
-                facet: true,
-                sort: true,
-                optional: false,
-            },
-            SearchField::Follows => TypesenseFieldSpec {
-                path: "follows",
-                ty: "int32",
-                facet: true,
-                sort: true,
-                optional: false,
-            },
-            SearchField::Author => TypesenseFieldSpec {
-                path: "author",
-                ty: "string",
-                facet: true,
-                sort: false,
-                optional: false,
-            },
-            SearchField::Name => TypesenseFieldSpec {
-                path: "name",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: false,
-            },
-            SearchField::DateCreated => TypesenseFieldSpec {
-                path: "date_created",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: true,
-            },
-            SearchField::CreatedTimestamp => TypesenseFieldSpec {
-                path: "created_timestamp",
-                ty: "int64",
-                facet: false,
-                sort: true,
-                optional: false,
-            },
-            SearchField::DateModified => TypesenseFieldSpec {
-                path: "date_modified",
-                ty: "string",
-                facet: false,
-                sort: false,
-                optional: true,
-            },
-            SearchField::ModifiedTimestamp => TypesenseFieldSpec {
-                path: "modified_timestamp",
-                ty: "int64",
-                facet: false,
-                sort: true,
-                optional: false,
-            },
-            SearchField::VersionPublishedTimestamp => TypesenseFieldSpec {
-                path: "version_published_timestamp",
-                ty: "int64",
-                facet: false,
-                sort: true,
                 optional: true,
             },
             SearchField::ProjectId => TypesenseFieldSpec {
@@ -378,29 +273,8 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
-            SearchField::Color => TypesenseFieldSpec {
-                path: "color",
-                ty: "int64",
-                facet: false,
-                sort: false,
-                optional: true,
-            },
-            SearchField::Environment => TypesenseFieldSpec {
-                path: "environment",
-                ty: "string[]",
-                facet: true,
-                sort: false,
-                optional: true,
-            },
             SearchField::GameVersions => TypesenseFieldSpec {
                 path: "game_versions",
-                ty: "string[]",
-                facet: true,
-                sort: false,
-                optional: true,
-            },
-            SearchField::MrpackLoaders => TypesenseFieldSpec {
-                path: "mrpack_loaders",
                 ty: "string[]",
                 facet: true,
                 sort: false,
@@ -416,13 +290,6 @@ impl SearchField {
             SearchField::ServerSide => TypesenseFieldSpec {
                 path: "server_side",
                 ty: "string[]",
-                facet: true,
-                sort: false,
-                optional: true,
-            },
-            SearchField::MinecraftServerCountry => TypesenseFieldSpec {
-                path: "minecraft_server.country",
-                ty: "string",
                 facet: true,
                 sort: false,
                 optional: true,
@@ -457,40 +324,6 @@ impl SearchField {
                     optional: true,
                 }
             }
-            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
-                TypesenseFieldSpec {
-                    path: "minecraft_java_server.content.recommended_game_version",
-                    ty: "string",
-                    facet: true,
-                    sort: false,
-                    optional: true,
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays2w => {
-                TypesenseFieldSpec {
-                    path: "minecraft_java_server.verified_plays_2w",
-                    ty: "int64",
-                    facet: true,
-                    sort: true,
-                    optional: true,
-                }
-            }
-            SearchField::MinecraftJavaServerVerifiedPlays4w => {
-                TypesenseFieldSpec {
-                    path: "minecraft_java_server.verified_plays_4w",
-                    ty: "int64",
-                    facet: false,
-                    sort: true,
-                    optional: true,
-                }
-            }
-            SearchField::MinecraftJavaServerIsOnline => TypesenseFieldSpec {
-                path: "minecraft_java_server.is_online",
-                ty: "bool",
-                facet: false,
-                sort: true,
-                optional: true,
-            },
             SearchField::MinecraftJavaServerPingData => TypesenseFieldSpec {
                 path: "minecraft_java_server.ping.data",
                 ty: "object",
@@ -498,15 +331,6 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
-            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
-                TypesenseFieldSpec {
-                    path: "minecraft_java_server.ping.data.players_online",
-                    ty: "int32",
-                    facet: true,
-                    sort: true,
-                    optional: true,
-                }
-            }
         }
     }
 }
@@ -542,8 +366,33 @@ impl Typesense {
     }
 
     fn collection_schema(name: &str) -> Value {
-        let mut fields =
-            vec![json!({"name": ".*", "type": "auto", "optional": true})];
+        let mut fields = vec![
+            json!({"name": ".*", "type": "auto", "optional": true}),
+            json!({"name": "version_id", "type": "string"}),
+            json!({"name": "name", "type": "string", "facet": false}),
+            json!({"name": "summary", "type": "string", "facet": false}),
+            json!({"name": "slug", "type": "string", "facet": false}),
+            json!({"name": "display_categories", "type": "string[]", "facet": true, "optional": true}),
+            json!({"name": "license", "type": "string", "facet": true, "optional": true}),
+            json!({"name": "downloads", "type": "int32", "facet": true, "sort": true}),
+            json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
+            json!({"name": "author", "type": "string", "facet": true}),
+            json!({"name": "date_created", "type": "string", "optional": true}),
+            json!({"name": "created_timestamp", "type": "int64", "sort": true}),
+            json!({"name": "date_modified", "type": "string", "optional": true}),
+            json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
+            json!({"name": "version_published_timestamp", "type": "int64", "sort": true, "optional": true}),
+            json!({"name": "color", "type": "int64", "optional": true}),
+            json!({"name": "environment", "type": "string[]", "facet": true, "optional": true}),
+            json!({"name": "mrpack_loaders", "type": "string[]", "facet": true, "optional": true}),
+            json!({"name": "loaders", "type": "string[]", "optional": true}),
+            json!({"name": "minecraft_server.country", "type": "string", "facet": true, "optional": true}),
+            json!({"name": "minecraft_java_server.content.recommended_game_version", "type": "string", "facet": true, "optional": true}),
+            json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "facet": true, "sort": true, "optional": true}),
+            json!({"name": "minecraft_java_server.verified_plays_4w", "type": "int64", "sort": true, "optional": true}),
+            json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
+            json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
+        ];
         fields.extend(TYPESENSE_SEARCH_FIELDS.iter().cloned());
 
         json!({
