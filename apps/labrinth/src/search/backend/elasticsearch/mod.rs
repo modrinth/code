@@ -517,9 +517,32 @@ impl Elasticsearch {
                         "downloads": { "type": "integer" },
                         "follows": { "type": "integer" },
                         "date_created": { "type": "date" },
+                        "created_timestamp": { "type": "long" },
                         "date_modified": { "type": "date" },
+                        "modified_timestamp": { "type": "long" },
+                        "version_published_timestamp": { "type": "long" },
                         "license": { "type": "keyword" },
-                        "loaders": { "type": "keyword" }
+                        "loaders": { "type": "keyword" },
+                        "open_source": { "type": "boolean" },
+                        "color": { "type": "long" },
+                        "project_types": { "type": "keyword" },
+                        "minecraft_java_server": {
+                            "type": "object",
+                            "properties": {
+                                "verified_plays_2w": { "type": "long" },
+                                "ping": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "players_online": { "type": "long" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }))
