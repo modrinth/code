@@ -285,6 +285,17 @@ impl Typesense {
                     "optional": true
                 },
                 {
+                    "name": "minecraft_java_server.ping.data",
+                    "type": "object",
+                    "optional": true
+                },
+                {
+                    "name": "minecraft_java_server.is_online",
+                    "type": "bool",
+                    "sort": true,
+                    "optional": true
+                },
+                {
                     "name": "minecraft_java_server.ping.data.players_online",
                     "type": "int32",
                     "sort": true,
@@ -296,6 +307,7 @@ impl Typesense {
     }
 
     fn get_sort_fields(&self, index: SearchIndex) -> &'static str {
+        // NOTE: we can only sort by max 3 fields here - typesense will not let us sort by more
         match index {
             SearchIndex::Relevance => {
                 "_text_match:desc,downloads:desc,version_published_timestamp:desc"
@@ -314,10 +326,11 @@ impl Typesense {
             }
             SearchIndex::MinecraftJavaServerVerifiedPlays2w => concat!(
                 "minecraft_java_server.verified_plays_2w:desc,",
-                "minecraft_java_server.ping.data.players_online:desc,",
-                "version_published_timestamp:desc"
+                "minecraft_java_server.is_online:desc,",
+                "minecraft_java_server.ping.data.players_online:desc"
             ),
             SearchIndex::MinecraftJavaServerPlayersOnline => concat!(
+                "minecraft_java_server.is_online:desc,",
                 "minecraft_java_server.ping.data.players_online:desc,",
                 "version_published_timestamp:desc"
             ),
@@ -656,6 +669,18 @@ fn documents_to_jsonl(uploads: &[UploadSearchProject]) -> Result<String> {
                 .unwrap_or_default()
                 .to_string();
             obj.insert("id".to_string(), Value::String(id));
+
+            if let Some(server) = obj
+                .get_mut("minecraft_java_server")
+                .and_then(Value::as_object_mut)
+            {
+                let is_online = server
+                    .get("ping")
+                    .and_then(Value::as_object)
+                    .and_then(|ping| ping.get("data"))
+                    .is_some_and(|data| !data.is_null());
+                server.insert("is_online".to_string(), Value::Bool(is_online));
+            }
         }
         out.push_str(&serde_json::to_string(&doc)?);
         out.push('\n');
@@ -678,6 +703,10 @@ fn meili_to_typesense(filter: &str) -> String {
         )
         .expect("valid regex")
     });
+    static EXISTS_RE: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"(?i)\b([a-zA-Z_.][a-zA-Z0-9_.]*)\s+(NOT\s+)?EXISTS\b")
+            .expect("valid regex")
+    });
     static CMP_RE: LazyLock<Regex> = LazyLock::new(|| {
         Regex::new(r"([a-zA-Z_.][a-zA-Z0-9_.]*)\s*(!=|>=|<=|>|<|=)\s*")
             .expect("valid regex")
@@ -696,6 +725,23 @@ fn meili_to_typesense(filter: &str) -> String {
             format!("{field}:!=[{values}]")
         } else {
             format!("{field}:[{values}]")
+        }
+    });
+
+    let s = EXISTS_RE.replace_all(&s, |caps: &regex::Captures<'_>| {
+        let field = caps.get(1).map(|m| m.as_str()).unwrap_or_default();
+        let is_not = caps.get(2).is_some();
+
+        match field {
+            "minecraft_java_server.ping.data" => format!(
+                "minecraft_java_server.is_online:= {}",
+                if is_not { "false" } else { "true" }
+            ),
+            _ => caps
+                .get(0)
+                .map(|m| m.as_str())
+                .unwrap_or_default()
+                .to_string(),
         }
     });
 
