@@ -17,6 +17,11 @@ use utoipa::ToSchema;
 pub mod backend;
 pub mod indexing;
 
+/// Search parameters which can fit in a URL query string.
+///
+/// Used with `GET /*/search` endpoints.
+///
+/// Can be converted into a [`SearchRequest`] using [`From`].
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchQuery {
     pub query: Option<String>,
@@ -26,11 +31,18 @@ pub struct SearchQuery {
 
     pub new_filters: Option<String>,
 
+    // TODO: Deprecated values below. WILL BE REMOVED V3!
     pub facets: Option<String>,
     pub filters: Option<String>,
     pub version: Option<String>,
 }
 
+/// Search parameters which are more complicated and more suitable for a POST
+/// request body.
+///
+/// Used with `POST /*/search` endpoints.
+///
+/// Can be converted from a [`SearchQuery`] using [`From`].
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchRequest {
     pub query: Option<String>,
