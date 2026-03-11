@@ -8,9 +8,9 @@
 			</div>
 		</template>
 		<div class="flex flex-col gap-4">
-			<Admonition type="warning" header="Beware of scams">
-				Only transfer your organization to people you trust. The new owner will have full control
-				over the organization and all its projects.
+			<Admonition type="warning" header="Selling organizations is against TOS">
+				Selling organizations violates Modrinth’s Terms of Use and may lead to moderation actions,
+				including organization removal or account suspension.
 			</Admonition>
 			<div
 				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-2xl bg-surface-2 p-4"

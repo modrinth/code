@@ -8,9 +8,9 @@
 			</div>
 		</template>
 		<div class="flex flex-col gap-4">
-			<Admonition type="warning" header="Beware of scams">
-				Only transfer your project to people you trust. Malicious actors may try to buy your project
-				to publish harmful files.
+			<Admonition type="warning" header="Selling projects is against TOS">
+				Selling projects violates Modrinth’s Terms of Use and may lead to moderation actions,
+				including project removal or account suspension.
 			</Admonition>
 			<div
 				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-2xl bg-surface-2 p-4"
