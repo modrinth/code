@@ -40,13 +40,17 @@
 					</div>
 				</div>
 				<ButtonStyled v-if="content" type="outlined">
-					<button class="!border-[1px]" @click="handleSwitchCompatibility">
+					<button
+						class="!border-[1px]"
+						@click="handleSwitchCompatibility"
+						:disabled="!hasPermission"
+					>
 						<ArrowLeftRightIcon />
 						Switch type
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else>
-					<button @click="handleSetCompatibility">
+					<button @click="handleSetCompatibility" :disabled="!hasPermission">
 						<ComponentIcon />
 						Set compatibility
 					</button>
@@ -183,14 +187,18 @@
 				</div>
 
 				<ButtonStyled v-if="content">
-					<button class="!w-full !max-w-[160px]" @click="handleUpdateContent">
+					<button
+						class="!w-full !max-w-[160px]"
+						@click="handleUpdateContent"
+						:disabled="!hasPermission"
+					>
 						<RefreshCwIcon />
 						Update
 					</button>
 				</ButtonStyled>
 			</div>
 		</div>
-		<ServerCompatibilityModal ref="serverCompatibilityModal" />
+		<ServerCompatibilityModal v-if="hasPermission" ref="serverCompatibilityModal" />
 	</div>
 </template>
 
@@ -224,9 +232,14 @@ const serverCompatibilityModal = useTemplateRef<InstanceType<typeof ServerCompat
 	'serverCompatibilityModal',
 )
 
-const { projectV3 } = injectProjectPageContext()
+const { projectV3, currentMember } = injectProjectPageContext()
 const { labrinth } = injectModrinthClient()
 const tags = useGeneratedState()
+
+const hasPermission = computed(() => {
+	const EDIT_DETAILS = 1 << 2
+	return ((currentMember.value?.permissions ?? 0) & EDIT_DETAILS) === EDIT_DETAILS
+})
 
 const content = computed(() => {
 	if (!projectV3.value) return null
