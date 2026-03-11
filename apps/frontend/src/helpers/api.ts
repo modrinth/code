@@ -2,7 +2,9 @@ import {
 	type AbstractFeature,
 	type AuthConfig,
 	AuthFeature,
+	CanaryCookieFeature,
 	CircuitBreakerFeature,
+	LABRINTH_CANARY_COOKIE,
 	NodeAuthFeature,
 	nodeAuthState,
 	NuxtCircuitBreakerStorage,
@@ -28,7 +30,11 @@ export function createModrinthClient(
 	auth: Ref<{ token: string | undefined }>,
 	config: { apiBaseUrl: string; archonBaseUrl: string; rateLimitKey?: string },
 ): NuxtModrinthClient {
+	const flags = useFeatureFlags()
 	const optionalFeatures = [
+		new CanaryCookieFeature({
+			getCookie: () => (flags.value.labrinthApiCanary ? LABRINTH_CANARY_COOKIE : undefined),
+		}) as AbstractFeature,
 		import.meta.dev ? (new VerboseLoggingFeature() as AbstractFeature) : undefined,
 	].filter(Boolean) as AbstractFeature[]
 
