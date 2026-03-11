@@ -54,6 +54,11 @@ impl DirectoryInfo {
             ))
         })?;
 
+        let default_opts = settings_dir.join("options.txt.default");
+        if !default_opts.exists() {
+            let _ = fs::write(&default_opts, []).await;
+        }
+
         let config_dir =
             config_dir.map_or_else(|| settings_dir.clone(), PathBuf::from);
 
@@ -176,6 +181,12 @@ impl DirectoryInfo {
     pub fn launcher_logs_dir_path(app_identifier: &str) -> Option<PathBuf> {
         Self::initial_settings_dir_path(app_identifier)
             .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
+    }
+
+    /// Path to the global default options.txt copied into new instances when they have none.
+    #[inline]
+    pub fn default_options_file_path(&self) -> PathBuf {
+        self.settings_dir.join("options.txt.default")
     }
 
     /// Get the cache directory for Theseus

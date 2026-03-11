@@ -1,9 +1,22 @@
 //! Theseus profile management interface
 
+use std::path::PathBuf;
+
 pub use crate::{
     State,
     state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
 };
+
+/// Ensures the default options file exists; creates it empty if missing. Returns its path.
+#[tracing::instrument]
+pub async fn ensure_default_options_file() -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let path = state.directories.default_options_file_path();
+    if !path.exists() {
+        tokio::fs::write(&path, []).await?;
+    }
+    Ok(path)
+}
 
 /// Gets entire settings
 #[tracing::instrument]

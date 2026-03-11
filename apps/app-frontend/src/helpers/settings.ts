@@ -85,3 +85,7 @@ export async function set(settings: AppSettings) {
 export async function cancel_directory_change(): Promise<void> {
 	return await invoke('plugin:settings|cancel_directory_change')
 }
+
+export async function ensure_default_options_file(): Promise<string> {
+	return await invoke('plugin:settings|ensure_default_options_file')
+}

@@ -204,6 +204,7 @@ fn main() {
                         "settings_get",
                         "settings_set",
                         "cancel_directory_change",
+                        "ensure_default_options_file",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
