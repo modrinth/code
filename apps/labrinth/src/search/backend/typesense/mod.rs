@@ -40,7 +40,7 @@ impl TypesenseConfig {
             api_key: ENV.TYPESENSE_API_KEY.clone(),
             index_prefix: ENV.TYPESENSE_INDEX_PREFIX.clone(),
             meta_namespace: meta_namespace.unwrap_or_default(),
-            index_chunk_size: ENV.TYPESENSE_INDEX_CHUNK_SIZE,
+            index_chunk_size: ENV.SEARCH_INDEX_CHUNK_SIZE,
         }
     }
 

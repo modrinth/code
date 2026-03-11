@@ -149,11 +149,10 @@ vars! {
     ELASTICSEARCH_INDEX_PREFIX: String;
     ELASTICSEARCH_USERNAME: String = "";
     ELASTICSEARCH_PASSWORD: String = "";
-    ELASTICSEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
+    SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
     TYPESENSE_URL: String = "http://localhost:8108";
     TYPESENSE_API_KEY: String = "modrinth";
     TYPESENSE_INDEX_PREFIX: String = "labrinth";
-    TYPESENSE_INDEX_CHUNK_SIZE: i64 = 5000i64;
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind;

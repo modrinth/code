@@ -922,7 +922,7 @@ impl SearchBackend for Elasticsearch {
                 &ro_pool,
                 &redis,
                 cursor,
-                ENV.ELASTICSEARCH_INDEX_CHUNK_SIZE,
+                ENV.SEARCH_INDEX_CHUNK_SIZE,
             )
             .await
             .wrap_internal_err("failed to index local")?;
