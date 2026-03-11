@@ -997,11 +997,19 @@ pub async fn project_edit_internal(
         _project_id: DBProjectId,
         edit: Option<Option<E>>,
         mut component: &mut Option<E::Component>,
+        perms: ProjectPermissions,
     ) -> Result<(), ApiError> {
         let Some(edit) = edit else {
             // component is not specified in the input JSON - leave alone
             return Ok(());
         };
+
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the components of this project!"
+                    .to_string(),
+            ));
+        }
 
         match (&mut component, edit) {
             (None, None) => {}
@@ -1040,6 +1048,7 @@ pub async fn project_edit_internal(
         id,
         new_project.minecraft_server,
         &mut project_item.inner.components.minecraft_server,
+        perms,
     )
     .await?;
     update(
@@ -1047,6 +1056,7 @@ pub async fn project_edit_internal(
         id,
         new_project.minecraft_java_server,
         &mut project_item.inner.components.minecraft_java_server,
+        perms,
     )
     .await?;
     update(
@@ -1054,6 +1064,7 @@ pub async fn project_edit_internal(
         id,
         new_project.minecraft_bedrock_server,
         &mut project_item.inner.components.minecraft_bedrock_server,
+        perms,
     )
     .await?;
 

@@ -1,5 +1,7 @@
 use crate::util::{download_file, fetch_json, fetch_xml, format_url};
-use crate::{Error, MirrorArtifact, UploadFile, insert_mirrored_artifact};
+use crate::{
+    Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
+};
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
 use daedalus::modded::PartialVersionInfo;
@@ -13,12 +15,10 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
-#[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
+#[tracing::instrument(skip(semaphore))]
 pub async fn fetch_forge(
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
     let forge_manifest = fetch_json::<IndexMap<String, Vec<String>>>(
         "https://files.minecraftforge.net/net/minecraftforge/forge/maven-metadata.json",
         &semaphore,
@@ -90,18 +90,14 @@ pub async fn fetch_forge(
         "https://maven.minecraftforge.net/",
         forge_versions,
         semaphore,
-        upload_files,
-        mirror_artifacts,
     )
     .await
 }
 
-#[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
+#[tracing::instrument(skip(semaphore))]
 pub async fn fetch_neo(
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
     #[derive(Debug, Deserialize)]
     struct Metadata {
         versioning: Versioning,
@@ -188,27 +184,20 @@ pub async fn fetch_neo(
         "https://maven.neoforged.net/",
         parsed_versions,
         semaphore,
-        upload_files,
-        mirror_artifacts,
     )
     .await
 }
 
-#[tracing::instrument(skip(
-    forge_versions,
-    semaphore,
-    upload_files,
-    mirror_artifacts
-))]
+#[tracing::instrument(skip(forge_versions, semaphore))]
 async fn fetch(
     format_version: usize,
     mod_loader: &str,
     maven_url: &str,
     forge_versions: Vec<ForgeVersion>,
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
+    let upload_files = DashMap::new();
+    let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
     let modrinth_manifest = fetch_json::<daedalus::modded::Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
@@ -708,8 +697,8 @@ async fn fetch(
                         loader,
                         maven_url,
                         mod_loader,
-                        upload_files,
-                        mirror_artifacts,
+                        &upload_files,
+                        &mirror_artifacts,
                     )
                 }),
         )
@@ -778,7 +767,10 @@ async fn fetch(
         );
     }
 
-    Ok(())
+    Ok(FetchResult {
+        upload_files,
+        mirror_artifacts,
+    })
 }
 
 #[derive(Debug)]
