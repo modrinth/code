@@ -1,7 +1,9 @@
 import {
 	type AuthConfig,
 	AuthFeature,
+	CanaryCookieFeature,
 	type FeatureConfig,
+	LABRINTH_CANARY_COOKIE,
 	type NuxtClientConfig,
 	NuxtModrinthClient,
 } from '@modrinth/api-client'
@@ -20,6 +22,7 @@ async function getRateLimitKeyFromSecretsStore(): Promise<string | undefined> {
 export interface ServerModrinthClientOptions {
 	event?: H3Event
 	authToken?: string
+	canaryCookie?: boolean
 }
 
 export function useServerModrinthClient(options?: ServerModrinthClientOptions): NuxtModrinthClient {
@@ -35,6 +38,10 @@ export function useServerModrinthClient(options?: ServerModrinthClientOptions): 
 				tokenPrefix: '',
 			} as AuthConfig as FeatureConfig),
 		)
+	}
+
+	if (options?.canaryCookie) {
+		features.push(new CanaryCookieFeature({ getCookie: () => LABRINTH_CANARY_COOKIE }))
 	}
 
 	const clientConfig: NuxtClientConfig = {
