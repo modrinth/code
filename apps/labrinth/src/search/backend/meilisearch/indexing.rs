@@ -1,11 +1,12 @@
+use std::sync::LazyLock;
 use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::search::UploadSearchProject;
 use crate::search::backend::meilisearch::MeilisearchConfig;
 use crate::search::indexing::index_local;
+use crate::search::{SearchField, UploadSearchProject};
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
 use eyre::{Result, eyre};
@@ -538,11 +539,191 @@ fn default_settings() -> Settings {
         .with_displayed_attributes(DEFAULT_DISPLAYED_ATTRIBUTES)
         .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
         .with_sortable_attributes(DEFAULT_SORTABLE_ATTRIBUTES)
-        .with_filterable_attributes(DEFAULT_ATTRIBUTES_FOR_FACETING)
+        .with_filterable_attributes(&*MEILI_FILTERABLE_ATTRIBUTES)
         .with_pagination(PaginationSetting {
             max_total_hits: 2147483647,
         })
 }
+
+pub struct MeilisearchFieldSpec {
+    pub path: &'static str,
+    pub filterable: bool,
+}
+
+impl SearchField {
+    pub const fn meilisearch_spec(self) -> MeilisearchFieldSpec {
+        match self {
+            SearchField::VersionId => MeilisearchFieldSpec {
+                path: "version_id",
+                filterable: false,
+            },
+            SearchField::Summary => MeilisearchFieldSpec {
+                path: "summary",
+                filterable: false,
+            },
+            SearchField::Slug => MeilisearchFieldSpec {
+                path: "slug",
+                filterable: false,
+            },
+            SearchField::DisplayCategories => MeilisearchFieldSpec {
+                path: "display_categories",
+                filterable: false,
+            },
+            SearchField::Loaders => MeilisearchFieldSpec {
+                path: "loaders",
+                filterable: false,
+            },
+            SearchField::Categories => MeilisearchFieldSpec {
+                path: "categories",
+                filterable: true,
+            },
+            SearchField::License => MeilisearchFieldSpec {
+                path: "license",
+                filterable: true,
+            },
+            SearchField::ProjectTypes => MeilisearchFieldSpec {
+                path: "project_types",
+                filterable: true,
+            },
+            SearchField::Downloads => MeilisearchFieldSpec {
+                path: "downloads",
+                filterable: true,
+            },
+            SearchField::Follows => MeilisearchFieldSpec {
+                path: "follows",
+                filterable: true,
+            },
+            SearchField::Author => MeilisearchFieldSpec {
+                path: "author",
+                filterable: true,
+            },
+            SearchField::Name => MeilisearchFieldSpec {
+                path: "name",
+                filterable: true,
+            },
+            SearchField::DateCreated => MeilisearchFieldSpec {
+                path: "date_created",
+                filterable: true,
+            },
+            SearchField::CreatedTimestamp => MeilisearchFieldSpec {
+                path: "created_timestamp",
+                filterable: true,
+            },
+            SearchField::DateModified => MeilisearchFieldSpec {
+                path: "date_modified",
+                filterable: true,
+            },
+            SearchField::ModifiedTimestamp => MeilisearchFieldSpec {
+                path: "modified_timestamp",
+                filterable: true,
+            },
+            SearchField::VersionPublishedTimestamp => MeilisearchFieldSpec {
+                path: "version_published_timestamp",
+                filterable: true,
+            },
+            SearchField::ProjectId => MeilisearchFieldSpec {
+                path: "project_id",
+                filterable: true,
+            },
+            SearchField::OpenSource => MeilisearchFieldSpec {
+                path: "open_source",
+                filterable: true,
+            },
+            SearchField::Color => MeilisearchFieldSpec {
+                path: "color",
+                filterable: true,
+            },
+            SearchField::Environment => MeilisearchFieldSpec {
+                path: "environment",
+                filterable: true,
+            },
+            SearchField::GameVersions => MeilisearchFieldSpec {
+                path: "game_versions",
+                filterable: true,
+            },
+            SearchField::MrpackLoaders => MeilisearchFieldSpec {
+                path: "mrpack_loaders",
+                filterable: true,
+            },
+            SearchField::ClientSide => MeilisearchFieldSpec {
+                path: "client_side",
+                filterable: true,
+            },
+            SearchField::ServerSide => MeilisearchFieldSpec {
+                path: "server_side",
+                filterable: true,
+            },
+            SearchField::MinecraftServerCountry => MeilisearchFieldSpec {
+                path: "minecraft_server.country",
+                filterable: true,
+            },
+            SearchField::MinecraftServerRegion => MeilisearchFieldSpec {
+                path: "minecraft_server.region",
+                filterable: true,
+            },
+            SearchField::MinecraftServerLanguages => MeilisearchFieldSpec {
+                path: "minecraft_server.languages",
+                filterable: true,
+            },
+            SearchField::MinecraftJavaServerContentKind => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.content.kind",
+                    filterable: true,
+                }
+            }
+            SearchField::MinecraftJavaServerContentSupportedGameVersions => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.content.supported_game_versions",
+                    filterable: true,
+                }
+            }
+            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.content.recommended_game_version",
+                    filterable: true,
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays2w => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.verified_plays_2w",
+                    filterable: true,
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays4w => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.verified_plays_4w",
+                    filterable: false,
+                }
+            }
+            SearchField::MinecraftJavaServerIsOnline => MeilisearchFieldSpec {
+                path: "minecraft_java_server.is_online",
+                filterable: false,
+            },
+            SearchField::MinecraftJavaServerPingData => MeilisearchFieldSpec {
+                path: "minecraft_java_server.ping.data",
+                filterable: true,
+            },
+            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
+                MeilisearchFieldSpec {
+                    path: "minecraft_java_server.ping.data.players_online",
+                    filterable: true,
+                }
+            }
+        }
+    }
+}
+
+static MEILI_FILTERABLE_ATTRIBUTES: LazyLock<Vec<&'static str>> =
+    LazyLock::new(|| {
+        use strum::IntoEnumIterator;
+
+        SearchField::iter()
+            .filter_map(|field| {
+                let spec = field.meilisearch_spec();
+                spec.filterable.then_some(spec.path)
+            })
+            .collect()
+    });
 
 const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "project_id",
@@ -596,41 +777,6 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
     &["name", "summary", "author", "slug"];
-
-const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
-    "categories",
-    "license",
-    "project_types",
-    "downloads",
-    "follows",
-    "author",
-    "name",
-    "date_created",
-    "created_timestamp",
-    "date_modified",
-    "modified_timestamp",
-    "version_published_timestamp",
-    "project_id",
-    "open_source",
-    "color",
-    // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
-    // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "environment",
-    "game_versions",
-    "mrpack_loaders",
-    // V2 legacy fields for logical consistency
-    "client_side",
-    "server_side",
-    "minecraft_server.country",
-    "minecraft_server.region",
-    "minecraft_server.languages",
-    "minecraft_java_server.content.kind",
-    "minecraft_java_server.content.supported_game_versions",
-    "minecraft_java_server.content.recommended_game_version",
-    "minecraft_java_server.verified_plays_2w",
-    "minecraft_java_server.ping.data",
-    "minecraft_java_server.ping.data.players_online",
-];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
     "downloads",

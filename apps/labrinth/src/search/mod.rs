@@ -180,6 +180,46 @@ pub enum SearchBackendKind {
     Typesense,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, strum::EnumIter)]
+pub enum SearchField {
+    VersionId,
+    Summary,
+    Slug,
+    DisplayCategories,
+    Loaders,
+    Categories,
+    License,
+    ProjectTypes,
+    Downloads,
+    Follows,
+    Author,
+    Name,
+    DateCreated,
+    CreatedTimestamp,
+    DateModified,
+    ModifiedTimestamp,
+    VersionPublishedTimestamp,
+    ProjectId,
+    OpenSource,
+    Color,
+    Environment,
+    GameVersions,
+    MrpackLoaders,
+    ClientSide,
+    ServerSide,
+    MinecraftServerCountry,
+    MinecraftServerRegion,
+    MinecraftServerLanguages,
+    MinecraftJavaServerContentKind,
+    MinecraftJavaServerContentSupportedGameVersions,
+    MinecraftJavaServerContentRecommendedGameVersion,
+    MinecraftJavaServerVerifiedPlays2w,
+    MinecraftJavaServerVerifiedPlays4w,
+    MinecraftJavaServerIsOnline,
+    MinecraftJavaServerPingData,
+    MinecraftJavaServerPingDataPlayersOnline,
+}
+
 #[derive(Debug, Error)]
 #[error("invalid search backend kind")]
 pub struct InvalidSearchBackendKind;

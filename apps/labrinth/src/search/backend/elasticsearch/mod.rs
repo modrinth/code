@@ -9,8 +9,8 @@ use crate::search::backend::{
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchRequest, SearchResults,
-    TasksCancelFilter, UploadSearchProject,
+    ResultSearchProject, SearchBackend, SearchField, SearchRequest,
+    SearchResults, TasksCancelFilter, UploadSearchProject,
 };
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
@@ -122,6 +122,242 @@ fn default_multi_match_fields() -> Vec<String> {
         "summary._2gram^3".to_string(),
         "summary._3gram^3".to_string(),
     ]
+}
+
+pub struct ElasticsearchFieldSpec {
+    pub path: &'static str,
+    pub mapping: Value,
+}
+
+impl SearchField {
+    pub fn elasticsearch_spec(self) -> ElasticsearchFieldSpec {
+        match self {
+            SearchField::VersionId => ElasticsearchFieldSpec {
+                path: "version_id",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::Summary => ElasticsearchFieldSpec {
+                path: "summary",
+                mapping: json!({ "type": "search_as_you_type" }),
+            },
+            SearchField::Slug => ElasticsearchFieldSpec {
+                path: "slug",
+                mapping: json!({ "type": "search_as_you_type", "fields": { "keyword": { "type": "keyword" } } }),
+            },
+            SearchField::DisplayCategories => ElasticsearchFieldSpec {
+                path: "display_categories",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::Loaders => ElasticsearchFieldSpec {
+                path: "loaders",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::Categories => ElasticsearchFieldSpec {
+                path: "categories",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::License => ElasticsearchFieldSpec {
+                path: "license",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::ProjectTypes => ElasticsearchFieldSpec {
+                path: "project_types",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::Downloads => ElasticsearchFieldSpec {
+                path: "downloads",
+                mapping: json!({ "type": "integer" }),
+            },
+            SearchField::Follows => ElasticsearchFieldSpec {
+                path: "follows",
+                mapping: json!({ "type": "integer" }),
+            },
+            SearchField::Author => ElasticsearchFieldSpec {
+                path: "author",
+                mapping: json!({ "type": "search_as_you_type", "fields": { "keyword": { "type": "keyword" } } }),
+            },
+            SearchField::Name => ElasticsearchFieldSpec {
+                path: "name",
+                mapping: json!({ "type": "search_as_you_type" }),
+            },
+            SearchField::DateCreated => ElasticsearchFieldSpec {
+                path: "date_created",
+                mapping: json!({ "type": "date" }),
+            },
+            SearchField::CreatedTimestamp => ElasticsearchFieldSpec {
+                path: "created_timestamp",
+                mapping: json!({ "type": "long" }),
+            },
+            SearchField::DateModified => ElasticsearchFieldSpec {
+                path: "date_modified",
+                mapping: json!({ "type": "date" }),
+            },
+            SearchField::ModifiedTimestamp => ElasticsearchFieldSpec {
+                path: "modified_timestamp",
+                mapping: json!({ "type": "long" }),
+            },
+            SearchField::VersionPublishedTimestamp => ElasticsearchFieldSpec {
+                path: "version_published_timestamp",
+                mapping: json!({ "type": "long" }),
+            },
+            SearchField::ProjectId => ElasticsearchFieldSpec {
+                path: "project_id",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::OpenSource => ElasticsearchFieldSpec {
+                path: "open_source",
+                mapping: json!({ "type": "boolean" }),
+            },
+            SearchField::Color => ElasticsearchFieldSpec {
+                path: "color",
+                mapping: json!({ "type": "long" }),
+            },
+            SearchField::Environment => ElasticsearchFieldSpec {
+                path: "environment",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::GameVersions => ElasticsearchFieldSpec {
+                path: "game_versions",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::MrpackLoaders => ElasticsearchFieldSpec {
+                path: "mrpack_loaders",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::ClientSide => ElasticsearchFieldSpec {
+                path: "client_side",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::ServerSide => ElasticsearchFieldSpec {
+                path: "server_side",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::MinecraftServerCountry => ElasticsearchFieldSpec {
+                path: "minecraft_server.country",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::MinecraftServerRegion => ElasticsearchFieldSpec {
+                path: "minecraft_server.region",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::MinecraftServerLanguages => ElasticsearchFieldSpec {
+                path: "minecraft_server.languages",
+                mapping: json!({ "type": "keyword" }),
+            },
+            SearchField::MinecraftJavaServerContentKind => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.content.kind",
+                    mapping: json!({ "type": "keyword" }),
+                }
+            }
+            SearchField::MinecraftJavaServerContentSupportedGameVersions => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.content.supported_game_versions",
+                    mapping: json!({ "type": "keyword" }),
+                }
+            }
+            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.content.recommended_game_version",
+                    mapping: json!({ "type": "keyword" }),
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays2w => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.verified_plays_2w",
+                    mapping: json!({ "type": "long" }),
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays4w => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.verified_plays_4w",
+                    mapping: json!({ "type": "long" }),
+                }
+            }
+            SearchField::MinecraftJavaServerIsOnline => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.is_online",
+                    mapping: json!({ "type": "boolean" }),
+                }
+            }
+            SearchField::MinecraftJavaServerPingData => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.ping.data",
+                    mapping: json!({ "type": "object" }),
+                }
+            }
+            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
+                ElasticsearchFieldSpec {
+                    path: "minecraft_java_server.ping.data.players_online",
+                    mapping: json!({ "type": "long" }),
+                }
+            }
+        }
+    }
+}
+
+static ELASTICSEARCH_PROPERTIES: LazyLock<serde_json::Map<String, Value>> =
+    LazyLock::new(|| {
+        use strum::IntoEnumIterator;
+
+        let mut properties = serde_json::Map::new();
+
+        for field in SearchField::iter() {
+            let spec = field.elasticsearch_spec();
+            insert_nested_mapping(&mut properties, spec.path, spec.mapping);
+        }
+
+        let minecraft_java_server = properties
+            .remove("minecraft_java_server")
+            .unwrap_or_else(|| json!({ "properties": {} }));
+
+        properties.insert(
+            "minecraft_java_server".to_string(),
+            json!({
+                "type": "object",
+                "properties": merge_object_properties(minecraft_java_server)
+            }),
+        );
+
+        properties
+    });
+
+fn merge_object_properties(value: Value) -> Value {
+    match value {
+        Value::Object(mut obj) => {
+            obj.remove("properties").unwrap_or_else(|| json!({}))
+        }
+        _ => json!({}),
+    }
+}
+
+fn insert_nested_mapping(
+    properties: &mut serde_json::Map<String, Value>,
+    path: &str,
+    mapping: Value,
+) {
+    let mut parts = path.split('.');
+    let Some(first) = parts.next() else {
+        return;
+    };
+
+    if let Some(rest) = parts.next() {
+        let remaining = std::iter::once(rest)
+            .chain(parts)
+            .collect::<Vec<_>>()
+            .join(".");
+        let entry = properties
+            .entry(first.to_string())
+            .or_insert_with(|| json!({ "type": "object", "properties": {} }));
+        let obj = entry.as_object_mut().expect("object mapping");
+        let nested = obj
+            .entry("properties".to_string())
+            .or_insert_with(|| json!({}));
+        let nested = nested.as_object_mut().expect("nested properties object");
+        insert_nested_mapping(nested, &remaining, mapping);
+    } else {
+        properties.insert(first.to_string(), mapping);
+    }
 }
 
 impl Elasticsearch {
@@ -495,55 +731,7 @@ impl Elasticsearch {
             .body(json!({
                 "mappings": {
                     "dynamic": true,
-                    "properties": {
-                        "version_id": { "type": "keyword" },
-                        "project_id": { "type": "keyword" },
-                        "slug": {
-                            "type": "search_as_you_type",
-                            "fields": {
-                                "keyword": { "type": "keyword" }
-                            }
-                        },
-                        "author": {
-                            "type": "search_as_you_type",
-                            "fields": {
-                                "keyword": { "type": "keyword" }
-                            }
-                        },
-                        "name": { "type": "search_as_you_type" },
-                        "summary": { "type": "search_as_you_type" },
-                        "categories": { "type": "keyword" },
-                        "display_categories": { "type": "keyword" },
-                        "downloads": { "type": "integer" },
-                        "follows": { "type": "integer" },
-                        "date_created": { "type": "date" },
-                        "created_timestamp": { "type": "long" },
-                        "date_modified": { "type": "date" },
-                        "modified_timestamp": { "type": "long" },
-                        "version_published_timestamp": { "type": "long" },
-                        "license": { "type": "keyword" },
-                        "loaders": { "type": "keyword" },
-                        "open_source": { "type": "boolean" },
-                        "color": { "type": "long" },
-                        "project_types": { "type": "keyword" },
-                        "minecraft_java_server": {
-                            "type": "object",
-                            "properties": {
-                                "verified_plays_2w": { "type": "long" },
-                                "ping": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "object",
-                                            "properties": {
-                                                "players_online": { "type": "long" }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    "properties": Value::Object(ELASTICSEARCH_PROPERTIES.clone())
                 }
             }))
             .send()

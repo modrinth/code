@@ -22,12 +22,7 @@ arc-swap = { workspace = true }
 argon2 = { workspace = true }
 ariadne = { workspace = true }
 async-minecraft-ping = { workspace = true, features = ["srv"] }
-async-stripe = { workspace = true, features = [
-  "billing",
-  "checkout",
-  "connect",
-  "webhook-events"
-] }
+async-stripe = { workspace = true, features = ["billing", "checkout", "connect", "webhook-events"] }
 async-trait = { workspace = true }
 base64 = { workspace = true }
 bitflags = { workspace = true }
@@ -53,21 +48,21 @@ hmac = { workspace = true }
 hyper-rustls = { workspace = true }
 hyper-util = { workspace = true }
 image = { workspace = true, features = [
-  "avif",
-  "bmp",
-  "dds",
-  "exr",
-  "ff",
-  "gif",
-  "hdr",
-  "ico",
-  "jpeg",
-  "png",
-  "pnm",
-  "qoi",
-  "tga",
-  "tiff",
-  "webp",
+	"avif",
+	"bmp",
+	"dds",
+	"exr",
+	"ff",
+	"gif",
+	"hdr",
+	"ico",
+	"jpeg",
+	"png",
+	"pnm",
+	"qoi",
+	"tga",
+	"tiff",
+	"webp",
 ] }
 itertools = { workspace = true }
 json-patch = { workspace = true }
@@ -83,16 +78,8 @@ rand = { workspace = true }
 rand_chacha = { workspace = true }
 redis = { workspace = true, features = ["ahash", "r2d2", "tokio-comp"] }
 regex = { workspace = true }
-reqwest = { workspace = true, features = [
-  "http2",
-  "json",
-  "multipart",
-  "rustls-tls-webpki-roots"
-] }
-rust_decimal = { workspace = true, features = [
-  "serde-with-float",
-  "serde-with-str"
-] }
+reqwest = { workspace = true, features = ["http2", "json", "multipart", "rustls-tls-webpki-roots"] }
+rust_decimal = { workspace = true, features = ["serde-with-float", "serde-with-str"] }
 rust_iso3166 = { workspace = true }
 rust-s3 = { workspace = true }
 rustls.workspace = true
@@ -105,17 +92,17 @@ sha1 = { workspace = true }
 sha2 = { workspace = true }
 spdx = { workspace = true, features = ["text"] }
 sqlx = { workspace = true, features = [
-  "chrono",
-  "json",
-  "macros",
-  "migrate",
-  "postgres",
-  "runtime-tokio",
-  "rust_decimal",
-  "tls-rustls-aws-lc-rs",
+	"chrono",
+	"json",
+	"macros",
+	"migrate",
+	"postgres",
+	"runtime-tokio",
+	"rust_decimal",
+	"tls-rustls-aws-lc-rs",
 ] }
 sqlx-tracing = { workspace = true, features = ["postgres"] }
-strum = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "sync"] }
 tokio-stream = { workspace = true }
@@ -147,8 +134,8 @@ iana-time-zone = { workspace = true }
 jemalloc_pprof = { workspace = true, features = ["flamegraph"] }
 tikv-jemalloc-ctl = { workspace = true, features = ["stats"] }
 tikv-jemallocator = { workspace = true, features = [
-  "profiling",
-  "unprefixed_malloc_on_supported_platforms",
+	"profiling",
+	"unprefixed_malloc_on_supported_platforms",
 ] }
 
 [features]

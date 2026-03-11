@@ -19,8 +19,8 @@ use crate::search::backend::{
 };
 use crate::search::indexing::index_local;
 use crate::search::{
-    ResultSearchProject, SearchBackend, SearchRequest, SearchResults,
-    TasksCancelFilter, UploadSearchProject,
+    ResultSearchProject, SearchBackend, SearchField, SearchRequest,
+    SearchResults, TasksCancelFilter, UploadSearchProject,
 };
 use crate::util::error::Context;
 
@@ -234,6 +234,307 @@ pub struct Typesense {
     client: TypesenseClient,
 }
 
+pub struct TypesenseFieldSpec {
+    pub path: &'static str,
+    pub ty: &'static str,
+    pub facet: bool,
+    pub sort: bool,
+    pub optional: bool,
+}
+
+impl SearchField {
+    pub const fn typesense_spec(self) -> TypesenseFieldSpec {
+        match self {
+            SearchField::VersionId => TypesenseFieldSpec {
+                path: "version_id",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: false,
+            },
+            SearchField::Summary => TypesenseFieldSpec {
+                path: "summary",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: false,
+            },
+            SearchField::Slug => TypesenseFieldSpec {
+                path: "slug",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: false,
+            },
+            SearchField::DisplayCategories => TypesenseFieldSpec {
+                path: "display_categories",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Loaders => TypesenseFieldSpec {
+                path: "loaders",
+                ty: "string[]",
+                facet: false,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Categories => TypesenseFieldSpec {
+                path: "categories",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::License => TypesenseFieldSpec {
+                path: "license",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::ProjectTypes => TypesenseFieldSpec {
+                path: "project_types",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Downloads => TypesenseFieldSpec {
+                path: "downloads",
+                ty: "int32",
+                facet: true,
+                sort: true,
+                optional: false,
+            },
+            SearchField::Follows => TypesenseFieldSpec {
+                path: "follows",
+                ty: "int32",
+                facet: true,
+                sort: true,
+                optional: false,
+            },
+            SearchField::Author => TypesenseFieldSpec {
+                path: "author",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::Name => TypesenseFieldSpec {
+                path: "name",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: false,
+            },
+            SearchField::DateCreated => TypesenseFieldSpec {
+                path: "date_created",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: true,
+            },
+            SearchField::CreatedTimestamp => TypesenseFieldSpec {
+                path: "created_timestamp",
+                ty: "int64",
+                facet: false,
+                sort: true,
+                optional: false,
+            },
+            SearchField::DateModified => TypesenseFieldSpec {
+                path: "date_modified",
+                ty: "string",
+                facet: false,
+                sort: false,
+                optional: true,
+            },
+            SearchField::ModifiedTimestamp => TypesenseFieldSpec {
+                path: "modified_timestamp",
+                ty: "int64",
+                facet: false,
+                sort: true,
+                optional: false,
+            },
+            SearchField::VersionPublishedTimestamp => TypesenseFieldSpec {
+                path: "version_published_timestamp",
+                ty: "int64",
+                facet: false,
+                sort: true,
+                optional: true,
+            },
+            SearchField::ProjectId => TypesenseFieldSpec {
+                path: "project_id",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::OpenSource => TypesenseFieldSpec {
+                path: "open_source",
+                ty: "bool",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Color => TypesenseFieldSpec {
+                path: "color",
+                ty: "int64",
+                facet: false,
+                sort: false,
+                optional: true,
+            },
+            SearchField::Environment => TypesenseFieldSpec {
+                path: "environment",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::GameVersions => TypesenseFieldSpec {
+                path: "game_versions",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MrpackLoaders => TypesenseFieldSpec {
+                path: "mrpack_loaders",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::ClientSide => TypesenseFieldSpec {
+                path: "client_side",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::ServerSide => TypesenseFieldSpec {
+                path: "server_side",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftServerCountry => TypesenseFieldSpec {
+                path: "minecraft_server.country",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftServerRegion => TypesenseFieldSpec {
+                path: "minecraft_server.region",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftServerLanguages => TypesenseFieldSpec {
+                path: "minecraft_server.languages",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftJavaServerContentKind => TypesenseFieldSpec {
+                path: "minecraft_java_server.content.kind",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftJavaServerContentSupportedGameVersions => {
+                TypesenseFieldSpec {
+                    path: "minecraft_java_server.content.supported_game_versions",
+                    ty: "string[]",
+                    facet: true,
+                    sort: false,
+                    optional: true,
+                }
+            }
+            SearchField::MinecraftJavaServerContentRecommendedGameVersion => {
+                TypesenseFieldSpec {
+                    path: "minecraft_java_server.content.recommended_game_version",
+                    ty: "string",
+                    facet: true,
+                    sort: false,
+                    optional: true,
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays2w => {
+                TypesenseFieldSpec {
+                    path: "minecraft_java_server.verified_plays_2w",
+                    ty: "int64",
+                    facet: true,
+                    sort: true,
+                    optional: true,
+                }
+            }
+            SearchField::MinecraftJavaServerVerifiedPlays4w => {
+                TypesenseFieldSpec {
+                    path: "minecraft_java_server.verified_plays_4w",
+                    ty: "int64",
+                    facet: false,
+                    sort: true,
+                    optional: true,
+                }
+            }
+            SearchField::MinecraftJavaServerIsOnline => TypesenseFieldSpec {
+                path: "minecraft_java_server.is_online",
+                ty: "bool",
+                facet: false,
+                sort: true,
+                optional: true,
+            },
+            SearchField::MinecraftJavaServerPingData => TypesenseFieldSpec {
+                path: "minecraft_java_server.ping.data",
+                ty: "object",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
+            SearchField::MinecraftJavaServerPingDataPlayersOnline => {
+                TypesenseFieldSpec {
+                    path: "minecraft_java_server.ping.data.players_online",
+                    ty: "int32",
+                    facet: true,
+                    sort: true,
+                    optional: true,
+                }
+            }
+        }
+    }
+}
+
+static TYPESENSE_SEARCH_FIELDS: LazyLock<Vec<Value>> = LazyLock::new(|| {
+    use strum::IntoEnumIterator;
+
+    SearchField::iter()
+        .map(|field| {
+            let spec = field.typesense_spec();
+            let mut obj = serde_json::Map::from_iter([
+                ("name".to_string(), Value::String(spec.path.to_string())),
+                ("type".to_string(), Value::String(spec.ty.to_string())),
+            ]);
+            if spec.facet {
+                obj.insert("facet".to_string(), Value::Bool(true));
+            }
+            if spec.sort {
+                obj.insert("sort".to_string(), Value::Bool(true));
+            }
+            if spec.optional {
+                obj.insert("optional".to_string(), Value::Bool(true));
+            }
+            Value::Object(obj)
+        })
+        .collect()
+});
+
 impl Typesense {
     pub fn new(config: TypesenseConfig) -> Self {
         let client = TypesenseClient::new(&config.url, &config.api_key);
@@ -241,67 +542,14 @@ impl Typesense {
     }
 
     fn collection_schema(name: &str) -> Value {
+        let mut fields =
+            vec![json!({"name": ".*", "type": "auto", "optional": true})];
+        fields.extend(TYPESENSE_SEARCH_FIELDS.iter().cloned());
+
         json!({
             "name": name,
             "enable_nested_fields": true,
-            "fields": [
-                // Wildcard catches all remaining fields via auto type detection.
-                {"name": ".*", "type": "auto", "optional": true},
-                // Explicit declarations ensure correct types for search/sort/filter.
-                {"name": "version_id", "type": "string"},
-                {"name": "project_id", "type": "string", "facet": true},
-                {"name": "name", "type": "string", "facet": false},
-                {"name": "summary", "type": "string", "facet": false},
-                {"name": "author", "type": "string", "facet": true},
-                {"name": "slug", "type": "string", "facet": false},
-                {"name": "categories", "type": "string[]", "facet": true, "optional": true},
-                {"name": "display_categories", "type": "string[]", "facet": true, "optional": true},
-                {"name": "project_types", "type": "string[]", "facet": true, "optional": true},
-                {"name": "license", "type": "string", "facet": true, "optional": true},
-                {"name": "downloads", "type": "int32", "facet": true, "sort": true},
-                {"name": "follows", "type": "int32", "facet": true, "sort": true},
-                {"name": "created_timestamp", "type": "int64", "sort": true},
-                {"name": "modified_timestamp", "type": "int64", "sort": true},
-                {
-                    "name": "version_published_timestamp",
-                    "type": "int64",
-                    "sort": true,
-                    "optional": true
-                },
-                {"name": "open_source", "type": "bool", "facet": true, "optional": true},
-                {"name": "color", "type": "int64", "optional": true},
-                {"name": "date_created", "type": "string", "optional": true},
-                {"name": "date_modified", "type": "string", "optional": true},
-                {
-                    "name": "minecraft_java_server.verified_plays_2w",
-                    "type": "int64",
-                    "sort": true,
-                    "optional": true
-                },
-                {
-                    "name": "minecraft_java_server.verified_plays_4w",
-                    "type": "int64",
-                    "sort": true,
-                    "optional": true
-                },
-                {
-                    "name": "minecraft_java_server.ping.data",
-                    "type": "object",
-                    "optional": true
-                },
-                {
-                    "name": "minecraft_java_server.is_online",
-                    "type": "bool",
-                    "sort": true,
-                    "optional": true
-                },
-                {
-                    "name": "minecraft_java_server.ping.data.players_online",
-                    "type": "int32",
-                    "sort": true,
-                    "optional": true
-                }
-            ],
+            "fields": fields,
             "default_sorting_field": "downloads"
         })
     }
