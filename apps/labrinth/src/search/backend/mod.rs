@@ -1,6 +1,7 @@
 mod common;
 pub mod elasticsearch;
 pub mod meilisearch;
+pub mod typesense;
 
 pub use common::{
     ParsedSearchRequest, SearchIndex, SearchIndexName, SearchSort,
@@ -8,3 +9,4 @@ pub use common::{
 };
 pub use elasticsearch::Elasticsearch;
 pub use meilisearch::{Meilisearch, MeilisearchConfig};
+pub use typesense::{Typesense, TypesenseConfig};

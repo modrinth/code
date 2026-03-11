@@ -177,6 +177,7 @@ pub enum TasksCancelFilter {
 pub enum SearchBackendKind {
     Meilisearch,
     Elasticsearch,
+    Typesense,
 }
 
 #[derive(Debug, Error)]
@@ -190,6 +191,7 @@ impl FromStr for SearchBackendKind {
         Ok(match s {
             "meilisearch" => SearchBackendKind::Meilisearch,
             "elasticsearch" => SearchBackendKind::Elasticsearch,
+            "typesense" => SearchBackendKind::Typesense,
             _ => return Err(InvalidSearchBackendKind),
         })
     }
@@ -317,6 +319,10 @@ pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
         }
         SearchBackendKind::Elasticsearch => {
             Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
+        }
+        SearchBackendKind::Typesense => {
+            let config = backend::TypesenseConfig::new(meta_namespace);
+            Box::new(backend::Typesense::new(config))
         }
     }
 }

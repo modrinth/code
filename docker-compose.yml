@@ -18,6 +18,20 @@ services:
       interval: 3s
       timeout: 5s
       retries: 3
+  typesense0:
+    image: typesense/typesense:27.1
+    container_name: labrinth-typesense0
+    restart: on-failure
+    ports:
+      - '127.0.0.1:8108:8108'
+    volumes:
+      - typesense-data:/data
+    command: --data-dir=/data --api-key=modrinth --enable-cors
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail http://localhost:8108/health || exit 1']
+      interval: 3s
+      timeout: 5s
+      retries: 3
   meilisearch0:
     image: getmeili/meilisearch:v1.12.0
     container_name: labrinth-meilisearch0
@@ -348,6 +362,7 @@ networks:
   elasticsearch-mesh:
     driver: bridge
 volumes:
+  typesense-data:
   meilisearch-data:
   meilisearch1-data:
   elasticsearch0-data:
