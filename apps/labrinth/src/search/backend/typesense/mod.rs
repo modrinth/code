@@ -367,28 +367,16 @@ impl Typesense {
 
     fn collection_schema(name: &str) -> Value {
         let mut fields = vec![
-            json!({"name": ".*", "type": "auto", "optional": true}),
-            json!({"name": "version_id", "type": "string"}),
             json!({"name": "name", "type": "string", "facet": false}),
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
-            json!({"name": "display_categories", "type": "string[]", "facet": true, "optional": true}),
-            json!({"name": "license", "type": "string", "facet": true, "optional": true}),
             json!({"name": "downloads", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "author", "type": "string", "facet": true}),
-            json!({"name": "date_created", "type": "string", "optional": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
-            json!({"name": "date_modified", "type": "string", "optional": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
             json!({"name": "version_published_timestamp", "type": "int64", "sort": true, "optional": true}),
-            json!({"name": "color", "type": "int64", "optional": true}),
-            json!({"name": "environment", "type": "string[]", "facet": true, "optional": true}),
-            json!({"name": "mrpack_loaders", "type": "string[]", "facet": true, "optional": true}),
-            json!({"name": "loaders", "type": "string[]", "optional": true}),
-            json!({"name": "minecraft_server.country", "type": "string", "facet": true, "optional": true}),
-            json!({"name": "minecraft_java_server.content.recommended_game_version", "type": "string", "facet": true, "optional": true}),
-            json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "facet": true, "sort": true, "optional": true}),
+            json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.verified_plays_4w", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
@@ -407,7 +395,7 @@ impl Typesense {
         // NOTE: we can only sort by max 3 fields here - typesense will not let us sort by more
         match index {
             SearchIndex::Relevance => {
-                "_text_match:desc,downloads:desc,version_published_timestamp:desc"
+                "_text_match(buckets:5):desc,downloads:desc,version_published_timestamp:desc"
             }
             SearchIndex::Downloads => {
                 "downloads:desc,version_published_timestamp:desc"
@@ -422,14 +410,14 @@ impl Typesense {
                 "created_timestamp:desc,version_published_timestamp:desc"
             }
             SearchIndex::MinecraftJavaServerVerifiedPlays2w => concat!(
+                "_text_match(buckets:5):desc,",
                 "minecraft_java_server.verified_plays_2w:desc,",
-                "minecraft_java_server.is_online:desc,",
-                "minecraft_java_server.ping.data.players_online:desc"
+                "minecraft_java_server.is_online:desc"
             ),
             SearchIndex::MinecraftJavaServerPlayersOnline => concat!(
+                "_text_match(buckets:5):desc,",
                 "minecraft_java_server.is_online:desc,",
-                "minecraft_java_server.ping.data.players_online:desc,",
-                "version_published_timestamp:desc"
+                "minecraft_java_server.ping.data.players_online:desc"
             ),
         }
     }
