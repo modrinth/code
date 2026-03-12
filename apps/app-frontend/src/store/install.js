@@ -1,3 +1,5 @@
+// TODO: migrate to content-install.ts DI
+
 import dayjs from 'dayjs'
 
 import { get_project, get_version_many } from '@/helpers/cache.js'
@@ -46,18 +48,23 @@ export const isVersionCompatible = (version, project, instance) => {
 	)
 }
 
-export const installVersionDependencies = async (profile, version) => {
+export const installVersionDependencies = async (profile, version, onDepInstalling) => {
 	for (const dep of version.dependencies) {
 		if (dep.dependency_type !== 'required') continue
 		// disallow fabric api install on quilt
 		if (dep.project_id === 'P7dR8mSH' && profile.loader === 'quilt') continue
 		if (dep.version_id) {
 			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
+			if (dep.project_id && onDepInstalling) {
+				const depProject = await get_project(dep.project_id, 'bypass').catch(() => null)
+				if (depProject) onDepInstalling(depProject)
+			}
 			await add_project_from_version(profile.path, dep.version_id)
 		} else {
 			if (dep.project_id && (await check_installed(profile.path, dep.project_id))) continue
 
 			const depProject = await get_project(dep.project_id, 'bypass')
+			if (onDepInstalling) onDepInstalling(depProject)
 
 			const depVersions = (await get_version_many(depProject.versions, 'bypass')).sort(
 				(a, b) => dayjs(b.date_published) - dayjs(a.date_published),

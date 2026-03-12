@@ -191,7 +191,7 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
-			const typeOrder = { removed: 0, added: 1, updated: 2 }
+			const typeOrder = { added: 0, updated: 1, removed: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
 

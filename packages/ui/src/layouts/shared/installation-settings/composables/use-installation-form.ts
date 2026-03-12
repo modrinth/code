@@ -90,6 +90,7 @@ export function useInstallationForm(
 
 				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
 					pendingPreview.value = preview
+					await nextTick()
 					contentDiffModalRef?.value?.show()
 					return
 				}

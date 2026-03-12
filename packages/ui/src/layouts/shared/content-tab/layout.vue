@@ -222,7 +222,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		const base = ctx.mapToTableItem(item)
 		return {
 			...base,
-			disabled: isChanging(base.id) || ctx.isBusy.value,
+			disabled: isChanging(base.id) || ctx.isBusy.value || item.installing === true,
 			hasUpdate: !ctx.isPackLocked.value && item.has_update,
 			isClientOnly: isClientOnlyEnvironment(item.environment),
 			overflowOptions: ctx.getOverflowOptions?.(item),

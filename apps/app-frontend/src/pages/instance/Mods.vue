@@ -83,6 +83,7 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
+import { injectContentInstall } from '@/providers/content-install'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
@@ -159,6 +160,7 @@ let savedModalState: ModpackContentModalState | null = null
 
 const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
+const { installingItems } = injectContentInstall()
 const router = useRouter()
 
 const props = defineProps<{
@@ -170,6 +172,15 @@ const props = defineProps<{
 
 const loading = ref(true)
 const projects = ref<ContentItem[]>([])
+const mergedProjects = computed<ContentItem[]>(() => {
+	const pending = installingItems.value.get(props.instance.path) ?? []
+	if (pending.length === 0) return projects.value
+	const realProjectIds = new Set(
+		projects.value.map((p) => p.project?.id).filter(Boolean),
+	)
+	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
+	return [...projects.value, ...placeholders]
+})
 
 const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
 const linkedModpackVersion = ref<ContentModpackCardVersion | null>(null)
@@ -614,7 +625,7 @@ provideAppBackup({
 })
 
 provideContentManager({
-	items: projects,
+	items: mergedProjects,
 	loading,
 	error: ref(null),
 	modpack: computed(() =>
@@ -671,16 +682,23 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
-		version: item.version ?? {
-			id: item.file_name,
-			version_number: formatMessage(messages.unknownVersion),
-			file_name: item.file_name,
-		},
-		versionLink:
-			item.project?.id && item.version?.id
-				? `/project/${item.project.id}/version/${item.version.id}`
-				: undefined,
+		projectLink: item.installing ? undefined : (item.project?.id ? `/project/${item.project.id}` : undefined),
+		version: item.installing
+			? {
+					id: item.file_name,
+					version_number: formatMessage(messages.installing),
+					file_name: '',
+				}
+			: (item.version ?? {
+					id: item.file_name,
+					version_number: formatMessage(messages.unknownVersion),
+					file_name: item.file_name,
+				}),
+		versionLink: item.installing
+			? undefined
+			: (item.project?.id && item.version?.id
+					? `/project/${item.project.id}/version/${item.version.id}`
+					: undefined),
 		owner: item.owner
 			? {
 					...item.owner,

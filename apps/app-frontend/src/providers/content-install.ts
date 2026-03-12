@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { ContentInstallInstance } from '@modrinth/ui'
+import type { ContentInstallInstance, ContentItem } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
@@ -95,6 +95,7 @@ export interface ContentInstallContext {
 		createInstanceCallback?: (profile: string) => void,
 		hints?: { preferredLoader?: string; preferredGameVersion?: string },
 	) => Promise<void>
+	installingItems: Ref<Map<string, ContentItem[]>>
 }
 
 export const [injectContentInstall, provideContentInstall] = createContext<ContentInstallContext>(
@@ -114,6 +115,48 @@ export function createContentInstall(opts: {
 	const preferredLoader = ref<string | null>(null)
 	const preferredGameVersion = ref<string | null>(null)
 	const releaseGameVersions = ref<Set<string>>(new Set())
+
+	const installingItems = ref<Map<string, ContentItem[]>>(new Map())
+
+	function addInstallingItem(
+		instancePath: string,
+		project: { id: string; slug?: string | null; title: string; icon_url?: string | null; project_type?: string },
+	) {
+		const placeholder: ContentItem = {
+			file_name: `__installing_${project.id}`,
+			project: {
+				id: project.id,
+				slug: project.slug ?? null,
+				title: project.title,
+				icon_url: project.icon_url ?? null,
+			},
+			project_type: project.project_type ?? 'mod',
+			has_update: false,
+			update_version_id: null,
+			enabled: true,
+			installing: true,
+		}
+		const next = new Map(installingItems.value)
+		const items = next.get(instancePath) ?? []
+		if (items.some((i) => i.file_name === placeholder.file_name)) return
+		next.set(instancePath, [...items, placeholder])
+		installingItems.value = next
+	}
+
+	function removeInstallingItems(instancePath: string, projectIds: string[]) {
+		const next = new Map(installingItems.value)
+		const items = next.get(instancePath)
+		if (items) {
+			const idsToRemove = new Set(projectIds.map((id) => `__installing_${id}`))
+			const filtered = items.filter((i) => !idsToRemove.has(i.file_name))
+			if (filtered.length > 0) {
+				next.set(instancePath, filtered)
+			} else {
+				next.delete(instancePath)
+			}
+			installingItems.value = next
+		}
+	}
 
 	let modalRef: ModalRef | null = null
 	let installConfirmModalRef: InstallConfirmModalRef | null = null
@@ -237,9 +280,18 @@ export function createContentInstall(opts: {
 			return
 		}
 
+		const installedProjectIds: string[] = []
+		if (currentProject) {
+			addInstallingItem(instance.id, currentProject)
+			installedProjectIds.push(currentProject.id)
+		}
+
 		try {
 			await add_project_from_version(instance.id, version.id)
-			await installVersionDependencies(profile, version)
+			await installVersionDependencies(profile, version, (depProject: Labrinth.Projects.v2.Project) => {
+				addInstallingItem(instance.id, depProject)
+				installedProjectIds.push(depProject.id)
+			})
 			if (storeInstance) {
 				storeInstance.installed = true
 				storeInstance.installing = false
@@ -257,6 +309,8 @@ export function createContentInstall(opts: {
 		} catch (err) {
 			if (storeInstance) storeInstance.installing = false
 			opts.handleError(err)
+		} finally {
+			removeInstallingItems(instance.id, installedProjectIds)
 		}
 	}
 
@@ -385,19 +439,28 @@ export function createContentInstall(opts: {
 					}
 				}
 
-				await add_project_from_version(instance.path, version.id)
-				await installVersionDependencies(instance, version)
+				const installedProjectIds: string[] = [project.id]
+				addInstallingItem(instancePath, project)
+				try {
+					await add_project_from_version(instance.path, version.id)
+					await installVersionDependencies(instance, version, (depProject: Labrinth.Projects.v2.Project) => {
+						addInstallingItem(instancePath, depProject)
+						installedProjectIds.push(depProject.id)
+					})
 
-				trackEvent('ProjectInstall', {
-					loader: instance.loader,
-					game_version: instance.game_version,
-					id: project.id,
-					project_type: project.project_type,
-					version_id: version.id,
-					title: project.title,
-					source,
-				})
-				callback(version.id)
+					trackEvent('ProjectInstall', {
+						loader: instance.loader,
+						game_version: instance.game_version,
+						id: project.id,
+						project_type: project.project_type,
+						version_id: version.id,
+						title: project.title,
+						source,
+					})
+					callback(version.id)
+				} finally {
+					removeInstallingItems(instancePath, installedProjectIds)
+				}
 			} else {
 				incompatibilityWarningModalRef?.show(instance, project, projectVersions, version, callback)
 			}
@@ -433,5 +496,6 @@ export function createContentInstall(opts: {
 			incompatibilityWarningModalRef = ref
 		},
 		install,
+		installingItems,
 	}
 }

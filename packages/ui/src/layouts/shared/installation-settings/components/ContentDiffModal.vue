@@ -68,8 +68,10 @@
 					</div>
 
 					<div class="flex gap-1 col-span-2">
-						<span class="text-sm">{{
-							formatMessage(diffTypeMessages[diff.type])
+						<span class="text-sm shrink-0 whitespace-nowrap">{{
+							diff.type === 'removed' && props.removedLabel
+								? props.removedLabel
+								: formatMessage(diffTypeMessages[diff.type])
 						}}</span>
 						<span
 							v-if="diff.projectName"
@@ -167,6 +169,7 @@ const props = defineProps<{
 	confirmIcon?: Component
 	showReportButton?: boolean
 	showBackupCreator?: boolean
+	removedLabel?: string
 }>()
 
 const emit = defineEmits<{
@@ -187,7 +190,7 @@ const updatedCount = computed(() => props.diffs.filter((d) => d.type === 'update
 
 const sortedDiffs = computed(() =>
 	[...props.diffs].sort((a, b) => {
-		const typeOrder = { removed: 0, added: 1, updated: 2 }
+		const typeOrder = { added: 0, updated: 1, removed: 2 }
 		return typeOrder[a.type] - typeOrder[b.type]
 	}),
 )

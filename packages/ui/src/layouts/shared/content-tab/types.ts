@@ -52,6 +52,7 @@ export interface ContentItem extends Omit<
 	update_version_id: string | null
 	date_added?: string
 	environment?: string
+	installing?: boolean
 }
 
 export type ContentModpackCardProject = Pick<

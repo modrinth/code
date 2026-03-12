@@ -193,7 +193,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				}}</span>
 			</div>
 
-			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'w-[335px] min-w-0' : 'flex-1'">
+			<div class="hidden @[800px]:flex" :class="hasAnyActions ? 'flex-1 min-w-0' : 'flex-1'">
 				<button
 					v-if="sortable"
 					role="columnheader"

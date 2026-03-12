@@ -251,6 +251,7 @@ export class ArchonContentV1Module extends AbstractModule {
 				api: 'archon',
 				version: 1,
 				method: 'GET',
+				timeout: 1000 * 1000,
 			},
 		)
 	}

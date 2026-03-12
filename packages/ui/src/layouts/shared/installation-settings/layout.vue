@@ -188,12 +188,16 @@ const messages = defineMessages({
 	},
 	confirmVersionChange: {
 		id: 'installation-settings.confirm-version-change',
-		defaultMessage: 'Confirm changes',
+		defaultMessage: 'Confirm',
 	},
 	confirmVersionChangeDescription: {
 		id: 'installation-settings.confirm-version-change-description',
 		defaultMessage:
 			'Changing to {gameVersion} will modify the following content on your server.',
+	},
+	removedIncompatible: {
+		id: 'installation-settings.removed-incompatible',
+		defaultMessage: 'Removed - incompatible',
 	},
 })
 </script>
@@ -647,6 +651,8 @@ const messages = defineMessages({
 			:diffs="form.pendingPreview.value.diffs"
 			:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
 			:confirm-label="formatMessage(messages.confirmVersionChange)"
+			:confirm-icon="SaveIcon"
+			:removed-label="formatMessage(messages.removedIncompatible)"
 			:show-backup-creator="ctx.isServer"
 			@confirm="form.confirmSave()"
 			@cancel="form.cancelPreview()"

@@ -174,7 +174,7 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 		<div
 			class="hidden flex-col gap-0.5 @[800px]:flex"
-			:class="hideActions ? 'flex-1' : 'w-[335px] min-w-0'"
+			:class="hideActions ? 'flex-1' : 'flex-1 min-w-0'"
 		>
 			<template v-if="version">
 				<AutoLink
