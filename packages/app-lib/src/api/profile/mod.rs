@@ -342,7 +342,7 @@ pub async fn update_project(
             .remove(project_path)
             && let Some(update_version) = &file.update_version_id
         {
-            let path = Profile::add_project_version(
+            let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
                 &state.pool,
@@ -350,6 +350,11 @@ pub async fn update_project(
                 &state.io_semaphore,
             )
             .await?;
+
+            if project_path.ends_with(".disabled") {
+                path = Profile::toggle_disable_project(profile_path, &path)
+                    .await?;
+            }
 
             if path != project_path {
                 Profile::remove_project(profile_path, project_path).await?;

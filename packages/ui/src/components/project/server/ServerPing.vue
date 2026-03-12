@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const pingMessage = defineMessage({
 	id: 'project.server.ping.ms',
-	defaultMessage: '{ping} ms',
+	defaultMessage: '{ping, number} ms',
 })
 
 const { formatMessage } = useVIntl()

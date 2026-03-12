@@ -10,6 +10,7 @@ use crate::{
     state::ProfileInstallStage,
 };
 use futures::try_join;
+use std::collections::HashSet;
 
 /// Updates a managed modrinth pack to the version specified by new_version_id
 #[tracing::instrument]
@@ -110,6 +111,22 @@ async fn replace_managed_modrinth(
     new_version_id: Option<&String>,
     ignore_lock: bool,
 ) -> crate::Result<()> {
+    // get disabled project ids to re-disable after update
+    let state = crate::State::get().await?;
+    let disabled_project_ids = profile
+        .get_projects(
+            Some(CacheBehaviour::MustRevalidate),
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?
+        .into_iter()
+        .filter_map(|(file_path, project)| {
+            (file_path.ends_with(".disabled"))
+                .then_some(project.metadata?.project_id)
+        })
+        .collect::<HashSet<_>>();
+
     crate::profile::edit(profile_path, |profile| {
         profile.install_stage = ProfileInstallStage::MinecraftInstalling;
         async { Ok(()) }
@@ -190,6 +207,31 @@ async fn replace_managed_modrinth(
         ignore_lock,
     )
     .await?;
+
+    // re-enable previously disabled project
+    if !disabled_project_ids.is_empty()
+        && let Some(updated_profile) = get(profile_path).await?
+    {
+        for (file_path, project) in updated_profile
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.api_semaphore,
+            )
+            .await?
+        {
+            if !file_path.ends_with(".disabled")
+                && let Some(metadata) = &project.metadata
+                && disabled_project_ids.contains(&metadata.project_id)
+            {
+                crate::state::Profile::toggle_disable_project(
+                    profile_path,
+                    &file_path,
+                )
+                .await?;
+            }
+        }
+    }
 
     Ok(())
 }

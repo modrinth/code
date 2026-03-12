@@ -412,5 +412,8 @@ export function flattenProjectV3Variables(
 	vars['PROJECT_SITE_URL'] = projectV3.link_urls?.site?.url || 'None'
 	vars['PROJECT_STORE_URL'] = projectV3.link_urls?.store?.url || 'None'
 
+	vars['PROJECT_LANGUAGES'] = projectV3.minecraft_server?.languages?.toString() || 'None'
+	vars['PROJECT_LANGUAGE_COUNT'] = (projectV3.minecraft_server?.languages?.length || 0).toString()
+
 	return vars
 }
