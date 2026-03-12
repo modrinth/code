@@ -189,6 +189,7 @@ pub enum SearchField {
     ProjectTypes,
     ProjectId,
     OpenSource,
+    Environment,
     GameVersions,
     ClientSide,
     ServerSide,

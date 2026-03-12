@@ -367,6 +367,13 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::Environment => TypesenseFieldSpec {
+                path: "environment",
+                ty: "string[]",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
             SearchField::GameVersions => TypesenseFieldSpec {
                 path: "game_versions",
                 ty: "string[]",
@@ -467,7 +474,6 @@ impl Typesense {
             json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "author", "type": "string", "facet": true}),
             json!({"name": "license", "type": "string", "facet": true}),
-            json!({"name": "environment", "type": "string[]", "facet": true, "optional": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),

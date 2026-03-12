@@ -148,6 +148,10 @@ impl SearchField {
                 path: "open_source",
                 mapping: json!({ "type": "boolean" }),
             },
+            SearchField::Environment => ElasticsearchFieldSpec {
+                path: "environment",
+                mapping: json!({ "type": "keyword" }),
+            },
             SearchField::GameVersions => ElasticsearchFieldSpec {
                 path: "game_versions",
                 mapping: json!({ "type": "keyword" }),

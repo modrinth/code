@@ -569,6 +569,10 @@ impl SearchField {
                 path: "open_source",
                 filterable: true,
             },
+            SearchField::Environment => MeilisearchFieldSpec {
+                path: "environment",
+                filterable: true,
+            },
             SearchField::GameVersions => MeilisearchFieldSpec {
                 path: "game_versions",
                 filterable: true,
