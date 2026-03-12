@@ -128,10 +128,11 @@
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -400,10 +401,11 @@
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
 								!allOrgMembers[index].override
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allOrgMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -556,12 +558,16 @@ import { removeSelfFromTeam } from '~/helpers/teams.js'
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectV3,
 	organization,
 	allMembers,
 	currentMember,
 	invalidate,
 } = injectProjectPageContext()
 
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
+const cosmetics = useCosmetics()
 const auth = await useAuth()
 
 const allTeamMembers = ref([])

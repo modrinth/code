@@ -82,7 +82,7 @@ info:
     - `X-Ratelimit-Reset`: the time in seconds until the ratelimit window resets
 
     Ratelimits are the same no matter whether you use a token or not.
-    The ratelimit is currently 300 requests per minute. If you have a use case requiring a higher limit, please [contact us](mailto:admin@modrinth.com).
+    The ratelimit is currently 300 requests per minute. If you have a use case requiring a higher limit, please [contact us](mailto:support@modrinth.com).
 
     ## User Agents
     To access the Modrinth API, you **must** use provide a uniquely-identifying `User-Agent` header.

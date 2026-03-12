@@ -44,6 +44,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	i18nDebug: false,
 	showDiscoverProjectButtons: false,
 	useV1ContentTabAPI: true,
+	labrinthApiCanary: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS
