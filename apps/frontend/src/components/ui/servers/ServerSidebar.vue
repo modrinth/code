@@ -24,7 +24,7 @@
 		</div>
 
 		<div class="h-full w-full">
-			<NuxtPage :route="route" :backup-in-progress="backupInProgress" @reinstall="onReinstall" />
+			<NuxtPage :route="route" @reinstall="onReinstall" />
 		</div>
 	</div>
 </template>
@@ -32,8 +32,6 @@
 <script setup lang="ts">
 import { RightArrowIcon } from '@modrinth/assets'
 import type { RouteLocationNormalized } from 'vue-router'
-
-import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const emit = defineEmits(['reinstall'])
 
@@ -46,7 +44,6 @@ defineProps<{
 		shown?: boolean
 	}[]
 	route: RouteLocationNormalized
-	backupInProgress?: BackupInProgressReason
 }>()
 
 const onReinstall = (...args: any[]) => {

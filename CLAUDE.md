@@ -97,7 +97,23 @@ Project-specific skill files with detailed patterns. Use them when the task matc
 ### General
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
 - For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
-- When editing, if the file has tabs USE TABS in edit tool - do not go back and forth identifying tabs in the file.
+
+## Edit Tool - Whitespace Handling (CLAUDE ONLY)
+
+The Read tool uses `→` to mark where line numbers end and file content begins.
+
+**Rule:** Copy the EXACT whitespace that appears after the `→` marker.
+- Whatever appears between `→` and the code text is what's actually in the file
+- That whitespace must be used EXACTLY in Edit tool's old_string
+- Don't count arrows, don't interpret - just copy what's after the `→`
+
+**Example:**
+14→		private byte tag;
+For Edit, use: `		private byte tag;` (copy everything after →, including the two tabs)
+
+**If Edit fails:** Stop and explain the problem. Do not attempt sed/awk/bash workarounds.
+
+**IMPORTANT**: Trust the Read tool output. Copy what's after `→` into Edit immediately. DO NOT verify with sed/od/grep first - that's wasting time and the instructions already tell you to stop if Edit fails, not to pre-verify.
 
 ## Skills
 

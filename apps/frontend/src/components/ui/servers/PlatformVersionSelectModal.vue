@@ -158,8 +158,8 @@
 			<div class="mt-4 flex justify-start gap-4">
 				<ButtonStyled :color="isDangerous ? 'red' : 'brand'">
 					<button
-						v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
-						:disabled="canInstall || !!backupInProgress"
+						v-tooltip="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
+						:disabled="canInstall || busyReasons.length > 0"
 						@click="handleReinstall"
 					>
 						<RightArrowIcon />
@@ -212,12 +212,10 @@ import {
 import { type Loaders, ModrinthServersFetchError } from '@modrinth/utils'
 import { $fetch } from 'ofetch'
 
-import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
-
 import LoaderIcon from './icons/LoaderIcon.vue'
 import LoadingIcon from './icons/LoadingIcon.vue'
 
-const { server, serverId } = injectModrinthServerContext()
+const { server, serverId, busyReasons } = injectModrinthServerContext()
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -237,7 +235,6 @@ type VersionCache = Record<string, any>
 
 const props = defineProps<{
 	currentLoader: Loaders | undefined
-	backupInProgress?: BackupInProgressReason
 	initialSetup?: boolean
 }>()
 

@@ -32,6 +32,8 @@
 						:search-query="searchQuery"
 						:show-refresh-button="showRefreshButton"
 						:base-id="baseId"
+						:disabled="serverBusy"
+						:disabled-tooltip="busyTooltip"
 						@navigate="navigateToSegment"
 						@navigate-home="() => navigateToSegment(-1)"
 						@prefetch-home="handlePrefetchHome"
@@ -185,6 +187,8 @@
 									<FileVirtualList
 										:items="filteredItems"
 										:selected-items="selectedItems"
+										:write-disabled="serverBusy"
+										:write-disabled-tooltip="busyTooltip"
 										@extract="handleExtractItem"
 										@delete="showDeleteModal"
 										@rename="showRenameModal"
@@ -239,13 +243,13 @@
 				<span class="text-sm font-medium text-contrast"> {{ selectedItems.size }} selected </span>
 				<div class="ml-auto flex items-center gap-2">
 					<ButtonStyled>
-						<button @click="showBulkMoveModal">
+						<button v-tooltip="busyTooltip" :disabled="serverBusy" @click="showBulkMoveModal">
 							<RightArrowIcon class="h-4 w-4" />
 							Move
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="red">
-						<button @click="showBulkDeleteModal">
+						<button v-tooltip="busyTooltip" :disabled="serverBusy" @click="showBulkDeleteModal">
 							<TrashIcon class="h-4 w-4" />
 							Delete
 						</button>
@@ -293,6 +297,7 @@ import {
 	FileUploadConflictModal,
 	FileUploadZipUrlModal,
 } from '#ui/components/servers/files/modals'
+import { useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import {
 	injectModrinthClient,
@@ -310,7 +315,13 @@ const notifications = injectNotificationManager()
 const { addNotification } = notifications
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { serverId, fsOps, fsQueuedOps } = serverContext
+const { serverId, fsOps, fsQueuedOps, busyReasons } = serverContext
+
+const { formatMessage } = useVIntl()
+const serverBusy = computed(() => busyReasons.value.length > 0)
+const busyTooltip = computed(() =>
+	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
+)
 const queryClient = useQueryClient()
 
 interface BaseOperation {
@@ -838,6 +849,7 @@ function extractItem(path: string) {
 }
 
 async function handleExtractItem(item: { name: string; type: string; path: string }) {
+	if (serverBusy.value) return
 	try {
 		const dry = await client.kyros.files_v0.extractFile(item.path, true, true)
 		if (dry) {
@@ -890,6 +902,7 @@ function handleDirectMove(moveData: {
 	path: string
 	destination: string
 }) {
+	if (serverBusy.value) return
 	const dest = `${moveData.destination}/${moveData.name}`.replace('//', '/')
 	const sourcePath = moveData.path.substring(0, moveData.path.lastIndexOf('/'))
 
@@ -919,25 +932,30 @@ function handleDeleteItem() {
 }
 
 function showCreateModal(type: 'file' | 'directory') {
+	if (serverBusy.value) return
 	newItemType.value = type
 	createItemModal.value?.show()
 }
 
 function showUnzipFromUrlModal(cf: boolean) {
+	if (serverBusy.value) return
 	uploadZipUrlModal.value?.show(cf)
 }
 
 function showRenameModal(item: Kyros.Files.v0.DirectoryItem) {
+	if (serverBusy.value) return
 	selectedItem.value = item
 	renameItemModal.value?.show(item)
 }
 
 function showMoveModal(item: Kyros.Files.v0.DirectoryItem) {
+	if (serverBusy.value) return
 	selectedItem.value = item
 	moveItemModal.value?.show()
 }
 
 function showDeleteModal(item: Kyros.Files.v0.DirectoryItem) {
+	if (serverBusy.value) return
 	selectedItem.value = item
 	deleteItemModal.value?.show()
 }
@@ -951,6 +969,7 @@ async function showBulkMoveModal() {
 }
 
 async function showBulkDeleteModal() {
+	if (serverBusy.value) return
 	if (selectedItems.value.size === 0) return
 
 	const itemsToDelete = Array.from(selectedItems.value)
@@ -1218,7 +1237,7 @@ function navigateToSegment(index: number) {
 }
 
 function handleDroppedFiles(files: File[]) {
-	if (isEditing.value) return
+	if (isEditing.value || serverBusy.value) return
 
 	files.forEach((file) => {
 		uploadDropdownRef.value?.uploadFile(file)
@@ -1226,6 +1245,7 @@ function handleDroppedFiles(files: File[]) {
 }
 
 function initiateFileUpload() {
+	if (serverBusy.value) return
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.multiple = true

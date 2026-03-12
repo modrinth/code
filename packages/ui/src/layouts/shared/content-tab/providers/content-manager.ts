@@ -47,6 +47,7 @@ export interface ContentManagerContext {
 
 	// Guards
 	isBusy: Ref<boolean> | ComputedRef<boolean>
+	busyMessage?: Ref<string | null> | ComputedRef<string | null>
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 

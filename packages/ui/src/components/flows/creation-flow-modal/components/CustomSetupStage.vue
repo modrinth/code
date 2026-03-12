@@ -21,7 +21,7 @@
 
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
-			<span class="font-semibold text-contrast">Name</span>
+			<span class="font-semibold text-contrast">Name<span class="text-red"> *</span></span>
 			<StyledInput v-model="ctx.instanceName.value" placeholder="Enter instance name" />
 		</div>
 
@@ -124,12 +124,12 @@ const {
 } = ctx
 
 // For instance flow, prepend 'vanilla' to available loaders.
-// For server-onboarding, vanilla is a separate option in the setup type stage, so exclude it here.
+// For server flows, vanilla is a separate option in the setup type stage, so exclude it here.
 const effectiveLoaders = computed(() => {
 	if (ctx.flowType === 'instance') {
 		return ['vanilla', ...ctx.availableLoaders.filter((l) => l !== 'vanilla')]
 	}
-	if (ctx.flowType === 'server-onboarding') {
+	if (ctx.flowType === 'server-onboarding' || ctx.flowType === 'reset-server') {
 		return ctx.availableLoaders.filter((l) => l !== 'vanilla')
 	}
 	return ctx.availableLoaders

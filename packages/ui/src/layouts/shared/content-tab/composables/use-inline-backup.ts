@@ -176,6 +176,9 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 		try {
 			await client.archon.backups_v1.delete(serverId, worldId.value, createdBackupId.value)
+			isBackingUp.value = false
+			isCancelling.value = false
+			backupCancelled.value = true
 			addNotification({
 				type: 'info',
 				title: 'Backup cancelled',

@@ -73,7 +73,7 @@ const props = withDefaults(
 )
 
 const client = injectModrinthClient()
-const { server, worldId } = injectModrinthServerContext()
+const { server, worldId, busyReasons } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const route = useRoute()
 const router = useRouter()
@@ -586,7 +586,7 @@ async function handleModpackUpdate() {
 }
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog !== undefined) return
+	if (version.changelog) return
 	loadingChangelog.value = true
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
@@ -604,7 +604,7 @@ async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 }
 
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog !== undefined) return
+	if (version.changelog) return
 	try {
 		const fullVersion = await client.labrinth.versions_v2.getVersion(version.id)
 		const index = updatingProjectVersions.value.findIndex((v) => v.id === version.id)
@@ -692,7 +692,10 @@ provideContentManager({
 	error: computed(() => contentQuery.error.value ?? null),
 	modpack,
 	isPackLocked: ref(false),
-	isBusy: ref(false),
+	isBusy: computed(() => busyReasons.value.length > 0),
+	busyMessage: computed(() =>
+		busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null,
+	),
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,

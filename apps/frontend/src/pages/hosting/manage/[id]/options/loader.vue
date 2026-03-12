@@ -57,7 +57,7 @@ import { computed, ref, watch } from 'vue'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
-const { server, serverId, worldId, isSyncingContent } = injectModrinthServerContext()
+const { server, serverId, worldId, isSyncingContent, busyReasons } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const tags = injectTags()
@@ -117,7 +117,7 @@ const emit = defineEmits<{
 }>()
 
 const isInstalling = computed(() => {
-	const val = server.value?.status === 'installing' || isSyncingContent.value
+	const val = server.value?.status === 'installing' || isSyncingContent.value || busyReasons.value.length > 0
 	debug(
 		'isInstalling:',
 		val,

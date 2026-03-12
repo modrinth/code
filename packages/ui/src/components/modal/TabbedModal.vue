@@ -78,10 +78,12 @@ defineExpose({ selectedTab, setTab })
 				class="min-w-[400px] h-[500px] overflow-y-auto px-4"
 				@scroll="checkScrollState"
 			>
-				<component
-					:is="visibleTabs[selectedTab].content"
-					v-bind="visibleTabs[selectedTab].props ?? {}"
-				/>
+				<Suspense>
+					<component
+						:is="visibleTabs[selectedTab].content"
+						v-bind="visibleTabs[selectedTab].props ?? {}"
+					/>
+				</Suspense>
 			</div>
 
 			<Transition

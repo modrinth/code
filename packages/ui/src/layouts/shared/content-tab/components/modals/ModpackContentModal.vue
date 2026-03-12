@@ -4,8 +4,6 @@ import {
 	FilterIcon,
 	GlassesIcon,
 	PaintbrushIcon,
-	PowerIcon,
-	PowerOffIcon,
 	SearchIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
@@ -15,9 +13,7 @@ import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
-import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -26,6 +22,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 import { isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
+import ContentSelectionBar from '../ContentSelectionBar.vue'
 
 const { formatMessage } = useVIntl()
 
@@ -81,18 +78,6 @@ const messages = defineMessages({
 	copyLink: {
 		id: 'instances.modpack-content-modal.copy-link',
 		defaultMessage: 'Copy link',
-	},
-	selectedCount: {
-		id: 'instances.modpack-content-modal.selected-count',
-		defaultMessage: '{count, number} selected',
-	},
-	enable: {
-		id: 'instances.modpack-content-modal.enable',
-		defaultMessage: 'Enable',
-	},
-	disable: {
-		id: 'instances.modpack-content-modal.disable',
-		defaultMessage: 'Disable',
 	},
 })
 
@@ -500,37 +485,13 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 			</div>
 		</div>
 
-		<FloatingActionBar
+		<ContentSelectionBar
 			v-if="props.enableToggle"
-			:shown="selectedItems.length > 0"
+			:selected-items="selectedItems"
 			style="--left-bar-width: 0px; --right-bar-width: 0px"
-		>
-			<div class="flex items-center gap-0.5">
-				<span class="px-4 py-2.5 text-base font-semibold text-contrast">
-					{{ formatMessage(messages.selectedCount, { count: selectedItems.length }) }}
-				</span>
-				<div class="mx-1 h-6 w-px bg-surface-5" />
-				<ButtonStyled type="transparent">
-					<button class="!text-primary" @click="selectedIds = []">
-						{{ formatMessage(commonMessages.clearButton) }}
-					</button>
-				</ButtonStyled>
-			</div>
-
-			<div class="ml-auto flex items-center gap-0.5">
-				<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
-					<button @click="bulkEnable">
-						<PowerIcon />
-						{{ formatMessage(messages.enable) }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled v-else type="transparent">
-					<button @click="bulkDisable">
-						<PowerOffIcon />
-						{{ formatMessage(messages.disable) }}
-					</button>
-				</ButtonStyled>
-			</div>
-		</FloatingActionBar>
+			@clear="selectedIds = []"
+			@enable="bulkEnable"
+			@disable="bulkDisable"
+		/>
 	</NewModal>
 </template>

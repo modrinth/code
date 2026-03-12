@@ -9,8 +9,6 @@ import {
 	FilterIcon,
 	FolderOpenIcon,
 	LinkIcon,
-	PowerIcon,
-	PowerOffIcon,
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
@@ -25,7 +23,6 @@ import { computed, ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
-import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -34,6 +31,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import ContentCardTable from './components/ContentCardTable.vue'
 import ContentModpackCard from './components/ContentModpackCard.vue'
+import ContentSelectionBar from './components/ContentSelectionBar.vue'
 import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.vue'
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
@@ -107,10 +105,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.empty.hint',
 		defaultMessage: 'Browse or upload {contentType} to get started',
 	},
-	selectedCount: {
-		id: 'content.page-layout.selected-count',
-		defaultMessage: '{count} {contentType} selected',
-	},
 	shareProjectNames: {
 		id: 'content.page-layout.share.project-names',
 		defaultMessage: 'Project names',
@@ -131,46 +125,6 @@ const messages = defineMessages({
 		id: 'content.page-layout.share.label',
 		defaultMessage: 'Share',
 	},
-	enable: {
-		id: 'content.page-layout.enable',
-		defaultMessage: 'Enable',
-	},
-	disable: {
-		id: 'content.page-layout.disable',
-		defaultMessage: 'Disable',
-	},
-	bulkEnabling: {
-		id: 'content.page-layout.bulk.enabling',
-		defaultMessage: 'Enabling content... ({progress}/{total})',
-	},
-	bulkEnablingWaiting: {
-		id: 'content.page-layout.bulk.enabling-waiting',
-		defaultMessage: 'Enabling content...',
-	},
-	bulkDisabling: {
-		id: 'content.page-layout.bulk.disabling',
-		defaultMessage: 'Disabling content... ({progress}/{total})',
-	},
-	bulkDisablingWaiting: {
-		id: 'content.page-layout.bulk.disabling-waiting',
-		defaultMessage: 'Disabling content...',
-	},
-	bulkUpdating: {
-		id: 'content.page-layout.bulk.updating',
-		defaultMessage: 'Updating content... ({progress}/{total})',
-	},
-	bulkUpdatingWaiting: {
-		id: 'content.page-layout.bulk.updating-waiting',
-		defaultMessage: 'Updating content...',
-	},
-	bulkDeleting: {
-		id: 'content.page-layout.bulk.deleting',
-		defaultMessage: 'Deleting content... ({progress}/{total})',
-	},
-	bulkDeletingWaiting: {
-		id: 'content.page-layout.bulk.deleting-waiting',
-		defaultMessage: 'Deleting content...',
-	},
 	uploadingFiles: {
 		id: 'content.page-layout.uploading-files',
 		defaultMessage: 'Uploading files ({completed}/{total})',
@@ -178,6 +132,10 @@ const messages = defineMessages({
 	sortByLabel: {
 		id: 'content.page-layout.sort.label',
 		defaultMessage: 'Sort by {mode}',
+	},
+	busyDescription: {
+		id: 'content.page-layout.busy-description',
+		defaultMessage: 'Please wait for the operation to complete before editing content.',
 	},
 })
 
@@ -458,6 +416,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		</div>
 
 		<template v-else>
+			<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
+				<template #header>{{ ctx.busyMessage.value }}</template>
+				{{ formatMessage(messages.busyDescription) }}
+			</Admonition>
+
 			<ContentModpackCard
 				v-if="ctx.modpack.value"
 				:project="ctx.modpack.value.project"
@@ -538,7 +501,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<ButtonStyled color="brand">
 								<button
 									v-tooltip="
-										ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined
+										ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 flex items-center gap-2"
@@ -551,7 +514,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<ButtonStyled type="outlined">
 								<button
 									v-tooltip="
-										ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined
+										ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 !border-button-bg !border-[1px]"
@@ -666,7 +629,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<template #actions>
 					<ButtonStyled type="outlined">
 						<button
-							v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+							v-tooltip="ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)"
 							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 !border-button-bg !border-[1px]"
 							@click="ctx.uploadFiles"
@@ -677,7 +640,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button
-							v-tooltip="ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined"
+							v-tooltip="ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)"
 							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 flex items-center gap-2"
 							@click="ctx.browse"
@@ -690,159 +653,98 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			</EmptyState>
 		</template>
 
-		<FloatingActionBar
-			:shown="selectedItems.length > 0 || isBulkOperating"
+		<ContentSelectionBar
+			:selected-items="selectedItems"
+			:content-type-label="ctx.contentTypeLabel.value"
+			:is-busy="ctx.isBusy.value"
+			:is-bulk-operating="isBulkOperating"
+			:bulk-operation="bulkOperation"
+			:bulk-progress="bulkProgress"
+			:bulk-total="bulkTotal"
+			:bulk-waiting="bulkWaiting"
 			:aria-label="formatMessage(commonMessages.selectionActionsLabel)"
+			@clear="clearSelection"
+			@enable="bulkEnable"
+			@disable="bulkDisable"
 		>
-			<template v-if="!isBulkOperating">
-				<div class="flex items-center gap-0.5">
-					<span class="px-4 py-2.5 text-base font-semibold text-contrast">
-						{{
-							formatMessage(messages.selectedCount, {
-								count: selectedItems.length,
-								contentType: `${ctx.contentTypeLabel.value}${selectedItems.length === 1 ? '' : 's'}`,
-							})
-						}}
-					</span>
-					<div class="mx-1 h-6 w-px bg-surface-5" />
-					<ButtonStyled type="transparent">
-						<button class="!text-primary" @click="clearSelection">
-							{{ formatMessage(commonMessages.clearButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
+			<template #actions>
+				<ButtonStyled
+					v-if="
+						hasBulkUpdateSupport &&
+						!ctx.isPackLocked.value &&
+						selectedItems.some((m) => m.has_update)
+					"
+					type="transparent"
+					color="green"
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
+						<DownloadIcon />
+						{{ formatMessage(commonMessages.updateButton) }}
+					</button>
+				</ButtonStyled>
 
-				<div class="ml-auto flex items-center gap-0.5">
-					<ButtonStyled
-						v-if="
-							hasBulkUpdateSupport &&
-							!ctx.isPackLocked.value &&
-							selectedItems.some((m) => m.has_update)
-						"
-						type="transparent"
-						color="green"
-						color-fill="text"
-						hover-color-fill="background"
+				<ButtonStyled v-if="ctx.shareItems" type="transparent">
+					<OverflowMenu
+						:options="[
+							{
+								id: 'share-names',
+								action: () => ctx.shareItems!(selectedItems, 'names'),
+							},
+							{
+								id: 'share-file-names',
+								action: () => ctx.shareItems!(selectedItems, 'file-names'),
+							},
+							{
+								id: 'share-urls',
+								action: () => ctx.shareItems!(selectedItems, 'urls'),
+							},
+							{
+								id: 'share-markdown',
+								action: () => ctx.shareItems!(selectedItems, 'markdown'),
+							},
+						]"
 					>
-						<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
-							<DownloadIcon />
-							{{ formatMessage(commonMessages.updateButton) }}
-						</button>
-					</ButtonStyled>
-
-					<ButtonStyled v-if="ctx.shareItems" type="transparent">
-						<OverflowMenu
-							:options="[
-								{
-									id: 'share-names',
-									action: () => ctx.shareItems!(selectedItems, 'names'),
-								},
-								{
-									id: 'share-file-names',
-									action: () => ctx.shareItems!(selectedItems, 'file-names'),
-								},
-								{
-									id: 'share-urls',
-									action: () => ctx.shareItems!(selectedItems, 'urls'),
-								},
-								{
-									id: 'share-markdown',
-									action: () => ctx.shareItems!(selectedItems, 'markdown'),
-								},
-							]"
-						>
-							<ShareIcon />
-							{{ formatMessage(messages.share) }}
-							<DropdownIcon />
-							<template #share-names>
-								<TextCursorInputIcon />
-								{{ formatMessage(messages.shareProjectNames) }}
-							</template>
-							<template #share-file-names>
-								<FileIcon />
-								{{ formatMessage(messages.shareFileNames) }}
-							</template>
-							<template #share-urls>
-								<LinkIcon />
-								{{ formatMessage(messages.shareProjectLinks) }}
-							</template>
-							<template #share-markdown>
-								<CodeIcon />
-								{{ formatMessage(messages.shareMarkdownLinks) }}
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-
-					<ButtonStyled v-if="selectedItems.every((m) => !m.enabled)" type="transparent">
-						<button :disabled="ctx.isBusy.value" @click="bulkEnable">
-							<PowerIcon />
-							{{ formatMessage(messages.enable) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled v-else type="transparent">
-						<button :disabled="ctx.isBusy.value" @click="bulkDisable">
-							<PowerOffIcon />
-							{{ formatMessage(messages.disable) }}
-						</button>
-					</ButtonStyled>
-
-					<div class="mx-1 h-6 w-px bg-surface-5" />
-
-					<ButtonStyled
-						type="transparent"
-						color="red"
-						color-fill="text"
-						hover-color-fill="background"
-					>
-						<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
-							<TrashIcon />
-							{{ formatMessage(commonMessages.deleteLabel) }}
-						</button>
-					</ButtonStyled>
-				</div>
+						<ShareIcon />
+						{{ formatMessage(messages.share) }}
+						<DropdownIcon />
+						<template #share-names>
+							<TextCursorInputIcon />
+							{{ formatMessage(messages.shareProjectNames) }}
+						</template>
+						<template #share-file-names>
+							<FileIcon />
+							{{ formatMessage(messages.shareFileNames) }}
+						</template>
+						<template #share-urls>
+							<LinkIcon />
+							{{ formatMessage(messages.shareProjectLinks) }}
+						</template>
+						<template #share-markdown>
+							<CodeIcon />
+							{{ formatMessage(messages.shareMarkdownLinks) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
 			</template>
 
-			<template v-else>
-				<div class="flex flex-1 flex-col gap-2" aria-live="polite">
-					<span class="text-sm font-medium text-contrast">
-						<template v-if="bulkWaiting">
-							{{
-								formatMessage(
-									bulkOperation === 'enable'
-										? messages.bulkEnablingWaiting
-										: bulkOperation === 'disable'
-											? messages.bulkDisablingWaiting
-											: bulkOperation === 'update'
-												? messages.bulkUpdatingWaiting
-												: messages.bulkDeletingWaiting,
-								)
-							}}
-						</template>
-						<template v-else>
-							{{
-								formatMessage(
-									bulkOperation === 'enable'
-										? messages.bulkEnabling
-										: bulkOperation === 'disable'
-											? messages.bulkDisabling
-											: bulkOperation === 'update'
-												? messages.bulkUpdating
-												: messages.bulkDeleting,
-									{ progress: bulkProgress, total: bulkTotal },
-								)
-							}}
-						</template>
-					</span>
-					<ProgressBar
-						full-width
-						:waiting="bulkWaiting"
-						:progress="bulkProgress"
-						:max="bulkTotal"
-						color="brand"
-					/>
-				</div>
+			<template #actions-end>
+				<div class="mx-1 h-6 w-px bg-surface-5" />
+
+				<ButtonStyled
+					type="transparent"
+					color="red"
+					color-fill="text"
+					hover-color-fill="background"
+				>
+					<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
+						<TrashIcon />
+						{{ formatMessage(commonMessages.deleteLabel) }}
+					</button>
+				</ButtonStyled>
 			</template>
-		</FloatingActionBar>
+		</ContentSelectionBar>
 
 		<ConfirmDeletionModal
 			ref="confirmDeletionModal"

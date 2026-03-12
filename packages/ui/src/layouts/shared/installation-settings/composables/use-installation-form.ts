@@ -145,7 +145,7 @@ export function useInstallationForm(
 	}
 
 	async function handleUpdaterVersionSelect(version: Labrinth.Versions.v2.Version) {
-		if (version.changelog !== undefined) return
+		if (version.changelog) return
 		loadingChangelog.value = true
 		try {
 			const full = await ctx.getVersionChangelog(version.id)
@@ -156,7 +156,7 @@ export function useInstallationForm(
 	}
 
 	async function handleUpdaterVersionHover(version: Labrinth.Versions.v2.Version) {
-		if (version.changelog !== undefined) return
+		if (version.changelog) return
 		try {
 			const full = await ctx.getVersionChangelog(version.id)
 			if (full) spliceVersion(full)

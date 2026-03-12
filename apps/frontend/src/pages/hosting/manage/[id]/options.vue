@@ -1,5 +1,5 @@
 <template>
-	<ServerSidebar :route="route" :nav-links="navLinks" :backup-in-progress="backupInProgress" />
+	<ServerSidebar :route="route" :nav-links="navLinks" />
 </template>
 <script setup lang="ts">
 import {
@@ -17,17 +17,12 @@ import { injectModrinthServerContext } from '@modrinth/ui'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
-import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 const route = useRoute()
 const serverId = route.params.id as string
 const auth = await useAuth()
 
 const { server } = injectModrinthServerContext()
-
-defineProps<{
-	backupInProgress?: BackupInProgressReason
-}>()
 
 useHead({
 	title: `Options - ${server.value?.name ?? 'Server'} - Modrinth`,

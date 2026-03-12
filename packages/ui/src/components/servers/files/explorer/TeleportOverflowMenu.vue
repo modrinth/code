@@ -41,11 +41,13 @@
 						<ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
 							<button
 								v-if="typeof option.action === 'function'"
+								v-tooltip="option.tooltip"
 								:ref="
 									(el) => {
 										if (el) menuItemsRef[index] = el as HTMLElement
 									}
 								"
+								:disabled="option.disabled"
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"
 								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
@@ -93,6 +95,8 @@ interface Option {
 	action?: (() => void) | string
 	shown?: boolean
 	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	disabled?: boolean
+	tooltip?: string
 }
 
 type Divider = {
@@ -258,6 +262,7 @@ const handleMouseMove = (event: MouseEvent) => {
 }
 
 const handleItemClick = (option: Option, index: number) => {
+	if (option.disabled) return
 	selectedIndex.value = index
 	selectOption(option)
 }

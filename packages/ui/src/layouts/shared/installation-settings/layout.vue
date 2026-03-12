@@ -600,21 +600,13 @@ const messages = defineMessages({
 			@confirm="handleModpackUpdateConfirm"
 			@cancel="handleModpackUpdateCancel"
 		/>
-		<ConfirmRepairModal
-			ref="repairModal"
-			:server="ctx.isServer"
-			@repair="handleRepair"
-		/>
+		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
 		<ConfirmReinstallModal
 			ref="reinstallModal"
 			:server="ctx.isServer"
 			@reinstall="handleReinstall"
 		/>
-		<ConfirmUnlinkModal
-			ref="unlinkModal"
-			:server="ctx.isServer"
-			@unlink="handleUnlink"
-		/>
+		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="handleUnlink" />
 
 		<slot name="extra-modals" />
 	</Teleport>

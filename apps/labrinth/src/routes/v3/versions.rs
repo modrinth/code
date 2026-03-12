@@ -799,8 +799,6 @@ pub async fn version_list_internal(
         )
         .await?
         .into_iter()
-        .skip(filters.offset.unwrap_or(0))
-        .take(filters.limit.unwrap_or(usize::MAX))
         .filter(|x| {
             let mut bool = true;
 
@@ -825,6 +823,17 @@ pub async fn version_list_internal(
         })
         .collect::<Vec<_>>();
 
+        // Sort before applying limit/offset so that limit=N returns the N newest versions
+        versions.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
+
+        let versions: Vec<_> = versions
+            .into_iter()
+            .skip(filters.offset.unwrap_or(0))
+            .take(filters.limit.unwrap_or(usize::MAX))
+            .collect();
+
         let mut response = versions
             .iter()
             .filter(|version| {
@@ -834,10 +843,6 @@ pub async fn version_list_internal(
             })
             .cloned()
             .collect::<Vec<_>>();
-
-        versions.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty()

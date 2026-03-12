@@ -381,9 +381,9 @@ async function serverInstall(project: InstallableSearchResult) {
 	project.installing = true
 	try {
 		if (projectType.value?.id === 'modpack') {
-			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
+			// TODO: restore limit=1 once the backend fix for version ordering is deployed (limit is applied before sorting)
+		const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
 				include_changelog: false,
-				limit: 1,
 			})
 			const versionId = versions[0]?.id ?? project.latest_version
 			if (!versionId) {

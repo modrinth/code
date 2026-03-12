@@ -1,7 +1,13 @@
 import type { Archon } from '@modrinth/api-client'
 import type { ComputedRef, Reactive, Ref } from 'vue'
 
+import type { MessageDescriptor } from '#ui/composables/i18n'
+
 import { createContext } from '.'
+
+export interface BusyReason {
+	reason: MessageDescriptor
+}
 
 export type BackupTaskState = {
 	progress: number
@@ -35,6 +41,9 @@ export interface ModrinthServerContext {
 
 	// Content sync state
 	readonly isSyncingContent: Ref<boolean>
+
+	// Busy state — when non-empty, all write operations should be disabled
+	readonly busyReasons: ComputedRef<BusyReason[]>
 
 	// Filesystem state
 	readonly fsAuth: Ref<FilesystemAuth | null>

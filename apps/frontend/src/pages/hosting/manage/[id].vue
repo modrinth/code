@@ -139,7 +139,7 @@
 								:server-name="serverData.name"
 								:server-data="serverData"
 								:uptime-seconds="uptimeSeconds"
-								:backup-in-progress="backupInProgress"
+								:busy-reason="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
 								@action="sendPowerAction"
 							/>
 						</div>
@@ -317,7 +317,6 @@
 					:stats="stats"
 					:server-power-state="serverPowerState"
 					:power-state-details="powerStateDetails"
-					:backup-in-progress="backupInProgress"
 					@reinstall="onReinstall"
 					@reinstall-failed="onReinstallFailed"
 				/>
@@ -354,7 +353,7 @@ import {
 	SettingsIcon,
 	TransferIcon,
 } from '@modrinth/assets'
-import type { MessageDescriptor } from '@modrinth/ui'
+import type { BusyReason } from '@modrinth/ui'
 import {
 	ButtonStyled,
 	defineMessage,
@@ -369,6 +368,7 @@ import {
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
+	useVIntl,
 } from '@modrinth/ui'
 import type { PowerAction, Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -387,6 +387,7 @@ import { useServerProject } from '~/composables/servers/use-server-project.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 
 const isReconnecting = ref(false)
@@ -510,6 +511,47 @@ const isSyncingContent = computed(
 	() => syncProgressActive.value || isAwaitingPostInstallRefresh.value,
 )
 
+const busyReasons = computed(() => {
+	const reasons: BusyReason[] = []
+	if (serverData.value?.status === 'installing') {
+		reasons.push({
+			reason: defineMessage({
+				id: 'servers.busy.installing',
+				defaultMessage: 'Server is installing',
+			}),
+		})
+	}
+	if (isSyncingContent.value) {
+		reasons.push({
+			reason: defineMessage({
+				id: 'servers.busy.syncing-content',
+				defaultMessage: 'Content sync in progress',
+			}),
+		})
+	}
+	for (const entry of backupsState.values()) {
+		if (entry.create?.state === 'ongoing') {
+			reasons.push({
+				reason: defineMessage({
+					id: 'servers.busy.backup-creating',
+					defaultMessage: 'Backup creation in progress',
+				}),
+			})
+			break
+		}
+		if (entry.restore?.state === 'ongoing') {
+			reasons.push({
+				reason: defineMessage({
+					id: 'servers.busy.backup-restoring',
+					defaultMessage: 'Backup restore in progress',
+				}),
+			})
+			break
+		}
+	}
+	return reasons
+})
+
 const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
@@ -536,6 +578,7 @@ provideModrinthServerContext({
 	backupsState,
 	markBackupCancelled,
 	isSyncingContent,
+	busyReasons,
 	fsAuth,
 	fsOps,
 	fsQueuedOps,
@@ -1155,27 +1198,7 @@ const notifyError = (title: string, text: string) => {
 	})
 }
 
-export type BackupInProgressReason = {
-	type: string
-	tooltip: MessageDescriptor
-}
 
-const restoreInProgressReason = {
-	type: 'restore',
-	tooltip: defineMessage({
-		id: 'servers.backup.restore.in-progress.tooltip',
-		defaultMessage: 'Backup restore in progress',
-	}),
-} satisfies BackupInProgressReason
-
-const backupInProgress = computed(() => {
-	for (const entry of backupsState.values()) {
-		if (entry.restore?.state === 'ongoing') {
-			return restoreInProgressReason
-		}
-	}
-	return undefined
-})
 
 const nodeUnavailableDetails = computed(() => [
 	{

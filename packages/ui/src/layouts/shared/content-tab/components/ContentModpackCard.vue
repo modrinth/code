@@ -12,6 +12,7 @@ import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
+import TagItem from '#ui/components/base/TagItem.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -253,15 +254,10 @@ const collapsedOptions = computed(() => {
 				<span class="font-medium">{{ formatCompact(project.followers) }}</span>
 			</div>
 
-			<div v-if="categories?.length" class="flex flex-wrap gap-2">
-				<button
-					v-for="cat in categories"
-					:key="cat.name"
-					class="cursor-pointer px-2 py-1 bg-surface-4 border border-solid rounded-full border-surface-5 text-secondary font-semibold"
-					@click="cat.action"
-				>
+			<div v-if="categories?.length" class="flex flex-wrap items-center gap-1">
+				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
 					{{ cat.name }}
-				</button>
+				</TagItem>
 			</div>
 		</div>
 	</div>

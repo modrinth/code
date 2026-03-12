@@ -148,6 +148,8 @@ import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useVIntl } from '#ui/composables/i18n'
+
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import BackupCreateModal from '#ui/components/servers/backups/BackupCreateModal.vue'
@@ -162,9 +164,10 @@ import {
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, backupsState, markBackupCancelled } = injectModrinthServerContext()
+const { server, worldId, backupsState, markBackupCancelled, busyReasons } = injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean
@@ -193,6 +196,7 @@ const deleteMutation = useMutation({
 		markBackupCancelled(backupId)
 		backupsState.delete(backupId)
 		queryClient.invalidateQueries({ queryKey: backupsQueryKey })
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	},
 })
 
@@ -283,42 +287,26 @@ const backupRestoreDisabled = computed(() => {
 	if (props.isServerRunning) {
 		return 'Cannot restore backup while server is running'
 	}
-	for (const entry of backupsState.values()) {
-		if (entry.create?.state === 'ongoing') {
-			return 'Cannot restore backup while a backup is being created'
-		}
-		if (entry.restore?.state === 'ongoing') {
-			return 'Cannot restore backup while another restore is in progress'
-		}
+	if (busyReasons.value.length > 0) {
+		return formatMessage(busyReasons.value[0].reason)
 	}
 	return undefined
 })
 
 const backupCreationDisabled = computed(() => {
-	if (
-		server.value.used_backup_quota !== undefined &&
-		server.value.backup_quota !== undefined &&
-		server.value.used_backup_quota >= server.value.backup_quota
-	) {
-		return `All ${server.value.backup_quota} of your backup slots are in use`
-	}
-
-	for (const entry of backupsState.values()) {
-		if (entry.create?.state === 'ongoing') {
-			return 'A backup is already in progress'
-		}
-		if (entry.restore?.state === 'ongoing') {
-			return 'Cannot create backup while a restore is in progress'
+	const quota = server.value.backup_quota
+	if (quota !== undefined) {
+		const usedCount = backupsData.value?.length ?? server.value.used_backup_quota ?? 0
+		if (usedCount >= quota) {
+			return `All ${quota} of your backup slots are in use`
 		}
 	}
-
+	if (busyReasons.value.length > 0) {
+		return formatMessage(busyReasons.value[0].reason)
+	}
 	// also check API data for ongoing backups (before ws fires)
 	if (backupsData.value?.some((backup) => backup.ongoing)) {
 		return 'A backup is already in progress'
-	}
-
-	if (server.value.status === 'installing') {
-		return 'Cannot create backup while server is installing'
 	}
 	return undefined
 })

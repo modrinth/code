@@ -98,7 +98,7 @@
 		<SaveBanner
 			:is-visible="hasUnsavedChanges"
 			:server-id="serverId"
-			:is-updating="isUpdating"
+			:is-updating="isUpdating || busyReasons.length > 0"
 			restart
 			:save="() => saveProperties()"
 			:reset="resetProperties"
@@ -126,7 +126,7 @@ import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { serverId, worldId, powerState } = injectModrinthServerContext()
+const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 
 const searchInput = ref('')

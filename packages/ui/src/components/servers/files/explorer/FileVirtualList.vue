@@ -29,6 +29,8 @@
 					:index="visibleRange.start + idx"
 					:is-last="visibleRange.start + idx === props.items.length - 1"
 					:selected="selectedItems.has(item.path)"
+					:write-disabled="writeDisabled"
+					:write-disabled-tooltip="writeDisabledTooltip"
 					@delete="$emit('delete', item)"
 					@rename="$emit('rename', item)"
 					@extract="$emit('extract', item)"
@@ -55,6 +57,8 @@ import FileItem from './FileItem.vue'
 const props = defineProps<{
 	items: Kyros.Files.v0.DirectoryItem[]
 	selectedItems: Set<string>
+	writeDisabled?: boolean
+	writeDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{
