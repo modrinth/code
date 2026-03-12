@@ -105,18 +105,18 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "slug", "author", "summary"]
+    ["name", "slug", "summary"]
         .into_iter()
         .map(str::to_string)
         .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 5, 2, 1]
+    vec![15, 5, 2]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, true, true]
+    vec![true, true, false]
 }
 
 const fn default_prioritize_exact_match() -> bool {
@@ -464,15 +464,12 @@ impl Typesense {
             json!({"name": "name", "type": "string", "facet": false}),
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
-            json!({"name": "downloads", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
-            json!({"name": "author", "type": "string", "facet": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
             json!({"name": "version_published_timestamp", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.verified_plays_2w", "type": "int64", "sort": true, "optional": true}),
-            json!({"name": "minecraft_java_server.verified_plays_4w", "type": "int64", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.is_online", "type": "bool", "sort": true, "optional": true}),
             json!({"name": "minecraft_java_server.ping.data.players_online", "type": "int32", "sort": true, "optional": true}),
         ];

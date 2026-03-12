@@ -28,7 +28,7 @@ services:
       - typesense-data:/data
     command: --data-dir=/data --api-key=modrinth --enable-cors
     healthcheck:
-      test: ['CMD-SHELL', 'curl --fail http://localhost:8108/health || exit 1']
+      test: ['CMD-SHELL', "bash -lc '</dev/tcp/127.0.0.1/8108'"]
       interval: 3s
       timeout: 5s
       retries: 3
