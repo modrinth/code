@@ -546,6 +546,7 @@ impl SearchBackend for Typesense {
         let mut params: Vec<(&str, String)> = vec![
             ("q", q.to_string()),
             ("query_by", "name,slug,author,summary".to_string()),
+            ("prioritize_num_matching_fields", "false".to_string()),
             ("sort_by", sort_by.to_string()),
             ("page", parsed.page.to_string()),
             ("per_page", parsed.hits_per_page.to_string()),
@@ -556,19 +557,22 @@ impl SearchBackend for Typesense {
             params.push(("filter_by", filter.clone()));
         }
 
-        let query_string = params
-            .iter()
-            .map(|(k, v)| format!("{}={}", k, urlencoding::encode(v)))
-            .collect::<Vec<_>>()
-            .join("&");
-
-        let url = format!(
-            "/collections/{collection_alias}/documents/search?{query_string}"
-        );
-
         let resp = self
             .client
-            .request(Method::GET, &url)
+            .request(Method::POST, "/multi_search")
+            .json(&json!({
+                "searches": [
+                    serde_json::Map::from_iter(
+                        params.iter().map(|(k, v)| ((*k).to_string(), Value::String(v.clone())))
+                    )
+                    .into_iter()
+                    .chain([(
+                        "collection".to_string(),
+                        Value::String(collection_alias.clone())
+                    )])
+                    .collect::<serde_json::Map<String, Value>>()
+                ]
+            }))
             .send()
             .await
             .wrap_internal_err("failed to execute Typesense search")?;
@@ -584,6 +588,12 @@ impl SearchBackend for Typesense {
             .json::<Value>()
             .await
             .wrap_internal_err("failed to parse Typesense search response")?;
+
+        let body = body["results"]
+            .as_array()
+            .and_then(|results| results.first())
+            .cloned()
+            .unwrap_or(body);
 
         let total_hits = body["found"].as_u64().unwrap_or(0) as usize;
 
