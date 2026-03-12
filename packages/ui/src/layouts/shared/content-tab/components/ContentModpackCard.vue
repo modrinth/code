@@ -205,7 +205,7 @@ const collapsedOptions = computed(() => {
 							:triggers="[]"
 							:shown="showContentHint"
 							:auto-hide="false"
-							placement="bottom"
+							placement="bottom-end"
 						>
 							<ButtonStyled>
 								<button

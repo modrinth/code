@@ -168,7 +168,10 @@ const instanceFilters = computed(() => {
 			})
 		}
 
-		if (instanceHideInstalled.value && (installedProjectIds.value || newlyInstalled.value.length > 0)) {
+		if (
+			instanceHideInstalled.value &&
+			(installedProjectIds.value || newlyInstalled.value.length > 0)
+		) {
 			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
 
 			allInstalled

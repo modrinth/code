@@ -286,10 +286,15 @@ async function confirmDelete() {
 		return
 	}
 
-	await runBulk('delete', itemsToDelete, async (item) => {
-		await ctx.deleteItem(item)
-		removeFromSelection(ctx.getItemId(item))
-	}, { onComplete: clearSelection })
+	await runBulk(
+		'delete',
+		itemsToDelete,
+		async (item) => {
+			await ctx.deleteItem(item)
+			removeFromSelection(ctx.getItemId(item))
+		},
+		{ onComplete: clearSelection },
+	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
@@ -436,7 +441,9 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				:has-update="ctx.modpack.value.hasUpdate"
 				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
 				:disabled-text="ctx.modpack.value.disabledText"
-				:show-content-hint="!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)"
+				:show-content-hint="
+					!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
+				"
 				v-on="{
 					...(ctx.updateModpack ? { update: () => ctx.updateModpack?.() } : {}),
 					...(ctx.viewModpackContent ? { content: () => ctx.viewModpackContent?.() } : {}),
@@ -507,7 +514,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<ButtonStyled color="brand">
 								<button
 									v-tooltip="
-										ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 flex items-center gap-2"
@@ -520,7 +528,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							<ButtonStyled type="outlined">
 								<button
 									v-tooltip="
-										ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+										ctx.busyMessage?.value ??
+										(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
 									"
 									:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 									class="!h-10 !border-button-bg !border-[1px]"
@@ -635,7 +644,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				<template #actions>
 					<ButtonStyled type="outlined">
 						<button
-							v-tooltip="ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)"
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
 							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 !border-button-bg !border-[1px]"
 							@click="ctx.uploadFiles"
@@ -646,7 +658,10 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button
-							v-tooltip="ctx.busyMessage?.value ?? (ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)"
+							v-tooltip="
+								ctx.busyMessage?.value ??
+								(ctx.disableAddContent?.value ? ctx.disableAddContentTooltip : undefined)
+							"
 							:disabled="ctx.isBusy.value || ctx.disableAddContent?.value"
 							class="!h-10 flex items-center gap-2"
 							@click="ctx.browse"

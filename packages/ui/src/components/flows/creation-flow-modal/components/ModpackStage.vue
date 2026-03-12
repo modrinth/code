@@ -11,7 +11,9 @@
 			@search-input="(query) => handleSearch(query)"
 		>
 			<template #option-suffix>
-				<RightArrowIcon class="size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover/option:opacity-100 group-data-[focused=true]/option:opacity-100" />
+				<RightArrowIcon
+					class="size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover/option:opacity-100 group-data-[focused=true]/option:opacity-100"
+				/>
 			</template>
 		</Combobox>
 		<div class="flex items-center gap-3">

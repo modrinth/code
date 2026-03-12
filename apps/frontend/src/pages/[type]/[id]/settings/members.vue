@@ -352,7 +352,7 @@
 					<Toggle
 						:id="`member-${allOrgMembers[index].user.username}-override-perms`"
 						v-model="allOrgMembers[index].override"
-						:disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
 				<div class="adjacent-input">
@@ -567,7 +567,6 @@ const {
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
-const cosmetics = useCosmetics()
 const auth = await useAuth()
 
 const allTeamMembers = ref([])

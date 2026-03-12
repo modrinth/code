@@ -139,7 +139,9 @@
 								:server-name="serverData.name"
 								:server-data="serverData"
 								:uptime-seconds="uptimeSeconds"
-								:busy-reason="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
+								:busy-reason="
+									busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined
+								"
 								@action="sendPowerAction"
 							/>
 						</div>
@@ -1197,8 +1199,6 @@ const notifyError = (title: string, text: string) => {
 		type: 'error',
 	})
 }
-
-
 
 const nodeUnavailableDetails = computed(() => [
 	{

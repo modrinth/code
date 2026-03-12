@@ -59,10 +59,7 @@
 					@click="setSetupType('vanilla')"
 				/>
 			</div>
-			<InlineBackupCreator
-				v-if="ctx.flowType === 'reset-server'"
-				backup-name="Before reinstall"
-			/>
+			<InlineBackupCreator v-if="ctx.flowType === 'reset-server'" backup-name="Before reinstall" />
 		</template>
 	</div>
 </template>

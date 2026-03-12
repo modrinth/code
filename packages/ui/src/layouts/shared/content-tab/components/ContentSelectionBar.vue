@@ -170,14 +170,15 @@ const bulkProgressMessage = computed(() => {
 			</span>
 		</div>
 
-		<div
-			v-if="isBulkOperating"
-			class="absolute bottom-0 left-0 right-0 h-1"
-		>
+		<div v-if="isBulkOperating" class="absolute bottom-0 left-0 right-0 h-1">
 			<div
 				class="h-full rounded-l-full bg-brand transition-[width] duration-200 ease-in-out"
 				:class="{ 'animate-indeterminate': bulkWaiting }"
-				:style="!bulkWaiting ? { width: `${bulkTotal > 0 ? (bulkProgress / bulkTotal) * 100 : 0}%` } : undefined"
+				:style="
+					!bulkWaiting
+						? { width: `${bulkTotal > 0 ? (bulkProgress / bulkTotal) * 100 : 0}%` }
+						: undefined
+				"
 				role="progressbar"
 				:aria-valuenow="bulkWaiting ? undefined : bulkProgress"
 				:aria-valuemin="0"

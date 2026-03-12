@@ -83,7 +83,6 @@ import { useRouter } from 'vue-router'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { injectContentInstall } from '@/providers/content-install'
 import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
@@ -103,6 +102,7 @@ import {
 import { get_categories } from '@/helpers/tags.js'
 import type { CacheBehaviour, GameInstance } from '@/helpers/types'
 import { highlightModInProfile } from '@/helpers/utils.js'
+import { injectContentInstall } from '@/providers/content-install'
 import { installVersionDependencies } from '@/store/install'
 
 const messages = defineMessages({
@@ -175,9 +175,7 @@ const projects = ref<ContentItem[]>([])
 const mergedProjects = computed<ContentItem[]>(() => {
 	const pending = installingItems.value.get(props.instance.path) ?? []
 	if (pending.length === 0) return projects.value
-	const realProjectIds = new Set(
-		projects.value.map((p) => p.project?.id).filter(Boolean),
-	)
+	const realProjectIds = new Set(projects.value.map((p) => p.project?.id).filter(Boolean))
 	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
 	return [...projects.value, ...placeholders]
 })
@@ -693,7 +691,11 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.installing ? undefined : (item.project?.id ? `/project/${item.project.id}` : undefined),
+		projectLink: item.installing
+			? undefined
+			: item.project?.id
+				? `/project/${item.project.id}`
+				: undefined,
 		version: item.installing
 			? {
 					id: item.file_name,
@@ -707,9 +709,9 @@ provideContentManager({
 				}),
 		versionLink: item.installing
 			? undefined
-			: (item.project?.id && item.version?.id
-					? `/project/${item.project.id}/version/${item.version.id}`
-					: undefined),
+			: item.project?.id && item.version?.id
+				? `/project/${item.project.id}/version/${item.version.id}`
+				: undefined,
 		owner: item.owner
 			? {
 					...item.owner,

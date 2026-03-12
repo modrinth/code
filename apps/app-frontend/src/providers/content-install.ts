@@ -120,7 +120,13 @@ export function createContentInstall(opts: {
 
 	function addInstallingItem(
 		instancePath: string,
-		project: { id: string; slug?: string | null; title: string; icon_url?: string | null; project_type?: string },
+		project: {
+			id: string
+			slug?: string | null
+			title: string
+			icon_url?: string | null
+			project_type?: string
+		},
 	) {
 		const placeholder: ContentItem = {
 			file_name: `__installing_${project.id}`,
@@ -288,10 +294,14 @@ export function createContentInstall(opts: {
 
 		try {
 			await add_project_from_version(instance.id, version.id)
-			await installVersionDependencies(profile, version, (depProject: Labrinth.Projects.v2.Project) => {
-				addInstallingItem(instance.id, depProject)
-				installedProjectIds.push(depProject.id)
-			})
+			await installVersionDependencies(
+				profile,
+				version,
+				(depProject: Labrinth.Projects.v2.Project) => {
+					addInstallingItem(instance.id, depProject)
+					installedProjectIds.push(depProject.id)
+				},
+			)
 			if (storeInstance) {
 				storeInstance.installed = true
 				storeInstance.installing = false
@@ -443,10 +453,14 @@ export function createContentInstall(opts: {
 				addInstallingItem(instancePath, project)
 				try {
 					await add_project_from_version(instance.path, version.id)
-					await installVersionDependencies(instance, version, (depProject: Labrinth.Projects.v2.Project) => {
-						addInstallingItem(instancePath, depProject)
-						installedProjectIds.push(depProject.id)
-					})
+					await installVersionDependencies(
+						instance,
+						version,
+						(depProject: Labrinth.Projects.v2.Project) => {
+							addInstallingItem(instancePath, depProject)
+							installedProjectIds.push(depProject.id)
+						},
+					)
 
 					trackEvent('ProjectInstall', {
 						loader: instance.loader,

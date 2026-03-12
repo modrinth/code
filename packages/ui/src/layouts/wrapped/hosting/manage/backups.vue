@@ -148,8 +148,6 @@ import type { Component } from 'vue'
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { useVIntl } from '#ui/composables/i18n'
-
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
 import BackupCreateModal from '#ui/components/servers/backups/BackupCreateModal.vue'
@@ -157,6 +155,7 @@ import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
+import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -167,7 +166,8 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { server, worldId, backupsState, markBackupCancelled, busyReasons } = injectModrinthServerContext()
+const { server, worldId, backupsState, markBackupCancelled, busyReasons } =
+	injectModrinthServerContext()
 
 const props = defineProps<{
 	isServerRunning: boolean

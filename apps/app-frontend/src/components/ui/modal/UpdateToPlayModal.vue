@@ -4,9 +4,7 @@
 		:header="formatMessage(messages.updateToPlay)"
 		:admonition-header="formatMessage(messages.updateRequired)"
 		:description="
-			instance
-				? formatMessage(messages.updateRequiredDescription, { name: instance.name })
-				: ''
+			instance ? formatMessage(messages.updateRequiredDescription, { name: instance.name }) : ''
 		"
 		:diffs="normalizedDiffs"
 		:confirm-label="formatMessage(commonMessages.updateButton)"
@@ -23,10 +21,10 @@ import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon } from '@modrinth/assets'
 import {
 	commonMessages,
+	type ContentDiffItem,
 	ContentDiffModal,
 	defineMessages,
 	useVIntl,
-	type ContentDiffItem,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'

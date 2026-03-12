@@ -68,11 +68,7 @@
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand">
-					<button
-						v-tooltip="busyReason"
-						:disabled="!canTakeAction"
-						@click="handlePrimaryAction"
-					>
+					<button v-tooltip="busyReason" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<div v-if="isTransitionState" class="grid place-content-center">
 							<LoadingIcon />
 						</div>
@@ -126,8 +122,6 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-
-
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
@@ -169,11 +163,7 @@ const dontAskAgain = ref(false)
 const startingDelay = ref(false)
 
 const canTakeAction = computed(
-	() =>
-		!props.isActioning &&
-		!startingDelay.value &&
-		!isTransitionState.value &&
-		!props.busyReason,
+	() => !props.isActioning && !startingDelay.value && !isTransitionState.value && !props.busyReason,
 )
 const isRunning = computed(() => serverState.value === 'running')
 const isTransitionState = computed(() =>

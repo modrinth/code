@@ -197,30 +197,6 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
-  "content.diff-modal.added-count": {
-    "defaultMessage": "{count} added"
-  },
-  "content.diff-modal.diff-type.added": {
-    "defaultMessage": "New dependency"
-  },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Removed"
-  },
-  "content.diff-modal.diff-type.updated": {
-    "defaultMessage": "Updated"
-  },
-  "content.diff-modal.removed-count": {
-    "defaultMessage": "{count} removed"
-  },
-  "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
-  },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "Unknown content"
-  },
-  "content.diff-modal.updated-count": {
-    "defaultMessage": "{count} updated"
-  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
   },
@@ -269,6 +245,30 @@
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "Unlink"
   },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} added"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Added (dependency)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Removed"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Updated"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} removed"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+  },
+  "content.diff-modal.unknown-content-header": {
+    "defaultMessage": "Unknown content"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} updated"
+  },
   "content.inline-backup.backing-up": {
     "defaultMessage": "Creating backup..."
   },
@@ -281,11 +281,23 @@
   "content.inline-backup.backup-in-progress": {
     "defaultMessage": "A backup is in progress, it's recommended to wait for it to finish before performing this action."
   },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Creating a backup may take several minutes depending on the size of your server."
+  },
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
   },
   "content.inline-backup.warning-body": {
-    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {worlds}} if anything breaks."
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Your modpack's content can now be found here!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Modpack content moved"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Don't show again"
   },
   "content.modpack-card.updating": {
     "defaultMessage": "Updating..."
@@ -295,6 +307,9 @@
   },
   "content.page-layout.browse-content": {
     "defaultMessage": "Browse content"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Please wait for the operation to complete before editing content."
   },
   "content.page-layout.empty.hint": {
     "defaultMessage": "Browse or upload {contentType} to get started"
@@ -354,28 +369,28 @@
     "defaultMessage": "Uploading files ({completed}/{total})"
   },
   "content.selection-bar.bulk.deleting": {
-    "defaultMessage": "Deleting content... ({progress}/{total})"
+    "defaultMessage": "Deleting {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.deleting-waiting": {
-    "defaultMessage": "Deleting content..."
+    "defaultMessage": "Deleting {contentType}..."
   },
   "content.selection-bar.bulk.disabling": {
-    "defaultMessage": "Disabling content... ({progress}/{total})"
+    "defaultMessage": "Disabling {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.disabling-waiting": {
-    "defaultMessage": "Disabling content..."
+    "defaultMessage": "Disabling {contentType}..."
   },
   "content.selection-bar.bulk.enabling": {
-    "defaultMessage": "Enabling content... ({progress}/{total})"
+    "defaultMessage": "Enabling {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.enabling-waiting": {
-    "defaultMessage": "Enabling content..."
+    "defaultMessage": "Enabling {contentType}..."
   },
   "content.selection-bar.bulk.updating": {
-    "defaultMessage": "Updating content... ({progress}/{total})"
+    "defaultMessage": "Updating {progress}/{total} {contentType}..."
   },
   "content.selection-bar.bulk.updating-waiting": {
-    "defaultMessage": "Updating content..."
+    "defaultMessage": "Updating {contentType}..."
   },
   "content.selection-bar.disable": {
     "defaultMessage": "Disable"
@@ -567,7 +582,7 @@
     "defaultMessage": "Select platform"
   },
   "installation-settings.confirm-version-change": {
-    "defaultMessage": "Confirm changes"
+    "defaultMessage": "Confirm"
   },
   "installation-settings.confirm-version-change-description": {
     "defaultMessage": "Changing to {gameVersion} will modify the following content on your server."
@@ -602,6 +617,9 @@
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Reinstalling modpack"
   },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Removed (incompatible)"
+  },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
   },
@@ -625,6 +643,9 @@
   },
   "installation-settings.unlink.description": {
     "defaultMessage": "Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Verifying..."
   },
   "instance.confirm-reinstall.admonition-body": {
     "defaultMessage": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation."

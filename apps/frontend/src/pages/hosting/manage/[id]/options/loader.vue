@@ -23,10 +23,7 @@
 			<template #extra-modals>
 				<ServerSetupModal
 					ref="setupModal"
-					@reinstall="
-						installationSettingsLayout?.cancelEditing();
-						emit('reinstall', $event)
-					"
+					@reinstall="onReinstall"
 					@browse-modpacks="onBrowseModpacks"
 				/>
 			</template>
@@ -117,7 +114,8 @@ const emit = defineEmits<{
 }>()
 
 const isInstalling = computed(() => {
-	const val = server.value?.status === 'installing' || isSyncingContent.value || busyReasons.value.length > 0
+	const val =
+		server.value?.status === 'installing' || isSyncingContent.value || busyReasons.value.length > 0
 	debug(
 		'isInstalling:',
 		val,
@@ -340,9 +338,12 @@ provideInstallationSettings({
 		const platformChanged = platform !== currentPlatform
 
 		debug('save: emitting reinstall before API call')
-		emit('reinstall', platformChanged
-			? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
-			: { mVersion: gameVersion })
+		emit(
+			'reinstall',
+			platformChanged
+				? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
+				: { mVersion: gameVersion },
+		)
 		try {
 			if (platformChanged) {
 				const request: Archon.Content.v1.InstallWorldContent = {
@@ -576,6 +577,11 @@ watch(
 		}
 	},
 )
+
+function onReinstall(event?: any) {
+	installationSettingsLayout.value?.cancelEditing()
+	emit('reinstall', event)
+}
 
 function onBrowseModpacks() {
 	debug('onBrowseModpacks: navigating to modpack discovery')

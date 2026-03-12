@@ -41,12 +41,12 @@
 						<ButtonStyled v-else type="transparent" role="menuitem" :color="option.color">
 							<button
 								v-if="typeof option.action === 'function'"
-								v-tooltip="option.tooltip"
 								:ref="
 									(el) => {
 										if (el) menuItemsRef[index] = el as HTMLElement
 									}
 								"
+								v-tooltip="option.tooltip"
 								:disabled="option.disabled"
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"

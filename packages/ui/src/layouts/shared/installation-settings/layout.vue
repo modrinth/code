@@ -24,13 +24,13 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ContentDiffModal from './components/ContentDiffModal.vue'
+import ConfirmLeaveModal from '../content-tab/components/modals/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
-import ConfirmLeaveModal from '../content-tab/components/modals/ConfirmLeaveModal.vue'
 import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
+import ContentDiffModal from './components/ContentDiffModal.vue'
 import { useInstallationForm } from './composables'
 import { injectInstallationSettings } from './providers/installation-settings'
 
@@ -58,13 +58,16 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 }
 
 if (typeof window !== 'undefined') {
-	watch(() => form.isSaving.value, (saving) => {
-		if (saving) {
-			window.addEventListener('beforeunload', handleBeforeUnload)
-		} else {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	})
+	watch(
+		() => form.isSaving.value,
+		(saving) => {
+			if (saving) {
+				window.addEventListener('beforeunload', handleBeforeUnload)
+			} else {
+				window.removeEventListener('beforeunload', handleBeforeUnload)
+			}
+		},
+	)
 
 	onBeforeUnmount(() => {
 		window.removeEventListener('beforeunload', handleBeforeUnload)
@@ -227,8 +230,7 @@ const messages = defineMessages({
 	},
 	confirmVersionChangeDescription: {
 		id: 'installation-settings.confirm-version-change-description',
-		defaultMessage:
-			'Changing to {gameVersion} will modify the following content on your server.',
+		defaultMessage: 'Changing to {gameVersion} will modify the following content on your server.',
 	},
 	removedIncompatible: {
 		id: 'installation-settings.removed-incompatible',
@@ -258,7 +260,10 @@ const messages = defineMessages({
 					>
 						<span class="text-primary">{{ row.label }}</span>
 						<span v-if="row.value" class="font-semibold text-contrast">{{ row.value }}</span>
-						<span v-else class="inline-block h-3 w-16 animate-pulse rounded bg-button-border"></span>
+						<span
+							v-else
+							class="inline-block h-3 w-16 animate-pulse rounded bg-button-border"
+						></span>
 					</div>
 				</div>
 			</div>
@@ -498,7 +503,10 @@ const messages = defineMessages({
 							</Combobox>
 						</div>
 
-						<div v-if="form.selectedPlatform.value !== 'vanilla' && !ctx.hideLoaderVersion" class="flex flex-col gap-2.5">
+						<div
+							v-if="form.selectedPlatform.value !== 'vanilla' && !ctx.hideLoaderVersion"
+							class="flex flex-col gap-2.5"
+						>
 							<span class="font-semibold text-contrast">
 								{{
 									formatMessage(messages.loaderVersionLabel, {

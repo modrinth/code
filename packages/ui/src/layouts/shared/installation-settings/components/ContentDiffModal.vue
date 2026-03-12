@@ -1,16 +1,8 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="header"
-		:closable="true"
-		no-padding
-	>
+	<NewModal ref="modal" :header="header" :closable="true" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
-				<Admonition
-					:type="hasUnknownContent ? 'warning' : 'info'"
-					:header="admonitionHeader"
-				>
+				<Admonition :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
 					{{ description }}
 				</Admonition>
 
@@ -46,11 +38,7 @@
 					v-for="(diff, index) in sortedDiffs"
 					:key="diff.projectName || diff.fileName || index"
 					class="grid items-center min-h-10 h-10 gap-2"
-					:class="
-						diff.projectName
-							? 'grid-cols-[auto_auto_1fr]'
-							: 'grid-cols-[auto_auto_1fr]'
-					"
+					:class="diff.projectName ? 'grid-cols-[auto_auto_1fr]' : 'grid-cols-[auto_auto_1fr]'"
 				>
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
@@ -58,11 +46,7 @@
 						<MinusIcon v-else-if="diff.type === 'removed'" class="text-red" />
 						<RefreshCwIcon v-else />
 						<div
-							:class="
-								index === sortedDiffs.length - 1
-									? 'bg-transparent'
-									: 'bg-surface-5'
-							"
+							:class="index === sortedDiffs.length - 1 ? 'bg-transparent' : 'bg-surface-5'"
 							class="w-[1px] h-2 relative top-1"
 						></div>
 					</div>
@@ -129,14 +113,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-	MinusIcon,
-	PlusIcon,
-	RefreshCwIcon,
-	ReportIcon,
-	XIcon,
-} from '@modrinth/assets'
-import { computed, ref, type Component } from 'vue'
+import { MinusIcon, PlusIcon, RefreshCwIcon, ReportIcon, XIcon } from '@modrinth/assets'
+import { type Component, computed, ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
