@@ -14,6 +14,8 @@
 				:enable-toggle="!props.isServerInstance"
 				:get-overflow-options="getOverflowOptions"
 				@update:enabled="handleModpackContentToggle"
+				@bulk:enable="handleModpackContentBulkToggle"
+				@bulk:disable="handleModpackContentBulkToggle"
 			/>
 			<ConfirmModpackUpdateModal
 				ref="modpackUpdateConfirmModal"
@@ -349,6 +351,12 @@ async function handleUpdate(id: string) {
 
 async function handleModpackContentToggle(item: ContentItem) {
 	await toggleDisableMod(item)
+}
+
+async function handleModpackContentBulkToggle(items: ContentItem[]) {
+	for (const item of items) {
+		await toggleDisableMod(item)
+	}
 }
 
 async function handleModpackContent() {

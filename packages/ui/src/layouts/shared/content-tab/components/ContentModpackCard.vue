@@ -10,7 +10,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { Tooltip } from 'floating-vue'
-import { computed, getCurrentInstance } from 'vue'
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
@@ -120,10 +120,25 @@ const collapsedOptions = computed(() => {
 	}
 	return options
 })
+
+const containerRef = ref<HTMLElement | null>(null)
+const isExpanded = ref(true)
+const observer = new ResizeObserver((entries) => {
+	for (const entry of entries) {
+		isExpanded.value = entry.contentRect.width >= 700
+	}
+})
+onMounted(() => {
+	if (containerRef.value) observer.observe(containerRef.value)
+})
+onUnmounted(() => {
+	observer.disconnect()
+})
 </script>
 
 <template>
 	<div
+		ref="containerRef"
 		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
@@ -203,7 +218,7 @@ const collapsedOptions = computed(() => {
 							v-if="hasContentListener"
 							theme="dismissable-prompt"
 							:triggers="[]"
-							:shown="showContentHint"
+							:shown="showContentHint && isExpanded"
 							:auto-hide="false"
 							placement="bottom-end"
 						>
@@ -269,23 +284,53 @@ const collapsedOptions = computed(() => {
 							</button>
 						</ButtonStyled>
 					</div>
-					<ButtonStyled v-if="collapsedOptions.length" circular type="outlined"
-						><TeleportOverflowMenu
-							:options="collapsedOptions"
-							class="flex @[700px]:hidden"
-							btn-class="!border-surface-4 !border"
-						>
-							<MoreVerticalIcon class="size-5" />
-							<template #content>
-								<BoxesIcon class="size-5" />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</template>
-							<template #settings>
-								<SettingsIcon class="size-5" />
-								{{ formatMessage(commonMessages.settingsLabel) }}
-							</template>
-						</TeleportOverflowMenu></ButtonStyled
+					<Tooltip
+						v-if="collapsedOptions.length"
+						theme="dismissable-prompt"
+						:triggers="[]"
+						:shown="showContentHint && !isExpanded"
+						:auto-hide="false"
+						placement="bottom-end"
 					>
+						<ButtonStyled circular type="outlined"
+							><TeleportOverflowMenu
+								:options="collapsedOptions"
+								class="flex @[700px]:hidden"
+								btn-class="!border-surface-4 !border"
+								@open="emit('dismiss-content-hint')"
+							>
+								<MoreVerticalIcon class="size-5" />
+								<template #content>
+									<BoxesIcon class="size-5" />
+									{{ formatMessage(commonMessages.contentLabel) }}
+								</template>
+								<template #settings>
+									<SettingsIcon class="size-5" />
+									{{ formatMessage(commonMessages.settingsLabel) }}
+								</template>
+							</TeleportOverflowMenu></ButtonStyled
+						>
+						<template #popper>
+							<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+								<div class="flex min-w-48 items-center justify-between gap-8">
+									<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+										{{ formatMessage(messages.contentHintTitle) }}
+									</h3>
+									<ButtonStyled size="small" circular>
+										<button
+											v-tooltip="formatMessage(messages.dismissHint)"
+											@click="emit('dismiss-content-hint')"
+										>
+											<XIcon aria-hidden="true" />
+										</button>
+									</ButtonStyled>
+								</div>
+								<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+									{{ formatMessage(messages.contentHintDescription) }}
+								</p>
+							</div>
+						</template>
+					</Tooltip>
 
 					<ButtonStyled
 						v-if="overflowOptions?.length"

@@ -24,6 +24,7 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	StyledInput,
+	useDebugLogger,
 	useSearch,
 	useServerSearch,
 	useVIntl,
@@ -59,14 +60,17 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
+const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
 
 const projectTypes = computed(() => {
+	debugLog('projectTypes computed', route.params.projectType)
 	return [route.params.projectType as ProjectType]
 })
 
+debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
 	get_categories()
 		.catch(handleError)
@@ -110,36 +114,43 @@ const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 await initInstanceContext()
 
 async function initInstanceContext() {
+	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
 	if (route.query.i) {
 		instance.value = await getInstance(route.query.i).catch(handleError)
+		debugLog('instance loaded', { name: instance.value?.name, loader: instance.value?.loader, gameVersion: instance.value?.game_version })
 
 		// Load installed project IDs in background — the page and initial search render immediately.
 		// When this resolves, instanceFilters recomputes and triggers a search refresh
 		// that applies the "hide installed" negative filters and marks installed badges.
 		getInstalledProjectIds(route.query.i)
 			.then((ids) => {
+				debugLog('installedProjectIds loaded', { count: ids?.length })
 				installedProjectIds.value = ids
 			})
 			.catch(handleError)
 
 		if (instance.value?.linked_data?.project_id) {
+			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
 			const projectV3 = await get_project_v3(
 				instance.value.linked_data.project_id,
 				'must_revalidate',
 			).catch(handleError)
 			if (projectV3?.minecraft_server != null) {
+				debugLog('instance is a server instance')
 				isServerInstance.value = true
 			}
 		}
 	}
 
 	if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
+		debugLog('setting instanceHideInstalled from query', route.query.ai)
 		instanceHideInstalled.value = route.query.ai === 'true'
 	}
 }
 
 const instanceFilters = computed(() => {
 	const filters = []
+	debugLog('instanceFilters recomputing', { hasInstance: !!instance.value, isServer: isServerInstance.value, hideInstalled: instanceHideInstalled.value })
 
 	if (instance.value) {
 		const gameVersion = instance.value.game_version
@@ -167,23 +178,9 @@ const instanceFilters = computed(() => {
 				option: 'client',
 			})
 		}
-
-		if (
-			instanceHideInstalled.value &&
-			(installedProjectIds.value || newlyInstalled.value.length > 0)
-		) {
-			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
-
-			allInstalled
-				.map((x) => ({
-					type: 'project_id',
-					option: `project_id:${x}`,
-					negative: true,
-				}))
-				.forEach((x) => filters.push(x))
-		}
 	}
 
+	debugLog('instanceFilters result', filters)
 	return filters
 })
 
@@ -226,6 +223,7 @@ const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
 async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	debugLog('checkServerRunningStates', { hitCount: hits.length })
 	const packs = await listInstances()
 	const newRunning: Record<string, string> = {}
 	for (const hit of hits) {
@@ -237,10 +235,12 @@ async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchPro
 			}
 		}
 	}
+	debugLog('runningServerProjects updated', newRunning)
 	runningServerProjects.value = newRunning
 }
 
 async function handleStopServerProject(projectId: string) {
+	debugLog('handleStopServerProject', projectId)
 	const instancePath = runningServerProjects.value[projectId]
 	if (!instancePath) return
 	await kill(instancePath).catch(() => {})
@@ -249,11 +249,13 @@ async function handleStopServerProject(projectId: string) {
 }
 
 async function handlePlayServerProject(projectId: string) {
+	debugLog('handlePlayServerProject', projectId)
 	await playServerProject(projectId)
 	checkServerRunningStates(serverHits.value)
 }
 
 function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
+	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
 	const address = getServerAddress(project.minecraft_java_server)
 	if (!address) return
 	showAddServerToInstanceModal(project.name, address)
@@ -261,6 +263,7 @@ function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProje
 
 const unlistenProcesses = await process_listener(
 	(e: { event: string; profile_path_id: string }) => {
+		debugLog('process event', e)
 		if (e.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
 				([, path]) => path === e.profile_path_id,
@@ -288,6 +291,7 @@ const {
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	debugLog('pingServerHits', { hitCount: hits.length })
 	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
 	await Promise.all(
 		pingsToFetch.map(async (hit) => {
@@ -307,9 +311,11 @@ let searchVersion = 0
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
+	debugLog('went offline')
 	offline.value = true
 })
 window.addEventListener('online', () => {
+	debugLog('went online')
 	offline.value = false
 })
 
@@ -334,34 +340,48 @@ const pageCount = computed(() =>
 )
 
 const effectiveRequestParams = computed(() => {
-	return projectType.value === 'server' ? serverRequestParams.value : requestParams.value
+	const isServer = projectType.value === 'server'
+	debugLog('effectiveRequestParams computed', { isServer })
+	return isServer ? serverRequestParams.value : requestParams.value
 })
 
 let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 watch(effectiveRequestParams, () => {
 	if (!route.params.projectType) return
+	debugLog('effectiveRequestParams changed, debouncing search')
 	if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
 	searchDebounceTimer = setTimeout(() => {
 		refreshSearch()
 	}, 200)
 })
 
+watch(instanceHideInstalled, () => {
+	debugLog('instanceHideInstalled changed', instanceHideInstalled.value)
+	refreshSearch()
+})
+
 async function refreshSearch() {
 	const version = ++searchVersion
+	debugLog('refreshSearch start', { version, projectType: projectType.value })
 
 	try {
 		const isServer = projectType.value === 'server'
 
 		if (isServer) {
+			debugLog('searching v3 (server)', serverRequestParams.value)
 			const rawResults = (await get_search_results_v3(serverRequestParams.value)) as {
 				result: Labrinth.Search.v3.SearchResults
 			} | null
 
-			if (version !== searchVersion) return
+			if (version !== searchVersion) {
+				debugLog('search version stale, discarding', { version, current: searchVersion })
+				return
+			}
 
 			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
 			const hits = searchResults.hits ?? []
+			debugLog('server search results', { hitCount: hits.length, totalHits: searchResults.total_hits })
 			serverHits.value = hits
 			serverPings.value = {}
 			pingServerHits(hits)
@@ -373,11 +393,15 @@ async function refreshSearch() {
 				offset: 0,
 			}
 		} else {
+			debugLog('searching v2', requestParams.value)
 			let rawResults = (await get_search_results(requestParams.value)) as {
 				result: SearchResults
 			} | null
 
-			if (version !== searchVersion) return
+			if (version !== searchVersion) {
+				debugLog('search version stale, discarding', { version, current: searchVersion })
+				return
+			}
 
 			if (!rawResults) {
 				rawResults = {
@@ -399,7 +423,12 @@ async function refreshSearch() {
 					...val,
 					installed: allInstalledIds.has(val.project_id),
 				}))
+
+				if (instanceHideInstalled.value) {
+					rawResults.result.hits = rawResults.result.hits.filter((val) => !val.installed)
+				}
 			}
+			debugLog('v2 search results', { hitCount: rawResults.result.hits.length, totalHits: rawResults.result.total_hits })
 			results.value = rawResults.result
 		}
 
@@ -412,6 +441,7 @@ async function refreshSearch() {
 		})
 
 		if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
+			debugLog('filters changed, resetting to page 1')
 			currentPage.value = 1
 		}
 
@@ -450,11 +480,13 @@ async function refreshSearch() {
 			})
 			.join('&')
 		const newUrl = `${route.path}${queryString ? '?' + queryString : ''}`
+		debugLog('updating URL', newUrl)
 		window.history.replaceState(window.history.state, '', newUrl)
 
 		loading.value = false
+		debugLog('refreshSearch complete', { version })
 	} catch (err) {
-		console.error('Error refreshing search:', err)
+		debugLog('refreshSearch error', err)
 		if (version === searchVersion) {
 			loading.value = false
 		}
@@ -462,6 +494,7 @@ async function refreshSearch() {
 }
 
 async function setPage(newPageNumber: number) {
+	debugLog('setPage', newPageNumber)
 	currentPage.value = newPageNumber
 
 	await onSearchChangeToTop()
@@ -476,6 +509,7 @@ async function onSearchChangeToTop() {
 }
 
 function clearSearch() {
+	debugLog('clearSearch')
 	query.value = ''
 	currentPage.value = 1
 }
@@ -486,6 +520,7 @@ watch(
 		// Check if the newType is not the same as the current value
 		if (!newType || newType === projectType.value) return
 
+		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
 		currentSortType.value = { display: 'Relevance', name: 'relevance' }
@@ -632,6 +667,7 @@ const handleOptionsClick = (args) => {
 	}
 }
 
+debugLog('performing initial search')
 await refreshSearch()
 
 // Initialize previousFilterState after first search

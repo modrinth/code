@@ -1,5 +1,8 @@
 <template>
 	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
+		<Admonition v-if="backupBusyReason" type="warning" :header="backupBusyReason">
+			Your server is still accessible during this time.
+		</Admonition>
 		<Admonition
 			v-if="inspectingError && isConnected && !isWsAuthIncorrect"
 			data-pyro-servers-inspecting-error
@@ -159,7 +162,12 @@
 
 <script setup lang="ts">
 import { TerminalSquareIcon } from '@modrinth/assets'
-import { Admonition, injectModrinthClient, injectModrinthServerContext } from '@modrinth/ui'
+import {
+	Admonition,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	useVIntl,
+} from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
 import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
@@ -180,8 +188,18 @@ type ServerProps = {
 
 const props = defineProps<ServerProps>()
 
+const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const { server: serverData, serverId } = injectModrinthServerContext()
+const { server: serverData, serverId, busyReasons } = injectModrinthServerContext()
+
+const backupBusyReason = computed(() => {
+	const reason = busyReasons.value.find(
+		(r) =>
+			r.reason.id === 'servers.busy.backup-creating' ||
+			r.reason.id === 'servers.busy.backup-restoring',
+	)
+	return reason ? formatMessage(reason.reason) : null
+})
 
 interface ErrorData {
 	id: string

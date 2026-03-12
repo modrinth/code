@@ -1,5 +1,10 @@
 <template>
-	<ServerSidebar :route="route" :nav-links="navLinks" />
+	<div class="flex flex-col gap-4">
+		<Admonition v-if="backupBusyReason" type="warning" :header="backupBusyReason">
+			Some options may not be editable while the operation is in progress.
+		</Admonition>
+		<ServerSidebar :route="route" :nav-links="navLinks" />
+	</div>
 </template>
 <script setup lang="ts">
 import {
@@ -13,7 +18,7 @@ import {
 	VersionIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
-import { injectModrinthServerContext } from '@modrinth/ui'
+import { Admonition, injectModrinthServerContext, useVIntl } from '@modrinth/ui'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
@@ -22,7 +27,17 @@ const route = useRoute()
 const serverId = route.params.id as string
 const auth = await useAuth()
 
-const { server } = injectModrinthServerContext()
+const { formatMessage } = useVIntl()
+const { server, busyReasons } = injectModrinthServerContext()
+
+const backupBusyReason = computed(() => {
+	const reason = busyReasons.value.find(
+		(r) =>
+			r.reason.id === 'servers.busy.backup-creating' ||
+			r.reason.id === 'servers.busy.backup-restoring',
+	)
+	return reason ? formatMessage(reason.reason) : null
+})
 
 useHead({
 	title: `Options - ${server.value?.name ?? 'Server'} - Modrinth`,

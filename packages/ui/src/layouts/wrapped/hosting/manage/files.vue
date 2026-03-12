@@ -21,7 +21,11 @@
 		</div>
 
 		<div v-else key="content" class="contents">
-			<div class="relative -mt-2 flex w-full flex-col">
+			<Admonition v-if="serverBusy" type="warning" class="mb-5">
+				<template #header>{{ busyTooltip }}</template>
+				File operations are disabled while the operation is in progress.
+			</Admonition>
+			<div class="relative flex w-full flex-col">
 				<div class="relative isolate flex w-full flex-col gap-2">
 					<FileNavbar
 						:breadcrumbs="breadcrumbSegments"
@@ -277,6 +281,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-que
 import { computed, inject, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'

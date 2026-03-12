@@ -124,6 +124,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
 	select: [option: Option]
+	open: []
 }>()
 
 const isOpen = ref(false)
@@ -194,6 +195,7 @@ const toggleMenu = (event: MouseEvent) => {
 
 const openMenu = () => {
 	isOpen.value = true
+	emit('open')
 	disableBodyScroll()
 	nextTick(() => {
 		menuStyle.value = calculateMenuPosition()

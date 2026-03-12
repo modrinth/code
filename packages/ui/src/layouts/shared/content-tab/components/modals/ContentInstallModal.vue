@@ -453,6 +453,7 @@ function handleCreateAndInstall() {
 		loader: selectedLoader.value,
 		gameVersion: selectedGameVersion.value,
 	})
+	hide()
 }
 
 defineExpose({ show, hide })
