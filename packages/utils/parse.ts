@@ -109,11 +109,12 @@ export const configuredXss = new FilterXSS({
 					'bstats.org',
 				]
 
-				const allowedHostnameSuffixes = [
-					".github.io",
-				]
+				const allowedHostnameSuffixes = ['.github.io']
 
-				if (!allowedHostnames.includes(url.hostname) && !allowedHostnameSuffixes.some(suffix => url.hostname.endsWith(suffix))) {
+				if (
+					!allowedHostnames.includes(url.hostname) &&
+					!allowedHostnameSuffixes.some((suffix) => url.hostname.endsWith(suffix))
+				) {
 					return safeAttrValue(
 						tag,
 						name,
