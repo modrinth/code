@@ -187,7 +187,9 @@ export function useInlineBackup(backupName: string | (() => string)) {
 				text: 'The backup has been cancelled. You can create a new one or proceed without a backup.',
 			})
 		} catch {
+			isBackingUp.value = false
 			isCancelling.value = false
+			backupFailed.value = true
 		}
 	}
 

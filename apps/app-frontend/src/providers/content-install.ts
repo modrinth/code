@@ -465,7 +465,10 @@ export function createContentInstall(opts: {
 					await installVersionDependencies(
 						instance,
 						version,
-						(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
+						(
+							depProject: Labrinth.Projects.v2.Project,
+							depVersion?: Labrinth.Versions.v2.Version,
+						) => {
 							addInstallingItem(instancePath, depProject, depVersion)
 							installedProjectIds.push(depProject.id)
 						},

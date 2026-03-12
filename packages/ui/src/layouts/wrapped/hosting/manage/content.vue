@@ -665,7 +665,7 @@ async function handleModpackUpdate() {
 			addNotification({
 				type: 'error',
 				title: formatMessage(messages.failedToLoadVersions),
-			text: err instanceof Error ? err.message : undefined,
+				text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
 			loadingVersions.value = false
