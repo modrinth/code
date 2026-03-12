@@ -20,8 +20,7 @@ use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectStatus, SearchRequest,
-    SideTypesMigrationReviewStatus,
+    MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -30,8 +29,7 @@ use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::routes::internal::delphi;
-use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::search::{SearchBackend, SearchQuery, SearchRequest, SearchResults};
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
@@ -48,6 +46,7 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("search", web::get().to(project_search));
+    cfg.service(project_search_post);
     cfg.route("projects", web::get().to(projects_get));
     cfg.route("projects", web::patch().to(projects_edit));
     cfg.route("projects_random", web::get().to(random_projects_get));
@@ -292,7 +291,7 @@ async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -302,7 +301,7 @@ async fn project_edit(
         req,
         info,
         pool,
-        search_config,
+        search_backend,
         web::Json(new_project),
         redis,
         session_queue,
@@ -315,7 +314,7 @@ pub async fn project_edit_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -1126,16 +1125,16 @@ pub async fn project_edit_internal(
         project_item.inner.status.is_searchable(),
         new_project.status.map(|status| status.is_searchable()),
     ) {
-        remove_documents(
-            &project_item
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-            &search_config,
-        )
-        .await
-        .wrap_internal_err("failed to remove documents")?;
+        search_backend
+            .remove_documents(
+                &project_item
+                    .versions
+                    .into_iter()
+                    .map(|x| x.into())
+                    .collect::<Vec<_>>(),
+            )
+            .await
+            .wrap_internal_err("failed to remove documents")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1190,11 +1189,13 @@ pub async fn edit_project_categories(
 // }
 
 pub async fn project_search(
-    web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
+    web::Query(info): web::Query<SearchQuery>,
+    search_backend: web::Data<dyn SearchBackend>,
     redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config, &redis).await?;
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend
+        .search_for_project(&SearchRequest::from(info), &redis)
+        .await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
@@ -1208,7 +1209,18 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(web::Json(results))
+}
+
+// for more complicated search queries
+#[post("/search")]
+pub async fn project_search_post(
+    web::Json(info): web::Json<SearchRequest>,
+    search_backend: web::Data<dyn SearchBackend>,
+    redis: web::Data<RedisPool>,
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend.search_for_project(&info, &redis).await?;
+    Ok(web::Json(results))
 }
 
 //checks the validity of a project id or slug
@@ -2452,7 +2464,7 @@ async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
     project_delete_internal(
@@ -2460,7 +2472,7 @@ async fn project_delete(
         info,
         pool,
         redis,
-        search_config,
+        search_backend,
         session_queue,
     )
     .await
@@ -2471,7 +2483,7 @@ pub async fn project_delete_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<(), ApiError> {
     let (_, user) = get_user_from_headers(
@@ -2583,16 +2595,16 @@ pub async fn project_delete_internal(
         .await
         .wrap_internal_err("failed to commit transaction")?;
 
-    remove_documents(
-        &project
-            .versions
-            .into_iter()
-            .map(|x| x.into())
-            .collect::<Vec<_>>(),
-        &search_config,
-    )
-    .await
-    .wrap_internal_err("failed to remove project version documents")?;
+    search_backend
+        .remove_documents(
+            &project
+                .versions
+                .into_iter()
+                .map(|x| x.into())
+                .collect::<Vec<_>>(),
+        )
+        .await
+        .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
         Ok(())
