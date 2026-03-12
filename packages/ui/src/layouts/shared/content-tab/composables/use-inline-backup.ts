@@ -20,6 +20,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 			return {
 				available: true as const,
+				isServer: false as const,
 				isBackingUp,
 				isCancelling: ref(false),
 				backupFailed,
@@ -45,6 +46,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 		return {
 			available: false as const,
+			isServer: false as const,
 			isBackingUp: ref(false),
 			isCancelling: ref(false),
 			backupFailed: ref(false),
@@ -220,6 +222,7 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 	return {
 		available: true as const,
+		isServer: true as const,
 		isBackingUp,
 		isCancelling,
 		backupFailed,
