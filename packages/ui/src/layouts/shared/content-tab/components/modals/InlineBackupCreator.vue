@@ -3,11 +3,8 @@
 		<span class="text-primary">
 			{{ formatMessage(messages.warningBody, { type: backup.isServer ? 'server' : 'instance' }) }}
 		</span>
-		<span v-if="backup.isServer" class="text-brand-orange font-semibold">
-			{{ formatMessage(messages.backupTakesAWhile) }}
-		</span>
 
-		<div v-if="backup.available">
+		<div v-if="backup.available" class="flex items-center gap-2">
 			<!-- Button / Loading state -->
 			<ButtonStyled v-if="!backup.backupComplete.value && !backup.backupFailed.value">
 				<button
@@ -39,12 +36,18 @@
 			<div v-else-if="backup.backupFailed.value" class="text-sm text-red">
 				{{ formatMessage(messages.backupFailed) }}
 			</div>
+
+			<TriangleAlertIcon
+				v-if="backup.isServer"
+				v-tooltip="formatMessage(messages.backupTakesAWhile)"
+				class="size-5 shrink-0 text-brand-orange hover:brightness-110"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { CheckCircleIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
+import { CheckCircleIcon, PlusIcon, SpinnerIcon, TriangleAlertIcon } from '@modrinth/assets'
 import { watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
