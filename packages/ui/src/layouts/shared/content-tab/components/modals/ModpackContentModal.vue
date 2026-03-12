@@ -19,6 +19,8 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+
 import { isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
@@ -30,12 +32,14 @@ interface Props {
 	modpackName?: string
 	modpackIconUrl?: string
 	enableToggle?: boolean
+	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	modpackName: undefined,
 	modpackIconUrl: undefined,
 	enableToggle: false,
+	getOverflowOptions: undefined,
 })
 
 const emit = defineEmits<{
@@ -215,6 +219,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		isClientOnly: isClientOnlyEnvironment(item.environment),
 		disabled: disabledIds.value.has(item.file_name),
+		overflowOptions: props.getOverflowOptions?.(item),
 	})),
 )
 

@@ -12,6 +12,7 @@
 				:modpack-name="linkedModpackProject?.title"
 				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
 				:enable-toggle="!props.isServerInstance"
+				:get-overflow-options="getOverflowOptions"
 				@update:enabled="handleModpackContentToggle"
 			/>
 			<ConfirmModpackUpdateModal
