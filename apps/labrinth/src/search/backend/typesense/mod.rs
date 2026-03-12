@@ -545,7 +545,9 @@ impl SearchBackend for Typesense {
 
         let mut params: Vec<(&str, String)> = vec![
             ("q", q.to_string()),
-            ("query_by", "name,slug,author,summary".to_string()),
+            ("query_by", "name,slug,summary,author".to_string()),
+            ("query_by_weights", "15,3,2,1".to_string()),
+            ("prefix", "true,true,false,false".to_string()),
             ("prioritize_num_matching_fields", "false".to_string()),
             ("sort_by", sort_by.to_string()),
             ("page", parsed.page.to_string()),
