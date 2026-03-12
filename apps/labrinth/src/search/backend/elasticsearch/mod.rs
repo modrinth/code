@@ -1326,7 +1326,10 @@ impl SearchBackend for Elasticsearch {
 #[cfg(test)]
 mod tests {
     use super::Elasticsearch;
-    use crate::search::{SearchRequest, backend::elasticsearch::RequestConfig};
+    use crate::search::{
+        SearchRequest,
+        backend::{elasticsearch::RequestConfig, typesense},
+    };
     use serde_json::json;
 
     #[test]
@@ -1344,6 +1347,7 @@ mod tests {
             limit: Some("20".to_string()),
             show_metadata: false,
             elasticsearch_config: RequestConfig::default(),
+            typesense_config: typesense::RequestConfig::default(),
             new_filters: None,
             facets: Some(facets.to_string()),
             filters: Some(filter_query.to_string()),
