@@ -39,7 +39,8 @@
 					class="shrink-0 no-wrap"
 					@click.stop="install()"
 				>
-					<template v-if="!installed">
+					<SpinnerIcon v-if="installing" class="animate-spin" />
+					<template v-else-if="!installed">
 						<DownloadIcon v-if="modpack || instance" />
 						<PlusIcon v-else />
 					</template>
@@ -60,14 +61,17 @@
 </template>
 
 <script setup>
-import { CheckIcon, DownloadIcon, PlusIcon } from '@modrinth/assets'
+import { CheckIcon, DownloadIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
 import { ButtonStyled, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { install as installVersion } from '@/store/install.js'
+import { injectContentInstall } from '@/providers/content-install'
+
+const { install: installVersion } = injectContentInstall()
+
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
@@ -99,6 +103,14 @@ const props = defineProps({
 		type: String,
 		default: undefined,
 	},
+	activeLoader: {
+		type: String,
+		default: null,
+	},
+	activeGameVersion: {
+		type: String,
+		default: null,
+	},
 })
 
 const emit = defineEmits(['open', 'install'])
@@ -112,12 +124,18 @@ async function install() {
 		null,
 		props.instance ? props.instance.path : null,
 		'SearchCard',
-		() => {
+		(versionId) => {
 			installing.value = false
-			emit('install', props.project.project_id ?? props.project.id)
+			if (versionId) {
+				emit('install', props.project.project_id ?? props.project.id)
+			}
 		},
 		(profile) => {
 			router.push(`/instance/${profile}`)
+		},
+		{
+			preferredLoader: props.activeLoader ?? undefined,
+			preferredGameVersion: props.activeGameVersion ?? undefined,
 		},
 	).catch(handleError)
 }

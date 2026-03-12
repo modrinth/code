@@ -42,15 +42,15 @@
 				<ButtonStyled v-if="content" type="outlined">
 					<button
 						class="!border-[1px]"
-						@click="handleSwitchCompatibility"
 						:disabled="!hasPermission"
+						@click="handleSwitchCompatibility"
 					>
 						<ArrowLeftRightIcon />
 						Switch type
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-else>
-					<button @click="handleSetCompatibility" :disabled="!hasPermission">
+					<button :disabled="!hasPermission" @click="handleSetCompatibility">
 						<ComponentIcon />
 						Set compatibility
 					</button>
@@ -189,8 +189,8 @@
 				<ButtonStyled v-if="content">
 					<button
 						class="!w-full !max-w-[160px]"
-						@click="handleUpdateContent"
 						:disabled="!hasPermission"
+						@click="handleUpdateContent"
 					>
 						<RefreshCwIcon />
 						Update

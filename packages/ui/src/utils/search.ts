@@ -478,6 +478,8 @@ export function useSearch(
 		/*
        Add environment facets, separate from the rest because it oddly depends on the combination
        of filters selected to determine which facets to add.
+       Uses filterValues (merged user + provided filters) so server-provided environment
+       filters are respected.
      */
 		const client = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'client',
