@@ -244,7 +244,15 @@ const collapsedOptions = computed(() => {
 						</Tooltip>
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
-							<button class="!border !border-surface-4" @click="emit('settings')">
+							<button
+								class="!border !border-surface-4"
+								@click="
+									() => {
+										emit('settings')
+										emit('dismiss-content-hint')
+									}
+								"
+							>
 								<SettingsIcon />
 							</button>
 						</ButtonStyled>
