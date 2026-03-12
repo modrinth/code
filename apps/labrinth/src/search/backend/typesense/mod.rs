@@ -41,6 +41,30 @@ pub enum Bucketing {
     BucketSize(u64),
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum TextMatchType {
+    MaxScore,
+    MaxWeight,
+    SumScore,
+}
+
+impl TextMatchType {
+    const fn as_str(&self) -> &'static str {
+        match self {
+            Self::MaxScore => "max_score",
+            Self::MaxWeight => "max_weight",
+            Self::SumScore => "sum_score",
+        }
+    }
+}
+
+impl Default for TextMatchType {
+    fn default() -> Self {
+        Self::MaxWeight
+    }
+}
+
 impl Default for Bucketing {
     fn default() -> Self {
         Self::Buckets(5)
@@ -60,6 +84,8 @@ pub struct RequestConfig {
     #[serde(default = "default_prioritize_num_matching_fields")]
     pub prioritize_num_matching_fields: bool,
     #[serde(default)]
+    pub text_match_type: TextMatchType,
+    #[serde(default)]
     pub bucketing: Bucketing,
 }
 
@@ -72,28 +98,29 @@ impl Default for RequestConfig {
             prioritize_exact_match: default_prioritize_exact_match(),
             prioritize_num_matching_fields:
                 default_prioritize_num_matching_fields(),
+            text_match_type: TextMatchType::default(),
             bucketing: Bucketing::default(),
         }
     }
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "slug", "summary", "author"]
+    ["name", "slug", "author", "summary"]
         .into_iter()
         .map(str::to_string)
         .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 3, 2, 1]
+    vec![15, 5, 2, 1]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, false, false]
+    vec![true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
-    false
+    true
 }
 
 const fn default_prioritize_num_matching_fields() -> bool {
@@ -630,6 +657,10 @@ impl SearchBackend for Typesense {
                 info.typesense_config
                     .prioritize_num_matching_fields
                     .to_string(),
+            ),
+            (
+                "text_match_type",
+                info.typesense_config.text_match_type.as_str().to_string(),
             ),
             ("sort_by", sort_by.to_string()),
             ("page", parsed.page.to_string()),
