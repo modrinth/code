@@ -35,7 +35,7 @@ const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
 const props = defineProps<InstanceSettingsTabProps>()
-const _emit = defineEmits<{
+const emit = defineEmits<{
 	unlinked: []
 }>()
 
@@ -234,6 +234,10 @@ provideInstallationSettings({
 		await edit(props.instance.path, {
 			linked_data: null as unknown as undefined,
 		})
+		await queryClient.invalidateQueries({
+			queryKey: ['linkedModpackInfo', props.instance.path],
+		})
+		emit('unlinked')
 	},
 
 	getCachedModpackVersions: () => null,
