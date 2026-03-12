@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE payouts_values\n\t\t\t\tSET user_id = $1\n\t\t\t\tWHERE user_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6f82c4f31d6b9344d48d997dafeff28a7365ac2483fea2ba34be4e348b73c723"
+}
