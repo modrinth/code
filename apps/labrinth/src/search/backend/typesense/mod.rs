@@ -43,14 +43,61 @@ pub enum Bucketing {
 
 impl Default for Bucketing {
     fn default() -> Self {
-        Self::BucketSize(5)
+        Self::Buckets(5)
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RequestConfig {
+    #[serde(default = "default_query_by")]
+    pub query_by: Vec<String>,
+    #[serde(default = "default_query_by_weights")]
+    pub query_by_weights: Vec<u8>,
+    #[serde(default = "default_prefix")]
+    pub prefix: Vec<bool>,
+    #[serde(default = "default_prioritize_exact_match")]
+    pub prioritize_exact_match: bool,
+    #[serde(default = "default_prioritize_num_matching_fields")]
+    pub prioritize_num_matching_fields: bool,
     #[serde(default)]
     pub bucketing: Bucketing,
+}
+
+impl Default for RequestConfig {
+    fn default() -> Self {
+        Self {
+            query_by: default_query_by(),
+            query_by_weights: default_query_by_weights(),
+            prefix: default_prefix(),
+            prioritize_exact_match: default_prioritize_exact_match(),
+            prioritize_num_matching_fields:
+                default_prioritize_num_matching_fields(),
+            bucketing: Bucketing::default(),
+        }
+    }
+}
+
+fn default_query_by() -> Vec<String> {
+    ["name", "slug", "summary", "author"]
+        .into_iter()
+        .map(str::to_string)
+        .collect()
+}
+
+fn default_query_by_weights() -> Vec<u8> {
+    vec![15, 3, 2, 1]
+}
+
+fn default_prefix() -> Vec<bool> {
+    vec![true, true, false, false]
+}
+
+const fn default_prioritize_exact_match() -> bool {
+    false
+}
+
+const fn default_prioritize_num_matching_fields() -> bool {
+    false
 }
 
 impl TypesenseConfig {
@@ -458,6 +505,32 @@ impl Typesense {
         }
     }
 
+    fn query_by(request_config: &RequestConfig) -> String {
+        request_config.query_by.join(",")
+    }
+
+    fn query_by_weights(request_config: &RequestConfig) -> Option<String> {
+        (!request_config.query_by_weights.is_empty()).then(|| {
+            request_config
+                .query_by_weights
+                .iter()
+                .map(u8::to_string)
+                .collect::<Vec<_>>()
+                .join(",")
+        })
+    }
+
+    fn prefix(request_config: &RequestConfig) -> Option<String> {
+        (!request_config.prefix.is_empty()).then(|| {
+            request_config
+                .prefix
+                .iter()
+                .map(bool::to_string)
+                .collect::<Vec<_>>()
+                .join(",")
+        })
+    }
+
     fn get_sort_index(
         &self,
         index: &str,
@@ -543,18 +616,35 @@ impl SearchBackend for Typesense {
             parsed.query
         };
 
+        let query_by = Self::query_by(&info.typesense_config);
+
         let mut params: Vec<(&str, String)> = vec![
             ("q", q.to_string()),
-            ("query_by", "name,slug,summary,author".to_string()),
-            ("query_by_weights", "15,3,2,1".to_string()),
-            ("prefix", "true,true,false,false".to_string()),
-            ("prioritize_num_matching_fields", "false".to_string()),
+            ("query_by", query_by),
+            (
+                "prioritize_exact_match",
+                info.typesense_config.prioritize_exact_match.to_string(),
+            ),
+            (
+                "prioritize_num_matching_fields",
+                info.typesense_config
+                    .prioritize_num_matching_fields
+                    .to_string(),
+            ),
             ("sort_by", sort_by.to_string()),
             ("page", parsed.page.to_string()),
             ("per_page", parsed.hits_per_page.to_string()),
             ("group_by", "project_id".to_string()),
             ("group_limit", "1".to_string()),
         ];
+        if let Some(query_by_weights) =
+            Self::query_by_weights(&info.typesense_config)
+        {
+            params.push(("query_by_weights", query_by_weights));
+        }
+        if let Some(prefix) = Self::prefix(&info.typesense_config) {
+            params.push(("prefix", prefix));
+        }
         if let Some(filter) = &filter_by {
             params.push(("filter_by", filter.clone()));
         }
