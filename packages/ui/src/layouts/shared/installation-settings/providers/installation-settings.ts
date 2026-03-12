@@ -60,6 +60,7 @@ export interface InstallationSettingsContext {
 	afterSave?: () => Promise<void>
 
 	lockPlatform?: boolean
+	hideLoaderVersion?: boolean
 	previewSave?: (
 		platform: string,
 		gameVersion: string,

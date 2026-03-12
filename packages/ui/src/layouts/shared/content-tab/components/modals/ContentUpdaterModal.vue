@@ -17,7 +17,7 @@
 		<div
 			class="flex h-[min(550px,calc(95vh-10rem))] border-solid border-transparent border-[1px] border-b-surface-4"
 		>
-			<div class="w-[300px] flex flex-col relative">
+			<div class="w-[300px] flex flex-col relative bg-surface-3">
 				<div class="p-4 pb-2">
 					<StyledInput
 						v-model="searchQuery"
@@ -123,7 +123,7 @@
 
 			<div class="w-px bg-divider" />
 
-			<div class="flex-1 flex flex-col min-w-0 relative" aria-live="polite">
+			<div class="flex-1 flex flex-col min-w-0 relative bg-surface-1" aria-live="polite">
 				<template v-if="selectedVersion">
 					<div class="bg-bg p-4">
 						<div class="flex flex-col gap-1.5">

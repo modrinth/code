@@ -462,7 +462,7 @@ const messages = defineMessages({
 							</Combobox>
 						</div>
 
-						<div v-if="form.selectedPlatform.value !== 'vanilla'" class="flex flex-col gap-2.5">
+						<div v-if="form.selectedPlatform.value !== 'vanilla' && !ctx.hideLoaderVersion" class="flex flex-col gap-2.5">
 							<span class="font-semibold text-contrast">
 								{{
 									formatMessage(messages.loaderVersionLabel, {

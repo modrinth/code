@@ -537,6 +537,7 @@ provideInstallationSettings({
 	isApp: false,
 
 	lockPlatform: true,
+	hideLoaderVersion: true,
 
 	async previewSave(_platform, gameVersion, _loaderVersionId) {
 		const result = await client.archon.content_v1.getUpdateGameVersionPreview(

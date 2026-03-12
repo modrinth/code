@@ -3,6 +3,9 @@
 		<span class="text-primary">
 			{{ formatMessage(messages.warningBody, { type: backup.available ? 'server' : 'instance' }) }}
 		</span>
+		<span v-if="backup.available" class="text-brand-orange font-semibold">
+			{{ formatMessage(messages.backupTakesAWhile) }}
+		</span>
 
 		<div v-if="backup.available">
 			<!-- Button / Loading state -->
@@ -94,6 +97,11 @@ const messages = defineMessages({
 	backupFailed: {
 		id: 'content.inline-backup.backup-failed',
 		defaultMessage: 'Backup creation failed. You can still proceed.',
+	},
+	backupTakesAWhile: {
+		id: 'content.inline-backup.backup-takes-a-while',
+		defaultMessage:
+			'Creating a backup may take several minutes depending on the size of your server.',
 	},
 	backupInProgress: {
 		id: 'content.inline-backup.backup-in-progress',
