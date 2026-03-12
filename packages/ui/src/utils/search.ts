@@ -437,6 +437,7 @@ export function useSearch(
 
 		const andFacets: string[][] = []
 		const orFacets: Record<string, string[]> = {}
+		const negativeByType: Record<string, string[]> = {}
 		for (const filterValue of filterValues) {
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
@@ -459,7 +460,13 @@ export function useSearch(
 
 			if (option.method === 'or' || option.method === 'and') {
 				if (filterValue.negative) {
-					andFacets.push([option.value.replace(':', '!=')])
+					const [field, val] = option.value.split(':')
+					if (field && val) {
+						if (!negativeByType[field]) {
+							negativeByType[field] = []
+						}
+						negativeByType[field].push(val)
+					}
 				} else {
 					if (option.method === 'or') {
 						if (!orFacets[type.id]) {
@@ -491,9 +498,9 @@ export function useSearch(
 
 		const projectType = projectTypes.value.map((projectType) => `project_type:${projectType}`)
 		if (andFacets.length > 0) {
-			return [projectType, ...andFacets]
+			return { facets: [projectType, ...andFacets], negativeByType }
 		} else {
-			return [projectType]
+			return { facets: [projectType], negativeByType }
 		}
 	})
 
@@ -504,7 +511,16 @@ export function useSearch(
 			params.push(`query=${encodeURIComponent(query.value)}`)
 		}
 
-		params.push(`facets=${encodeURIComponent(JSON.stringify(facets.value))}`)
+		params.push(`facets=${encodeURIComponent(JSON.stringify(facets.value.facets))}`)
+
+		const negativeFilterParts: string[] = []
+		for (const [field, values] of Object.entries(facets.value.negativeByType)) {
+			const quoted = values.map((v) => `"${v}"`).join(', ')
+			negativeFilterParts.push(`${field} NOT IN [${quoted}]`)
+		}
+		if (negativeFilterParts.length > 0) {
+			params.push(`new_filters=${encodeURIComponent(negativeFilterParts.join(' AND '))}`)
+		}
 
 		const offset = (currentPage.value - 1) * maxResults.value
 		if (currentPage.value !== 1) {

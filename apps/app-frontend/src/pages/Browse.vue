@@ -186,6 +186,21 @@ const instanceFilters = computed(() => {
 				option: 'client',
 			})
 		}
+
+		if (
+			instanceHideInstalled.value &&
+			(installedProjectIds.value || newlyInstalled.value.length > 0)
+		) {
+			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
+
+			allInstalled
+				.map((x) => ({
+					type: 'project_id',
+					option: `project_id:${x}`,
+					negative: true,
+				}))
+				.forEach((x) => filters.push(x))
+		}
 	}
 
 	debugLog('instanceFilters result', filters)
@@ -364,10 +379,6 @@ watch(effectiveRequestParams, () => {
 	}, 200)
 })
 
-watch(instanceHideInstalled, () => {
-	debugLog('instanceHideInstalled changed', instanceHideInstalled.value)
-	refreshSearch()
-})
 
 async function refreshSearch() {
 	const version = ++searchVersion
@@ -434,10 +445,6 @@ async function refreshSearch() {
 					...val,
 					installed: allInstalledIds.has(val.project_id),
 				}))
-
-				if (instanceHideInstalled.value) {
-					rawResults.result.hits = rawResults.result.hits.filter((val) => !val.installed)
-				}
 			}
 			debugLog('v2 search results', {
 				hitCount: rawResults.result.hits.length,
