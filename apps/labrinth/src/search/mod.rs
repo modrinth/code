@@ -186,6 +186,9 @@ pub enum SearchBackendKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, strum::EnumIter)]
 pub enum SearchField {
     Categories,
+    Name,
+    Author,
+    License,
     ProjectTypes,
     ProjectId,
     OpenSource,

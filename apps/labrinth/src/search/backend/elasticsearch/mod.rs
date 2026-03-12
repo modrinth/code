@@ -136,6 +136,21 @@ impl SearchField {
                 path: "categories",
                 mapping: json!({ "type": "keyword" }),
             },
+            SearchField::Name => ElasticsearchFieldSpec {
+                path: "name",
+                mapping: json!({ "type": "search_as_you_type" }),
+            },
+            SearchField::Author => ElasticsearchFieldSpec {
+                path: "author",
+                mapping: json!({
+                    "type": "search_as_you_type",
+                    "fields": { "keyword": { "type": "keyword" } }
+                }),
+            },
+            SearchField::License => ElasticsearchFieldSpec {
+                path: "license",
+                mapping: json!({ "type": "keyword" }),
+            },
             SearchField::ProjectTypes => ElasticsearchFieldSpec {
                 path: "project_types",
                 mapping: json!({ "type": "keyword" }),

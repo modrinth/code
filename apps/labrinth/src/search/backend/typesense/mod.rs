@@ -346,6 +346,27 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::Name => TypesenseFieldSpec {
+                path: "name",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::Author => TypesenseFieldSpec {
+                path: "author",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::License => TypesenseFieldSpec {
+                path: "license",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
             SearchField::ProjectTypes => TypesenseFieldSpec {
                 path: "project_types",
                 ty: "string[]",
@@ -468,12 +489,9 @@ impl Typesense {
 
     fn collection_schema(name: &str) -> Value {
         let mut fields = vec![
-            json!({"name": "name", "type": "string", "facet": false}),
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
-            json!({"name": "author", "type": "string", "facet": true}),
-            json!({"name": "license", "type": "string", "facet": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
