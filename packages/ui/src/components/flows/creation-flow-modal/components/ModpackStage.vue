@@ -9,7 +9,11 @@
 			:no-options-message="searchLoading ? 'Loading...' : 'No results found'"
 			:disable-search-filter="true"
 			@search-input="(query) => handleSearch(query)"
-		/>
+		>
+			<template #option-suffix>
+				<RightArrowIcon class="size-5 shrink-0 text-secondary opacity-0 transition-opacity group-hover/option:opacity-100 group-data-[focused=true]/option:opacity-100" />
+			</template>
+		</Combobox>
 		<div class="flex items-center gap-3">
 			<div class="h-[1px] w-full flex-1 bg-surface-5" />
 			<span class="text-sm text-secondary">or</span>
@@ -33,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { CompassIcon, ImportIcon } from '@modrinth/assets'
+import { CompassIcon, ImportIcon, RightArrowIcon } from '@modrinth/assets'
 import { defineAsyncComponent, h, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'

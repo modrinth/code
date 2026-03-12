@@ -337,23 +337,32 @@ provideInstallationSettings({
 
 	async save(platform, gameVersion, loaderVersionId) {
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
-		debug('save: emitting reinstall before API call')
-		emit('reinstall', { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion })
-		try {
-			const request: Archon.Content.v1.InstallWorldContent = {
-				content_variant: 'bare',
-				loader: toApiLoader(platform),
-				version: loaderVersionId ?? '',
-				game_version: gameVersion || undefined,
-				soft_override: true,
-			}
+		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
+		const platformChanged = platform !== currentPlatform
 
-			debug('save: calling installContent', request)
-			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			debug('save: installContent succeeded, invalidating')
+		debug('save: emitting reinstall before API call')
+		emit('reinstall', platformChanged
+			? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
+			: { mVersion: gameVersion })
+		try {
+			if (platformChanged) {
+				const request: Archon.Content.v1.InstallWorldContent = {
+					content_variant: 'bare',
+					loader: toApiLoader(platform),
+					version: loaderVersionId ?? '',
+					game_version: gameVersion || undefined,
+					soft_override: true,
+				}
+				debug('save: platform changed, calling installContent', request)
+				await client.archon.content_v1.installContent(serverId, worldId.value!, request)
+			} else {
+				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
+				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
+			}
+			debug('save: succeeded, invalidating')
 			invalidateServerState()
 		} catch (err) {
-			debug('save: installContent failed, emitting reinstall-failed', err)
+			debug('save: failed, emitting reinstall-failed', err)
 			emit('reinstall-failed')
 			addNotification({
 				type: 'error',
