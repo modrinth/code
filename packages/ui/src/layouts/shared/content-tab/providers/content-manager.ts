@@ -97,6 +97,10 @@ export interface ContentManagerContext {
 	// Deletion context (controls modal variant)
 	deletionContext?: 'instance' | 'server'
 
+	// One-time content hint (optional — shows tooltip on modpack content button)
+	showContentHint?: Ref<boolean>
+	dismissContentHint?: () => void
+
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
 }

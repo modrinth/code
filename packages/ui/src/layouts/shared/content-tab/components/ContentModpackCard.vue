@@ -7,18 +7,20 @@ import {
 	MoreVerticalIcon,
 	SettingsIcon,
 	SpinnerIcon,
+	XIcon,
 } from '@modrinth/assets'
+import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
-import TagItem from '#ui/components/base/TagItem.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu, {
 	type Option as OverflowMenuOption,
 } from '#ui/components/base/OverflowMenu.vue'
+import TagItem from '#ui/components/base/TagItem.vue'
 import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -38,6 +40,18 @@ const messages = defineMessages({
 		id: 'content.modpack-card.updating',
 		defaultMessage: 'Updating...',
 	},
+	contentHintTitle: {
+		id: 'content.modpack-card.content-hint-title',
+		defaultMessage: 'Modpack content moved',
+	},
+	contentHintDescription: {
+		id: 'content.modpack-card.content-hint-description',
+		defaultMessage: "Your modpack's content can now be found here!",
+	},
+	dismissHint: {
+		id: 'content.modpack-card.dismiss-hint',
+		defaultMessage: "Don't show again",
+	},
 })
 
 interface Props {
@@ -51,6 +65,7 @@ interface Props {
 	overflowOptions?: OverflowMenuOption[]
 	hasUpdate?: boolean
 	disabledText?: string
+	showContentHint?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -63,12 +78,14 @@ withDefaults(defineProps<Props>(), {
 	overflowOptions: undefined,
 	hasUpdate: false,
 	disabledText: undefined,
+	showContentHint: false,
 })
 
 const emit = defineEmits<{
 	update: []
 	content: []
 	settings: []
+	'dismiss-content-hint': []
 }>()
 
 const instance = getCurrentInstance()
@@ -182,12 +199,49 @@ const collapsedOptions = computed(() => {
 							</button>
 						</ButtonStyled>
 
-						<ButtonStyled v-if="hasContentListener">
-							<button class="!shadow-none" @click="emit('content')">
-								<BoxesIcon />
-								{{ formatMessage(commonMessages.contentLabel) }}
-							</button>
-						</ButtonStyled>
+						<Tooltip
+							v-if="hasContentListener"
+							theme="dismissable-prompt"
+							:triggers="[]"
+							:shown="showContentHint"
+							:auto-hide="false"
+							placement="bottom"
+						>
+							<ButtonStyled>
+								<button
+									class="!shadow-none"
+									@click="
+										() => {
+											emit('content')
+											emit('dismiss-content-hint')
+										}
+									"
+								>
+									<BoxesIcon />
+									{{ formatMessage(commonMessages.contentLabel) }}
+								</button>
+							</ButtonStyled>
+							<template #popper>
+								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="flex min-w-48 items-center justify-between gap-8">
+										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
+											{{ formatMessage(messages.contentHintTitle) }}
+										</h3>
+										<ButtonStyled size="small" circular>
+											<button
+												v-tooltip="formatMessage(messages.dismissHint)"
+												@click="emit('dismiss-content-hint')"
+											>
+												<XIcon aria-hidden="true" />
+											</button>
+										</ButtonStyled>
+									</div>
+									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
+										{{ formatMessage(messages.contentHintDescription) }}
+									</p>
+								</div>
+							</template>
+						</Tooltip>
 
 						<ButtonStyled v-if="hasSettingsListener" type="outlined" circular>
 							<button class="!border !border-surface-4" @click="emit('settings')">
