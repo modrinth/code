@@ -190,6 +190,7 @@ const linkedModpackHasUpdate = ref(false)
 const linkedModpackUpdateVersionId = ref<string | null>(null)
 
 const isModpackUpdating = ref(false)
+const isBulkOperating = ref(false)
 const isInstanceBusy = computed(() => props.instance?.install_stage !== 'installed')
 const isPackLocked = computed(() => props.instance?.linked_data?.locked ?? false)
 
@@ -414,14 +415,14 @@ async function fetchAndSpliceVersion(
 }
 
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog !== undefined) return
+	if (version.changelog != null) return
 	loadingChangelog.value = true
 	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError)
 	loadingChangelog.value = false
 }
 
 async function handleVersionHover(version: Labrinth.Versions.v2.Version) {
-	if (version.changelog !== undefined) return
+	if (version.changelog != null) return
 	await fetchAndSpliceVersion(version.id)
 }
 
@@ -658,6 +659,7 @@ provideContentManager({
 	),
 	isPackLocked,
 	isBusy: isInstanceBusy,
+	isBulkOperating,
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
@@ -741,7 +743,8 @@ const unlistenProfiles = await profile_listener(
 			props.instance &&
 			event.profile_path_id === props.instance.path &&
 			event.event === 'synced' &&
-			props.instance.install_stage !== 'pack_installing'
+			props.instance.install_stage !== 'pack_installing' &&
+			!isBulkOperating.value
 		) {
 			await initProjects()
 		}

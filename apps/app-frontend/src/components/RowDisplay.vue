@@ -19,7 +19,7 @@ import { useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
 import LegacyProjectCard from '@/components/ui/LegacyProjectCard.vue'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_by_profile_path } from '@/helpers/process.js'
 import { duplicate, kill, remove, run } from '@/helpers/profile.js'
@@ -239,14 +239,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<ConfirmModalWrapper
-		ref="deleteConfirmModal"
-		title="Are you sure you want to delete this instance?"
-		description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteProfile"
-	/>
+	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="deleteProfile" />
 	<div ref="rowContainer" class="flex flex-col gap-4">
 		<div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
 			<HeadingLink class="mt-1" :to="row.route">

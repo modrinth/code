@@ -18,10 +18,10 @@
 		<!-- Existing instance tab -->
 		<div
 			v-if="tab === 'existing'"
-			class="flex flex-col gap-3 bg-surface-2 px-6 py-4"
-			style="min-height: 300px; max-height: 400px; overflow-y: auto"
+			class="flex flex-col gap-3 bg-surface-2 py-4"
+			style="height: 400px; overflow-y: auto"
 		>
-			<div class="flex items-start gap-3">
+			<div class="flex items-start gap-3 px-6">
 				<StyledInput
 					v-model="searchFilter"
 					:icon="SearchIcon"
@@ -53,7 +53,7 @@
 				<div
 					v-for="inst in filteredInstances"
 					:key="inst.id"
-					class="flex items-center justify-between rounded-lg px-2 py-1.5"
+					class="flex items-center justify-between px-6 py-1.5"
 					:class="
 						!inst.compatible ? 'opacity-40' : inst.installed ? 'opacity-60' : 'hover:bg-surface-3'
 					"

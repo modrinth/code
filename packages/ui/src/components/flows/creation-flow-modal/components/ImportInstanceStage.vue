@@ -1,93 +1,96 @@
 <template>
-	<div class="flex flex-col gap-4">
+	<div class="flex flex-col gap-2">
 		<!-- Header -->
 		<div class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">Launcher instances</span>
 			<ButtonStyled
 				type="transparent"
-				size="standard"
+				size="small"
 				:class="{ invisible: totalSelectedCount === 0 }"
 			>
 				<button @click="clearAll">Clear all</button>
 			</ButtonStyled>
 		</div>
 
-		<!-- Search -->
-		<StyledInput
-			v-model="ctx.importSearchQuery.value"
-			:icon="SearchIcon"
-			placeholder="Search instance name"
-		/>
-
-		<!-- Launcher sections -->
-		<div v-if="ctx.importLaunchers.value.length > 0" class="flex flex-col gap-2">
-			<div
-				v-for="launcher in visibleLaunchers"
-				:key="launcher.name"
-				class="flex flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
-			>
-				<!-- Launcher header -->
-				<button
-					class="flex w-full cursor-pointer items-center gap-3 border-none bg-surface-3 p-3 text-left transition-colors"
-					@click="toggleLauncherExpanded(launcher.name)"
-				>
-					<ChevronRightIcon
-						class="size-5 shrink-0 text-secondary transition-transform"
-						:class="{ 'rotate-90': expandedLaunchers.has(launcher.name) }"
-					/>
-					<Checkbox
-						:model-value="getLauncherCheckState(launcher)"
-						:indeterminate="getLauncherIndeterminate(launcher)"
-						@update:model-value="toggleLauncherAll(launcher, $event)"
-						@click.stop
-					/>
-					<span class="font-semibold text-contrast">{{ launcher.name }}</span>
-				</button>
-
-				<!-- Instance list (expanded) -->
-				<Collapsible :collapsed="!expandedLaunchers.has(launcher.name)">
-					<div class="flex flex-col">
-						<template v-for="(instance, i) in filteredInstances(launcher)" :key="instance">
-							<div
-								class="flex items-center gap-3 border-0 border-t border-solid border-surface-4 py-3 pr-3"
-								:class="i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
-								style="padding-left: 2.75rem"
-							>
-								<Checkbox
-									:model-value="isInstanceSelected(launcher.name, instance)"
-									@update:model-value="toggleInstance(launcher.name, instance, $event)"
-								/>
-								<span class="text-sm">{{ instance }}</span>
-							</div>
-						</template>
-					</div>
-				</Collapsible>
+		<template v-if="loading">
+			<div class="flex items-center justify-center py-8 text-secondary text-sm">
+				Detecting launcher instances...
 			</div>
-		</div>
+		</template>
+		<template v-else>
+			<!-- Search -->
+			<StyledInput
+				v-if="ctx.importLaunchers.value.length > 0"
+				v-model="ctx.importSearchQuery.value"
+				:icon="SearchIcon"
+				placeholder="Search instance name"
+			/>
 
-		<!-- Loading state -->
-		<div v-if="loading" class="flex items-center justify-center py-8 text-secondary text-sm">
-			Detecting launcher instances...
-		</div>
+			<!-- Launcher sections -->
+			<div v-if="ctx.importLaunchers.value.length > 0" class="flex flex-col gap-2">
+				<div
+					v-for="launcher in visibleLaunchers"
+					:key="launcher.name"
+					class="flex flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
+				>
+					<!-- Launcher header -->
+					<button
+						class="flex w-full cursor-pointer items-center gap-3 border-none bg-surface-3 p-3 text-left transition-colors"
+						@click="toggleLauncherExpanded(launcher.name)"
+					>
+						<ChevronRightIcon
+							class="size-5 shrink-0 text-secondary transition-transform"
+							:class="{ 'rotate-90': expandedLaunchers.has(launcher.name) }"
+						/>
+						<Checkbox
+							:model-value="getLauncherCheckState(launcher)"
+							:indeterminate="getLauncherIndeterminate(launcher)"
+							@update:model-value="toggleLauncherAll(launcher, $event)"
+							@click.stop
+						/>
+						<span class="font-semibold text-contrast">{{ launcher.name }}</span>
+					</button>
 
-		<!-- Add launcher path -->
-		<div v-if="!showAddPath">
-			<ButtonStyled>
-				<button class="w-full !shadow-none" @click="showAddPath = true">Add launcher path</button>
-			</ButtonStyled>
-		</div>
-		<div v-else class="flex items-center gap-2">
-			<ButtonStyled icon-only
-				><button class="!shadow-none" @click="browseForLauncherPath">
-					<FolderSearchIcon class="size-5" /></button
-			></ButtonStyled>
-			<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
-			<ButtonStyled>
-				<button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
-					Add
-				</button>
-			</ButtonStyled>
-		</div>
+					<!-- Instance list (expanded) -->
+					<Collapsible :collapsed="!expandedLaunchers.has(launcher.name)">
+						<div class="flex flex-col">
+							<template v-for="(instance, i) in filteredInstances(launcher)" :key="instance">
+								<div
+									class="flex items-center gap-3 border-0 border-t border-solid border-surface-4 py-3 pr-3"
+									:class="i % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
+									style="padding-left: 2.75rem"
+								>
+									<Checkbox
+										:model-value="isInstanceSelected(launcher.name, instance)"
+										@update:model-value="toggleInstance(launcher.name, instance, $event)"
+									/>
+									<span class="text-sm">{{ instance }}</span>
+								</div>
+							</template>
+						</div>
+					</Collapsible>
+				</div>
+			</div>
+
+			<!-- Add launcher path -->
+			<div v-if="!showAddPath">
+				<ButtonStyled>
+					<button class="w-full !shadow-none" @click="showAddPath = true">Add launcher path</button>
+				</ButtonStyled>
+			</div>
+			<div v-else class="flex items-center gap-2">
+				<ButtonStyled icon-only
+					><button class="!shadow-none" @click="browseForLauncherPath">
+						<FolderSearchIcon class="size-5" /></button
+				></ButtonStyled>
+				<StyledInput v-model="newLauncherPath" placeholder="Path to launcher..." class="flex-1" />
+				<ButtonStyled>
+					<button class="!shadow-none" :disabled="!newLauncherPath.trim()" @click="addLauncherPath">
+						Add
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
 	</div>
 </template>
 

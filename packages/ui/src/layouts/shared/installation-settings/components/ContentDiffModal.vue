@@ -55,7 +55,7 @@
 					<div class="flex flex-col justify-between items-center">
 						<div class="w-[1px] h-2"></div>
 						<PlusIcon v-if="diff.type === 'added'" />
-						<MinusIcon v-else-if="diff.type === 'removed'" />
+						<MinusIcon v-else-if="diff.type === 'removed'" class="text-red" />
 						<RefreshCwIcon v-else />
 						<div
 							:class="
@@ -228,7 +228,7 @@ const messages = defineMessages({
 const diffTypeMessages = defineMessages({
 	added: {
 		id: 'content.diff-modal.diff-type.added',
-		defaultMessage: 'New dependency',
+		defaultMessage: 'Added (dependency)',
 	},
 	removed: {
 		id: 'content.diff-modal.diff-type.removed',

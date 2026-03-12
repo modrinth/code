@@ -18,7 +18,7 @@ import {
 	UploadIcon,
 } from '@modrinth/assets'
 import { formatBytes, formatProjectType } from '@modrinth/utils'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -200,6 +200,13 @@ const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useC
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
+
+// Sync bulk operation state back to the content manager so providers can suppress refreshes
+if (ctx.isBulkOperating) {
+	watch(isBulkOperating, (val) => {
+		ctx.isBulkOperating!.value = val
+	})
+}
 
 const { isChanging, markChanging, unmarkChanging } = useChangingItems()
 
