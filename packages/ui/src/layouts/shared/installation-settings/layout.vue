@@ -222,7 +222,8 @@ const messages = defineMessages({
 						class="flex items-center justify-between"
 					>
 						<span class="text-primary">{{ row.label }}</span>
-						<span class="font-semibold text-contrast">{{ row.value }}</span>
+						<span v-if="row.value" class="font-semibold text-contrast">{{ row.value }}</span>
+						<span v-else class="inline-block h-3 w-16 animate-pulse rounded bg-button-border"></span>
 					</div>
 				</div>
 			</div>

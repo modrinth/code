@@ -2,7 +2,7 @@ import type { RouteLocationRaw } from 'vue-router'
 
 export interface InstallationInfoRow {
 	label: string
-	value: string
+	value: string | null
 }
 
 export interface InstallationModpackOwner {

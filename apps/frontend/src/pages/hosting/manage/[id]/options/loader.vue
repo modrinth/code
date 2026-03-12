@@ -228,11 +228,10 @@ provideInstallationSettings({
 	loading: computed(() => !server.value || addonsQuery.isLoading.value),
 	installationInfo: computed(() => {
 		const addons = addonsQuery.data.value
-		const unknownStr = formatMessage(commonMessages.unknownLabel)
-		const rawLoader = addons?.modloader ?? server.value?.loader ?? unknownStr
-		const loader = formatLoaderLabel(rawLoader)
-		const gameVersion = addons?.game_version ?? server.value?.mc_version ?? unknownStr
-		const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? unknownStr
+		const rawLoader = addons?.modloader ?? server.value?.loader ?? null
+		const loader = rawLoader ? formatLoaderLabel(rawLoader) : null
+		const gameVersion = addons?.game_version ?? server.value?.mc_version ?? null
+		const loaderVersion = addons?.modloader_version ?? server.value?.loader_version ?? null
 
 		debug('installationInfo computed:', {
 			'addons?.modloader': addons?.modloader,
@@ -253,7 +252,7 @@ provideInstallationSettings({
 			{ label: formatMessage(commonMessages.platformLabel), value: loader },
 			{ label: formatMessage(commonMessages.gameVersionLabel), value: gameVersion },
 		]
-		if (loader && loader !== 'Vanilla') {
+		if (loader !== 'Vanilla') {
 			rows.push({
 				label: formatMessage(messages.loaderVersionLabel, { loader }),
 				value: loaderVersion,
