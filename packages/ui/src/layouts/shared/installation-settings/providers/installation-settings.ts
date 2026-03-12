@@ -65,6 +65,7 @@ export interface InstallationSettingsContext {
 		platform: string,
 		gameVersion: string,
 		loaderVersionId: string | null,
+		signal?: AbortSignal,
 	) => Promise<ContentDiffPreview | null>
 
 	/**

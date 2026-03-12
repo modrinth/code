@@ -20,7 +20,9 @@ export function useInstallationForm(
 	const selectedLoaderVersion = ref(0)
 	const showSnapshots = ref(false)
 	const isSaving = ref(false)
+	const isVerifying = ref(false)
 	const pendingPreview = ref<ContentDiffPreview | null>(null)
+	let abortController: AbortController | null = null
 
 	const gameVersionOptions = computed(() =>
 		ctx.resolveGameVersions(selectedPlatform.value, showSnapshots.value),
@@ -77,16 +79,25 @@ export function useInstallationForm(
 			const gameVersionChanged = selectedGameVersion.value !== ctx.currentGameVersion.value
 
 			if (ctx.previewSave && isModded && gameVersionChanged) {
+				isVerifying.value = true
+				abortController = new AbortController()
 				const loaderVersionId =
 					selectedPlatform.value !== 'vanilla'
 						? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
 						: null
 
-				const preview = await ctx.previewSave(
-					selectedPlatform.value,
-					selectedGameVersion.value,
-					loaderVersionId,
-				)
+				let preview: ContentDiffPreview | null
+				try {
+					preview = await ctx.previewSave(
+						selectedPlatform.value,
+						selectedGameVersion.value,
+						loaderVersionId,
+						abortController.signal,
+					)
+				} finally {
+					isVerifying.value = false
+					abortController = null
+				}
 
 				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
 					pendingPreview.value = preview
@@ -131,6 +142,11 @@ export function useInstallationForm(
 	}
 
 	function cancelEditing() {
+		abortController?.abort()
+		abortController = null
+		isVerifying.value = false
+		isSaving.value = false
+		pendingPreview.value = null
 		selectedPlatform.value = ctx.currentPlatform.value
 		selectedGameVersion.value = ctx.currentGameVersion.value
 		const currentId = ctx.currentLoaderVersion.value
@@ -236,6 +252,7 @@ export function useInstallationForm(
 		selectedLoaderVersion,
 		showSnapshots,
 		isSaving,
+		isVerifying,
 		gameVersionOptions,
 		loaderVersionOptions,
 		loaderVersionDisplayValue,

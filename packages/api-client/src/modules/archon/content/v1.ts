@@ -244,6 +244,7 @@ export class ArchonContentV1Module extends AbstractModule {
 		serverId: string,
 		worldId: string,
 		gameVersion: string,
+		signal?: AbortSignal,
 	): Promise<Archon.Content.v1.UpdateGameVersionPreview> {
 		return this.client.request<Archon.Content.v1.UpdateGameVersionPreview>(
 			`/servers/${serverId}/worlds/${worldId}/content/update-game-version?game_version=${encodeURIComponent(gameVersion)}`,
@@ -252,6 +253,7 @@ export class ArchonContentV1Module extends AbstractModule {
 				version: 1,
 				method: 'GET',
 				timeout: 1000 * 1000,
+				signal,
 			},
 		)
 	}

@@ -538,11 +538,12 @@ provideInstallationSettings({
 	lockPlatform: true,
 	hideLoaderVersion: true,
 
-	async previewSave(_platform, gameVersion, _loaderVersionId) {
+	async previewSave(_platform, gameVersion, _loaderVersionId, signal) {
 		const result = await client.archon.content_v1.getUpdateGameVersionPreview(
 			serverId,
 			worldId.value!,
 			gameVersion,
+			signal,
 		)
 		if (result.addon_changes.length === 0 && !result.has_unknown_content) return null
 		return {

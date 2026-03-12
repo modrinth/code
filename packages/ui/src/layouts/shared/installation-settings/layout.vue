@@ -13,7 +13,8 @@ import {
 	UnlinkIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { onBeforeRouteLeave } from 'vue-router'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -28,6 +29,7 @@ import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmM
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
+import ConfirmLeaveModal from '../content-tab/components/modals/ConfirmLeaveModal.vue'
 import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
 import { useInstallationForm } from './composables'
 import { injectInstallationSettings } from './providers/installation-settings'
@@ -35,6 +37,7 @@ import { injectInstallationSettings } from './providers/installation-settings'
 const { formatMessage } = useVIntl()
 const ctx = injectInstallationSettings()
 
+const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 const repairModal = ref<InstanceType<typeof ConfirmRepairModal>>()
 const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
@@ -46,6 +49,34 @@ const pendingUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isUpdateDowngrade = ref(false)
 
 const form = useInstallationForm(ctx, contentUpdaterModal, contentDiffModal)
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+	if (form.isSaving.value) {
+		e.preventDefault()
+		return ''
+	}
+}
+
+if (typeof window !== 'undefined') {
+	watch(() => form.isSaving.value, (saving) => {
+		if (saving) {
+			window.addEventListener('beforeunload', handleBeforeUnload)
+		} else {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	})
+
+	onBeforeUnmount(() => {
+		window.removeEventListener('beforeunload', handleBeforeUnload)
+	})
+
+	onBeforeRouteLeave(async () => {
+		if (form.isSaving.value) {
+			return (await confirmLeaveModal.value?.prompt()) ?? false
+		}
+		return true
+	})
+}
 
 const disabledPlatforms = computed(() => {
 	if (!ctx.lockPlatform || ctx.currentPlatform.value === 'vanilla') return []
@@ -157,6 +188,10 @@ const messages = defineMessages({
 	savingLabel: {
 		id: 'installation-settings.saving',
 		defaultMessage: 'Saving...',
+	},
+	verifyingLabel: {
+		id: 'installation-settings.verifying',
+		defaultMessage: 'Verifying...',
 	},
 	selectPlatformAriaLabel: {
 		id: 'installation-settings.aria.select-platform',
@@ -503,9 +538,11 @@ const messages = defineMessages({
 									<SpinnerIcon v-if="form.isSaving.value" class="animate-spin" />
 									<SaveIcon v-else />
 									{{
-										form.isSaving.value
-											? formatMessage(messages.savingLabel)
-											: formatMessage(commonMessages.saveButton)
+										form.isVerifying.value
+											? formatMessage(messages.verifyingLabel)
+											: form.isSaving.value
+												? formatMessage(messages.savingLabel)
+												: formatMessage(commonMessages.saveButton)
 									}}
 								</button>
 							</ButtonStyled>
@@ -659,6 +696,7 @@ const messages = defineMessages({
 			@cancel="form.cancelPreview()"
 		/>
 
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<slot name="extra-modals" />
 	</Teleport>
 </template>
