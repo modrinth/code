@@ -28,7 +28,7 @@
 			/>
 			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarCreators
-				:organization="null"
+				:organization="organization"
 				:members="members"
 				:org-link="(slug) => `https://modrinth.com/organization/${slug}`"
 				:user-link="(username) => `https://modrinth.com/user/${username}`"
@@ -248,6 +248,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import {
+	get_organization,
 	get_project,
 	get_project_v3,
 	get_team,
@@ -287,6 +288,7 @@ const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
 const categories = shallowRef([])
+const organization = shallowRef(null)
 const instance = ref(null)
 const instanceProjects = ref(null)
 
@@ -390,6 +392,10 @@ async function fetchProjectData() {
 			installed.value = true
 			installedVersion.value = installedFile.metadata.version_id
 		}
+	}
+
+	if (project.organization) {
+		organization.value = await get_organization(project.organization).catch(handleError)
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server != null
