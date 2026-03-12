@@ -76,6 +76,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
+import { useDebounceFn } from '@vueuse/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -252,7 +253,7 @@ async function handleUploadFiles() {
 	}
 }
 
-async function toggleDisableMod(mod: ContentItem) {
+async function _toggleDisableMod(mod: ContentItem) {
 	try {
 		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
 		mod.enabled = !mod.enabled
@@ -269,6 +270,8 @@ async function toggleDisableMod(mod: ContentItem) {
 		handleError(err as Error)
 	}
 }
+
+const toggleDisableMod = useDebounceFn(_toggleDisableMod, 20)
 
 async function removeMod(mod: ContentItem) {
 	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
@@ -354,9 +357,7 @@ async function handleModpackContentToggle(item: ContentItem) {
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[]) {
-	for (const item of items) {
-		await toggleDisableMod(item)
-	}
+	await Promise.all(items.map((item) => toggleDisableMod(item)))
 }
 
 async function handleModpackContent() {
@@ -676,6 +677,8 @@ provideContentManager({
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
+	bulkEnableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+	bulkDisableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
 	deleteItem: removeMod,
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
