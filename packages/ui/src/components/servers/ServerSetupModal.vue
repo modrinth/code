@@ -82,7 +82,11 @@ const serverLoaders = ['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper
 async function searchModpacks(query: string, limit: number = 10) {
 	return client.labrinth.projects_v2.search({
 		query: query || undefined,
-		facets: [['project_type:modpack']],
+		facets: [
+			['project_type:modpack'],
+			['client_side:required'],
+			['server_side:required'],
+		],
 		limit,
 	})
 }

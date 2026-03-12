@@ -59,16 +59,10 @@
 					@click="setSetupType('vanilla')"
 				/>
 			</div>
-			<span v-if="ctx.flowType === 'reset-server'" class="text-sm text-secondary">
-				We recommend creating a
-				<AutoLink
-					:to="`/hosting/manage/${serverId}/backups`"
-					class="font-semibold text-link hover:underline"
-					@click="ctx.modal.value?.hide()"
-					>backup</AutoLink
-				>
-				before proceeding so you can restore your world if anything breaks.
-			</span>
+			<InlineBackupCreator
+				v-if="ctx.flowType === 'reset-server'"
+				backup-name="Before reinstall"
+			/>
 		</template>
 	</div>
 </template>
@@ -78,8 +72,7 @@ import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectModrinthServerContext } from '../../../../providers/server-context'
-import AutoLink from '../../../base/AutoLink.vue'
+import InlineBackupCreator from '../../../../layouts/shared/content-tab/components/modals/InlineBackupCreator.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 
@@ -91,6 +84,4 @@ function setSetupType(type: 'modpack' | 'custom' | 'vanilla') {
 	debug('selected:', type)
 	_setSetupType(type)
 }
-const serverContext = injectModrinthServerContext(null)
-const serverId = serverContext?.serverId
 </script>

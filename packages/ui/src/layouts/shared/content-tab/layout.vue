@@ -261,11 +261,11 @@ async function confirmDelete() {
 		try {
 			await ctx.bulkDeleteItems(itemsToDelete)
 		} finally {
+			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
 			bulkWaiting.value = false
 		}
-		clearSelection()
 		return
 	}
 
@@ -282,8 +282,7 @@ async function confirmDelete() {
 	await runBulk('delete', itemsToDelete, async (item) => {
 		await ctx.deleteItem(item)
 		removeFromSelection(ctx.getItemId(item))
-	})
-	clearSelection()
+	}, { onComplete: clearSelection })
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
@@ -307,15 +306,14 @@ async function bulkEnable() {
 		try {
 			await ctx.bulkEnableItems(items)
 		} finally {
+			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
 			bulkWaiting.value = false
 		}
-		clearSelection()
 		return
 	}
-	await runBulk('enable', items, (item) => ctx.toggleEnabled(item))
-	clearSelection()
+	await runBulk('enable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
 }
 
 async function bulkDisable() {
@@ -328,15 +326,14 @@ async function bulkDisable() {
 		try {
 			await ctx.bulkDisableItems(items)
 		} finally {
+			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
 			bulkWaiting.value = false
 		}
-		clearSelection()
 		return
 	}
-	await runBulk('disable', items, (item) => ctx.toggleEnabled(item))
-	clearSelection()
+	await runBulk('disable', items, (item) => ctx.toggleEnabled(item), { onComplete: clearSelection })
 }
 
 function handleUpdateById(id: string) {
@@ -376,14 +373,14 @@ async function confirmBulkUpdate() {
 		try {
 			await ctx.bulkUpdateItems(items)
 		} finally {
+			clearSelection()
 			isBulkOperating.value = false
 			bulkOperation.value = null
 			bulkWaiting.value = false
 		}
 	} else if (ctx.bulkUpdateItem) {
-		await runBulk('update', items, ctx.bulkUpdateItem)
+		await runBulk('update', items, ctx.bulkUpdateItem, { onComplete: clearSelection })
 	}
-	clearSelection()
 	pendingBulkUpdateItems.value = []
 }
 

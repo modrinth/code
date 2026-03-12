@@ -197,6 +197,30 @@
   "collections.label.private": {
     "defaultMessage": "Private"
   },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} added"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "New dependency"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Removed"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Updated"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} removed"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+  },
+  "content.diff-modal.unknown-content-header": {
+    "defaultMessage": "Unknown content"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} updated"
+  },
   "content.confirm-bulk-update.admonition-body": {
     "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
   },
@@ -542,6 +566,15 @@
   "installation-settings.aria.select-platform": {
     "defaultMessage": "Select platform"
   },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Confirm changes"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Changing to {gameVersion} will modify the following content on your server."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Review content changes"
+  },
   "installation-settings.edit-installation.title": {
     "defaultMessage": "Edit installation"
   },
@@ -556,6 +589,9 @@
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "You will need to reset your server to switch loader."
   },
   "installation-settings.reinstall-modpack.description": {
     "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."

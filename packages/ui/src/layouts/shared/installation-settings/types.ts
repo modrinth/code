@@ -29,3 +29,18 @@ export interface LoaderVersionEntry {
 	id: string
 	stable?: boolean
 }
+
+export interface ContentDiffItem {
+	type: 'added' | 'removed' | 'updated'
+	projectName?: string
+	fileName?: string
+	currentVersionName?: string
+	newVersionName?: string
+}
+
+export interface ContentDiffPreview {
+	diffs: ContentDiffItem[]
+	newGameVersion: string
+	newLoaderVersion: string
+	hasUnknownContent: boolean
+}

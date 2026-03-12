@@ -13,8 +13,9 @@ export function useBulkOperation() {
 		operation: BulkOperationType,
 		items: T[],
 		fn: (item: T) => Promise<void>,
-		delayMs = 250,
+		options?: { delayMs?: number; onComplete?: () => void },
 	) {
+		const delayMs = options?.delayMs ?? 250
 		isBulkOperating.value = true
 		bulkOperation.value = operation
 		bulkTotal.value = items.length
@@ -29,6 +30,7 @@ export function useBulkOperation() {
 				}
 			}
 		} finally {
+			options?.onComplete?.()
 			isBulkOperating.value = false
 			bulkOperation.value = null
 			bulkProgress.value = 0

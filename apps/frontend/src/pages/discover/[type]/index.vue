@@ -272,6 +272,19 @@ const serverFilters = computed(() => {
 				.forEach((x) => filters.push(x))
 		}
 	}
+
+	if (currentServerId.value && projectType.value?.id === 'modpack') {
+		filters.push(
+			{
+				type: 'environment',
+				option: 'client',
+			},
+			{
+				type: 'environment',
+				option: 'server',
+			},
+		)
+	}
 	debug('serverFilters result:', filters)
 	return filters
 })

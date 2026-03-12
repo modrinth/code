@@ -162,6 +162,50 @@ export namespace Archon {
 						soft_override: boolean
 						properties?: PropertiesFields | null
 				  }
+
+			export type AddonDiffVersion = {
+				id: string
+				version_number: string
+			}
+
+			export type AddonDiffProject = {
+				id: string
+				title: string
+				icon_url: string | null
+				slug: string
+			}
+
+			export type AddonBaseDiffInfo = {
+				current_version: AddonDiffVersion | null
+				new_version: AddonDiffVersion | null
+				file_name: string | null
+				project_id: string | null
+				project: AddonDiffProject | null
+			}
+
+			export type AddonDiffAdded = AddonBaseDiffInfo & {
+				type: 'added'
+				new_version_id: string
+			}
+
+			export type AddonDiffRemoved = AddonBaseDiffInfo & {
+				type: 'removed'
+			}
+
+			export type AddonDiffUpdated = AddonBaseDiffInfo & {
+				type: 'updated'
+				current_version_id: string
+				new_version_id: string
+			}
+
+			export type AddonDiff = AddonDiffAdded | AddonDiffRemoved | AddonDiffUpdated
+
+			export type UpdateGameVersionPreview = {
+				addon_changes: AddonDiff[]
+				new_game_version: string
+				new_loader_version: string
+				has_unknown_content: boolean
+			}
 		}
 	}
 

@@ -5,11 +5,14 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import type { ContentUpdaterModal } from '../../content-tab'
+import type ContentDiffModal from '../components/ContentDiffModal.vue'
 import type { InstallationSettingsContext } from '../providers/installation-settings'
+import type { ContentDiffPreview } from '../types'
 
 export function useInstallationForm(
 	ctx: InstallationSettingsContext,
 	updaterModalRef: Ref<InstanceType<typeof ContentUpdaterModal> | null | undefined>,
+	contentDiffModalRef?: Ref<InstanceType<typeof ContentDiffModal> | null | undefined>,
 ) {
 	const isEditing = ref(false)
 	const selectedPlatform = ctx.editingPlatformRef ?? ref(ctx.currentPlatform.value)
@@ -17,6 +20,7 @@ export function useInstallationForm(
 	const selectedLoaderVersion = ref(0)
 	const showSnapshots = ref(false)
 	const isSaving = ref(false)
+	const pendingPreview = ref<ContentDiffPreview | null>(null)
 
 	const gameVersionOptions = computed(() =>
 		ctx.resolveGameVersions(selectedPlatform.value, showSnapshots.value),
@@ -69,6 +73,36 @@ export function useInstallationForm(
 	async function save() {
 		isSaving.value = true
 		try {
+			const isModded = ctx.currentPlatform.value !== 'vanilla'
+			const gameVersionChanged = selectedGameVersion.value !== ctx.currentGameVersion.value
+
+			if (ctx.previewSave && isModded && gameVersionChanged) {
+				const loaderVersionId =
+					selectedPlatform.value !== 'vanilla'
+						? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
+						: null
+
+				const preview = await ctx.previewSave(
+					selectedPlatform.value,
+					selectedGameVersion.value,
+					loaderVersionId,
+				)
+
+				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
+					pendingPreview.value = preview
+					contentDiffModalRef?.value?.show()
+					return
+				}
+			}
+
+			await performSave()
+		} catch {
+			isSaving.value = false
+		}
+	}
+
+	async function performSave() {
+		try {
 			const loaderVersionId =
 				selectedPlatform.value !== 'vanilla'
 					? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
@@ -79,6 +113,20 @@ export function useInstallationForm(
 		} finally {
 			isSaving.value = false
 		}
+	}
+
+	async function confirmSave() {
+		pendingPreview.value = null
+		try {
+			await performSave()
+		} catch {
+			// Error handled in performSave
+		}
+	}
+
+	function cancelPreview() {
+		pendingPreview.value = null
+		isSaving.value = false
 	}
 
 	function cancelEditing() {
@@ -195,6 +243,9 @@ export function useInstallationForm(
 		isValid,
 		hasChanges,
 		save,
+		pendingPreview,
+		confirmSave,
+		cancelPreview,
 		cancelEditing,
 		updatingModpack,
 		updatingProjectVersions,

@@ -526,6 +526,29 @@ provideInstallationSettings({
 
 	isServer: true,
 	isApp: false,
+
+	lockPlatform: true,
+
+	async previewSave(_platform, gameVersion, _loaderVersionId) {
+		const result = await client.archon.content_v1.getUpdateGameVersionPreview(
+			serverId,
+			worldId.value!,
+			gameVersion,
+		)
+		if (result.addon_changes.length === 0 && !result.has_unknown_content) return null
+		return {
+			diffs: result.addon_changes.map((diff) => ({
+				type: diff.type,
+				projectName: diff.project?.title ?? undefined,
+				fileName: diff.file_name ?? undefined,
+				currentVersionName: diff.current_version?.version_number ?? undefined,
+				newVersionName: diff.new_version?.version_number ?? undefined,
+			})),
+			newGameVersion: result.new_game_version,
+			newLoaderVersion: result.new_loader_version,
+			hasUnknownContent: result.has_unknown_content,
+		}
+	},
 })
 
 watch(

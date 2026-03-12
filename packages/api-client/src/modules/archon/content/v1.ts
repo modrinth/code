@@ -238,4 +238,36 @@ export class ArchonContentV1Module extends AbstractModule {
 			},
 		)
 	}
+
+	/** GET /v1/:server_id/worlds/:world_id/content/update-game-version?game_version=... */
+	public async getUpdateGameVersionPreview(
+		serverId: string,
+		worldId: string,
+		gameVersion: string,
+	): Promise<Archon.Content.v1.UpdateGameVersionPreview> {
+		return this.client.request<Archon.Content.v1.UpdateGameVersionPreview>(
+			`/servers/${serverId}/worlds/${worldId}/content/update-game-version?game_version=${encodeURIComponent(gameVersion)}`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'GET',
+			},
+		)
+	}
+
+	/** POST /v1/:server_id/worlds/:world_id/content/update-game-version?game_version=... */
+	public async applyGameVersionUpdate(
+		serverId: string,
+		worldId: string,
+		gameVersion: string,
+	): Promise<void> {
+		await this.client.request<void>(
+			`/servers/${serverId}/worlds/${worldId}/content/update-game-version?game_version=${encodeURIComponent(gameVersion)}`,
+			{
+				api: 'archon',
+				version: 1,
+				method: 'POST',
+			},
+		)
+	}
 }

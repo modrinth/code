@@ -13,7 +13,7 @@ import {
 	UnlinkIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
@@ -23,6 +23,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
+import ContentDiffModal from './components/ContentDiffModal.vue'
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
@@ -39,11 +40,17 @@ const reinstallModal = ref<InstanceType<typeof ConfirmReinstallModal>>()
 const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
+const contentDiffModal = ref<InstanceType<typeof ContentDiffModal>>()
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isUpdateDowngrade = ref(false)
 
-const form = useInstallationForm(ctx, contentUpdaterModal)
+const form = useInstallationForm(ctx, contentUpdaterModal, contentDiffModal)
+
+const disabledPlatforms = computed(() => {
+	if (!ctx.lockPlatform || ctx.currentPlatform.value === 'vanilla') return []
+	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
+})
 
 const showModpackVersionActions = ctx.showModpackVersionActions ?? true
 
@@ -170,6 +177,23 @@ const messages = defineMessages({
 	unlinkButton: {
 		id: 'installation-settings.unlink',
 		defaultMessage: 'Unlink',
+	},
+	platformLockTooltip: {
+		id: 'installation-settings.platform-lock-tooltip',
+		defaultMessage: 'You will need to reset your server to switch loader.',
+	},
+	confirmVersionChangeHeader: {
+		id: 'installation-settings.confirm-version-change-header',
+		defaultMessage: 'Review content changes',
+	},
+	confirmVersionChange: {
+		id: 'installation-settings.confirm-version-change',
+		defaultMessage: 'Confirm changes',
+	},
+	confirmVersionChangeDescription: {
+		id: 'installation-settings.confirm-version-change-description',
+		defaultMessage:
+			'Changing to {gameVersion} will modify the following content on your server.',
 	},
 })
 </script>
@@ -393,6 +417,8 @@ const messages = defineMessages({
 							<Chips
 								v-model="form.selectedPlatform.value"
 								:items="ctx.availablePlatforms"
+								:disabled-items="disabledPlatforms"
+								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
 							/>
 						</div>
@@ -607,6 +633,24 @@ const messages = defineMessages({
 			@reinstall="handleReinstall"
 		/>
 		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="handleUnlink" />
+
+		<ContentDiffModal
+			v-if="form.pendingPreview.value"
+			ref="contentDiffModal"
+			:header="formatMessage(messages.confirmVersionChangeHeader)"
+			:description="
+				formatMessage(messages.confirmVersionChangeDescription, {
+					gameVersion: form.pendingPreview.value.newGameVersion,
+				})
+			"
+			:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
+			:diffs="form.pendingPreview.value.diffs"
+			:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
+			:confirm-label="formatMessage(messages.confirmVersionChange)"
+			:show-backup-creator="ctx.isServer"
+			@confirm="form.confirmSave()"
+			@cancel="form.cancelPreview()"
+		/>
 
 		<slot name="extra-modals" />
 	</Teleport>

@@ -73,7 +73,7 @@ const props = withDefaults(
 )
 
 const client = injectModrinthClient()
-const { server, worldId, busyReasons } = injectModrinthServerContext()
+const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
 const route = useRoute()
 const router = useRouter()
@@ -693,9 +693,17 @@ provideContentManager({
 	modpack,
 	isPackLocked: ref(false),
 	isBusy: computed(() => busyReasons.value.length > 0),
-	busyMessage: computed(() =>
-		busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : null,
-	),
+	busyMessage: computed(() => {
+		const bannerCoversInstalling = server.value?.status === 'installing' || isSyncingContent.value
+		const nonBannerReasons = bannerCoversInstalling
+			? busyReasons.value.filter(
+					(r) =>
+						r.reason.id !== 'servers.busy.installing' &&
+						r.reason.id !== 'servers.busy.syncing-content',
+				)
+			: busyReasons.value
+		return nonBannerReasons.length > 0 ? formatMessage(nonBannerReasons[0].reason) : null
+	}),
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,

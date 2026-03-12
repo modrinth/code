@@ -4,6 +4,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
+	ContentDiffPreview,
 	GameVersionOption,
 	InstallationInfoRow,
 	InstallationModpackData,
@@ -57,6 +58,13 @@ export interface InstallationSettingsContext {
 	reinstalling?: Ref<boolean>
 
 	afterSave?: () => Promise<void>
+
+	lockPlatform?: boolean
+	previewSave?: (
+		platform: string,
+		gameVersion: string,
+		loaderVersionId: string | null,
+	) => Promise<ContentDiffPreview | null>
 
 	/**
 	 * Optional refs for the editing form state. When provided, the composable
