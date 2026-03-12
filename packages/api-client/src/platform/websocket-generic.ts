@@ -14,7 +14,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 
 	async connect(serverId: string, auth: Archon.Websocket.v0.WSAuth): Promise<void> {
 		if (this.connections.has(serverId)) {
-			this.disconnect(serverId)
+			this.closeConnection(serverId)
 		}
 
 		return new Promise((resolve, reject) => {
@@ -89,6 +89,16 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 	}
 
 	disconnect(serverId: string): void {
+		this.closeConnection(serverId)
+
+		this.emitter.all.forEach((_handlers, type) => {
+			if (type.toString().startsWith(`${serverId}:`)) {
+				this.emitter.all.delete(type)
+			}
+		})
+	}
+
+	private closeConnection(serverId: string): void {
 		const connection = this.connections.get(serverId)
 		if (!connection) return
 
@@ -103,12 +113,6 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 		) {
 			connection.socket.close(NORMAL_CLOSURE, 'Client disconnecting')
 		}
-
-		this.emitter.all.forEach((_handlers, type) => {
-			if (type.toString().startsWith(`${serverId}:`)) {
-				this.emitter.all.delete(type)
-			}
-		})
 
 		this.connections.delete(serverId)
 	}
