@@ -76,10 +76,10 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
-import { useDebounceFn } from '@vueuse/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { useDebounceFn } from '@vueuse/core'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -699,8 +699,10 @@ provideContentManager({
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
-	bulkEnableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
-	bulkDisableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+	bulkEnableItems: (items) =>
+		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+	bulkDisableItems: (items) =>
+		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
@@ -725,17 +727,16 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id
-			? `/project/${item.project.id}`
-			: undefined,
+		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
 		version: item.version ?? {
 			id: item.file_name,
 			version_number: formatMessage(messages.unknownVersion),
 			file_name: item.file_name,
 		},
-		versionLink: item.project?.id && item.version?.id
-			? `/project/${item.project.id}/version/${item.version.id}`
-			: undefined,
+		versionLink:
+			item.project?.id && item.version?.id
+				? `/project/${item.project.id}/version/${item.version.id}`
+				: undefined,
 		owner: item.owner
 			? {
 					...item.owner,

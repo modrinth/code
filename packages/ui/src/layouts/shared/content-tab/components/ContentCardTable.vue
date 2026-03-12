@@ -284,7 +284,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 						'border-0 border-t border-solid border-surface-4',
 						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
-					@update:selected="(val) => toggleItemSelection(item.id, val ?? false, visibleRange.start + idx)"
+					@update:selected="
+						(val) => toggleItemSelection(item.id, val ?? false, visibleRange.start + idx)
+					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="emit('delete', item.id)"
 					@update="emit('update', item.id)"

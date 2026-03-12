@@ -379,7 +379,6 @@ watch(effectiveRequestParams, () => {
 	}, 200)
 })
 
-
 async function refreshSearch() {
 	const version = ++searchVersion
 	debugLog('refreshSearch start', { version, projectType: projectType.value })

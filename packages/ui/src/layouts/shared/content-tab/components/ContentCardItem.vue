@@ -98,7 +98,10 @@ const fileNameRef = ref<HTMLElement | null>(null)
 			/>
 
 			<div class="flex min-w-0 items-center gap-3">
-				<div v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined" class="relative shrink-0">
+				<div
+					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
+					class="relative shrink-0"
+				>
 					<Avatar
 						:src="project.icon_url"
 						:alt="project.title"

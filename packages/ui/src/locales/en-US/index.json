@@ -506,6 +506,18 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Failed to delete content"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Failed to disable content"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Failed to enable content"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "Failed to update content"
+  },
   "hosting.content.failed-to-load-modpack-content": {
     "defaultMessage": "Failed to load modpack content"
   },
@@ -892,6 +904,9 @@
   },
   "label.installed-modpack": {
     "defaultMessage": "Installed modpack"
+  },
+  "label.installing": {
+    "defaultMessage": "Installing..."
   },
   "label.loading": {
     "defaultMessage": "Loading..."
