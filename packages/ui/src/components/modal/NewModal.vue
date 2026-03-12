@@ -79,14 +79,14 @@
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-12"
+						enter-to-class="opacity-100 max-h-6"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-12"
+						leave-from-class="opacity-100 max-h-6"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-12 bg-gradient-to-b from-bg-raised to-transparent"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-6 bg-gradient-to-b from-bg-raised to-transparent"
 						/>
 					</Transition>
 
@@ -106,14 +106,14 @@
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-12"
+						enter-to-class="opacity-100 max-h-6"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-12"
+						leave-from-class="opacity-100 max-h-6"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-12 bg-gradient-to-t from-bg-raised to-transparent"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-bg-raised to-transparent"
 						/>
 					</Transition>
 				</div>
