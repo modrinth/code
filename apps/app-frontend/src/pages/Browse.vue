@@ -50,7 +50,7 @@ import {
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { getServerLatency } from '@/helpers/worlds'
+import { get_server_status } from '@/helpers/worlds'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
 
@@ -222,7 +222,12 @@ const {
 } = useSearch(projectTypes, tags, instanceFilters)
 
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
-const serverPings = shallowRef<Record<string, number | undefined>>({})
+type ServerPingData = {
+	latency?: number
+	online: boolean
+	playersOnline: number
+}
+const serverPings = shallowRef<Record<string, ServerPingData>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
 async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
@@ -293,10 +298,21 @@ async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 		pingsToFetch.map(async (hit) => {
 			const address = hit.minecraft_java_server!.address!
 			try {
-				const latency = await getServerLatency(address)
-				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
+				const status = await get_server_status(address)
+				serverPings.value = {
+					...serverPings.value,
+					[hit.project_id]: {
+						latency: status.ping,
+						online: true,
+						playersOnline: status.players?.online ?? 0,
+					},
+				}
 			} catch (err) {
 				console.error(`Failed to ping server ${address}:`, err)
+				serverPings.value = {
+					...serverPings.value,
+					[hit.project_id]: { online: false, playersOnline: 0 },
+				}
 			}
 		}),
 	)
@@ -815,12 +831,18 @@ previousFilterState.value = JSON.stringify({
 						:summary="project.summary"
 						:tags="project.categories"
 						:link="`/project/${project.slug ?? project.project_id}`"
-						:server-online-players="project.minecraft_java_server?.ping?.data?.players_online ?? 0"
+						:server-online-players="
+							serverPings[project.project_id]?.playersOnline ??
+							project.minecraft_java_server?.ping?.data?.players_online ??
+							0
+						"
 						:server-region="project.minecraft_server?.region"
 						:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
 						:server-modpack-content="getServerModpackContent(project)"
-						:server-ping="serverPings[project.project_id]"
-						:server-status-online="!!project.minecraft_java_server?.ping?.data"
+						:server-ping="serverPings[project.project_id]?.latency"
+						:server-status-online="
+							serverPings[project.project_id]?.online ?? !!project.minecraft_java_server?.ping?.data
+						"
 						:hide-online-players-label="true"
 						:hide-recent-plays-label="true"
 						layout="list"
