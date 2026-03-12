@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import GridDisplay from '@/components/GridDisplay.vue'
 
 defineProps({

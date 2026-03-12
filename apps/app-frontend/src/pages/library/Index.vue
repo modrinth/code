@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { PlusIcon } from '@modrinth/assets'
 import { Button, injectNotificationManager } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
@@ -41,7 +41,8 @@ onUnmounted(() => {
 		<NavTabs
 			:links="[
 				{ label: 'All instances', href: `/library` },
-				{ label: 'Downloaded', href: `/library/downloaded` },
+				{ label: 'Modpacks', href: `/library/modpacks` },
+				{ label: 'Servers', href: `/library/servers` },
 				{ label: 'Custom', href: `/library/custom` },
 				{ label: 'Shared with me', href: `/library/shared`, shown: false },
 				{ label: 'Saved', href: `/library/saved`, shown: false },
