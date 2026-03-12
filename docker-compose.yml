@@ -19,7 +19,7 @@ services:
       timeout: 5s
       retries: 3
   typesense0:
-    image: typesense/typesense:27.1
+    image: typesense/typesense:30.1
     container_name: labrinth-typesense0
     restart: on-failure
     ports:

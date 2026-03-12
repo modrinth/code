@@ -431,6 +431,7 @@ pub async fn index_local(
                     display_categories: display_categories.clone(),
                     follows: project.follows,
                     downloads: project.downloads,
+                    log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
                     author: owner.clone(),
                     date_created: project.approved,

@@ -53,6 +53,8 @@ pub struct SearchRequest {
     pub show_metadata: bool,
     #[serde(default)]
     pub elasticsearch_config: backend::elasticsearch::RequestConfig,
+    #[serde(default)]
+    pub typesense_config: backend::typesense::RequestConfig,
 
     pub new_filters: Option<String>,
 
@@ -71,6 +73,7 @@ impl From<SearchQuery> for SearchRequest {
             show_metadata: false,
             elasticsearch_config:
                 backend::elasticsearch::RequestConfig::default(),
+            typesense_config: backend::typesense::RequestConfig::default(),
             new_filters: query.new_filters,
             facets: query.facets,
             filters: query.filters,
@@ -227,6 +230,7 @@ pub struct UploadSearchProject {
     pub display_categories: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
+    pub log_downloads: f64,
     pub icon_url: Option<String>,
     pub license: String,
     pub gallery: Vec<String>,

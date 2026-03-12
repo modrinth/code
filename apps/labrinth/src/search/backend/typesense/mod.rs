@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use eyre::{Result, eyre};
 use regex::Regex;
 use reqwest::Method;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tracing::{info, warn};
 
@@ -31,6 +32,25 @@ pub struct TypesenseConfig {
     pub index_prefix: String,
     pub meta_namespace: String,
     pub index_chunk_size: i64,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum Bucketing {
+    Buckets(u64),
+    BucketSize(u64),
+}
+
+impl Default for Bucketing {
+    fn default() -> Self {
+        Self::BucketSize(5)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct RequestConfig {
+    #[serde(default)]
+    pub bucketing: Bucketing,
 }
 
 impl TypesenseConfig {
@@ -371,6 +391,7 @@ impl Typesense {
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
             json!({"name": "downloads", "type": "int32", "facet": true, "sort": true}),
+            json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "author", "type": "string", "facet": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
@@ -387,37 +408,52 @@ impl Typesense {
             "name": name,
             "enable_nested_fields": true,
             "fields": fields,
-            "default_sorting_field": "downloads"
+            "default_sorting_field": "log_downloads"
         })
     }
 
-    fn get_sort_fields(&self, index: SearchIndex) -> &'static str {
-        // NOTE: we can only sort by max 3 fields here - typesense will not let us sort by more
-        match index {
-            SearchIndex::Relevance => {
-                "_text_match(buckets:5):desc,downloads:desc,version_published_timestamp:desc"
+    fn text_match_sort_field(request_config: &RequestConfig) -> String {
+        match request_config.bucketing {
+            Bucketing::Buckets(count) => {
+                format!("_text_match(buckets:{count}):desc")
             }
+            Bucketing::BucketSize(size) => {
+                format!("_text_match(bucket_size:{size}):desc")
+            }
+        }
+    }
+
+    fn get_sort_fields(
+        &self,
+        index: SearchIndex,
+        request_config: &RequestConfig,
+    ) -> String {
+        // NOTE: we can only sort by max 3 fields here - typesense will not let us sort by more
+        let text_match = Self::text_match_sort_field(request_config);
+        match index {
+            SearchIndex::Relevance => format!(
+                "{text_match},log_downloads:desc,version_published_timestamp:desc"
+            ),
             SearchIndex::Downloads => {
-                "downloads:desc,version_published_timestamp:desc"
+                "log_downloads:desc,version_published_timestamp:desc"
+                    .to_string()
             }
             SearchIndex::Follows => {
-                "follows:desc,version_published_timestamp:desc"
+                "follows:desc,version_published_timestamp:desc".to_string()
             }
             SearchIndex::Updated => {
                 "modified_timestamp:desc,version_published_timestamp:desc"
+                    .to_string()
             }
             SearchIndex::Newest => {
                 "created_timestamp:desc,version_published_timestamp:desc"
+                    .to_string()
             }
-            SearchIndex::MinecraftJavaServerVerifiedPlays2w => concat!(
-                "_text_match(buckets:5):desc,",
-                "minecraft_java_server.verified_plays_2w:desc,",
-                "minecraft_java_server.is_online:desc"
+            SearchIndex::MinecraftJavaServerVerifiedPlays2w => format!(
+                "{text_match},minecraft_java_server.verified_plays_2w:desc,minecraft_java_server.is_online:desc"
             ),
-            SearchIndex::MinecraftJavaServerPlayersOnline => concat!(
-                "_text_match(buckets:5):desc,",
-                "minecraft_java_server.is_online:desc,",
-                "minecraft_java_server.ping.data.players_online:desc"
+            SearchIndex::MinecraftJavaServerPlayersOnline => format!(
+                "{text_match},minecraft_java_server.is_online:desc,minecraft_java_server.ping.data.players_online:desc"
             ),
         }
     }
@@ -426,7 +462,8 @@ impl Typesense {
         &self,
         index: &str,
         new_filters: Option<&str>,
-    ) -> Result<(String, &'static str), ApiError> {
+        request_config: &RequestConfig,
+    ) -> Result<(String, String), ApiError> {
         let sort = parse_search_index(index, new_filters)?;
         let alias = match sort.index_name {
             SearchIndexName::Projects => self.config.get_alias_name("projects"),
@@ -434,7 +471,7 @@ impl Typesense {
                 self.config.get_alias_name("projects_filtered")
             }
         };
-        Ok((alias, self.get_sort_fields(sort.index)))
+        Ok((alias, self.get_sort_fields(sort.index, request_config)))
     }
 
     /// Builds a Typesense `filter_by` string from the [`SearchRequest`].
@@ -493,8 +530,11 @@ impl SearchBackend for Typesense {
         info: &SearchRequest,
     ) -> Result<SearchResults, ApiError> {
         let parsed = parse_search_request(info)?;
-        let (collection_alias, sort_by) =
-            self.get_sort_index(parsed.index, info.new_filters.as_deref())?;
+        let (collection_alias, sort_by) = self.get_sort_index(
+            parsed.index,
+            info.new_filters.as_deref(),
+            &info.typesense_config,
+        )?;
         let filter_by = Self::build_filter(info)?;
 
         let q = if parsed.query.is_empty() {
