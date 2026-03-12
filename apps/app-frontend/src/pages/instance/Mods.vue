@@ -175,12 +175,34 @@ const props = defineProps<{
 
 const loading = ref(true)
 const projects = ref<ContentItem[]>([])
+
+const installingBuffer = ref<ContentItem[]>([])
+
+watch(
+	() => installingItems.value.get(props.instance.path),
+	(items) => {
+		if (items && items.length > 0) {
+			installingBuffer.value = [...items]
+		}
+	},
+	{ immediate: true, deep: true },
+)
+
+watch(projects, (newProjects) => {
+	if (installingBuffer.value.length === 0) return
+	const realProjectIds = new Set(newProjects.map((p) => p.project?.id).filter(Boolean))
+	if (installingBuffer.value.every((item) => realProjectIds.has(item.project?.id))) {
+		installingBuffer.value = []
+	}
+})
+
 const mergedProjects = computed<ContentItem[]>(() => {
-	const pending = installingItems.value.get(props.instance.path) ?? []
+	const active = installingItems.value.get(props.instance.path)
+	const pending = active ?? installingBuffer.value
 	if (pending.length === 0) return projects.value
 	const realProjectIds = new Set(projects.value.map((p) => p.project?.id).filter(Boolean))
 	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
-	return [...projects.value, ...placeholders]
+	return placeholders.length > 0 ? [...projects.value, ...placeholders] : projects.value
 })
 
 const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
@@ -703,23 +725,17 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.installing
-			? undefined
-			: item.project?.id
-				? `/project/${item.project.id}`
-				: undefined,
-		version: item.installing
-			? undefined
-			: (item.version ?? {
-					id: item.file_name,
-					version_number: formatMessage(messages.unknownVersion),
-					file_name: item.file_name,
-				}),
-		versionLink: item.installing
-			? undefined
-			: item.project?.id && item.version?.id
-				? `/project/${item.project.id}/version/${item.version.id}`
-				: undefined,
+		projectLink: item.project?.id
+			? `/project/${item.project.id}`
+			: undefined,
+		version: item.version ?? {
+			id: item.file_name,
+			version_number: formatMessage(messages.unknownVersion),
+			file_name: item.file_name,
+		},
+		versionLink: item.project?.id && item.version?.id
+			? `/project/${item.project.id}/version/${item.version.id}`
+			: undefined,
 		owner: item.owner
 			? {
 					...item.owner,

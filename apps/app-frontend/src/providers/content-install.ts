@@ -127,7 +127,9 @@ export function createContentInstall(opts: {
 			icon_url?: string | null
 			project_type?: string
 		},
+		version?: Labrinth.Versions.v2.Version,
 	) {
+		const primaryFile = version?.files?.find((f) => f.primary) ?? version?.files?.[0]
 		const placeholder: ContentItem = {
 			file_name: `__installing_${project.id}`,
 			project: {
@@ -136,6 +138,13 @@ export function createContentInstall(opts: {
 				title: project.title,
 				icon_url: project.icon_url ?? null,
 			},
+			version: version
+				? {
+						id: version.id,
+						version_number: version.version_number,
+						file_name: primaryFile?.filename ?? '',
+					}
+				: undefined,
 			project_type: project.project_type ?? 'mod',
 			has_update: false,
 			update_version_id: null,
@@ -288,7 +297,7 @@ export function createContentInstall(opts: {
 
 		const installedProjectIds: string[] = []
 		if (currentProject) {
-			addInstallingItem(instance.id, currentProject)
+			addInstallingItem(instance.id, currentProject, version)
 			installedProjectIds.push(currentProject.id)
 		}
 
@@ -297,8 +306,8 @@ export function createContentInstall(opts: {
 			await installVersionDependencies(
 				profile,
 				version,
-				(depProject: Labrinth.Projects.v2.Project) => {
-					addInstallingItem(instance.id, depProject)
+				(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
+					addInstallingItem(instance.id, depProject, depVersion)
 					installedProjectIds.push(depProject.id)
 				},
 			)
@@ -450,14 +459,14 @@ export function createContentInstall(opts: {
 				}
 
 				const installedProjectIds: string[] = [project.id]
-				addInstallingItem(instancePath, project)
+				addInstallingItem(instancePath, project, version)
 				try {
 					await add_project_from_version(instance.path, version.id)
 					await installVersionDependencies(
 						instance,
 						version,
-						(depProject: Labrinth.Projects.v2.Project) => {
-							addInstallingItem(instancePath, depProject)
+						(depProject: Labrinth.Projects.v2.Project, depVersion?: Labrinth.Versions.v2.Version) => {
+							addInstallingItem(instancePath, depProject, depVersion)
 							installedProjectIds.push(depProject.id)
 						},
 					)
