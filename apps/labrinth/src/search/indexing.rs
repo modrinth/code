@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
+use eyre::Result;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use std::collections::HashMap;
 use tracing::info;
 
-use super::IndexingError;
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
@@ -29,7 +29,7 @@ pub async fn index_local(
     redis: &RedisPool,
     cursor: i64,
     limit: i64,
-) -> Result<(Vec<UploadSearchProject>, i64), IndexingError> {
+) -> eyre::Result<(Vec<UploadSearchProject>, i64)> {
     info!("Indexing local projects!");
 
     // todo: loaders, project type, game versions
@@ -84,7 +84,8 @@ pub async fn index_local(
             }
         })
         .try_collect::<Vec<PartialProject>>()
-        .await?;
+        .await
+        .wrap_err("failed to fetch projects")?;
 
     let project_ids = db_projects.iter().map(|x| x.id.0).collect::<Vec<i64>>();
     let project_components = db_projects
@@ -473,7 +474,7 @@ struct PartialVersion {
 async fn index_versions(
     pool: &PgPool,
     project_ids: Vec<i64>,
-) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>, IndexingError> {
+) -> Result<HashMap<DBProjectId, Vec<PartialVersion>>> {
     let versions: HashMap<DBProjectId, Vec<(DBVersionId, DateTime<Utc>)>> =
         sqlx::query!(
             "
@@ -497,7 +498,8 @@ async fn index_versions(
                 async move { Ok(acc) }
             },
         )
-        .await?;
+        .await
+        .wrap_err("failed to fetch versions")?;
 
     // Get project types, loaders
     #[derive(Default)]
@@ -538,7 +540,8 @@ async fn index_versions(
         (version_id, version_loader_data)
     })
     .try_collect()
-    .await?;
+    .await
+    .wrap_err("failed to fetch loaders and project types")?;
 
     // Get version fields
     let version_fields: DashMap<DBVersionId, Vec<QueryVersionField>> =
@@ -570,7 +573,10 @@ async fn index_versions(
                 async move { Ok(acc) }
             },
         )
-        .await?;
+        .await
+        .wrap_err("failed to fetch version fields")?;
+
+    // Get version fields
 
     // Convert to partial versions
     let mut res_versions: HashMap<DBProjectId, Vec<PartialVersion>> =

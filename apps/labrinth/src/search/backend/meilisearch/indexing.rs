@@ -1,42 +1,21 @@
-/// This module is used for the indexing from any source.
-pub mod local_import;
-
 use std::time::Duration;
 
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
-use crate::search::{SearchConfig, UploadSearchProject};
+use crate::search::UploadSearchProject;
+use crate::search::backend::meilisearch::MeilisearchConfig;
+use crate::search::indexing::index_local;
 use crate::util::error::Context;
 use ariadne::ids::base62_impl::to_base62;
-use eyre::eyre;
+use eyre::{Result, eyre};
 use futures::StreamExt;
 use futures::stream::FuturesOrdered;
-use local_import::index_local;
 use meilisearch_sdk::client::{Client, SwapIndexes};
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use meilisearch_sdk::task_info::TaskInfo;
-use thiserror::Error;
 use tracing::{Instrument, error, info, info_span, instrument};
-
-#[derive(Error, Debug)]
-pub enum IndexingError {
-    #[error(transparent)]
-    Internal(#[from] eyre::Report),
-    #[error("Error while connecting to the MeiliSearch database")]
-    Indexing(#[from] meilisearch_sdk::errors::Error),
-    #[error("Error while serializing or deserializing JSON: {0}")]
-    Serde(#[from] serde_json::Error),
-    #[error("Database Error: {0}")]
-    Sqlx(#[from] sqlx::error::Error),
-    #[error("Database Error: {0}")]
-    Database(#[from] crate::database::models::DatabaseError),
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
-    #[error("Error while awaiting index creation task")]
-    Task,
-}
 
 // // The chunk size for adding projects to the indexing database. If the request size
 // // is too large (>10MiB) then the request fails with an error.  This chunk size
@@ -51,8 +30,8 @@ fn search_operation_timeout() -> std::time::Duration {
 
 pub async fn remove_documents(
     ids: &[crate::models::ids::VersionId],
-    config: &SearchConfig,
-) -> eyre::Result<()> {
+    config: &MeilisearchConfig,
+) -> Result<()> {
     let mut indexes = get_indexes_for_indexing(config, false, false)
         .await
         .wrap_err("failed to get current indexes")?;
@@ -108,8 +87,8 @@ pub async fn remove_documents(
 pub async fn index_projects(
     ro_pool: PgPool,
     redis: RedisPool,
-    config: &SearchConfig,
-) -> eyre::Result<()> {
+    config: &MeilisearchConfig,
+) -> Result<()> {
     info!("Indexing projects.");
 
     info!("Ensuring current indexes exists");
@@ -197,9 +176,9 @@ pub async fn index_projects(
 }
 
 pub async fn swap_index(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     index_name: &str,
-) -> Result<(), IndexingError> {
+) -> Result<()> {
     let client = config.make_batch_client()?;
     let index_name_next = config.get_index_name(index_name, true);
     let index_name = config.get_index_name(index_name, false);
@@ -210,12 +189,13 @@ pub async fn swap_index(
 
     let swap_indices_ref = &swap_indices;
 
+    // is it "indexes" or "indices"? who knows! roll a die!
     client
         .with_all_clients("swap_indexes", |client| async move {
             let task = client
                 .swap_indexes([swap_indices_ref])
                 .await
-                .map_err(IndexingError::Indexing)?;
+                .wrap_err("failed to swap indices")?;
 
             monitor_task(
                 client,
@@ -233,10 +213,10 @@ pub async fn swap_index(
 
 #[instrument(skip(config))]
 pub async fn get_indexes_for_indexing(
-    config: &SearchConfig,
+    config: &MeilisearchConfig,
     next: bool, // Get the 'next' one
     update_settings: bool,
-) -> Result<Vec<Vec<Index>>, IndexingError> {
+) -> Result<Vec<Vec<Index>>> {
     let client = config.make_batch_client()?;
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name =
@@ -381,7 +361,7 @@ async fn add_to_index(
     client: &Client,
     index: &Index,
     mods: &[UploadSearchProject],
-) -> Result<(), IndexingError> {
+) -> Result<()> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
         info!(
             "Adding chunk of {} versions starting with version id {}",
@@ -419,7 +399,7 @@ async fn monitor_task(
     task: TaskInfo,
     timeout: Duration,
     poll: Option<Duration>,
-) -> Result<(), IndexingError> {
+) -> Result<()> {
     let now = std::time::Instant::now();
 
     let id = task.get_task_uid();
@@ -465,7 +445,7 @@ async fn update_and_add_to_index(
     index: &Index,
     projects: &[UploadSearchProject],
     _additional_fields: &[String],
-) -> Result<(), IndexingError> {
+) -> Result<()> {
     // TODO: Uncomment this- hardcoding loader_fields is a band-aid fix, and will be fixed soon
     // let mut new_filterable_attributes: Vec<String> = index.get_filterable_attributes().await?;
     // let mut new_displayed_attributes = index.get_displayed_attributes().await?;
@@ -509,8 +489,8 @@ pub async fn add_projects_batch_client(
     indices: &[Vec<Index>],
     projects: Vec<UploadSearchProject>,
     additional_fields: Vec<String>,
-    config: &SearchConfig,
-) -> Result<(), IndexingError> {
+    config: &MeilisearchConfig,
+) -> Result<()> {
     let client = config.make_batch_client()?;
 
     let index_references = indices
