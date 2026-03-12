@@ -173,7 +173,7 @@
 				data-pyro-navigation
 				class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
 			>
-				<NavTabs :links="navLinks" />
+				<NavTabs :links="navLinks" replace />
 			</div>
 
 			<div data-pyro-mount class="h-full w-full flex-1">

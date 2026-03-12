@@ -30,6 +30,7 @@ export interface ContentCardTableItem {
 	owner?: ContentOwner
 	enabled?: boolean
 	disabled?: boolean
+	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	overflowOptions?: OverflowMenuOption[]

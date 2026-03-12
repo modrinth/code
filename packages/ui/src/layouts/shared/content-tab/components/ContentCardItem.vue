@@ -3,6 +3,7 @@ import {
 	DownloadIcon,
 	MoreVerticalIcon,
 	OrganizationIcon,
+	SpinnerIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
@@ -33,6 +34,7 @@ interface Props {
 	versionLink?: string | RouteLocationRaw
 	owner?: ContentOwner
 	enabled?: boolean
+	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	overflowOptions?: OverflowMenuOption[]
@@ -48,6 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 	versionLink: undefined,
 	owner: undefined,
 	enabled: undefined,
+	installing: false,
 	hasUpdate: false,
 	isClientOnly: false,
 	overflowOptions: undefined,
@@ -95,13 +98,21 @@ const fileNameRef = ref<HTMLElement | null>(null)
 			/>
 
 			<div class="flex min-w-0 items-center gap-3">
-				<Avatar
-					:src="project.icon_url"
-					:alt="project.title"
-					size="3rem"
-					no-shadow
-					class="shrink-0 rounded-2xl border border-surface-5"
-				/>
+				<div v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined" class="relative shrink-0">
+					<Avatar
+						:src="project.icon_url"
+						:alt="project.title"
+						size="3rem"
+						no-shadow
+						class="rounded-2xl border border-surface-5"
+					/>
+					<div
+						v-if="installing"
+						class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
+					>
+						<SpinnerIcon class="size-5 animate-spin text-white" />
+					</div>
+				</div>
 				<div class="flex min-w-0 flex-col gap-0.5">
 					<div class="flex min-w-0 items-center gap-1">
 						<AutoLink

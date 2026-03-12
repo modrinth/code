@@ -76,6 +76,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
+import { useDebounceFn } from '@vueuse/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -174,12 +175,34 @@ const props = defineProps<{
 
 const loading = ref(true)
 const projects = ref<ContentItem[]>([])
+
+const installingBuffer = ref<ContentItem[]>([])
+
+watch(
+	() => installingItems.value.get(props.instance.path),
+	(items) => {
+		if (items && items.length > 0) {
+			installingBuffer.value = [...items]
+		}
+	},
+	{ immediate: true, deep: true },
+)
+
+watch(projects, (newProjects) => {
+	if (installingBuffer.value.length === 0) return
+	const realProjectIds = new Set(newProjects.map((p) => p.project?.id).filter(Boolean))
+	if (installingBuffer.value.every((item) => realProjectIds.has(item.project?.id))) {
+		installingBuffer.value = []
+	}
+})
+
 const mergedProjects = computed<ContentItem[]>(() => {
-	const pending = installingItems.value.get(props.instance.path) ?? []
+	const active = installingItems.value.get(props.instance.path)
+	const pending = active ?? installingBuffer.value
 	if (pending.length === 0) return projects.value
 	const realProjectIds = new Set(projects.value.map((p) => p.project?.id).filter(Boolean))
 	const placeholders = pending.filter((item) => !realProjectIds.has(item.project?.id))
-	return [...projects.value, ...placeholders]
+	return placeholders.length > 0 ? [...projects.value, ...placeholders] : projects.value
 })
 
 const linkedModpackProject = ref<ContentModpackCardProject | null>(null)
@@ -252,7 +275,7 @@ async function handleUploadFiles() {
 	}
 }
 
-async function toggleDisableMod(mod: ContentItem) {
+async function _toggleDisableMod(mod: ContentItem) {
 	try {
 		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
 		mod.enabled = !mod.enabled
@@ -269,6 +292,8 @@ async function toggleDisableMod(mod: ContentItem) {
 		handleError(err as Error)
 	}
 }
+
+const toggleDisableMod = useDebounceFn(_toggleDisableMod, 20)
 
 async function removeMod(mod: ContentItem) {
 	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
@@ -354,9 +379,7 @@ async function handleModpackContentToggle(item: ContentItem) {
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[]) {
-	for (const item of items) {
-		await toggleDisableMod(item)
-	}
+	await Promise.all(items.map((item) => toggleDisableMod(item)))
 }
 
 async function handleModpackContent() {
@@ -676,7 +699,10 @@ provideContentManager({
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
+	bulkEnableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+	bulkDisableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
 	deleteItem: removeMod,
+	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
@@ -699,27 +725,17 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.installing
-			? undefined
-			: item.project?.id
-				? `/project/${item.project.id}`
-				: undefined,
-		version: item.installing
-			? {
-					id: item.file_name,
-					version_number: formatMessage(messages.installing),
-					file_name: '',
-				}
-			: (item.version ?? {
-					id: item.file_name,
-					version_number: formatMessage(messages.unknownVersion),
-					file_name: item.file_name,
-				}),
-		versionLink: item.installing
-			? undefined
-			: item.project?.id && item.version?.id
-				? `/project/${item.project.id}/version/${item.version.id}`
-				: undefined,
+		projectLink: item.project?.id
+			? `/project/${item.project.id}`
+			: undefined,
+		version: item.version ?? {
+			id: item.file_name,
+			version_number: formatMessage(messages.unknownVersion),
+			file_name: item.file_name,
+		},
+		versionLink: item.project?.id && item.version?.id
+			? `/project/${item.project.id}/version/${item.version.id}`
+			: undefined,
 		owner: item.owner
 			? {
 					...item.owner,

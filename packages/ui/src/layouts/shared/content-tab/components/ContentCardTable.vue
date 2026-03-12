@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
-import { computed, getCurrentInstance, ref, toRef } from 'vue'
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, toRef } from 'vue'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { useVIntl } from '#ui/composables/i18n'
@@ -112,13 +112,42 @@ function toggleSelectAll() {
 	}
 }
 
-function toggleItemSelection(itemId: string, selected: boolean) {
-	if (selected) {
+const lastSelectedIndex = ref<number | null>(null)
+const shiftHeld = ref(false)
+
+function onKeyDown(e: KeyboardEvent) {
+	if (e.key === 'Shift') shiftHeld.value = true
+}
+function onKeyUp(e: KeyboardEvent) {
+	if (e.key === 'Shift') shiftHeld.value = false
+}
+
+onMounted(() => {
+	window.addEventListener('keydown', onKeyDown)
+	window.addEventListener('keyup', onKeyUp)
+})
+onUnmounted(() => {
+	window.removeEventListener('keydown', onKeyDown)
+	window.removeEventListener('keyup', onKeyUp)
+})
+
+function toggleItemSelection(itemId: string, selected: boolean, index?: number) {
+	if (selected && shiftHeld.value && lastSelectedIndex.value !== null && index !== undefined) {
+		const start = Math.min(lastSelectedIndex.value, index)
+		const end = Math.max(lastSelectedIndex.value, index)
+		const rangeIds = props.items.slice(start, end + 1).map((item) => item.id)
+		const merged = new Set([...selectedIds.value, ...rangeIds])
+		selectedIds.value = [...merged]
+	} else if (selected) {
 		if (!selectedIds.value.includes(itemId)) {
 			selectedIds.value = [...selectedIds.value, itemId]
 		}
 	} else {
 		selectedIds.value = selectedIds.value.filter((id) => id !== itemId)
+	}
+
+	if (index !== undefined) {
+		lastSelectedIndex.value = index
 	}
 }
 
@@ -241,6 +270,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:version-link="item.versionLink"
 					:owner="item.owner"
 					:enabled="item.enabled"
+					:installing="item.installing"
 					:has-update="item.hasUpdate"
 					:is-client-only="item.isClientOnly"
 					:overflow-options="item.overflowOptions"
@@ -254,7 +284,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 						'border-0 border-t border-solid border-surface-4',
 						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
-					@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
+					@update:selected="(val) => toggleItemSelection(item.id, val ?? false, visibleRange.start + idx)"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="emit('delete', item.id)"
 					@update="emit('update', item.id)"
@@ -285,6 +315,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:version-link="item.versionLink"
 				:owner="item.owner"
 				:enabled="item.enabled"
+				:installing="item.installing"
 				:has-update="item.hasUpdate"
 				:overflow-options="item.overflowOptions"
 				:disabled="item.disabled"
@@ -297,7 +328,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					'border-0 border-t border-solid border-surface-4',
 					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
-				@update:selected="(val) => toggleItemSelection(item.id, val ?? false)"
+				@update:selected="(val) => toggleItemSelection(item.id, val ?? false, index)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
 				@delete="emit('delete', item.id)"
 				@update="emit('update', item.id)"

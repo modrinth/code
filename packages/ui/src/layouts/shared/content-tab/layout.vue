@@ -230,6 +230,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		return {
 			...base,
 			disabled: isChanging(base.id) || ctx.isBusy.value || item.installing === true,
+			installing: item.installing === true,
 			hasUpdate: !ctx.isPackLocked.value && item.has_update,
 			isClientOnly: isClientOnlyEnvironment(item.environment),
 			overflowOptions: ctx.getOverflowOptions?.(item),
@@ -542,7 +543,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						</div>
 					</div>
 
-					<div class="flex flex-wrap items-center justify-between gap-2">
+					<div class="@container flex flex-wrap items-center justify-between gap-2">
 						<div class="flex flex-wrap items-center gap-1.5">
 							<FilterIcon class="size-5 text-secondary" />
 							<button
@@ -571,22 +572,36 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							>
 								{{ option.label }}
 							</button>
-							<div class="ml-4 mx-0.5 h-5 w-px bg-surface-5" />
-
-							<ButtonStyled type="transparent" hover-color-fill="none">
-								<button
-									:aria-label="
-										formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
-									"
-									@click="cycleSortMode"
-								>
-									<ArrowUpDownIcon />
-									{{ sortLabels[sortMode]() }}
-								</button>
-							</ButtonStyled>
+							<div class="hidden @[900px]:block">
+								<ButtonStyled type="transparent" hover-color-fill="none">
+									<button
+										:aria-label="
+											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpDownIcon />
+										{{ sortLabels[sortMode]() }}
+									</button>
+								</ButtonStyled>
+							</div>
 						</div>
 
 						<div class="flex items-center gap-2">
+							<div class="@[900px]:hidden">
+								<ButtonStyled type="transparent" hover-color-fill="none">
+									<button
+										:aria-label="
+											formatMessage(messages.sortByLabel, { mode: sortLabels[sortMode]() })
+										"
+										@click="cycleSortMode"
+									>
+										<ArrowUpDownIcon />
+										{{ sortLabels[sortMode]() }}
+									</button>
+								</ButtonStyled>
+							</div>
+
 							<ButtonStyled
 								v-if="hasBulkUpdateSupport && !ctx.isPackLocked.value && hasOutdatedProjects"
 								color="green"

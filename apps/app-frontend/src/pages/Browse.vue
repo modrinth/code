@@ -40,7 +40,7 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_project_v3, get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
+import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
@@ -185,6 +185,21 @@ const instanceFilters = computed(() => {
 				type: 'environment',
 				option: 'client',
 			})
+		}
+
+		if (
+			instanceHideInstalled.value &&
+			(installedProjectIds.value || newlyInstalled.value.length > 0)
+		) {
+			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
+
+			allInstalled
+				.map((x) => ({
+					type: 'project_id',
+					option: `project_id:${x}`,
+					negative: true,
+				}))
+				.forEach((x) => filters.push(x))
 		}
 	}
 
@@ -338,13 +353,13 @@ watch(projectType, () => {
 	loading.value = true
 })
 
-interface SearchResults extends Labrinth.Search.v2.SearchResults {
-	hits: (Labrinth.Search.v2.ResultSearchProject & { installed?: boolean })[]
+interface SearchResults extends Labrinth.Search.v3.SearchResults {
+	hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
 }
 
 const results: Ref<SearchResults | null> = shallowRef(null)
 const pageCount = computed(() =>
-	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
+	results.value ? Math.ceil(results.value.total_hits / results.value.hits_per_page) : 1,
 )
 
 const effectiveRequestParams = computed(() => {
@@ -364,10 +379,6 @@ watch(effectiveRequestParams, () => {
 	}, 200)
 })
 
-watch(instanceHideInstalled, () => {
-	debugLog('instanceHideInstalled changed', instanceHideInstalled.value)
-	refreshSearch()
-})
 
 async function refreshSearch() {
 	const version = ++searchVersion
@@ -375,23 +386,34 @@ async function refreshSearch() {
 
 	try {
 		const isServer = projectType.value === 'server'
+		const searchParams = isServer ? serverRequestParams.value : requestParams.value
+
+		debugLog('searching v3', searchParams)
+		let rawResults = (await get_search_results_v3(searchParams)) as {
+			result: SearchResults
+		} | null
+
+		if (version !== searchVersion) {
+			debugLog('search version stale, discarding', { version, current: searchVersion })
+			return
+		}
+
+		if (!rawResults) {
+			rawResults = {
+				result: {
+					hits: [],
+					total_hits: 0,
+					hits_per_page: maxResults.value,
+					page: 1,
+				},
+			}
+		}
 
 		if (isServer) {
-			debugLog('searching v3 (server)', serverRequestParams.value)
-			const rawResults = (await get_search_results_v3(serverRequestParams.value)) as {
-				result: Labrinth.Search.v3.SearchResults
-			} | null
-
-			if (version !== searchVersion) {
-				debugLog('search version stale, discarding', { version, current: searchVersion })
-				return
-			}
-
-			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
-			const hits = searchResults.hits ?? []
+			const hits = rawResults.result.hits ?? []
 			debugLog('server search results', {
 				hitCount: hits.length,
-				totalHits: searchResults.total_hits,
+				totalHits: rawResults.result.total_hits,
 			})
 			serverHits.value = hits
 			serverPings.value = {}
@@ -399,31 +421,11 @@ async function refreshSearch() {
 			checkServerRunningStates(hits)
 			results.value = {
 				hits: [],
-				total_hits: searchResults.total_hits ?? 0,
-				limit: maxResults.value,
-				offset: 0,
+				total_hits: rawResults.result.total_hits ?? 0,
+				hits_per_page: maxResults.value,
+				page: 1,
 			}
 		} else {
-			debugLog('searching v2', requestParams.value)
-			let rawResults = (await get_search_results(requestParams.value)) as {
-				result: SearchResults
-			} | null
-
-			if (version !== searchVersion) {
-				debugLog('search version stale, discarding', { version, current: searchVersion })
-				return
-			}
-
-			if (!rawResults) {
-				rawResults = {
-					result: {
-						hits: [],
-						total_hits: 0,
-						limit: 1,
-						offset: 0,
-					},
-				}
-			}
 			if (instance.value) {
 				const allInstalledIds = new Set([
 					...newlyInstalled.value,
@@ -434,12 +436,8 @@ async function refreshSearch() {
 					...val,
 					installed: allInstalledIds.has(val.project_id),
 				}))
-
-				if (instanceHideInstalled.value) {
-					rawResults.result.hits = rawResults.result.hits.filter((val) => !val.installed)
-				}
 			}
-			debugLog('v2 search results', {
+			debugLog('v3 search results', {
 				hitCount: rawResults.result.hits.length,
 				totalHits: rawResults.result.total_hits,
 			})
@@ -671,11 +669,11 @@ const handleRightClick = (event, result) => {
 const handleOptionsClick = (args) => {
 	switch (args.option) {
 		case 'open_link':
-			openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
+			openUrl(`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`)
 			break
 		case 'copy_link':
 			navigator.clipboard.writeText(
-				`https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+				`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`,
 			)
 			break
 	}
@@ -887,7 +885,7 @@ previousFilterState.value = JSON.stringify({
 						exclude-loaders
 						@contextmenu.prevent.stop="
 							(event: any) =>
-								handleRightClick(event, { project_type: 'server', slug: project.slug })
+								handleRightClick(event, { project_types: ['server'], slug: project.slug })
 						"
 					>
 						<template #actions>

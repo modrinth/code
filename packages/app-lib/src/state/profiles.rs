@@ -1223,20 +1223,41 @@ impl Profile {
     }
 
     /// Toggle a project's disabled state.
+    ///
+    /// Accepts either a bare file name (e.g. `mymod.jar`) or a relative
+    /// path (`mods/mymod.jar`). The function resolves the current on-disk
+    /// path (enabled or disabled) before renaming, so callers don't need
+    /// to track the `.disabled` suffix.
     #[tracing::instrument]
     pub async fn toggle_disable_project(
         profile_path: &str,
         project_path: &str,
     ) -> crate::Result<String> {
-        let path = crate::api::profile::get_full_path(profile_path).await?;
+        let base = crate::api::profile::get_full_path(profile_path).await?;
 
-        let new_path = if project_path.ends_with(".disabled") {
-            project_path.trim_end_matches(".disabled").to_string()
+        let trimmed = project_path.trim_end_matches(".disabled");
+
+        // Resolve the actual current path on disk
+        let current_path = if base.join(project_path).exists() {
+            project_path.to_string()
+        } else if base.join(format!("{trimmed}.disabled")).exists() {
+            format!("{trimmed}.disabled")
+        } else if base.join(trimmed).exists() {
+            trimmed.to_string()
         } else {
-            format!("{project_path}.disabled")
+            return Err(crate::ErrorKind::FSError(format!(
+                "Could not find project file for '{project_path}' in profile"
+            ))
+            .into());
         };
 
-        io::rename_or_move(&path.join(project_path), &path.join(&new_path))
+        let new_path = if current_path.ends_with(".disabled") {
+            current_path.trim_end_matches(".disabled").to_string()
+        } else {
+            format!("{current_path}.disabled")
+        };
+
+        io::rename_or_move(&base.join(&current_path), &base.join(&new_path))
             .await?;
 
         Ok(new_path)

@@ -61,6 +61,22 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-update',
 		defaultMessage: 'Failed to update',
 	},
+	failedToBulkDelete: {
+		id: 'hosting.content.failed-to-bulk-delete',
+		defaultMessage: 'Failed to delete content',
+	},
+	failedToBulkEnable: {
+		id: 'hosting.content.failed-to-bulk-enable',
+		defaultMessage: 'Failed to enable content',
+	},
+	failedToBulkDisable: {
+		id: 'hosting.content.failed-to-bulk-disable',
+		defaultMessage: 'Failed to disable content',
+	},
+	failedToBulkUpdate: {
+		id: 'hosting.content.failed-to-bulk-update',
+		defaultMessage: 'Failed to update content',
+	},
 })
 
 const props = withDefaults(
@@ -208,7 +224,8 @@ const deleteMutation = useMutation({
 		}
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToRemoveContent),
+			title: formatMessage(messages.failedToRemoveContent),
+			text: err instanceof Error ? err.message : undefined,
 		})
 	},
 })
@@ -241,7 +258,7 @@ const toggleMutation = useMutation({
 	onError: (_err, { addon }) => {
 		addNotification({
 			type: 'error',
-			text: formatMessage(messages.failedToToggle, { name: friendlyAddonName(addon) }),
+			title: formatMessage(messages.failedToToggle, { name: friendlyAddonName(addon) }),
 		})
 	},
 })
@@ -269,22 +286,46 @@ function itemsToAddonRequests(items: ContentItem[]): Archon.Content.v1.RemoveAdd
 async function handleBulkDelete(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.deleteAddons(serverId, worldId.value!, requests)
-	await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	try {
+		await client.archon.content_v1.deleteAddons(serverId, worldId.value!, requests)
+		await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToBulkDelete),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	}
 }
 
 async function handleBulkEnable(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
-	await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	try {
+		await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
+		await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToBulkEnable),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	}
 }
 
 async function handleBulkDisable(items: ContentItem[]) {
 	const requests = itemsToAddonRequests(items)
 	if (requests.length === 0) return
-	await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
-	await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	try {
+		await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
+		await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToBulkDisable),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	}
 }
 
 const uploadState = ref<UploadState>({
@@ -396,7 +437,8 @@ function handleUploadFiles() {
 			if (err instanceof Error && err.message === 'Upload cancelled') return
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : formatMessage(messages.failedToUpload),
+				title: formatMessage(messages.failedToUpload),
+				text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
 			activeUploadCancel = null
@@ -458,7 +500,8 @@ async function handleViewModpackContent() {
 		modpackContentModal.value?.hide()
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadModpackContent),
+			title: formatMessage(messages.failedToLoadModpackContent),
+			text: err instanceof Error ? err.message : undefined,
 		})
 	}
 }
@@ -500,14 +543,18 @@ async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
 			await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
 		}
 		await queryClient.invalidateQueries({ queryKey: queryKey.value })
-	} catch {
-		// Revert
+	} catch (err) {
 		for (const item of items) {
 			modpackAddons.value = modpackAddons.value.map((a) =>
 				a.filename === item.file_name ? { ...a, disabled: enable } : a,
 			)
 			modpackContentModal.value?.updateItem(item.file_name, { enabled: !enable })
 		}
+		addNotification({
+			type: 'error',
+			title: formatMessage(enable ? messages.failedToBulkEnable : messages.failedToBulkDisable),
+			text: err instanceof Error ? err.message : undefined,
+		})
 	}
 }
 
@@ -522,7 +569,8 @@ async function handleModpackUnlinkConfirm() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToUnlink),
+			title: formatMessage(messages.failedToUnlink),
+			text: err instanceof Error ? err.message : undefined,
 		})
 	}
 }
@@ -535,8 +583,16 @@ async function handleBulkUpdate(items: ContentItem[]) {
 			version_id: item.update_version_id ?? undefined,
 		}))
 	if (addons.length === 0) return
-	await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
-	await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	try {
+		await client.archon.content_v1.updateAddons(serverId, worldId.value!, addons)
+		await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToBulkUpdate),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	}
 }
 
 async function handleUpdateItem(fileNameKey: string) {
@@ -564,7 +620,8 @@ async function handleUpdateItem(fileNameKey: string) {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
+			title: formatMessage(messages.failedToLoadVersions),
+			text: err instanceof Error ? err.message : undefined,
 		})
 	} finally {
 		loadingVersions.value = false
@@ -593,7 +650,7 @@ async function handleModpackUpdate() {
 
 	await nextTick()
 
-	contentUpdaterModal.value?.show(mp.spec.version_id ?? undefined)
+	contentUpdaterModal.value?.show(mp.has_update ?? undefined)
 
 	if (!cached) {
 		try {
@@ -607,7 +664,8 @@ async function handleModpackUpdate() {
 		} catch (err) {
 			addNotification({
 				type: 'error',
-				text: err instanceof Error ? err.message : formatMessage(messages.failedToLoadVersions),
+				title: formatMessage(messages.failedToLoadVersions),
+			text: err instanceof Error ? err.message : undefined,
 			})
 		} finally {
 			loadingVersions.value = false
@@ -698,7 +756,8 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text: err instanceof Error ? err.message : formatMessage(messages.failedToUpdate),
+			title: formatMessage(messages.failedToUpdate),
+			text: err instanceof Error ? err.message : undefined,
 		})
 	} finally {
 		resetUpdateState()
