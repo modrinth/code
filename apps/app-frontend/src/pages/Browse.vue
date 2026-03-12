@@ -117,7 +117,11 @@ async function initInstanceContext() {
 	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
 	if (route.query.i) {
 		instance.value = await getInstance(route.query.i).catch(handleError)
-		debugLog('instance loaded', { name: instance.value?.name, loader: instance.value?.loader, gameVersion: instance.value?.game_version })
+		debugLog('instance loaded', {
+			name: instance.value?.name,
+			loader: instance.value?.loader,
+			gameVersion: instance.value?.game_version,
+		})
 
 		// Load installed project IDs in background — the page and initial search render immediately.
 		// When this resolves, instanceFilters recomputes and triggers a search refresh
@@ -150,7 +154,11 @@ async function initInstanceContext() {
 
 const instanceFilters = computed(() => {
 	const filters = []
-	debugLog('instanceFilters recomputing', { hasInstance: !!instance.value, isServer: isServerInstance.value, hideInstalled: instanceHideInstalled.value })
+	debugLog('instanceFilters recomputing', {
+		hasInstance: !!instance.value,
+		isServer: isServerInstance.value,
+		hideInstalled: instanceHideInstalled.value,
+	})
 
 	if (instance.value) {
 		const gameVersion = instance.value.game_version
@@ -381,7 +389,10 @@ async function refreshSearch() {
 
 			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
 			const hits = searchResults.hits ?? []
-			debugLog('server search results', { hitCount: hits.length, totalHits: searchResults.total_hits })
+			debugLog('server search results', {
+				hitCount: hits.length,
+				totalHits: searchResults.total_hits,
+			})
 			serverHits.value = hits
 			serverPings.value = {}
 			pingServerHits(hits)
@@ -428,7 +439,10 @@ async function refreshSearch() {
 					rawResults.result.hits = rawResults.result.hits.filter((val) => !val.installed)
 				}
 			}
-			debugLog('v2 search results', { hitCount: rawResults.result.hits.length, totalHits: rawResults.result.total_hits })
+			debugLog('v2 search results', {
+				hitCount: rawResults.result.hits.length,
+				totalHits: rawResults.result.total_hits,
+			})
 			results.value = rawResults.result
 		}
 
