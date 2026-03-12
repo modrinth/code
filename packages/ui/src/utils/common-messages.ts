@@ -414,6 +414,10 @@ export const commonMessages = defineMessages({
 		id: 'label.update-available',
 		defaultMessage: 'Update available',
 	},
+	installingLabel: {
+		id: 'label.installing',
+		defaultMessage: 'Installing...',
+	},
 	changelogLabel: {
 		id: 'label.changelog',
 		defaultMessage: 'Changelog',

@@ -586,10 +586,6 @@ impl Typesense {
     /// `filters`/`version` fields, translating each from Meilisearch filter
     /// syntax to Typesense filter syntax.
     fn build_filter(info: &SearchRequest) -> Result<Option<String>, ApiError> {
-        if let Some(new_filters) = info.new_filters.as_deref() {
-            return Ok(Some(meili_to_typesense(new_filters)));
-        }
-
         let facet_part = if let Some(facets_json) = info.facets.as_deref() {
             Some(
                 facets_to_typesense(facets_json)
@@ -599,10 +595,18 @@ impl Typesense {
             None
         };
 
-        let legacy_part =
-            combined_search_filters(info).map(|f| meili_to_typesense(&f));
+        let new_filters_part =
+            info.new_filters.as_deref().map(|f| meili_to_typesense(f));
 
-        Ok(match (facet_part, legacy_part) {
+        let legacy_part = if info.new_filters.is_none() {
+            combined_search_filters(info).map(|f| meili_to_typesense(&f))
+        } else {
+            None
+        };
+
+        let filter_part = new_filters_part.or(legacy_part);
+
+        Ok(match (facet_part, filter_part) {
             (Some(f), Some(l)) if !f.is_empty() && !l.is_empty() => {
                 Some(format!("({f}) && ({l})"))
             }

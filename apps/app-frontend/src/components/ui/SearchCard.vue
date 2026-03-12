@@ -1,6 +1,6 @@
 <template>
 	<ProjectCard
-		:title="project.title"
+		:title="project.name"
 		:link="
 			() => {
 				emit('open')
@@ -12,7 +12,7 @@
 		"
 		:author="{ name: project.author, link: `https://modrinth.com/user/${project.author}` }"
 		:icon-url="project.icon_url"
-		:summary="project.description"
+		:summary="project.summary"
 		:tags="project.display_categories"
 		:all-tags="project.categories"
 		:downloads="project.downloads"
@@ -20,16 +20,6 @@
 		:date-updated="project.date_modified"
 		:banner="project.featured_gallery ?? undefined"
 		:color="project.color ?? undefined"
-		:environment="
-			projectType
-				? ['mod', 'modpack'].includes(projectType)
-					? {
-							clientSide: project.client_side,
-							serverSide: project.server_side,
-						}
-					: undefined
-				: undefined
-		"
 		layout="list"
 	>
 		<template #actions>
@@ -140,5 +130,5 @@ async function install() {
 	).catch(handleError)
 }
 
-const modpack = computed(() => props.project.project_type === 'modpack')
+const modpack = computed(() => props.project.project_types?.includes('modpack'))
 </script>

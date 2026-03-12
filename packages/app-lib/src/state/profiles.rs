@@ -1252,9 +1252,7 @@ impl Profile {
         };
 
         let new_path = if current_path.ends_with(".disabled") {
-            current_path
-                .trim_end_matches(".disabled")
-                .to_string()
+            current_path.trim_end_matches(".disabled").to_string()
         } else {
             format!("{current_path}.disabled")
         };

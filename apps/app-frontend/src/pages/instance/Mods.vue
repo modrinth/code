@@ -680,6 +680,7 @@ provideContentManager({
 	bulkEnableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
 	bulkDisableItems: (items) => Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
 	deleteItem: removeMod,
+	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
@@ -708,11 +709,7 @@ provideContentManager({
 				? `/project/${item.project.id}`
 				: undefined,
 		version: item.installing
-			? {
-					id: item.file_name,
-					version_number: formatMessage(messages.installing),
-					file_name: '',
-				}
+			? undefined
 			: (item.version ?? {
 					id: item.file_name,
 					version_number: formatMessage(messages.unknownVersion),
