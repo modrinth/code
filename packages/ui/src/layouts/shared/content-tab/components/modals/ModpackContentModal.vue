@@ -44,6 +44,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
 	'update:enabled': [item: ContentItem, value: boolean]
+	'bulk:enable': [items: ContentItem[]]
+	'bulk:disable': [items: ContentItem[]]
 }>()
 
 const messages = defineMessages({
@@ -244,16 +246,12 @@ function handleEnabledChange(fileName: string, value: boolean) {
 }
 
 function bulkEnable() {
-	for (const item of selectedItems.value) {
-		emit('update:enabled', item, true)
-	}
+	emit('bulk:enable', [...selectedItems.value])
 	selectedIds.value = []
 }
 
 function bulkDisable() {
-	for (const item of selectedItems.value) {
-		emit('update:enabled', item, false)
-	}
+	emit('bulk:disable', [...selectedItems.value])
 	selectedIds.value = []
 }
 

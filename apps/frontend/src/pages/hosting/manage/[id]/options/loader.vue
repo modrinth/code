@@ -75,7 +75,7 @@ const messages = defineMessages({
 	},
 	loaderVersionLabel: {
 		id: 'hosting.loader.loader-version',
-		defaultMessage: '{loader} version',
+		defaultMessage: '{loader, select, null {Loader} other {{loader}}} version',
 	},
 	failedToLoadVersions: {
 		id: 'hosting.loader.failed-to-load-versions',
@@ -254,7 +254,7 @@ provideInstallationSettings({
 		]
 		if (loader !== 'Vanilla') {
 			rows.push({
-				label: formatMessage(messages.loaderVersionLabel, { loader }),
+				label: formatMessage(messages.loaderVersionLabel, { loader: loader ?? 'null' }),
 				value: loaderVersion,
 			})
 		}

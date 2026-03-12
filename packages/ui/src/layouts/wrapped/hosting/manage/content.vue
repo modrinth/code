@@ -481,6 +481,36 @@ async function handleModpackContentToggle(item: ContentItem) {
 	}
 }
 
+async function handleModpackBulkToggle(items: ContentItem[], enable: boolean) {
+	const requests = itemsToAddonRequests(items)
+	if (requests.length === 0) return
+
+	// Optimistic update
+	for (const item of items) {
+		modpackAddons.value = modpackAddons.value.map((a) =>
+			a.filename === item.file_name ? { ...a, disabled: !enable } : a,
+		)
+		modpackContentModal.value?.updateItem(item.file_name, { enabled: enable })
+	}
+
+	try {
+		if (enable) {
+			await client.archon.content_v1.enableAddons(serverId, worldId.value!, requests)
+		} else {
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, requests)
+		}
+		await queryClient.invalidateQueries({ queryKey: queryKey.value })
+	} catch {
+		// Revert
+		for (const item of items) {
+			modpackAddons.value = modpackAddons.value.map((a) =>
+				a.filename === item.file_name ? { ...a, disabled: enable } : a,
+			)
+			modpackContentModal.value?.updateItem(item.file_name, { enabled: !enable })
+		}
+	}
+}
+
 function handleModpackUnlink() {
 	modpackUnlinkModal.value?.show()
 }
@@ -756,6 +786,8 @@ provideContentManager({
 				:modpack-icon-url="modpack?.project.icon_url"
 				enable-toggle
 				@update:enabled="handleModpackContentToggle"
+				@bulk:enable="handleModpackBulkToggle($event, true)"
+				@bulk:disable="handleModpackBulkToggle($event, false)"
 			/>
 			<ContentUpdaterModal
 				v-if="updatingProject || updatingModpack"
