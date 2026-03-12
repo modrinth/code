@@ -48,8 +48,8 @@
 					class="grid items-center min-h-10 h-10 gap-2"
 					:class="
 						diff.projectName
-							? 'grid-cols-[auto_1fr_1fr_1fr]'
-							: 'grid-cols-[auto_1fr_1fr]'
+							? 'grid-cols-[auto_auto_1fr]'
+							: 'grid-cols-[auto_auto_1fr]'
 					"
 				>
 					<div class="flex flex-col justify-between items-center">
@@ -67,32 +67,20 @@
 						></div>
 					</div>
 
-					<div class="flex gap-1 col-span-2">
-						<span class="text-sm shrink-0 whitespace-nowrap">{{
-							diff.type === 'removed' && props.removedLabel
-								? props.removedLabel
-								: formatMessage(diffTypeMessages[diff.type])
-						}}</span>
-						<span
-							v-if="diff.projectName"
-							v-tooltip="diff.projectName"
-							class="text-sm text-contrast font-medium truncate"
-						>
-							{{ diff.projectName }}
-						</span>
-						<span
-							v-else-if="diff.fileName"
-							v-tooltip="diff.fileName"
-							class="text-sm text-contrast font-medium truncate"
-						>
-							{{ decodeURIComponent(diff.fileName) }}
-						</span>
-					</div>
-
+					<span class="text-sm shrink-0 whitespace-nowrap">{{
+						diff.type === 'removed' && props.removedLabel
+							? props.removedLabel
+							: formatMessage(diffTypeMessages[diff.type])
+					}}</span>
 					<span
-						v-if="diff.projectName && diff.fileName"
-						v-tooltip="decodeURIComponent(diff.fileName)"
-						class="text-xs truncate text-right"
+						v-if="diff.projectName"
+						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+					>
+						{{ diff.projectName }}
+					</span>
+					<span
+						v-else-if="diff.fileName"
+						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
 					>
 						{{ decodeURIComponent(diff.fileName) }}
 					</span>

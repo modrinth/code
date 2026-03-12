@@ -232,7 +232,7 @@ const messages = defineMessages({
 	},
 	removedIncompatible: {
 		id: 'installation-settings.removed-incompatible',
-		defaultMessage: 'Removed - incompatible',
+		defaultMessage: 'Removed (Incompatible)',
 	},
 })
 </script>

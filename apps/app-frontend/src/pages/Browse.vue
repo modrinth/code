@@ -104,10 +104,6 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
-// Non-reactive snapshot used by instanceFilters to avoid triggering a search
-// refresh when an item is installed mid-browse (which causes content shift).
-// Synced before each search triggered by filter/page/query changes.
-let newlyInstalledSnapshot: string[] = []
 
 const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
@@ -172,8 +168,8 @@ const instanceFilters = computed(() => {
 			})
 		}
 
-		if (instanceHideInstalled.value && installedProjectIds.value) {
-			const allInstalled = [...installedProjectIds.value, ...newlyInstalledSnapshot]
+		if (instanceHideInstalled.value && (installedProjectIds.value || newlyInstalled.value.length > 0)) {
+			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
 
 			allInstalled
 				.map((x) => ({
@@ -350,7 +346,6 @@ watch(effectiveRequestParams, () => {
 
 async function refreshSearch() {
 	const version = ++searchVersion
-	newlyInstalledSnapshot = [...newlyInstalled.value]
 
 	try {
 		const isServer = projectType.value === 'server'
