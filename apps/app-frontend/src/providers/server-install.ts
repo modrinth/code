@@ -106,7 +106,7 @@ export function createServerInstall(opts: {
 			gameVersion,
 			'vanilla',
 			null,
-			project.icon_url,
+			project.icon_url ?? null,
 			false,
 			{
 				project_id: project.id,
@@ -293,7 +293,7 @@ export function createServerInstall(opts: {
 				const path = await createVanillaInstance(project, recommendedGameVersion, serverAddress)
 				if (path) {
 					instance = await get(path)
-					showModpackInstallSuccess(instance, serverAddress)
+					if (instance) showModpackInstallSuccess(instance, serverAddress)
 				}
 			} finally {
 				stopInstallingServer(projectId)
