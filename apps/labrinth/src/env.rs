@@ -141,7 +141,7 @@ vars! {
     ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>;
 
     // search
-    SEARCH_BACKEND: crate::search::SearchBackendKind;
+    SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
     MEILISEARCH_READ_ADDR: String;
     MEILISEARCH_WRITE_ADDRS: StringCsv;
     MEILISEARCH_KEY: String;

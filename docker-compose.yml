@@ -264,6 +264,8 @@ services:
     ports:
       - '127.0.0.1:13000:3000'
     extra_hosts:
+      # Gotenberg must send a message on a webhook to our backend,
+      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
   labrinth:
     profiles:
@@ -315,8 +317,12 @@ services:
       timeout: 5s
       retries: 3
     volumes:
+      # Labrinth deposits version files here;
+      # Delphi reads them from here
       - /tmp/modrinth:/tmp/modrinth:ro,z
     extra_hosts:
+      # Delphi must send a message on a webhook to our backend,
+      # so it must have access to our local network
       - 'host.docker.internal:host-gateway'
   # Sharded Meilisearch
   meilisearch1:

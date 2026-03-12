@@ -51,7 +51,6 @@ impl BackgroundTask {
         mural_client: muralpay::Client,
     ) -> eyre::Result<()> {
         use BackgroundTask::*;
-        // TODO: all of these tasks should return `eyre::Result`s
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
