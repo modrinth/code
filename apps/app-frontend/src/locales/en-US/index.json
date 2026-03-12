@@ -59,6 +59,15 @@
   "app.modal.update-to-play.updated-count": {
     "message": "{count} updated"
   },
+  "app.settings.default-options.description": {
+    "message": "This file is copied to every new instance. Edit it to set default keybinds and other options."
+  },
+  "app.settings.default-options.open-file-location": {
+    "message": "Open file location"
+  },
+  "app.settings.default-options.title": {
+    "message": "Default options.txt"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
