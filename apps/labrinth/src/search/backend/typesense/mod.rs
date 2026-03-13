@@ -105,18 +105,18 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "slug", "summary"]
+    ["name", "slug", "summary", "author"]
         .into_iter()
         .map(str::to_string)
         .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 5, 2]
+    vec![15, 5, 2, 1]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, false]
+    vec![true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
