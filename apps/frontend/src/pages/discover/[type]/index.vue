@@ -47,8 +47,6 @@ import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
-import { useModrinthServers } from '~/composables/servers/modrinth-servers.ts'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
