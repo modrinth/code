@@ -6,13 +6,19 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
-import { create } from '@/helpers/profile.js'
+import { create, list } from '@/helpers/profile.js'
 
 export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
 	const { handleError } = notificationManager
 	const router = useRouter()
 
 	const installationModal = useTemplateRef('installationModal')
+
+	async function fetchExistingInstanceNames(): Promise<string[]> {
+		const instances = await list().catch(handleError)
+		return instances?.map((i) => i.name) ?? []
+	}
+
 	provide('showCreationModal', () => {
 		installationModal.value?.show()
 	})
@@ -56,9 +62,10 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 				? null
 				: (config.selectedLoaderVersion.value ?? config.loaderVersionType.value)
 			const iconPath = config.instanceIconPath.value ?? null
+			const name = config.instanceName.value.trim() || config.autoInstanceName.value
 
 			await create(
-				config.instanceName.value,
+				name,
 				config.selectedGameVersion.value,
 				loader,
 				loaderVersion,
@@ -67,7 +74,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 			).catch(handleError)
 
 			trackEvent('InstanceCreate', {
-				profile_name: config.instanceName.value,
+				profile_name: name,
 				game_version: config.selectedGameVersion.value,
 				loader,
 				loader_version: loaderVersion,
@@ -101,6 +108,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 	return {
 		installationModal,
+		fetchExistingInstanceNames,
 		handleCreate,
 		handleBrowseModpacks,
 		searchModpacks,
