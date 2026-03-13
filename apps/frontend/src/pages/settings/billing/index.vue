@@ -299,12 +299,18 @@
 										<div class="flex text-2xl font-bold text-contrast">
 											<span class="text-contrast">
 												{{
-													formatPrice(
-														getProductPrice(getPyroProduct(subscription), subscription.interval)
-															.prices.intervals[subscription.interval],
-														getProductPrice(getPyroProduct(subscription), subscription.interval)
-															.currency_code,
-													)
+													getProductPrice(getPyroProduct(subscription), subscription.interval)
+														? formatPrice(
+																getProductPrice(
+																	getPyroProduct(subscription),
+																	subscription.interval,
+																).prices.intervals[subscription.interval],
+																getProductPrice(
+																	getPyroProduct(subscription),
+																	subscription.interval,
+																).currency_code,
+															)
+														: ''
 												}}
 											</span>
 											<span>/{{ subscription.interval.replace('ly', '') }}</span>
@@ -450,6 +456,7 @@
 			@proceed="removePaymentMethod(removePaymentMethodIndex)"
 		/>
 		<PurchaseModal
+			v-if="customer && paymentMethods"
 			ref="midasPurchaseModal"
 			:product="midasProduct"
 			:country="country"
