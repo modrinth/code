@@ -664,10 +664,6 @@ watch(
 	{ immediate: true },
 )
 
-const title = computed(() =>
-	collection.value ? formatMessage(messages.collectionTitle, { name: collection.value.name }) : '',
-)
-
 watch(
 	[collection, creator],
 	([col, cre]) => {

@@ -146,7 +146,6 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-
 import { useQuery } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'

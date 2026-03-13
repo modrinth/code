@@ -351,7 +351,6 @@ const {
 	data: organization,
 	refetch: refreshOrganization,
 	isError,
-	error,
 	isPending: organizationIsPending,
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId]),
