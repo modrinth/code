@@ -5,6 +5,9 @@
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.ts",
+	"imports": {
+		"#ui/*": "./src/*"
+	},
 	"exports": {
 		".": {
 			"types": "./index.ts",

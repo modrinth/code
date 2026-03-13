@@ -1301,6 +1301,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Failed to change modpack version"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Failed to load versions"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Failed to reinstall modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Failed to repair server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Failed to save installation settings"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Failed to unlink modpack"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Loader} other {{loader}}} version"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Your server installation has been repaired."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Repair completed"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Reset server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Out of stock"
   },
@@ -2780,8 +2813,17 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "Backup creation in progress"
+  },
+  "servers.busy.backup-restoring": {
     "message": "Backup restore in progress"
+  },
+  "servers.busy.installing": {
+    "message": "Server is installing"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Content sync in progress"
   },
   "servers.notice.actions": {
     "message": "Actions"

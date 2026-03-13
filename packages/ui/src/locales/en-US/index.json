@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Cancel"
   },
+  "button.change-version": {
+    "defaultMessage": "Change version"
+  },
   "button.clear": {
     "defaultMessage": "Clear"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Follow"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Hide snapshots"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "Refresh"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Re-install modpack"
+  },
   "button.remove": {
     "defaultMessage": "Remove"
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
   },
+  "button.repair": {
+    "defaultMessage": "Repair"
+  },
+  "button.repairing": {
+    "defaultMessage": "Repairing..."
+  },
   "button.report": {
     "defaultMessage": "Report"
   },
   "button.reset": {
     "defaultMessage": "Reset"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Reset server"
   },
   "button.retry": {
     "defaultMessage": "Retry"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Saving"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Show all versions"
+  },
   "button.sign-in": {
     "defaultMessage": "Sign in"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Switch version"
+  },
   "button.unfollow": {
     "defaultMessage": "Unfollow"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Unlink modpack"
   },
   "button.update": {
     "defaultMessage": "Update"
@@ -169,6 +196,213 @@
   },
   "collections.label.private": {
     "defaultMessage": "Private"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Are you sure you want to update {count, plural, one {# project} other {# projects}} to their latest compatible version? It's recommended to update content one-by-one."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Update warning"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Update projects"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Deleting a mod can permanently affect your world and may cause missing content or unexpected issues when it loads again."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Deletion warning"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Delete {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Any mods or content you added on top of the modpack will be deleted."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} warning"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} modpack"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} modpack"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mods and content will be merged with what you added on top of the modpack, and it will stop receiving updates."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Unlinking modpack"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Unlink modpack"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Unlink"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} added"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Added (dependency)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Removed"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Updated"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} removed"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
+  },
+  "content.diff-modal.unknown-content-header": {
+    "defaultMessage": "Unknown content"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} updated"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Creating backup..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Backup created successfully"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Backup creation failed. You can still proceed."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "A backup is in progress, it's recommended to wait for it to finish before performing this action."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Creating a backup may take several minutes depending on the size of your server."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Create backup"
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Your modpack's content can now be found here!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Modpack content moved"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Don't show again"
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Additional content"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Browse content"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Please wait for the operation to complete before editing content."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Browse or upload {contentType} to get started"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Add additional content on top of this modpack"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "No content installed"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "No extra content installed"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Failed to load content"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Loading content..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "No content found."
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Search {count} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "File names"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Share"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Markdown links"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Project links"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Project names"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alphabetical"
+  },
+  "content.page-layout.sort.date-added": {
+    "defaultMessage": "Date added"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Sort by {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Update all"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Upload files"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Deleting {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Deleting {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Disabling {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Disabling {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Enabling {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Enabling {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Updating {progress}/{total} {contentType}..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Updating {contentType}..."
+  },
+  "content.selection-bar.disable": {
+    "defaultMessage": "Disable"
+  },
+  "content.selection-bar.enable": {
+    "defaultMessage": "Enable"
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} selected"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} selected"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -272,6 +506,39 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Failed to delete content"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Failed to disable content"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Failed to enable content"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "Failed to update content"
+  },
+  "hosting.content.failed-to-load-modpack-content": {
+    "defaultMessage": "Failed to load modpack content"
+  },
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Failed to load versions"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Failed to remove content"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Failed to toggle {name}"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Failed to unlink modpack"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Failed to update"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Failed to upload file"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },
@@ -299,8 +566,14 @@
   "icon-select.select": {
     "defaultMessage": "Select icon"
   },
+  "input.search-version.placeholder": {
+    "defaultMessage": "Search version..."
+  },
   "input.search.placeholder": {
     "defaultMessage": "Search..."
+  },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Select version"
   },
   "input.view.gallery": {
     "defaultMessage": "Gallery view"
@@ -310,6 +583,102 @@
   },
   "input.view.list": {
     "defaultMessage": "Rows view"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Select game version"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Select {loader} version"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Select platform"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Confirm"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Changing to {gameVersion} will modify the following content on your server."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Review content changes"
+  },
+  "installation-settings.edit-installation.title": {
+    "defaultMessage": "Edit installation"
+  },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "We don't recommend editing your installation settings after installing content. If you want to edit them, be cautious as it may cause issues."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "We don't recommend editing your installation settings after installing content. If you want to edit them reset your server."
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Linked {projectType, select, server {server project} other {modpack}}"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "{loader} version"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "You will need to reset your server to switch loader."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Re-installing the modpack resets the {type, select, server {server's} other {instance's}} content to its original state, removing any mods or content you have added."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Re-install modpack"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Reinstalling modpack"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Removed (incompatible)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Repair instance"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your server is not starting correctly."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Repair server"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Saving..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Search game version..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Unlink"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Unlinking permanently disconnects this {type, select, server {server} other {instance}} from the {projectType, select, server {server} other {modpack}} project, allowing you to change the loader and Minecraft version, but you won't receive future updates."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Verifying..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Reinstallation warning"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Reinstall modpack"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Reinstall modpack"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Repairing reinstalls the loader and Minecraft dependencies without deleting your content. This may resolve issues if your {type, select, server {server is not starting correctly} other {game is not launching due to launcher-related errors}}."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Repair {type, select, server {server} other {instance}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Repair"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Adventure mode"
@@ -326,23 +695,86 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Unknown game mode"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Unlink modpack"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost."
+  },
+  "instances.confirm-leave-modal.leave": {
+    "defaultMessage": "Leave page"
+  },
+  "instances.confirm-leave-modal.stay": {
+    "defaultMessage": "Stay on page"
+  },
+  "instances.confirm-leave-modal.title": {
+    "defaultMessage": "Leave page?"
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Upload in progress"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} compatible {count, plural, one {instance} other {instances}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Existing instance"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "Game version"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Select game version"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Install project"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "Hide snapshots"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Install"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installed"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "Installing..."
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Instance type"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Loader"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Name"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Enter instance name"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "New instance"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "No compatible instances found"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Remove icon"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Search instance"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Select icon"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "Show all versions"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copy link"
-  },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Disable"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Enable"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "All"
@@ -359,9 +791,6 @@
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
   },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count, number} selected"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
   },
@@ -369,13 +798,22 @@
     "defaultMessage": "Incompatible"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Downgrade to v{version}"
+    "defaultMessage": "Downgrade to {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update version"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Switch modpack version"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Loading changelog..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Loading versions..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "No changelog provided for this version."
@@ -393,13 +831,13 @@
     "defaultMessage": "Show incompatible"
   },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Update to v{version}"
+    "defaultMessage": "Update to {version}"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "We can't guarantee updates are safe for your instance. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Updating can break your instance. Review version changelogs and back up first."
   },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "We can't guarantee updates are safe for your worlds. Review the changelog for all intermediate versions and consider a backup."
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Updating can break your world. Review version changelogs and back up first."
   },
   "label.actions": {
     "defaultMessage": "Actions"
@@ -412,6 +850,9 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict."
   },
   "label.collections": {
     "defaultMessage": "Collections"
@@ -452,11 +893,26 @@
   "label.followed-projects": {
     "defaultMessage": "Followed projects"
   },
+  "label.game-version": {
+    "defaultMessage": "Game version"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Installation info"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Installed modpack"
+  },
+  "label.installing": {
+    "defaultMessage": "Installing..."
+  },
   "label.loading": {
     "defaultMessage": "Loading..."
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.modpack": {
+    "defaultMessage": "Modpack"
   },
   "label.no": {
     "defaultMessage": "No"
@@ -472,6 +928,9 @@
   },
   "label.password": {
     "defaultMessage": "Password"
+  },
+  "label.platform": {
+    "defaultMessage": "Platform"
   },
   "label.played": {
     "defaultMessage": "Played {ago}"
@@ -497,6 +956,12 @@
   "label.search": {
     "defaultMessage": "Search"
   },
+  "label.select-all": {
+    "defaultMessage": "Select all"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Selection actions"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -517,6 +982,9 @@
   },
   "label.title": {
     "defaultMessage": "Title"
+  },
+  "label.unknown": {
+    "defaultMessage": "Unknown"
   },
   "label.unlisted": {
     "defaultMessage": "Unlisted"
@@ -1756,6 +2224,24 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Western Europe"
+  },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "You are being rate limited. Please try again later."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Cannot reinstall server"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "An unexpected error occurred while reinstalling. Please try again later."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Reinstall Failed"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Please don't close this page while uploading."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Uploading modpack"
   },
   "settings.account.title": {
     "defaultMessage": "Account and security"

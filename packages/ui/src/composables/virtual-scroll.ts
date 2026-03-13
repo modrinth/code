@@ -78,10 +78,10 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	)
 
 	function checkNearEnd() {
-		if (!onNearEnd || !listContainer.value) return
+		if (!onNearEnd || !listContainer.value || !viewportHeight.value) return
 
 		const containerBottom = listContainer.value.getBoundingClientRect().bottom
-		const remainingScroll = containerBottom - window.innerHeight
+		const remainingScroll = containerBottom - viewportHeight.value
 
 		if (remainingScroll < viewportHeight.value * nearEndThreshold) {
 			onNearEnd()
@@ -102,6 +102,8 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	}
 
 	watchEffect((onCleanup) => {
+		if (typeof window === 'undefined') return
+
 		const listEl = listContainer.value
 		if (!listEl) return
 
