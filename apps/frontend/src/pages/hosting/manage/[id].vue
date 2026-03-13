@@ -311,6 +311,7 @@
 						</template>
 					</InstallingBanner>
 				</Transition>
+				<BackupProgressAdmonitions class="mb-4" />
 				<NuxtPage
 					:route="route"
 					:is-connected="isConnected"
@@ -357,6 +358,7 @@ import {
 } from '@modrinth/assets'
 import type { BusyReason } from '@modrinth/ui'
 import {
+	BackupProgressAdmonitions,
 	ButtonStyled,
 	defineMessage,
 	ErrorInformationCard,
