@@ -105,7 +105,7 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "slug", "summary", "author"]
+    ["indexed_title", "slug", "summary", "indexed_author"]
         .into_iter()
         .map(str::to_string)
         .collect()
@@ -491,6 +491,8 @@ impl Typesense {
         let mut fields = vec![
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
+            json!({"name": "indexed_title", "type": "string", "facet": false}),
+            json!({"name": "indexed_author", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
@@ -505,6 +507,7 @@ impl Typesense {
         json!({
             "name": name,
             "enable_nested_fields": true,
+            "token_separators": ["-"],
             "fields": fields,
             "default_sorting_field": "log_downloads"
         })
