@@ -183,17 +183,9 @@
 										:values="{
 											count: formatCompactNumber(projects?.length || 0),
 											type: formatMessage(
-												commonProjectTypeSentenceMessages[
-													projectTypes.length === 1 ? projectTypes[0] : 'project'
-												],
-												{ count: projects?.length || 0 },
-											),
-											type: formatMessage(
-												commonProjectTypeSentenceMessages[
-													projectTypes.length === 1 && projects?.length > 1
-														? projectTypes[0]
-														: 'project'
-												],
+												getProjectTypeSentenceMessage(
+													projectTypes.length === 1 ? projectTypes[0] : 'project',
+												),
 												{ count: formatCompactNumberPlural(projects?.length || 0) },
 											),
 										}"
@@ -293,7 +285,7 @@
 					},
 					...projectTypes.map((x) => {
 						return {
-							label: formatMessage(commonProjectTypeCategoryMessages[x]),
+							label: formatMessage(getProjectTypeCategoryMessage(x)),
 							href: `/collection/${collection.id}/${x}s`,
 						}
 					}),
@@ -402,6 +394,8 @@ import {
 	EmptyState,
 	FileInput,
 	HorizontalRule,
+	injectModrinthClient,
+	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
 	normalizeChildren,
@@ -416,8 +410,10 @@ import {
 	useFormatDateTime,
 	useRelativeTime,
 	useSavable,
+	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -700,6 +696,14 @@ const projectTypes = computed(() => {
 	projectSet.delete('project')
 	return Array.from(projectSet)
 })
+
+function getProjectTypeSentenceMessage(type) {
+	return commonProjectTypeSentenceMessages[type] ?? commonProjectTypeSentenceMessages.project
+}
+
+function getProjectTypeCategoryMessage(type) {
+	return commonProjectTypeCategoryMessages[type] ?? commonProjectTypeCategoryMessages.project
+}
 
 const showUpdatedDate = computed(() => {
 	if (!collection.value?.updated || !collection.value?.created) {

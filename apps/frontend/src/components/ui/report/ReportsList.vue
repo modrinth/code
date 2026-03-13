@@ -21,7 +21,7 @@
 		:auth="auth"
 		class="universal-card recessed"
 	/>
-	<p v-if="reports.length === 0">You don't have any active reports.</p>
+	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
 import { Chips } from '@modrinth/ui'
@@ -123,23 +123,26 @@ const { data: projects } = useQuery({
 	placeholderData: [],
 })
 
+const userMap = computed(() => new Map(users.value.map((u) => [u.id, u])))
+const versionMap = computed(() => new Map(versions.value.map((v) => [v.id, v])))
+const projectMap = computed(() => new Map(projects.value.map((p) => [p.id, p])))
+const threadMap = computed(() => new Map(threads.value.map((t) => [t.id, t])))
+
 const reports = computed(() =>
 	rawReports.value.map((report) => {
 		const enrichedReport = { ...report }
-		enrichedReport.reporterUser = users.value.find((user) => user.id === report.reporter)
+		enrichedReport.reporterUser = userMap.value.get(report.reporter)
 		if (report.item_type === 'user') {
-			enrichedReport.user = users.value.find((user) => user.id === report.item_id)
+			enrichedReport.user = userMap.value.get(report.item_id)
 		} else if (report.item_type === 'project') {
-			enrichedReport.project = projects.value.find((project) => project.id === report.item_id)
+			enrichedReport.project = projectMap.value.get(report.item_id)
 		} else if (report.item_type === 'version') {
-			enrichedReport.version = versions.value.find((version) => version.id === report.item_id)
-			enrichedReport.project = projects.value.find(
-				(project) => project.id === enrichedReport.version?.project_id,
-			)
+			enrichedReport.version = versionMap.value.get(report.item_id)
+			enrichedReport.project = projectMap.value.get(enrichedReport.version?.project_id)
 		}
 		if (report.thread_id) {
-			const thread = threads.value.find((thread) => report.thread_id === thread.id)
-			enrichedReport.thread = thread ? addReportMessage(thread, report) : null
+			const thread = threadMap.value.get(report.thread_id)
+			enrichedReport.thread = thread ? addReportMessage(thread, enrichedReport) : null
 		}
 		enrichedReport.open = true
 		return enrichedReport
