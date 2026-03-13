@@ -126,7 +126,7 @@
     "message": "∞ * ∞ Mo"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 Mo"
+    "message": "moins de 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Créer un projet"
   },
+  "create.project.create-server-project": {
+    "message": "Créer un serveur"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Champs manquants : {fields}"
+  },
   "create.project.name-label": {
     "message": "Nom"
   },
   "create.project.name-placeholder": {
     "message": "Entrez le nom du projet..."
+  },
+  "create.project.owner-description": {
+    "message": "Définissez le propriétaire du projet comme étant vous-même ou une organisation dont vous êtes membre."
+  },
+  "create.project.owner-label": {
+    "message": "Propriétaire"
+  },
+  "create.project.server-project-title": {
+    "message": "Création d'un serveur"
   },
   "create.project.summary-description": {
     "message": "Une phrase ou deux qui décrivent votre projet."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Création d'un projet"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Projet"
+  },
+  "create.project.type-server": {
+    "message": "Serveur"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -825,7 +849,7 @@
     "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Clique pour lire comment Modrinth gère votre revenu."
+    "message": "Cliquez pour lire comment Modrinth gère votre revenu."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Estimé pour {date}"
@@ -1068,7 +1092,7 @@
     "message": "Grenouille"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une une couverture étendue."
+    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une couverture étendue."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Payer mensuellement"
@@ -1215,7 +1239,7 @@
     "message": "Déjà trouvé ce dont vous avez besoin ?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
+    "message": "Essayez un <orange>serveur 3 Go</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "En savoir plus"
@@ -1432,6 +1456,12 @@
   },
   "layout.action.new-project": {
     "message": "Nouveau projet"
+  },
+  "layout.action.new-server-project": {
+    "message": "Nouveau serveur"
+  },
+  "layout.action.publish": {
+    "message": "Publier"
   },
   "layout.action.reports": {
     "message": "Rapports d'examen"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numéro de compte"
   },
-  "muralpay.field.branch-code": {
-    "message": "Identifiant de branche"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Téléphone PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Clef aléatoire"
   },
   "muralpay.field.routing-number": {
     "message": "Numéro de routage"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Saisissez le numéro de compte"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Saisissez le code de l'agence"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Entrez la CLABE à 18 chiffres"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Saisissez votre adresse e-mail PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Entrez une clef aléatoire"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Saisissez le numéro de routage à 9 chiffres"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Datapack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Serveurs"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Serveur"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pack de ressources"
+  },
+  "project-type.server.plural": {
+    "message": "Serveurs"
+  },
+  "project-type.server.singular": {
+    "message": "Serveur"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2954,6 +2996,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Page des packs de ressources"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Page des serveurs"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Page des shaders"
   },
@@ -2979,7 +3024,7 @@
     "message": "Ouvre les liens externes dans un nouvel onglet"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons \"Obtenir Modrinth App\" de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+    "message": "Cache les boutons « Obtenir Modrinth App » de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Cache les publicités de Modrinth App"
@@ -3105,7 +3150,7 @@
     "message": "Aucun environnement choisi"
   },
   "version.environment.unknown.description": {
-    "message": "L'environnement \"{environment}\" na pas été reconnu."
+    "message": "L'environnement « {environment} » na pas été reconnu."
   },
   "version.environment.unknown.title": {
     "message": "Environnement Inconnue"

@@ -6,7 +6,6 @@ use crate::models::exp;
 use crate::models::ids::ProjectId;
 use crate::models::projects::ProjectStatus;
 use crate::{database::PgPool, util::error::Context};
-use async_minecraft_ping::ServerDescription;
 use chrono::{TimeDelta, Utc};
 use clickhouse::{Client, Row};
 use serde::Serialize;
@@ -107,11 +106,16 @@ impl ServerPingQueue {
                     project_id: project_id.0,
                     address: ping.address.clone(),
                     latency_ms: data.map(|d| d.latency.as_millis() as u32),
-                    description: data.map(|d| d.description.clone()),
+                    description: data.and_then(|d| {
+                        d.description.as_ref().map(|d| {
+                            serde_json::to_string(&d)
+                                .expect("serialization should not fail")
+                        })
+                    }),
                     version_name: data.map(|d| d.version_name.clone()),
                     version_protocol: data.map(|d| d.version_protocol),
-                    players_online: data.map(|d| d.players_online),
-                    players_max: data.map(|d| d.players_max),
+                    players_online: data.and_then(|d| d.players_online),
+                    players_max: data.and_then(|d| d.players_max),
                 };
 
                 ch.write(&row)
@@ -256,45 +260,27 @@ pub async fn ping_server(
         .map(|duration| duration.min(default_duration))
         .unwrap_or(default_duration);
 
-    let (address, port) = match address.rsplit_once(':') {
-        Some((addr, port)) => {
-            let port = port.parse::<u16>().wrap_err("invalid port number")?;
-            (addr, port)
-        }
-        None => (address, 25565),
-    };
-
-    let task = async move {
-        let conn = async_minecraft_ping::ConnectionConfig::build(address)
-            .with_port(port)
-            .with_srv_lookup()
-            .connect()
-            .await
-            .wrap_err("failed to connect to server")?;
-
-        let status = conn
-            .status()
-            .await
-            .wrap_err("failed to get server status")?
-            .status;
-
-        eyre::Ok(exp::minecraft::JavaServerPingData {
-            latency: start.elapsed(),
-            version_name: status.version.name,
-            version_protocol: status.version.protocol,
-            description: match status.description {
-                ServerDescription::Plain(text)
-                | ServerDescription::Object { text } => text,
-            },
-            players_online: status.players.online,
-            players_max: status.players.max,
-        })
-    };
-
-    tokio::time::timeout(timeout, task)
+    let conn = async_minecraft_ping::ConnectionConfig::build(address)
+        .with_srv_lookup()
+        .with_timeout(timeout)
+        .connect()
         .await
-        .map_err(eyre::Error::new)
-        .flatten()
+        .wrap_err("failed to connect to server")?;
+
+    let status = conn
+        .status()
+        .await
+        .wrap_err("failed to get server status")?
+        .status;
+
+    eyre::Ok(exp::minecraft::JavaServerPingData {
+        latency: start.elapsed(),
+        version_name: status.version.name,
+        version_protocol: status.version.protocol,
+        description: status.description,
+        players_online: status.players.online,
+        players_max: status.players.max,
+    })
 }
 
 #[derive(Debug, Row, Serialize, Clone)]
@@ -305,9 +291,9 @@ struct ServerPingRecord {
     latency_ms: Option<u32>,
     description: Option<String>,
     version_name: Option<String>,
-    version_protocol: Option<u32>,
-    players_online: Option<u32>,
-    players_max: Option<u32>,
+    version_protocol: Option<i32>,
+    players_online: Option<i32>,
+    players_max: Option<i32>,
 }
 
 #[cfg(test)]

@@ -8,6 +8,8 @@ import type { RequestContext } from '../types/request'
 export interface NodeAuth {
 	/** Node instance URL (e.g., "node-xyz.modrinth.com/modrinth/v0/fs") */
 	url: string
+	/** Base URL without path suffix (e.g., "node-xyz.modrinth.com") — used when available */
+	baseUrl?: string
 	/** JWT token */
 	token: string
 }
@@ -105,7 +107,7 @@ export class NodeAuthFeature extends AbstractFeature {
 	}
 
 	private applyAuth(context: RequestContext, auth: NodeAuth): void {
-		const baseUrl = `https://${auth.url.replace('v0/fs', '')}`
+		const baseUrl = `https://${auth.url.replace(/\/modrinth\/v\d+\/fs\/?$/, '')}`
 		context.url = this.buildUrl(context.path, baseUrl, context.options.version)
 
 		context.options.headers = {

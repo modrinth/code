@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tDELETE FROM moderation_locks\n\t\t\t\tWHERE moderator_id = $1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "46101c0ee885ee24a5dab914a574217fd19392b5ae6219f674b3fe1a1e5b7af9"
+}

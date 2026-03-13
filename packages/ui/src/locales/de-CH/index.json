@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Funktion"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Community"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Funktionen"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Gameplay"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Leistungsauswirkung"
   },
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "Modpaket entkoppeln"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Zurück"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Link kopieren"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Deaktivieren"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Dieses Modpack enthält keine zusätzlichen inhalte."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Keine Inhalte gefunden"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Aktivieren"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Alle"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Modpack Inhalt"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Lade Inhalte..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Keine Projekte entsprechen deiner Suche."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Durchsuche {count} Projekte"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} ausgewählt"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktuell"
@@ -494,11 +542,131 @@
   "label.yes": {
     "defaultMessage": "Ja"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Tschechisch"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Dänisch"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Deutsch (Schweiz)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Deutsch (Deutschland)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Englisch (Vereinigte Staaten)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spanisch (Lateinamerika)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spanisch (Spanien)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finnisch"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipinisch"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Französisch"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebräisch"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Ungarisch"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesisch"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italienisch (Italien)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japanisch"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Koreanisch"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malaiisch"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Niederländisch"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norwegisch, Buchsprache"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polnisch"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portugiesisch (Brasilien)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portugiesisch (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Rumänisch"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russisch"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbisch (Latein)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Schwedisch"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thailändisch"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Türkisch"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukrainisch"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamesisch"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chinesisch (Vereinfacht)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chinesisch (Traditionell)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Zahlungsmethode hinzufügen"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Eine Zahlungsmethode hinzufügen"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Installiere automatisch benötigte Inhalte"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Server direct nach Start beitreten"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Aktualisiere Dateien wenn der Server sich ändert"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Schliessen"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Modrinth App herunterladen"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Die Modrinth App wird sich automatisch öffnen..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Öffne Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Warum die Modrinth App nutzen"
   },
   "notification.error.title": {
     "defaultMessage": "Ein Fehler ist aufgetreten"
@@ -812,14 +980,32 @@
   "project.about.links.issues": {
     "defaultMessage": "Problem melden"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Webseite besuchen"
+  },
   "project.about.links.source": {
     "defaultMessage": "Quelle anzeigen"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Shopseite besuchen"
   },
   "project.about.links.title": {
     "defaultMessage": "Links"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Wiki besuchen"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Kopiert!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP Addresse in Zwischenablage kopiert"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latenz"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Serverdetails"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {Download} other {Downloads}}"
@@ -893,8 +1079,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {Follower} other {Follower}}"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} online"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} kürzliche spiele"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytiks"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Inhalt"
   },
   "project.settings.description.title": {
     "defaultMessage": "Beschreibung"
@@ -1003,6 +1201,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Keine Berechtigung"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tags"
@@ -1361,11 +1562,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Abenteuer"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Abenteuermodus"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarchie"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Atmosphäre"
   },
   "tag.category.audio": {
     "defaultMessage": "Audio"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
   },
   "tag.category.blocks": {
     "defaultMessage": "Blöcke"
@@ -1373,11 +1586,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Bloom"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Bosse"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Cartoon"
   },
   "tag.category.challenging": {
     "defaultMessage": "Herausfordernd"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Klassen"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Farbige Beleuchtung"
@@ -1385,14 +1604,32 @@
   "tag.category.combat": {
     "defaultMessage": "Kampf"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Kompetitiv"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Kern-Shader"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Kreativmodus"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Creator Community"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Crossplay"
   },
   "tag.category.cursed": {
     "defaultMessage": "Komisch"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Benutzerdefinierter Inhalt"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Dekoration"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Dungeons"
   },
   "tag.category.economy": {
     "defaultMessage": "Wirtschaft"
@@ -1405,6 +1642,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Ausrüstung"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Fraktionen"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Fantasy"
@@ -1421,8 +1661,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Spielemechaniken"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Gens"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Hardcore-Modus"
   },
   "tag.category.high": {
     "defaultMessage": "Hoch"
@@ -1430,11 +1676,20 @@
   "tag.category.items": {
     "defaultMessage": "Items"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Behalte Inventar"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Von allem etwas"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit-PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Bibliothek"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Anspruchslos"
@@ -1451,11 +1706,23 @@
   "tag.category.management": {
     "defaultMessage": "Verwaltung"
   },
+  "tag.category.media": {
+    "defaultMessage": "Medien"
+  },
   "tag.category.medium": {
     "defaultMessage": "Mittel"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Microspiele"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minispiel"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Minispiele"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Mobs"
@@ -1469,8 +1736,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Mehrspieler"
   },
+  "tag.category.network": {
+    "defaultMessage": "Netzwerk"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Offline-Modus"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Ein Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimierung"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Pfadverfolgung"
@@ -1478,17 +1760,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Persöhnliche Welten"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Plots"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Kartoffel"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Gefängnis"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Quests"
   },
   "tag.category.quests": {
     "defaultMessage": "Aufgaben"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Rennen"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistisch"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Aufgenommenes SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Reflektionen"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Rollenspiel"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Screenshots"
@@ -1502,17 +1817,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Simpel"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "SkyBlock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Soziales"
   },
   "tag.category.storage": {
     "defaultMessage": "Lagerung"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Überlebensmodus"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Teams"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Technisch"
+  },
   "tag.category.technology": {
     "defaultMessage": "Technologie"
   },
   "tag.category.themed": {
     "defaultMessage": "Thematisiert"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Städte"
   },
   "tag.category.transportation": {
     "defaultMessage": "Transportation"
@@ -1525,6 +1858,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Vanilla-ähnlich"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Whitelist"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Welt zurücksetzungen"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Weltgenerierung"

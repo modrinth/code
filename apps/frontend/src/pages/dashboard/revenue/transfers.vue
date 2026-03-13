@@ -72,14 +72,11 @@
 				</div>
 			</div>
 		</div>
-		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
-			<span class="text-lg text-contrast md:text-xl">{{
-				formatMessage(messages.noTransactions)
-			}}</span>
-			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
-				formatMessage(messages.noTransactionsDesc)
-			}}</span>
-		</div>
+		<EmptyState
+			v-else
+			:heading="formatMessage(messages.noTransactions)"
+			:description="formatMessage(messages.noTransactionsDesc)"
+		/>
 	</div>
 </template>
 <script setup>
@@ -90,8 +87,16 @@ import {
 	GenericListIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Combobox, defineMessages, useVIntl } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	Combobox,
+	defineMessages,
+	EmptyState,
+	useFormatDateTime,
+	useFormatMoney,
+	useVIntl,
+} from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
@@ -99,6 +104,12 @@ import { useGeneratedState } from '~/composables/generated'
 import { findRail } from '~/utils/muralpay-rails'
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
+const formatMonth = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+})
+
 const generatedState = useGeneratedState()
 
 useHead({
@@ -152,7 +163,7 @@ function getPeriodLabel(date) {
 	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
 		return 'Last month'
 	} else {
-		return txnDate.format('MMMM YYYY')
+		return capitalizeString(formatMonth(txnDate.toDate()))
 	}
 }
 

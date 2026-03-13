@@ -72,6 +72,40 @@ pub enum Language {
     Lt,
     Lv,
     Et,
+    Af,
+    Am,
+    Az,
+    Be,
+    Bs,
+    Ca,
+    Eo,
+    Eu,
+    Fa,
+    Ga,
+    Gl,
+    Hy,
+    Is,
+    Ka,
+    Kk,
+    Km,
+    Kn,
+    Lo,
+    Mk,
+    Ml,
+    Mn,
+    Mr,
+    My,
+    Ne,
+    Pa,
+    Si,
+    Sl,
+    Sq,
+    Sw,
+    Ta,
+    Te,
+    Uz,
+    Yo,
+    Zu,
 }
 
 component::define! {
@@ -387,13 +421,13 @@ pub struct JavaServerPingData {
     /// Reported version name of the server.
     pub version_name: String,
     /// Reported version protocol number of the server.
-    pub version_protocol: u32,
+    pub version_protocol: i32,
     /// Description/MOTD of the server as shown in the server list.
-    pub description: String,
+    pub description: Option<serde_json::Value>,
     /// Number of players online at the time.
-    pub players_online: u32,
+    pub players_online: Option<i32>,
     /// Maximum number of players allowed on the server.
-    pub players_max: u32,
+    pub players_max: Option<i32>,
 }
 
 component::relations! {

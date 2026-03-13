@@ -16,7 +16,8 @@
 <script lang="ts" setup>
 import { PackageIcon } from '@modrinth/assets'
 import { useDebounceFn } from '@vueuse/core'
-import { defineAsyncComponent, h, ref, watch } from 'vue'
+import Fuse from 'fuse.js'
+import { defineAsyncComponent, h, markRaw, ref, watch } from 'vue'
 
 import { injectModrinthClient, injectNotificationManager } from '../../providers'
 import type { ComboboxOption } from '../base/Combobox.vue'
@@ -57,6 +58,10 @@ const props = withDefaults(
 		limit?: number
 		/** Project IDs to exclude from results */
 		excludeProjectIds?: string[]
+		/** Include the user's own projects (including unlisted) in results via Fuse search */
+		includeUserUnlistedProjects?: boolean
+		/** User ID or username required when includeUserUnlistedProjects is true */
+		userId?: string
 	}>(),
 	{
 		placeholder: 'Select project',
@@ -78,22 +83,67 @@ const searchResultsCache = ref<Map<string, SearchHit>>(new Map())
 
 const { labrinth } = injectModrinthClient()
 
+const userProjectHits = ref<SearchHit[]>([])
+const userProjectsFuse = ref<Fuse<SearchHit> | null>(null)
+
+watch(
+	() => props.includeUserUnlistedProjects && props.userId,
+	async (shouldFetch) => {
+		if (!shouldFetch || !props.userId) {
+			userProjectHits.value = []
+			userProjectsFuse.value = null
+			return
+		}
+
+		try {
+			const projects = await labrinth.users_v2.getProjects(props.userId)
+			const projectTypeSet = props.projectTypes ? new Set(props.projectTypes) : null
+
+			userProjectHits.value = projects
+				.filter((p) => !projectTypeSet || projectTypeSet.has(p.project_type as ProjectType))
+				.filter((p) => p.status === 'unlisted')
+				.map((p) => ({
+					project_id: p.id,
+					title: p.title,
+					icon_url: p.icon_url ?? undefined,
+					project_type: p.project_type,
+					slug: p.slug,
+				}))
+
+			for (const hit of userProjectHits.value) {
+				searchResultsCache.value.set(hit.project_id, hit)
+			}
+
+			userProjectsFuse.value = new Fuse(userProjectHits.value, {
+				keys: ['title', 'slug'],
+				threshold: 0.4,
+			})
+		} catch {
+			userProjectHits.value = []
+			userProjectsFuse.value = null
+		}
+	},
+	{ immediate: true },
+)
+
 function hitToOption(hit: SearchHit): ComboboxOption<string> {
 	return {
 		label: hit.title,
 		value: hit.project_id,
 		icon: hit.icon_url
-			? defineAsyncComponent(() =>
-					Promise.resolve({
-						setup: () => () =>
-							h('img', {
-								src: hit.icon_url,
-								alt: hit.title,
-								class: 'h-5 w-5 rounded',
-							}),
-					}),
+			? markRaw(
+					defineAsyncComponent(() =>
+						Promise.resolve({
+							setup: () => () =>
+								h('img', {
+									src: hit.icon_url,
+									alt: hit.title,
+									class: 'h-5 w-5 rounded',
+								}),
+						}),
+					),
 				)
-			: PackageIcon,
+			: markRaw(PackageIcon),
 	}
 }
 
@@ -160,7 +210,11 @@ const search = async (query: string) => {
 			facets: [[`project_id:${query.replace(/[^a-zA-Z0-9]/g, '')}`]],
 		})
 
-		const allHits = [...resultsByProjectId.hits, ...results.hits]
+		const userFuseHits: SearchHit[] = userProjectsFuse.value
+			? userProjectsFuse.value.search(query).map((r) => r.item)
+			: []
+
+		const allHits = [...userFuseHits, ...resultsByProjectId.hits, ...results.hits]
 		const seenIds = new Set<string>()
 		const excludeSet = new Set(props.excludeProjectIds ?? [])
 		const uniqueHits: SearchHit[] = []
@@ -169,7 +223,6 @@ const search = async (query: string) => {
 			if (!seenIds.has(hit.project_id) && !excludeSet.has(hit.project_id)) {
 				seenIds.add(hit.project_id)
 				uniqueHits.push(hit)
-				// Cache the hit for later lookup
 				searchResultsCache.value.set(hit.project_id, hit)
 			}
 		}

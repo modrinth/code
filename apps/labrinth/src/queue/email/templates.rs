@@ -95,8 +95,8 @@ pub struct MailingIdentity {
 }
 
 impl MailingIdentity {
-    pub fn from_env() -> dotenvy::Result<Self> {
-        Ok(Self {
+    pub fn from_env() -> Self {
+        Self {
             from_name: ENV.SMTP_FROM_NAME.clone(),
             from_address: ENV.SMTP_FROM_ADDRESS.clone(),
             reply_name: if ENV.SMTP_REPLY_TO_NAME.is_empty() {
@@ -109,7 +109,7 @@ impl MailingIdentity {
             } else {
                 Some(ENV.SMTP_REPLY_TO_ADDRESS.clone())
             },
-        })
+        }
     }
 }
 

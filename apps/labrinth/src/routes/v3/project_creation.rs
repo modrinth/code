@@ -22,8 +22,8 @@ use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::v3::user_limits::UserLimits;
 use crate::queue::session::AuthQueue;
-use crate::search::indexing::IndexingError;
 use crate::util::guards::admin_key_guard;
+use crate::util::http::HttpClient;
 use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -54,14 +54,10 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
 
 #[derive(Error, Debug)]
 pub enum CreateError {
-    #[error("Environment Error")]
-    EnvError(#[from] dotenvy::Error),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
-    #[error("Indexing Error: {0}")]
-    IndexingError(#[from] IndexingError),
     #[error("Error while parsing multipart payload: {0}")]
     MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -125,12 +121,10 @@ impl From<crate::routes::ApiError> for CreateError {
 impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
-            CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SqlxDatabaseError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
@@ -158,10 +152,8 @@ impl actix_web::ResponseError for CreateError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
-                CreateError::EnvError(..) => "environment_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::DatabaseError(..) => "database_error",
-                CreateError::IndexingError(..) => "indexing_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -300,6 +292,7 @@ pub async fn project_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     project_create_internal(
         req,
@@ -308,6 +301,7 @@ pub async fn project_create(
         redis,
         file_host,
         session_queue,
+        http,
     )
     .await
 }
@@ -319,6 +313,7 @@ pub async fn project_create_internal(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -335,6 +330,7 @@ pub async fn project_create_internal(
         &client,
         &redis,
         &session_queue,
+        &http,
         project_id,
     )
     .await;
@@ -366,6 +362,7 @@ pub async fn project_create_with_id(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    http: Data<HttpClient>,
     path: web::Path<(ProjectId,)>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -382,6 +379,7 @@ pub async fn project_create_with_id(
         &client,
         &redis,
         &session_queue,
+        &http,
         project_id,
     )
     .await;
@@ -443,6 +441,7 @@ async fn project_create_inner(
     pool: &PgPool,
     redis: &RedisPool,
     session_queue: &AuthQueue,
+    http: &reqwest::Client,
     project_id: ProjectId,
 ) -> Result<HttpResponse, CreateError> {
     // The currently logged in user
@@ -907,7 +906,9 @@ async fn project_create_inner(
 
         let now = Utc::now();
 
-        let id = project_builder_actual.insert(&mut *transaction).await?;
+        let id = project_builder_actual
+            .insert(&mut *transaction, http)
+            .await?;
         DBUser::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {

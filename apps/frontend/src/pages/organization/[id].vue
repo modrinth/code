@@ -19,7 +19,7 @@
 								</nuxt-link>
 							</h2>
 							<span>
-								{{ formatNumber(acceptedMembers?.length || 0) }}
+								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
 								member<template v-if="acceptedMembers?.length !== 1">s</template>
 							</span>
 						</div>
@@ -89,7 +89,7 @@
 							projects
 						</div>
 						<div
-							v-tooltip="sumDownloads.toLocaleString()"
+							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
@@ -144,7 +144,7 @@
 				<div class="card flex-card">
 					<h2>Members</h2>
 					<div class="details-list">
-						<template v-for="member in acceptedMembers" :key="member.user.id">
+						<template v-for="member in acceptedMembers" :key="member?.user.id">
 							<nuxt-link
 								class="details-list__item details-list__item--type-large"
 								:to="`/user/${member?.user?.username}`"
@@ -184,10 +184,10 @@
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" />
+					<NavTabs :links="navLinks" replace />
 				</div>
 				<ProjectCardList v-if="projects && projects.length > 0">
-					<ProjectCard
+					<template
 						v-for="project in (route.params.projectType !== undefined
 							? (projects ?? []).filter((x) =>
 									x.project_types.includes(
@@ -204,28 +204,55 @@
 							.slice()
 							.sort((a, b) => b.downloads - a.downloads)"
 						:key="project.id"
-						:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
-						:title="project.name"
-						:icon-url="project.icon_url"
-						:banner="project.gallery.find((element) => element.featured)?.url"
-						:summary="project.summary"
-						:date-updated="project.updated"
-						:downloads="project.downloads"
-						:followers="project.followers"
-						:tags="project.categories"
-						:environment="{
-							clientSide: project.client_side,
-							serverSide: project.server_side,
-						}"
-						:status="
-							auth.user &&
-							(auth.user.id! === (user as any).id || tags.staffRoles.includes(auth.user.role))
-								? (project.status as ProjectStatus)
-								: undefined
-						"
-						:color="project.color"
-						layout="list"
-					/>
+					>
+						<ProjectCard
+							v-if="isProjectServer(project)"
+							:link="`/server/${project.slug || project.id}`"
+							:title="project.name"
+							:icon-url="project.icon_url"
+							:summary="project.summary"
+							:tags="project.categories"
+							:server-online-players="
+								project.minecraft_java_server?.ping?.data?.players_online ?? 0
+							"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
+							:server-region="project.minecraft_server?.region"
+							:server-status-online="!!project.minecraft_java_server?.ping?.data"
+							:server-modpack-content="getServerModpackContent(project)"
+							:status="
+								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
+									? (project.status as ProjectStatus)
+									: undefined
+							"
+							:max-tags="2"
+							layout="list"
+							is-server-project
+							exclude-loaders
+						/>
+						<ProjectCard
+							v-else
+							:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
+							:title="project.name"
+							:icon-url="project.icon_url"
+							:banner="project.gallery.find((element) => element.featured)?.url"
+							:summary="project.summary"
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:followers="project.followers"
+							:tags="project.categories"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
+							:status="
+								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
+									? (project.status as ProjectStatus)
+									: undefined
+							"
+							:color="project.color"
+							layout="list"
+						/>
+					</template>
 				</ProjectCardList>
 				<div v-else-if="true" class="error">
 					<UpToDate class="icon" />
@@ -234,7 +261,7 @@
 						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
 							Would you like to
-							<a class="link" @click="($refs as any).modal_creation?.show()">create one</a>?
+							<a class="link" @click="modal_creation?.show()">create one</a>?
 						</template>
 					</span>
 				</div>
@@ -244,6 +271,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChartIcon,
@@ -265,10 +293,11 @@ import {
 	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
+	useCompactNumber,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
-import { formatNumber } from '@modrinth/utils'
+import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -282,10 +311,16 @@ import {
 } from '~/providers/organization-context.ts'
 import { isPermission } from '~/utils/permissions.ts'
 
+type ProjectV3 = Labrinth.Projects.v3.Project & {
+	client_side: 'required' | 'optional' | 'unsupported'
+	server_side: 'required' | 'optional' | 'unsupported'
+}
+
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatCompactNumber = useCompactNumber(true)
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
 const user = await useUser()
@@ -294,6 +329,7 @@ const route = useNativeRoute()
 const router = useRouter()
 const tags = useGeneratedState()
 const config = useRuntimeConfig()
+const modal_creation = useTemplateRef('modal_creation')
 
 const orgId = useRouteId()
 
@@ -397,6 +433,30 @@ const projectTypes = computed(() => {
 
 	return Object.keys(obj)
 })
+function isProjectServer(project: ProjectV3): boolean {
+	return project.minecraft_server != null
+}
+
+function getServerModpackContent(project: ProjectV3) {
+	const content = project.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick:
+				project_id !== project.id
+					? () => {
+							navigateTo(`/project/${project_id}`)
+						}
+					: undefined,
+			showCustomModpackTooltip: project_id === project.id,
+		}
+	}
+	return undefined
+}
+
 const sumDownloads = computed(() => {
 	let sum = 0
 

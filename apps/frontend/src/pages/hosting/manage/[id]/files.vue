@@ -10,5 +10,8 @@ useHead({
 </script>
 
 <template>
-	<ServersManageFilesPage :show-debug-info="flags.advancedDebugInfo" />
+	<ServersManageFilesPage
+		:show-debug-info="flags.advancedDebugInfo"
+		:show-refresh-button="flags.FilesRefreshButton"
+	/>
 </template>
