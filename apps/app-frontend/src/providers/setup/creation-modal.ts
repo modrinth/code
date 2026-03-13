@@ -6,16 +6,15 @@ import { trackEvent } from '@/helpers/analytics'
 import { get_project_versions, get_search_results } from '@/helpers/cache.js'
 import { import_instance } from '@/helpers/import.js'
 import { create_profile_and_install, create_profile_and_install_from_file } from '@/helpers/pack'
-import { create, list } from '@/helpers/profile.js'
+import { create } from '@/helpers/profile.js'
 
 export function setupCreationModal(notificationManager: AbstractWebNotificationManager) {
 	const { handleError } = notificationManager
 	const router = useRouter()
 
 	const installationModal = useTemplateRef('installationModal')
-	provide('showCreationModal', async () => {
-		const instances = await list().catch(handleError)
-		installationModal.value?.show(instances?.length ?? 0)
+	provide('showCreationModal', () => {
+		installationModal.value?.show()
 	})
 
 	async function handleCreate(config: CreationFlowContextValue) {

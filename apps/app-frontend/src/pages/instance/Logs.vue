@@ -150,10 +150,6 @@ const props = defineProps({
 			return false
 		},
 	},
-	versions: {
-		type: Array,
-		required: true,
-	},
 	installed: {
 		type: Boolean,
 		default() {

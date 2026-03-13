@@ -36,7 +36,7 @@
 						: (updatingProject?.version?.id ?? '')
 				"
 				:is-app="true"
-				:is-modpack="updatingModpack"
+				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 				:project-icon-url="
 					updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
 				"
@@ -68,6 +68,7 @@ import {
 	ContentUpdaterModal,
 	defineMessages,
 	injectNotificationManager,
+	useDebugLogger,
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
@@ -165,10 +166,10 @@ const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const { installingItems } = injectContentInstall()
 const router = useRouter()
+const debug = useDebugLogger('Mods:ContentUpdate')
 
 const props = defineProps<{
 	instance: GameInstance
-	versions: Labrinth.Versions.v2.Version[]
 	isServerInstance?: boolean
 	openSettings?: () => void
 }>()
@@ -349,6 +350,18 @@ async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
+	debug('handleUpdate triggered', {
+		fileName: item.file_name,
+		projectType: item.project_type,
+		projectId: item.project.id,
+		projectTitle: item.project.title,
+		currentVersionId: item.version.id,
+		currentVersionNumber: item.version.version_number,
+		updateVersionId: item.update_version_id,
+		instanceGameVersion: props.instance.game_version,
+		instanceLoader: props.instance.loader,
+	})
+
 	updatingModpack.value = false
 	updatingProject.value = item
 	updatingProjectVersions.value = []
@@ -365,7 +378,24 @@ async function handleUpdate(id: string) {
 
 	loadingVersions.value = false
 
-	if (!versions) return
+	if (!versions) {
+		debug('handleUpdate: no versions returned', { projectId: item.project.id })
+		return
+	}
+
+	debug('handleUpdate: fetched versions', {
+		projectId: item.project.id,
+		projectType: item.project_type,
+		totalVersions: versions.length,
+		versionSample: versions.slice(0, 5).map((v) => ({
+			id: v.id,
+			number: v.version_number,
+			loaders: v.loaders,
+			gameVersions: v.game_versions,
+		})),
+		currentVersionInList: versions.some((v) => v.id === item.version?.id),
+		updateVersionInList: versions.some((v) => v.id === item.update_version_id),
+	})
 
 	versions.sort(
 		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
@@ -493,9 +523,14 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	if (updatingModpack.value) {
-		handleModpackUpdateRequest(selectedVersion)
+		if (event?.shiftKey) {
+			pendingModpackUpdateVersion.value = selectedVersion
+			await handleModpackUpdateConfirm()
+		} else {
+			handleModpackUpdateRequest(selectedVersion)
+		}
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 

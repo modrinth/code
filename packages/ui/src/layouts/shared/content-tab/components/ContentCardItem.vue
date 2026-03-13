@@ -4,9 +4,11 @@ import {
 	MoreVerticalIcon,
 	OrganizationIcon,
 	SpinnerIcon,
+	TrashExclamationIcon,
 	TrashIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
+import { useMagicKeys } from '@vueuse/core'
 import { Tooltip } from 'floating-vue'
 import { computed, getCurrentInstance, ref } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
@@ -64,7 +66,7 @@ const selected = defineModel<boolean>('selected')
 
 const emit = defineEmits<{
 	'update:enabled': [value: boolean]
-	delete: []
+	delete: [event: MouseEvent]
 	update: []
 }>()
 
@@ -74,6 +76,9 @@ const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate 
 
 const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
+
+const { shift: shiftHeld } = useMagicKeys()
+const deleteHovered = ref(false)
 </script>
 
 <template>
@@ -84,9 +89,10 @@ const fileNameRef = ref<HTMLElement | null>(null)
 	>
 		<div
 			class="flex min-w-0 items-center gap-4"
-			:class="
-				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
-			"
+			:class="[
+				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none',
+				enabled === false && !disabled ? 'grayscale opacity-50' : '',
+			]"
 		>
 			<Checkbox
 				v-if="showCheckbox"
@@ -188,7 +194,10 @@ const fileNameRef = ref<HTMLElement | null>(null)
 
 		<div
 			class="hidden flex-col gap-0.5 @[800px]:flex"
-			:class="hideActions ? 'flex-1' : 'flex-1 min-w-0'"
+			:class="[
+				hideActions ? 'flex-1' : 'flex-1 min-w-0',
+				enabled === false && !disabled ? 'grayscale opacity-50' : '',
+			]"
 		>
 			<template v-if="version">
 				<AutoLink
@@ -221,7 +230,10 @@ const fileNameRef = ref<HTMLElement | null>(null)
 			</template>
 		</div>
 
-		<div v-if="!hideActions" class="flex min-w-[160px] shrink-0 items-center justify-end gap-2">
+		<div
+			v-if="!hideActions"
+			class="flex min-w-[160px] shrink-0 items-center justify-end gap-2 transition-colors duration-200"
+		>
 			<slot name="additionalButtonsLeft" />
 
 			<!-- Fixed width container to reserve space for update button -->
@@ -249,18 +261,28 @@ const fileNameRef = ref<HTMLElement | null>(null)
 				:model-value="enabled"
 				:disabled="disabled"
 				:aria-label="project.title"
-				small
 				class="mr-2 my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
 			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
-					v-tooltip="formatMessage(commonMessages.deleteLabel)"
+					v-tooltip="formatMessage(shiftHeld && deleteHovered ? commonMessages.deleteImmediatelyLabel : commonMessages.deleteLabel)"
 					:disabled="disabled"
-					@click="emit('delete')"
+					@click="emit('delete', $event)"
+					@mouseenter="deleteHovered = true"
+					@mouseleave="deleteHovered = false"
 				>
-					<TrashIcon class="size-5 text-secondary" />
+					<span class="relative size-5">
+						<TrashIcon
+							class="absolute inset-0 size-5 text-secondary transition-opacity duration-200"
+							:class="shiftHeld && deleteHovered ? 'opacity-0' : 'opacity-100'"
+						/>
+						<TrashExclamationIcon
+							class="absolute inset-0 size-5 text-red transition-opacity duration-200"
+							:class="shiftHeld && deleteHovered ? 'opacity-100' : 'opacity-0'"
+						/>
+					</span>
 				</button>
 			</ButtonStyled>
 

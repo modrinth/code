@@ -138,7 +138,6 @@ export const [injectCreationFlowContext, provideCreationFlowContext] =
 
 // TODO: replace with actual world count from the world list once available
 let worldCounter = 0
-let instanceCounter = 0
 
 export interface CreationFlowOptions {
 	availableLoaders?: string[]
@@ -227,15 +226,11 @@ export function createCreationFlowContext(
 		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
 
-	function reset(instanceCount?: number) {
+	function reset() {
 		setupType.value = null
 		isImportMode.value = false
 		worldCounter++
 		worldName.value = flowType === 'world' ? `World ${worldCounter}` : ''
-		if (instanceCount != null) {
-			instanceCounter = instanceCount
-		}
-		instanceCounter++
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
 		worldSeed.value = ''
@@ -245,7 +240,7 @@ export function createCreationFlowContext(
 		generatorSettingsCustom.value = ''
 
 		// Instance-specific
-		instanceName.value = flowType === 'instance' ? `New instance (${instanceCounter})` : ''
+		instanceName.value = flowType === 'instance' ? 'New instance' : ''
 		instanceIconUrl.value = null
 		instanceIcon.value = null
 		instanceIconPath.value = null

@@ -76,8 +76,8 @@ const ctx = createCreationFlowContext(
 )
 provideCreationFlowContext(ctx)
 
-function show(instanceCount?: number) {
-	ctx.reset(instanceCount)
+function show() {
+	ctx.reset()
 	modal.value?.setStage(0)
 	modal.value?.show()
 }

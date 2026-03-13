@@ -16,7 +16,7 @@
 		<span
 			class="absolute rounded-full transition-all duration-200"
 			:class="[
-				small ? 'w-4 h-4 top-0.5 left-0.5' : 'w-[18px] h-[18px] top-[7px] left-[7px]',
+				small ? 'w-4 h-4 top-0.5 left-0.5' : 'w-[24px] h-[24px] top-1 left-1',
 				modelValue
 					? small
 						? 'translate-x-[18px] bg-black/90'
