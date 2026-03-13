@@ -4,7 +4,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex w-full items-center overflow-hidden rounded-xl bg-surface-4 px-3 py-2 text-left transition-all duration-200"
+			class="relative flex w-full items-center overflow-hidden rounded-xl bg-surface-4 px-3 py-1 text-left transition-all duration-200"
 			:class="[
 				triggerClass,
 				{
@@ -21,7 +21,7 @@
 		>
 			<div
 				ref="tagsContainerRef"
-				class="flex flex-1 items-center gap-1.5 overflow-hidden flex-wrap"
+				class="flex flex-1 items-center gap-1.5 overflow-hidden flex-wrap min-h-8"
 				:style="{ maxHeight: `calc(${maxTagRows} * 30px + ${maxTagRows - 1} * 6px)` }"
 			>
 				<span
