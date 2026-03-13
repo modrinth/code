@@ -308,8 +308,8 @@ const backupCreationDisabled = computed(() => {
 	if (busyReasons.value.length > 0) {
 		return formatMessage(busyReasons.value[0].reason)
 	}
-	// also check API data for active backups (before ws fires)
-	if (backupsData.value?.some((b) => b.status === 'in_progress' || b.status === 'pending')) {
+	// also check for active backups, combining REST data with WS overlay
+	if (backups.value.some((b) => b.status === 'in_progress' || b.status === 'pending')) {
 		return 'A backup is already in progress'
 	}
 	return undefined
