@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "アイコンを追加する"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Java Editionプレイヤーがサーバーに参加するために使用できるIPアドレスとポートを追加してください。"
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Javaアドレスを追加する"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "外部リンクを追加する"
+  },
   "nags.add-links.description": {
     "defaultMessage": "ソースコードやバグの報告場所、Discordの招待などの外部リンクを追加してください。"
   },
@@ -84,7 +96,7 @@
     "defaultMessage": "短縮リンクサービスを使用しないでください"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
+    "defaultMessage": "説明文にある{count, plural, other {#個のヘッダー}}{count, plural, other{}}はあまりに長すぎます。ヘッダーは簡潔で、セクションの見出しとして機能すべきであり、完全な文として使用すべきではありません。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "ヘッダーを短縮"
@@ -122,6 +134,18 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "サーバーがサポートするバージョンのModpackを選択するか、または独自のModpackをアップロードしてください。"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "互換性を選択する"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "サーバーが対応している言語をリストアップしてください。"
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "言語を選択"
+  },
   "nags.select-license.description": {
     "defaultMessage": "この{type, select, mod {MOD} modpack {MODパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
   },
@@ -133,6 +157,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "タグ選択"
+  },
+  "nags.server.title": {
+    "defaultMessage": "サーバー設定を表示する"
   },
   "nags.settings.description.title": {
     "defaultMessage": "訪問設定の表示"
@@ -172,6 +199,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount, plural, one {# tag} other {# tags}} を選択しました。サーバーが関連する検索結果に表示されるように、{maxTagCount} 以下に減らしてください。"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "適切なタグを選択する"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"

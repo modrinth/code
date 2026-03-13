@@ -25,12 +25,12 @@
 							</template>
 						</span>
 						⋅
-						<span>{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}</span>
+						<span>{{ formatPrice(charge.amount, charge.currency_code) }}</span>
 					</div>
 					<div class="flex items-center gap-1">
 						<Badge :color="charge.status === 'succeeded' ? 'green' : 'red'" :type="charge.status" />
 						⋅
-						{{ $dayjs(charge.due).format('YYYY-MM-DD') }}
+						{{ formatDate(charge.due) }}
 					</div>
 				</div>
 			</div>
@@ -38,8 +38,7 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs, useVIntl } from '@modrinth/ui'
-import { formatPrice } from '@modrinth/utils'
+import { Badge, Breadcrumbs, useFormatDateTime, useFormatPrice } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'
@@ -48,7 +47,12 @@ definePageMeta({
 	middleware: 'auth',
 })
 
-const vintl = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit',
+})
 
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],

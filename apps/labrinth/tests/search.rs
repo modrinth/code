@@ -101,7 +101,7 @@ async fn search_projects() {
                     async move {
                         let projects = api
                             .search_deserialized(
-                                Some(&format!("\"&{test_name}\"")),
+                                Some(&format!("&{test_name}")),
                                 Some(facets.clone()),
                                 USER_USER_PAT,
                             )

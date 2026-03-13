@@ -1,63 +1,128 @@
-# Architecture
+# Modrinth Monorepo
 
-Use TAB instead of spaces.
+This is the Modrinth monorepo — it contains all Modrinth projects, both frontend and backend. When entering a project, either to edit or analyse, you should read it's CLAUDE.md.
 
-## Frontend
+## Architecture
 
-There are two similar frontends in the Modrinth monorepo, the website (apps/frontend) and the app frontend (apps/app-frontend).
+- **Monorepo tooling:** [Turborepo](https://turbo.build/) (`turbo.jsonc`) + [pnpm workspaces](https://pnpm.io/workspaces) (`pnpm-workspace.yaml`)
+- **Frontend:** Vue 3 / Nuxt 3, Tailwind CSS v3
+- **Backend:** Rust (Labrinth API), Postgres, Clickhouse
+- **Indentation:** Use TAB everywhere, never spaces
 
-Both use Tailwind v3, and their respective configs can be seen at `tailwind.config.ts` and `tailwind.config.js` respectively.
+### Apps (`apps/`)
 
-Both utilize shared and common components from `@modrinth/ui` which can be found at `packages/ui`, and stylings from `@modrinth/assets` which can be found at `packages/assets`.
+| App               | Description                    |
+| ----------------- | ------------------------------ |
+| `frontend`        | Main Modrinth website (Nuxt 3) |
+| `app-frontend`    | Desktop/app frontend (Vue 3)   |
+| `app`             | Desktop/app shell (Tauri)      |
+| `app-playground`  | Testing playground for app     |
+| `labrinth`        | Backend API service            |
+| `daedalus_client` | Daedalus client implementation |
+| `docs`            | Documentation site (Astro)     |
 
-Both can utilize icons from `@modrinth/assets`, which are automatically generated based on what's available within the `icons` folder of the `packages/assets` directory. You can see the generated icons list in `generated-icons.ts`.
+### Packages (`packages/`)
 
-Both have access to our dependency injection framework, examples as seen in `packages/ui/src/providers/`. Ideally any state which is shared between a page and it's subpages should be shared using this dependency injection framework.
+| Package            | Description                                           |
+| ------------------ | ----------------------------------------------------- |
+| `ui`               | Shared Vue component library (`@modrinth/ui`)         |
+| `assets`           | Styling and auto-generated icons (`@modrinth/assets`) |
+| `api-client`       | API client for Nuxt, Tauri, and Node/browser          |
+| `app-lib`          | Shared app library                                    |
+| `blog`             | Blog system and changelog data                        |
+| `utils`            | Shared utility functions                              |
+| `moderation`       | Moderation utilities                                  |
+| `daedalus`         | Daedalus protocol                                     |
+| `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
+| `ariadne`          | Analytics library                                     |
+| `modrinth-log`     | Logging utilities                                     |
+| `modrinth-maxmind` | MaxMind GeoIP                                         |
+| `modrinth-util`    | General utilities                                     |
+| `muralpay`         | Payment processing                                    |
+| `path-util`        | Path utilities                                        |
+| `sqlx-tracing`     | SQLx query tracing                                    |
 
-### Website (apps/frontend)
+## Pre-PR Commands
 
-Before a pull request can be opened for the website, run `pnpm prepr:frontend:web` from the root folder, otherwise CI will fail.
+Run these from the **root** folder before opening a pull request - do not run these after each prompt the user gives you, only run when asked, ask the user a question if they want to run it if the user indicates that they are about to create a pull request.
 
-To run a development version of the frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within the `apps/frontend` folder into `apps/frontend/.env`. Then you can run the frontend by running `pnpm web:dev` in the root folder.
+- **Website:** `pnpm prepr:frontend:web`
+- **App frontend:** `pnpm prepr:frontend:app`
+- **Frontend libs:** `pnpm prepr:frontend:lib`
+- **All frontend (app+web):** `pnpm prepr`
+- **Labrinth (backend):** See `apps/labrinth/CLAUDE.md`
 
-### App Frontend (apps/app-frontend)
+The website and app `prepr` commands
 
-Before a pull request can be opened for the app frontend, run `pnpm prepr:frontend:app` from the root folder, otherwise CI will fail.
+## Dev Commands
 
-To run a development version of the app frontend, you must first copy over the relevant `.env` template file (prod, staging or local, usually prod) within `packages/app-lib` into `packages/app-lib/.env`. Then you must run the app itself by running `pnpm app:dev` in the root folder.
+- **Website:** `pnpm web:dev` (copy `.env` template in `apps/frontend/` first)
+- **App:** `pnpm app:dev` (copy `.env` template in `packages/app-lib/` first)
+- **Storybook (packages/ui):** `pnpm storybook`
 
-### Localization
+## Project-Specific Instructions
 
-Refer to `.github/instructions/i18n-convert.instructions.md` if the user asks you to perform any i18n conversion work on a component, set of components, pages or sets of pages.
+Each project may have its own `CLAUDE.md` with detailed instructions:
 
-## Labrinth
+- [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API
+- [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
-Labrinth is the backend API service for Modrinth.
+## Skills (`.claude/skills/`)
 
-### Testing
+Project-specific skill files with detailed patterns. Use them when the task matches:
 
-Before a pull request can be opened, run `cargo clippy -p labrinth --all-targets` and make sure there are ZERO warnings, otherwise CI will fail.
+- **`api-module`** — Adding a new API endpoint module to `packages/api-client` (types, module class, registry registration)
+- **`cross-platform-pages`** — Building a page that needs to work in both the website (`apps/frontend`) and the desktop app (`apps/app-frontend`)
+- **`dependency-injection`** — Creating or wiring up a `provide`/`inject` context for platform abstraction or deep component state sharing
+- **`figma-mcp`** — Translating a Figma design into Vue components using the Figma MCP tools
+- **`i18n-convert`** — Converting hardcoded English strings in Vue SFCs into the `@modrinth/ui` i18n system (`defineMessages`, `formatMessage`, `IntlFormatted`)
+- **`multistage-modals`** — Building a wizard-like modal with multiple stages, progress tracking, and per-stage buttons using `MultiStageModal`
+- **`tanstack-query`** — Fetching, caching, or mutating server data with `@tanstack/vue-query` (queries, mutations, invalidation, optimistic updates)
 
-Use `cargo test -p labrinth --all-targets` to test your changes. All tests must pass, otherwise CI will fail.
+## Code Guidelines
 
-To prepare the sqlx cache, cd into `apps/labrinth` and run `cargo sqlx prepare`. Make sure to NEVER run `cargo sqlx prepare --workspace`.
+### Comments
+- DO NOT use "heading" comments like: `=== Helper methods ===`.
+- Use doc comments, but avoid inline comments unless ABSOLUTELY necessary for clarity. Code should aim to be self documenting!
 
-Read the root `docker-compose.yml` to see what running services are available while developing. Use `docker exec` to access these services.
+## Bash Guidelines
 
-When the user refers to "performing pre-PR checks", do the following:
+### Output handling
+- DO NOT pipe output through `head`, `tail`, `less`, or `more`
+- NEVER use `| head -n X` or `| tail -n X` to truncate output
+- IMPORTANT: Run commands directly without pipes when possible
+- IMPORTANT: If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
+- ALWAYS read the full output — never pipe through filters
 
-- Run clippy as described above
-- DO NOT run tests unless explicitly requested (they take a long time)
-- Prepare the sqlx cache
+### General
+- Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
+- For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
 
-### Clickhouse
+## Edit Tool - Whitespace Handling (CLAUDE ONLY)
 
-Use `docker exec labrinth-clickhouse clickhouse-client` to access the Clickhouse instance. We use the `staging_ariadne` database to store data in testing.
+The Read tool uses `→` to mark where line numbers end and file content begins.
 
-### Postgres
+**Rule:** Copy the EXACT whitespace that appears after the `→` marker.
+- Whatever appears between `→` and the code text is what's actually in the file
+- That whitespace must be used EXACTLY in Edit tool's old_string
+- Don't count arrows, don't interpret - just copy what's after the `→`
 
-Use `docker exec labrinth-postgres psql -U labrinth -d labrinth -c "SELECT 1"` to access the PostgreSQL instance, replacing the `SELECT 1` with your query.
+**Example:**
+14→		private byte tag;
+For Edit, use: `		private byte tag;` (copy everything after →, including the two tabs)
 
-# Guidelines
+**If Edit fails:** Stop and explain the problem. Do not attempt sed/awk/bash workarounds.
 
-- Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to.
+**IMPORTANT**: Trust the Read tool output. Copy what's after `→` into Edit immediately. DO NOT verify with sed/od/grep first - that's wasting time and the instructions already tell you to stop if Edit fails, not to pre-verify.
+
+## Skills
+
+Project-specific skills (patterns, conventions, and implementation guides) are located in [`.claude/skills/`](./.claude/skills/). Each skill has a `SKILL.md` describing the pattern:
+
+- **[Dependency Injection](./.claude/skills/dependency-injection/SKILL.md)** — Vue provide/inject DI layer using `createContext`
+- **[Cross-Platform Pages](./.claude/skills/cross-platform-pages/SKILL.md)** — Shared component architecture across Nuxt and Tauri frontends
+- **[Multistage Modals](./.claude/skills/multistage-modals/SKILL.md)** — Wizard-like modal flows with `MultiStageModal`
+- **[Figma MCP](./.claude/skills/figma-mcp/SKILL.md)** — Translating Figma designs to Modrinth Vue components
+- **[i18n Convert](./.claude/skills/i18n-convert/SKILL.md)** — Converting hard-coded strings to vue-i18n localization
+- **[API Module](./.claude/skills/api-module/SKILL.md)** — Adding new endpoint modules to `@modrinth/api-client`
+- **[TanStack Query](./.claude/skills/tanstack-query/SKILL.md)** — Server state management with `@tanstack/vue-query` v5

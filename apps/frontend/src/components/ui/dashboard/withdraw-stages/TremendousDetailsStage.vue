@@ -350,9 +350,9 @@ import {
 	paymentMethodMessages,
 	StyledInput,
 	useDebugLogger,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { useDebounceFn } from '@vueuse/core'
 import { computed, onMounted, ref, watch } from 'vue'
 
@@ -365,6 +365,7 @@ const debug = useDebugLogger('TremendousDetailsStage')
 const { withdrawData, maxWithdrawAmount, availableMethods, paymentOptions, calculateFees } =
 	useWithdrawContext()
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 const auth = await useAuth()
 
 const userEmail = computed(() => {
@@ -587,16 +588,7 @@ function formatAmountForDisplay(
 	if (!currencyCode || currencyCode === 'USD' || !rate) {
 		return formatMoney(localAmount)
 	}
-	try {
-		return new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: currencyCode,
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		}).format(localAmount)
-	} catch {
-		return `${currencyCode} ${localAmount.toFixed(2)}`
-	}
+	return formatMoney(localAmount, currencyCode)
 }
 
 const useFixedDenominations = computed(() => {

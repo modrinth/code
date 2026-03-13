@@ -1,119 +1,39 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.updateToPlay)" :closable="true" no-padding>
-		<div class="max-w-[500px]">
-			<div class="flex flex-col gap-4 p-4">
-				<Admonition type="warning" :header="formatMessage(messages.updateRequired)">
-					{{ formatMessage(messages.updateRequiredDescription, { name: instance.name }) }}
-				</Admonition>
-
-				<div v-if="diffs.length" class="flex flex-col gap-2">
-					<span v-if="publishedDate" class="text-contrast font-semibold">{{
-						formatMessage(messages.publishedDate, { date: publishedDate })
-					}}</span>
-					<div class="flex gap-2">
-						<div v-if="removedCount" class="flex gap-1 items-center">
-							<MinusIcon />
-							{{ formatMessage(messages.removedCount, { count: removedCount }) }}
-						</div>
-						<div v-if="addedCount" class="flex gap-1 items-center">
-							<PlusIcon />
-							{{ formatMessage(messages.addedCount, { count: addedCount }) }}
-						</div>
-						<div v-if="updatedCount" class="flex gap-1 items-center">
-							<RefreshCwIcon />
-							{{ formatMessage(messages.updatedCount, { count: updatedCount }) }}
-						</div>
-					</div>
-				</div>
-			</div>
-			<div v-if="diffs.length" class="flex flex-col bg-surface-2 p-4 max-h-[272px] overflow-y-auto">
-				<div
-					v-for="diff in diffs"
-					:key="diff.project_id"
-					class="grid grid-cols-[auto_1fr_1fr_1fr] items-center min-h-10 h-10 gap-2"
-				>
-					<div class="flex flex-col justify-between items-center">
-						<div class="w-[1px] h-2"></div>
-						<PlusIcon v-if="diff.type === 'added'" />
-						<MinusIcon v-else-if="diff.type === 'removed'" />
-						<RefreshCwIcon v-else />
-						<div class="bg-surface-5 w-[1px] h-2 relative top-1"></div>
-					</div>
-
-					<div class="flex gap-1 col-span-2">
-						<span class="text-sm">{{ formatMessage(diffTypeMessages[diff.type]) }}</span>
-						<span
-							v-if="diff.project"
-							v-tooltip="diff.project.title"
-							class="text-sm text-contrast font-medium truncate"
-						>
-							{{ diff.project.title }}
-						</span>
-					</div>
-
-					<span
-						v-if="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
-						v-tooltip="getFilename(diff.newVersion) || getFilename(diff.currentVersion)"
-						class="text-xs truncate text-right"
-					>
-						{{ getFilename(diff.newVersion) || getFilename(diff.currentVersion) }}
-					</span>
-				</div>
-			</div>
-		</div>
-
-		<template #actions>
-			<div class="flex justify-between gap-2">
-				<ButtonStyled color="red" type="transparent">
-					<button @click="handleReport">
-						<ReportIcon />
-						{{ formatMessage(commonMessages.reportButton) }}
-					</button>
-				</ButtonStyled>
-				<div class="flex gap-2">
-					<ButtonStyled>
-						<button @click="handleDecline">
-							<XIcon />
-							{{ formatMessage(commonMessages.cancelButton) }}
-						</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button @click="handleUpdate">
-							<DownloadIcon />
-							{{ formatMessage(commonMessages.updateButton) }}
-						</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</template>
-	</NewModal>
+	<ContentDiffModal
+		ref="diffModal"
+		:header="formatMessage(messages.updateToPlay)"
+		:admonition-header="formatMessage(messages.updateRequired)"
+		:description="
+			instance ? formatMessage(messages.updateRequiredDescription, { name: instance.name }) : ''
+		"
+		:diffs="normalizedDiffs"
+		:confirm-label="formatMessage(commonMessages.updateButton)"
+		:confirm-icon="DownloadIcon"
+		:show-report-button="true"
+		@confirm="handleUpdate"
+		@cancel="handleDecline"
+		@report="handleReport"
+	/>
 </template>
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { DownloadIcon } from '@modrinth/assets'
 import {
-	DownloadIcon,
-	MinusIcon,
-	PlusIcon,
-	RefreshCwIcon,
-	ReportIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Admonition,
-	ButtonStyled,
 	commonMessages,
+	type ContentDiffItem,
+	ContentDiffModal,
 	defineMessages,
-	NewModal,
 	useVIntl,
 } from '@modrinth/ui'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
-import { get_project, get_project_many, get_version_many } from '@/helpers/cache.js'
+import { get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
 import { update_managed_modrinth_version } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
+import { injectServerInstall } from '@/providers/server-install'
 
 type Dependency = Labrinth.Versions.v3.Dependency
 type Version = Labrinth.Versions.v2.Version
@@ -129,6 +49,7 @@ interface BaseDiff {
 	newVersionId?: string
 	currentVersion?: Version
 	newVersion?: Version
+	fileName?: string
 }
 interface AddedDiff extends BaseDiff {
 	type: 'added'
@@ -151,44 +72,52 @@ type ProjectInfo = {
 	slug: string
 }
 
-const { instance } = defineProps<{
-	instance: GameInstance
-}>()
-
 const { formatMessage } = useVIntl()
+const { startInstallingServer, stopInstallingServer } = injectServerInstall()
+type UpdateCompleteCallback = () => void | Promise<void>
 
-const modal = ref<InstanceType<typeof NewModal>>()
+const diffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const instance = ref<GameInstance | null>(null)
+const onUpdateComplete = ref<UpdateCompleteCallback>(() => {})
 const diffs = ref<DependencyDiff[]>([])
-const latestVersionId = ref<string | null>(null)
-const latestVersion = ref<Version | null>(null)
+const modpackVersionId = ref<string | null>(null)
+const modpackVersion = ref<Version | null>(null)
 
-const removedCount = computed(() => diffs.value.filter((d) => d.type === 'removed').length)
-const addedCount = computed(() => diffs.value.filter((d) => d.type === 'added').length)
-const updatedCount = computed(() => diffs.value.filter((d) => d.type === 'updated').length)
-const publishedDate = computed(() =>
-	latestVersion.value?.date_published ? new Date(latestVersion.value.date_published) : null,
+const normalizedDiffs = computed<ContentDiffItem[]>(() =>
+	diffs.value.map((diff) => ({
+		type: diff.type,
+		projectName: diff.project?.title,
+		fileName: diff.fileName,
+		currentVersionName: diff.currentVersion?.version_number,
+		newVersionName: diff.newVersion?.version_number,
+	})),
 )
-
-function getFilename(version?: Version): string | undefined {
-	return version?.files.find((f) => f.primary)?.filename
-}
 
 async function computeDependencyDiffs(
 	currentDeps: Dependency[],
 	latestDeps: Dependency[],
 ): Promise<DependencyDiff[]> {
+	console.log('Computing dependency diffs', { currentDeps, latestDeps })
+
+	// Separate deps with project_id from file_name-only deps
+	const currentWithProject = currentDeps.filter((d) => d.project_id)
+	const latestWithProject = latestDeps.filter((d) => d.project_id)
+	const currentFileOnly = currentDeps.filter((d) => !d.project_id && d.file_name)
+	const latestFileOnly = latestDeps.filter((d) => !d.project_id && d.file_name)
+
 	const currentByProject = new Map<string, Dependency>(
-		currentDeps.map((d) => [d.project_id || '', d]),
+		currentWithProject.map((d) => [d.project_id!, d]),
 	)
 	const latestByProject = new Map<string, Dependency>(
-		latestDeps.map((d) => [d.project_id || '', d]),
+		latestWithProject.map((d) => [d.project_id!, d]),
 	)
+	const currentFilenames = new Set(currentFileOnly.map((d) => d.file_name!))
+	const latestFilenames = new Set(latestFileOnly.map((d) => d.file_name!))
 
 	const diffs: DependencyDiff[] = []
 
-	// Find added and updated dependencies
+	// Find added and updated dependencies (by project_id)
 	latestByProject.forEach((latestDep, projectId) => {
-		if (!projectId) return
 		const currentDep = currentByProject.get(projectId)
 		if (!currentDep && latestDep.version_id) {
 			diffs.push({ type: 'added', project_id: projectId, newVersionId: latestDep.version_id })
@@ -206,9 +135,8 @@ async function computeDependencyDiffs(
 		}
 	})
 
-	// Find removed dependencies
+	// Find removed dependencies (by project_id)
 	currentByProject.forEach((currentDep, projectId) => {
-		if (!projectId) return
 		if (!latestByProject.has(projectId)) {
 			diffs.push({
 				type: 'removed',
@@ -217,6 +145,19 @@ async function computeDependencyDiffs(
 			})
 		}
 	})
+
+	// Find added/removed file_name-only dependencies
+	// ideally in future, this should use the hash of the file instead of filename, but since version dependencies don't include file hashes, we'll use filename as a best effort approach
+	for (const fileName of latestFilenames) {
+		if (!currentFilenames.has(fileName)) {
+			diffs.push({ type: 'added', project_id: '', newVersionId: '' as string, fileName })
+		}
+	}
+	for (const fileName of currentFilenames) {
+		if (!latestFilenames.has(fileName)) {
+			diffs.push({ type: 'removed', project_id: '', fileName })
+		}
+	}
 
 	// Fetch projects and versions of diffs
 	const allProjectIds = [...new Set(diffs.map((d) => d.project_id).filter(Boolean))]
@@ -228,14 +169,14 @@ async function computeDependencyDiffs(
 		),
 	] as string[]
 	const [projects, versions] = await Promise.all([
-		get_project_many(allProjectIds, 'must_revalidate'),
-		get_version_many(allVersionIds, 'must_revalidate'),
+		get_project_many(allProjectIds, 'bypass'),
+		get_version_many(allVersionIds, 'bypass'),
 	])
 
 	const projectMap = new Map<string, ProjectInfo>(projects.map((p: ProjectInfo) => [p.id, p]))
 	const versionMap = new Map<string, Version>(versions.map((v: Version) => [v.id, v]))
 
-	return diffs
+	const mappedDiffs = diffs
 		.map((diff) => {
 			const project = projectMap.get(diff.project_id)
 			return {
@@ -248,7 +189,7 @@ async function computeDependencyDiffs(
 			}
 		})
 		.sort((a, b) => {
-			const typeOrder = { removed: 0, added: 1, updated: 2 }
+			const typeOrder = { added: 0, updated: 1, removed: 2 }
 			const typeCompare = typeOrder[a.type] - typeOrder[b.type]
 			if (typeCompare !== 0) return typeCompare
 
@@ -256,34 +197,26 @@ async function computeDependencyDiffs(
 			const bDate = b.newVersion?.date_published || b.currentVersion?.date_published || ''
 			return dayjs(bDate).valueOf() - dayjs(aDate).valueOf()
 		})
+		.filter((d) => d.project || d.fileName) // filter out any diffs that couldn't be matched to a project or file
+	return mappedDiffs
 }
 
-async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyDiff[] | null> {
-	if (!instance.linked_data) return null
+async function checkUpdateAvailable(inst: GameInstance): Promise<DependencyDiff[] | null> {
+	if (!inst.linked_data) return null
+	if (!modpackVersionId.value || !inst.linked_data.version_id) return null
 
 	try {
-		const project = await get_project(instance.linked_data.project_id, 'must_revalidate')
-		if (!project || !project.versions || project.versions.length === 0) {
-			return null
-		}
-
-		const versions = await get_version_many(project.versions, 'must_revalidate')
-		const sortedVersions = versions.sort(
-			(a: { date_published: string }, b: { date_published: string }) =>
-				dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
-		)
-
-		latestVersion.value = sortedVersions[0]
-		latestVersionId.value = latestVersion.value?.id || null
-
-		const currentVersionId = instance.linked_data.version_id
-		const currentVersion = versions.find((v: { id: string }) => v.id === currentVersionId)
+		// For server projects, linked_data.project_id is the server project but
+		// linked_data.version_id references a content modpack version from a different project.
+		// Detect this by comparing the version's project_id with linked_data.project_id.
+		modpackVersion.value = await get_version(modpackVersionId.value, 'bypass')
+		const instanceModpackVersion = await get_version(inst.linked_data.version_id, 'bypass')
 
 		// Compute dependency diffs between current and latest version
-		if (currentVersion && latestVersion.value) {
+		if (instanceModpackVersion && modpackVersion.value) {
 			return await computeDependencyDiffs(
-				currentVersion.dependencies || [],
-				latestVersion.value.dependencies || [],
+				instanceModpackVersion.dependencies || [],
+				modpackVersion.value.dependencies || [],
 			)
 		}
 	} catch (error) {
@@ -294,9 +227,10 @@ async function checkUpdateAvailable(instance: GameInstance): Promise<DependencyD
 }
 
 watch(
-	() => instance,
-	async () => {
-		const result = await checkUpdateAvailable(instance)
+	() => instance.value,
+	async (newInstance) => {
+		if (!newInstance) return
+		const result = await checkUpdateAvailable(newInstance)
 		diffs.value = result || []
 	},
 	{ immediate: true, deep: true },
@@ -304,18 +238,25 @@ watch(
 
 async function handleUpdate() {
 	hide()
+	const serverProjectId = instance.value?.linked_data?.project_id
+	if (serverProjectId) startInstallingServer(serverProjectId)
 	try {
-		if (latestVersionId.value) {
-			await update_managed_modrinth_version(instance.path, latestVersionId.value)
+		if (modpackVersionId.value && instance.value) {
+			await update_managed_modrinth_version(instance.value.path, modpackVersionId.value)
+			await onUpdateComplete.value()
 		}
 	} catch (error) {
 		console.error('Error updating instance:', error)
+	} finally {
+		if (serverProjectId) stopInstallingServer(serverProjectId)
 	}
 }
 
 function handleReport() {
-	if (instance.linked_data?.project_id) {
-		openUrl(`https://modrinth.com/report?item=project&itemID=${instance.linked_data.project_id}`)
+	if (instance.value?.linked_data?.project_id) {
+		openUrl(
+			`https://modrinth.com/report?item=project&itemID=${instance.value.linked_data.project_id}`,
+		)
 	}
 }
 
@@ -323,12 +264,20 @@ function handleDecline() {
 	hide()
 }
 
-function show(e?: MouseEvent) {
-	modal.value?.show(e)
+function show(
+	instanceVal: GameInstance,
+	modpackVersionIdVal: string | null = null,
+	callback: UpdateCompleteCallback = () => {},
+	e?: MouseEvent,
+) {
+	instance.value = instanceVal
+	modpackVersionId.value = modpackVersionIdVal
+	onUpdateComplete.value = callback
+	diffModal.value?.show(e)
 }
 
 function hide() {
-	modal.value?.hide()
+	diffModal.value?.hide()
 }
 
 const messages = defineMessages({
@@ -345,38 +294,15 @@ const messages = defineMessages({
 		defaultMessage:
 			'An update is required to play {name}. Please update to the latest version to launch the game.',
 	},
-	publishedDate: {
-		id: 'app.modal.update-to-play.published-date',
-		defaultMessage: '{date, date, long}',
-	},
-	removedCount: {
-		id: 'app.modal.update-to-play.removed-count',
-		defaultMessage: '{count} removed',
-	},
-	addedCount: {
-		id: 'app.modal.update-to-play.added-count',
-		defaultMessage: '{count} added',
-	},
-	updatedCount: {
-		id: 'app.modal.update-to-play.updated-count',
-		defaultMessage: '{count} updated',
-	},
 })
 
-const diffTypeMessages = defineMessages({
-	added: {
-		id: 'app.modal.update-to-play.diff-type.added',
-		defaultMessage: 'Added',
-	},
-	removed: {
-		id: 'app.modal.update-to-play.diff-type.removed',
-		defaultMessage: 'Removed',
-	},
-	updated: {
-		id: 'app.modal.update-to-play.diff-type.updated',
-		defaultMessage: 'Updated',
-	},
+const hasUpdate = computed(() => {
+	if (!instance.value?.linked_data) return false
+	return (
+		modpackVersionId.value != null &&
+		modpackVersionId.value !== instance.value.linked_data.version_id
+	)
 })
 
-defineExpose({ show, hide })
+defineExpose({ show, hide, hasUpdate })
 </script>

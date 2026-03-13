@@ -207,7 +207,7 @@
     "defaultMessage": "Postal code/ZIP code"
   },
   "form.label.state-province": {
-    "defaultMessage": "Eatado/probinsiya"
+    "defaultMessage": "Estado/probinsiya"
   },
   "form.placeholder.address": {
     "defaultMessage": "Ilagay ang address"
@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "Tampok"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Komunidad"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Mga tampok"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Paglalaro"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Epekto sa performance"
   },
@@ -291,7 +303,7 @@
     "defaultMessage": "Maghanap..."
   },
   "input.view.gallery": {
-    "defaultMessage": "Tanawing gallery"
+    "defaultMessage": "Tanaw ng galeriya"
   },
   "input.view.grid": {
     "defaultMessage": "Tanawing grid"
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "I-unlink ang modpack"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Bumalik"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Kopyahin ang link"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "Nakapatay"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Walang mahanap na kontento"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "Nakabukas"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Lahat"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Kontentong modpack"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Inihahanda ang kontento..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Walang proyektong tumugma sa iyong paghanap."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Maghanap nang {count} proyekto"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count} pinili"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Kasalukuyan"
@@ -500,6 +548,30 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "Nagdaragdag ng praan ng pagbabayad"
   },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Kusang ma-install ang kinailangang kontento"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Ilulunsad ang laro diretso sa server"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Panatilihing naisapanahon ang mga file kapag nagbago ang server"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Isara"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Kunin ang Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Kusang bubukas ang Modrinth App..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Binubukas ang Modrnth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Bakit Modrinth App ang gamitin"
+  },
   "notification.error.title": {
     "defaultMessage": "Isang kamaliang naganap"
   },
@@ -576,7 +648,7 @@
     "defaultMessage": "Client and server"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
-    "defaultMessage": "Client or server"
+    "defaultMessage": "Client o server"
   },
   "omorphia.component.environment-indicator.label.server": {
     "defaultMessage": "Server"
@@ -652,6 +724,12 @@
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Client at server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Client o server"
   },
   "project-card.environment.server": {
     "defaultMessage": "Server"
@@ -804,16 +882,34 @@
     "defaultMessage": "Mag-donate sa PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Masumbong ng isyu"
+    "defaultMessage": "Mag-ulat ng isyu"
+  },
+  "project.about.links.site": {
+    "defaultMessage": "Bisitahin ang website"
   },
   "project.about.links.source": {
     "defaultMessage": "Tingnan ang source"
   },
+  "project.about.links.store": {
+    "defaultMessage": "Bisitahin ang store page"
+  },
   "project.about.links.title": {
-    "defaultMessage": "Mga Link"
+    "defaultMessage": "Mga link"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Bisitahin ang wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Nakopya na!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Nakopya ang IP address na nasa clipboard na"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latency"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Detalye ng server"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} {count, plural, one {download} other {na download}}"
@@ -884,8 +980,23 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Hindi kilalang environment"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count} {count, plural, one {follower} other {na follower}}"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, one {online} other {na online}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, one {kamakailang paglaro} other {na kamakailang paglaro}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitika"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Kontento"
   },
   "project.settings.description.title": {
     "defaultMessage": "Paglalarawan"
@@ -909,7 +1020,7 @@
     "defaultMessage": "Kinakailangan ng dalawa"
   },
   "project.settings.environment.client_and_server.title": {
-    "defaultMessage": "Client and server"
+    "defaultMessage": "Client at server"
   },
   "project.settings.environment.client_only.description": {
     "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng client at maaaring gumana sa mga vanilla server."
@@ -975,7 +1086,7 @@
     "defaultMessage": "Patinayang wasto ang nakatakdang environment ng proyekto."
   },
   "project.settings.gallery.title": {
-    "defaultMessage": "Gallery"
+    "defaultMessage": "Galeriya"
   },
   "project.settings.general.title": {
     "defaultMessage": "General"
@@ -984,7 +1095,7 @@
     "defaultMessage": "Lisensiya"
   },
   "project.settings.links.title": {
-    "defaultMessage": "Mga Link"
+    "defaultMessage": "Mga link"
   },
   "project.settings.members.title": {
     "defaultMessage": "Mga miyembro"
@@ -995,8 +1106,11 @@
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Walang pahintulot"
   },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
+  },
   "project.settings.tags.title": {
-    "defaultMessage": "Mga Tag"
+    "defaultMessage": "Mga tag"
   },
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
@@ -1074,7 +1188,7 @@
     "defaultMessage": "Magpakita nang mas kaunti"
   },
   "search.filter.option.show_more": {
-    "defaultMessage": "Magpakita nang mas humigit"
+    "defaultMessage": "Magpakita nang higit pa"
   },
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
@@ -1296,7 +1410,7 @@
     "defaultMessage": "Piliin ang iyong ninanais na wiki para sa {platform}. Ambag ng mga boluntaryo <crowdin-link>galing sa Crowdin</crowdin-link> ang mga pagsasalin."
   },
   "settings.language.languages.search-field.placeholder": {
-    "defaultMessage": "Maghanap ng wiki..."
+    "defaultMessage": "Maghanap ng wika..."
   },
   "settings.language.languages.search-results-announcement": {
     "defaultMessage": "{matches, plural, =0 {Walang tumugmang wika} one {# wikang tumugma} other {# na wikang tumugma}} sa iyong paghanap."
@@ -1352,11 +1466,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Pakikipagsapalaran"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Modong Pakikipagsapalaran"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarkiya"
+  },
   "tag.category.atmosphere": {
-    "defaultMessage": "Kahanginan"
+    "defaultMessage": "Kapaligiran"
   },
   "tag.category.audio": {
     "defaultMessage": "Audio"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
   },
   "tag.category.blocks": {
     "defaultMessage": "Bloke"
@@ -1364,11 +1490,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Bloom"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Mga Boss"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Cartoon"
   },
   "tag.category.challenging": {
     "defaultMessage": "Mapanghamon"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Mga Klase"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Makulay na Pag-iilaw"
@@ -1376,14 +1508,32 @@
   "tag.category.combat": {
     "defaultMessage": "Labanan"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Mapagkumpetensiya"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Core Shaders"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Modong Kalikhaan"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Komunidad ng Tagagawa"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Crossplay"
   },
   "tag.category.cursed": {
     "defaultMessage": "Nakababagabag"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Pasadyang Kontento"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Palamuti"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Mga Piitan"
   },
   "tag.category.economy": {
     "defaultMessage": "Ekonomiya"
@@ -1396,6 +1546,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Kagamitan"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Mga Paksiyon"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Pantasya"
@@ -1412,8 +1565,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Mekaniks ng Laro"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Gens"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Modong Eksperto"
   },
   "tag.category.high": {
     "defaultMessage": "Mataas"
@@ -1421,11 +1580,20 @@
   "tag.category.items": {
     "defaultMessage": "Bagay"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Pananatili ng Imbentaryo"
+  },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "Kitchen Sink"
+    "defaultMessage": "Samot-sari't Labis"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PVP"
   },
   "tag.category.library": {
     "defaultMessage": "Librarya"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Magaan"
@@ -1442,11 +1610,23 @@
   "tag.category.management": {
     "defaultMessage": "Pamamahala"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Katamtaman"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Microgames"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minigame"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Minigames"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Mobs"
@@ -1460,8 +1640,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Pangmaramihang-laro"
   },
+  "tag.category.network": {
+    "defaultMessage": "Network"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Modong Offline"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "One Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimisasyon"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Path Tracing"
@@ -1469,17 +1664,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Mga Personal na Mundo"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Plots"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokemon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Kamote"
   },
+  "tag.category.prison": {
+    "defaultMessage": "Bilanggo"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Paggawa ng gawain"
+  },
   "tag.category.quests": {
-    "defaultMessage": "Quests"
+    "defaultMessage": "Gawain"
+  },
+  "tag.category.racing": {
+    "defaultMessage": "Karera"
   },
   "tag.category.realistic": {
     "defaultMessage": "Makatotohanan"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Recording SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Repleksiyon"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Roleplay"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Screenshot"
@@ -1493,11 +1721,26 @@
   "tag.category.simplistic": {
     "defaultMessage": "Simplistiko"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Sosyal"
   },
   "tag.category.storage": {
-    "defaultMessage": "Storage"
+    "defaultMessage": "Imbakan"
+  },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Modong Kaligtasan"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Mga Koponan"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Teknikal"
   },
   "tag.category.technology": {
     "defaultMessage": "Teknolohiya"
@@ -1505,17 +1748,26 @@
   "tag.category.themed": {
     "defaultMessage": "May tema"
   },
+  "tag.category.towns": {
+    "defaultMessage": "Mga Bayan"
+  },
   "tag.category.transportation": {
     "defaultMessage": "Transportasyon"
   },
   "tag.category.tweaks": {
-    "defaultMessage": "Tweaks"
+    "defaultMessage": "Pagsasaayos"
   },
   "tag.category.utility": {
     "defaultMessage": "Utilidad"
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Mala-Vanilla"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "May Whitelist"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Pag-reset ng Mundo"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Pag-generate ng Mundo"

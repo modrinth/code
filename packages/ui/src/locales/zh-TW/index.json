@@ -254,6 +254,18 @@
   "header.category.feature": {
     "defaultMessage": "功能"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "社群"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "特色"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "遊戲玩法"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "設定與機制"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "效能影響"
   },
@@ -264,7 +276,7 @@
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
   },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "CPU 突發技術可讓你的伺服器暫時調用額外執行緒，幫助緩解 TPS 波動。按這裡查看更多資訊。"
+    "defaultMessage": "CPU 突發技術可讓你的伺服器暫時使用額外執行緒，幫助緩解 TPS 波動。按這裡查看更多資訊。"
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB 記憶體"
@@ -273,7 +285,7 @@
     "defaultMessage": "{storage} GB 儲存空間"
   },
   "hosting.specs.shared-cpus": {
-    "defaultMessage": "{cpus} 共享 CPU"
+    "defaultMessage": "{cpus} 個共用 CPU"
   },
   "icon-select.edit": {
     "defaultMessage": "編輯圖示"
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "解除連結模組包"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "返回"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "複製連結"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "停用"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "這個模組包不包含任何額外內容。"
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "找不到內容"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "啟用"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "全部"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "模組包內容"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "正在載入內容..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "沒有專案符合你的搜尋字詞。"
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "搜尋 {count} 個專案"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "已選取 {count} 個模組"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "目前"
@@ -500,6 +548,30 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "正在新增付款方式"
   },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "自動安裝所需內容"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "直接啟動遊戲並加入伺服器"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "當伺服器變動時，維持檔案為最新狀態"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "關閉"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "取得 Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App 將自動開啟..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "正在開啟 Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "為何使用 Modrinth App"
+  },
   "notification.error.title": {
     "defaultMessage": "發生錯誤"
   },
@@ -528,7 +600,7 @@
     "defaultMessage": "公開"
   },
   "omorphia.component.badge.label.moderator": {
-    "defaultMessage": "審查員"
+    "defaultMessage": "管理員"
   },
   "omorphia.component.badge.label.modrinth-team": {
     "defaultMessage": "Modrinth 團隊"
@@ -555,7 +627,7 @@
     "defaultMessage": "已排定"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "審核中"
+    "defaultMessage": "審查中"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "不公開"
@@ -564,7 +636,7 @@
     "defaultMessage": "不通過"
   },
   "omorphia.component.badge.label.withheld": {
-    "defaultMessage": "已隱藏"
+    "defaultMessage": "已擱置"
   },
   "omorphia.component.copy.action.copy": {
     "defaultMessage": "將程式碼複製到剪貼簿"
@@ -600,7 +672,7 @@
     "defaultMessage": "Cash App"
   },
   "payment-method.charity": {
-    "defaultMessage": "慈善"
+    "defaultMessage": "慈善機構"
   },
   "payment-method.charity-plural": {
     "defaultMessage": "慈善機構"
@@ -762,7 +834,7 @@
     "defaultMessage": "Minecraft Java 版"
   },
   "project.about.compatibility.platforms": {
-    "defaultMessage": "平台"
+    "defaultMessage": "平臺"
   },
   "project.about.compatibility.title": {
     "defaultMessage": "相容性"
@@ -812,14 +884,32 @@
   "project.about.links.issues": {
     "defaultMessage": "回報問題"
   },
+  "project.about.links.site": {
+    "defaultMessage": "前往網站"
+  },
   "project.about.links.source": {
     "defaultMessage": "檢視原始碼"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "前往商店頁面"
   },
   "project.about.links.title": {
     "defaultMessage": "相關連結"
   },
   "project.about.links.wiki": {
     "defaultMessage": "前往 wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "已複製！"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "已將 IP 位址複製到剪貼簿"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "延遲"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "伺服器詳細資訊"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} 次下載"
@@ -893,8 +983,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} 位追蹤者"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} 位線上"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} 次最近遊玩"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} 毫秒"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "數據分析"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "內容"
   },
   "project.settings.description.title": {
     "defaultMessage": "描述"
@@ -942,7 +1044,7 @@
     "defaultMessage": "我們剛剛對 Modrinth 的執行環境系統進行了全面更新，並提供了新的選項。請確定已選擇正確的選項，然後按一下「驗證」！"
   },
   "project.settings.environment.notice.review-options.title": {
-    "defaultMessage": "請審核以下選項"
+    "defaultMessage": "請審查以下選項"
   },
   "project.settings.environment.notice.wrong-project-type.description": {
     "defaultMessage": "只有模組或模組包專案才能擁有環境詮釋資料。"
@@ -1004,6 +1106,9 @@
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "沒有權限"
   },
+  "project.settings.server.title": {
+    "defaultMessage": "伺服器"
+  },
   "project.settings.tags.title": {
     "defaultMessage": "標籤"
   },
@@ -1044,7 +1149,7 @@
     "defaultMessage": "已排定"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "審核中"
+    "defaultMessage": "審查中"
   },
   "project.visibility.unknown": {
     "defaultMessage": "未知"
@@ -1116,7 +1221,7 @@
     "defaultMessage": "載入器"
   },
   "search.filter_type.plugin_platform": {
-    "defaultMessage": "平台"
+    "defaultMessage": "平臺"
   },
   "search.filter_type.project_id": {
     "defaultMessage": "專案 ID"
@@ -1361,11 +1466,23 @@
   "tag.category.adventure": {
     "defaultMessage": "冒險"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "冒險模式"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "無政府"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "大氣效果"
   },
   "tag.category.audio": {
     "defaultMessage": "音效"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "大逃殺"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "床戰"
   },
   "tag.category.blocks": {
     "defaultMessage": "方塊"
@@ -1373,11 +1490,17 @@
   "tag.category.bloom": {
     "defaultMessage": "泛光"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Boss"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "卡通"
   },
   "tag.category.challenging": {
     "defaultMessage": "挑戰"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "職業"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "彩色光照"
@@ -1385,14 +1508,32 @@
   "tag.category.combat": {
     "defaultMessage": "戰鬥"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "競技"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "核心著色器"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "創造模式"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "創作者社群"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "跨平臺"
   },
   "tag.category.cursed": {
     "defaultMessage": "邪門"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "自訂內容"
+  },
   "tag.category.decoration": {
     "defaultMessage": "裝飾"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "副本"
   },
   "tag.category.economy": {
     "defaultMessage": "經濟"
@@ -1405,6 +1546,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "裝備"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "派系"
   },
   "tag.category.fantasy": {
     "defaultMessage": "奇幻"
@@ -1421,8 +1565,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "遊戲機制"
   },
+  "tag.category.gens": {
+    "defaultMessage": "生成器"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "極限模式"
   },
   "tag.category.high": {
     "defaultMessage": "高"
@@ -1430,11 +1580,20 @@
   "tag.category.items": {
     "defaultMessage": "物品"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "保留物品欄"
+  },
   "tag.category.kitchen-sink": {
-    "defaultMessage": "大雜燴"
+    "defaultMessage": "水槽"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "程式庫"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "輕量"
@@ -1451,11 +1610,23 @@
   "tag.category.management": {
     "defaultMessage": "管理"
   },
+  "tag.category.media": {
+    "defaultMessage": "媒體"
+  },
   "tag.category.medium": {
     "defaultMessage": "中"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "微型遊戲"
+  },
   "tag.category.minigame": {
     "defaultMessage": "小遊戲"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "小遊戲"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "生物"
@@ -1469,8 +1640,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "多人遊戲"
   },
+  "tag.category.network": {
+    "defaultMessage": "群組伺服器"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "離線模式"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "一格方塊"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "最佳化"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "跑酷"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "光線追蹤"
@@ -1478,17 +1664,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "個人世界"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "地塊"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "寶可夢"
+  },
   "tag.category.potato": {
     "defaultMessage": "馬鈴薯"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "監獄"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "任務"
   },
   "tag.category.quests": {
     "defaultMessage": "任務"
   },
+  "tag.category.racing": {
+    "defaultMessage": "競速"
+  },
   "tag.category.realistic": {
     "defaultMessage": "寫實"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "錄影 SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "折射"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "角色扮演"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "角色扮演"
   },
   "tag.category.screenshot": {
     "defaultMessage": "擷圖用"
@@ -1502,17 +1721,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "簡約"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "空島生存"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "社交"
   },
   "tag.category.storage": {
     "defaultMessage": "儲存"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "生存模式"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "團隊"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "技術性"
+  },
   "tag.category.technology": {
     "defaultMessage": "科技"
   },
   "tag.category.themed": {
     "defaultMessage": "特定主題"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "城鎮"
   },
   "tag.category.transportation": {
     "defaultMessage": "交通"
@@ -1524,7 +1761,13 @@
     "defaultMessage": "工具"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "原版風格"
+    "defaultMessage": "類原版"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "白名單"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "世界重設"
   },
   "tag.category.worldgen": {
     "defaultMessage": "世界生成"

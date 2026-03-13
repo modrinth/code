@@ -51,7 +51,7 @@
     "defaultMessage": "분석"
   },
   "button.back": {
-    "defaultMessage": "이전"
+    "defaultMessage": "뒤로 가기"
   },
   "button.cancel": {
     "defaultMessage": "취소"
@@ -254,11 +254,23 @@
   "header.category.feature": {
     "defaultMessage": "특징"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "커뮤니티"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "기능"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "게임플레이"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "메타"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "성능에 미치는 영향"
   },
   "header.category.resolutions": {
-    "defaultMessage": "결의안"
+    "defaultMessage": "해상도"
   },
   "hosting.specs.burst": {
     "defaultMessage": "최대 {cpus} CPU까지 버스트 가능"
@@ -316,6 +328,42 @@
   },
   "instances.modpack-card.unlink": {
     "defaultMessage": "모드팩 연결 해제"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "뒤로 가기"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "링크 복사"
+  },
+  "instances.modpack-content-modal.disable": {
+    "defaultMessage": "비활성화"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "콘텐츠를 찾을 수 없습니다"
+  },
+  "instances.modpack-content-modal.enable": {
+    "defaultMessage": "활성화"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "전체"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "모드팩 콘텐츠"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "콘텐츠 불러오는 중..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "{count}개의 프로젝트 검색"
+  },
+  "instances.modpack-content-modal.selected-count": {
+    "defaultMessage": "{count}개 선택됨"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
@@ -499,6 +547,30 @@
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "결제 수단 추가"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "필수 콘텐츠 자동 설치"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "서버로 바로 게임 접속"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "서버 변경 시 파일 자동 업데이트"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "닫기"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Modrinth App 받기"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App이 자동으로 열립니다..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Modrinth App 여는 중"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Modrinth App을 사용하는 이유"
   },
   "notification.error.title": {
     "defaultMessage": "오류가 발생했습니다"
@@ -714,7 +786,7 @@
     "defaultMessage": "{count, plural, other {리소스 팩}}"
   },
   "project-type.resourcepack.category": {
-    "defaultMessage": "리소스팩"
+    "defaultMessage": "리소스 팩"
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, other {리소스 팩}}"
@@ -812,14 +884,32 @@
   "project.about.links.issues": {
     "defaultMessage": "오류 신고"
   },
+  "project.about.links.site": {
+    "defaultMessage": "웹사이트 방문하기"
+  },
   "project.about.links.source": {
     "defaultMessage": "소스 코드 보기"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "스토어 페이지 방문하기"
   },
   "project.about.links.title": {
     "defaultMessage": "링크"
   },
   "project.about.links.wiki": {
     "defaultMessage": "위키"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "복사됨!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP 주소가 클립보드에 복사되었습니다"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "지연시간"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "서버 세부정보"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count} 다운로드"
@@ -893,8 +983,20 @@
   "project.follower-count-tooltip": {
     "defaultMessage": "{count} 팔로워"
   },
+  "project.online-player-count": {
+    "defaultMessage": "{count} {count, plural, other {명 온라인}}"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {count, plural, other {회 최근 플레이}}"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "분석"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "콘텐츠"
   },
   "project.settings.description.title": {
     "defaultMessage": "설명"
@@ -1003,6 +1105,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "권한 없음"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "서버"
   },
   "project.settings.tags.title": {
     "defaultMessage": "태그"
@@ -1323,7 +1428,7 @@
     "defaultMessage": "언어"
   },
   "settings.language.warning": {
-    "defaultMessage": "{platform}의 언어를 변경하면 번역이 없는 일부 콘텐츠가 영어로 표시될 수 있습니다. {platform}은 아직 완전히 번역되지 않았기 때문에, 일부 언어에서는 일부 콘텐츠가 영어로 남아 있을 수 있습니다."
+    "defaultMessage": "{platform}의 언어를 변경하면 번역이 없는 일부 콘텐츠가 영어로 표시될 수 있습니다. {platform}는 아직 완전히 번역되지 않았기 때문에, 일부 언어에서는 일부 콘텐츠가 영어로 남아 있을 수 있습니다."
   },
   "settings.pats.title": {
     "defaultMessage": "개인 액세스 토큰"
@@ -1361,11 +1466,23 @@
   "tag.category.adventure": {
     "defaultMessage": "모험"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "모험 모드"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "아나키"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "대기 효과"
   },
   "tag.category.audio": {
     "defaultMessage": "소리"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "배틀 로엄"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "베드 워즈"
   },
   "tag.category.blocks": {
     "defaultMessage": "블록"
@@ -1373,11 +1490,17 @@
   "tag.category.bloom": {
     "defaultMessage": "블룸"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "보스"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "만화풍"
   },
   "tag.category.challenging": {
     "defaultMessage": "도전"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "클래스"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "색 조명"
@@ -1385,14 +1508,32 @@
   "tag.category.combat": {
     "defaultMessage": "전투"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "경쟁전"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "코어 셰이더"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "크리에이티브 모드"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "크리에이터 커뮤니티"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "크로스플레이"
   },
   "tag.category.cursed": {
     "defaultMessage": "특이한"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "커스텀 콘텐츠"
+  },
   "tag.category.decoration": {
     "defaultMessage": "장식"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "던전"
   },
   "tag.category.economy": {
     "defaultMessage": "경제"
@@ -1405,6 +1546,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "장비"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "팀"
   },
   "tag.category.fantasy": {
     "defaultMessage": "공상"
@@ -1421,8 +1565,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "게임 동작"
   },
+  "tag.category.gens": {
+    "defaultMessage": "세대"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "하드코어 모드"
   },
   "tag.category.high": {
     "defaultMessage": "높은"
@@ -1430,11 +1580,20 @@
   "tag.category.items": {
     "defaultMessage": "아이템"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "인벤토리 유지"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "다양한"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "라이브러리"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "라이프스틸"
   },
   "tag.category.lightweight": {
     "defaultMessage": "가벼운"
@@ -1451,11 +1610,23 @@
   "tag.category.management": {
     "defaultMessage": "관리"
   },
+  "tag.category.media": {
+    "defaultMessage": "미디어"
+  },
   "tag.category.medium": {
     "defaultMessage": "보통"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "마이크로게임"
+  },
   "tag.category.minigame": {
     "defaultMessage": "미니게임"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "미니 게임"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "몹"
@@ -1469,8 +1640,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "멀티플레이어"
   },
+  "tag.category.network": {
+    "defaultMessage": "네트워크"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "오프라인 모드"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "원블럭"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "최적화"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "파쿠르"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "패스 트레이싱"
@@ -1478,17 +1664,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "개인 세계"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "플롯"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "포켓몬"
+  },
   "tag.category.potato": {
     "defaultMessage": "저사양"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "감옥"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "퀴스트"
   },
   "tag.category.quests": {
     "defaultMessage": "퀘스트"
   },
+  "tag.category.racing": {
+    "defaultMessage": "레이싱"
+  },
   "tag.category.realistic": {
     "defaultMessage": "사실적"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "레코딩 SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "반사"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "롤플레이"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "스크린샷"
@@ -1502,17 +1721,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "단순한"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "스카이블럭"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "소셜"
   },
   "tag.category.storage": {
     "defaultMessage": "보관"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "서바이벌 모드"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "팀"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "테크니컈"
+  },
   "tag.category.technology": {
     "defaultMessage": "기술"
   },
   "tag.category.themed": {
     "defaultMessage": "테마"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "마을"
   },
   "tag.category.transportation": {
     "defaultMessage": "운송"
@@ -1526,11 +1763,17 @@
   "tag.category.vanilla-like": {
     "defaultMessage": "바닐라 같은"
   },
+  "tag.category.whitelisted": {
+    "defaultMessage": "화이트리스트"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "월드 초기화"
+  },
   "tag.category.worldgen": {
     "defaultMessage": "세계 생성"
   },
   "tag.loader.babric": {
-    "defaultMessage": "배브릭"
+    "defaultMessage": "Babric"
   },
   "tag.loader.bta-babric": {
     "defaultMessage": "BTA (Babric)"
@@ -1611,7 +1854,7 @@
     "defaultMessage": "Sponge"
   },
   "tag.loader.vanilla": {
-    "defaultMessage": "바닐라 쉐이더"
+    "defaultMessage": "바닐라 셰이더"
   },
   "tag.loader.velocity": {
     "defaultMessage": "Velocity"

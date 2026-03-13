@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Buat proyek"
   },
+  "create.project.create-server-project": {
+    "message": "Buat server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Bidang hilang: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nama"
   },
   "create.project.name-placeholder": {
     "message": "Masukkan nama proyek..."
+  },
+  "create.project.owner-description": {
+    "message": "Buat diri Anda atau organisasi yang Anda sertai sebagai pemilik proyek."
+  },
+  "create.project.owner-label": {
+    "message": "Pemilik"
+  },
+  "create.project.server-project-title": {
+    "message": "Membuat proyek server"
   },
   "create.project.summary-description": {
     "message": "Satu atau dua kalimat yang menjelaskan proyek Anda."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Membuat proyek"
+  },
+  "create.project.type-label": {
+    "message": "Jenis"
+  },
+  "create.project.type-project": {
+    "message": "Proyek"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1077,7 +1101,7 @@
     "message": "Bayar per tiga bulan"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "Hemat 16% dengan pembayaran triwulan!"
+    "message": "Hemat 16% dengan penagihan triwulan!"
   },
   "hosting-marketing.billing.starting-at": {
     "message": "Mulai dari {price} / bulan"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Proyek baru"
   },
+  "layout.action.new-server-project": {
+    "message": "Server baru"
+  },
+  "layout.action.publish": {
+    "message": "Terbitkan"
+  },
   "layout.action.reports": {
     "message": "Tinjau laporan"
   },
@@ -1485,7 +1515,7 @@
     "message": "Lengkapi formulir pajak"
   },
   "layout.banner.tax.description": {
-    "message": "Anda telah menarik lebih dari $600 dari Modrinth tahun ini. Untuk mematuhi peraturan perpajakan, Anda harus melengkapi formulir pajak. Penarikan dana Anda dihentikan sementara hingga formulir diajukan."
+    "message": "Anda telah menarik lebih dari {threshold} dari Modrinth tahun ini. Untuk mematuhi peraturan perpajakan, Anda harus melengkapi formulir pajak. Penarikan dana Anda dihentikan sementara hingga formulir diajukan."
   },
   "layout.banner.tax.title": {
     "message": "Formulir pajak diperlukan"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Nomor rekening"
   },
-  "muralpay.field.branch-code": {
-    "message": "Kode cabang"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Gawai PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Kunci acak"
   },
   "muralpay.field.routing-number": {
     "message": "Nomor perutean"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Masukkan nomor rekening"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Masukkan kode cabang"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Masukkan CLABE 18 digit"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Masukkan sur-el PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Masukkan kunci acak"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Masukkan nomor perutean 9 digit"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Paket Data"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mod"
   },
@@ -2132,6 +2168,12 @@
   "project-type.resourcepack.singular": {
     "message": "Paket Sumber"
   },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
+  },
   "project-type.shader.plural": {
     "message": "Pencorak"
   },
@@ -2145,16 +2187,16 @@
     "message": "Berlisensi {license}"
   },
   "project.about.details.published": {
-    "message": "Diterbitkan pada {date}"
+    "message": "Diterbitkan {date}"
   },
   "project.about.details.submitted": {
-    "message": "Diserahkan pada {date}"
+    "message": "Diserahkan {date}"
   },
   "project.about.details.title": {
     "message": "Perincian"
   },
   "project.about.details.updated": {
-    "message": "Diperbarui pada {date}"
+    "message": "Diperbarui {date}"
   },
   "project.actions.create-server": {
     "message": "Buat server"
@@ -2814,7 +2856,7 @@
     "message": "Rahasia klien"
   },
   "settings.applications.created-on": {
-    "message": "Dibuat pada {date}"
+    "message": "Dibuat {date}"
   },
   "settings.applications.delete.confirm.button": {
     "message": "Hapus aplikasi ini"
@@ -2953,6 +2995,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Halaman Paket Sumber"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Halaman Server"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Halaman Pencorak (Shader)"

@@ -114,7 +114,7 @@
     "message": "Discord"
   },
   "app-marketing.features.performance.good-performance": {
-    "message": "Висока швидкодія"
+    "message": "Висока продуктивність"
   },
   "app-marketing.features.performance.google-chrome": {
     "message": "Google Chrome"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Створити проєкт"
   },
+  "create.project.create-server-project": {
+    "message": "Створити сервер"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Відсутні поля: {fields}"
+  },
   "create.project.name-label": {
     "message": "Назва"
   },
   "create.project.name-placeholder": {
     "message": "Уведіть назву проєкту…"
+  },
+  "create.project.owner-description": {
+    "message": "Установіть власника проєкту як себе чи організацію, членом якої ви є."
+  },
+  "create.project.owner-label": {
+    "message": "Власник"
+  },
+  "create.project.server-project-title": {
+    "message": "Створення проєкту сервера"
   },
   "create.project.summary-description": {
     "message": "Кілька речень, які описують ваш проєкт."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Створення проєкту"
+  },
+  "create.project.type-label": {
+    "message": "Тип"
+  },
+  "create.project.type-project": {
+    "message": "Проєкт"
+  },
+  "create.project.type-server": {
+    "message": "Сервер"
   },
   "create.project.url-label": {
     "message": "Посилання"
@@ -1143,7 +1167,7 @@
     "message": "Ми також підтримуємо широкий спектр завантажувачів модів і плаґінів, таких як Fabric, Quilt, Forge і NeoForge для модів, а також Paper і Purpur для плаґінів. Доступність залежить від того, чи підтримує завантажувач модів або плаґінів вибрану вами версію Minecraft."
   },
   "hosting-marketing.get-started": {
-    "message": "Почнімо"
+    "message": "Розпочати"
   },
   "hosting-marketing.hero.button.manage-your-servers": {
     "message": "Керувати своїми серверами"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Новий проєкт"
   },
+  "layout.action.new-server-project": {
+    "message": "Новий сервер"
+  },
+  "layout.action.publish": {
+    "message": "Опублікувати"
+  },
   "layout.action.reports": {
     "message": "Перегляд звітів"
   },
@@ -1485,7 +1515,7 @@
     "message": "Заповніть податкову форму"
   },
   "layout.banner.tax.description": {
-    "message": "Ви вже вивели більше ніж $600 з Modrinth цього року. Щоб дотримуватися податкових зобов’язань, ви маєте заповнити податкову форму. Ваші виведення затримані, доки ця форма не буде заповнена."
+    "message": "Ви вже вивели більше ніж {threshold} з Modrinth цього року. Щоб дотримуватися податкових зобов’язань, ви маєте заповнити податкову форму. Ваші виведення затримані, доки ця форма не буде заповнена."
   },
   "layout.banner.tax.title": {
     "message": "Вимагано податкову форму"
@@ -1614,7 +1644,7 @@
     "message": "Дослідити"
   },
   "layout.nav.discover-content": {
-    "message": "Шукати вміст"
+    "message": "Дослідити вміст"
   },
   "layout.nav.feature-flags": {
     "message": "Спеціальні функції"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Номер рахунку"
   },
-  "muralpay.field.branch-code": {
-    "message": "Код відділення"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Телефон PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Випадковий ключ"
   },
   "muralpay.field.routing-number": {
     "message": "Номер маршруту"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Уведіть номер рахунку"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Уведіть код відділення"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Уведіть 18-значний CLABE"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Уведіть електронну адресу PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Уведіть випадковий ключ"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Введіть 9-значний маршрутний номер"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Пакет даних"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Сервери"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Сервер"
+  },
   "project-type.mod.plural": {
     "message": "Моди"
   },
@@ -2132,6 +2168,12 @@
   "project-type.resourcepack.singular": {
     "message": "Пакет ресурсів"
   },
+  "project-type.server.plural": {
+    "message": "Сервери"
+  },
+  "project-type.server.singular": {
+    "message": "Сервер"
+  },
   "project-type.shader.plural": {
     "message": "Шейдери"
   },
@@ -2148,7 +2190,7 @@
     "message": "Опубліковано {date}"
   },
   "project.about.details.submitted": {
-    "message": "Підтверджено {date}"
+    "message": "Подано на розгляд {date}"
   },
   "project.about.details.title": {
     "message": "Деталі"
@@ -2442,7 +2484,7 @@
     "message": "Доступ до ваших аналітичних даних"
   },
   "scopes.analytics.label": {
-    "message": "Див. аналітику"
+    "message": "Переглядати аналітику"
   },
   "scopes.category.analytics": {
     "message": "Аналітика"
@@ -2484,151 +2526,151 @@
     "message": "Створювати добірки"
   },
   "scopes.collectionCreate.label": {
-    "message": "Створ. добірки"
+    "message": "Створювати добірки"
   },
   "scopes.collectionDelete.description": {
     "message": "Видаляти добірки"
   },
   "scopes.collectionDelete.label": {
-    "message": "Вид. добірки"
+    "message": "Видаляти добірки"
   },
   "scopes.collectionRead.description": {
     "message": "Переглядати добірки"
   },
   "scopes.collectionRead.label": {
-    "message": "Див. добірки"
+    "message": "Переглядати добірки"
   },
   "scopes.collectionWrite.description": {
     "message": "Редагувати добірки"
   },
   "scopes.collectionWrite.label": {
-    "message": "Ред. добірки"
+    "message": "Редагувати добірки"
   },
   "scopes.notificationRead.description": {
     "message": "Переглядати ваші сповіщення"
   },
   "scopes.notificationRead.label": {
-    "message": "Див. сповіщення"
+    "message": "Переглядати сповіщення"
   },
   "scopes.notificationWrite.description": {
     "message": "Видаляти/переглядати ваші сповіщення"
   },
   "scopes.notificationWrite.label": {
-    "message": "Ред. сповіщення"
+    "message": "Редагувати сповіщення"
   },
   "scopes.organizationCreate.description": {
     "message": "Створювати організації"
   },
   "scopes.organizationCreate.label": {
-    "message": "Створ. організації"
+    "message": "Створювати організації"
   },
   "scopes.organizationDelete.description": {
     "message": "Видаляти організації"
   },
   "scopes.organizationDelete.label": {
-    "message": "Вид. організації"
+    "message": "Видаляти організації"
   },
   "scopes.organizationRead.description": {
     "message": "Переглядати організації"
   },
   "scopes.organizationRead.label": {
-    "message": "Див. організації"
+    "message": "Переглядати організації"
   },
   "scopes.organizationWrite.description": {
     "message": "Редагувати організації"
   },
   "scopes.organizationWrite.label": {
-    "message": "Ред. організації"
+    "message": "Редагувати організації"
   },
   "scopes.patCreate.description": {
     "message": "Створювати особисті API-токени"
   },
   "scopes.patCreate.label": {
-    "message": "Створ. токени доступу"
+    "message": "Створювати токени доступу"
   },
   "scopes.patDelete.description": {
     "message": "Видаляти ваші особисті API-токени"
   },
   "scopes.patDelete.label": {
-    "message": "Вид. токени доступу"
+    "message": "Видаляти токени доступу"
   },
   "scopes.patRead.description": {
     "message": "Переглядати створені API-токени"
   },
   "scopes.patRead.label": {
-    "message": "Див. токени доступу"
+    "message": "Дивитися токени доступу"
   },
   "scopes.patWrite.description": {
     "message": "Змінювати особисті API-токени"
   },
   "scopes.patWrite.label": {
-    "message": "Ред. токени доступу"
+    "message": "Редагувати токени доступу"
   },
   "scopes.payoutsRead.description": {
     "message": "Переглядати ваші дані про виплати"
   },
   "scopes.payoutsRead.label": {
-    "message": "Див. виплати"
+    "message": "Переглядати виплати"
   },
   "scopes.payoutsWrite.description": {
     "message": "Виводити кошти"
   },
   "scopes.payoutsWrite.label": {
-    "message": "Ред. виплати"
+    "message": "Редагувати виплати"
   },
   "scopes.performAnalytics.description": {
     "message": "Виконувати дії з аналітикою"
   },
   "scopes.performAnalytics.label": {
-    "message": "Управ. аналітикою"
+    "message": "Управляти аналітикою"
   },
   "scopes.projectCreate.description": {
     "message": "Створювати нові проєкти"
   },
   "scopes.projectCreate.label": {
-    "message": "Створ. проєкти"
+    "message": "Створювати проєкти"
   },
   "scopes.projectDelete.description": {
     "message": "Видалення ваших проєктів"
   },
   "scopes.projectDelete.label": {
-    "message": "Вид. проєкти"
+    "message": "Видаляти проєкти"
   },
   "scopes.projectRead.description": {
     "message": "Переглядати всі ваші проєкти"
   },
   "scopes.projectRead.label": {
-    "message": "Див. проєкти"
+    "message": "Переглядати проєкти"
   },
   "scopes.projectWrite.description": {
     "message": "Редагувати дані проєкту"
   },
   "scopes.projectWrite.label": {
-    "message": "Ред. проєкти"
+    "message": "Редагувати проєкти"
   },
   "scopes.reportCreate.description": {
     "message": "Створювати скарги"
   },
   "scopes.reportCreate.label": {
-    "message": "Створ. скарги"
+    "message": "Створювати скарги"
   },
   "scopes.reportDelete.description": {
     "message": "Видаляти скарги"
   },
   "scopes.reportDelete.label": {
-    "message": "Вид. скарги"
+    "message": "Видаляти скарги"
   },
   "scopes.reportRead.description": {
     "message": "Переглядати скарги"
   },
   "scopes.reportRead.label": {
-    "message": "Див. скарги"
+    "message": "Переглядати скарги"
   },
   "scopes.reportWrite.description": {
     "message": "Редагувати скарги"
   },
   "scopes.reportWrite.label": {
-    "message": "Ред. скарги"
+    "message": "Редагувати скарги"
   },
   "scopes.sessionAccess.description": {
     "message": "Доступ до сесій, створених Modrinth"
@@ -2640,79 +2682,79 @@
     "message": "Видаляти сесії"
   },
   "scopes.sessionDelete.label": {
-    "message": "Вид. сесії"
+    "message": "Видаляти сесії"
   },
   "scopes.sessionRead.description": {
     "message": "Переглядати активні сесії"
   },
   "scopes.sessionRead.label": {
-    "message": "Див. сесії"
+    "message": "Переглядати сесії"
   },
   "scopes.threadRead.description": {
     "message": "Переглядати гілки"
   },
   "scopes.threadRead.label": {
-    "message": "Див. гілки"
+    "message": "Переглядати гілки"
   },
   "scopes.threadWrite.description": {
     "message": "Редагувати гілки"
   },
   "scopes.threadWrite.label": {
-    "message": "Ред. гілки"
+    "message": "Редагувати гілки"
   },
   "scopes.userAuthWrite.description": {
     "message": "Змінювати ваші автентифікаційні дані"
   },
   "scopes.userAuthWrite.label": {
-    "message": "Ред. дані входу"
+    "message": "Редагувати дані входу"
   },
   "scopes.userDelete.description": {
     "message": "Видаляти ваш обліковий запис"
   },
   "scopes.userDelete.label": {
-    "message": "Вид. обліковий запис"
+    "message": "Видаляти обліковий запис"
   },
   "scopes.userRead.description": {
     "message": "Доступ до публічної інформації вашого профілю"
   },
   "scopes.userRead.label": {
-    "message": "Див. дані користувача"
+    "message": "Переглядати дані користувача"
   },
   "scopes.userReadEmail.description": {
     "message": "Переглядати адресу вашої ел. пошти"
   },
   "scopes.userReadEmail.label": {
-    "message": "Див. адресу ел. пошти"
+    "message": "Переглядати адресу ел. пошти"
   },
   "scopes.userWrite.description": {
     "message": "Редагувати ваш профіль"
   },
   "scopes.userWrite.label": {
-    "message": "Ред. дані користувача"
+    "message": "Редагувати дані користувача"
   },
   "scopes.versionCreate.description": {
     "message": "Створювати нові версії"
   },
   "scopes.versionCreate.label": {
-    "message": "Створ. версії"
+    "message": "Створити версії"
   },
   "scopes.versionDelete.description": {
     "message": "Видаляти версію"
   },
   "scopes.versionDelete.label": {
-    "message": "Вид. версії"
+    "message": "Видаляти версії"
   },
   "scopes.versionRead.description": {
     "message": "Переглядати всі версії"
   },
   "scopes.versionRead.label": {
-    "message": "Див. версії"
+    "message": "Переглядати версії"
   },
   "scopes.versionWrite.description": {
     "message": "Редагувати дані версії"
   },
   "scopes.versionWrite.label": {
-    "message": "Ред. версії"
+    "message": "Редагувати версії"
   },
   "search.filter.game-version-shader-message": {
     "message": "Пакети шейдерів для старіших версій, швидше за все, працюватимуть на нових версіях з незначними проблемами."
@@ -2954,6 +2996,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Сторінка пакетів ресурсів"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Сторінка серверів"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Сторінка шейдерів"
   },
@@ -2973,7 +3018,7 @@
     "message": "Розширене промальовування"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Зробити так, щоб посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені та в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
+    "message": "Робить так, аби посилання за межі Modrinth, відкривалися в новій вкладці. Незалежно від цього налаштування, посилання в одному домені та в описах з Markdown відкриватимуться в тій же вкладці, а посилання в рекламах і на сторінках редагування — в новій вкладці."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Відкривати зовнішні посилання в новій вкладці"
@@ -3051,7 +3096,7 @@
     "message": "Використовувався {ago}"
   },
   "settings.pats.token.never-used": {
-    "message": "Ніколи не використовувався"
+    "message": "Не використовувався"
   },
   "settings.profile.bio.description": {
     "message": "Короткий опис, щоб розповісти всім трохи про себе."
@@ -3084,7 +3129,7 @@
     "message": "Тут перераховані всі пристрої, на яких здійснено вхід у ваш обліковий запис Modrinth. Ви можете керувати сеансом на кожному з них.\n\nЯкщо ви бачите тут пристрій, якого у вас немає, негайно завершіть сеанс і змініть пароль до вашого облікового запису."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Востаннє активний {ago}"
+    "message": "Остання активність {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Невідома ОС"

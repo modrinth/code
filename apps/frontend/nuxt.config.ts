@@ -68,6 +68,9 @@ export default defineNuxtConfig({
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
 			noExternal: ['v-tooltip'],
+			optimizeDeps: {
+				include: ['vue-router'],
+			},
 		},
 		define: {
 			global: {},
@@ -111,6 +114,8 @@ export default defineNuxtConfig({
 			const docTemplates = Object.keys(
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
+			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
+			const { getChangelog } = await import('@modrinth/utils')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
@@ -119,6 +124,15 @@ export default defineNuxtConfig({
 			}
 			for (const template of docTemplates) {
 				nitroConfig.prerender.routes.push(`/_internal/templates/doc/${template}`)
+			}
+			nitroConfig.prerender.routes.push('/news')
+			for (const article of blogArticles) {
+				nitroConfig.prerender.routes.push(`/news/article/${article.slug}`)
+			}
+			nitroConfig.prerender.routes.push('/news/changelog')
+			for (const entry of getChangelog()) {
+				const id = entry.version ?? entry.date.unix()
+				nitroConfig.prerender.routes.push(`/news/changelog/${entry.product}/${id}`)
 			}
 		},
 		async 'build:before'() {

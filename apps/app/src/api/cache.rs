@@ -30,11 +30,13 @@ macro_rules! impl_cache_methods {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
     (Organization, Organization),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -42,6 +44,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             get_project,
             get_project_many,
+            get_project_v3,
+            get_project_v3_many,
             get_version,
             get_version_many,
             get_user,
@@ -52,7 +56,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_organization_many,
             get_search_results,
             get_search_results_many,
+            get_search_results_v3,
+            get_search_results_v3_many,
             purge_cache_types,
+            get_project_versions,
         ])
         .build()
 }
@@ -60,4 +67,15 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
     Ok(theseus::cache::purge_cache_types(&cache_types).await?)
+}
+
+#[tauri::command]
+pub async fn get_project_versions(
+    project_id: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> Result<Option<Vec<Version>>> {
+    Ok(
+        theseus::cache::get_project_versions(project_id, cache_behaviour)
+            .await?,
+    )
 }

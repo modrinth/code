@@ -11,6 +11,71 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-12T14:05:00-00:00`,
+		product: 'app',
+		version: '0.12.0',
+		body: `## Major changes
+- Overhauled the "Content" tab on instances
+	- Installed modpacks now display under the content tab
+	- Content that came bundled with a modpack is now separated from content you have installed on top of it. To view a modpack's content, click the "Content" button in the modpack's card.
+	- Added the ability to sort content by date added.
+	- Overhauled the pop-out screen for updating a modpack. It will now make it clearer when a version is likely incompatible, and will show you the changelogs of each version.
+	- Various bugs and inconsistencies with the content list has now been fixed.
+
+## Improvements
+- Fixed the "add server to instance" pop-out opening slowly.
+- Fixed project pages not showing organizations under "Creators" in the sidebar.
+- In the library, split "Downloaded" tab into "Modpacks" and "Servers" depending on instance type.`,
+	},
+	{
+		date: `2026-03-10T16:40:00-00:00`,
+		product: 'app',
+		version: '0.11.4',
+		body: `## Improvements
+- Fix PostHog analytics
+- Improve language selector
+- Improve server play analytics tracking`,
+	},
+	{
+		date: `2026-03-06T19:10:00-08:00`,
+		product: 'app',
+		version: '0.11.3',
+		body: `## Improvements
+- Added warning banner for installing content to server instance.
+- Fixed server instance pinging to be less jumpy and only ping once in instance.
+- Fixed unlinking instance not giving sufficient feedback.
+- Improved the identification of server project worlds for tracking.
+- Fixed many other visual issues with server projects.`,
+	},
+	{
+		date: `2026-03-06T18:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Added the ability to search your own unlisted projects when selecting required content for a server project.
+- Added support for bulk editing of links of server projects.
+- Fixed server project tags in project settings having missing icons or unformatted names.
+- Fixed many other visual issues with server projects.`,
+	},
+	{
+		date: `2026-03-03T17:30:00-08:00`,
+		product: 'app',
+		version: '0.11.2',
+		body: `## [Introducing Server Projects](/news/article/introducing-server-projects)
+- Added new Server Project type
+  - Three compatibility types: vanilla, modded (published pack), or modded (uploaded pack)
+- Added new linked server instance type that receives updates from the server
+  - Joining a server from the app downloads the required content and launches you directly into the server.`,
+	},
+	{
+		date: `2026-02-16T12:40:00-08:00`,
+		product: 'web',
+		body: `## Improvements
+- Fixed slider inputs not being styled correctly.
+- Fixed tabbed modal icons shrinking when the text is too long.
+- Fixed version dependencies sometimes appearing as "Unknown project"
+- Fixed overflow in the collections list when descriptions contain very long words.`,
+	},
+	{
 		date: `2026-02-09T16:45:00-08:00`,
 		product: 'app',
 		version: '0.10.29',

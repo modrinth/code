@@ -228,7 +228,7 @@
     "message": "Invia email di recupero"
   },
   "auth.reset-password.method-choice.description": {
-    "message": "Inserisci la tua email qui sotto e ti invieremo un link per il recupero del tuo account."
+    "message": "Inserisci la tua email. Ti invieremo un link per il recupero dell'account."
   },
   "auth.reset-password.notification.email-sent.text": {
     "message": "Una email con istruzioni ti è stata inviata, se questo indirizzo era associato al tuo account."
@@ -249,13 +249,13 @@
     "message": "Conferma password"
   },
   "auth.reset-password.post-challenge.description": {
-    "message": "Inserisci la tua nuova password qui sotto per ottenere l'accesso al tuo account."
+    "message": "Inserisci la nuova password per poter accedere al tuo account."
   },
   "auth.reset-password.title": {
     "message": "Reimposta password"
   },
   "auth.reset-password.title.long": {
-    "message": "Reimposta la tua password"
+    "message": "Reimposta la password"
   },
   "auth.sign-in.2fa.description": {
     "message": "Inserisci un codice di autenticazione a due fattori per procedere."
@@ -291,7 +291,7 @@
     "message": "Hai già un account?"
   },
   "auth.sign-up.subscribe.label": {
-    "message": "Ricevi novità su Modrinth"
+    "message": "Ricevi novità da Modrinth"
   },
   "auth.sign-up.title": {
     "message": "Registrati"
@@ -393,7 +393,7 @@
     "message": "Nessun progetto nella raccolta"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>#</stat> {type}}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aggiornata {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Crea progetto"
   },
+  "create.project.create-server-project": {
+    "message": "Crea server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Campi mancanti: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nome"
   },
   "create.project.name-placeholder": {
     "message": "Inserisci il nome del progetto..."
+  },
+  "create.project.owner-description": {
+    "message": "Puoi impostare come proprietario del progetto te o un'organizzazione di cui sei membro."
+  },
+  "create.project.owner-label": {
+    "message": "Proprietario"
+  },
+  "create.project.server-project-title": {
+    "message": "Crea un server"
   },
   "create.project.summary-description": {
     "message": "Una frase o due che descrivano il tuo progetto."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Creando un progetto"
+  },
+  "create.project.type-label": {
+    "message": "Tipo"
+  },
+  "create.project.type-project": {
+    "message": "Progetto"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -555,7 +579,7 @@
     "message": "Crea nuova"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cerca fra le tue raccolte"
@@ -1272,7 +1296,7 @@
     "message": "Non disponibile"
   },
   "hosting.plan.select-plan": {
-    "message": "Scegli un piano"
+    "message": "Scegli questo piano"
   },
   "landing.button.discover-mods": {
     "message": "Esplora mod"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Nuovo progetto"
   },
+  "layout.action.new-server-project": {
+    "message": "Nuovo server"
+  },
+  "layout.action.publish": {
+    "message": "Pubblica"
+  },
   "layout.action.reports": {
     "message": "Revisiona segnalazioni"
   },
@@ -1485,7 +1515,7 @@
     "message": "Completa il modulo fiscale"
   },
   "layout.banner.tax.description": {
-    "message": "Hai già prelevato oltre $600 da Modrinth quest'anno. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
+    "message": "Hai già prelevato oltre {threshold} da Modrinth quest'anno. Per essere in regola con le norme fiscali devi completare un modulo fiscale. I tuoi prelievi saranno sospesi finché questo modulo sarà inviato."
   },
   "layout.banner.tax.title": {
     "message": "Modulo fiscale obbligatorio"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numero conto"
   },
-  "muralpay.field.branch-code": {
-    "message": "Codice filiale"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Cellulare PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Chiave casuale"
   },
   "muralpay.field.routing-number": {
     "message": "Numero di routing"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Inserisci codice conto"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Inserisci codice filiale"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Inserisci il CLABE di 18 cifre"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Inserisci email PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Inserisci chiave casuale"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Inserisci il numero di routing di 9 cifre"
@@ -1998,7 +2028,7 @@
     "message": "Raccolta"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nessun} one {Un} other {#}} download"
+    "message": "{count, plural, =0 {Nessun} one {Un} other {{count}}} download"
   },
   "profile.label.joined": {
     "message": "Account creato"
@@ -2019,7 +2049,7 @@
     "message": "Organizzazioni"
   },
   "profile.label.projects": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -2031,7 +2061,7 @@
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {Nessun} one {<stat>Un</stat>} other {<stat>#</stat>}} follower del progetto"
+    "message": "<stat>{count, plural, =0 {Nessun} one {Un} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Pacchetto di dati"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mod"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pacchetto di risorse"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shader"
@@ -2718,13 +2760,13 @@
     "message": "I pacchetti di shader per versioni più vecchie potrebbero funzionare anche su quelle più recenti, seppur con problemi minori."
   },
   "search.filter.locked.server": {
-    "message": "Fornito dal server"
+    "message": "Determinato dal server"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "La versione del gioco è fornita dal server"
+    "message": "La versione del gioco è determinata dal server"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "Il loader è fornito dal server"
+    "message": "Il loader è determinato dal server"
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
@@ -2928,13 +2970,13 @@
     "message": "Disattiva modalità sviluppatore"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "La <strong>modalità sviluppatore</strong> è attiva. Questo ti permette di visualizzare gli ID interni in Modrinth, che possono essere utili se sei uno sviluppatore che utilizza l'API di Modrinth. Clicca 5 volte sul logo Modrinth in fondo alla pagina per attivare/disattivare la modalità sviluppatore."
+    "message": "La <strong>modalità sviluppatore</strong> è attiva: ciò ti permetterà di visualizzare gli ID interni usati da Modrinth, che possono essere utili se sei uno sviluppatore che utilizza le nostre API. Clicca 5 volte sul logo di Modrinth nel piè per disattivarla."
   },
   "settings.display.flags.description": {
     "message": "Attiva o disattiva determinate funzionalità su questo dispositivo."
   },
   "settings.display.flags.title": {
-    "message": "Attiva/Disattiva funzioni"
+    "message": "Altre funzionalità"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Pagina dei pacchetti di dati"
@@ -2954,6 +2996,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Pagina dei pacchetti di risorse"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Pagina dei server"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Pagina delle shader"
   },
@@ -2967,34 +3012,34 @@
     "message": "Raccolta"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Abilita il rendering avanzato, come gli effetti di sfocatura, che può causare problemi di prestazioni senza accelerazione hardware."
+    "message": "Abilita alcuni effetti come la sfocatura, ma può causare problemi di prestazioni senza accelerazione hardware."
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "Rendering avanzato"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Fai in modo che i link esterni a Modrinth vengano aperti in una nuova scheda. A prescindere da questa impostazione, i link nello stesso dominio e nelle descrizioni Markdown si apriranno nella stessa scheda, e i link sugli annunci e sulle pagine di modifica si apriranno in una nuova scheda."
+    "message": "I link esterni a Modrinth si apriranno in una nuova scheda. A prescindere da questa impostazione, i link nello stesso dominio e nelle descrizioni Markdown si apriranno nella stessa scheda, e le pubblicità e le pagine di modifica in una nuova."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Apri link esterni in una nuova scheda"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Nasconde i pulsanti \"Scarica Modrinth App\" dalla navigazione primaria. La pagina Modrinth App è comunque raggiungibile dalla pagina principale o nel piè di pagina."
+    "message": "I pulsanti \"Scarica Modrinth App\" saranno nascosti dalla navigazione primaria. La pagina di Modrinth App rimarrà comunque raggiungibile nella home o nel piè."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Nascondi promozioni per Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Sidebar a sinistra nelle pagine dei contenuti"
+    "message": "Allineamento opposto della barra laterale"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
     "message": "Allinea la barra laterale a sinistra del contenuto della pagina."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Allinea la barra laterale dei filtri a destra dei risultati di ricerca."
+    "message": "Allinea la barra dei filtri a destra dei risultati di ricerca."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Sidebar dei filtri a destra nelle pagine di ricerca"
+    "message": "Allineamento opposto della barra dei filtri"
   },
   "settings.display.theme.description": {
     "message": "Scegli il tema che Modrinth userà su questo dispositivo."

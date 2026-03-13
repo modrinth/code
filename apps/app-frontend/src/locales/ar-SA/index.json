@@ -5,6 +5,51 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.modal.install-to-play.header": {
+    "message": "نزل للعب"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "تثبيت"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": ""
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "حُزْمَة مشاركة"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "حُزْمَة خادم مشاركة"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count} مضاف"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "تمت الإضافة"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "تمت الإزالة"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "تم تحديث"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "حدث للعب"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count} مزال"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "يلزم التحديث"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "هناك تحديث لازم للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} حُدِّث"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
   },
@@ -31,33 +76,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
-  },
-  "app.update-toast.body": {
-    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "تطبيق Modrinth الإصدار {version} جاهز للتثبيت!\nأعد التحميل لتحديث التطبيق الآن، أو سيتم التحديث تلقائيًا عند إغلاق تطبيق Modrinth."
-  },
-  "app.update-toast.body.metered": {
-    "message": "تطبيق Modrinth الإصدار {version} متاح الآن!\nنظرًا لأنك تستخدم شبكة محدودة البيانات، لم نقم بتنزيل التحديث تلقائيًا.\n"
-  },
-  "app.update-toast.changelog": {
-    "message": "سجلّ التغييرات"
-  },
-  "app.update-toast.download": {
-    "message": "تنزيل ({size})"
-  },
-  "app.update-toast.downloading": {
-    "message": "جار التنزيل..."
-  },
-  "app.update-toast.reload": {
-    "message": "إعادة تحميل"
-  },
-  "app.update-toast.title": {
-    "message": "تحديث متاح"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "اكتمل التنزيل"
   },
   "app.update.complete-toast.text": {
     "message": "انقر هنا لعرض سجلّ التغييرات."
@@ -186,7 +204,7 @@
     "message": "الاسم"
   },
   "instance.server-modal.placeholder-name": {
-    "message": "خادم ماينكرافت"
+    "message": "خادم Minecraft"
   },
   "instance.server-modal.resource-pack": {
     "message": "حزمة الموارد"
@@ -288,7 +306,7 @@
     "message": "تثبيت"
   },
   "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} لماينكرافت {game_version} مثبت بالفعل"
+    "message": "{platform} {version} لـ Minecraft{game_version} مثبت بالفعل"
   },
   "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
     "message": "فانيلا {game_version} مُثبّتة بالفعل"
@@ -330,7 +348,7 @@
     "message": "إصدار {loader}"
   },
   "instance.settings.tabs.installation.minecraft-version": {
-    "message": "ماين كرافت {version}"
+    "message": "Minecraft {version}"
   },
   "instance.settings.tabs.installation.no-connection": {
     "message": "تعذّر جلب تفاصيل حزمة المودات المرتبطة. يرجى التحقق من اتصالك بالإنترنت."

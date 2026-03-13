@@ -497,11 +497,23 @@
   "create.project.create-project": {
     "message": "Cipta projek"
   },
+  "create.project.create-server-project": {
+    "message": "Cipta sebuah pelayan"
+  },
   "create.project.name-label": {
     "message": "Nama"
   },
   "create.project.name-placeholder": {
     "message": "Masukkan nama projek..."
+  },
+  "create.project.owner-description": {
+    "message": "Tetapkan pemilik projek sebagai diri anda atau organisasi yang anda sertai."
+  },
+  "create.project.owner-label": {
+    "message": "Pemilik"
+  },
+  "create.project.server-project-title": {
+    "message": "Mencipta sebuah projek pelayan"
   },
   "create.project.summary-description": {
     "message": "Satu atau dua ayat yang menerangkan projek anda."
@@ -514,6 +526,15 @@
   },
   "create.project.title": {
     "message": "Mencipta sebuah projek"
+  },
+  "create.project.type-label": {
+    "message": "Jenis"
+  },
+  "create.project.type-project": {
+    "message": "Projek"
+  },
+  "create.project.type-server": {
+    "message": "Pelayan"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1433,6 +1454,12 @@
   "layout.action.new-project": {
     "message": "Projek baharu"
   },
+  "layout.action.new-server-project": {
+    "message": "Pelayan baharu"
+  },
+  "layout.action.publish": {
+    "message": "Terbitkan"
+  },
   "layout.action.reports": {
     "message": "Semak laporan"
   },
@@ -1485,7 +1512,7 @@
     "message": "Lengkapkan borang cukai"
   },
   "layout.banner.tax.description": {
-    "message": "Anda telah mengeluarkan lebih $600 daripada Modrinth tahun ini. Untuk mematuhi peraturan cukai, anda perlu melengkapkan borang cukai. Pengeluaran anda dijeda sehingga borang ini diserahkan."
+    "message": "Anda telah mengeluarkan lebih {threshold} daripada Modrinth tahun ini. Untuk mematuhi peraturan cukai, anda perlu melengkapkan borang cukai. Pengeluaran anda dijeda sehingga borang ini diserahkan."
   },
   "layout.banner.tax.title": {
     "message": "Borang cukai diperlukan"
@@ -1763,9 +1790,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Nombor akaun"
   },
-  "muralpay.field.branch-code": {
-    "message": "Kod cawangan"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1855,9 +1879,6 @@
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "Masukkan nombor akaun"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Masukkan kod cawangan"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Masukkan CLABE 18 digit"
@@ -2131,6 +2152,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pek Sumber"
+  },
+  "project-type.server.plural": {
+    "message": "Pelayan"
+  },
+  "project-type.server.singular": {
+    "message": "Pelayan"
   },
   "project-type.shader.plural": {
     "message": "Pembayang"

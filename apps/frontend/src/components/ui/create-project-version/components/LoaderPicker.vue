@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-2.5">
-		<span class="font-semibold text-contrast">Loaders <span class="text-red">*</span></span>
+		<span class="font-semibold text-contrast">Loaders</span>
 
 		<Chips
 			v-model="loaderGroup"

@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Criar projeto"
   },
+  "create.project.create-server-project": {
+    "message": "Criar servidor"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Campos ausentes: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nome"
   },
   "create.project.name-placeholder": {
     "message": "Insira o nome do projeto..."
+  },
+  "create.project.owner-description": {
+    "message": "Defina o dono do projeto como você mesmo ou como uma organização da qual você faz parte."
+  },
+  "create.project.owner-label": {
+    "message": "Dono"
+  },
+  "create.project.server-project-title": {
+    "message": "Criando um projeto de servidor"
   },
   "create.project.summary-description": {
     "message": "Escreva uma ou duas frases para descrever seu projeto."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Criando um projeto"
+  },
+  "create.project.type-label": {
+    "message": "Tipo"
+  },
+  "create.project.type-project": {
+    "message": "Projeto"
+  },
+  "create.project.type-server": {
+    "message": "Servidor"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Novo projeto"
   },
+  "layout.action.new-server-project": {
+    "message": "Novo servidor"
+  },
+  "layout.action.publish": {
+    "message": "Publicar"
+  },
   "layout.action.reports": {
     "message": "Revisão de relatórios"
   },
@@ -1485,7 +1515,7 @@
     "message": "Preencha o formulário fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Você já retirou mais de $600 do Modrinth neste ano. Para cumprir as regras fiscais, é preciso preencher um formulário de impostos. Seus saques ficarão pausados até que o formulário seja enviado."
+    "message": "Você já retirou mais de {threshold} do Modrinth este ano. Para cumprir as normas fiscais, você precisa preencher um formulário fiscal. Suas retiradas ficarão suspensas até que esse formulário seja enviado."
   },
   "layout.banner.tax.title": {
     "message": "Formulário fiscal necessário"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Número da conta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Código da filial"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Telefone do PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Chave aleatória"
   },
   "muralpay.field.routing-number": {
     "message": "Número de rota"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Digitar número da conta"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Digitar código de poupança"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Digitar a CLABE de 18 dígitos"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Insira e-mail do PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Inserir chave aleatória"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Digitar número de rota de 9 dígitos"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Pacote de dado"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Servidor"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pacote de recurso"
+  },
+  "project-type.server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.server.singular": {
+    "message": "Servidor"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2953,6 +2995,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Página dos pacotes de recursos"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Página dos servidores"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Página dos sombreadores"

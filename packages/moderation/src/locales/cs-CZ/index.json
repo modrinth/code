@@ -17,6 +17,9 @@
   "nags.add-links.title": {
     "defaultMessage": "Přidat externí odkazy"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Vybrali jste všechny dostupné značky {totalAvailableTags,plural,one {#Dostupný tag} other {#Dostupný tags}}. To popírá účel značek, které mají uživatelům pomoci najít relevantní projekty. Vyberte prosím pouze tagy, které jsou pro váš projekt relevantní."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Vyberte vhodné tagy"
   },

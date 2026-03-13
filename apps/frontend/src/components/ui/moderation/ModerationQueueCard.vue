@@ -73,7 +73,7 @@
 
 			<div class="flex items-center gap-3">
 				<span
-					v-tooltip="`Since ${queuedDate.toLocaleString()}`"
+					v-tooltip="`Since ${formatDateTimeFull(queuedDate.toDate())}`"
 					class="text-base text-secondary"
 					:class="{
 						'text-red': daysInQueue > 4,
@@ -120,6 +120,7 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	type OverflowMenuOption,
+	useFormatDateTime,
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
@@ -130,6 +131,17 @@ import type { ModerationProject } from '~/helpers/moderation'
 
 const { addNotification } = injectNotificationManager()
 const formatRelativeTime = useRelativeTime()
+const formatDateTimeFull = useFormatDateTime({
+	weekday: 'short',
+	year: 'numeric',
+	month: 'short',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+	second: '2-digit',
+	timeZoneName: 'short',
+	timeZone: 'UTC',
+})
 
 const baseId = useId()
 

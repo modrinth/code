@@ -12,6 +12,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::billing::{
     ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     ProductMetadata, SubscriptionMetadata, SubscriptionStatus,
@@ -913,10 +914,10 @@ async fn unprovision_subscriptions(
                 let res = reqwest::Client::new()
                     .post(format!(
                         "{}/modrinth/v0/servers/{}/suspend",
-                        dotenvy::var("ARCHON_URL")?,
+                        ENV.ARCHON_URL,
                         server_id
                     ))
-                    .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                    .header("X-Master-Key", &ENV.PYRO_API_KEY)
                     .json(&serde_json::json!({
                         "reason": if charge.status == ChargeStatus::Cancelled || charge.status == ChargeStatus::Expiring {
                             "cancelled"

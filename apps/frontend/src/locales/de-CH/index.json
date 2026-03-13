@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Projekt erstellen"
   },
+  "create.project.create-server-project": {
+    "message": "Server erstellen"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Fehlende Felder: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },
   "create.project.name-placeholder": {
     "message": "Projektnamen eingeben..."
+  },
+  "create.project.owner-description": {
+    "message": "Setze dich oder eine Organisation, bei der du Mitglied bist, als Projektbesitzer."
+  },
+  "create.project.owner-label": {
+    "message": "Besitzer"
+  },
+  "create.project.server-project-title": {
+    "message": "Ein Serverprojekt erstellen"
   },
   "create.project.summary-description": {
     "message": "Ein, zwei Sätze eingeben, um dein Projekt zu beschreiben."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Ein Projekt erstellen"
+  },
+  "create.project.type-label": {
+    "message": "Art"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1433,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Neues Projekt"
   },
+  "layout.action.new-server-project": {
+    "message": "Neuer Server"
+  },
+  "layout.action.publish": {
+    "message": "Veröffentlichen"
+  },
   "layout.action.reports": {
     "message": "Meldungen einsehen"
   },
@@ -1485,7 +1515,7 @@
     "message": "Steuerformular abschliessen"
   },
   "layout.banner.tax.description": {
-    "message": "Du hast bereits mehr als $600 von Modrinth für dieses Jahr abgehoben. Um geltende Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
+    "message": "Du hast dieses Jahr bereits über {threshold} von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Auszahlungen werden bis zur Einreichung dieses Formulars pausiert."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular benötigt"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Kontonummer"
   },
-  "muralpay.field.branch-code": {
-    "message": "Filialcode"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX-Telefon"
+  },
+  "muralpay.field.random-key": {
+    "message": "Zufälliger Schlüssel"
   },
   "muralpay.field.routing-number": {
     "message": "Bankleitzahl"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Kontonummer eingeben"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Filialcode eingeben"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "18-stelligen CLABE eingeben"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "PIX-E-Mail eingeben"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Zufälligen Schlüssel eingeben"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "9-stellige Bankleitzahl eingeben"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Datenpaket"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Ressourcenpaket"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shader"
@@ -2953,6 +2995,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Ressourcenpakete-Seite"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Server-Seite"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Shader-Seite"

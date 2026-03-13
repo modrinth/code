@@ -483,3 +483,40 @@ smaato.com, 1100053415, RESELLER, 07bcf65f187117b4
 
 #Triplelift
 triplelift.com, 14661, RESELLER, 6c33edb13117fd86
+
+cpmstar.com, 54166, DIRECT, 1b929e6459dfc260
+loopme.com, 15270, RESELLER, 6c8d5f95897a5a3b
+loopme.com, 15268, RESELLER, 6c8d5f95897a5a3b
+rubiconproject.com, 23330, RESELLER, 0bfd66d529a55807
+nativo.com, 6000, RESELLER, 59521ca7cc5e9fee
+richaudience.com, NtMZGaQQTT, RESELLER
+video.unrulymedia.com, 1838093862, RESELLER
+video.unrulymedia.com, 1782942345, RESELLER
+inmobi.com, e444c15ddce744479f7f0548ddf1ff58, RESELLER, 83e75a7ae333ca9d
+lijit.com, 57729, RESELLER, fafdf38b16bf6b2b
+openx.com, 541079309, RESELLER, 6a698e2ec38604c6
+pubmatic.com, 160251, RESELLER, 5d62403b186f2ace
+insticator.com, a4be8543-c8b1-4f3a-a4c0-73cfbdc3b652, RESELLER, b3511ffcafb23a32
+oko.uk, a4be8543-c8b1-4f3a-a4c0-73cfbdc3b652, DIRECT, b3511ffcafb23a32 #OKO_Version_456
+sonobi.com, da6df59178, RESELLER, d1a215d9eb5aee9e
+33across.com, 0010b00002QImX1AAL, RESELLER, bbea06d9c4d2853c
+pubmatic.com, 156500, RESELLER, 5d62403b186f2ace
+appnexus.com, 8233, RESELLER
+pubmatic.com, 81564, RESELLER, 5d62403b186f2ace
+pubmatic.com, 156538, RESELLER, 5d62403b186f2ace
+rubiconproject.com, 13510, RESELLER
+zetaglobal.net, 989, RESELLER
+smaato.com, 1100058321, RESELLER, 07bcf65f187117b4
+admanmedia.com, 2199, RESELLER
+amxrtb.com, 105199420, RESELLER
+sharethrough.com, 3713, RESELLER, d53b998a7bd4ecd2
+triplelift.com, 12456, RESELLER, 6c33edb13117fd86
+pgamssp.com, 6720eaffd76cc4dc1f00de26, RESELLER
+waardex.com, 215296, RESELLER
+risecodes.com, 673da70c91e2fd000109c6f6, RESELLER
+rubiconproject.com, 20744, RESELLER, 0bfd66d529a55807
+xandr.com, 13799, RESELLER
+improvedigital.com, 1532, RESELLER
+opera.com, pub6871903319744, RESELLER, 55a0c5fd61378de3
+mintegral.com, 10003, RESELLER
+blis.com, 33, RESELLER, 61453ae19a4b73f4

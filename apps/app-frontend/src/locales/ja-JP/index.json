@@ -5,6 +5,63 @@
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "必須コンテンツ"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "インストールしてプレイ"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "インストール"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, other {#個のMod}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "必須なModpack"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "このサーバーをプレイするにはModが必要です。インストールをクリックしてModrinthから必要なファイルを設定し、サーバーに接続してください。"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "共有インスタンス"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "共有サーバーインスタンス"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "コンテンツを見る"
+  },
+  "app.modal.update-to-play.added-count": {
+    "message": "{count}追加"
+  },
+  "app.modal.update-to-play.diff-type.added": {
+    "message": "追加"
+  },
+  "app.modal.update-to-play.diff-type.removed": {
+    "message": "削除済み"
+  },
+  "app.modal.update-to-play.diff-type.updated": {
+    "message": "更新済み"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "更新してプレイ"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
+  },
+  "app.modal.update-to-play.removed-count": {
+    "message": "{count}件削除されました"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "更新が必要です"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
+  },
+  "app.modal.update-to-play.updated-count": {
+    "message": "{count} 更新されました"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
   },
@@ -32,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version}のインストールの準備ができました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} のインストール準備が整いました！今すぐ更新するには再読み込みするか、Modrinth App を閉じる際に自動更新されます。"
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth App を閉じる際に自動更新されます。"
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} が利用可能です。最新の機能と修正プログラムを入手するには、パッケージマネージャーを使用して更新してください！"
   },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}は今すぐダウンロードできます。従量課金制ネットワークを使用しているため自動ダウンロードはされていません。"
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} が利用可能になりました！お使いのネットワークが従量制のため、自動ダウンロードは行っておりません。"
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "更新履歴"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "ダウンロード ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "ダウンロード"
-  },
-  "app.update-toast.downloading": {
-    "message": "ダウンロード中..."
-  },
-  "app.update-toast.reload": {
-    "message": "再起動"
-  },
-  "app.update-toast.title": {
-    "message": "アップデートが利用可能です"
-  },
-  "app.update-toast.title.download-complete": {
+  "app.update-popup.download-complete": {
     "message": "ダウンロード完了"
+  },
+  "app.update-popup.reload": {
+    "message": "リロード"
+  },
+  "app.update-popup.title": {
+    "message": "アップデートが利用可能です"
   },
   "app.update.complete-toast.text": {
     "message": "クリックすると更新履歴を表示できます。"
@@ -413,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(不明なバージョン)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "このインスタンスはサーバーにリンクされているので、Minecraftのバージョンを変更することはできません。リンクを解除するとこのインスタンスはサーバーから永久に切断されます。"
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "このインスタンスはサーバーにリンクされているので、Modの更新はできず、ModローダーやMinecraftのバージョンを変更することもできません。リンクを解除すると、このインスタンスはサーバーから永久に切断されます。"
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "サーバーとのリンクを解除する"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "インスタンスのリンク解除"
   },
@@ -500,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "サーバーに互換性がありません"
   },
+  "instance.worlds.linked_server": {
+    "message": "サーバープロジェクトによる管理"
+  },
   "instance.worlds.no_contact": {
     "message": "サーバーに接続できませんでした"
   },
@@ -535,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "インスタンスと同期"
+  },
+  "search.filter.locked.server": {
+    "message": "サーバーにより提供されています"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "サーバー構成にはクライアント側Modのみ追加可能"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "ゲームバージョンはサーバーにより提供されています"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "ローダーはサーバーにより提供されています"
   }
 }

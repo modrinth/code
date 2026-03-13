@@ -942,7 +942,7 @@
     "message": "Verificación de email errónea"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
-    "message": "Los datos de la cuenta bancaria que has proporcionado no son válidos. Verifica la información."
+    "message": ""
   },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Datos bancarios no válidos"
@@ -1059,7 +1059,7 @@
     "message": "Usuario no encontrado"
   },
   "frog": {
-    "message": "¡Te han ranado! 🐸"
+    "message": ""
   },
   "frog.altText": {
     "message": "Una pintura fotorrealista de un laberinto de ranas"
@@ -1338,7 +1338,7 @@
     "message": "Encuentre lo que busca, de forma rápida y sencilla"
   },
   "landing.heading.the-place-for-minecraft": {
-    "message": "El lugar para {content} de Minecraft"
+    "message": "El lugar para Minecraft {content}"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
     "message": "paquetes de datos"
@@ -1485,7 +1485,7 @@
     "message": "Rellene el formulario fiscal"
   },
   "layout.banner.tax.description": {
-    "message": "Ya ha retirado más de 600 dólares de Modrinth este año. Para cumplir con la normativa fiscal, debes rellenar un formulario de impuestos. Tus retiradas quedarán en suspenso hasta que envíes el formulario."
+    "message": "Ya has retirado más de {threshold} de Modrinth este año. Para cumplir con las regulaciones fiscales, es necesario que completes un formulario de impuestos. Tus retiros estarán pausados hasta que dicho formulario sea enviado."
   },
   "layout.banner.tax.title": {
     "message": "Se requiere formulario fiscal"
@@ -1763,9 +1763,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Número de cuenta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Código de sucursal"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1855,9 +1852,6 @@
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "Introduce tú número de cuenta"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Ingrese el código de sucursal"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Ingrese el CLABE de 18 dígitos"
@@ -2363,11 +2357,23 @@
   "report.already-reported": {
     "message": "Ya has reportado {title}"
   },
+  "report.already-reported-description": {
+    "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
+  },
+  "report.back-to-item": {
+    "message": "Volver a {item, select, project {project} version {version} user {user} other {content}}"
+  },
   "report.body.description": {
     "message": "Incluya enlaces e imágenes si es posible y relevante. Los informes vacíos o insuficientes serán cerrados e ignorados."
   },
   "report.body.title": {
     "message": "Por favor, proporcione más información sobre su informe"
+  },
+  "report.checking": {
+    "message": "Revisando {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}..."
+  },
+  "report.could-not-find": {
+    "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"
   },
   "report.for.violation": {
     "message": "Violación de las <rules-link>Normas</rules-link> o los <terms-link>Términos de uso</terms-link> de Modrinth"
@@ -2408,8 +2414,14 @@
   "report.please-report": {
     "message": "Por favor, informe:"
   },
+  "report.question.content-id": {
+    "message": "¿Cual es la ID de {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
+  },
   "report.question.content-type": {
     "message": "¿Qué tipo de contenido estás denunciando?"
+  },
+  "report.question.report-reason": {
+    "message": "¿Que regla de Mondrinth esta quebrantando {item, select, project {el proyecto} version {la versión} user {el usuario} other {el contenido}}?"
   },
   "report.report-content": {
     "message": "Denunciar contenido a los moderadores"

@@ -9,6 +9,8 @@ use hex::ToHex;
 use sha2::Digest;
 use std::path::PathBuf;
 
+use crate::env::ENV;
+
 #[derive(Default)]
 pub struct MockHost(());
 
@@ -54,8 +56,7 @@ impl FileHost for MockHost {
         file_name: &str,
         _expiry_secs: u32,
     ) -> Result<String, FileHostingError> {
-        let cdn_url = dotenvy::var("CDN_URL").unwrap();
-        Ok(format!("{cdn_url}/private/{file_name}"))
+        Ok(format!("{}/private/{file_name}", ENV.CDN_URL))
     }
 
     async fn delete_file(
@@ -77,7 +78,7 @@ fn get_file_path(
     file_name: &str,
     file_publicity: FileHostPublicity,
 ) -> PathBuf {
-    let mut path = PathBuf::from(dotenvy::var("MOCK_FILE_PATH").unwrap());
+    let mut path = PathBuf::from(ENV.MOCK_FILE_PATH.clone());
 
     if matches!(file_publicity, FileHostPublicity::Private) {
         path.push("private");

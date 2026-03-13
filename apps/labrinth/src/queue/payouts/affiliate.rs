@@ -1,4 +1,5 @@
 use crate::database::PgPool;
+use crate::env::ENV;
 use chrono::{Datelike, Duration, TimeZone, Utc};
 use eyre::{Context, Result, eyre};
 use rust_decimal::{Decimal, dec};
@@ -62,11 +63,7 @@ pub async fn process_affiliate_payouts(postgres: &PgPool) -> Result<()> {
     .await
     .wrap_err("failed to fetch charges awaiting affiliate payout")?;
 
-    let default_affiliate_revenue_split =
-        dotenvy::var("DEFAULT_AFFILIATE_REVENUE_SPLIT")
-            .wrap_err("no env var `DEFAULT_AFFILIATE_REVENUE_SPLIT`")?
-            .parse::<Decimal>()
-            .wrap_err("`DEFAULT_AFFILIATE_REVENUE_SPLIT` is not a decimal")?;
+    let default_affiliate_revenue_split = ENV.DEFAULT_AFFILIATE_REVENUE_SPLIT;
 
     let (
         mut insert_usap_charges,

@@ -5,8 +5,11 @@
   "app.auth-servers.unreachable.header": {
     "message": "Нет связи с серверами аутентификации"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Требуется дополнительный контент"
+  },
   "app.modal.install-to-play.header": {
-    "message": "Установите чтобы играть"
+    "message": "Установка перед запуском"
   },
   "app.modal.install-to-play.install-button": {
     "message": "Установить"
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {# мод} few {# мода} other {# модов}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Необходимая сборка"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} делится с вами сборкой."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Для игры на сервере требуются моды. Установите необходимые файлы с Modrinth, чтобы подключиться."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Сборка"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "Требуется серверная сборка"
+    "message": "Общая сборка сервера"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Посмотреть содержимое"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count, plural, one {# добавление} few {# добавления} other {# добавлений}}"
@@ -39,7 +45,7 @@
     "message": "Обновлён"
   },
   "app.modal.update-to-play.header": {
-    "message": "Обновите перед запуском"
+    "message": "Обновление перед запуском"
   },
   "app.modal.update-to-play.published-date": {
     "message": "{date, date, long}"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Управление ресурсами"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Версия Modrinth App {version} готова к установке! Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Скачивание версии Modrinth App {version} завершено. Перезапустите приложение, чтобы обновить его, или оно обновится автоматически после закрытия."
   },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} доступен. Обновите приложение, с помощью менеджера пакетов, для получения последних исправлений и улучшений!"
+  "app.update-popup.body.linux": {
+    "message": "Доступна версия Modrinth App {version}. Обновите приложение через менеджер пакетов, чтобы получить последние улучшения и исправления!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Версия Modrinth App {version} доступна для скачивания! Используется сеть с лимитным тарифным планом, поэтому скачивание не началось автоматически."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Список изменений"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Скачать ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Скачать"
+  "app.update-popup.download-complete": {
+    "message": "Скачивание завершено"
   },
-  "app.update-toast.downloading": {
-    "message": "Скачивание..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Перезапустить"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Доступно обновление"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Скачивание завершено"
   },
   "app.update.complete-toast.text": {
     "message": "Нажмите здесь, чтобы посмотреть изменения."
@@ -153,7 +153,7 @@
     "message": "Какое имя у друга на Modrinth?"
   },
   "friends.add-friends-to-share": {
-    "message": "<link>Добавьте друзей</link>, чтобы видеть их статус игры!"
+    "message": "<link>Добавьте друзей</link>, чтобы видеть, во что они играют!"
   },
   "friends.friend.cancel-request": {
     "message": "Отменить запрос"
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(неизвестная версия)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Текущее содержимое связано с сервером — смена версии игры недоступна. Отвязка сервера необратимо разорвёт эту связь."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Текущее содержимое связано с сервером — обновление модов и смена загрузчика или версии игры недоступны. Отвязка сервера необратимо разорвёт эту связь."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Отвязка сервера"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Отвязать сборку"
   },
@@ -474,7 +483,7 @@
     "message": "Вы действительно хотите отвязать сборку?"
   },
   "instance.settings.tabs.installation.unlink.description": {
-    "message": "Установленное содержимое связано со сборкой на Modrinth, что блокирует возможность менять версии игры, модов или загрузчик. Нажатие на кнопку ниже необратимо разрушит эту связь."
+    "message": "Текущее содержимое связано со сборкой на Modrinth — обновление модов и смена загрузчика или версии игры недоступны. Отвязка сборки необратимо разорвёт эту связь."
   },
   "instance.settings.tabs.installation.unlink.title": {
     "message": "Отвязка сборки"
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Сервер несовместим"
   },
+  "instance.worlds.linked_server": {
+    "message": "Управляется серверным проектом"
+  },
   "instance.worlds.no_contact": {
     "message": "Не удалось связаться с сервером"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Использовать из сборки"
+  },
+  "search.filter.locked.server": {
+    "message": "Управляется сервером"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "В серверную сборку можно добавлять только моды для клиента"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Версия игры управляется сервером"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Загрузчик управляется сервером"
   }
 }

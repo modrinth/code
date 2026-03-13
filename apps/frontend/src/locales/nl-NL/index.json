@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Download het RPM-pakket"
   },
+  "app-marketing.download.flathub": {
+    "message": "Verkrijg het op Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -193,6 +196,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Meer download opties"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Verberg andere pakketten"
+  },
+  "app-marketing.not-recommended": {
+    "message": "We raden je niet aan deze te gebruiken, behalve als je weet wat je doet."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Toon andere pakketten"
   },
   "auth.authorize.action.authorize": {
     "message": "Toestaan"
@@ -447,7 +459,7 @@
     "message": "Collecties"
   },
   "create.limit-alert.type-plural-organization": {
-    "message": "Organisaties"
+    "message": "organisaties"
   },
   "create.limit-alert.type-plural-project": {
     "message": "Projecten"
@@ -485,11 +497,26 @@
   "create.project.create-project": {
     "message": "Project aanmaken"
   },
+  "create.project.create-server-project": {
+    "message": "Maak server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Missende velden: {fields}"
+  },
   "create.project.name-label": {
     "message": "Naam"
   },
   "create.project.name-placeholder": {
     "message": "Voer projectnaam in..."
+  },
+  "create.project.owner-description": {
+    "message": "Stel de project eigenaar in als jezelf of een organisatie waar je lid van bent."
+  },
+  "create.project.owner-label": {
+    "message": "Eigenaar"
+  },
+  "create.project.server-project-title": {
+    "message": "Een server project aanmaken"
   },
   "create.project.summary-description": {
     "message": "Eén of twee zinnen die je project beschrijven."
@@ -502,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Een project aanmaken"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Project"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -1055,8 +1091,212 @@
   "frog.title": {
     "message": "Kikker"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië voor een brede dekking."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Betaal maandelijks"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "Betaal elk kwartaal"
+  },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "Bespaar 16% door elk kwartaal te betalen!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Vanaf {price} / maand"
+  },
   "hosting-marketing.billing.yearly": {
     "message": "Betaal jaarlijks"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Hoe werken CPU burst threads?"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Wanneer uw server zwaar belast wordt, geven we deze tijdelijk toegang tot extra CPU-threads om vertragingspieken en instabiliteit te verminderen. Dit helpt voorkomen dat de TPS onder de 20 zakt, waardoor een zo soepel mogelijke ervaring wordt gegarandeerd. Omdat deze CPU-threads slechts kort beschikbaar zijn tijdens zwaardere periodes, worden ze mogelijk niet weergeven in Spark-rapporten of andere profilingtools."
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Op wat voor CPU's draaien de servers van Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "De servers van Modrinth Hosting draaien op AMD Ryzen 7900 en 7950X3D-equivalent CPU's met een kloksnelheid van 5 GHz of hoger, in combinatie met DDR5-geheugen."
+  },
+  "hosting-marketing.faq.currency": {
+    "message": "In welke valuta zijn de prijzen?"
+  },
+  "hosting-marketing.faq.currency.answer": {
+    "message": "Alle prijzen worden vermeld in Amerikaanse dollars (USD)."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Hebben Modrinth Hosting servers ook DDoS-bescherming?"
+  },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle servers van Modrinth Hosting zijn voorzien van DDoS-bescherming, met een capaciteit van tot wel 17Tbps op sommige locaties."
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Veelgestelde vragen"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Hoe snel zijn Modrinth Hosting servers?"
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "De servers van Modrinth Hosting worden gehost op zeer moderne, krachtige hardware, maar het is lastig te zeggen hoe dat zich precies vertaalt naar de snelheid van je server. Er zijn namelijk zoveel factoren die daarop van invloed zijn, zoals de mods, datapacks of plugins die je op je server gebruikt, en zelfs het gedrag van de gebruikers."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "De meeste prestatieproblemen worden veroorzaakt door een niet-geoptimaliseerd modpack, mod, datapack of plugin die de server vertraagt. Omdat onze servers zeer krachtig zijn, zou je weinig problemen moeten ondervinden, zolang je maar een geschikt abonnement kiest voor de content die je op de server draait."
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Kan ik de opslagruimte op mijn server vergroten?"
+  },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Ja, de opslagruimte op uw server kan kosteloos worden uitgebreid. Neem contact op met Modrinth klantenservice als u meer opslagruimte nodig heeft."
+  },
+  "hosting-marketing.faq.location": {
+    "message": "Waar bevinden de servers van Modrinth Hosting zich? Kan ik een regio kiezen?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "We hebben momenteel servers beschikbaar in Noord-Amerika, Europa en Zuidoost-Azië, waaruit u bij aankoop kunt kiezen. In de toekomst zullen er meer regio's volgen! Als u uw regio wilt wijzigen, neem dan contact op met de klantenservice."
+  },
+  "hosting-marketing.faq.versions-loaders": {
+    "message": "Welke Minecraft-versies en loaders kunnen worden gebruikt?"
+  },
+  "hosting-marketing.faq.versions-loaders.answer.one": {
+    "message": "De servers van Modrinth Hosting kunnen elke versie van Minecraft: Java Edition draaien, helemaal terug tot versie 1.2.5, inclusief snapshot-versies."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "We ondersteunen ook een uitgebreid assortiment van mod- en plugin-loaders, waaronder Fabric, Quilt, Forge en NeoForge voor mods, en Paper en Purpur voor plugins. De beschikbaarheid hangt af van de compatibiliteit van de mod- of plugin-loader met de geselecteerde Minecraft-versie."
+  },
+  "hosting-marketing.get-started": {
+    "message": "Ga aan de slag"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Beheer jouw servers"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Begin een nieuwe server"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Begin jouw server"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Host jouw volgende server bij Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting is de eenvoudigste manier om je eigen Minecraft: Java Edition-server te hosten. Installeer en speel je favoriete mods en modpacks moeiteloos, allemaal binnen het Modrinth-platform."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Geavanceerd netwerkbeheer"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Voeg je eigen domein toe aan je server, reserveer tot 15 poorten voor mods die ze nodig hebben, en meer."
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Inclusief back-ups"
+  },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Elke server wordt geleverd met 15 back-ups die veilig op een externe locatie worden opgeslagen."
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "Aangepaste URL"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Deel je server met een aangepaste <contrast>modrinth.gg</contrast> URL."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Elke server wordt geleverd met een reeks functies die zijn ontworpen om een ​​hostingervaring te bieden die alleen Modrinth kan leveren."
+  },
+  "hosting-marketing.included.file-manager": {
+    "message": "Gebruiksvriendelijke bestandsbeheerder"
+  },
+  "hosting-marketing.included.file-manager.description": {
+    "message": "Zoek, beheer, bewerk en upload bestanden eenvoudig rechtstreeks naar uw server."
+  },
+  "hosting-marketing.included.heading": {
+    "message": "Komt met alle functies die u nodig heeft."
+  },
+  "hosting-marketing.included.help": {
+    "message": "Hulp wanneer je het nodig hebt"
+  },
+  "hosting-marketing.included.help.description": {
+    "message": "Neem op elk gewenst moment contact op met het Modrinth-team voor hulp met je server."
+  },
+  "hosting-marketing.included.powerful-console": {
+    "message": "Een krachtige console, servereigenschappenbeheerder en meer"
+  },
+  "hosting-marketing.included.powerful-console.description": {
+    "message": "Modrinth Hosting biedt krachtige tools voor het beheren van uw server."
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "SFTP toegang"
+  },
+  "hosting-marketing.included.sftp-access.description": {
+    "message": "Krijg rechtstreeks toegang tot de bestanden op uw server met de SFTP-functionaliteit die in Modrinth Hosting is ingebouwd."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "Inbegrepen bij uw server"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "Weet je precies wat je nodig hebt?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Probeer een gratis <orange>3 GB server</orange> voor 5 dagen. Mogelijk gemaakt door <orange>Medal<orange>"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Leer meer"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Tijdelijke aanbieding. Geen credit-card nodig. Beschikbaar voor US-servers."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "Kies een aangepast plan voor wat je nodig hebt."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "Er is een server voor iedereen"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "Beheer het allemaal op Modrinth"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "Jouw server, mods, spelers, en meer allemaal op Modrinth. Het is niet nodig om te wisselen tussen diensten"
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "Altijd snel"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "Onze servers zijn nooit overladen waardoor servers gehost op Modrinth altijd draaien op maximale kracht."
+  },
+  "hosting-marketing.why.description": {
+    "message": "Kies uit duizenden modpakketen op Modrinth of maak je eigen. Nodig je vrienden uit wanneer je klaar bent om te spelen."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "Vindt een modpakket. Nu is het een server."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "Ervaar een moderne, betrouwbare hosting"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "Modrinth hosting servers draaien op <contrast>hoog-perfarmance AMD CPU's met DDR5 RAM </contrast>, draaiend op zelf gemaakte software om ervoor te zorgen dat uw servers perfect draaien."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Speel waar uw mods worden gemaakt"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "Modrinth Hosting zorgt voor een gemakelijke intergratie voor mod en modpakketen instalatie op uw servers."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "Waarom Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Al je Favorite mods"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Kies tussen Vanilla, Fabric, Forge, Quilt en NeoForge. Als het op Modrinth is kan het op uw server."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Uitverkocht"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Selecteer uw plan"
   },
   "landing.button.discover-mods": {
     "message": "Ontdek mods"
@@ -1217,6 +1457,12 @@
   "layout.action.new-project": {
     "message": "Nieuw project"
   },
+  "layout.action.new-server-project": {
+    "message": "Nieuwe server"
+  },
+  "layout.action.publish": {
+    "message": "Publiceer"
+  },
   "layout.action.reports": {
     "message": "Beoordeel meldingen"
   },
@@ -1269,7 +1515,7 @@
     "message": "Voltooi het belastingformulier"
   },
   "layout.banner.tax.description": {
-    "message": "Je hebt dit jaar al meer dan $600 van je Modrinth account opgenomen. Om aan de belastingregels te voldoen, moet je een belastingformulier invullen. Je opnames worden gepauzeerd totdat dit formulier is ingediend."
+    "message": "Je hebt al {threshold} uitbetaald gekeregen van modrinth dit jaar. Om in aanmerking te komen met de belasting moet je een formulier invullen. Je uitbetalingen zijn gepuzeerd totdat hij is ingevuld."
   },
   "layout.banner.tax.title": {
     "message": "Belastingformulier vereist"
@@ -1296,7 +1542,7 @@
     "message": "Carrières"
   },
   "layout.footer.about.changelog": {
-    "message": "Wijzigingsoverzicht"
+    "message": "Changelog"
   },
   "layout.footer.about.news": {
     "message": "Nieuws"
@@ -1547,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Account nummer"
   },
-  "muralpay.field.branch-code": {
-    "message": "Branch code"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1579,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX telefoon"
+  },
+  "muralpay.field.random-key": {
+    "message": "Willekeurige sleutel"
   },
   "muralpay.field.routing-number": {
     "message": "Routingnummer"
@@ -1640,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Voer account nummer in"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Voer branch code in"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Voer 18-cijferige CLABE in"
   },
@@ -1654,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Voer PIX email in"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Vul een willekeurige sleutel in"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Voer 9-cijferige routingnummer in"
@@ -1916,6 +2162,12 @@
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
   },
+  "project-type.server.plural": {
+    "message": "Servers"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
+  },
   "project-type.shader.plural": {
     "message": "Shaders"
   },
@@ -2042,6 +2294,9 @@
   "project.environment.migration.title": {
     "message": "Bekijk de omgeving metadata."
   },
+  "project.error.loading": {
+    "message": "Error tijdens het laden van de projectdata{message}"
+  },
   "project.error.page-not-found": {
     "message": "De pagina kon niet worden gevonden"
   },
@@ -2050,6 +2305,9 @@
   },
   "project.gallery.title": {
     "message": "Gallerij"
+  },
+  "project.license.error": {
+    "message": "Licentie inhoud kon niet worden verkregen."
   },
   "project.license.loading": {
     "message": "Licentietekst aan het laden..."
@@ -2061,7 +2319,7 @@
     "message": "Moderatie"
   },
   "project.navigation.changelog": {
-    "message": "Wijzigingsoverzicht"
+    "message": "Changelog"
   },
   "project.notification.icon-updated.message": {
     "message": "Het icoon van jouw project is bijgewerkt."
@@ -2074,6 +2332,9 @@
   },
   "project.notification.updated.title": {
     "message": "Project bijgewerkt"
+  },
+  "project.settings.general.name.description": {
+    "message": "Probeer voorvoegsels, achtervoegsels, tussenvoegsels en omschrijvingen te vermijden, alleen de echte naam."
   },
   "project.settings.general.name.placeholder.1": {
     "message": "bijv. Nether Revisie 2"
@@ -2138,11 +2399,23 @@
   "report.already-reported": {
     "message": "U heeft al {title} gerapporteerd"
   },
+  "report.already-reported-description": {
+    "message": "Je hebt al een open report voor {item, select, project {project} version {version} user {user} other {content}}, je kan nog meer informatie toevoegen aan de report als je nog meer informatie hebt."
+  },
+  "report.back-to-item": {
+    "message": "Terug naar {item, select, project {project} version {version} user {user} other {content}}"
+  },
   "report.body.description": {
     "message": "Voeg linken en afbeelding als het mogelijk en relevant is. Lege of onvoldoende rapportages zullen gesloten worden en geregeerd worden."
   },
   "report.body.title": {
     "message": "Geef alstublieft aanvoegende context over uw rapportage"
+  },
+  "report.checking": {
+    "message": "Controleren {item, select, project {project} version {version} user {user} other {content}}..."
+  },
+  "report.could-not-find": {
+    "message": "Kan {item, select, project {project} version {version} user {user} other {content}} niet vinden"
   },
   "report.for.violation": {
     "message": "Het schenden van Modrinth <rules-link> Regels</rules-link> of <terms-link>Termen</terms-link>"
@@ -2168,6 +2441,30 @@
   "report.not-for.dmca.description": {
     "message": "Zie onze <policy-link>Auteursrechtbeleid</policy-link>."
   },
+  "report.note.copyright.1": {
+    "message": "Wees er zeker van dat je *geen* DMCA-report indient maar een report van opnieuw geüpload werk."
+  },
+  "report.note.copyright.2": {
+    "message": "Als het uw bedoeling was om een DMCA-report in te dienen(wat een wettelijke actie is), kijk dan alsublieft in onze <copyright-policy-link>Copyright Policy</copyright-policy-link>."
+  },
+  "report.note.malicious.1": {
+    "message": "Rapporten voor malware en niet geaccepteerde content moeten bewijs hebben zoals code voorbeelden."
+  },
+  "report.note.malicious.2": {
+    "message": "Samenvattingen van Microsoft Defender, VirusTotal, of AI malware is geen goede vorm van bewijs en zal niet geaccepteerd worden."
+  },
+  "report.please-report": {
+    "message": "Graag rapporteer:"
+  },
+  "report.question.content-id": {
+    "message": "Wat is het ID van {item, select, project {project} version {version} user {user} other {content}}?"
+  },
+  "report.question.content-type": {
+    "message": "Welk type conteant wil je rapporteren?"
+  },
+  "report.question.report-reason": {
+    "message": "Welke regels van Modrinth is {item, select, project {project} version {version} user {user} other {content}} zich niet aan het houden?"
+  },
   "report.report-content": {
     "message": "Meld content aan moderators"
   },
@@ -2182,6 +2479,42 @@
   },
   "scopes.analytics.label": {
     "message": "Lees analyses"
+  },
+  "scopes.category.analytics": {
+    "message": "Statistieken"
+  },
+  "scopes.category.collections": {
+    "message": "Collecties"
+  },
+  "scopes.category.notifications": {
+    "message": "Meldingen"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisaties"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Uitbetalingen"
+  },
+  "scopes.category.projects": {
+    "message": "Projecten"
+  },
+  "scopes.category.reports": {
+    "message": "Rapporten"
+  },
+  "scopes.category.sessions": {
+    "message": "Sessies"
+  },
+  "scopes.category.threads": {
+    "message": ""
+  },
+  "scopes.category.user-account": {
+    "message": "Gebruikers Account"
+  },
+  "scopes.category.versions": {
+    "message": "Versies"
   },
   "scopes.collectionCreate.description": {
     "message": "Collecties aanmaken"
@@ -2330,6 +2663,12 @@
   "scopes.reportWrite.description": {
     "message": "Meldingen bewerken"
   },
+  "scopes.reportWrite.label": {
+    "message": "Schrijf rapporten"
+  },
+  "scopes.sessionAccess.description": {
+    "message": "Bekijk Modrinth sessies"
+  },
   "scopes.sessionAccess.label": {
     "message": "Toegang tot sessies"
   },
@@ -2411,6 +2750,9 @@
   "scopes.versionWrite.label": {
     "message": "Schrijf versies"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Shaderpakketten voor oudere versies werken hoogstwaarschijnlijk ook op nieuwere versies, met slechts kleine problemen."
+  },
   "search.filter.locked.server": {
     "message": "Gegeven door de server"
   },
@@ -2447,17 +2789,155 @@
   "servers.notice.undismissable": {
     "message": "Onnegeerbaar"
   },
+  "servers.notices.create-notice": {
+    "message": "Maak een melding"
+  },
+  "servers.notices.no-notices": {
+    "message": "Geen meldingen"
+  },
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
   "servers.plan.large.name": {
     "message": "Groot"
   },
+  "servers.plan.medium.description": {
+    "message": "Goed voor 6-15 spelers en meerdere mods"
+  },
   "servers.plan.medium.name": {
     "message": "Medium"
   },
+  "servers.plan.small.description": {
+    "message": "Perfect voor 1-5 vrienden en een paar lichte mods"
+  },
   "servers.plan.small.name": {
     "message": "Klein"
+  },
+  "settings.applications.about": {
+    "message": "Over"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Voeg meer toe"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Voeg een redirect-URI toe."
+  },
+  "settings.applications.button.cancel": {
+    "message": "Annuleren"
+  },
+  "settings.applications.button.create": {
+    "message": "Maak nieuwe"
+  },
+  "settings.applications.button.delete": {
+    "message": "Verwijder"
+  },
+  "settings.applications.button.edit": {
+    "message": "Bewerk"
+  },
+  "settings.applications.button.new": {
+    "message": "Nieuw project"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Wijzigingen opslaan"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Pictogram Uploaden"
+  },
+  "settings.applications.client-id": {
+    "message": "Client ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client geheim"
+  },
+  "settings.applications.created-on": {
+    "message": "Aangemaakt op {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Verwijder dit project"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Hierdoor wordt deze applicatie permanent verwijderd en worden alle toegangstokens ingetrokken (voor altijd!)."
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Weet je zeker dat je dit project wilt verwijderen"
+  },
+  "settings.applications.description.intro": {
+    "message": "Applicaties kunnen worden gebruikt om Modrinth-gebruikers te authenticeren bij uw producten. Zie voor meer informatie de <docs-link>.API-documentatie van Modrinth.</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Beschrijving"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Voer de beschrijving van de applicatie in..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Pictogram"
+  },
+  "settings.applications.field.name": {
+    "message": "Naam"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Voer de naam van de applicatie in..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Uris omleiden"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Permissiebereik"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Project informatie"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Er is een fout opgetreden"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Het icoon van jouw project is bijgewerkt."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icoon bijgewerkt"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Bewaar je geheim nu, het blijft verborgen nadat je deze pagina verlaat!"
+  },
+  "settings.billing.modal.cancel.action": {
+    "message": "Annuleer abbonement"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "Dit zal uw abonnement opzeggen. Je houdt je voordelen tot het einde van je huidige betaling cyclus"
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Weet je zeker dat je je abonnement wil beëindigen?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Verwijder betalings- methode"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Dit zal deze betalings-methode voor altijd verwijderen (voor echt altijd)"
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Weet je zeker dat je deze betalings-methode wil verwijderen?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Voeg betalings-methode toe"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "Zie vorige betalingen"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Maak primair"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Verloopt in {month}/{year}"
   },
   "settings.billing.payment_method.none": {
     "message": "Je hebt geen betaalmethodes toegevoegd."
@@ -2540,11 +3020,17 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Verberg Modrinth App promoties"
   },
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Links uitgelijnde zijbalk voor inhoudspagina's"
+  },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
     "message": "Lijn de project-details zijbalk uit naar de rechterkant van de paginainhoud."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.description": {
     "message": "Lijn de zoekfilters zijbalk uit aan de rechterkant van de zoekresultaten."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Rechts uitgelijnde zijbalk voor zoek pagina's"
   },
   "settings.display.theme.description": {
     "message": "Selecteer je gewenste kleurschema voor Modrinth op dit apparaat."
@@ -2647,6 +3133,15 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Zie all het nieuws"
+  },
+  "version.environment.none.description": {
+    "message": "De omgeving voor deze versie is niet gespecificeerd."
+  },
+  "version.environment.none.title": {
+    "message": "Geen omgeving ingesteld"
+  },
+  "version.environment.unknown.description": {
+    "message": "De omgeving \"{environment}\" is niet gevonden"
   },
   "version.environment.unknown.title": {
     "message": "Onbekende omgeving"

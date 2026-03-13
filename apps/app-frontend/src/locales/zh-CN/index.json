@@ -1,9 +1,12 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft 认证服务器现在可能无法使用。请检查你的网络连接，并稍后再试。"
+    "message": "Minecraft 身份验证服务器现在可能无法使用。请检查你的网络连接，并稍后再试。"
   },
   "app.auth-servers.unreachable.header": {
-    "message": "无法连接到认证服务器"
+    "message": "无法连接到身份验证服务器"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "内容需求"
   },
   "app.modal.install-to-play.header": {
     "message": "安装以游玩"
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count} 个模组"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件。"
+  "app.modal.install-to-play.required-modpack": {
+    "message": "整合包需求"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} 今天与你分享了这个实例。"
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "此服务器需要安装模组才能游玩。点击安装，从 Modrinth 下载所需文件，然后直接进入服务器。"
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "共享的实例"
+    "message": "共享实例"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "共享的服务端实例"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "查看内容"
   },
   "app.modal.update-to-play.added-count": {
     "message": "添加了 {count} 项"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "资源管理"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} 更新已就绪！立即重启更新，或退出时自动安装。"
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} 更新已下载完成！立即重启更新，或退出时自动安装。"
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} 现已发布。请使用你的软件包管理器进行更新，获取最新功能与修复！"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} 现已发布！由于你正在使用按流量计费的网络，该更新未自动下载。"
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "更新日志"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "下载（{size}）"
   },
-  "app.update-toast.download-page": {
-    "message": "下载"
+  "app.update-popup.download-complete": {
+    "message": "下载完成"
   },
-  "app.update-toast.downloading": {
-    "message": "下载中…"
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "重新启动"
   },
-  "app.update-toast.title": {
-    "message": "有可用更新"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "下载完成"
+  "app.update-popup.title": {
+    "message": "有可用的更新"
   },
   "app.update.complete-toast.text": {
     "message": "点击此处查看更新日志。"
@@ -147,10 +147,10 @@
     "message": "这可能与对方的 Minecraft 用户名不同！"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "输入 Modrinth 用户名……"
+    "message": "输入 Modrinth 用户名…"
   },
   "friends.add-friend.username.title": {
-    "message": "好友的 Modrinth 用户名是什么？"
+    "message": "你好友的 Modrinth 用户名是什么？"
   },
   "friends.add-friends-to-share": {
     "message": "<link>添加好友</link> 来看看他们都在玩什么！"
@@ -162,7 +162,7 @@
     "message": "删除好友"
   },
   "friends.friend.request-sent": {
-    "message": "已发送好友请求"
+    "message": "已发送好友申请"
   },
   "friends.friend.view-profile": {
     "message": "查看个人资料"
@@ -186,7 +186,7 @@
     "message": "没有对应名字“{query}”的好友"
   },
   "friends.search-friends-placeholder": {
-    "message": "搜索好友……"
+    "message": "搜索好友…"
   },
   "friends.section.heading": {
     "message": "{title} - {count}"
@@ -222,10 +222,10 @@
     "message": "名称"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Minecraft 世界"
+    "message": "Minecraft 存档"
   },
   "instance.edit-world.reset-icon": {
-    "message": "重置图标"
+    "message": "重设图标"
   },
   "instance.edit-world.title": {
     "message": "编辑存档"
@@ -234,7 +234,7 @@
     "message": "已禁用的项目"
   },
   "instance.filter.updates-available": {
-    "message": "有可用更新"
+    "message": "有可用的更新"
   },
   "instance.server-modal.address": {
     "message": "地址"
@@ -261,7 +261,7 @@
     "message": "将从设备中永久删除该实例，包括所有存档、配置文件及已安装内容。此操作不可撤销，请谨慎操作。"
   },
   "instance.settings.tabs.general.deleting.button": {
-    "message": "删除中……"
+    "message": "删除中..."
   },
   "instance.settings.tabs.general.duplicate-button": {
     "message": "复制"
@@ -318,7 +318,7 @@
     "message": "在游戏关闭后运行。"
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "输入退出后运行的命令……"
+    "message": "输入退出后运行的命令…"
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "启动前"
@@ -327,7 +327,7 @@
     "message": "在实例启动前运行。"
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "输入预启动命令……"
+    "message": "输入启动前命令..."
   },
   "instance.settings.tabs.hooks.title": {
     "message": "游戏启动钩子"
@@ -339,7 +339,7 @@
     "message": "用于启动 Minecraft 的包装器命令。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
-    "message": "输入包装器命令……"
+    "message": "输入封装命令..."
   },
   "instance.settings.tabs.installation": {
     "message": "安装"
@@ -429,7 +429,7 @@
     "message": "修复会重新安装 Minecraft 依赖项并检查是否有损坏。如果你的游戏因启动器相关错误无法启动，这可能会解决问题，但不会解决与已安装模组相关的问题或崩溃。"
   },
   "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "确定修复该实例吗？"
+    "message": "确定要修复该实例吗？"
   },
   "instance.settings.tabs.installation.repair.in-progress": {
     "message": "正在修复"
@@ -464,20 +464,29 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "（未知版本）"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "该实例已关联至服务器，因此无法更改 Minecraft 版本。解除关联将永久断开该实例与服务器。"
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "该实例已关联至服务器，因此无法单独更新模组，也无法更改模组加载器和 Minecraft 版本。解除关联将永久断开该实例与服务器。"
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "与服务器解除关联"
+  },
   "instance.settings.tabs.installation.unlink.button": {
-    "message": "解除实例关联"
+    "message": "取消实例关联"
   },
   "instance.settings.tabs.installation.unlink.confirm.description": {
     "message": "若继续操作，该实例将无法重新关联至原整合包，除非创建全新的实例。此后，不再接收整合包的任何更新，该实例变为普通实例。"
   },
   "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "你确定要取消关联此实例吗？"
+    "message": "你确定要取消关联此版本吗？"
   },
   "instance.settings.tabs.installation.unlink.description": {
     "message": "该实例已关联至整合包，因此无法单独更新模组，也无法更改模组加载器和 Minecraft 版本。解除关联后，该实例将无法重新关联至整合包。"
   },
   "instance.settings.tabs.installation.unlink.title": {
-    "message": "取消整合包关联"
+    "message": "解除整合包关联"
   },
   "instance.settings.tabs.java": {
     "message": "Java 及内存"
@@ -486,7 +495,7 @@
     "message": "环境变量"
   },
   "instance.settings.tabs.java.hooks": {
-    "message": "钩子"
+    "message": "Hooks"
   },
   "instance.settings.tabs.java.java-arguments": {
     "message": "Java 参数"
@@ -516,7 +525,7 @@
     "message": "游戏启动时的窗口高度。"
   },
   "instance.settings.tabs.window.height.enter": {
-    "message": "输入高度……"
+    "message": "输入高度…"
   },
   "instance.settings.tabs.window.width": {
     "message": "宽度"
@@ -525,7 +534,7 @@
     "message": "游戏启动时的窗口宽度。"
   },
   "instance.settings.tabs.window.width.enter": {
-    "message": "输入宽度……"
+    "message": "输入宽度…"
   },
   "instance.worlds.a_minecraft_server": {
     "message": "Minecraft 服务器"
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "服务器不兼容"
   },
+  "instance.worlds.linked_server": {
+    "message": "由服务器项目管理"
+  },
   "instance.worlds.no_contact": {
     "message": "无法连接服务器"
   },
@@ -564,7 +576,7 @@
     "message": "游玩实例"
   },
   "instance.worlds.type.server": {
-    "message": "服务端"
+    "message": "服务器"
   },
   "instance.worlds.type.singleplayer": {
     "message": "单人游戏"
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "与实例同步"
+  },
+  "search.filter.locked.server": {
+    "message": "由该服务器提供"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "只能将客户端模组添加到服务器实例中"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "游戏版本由服务器提供"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "加载器由服务器提供"
   }
 }

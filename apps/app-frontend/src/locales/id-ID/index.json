@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Konten diperlukan"
+  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk memainkan"
   },
@@ -14,17 +17,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Server ini memerlukan mod untuk dimainkan. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Paket mod yang diperlukan"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} membagikan instans ini dengan Anda hari ini."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Mod diperlukan untuk bermain di server ini. Klik pasang untuk menyiapkan berkas-berkas yang diperlukan dari Modrinth, kemudian luncurkan langsung sari server."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instans terbagi"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Instans server terbagi"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Lihat konten"
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} ditambahkan"
@@ -66,7 +72,7 @@
     "message": "Tampilan"
   },
   "app.settings.tabs.default-instance-options": {
-    "message": "Pilihan instans asali"
+    "message": "Pilihan instans bawaan"
   },
   "app.settings.tabs.feature-flags": {
     "message": "Bendera fitur"
@@ -83,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Manajemen sumber"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} siap dipasang! Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} telah selesai mengunduh. Muat ulang untuk memperbarui sekarang, atau secara otomatis saat Anda menutup Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} tersedia. Gunakan pengelola paket Anda untuk memperbarui dan mendapatkan fitur-fitur dan perbaikan terbaru!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} sudah tersedia! Karena Anda saat ini sedang berada dalam jaringan terukur, kami tidak mengunduhnya secara otomatis."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Catatan perubahan"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Unduh ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Unduh"
+  "app.update-popup.download-complete": {
+    "message": "Selesai mengunduh"
   },
-  "app.update-toast.downloading": {
-    "message": "Mengunduh..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Muat ulang"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Pembaruan tersedia"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Selesai mengunduh"
   },
   "app.update.complete-toast.text": {
     "message": "Klik di sini untuk melihat catatan perubahan."
@@ -464,6 +464,15 @@
   "instance.settings.tabs.installation.unknown-version": {
     "message": "(versi tidak dikenal)"
   },
+  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
+    "message": "Instans ini berkaitan dengan suatu server, yang berarti Anda tidak dapat mengubah versi Minecraft. Melepas kaitan akan memutuskan instans ini dari server secara permanen."
+  },
+  "instance.settings.tabs.installation.unlink-server.description": {
+    "message": "Instans ini berkaitan dengan suatu server, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan instans ini dari server secara permanen."
+  },
+  "instance.settings.tabs.installation.unlink-server.title": {
+    "message": "Lepas kaitan dari server"
+  },
   "instance.settings.tabs.installation.unlink.button": {
     "message": "Lepas kaitan instans"
   },
@@ -551,6 +560,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Server tidak cocok"
   },
+  "instance.worlds.linked_server": {
+    "message": "Dikelola oleh proyek server"
+  },
   "instance.worlds.no_contact": {
     "message": "Server tidak dapat dihubungi"
   },
@@ -586,5 +598,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sinkronkan dengan instans"
+  },
+  "search.filter.locked.server": {
+    "message": "Disediakan oleh server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Anda hanya dapat menambahkan mod sisi klien pada instans server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versi permainan disediakan oleh server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Pemuat disediakan oleh server"
   }
 }

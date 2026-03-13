@@ -46,7 +46,6 @@ const selectableProjectTypes = [
 		label: formatMessage(commonProjectTypeCategoryMessages.server),
 		href: `/discover/servers`,
 		type: 'servers',
-		shown: flags.value.serverDiscovery,
 	},
 ]
 </script>
@@ -57,6 +56,7 @@ const selectableProjectTypes = [
 			<NavTabs
 				v-if="!flags.projectTypesPrimaryNav && allowTabChanging"
 				:links="selectableProjectTypes"
+				replace
 				class="hidden md:flex"
 			/>
 		</section>

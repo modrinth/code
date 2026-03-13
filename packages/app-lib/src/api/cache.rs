@@ -1,6 +1,6 @@
 use crate::state::{
     CacheBehaviour, CacheValueType, CachedEntry, Organization, Project,
-    SearchResults, TeamMember, User, Version,
+    ProjectV3, SearchResults, SearchResultsV3, TeamMember, User, Version,
 };
 
 macro_rules! impl_cache_methods {
@@ -36,11 +36,13 @@ macro_rules! impl_cache_methods {
 
 impl_cache_methods!(
     (Project, Project),
+    (ProjectV3, ProjectV3),
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
     (Organization, Organization),
-    (SearchResults, SearchResults)
+    (SearchResults, SearchResults),
+    (SearchResultsV3, SearchResultsV3)
 );
 
 pub async fn purge_cache_types(
@@ -50,4 +52,21 @@ pub async fn purge_cache_types(
     CachedEntry::purge_cache_types(cache_types, &state.pool).await?;
 
     Ok(())
+}
+
+/// Get versions for a project (without changelogs for fast loading).
+/// Uses the cache system with the ProjectVersions cache type.
+#[tracing::instrument]
+pub async fn get_project_versions(
+    project_id: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Option<Vec<Version>>> {
+    let state = crate::State::get().await?;
+    CachedEntry::get_project_versions(
+        project_id,
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await
 }

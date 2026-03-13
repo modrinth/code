@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Tambah ikon"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Tambah alamat IP dan porta yang dapat digunakan oleh pemain edisi Java untuk bergabung dengan server Anda."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Tambah alamat Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Tambah tautan relevan yang disasarkan di luar Modrinth, seperti situs web, toko, atau undangan Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Tambah tautan eksternal"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Tambahkan tautan relevan yang disasarkan di luar Modrinth, seperti kode sumber, pelacak masalah, atau undangan Discord."
   },
@@ -18,10 +30,10 @@
     "defaultMessage": "Tambah tautan eksternal"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "Anda memilih semua {totalAvailableTags, plural, other {(#) etiket yang tersedia}}. Ini bertentangan dengan tujuan etiket, yang bertujuan membantu pengguna mencari proyek yang relevan. Mohon hanya pilih etiket yang relevan dengan proyek Anda."
+    "defaultMessage": "Anda memilih semua {totalAvailableTags, plural, other {(#) tag yang tersedia}}. Ini bertentangan dengan tujuan tag, yang bertujuan membantu pengguna mencari proyek yang relevan. Mohon hanya pilih tag yang relevan dengan proyek Anda."
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "Pilih etiket yang tepat"
+    "defaultMessage": "Pilih tag yang tepat"
   },
   "nags.description-too-short.description": {
     "defaultMessage": "Panjang keterangan Anda adalah {length, plural, other {# karakter yang dapat dibaca}}. Setidaknya {minChars, plural, other {# karakter}} disarankan untuk membuat keterangan yang jelas dan informatif."
@@ -39,7 +51,7 @@
     "defaultMessage": "Sunting ringkasan"
   },
   "nags.edit-tags.title": {
-    "defaultMessage": "Sunting etiket"
+    "defaultMessage": "Sunting tag"
   },
   "nags.edit-title.title": {
     "defaultMessage": "Sunting judul"
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Berikan kode sumber"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Beberapa tautan eksternal Anda tampaknya identik. Setiap tautan seharusnya dimasukkan hanya sekali dan dengan jenis tautan yang sesuai."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Tautan Identik"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan Anda seharusnya berisi teks biasa atau teks alt gambar yang cukup, agar memastikan aksesibilitas terhadap pengguna pembaca layar atau pengguna dengan koneksi internet yang lambat."
@@ -117,10 +135,28 @@
     "defaultMessage": "Tinjau umpan balik"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Anda memilih {count, plural, other {# etiket resolusi}} ({tags}). Paket sumber seharusnya hanya memiliki satu etiket resolusi yang sepadan dengan resolusi utamanya."
+    "defaultMessage": "Anda memilih {count, plural, other {# tag resolusi}} ({tags}). Paket sumber seharusnya hanya memiliki satu tag resolusi yang sepadan dengan resolusi utamanya."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang benar"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Pilih versi apa saja yang didukung oleh server Anda, pilih paket mod, atau unggah milik Anda sendiri."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Pilih kompatibilitas"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Beri tahu lokasi wilayah server Anda kepada para pemain."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Pilih wilayah"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Sebutkan bahasa yang didukung oleh server Anda."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Pilih bahasa"
   },
   "nags.select-license.description": {
     "defaultMessage": "Pilih lisensi yang digunakan untuk mendistribusikan {type, select, mod {mod} modpack {paket mod} resourcepack {paket sumber} shader {pencorak} plugin {pasang-masuk} datapack {paket data} other {proyek}} Anda."
@@ -129,10 +165,13 @@
     "defaultMessage": "Pilih lisensi"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Pilih etiket yang sesuai dengan proyek Anda untuk membantu pencarian oleh pengguna yang tepat."
+    "defaultMessage": "Pilih tag yang sesuai dengan proyek Anda untuk membantu pencarian oleh pengguna yang tepat."
   },
   "nags.select-tags.title": {
-    "defaultMessage": "Pilih etiket"
+    "defaultMessage": "Pilih tag"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Kunjungi pengaturan server"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Kunjungi pengaturan keterangan"
@@ -144,7 +183,7 @@
     "defaultMessage": "Kunjungi pengaturan tautan"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Kunjungi pengaturan etiket"
+    "defaultMessage": "Kunjungi pengaturan tag"
   },
   "nags.settings.title": {
     "defaultMessage": "Kunjungi pengaturan umum"
@@ -173,14 +212,20 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Bersihkan nama"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Anda memilih {tagCount, plural, other {# tag}}. Mohon pertimbangkan untuk menguranginya menjadi sebanyak-banyaknya {maxTagCount} untuk memastikan server Anda muncul pada hasil pencarian yang relevan."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Pilih tag yang tepat"
+  },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Anda memilih {tagCount, plural, other {# etiket}}. Pertimbangkan untuk menguranginya menjadi {maxTagCount} atau kurang untuk memastikan proyek Anda muncul pada hasil pencarian yang relevan."
+    "defaultMessage": "Anda memilih {tagCount, plural, other {# tag}}. Pertimbangkan untuk menguranginya menjadi {maxTagCount} atau kurang untuk memastikan proyek Anda muncul pada hasil pencarian yang relevan."
   },
   "nags.too-many-tags.title": {
-    "defaultMessage": "Pilih etiket yang tepat"
+    "defaultMessage": "Pilih tag yang tepat"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk menampilkan konten {type, select, resourcepack {paket sumber Anda, kecuali bila paket sumber Anda merupakan paket audio atau penerjemahan. Bila demikian, mohon pilih etiket yang sesuai} shader {pencorak Anda} other {proyek Anda}}."
+    "defaultMessage": "Setidaknya satu gambar galeri diperlukan untuk menampilkan konten {type, select, resourcepack {paket sumber Anda, kecuali bila paket sumber Anda merupakan paket audio atau penerjemahan. Bila demikian, mohon pilih tag yang sesuai} shader {pencorak Anda} other {proyek Anda}}."
   },
   "nags.upload-gallery-image.title": {
     "defaultMessage": "Unggah gambar galeri"

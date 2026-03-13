@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installer for at spille"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Installer"
   },
@@ -12,7 +15,7 @@
     "message": "{count, plural, one {# mod} other {# mods}}"
   },
   "app.modal.install-to-play.server-requires-mods": {
-    "message": "Denne server kræver mods for at spille. Klik installer for at sætte op filerne som er krævet fra Modrinth."
+    "message": "Denne server kræver mods for at spille. Tryk på installer for at sætte de krævet filler fra modrinth op, så lancer direkte til serveren."
   },
   "app.modal.update-to-play.added-count": {
     "message": "{count} tilføjet"
@@ -28,6 +31,9 @@
   },
   "app.modal.update-to-play.header": {
     "message": "Opdater for at spille"
+  },
+  "app.modal.update-to-play.published-date": {
+    "message": "{date, date, long}"
   },
   "app.modal.update-to-play.removed-count": {
     "message": "{count} fjernet"
@@ -67,39 +73,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressourcestyring"
-  },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} er allerede installeret! Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} er færdig med at download. Genindlæs for at opdatere nu, eller automatisk når du lukker Modrinth App."
-  },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} er nu tilgængelig. Brug din pakke-manager til at opdatere for de nyeste features og fejlrettelser!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} er nu tilgængelig! Siden du er på et begrænset netværk, vi downloadede den ikke automatisk."
-  },
-  "app.update-toast.changelog": {
-    "message": "Ændringslog"
-  },
-  "app.update-toast.download": {
-    "message": "Download ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "Download"
-  },
-  "app.update-toast.downloading": {
-    "message": "Downloader..."
-  },
-  "app.update-toast.reload": {
-    "message": "Geninlæs"
-  },
-  "app.update-toast.title": {
-    "message": "Opdatering tilgængelig"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Download færdiggjort"
   },
   "app.update.complete-toast.text": {
     "message": "Klik her for at vise ændringslog."
