@@ -186,7 +186,7 @@ const messages = defineMessages({
 							<span class="font-medium">{{ relativeTime(createdAt) }}</span>
 						</div>
 					</div>
-					<span class="text-contrast">{{ description }}</span>
+					<span class="text-contrast opacity-80">{{ description }}</span>
 				</div>
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
