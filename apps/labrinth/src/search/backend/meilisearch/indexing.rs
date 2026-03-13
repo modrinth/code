@@ -557,6 +557,18 @@ impl SearchField {
                 path: "categories",
                 filterable: true,
             },
+            SearchField::Name => MeilisearchFieldSpec {
+                path: "name",
+                filterable: true,
+            },
+            SearchField::Author => MeilisearchFieldSpec {
+                path: "author",
+                filterable: true,
+            },
+            SearchField::License => MeilisearchFieldSpec {
+                path: "license",
+                filterable: true,
+            },
             SearchField::ProjectTypes => MeilisearchFieldSpec {
                 path: "project_types",
                 filterable: true,

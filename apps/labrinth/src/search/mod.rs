@@ -186,6 +186,9 @@ pub enum SearchBackendKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, strum::EnumIter)]
 pub enum SearchField {
     Categories,
+    Name,
+    Author,
+    License,
     ProjectTypes,
     ProjectId,
     OpenSource,
@@ -225,7 +228,9 @@ pub struct UploadSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
+    pub indexed_author: String,
     pub name: String,
+    pub indexed_title: String,
     pub summary: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,

@@ -208,7 +208,7 @@ pub async fn profile_check_installed_batch(
                 projects.into_iter().any(|(_, pf)| {
                     pf.metadata
                         .as_ref()
-                        .map_or(false, |m| m.project_id == project_id)
+                        .is_some_and(|m| m.project_id == project_id)
                 })
             } else {
                 false
