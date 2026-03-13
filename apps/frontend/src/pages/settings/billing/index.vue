@@ -301,14 +301,10 @@
 												{{
 													getProductPrice(getPyroProduct(subscription), subscription.interval)
 														? formatPrice(
-																getProductPrice(
-																	getPyroProduct(subscription),
-																	subscription.interval,
-																).prices.intervals[subscription.interval],
-																getProductPrice(
-																	getPyroProduct(subscription),
-																	subscription.interval,
-																).currency_code,
+																getProductPrice(getPyroProduct(subscription), subscription.interval)
+																	.prices.intervals[subscription.interval],
+																getProductPrice(getPyroProduct(subscription), subscription.interval)
+																	.currency_code,
 															)
 														: ''
 												}}

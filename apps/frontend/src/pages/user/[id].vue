@@ -492,6 +492,7 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
@@ -503,7 +504,6 @@ import {
 	useFormatDateTime,
 	useFormatNumber,
 	useRelativeTime,
-	injectModrinthClient,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -732,7 +732,6 @@ const { data: collections } = useQuery({
 	queryKey: computed(() => ['user', route.params.id, 'collections']),
 	queryFn: () => useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
 })
-
 
 watch(
 	user,

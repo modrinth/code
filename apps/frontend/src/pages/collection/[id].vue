@@ -650,7 +650,6 @@ const isLoading = computed(() => {
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
 })
 
-
 watch(
 	[collection, creator],
 	([col, cre]) => {

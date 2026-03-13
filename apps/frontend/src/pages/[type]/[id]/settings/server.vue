@@ -32,7 +32,7 @@
 						:options="languageOptions"
 						searchable
 						include-select-all-option
-						:maxTagRows="2"
+						:max-tag-rows="2"
 						placeholder="Select languages"
 						:disabled="!hasPermission"
 					/>
