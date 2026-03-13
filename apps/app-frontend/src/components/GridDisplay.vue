@@ -22,7 +22,7 @@ import { computed, ref } from 'vue'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import Instance from '@/components/ui/Instance.vue'
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { duplicate, remove } from '@/helpers/profile.js'
 
 const { handleError } = injectNotificationManager()
@@ -302,14 +302,7 @@ const filteredResults = computed(() => {
 			/>
 		</section>
 	</div>
-	<ConfirmModalWrapper
-		ref="confirmModal"
-		title="Are you sure you want to delete this instance?"
-		description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
-		:has-to-type="false"
-		proceed-label="Delete"
-		@proceed="deleteProfile"
-	/>
+	<ConfirmDeleteInstanceModal ref="confirmModal" @delete="deleteProfile" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
 		<template #play> <PlayIcon /> Play </template>
 		<template #stop> <StopCircleIcon /> Stop </template>

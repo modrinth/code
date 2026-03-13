@@ -105,18 +105,18 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["name", "slug", "summary"]
+    ["indexed_title", "slug", "summary", "indexed_author"]
         .into_iter()
         .map(str::to_string)
         .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 5, 2]
+    vec![15, 5, 2, 1]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, false]
+    vec![true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
@@ -346,6 +346,27 @@ impl SearchField {
                 sort: false,
                 optional: true,
             },
+            SearchField::Name => TypesenseFieldSpec {
+                path: "name",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::Author => TypesenseFieldSpec {
+                path: "author",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: false,
+            },
+            SearchField::License => TypesenseFieldSpec {
+                path: "license",
+                ty: "string",
+                facet: true,
+                sort: false,
+                optional: true,
+            },
             SearchField::ProjectTypes => TypesenseFieldSpec {
                 path: "project_types",
                 ty: "string[]",
@@ -468,12 +489,11 @@ impl Typesense {
 
     fn collection_schema(name: &str) -> Value {
         let mut fields = vec![
-            json!({"name": "name", "type": "string", "facet": false}),
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
+            json!({"name": "indexed_title", "type": "string", "facet": false, "stem": true}),
+            json!({"name": "indexed_author", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
-            json!({"name": "author", "type": "string", "facet": true}),
-            json!({"name": "license", "type": "string", "facet": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),
             json!({"name": "created_timestamp", "type": "int64", "sort": true}),
             json!({"name": "modified_timestamp", "type": "int64", "sort": true}),
@@ -487,6 +507,7 @@ impl Typesense {
         json!({
             "name": name,
             "enable_nested_fields": true,
+            "token_separators": ["-"],
             "fields": fields,
             "default_sorting_field": "log_downloads"
         })
@@ -586,10 +607,6 @@ impl Typesense {
     /// `filters`/`version` fields, translating each from Meilisearch filter
     /// syntax to Typesense filter syntax.
     fn build_filter(info: &SearchRequest) -> Result<Option<String>, ApiError> {
-        if let Some(new_filters) = info.new_filters.as_deref() {
-            return Ok(Some(meili_to_typesense(new_filters)));
-        }
-
         let facet_part = if let Some(facets_json) = info.facets.as_deref() {
             Some(
                 facets_to_typesense(facets_json)
@@ -599,10 +616,18 @@ impl Typesense {
             None
         };
 
-        let legacy_part =
-            combined_search_filters(info).map(|f| meili_to_typesense(&f));
+        let new_filters_part =
+            info.new_filters.as_deref().map(meili_to_typesense);
 
-        Ok(match (facet_part, legacy_part) {
+        let legacy_part = if info.new_filters.is_none() {
+            combined_search_filters(info).map(|f| meili_to_typesense(&f))
+        } else {
+            None
+        };
+
+        let filter_part = new_filters_part.or(legacy_part);
+
+        Ok(match (facet_part, filter_part) {
             (Some(f), Some(l)) if !f.is_empty() && !l.is_empty() => {
                 Some(format!("({f}) && ({l})"))
             }

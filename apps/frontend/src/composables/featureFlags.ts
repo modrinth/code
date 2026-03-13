@@ -43,6 +43,7 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	hidePreviewBanner: false,
 	i18nDebug: false,
 	showDiscoverProjectButtons: false,
+	useV1ContentTabAPI: true,
 	labrinthApiCanary: false,
 } as const)
 

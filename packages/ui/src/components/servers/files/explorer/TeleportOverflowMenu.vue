@@ -3,6 +3,7 @@
 		<button
 			ref="triggerRef"
 			class="teleport-overflow-menu-trigger"
+			:class="btnClass"
 			:aria-expanded="isOpen"
 			:aria-haspopup="true"
 			@mousedown="handleMouseDown"
@@ -45,6 +46,8 @@
 										if (el) menuItemsRef[index] = el as HTMLElement
 									}
 								"
+								v-tooltip="option.tooltip"
+								:disabled="option.disabled"
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"
 								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
@@ -92,6 +95,8 @@ interface Option {
 	action?: (() => void) | string
 	shown?: boolean
 	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	disabled?: boolean
+	tooltip?: string
 }
 
 type Divider = {
@@ -109,14 +114,17 @@ const props = withDefaults(
 	defineProps<{
 		options: Item[]
 		hoverable?: boolean
+		btnClass?: string | string[] | Record<string, boolean>
 	}>(),
 	{
 		hoverable: false,
+		btnClass: undefined,
 	},
 )
 
 const emit = defineEmits<{
 	select: [option: Option]
+	open: []
 }>()
 
 const isOpen = ref(false)
@@ -187,6 +195,7 @@ const toggleMenu = (event: MouseEvent) => {
 
 const openMenu = () => {
 	isOpen.value = true
+	emit('open')
 	disableBodyScroll()
 	nextTick(() => {
 		menuStyle.value = calculateMenuPosition()
@@ -255,6 +264,7 @@ const handleMouseMove = (event: MouseEvent) => {
 }
 
 const handleItemClick = (option: Option, index: number) => {
+	if (option.disabled) return
 	selectedIndex.value = index
 	selectOption(option)
 }

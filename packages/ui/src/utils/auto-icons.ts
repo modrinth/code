@@ -5,6 +5,7 @@ import {
 	CalendarIcon,
 	CardIcon,
 	CurrencyIcon,
+	DiscordIcon,
 	FileArchiveIcon,
 	FileCodeIcon,
 	FileIcon,
@@ -32,6 +33,13 @@ import {
 import type { ProjectStatus, ProjectType } from '@modrinth/utils'
 import type { Component } from 'vue'
 
+import {
+	FILE_ARCHIVE_EXTENSIONS,
+	FILE_CODE_EXTENSIONS,
+	FILE_IMAGE_EXTENSIONS,
+	FILE_TEXT_EXTENSIONS,
+} from './file-extensions'
+
 export const PROJECT_TYPE_ICONS: Record<ProjectType, Component> = {
 	mod: BoxIcon,
 	modpack: PackageOpenIcon,
@@ -49,7 +57,7 @@ export const PAYMENT_METHOD_ICONS: Record<string, Component> = {
 }
 
 export const SOCIAL_PLATFORM_ICONS: Record<string, Component> = {
-	discord: GithubIcon,
+	discord: DiscordIcon,
 	github: GithubIcon,
 }
 
@@ -88,53 +96,6 @@ const BLOCKCHAIN_CONFIG: Record<string, { icon: Component; color: string }> = {
 	polygon: { icon: PolygonIcon, color: 'text-purple' },
 }
 
-export const CODE_EXTENSIONS: readonly string[] = [
-	'json',
-	'json5',
-	'jsonc',
-	'java',
-	'kt',
-	'kts',
-	'sh',
-	'bat',
-	'ps1',
-	'yml',
-	'yaml',
-	'toml',
-	'js',
-	'ts',
-	'py',
-	'rb',
-	'php',
-	'html',
-	'css',
-	'cpp',
-	'c',
-	'h',
-	'rs',
-	'go',
-] as const
-
-export const TEXT_EXTENSIONS: readonly string[] = [
-	'txt',
-	'md',
-	'log',
-	'cfg',
-	'conf',
-	'properties',
-	'ini',
-	'sk',
-] as const
-export const IMAGE_EXTENSIONS: readonly string[] = [
-	'png',
-	'jpg',
-	'jpeg',
-	'gif',
-	'svg',
-	'webp',
-] as const
-const ARCHIVE_EXTENSIONS: string[] = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
-
 export function getProjectTypeIcon(projectType: ProjectType): Component {
 	return PROJECT_TYPE_ICONS[projectType] ?? BoxIcon
 }
@@ -162,16 +123,16 @@ export function getDirectoryIcon(name: string): Component {
 export function getFileExtensionIcon(extension: string): Component {
 	const ext: string = extension.toLowerCase()
 
-	if (CODE_EXTENSIONS.includes(ext)) {
+	if ((FILE_CODE_EXTENSIONS as readonly string[]).includes(ext)) {
 		return FileCodeIcon
 	}
-	if (TEXT_EXTENSIONS.includes(ext)) {
+	if ((FILE_TEXT_EXTENSIONS as readonly string[]).includes(ext)) {
 		return FileTextIcon
 	}
-	if (IMAGE_EXTENSIONS.includes(ext)) {
+	if ((FILE_IMAGE_EXTENSIONS as readonly string[]).includes(ext)) {
 		return FileImageIcon
 	}
-	if (ARCHIVE_EXTENSIONS.includes(ext)) {
+	if ((FILE_ARCHIVE_EXTENSIONS as readonly string[]).includes(ext)) {
 		return FileArchiveIcon
 	}
 

@@ -1,11 +1,28 @@
 <template>
 	<div
 		:class="[
-			'flex flex-col rounded-2xl border-[1px] border-solid p-4 gap-3 text-contrast',
+			'relative flex flex-col rounded-2xl border-[1px] border-solid p-4 gap-3 text-contrast',
 			typeClasses[type],
 		]"
 	>
-		<div :class="['flex gap-2 items-start', (header || $slots.header) && 'flex-col']">
+		<ButtonStyled
+			v-if="dismissible"
+			circular
+			type="highlight-colored-text"
+			:color="buttonColors[type]"
+		>
+			<button aria-label="Dismiss" class="absolute top-3 right-3" @click="$emit('dismiss')">
+				<XIcon class="h-4 w-4" />
+			</button>
+		</ButtonStyled>
+
+		<div
+			:class="[
+				'flex gap-2 items-start',
+				(header || $slots.header) && 'flex-col',
+				dismissible && 'pr-8',
+			]"
+		>
 			<div class="flex gap-2 items-start" :class="header || $slots.header ? 'w-full' : 'contents'">
 				<slot name="icon" :icon-class="['h-6 w-6 flex-none', iconClasses[type]]">
 					<component
@@ -28,7 +45,10 @@
 </template>
 
 <script setup lang="ts">
+import { XIcon } from '@modrinth/assets'
+
 import { getSeverityIcon } from '../../utils'
+import ButtonStyled from './ButtonStyled.vue'
 
 withDefaults(
 	defineProps<{
@@ -36,14 +56,20 @@ withDefaults(
 		header?: string
 		body?: string
 		showActionsUnderneath?: boolean
+		dismissible?: boolean
 	}>(),
 	{
 		type: 'info',
 		header: '',
 		body: '',
 		showActionsUnderneath: false,
+		dismissible: false,
 	},
 )
+
+defineEmits<{
+	dismiss: []
+}>()
 
 const typeClasses = {
 	info: 'border-brand-blue bg-bg-blue',
@@ -55,5 +81,11 @@ const iconClasses = {
 	info: 'text-brand-blue',
 	warning: 'text-brand-orange',
 	critical: 'text-brand-red',
+}
+
+const buttonColors: Record<string, 'blue' | 'orange' | 'red'> = {
+	info: 'blue',
+	warning: 'orange',
+	critical: 'red',
 }
 </script>

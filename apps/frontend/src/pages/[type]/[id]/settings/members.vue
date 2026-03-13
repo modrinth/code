@@ -5,7 +5,6 @@
 			title="Are you sure you want to remove this project from the organization?"
 			description="If you proceed, this project will no longer be managed by the organization."
 			proceed-label="Remove"
-			:noblur="!(cosmetics?.advancedRendering ?? true)"
 			@proceed="onRemoveFromOrg"
 		/>
 		<Card>
@@ -568,7 +567,6 @@ const {
 
 const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
-const cosmetics = useCosmetics()
 const auth = await useAuth()
 
 const allTeamMembers = ref([])

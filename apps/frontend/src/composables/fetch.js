@@ -3,9 +3,10 @@
  * This composable is kept for legacy code that hasn't been migrated yet.
  */
 
+import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
+
 let cachedRateLimitKey = undefined
 let rateLimitKeyPromise = undefined
-const LABRINTH_CANARY_COOKIE = 'labrinth-canary=always'
 
 async function getRateLimitKey(config) {
 	if (config.rateLimitKey) return config.rateLimitKey
@@ -35,17 +36,10 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
 		options.headers = {}
 	}
 
+	options.headers = withLabrinthCanaryHeader(options.headers)
+
 	if (import.meta.server) {
 		options.headers['x-ratelimit-key'] = await getRateLimitKey(config)
-	}
-
-	if (useFeatureFlags().value.labrinthApiCanary) {
-		const existingCookie = options.headers.cookie
-		if (!existingCookie?.split('; ').includes(LABRINTH_CANARY_COOKIE)) {
-			options.headers.cookie = existingCookie
-				? `${existingCookie}; ${LABRINTH_CANARY_COOKIE}`
-				: LABRINTH_CANARY_COOKIE
-		}
 	}
 
 	if (!skipAuth) {
