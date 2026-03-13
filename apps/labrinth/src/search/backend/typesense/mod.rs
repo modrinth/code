@@ -617,7 +617,7 @@ impl Typesense {
         };
 
         let new_filters_part =
-            info.new_filters.as_deref().map(|f| meili_to_typesense(f));
+            info.new_filters.as_deref().map(meili_to_typesense);
 
         let legacy_part = if info.new_filters.is_none() {
             combined_search_filters(info).map(|f| meili_to_typesense(&f))
