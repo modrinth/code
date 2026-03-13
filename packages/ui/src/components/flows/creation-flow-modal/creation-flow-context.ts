@@ -240,7 +240,7 @@ export function createCreationFlowContext(
 		generatorSettingsCustom.value = ''
 
 		// Instance-specific
-		instanceName.value = flowType === 'instance' ? 'New instance' : ''
+		instanceName.value = ''
 		instanceIconUrl.value = null
 		instanceIcon.value = null
 		instanceIconPath.value = null
