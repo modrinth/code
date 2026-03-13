@@ -1,32 +1,6 @@
 <template>
 	<div class="relative h-full w-full">
-		<div
-			v-if="server.moduleErrors.startup"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
-			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
-				<div class="flex flex-col items-center text-center">
-					<div class="flex flex-col items-center gap-4">
-						<div class="grid place-content-center rounded-full bg-bg-orange p-4">
-							<IssuesIcon class="size-12 text-orange" />
-						</div>
-						<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load startup settings</h1>
-					</div>
-					<p class="text-lg text-secondary">
-						We couldn't load your server's startup settings. Here's what we know:
-					</p>
-					<p>
-						<span class="break-all font-mono">{{
-							JSON.stringify(server.moduleErrors.startup.error)
-						}}</span>
-					</p>
-					<ButtonStyled size="large" color="brand" @click="() => server.refresh(['startup'])">
-						<button class="mt-6 !w-full">Retry</button>
-					</ButtonStyled>
-				</div>
-			</div>
-		</div>
-		<div v-else-if="data" class="flex h-full w-full flex-col gap-4">
+		<div class="flex h-full w-full flex-col gap-4">
 			<div
 				class="rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
 			>
@@ -42,7 +16,7 @@
 						</label>
 						<ButtonStyled>
 							<button
-								:disabled="invocation === originalInvocation"
+								:disabled="isStartupLoading || startupCommand === defaultStartupCommand"
 								class="!w-full sm:!w-auto"
 								@click="resetToDefault"
 							>
@@ -51,13 +25,22 @@
 							</button>
 						</ButtonStyled>
 					</div>
-					<StyledInput
-						id="startup-command-field"
-						v-model="invocation"
-						multiline
-						resize="vertical"
-						input-class="min-h-[270px] font-[family-name:var(--mono-font)]"
-					/>
+					<div class="relative">
+						<StyledInput
+							id="startup-command-field"
+							v-model="startupCommand"
+							multiline
+							resize="vertical"
+							input-class="min-h-[270px] font-[family-name:var(--mono-font)]"
+							:disabled="isStartupLoading"
+						/>
+						<div
+							v-if="isStartupLoading"
+							class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
+						>
+							<SpinnerIcon class="h-6 w-6 animate-spin text-secondary" />
+						</div>
+					</div>
 				</div>
 
 				<div class="card flex flex-col gap-8">
@@ -70,168 +53,203 @@
 								different Java version to work properly.
 							</span>
 						</div>
-						<div class="flex items-center gap-2">
-							<Toggle id="show-all-versions" v-model="showAllVersions" class="flex-none" />
-							<label for="show-all-versions" class="text-sm">Show all Java versions</label>
+						<div class="relative max-w-xs">
+							<Combobox
+								:id="'java-version-field'"
+								v-model="javaVersion"
+								name="java-version"
+								:options="displayedJavaVersions"
+								:display-value="javaVersionLabel ?? 'Java Version'"
+								:disabled="isStartupLoading"
+							>
+								<template #dropdown-footer>
+									<button
+										class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+										@mousedown.prevent
+										@click="showAllVersions = !showAllVersions"
+									>
+										<EyeOffIcon v-if="showAllVersions" class="size-4" />
+										<EyeIcon v-else class="size-4" />
+										{{ showAllVersions ? 'Hide extra versions' : 'Show all versions' }}
+									</button>
+								</template>
+							</Combobox>
+							<div
+								v-if="isStartupLoading"
+								class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
+							>
+								<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
+							</div>
 						</div>
-						<Combobox
-							:id="'java-version-field'"
-							v-model="jdkVersion"
-							name="java-version"
-							:options="displayedJavaVersions.map((v) => ({ value: v, label: v }))"
-							:display-value="jdkVersion ?? 'Java Version'"
-						/>
 					</div>
 					<div class="flex flex-col gap-4">
 						<div class="flex flex-col gap-2">
 							<span class="text-lg font-bold text-contrast">Runtime</span>
 							<span> The Java runtime your server will use. </span>
 						</div>
-						<Combobox
-							:id="'runtime-field'"
-							v-model="jdkBuild"
-							name="runtime"
-							:options="['Corretto', 'Temurin', 'GraalVM'].map((v) => ({ value: v, label: v }))"
-							:display-value="jdkBuild ?? 'Runtime'"
-						/>
+						<div class="relative max-w-xs">
+							<Combobox
+								:id="'runtime-field'"
+								v-model="jreVendor"
+								name="runtime"
+								:options="JRE_VENDORS"
+								:display-value="jreVendorLabel ?? 'Runtime'"
+								:disabled="isStartupLoading"
+							/>
+							<div
+								v-if="isStartupLoading"
+								class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
+							>
+								<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<SaveBanner
 			:is-visible="!!hasUnsavedChanges"
-			:server="props.server"
-			:is-updating="isUpdating"
-			:save="saveStartup"
+			:server-id="serverId"
+			:is-updating="isPending"
+			:save="() => saveStartup()"
 			:reset="resetStartup"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { IssuesIcon, UpdatedIcon } from '@modrinth/assets'
+import type { Archon } from '@modrinth/api-client'
+import { EyeIcon, EyeOffIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	injectModrinthClient,
+	injectModrinthServerContext,
 	injectNotificationManager,
 	StyledInput,
-	Toggle,
 } from '@modrinth/ui'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import SaveBanner from '~/components/ui/servers/SaveBanner.vue'
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
+const { server, serverId, worldId } = injectModrinthServerContext()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
-await props.server.startup.fetch()
+const startupQueryKey = computed(() => ['servers', 'startup', 'v1', serverId, worldId.value])
 
-const data = computed(() => props.server.general)
-const showAllVersions = ref(false)
+const { data: startupData, isLoading: isStartupLoading } = useQuery({
+	queryKey: startupQueryKey,
+	queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
+	enabled: computed(() => worldId.value !== null),
+})
 
-const jdkVersionMap = [
-	{ value: 'lts8', label: 'Java 8' },
-	{ value: 'lts11', label: 'Java 11' },
-	{ value: 'lts17', label: 'Java 17' },
-	{ value: 'lts21', label: 'Java 21' },
+const JAVA_VERSIONS = [
+	{ value: 8, label: 'Java 8' },
+	{ value: 11, label: 'Java 11' },
+	{ value: 17, label: 'Java 17' },
+	{ value: 21, label: 'Java 21' },
 ]
 
-const jdkBuildMap = [
+const JRE_VENDORS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
 	{ value: 'corretto', label: 'Corretto' },
 	{ value: 'temurin', label: 'Temurin' },
 	{ value: 'graal', label: 'GraalVM' },
 ]
 
-const invocation = ref(props.server.startup.invocation)
-const jdkVersion = ref(
-	jdkVersionMap.find((v) => v.value === props.server.startup.jdk_version)?.label,
+// Saved state derived directly from query
+const savedStartupCommand = computed(() => startupData.value?.startup_command ?? '')
+const savedJavaVersion = computed(() => startupData.value?.java_version ?? undefined)
+const savedJreVendor = computed(() => startupData.value?.jre_vendor ?? undefined)
+const defaultStartupCommand = computed(
+	() => startupData.value?.original_invocation ?? savedStartupCommand.value,
 )
-const jdkBuild = ref(jdkBuildMap.find((v) => v.value === props.server.startup.jdk_build)?.label)
 
-const originalInvocation = ref(invocation.value)
-const originalJdkVersion = ref(jdkVersion.value)
-const originalJdkBuild = ref(jdkBuild.value)
+// Local form state
+const startupCommand = ref('')
+const javaVersion = ref<number>()
+const jreVendor = ref<Archon.Content.v1.JreVendor>()
+
+// Display labels for comboboxes
+const javaVersionLabel = computed(
+	() => JAVA_VERSIONS.find((v) => v.value === javaVersion.value)?.label,
+)
+const jreVendorLabel = computed(() => JRE_VENDORS.find((v) => v.value === jreVendor.value)?.label)
+
+function syncFormFromData() {
+	startupCommand.value = savedStartupCommand.value
+	javaVersion.value = savedJavaVersion.value
+	jreVendor.value = savedJreVendor.value
+}
+
+watch(
+	startupData,
+	(newData, oldData) => {
+		if (newData && !oldData) {
+			syncFormFromData()
+		}
+	},
+	{ immediate: true },
+)
 
 const hasUnsavedChanges = computed(
 	() =>
-		invocation.value !== originalInvocation.value ||
-		jdkVersion.value !== originalJdkVersion.value ||
-		jdkBuild.value !== originalJdkBuild.value,
+		startupCommand.value !== savedStartupCommand.value ||
+		javaVersion.value !== savedJavaVersion.value ||
+		jreVendor.value !== savedJreVendor.value,
 )
 
-const isUpdating = ref(false)
-
-const compatibleJavaVersions = computed(() => {
-	const mcVersion = data.value?.mc_version ?? ''
-	if (!mcVersion) return jdkVersionMap.map((v) => v.label)
-
-	const [major, minor] = mcVersion.split('.').map(Number)
-
-	if (major >= 1) {
-		if (minor >= 20) return ['Java 21']
-		if (minor >= 18) return ['Java 17', 'Java 21']
-		if (minor >= 17) return ['Java 16', 'Java 17', 'Java 21']
-		if (minor >= 12) return ['Java 8', 'Java 11', 'Java 17', 'Java 21']
-		if (minor >= 6) return ['Java 8', 'Java 11']
-	}
-
-	return ['Java 8']
-})
+// Java version filtering
+const showAllVersions = ref(false)
 
 const displayedJavaVersions = computed(() => {
-	return showAllVersions.value ? jdkVersionMap.map((v) => v.label) : compatibleJavaVersions.value
+	if (showAllVersions.value) return JAVA_VERSIONS
+
+	const mcVersion = server.value?.mc_version ?? ''
+	if (!mcVersion) return JAVA_VERSIONS
+
+	const [, minor] = mcVersion.split('.').map(Number)
+
+	if (minor >= 20) return JAVA_VERSIONS.filter((v) => v.value === 21)
+	if (minor >= 17) return JAVA_VERSIONS.filter((v) => [17, 21].includes(v.value))
+	if (minor >= 12) return JAVA_VERSIONS
+	if (minor >= 6) return JAVA_VERSIONS.filter((v) => [8, 11].includes(v.value))
+	return JAVA_VERSIONS.filter((v) => v.value === 8)
 })
 
-async function saveStartup() {
-	try {
-		isUpdating.value = true
-		const invocationValue = invocation.value ?? ''
-		const jdkVersionKey = jdkVersionMap.find((v) => v.label === jdkVersion.value)?.value
-		const jdkBuildKey = jdkBuildMap.find((v) => v.label === jdkBuild.value)?.value
-		await props.server.startup?.update(invocationValue, jdkVersionKey as any, jdkBuildKey as any)
-
-		await new Promise((resolve) => setTimeout(resolve, 10))
-
-		await props.server.refresh(['startup'])
-
-		if (props.server.startup) {
-			invocation.value = props.server.startup.invocation
-			jdkVersion.value =
-				jdkVersionMap.find((v) => v.value === props.server.startup?.jdk_version)?.label || ''
-			jdkBuild.value =
-				jdkBuildMap.find((v) => v.value === props.server.startup?.jdk_build)?.label || ''
-
-			originalInvocation.value = invocation.value
-			originalJdkVersion.value = jdkVersion.value
-			originalJdkBuild.value = jdkBuild.value
-		}
-
+// Save mutation
+const { mutate: saveStartup, isPending } = useMutation({
+	mutationFn: () =>
+		client.archon.options_v1.patchStartup(serverId, worldId.value!, {
+			startup_command: startupCommand.value || null,
+			java_version: javaVersion.value ?? null,
+			jre_vendor: jreVendor.value ?? null,
+		}),
+	onSuccess: async () => {
+		await queryClient.invalidateQueries({ queryKey: startupQueryKey.value })
+		syncFormFromData()
 		addNotification({
 			type: 'success',
 			title: 'Server settings updated',
 			text: 'Your server settings were successfully changed.',
 		})
-	} catch (error) {
+	},
+	onError: (error) => {
 		console.error(error)
 		addNotification({
 			type: 'error',
 			title: 'Failed to update server arguments',
 			text: 'Please try again later.',
 		})
-	} finally {
-		isUpdating.value = false
-	}
-}
+	},
+})
 
 function resetStartup() {
-	invocation.value = originalInvocation.value
-	jdkVersion.value = originalJdkVersion.value
-	jdkBuild.value = originalJdkBuild.value
+	syncFormFromData()
 }
 
 function resetToDefault() {
-	invocation.value = originalInvocation.value ?? ''
+	startupCommand.value = defaultStartupCommand.value
 }
 </script>

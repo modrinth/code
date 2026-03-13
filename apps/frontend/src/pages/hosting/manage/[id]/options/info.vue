@@ -119,16 +119,15 @@
 
 <script setup lang="ts">
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, injectNotificationManager } from '@modrinth/ui'
-
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import {
+	ButtonStyled,
+	CopyCode,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
-const data = computed(() => props.server.general)
+const { server: data, serverId } = injectModrinthServerContext()
 const showPassword = ref(false)
 
 const sftpUrl = computed(() => `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`)
@@ -146,7 +145,7 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 }
 
 const properties = [
-	{ name: 'Server ID', value: props.server.serverId ?? 'Unknown' },
+	{ name: 'Server ID', value: serverId ?? 'Unknown' },
 	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown' },
 	{ name: 'Kind', value: data.value?.upstream?.kind ?? data.value?.loader ?? 'Unknown' },
 	{ name: 'Project ID', value: data.value?.upstream?.project_id ?? 'Unknown' },

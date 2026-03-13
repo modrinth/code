@@ -4,7 +4,7 @@ import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
-import ContentUpdaterModal from '../../components/instances/modals/ContentUpdaterModal.vue'
+import ContentUpdaterModal from '../../layouts/shared/content-tab/components/modals/ContentUpdaterModal.vue'
 
 // Real version data from Modrinth API - Sodium (mod)
 const sodiumVersions: Labrinth.Versions.v2.Version[] = [

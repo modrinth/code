@@ -28,7 +28,7 @@
 			/>
 			<ProjectSidebarTags :project="data" class="project-sidebar-section" />
 			<ProjectSidebarCreators
-				:organization="null"
+				:organization="organization"
 				:members="members"
 				:org-link="(slug) => `https://modrinth.com/organization/${slug}`"
 				:user-link="(username) => `https://modrinth.com/user/${username}`"
@@ -69,15 +69,11 @@
 						</ButtonStyled>
 						<ButtonStyled v-else size="large" color="brand">
 							<button
-								:disabled="data && installStore.installingServerProjects.includes(data.id)"
+								:disabled="data && installingServerProjects.includes(data.id)"
 								@click="handleClickPlay"
 							>
 								<PlayIcon />
-								{{
-									data && installStore.installingServerProjects.includes(data.id)
-										? 'Installing...'
-										: 'Play'
-								}}
+								{{ data && installingServerProjects.includes(data.id) ? 'Installing...' : 'Play' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled size="large" circular>
@@ -248,6 +244,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import {
+	get_organization,
 	get_project,
 	get_project_v3,
 	get_team,
@@ -264,29 +261,29 @@ import {
 } from '@/helpers/profile'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import { getServerLatency } from '@/helpers/worlds'
+import { injectContentInstall } from '@/providers/content-install'
+import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import {
-	getServerAddress,
-	install as installVersion,
-	playServerProject,
-	useInstall,
-} from '@/store/install.js'
+import { getServerAddress } from '@/store/install.js'
 import { useTheming } from '@/store/state.js'
 
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { install: installVersion } = injectContentInstall()
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 const themeStore = useTheming()
 
-const installStore = useInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
 const categories = shallowRef([])
+const organization = shallowRef(null)
 const instance = ref(null)
 const instanceProjects = ref(null)
 
@@ -355,7 +352,7 @@ async function handleStopServer() {
 function handleAddServerToInstance() {
 	const address = getServerAddress(projectV3.value?.minecraft_java_server)
 	if (!address || !data.value) return
-	installStore.showAddServerToInstanceModal(data.value.title, address)
+	showAddServerToInstanceModal(data.value.title, address)
 }
 
 async function fetchProjectData() {
@@ -390,6 +387,10 @@ async function fetchProjectData() {
 			installed.value = true
 			installedVersion.value = installedFile.metadata.version_id
 		}
+	}
+
+	if (project.organization) {
+		organization.value = await get_organization(project.organization).catch(handleError)
 	}
 
 	isServerProject.value = projectV3.value?.minecraft_server != null

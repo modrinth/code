@@ -48,6 +48,7 @@ elasticsearch = { workspace = true, features = ["experimental-apis"] }
 eyre = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
+heck = { workspace = true }
 hex = { workspace = true }
 hmac = { workspace = true }
 hyper-rustls = { workspace = true }
