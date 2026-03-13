@@ -191,9 +191,7 @@
 								class="!w-auto"
 								name="Sort by"
 								:options="sortOptions"
-								@change="
-									sortedProjects = updateSort(sortedProjects, sortBy, descending)
-								"
+								@change="sortedProjects = updateSort(sortedProjects, sortBy, descending)"
 							/>
 							<button
 								v-tooltip="descending ? 'Descending' : 'Ascending'"
