@@ -165,7 +165,12 @@ const sortLabels: Record<SortMode, () => string> = {
 }
 
 function cycleSortMode() {
-	const modes: SortMode[] = ['alphabetical-asc', 'date-added-newest', 'alphabetical-desc', 'date-added-oldest']
+	const modes: SortMode[] = [
+		'alphabetical-asc',
+		'date-added-newest',
+		'alphabetical-desc',
+		'date-added-oldest',
+	]
 	const idx = modes.indexOf(sortMode.value)
 	sortMode.value = modes[(idx + 1) % modes.length]
 }
@@ -627,7 +632,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" /><ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" /><ArrowDownAZIcon v-else />
+										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 									</button>
 								</ButtonStyled>
@@ -643,7 +652,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon v-else-if="sortMode === 'date-added-newest'" /><ClockArrowUpIcon v-else-if="sortMode === 'date-added-oldest'" /><ArrowDownAZIcon v-else />
+										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 									</button>
 								</ButtonStyled>

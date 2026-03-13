@@ -68,12 +68,12 @@ import {
 	ContentUpdaterModal,
 	defineMessages,
 	injectNotificationManager,
-	useDebugLogger,
 	ModpackContentModal,
 	type ModpackContentModalState,
 	type OverflowMenuOption,
 	provideAppBackup,
 	provideContentManager,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
@@ -523,7 +523,10 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
+async function handleModalUpdate(
+	selectedVersion: Labrinth.Versions.v2.Version,
+	event?: MouseEvent,
+) {
 	if (updatingModpack.value) {
 		if (event?.shiftKey) {
 			pendingModpackUpdateVersion.value = selectedVersion

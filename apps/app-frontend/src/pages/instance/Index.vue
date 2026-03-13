@@ -246,7 +246,7 @@
 							:options="options"
 							:offline="offline"
 							:playing="playing"
-		:installed="instance.install_stage !== 'installed'"
+							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
 							@play="updatePlayState"

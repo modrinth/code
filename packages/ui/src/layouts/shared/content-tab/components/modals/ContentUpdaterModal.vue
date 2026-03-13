@@ -240,13 +240,13 @@ import {
 import { capitalizeString, renderHighlightedString } from '@modrinth/utils'
 import { useTimeoutFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
-import { useDebugLogger } from '#ui/composables/debug-logger'
 
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -386,7 +386,10 @@ watch(
 				currentInList: newVersions.some((v) => v.id === props.currentVersionId),
 				totalVersions: newVersions.length,
 				loaderDistribution: [...new Set(newVersions.flatMap((v) => v.loaders))],
-				gameVersionDistribution: [...new Set(newVersions.flatMap((v) => v.game_versions))].slice(0, 10),
+				gameVersionDistribution: [...new Set(newVersions.flatMap((v) => v.game_versions))].slice(
+					0,
+					10,
+				),
 			})
 			const version = pendingFound ?? newVersions[0]
 			selectedVersion.value = version
@@ -403,13 +406,10 @@ const NON_MOD_PROJECT_TYPES = new Set(['shader', 'shaderpack', 'resourcepack', '
 
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
 	const hasGameVersion = version.game_versions.includes(props.currentGameVersion)
-	const skipLoaderCheck =
-		props.projectType != null && NON_MOD_PROJECT_TYPES.has(props.projectType)
+	const skipLoaderCheck = props.projectType != null && NON_MOD_PROJECT_TYPES.has(props.projectType)
 	const hasLoader =
 		skipLoaderCheck ||
-		version.loaders.some(
-			(loader) => loader.toLowerCase() === props.currentLoader.toLowerCase(),
-		)
+		version.loaders.some((loader) => loader.toLowerCase() === props.currentLoader.toLowerCase())
 	const compatible = hasGameVersion && hasLoader
 	if (!compatible) {
 		debug('isVersionCompatible: INCOMPATIBLE', {
@@ -592,7 +592,9 @@ function show(initialVersionId?: string) {
 	} else {
 		selectedVersion.value = null
 		pendingInitialVersionId.value = initialVersionId
-		debug('show(): no versions yet, deferring selection', { pendingInitialVersionId: initialVersionId })
+		debug('show(): no versions yet, deferring selection', {
+			pendingInitialVersionId: initialVersionId,
+		})
 	}
 
 	modal.value?.show()

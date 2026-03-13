@@ -367,7 +367,7 @@ const messages = defineMessages({
 							<button
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="(e: MouseEvent) => e.shiftKey ? handleUnlink() : unlinkModal?.show()"
+								@click="(e: MouseEvent) => (e.shiftKey ? handleUnlink() : unlinkModal?.show())"
 							>
 								<UnlinkIcon class="size-5" />
 								{{
@@ -399,7 +399,9 @@ const messages = defineMessages({
 							<button
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="(e: MouseEvent) => e.shiftKey ? handleReinstall() : reinstallModal?.show()"
+								@click="
+									(e: MouseEvent) => (e.shiftKey ? handleReinstall() : reinstallModal?.show())
+								"
 							>
 								<SpinnerIcon v-if="ctx.reinstalling?.value" class="animate-spin" />
 								<DownloadIcon v-else class="size-5" />

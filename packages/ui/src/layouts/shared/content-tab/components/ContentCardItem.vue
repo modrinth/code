@@ -267,7 +267,13 @@ const deleteHovered = ref(false)
 
 			<ButtonStyled v-if="hasDeleteListener && !props.hideDelete" circular type="transparent">
 				<button
-					v-tooltip="formatMessage(shiftHeld && deleteHovered ? commonMessages.deleteImmediatelyLabel : commonMessages.deleteLabel)"
+					v-tooltip="
+						formatMessage(
+							shiftHeld && deleteHovered
+								? commonMessages.deleteImmediatelyLabel
+								: commonMessages.deleteLabel,
+						)
+					"
 					:disabled="disabled"
 					@click="emit('delete', $event)"
 					@mouseenter="deleteHovered = true"
