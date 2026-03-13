@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, watch } from 'vue'
 
 import { injectModrinthClient, injectModrinthServerContext } from '../../../providers'
@@ -12,6 +12,12 @@ const queryClient = useQueryClient()
 const { serverId, worldId, backupsState, markBackupCancelled } = injectModrinthServerContext()
 
 const backupsQueryKey = ['backups', 'list', serverId]
+
+const { data: backupsList } = useQuery({
+	queryKey: backupsQueryKey,
+	queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
+	enabled: computed(() => !!worldId.value),
+})
 
 interface TerminalEntry {
 	type: 'create' | 'restore'
@@ -33,16 +39,15 @@ interface AdmonitionEntry {
 const terminalEntries = reactive(new Map<string, TerminalEntry>())
 const dismissedIds = reactive(new Set<string>())
 
-function getBackupFromCache(backupId: string) {
-	const backups = queryClient.getQueryData<Archon.Backups.v1.Backup[]>(backupsQueryKey)
-	return backups?.find((b) => b.id === backupId)
+function findBackup(backupId: string) {
+	return backupsList.value?.find((b) => b.id === backupId)
 }
 
 watch(
 	() => [...backupsState.entries()] as [string, BackupProgressEntry][],
 	(entries) => {
 		for (const [id, entry] of entries) {
-			const backup = getBackupFromCache(id)
+			const backup = findBackup(id)
 			if (entry.create?.state === 'failed') {
 				terminalEntries.set(`${id}:create`, {
 					type: 'create',
@@ -74,12 +79,15 @@ watch(
 
 const admonitions = computed<AdmonitionEntry[]>(() => {
 	const result: AdmonitionEntry[] = []
+	const seenIds = new Set<string>()
 
+	// 1. Active WS entries (real-time progress from backupsState)
 	for (const [id, entry] of backupsState.entries()) {
-		const backup = getBackupFromCache(id)
+		const backup = findBackup(id)
 		if (entry.create && entry.create.state === 'ongoing') {
 			const key = `${id}:create`
 			if (!dismissedIds.has(key)) {
+				seenIds.add(id)
 				result.push({
 					key,
 					backupId: id,
@@ -94,6 +102,7 @@ const admonitions = computed<AdmonitionEntry[]>(() => {
 		if (entry.restore && entry.restore.state === 'ongoing') {
 			const key = `${id}:restore`
 			if (!dismissedIds.has(key)) {
+				seenIds.add(id)
 				result.push({
 					key,
 					backupId: id,
@@ -107,12 +116,34 @@ const admonitions = computed<AdmonitionEntry[]>(() => {
 		}
 	}
 
+	// 2. REST-based entries for pending/in_progress backups without WS data yet
+	if (backupsList.value) {
+		for (const backup of backupsList.value) {
+			if (seenIds.has(backup.id)) continue
+			if (backup.status === 'pending' || backup.status === 'in_progress') {
+				const key = `${backup.id}:create`
+				if (!dismissedIds.has(key)) {
+					result.push({
+						key,
+						backupId: backup.id,
+						type: 'create',
+						state: 'ongoing',
+						progress: 0,
+						name: backup.name,
+						createdAt: backup.created_at,
+					})
+				}
+			}
+		}
+	}
+
+	// 3. Terminal entries (snapshotted before cleanup)
 	for (const [key, entry] of terminalEntries.entries()) {
 		if (dismissedIds.has(key)) continue
 		if (result.some((r) => r.key === key)) continue
 
 		const backupId = key.split(':')[0]
-		const backup = getBackupFromCache(backupId)
+		const backup = findBackup(backupId)
 		result.push({
 			key,
 			backupId,
