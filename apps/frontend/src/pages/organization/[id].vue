@@ -243,10 +243,14 @@
 							:downloads="project.downloads"
 							:followers="project.followers"
 							:tags="project.categories"
-							:environment="{
-								clientSide: project.client_side,
-								serverSide: project.server_side,
-							}"
+							:environment="
+								project.client_side && project.server_side
+									? {
+											clientSide: project.client_side,
+											serverSide: project.server_side,
+										}
+									: undefined
+							"
 							:status="
 								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
@@ -294,6 +298,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	injectModrinthClient,
 	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
@@ -347,28 +352,34 @@ if (route.path.includes('settings')) {
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
+const client = injectModrinthClient()
+
 const {
 	data: organization,
 	refetch: refreshOrganization,
-	isError,
+	error: orgError,
 	isPending: organizationIsPending,
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId]),
-	queryFn: async (): Promise<Organization> => {
-		const org = await useBaseFetch(`organization/${orgId}`, {
-			apiVersion: 3,
-		})
+	// @ts-expect-error
+	queryFn: () => client.labrinth.organizations_v3.get(orgId),
+	enabled: !!orgId,
+})
 
-		if (!org) {
-			throw createError({
+watch(
+	orgError,
+	(error) => {
+		if (error) {
+			const status = (error as any).statusCode ?? (error as any).status ?? 404
+			showError({
 				fatal: true,
-				statusCode: 404,
+				statusCode: status,
 				message: 'Organization not found',
 			})
 		}
-		return org as Organization
 	},
-})
+	{ immediate: true },
+)
 
 const {
 	data: projects,
@@ -377,15 +388,13 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['organization', orgId, 'projects']),
 	queryFn: async () => {
-		const projects = (await useBaseFetch(`organization/${orgId}/projects`, {
-			apiVersion: 3,
-		})) as ProjectV3[]
+		// @ts-expect-error
+		const rawProjects = (await client.labrinth.organizations_v3.getProjects(orgId)) as ProjectV3[]
 
-		for (const project of projects) {
-			project.categories = project.categories.concat(project.loaders)
-
+		return rawProjects.map((project) => {
+			let categories = project.categories.concat(project.loaders)
 			if (project.mrpack_loaders) {
-				project.categories = project.categories.concat(project.mrpack_loaders as string[])
+				categories = categories.concat(project.mrpack_loaders as string[])
 			}
 
 			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
@@ -394,23 +403,26 @@ const {
 			const clientOnly = project.client_only && (project.client_only as string[])[0]
 			const serverOnly = project.server_only && (project.server_only as string[])[0]
 
+			let client_side: ProjectV3['client_side'] | undefined
+			let server_side: ProjectV3['server_side'] | undefined
+
 			// quick and dirty hack to show envs as legacy
 			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-				project.client_side = 'required'
-				project.server_side = 'required'
+				client_side = 'required'
+				server_side = 'required'
 			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-				project.client_side = 'required'
-				project.server_side = 'unsupported'
+				client_side = 'required'
+				server_side = 'unsupported'
 			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-				project.client_side = 'unsupported'
-				project.server_side = 'required'
+				client_side = 'unsupported'
+				server_side = 'required'
 			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-				project.client_side = 'optional'
-				project.server_side = 'optional'
+				client_side = 'optional'
+				server_side = 'optional'
 			}
-		}
 
-		return projects
+			return { ...project, categories, client_side, server_side }
+		})
 	},
 	placeholderData: [],
 })
@@ -421,24 +433,8 @@ const refresh = async () => {
 
 // Loading state
 const isLoading = computed(() => {
-	if (isError.value) return false
 	return organizationIsPending.value || projectsIsFetching.value
 })
-
-// 404 handling - throw error when organization fetch fails
-watch(
-	isError,
-	(hasError) => {
-		if (hasError) {
-			throw createError({
-				fatal: true,
-				statusCode: 404,
-				message: 'Organization not found',
-			})
-		}
-	},
-	{ immediate: true },
-)
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {

@@ -555,23 +555,28 @@ const followingCollection = computed(() =>
 const {
 	data: fetchedCollection,
 	refetch: refreshFetchedCollection,
-	isError: collectionIsError,
+	error: collectionError,
 	isPending: collectionIsPending,
 } = useQuery({
 	queryKey: computed(() => ['collection', collectionId.value]),
-	queryFn: async () => {
-		const data = await useBaseFetch(`collection/${collectionId.value}`, { apiVersion: 3 })
-		if (!data) {
-			throw createError({
+	queryFn: () => api.labrinth.collections.get(collectionId.value),
+	enabled: computed(() => !isFollowingCollection.value),
+})
+
+watch(
+	collectionError,
+	(error) => {
+		if (error && !isFollowingCollection.value) {
+			const status = error.statusCode ?? error.status ?? 404
+			showError({
 				fatal: true,
-				statusCode: 404,
+				statusCode: status,
 				message: formatMessage(messages.collectionNotFoundError),
 			})
 		}
-		return data
 	},
-	enabled: computed(() => !isFollowingCollection.value),
-})
+	{ immediate: true },
+)
 
 // Unified collection ref
 const collection = computed(() => followingCollection.value ?? fetchedCollection.value)
@@ -645,20 +650,6 @@ const isLoading = computed(() => {
 	return collectionIsPending.value || creatorIsPending.value || collectionProjectsIsFetching.value
 })
 
-// 404 handling - throw error when collection fetch fails
-watch(
-	collectionIsError,
-	(isError) => {
-		if (isError) {
-			throw createError({
-				fatal: true,
-				statusCode: 404,
-				message: formatMessage(messages.collectionNotFoundError),
-			})
-		}
-	},
-	{ immediate: true },
-)
 
 watch(
 	[collection, creator],

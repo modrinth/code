@@ -503,6 +503,7 @@ import {
 	useFormatDateTime,
 	useFormatNumber,
 	useRelativeTime,
+	injectModrinthClient,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
@@ -681,10 +682,27 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user, isError: isUserError } = useQuery({
+const client = injectModrinthClient()
+
+const { data: user, error: userError } = useQuery({
 	queryKey: computed(() => ['user', route.params.id]),
-	queryFn: () => useBaseFetch(`user/${route.params.id}`),
+	queryFn: () => client.labrinth.users_v2.get(route.params.id),
 })
+
+watch(
+	userError,
+	(error) => {
+		if (error) {
+			const status = error.statusCode ?? error.status ?? 404
+			showError({
+				fatal: true,
+				statusCode: status,
+				message: formatMessage(messages.userNotFoundError),
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['user', route.params.id, 'projects']),
@@ -715,15 +733,6 @@ const { data: collections } = useQuery({
 	queryFn: () => useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
 })
 
-watch(isUserError, (error) => {
-	if (error) {
-		throw createError({
-			fatal: true,
-			statusCode: 404,
-			message: formatMessage(messages.userNotFoundError),
-		})
-	}
-})
 
 watch(
 	user,
