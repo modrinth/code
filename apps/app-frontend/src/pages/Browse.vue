@@ -44,8 +44,8 @@ import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
+	get as getInstance,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
@@ -440,7 +440,10 @@ async function refreshSearch() {
 				hitCount: rawResults.result.hits.length,
 				totalHits: rawResults.result.total_hits,
 			})
-			results.value = rawResults.result
+			results.value = {
+				...rawResults.result,
+				hits_per_page: maxResults.value,
+			}
 		}
 
 		const currentFilterState = JSON.stringify({
