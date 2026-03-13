@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-13T12:30:00-00:00`,
+		product: 'hosting',
+		body: `## [Content Management Overhaul](/news/article/content-management-overhaul)
+- We've overhauled the Content tab and improved parity with Modrinth App. Check out our [blog post](/news/article/content-management-overhaul) to learn more.`,
+	},
+	{
 		date: `2026-03-13T00:15:00-00:00`,
 		product: 'app',
 		version: '0.12.2',
