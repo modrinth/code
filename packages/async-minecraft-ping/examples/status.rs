@@ -37,10 +37,12 @@ async fn main() -> Result<()> {
 
     let connection = connection.status().await?;
 
-    println!(
-        "{} of {} player(s) online",
-        connection.status.players.online, connection.status.players.max
-    );
+    if let (Some(online), Some(max)) = (
+        connection.status.players.online,
+        connection.status.players.max,
+    ) {
+        println!("{online} of {max} player(s) online");
+    }
 
     connection.ping(42).await?;
 

@@ -491,7 +491,7 @@ impl Typesense {
         let mut fields = vec![
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
-            json!({"name": "indexed_title", "type": "string", "facet": false}),
+            json!({"name": "indexed_title", "type": "string", "facet": false, "stem": true}),
             json!({"name": "indexed_author", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),

@@ -10,11 +10,6 @@ export {
 export { ModrinthApiError, ModrinthServerError } from './core/errors'
 export { type AuthConfig, AuthFeature } from './features/auth'
 export {
-	type CanaryCookieConfig,
-	CanaryCookieFeature,
-	LABRINTH_CANARY_COOKIE,
-} from './features/canary-cookie'
-export {
 	type CircuitBreakerConfig,
 	CircuitBreakerFeature,
 	type CircuitBreakerState,

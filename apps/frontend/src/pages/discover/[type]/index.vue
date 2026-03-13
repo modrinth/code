@@ -47,6 +47,7 @@ import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
+import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
 import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
@@ -472,6 +473,7 @@ const {
 		return url
 	},
 	{
+		headers: computed(() => withLabrinthCanaryHeader()),
 		watch: false,
 		transform: (hits) => {
 			debug('useLazyFetch transform, hits:', (hits as any)?.total_hits)

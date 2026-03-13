@@ -3,7 +3,7 @@
 
 use std::time::Duration;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::net::TcpStream;
 
@@ -34,7 +34,7 @@ impl From<protocol::ProtocolError> for ServerError {
 }
 
 /// Contains information about the server version.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ServerVersion {
     /// The server's Minecraft version, i.e. "1.15.2".
     pub name: String,
@@ -44,7 +44,7 @@ pub struct ServerVersion {
 }
 
 /// Contains information about a player.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ServerPlayer {
     /// The player's in-game name.
     pub name: String,
@@ -55,40 +55,33 @@ pub struct ServerPlayer {
 
 /// Contains information about the currently online
 /// players.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct ServerPlayers {
     /// The configured maximum number of players for the
     /// server.
-    pub max: i32,
+    pub max: Option<i32>,
 
     /// The number of players currently online.
-    pub online: i32,
+    pub online: Option<i32>,
 
     /// An optional list of player information for
     /// currently online players.
     pub sample: Option<Vec<ServerPlayer>>,
 }
 
-/// Contains the server's MOTD.
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-pub enum ServerDescription {
-    Plain(String),
-    Object { text: String },
-}
-
 /// The decoded JSON response from a status query over
 /// ServerListPing.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct StatusResponse {
     /// Information about the server's version.
     pub version: ServerVersion,
 
     /// Information about currently online players.
+    #[serde(default)]
     pub players: ServerPlayers,
 
     /// Single-field struct containing the server's MOTD.
-    pub description: ServerDescription,
+    pub description: Option<serde_json::Value>,
 
     /// Optional field containing a path to the server's
     /// favicon.
@@ -104,7 +97,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(2);
 pub struct ConnectionConfig {
     protocol_version: usize,
     address: String,
-    port: u16,
+    port_override: Option<u16>,
     timeout: Duration,
     #[cfg(feature = "srv")]
     srv_lookup: bool,
@@ -113,11 +106,19 @@ pub struct ConnectionConfig {
 impl ConnectionConfig {
     /// Initiates the Minecraft server
     /// connection build process.
-    pub fn build<T: Into<String>>(address: T) -> Self {
+    pub fn build(address: impl AsRef<str>) -> Self {
+        let (address, port_override) = match address.as_ref().rsplit_once(':') {
+            Some((addr, port)) => match port.parse::<u16>() {
+                Ok(port) => (addr, Some(port)),
+                Err(_) => (addr, None),
+            },
+            None => (address.as_ref(), None),
+        };
+
         ConnectionConfig {
             protocol_version: LATEST_PROTOCOL_VERSION,
-            address: address.into(),
-            port: DEFAULT_PORT,
+            address: address.to_string(),
+            port_override,
             timeout: DEFAULT_TIMEOUT,
             #[cfg(feature = "srv")]
             srv_lookup: false,
@@ -137,7 +138,7 @@ impl ConnectionConfig {
     /// connection to use. If not specified, the
     /// default port of 25565 will be used.
     pub fn with_port(mut self, port: u16) -> Self {
-        self.port = port;
+        self.port_override = Some(port);
         self
     }
 
@@ -165,7 +166,8 @@ impl ConnectionConfig {
 
     /// Connects to the server and consumes the builder.
     pub async fn connect(self) -> Result<StatusConnection, ServerError> {
-        let (address, port) = self.resolve_address().await;
+        let (address, resolved_port) = self.resolve_address().await;
+        let port = self.port_override.or(resolved_port).unwrap_or(DEFAULT_PORT);
 
         let stream = tokio::time::timeout(
             self.timeout,
@@ -185,43 +187,43 @@ impl ConnectionConfig {
     }
 
     #[cfg(feature = "srv")]
-    async fn resolve_address(&self) -> (String, u16) {
+    async fn resolve_address(&self) -> (String, Option<u16>) {
         if !self.srv_lookup {
-            return (self.address.clone(), self.port);
+            return (self.address.clone(), None);
         }
 
         // Try to resolve SRV record, fall back to original address on any failure
-        match self.lookup_srv().await {
-            Some((host, port)) => (host, port),
-            None => (self.address.clone(), self.port),
+        match lookup_srv(&self.address, self.timeout).await {
+            Some((host, port)) => (host, Some(port)),
+            None => (self.address.clone(), None),
         }
     }
 
     #[cfg(not(feature = "srv"))]
-    async fn resolve_address(&self) -> (String, u16) {
-        (self.address.clone(), self.port)
+    async fn resolve_address(&self) -> (String, Option<u16>) {
+        (self.address.clone(), None)
     }
+}
 
-    #[cfg(feature = "srv")]
-    async fn lookup_srv(&self) -> Option<(String, u16)> {
-        use hickory_resolver::TokioAsyncResolver;
+#[cfg(feature = "srv")]
+async fn lookup_srv(address: &str, timeout: Duration) -> Option<(String, u16)> {
+    use hickory_resolver::TokioAsyncResolver;
 
-        let resolver = TokioAsyncResolver::tokio_from_system_conf().ok()?;
-        let srv_name = format!("_minecraft._tcp.{}", self.address);
+    let resolver = TokioAsyncResolver::tokio_from_system_conf().ok()?;
+    let srv_name = format!("_minecraft._tcp.{address}");
 
-        let lookup = tokio::time::timeout(self.timeout, resolver.srv_lookup(&srv_name))
-            .await
-            .ok()?
-            .ok()?;
+    let lookup = tokio::time::timeout(timeout, resolver.srv_lookup(&srv_name))
+        .await
+        .ok()?
+        .ok()?;
 
-        let record = lookup.iter().next()?;
-        let target = record.target().to_string();
-        // Remove trailing dot from DNS name
-        let host = target.trim_end_matches('.').to_string();
-        let port = record.port();
+    let record = lookup.iter().next()?;
+    let target = record.target().to_string();
+    // Remove trailing dot from DNS name
+    let host = target.trim_end_matches('.').to_string();
+    let port = record.port();
 
-        Some((host, port))
-    }
+    Some((host, port))
 }
 
 /// Convenience wrapper for easily connecting
@@ -326,21 +328,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_server_description_plain() {
-        let json = r#""A Minecraft Server""#;
-        let desc: ServerDescription = serde_json::from_str(json).unwrap();
-        assert!(matches!(desc, ServerDescription::Plain(s) if s == "A Minecraft Server"));
-    }
-
-    #[test]
-    fn test_server_description_object() {
-        let json = r#"{"text":"A Minecraft Server"}"#;
-        let desc: ServerDescription = serde_json::from_str(json).unwrap();
-        assert!(matches!(desc, ServerDescription::Object { text } if text == "A Minecraft Server"));
-    }
-
-    #[test]
     fn test_status_response_minimal() {
+        let json = r#"{
+            "version": {"name": "1.20.4", "protocol": 765}
+        }"#;
+
+        let response: StatusResponse = serde_json::from_str(json).unwrap();
+        assert_eq!(response.version.name, "1.20.4");
+        assert_eq!(response.version.protocol, 765);
+        assert_eq!(response.players.max, None);
+        assert_eq!(response.players.online, None);
+        assert!(response.description.is_none());
+        assert!(response.players.sample.is_none());
+        assert!(response.favicon.is_none());
+    }
+
+    #[test]
+    fn test_status_response_small() {
         let json = r#"{
             "version": {"name": "1.20.4", "protocol": 765},
             "players": {"max": 20, "online": 5},
@@ -350,8 +354,8 @@ mod tests {
         let response: StatusResponse = serde_json::from_str(json).unwrap();
         assert_eq!(response.version.name, "1.20.4");
         assert_eq!(response.version.protocol, 765);
-        assert_eq!(response.players.max, 20);
-        assert_eq!(response.players.online, 5);
+        assert_eq!(response.players.max, Some(20));
+        assert_eq!(response.players.online, Some(5));
         assert!(response.players.sample.is_none());
         assert!(response.favicon.is_none());
     }
@@ -396,15 +400,21 @@ mod tests {
     fn test_connection_config_defaults() {
         let config = ConnectionConfig::build("localhost");
         assert_eq!(config.address, "localhost");
-        assert_eq!(config.port, DEFAULT_PORT);
+        assert_eq!(config.port_override, None);
         assert_eq!(config.timeout, DEFAULT_TIMEOUT);
         assert_eq!(config.protocol_version, LATEST_PROTOCOL_VERSION);
     }
 
     #[test]
+    fn test_connection_config_with_port_in_address() {
+        let config = ConnectionConfig::build("localhost:12345");
+        assert_eq!(config.port_override, Some(12345));
+    }
+
+    #[test]
     fn test_connection_config_with_port() {
         let config = ConnectionConfig::build("localhost").with_port(12345);
-        assert_eq!(config.port, 12345);
+        assert_eq!(config.port_override, Some(12345));
     }
 
     #[test]
