@@ -1,9 +1,5 @@
 //! Theseus error type
-use std::{
-    convert::Infallible,
-    fmt::{Debug, Display},
-    sync::Arc,
-};
+use std::sync::Arc;
 
 use crate::{profile, util};
 use data_url::DataUrlError;
@@ -224,41 +220,4 @@ impl ErrorKind {
     }
 }
 
-pub type Result<T, E = Error> = core::result::Result<T, E>;
-
-pub trait Context<T, E>: Sized {
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, Error>
-    where
-        D: Send + Sync + Debug + Display + 'static;
-
-    #[inline]
-    fn wrap_err<D>(self, msg: D) -> Result<T, Error>
-    where
-        D: Send + Sync + Debug + Display + 'static,
-    {
-        self.wrap_err_with(|| msg)
-    }
-}
-
-impl<T, E> Context<T, E> for Result<T, E>
-where
-    Self: eyre::WrapErr<T, E>,
-{
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, Error>
-    where
-        D: Send + Sync + Debug + Display + 'static,
-    {
-        eyre::WrapErr::wrap_err_with(self, f).map_err(|err| {
-            Error::from(ErrorKind::OtherError(format!("{err:#}")))
-        })
-    }
-}
-
-impl<T> Context<T, Infallible> for Option<T> {
-    fn wrap_err_with<D>(self, f: impl FnOnce() -> D) -> Result<T, Error>
-    where
-        D: Send + Sync + Debug + Display + 'static,
-    {
-        self.ok_or_else(|| Error::from(ErrorKind::OtherError(f().to_string())))
-    }
-}
+pub type Result<T> = core::result::Result<T, Error>;

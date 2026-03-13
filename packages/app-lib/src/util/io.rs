@@ -318,7 +318,7 @@ macro_rules! get_resource_file {
                 Ok(dir) => dir,
                 Err(e) => {
                     break 'get_resource_file $crate::Result::Err(
-                        $crate::Error::from($crate::util::io::IOError::from(e)),
+                        $crate::util::io::IOError::from(e).into(),
                     );
                 }
             };

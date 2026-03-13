@@ -1,3 +1,53 @@
+use crate::ErrorKind;
+use crate::error::Result;
+use crate::util::protocol_version::ProtocolVersion;
+use serde::{Deserialize, Serialize};
+use serde_json::value::RawValue;
+use std::time::Duration;
+use tokio::net::ToSocketAddrs;
+use tokio::select;
+use url::Url;
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerStatus {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<Box<RawValue>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub players: Option<ServerPlayers>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<ServerVersion>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub favicon: Option<Url>,
+    #[serde(default)]
+    pub enforces_secure_chat: bool,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ping: Option<i64>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ServerPlayers {
+    pub max: i32,
+    pub online: i32,
+    #[serde(default)]
+    pub sample: Vec<ServerGameProfile>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ServerGameProfile {
+    pub id: String,
+    pub name: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ServerVersion {
+    pub name: String,
+    pub protocol: i32,
+    #[serde(skip_deserializing)]
+    pub legacy: bool,
+}
+
 pub async fn get_server_status(
     address: &impl ToSocketAddrs,
     original_address: (&str, u16),
@@ -255,8 +305,8 @@ mod legacy {
             }),
             description: parts.next().and_then(|x| to_raw_value(x).ok()),
             players: Some(ServerPlayers {
-                online: parts.next().and_then(|x| x.parse().ok()),
-                max: parts.next().and_then(|x| x.parse().ok()),
+                online: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
+                max: parts.next().and_then(|x| x.parse().ok()).unwrap_or(-1),
                 sample: vec![],
             }),
             favicon: None,
