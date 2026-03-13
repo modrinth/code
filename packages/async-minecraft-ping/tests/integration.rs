@@ -250,8 +250,8 @@ async fn test_status_json_parsing_plain_description() {
     let response: StatusResponse = serde_json::from_str(json).unwrap();
     assert_eq!(response.version.name, "1.20.4");
     assert_eq!(response.version.protocol, 765);
-    assert_eq!(response.players.max, 100);
-    assert_eq!(response.players.online, 42);
+    assert_eq!(response.players.max, Some(100));
+    assert_eq!(response.players.online, Some(42));
 }
 
 #[tokio::test]
@@ -267,7 +267,7 @@ async fn test_status_json_parsing_object_description() {
 
     let response: StatusResponse = serde_json::from_str(json).unwrap();
     assert_eq!(response.version.name, "1.19.4");
-    assert_eq!(response.players.online, 10);
+    assert_eq!(response.players.online, Some(10));
     assert!(response.players.sample.is_some());
     assert_eq!(response.players.sample.as_ref().unwrap().len(), 1);
     assert_eq!(response.players.sample.as_ref().unwrap()[0].name, "Notch");
