@@ -11,7 +11,9 @@ import _ArchiveIcon from './icons/archive.svg?component'
 import _ArrowBigRightDashIcon from './icons/arrow-big-right-dash.svg?component'
 import _ArrowBigUpDashIcon from './icons/arrow-big-up-dash.svg?component'
 import _ArrowDownIcon from './icons/arrow-down.svg?component'
+import _ArrowDownAZIcon from './icons/arrow-down-a-z.svg?component'
 import _ArrowDownLeftIcon from './icons/arrow-down-left.svg?component'
+import _ArrowDownZAIcon from './icons/arrow-down-z-a.svg?component'
 import _ArrowLeftIcon from './icons/arrow-left.svg?component'
 import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
@@ -38,6 +40,7 @@ import _BracesIcon from './icons/braces.svg?component'
 import _BrushCleaningIcon from './icons/brush-cleaning.svg?component'
 import _BugIcon from './icons/bug.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
+import _CalendarArrowDownIcon from './icons/calendar-arrow-down.svg?component'
 import _CardIcon from './icons/card.svg?component'
 import _ChangeSkinIcon from './icons/change-skin.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
@@ -54,6 +57,8 @@ import _ClearIcon from './icons/clear.svg?component'
 import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
 import _ClockIcon from './icons/clock.svg?component'
+import _ClockArrowDownIcon from './icons/clock-arrow-down.svg?component'
+import _ClockArrowUpIcon from './icons/clock-arrow-up.svg?component'
 import _CloudIcon from './icons/cloud.svg?component'
 import _CodeIcon from './icons/code.svg?component'
 import _CoffeeIcon from './icons/coffee.svg?component'
@@ -358,6 +363,7 @@ import _ToggleLeftIcon from './icons/toggle-left.svg?component'
 import _ToggleRightIcon from './icons/toggle-right.svg?component'
 import _TransferIcon from './icons/transfer.svg?component'
 import _TrashIcon from './icons/trash.svg?component'
+import _TrashExclamationIcon from './icons/trash-exclamation.svg?component'
 import _TriangleAlertIcon from './icons/triangle-alert.svg?component'
 import _UnderlineIcon from './icons/underline.svg?component'
 import _UndoIcon from './icons/undo.svg?component'
@@ -390,7 +396,9 @@ export const ArchiveIcon = _ArchiveIcon
 export const ArrowBigRightDashIcon = _ArrowBigRightDashIcon
 export const ArrowBigUpDashIcon = _ArrowBigUpDashIcon
 export const ArrowDownIcon = _ArrowDownIcon
+export const ArrowDownAZIcon = _ArrowDownAZIcon
 export const ArrowDownLeftIcon = _ArrowDownLeftIcon
+export const ArrowDownZAIcon = _ArrowDownZAIcon
 export const ArrowLeftIcon = _ArrowLeftIcon
 export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
@@ -417,6 +425,7 @@ export const BracesIcon = _BracesIcon
 export const BrushCleaningIcon = _BrushCleaningIcon
 export const BugIcon = _BugIcon
 export const CalendarIcon = _CalendarIcon
+export const CalendarArrowDownIcon = _CalendarArrowDownIcon
 export const CardIcon = _CardIcon
 export const ChangeSkinIcon = _ChangeSkinIcon
 export const ChartIcon = _ChartIcon
@@ -433,6 +442,8 @@ export const ClearIcon = _ClearIcon
 export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
 export const ClockIcon = _ClockIcon
+export const ClockArrowDownIcon = _ClockArrowDownIcon
+export const ClockArrowUpIcon = _ClockArrowUpIcon
 export const CloudIcon = _CloudIcon
 export const CodeIcon = _CodeIcon
 export const CoffeeIcon = _CoffeeIcon
@@ -737,6 +748,7 @@ export const ToggleLeftIcon = _ToggleLeftIcon
 export const ToggleRightIcon = _ToggleRightIcon
 export const TransferIcon = _TransferIcon
 export const TrashIcon = _TrashIcon
+export const TrashExclamationIcon = _TrashExclamationIcon
 export const TriangleAlertIcon = _TriangleAlertIcon
 export const UnderlineIcon = _UnderlineIcon
 export const UndoIcon = _UndoIcon

@@ -85,6 +85,10 @@ export const commonMessages = defineMessages({
 		id: 'label.delete',
 		defaultMessage: 'Delete',
 	},
+	deleteImmediatelyLabel: {
+		id: 'label.delete-immediately',
+		defaultMessage: 'Delete immediately',
+	},
 	descriptionLabel: {
 		id: 'label.description',
 		defaultMessage: 'Description',

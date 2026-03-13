@@ -134,7 +134,6 @@ import {
 	RadialHeader,
 	StyledInput,
 } from '@modrinth/ui'
-import type { Version } from '@modrinth/utils'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -202,7 +201,6 @@ const props = defineProps<{
 	options: InstanceType<typeof ContextMenu> | null
 	offline: boolean
 	playing: boolean
-	versions: Version[]
 	installed: boolean
 }>()
 

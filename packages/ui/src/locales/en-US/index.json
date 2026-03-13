@@ -287,6 +287,9 @@
   "content.inline-backup.create-backup": {
     "defaultMessage": "Create backup"
   },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Hold Shift while clicking to skip confirmation."
+  },
   "content.inline-backup.warning-body": {
     "defaultMessage": "We recommend creating a backup before proceeding so you can restore your {type, select, server {world} other {instance}} if anything breaks."
   },
@@ -353,8 +356,11 @@
   "content.page-layout.sort.alphabetical": {
     "defaultMessage": "Alphabetical"
   },
-  "content.page-layout.sort.date-added": {
-    "defaultMessage": "Date added"
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Newest first"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Oldest first"
   },
   "content.page-layout.sort.label": {
     "defaultMessage": "Sort by {mode}"
@@ -874,6 +880,9 @@
   },
   "label.delete": {
     "defaultMessage": "Delete"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Delete immediately"
   },
   "label.description": {
     "defaultMessage": "Description"
