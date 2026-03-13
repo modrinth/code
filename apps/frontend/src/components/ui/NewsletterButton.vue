@@ -30,7 +30,7 @@ const queryClient = useQueryClient()
 const showSubscriptionConfirmation = ref(false)
 
 const { data: showSubscribeButton, isSuccess } = useQuery({
-	queryKey: computed(() => ['newsletter', 'subscribed', auth.value.user.id]),
+	queryKey: computed(() => ['newsletter', 'subscribed', auth.value?.user?.id]),
 	queryFn: async () => {
 		if (auth.value?.user) {
 			try {

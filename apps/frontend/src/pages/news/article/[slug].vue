@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { Avatar, ButtonStyled, useFormatDateTime } from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
+import { Avatar, ButtonStyled, injectModrinthClient, useFormatDateTime } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
@@ -10,6 +9,7 @@ import { computed, onMounted } from 'vue'
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
 
+const client = injectModrinthClient()
 const config = useRuntimeConfig()
 const route = useRoute()
 
@@ -25,18 +25,16 @@ if (!rawArticle) {
 	})
 }
 
-const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`
-
 const { data: authors } = useQuery({
 	queryKey: computed(() => ['users', rawArticle.authors]),
 	queryFn: async () => {
-		const users = (await useBaseFetch(authorsUrl)) as User[]
+		const users = await client.labrinth.users_v2.getMultiple(rawArticle.authors)
 		users.sort((a, b) => {
 			return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
 		})
 		return users
 	},
-	enabled: computed(() => !!rawArticle.authors),
+	enabled: computed(() => rawArticle.authors.length > 0),
 })
 
 const html = await rawArticle.html()
