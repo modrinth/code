@@ -3,6 +3,7 @@ import { computed, type ComputedRef, type Ref, ref, type ShallowRef, watch } fro
 import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
+import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import { createContext } from '../../../providers'
 import type { ImportableLauncher } from '../../../providers/instance-import'
@@ -77,6 +78,7 @@ export interface CreationFlowContextValue {
 
 	// Instance-specific state
 	instanceName: Ref<string>
+	autoInstanceName: ComputedRef<string>
 	instanceIcon: Ref<File | null>
 	instanceIconUrl: Ref<string | null>
 	instanceIconPath: Ref<string | null>
@@ -121,7 +123,7 @@ export interface CreationFlowContextValue {
 	onBack: (() => void) | null
 
 	// Methods
-	reset: (instanceCount?: number) => void
+	reset: (instanceCount?: number) => Promise<void>
 	setSetupType: (type: SetupType) => void
 	setImportMode: () => void
 	browseModpacks: () => void
@@ -138,7 +140,6 @@ export const [injectCreationFlowContext, provideCreationFlowContext] =
 
 // TODO: replace with actual world count from the world list once available
 let worldCounter = 0
-let instanceCounter = 0
 
 export interface CreationFlowOptions {
 	availableLoaders?: string[]
@@ -147,6 +148,7 @@ export interface CreationFlowOptions {
 	isInitialSetup?: boolean
 	initialLoader?: string
 	initialGameVersion?: string
+	fetchExistingInstanceNames?: () => Promise<string[]>
 	onBack?: () => void
 	searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
 	getProjectVersions?: (projectId: string) => Promise<{ id: string }[]>
@@ -183,6 +185,8 @@ export function createCreationFlowContext(
 
 	// Instance-specific state
 	const instanceName = ref('')
+	const existingInstanceNames = ref<string[]>([])
+	const fetchExistingInstanceNames = options.fetchExistingInstanceNames ?? null
 	const instanceIcon = ref<File | null>(null)
 	const instanceIconUrl = ref<string | null>(null)
 	const instanceIconPath = ref<string | null>(null)
@@ -199,6 +203,24 @@ export function createCreationFlowContext(
 	const loaderVersionType = ref<LoaderVersionType>('stable')
 	const selectedLoaderVersion = ref<string | null>(null)
 	const showSnapshots = ref(false)
+
+	const autoInstanceName = computed(() => {
+		const loader = selectedLoader.value
+		const version = selectedGameVersion.value
+		if (!version) return ''
+
+		const loaderName = loader ? formatLoaderLabel(loader) : 'Vanilla'
+		const baseName = `${loaderName} ${version}`
+
+		const names = new Set(existingInstanceNames.value)
+		if (!names.has(baseName)) return baseName
+
+		let counter = 1
+		while (names.has(`${baseName} (${counter})`)) {
+			counter++
+		}
+		return `${baseName} (${counter})`
+	})
 
 	const modpackSelection = ref<ModpackSelection | null>(null)
 	const modpackFile = ref<File | null>(null)
@@ -227,15 +249,14 @@ export function createCreationFlowContext(
 		() => setupType.value === 'vanilla' || selectedLoader.value === 'vanilla',
 	)
 
-	function reset(instanceCount?: number) {
+	async function reset() {
+		if (fetchExistingInstanceNames) {
+			existingInstanceNames.value = await fetchExistingInstanceNames()
+		}
 		setupType.value = null
 		isImportMode.value = false
 		worldCounter++
 		worldName.value = flowType === 'world' ? `World ${worldCounter}` : ''
-		if (instanceCount != null) {
-			instanceCounter = instanceCount
-		}
-		instanceCounter++
 		gamemode.value = 'survival'
 		difficulty.value = 'normal'
 		worldSeed.value = ''
@@ -245,7 +266,7 @@ export function createCreationFlowContext(
 		generatorSettingsCustom.value = ''
 
 		// Instance-specific
-		instanceName.value = flowType === 'instance' ? `New instance (${instanceCounter})` : ''
+		instanceName.value = ''
 		instanceIconUrl.value = null
 		instanceIcon.value = null
 		instanceIconPath.value = null
@@ -356,6 +377,7 @@ export function createCreationFlowContext(
 		generatorSettingsMode,
 		generatorSettingsCustom,
 		instanceName,
+		autoInstanceName,
 		instanceIcon,
 		instanceIconUrl,
 		instanceIconPath,

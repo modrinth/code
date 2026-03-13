@@ -31,6 +31,7 @@ const props = withDefaults(
 		isInitialSetup?: boolean
 		initialLoader?: string
 		initialGameVersion?: string
+		fetchExistingInstanceNames?: () => Promise<string[]>
 		onBack?: (() => void) | null
 		fade?: 'standard' | 'warning' | 'danger'
 		searchModpacks?: (query: string, limit?: number) => Promise<ModpackSearchResult>
@@ -44,6 +45,7 @@ const props = withDefaults(
 		isInitialSetup: false,
 		initialLoader: undefined,
 		initialGameVersion: undefined,
+		fetchExistingInstanceNames: undefined,
 		onBack: null,
 	},
 )
@@ -69,6 +71,7 @@ const ctx = createCreationFlowContext(
 		isInitialSetup: props.isInitialSetup,
 		initialLoader: props.initialLoader,
 		initialGameVersion: props.initialGameVersion,
+		fetchExistingInstanceNames: props.fetchExistingInstanceNames,
 		onBack: props.onBack ?? undefined,
 		searchModpacks: props.searchModpacks,
 		getProjectVersions: props.getProjectVersions,
@@ -76,8 +79,8 @@ const ctx = createCreationFlowContext(
 )
 provideCreationFlowContext(ctx)
 
-function show(instanceCount?: number) {
-	ctx.reset(instanceCount)
+async function show() {
+	await ctx.reset()
 	modal.value?.setStage(0)
 	modal.value?.show()
 }

@@ -47,7 +47,7 @@ const selectedIds = defineModel<string[]>('selectedIds', { default: () => [] })
 
 const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
-	delete: [id: string]
+	delete: [id: string, event: MouseEvent]
 	update: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
@@ -280,7 +280,11 @@ function handleSort(column: ContentCardTableSortColumn) {
 					:hide-actions="!hasAnyActions"
 					:selected="isItemSelected(item.id)"
 					:class="[
-						(visibleRange.start + idx) % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
+						isItemSelected(item.id)
+							? 'bg-surface-2.5'
+							: (visibleRange.start + idx) % 2 === 1
+								? 'bg-surface-1.5'
+								: 'bg-surface-2',
 						'border-0 border-t border-solid border-surface-4',
 						visibleRange.start + idx === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 					]"
@@ -288,7 +292,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 						(val) => toggleItemSelection(item.id, val ?? false, visibleRange.start + idx)
 					"
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
-					@delete="emit('delete', item.id)"
+					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
 				>
 					<template #additionalButtonsLeft>
@@ -326,13 +330,17 @@ function handleSort(column: ContentCardTableSortColumn) {
 				:hide-actions="!hasAnyActions"
 				:selected="isItemSelected(item.id)"
 				:class="[
-					index % 2 === 1 ? 'bg-surface-1.5' : 'bg-surface-2',
+					isItemSelected(item.id)
+						? 'bg-surface-2.5'
+						: index % 2 === 1
+							? 'bg-surface-1.5'
+							: 'bg-surface-2',
 					'border-0 border-t border-solid border-surface-4',
 					index === items.length - 1 && !flat ? 'rounded-b-[20px]' : '',
 				]"
 				@update:selected="(val) => toggleItemSelection(item.id, val ?? false, index)"
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
-				@delete="emit('delete', item.id)"
+				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 				@update="emit('update', item.id)"
 			>
 				<template #additionalButtonsLeft>

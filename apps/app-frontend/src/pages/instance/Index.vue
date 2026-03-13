@@ -246,7 +246,6 @@
 							:options="options"
 							:offline="offline"
 							:playing="playing"
-							:versions="modrinthVersions"
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
 							:open-settings="() => settingsModal?.show(1)"
@@ -332,7 +331,7 @@ import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.v
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
-import { get_project_v3, get_version_many } from '@/helpers/cache.js'
+import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
@@ -362,7 +361,6 @@ window.addEventListener('online', () => {
 })
 
 const instance = ref<GameInstance>()
-const modrinthVersions = ref<Labrinth.Versions.v2.Version[]>([])
 const playing = ref(false)
 const loading = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
@@ -385,7 +383,6 @@ const loadingServerPing = ref(false)
 async function fetchInstance() {
 	isServerInstance.value = false
 	linkedProjectV3.value = undefined
-	modrinthVersions.value = []
 	ping.value = undefined
 	playersOnline.value = undefined
 	loadingServerPing.value = false
@@ -401,14 +398,6 @@ async function fetchInstance() {
 
 			if (linkedProjectV3.value?.minecraft_server != null) {
 				isServerInstance.value = true
-			}
-
-			if (linkedProjectV3.value && linkedProjectV3.value.versions) {
-				const versions = await get_version_many(linkedProjectV3.value.versions, 'must_revalidate')
-				modrinthVersions.value = versions.sort(
-					(a: Labrinth.Versions.v2.Version, b: Labrinth.Versions.v2.Version) =>
-						dayjs(b.date_published).valueOf() - dayjs(a.date_published).valueOf(),
-				)
 			}
 		} catch (error) {
 			handleError(error as Error)
@@ -605,18 +594,23 @@ const handleOptionsClick = async (args: { option: string; item: unknown }) => {
 
 const unlistenProfiles = await profile_listener(
 	async (event: { profile_path_id: string; event: string }) => {
-		if (event.profile_path_id === route.params.id) {
-			if (event.event === 'removed') {
-				await router.push({
-					path: '/',
-				})
-				return
+		if (event.profile_path_id !== route.params.id) return
+		if (event.event === 'removed' || route.path === '/') {
+			if (route.path !== '/') {
+				await router.push({ path: '/' })
 			}
-			instance.value = await get(route.params.id as string).catch(handleError)
-			if (!instance.value?.linked_data?.project_id) {
-				linkedProjectV3.value = undefined
-				isServerInstance.value = false
+			return
+		}
+		instance.value = await get(route.params.id as string).catch((err) => {
+			if (String(err).includes('not managed')) {
+				router.push({ path: '/' })
+				return undefined
 			}
+			return handleError(err)
+		})
+		if (!instance.value?.linked_data?.project_id) {
+			linkedProjectV3.value = undefined
+			isServerInstance.value = false
 		}
 	},
 )

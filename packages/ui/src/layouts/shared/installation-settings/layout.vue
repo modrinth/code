@@ -88,14 +88,18 @@ const disabledPlatforms = computed(() => {
 
 const showModpackVersionActions = ctx.showModpackVersionActions ?? true
 
-function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version) {
+function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
 	const currentVersion = form.updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 	isUpdateDowngrade.value = currentVersion
 		? new Date(version.date_published) < new Date(currentVersion.date_published)
 		: false
-	modpackUpdateModal.value?.show()
+	if (event?.shiftKey) {
+		handleModpackUpdateConfirm()
+	} else {
+		modpackUpdateModal.value?.show()
+	}
 }
 
 function handleModpackUpdateConfirm() {
@@ -363,7 +367,7 @@ const messages = defineMessages({
 							<button
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="unlinkModal?.show()"
+								@click="(e: MouseEvent) => (e.shiftKey ? handleUnlink() : unlinkModal?.show())"
 							>
 								<UnlinkIcon class="size-5" />
 								{{
@@ -395,7 +399,9 @@ const messages = defineMessages({
 							<button
 								class="!shadow-none"
 								:disabled="ctx.isBusy.value"
-								@click="reinstallModal?.show()"
+								@click="
+									(e: MouseEvent) => (e.shiftKey ? handleReinstall() : reinstallModal?.show())
+								"
 							>
 								<SpinnerIcon v-if="ctx.reinstalling?.value" class="animate-spin" />
 								<DownloadIcon v-else class="size-5" />
@@ -659,7 +665,7 @@ const messages = defineMessages({
 			:current-loader="ctx.updaterModalProps.value.currentLoader"
 			:current-version-id="ctx.updaterModalProps.value.currentVersionId"
 			:is-app="ctx.isApp"
-			:is-modpack="true"
+			project-type="modpack"
 			:project-icon-url="ctx.updaterModalProps.value.projectIconUrl"
 			:project-name="ctx.updaterModalProps.value.projectName"
 			:loading="form.loadingVersions.value"

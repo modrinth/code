@@ -109,6 +109,7 @@ watch(
 const removing = ref(false)
 async function removeProfile() {
 	removing.value = true
+	const path = props.instance.path
 
 	trackEvent('InstanceRemove', {
 		loader: props.instance.loader,
@@ -116,7 +117,7 @@ async function removeProfile() {
 	})
 
 	await router.push({ path: '/' })
-	await remove(props.instance.path).catch(handleError)
+	await remove(path).catch(handleError)
 }
 
 const messages = defineMessages({

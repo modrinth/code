@@ -13,9 +13,14 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 	const router = useRouter()
 
 	const installationModal = useTemplateRef('installationModal')
-	provide('showCreationModal', async () => {
+
+	async function fetchExistingInstanceNames(): Promise<string[]> {
 		const instances = await list().catch(handleError)
-		installationModal.value?.show(instances?.length ?? 0)
+		return instances?.map((i) => i.name) ?? []
+	}
+
+	provide('showCreationModal', () => {
+		installationModal.value?.show()
 	})
 
 	async function handleCreate(config: CreationFlowContextValue) {
@@ -57,9 +62,10 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 				? null
 				: (config.selectedLoaderVersion.value ?? config.loaderVersionType.value)
 			const iconPath = config.instanceIconPath.value ?? null
+			const name = config.instanceName.value.trim() || config.autoInstanceName.value
 
 			await create(
-				config.instanceName.value,
+				name,
 				config.selectedGameVersion.value,
 				loader,
 				loaderVersion,
@@ -68,7 +74,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 			).catch(handleError)
 
 			trackEvent('InstanceCreate', {
-				profile_name: config.instanceName.value,
+				profile_name: name,
 				game_version: config.selectedGameVersion.value,
 				loader,
 				loader_version: loaderVersion,
@@ -102,6 +108,7 @@ export function setupCreationModal(notificationManager: AbstractWebNotificationM
 
 	return {
 		installationModal,
+		fetchExistingInstanceNames,
 		handleCreate,
 		handleBrowseModpacks,
 		searchModpacks,

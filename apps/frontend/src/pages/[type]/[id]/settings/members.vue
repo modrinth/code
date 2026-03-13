@@ -1,5 +1,17 @@
 <template>
 	<div>
+		<ConfirmTransferProjectModal
+			v-if="transferData && project"
+			ref="transferModal"
+			:project="{ name: project.title, icon_url: project.icon_url }"
+			:current-owner="{
+				avatar_url: currentMember?.avatar_url,
+				username: currentMember?.user?.username ?? '',
+				role: currentMember?.role ?? 'Owner',
+			}"
+			:transfer-to="transferData.target"
+			:on-confirm="transferData.onConfirm"
+		/>
 		<ConfirmModal
 			ref="modal_remove"
 			title="Are you sure you want to remove this project from the organization?"
@@ -233,7 +245,7 @@
 					<button
 						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
 						class="iconified-button"
-						@click="transferOwnership(index)"
+						@click="openTransferModal(index, $event)"
 					>
 						<TransferIcon />
 						Transfer ownership
@@ -298,7 +310,11 @@
 					:options="organizations || []"
 					:disabled="!currentMember?.is_owner || organizations?.length === 0"
 				/>
-				<button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
+				<button
+					class="btn btn-primary"
+					:disabled="!selectedOrganization"
+					@click="openTransferToOrgModal($event)"
+				>
 					<CheckIcon />
 					Transfer management
 				</button>
@@ -554,6 +570,7 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { Multiselect } from 'vue-multiselect'
 
+import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
 import { useBaseFetch } from '~/composables/fetch.js'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
@@ -606,6 +623,8 @@ initMembers()
 const currentUsername = ref('')
 const openTeamMembers = ref([])
 const selectedOrganization = ref(null)
+const transferData = ref(null)
+const transferModal = ref(null)
 
 const { data: organizations } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
@@ -761,6 +780,34 @@ const updateTeamMember = async (index) => {
 	}
 
 	stopLoading()
+}
+
+const openTransferModal = (index, e) => {
+	transferData.value = {
+		target: {
+			avatar_url: allTeamMembers.value[index]?.avatar_url,
+			username: allTeamMembers.value[index]?.user?.username,
+			role: allTeamMembers.value[index]?.role || 'Member',
+		},
+		onConfirm: () => transferOwnership(index),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
+}
+
+const openTransferToOrgModal = (e) => {
+	if (!selectedOrganization.value) return
+	transferData.value = {
+		target: {
+			avatar_url: selectedOrganization.value.icon_url,
+			name: selectedOrganization.value.name,
+		},
+		onConfirm: () => onAddToOrg(),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
 }
 
 const transferOwnership = async (index) => {
