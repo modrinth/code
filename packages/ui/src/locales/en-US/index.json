@@ -335,6 +335,9 @@
   "content.page-layout.no-content-found": {
     "defaultMessage": "No content found."
   },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Please wait"
+  },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count} {contentType}..."
   },
@@ -1865,9 +1868,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Creating backup..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Failed to create backup"
   },
@@ -1877,20 +1877,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Backup queued"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Restore queued"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Rename"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Restoring from backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"

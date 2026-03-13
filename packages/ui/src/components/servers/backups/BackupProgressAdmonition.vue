@@ -191,7 +191,7 @@ const messages = defineMessages({
 			</div>
 			<div class="flex shrink-0 items-center gap-2">
 				<ButtonStyled v-if="showCancel" type="outlined" color="blue">
-					<button @click="emit('cancel')" class="!border">
+					<button class="!border" @click="emit('cancel')">
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
