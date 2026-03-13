@@ -5,6 +5,78 @@
   "app.auth-servers.unreachable.header": {
     "message": "Cannot reach authentication servers"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Enter modpack description..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Export"
+  },
+  "app.export-modal.header": {
+    "message": "Export modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Name"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack name"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Select files and folders to include in pack"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Version number"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "All data for your instance will be permanently deleted, including your worlds, configs, and all installed content."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "This action cannot be undone"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Delete instance"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Delete instance"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "project"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Copy link"
+  },
+  "app.instance.mods.installing": {
+    "message": "Installing..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" was added"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projects were added"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Check out the projects I'm using in my modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Sharing modpack content"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Show file"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Successfully uploaded"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Unknown"
+  },
+  "app.instance.mods.updating": {
+    "message": "Updating..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
   },
@@ -32,32 +104,14 @@
   "app.modal.install-to-play.view-contents": {
     "message": "View contents"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} added"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "Added"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "Removed"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "Updated"
-  },
   "app.modal.update-to-play.header": {
     "message": "Update to play"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} removed"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Update required"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} updated"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
@@ -227,12 +281,6 @@
   "instance.edit-world.title": {
     "message": "Edit world"
   },
-  "instance.filter.disabled": {
-    "message": "Disabled projects"
-  },
-  "instance.filter.updates-available": {
-    "message": "Updates available"
-  },
   "instance.server-modal.address": {
     "message": "Address"
   },
@@ -341,149 +389,8 @@
   "instance.settings.tabs.installation": {
     "message": "Installation"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} for Minecraft {game_version} already installed"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} already installed"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Change version"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Install"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Installing"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Fetching modpack versions"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Installing new version"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Currently installed"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Debug information:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Fetching modpack details"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Game version"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Install"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Installation in progress"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Cannot fetch linked modpack details. Please check your internet connection."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} is not available for Minecraft {version}. Try another mod loader."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "This instance is linked to a modpack, but the modpack could not be found on Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Reinstall modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Reinstalling modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Reinstalling will reset all installed or modified content to what is provided by the modpack, removing any mods or content you have added on top of the original installation. This may fix unexpected behavior if changes have been made to the instance, but if your worlds now depend on additional installed content, it may break existing worlds."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Are you sure you want to reinstall this instance?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resets the instance's content to its original state, removing any mods or content you have added on top of the original modpack."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstall modpack"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Repair"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Repairing"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Repairing reinstalls Minecraft dependencies and checks for corruption. This may resolve issues if your game is not launching due to launcher-related errors, but will not resolve issues or crashes related to installed mods."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Repair instance?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Repair in progress"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Reset to current"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Show all versions"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "change version"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "install"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "reinstall"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "repair"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Cannot {action} while installing"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Cannot {action} while offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Cannot {action} while repairing"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(unknown version)"
-  },
-  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
-    "message": "This instance is linked to a server, which means you can't change the Minecraft version. Unlinking will permanently disconnect this instance from the server."
-  },
-  "instance.settings.tabs.installation.unlink-server.description": {
-    "message": "This instance is linked to a server, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the server."
-  },
-  "instance.settings.tabs.installation.unlink-server.title": {
-    "message": "Unlink from server"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Unlink instance"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "If you proceed, you will not be able to re-link it without creating an entirely new instance. You will no longer receive modpack updates and it will become a normal instance."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Are you sure you want to unlink this instance?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "This instance is linked to a modpack, which means mods can't be updated and you can't change the mod loader or Minecraft version. Unlinking will permanently disconnect this instance from the modpack."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Unlink from modpack"
   },
   "instance.settings.tabs.java": {
     "message": "Java and memory"

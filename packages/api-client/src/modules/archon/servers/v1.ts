@@ -7,6 +7,30 @@ export class ArchonServersV1Module extends AbstractModule {
 	}
 
 	/**
+	 * Get list of servers for the authenticated user
+	 * GET /v1/servers
+	 */
+	public async list(): Promise<Archon.Servers.v1.ServerFull[]> {
+		return this.client.request<Archon.Servers.v1.ServerFull[]>('/servers', {
+			api: 'archon',
+			version: 1,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Get full server details including worlds, backups, and content
+	 * GET /v1/servers/:server_id
+	 */
+	public async get(serverId: string): Promise<Archon.Servers.v1.ServerFull> {
+		return this.client.request<Archon.Servers.v1.ServerFull>(`/servers/${serverId}`, {
+			api: 'archon',
+			version: 1,
+			method: 'GET',
+		})
+	}
+
+	/**
 	 * Get available regions
 	 * GET /v1/regions
 	 */
@@ -15,6 +39,18 @@ export class ArchonServersV1Module extends AbstractModule {
 			api: 'archon',
 			version: 1,
 			method: 'GET',
+		})
+	}
+
+	/**
+	 * End the intro flow for a server
+	 * DELETE /v1/servers/:id/flows/intro
+	 */
+	public async endIntro(serverId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/flows/intro`, {
+			api: 'archon',
+			version: 1,
+			method: 'DELETE',
 		})
 	}
 }

@@ -182,7 +182,12 @@ pub fn get_default_launcher_path(
             Some(dirs::data_dir()?.join("gdlauncher_next"))
         }
         ImportLauncherType::Curseforge => {
-            Some(dirs::home_dir()?.join("curseforge").join("minecraft"))
+            let home = dirs::home_dir()?;
+            let primary = home.join("curseforge").join("minecraft");
+            if primary.exists() {
+                return Some(primary);
+            }
+            Some(dirs::document_dir()?.join("curseforge").join("minecraft"))
         }
         ImportLauncherType::Unknown => None,
     };
