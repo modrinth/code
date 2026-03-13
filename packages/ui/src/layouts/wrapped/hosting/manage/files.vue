@@ -21,8 +21,8 @@
 		</div>
 
 		<div v-else key="content" class="contents">
-			<Admonition v-if="serverBusy" type="warning" class="mb-5">
-				<template #header>{{ busyTooltip }}</template>
+			<Admonition v-if="nonBackupBusyReasons.length > 0" type="warning" class="mb-5">
+				<template #header>{{ formatMessage(nonBackupBusyReasons[0].reason) }}</template>
 				File operations are disabled while the operation is in progress.
 			</Admonition>
 			<div class="relative flex w-full flex-col">
@@ -326,6 +326,13 @@ const { formatMessage } = useVIntl()
 const serverBusy = computed(() => busyReasons.value.length > 0)
 const busyTooltip = computed(() =>
 	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
+)
+const nonBackupBusyReasons = computed(() =>
+	busyReasons.value.filter(
+		(r) =>
+			r.reason.id !== 'servers.busy.backup-creating' &&
+			r.reason.id !== 'servers.busy.backup-restoring',
+	),
 )
 const queryClient = useQueryClient()
 

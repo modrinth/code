@@ -335,6 +335,9 @@
   "content.page-layout.no-content-found": {
     "defaultMessage": "No content found."
   },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Please wait"
+  },
   "content.page-layout.search-placeholder": {
     "defaultMessage": "Search {count} {contentType}..."
   },
@@ -1814,14 +1817,56 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Something went wrong while creating {backupName}. Please try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Backup failed"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} is queued and will start shortly."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Backup queued"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "Saving world data and server configuration for {backupName}. This can take a few minutes."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Creating backup"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "your backup"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Restoring from backup failed"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Restoring from {backupName} is queued and will start shortly."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Restoring from backup queued"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "Your server has been restored to {backupName} and is ready to start."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Restoring from backup successful"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Restoring your server from {backupName}. This may take a couple of minutes."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Restoring from backup"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Creating backup..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Failed to create backup"
@@ -1832,20 +1877,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Backup queued"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Restore queued"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Rename"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Restoring from backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Dismiss"

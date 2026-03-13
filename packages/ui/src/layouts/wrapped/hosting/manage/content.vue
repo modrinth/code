@@ -789,14 +789,21 @@ provideContentManager({
 	isBusy: computed(() => busyReasons.value.length > 0),
 	busyMessage: computed(() => {
 		const bannerCoversInstalling = server.value?.status === 'installing' || isSyncingContent.value
-		const nonBannerReasons = bannerCoversInstalling
-			? busyReasons.value.filter(
-					(r) =>
-						r.reason.id !== 'servers.busy.installing' &&
-						r.reason.id !== 'servers.busy.syncing-content',
-				)
-			: busyReasons.value
-		return nonBannerReasons.length > 0 ? formatMessage(nonBannerReasons[0].reason) : null
+		const filteredReasons = busyReasons.value.filter((r) => {
+			if (
+				bannerCoversInstalling &&
+				(r.reason.id === 'servers.busy.installing' ||
+					r.reason.id === 'servers.busy.syncing-content')
+			)
+				return false
+			if (
+				r.reason.id === 'servers.busy.backup-creating' ||
+				r.reason.id === 'servers.busy.backup-restoring'
+			)
+				return false
+			return true
+		})
+		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: type,
