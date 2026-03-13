@@ -440,7 +440,10 @@ async function refreshSearch() {
 				hitCount: rawResults.result.hits.length,
 				totalHits: rawResults.result.total_hits,
 			})
-			results.value = rawResults.result
+			results.value = {
+				...rawResults.result,
+				hits_per_page: maxResults.value,
+			}
 		}
 
 		const currentFilterState = JSON.stringify({
