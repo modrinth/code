@@ -59,18 +59,6 @@ export interface WSNewModEvent {
 	event: 'new-mod'
 }
 
-export type WSBackupTask = 'create' | 'restore'
-export type WSBackupState = 'ongoing' | 'done' | 'failed' | 'cancelled' | 'unchanged'
-
-export interface WSBackupProgressEvent {
-	event: 'backup-progress'
-	task: WSBackupTask
-	id: string
-	progress: number // percentage
-	state: WSBackupState
-	ready: boolean
-}
-
 export type FSQueuedOpUnarchive = {
 	op: 'unarchive'
 	src: string
@@ -109,16 +97,3 @@ export interface WSFilesystemOpsEvent {
 	event: 'filesystem-ops'
 	all: FilesystemOp[]
 }
-
-export type WSEvent =
-	| WSLogEvent
-	| WSStatsEvent
-	| WSPowerStateEvent
-	| WSAuthExpiringEvent
-	| WSAuthIncorrectEvent
-	| WSInstallationResultEvent
-	| WSAuthOkEvent
-	| WSUptimeEvent
-	| WSNewModEvent
-	| WSBackupProgressEvent
-	| WSFilesystemOpsEvent
