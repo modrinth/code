@@ -1593,4 +1593,3 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
