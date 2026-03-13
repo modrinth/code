@@ -221,7 +221,11 @@ const backups = computed(() => {
 					...backup.task,
 					...progressState,
 				},
-
+				status: hasOngoingTask
+					? ('in_progress' as const)
+					: hasCompletedTask
+						? ('done' as const)
+						: backup.status,
 				ongoing: hasOngoingTask || (backup.ongoing && !hasCompletedTask),
 			}
 		}
@@ -304,8 +308,8 @@ const backupCreationDisabled = computed(() => {
 	if (busyReasons.value.length > 0) {
 		return formatMessage(busyReasons.value[0].reason)
 	}
-	// also check API data for ongoing backups (before ws fires)
-	if (backupsData.value?.some((backup) => backup.ongoing)) {
+	// also check API data for active backups (before ws fires)
+	if (backupsData.value?.some((b) => b.status === 'in_progress' || b.status === 'pending')) {
 		return 'A backup is already in progress'
 	}
 	return undefined

@@ -50,11 +50,13 @@ const props = withDefaults(
 
 const backupQueued = computed(
 	() =>
+		props.backup.status === 'pending' ||
 		props.backup.task?.create?.progress === 0 ||
-		(props.backup.ongoing && !props.backup.task?.create),
+		(props.backup.status === 'in_progress' && !props.backup.task?.create),
 )
-// const automated = computed(() => props.backup.automated)
-const failedToCreate = computed(() => props.backup.interrupted)
+const failedToCreate = computed(
+	() => props.backup.status === 'error' || props.backup.status === 'timed_out',
+)
 
 const inactiveStates = ['failed', 'cancelled', 'done']
 
@@ -64,11 +66,11 @@ const creating = computed(() => {
 		return task
 	}
 
-	if (props.backup.ongoing && !props.backup.task?.restore) {
-		return {
-			progress: 0,
-			state: 'ongoing',
-		}
+	if (
+		(props.backup.status === 'in_progress' || props.backup.status === 'pending') &&
+		!props.backup.task?.restore
+	) {
+		return { progress: 0, state: 'ongoing' as const }
 	}
 	return undefined
 })
@@ -77,13 +79,6 @@ const restoring = computed(() => {
 	const task = props.backup.task?.restore
 	if (task && task.progress < 1 && !inactiveStates.includes(task.state)) {
 		return task
-	}
-
-	if (props.backup.ongoing && props.backup.task?.restore) {
-		return {
-			progress: 0,
-			state: 'ongoing',
-		}
 	}
 	return undefined
 })
