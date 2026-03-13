@@ -28,6 +28,7 @@
 	},
 	"devDependencies": {
 		"@modrinth/tooling-config": "workspace:*",
+		"@tailwindcss/container-queries": "^0.1.1",
 		"@types/node": "^20.1.0",
 		"@vue/compiler-dom": "^3.5.26",
 		"@vue/compiler-sfc": "^3.5.26",

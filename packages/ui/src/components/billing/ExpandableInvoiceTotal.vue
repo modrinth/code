@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
-import { formatPrice } from '@modrinth/utils'
 import { computed } from 'vue'
 
-import { useVIntl } from '../../composables/i18n'
+import { useFormatPrice } from '../../composables'
 import Accordion from '../base/Accordion.vue'
 
-const { locale } = useVIntl()
+const formatPrice = useFormatPrice()
 
 export type BillingItem = {
 	title: string
@@ -38,7 +37,7 @@ const periodSuffix = computed(() => {
 						<template v-if="loading">
 							<SpinnerIcon class="animate-spin size-4" />
 						</template>
-						<template v-else> {{ formatPrice(locale, total, currency) }} </template
+						<template v-else> {{ formatPrice(total, currency) }} </template
 						><span class="text-xs text-secondary">{{ periodSuffix }}</span>
 					</span>
 				</div>
@@ -57,7 +56,7 @@ const periodSuffix = computed(() => {
 					<template v-if="loading">
 						<SpinnerIcon class="animate-spin size-4" />
 					</template>
-					<template v-else> {{ formatPrice(locale, amount, currency) }} </template
+					<template v-else> {{ formatPrice(amount, currency) }} </template
 					><span class="text-xs text-secondary">{{ periodSuffix }}</span>
 				</div>
 			</div>

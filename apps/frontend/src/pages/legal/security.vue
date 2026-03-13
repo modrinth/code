@@ -13,7 +13,7 @@
 			<strong>Do not open a GitHub issue for a found vulnerability</strong>.
 		</p>
 		<p>
-			Send details to <a href="mailto:jai@modrinth.com">jai@modrinth.com</a>
+			Send details to <a href="mailto:support@modrinth.com">support@modrinth.com</a>
 			including:
 		</p>
 		<ul>
@@ -48,7 +48,7 @@
 				Python Discord Security Notice</a
 			>.
 		</p>
-		<p><em>Version 2022-11</em></p>
+		<p><em>Version 2026-03</em></p>
 	</div>
 </template>
 

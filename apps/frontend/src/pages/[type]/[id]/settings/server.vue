@@ -165,6 +165,8 @@ import {
 	injectNotificationManager,
 	injectProjectPageContext,
 	MultiSelect,
+	SERVER_LANGUAGES,
+	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
 } from '@modrinth/ui'
@@ -260,58 +262,15 @@ if (projectV3.value) {
 	)
 }
 
-const regionOptions = [
-	{ value: 'us_east', label: 'US East' },
-	{ value: 'us_west', label: 'US West' },
-	{ value: 'europe', label: 'Europe' },
-	{ value: 'asia', label: 'Asia' },
-	{ value: 'australia', label: 'Australia' },
-	{ value: 'south_america', label: 'South America' },
-	{ value: 'middle_east', label: 'Middle East' },
-	{ value: 'russia', label: 'Russia' },
-]
+const regionOptions = SERVER_REGIONS.map((region) => ({
+	value: region.code,
+	label: region.name,
+}))
 
-const languageOptions = [
-	{ value: 'en', label: 'English' },
-	{ value: 'es', label: 'Spanish' },
-	{ value: 'pt', label: 'Portuguese' },
-	{ value: 'fr', label: 'French' },
-	{ value: 'de', label: 'German' },
-	{ value: 'it', label: 'Italian' },
-	{ value: 'nl', label: 'Dutch' },
-	{ value: 'ru', label: 'Russian' },
-	{ value: 'uk', label: 'Ukrainian' },
-	{ value: 'pl', label: 'Polish' },
-	{ value: 'cs', label: 'Czech' },
-	{ value: 'sk', label: 'Slovak' },
-	{ value: 'hu', label: 'Hungarian' },
-	{ value: 'ro', label: 'Romanian' },
-	{ value: 'bg', label: 'Bulgarian' },
-	{ value: 'hr', label: 'Croatian' },
-	{ value: 'sr', label: 'Serbian' },
-	{ value: 'el', label: 'Greek' },
-	{ value: 'tr', label: 'Turkish' },
-	{ value: 'ar', label: 'Arabic' },
-	{ value: 'he', label: 'Hebrew' },
-	{ value: 'hi', label: 'Hindi' },
-	{ value: 'bn', label: 'Bengali' },
-	{ value: 'ur', label: 'Urdu' },
-	{ value: 'zh', label: 'Chinese' },
-	{ value: 'ja', label: 'Japanese' },
-	{ value: 'ko', label: 'Korean' },
-	{ value: 'th', label: 'Thai' },
-	{ value: 'vi', label: 'Vietnamese' },
-	{ value: 'id', label: 'Indonesian' },
-	{ value: 'ms', label: 'Malay' },
-	{ value: 'tl', label: 'Filipino' },
-	{ value: 'sv', label: 'Swedish' },
-	{ value: 'no', label: 'Norwegian' },
-	{ value: 'da', label: 'Danish' },
-	{ value: 'fi', label: 'Finnish' },
-	{ value: 'lt', label: 'Lithuanian' },
-	{ value: 'lv', label: 'Latvian' },
-	{ value: 'et', label: 'Estonian' },
-]
+const languageOptions = SERVER_LANGUAGES.map((language) => ({
+	value: language.code,
+	label: language.name,
+}))
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =

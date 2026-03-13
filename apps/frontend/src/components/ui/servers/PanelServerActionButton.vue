@@ -68,11 +68,7 @@
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand">
-					<button
-						v-tooltip="backupInProgress ? formatMessage(backupInProgress.tooltip) : undefined"
-						:disabled="!canTakeAction"
-						@click="handlePrimaryAction"
-					>
+					<button v-tooltip="busyReason" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<div v-if="isTransitionState" class="grid place-content-center">
 							<LoadingIcon />
 						</div>
@@ -120,20 +116,17 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, NewModal, ServerInfoLabels, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, NewModal, ServerInfoLabels } from '@modrinth/ui'
 import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import type { BackupInProgressReason } from '~/pages/hosting/manage/[id].vue'
 
 import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
 const flags = useFeatureFlags()
-const { formatMessage } = useVIntl()
 
 interface PowerAction {
 	action: ServerPowerAction
@@ -148,7 +141,7 @@ const props = defineProps<{
 	serverName?: string
 	serverData: object
 	uptimeSeconds: number
-	backupInProgress?: BackupInProgressReason
+	busyReason?: string
 }>()
 
 const emit = defineEmits<{
@@ -170,11 +163,7 @@ const dontAskAgain = ref(false)
 const startingDelay = ref(false)
 
 const canTakeAction = computed(
-	() =>
-		!props.isActioning &&
-		!startingDelay.value &&
-		!isTransitionState.value &&
-		!props.backupInProgress,
+	() => !props.isActioning && !startingDelay.value && !isTransitionState.value && !props.busyReason,
 )
 const isRunning = computed(() => serverState.value === 'running')
 const isTransitionState = computed(() =>

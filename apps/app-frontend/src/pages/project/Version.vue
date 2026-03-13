@@ -136,22 +136,7 @@
 					<div class="metadata-item">
 						<span class="metadata-label">Publication Date</span>
 						<span class="metadata-value">
-							{{
-								new Date(version.date_published).toLocaleString('en-US', {
-									month: 'long',
-									day: 'numeric',
-									year: 'numeric',
-								})
-							}}
-							at
-							{{
-								new Date(version.date_published).toLocaleString('en-US', {
-									hour: 'numeric',
-									minute: 'numeric',
-									second: 'numeric',
-									hour12: true,
-								})
-							}}
+							{{ formatDateTime(version.date_published) }}
 						</span>
 					</div>
 					<div v-if="author" class="metadata-item">
@@ -183,7 +168,7 @@
 
 <script setup>
 import { CheckIcon, DownloadIcon, ExternalIcon, FileIcon, ReportIcon } from '@modrinth/assets'
-import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode } from '@modrinth/ui'
+import { Avatar, Badge, Breadcrumbs, Button, Card, CopyCode, useFormatDateTime } from '@modrinth/ui'
 import { formatBytes, renderString } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -192,6 +177,11 @@ import { SwapIcon } from '@/assets/icons'
 import { get_project_many, get_version_many } from '@/helpers/cache.js'
 import { releaseColor } from '@/helpers/utils'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const breadcrumbs = useBreadcrumbs()
 

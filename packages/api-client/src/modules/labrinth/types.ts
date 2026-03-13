@@ -197,7 +197,7 @@ export namespace Labrinth {
 				body: string
 				requested_status: v2.ProjectStatus
 				initial_versions: unknown[]
-				team_members: any[]
+				team_members: unknown[]
 				categories: string[]
 				client_side: string
 				server_side: string
@@ -617,6 +617,14 @@ export namespace Labrinth {
 				game_versions: string[]
 				loaders: string[]
 			}
+
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+				include_changelog?: boolean
+				limit?: number
+				offset?: number
+			}
 		}
 
 		// TODO: consolidate duplicated types between v2 and v3 versions
@@ -632,7 +640,8 @@ export namespace Labrinth {
 				game_versions?: string[]
 				loaders?: string[]
 				include_changelog?: boolean
-				apiVersion?: 2 | 3
+				limit?: number
+				offset?: number
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

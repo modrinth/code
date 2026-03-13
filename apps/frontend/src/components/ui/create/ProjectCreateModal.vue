@@ -323,15 +323,17 @@ const userOption = computed(() => ({
 	value: 'self',
 	label: auth.value.user?.username || 'Unknown user',
 	icon: auth.value.user?.avatar_url
-		? defineAsyncComponent(() =>
-				Promise.resolve({
-					setup: () => () =>
-						h('img', {
-							src: auth.value.user?.avatar_url,
-							alt: 'User Avatar',
-							class: 'h-5 w-5 rounded',
-						}),
-				}),
+		? markRaw(
+				defineAsyncComponent(() =>
+					Promise.resolve({
+						setup: () => () =>
+							h('img', {
+								src: auth.value.user?.avatar_url,
+								alt: 'User Avatar',
+								class: 'h-5 w-5 rounded-full',
+							}),
+					}),
+				),
 			)
 		: undefined,
 }))
@@ -352,15 +354,17 @@ async function fetchOrganizations() {
 			value: org.id,
 			label: org.name,
 			icon: org.icon_url
-				? defineAsyncComponent(() =>
-						Promise.resolve({
-							setup: () => () =>
-								h('img', {
-									src: org.icon_url,
-									alt: `${org.name} Icon`,
-									class: 'h-5 w-5 rounded',
-								}),
-						}),
+				? markRaw(
+						defineAsyncComponent(() =>
+							Promise.resolve({
+								setup: () => () =>
+									h('img', {
+										src: org.icon_url,
+										alt: `${org.name} Icon`,
+										class: 'h-5 w-5 rounded',
+									}),
+							}),
+						),
 					)
 				: undefined,
 		}))

@@ -75,7 +75,7 @@
 				<div class="section-header">
 					<div class="section-label green">{{ formatMessage(messages.forPlayersLabel) }}</div>
 					<h2 class="section-tagline">
-						{{ formatMessage(messages.discoverCreationsTagline, { count: formattedProjectCount }) }}
+						{{ formatMessage(messages.discoverCreationsTagline, { count: PROJECT_COUNT }) }}
 					</h2>
 					<p class="section-description">
 						{{ formatMessage(messages.playersDescription) }}
@@ -470,8 +470,6 @@ const sortType = ref('relevance')
 const sortOptions = ['relevance', 'downloads', 'follows', 'updated', 'newest']
 
 const PROJECT_COUNT = 100000
-const formatNumber = new Intl.NumberFormat().format
-const formattedProjectCount = computed(() => formatNumber(PROJECT_COUNT))
 
 const auth = await useAuth()
 
@@ -530,7 +528,7 @@ const messages = defineMessages({
 	},
 	discoverCreationsTagline: {
 		id: 'landing.section.for-players.tagline',
-		defaultMessage: 'Discover over {count} creations',
+		defaultMessage: 'Discover over {count, number} creations',
 	},
 	shareContentTagline: {
 		id: 'landing.section.for-creators.tagline',

@@ -12,28 +12,34 @@ import {
 	Avatar,
 	commonMessages,
 	defineMessage,
+	NewModal,
 	TabbedModal,
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { get_project_v3 } from '@/helpers/cache'
+import { get_linked_modpack_info } from '@/helpers/profile'
 
 import type { InstanceSettingsTabProps } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
 const props = defineProps<InstanceSettingsTabProps>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
 const isMinecraftServer = ref(false)
+const handleUnlinked = () => emit('unlinked')
 
 watch(
 	() => props.instance,
@@ -95,16 +101,31 @@ const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 	},
 ])
 
+const queryClient = useQueryClient()
 const modal = ref()
+const tabbedModal = useTemplateRef('tabbedModal')
 
-function show() {
+function show(tabIndex?: number) {
+	if (props.instance.linked_data?.project_id) {
+		queryClient.prefetchQuery({
+			queryKey: ['linkedModpackInfo', props.instance.path],
+			queryFn: () => get_linked_modpack_info(props.instance.path, 'stale_while_revalidate'),
+		})
+	}
 	modal.value.show()
+	if (tabIndex !== undefined) {
+		nextTick(() => tabbedModal.value?.setTab(tabIndex))
+	}
 }
 
 defineExpose({ show })
 </script>
 <template>
-	<ModalWrapper ref="modal">
+	<NewModal
+		ref="modal"
+		:max-width="'min(928px, calc(95vw - 10rem))'"
+		:width="'min(928px, calc(95vw - 10rem))'"
+	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
 				<Avatar
@@ -120,9 +141,17 @@ defineExpose({ show })
 		</template>
 
 		<TabbedModal
+			ref="tabbedModal"
 			:tabs="
-				tabs.map((tab) => ({ ...tab, props: { ...props, isMinecraftServer: isMinecraftServer } }))
+				tabs.map((tab) => ({
+					...tab,
+					props: {
+						...props,
+						isMinecraftServer,
+						onUnlinked: handleUnlinked,
+					},
+				}))
 			"
 		/>
-	</ModalWrapper>
+	</NewModal>
 </template>

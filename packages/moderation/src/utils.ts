@@ -237,6 +237,25 @@ export function arrayOrNone(arr: string[]): string {
 	return arr.length > 0 ? arr.join(', ') : 'None'
 }
 
+export function formatProjectTypes(type: string, lower: boolean = false) {
+	let value = type
+	try {
+		value = value
+			.replaceAll('mod', 'Mod')
+			.replaceAll('resourcepack', 'Resource Pack')
+			.replaceAll('datapack', 'Data Pack')
+			.replaceAll('plugin', 'Plugin')
+			.replaceAll('shader', 'Shaders')
+			.replaceAll('minecraft_java_server', 'Server')
+			.replaceAll('minecraft_server', 'Server')
+	} catch {
+		return 'No project type'
+	}
+
+	if (lower === true) value = value.toLowerCase()
+	return value
+}
+
 export function flattenStaticVariables(): Record<string, string> {
 	const vars: Record<string, string> = {}
 
@@ -255,7 +274,7 @@ export function flattenStaticVariables(): Record<string, string> {
 		`our guide to [Licensing your Mods](https://modrinth.com/news/article/licensing-guide)`
 	vars[`NEW_ENVIRONMENTS_LINK`] = `https://modrinth.com/news/article/new-environments`
 	vars[`LEARN_MORE_ABOUT_SERVERS_FLINK`] =
-		`[learn more about server projects from our news feed](https://modrinth.com/news/)`
+		`[learn more about server projects from our news feed](https://modrinth.com/news/article/introducing-server-projects/)`
 
 	return vars
 }
@@ -334,9 +353,8 @@ export function flattenProjectVariables(
 	vars[`PROJECT_TITLE_FLINK`] = `[Name](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SLUG_FLINK`] = `[URL](https://modrinth.com/project/${project.id}/settings)`
 	vars[`PROJECT_SUMMARY_FLINK`] = `[Summary](https://modrinth.com/project/${project.id}/settings)`
-	// Depreciated
 	vars[`PROJECT_ENVIRONMENT_FLINK`] =
-		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)`
+		`[Environment Information](https://modrinth.com/project/${project.id}/settings/environment)` // Depreciated
 	vars[`PROJECT_TAGS_LINK`] = `https://modrinth.com/project/${project.id}/settings/tags`
 	vars[`PROJECT_TAGS_FLINK`] = `[Tags](https://modrinth.com/project/${project.id}/settings/tags)`
 	vars[`PROJECT_DESCRIPTION_LINK`] =
@@ -358,6 +376,12 @@ export function flattenProjectVariables(
 	vars[`PROJECT_MODERATION_LINK`] = `https://modrinth.com/project/${project.id}/moderation`
 	vars[`PROJECT_MODERATION_FLINK`] =
 		`[moderation tab](https://modrinth.com/project/${project.id}/moderation)`
+	vars[`PROJECT_SERVER_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
+	vars[`PROJECT_SERVER_SETTINGS_FLINK`] =
+		`[Server Settings](https://modrinth.com/project/${project.id}/settings/server)`
+	vars[`PROJECT_LANGUAGE_SETTINGS`] = `https://modrinth.com/project/${project.id}/settings/server`
+	vars[`PROJECT_LANGUAGE_SETTINGS_FLINK`] =
+		`[Language Settings](https://modrinth.com/project/${project.id}/settings/server)`
 
 	return vars
 }
@@ -377,9 +401,19 @@ export function flattenProjectV3Variables(
 
 	vars['PROJECT_V3_REVIEW_STATUS'] = projectV3.side_types_migration_review_status
 	vars['PROJECT_V3_TYPES'] = projectV3.project_types.join(', ')
+	vars['PROJECT_TYPE_FORMATTED'] = formatProjectTypes(projectV3.project_types[0])
+	vars['PROJECT_TYPE_FORMATTED_LOWER'] = formatProjectTypes(projectV3.project_types[0], true)
+	vars['PROJECT_TYPES_FORMATTED'] = formatProjectTypes(projectV3.project_types.join(' / '))
+	vars['PROJECT_TYPES_FORMATTED_LOWER'] = formatProjectTypes(
+		projectV3.project_types.join(' / '),
+		true,
+	)
 
 	vars['PROJECT_SITE_URL'] = projectV3.link_urls?.site?.url || 'None'
 	vars['PROJECT_STORE_URL'] = projectV3.link_urls?.store?.url || 'None'
+
+	vars['PROJECT_LANGUAGES'] = projectV3.minecraft_server?.languages?.toString() || 'None'
+	vars['PROJECT_LANGUAGE_COUNT'] = (projectV3.minecraft_server?.languages?.length || 0).toString()
 
 	return vars
 }

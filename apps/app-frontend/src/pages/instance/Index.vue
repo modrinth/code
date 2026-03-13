@@ -2,7 +2,12 @@
 	<div v-if="instance">
 		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
-			<InstanceSettingsModal ref="settingsModal" :instance="instance" :offline="offline" />
+			<InstanceSettingsModal
+				ref="settingsModal"
+				:instance="instance"
+				:offline="offline"
+				@unlinked="fetchInstance"
+			/>
 			<UpdateToPlayModal ref="updateToPlayModal" :instance="instance" />
 			<ContentPageHeader>
 				<template #icon>
@@ -55,26 +60,25 @@
 						</template>
 
 						<template v-else>
-							<ServerOnlinePlayers
-								v-if="playersOnline !== undefined"
-								:online="playersOnline"
-								:status-online="statusOnline"
-								hide-label
-							/>
-
-							<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
-
-							<div
-								v-if="
-									(playersOnline !== undefined || recentPlays !== undefined) &&
-									(minecraftServer?.region || ping)
-								"
-								class="w-1.5 h-1.5 rounded-full bg-surface-5"
-							></div>
+							<template v-if="loadingServerPing">
+								<ServerOnlinePlayers
+									v-if="playersOnline !== undefined"
+									:online="playersOnline"
+									:status-online="statusOnline"
+									hide-label
+								/>
+								<ServerRecentPlays :recent-plays="recentPlays ?? 0" hide-label />
+								<div
+									v-if="
+										(playersOnline !== undefined || recentPlays !== undefined) &&
+										(minecraftServer?.region || ping)
+									"
+									class="w-1.5 h-1.5 rounded-full bg-surface-5"
+								></div>
+								<ServerPing v-if="ping" :ping="ping" />
+							</template>
 
 							<ServerRegion v-if="minecraftServer?.region" :region="minecraftServer?.region" />
-
-							<ServerPing v-if="ping" :ping="ping" />
 
 							<div
 								v-if="minecraftServer?.region || ping"
@@ -106,9 +110,13 @@
 					<div class="flex gap-2">
 						<ButtonStyled
 							v-if="
-								['installing', 'pack_installing', 'minecraft_installing'].includes(
-									instance.install_stage,
-								)
+								[
+									'installing',
+									'pack_installing',
+									'pack_installed',
+									'not_installed',
+									'minecraft_installing',
+								].includes(instance.install_stage)
 							"
 							color="brand"
 							size="large"
@@ -241,6 +249,7 @@
 							:versions="modrinthVersions"
 							:installed="instance.install_stage !== 'installed'"
 							:is-server-instance="isServerInstance"
+							:open-settings="() => settingsModal?.show(1)"
 							@play="updatePlayState"
 							@stop="() => stopInstance('InstanceSubpage')"
 						></component>
@@ -329,15 +338,16 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status, getServerLatency } from '@/helpers/worlds'
+import { get_server_status } from '@/helpers/worlds'
+import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
-import { playServerProject } from '@/store/install.js'
 import { useBreadcrumbs, useLoading } from '@/store/state'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const route = useRoute()
 
 const router = useRouter()
@@ -370,6 +380,7 @@ const recentPlays = computed(
 )
 const playersOnline = ref<number | undefined>(undefined)
 const ping = ref<number | undefined>(undefined)
+const loadingServerPing = ref(false)
 
 async function fetchInstance() {
 	isServerInstance.value = false
@@ -377,6 +388,7 @@ async function fetchInstance() {
 	modrinthVersions.value = []
 	ping.value = undefined
 	playersOnline.value = undefined
+	loadingServerPing.value = false
 
 	instance.value = await get(route.params.id as string).catch(handleError)
 
@@ -409,14 +421,19 @@ async function fetchInstance() {
 function fetchDeferredData() {
 	const serverAddress = linkedProjectV3.value?.minecraft_java_server?.address
 	if (isServerInstance.value && serverAddress) {
-		Promise.all([get_server_status(serverAddress), getServerLatency(serverAddress)])
-			.then(([status, latency]) => {
-				ping.value = latency
+		get_server_status(serverAddress)
+			.then((status) => {
 				playersOnline.value = status.players?.online
+				ping.value = status.ping
 			})
-			.catch((err) => {
-				console.error(`Failed to ping server ${serverAddress}:`, err)
+			.catch((error) => {
+				console.error(`Failed to fetch server status for ${serverAddress}:`, error)
 			})
+			.finally(() => {
+				loadingServerPing.value = true
+			})
+	} else {
+		loadingServerPing.value = true
 	}
 
 	updatePlayState()
@@ -490,7 +507,7 @@ const startInstance = async (context: string) => {
 	}
 	loading.value = false
 
-	trackEvent('InstancePlay', {
+	trackEvent('InstanceStart', {
 		loader: instance.value.loader,
 		game_version: instance.value.game_version,
 		source: context,
@@ -596,6 +613,10 @@ const unlistenProfiles = await profile_listener(
 				return
 			}
 			instance.value = await get(route.params.id as string).catch(handleError)
+			if (!instance.value?.linked_data?.project_id) {
+				linkedProjectV3.value = undefined
+				isServerInstance.value = false
+			}
 		}
 	},
 )

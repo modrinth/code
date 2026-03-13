@@ -180,9 +180,11 @@
 										count: formatCompactNumber(projects?.length || 0),
 										type: formatMessage(
 											commonProjectTypeSentenceMessages[
-												projectTypes.length === 1 ? projectTypes[0] : 'project'
+												projectTypes.length === 1 && projects?.length > 1
+													? projectTypes[0]
+													: 'project'
 											],
-											{ count: projects?.length || 0 },
+											{ count: formatCompactNumberPlural(projects?.length || 0) },
 										),
 									}"
 								>
@@ -247,7 +249,7 @@
 			>
 				<div class="flex flex-col gap-2">
 					<span
-						v-tooltip="dayjs(collection.created).format('MMMM D, YYYY [at] h:mm A')"
+						v-tooltip="formatDateTime(collection.created)"
 						class="flex w-fit items-center gap-2"
 					>
 						<CalendarIcon aria-hidden="true" />
@@ -259,7 +261,7 @@
 					</span>
 					<span
 						v-if="showUpdatedDate"
-						v-tooltip="dayjs(collection.updated).format('MMMM D, YYYY [at] h:mm A')"
+						v-tooltip="formatDateTime(collection.updated)"
 						class="flex w-fit items-center gap-2"
 					>
 						<UpdatedIcon aria-hidden="true" />
@@ -286,6 +288,7 @@
 					}
 				}),
 			]"
+			replace
 		/>
 
 		<ProjectCardList
@@ -347,24 +350,16 @@
 				</template>
 			</ProjectCard>
 		</ProjectCardList>
-		<div v-else>
-			<div class="mx-auto flex flex-col justify-center gap-8 p-6 text-center">
-				<EmptyIllustration class="h-[120px] w-auto" />
-				<div class="-mt-4 flex flex-col gap-4">
-					<div class="flex flex-col items-center gap-1.5">
-						<span class="text-lg text-contrast md:text-2xl">{{
-							formatMessage(messages.noProjectsLabel)
-						}}</span>
-					</div>
-					<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
-						<nuxt-link class="mx-auto w-min" to="/discover/mods">
-							<CompassIcon class="size-5" />
-							Discover mods
-						</nuxt-link>
-					</ButtonStyled>
-				</div>
-			</div>
-		</div>
+		<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noProjectsLabel)">
+			<template #actions>
+				<ButtonStyled v-if="auth.user && auth.user.id === creator.id" color="brand">
+					<nuxt-link class="mx-auto w-min" to="/discover/mods">
+						<CompassIcon class="size-5" />
+						Discover mods
+					</nuxt-link>
+				</ButtonStyled>
+			</template>
+		</EmptyState>
 	</NormalPage>
 </template>
 
@@ -374,7 +369,6 @@ import {
 	ChevronLeftIcon,
 	CompassIcon,
 	EditIcon,
-	EmptyIllustration,
 	GlobeIcon,
 	HeartMinusIcon,
 	LinkIcon,
@@ -395,6 +389,7 @@ import {
 	ConfirmModal,
 	defineMessage,
 	defineMessages,
+	EmptyState,
 	FileInput,
 	HorizontalRule,
 	injectModrinthClient,
@@ -409,6 +404,8 @@ import {
 	RadioButtons,
 	SidebarCard,
 	StyledInput,
+	useCompactNumber,
+	useFormatDateTime,
 	useRelativeTime,
 	useSavable,
 	useVIntl,
@@ -424,7 +421,11 @@ const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
-const formatCompactNumber = useCompactNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const route = useNativeRoute()
 const router = useRouter()
@@ -490,8 +491,7 @@ const messages = defineMessages({
 	},
 	projectsCountLabel: {
 		id: 'collection.label.projects-count',
-		defaultMessage:
-			'{count, plural, =0 {No projects yet} one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}',
+		defaultMessage: '{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}',
 	},
 	removeProjectButton: {
 		id: 'collection.button.remove-project',

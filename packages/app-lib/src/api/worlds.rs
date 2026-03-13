@@ -6,14 +6,13 @@ use crate::state::attached_world_data::AttachedWorldData;
 use crate::state::{
     Profile, ProfileInstallStage, attached_world_data, server_join_log,
 };
+use crate::util::io;
 use crate::util::protocol_version::OLD_PROTOCOL_VERSIONS;
 pub use crate::util::protocol_version::ProtocolVersion;
 pub use crate::util::server_ping::{
     ServerGameProfile, ServerPlayers, ServerStatus, ServerVersion,
 };
-use crate::util::{io, server_ping};
-use crate::{Error, ErrorKind, Result, State, launcher};
-use async_minecraft_ping::ServerDescription;
+use crate::{Context, ErrorKind, Result, State, launcher};
 use async_walkdir::WalkDir;
 use async_zip::{Compression, ZipEntryBuilder};
 use chrono::{DateTime, Local, TimeZone, Utc};
@@ -142,8 +141,6 @@ pub enum WorldDetails {
         index: usize,
         address: String,
         pack_status: ServerPackStatus,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        linked_project_id: Option<String>,
     },
 }
 
@@ -428,7 +425,6 @@ async fn get_server_worlds_in_profile(
                 index,
                 address: server.ip,
                 pack_status: server.accept_textures.into(),
-                linked_project_id: server.linked_project_id,
             },
         };
         worlds.push(world);
@@ -718,7 +714,6 @@ pub async fn add_server_to_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
     let insert_index = servers
@@ -733,7 +728,6 @@ pub async fn add_server_to_profile(
             accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
-            linked_project_id,
         },
     );
     servers_data::write(profile_path, &servers).await?;
@@ -746,7 +740,6 @@ pub async fn edit_server_in_profile(
     name: String,
     address: String,
     pack_status: ServerPackStatus,
-    linked_project_id: Option<String>,
 ) -> Result<()> {
     let mut servers = servers_data::read(profile_path).await?;
     let server =
@@ -762,9 +755,6 @@ pub async fn edit_server_in_profile(
     server.name = name;
     server.ip = address;
     server.accept_textures = pack_status.into();
-    if let Some(id) = linked_project_id {
-        server.linked_project_id = Some(id);
-    }
     servers_data::write(profile_path, &servers).await?;
     Ok(())
 }
@@ -804,8 +794,6 @@ mod servers_data {
         pub name: String,
         #[serde(skip_serializing_if = "Option::is_none")]
         pub accept_textures: Option<bool>,
-        #[serde(default, skip_serializing_if = "Option::is_none")]
-        pub linked_project_id: Option<String>,
     }
 
     pub async fn read(instance_dir: &Path) -> Result<Vec<ServerData>> {
@@ -921,71 +909,58 @@ pub async fn get_server_status(
         "Pinging {address} with protocol version {protocol_version:?}"
     );
 
-    get_server_status_old(address, protocol_version).await
-    // get_server_status_new(address, protocol_version).await
+    // get_server_status_old(address, protocol_version).await
+    get_server_status_new(address, protocol_version).await
 }
 
-async fn get_server_status_old(
+// async fn _get_server_status_old(
+//     address: &str,
+//     protocol_version: Option<ProtocolVersion>,
+// ) -> Result<ServerStatus> {
+//     let (original_host, original_port) = parse_server_address(address)?;
+//     let (host, port) =
+//         resolve_server_address(original_host, original_port).await?;
+//     tracing::debug!(
+//         "Pinging {address} with protocol version {protocol_version:?}"
+//     );
+//     server_ping::get_server_status(
+//         &(&host as &str, port),
+//         (original_host, original_port),
+//         protocol_version,
+//     )
+//     .await
+
+async fn get_server_status_new(
     address: &str,
     protocol_version: Option<ProtocolVersion>,
 ) -> Result<ServerStatus> {
-    let (original_host, original_port) = parse_server_address(address)?;
-    let (host, port) =
-        resolve_server_address(original_host, original_port).await?;
-    tracing::debug!(
-        "Pinging {address} with protocol version {protocol_version:?}"
-    );
-    server_ping::get_server_status(
-        &(&host as &str, port),
-        (original_host, original_port),
-        protocol_version,
-    )
-    .await
-}
-
-async fn _get_server_status_new(
-    address: &str,
-    protocol_version: Option<ProtocolVersion>,
-) -> Result<ServerStatus> {
-    let (address, port) = match address.rsplit_once(':') {
-        Some((addr, port)) => {
-            let port = port.parse::<u16>().map_err(|_err| {
-                Error::from(ErrorKind::InputError("invalid port number".into()))
-            })?;
-            (addr, port)
-        }
-        None => (address, 25565),
-    };
-
     let mut builder = async_minecraft_ping::ConnectionConfig::build(address)
-        .with_port(port)
         .with_srv_lookup();
 
     if let Some(version) = protocol_version {
         builder = builder.with_protocol_version(version.version as usize)
     }
 
-    let conn = builder.connect().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to connect to server".into()))
-    })?;
+    let conn = builder
+        .connect()
+        .await
+        .wrap_err("failed to connect to server")?;
 
-    let ping_conn = conn.status().await.map_err(|_err| {
-        Error::from(ErrorKind::InputError("failed to get server status".into()))
-    })?;
+    let ping_conn = conn
+        .status()
+        .await
+        .wrap_err("failed to get server status")?;
     let status = &ping_conn.status;
-    let description = match &status.description {
-        ServerDescription::Plain(text) => {
-            serde_json::value::to_raw_value(&text).ok()
-        }
-        ServerDescription::Object { text } => {
-            // TODO: `text` always seems to be empty?
-            RawValue::from_string(text.clone()).ok()
-        }
-    };
+    let description = status.description.as_ref().map(|d| {
+        let json =
+            serde_json::to_string(d).expect("serializing should not fail");
+        RawValue::from_string(json)
+            .expect("converting to `RawValue` should not fail")
+    });
 
     let players = ServerPlayers {
-        max: status.players.max.cast_signed(),
-        online: status.players.online.cast_signed(),
+        max: status.players.max,
+        online: status.players.online,
         sample: status
             .players
             .sample
@@ -1011,9 +986,10 @@ async fn _get_server_status_new(
     let latency = {
         let start = Instant::now();
         let ping_magic = Utc::now().timestamp_millis().cast_unsigned();
-        ping_conn.ping(ping_magic).await.map_err(|_err| {
-            Error::from(ErrorKind::InputError("failed to do ping".into()))
-        })?;
+        ping_conn
+            .ping(ping_magic)
+            .await
+            .wrap_err("failed to do ping")?;
         start.elapsed().as_millis() as i64
     };
 

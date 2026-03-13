@@ -242,6 +242,18 @@
   "form.placeholder.state": {
     "defaultMessage": "Megye/tartomány megadása"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategória"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Funkció"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Közösség"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Funkciók"
+  },
   "header.category.resolutions": {
     "defaultMessage": "Felbontások"
   },
@@ -464,6 +476,9 @@
   "modal.add-payment-method.title": {
     "defaultMessage": "Fizetési mód hozzáadása"
   },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "A szükséges tartalom automatikus telepítése"
+  },
   "notification.error.title": {
     "defaultMessage": "Hiba történt"
   },
@@ -654,13 +669,13 @@
     "defaultMessage": "{count, plural,one {modcsomag} other {modcsomagok}}"
   },
   "project-type.plugin.capital": {
-    "defaultMessage": "{count, plural,one {Plugin} other {Pluginok}}"
+    "defaultMessage": "{count, plural,one {Bővítmény} other {Bővítmények}}"
   },
   "project-type.plugin.category": {
-    "defaultMessage": "Pluginok"
+    "defaultMessage": "Bővítmények"
   },
   "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural,one {plugin} other {pluginok}}"
+    "defaultMessage": "{count, plural,one {bővítmény} other {bővítmények}}"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural, one {Projekt} other {Projektek}}"
@@ -735,7 +750,7 @@
     "defaultMessage": "Létrehozva {date}"
   },
   "project.about.details.licensed": {
-    "defaultMessage": "Licenszelve: {license}"
+    "defaultMessage": "Licensz: {license}"
   },
   "project.about.details.published": {
     "defaultMessage": "Publikálva {date}"
@@ -894,7 +909,7 @@
     "defaultMessage": "Általános"
   },
   "project.settings.license.title": {
-    "defaultMessage": "Licenc"
+    "defaultMessage": "Licensz"
   },
   "project.settings.links.title": {
     "defaultMessage": "Linkek"
@@ -1005,10 +1020,10 @@
     "defaultMessage": "Összes verzió mutatása"
   },
   "search.filter_type.license": {
-    "defaultMessage": "Licenc"
+    "defaultMessage": "Licensz"
   },
   "search.filter_type.license.open_source": {
-    "defaultMessage": "Nyilt forráskódú"
+    "defaultMessage": "Nyílt forráskódú"
   },
   "search.filter_type.mod_loader": {
     "defaultMessage": "Betöltő"
@@ -1355,6 +1370,9 @@
   "tag.category.shadows": {
     "defaultMessage": "Árnyékok"
   },
+  "tag.category.simplistic": {
+    "defaultMessage": "Egyszerűsítő"
+  },
   "tag.category.social": {
     "defaultMessage": "Szociális"
   },
@@ -1369,6 +1387,9 @@
   },
   "tag.category.tweaks": {
     "defaultMessage": "Finomítások"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Hasznosság"
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Vanilla-szerű"
