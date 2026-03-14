@@ -79,7 +79,7 @@ watch([() => props.recentInstances, () => showWorlds.value], async () => {
 	})
 })
 
-populateJumpBackIn()
+await populateJumpBackIn()
 	.catch(() => {
 		console.error('Failed to populate jump back in')
 	})
