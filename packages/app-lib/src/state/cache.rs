@@ -252,12 +252,45 @@ pub struct SearchResultV3 {
     pub total_hits: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug)]
 pub struct CachedFileUpdate {
     pub hash: String,
     pub game_version: String,
     pub loaders: Vec<String>,
     pub update_version_id: String,
+}
+
+/// Migrates old cache entries that stored `"loader": "forge"` (singular string)
+/// to the current `"loaders": ["forge"]` (array) format.
+/// SEE: https://github.com/modrinth/code/issues/5562
+impl<'de> serde::Deserialize<'de> for CachedFileUpdate {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Helper {
+            hash: String,
+            game_version: String,
+            #[serde(default)]
+            loaders: Option<Vec<String>>,
+            #[serde(default)]
+            loader: Option<String>,
+            update_version_id: String,
+        }
+
+        let helper = Helper::deserialize(deserializer)?;
+        let loaders = helper.loaders.unwrap_or_else(|| {
+            helper.loader.map(|l| vec![l]).unwrap_or_default()
+        });
+
+        Ok(CachedFileUpdate {
+            hash: helper.hash,
+            game_version: helper.game_version,
+            loaders,
+            update_version_id: helper.update_version_id,
+        })
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
