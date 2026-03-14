@@ -114,7 +114,7 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 			</Container>
 		</Section>
 
-		<!-- <Text
+		<Text
 			class="text-footerText text-2xs mb-4 mt-0 pb-0 pl-4 pr-4 pt-0 text-center font-sans"
 		>
 			This email was sent to you as a registered user of Modrinth. You can customize the
@@ -122,7 +122,7 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 			<VLink href="https://modrinth.com/settings/notifications" class="text-green underline"
 				>notification settings</VLink
 			>. Some emails are required to keep your account secure and cannot be disabled.
-		</Text> -->
+		</Text>
 
 		<hr />
 
@@ -151,10 +151,10 @@ const socialLinks = Object.freeze<readonly SocialLink[]>([
 					</span>
 					{{ item.link }}
 				</span>
-				<!-- <span class="block break-words">
+				<span class="block break-words">
 					<span> <b>Notification settings:</b><br /> </span>
 					https://modrinth.com/settings/notifications
-				</span> -->
+				</span>
 			</Text>
 		</Section>
 	</StyledTemplate>
