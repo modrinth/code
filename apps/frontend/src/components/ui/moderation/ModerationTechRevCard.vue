@@ -28,6 +28,7 @@ import {
 	injectNotificationManager,
 	OverflowMenu,
 	type OverflowMenuOption,
+	useFormatDateTime,
 } from '@modrinth/ui'
 import {
 	capitalizeString,
@@ -45,6 +46,16 @@ import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const auth = await useAuth()
 const featureFlags = useFeatureFlags()
+
+const formatDateTimeUtc = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	hour: 'numeric',
+	minute: '2-digit',
+	timeZoneName: 'short',
+	timeZone: 'UTC',
+})
 
 type FlattenedFileReport = Labrinth.TechReview.Internal.FileReport & {
 	id: string
@@ -763,7 +774,7 @@ const reviewSummaryPreview = computed(() => {
 	const totalDecisions = totalSafe + totalUnsafe
 	if (totalDecisions === 0) return ''
 
-	const timestamp = dayjs().utc().format('MMMM D, YYYY [at] h:mm A [UTC]')
+	const timestamp = formatDateTimeUtc(dayjs().toDate())
 	let markdown = `## Tech Review Summary\n*${timestamp}*\n\n`
 	markdown += `<details>\n<summary>File Details (${totalSafe} safe, ${totalUnsafe} unsafe)</summary>\n\n`
 

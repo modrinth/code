@@ -83,13 +83,17 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn highlight_in_folder<R: Runtime>(
+pub async fn highlight_in_folder<R: Runtime>(
     app: tauri::AppHandle<R>,
     path: PathBuf,
 ) {
-    if let Err(e) = app.opener().reveal_item_in_dir(path) {
-        tracing::error!("Failed to highlight file in folder: {}", e);
-    }
+    tauri::async_runtime::spawn_blocking(move || {
+        if let Err(e) = app.opener().reveal_item_in_dir(path) {
+            tracing::error!("Failed to highlight file in folder: {}", e);
+        }
+    })
+    .await
+    .ok();
 }
 
 #[tauri::command]

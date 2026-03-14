@@ -393,7 +393,7 @@
     "message": "Nessun progetto nella raccolta"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>#</stat> {type}}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aggiornata {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Crea progetto"
   },
+  "create.project.create-server-project": {
+    "message": "Crea server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Campi mancanti: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nome"
   },
   "create.project.name-placeholder": {
     "message": "Inserisci il nome del progetto..."
+  },
+  "create.project.owner-description": {
+    "message": "Puoi impostare come proprietario del progetto te o un'organizzazione di cui sei membro."
+  },
+  "create.project.owner-label": {
+    "message": "Proprietario"
+  },
+  "create.project.server-project-title": {
+    "message": "Crea un server"
   },
   "create.project.summary-description": {
     "message": "Una frase o due che descrivano il tuo progetto."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Creando un progetto"
+  },
+  "create.project.type-label": {
+    "message": "Tipo"
+  },
+  "create.project.type-project": {
+    "message": "Progetto"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -555,7 +579,7 @@
     "message": "Crea nuova"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cerca fra le tue raccolte"
@@ -1272,7 +1296,7 @@
     "message": "Non disponibile"
   },
   "hosting.plan.select-plan": {
-    "message": "Scegli un piano"
+    "message": "Scegli questo piano"
   },
   "landing.button.discover-mods": {
     "message": "Esplora mod"
@@ -1432,6 +1456,12 @@
   },
   "layout.action.new-project": {
     "message": "Nuovo progetto"
+  },
+  "layout.action.new-server-project": {
+    "message": "Nuovo server"
+  },
+  "layout.action.publish": {
+    "message": "Pubblica"
   },
   "layout.action.reports": {
     "message": "Revisiona segnalazioni"
@@ -1763,9 +1793,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numero conto"
   },
-  "muralpay.field.branch-code": {
-    "message": "Codice filiale"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1822,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Cellulare PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Chiave casuale"
   },
   "muralpay.field.routing-number": {
     "message": "Numero di routing"
@@ -1856,9 +1886,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Inserisci codice conto"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Inserisci codice filiale"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Inserisci il CLABE di 18 cifre"
   },
@@ -1870,6 +1897,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Inserisci email PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Inserisci chiave casuale"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Inserisci il numero di routing di 9 cifre"
@@ -1998,7 +2028,7 @@
     "message": "Raccolta"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nessun} one {Un} other {#}} download"
+    "message": "{count, plural, =0 {Nessun} one {Un} other {{count}}} download"
   },
   "profile.label.joined": {
     "message": "Account creato"
@@ -2019,7 +2049,7 @@
     "message": "Organizzazioni"
   },
   "profile.label.projects": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {# progetti}}"
+    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -2031,7 +2061,7 @@
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, =0 {Nessun} one {<stat>Un</stat>} other {<stat>#</stat>}} follower del progetto"
+    "message": "<stat>{count, plural, =0 {Nessun} one {Un} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -2102,6 +2132,12 @@
   "project-type.datapack.singular": {
     "message": "Pacchetto di dati"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mod"
   },
@@ -2131,6 +2167,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pacchetto di risorse"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shader"
@@ -2718,13 +2760,13 @@
     "message": "I pacchetti di shader per versioni più vecchie potrebbero funzionare anche su quelle più recenti, seppur con problemi minori."
   },
   "search.filter.locked.server": {
-    "message": "Fornito dal server"
+    "message": "Determinato dal server"
   },
   "search.filter.locked.server-game-version.title": {
-    "message": "La versione del gioco è fornita dal server"
+    "message": "La versione del gioco è determinata dal server"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "Il loader è fornito dal server"
+    "message": "Il loader è determinato dal server"
   },
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
@@ -2954,6 +2996,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Pagina dei pacchetti di risorse"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Pagina dei server"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Pagina delle shader"
   },
@@ -2979,7 +3024,7 @@
     "message": "Apri link esterni in una nuova scheda"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "I pulsanti \"Scarica Modrinth App\" saranno nascosti dalla navigazione primaria. La pagina della Modrinth App rimarrà comunque raggiungibile nella home o nel piè."
+    "message": "I pulsanti \"Scarica Modrinth App\" saranno nascosti dalla navigazione primaria. La pagina di Modrinth App rimarrà comunque raggiungibile nella home o nel piè."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Nascondi promozioni per Modrinth App"

@@ -100,12 +100,12 @@
 					() => {
 						debug('on-show fired')
 						loadVersions()
-						navigateTo({ query: route.query, hash: '#download' })
+						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 					}
 				"
 				:on-hide="
 					() => {
-						navigateTo({ query: route.query, hash: '' })
+						navigateTo({ query: route.query, hash: '' }, { replace: true })
 					}
 				"
 			>
@@ -243,18 +243,21 @@
 														platformAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -344,18 +347,21 @@
 														gameVersionAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -433,14 +439,11 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<component
-						:is="isServerProject ? ServerProjectHeader : ProjectHeader"
+					<ProjectHeader
 						v-if="projectV3Loaded"
-						v-bind="
-							isServerProject
-								? { project, projectV3, member: !!currentMember }
-								: { project, member: !!currentMember }
-						"
+						:project="project"
+						:project-v3="projectV3"
+						:member="!!currentMember"
 					>
 						<template #actions>
 							<ButtonStyled
@@ -610,7 +613,7 @@
 											<IntlFormatted
 												:message-id="messages.serversPromoPricing"
 												:values="{
-													price: formatPrice(locale, 500, 'USD', true),
+													price: formatPrice(500, 'USD', true),
 												}"
 											>
 												<template #small="{ children }">
@@ -800,7 +803,7 @@
 								</OverflowMenu>
 							</ButtonStyled>
 						</template>
-					</component>
+					</ProjectHeader>
 					<ProjectMemberHeader
 						v-if="currentMember"
 						:project="project"
@@ -901,6 +904,7 @@
 						:project="project"
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
+						:show-followers="isServerProject"
 						class="card flex-card experimental-styles-within"
 					/>
 					<div class="card flex-card experimental-styles-within">
@@ -935,55 +939,71 @@
 								</div>
 							</div>
 
+							<div v-if="isServerProject" class="details-list__item">
+								<HeartIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(
+											formatMessage(commonMessages.projectFollowers, {
+												count: project.followers,
+											}),
+										)
+									}}
+								</div>
+							</div>
 							<div
 								v-if="project.approved"
-								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.approved)"
 								class="details-list__item"
 							>
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.published, {
-											date: publishedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.published, {
+												date: publishedDate,
+											}),
+										)
+									}}
+								</div>
+							</div>
+
+							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
+								<CalendarIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
 									}}
 								</div>
 							</div>
 
 							<div
-								v-else
-								v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-								class="details-list__item"
-							>
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
-								</div>
-							</div>
-
-							<div
 								v-if="project.status === 'processing' && project.queued"
-								v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.queued)"
 								class="details-list__item"
 							>
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.submitted, {
-											date: submittedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.submitted, {
+												date: submittedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
 
 							<div
 								v-if="versions.length > 0 && project.updated"
-								v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.updated)"
 								class="details-list__item"
 							>
 								<VersionIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									}}
 								</div>
 							</div>
 						</div>
@@ -991,7 +1011,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -1071,16 +1091,17 @@ import {
 	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
-	ServerProjectHeader,
 	ServersPromo,
 	StyledInput,
 	TagItem,
 	useDebugLogger,
+	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -1121,7 +1142,12 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
-const { locale, formatMessage } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const debug = useDebugLogger('DownloadModal')
 

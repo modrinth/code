@@ -1763,9 +1763,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Número de cuenta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Código de sucursal"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1855,9 +1852,6 @@
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "Introduce tú número de cuenta"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Ingrese el código de sucursal"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Ingrese el CLABE de 18 dígitos"

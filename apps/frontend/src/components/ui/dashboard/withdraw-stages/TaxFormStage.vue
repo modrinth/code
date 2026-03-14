@@ -80,9 +80,9 @@ import {
 	defineMessages,
 	IntlFormatted,
 	normalizeChildren,
+	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatMoney } from '@modrinth/utils'
 import { computed } from 'vue'
 
 import { getTaxThreshold, getTaxThresholdActual } from '@/providers/creator-withdraw.ts'
@@ -94,6 +94,7 @@ const props = defineProps<{
 }>()
 
 const { formatMessage } = useVIntl()
+const formatMoney = useFormatMoney()
 
 const generatedState = useGeneratedState()
 const taxThreshold = computed(() => getTaxThreshold(generatedState.value.taxComplianceThresholds))

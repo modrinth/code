@@ -16,6 +16,9 @@ importers:
       '@modrinth/tooling-config':
         specifier: workspace:*
         version: link:packages/tooling-config
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@4.1.18)
       '@types/node':
         specifier: ^20.1.0
         version: 20.19.31
@@ -87,7 +90,7 @@ importers:
         specifier: ^2.2.1
         version: 2.6.0
       '@tauri-apps/plugin-http':
-        specifier: ^2.5.0
+        specifier: ~2.5.7
         version: 2.5.7
       '@tauri-apps/plugin-opener':
         specifier: ^2.2.6
@@ -113,6 +116,9 @@ importers:
       floating-vue:
         specifier: ^5.2.2
         version: 5.2.2(@nuxt/kit@3.21.0(magicast@0.5.1))(vue@3.5.27(typescript@5.9.3))
+      fuse.js:
+        specifier: ^6.6.2
+        version: 6.6.2
       intl-messageformat:
         specifier: ^10.7.7
         version: 10.7.18
@@ -652,6 +658,9 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
+      lru-cache:
+        specifier: ^11.2.4
+        version: 11.2.5
       markdown-it:
         specifier: ^13.0.2
         version: 13.0.2
@@ -3890,6 +3899,11 @@ packages:
     resolution: {integrity: sha512-nW3eYHdqRiA1AhhOm2rHxHAQCTww9W3CDHd4DYFniqwy29X1W5HXeNjr/yt+8kysTqJsb5PUv0tN6nghKmPq5w==}
     peerDependencies:
       vue: ^3.0.0
+
+  '@tailwindcss/container-queries@0.1.1':
+    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
 
   '@tailwindcss/node@4.1.18':
     resolution: {integrity: sha512-DoR7U1P7iYhw16qJ49fgXUlry1t4CpXeErJHnQ44JgTSKMaZUdf17cfn5mHchfJ4KRBZRFA/Coo+MUF5+gOaCQ==}
@@ -9401,6 +9415,9 @@ packages:
   vue-component-type-helpers@3.2.4:
     resolution: {integrity: sha512-05lR16HeZDcDpB23ku5b5f1fBOoHqFnMiKRr2CiEvbG5Ux4Yi0McmQBOET0dR0nxDXosxyVqv67q6CzS3AK8rw==}
 
+  vue-component-type-helpers@3.2.5:
+    resolution: {integrity: sha512-tkvNr+bU8+xD/onAThIe7CHFvOJ/BO6XCOrxMzeytJq40nTfpGDJuVjyCM8ccGZKfAbGk2YfuZyDMXM56qheZQ==}
+
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
     engines: {node: '>=12'}
@@ -12755,7 +12772,7 @@ snapshots:
       storybook: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       type-fest: 2.19.0
       vue: 3.5.27(typescript@5.9.3)
-      vue-component-type-helpers: 3.2.4
+      vue-component-type-helpers: 3.2.5
 
   '@stripe/stripe-js@7.9.0': {}
 
@@ -12806,6 +12823,10 @@ snapshots:
   '@taijased/vue-render-tracker@1.0.7(vue@3.5.27(typescript@5.9.3))':
     dependencies:
       vue: 3.5.27(typescript@5.9.3)
+
+  '@tailwindcss/container-queries@0.1.1(tailwindcss@4.1.18)':
+    dependencies:
+      tailwindcss: 4.1.18
 
   '@tailwindcss/node@4.1.18':
     dependencies:
@@ -19519,6 +19540,8 @@ snapshots:
   vue-component-type-helpers@2.2.12: {}
 
   vue-component-type-helpers@3.2.4: {}
+
+  vue-component-type-helpers@3.2.5: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.27(typescript@5.9.3)):
     dependencies:

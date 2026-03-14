@@ -8,8 +8,9 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
-    ProfileFile, ProfileInstallStage, ProjectType, SideType,
+    CacheBehaviour, CachedEntry, ContentItem, Credentials, Dependency,
+    JavaVersion, LinkedModpackInfo, ProcessMetadata, ProfileFile,
+    ProfileInstallStage, ProjectType, SideType,
 };
 
 use crate::event::{ProfilePayloadType, emit::emit_profile};
@@ -23,6 +24,7 @@ use serde_json::json;
 use tracing::{info, warn};
 
 use std::collections::{HashMap, HashSet};
+use std::time::Duration;
 
 use crate::data::Settings;
 use crate::server_address::ServerAddress;
@@ -86,6 +88,119 @@ pub async fn get_projects(
             .await?;
 
         Ok(files)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+#[tracing::instrument]
+pub async fn get_installed_project_ids(
+    path: &str,
+) -> crate::Result<Vec<String>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let ids = profile
+            .get_installed_project_ids(&state.pool, &state.api_semaphore)
+            .await?;
+        Ok(ids)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Get content items with rich metadata for a profile
+///
+/// Returns content items filtered to exclude modpack files (if linked),
+/// sorted alphabetically by project name.
+#[tracing::instrument]
+pub async fn get_content_items(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let items = crate::state::get_content_items(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(items)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Get content items that are part of the linked modpack
+///
+/// Returns the modpack's dependencies as ContentItem list.
+/// Returns empty vec if the profile is not linked to a modpack.
+#[tracing::instrument]
+pub async fn get_linked_modpack_content(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let items = crate::state::get_linked_modpack_content(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(items)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
+    }
+}
+
+/// Convert a list of dependencies into ContentItems with rich metadata
+#[tracing::instrument]
+pub async fn get_dependencies_as_content_items(
+    dependencies: Vec<Dependency>,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Vec<ContentItem>> {
+    let state = State::get().await?;
+
+    let items = crate::state::dependencies_to_content_items(
+        &dependencies,
+        cache_behaviour,
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?;
+    Ok(items)
+}
+
+/// Get linked modpack info for a profile
+///
+/// Returns project, version, and owner information for the linked modpack,
+/// or None if the profile is not linked to a modpack.
+#[tracing::instrument]
+pub async fn get_linked_modpack_info(
+    path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
+) -> crate::Result<Option<LinkedModpackInfo>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let info = crate::state::get_linked_modpack_info(
+            &profile,
+            cache_behaviour,
+            &state.pool,
+            &state.api_semaphore,
+        )
+        .await?;
+        Ok(info)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error())
@@ -341,7 +456,7 @@ pub async fn update_project(
             .remove(project_path)
             && let Some(update_version) = &file.update_version_id
         {
-            let path = Profile::add_project_version(
+            let mut path = Profile::add_project_version(
                 profile_path,
                 update_version,
                 &state.pool,
@@ -349,6 +464,11 @@ pub async fn update_project(
                 &state.io_semaphore,
             )
             .await?;
+
+            if project_path.ends_with(".disabled") {
+                path = Profile::toggle_disable_project(profile_path, &path)
+                    .await?;
+            }
 
             if path != project_path {
                 Profile::remove_project(profile_path, project_path).await?;
@@ -739,25 +859,54 @@ async fn run_credentials(
     if let Some(linked_data) = &profile.linked_data {
         let project_id = &linked_data.project_id;
         if !project_id.trim().is_empty() {
-            let result = fetch::post_json(
-                concat!(
-                    env!("MODRINTH_API_BASE_URL"),
-                    "analytics/minecraft-server-play"
-                ),
-                json!({
-                    "project_id": &linked_data.project_id,
-                    "minecraft_uuid": credentials.offline_profile.id,
-                }),
-                &state.api_semaphore,
-                &state.pool,
-            )
-            .await;
+            let server_id = uuid::Uuid::new_v4().to_string();
 
-            match result {
-                Ok(()) => {
-                    info!("Tracked server play for '{project_id}' in analytics")
+            let join_result = fetch::REQWEST_CLIENT
+                .post("https://sessionserver.mojang.com/session/minecraft/join")
+                .json(&json!({
+                    "accessToken": &credentials.access_token,
+                    "selectedProfile": credentials.offline_profile.id.simple().to_string(),
+                    "serverId": &server_id,
+                }))
+                .timeout(Duration::from_secs(5))
+                .send()
+                .await;
+
+            match join_result {
+                Ok(resp) if resp.status().is_success() => {
+                    let result = fetch::post_json(
+                        concat!(
+                            env!("MODRINTH_API_BASE_URL"),
+                            "analytics/minecraft-server-play"
+                        ),
+                        json!({
+                            "project_id": &linked_data.project_id,
+                            "username": &credentials.offline_profile.name,
+                            "server_id": &server_id,
+                        }),
+                        &state.api_semaphore,
+                        &state.pool,
+                    )
+                    .await;
+
+                    match result {
+                        Ok(()) => {
+                            info!(
+                                "Tracked server play for '{project_id}' in analytics"
+                            )
+                        }
+                        Err(err) => {
+                            warn!("Failed to report server play: {err:?}")
+                        }
+                    }
                 }
-                Err(err) => warn!("Failed to report server play: {err:?}"),
+                Ok(resp) => warn!(
+                    "Failed to join Mojang session server: HTTP {}",
+                    resp.status()
+                ),
+                Err(err) => {
+                    warn!("Failed to join Mojang session server: {err:?}")
+                }
             }
         }
     }

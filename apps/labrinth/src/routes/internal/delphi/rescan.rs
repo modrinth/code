@@ -2,11 +2,14 @@ use eyre::{Result, WrapErr, eyre};
 use futures::future::try_join_all;
 use tracing::info;
 
-use super::{DELPHI_CLIENT, DelphiRunParameters};
+use super::DelphiRunParameters;
 use crate::{database::PgPool, env::ENV, models::ids::FileId};
 
-pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
-    let delphi_version = fetch_delphi_version().await?;
+pub async fn rescan_projects_in_queue(
+    pool: &PgPool,
+    http: &reqwest::Client,
+) -> Result<()> {
+    let delphi_version = fetch_delphi_version(http).await?;
     let old_delphi_version = fetch_stored_delphi_version(pool).await?;
 
     if old_delphi_version == Some(delphi_version) {
@@ -44,7 +47,7 @@ pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
         .map(|file_id| FileId(file_id.cast_unsigned()));
 
     try_join_all(file_ids.map(|file_id| async move {
-        super::run(pool, DelphiRunParameters { file_id })
+        super::run(pool, DelphiRunParameters { file_id }, http)
             .await
             .wrap_err_with(|| {
                 eyre!("failed to submit Delphi rescan for `{file_id:?}`")
@@ -60,8 +63,8 @@ pub async fn rescan_projects_in_queue(pool: &PgPool) -> Result<()> {
     Ok(())
 }
 
-async fn fetch_delphi_version() -> Result<i32> {
-    let response = DELPHI_CLIENT
+async fn fetch_delphi_version(http: &reqwest::Client) -> Result<i32> {
+    let response = http
         .get(format!("{}/version", ENV.DELPHI_URL))
         .send()
         .await

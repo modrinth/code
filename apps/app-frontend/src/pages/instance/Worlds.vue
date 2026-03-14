@@ -134,7 +134,6 @@ import {
 	RadialHeader,
 	StyledInput,
 } from '@modrinth/ui'
-import type { Version } from '@modrinth/utils'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -145,6 +144,7 @@ import AddServerModal from '@/components/ui/world/modal/AddServerModal.vue'
 import EditServerModal from '@/components/ui/world/modal/EditServerModal.vue'
 import EditWorldModal from '@/components/ui/world/modal/EditSingleplayerWorldModal.vue'
 import WorldItem from '@/components/ui/world/WorldItem.vue'
+import { trackEvent } from '@/helpers/analytics'
 import { get_project, get_project_v3 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events'
 import { get_game_versions } from '@/helpers/tags'
@@ -175,13 +175,11 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import {
-	ensureManagedServerWorldExists,
-	getServerAddress,
-	playServerProject,
-} from '@/store/install'
+import { injectServerInstall } from '@/providers/server-install'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
@@ -203,7 +201,6 @@ const props = defineProps<{
 	options: InstanceType<typeof ContextMenu> | null
 	offline: boolean
 	playing: boolean
-	versions: Version[]
 	installed: boolean
 }>()
 
@@ -409,10 +406,20 @@ async function joinWorld(world: World) {
 		const managedProjectId = instance.value.linked_data?.project_id
 		if (managedProjectId && isManagedServerWorld(world)) {
 			await playServerProject(managedProjectId).catch(handleJoinError)
+			trackEvent('InstanceStart', {
+				loader: instance.value.loader,
+				game_version: instance.value.game_version,
+				source: 'WorldsPage',
+			})
 			startingInstance.value = false
 			return
 		}
 		await start_join_server(instance.value.path, world.address).catch(handleJoinError)
+		trackEvent('InstanceStart', {
+			loader: instance.value.loader,
+			game_version: instance.value.game_version,
+			source: 'WorldsPage',
+		})
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(instance.value.path, world.path).catch(handleJoinError)
 	}
