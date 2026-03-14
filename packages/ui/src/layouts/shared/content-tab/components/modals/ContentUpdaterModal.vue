@@ -218,15 +218,15 @@
 						<DownloadIcon />
 						{{
 							formatMessage(
-							isDowngrade
-								? messages.downgradeToVersion
-								: switchMode
-									? messages.switchToVersion
-									: messages.updateToVersion,
-							{
-								version: selectedVersion?.version_number ?? '...',
-							},
-						)
+								isDowngrade
+									? messages.downgradeToVersion
+									: switchMode
+										? messages.switchToVersion
+										: messages.updateToVersion,
+								{
+									version: selectedVersion?.version_number ?? '...',
+								},
+							)
 						}}
 					</button>
 				</ButtonStyled>

@@ -824,6 +824,9 @@
   "instances.updater-modal.header-modpack": {
     "defaultMessage": "Switch modpack version"
   },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Switch version"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
@@ -847,6 +850,9 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Show incompatible"
+  },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Switch to {version}"
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Update to {version}"

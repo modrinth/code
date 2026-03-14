@@ -186,7 +186,10 @@ const sortedItems = computed(() => {
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
 				const nameB = b.project?.title ?? b.file_name
-				return nameB.toLowerCase().localeCompare(nameA.toLowerCase()) || a.file_name.localeCompare(b.file_name)
+				return (
+					nameB.toLowerCase().localeCompare(nameA.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
 			})
 		case 'date-added-newest':
 			return items.sort((a, b) => {
@@ -204,7 +207,10 @@ const sortedItems = computed(() => {
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
 				const nameB = b.project?.title ?? b.file_name
-				return nameA.toLowerCase().localeCompare(nameB.toLowerCase()) || a.file_name.localeCompare(b.file_name)
+				return (
+					nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
 			})
 	}
 })
