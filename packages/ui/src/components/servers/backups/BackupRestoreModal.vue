@@ -1,17 +1,17 @@
 <template>
 	<NewModal ref="modal" header="Restore backup" fade="danger">
-		<div class="flex flex-col gap-6 max-w-[600px]">
+		<div class="flex flex-col gap-6 max-w-[400px]">
 			<Admonition v-if="ctx.isServerRunning.value" type="critical" header="Server is running">
 				Stop the server before restoring a backup.
 			</Admonition>
-			<!-- TODO: Worlds: Replace "server" with "world" -->
-			<Admonition v-else type="warning" header="Restore warning">
-				This will overwrite all files in the server and replace them with the files from the backup.
+			<Admonition v-else type="critical" header="Restore warning">
+				Restoring your server will replace the current world and server files. Any changes made
+				since that backup will be permanently lost.
 			</Admonition>
 
 			<div v-if="currentBackup" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">Backup</span>
-				<BackupItem :backup="currentBackup" preview class="!bg-surface-2" />
+				<BackupItem :backup="currentBackup" preview class="!bg-surface-2 !shadow-none" />
 			</div>
 		</div>
 

@@ -43,6 +43,9 @@
 				class="size-5 shrink-0 text-brand-orange hover:brightness-110"
 			/>
 		</div>
+		<span class="text-secondary">
+			{{ formatMessage(messages.shiftClickHint) }}
+		</span>
 	</div>
 </template>
 
@@ -110,6 +113,10 @@ const messages = defineMessages({
 		id: 'content.inline-backup.backup-in-progress',
 		defaultMessage:
 			"A backup is in progress, it's recommended to wait for it to finish before performing this action.",
+	},
+	shiftClickHint: {
+		id: 'content.inline-backup.shift-click-hint',
+		defaultMessage: 'Hold Shift while clicking to skip confirmation.',
 	},
 })
 </script>

@@ -514,10 +514,11 @@ export function useSearch(
 		}
 
 		// Project types
-		if (projectTypes.value.length === 1) {
-			parts.push(`project_types = "${projectTypes.value[0]}"`)
-		} else if (projectTypes.value.length > 1) {
-			const quoted = projectTypes.value.map((v) => `"${v}"`).join(', ')
+		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
+		if (mappedProjectTypes.length === 1) {
+			parts.push(`project_types = "${mappedProjectTypes[0]}"`)
+		} else if (mappedProjectTypes.length > 1) {
+			const quoted = mappedProjectTypes.map((v) => `"${v}"`).join(', ')
 			parts.push(`project_types IN [${quoted}]`)
 		}
 
@@ -752,6 +753,14 @@ export function useSearch(
 		createPageParams,
 		createPageParamsString,
 	}
+}
+
+const PROJECT_TYPE_SEARCH_MAP: Partial<Record<ProjectType, string>> = {
+	server: 'minecraft_java_server',
+}
+
+function mapProjectTypeToSearch(projectType: ProjectType): string {
+	return PROJECT_TYPE_SEARCH_MAP[projectType] ?? projectType
 }
 
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {

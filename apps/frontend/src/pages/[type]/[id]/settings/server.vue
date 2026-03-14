@@ -26,15 +26,13 @@
 							>Languages <span class="font-normal text-secondary">(optional)</span></span
 						>
 					</label>
-					<Multiselect
+					<MultiSelect
 						id="server-language"
 						v-model="languages"
-						:options="languageOptions.map((l) => l.value)"
-						:custom-label="(code) => languageOptions.find((l) => l.value === code)?.label ?? code"
-						:multiple="true"
-						:searchable="true"
-						:show-labels="false"
-						:close-on-select="false"
+						:options="languageOptions"
+						searchable
+						include-select-all-option
+						:max-tag-rows="2"
 						placeholder="Select languages"
 						:disabled="!hasPermission"
 					/>
@@ -166,13 +164,13 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	MultiSelect,
 	SERVER_LANGUAGES,
 	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
 	useVIntl,
 } from '@modrinth/ui'
-import { Multiselect } from 'vue-multiselect'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 

@@ -714,15 +714,20 @@ function resetUpdateState() {
 	loadingChangelog.value = false
 }
 
-function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	if (updatingModpack.value) {
-		const currentVersionId = contentQuery.data.value?.modpack?.spec.version_id
-		const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
-		isModpackUpdateDowngrade.value = currentVersion
-			? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
-			: false
-		pendingModpackUpdateVersion.value = selectedVersion
-		modpackUpdateModal.value?.show()
+		if (event?.shiftKey) {
+			pendingModpackUpdateVersion.value = selectedVersion
+			handleModpackUpdateConfirm()
+		} else {
+			const currentVersionId = contentQuery.data.value?.modpack?.spec.version_id
+			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
+			isModpackUpdateDowngrade.value = currentVersion
+				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
+				: false
+			pendingModpackUpdateVersion.value = selectedVersion
+			modpackUpdateModal.value?.show()
+		}
 		return
 	}
 
@@ -784,14 +789,21 @@ provideContentManager({
 	isBusy: computed(() => busyReasons.value.length > 0),
 	busyMessage: computed(() => {
 		const bannerCoversInstalling = server.value?.status === 'installing' || isSyncingContent.value
-		const nonBannerReasons = bannerCoversInstalling
-			? busyReasons.value.filter(
-					(r) =>
-						r.reason.id !== 'servers.busy.installing' &&
-						r.reason.id !== 'servers.busy.syncing-content',
-				)
-			: busyReasons.value
-		return nonBannerReasons.length > 0 ? formatMessage(nonBannerReasons[0].reason) : null
+		const filteredReasons = busyReasons.value.filter((r) => {
+			if (
+				bannerCoversInstalling &&
+				(r.reason.id === 'servers.busy.installing' ||
+					r.reason.id === 'servers.busy.syncing-content')
+			)
+				return false
+			if (
+				r.reason.id === 'servers.busy.backup-creating' ||
+				r.reason.id === 'servers.busy.backup-restoring'
+			)
+				return false
+			return true
+		})
+		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
 	getItemId: (item) => item.file_name,
 	contentTypeLabel: type,
@@ -860,7 +872,7 @@ provideContentManager({
 						: (updatingProject?.version?.id ?? '')
 				"
 				:is-app="false"
-				:is-modpack="updatingModpack"
+				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 				:project-icon-url="
 					updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
 				"

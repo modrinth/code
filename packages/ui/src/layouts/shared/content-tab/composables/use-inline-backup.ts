@@ -86,13 +86,16 @@ export function useInlineBackup(backupName: string | (() => string)) {
 			if (!entry?.create) return
 
 			if (entry.create.state === 'done') {
+				stopPolling()
 				isBackingUp.value = false
 				backupComplete.value = true
 			} else if (entry.create.state === 'cancelled') {
+				stopPolling()
 				isBackingUp.value = false
 				isCancelling.value = false
 				backupCancelled.value = true
 			} else if (entry.create.state === 'failed') {
+				stopPolling()
 				isBackingUp.value = false
 				backupFailed.value = true
 			}
@@ -118,11 +121,13 @@ export function useInlineBackup(backupName: string | (() => string)) {
 
 		try {
 			const backup = await client.archon.backups_v1.get(serverId, worldId.value!, backupId)
+			const isTerminal =
+				backup.status === 'done' || backup.status === 'error' || backup.status === 'timed_out'
 
-			if (!backup.ongoing) {
+			if (isTerminal) {
 				stopPolling()
-
-				if (backup.interrupted) {
+				if (!isBackingUp.value) return
+				if (backup.status === 'error' || backup.status === 'timed_out') {
 					isBackingUp.value = false
 					backupFailed.value = true
 				} else {

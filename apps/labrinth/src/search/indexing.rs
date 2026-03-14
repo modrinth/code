@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use dashmap::DashMap;
 use eyre::Result;
 use futures::TryStreamExt;
+use heck::ToKebabCase;
 use itertools::Itertools;
 use std::collections::HashMap;
 use tracing::info;
@@ -426,6 +427,7 @@ pub async fn index_local(
                     project_id: crate::models::ids::ProjectId::from(project.id)
                         .to_string(),
                     name: project.name.clone(),
+                    indexed_title: project.name.to_kebab_case(),
                     summary: project.summary.clone(),
                     categories: categories.clone(),
                     display_categories: display_categories.clone(),
@@ -434,6 +436,7 @@ pub async fn index_local(
                     log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
                     author: owner.clone(),
+                    indexed_author: owner.to_kebab_case(),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),
                     date_modified: project.updated,

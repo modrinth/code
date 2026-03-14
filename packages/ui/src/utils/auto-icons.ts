@@ -4,6 +4,7 @@ import {
 	BracesIcon,
 	CalendarIcon,
 	CardIcon,
+	CheckCircleIcon,
 	CurrencyIcon,
 	DiscordIcon,
 	FileArchiveIcon,
@@ -66,6 +67,7 @@ export const SEVERITY_ICONS: Record<string, Component> = {
 	warning: IssuesIcon,
 	error: XCircleIcon,
 	critical: XCircleIcon,
+	success: CheckCircleIcon,
 }
 
 export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {

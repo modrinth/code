@@ -22,7 +22,10 @@
 		<!-- Instance-specific: Name field -->
 		<div v-if="ctx.flowType === 'instance'" class="flex flex-col gap-2">
 			<span class="font-semibold text-contrast">Name</span>
-			<StyledInput v-model="ctx.instanceName.value" placeholder="Enter instance name" />
+			<StyledInput
+				v-model="ctx.instanceName.value"
+				:placeholder="ctx.autoInstanceName.value || 'Enter instance name'"
+			/>
 		</div>
 
 		<!-- Loader chips -->
