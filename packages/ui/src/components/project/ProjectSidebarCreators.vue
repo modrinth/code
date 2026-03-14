@@ -14,7 +14,7 @@
 							{{ organization.name }}
 						</span>
 						<span class="text-secondary text-sm font-medium flex items-center gap-1"
-							><OrganizationIcon /> Organization</span
+							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
 						>
 					</div>
 				</AutoLink>
@@ -116,6 +116,10 @@ const messages = defineMessages({
 	owner: {
 		id: 'project.about.creators.owner',
 		defaultMessage: 'Project owner',
+	},
+	organization: {
+		id: 'project.about.creators.organization',
+		defaultMessage: 'Organization',
 	},
 })
 </script>

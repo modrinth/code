@@ -229,10 +229,6 @@ const messages = defineMessages({
 		id: 'create.project.create-project',
 		defaultMessage: 'Create project',
 	},
-	createServerProject: {
-		id: 'create.project.create-server-project',
-		defaultMessage: 'Create server',
-	},
 	visibilityPublic: {
 		id: 'create.project.visibility-public',
 		defaultMessage: 'Public',

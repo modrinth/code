@@ -169,11 +169,14 @@ import {
 	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
+	useVIntl,
 } from '@modrinth/ui'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const PING_TIMEOUT_MS = 5000
+
+const { formatMessage, locale } = useVIntl()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -262,15 +265,31 @@ if (projectV3.value) {
 	)
 }
 
-const regionOptions = SERVER_REGIONS.map((region) => ({
-	value: region.code,
-	label: region.name,
-}))
+const regionOptions = computed(() =>
+	Object.entries(SERVER_REGIONS)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
-const languageOptions = SERVER_LANGUAGES.map((language) => ({
-	value: language.code,
-	label: language.name,
-}))
+const languageOptions = computed(() =>
+	Object.entries(SERVER_LANGUAGES)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =
