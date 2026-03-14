@@ -10,7 +10,11 @@
 			<span class="text-lg font-extrabold text-contrast">{{
 				header ??
 				formatMessage(
-					isModpack.value ? messages.switchModpackVersionHeader : messages.updateVersionHeader,
+					isModpack.value
+						? messages.switchModpackVersionHeader
+						: switchMode
+							? messages.switchVersionHeader
+							: messages.updateVersionHeader,
 				)
 			}}</span>
 		</template>
@@ -213,9 +217,16 @@
 					>
 						<DownloadIcon />
 						{{
-							formatMessage(isDowngrade ? messages.downgradeToVersion : messages.updateToVersion, {
+							formatMessage(
+							isDowngrade
+								? messages.downgradeToVersion
+								: switchMode
+									? messages.switchToVersion
+									: messages.updateToVersion,
+							{
 								version: selectedVersion?.version_number ?? '...',
-							})
+							},
+						)
 						}}
 					</button>
 				</ButtonStyled>
@@ -303,6 +314,14 @@ const messages = defineMessages({
 		id: 'instances.updater-modal.update-to',
 		defaultMessage: 'Update to {version}',
 	},
+	switchVersionHeader: {
+		id: 'instances.updater-modal.header-switch',
+		defaultMessage: 'Switch version',
+	},
+	switchToVersion: {
+		id: 'instances.updater-modal.switch-to',
+		defaultMessage: 'Switch to {version}',
+	},
 	currentBadge: {
 		id: 'instances.updater-modal.badge.current',
 		defaultMessage: 'Current',
@@ -361,6 +380,7 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const searchQuery = ref('')
 const hideIncompatibleState = ref(true)
+const switchMode = ref(false)
 const selectedVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 // Store the initial version ID to select when versions become available
 const pendingInitialVersionId = ref<string | undefined>(undefined)
@@ -558,9 +578,10 @@ function handleCancel() {
 	hide()
 }
 
-function show(initialVersionId?: string) {
+function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
 	hideIncompatibleState.value = true
+	switchMode.value = options?.switchMode ?? false
 
 	debug('show() called', {
 		initialVersionId,

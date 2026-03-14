@@ -515,6 +515,9 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.copy-link": {
+    "defaultMessage": "Copy link"
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
   },
@@ -547,6 +550,9 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
+  },
+  "hosting.content.switch-version": {
+    "defaultMessage": "Switch version"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
