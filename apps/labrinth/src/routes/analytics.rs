@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::PgPool;
+use crate::database::models::DBProject;
 use crate::database::redis::RedisPool;
 use crate::env::ENV;
 use crate::models::analytics::{MinecraftServerPlay, PageView, Playtime};
@@ -9,8 +10,11 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
+use crate::util::http::HttpClient;
 use actix_web::{HttpRequest, HttpResponse};
 use actix_web::{post, web};
+use eyre::eyre;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
@@ -233,10 +237,18 @@ async fn playtime_ingest(
     Ok(HttpResponse::NoContent().finish())
 }
 
+#[derive(Debug, Deserialize)]
+struct MinecraftProfile {
+    id: Uuid,
+    name: String,
+}
+
 #[derive(Deserialize)]
 pub struct MinecraftJavaServerPlayInput {
     project_id: ProjectId,
-    minecraft_uuid: Uuid,
+    username: Option<String>,
+    server_id: Option<String>,
+    minecraft_uuid: Option<Uuid>,
 }
 
 pub const MINECRAFT_SERVER_PLAYS: &str = "minecraft_server_plays";
@@ -249,7 +261,8 @@ async fn minecraft_server_play_ingest(
     play_input: web::Json<MinecraftJavaServerPlayInput>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
+    http: web::Data<HttpClient>,
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -262,14 +275,86 @@ async fn minecraft_server_play_ingest(
     .ok();
 
     let project_id = play_input.project_id;
+
+    let project = DBProject::get(&project_id.to_string(), &**pool, &redis)
+        .await?
+        .ok_or(ApiError::NotFound)?;
+
+    if project.components.minecraft_server.is_none() {
+        return Err(ApiError::Request(eyre!(
+            "not a `minecraft_server` project"
+        )));
+    }
+
+    let minecraft_uuid = if let (Some(username), Some(server_id)) =
+        (&play_input.username, &play_input.server_id)
+    {
+        let has_joined = http
+            .get("https://sessionserver.mojang.com/session/minecraft/hasJoined")
+            .query(&[
+                ("username", username.as_str()),
+                ("serverId", server_id.as_str()),
+            ])
+            .send()
+            .await
+            .wrap_internal_err("failed to contact Mojang session server")?;
+
+        if has_joined.status() == reqwest::StatusCode::NO_CONTENT
+            || !has_joined.status().is_success()
+        {
+            return Err(ApiError::Request(eyre!(
+                "Minecraft session verification failed"
+            )));
+        }
+
+        let profile = has_joined
+            .json::<MinecraftProfile>()
+            .await
+            .wrap_internal_err("invalid Mojang session response")?;
+
+        if profile.name != *username {
+            return Err(ApiError::Request(eyre!(
+                "returned Mojang profile name does not match username"
+            )));
+        }
+
+        profile.id
+    } else {
+        play_input
+            .minecraft_uuid
+            .wrap_request_err("missing `minecraft_uuid`")?
+    };
+
+    let conn_info = req.connection_info().peer_addr().map(|x| x.to_string());
+    let headers = req
+        .headers()
+        .into_iter()
+        .map(|(key, val)| {
+            (
+                key.to_string().to_lowercase(),
+                val.to_str().unwrap_or_default().to_string(),
+            )
+        })
+        .collect::<HashMap<String, String>>();
+
+    let ip = crate::util::ip::convert_to_ip_v6(
+        if let Some(header) = headers.get("cf-connecting-ip") {
+            header
+        } else {
+            conn_info.as_deref().unwrap_or_default()
+        },
+    )
+    .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
+
     let row = MinecraftServerPlay {
         recorded: get_current_tenths_of_ms(),
         user_id: user.map(|u| u.id.0).unwrap_or(0),
         project_id: project_id.0,
-        minecraft_uuid: play_input.minecraft_uuid,
+        minecraft_uuid,
+        ip,
     };
 
     analytics_queue.add_minecraft_server_play(row);
 
-    Ok(HttpResponse::NoContent().finish())
+    Ok(())
 }

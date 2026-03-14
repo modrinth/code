@@ -1,10 +1,17 @@
 {
 	"articles": [
 		{
+			"title": "Content Management Overhaul",
+			"summary": "Overhauled content management for both Modrinth Hosting servers and Modrinth App instances.",
+			"thumbnail": "https://modrinth.com/news/article/content-management-overhaul/thumbnail.webp",
+			"date": "2026-03-13T20:30:00.000Z",
+			"link": "https://modrinth.com/news/article/content-management-overhaul"
+		},
+		{
 			"title": "Introducing Server Projects",
 			"summary": "A new project type made for seamless modded multiplayer on Modrinth.",
 			"thumbnail": "https://modrinth.com/news/article/introducing-server-projects/thumbnail.webp",
-			"date": "2026-03-02T15:00:00.000Z",
+			"date": "2026-03-04T01:30:00.000Z",
 			"link": "https://modrinth.com/news/article/introducing-server-projects"
 		},
 		{

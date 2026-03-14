@@ -656,7 +656,7 @@ impl AutomatedModerationQueue {
                                 )
                                     .await?;
 
-                                if mod_messages.should_reject(first_time) {
+							if mod_messages.should_reject(first_time) && !is_server_project {
                                     ThreadMessageBuilder {
                                         author_id: Some(database::models::DBUserId(AUTOMOD_ID)),
                                         body: MessageBody::StatusChange {

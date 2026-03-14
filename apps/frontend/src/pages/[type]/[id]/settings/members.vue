@@ -1,11 +1,22 @@
 <template>
 	<div>
+		<ConfirmTransferProjectModal
+			v-if="transferData && project"
+			ref="transferModal"
+			:project="{ name: project.title, icon_url: project.icon_url }"
+			:current-owner="{
+				avatar_url: currentMember?.avatar_url,
+				username: currentMember?.user?.username ?? '',
+				role: currentMember?.role ?? 'Owner',
+			}"
+			:transfer-to="transferData.target"
+			:on-confirm="transferData.onConfirm"
+		/>
 		<ConfirmModal
 			ref="modal_remove"
 			title="Are you sure you want to remove this project from the organization?"
 			description="If you proceed, this project will no longer be managed by the organization."
 			proceed-label="Remove"
-			:noblur="!(cosmetics?.advancedRendering ?? true)"
 			@proceed="onRemoveFromOrg"
 		/>
 		<Card>
@@ -129,10 +140,11 @@
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -233,7 +245,7 @@
 					<button
 						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
 						class="iconified-button"
-						@click="transferOwnership(index)"
+						@click="openTransferModal(index, $event)"
 					>
 						<TransferIcon />
 						Transfer ownership
@@ -298,7 +310,11 @@
 					:options="organizations || []"
 					:disabled="!currentMember?.is_owner || organizations?.length === 0"
 				/>
-				<button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
+				<button
+					class="btn btn-primary"
+					:disabled="!selectedOrganization"
+					@click="openTransferToOrgModal($event)"
+				>
 					<CheckIcon />
 					Transfer management
 				</button>
@@ -401,10 +417,11 @@
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
 								!allOrgMembers[index].override
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allOrgMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -552,18 +569,21 @@ import {
 } from '@modrinth/ui'
 import { Multiselect } from 'vue-multiselect'
 
+import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectV3,
 	organization,
 	allMembers,
 	currentMember,
 	invalidate,
 } = injectProjectPageContext()
 
-const cosmetics = useCosmetics()
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
 const auth = await useAuth()
 
 const allTeamMembers = ref([])
@@ -601,6 +621,8 @@ initMembers()
 const currentUsername = ref('')
 const openTeamMembers = ref([])
 const selectedOrganization = ref(null)
+const transferData = ref(null)
+const transferModal = ref(null)
 
 const { data: organizations } = useAsyncData('organizations', () => {
 	return useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
@@ -753,6 +775,34 @@ const updateTeamMember = async (index) => {
 	}
 
 	stopLoading()
+}
+
+const openTransferModal = (index, e) => {
+	transferData.value = {
+		target: {
+			avatar_url: allTeamMembers.value[index]?.avatar_url,
+			username: allTeamMembers.value[index]?.user?.username,
+			role: allTeamMembers.value[index]?.role || 'Member',
+		},
+		onConfirm: () => transferOwnership(index),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
+}
+
+const openTransferToOrgModal = (e) => {
+	if (!selectedOrganization.value) return
+	transferData.value = {
+		target: {
+			avatar_url: selectedOrganization.value.icon_url,
+			name: selectedOrganization.value.name,
+		},
+		onConfirm: () => onAddToOrg(),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
 }
 
 const transferOwnership = async (index) => {

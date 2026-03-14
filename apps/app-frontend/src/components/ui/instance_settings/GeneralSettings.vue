@@ -15,7 +15,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, type Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
 
@@ -100,7 +100,8 @@ const addCategory = () => {
 watch(
 	[title, groups, groups],
 	async () => {
-		await edit(props.instance.path, editProfileObject.value)
+		if (removing.value) return
+		await edit(props.instance.path, editProfileObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -108,8 +109,7 @@ watch(
 const removing = ref(false)
 async function removeProfile() {
 	removing.value = true
-	await remove(props.instance.path).catch(handleError)
-	removing.value = false
+	const path = props.instance.path
 
 	trackEvent('InstanceRemove', {
 		loader: props.instance.loader,
@@ -117,6 +117,7 @@ async function removeProfile() {
 	})
 
 	await router.push({ path: '/' })
+	await remove(path).catch(handleError)
 }
 
 const messages = defineMessages({
@@ -194,15 +195,7 @@ const messages = defineMessages({
 </script>
 
 <template>
-	<ConfirmModalWrapper
-		ref="deleteConfirmModal"
-		title="Are you sure you want to delete this instance?"
-		description="If you proceed, all data for your instance will be permanently erased, including your worlds. You will not be able to recover it."
-		:has-to-type="false"
-		proceed-label="Delete"
-		:show-ad-on-close="false"
-		@proceed="removeProfile"
-	/>
+	<ConfirmDeleteInstanceModal ref="deleteConfirmModal" @delete="removeProfile" />
 	<div class="block">
 		<div class="float-end ml-4 relative group">
 			<OverflowMenu

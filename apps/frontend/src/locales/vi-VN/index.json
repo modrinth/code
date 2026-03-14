@@ -1067,6 +1067,9 @@
   "frog.title": {
     "message": "Ếch"
   },
+  "hosting-marketing.available-locations": {
+    "message": "Có sẵn ở Bắc Mỹ, Châu Âu và Đông Nam Á để phủ sóng rộng rãi."
+  },
   "hosting-marketing.billing.monthly": {
     "message": "Thanh toán hàng tháng"
   },
@@ -1084,6 +1087,9 @@
   },
   "hosting-marketing.faq.burst-threads": {
     "message": "\n\n"
+  },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "Khi máy chủ của bạn bị tải nặng, chúng tôi tạm thời cấp cho máy chủ quyền truy cập vào các luồng CPU bổ sung để giúp giảm thiểu độ trễ tăng đột biến và mất ổn định. Điều này giúp ngăn TPS xuống dưới 20, đảm bảo trải nghiệm mượt mà nhất có thể. Vì các luồng CPU bổ sung đó chỉ có sẵn trong thời gian tải cao nên chúng có thể không hiển thị trong báo cáo Spark hoặc các công cụ cấu hình khác."
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Những loại CPU nào được sử dụng trên Modrinth?"
@@ -1109,11 +1115,23 @@
   "hosting-marketing.faq.how-fast": {
     "message": "Máy chủ Modrinth nhanh cỡ nào?"
   },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "Máy chủ Modrinth Hosting được lưu trữ trên phần cứng hiệu suất cao rất hiện đại, nhưng thật khó để nói chính xác điều đó sẽ chuyển thành tốc độ máy chủ của bạn sẽ chạy như thế nào vì có rất nhiều yếu tố ảnh hưởng đến nó, chẳng hạn như mod, gói dữ liệu hoặc plugin bạn đang chạy trên máy chủ của mình và thậm chí cả hành vi của người dùng."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Hầu hết các vấn đề về hiệu suất phát sinh có xu hướng là lỗi của modpack, mod, gói dữ liệu hoặc plugin không được tối ưu hóa khiến máy chủ bị lag. Vì các máy chủ của chúng tôi rất cao cấp, bạn sẽ không gặp nhiều rắc rối miễn là bạn chọn một gói phù hợp cho nội dung bạn đang chạy trên máy chủ."
+  },
   "hosting-marketing.faq.increase-storage": {
     "message": "Tôi có thể tăng dung lượng lưu trữ trên máy chủ của tôi được không?"
   },
+  "hosting-marketing.faq.increase-storage.answer": {
+    "message": "Có, bạn có thể tăng dung lượng lưu trữ trên máy chủ của mình mà không phải trả thêm phí. Nếu bạn cần thêm dung lượng lưu trữ, hãy liên hệ với Bộ phận hỗ trợ của Modrinth."
+  },
   "hosting-marketing.faq.location": {
     "message": "Những máy chủ Modrinth Hosting được nằm ở đâu? Tôi có thể chọn khu vực không?"
+  },
+  "hosting-marketing.faq.location.answer": {
+    "message": "Chúng tôi có các máy chủ có sẵn ở Bắc Mỹ, Châu Âu và Đông Nam Á tại thời điểm này mà bạn có thể chọn khi mua. Nhiều khu vực sẽ đến trong tương lai! Nếu bạn muốn chuyển đổi khu vực của mình, vui lòng liên hệ với bộ phận hỗ trợ."
   },
   "hosting-marketing.faq.versions-loaders": {
     "message": "Những phiên bản Minecraft và modloader nào có thể được sử dụng?"
@@ -1136,11 +1154,32 @@
   "hosting-marketing.hero.button.start-your-server": {
     "message": "Khởi động máy chủ của bạn"
   },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "Lưu trữ máy chủ tiếp theo của bạn với Modrinth Hosting"
+  },
+  "hosting-marketing.hero.hosting-description": {
+    "message": "Modrinth Hosting là cách đơn giản nhất để lưu trữ máy chủ Minecraft: Phiên bản Java của bạn. Cài đặt và chơi liền mạch các bản mod và gói mod yêu thích của bạn, tất cả đều có trong nền tảng Modrinth."
+  },
+  "hosting-marketing.included.advanced-networking": {
+    "message": "Quản lý mạng nâng cao"
+  },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "Thêm tên miền của bạn vào máy chủ của bạn, lên đến 15 cổng cho mod cần nó, và hơn thế nữa."
+  },
   "hosting-marketing.included.backups-included": {
     "message": "Bao gồm sao lưu"
   },
+  "hosting-marketing.included.backups-included.description": {
+    "message": "Mỗi máy chủ đi kèm với 15 bản sao lưu được lưu trữ an toàn bên ngoài."
+  },
   "hosting-marketing.included.custom-url": {
     "message": "URL riêng"
+  },
+  "hosting-marketing.included.custom-url.description": {
+    "message": "Chia sẻ máy chủ của bạn thông qua URL tùy chỉnh <contrast>modrinth.gg</contrast>."
+  },
+  "hosting-marketing.included.description": {
+    "message": "Đi kèm với mỗi máy chủ là một bộ tính năng được thiết kế để cung cấp trải nghiệm lưu trữ mà chỉ Modrinth mới có thể cung cấp."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Trình duyệt tập tin dễ sử dụng"
@@ -1673,9 +1712,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Số tài khoản"
   },
-  "muralpay.field.branch-code": {
-    "message": "Mã chi nhánh"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1765,9 +1801,6 @@
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "Nhập số tài khoản"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Nhập mã chi nhánh"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Nhập mã CLABE gồm 18 chữ số"
@@ -2336,6 +2369,9 @@
   "scopes.analytics.label": {
     "message": "Đọc phân tích"
   },
+  "scopes.category.notifications": {
+    "message": "Thông báo"
+  },
   "scopes.collectionCreate.description": {
     "message": "Tạo bộ sưu tập"
   },
@@ -2629,6 +2665,15 @@
   },
   "servers.plan.small.name": {
     "message": "Nhỏ"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Có lỗi xảy ra"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Biểu tượng dự án của bạn đã được cập nhật."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Biểu tượng đã được cập nhật"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Hủy gói đăng ký"
