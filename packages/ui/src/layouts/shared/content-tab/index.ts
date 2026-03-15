@@ -9,7 +9,7 @@ export { default as ConfirmModpackUpdateModal } from './components/modals/Confir
 export { default as ConfirmReinstallModal } from './components/modals/ConfirmReinstallModal.vue'
 export { default as ConfirmRepairModal } from './components/modals/ConfirmRepairModal.vue'
 export { default as ConfirmUnlinkModal } from './components/modals/ConfirmUnlinkModal.vue'
-export type { ContentInstallInstance } from './components/modals/ContentInstallModal.vue'
+export type { ContentInstallInstance, ContentInstallProjectInfo, ContentInstallProjectOwner } from './components/modals/ContentInstallModal.vue'
 export { default as ContentInstallModal } from './components/modals/ContentInstallModal.vue'
 export { default as ContentUpdaterModal } from './components/modals/ContentUpdaterModal.vue'
 export type { ModpackContentModalState } from './components/modals/ModpackContentModal.vue'
