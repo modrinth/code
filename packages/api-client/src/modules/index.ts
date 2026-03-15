@@ -12,6 +12,7 @@ import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
+import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthServerPingInternalModule } from './labrinth/server-ping/internal'
@@ -47,6 +48,7 @@ export const MODULE_REGISTRY = {
 	kyros_files_v0: KyrosFilesV0Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
+	labrinth_organizations_v3: LabrinthOrganizationsV3Module,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_server_ping_internal: LabrinthServerPingInternalModule,

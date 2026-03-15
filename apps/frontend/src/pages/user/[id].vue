@@ -282,7 +282,7 @@
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" replace />
 				</div>
-				<div v-if="projects.length > 0">
+				<div v-if="projects?.length > 0">
 					<ProjectCardList
 						v-if="route.params.projectType !== 'collections'"
 						:layout="cosmetics.searchDisplayMode.user"
@@ -331,7 +331,7 @@
 				<div
 					v-else-if="
 						(route.params.projectType && route.params.projectType !== 'collections') ||
-						(!route.params.projectType && collections.length === 0)
+						(!route.params.projectType && collections?.length === 0)
 					"
 					class="error"
 				>
@@ -353,7 +353,7 @@
 					class="collections-grid"
 				>
 					<nuxt-link
-						v-for="collection in collections.sort(
+						v-for="collection in (collections ?? []).sort(
 							(a, b) => new Date(b.created) - new Date(a.created),
 						)"
 						:key="collection.id"
@@ -404,7 +404,7 @@
 					</nuxt-link>
 				</div>
 				<div
-					v-if="route.params.projectType === 'collections' && collections.length === 0"
+					v-if="route.params.projectType === 'collections' && collections?.length === 0"
 					class="error"
 				>
 					<UpToDate class="icon" />
@@ -425,7 +425,7 @@
 				</div>
 			</div>
 			<div class="normal-page__sidebar">
-				<div v-if="organizations.length > 0" class="card flex-card">
+				<div v-if="organizations?.length > 0" class="card flex-card">
 					<h2 class="text-lg text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
@@ -492,6 +492,7 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
@@ -506,6 +507,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
@@ -527,6 +529,7 @@ const auth = await useAuth()
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const config = useRuntimeConfig()
+const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
@@ -679,74 +682,81 @@ const messages = defineMessages({
 	},
 })
 
-let user, projects, organizations, collections, refreshUser
-try {
-	;[
-		{ data: user, refresh: refreshUser },
-		{ data: projects },
-		{ data: organizations },
-		{ data: collections },
-	] = await Promise.all([
-		useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
-		useAsyncData(
-			`user/${route.params.id}/projects`,
-			() => useBaseFetch(`user/${route.params.id}/projects`),
-			{
-				transform: (projects) => {
-					for (const project of projects) {
-						project.categories = project.categories.concat(project.loaders)
-						project.project_type = data.$getProjectTypeForUrl(
-							project.project_type,
-							project.categories,
-							tags.value,
-						)
-					}
+const client = injectModrinthClient()
 
-					return projects
-				},
-			},
-		),
-		useAsyncData(`user/${route.params.id}/organizations`, () =>
-			useBaseFetch(`user/${route.params.id}/organizations`, {
-				apiVersion: 3,
-			}),
-		),
-		useAsyncData(`user/${route.params.id}/collections`, () =>
-			useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
-		),
-	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+const { data: user, error: userError } = useQuery({
+	queryKey: computed(() => ['user', route.params.id]),
+	queryFn: () => client.labrinth.users_v2.get(route.params.id),
+})
+
+watch(
+	userError,
+	(error) => {
+		if (error) {
+			const status = error.statusCode ?? error.status ?? 404
+			showError({
+				fatal: true,
+				statusCode: status,
+				message: formatMessage(messages.userNotFoundError),
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+const { data: projects } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'projects']),
+	queryFn: async () => {
+		const projects = await useBaseFetch(`user/${route.params.id}/projects`)
+		for (const project of projects) {
+			project.categories = project.categories.concat(project.loaders)
+			project.project_type = data.$getProjectTypeForUrl(
+				project.project_type,
+				project.categories,
+				tags.value,
+			)
+		}
+		return projects
+	},
+})
+
+const { data: organizations } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'organizations']),
+	queryFn: () =>
+		useBaseFetch(`user/${route.params.id}/organizations`, {
+			apiVersion: 3,
+		}),
+})
+
+const { data: collections } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'collections']),
+	queryFn: () => useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
+})
+
+watch(
+	user,
+	(userData) => {
+		if (userData && userData.username !== route.params.id) {
+			navigateTo(`/user/${userData.username}`, { redirectCode: 301 })
+		}
+	},
+	{ immediate: true },
+)
 
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
-
-if (user.value.username !== route.params.id) {
-	await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 })
-}
-
-const title = computed(() => `${user.value.username} - Modrinth`)
+const title = computed(() => (user.value ? `${user.value.username} - Modrinth` : 'Modrinth'))
 const description = computed(() =>
-	user.value.bio
+	user.value?.bio
 		? formatMessage(messages.profileMetaDescriptionWithBio, {
 				bio: user.value.bio,
 				username: user.value.username,
 			})
-		: formatMessage(messages.profileMetaDescription, { username: user.value.username }),
+		: user.value
+			? formatMessage(messages.profileMetaDescription, { username: user.value.username })
+			: '',
 )
 
 useSeoMeta({
@@ -754,7 +764,7 @@ useSeoMeta({
 	description: () => description.value,
 	ogTitle: () => title.value,
 	ogDescription: () => description.value,
-	ogImage: () => user.value.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
+	ogImage: () => user.value?.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
 })
 
 const projectTypes = computed(() => {
@@ -838,7 +848,7 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
-const isAffiliate = computed(() => user.value.badges & UserBadge.AFFILIATE)
+const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
 
 async function toggleAffiliate(id) {
@@ -846,7 +856,7 @@ async function toggleAffiliate(id) {
 		method: 'PATCH',
 		body: { badges: user.value.badges ^ (1 << 7) },
 	})
-	refreshUser()
+	queryClient.invalidateQueries({ queryKey: ['user', route.params.id] })
 }
 
 const navLinks = computed(() => [
@@ -865,7 +875,7 @@ const navLinks = computed(() => [
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
 
-const selectedRole = ref(user.value.role)
+const selectedRole = ref(user.value?.role)
 const isSavingRole = ref(false)
 
 const roleOptions = [

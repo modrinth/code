@@ -144,7 +144,7 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
@@ -207,13 +207,16 @@ if (auth.value.user) {
 
 const captcha = ref()
 
-const { data: globals } = await useAsyncData('auth-globals', async () => {
-	try {
-		return await useBaseFetch('globals', { internal: true })
-	} catch (err) {
-		console.error('Error fetching globals:', err)
-		return { captcha_enabled: true }
-	}
+const { data: globals } = useQuery({
+	queryKey: ['auth-globals'],
+	queryFn: async () => {
+		try {
+			return await useBaseFetch('globals', { internal: true })
+		} catch (err) {
+			console.error('Error fetching globals:', err)
+			return { captcha_enabled: true }
+		}
+	},
 })
 
 const email = ref('')

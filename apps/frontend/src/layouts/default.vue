@@ -739,6 +739,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -776,9 +777,10 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
-	if (!auth.value.user) return null
-	return useBaseFetch('payout/balance', { apiVersion: 3 })
+const { data: payoutBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => useBaseFetch('payout/balance', { apiVersion: 3 }),
+	enabled: computed(() => !!auth.value.user),
 })
 
 const showTaxComplianceBanner = computed(() => {

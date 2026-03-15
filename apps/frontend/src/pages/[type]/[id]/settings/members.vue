@@ -567,9 +567,11 @@ import {
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { Multiselect } from 'vue-multiselect'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
 const { addNotification } = injectNotificationManager()
@@ -624,10 +626,13 @@ const selectedOrganization = ref(null)
 const transferData = ref(null)
 const transferModal = ref(null)
 
-const { data: organizations } = useAsyncData('organizations', () => {
-	return useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
-		apiVersion: 3,
-	})
+const { data: organizations } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
+	queryFn: () =>
+		useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
+			apiVersion: 3,
+		}),
+	enabled: computed(() => !!auth.value?.user?.id),
 })
 
 const UPLOAD_VERSION = 1 << 0

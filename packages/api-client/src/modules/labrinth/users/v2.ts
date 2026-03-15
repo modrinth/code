@@ -7,6 +7,47 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a user by ID or username
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to the user data
+	 *
+	 * @example
+	 * ```typescript
+	 * const user = await client.labrinth.users_v2.get('my_user')
+	 * ```
+	 */
+	public async get(idOrUsername: string): Promise<Labrinth.Users.v2.User> {
+		return this.client.request<Labrinth.Users.v2.User>(`/user/${idOrUsername}`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
+	}
+
+	/**
+	 * Get multiple users by their IDs
+	 *
+	 * @param ids - Array of user IDs
+	 * @returns Promise resolving to an array of users
+	 *
+	 * @example
+	 * ```typescript
+	 * const users = await client.labrinth.users_v2.getMultiple(['id1', 'id2'])
+	 * ```
+	 */
+	public async getMultiple(ids: string[]): Promise<Labrinth.Users.v2.User[]> {
+		return this.client.request<Labrinth.Users.v2.User[]>(
+			`/users?ids=${encodeURIComponent(JSON.stringify(ids))}`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Get a user's projects
 	 *
 	 * @param idOrUsername - The user's ID or username

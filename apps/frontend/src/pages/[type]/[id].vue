@@ -1811,12 +1811,16 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organization } = useQuery({
+const { data: organizationRaw } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
+
+// When project is removed from org, enabled becomes false but TanStack keeps stale data.
+// Return null when the project no longer belongs to an organization.
+const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {

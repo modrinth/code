@@ -133,13 +133,13 @@ export function groupNotifications(notifications: PlatformNotification[]): Platf
 		const current = notifications[i]
 		const next = notifications[i + 1]
 		if (current.body && i < notifications.length - 1 && isSimilar(current, next)) {
-			current.grouped_notifs = [next]
+			const groupedNotif = { ...current, grouped_notifs: [next] }
 			let j = i + 2
 			while (j < notifications.length && isSimilar(current, notifications[j])) {
-				current.grouped_notifs.push(notifications[j])
+				groupedNotif.grouped_notifs.push(notifications[j])
 				j++
 			}
-			grouped.push(current)
+			grouped.push(groupedNotif)
 			i = j - 1
 		} else {
 			grouped.push(current)
