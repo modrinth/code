@@ -156,7 +156,6 @@ const {
 const news = ref([])
 const availableSurvey = ref(false)
 
-
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
 	offline.value = true
@@ -547,10 +546,16 @@ async function handleCommand(e) {
 	} else if (e.event === 'InstallVersion') {
 		const version = await get_version(e.id, 'must_revalidate').catch(handleError)
 		if (version) {
-			await contentInstall.install(version.project_id, version.id, null, 'URLConfirmModal', undefined, undefined, { showProjectInfo: true }).catch(handleError)
+			await contentInstall
+				.install(version.project_id, version.id, null, 'URLConfirmModal', undefined, undefined, {
+					showProjectInfo: true,
+				})
+				.catch(handleError)
 		}
 	} else {
-		await contentInstall.install(e.id, null, null, 'URLConfirmModal', undefined, undefined, { showProjectInfo: true }).catch(handleError)
+		await contentInstall
+			.install(e.id, null, null, 'URLConfirmModal', undefined, undefined, { showProjectInfo: true })
+			.catch(handleError)
 	}
 }
 
