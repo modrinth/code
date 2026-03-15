@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO users_notifications_preferences (\n                user_id, channel, notification_type, enabled\n            )\n            VALUES ($1, $2, $3, $4)\n            ON CONFLICT (COALESCE(user_id, -1), channel, notification_type)\n            DO UPDATE SET enabled = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "434f55e473f787e2b401195440e03fb132a2c6a37c6d040f51ccdd0feb44ee29"
+}
