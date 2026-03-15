@@ -46,10 +46,23 @@ export interface ServerInstallContext {
 	showAddServerToInstanceModal: (serverName: string, serverAddress: string) => void
 }
 
-export const [injectServerInstall, provideServerInstall] = createContext<ServerInstallContext>(
+let _serverInstallSingleton: ServerInstallContext | null = null
+
+const [_rawInjectServerInstall, provideServerInstall] = createContext<ServerInstallContext>(
 	'root',
 	'serverInstall',
 )
+
+export { provideServerInstall }
+
+export function injectServerInstall(): ServerInstallContext {
+	try {
+		return _rawInjectServerInstall()
+	} catch {
+		if (_serverInstallSingleton) return _serverInstallSingleton
+		throw new Error('ServerInstall context not available')
+	}
+}
 
 export function createServerInstall(opts: {
 	router: Router
@@ -345,7 +358,7 @@ export function createServerInstall(opts: {
 		}
 	}
 
-	return {
+	const context: ServerInstallContext = {
 		installingServerProjects,
 		startInstallingServer,
 		stopInstallingServer,
@@ -365,4 +378,7 @@ export function createServerInstall(opts: {
 			addServerToInstanceModalRef?.show(serverName, serverAddress)
 		},
 	}
+
+	_serverInstallSingleton = context
+	return context
 }
