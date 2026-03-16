@@ -1002,7 +1002,7 @@
     "defaultMessage": "Singleplayer"
   },
   "label.sort-by": {
-    "defaultMessage": "Sort by"
+    "defaultMessage": "Sort by: "
   },
   "label.success": {
     "defaultMessage": "Success"
