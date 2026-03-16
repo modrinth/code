@@ -44,11 +44,11 @@
 						v-tooltip="
 							isModpack
 								? 'Modpack loaders cannot be edited'
-								: isResourcePack
-									? 'Resource pack loaders cannot be edited'
+								: isLoaderFreeProject
+									? loaderFreeProjectTooltip
 									: undefined
 						"
-						:disabled="isModpack || isResourcePack"
+						:disabled="isModpack || isLoaderFreeProject"
 						@click="editLoaders"
 					>
 						<EditIcon />
@@ -230,11 +230,16 @@ const { projectV2 } = injectProjectPageContext()
 const generatedState = useGeneratedState()
 const loaders = computed(() => generatedState.value.loaders)
 const isModpack = computed(() => projectType.value === 'modpack')
-const isResourcePack = computed(
+const loaderFreeProjectTypes = new Set(['resourcepack', 'map'])
+const isLoaderFreeProject = computed(
 	() =>
-		projectType.value === 'resourcepack' &&
-		(projectV2.value?.project_type === 'resourcepack' ||
-			projectV2.value?.project_type === 'project'),
+		loaderFreeProjectTypes.has(projectType.value ?? '') &&
+		loaderFreeProjectTypes.has(projectV2.value?.project_type ?? 'project'),
+)
+const loaderFreeProjectTooltip = computed(() =>
+	projectType.value === 'map'
+		? 'Map loaders cannot be edited'
+		: 'Resource pack loaders cannot be edited',
 )
 
 const draftVersionLoaders = computed(() =>

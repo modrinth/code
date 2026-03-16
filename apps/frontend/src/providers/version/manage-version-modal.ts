@@ -16,6 +16,7 @@ import type { ComponentExposed } from 'vue-component-type-helpers'
 
 import { useGeneratedState } from '~/composables/generated'
 import { inferVersionInfo } from '~/helpers/infer'
+import { isLikelyWorldSave } from '~/helpers/infer/map-parsers'
 
 import { stageConfigs } from './stages'
 
@@ -201,6 +202,9 @@ export function createManageVersionContext(
 		if (loaders.some((loader) => PROJECT_TYPE_LOADERS.datapack.includes(loader))) {
 			return 'datapack'
 		}
+		if (inferredVersionData.value?.project_type === 'map') {
+			return 'map'
+		}
 		if (loaders.length === 1 && loaders[0] === 'minecraft') {
 			return 'resourcepack'
 		}
@@ -340,6 +344,20 @@ export function createManageVersionContext(
 		}
 	}
 
+	async function checkIsMap(file: File): Promise<boolean> {
+		try {
+			const name = file.name.toLowerCase()
+			if (!name.endsWith('.zip')) return false
+
+			const zip = await JSZip.loadAsync(file)
+			const entries = Object.keys(zip.files).map((f) => f.toLowerCase())
+
+			return isLikelyWorldSave(entries)
+		} catch {
+			return false
+		}
+	}
+
 	async function checkRedundantWrappedZip(file: File): Promise<boolean> {
 		const fileName = file.name.toLowerCase()
 		if (!fileName.endsWith('.zip')) return false
@@ -362,7 +380,7 @@ export function createManageVersionContext(
 		const hasAssets = hasDir(innerEntries, 'assets')
 		const hasData = hasDir(innerEntries, 'data')
 
-		return hasPackMcmeta && (hasAssets || hasData)
+		return (hasPackMcmeta && (hasAssets || hasData)) || isLikelyWorldSave(innerEntries)
 	}
 
 	async function rejectOnRedundantWrappedZip(file: File): Promise<boolean> {
@@ -419,6 +437,11 @@ export function createManageVersionContext(
 
 		if (noLoaders && (await checkIsDataPack(file))) {
 			inferred.loaders = ['datapack']
+		}
+
+		if (noLoaders && project.project_type === 'map' && (await checkIsMap(file))) {
+			inferred.loaders = ['minecraft']
+			inferred.project_type = 'map'
 		}
 
 		inferredVersionData.value = inferred
