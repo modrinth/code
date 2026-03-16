@@ -643,7 +643,7 @@ onUnmounted(() => {
 		margin-bottom: 0;
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
-		min-height: 10rem;
+		aspect-ratio: 2 / 1.1;
 		object-fit: cover;
 	}
 
