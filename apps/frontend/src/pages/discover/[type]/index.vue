@@ -36,6 +36,7 @@ import {
 	StyledInput,
 	useDebugLogger,
 	useSearch,
+	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString, cycleValue } from '@modrinth/utils'
@@ -87,17 +88,17 @@ const handleProjectMouseEnter = (result: Labrinth.Search.v2.ResultSearchProject)
 	prefetchTimeout.start()
 }
 
-const _handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
+const handleServerProjectMouseEnter = (result: Labrinth.Search.v3.ResultSearchProject) => {
 	const slug = result.slug || result.project_id
 
 	prefetchTimeout = useTimeoutFn(
 		async () => {
-			queryClient.prefetchQuery(projectQueryOptions.v2(slug, modrinthClient))
-			queryClient.prefetchQuery(projectQueryOptions.v3(slug, modrinthClient))
+			queryClient.prefetchQuery(projectQueryOptions.v2(slug, client))
+			queryClient.prefetchQuery(projectQueryOptions.v3(slug, client))
 
 			const content = result.minecraft_java_server?.content
 			if (content?.kind === 'modpack' && content.version_id) {
-				queryClient.prefetchQuery(versionQueryOptions.v3(content.version_id, modrinthClient))
+				queryClient.prefetchQuery(versionQueryOptions.v3(content.version_id, client))
 			}
 		},
 		HOVER_DURATION_TO_PREFETCH_MS,
@@ -113,6 +114,8 @@ const handleProjectHoverEnd = () => {
 const currentType = computed(() =>
 	queryAsStringOrEmpty(route.params.type).replaceAll(/^\/|s\/?$/g, ''),
 )
+
+const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
@@ -330,6 +333,36 @@ const {
 } = useSearch(projectTypes, tags, serverFilters)
 debug('useSearch initialized, requestParams:', requestParams.value)
 
+const {
+	serverCurrentSortType,
+	serverCurrentFilters,
+	serverToggledGroups,
+	serverSortTypes,
+	serverFilterTypes,
+	serverRequestParams,
+	createServerPageParams,
+} = useServerSearch({ tags, query, maxResults, currentPage })
+
+const effectiveRequestParams = computed(() =>
+	isServerType.value ? serverRequestParams.value : requestParams.value,
+)
+const effectiveSortTypes = computed(() =>
+	isServerType.value ? (serverSortTypes as readonly SortType[]) : sortTypes,
+)
+const effectiveCurrentSortType = computed({
+	get: () => (isServerType.value ? serverCurrentSortType.value : currentSortType.value),
+	set: (v: SortType) => {
+		if (isServerType.value) serverCurrentSortType.value = v
+		else currentSortType.value = v
+	},
+})
+const effectiveCurrentFilters = computed({
+	get: () => (isServerType.value ? serverCurrentFilters.value : currentFilters.value),
+	set: (v) => {
+		if (isServerType.value) serverCurrentFilters.value = v
+		else currentFilters.value = v
+	},
+})
 const selectedFilterTags = computed(() =>
 	currentFilters.value
 		.filter(
@@ -458,6 +491,22 @@ async function serverInstall(project: InstallableSearchResult) {
 	project.installing = false
 }
 
+function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject) {
+	const content = project.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick:
+				project_id !== project.project_id ? () => navigateTo(`/project/${project_id}`) : undefined,
+			showCustomModpackTooltip: project_id === project.project_id,
+		}
+	}
+	return undefined
+}
+
 const noLoad = ref(false)
 const {
 	data: rawResults,
@@ -466,19 +515,31 @@ const {
 } = useLazyFetch(
 	() => {
 		const config = useRuntimeConfig()
-		const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
+		let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
-		const url = `${base}search${requestParams.value}`
-		debug('useLazyFetch URL:', url)
-		return url
+		if (currentType.value === 'server') {
+			base = base.replace(/\/v\d\//, '/v3/').replace(/\/v\d$/, '/v3')
+		}
+
+		return `${base}search${effectiveRequestParams.value}`
 	},
 	{
 		headers: computed(() => withLabrinthCanaryHeader()),
+
 		watch: false,
-		transform: (hits) => {
-			debug('useLazyFetch transform, hits:', (hits as any)?.total_hits)
+		transform: (
+			hits: Labrinth.Search.v2.SearchResults | Labrinth.Search.v3.SearchResults,
+		): Labrinth.Search.v2.SearchResults => {
 			noLoad.value = false
-			return hits as Labrinth.Search.v2.SearchResults
+			if ('hits_per_page' in hits) {
+				return {
+					hits: hits.hits as unknown as Labrinth.Search.v2.ResultSearchProject[],
+					total_hits: hits.total_hits,
+					limit: hits.hits_per_page,
+					offset: (hits.page - 1) * hits.hits_per_page,
+				}
+			}
+			return hits
 		},
 	},
 )
@@ -487,9 +548,18 @@ watch(searchLoading, (val) => debug('searchLoading:', val))
 watch(rawResults, (val) => debug('rawResults changed, total_hits:', val?.total_hits))
 
 const results = computed(() => rawResults.value)
-const pageCount = computed(() =>
-	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
+const serverResults = computed(() =>
+	isServerType.value ? (results.value as Labrinth.Search.v3.SearchResults | null) : null,
 )
+const projectResults = computed(() =>
+	isServerType.value ? null : (results.value as Labrinth.Search.v2.SearchResults | null),
+)
+const pageCount = computed(() => {
+	if (!results.value) return 1
+	// @ts-expect-error
+	const perPage = 'limit' in results.value ? results.value.limit : results.value.hits_per_page
+	return Math.ceil(results.value.total_hits / perPage)
+})
 
 function scrollToTop(behavior: ScrollBehavior = 'smooth') {
 	window.scrollTo({ top: 0, behavior })
@@ -535,14 +605,14 @@ function updateSearchResults(pageNumber: number = 1, resetScroll = true) {
 
 		const params = {
 			...persistentParams,
-			...createPageParams(),
+			...(isServerType.value ? createServerPageParams() : createPageParams()),
 		}
 
 		router.replace({ path: route.path, query: params })
 	}
 }
 
-watch([currentFilters], () => {
+watch([effectiveCurrentFilters], () => {
 	updateSearchResults(1, false)
 })
 
@@ -734,41 +804,73 @@ useSeoMeta({
 					@update:model-value="updateSearchResults()"
 				/>
 			</div>
-			<SearchSidebarFilter
-				v-for="filter in filters.filter((f) => f.display !== 'none')"
-				:key="`filter-${filter.id}`"
-				v-model:selected-filters="currentFilters"
-				v-model:toggled-groups="toggledGroups"
-				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-filters="serverFilters"
-				:filter-type="filter"
-				:class="
-					filtersMenuOpen
-						? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-						: 'card-shadow rounded-2xl bg-bg-raised'
-				"
-				button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-				content-class="mb-4 mx-3"
-				inner-panel-class="p-1"
-				:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
-			>
-				<template #header>
-					<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-				</template>
-				<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
-					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
-						<InfoIcon class="mt-1 size-4" />
-						<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
-					</div>
-				</template>
-				<template #locked-game_version>
-					{{ formatMessage(messages.gameVersionProvidedByServer) }}
-				</template>
-				<template #locked-mod_loader>
-					{{ formatMessage(messages.modLoaderProvidedByServer) }}
-				</template>
-				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
-			</SearchSidebarFilter>
+			<template v-if="isServerType">
+				<SearchSidebarFilter
+					v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
+					:key="`server-filter-${filterType.id}`"
+					v-model:selected-filters="serverCurrentFilters"
+					v-model:toggled-groups="serverToggledGroups"
+					:provided-filters="[]"
+					:filter-type="filterType"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="
+						![
+							'server_category_minecraft_server_meta',
+							'server_category_minecraft_server_community',
+							'server_game_version',
+							'server_status',
+						].includes(filterType.id)
+					"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filterType.formatted_name }}</h3>
+					</template>
+				</SearchSidebarFilter>
+			</template>
+			<template v-else>
+				<SearchSidebarFilter
+					v-for="filter in filters.filter((f) => f.display !== 'none')"
+					:key="`filter-${filter.id}`"
+					v-model:selected-filters="currentFilters"
+					v-model:toggled-groups="toggledGroups"
+					v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+					:provided-filters="serverFilters"
+					:filter-type="filter"
+					:class="
+						filtersMenuOpen
+							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+							: 'card-shadow rounded-2xl bg-bg-raised'
+					"
+					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
+					content-class="mb-4 mx-3"
+					inner-panel-class="p-1"
+					:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
+				>
+					<template #header>
+						<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
+					</template>
+					<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
+						<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+							<InfoIcon class="mt-1 size-4" />
+							<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
+						</div>
+					</template>
+					<template #locked-game_version>
+						{{ formatMessage(messages.gameVersionProvidedByServer) }}
+					</template>
+					<template #locked-mod_loader>
+						{{ formatMessage(messages.modLoaderProvidedByServer) }}
+					</template>
+					<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
+				</SearchSidebarFilter>
+			</template>
 		</div>
 	</aside>
 	<section class="normal-page__content">
@@ -788,10 +890,10 @@ useSeoMeta({
 			<div class="flex flex-wrap items-center gap-2">
 				<DropdownSelect
 					v-slot="{ selected }"
-					v-model="currentSortType"
+					v-model="effectiveCurrentSortType"
 					class="!w-auto flex-grow md:flex-grow-0"
 					name="Sort by"
-					:options="[...sortTypes]"
+					:options="[...effectiveSortTypes]"
 					:display-name="(option?: SortType) => option?.display"
 					@change="updateSearchResults()"
 				>
@@ -837,6 +939,14 @@ useSeoMeta({
 				/>
 			</div>
 			<SearchFilterControl
+				v-if="isServerType"
+				v-model:selected-filters="serverCurrentFilters"
+				:filters="serverFilterTypes"
+				:provided-filters="[]"
+				:overridden-provided-filter-types="[]"
+			/>
+			<SearchFilterControl
+				v-else
 				v-model:selected-filters="currentFilters"
 				:filters="filters.filter((f) => f.display !== 'none')"
 				:provided-filters="serverFilters"
@@ -854,15 +964,46 @@ useSeoMeta({
 						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
 					"
 				>
-					<template v-for="result in results?.hits" :key="result.project_id">
+					<template v-if="isServerType">
 						<ProjectCard
+							v-for="result in serverResults?.hits"
+							:key="`server-${result.project_id}`"
+							:link="`/server/${result.slug ?? result.project_id}`"
+							:title="result.name"
+							:icon-url="result.icon_url || undefined"
+							:summary="result.summary"
+							:tags="result.categories"
+							:server-online-players="result.minecraft_java_server?.ping?.data?.players_online ?? 0"
+							:server-region="result.minecraft_server?.region"
+							:server-recent-plays="result.minecraft_java_server?.verified_plays_2w ?? 0"
+							:server-status-online="!!result.minecraft_java_server?.ping?.data"
+							:server-modpack-content="getServerModpackContent(result)"
+							is-server-project
+							exclude-loaders
+							:followers="result.follows"
+							:date-updated="result.date_modified"
+							:date-published="result.date_created"
+							:color="result.color ?? undefined"
+							:banner="result.featured_gallery ?? undefined"
+							:layout="
+								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
+							"
+							:max-tags="2"
+							@mouseenter="handleServerProjectMouseEnter(result)"
+							@mouseleave="handleProjectHoverEnd"
+						/>
+					</template>
+					<template v-else>
+						<ProjectCard
+							v-for="result in projectResults?.hits"
+							:key="result.project_id"
 							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
 							:title="result.title"
 							:icon-url="result.icon_url"
 							:author="{ name: result.author, link: `/user/${result.author}` }"
 							:date-updated="result.date_modified"
 							:date-published="result.date_created"
-							:displayed-date="currentSortType.name === 'newest' ? 'published' : 'updated'"
+							:displayed-date="effectiveCurrentSortType.name === 'newest' ? 'published' : 'updated'"
 							:downloads="result.downloads"
 							:summary="result.description"
 							:tags="result.display_categories"
@@ -875,8 +1016,8 @@ useSeoMeta({
 							:environment="
 								['mod', 'modpack'].includes(currentType)
 									? {
-											clientSide: result.client_side,
-											serverSide: result.server_side,
+											clientSide: result.client_side as Labrinth.Projects.v2.Environment,
+											serverSide: result.server_side as Labrinth.Projects.v2.Environment,
 										}
 									: undefined
 							"
