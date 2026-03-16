@@ -98,7 +98,11 @@
 			</div>
 		</Accordion>
 
-		<InlineBackupCreator v-if="ctx.flowType === 'reset-server'" backup-name="Before reinstall" hide-shift-click-hint />
+		<InlineBackupCreator
+			v-if="ctx.flowType === 'reset-server'"
+			backup-name="Before reinstall"
+			hide-shift-click-hint
+		/>
 	</div>
 </template>
 

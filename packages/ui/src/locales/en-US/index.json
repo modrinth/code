@@ -263,9 +263,6 @@
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Some content on your server could not be analyzed and may be affected by this change."
   },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "Unknown content"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} updated"
   },
