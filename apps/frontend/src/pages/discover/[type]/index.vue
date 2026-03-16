@@ -980,9 +980,6 @@ useSeoMeta({
 							:server-modpack-content="getServerModpackContent(result)"
 							is-server-project
 							exclude-loaders
-							:followers="result.follows"
-							:date-updated="result.date_modified"
-							:date-published="result.date_created"
 							:color="result.color ?? undefined"
 							:banner="result.featured_gallery ?? undefined"
 							:layout="
