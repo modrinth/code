@@ -685,7 +685,11 @@ const messages = defineMessages({
 
 const client = injectModrinthClient()
 
-const { data: user, error: userError, suspense: userSuspense } = useQuery({
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
 	queryKey: computed(() => ['user', route.params.id]),
 	queryFn: () => client.labrinth.users_v2.get(route.params.id),
 })
@@ -739,8 +743,6 @@ onServerPrefetch(async () => {
 		collectionsSuspense(),
 	])
 })
-
-
 
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
@@ -899,7 +901,8 @@ function saveRoleEdit() {
 
 	isSavingRole.value = true
 
-	client.labrinth.users_v2.patch(user.value.id, { role: selectedRole.value })
+	client.labrinth.users_v2
+		.patch(user.value.id, { role: selectedRole.value })
 		.then(() => {
 			user.value.role = selectedRole.value
 

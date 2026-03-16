@@ -12,14 +12,11 @@ export class LabrinthAuthInternalModule extends AbstractModule {
 	 * @returns Promise resolving to the subscription status
 	 */
 	public async getNewsletterStatus(): Promise<Labrinth.Auth.Internal.SubscriptionStatus> {
-		return this.client.request<Labrinth.Auth.Internal.SubscriptionStatus>(
-			'/auth/email/subscribe',
-			{
-				api: 'labrinth',
-				version: 'internal',
-				method: 'GET',
-			},
-		)
+		return this.client.request<Labrinth.Auth.Internal.SubscriptionStatus>('/auth/email/subscribe', {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'GET',
+		})
 	}
 
 	/**

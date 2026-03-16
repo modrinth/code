@@ -101,9 +101,7 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	 * const collections = await client.labrinth.users_v2.getCollections('my_user')
 	 * ```
 	 */
-	public async getCollections(
-		idOrUsername: string,
-	): Promise<Labrinth.Collections.Collection[]> {
+	public async getCollections(idOrUsername: string): Promise<Labrinth.Collections.Collection[]> {
 		return this.client.request<Labrinth.Collections.Collection[]>(
 			`/user/${idOrUsername}/collections`,
 			{
