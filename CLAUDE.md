@@ -67,16 +67,6 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 - [`apps/labrinth/CLAUDE.md`](apps/labrinth/CLAUDE.md) — Backend API
 - [`apps/frontend/CLAUDE.md`](apps/frontend/CLAUDE.md) - Frontend Website
 
-## Skills (`.claude/skills/`)
-
-Task-oriented skills that reference the detailed standards in `standards/frontend/`:
-
-- **`api-module`** — Create a new API endpoint module from an OpenAPI schema
-- **`cross-platform-pages`** — Convert a page to the cross-platform shared/wrapped layout system
-- **`i18n-pass`** — Perform an i18n localization pass on changed files or a PR
-- **`figma-mcp`** — Draft a page layout from a Figma design using the MCP server
-- **`tanstack-query`** — Convert a page from `useAsyncData` / manual fetching to TanStack Query
-
 ## Code Guidelines
 
 ### Comments
