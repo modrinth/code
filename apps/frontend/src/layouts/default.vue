@@ -514,9 +514,6 @@
 			</div>
 		</header>
 		<header class="mobile-navigation mobile-only">
-			<div class="nav-menu h-[500px]">
-				<!-- placeholder so other nav menus aren't visible -->
-			</div>
 			<div
 				class="nav-menu nav-menu-browse"
 				:class="{ expanded: isBrowseMenuOpen }"
@@ -1369,6 +1366,17 @@ const { cycle: changeTheme } = useTheme()
 		transition: border-radius 0.3s ease-out;
 		border-top: 2px solid rgba(0, 0, 0, 0);
 		box-sizing: border-box;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			height: 300px;
+			background-color: var(--color-raised-bg);
+			transform: translateY(100%);
+		}
 
 		&.expanded {
 			box-shadow: none;
