@@ -73,8 +73,8 @@
 						class="!border-surface-4 !border"
 						@click="hideUninstallable = !hideUninstallable"
 					>
-						<EyeIcon v-if="hideUninstallable" />
-						<EyeOffIcon v-else />
+						<EyeOffIcon v-if="hideUninstallable" />
+						<EyeIcon v-else />
 					</button>
 				</ButtonStyled>
 			</div>
