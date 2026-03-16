@@ -17,6 +17,7 @@ async fn get_tags() {
             let game_versions = api.get_game_versions_deserialized().await;
             let loaders = api.get_loaders_deserialized().await;
             let side_types = api.get_side_types_deserialized().await;
+            let categories = api.get_categories_deserialized().await;
 
             // These tests match dummy data and will need to be updated if the dummy data changes
             // Versions should be ordered by:
@@ -64,6 +65,25 @@ async fn get_tags() {
                     .map(|s| s.to_string())
                     .collect()
             );
+
+            let map_categories = categories
+                .into_iter()
+                .filter(|x| x.project_type == "map")
+                .map(|x| (x.header, x.name))
+                .collect::<HashSet<_>>();
+
+            for category in [
+                ("genre", "adventure"),
+                ("genre", "parkour"),
+                ("play-style", "singleplayer"),
+                ("technical", "command-blocks"),
+                ("format", "playable-map"),
+            ] {
+                assert!(map_categories.contains(&(
+                    category.0.to_string(),
+                    category.1.to_string(),
+                )));
+            }
         },
     )
     .await;

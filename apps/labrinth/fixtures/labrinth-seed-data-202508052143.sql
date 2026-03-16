@@ -34,6 +34,31 @@ COPY public.categories (id, category, project_type, icon, header, ordering) FROM
 10079	reflections	4	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style=""><path d="m3 7 5 5-5 5V7"/><path d="m21 7-5 5 5 5V7"/><path d="M12 20v2"/><path d="M12 14v2"/><path d="M12 8v2"/><path d="M12 2v2"/></svg>	features	0
 10080	screenshot	4	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>	performance impact	0
 10081	colored-lighting	4	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="7.618" cy="6.578" r="5.422" style="" transform="translate(3.143 .726) scale(1.16268)"/><circle cx="7.618" cy="6.578" r="5.422" style="" transform="translate(-.862 7.796) scale(1.16268)"/><circle cx="7.618" cy="6.578" r="5.422" style="" transform="translate(7.148 7.796) scale(1.16268)"/></svg>	features	0
+10082	adventure	8		genre	0
+10083	survival	8		genre	0
+10084	puzzle	8		genre	0
+10085	parkour	8		genre	0
+10086	horror	8		genre	0
+10087	minigame	8		genre	0
+10088	pvp	8		genre	0
+10089	escape	8		genre	0
+10090	story	8		genre	0
+10091	building	8		genre	0
+10092	creation	8		genre	0
+10093	singleplayer	8		play-style	0
+10094	multiplayer	8		play-style	0
+10095	co-op	8		play-style	0
+10096	competitive	8		play-style	0
+10097	short	8		audience	0
+10098	medium	8		audience	0
+10099	long	8		audience	0
+10100	casual	8		audience	0
+10101	hardcore	8		audience	0
+10102	vanilla	8		technical	0
+10103	command-blocks	8		technical	0
+10104	resource-pack-supported	8		technical	0
+10105	world-template	8		format	0
+10106	playable-map	8		format	0
 10057	128x	3		resolutions	0
 10030	economy	1	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>	categories	0
 10031	management	1	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>	categories	0
@@ -1026,6 +1051,7 @@ COPY public.loader_fields_loaders (loader_id, loader_field_id) FROM stdin;
 COPY public.project_types (id, name) FROM stdin;
 5	resourcepack
 6	shader
+8	map
 \.
 
 

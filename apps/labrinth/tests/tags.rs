@@ -18,8 +18,8 @@ async fn get_tags() {
         let categories = api.get_categories_deserialized_common().await;
 
         let category_names = categories
-            .into_iter()
-            .map(|x| x.name)
+            .iter()
+            .map(|x| x.name.clone())
             .collect::<HashSet<_>>();
 
         for name in [
@@ -32,6 +32,25 @@ async fn get_tags() {
             "magic",
         ] {
             assert!(category_names.contains(name));
+        }
+
+        let map_categories = categories
+            .iter()
+            .filter(|x| x.project_type == "map")
+            .map(|x| (x.header.clone(), x.name.clone()))
+            .collect::<HashSet<_>>();
+
+        for category in [
+            ("genre", "adventure"),
+            ("genre", "parkour"),
+            ("play-style", "singleplayer"),
+            ("technical", "command-blocks"),
+            ("format", "playable-map"),
+        ] {
+            assert!(map_categories.contains(&(
+                category.0.to_string(),
+                category.1.to_string(),
+            )));
         }
     })
     .await;

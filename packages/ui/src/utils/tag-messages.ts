@@ -190,6 +190,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.blocks',
 		defaultMessage: 'Blocks',
 	},
+	building: {
+		id: 'tag.category.building',
+		defaultMessage: 'Building',
+	},
 	bloom: {
 		id: 'tag.category.bloom',
 		defaultMessage: 'Bloom',
@@ -202,6 +206,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.cartoon',
 		defaultMessage: 'Cartoon',
 	},
+	casual: {
+		id: 'tag.category.casual',
+		defaultMessage: 'Casual',
+	},
 	challenging: {
 		id: 'tag.category.challenging',
 		defaultMessage: 'Challenging',
@@ -210,6 +218,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.classes',
 		defaultMessage: 'Classes',
 	},
+	'co-op': {
+		id: 'tag.category.co-op',
+		defaultMessage: 'Co-op',
+	},
 	'colored-lighting': {
 		id: 'tag.category.colored-lighting',
 		defaultMessage: 'Colored Lighting',
@@ -217,6 +229,10 @@ export const categoryMessages = defineMessages({
 	combat: {
 		id: 'tag.category.combat',
 		defaultMessage: 'Combat',
+	},
+	'command-blocks': {
+		id: 'tag.category.command-blocks',
+		defaultMessage: 'Command Blocks',
 	},
 	competitive: {
 		id: 'tag.category.competitive',
@@ -238,6 +254,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.crossplay',
 		defaultMessage: 'Crossplay',
 	},
+	creation: {
+		id: 'tag.category.creation',
+		defaultMessage: 'Creation',
+	},
 	cursed: {
 		id: 'tag.category.cursed',
 		defaultMessage: 'Cursed',
@@ -257,6 +277,10 @@ export const categoryMessages = defineMessages({
 	economy: {
 		id: 'tag.category.economy',
 		defaultMessage: 'Economy',
+	},
+	escape: {
+		id: 'tag.category.escape',
+		defaultMessage: 'Escape',
 	},
 	entities: {
 		id: 'tag.category.entities',
@@ -306,9 +330,17 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.hardcore-mode',
 		defaultMessage: 'Hardcore Mode',
 	},
+	hardcore: {
+		id: 'tag.category.hardcore',
+		defaultMessage: 'Hardcore',
+	},
 	high: {
 		id: 'tag.category.high',
 		defaultMessage: 'High',
+	},
+	horror: {
+		id: 'tag.category.horror',
+		defaultMessage: 'Horror',
 	},
 	items: {
 		id: 'tag.category.items',
@@ -341,6 +373,10 @@ export const categoryMessages = defineMessages({
 	locale: {
 		id: 'tag.category.locale',
 		defaultMessage: 'Locale',
+	},
+	long: {
+		id: 'tag.category.long',
+		defaultMessage: 'Long',
 	},
 	low: {
 		id: 'tag.category.low',
@@ -418,6 +454,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.parkour',
 		defaultMessage: 'Parkour',
 	},
+	'playable-map': {
+		id: 'tag.category.playable-map',
+		defaultMessage: 'Playable Map',
+	},
 	'path-tracing': {
 		id: 'tag.category.path-tracing',
 		defaultMessage: 'Path Tracing',
@@ -452,7 +492,11 @@ export const categoryMessages = defineMessages({
 	},
 	pvp: {
 		id: 'tag.category.pvp',
-		defaultMessage: 'PVP',
+		defaultMessage: 'PvP',
+	},
+	puzzle: {
+		id: 'tag.category.puzzle',
+		defaultMessage: 'Puzzle',
 	},
 	questing: {
 		id: 'tag.category.questing',
@@ -482,6 +526,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.roleplay',
 		defaultMessage: 'Roleplay',
 	},
+	'resource-pack-supported': {
+		id: 'tag.category.resource-pack-supported',
+		defaultMessage: 'Resource Pack Supported',
+	},
 	rpg: {
 		id: 'tag.category.rpg',
 		defaultMessage: 'RPG',
@@ -489,6 +537,10 @@ export const categoryMessages = defineMessages({
 	screenshot: {
 		id: 'tag.category.screenshot',
 		defaultMessage: 'Screenshot',
+	},
+	short: {
+		id: 'tag.category.short',
+		defaultMessage: 'Short',
 	},
 	'semi-realistic': {
 		id: 'tag.category.semi-realistic',
@@ -506,6 +558,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.skyblock',
 		defaultMessage: 'Skyblock',
 	},
+	singleplayer: {
+		id: 'tag.category.singleplayer',
+		defaultMessage: 'Singleplayer',
+	},
 	smp: {
 		id: 'tag.category.smp',
 		defaultMessage: 'SMP',
@@ -514,9 +570,17 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.social',
 		defaultMessage: 'Social',
 	},
+	story: {
+		id: 'tag.category.story',
+		defaultMessage: 'Story',
+	},
 	storage: {
 		id: 'tag.category.storage',
 		defaultMessage: 'Storage',
+	},
+	survival: {
+		id: 'tag.category.survival',
+		defaultMessage: 'Survival',
 	},
 	'survival-mode': {
 		id: 'tag.category.survival-mode',
@@ -554,6 +618,10 @@ export const categoryMessages = defineMessages({
 		id: 'tag.category.utility',
 		defaultMessage: 'Utility',
 	},
+	vanilla: {
+		id: 'tag.category.vanilla',
+		defaultMessage: 'Vanilla',
+	},
 	'vanilla-like': {
 		id: 'tag.category.vanilla-like',
 		defaultMessage: 'Vanilla Like',
@@ -569,6 +637,10 @@ export const categoryMessages = defineMessages({
 	worldgen: {
 		id: 'tag.category.worldgen',
 		defaultMessage: 'World Generation',
+	},
+	'world-template': {
+		id: 'tag.category.world-template',
+		defaultMessage: 'World Template',
 	},
 })
 
@@ -596,6 +668,10 @@ export function sortTagsForDisplay(tags: string[]): string[] {
 }
 
 export const categoryHeaderMessages = defineMessages({
+	audience: {
+		id: 'header.category.audience',
+		defaultMessage: 'Audience',
+	},
 	resolutions: {
 		id: 'header.category.resolutions',
 		defaultMessage: 'Resolution',
@@ -608,9 +684,21 @@ export const categoryHeaderMessages = defineMessages({
 		id: 'header.category.feature',
 		defaultMessage: 'Feature',
 	},
+	format: {
+		id: 'header.category.format',
+		defaultMessage: 'Format',
+	},
+	genre: {
+		id: 'header.category.genre',
+		defaultMessage: 'Genre',
+	},
 	'performance impact': {
 		id: 'header.category.performance-impact',
 		defaultMessage: 'Performance impact',
+	},
+	'play-style': {
+		id: 'header.category.play-style',
+		defaultMessage: 'Play style',
 	},
 	minecraft_server_community: {
 		id: 'header.category.minecraft-server-community',

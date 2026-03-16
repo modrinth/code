@@ -84,25 +84,53 @@ FROM
 WHERE lf.field IN ('game_versions', 'environment')
 ON CONFLICT DO NOTHING;
 
-INSERT INTO categories (id, category, project_type)
+INSERT INTO categories (id, category, project_type, header)
 VALUES
-	(51, 'combat', 1),
-	(52, 'decoration', 1),
-	(53, 'economy', 1),
-	(54, 'food', 1),
-	(55, 'magic', 1),
-	(56, 'mobs', 1),
-	(57, 'optimization', 1);
+	(51, 'combat', 1, 'categories'),
+	(52, 'decoration', 1, 'categories'),
+	(53, 'economy', 1, 'categories'),
+	(54, 'food', 1, 'categories'),
+	(55, 'magic', 1, 'categories'),
+	(56, 'mobs', 1, 'categories'),
+	(57, 'optimization', 1, 'categories');
 
-INSERT INTO categories (id, category, project_type)
+INSERT INTO categories (id, category, project_type, header)
 VALUES
-	(101, 'combat', 2),
-	(102, 'decoration', 2),
-	(103, 'economy', 2),
-	(104, 'food', 2),
-	(105, 'magic', 2),
-	(106, 'mobs', 2),
-	(107, 'optimization', 2);
+	(101, 'combat', 2, 'categories'),
+	(102, 'decoration', 2, 'categories'),
+	(103, 'economy', 2, 'categories'),
+	(104, 'food', 2, 'categories'),
+	(105, 'magic', 2, 'categories'),
+	(106, 'mobs', 2, 'categories'),
+	(107, 'optimization', 2, 'categories');
+
+INSERT INTO categories (id, category, project_type, header)
+VALUES
+	(151, 'adventure', 8, 'genre'),
+	(152, 'survival', 8, 'genre'),
+	(153, 'puzzle', 8, 'genre'),
+	(154, 'parkour', 8, 'genre'),
+	(155, 'horror', 8, 'genre'),
+	(156, 'minigame', 8, 'genre'),
+	(157, 'pvp', 8, 'genre'),
+	(158, 'escape', 8, 'genre'),
+	(159, 'story', 8, 'genre'),
+	(160, 'building', 8, 'genre'),
+	(161, 'creation', 8, 'genre'),
+	(162, 'singleplayer', 8, 'play-style'),
+	(163, 'multiplayer', 8, 'play-style'),
+	(164, 'co-op', 8, 'play-style'),
+	(165, 'competitive', 8, 'play-style'),
+	(166, 'short', 8, 'audience'),
+	(167, 'medium', 8, 'audience'),
+	(168, 'long', 8, 'audience'),
+	(169, 'casual', 8, 'audience'),
+	(170, 'hardcore', 8, 'audience'),
+	(171, 'vanilla', 8, 'technical'),
+	(172, 'command-blocks', 8, 'technical'),
+	(173, 'resource-pack-supported', 8, 'technical'),
+	(174, 'world-template', 8, 'format'),
+	(175, 'playable-map', 8, 'format');
 
 -- Create dummy oauth client, secret_hash is SHA512 hash of full lowercase alphabet
 INSERT INTO oauth_clients (
