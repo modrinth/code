@@ -296,13 +296,12 @@
 				This project is not managed by an organization. If you are the member of any organizations,
 				you can transfer management to one of them.
 			</p>
-			<div v-if="!organization" class="input-group">
+			<div v-if="!organization" class="flex gap-2">
 				<Combobox
-					id="organization-picker"
 					v-model="selectedOrganizationId"
-					class="large-multiselect"
 					:options="organizationOptions"
 					:searchable="true"
+					search-placeholder="Select organization..."
 					force-direction="up"
 					:disabled="!currentMember?.is_owner || organizationOptions.length === 0"
 				/>
@@ -312,7 +311,7 @@
 					@click="openTransferToOrgModal($event)"
 				>
 					<CheckIcon />
-					Transfer management
+					<span class="w-max"> Transfer management </span>
 				</button>
 			</div>
 			<button v-if="organization" class="btn" @click="$refs.modal_remove.show()">
@@ -1008,9 +1007,5 @@ const updateMembers = async () => {
 			display: flex;
 		}
 	}
-}
-
-.large-multiselect {
-	max-width: 24rem;
 }
 </style>
