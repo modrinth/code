@@ -55,7 +55,10 @@
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</button>
 							<AutoLink
 								v-else-if="typeof option.action === 'string'"
@@ -72,10 +75,16 @@
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</AutoLink>
 							<span v-else>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</span>
 						</ButtonStyled>
 					</template>
@@ -88,10 +97,11 @@
 <script setup lang="ts">
 import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { onClickOutside, useElementHover } from '@vueuse/core'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 interface Option {
 	id: string
+	icon?: Component
 	action?: (() => void) | string
 	shown?: boolean
 	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'

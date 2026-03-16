@@ -147,6 +147,7 @@ provideModalBehavior({
 
 const {
 	installationModal,
+	fetchExistingInstanceNames,
 	handleCreate,
 	handleBrowseModpacks,
 	searchModpacks,
@@ -945,6 +946,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			ref="installationModal"
 			type="instance"
 			show-snapshot-toggle
+			:fetch-existing-instance-names="fetchExistingInstanceNames"
 			:search-modpacks="searchModpacks"
 			:get-project-versions="getProjectVersions"
 			@create="handleCreate"

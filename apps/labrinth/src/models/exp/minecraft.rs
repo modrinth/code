@@ -423,11 +423,11 @@ pub struct JavaServerPingData {
     /// Reported version protocol number of the server.
     pub version_protocol: i32,
     /// Description/MOTD of the server as shown in the server list.
-    pub description: Option<serde_json::Value>,
+    pub description: String,
     /// Number of players online at the time.
-    pub players_online: Option<i32>,
+    pub players_online: i32,
     /// Maximum number of players allowed on the server.
-    pub players_max: Option<i32>,
+    pub players_max: i32,
 }
 
 component::relations! {

@@ -11,6 +11,29 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-13T12:30:00-00:00`,
+		product: 'hosting',
+		body: `## [Content Management Overhaul](/news/article/content-management-overhaul)
+- We've overhauled the Content tab and improved parity with Modrinth App. Check out our [blog post](/news/article/content-management-overhaul) to learn more.`,
+	},
+	{
+		date: `2026-03-13T00:15:00-00:00`,
+		product: 'app',
+		version: '0.12.2',
+		body: `## Hotfixes
+- Fixed search pages not showing beyond the first page.`,
+	},
+	{
+		date: `2026-03-12T16:30:00-00:00`,
+		product: 'app',
+		version: '0.12.1',
+		body: `## Improvements
+- Added shift + click multiselect to the content tab.
+- Fixed overflow problem with the content sort button in the content tab.
+- Bulk enable, bulk disable and bulk delete actions are now done immediately all in one go, rather one by one.
+- Improved installing visual and state management for content on the content tab.`,
+	},
+	{
 		date: `2026-03-12T14:05:00-00:00`,
 		product: 'app',
 		version: '0.12.0',

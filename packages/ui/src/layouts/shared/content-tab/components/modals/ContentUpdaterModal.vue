@@ -10,7 +10,11 @@
 			<span class="text-lg font-extrabold text-contrast">{{
 				header ??
 				formatMessage(
-					isModpack ? messages.switchModpackVersionHeader : messages.updateVersionHeader,
+					isModpack.value
+						? messages.switchModpackVersionHeader
+						: switchMode
+							? messages.switchVersionHeader
+							: messages.updateVersionHeader,
 				)
 			}}</span>
 		</template>
@@ -213,9 +217,16 @@
 					>
 						<DownloadIcon />
 						{{
-							formatMessage(isDowngrade ? messages.downgradeToVersion : messages.updateToVersion, {
-								version: selectedVersion?.version_number ?? '...',
-							})
+							formatMessage(
+								isDowngrade
+									? messages.downgradeToVersion
+									: switchMode
+										? messages.switchToVersion
+										: messages.updateToVersion,
+								{
+									version: selectedVersion?.version_number ?? '...',
+								},
+							)
 						}}
 					</button>
 				</ButtonStyled>
@@ -246,10 +257,12 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import VersionChannelIndicator from '#ui/components/version/VersionChannelIndicator.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ContentUpdaterModal')
 
 const messages = defineMessages({
 	updateVersionHeader: {
@@ -301,6 +314,14 @@ const messages = defineMessages({
 		id: 'instances.updater-modal.update-to',
 		defaultMessage: 'Update to {version}',
 	},
+	switchVersionHeader: {
+		id: 'instances.updater-modal.header-switch',
+		defaultMessage: 'Switch version',
+	},
+	switchToVersion: {
+		id: 'instances.updater-modal.switch-to',
+		defaultMessage: 'Switch to {version}',
+	},
 	currentBadge: {
 		id: 'instances.updater-modal.badge.current',
 		defaultMessage: 'Current',
@@ -326,8 +347,8 @@ const props = withDefaults(
 		currentLoader: string
 		currentVersionId: string
 		isApp: boolean
-		/** Whether this is a modpack update (changes header text) */
-		isModpack?: boolean
+		/** The project type (e.g. mod, shader, resourcepack, datapack, modpack). */
+		projectType?: string
 		projectIconUrl?: string
 		projectName?: string
 		header?: string
@@ -337,7 +358,7 @@ const props = withDefaults(
 		loadingChangelog?: boolean
 	}>(),
 	{
-		isModpack: false,
+		projectType: undefined,
 		projectIconUrl: undefined,
 		projectName: undefined,
 		header: undefined,
@@ -346,8 +367,10 @@ const props = withDefaults(
 	},
 )
 
+const isModpack = computed(() => props.projectType === 'modpack')
+
 const emit = defineEmits<{
-	update: [version: Labrinth.Versions.v2.Version]
+	update: [version: Labrinth.Versions.v2.Version, event: MouseEvent]
 	cancel: []
 	/** Emitted when user selects a version, so parent can fetch full version data with changelog */
 	versionSelect: [version: Labrinth.Versions.v2.Version]
@@ -357,6 +380,7 @@ const emit = defineEmits<{
 const modal = ref<InstanceType<typeof NewModal>>()
 const searchQuery = ref('')
 const hideIncompatibleState = ref(true)
+const switchMode = ref(false)
 const selectedVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 // Store the initial version ID to select when versions become available
 const pendingInitialVersionId = ref<string | undefined>(undefined)
@@ -374,8 +398,20 @@ watch(
 
 		// Handle initial selection when versions first arrive
 		if (newVersions.length > 0 && !selectedVersion.value && pendingInitialVersionId.value) {
-			const version =
-				newVersions.find((v) => v.id === pendingInitialVersionId.value) ?? newVersions[0]
+			const pendingFound = newVersions.find((v) => v.id === pendingInitialVersionId.value)
+			debug('versions watcher: initial selection', {
+				pendingInitialVersionId: pendingInitialVersionId.value,
+				foundPending: !!pendingFound,
+				currentVersionId: props.currentVersionId,
+				currentInList: newVersions.some((v) => v.id === props.currentVersionId),
+				totalVersions: newVersions.length,
+				loaderDistribution: [...new Set(newVersions.flatMap((v) => v.loaders))],
+				gameVersionDistribution: [...new Set(newVersions.flatMap((v) => v.game_versions))].slice(
+					0,
+					10,
+				),
+			})
+			const version = pendingFound ?? newVersions[0]
 			selectedVersion.value = version
 			if (version) {
 				emit('versionSelect', version)
@@ -386,12 +422,30 @@ watch(
 	{ deep: true },
 )
 
+const NON_MOD_PROJECT_TYPES = new Set(['shader', 'shaderpack', 'resourcepack', 'datapack'])
+
 function isVersionCompatible(version: Labrinth.Versions.v2.Version): boolean {
 	const hasGameVersion = version.game_versions.includes(props.currentGameVersion)
-	const hasLoader = version.loaders.some(
-		(loader) => loader.toLowerCase() === props.currentLoader.toLowerCase(),
-	)
-	return hasGameVersion && hasLoader
+	const skipLoaderCheck = props.projectType != null && NON_MOD_PROJECT_TYPES.has(props.projectType)
+	const hasLoader =
+		skipLoaderCheck ||
+		version.loaders.some((loader) => loader.toLowerCase() === props.currentLoader.toLowerCase())
+	const compatible = hasGameVersion && hasLoader
+	if (!compatible) {
+		debug('isVersionCompatible: INCOMPATIBLE', {
+			versionId: version.id,
+			versionNumber: version.version_number,
+			versionLoaders: version.loaders,
+			versionGameVersions: version.game_versions,
+			currentLoader: props.currentLoader,
+			currentGameVersion: props.currentGameVersion,
+			projectType: props.projectType,
+			hasGameVersion,
+			hasLoader,
+			skipLoaderCheck,
+		})
+	}
+	return compatible
 }
 
 const currentVersion = computed(() => props.versions.find((v) => v.id === props.currentVersionId))
@@ -413,9 +467,18 @@ const filteredVersions = computed(() => {
 		)
 	}
 
+	const beforeFilterCount = versions.length
 	if (hideIncompatibleState.value) {
 		versions = versions.filter(isVersionCompatible)
 	}
+
+	debug('filteredVersions computed', {
+		totalVersions: props.versions.length,
+		afterSearchFilter: beforeFilterCount,
+		afterCompatibilityFilter: versions.length,
+		hiddenByCompatibility: beforeFilterCount - versions.length,
+		hideIncompatible: hideIncompatibleState.value,
+	})
 
 	return versions
 })
@@ -503,9 +566,9 @@ function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	emit('versionSelect', version)
 }
 
-function handleUpdate() {
+function handleUpdate(event: MouseEvent) {
 	if (selectedVersion.value) {
-		emit('update', selectedVersion.value)
+		emit('update', selectedVersion.value, event)
 		hide()
 	}
 }
@@ -515,11 +578,28 @@ function handleCancel() {
 	hide()
 }
 
-function show(initialVersionId?: string) {
+function show(initialVersionId?: string, options?: { switchMode?: boolean }) {
 	searchQuery.value = ''
 	hideIncompatibleState.value = true
+	switchMode.value = options?.switchMode ?? false
+
+	debug('show() called', {
+		initialVersionId,
+		currentVersionId: props.currentVersionId,
+		currentGameVersion: props.currentGameVersion,
+		currentLoader: props.currentLoader,
+		projectType: props.projectType,
+		versionsAvailable: props.versions.length,
+	})
 
 	if (props.versions.length > 0) {
+		const currentInList = props.versions.find((v) => v.id === props.currentVersionId)
+		debug('show(): currentVersionId lookup', {
+			currentVersionId: props.currentVersionId,
+			foundInList: !!currentInList,
+			allVersionIds: props.versions.map((v) => v.id),
+		})
+
 		if (initialVersionId) {
 			selectedVersion.value =
 				props.versions.find((v) => v.id === initialVersionId) ?? props.versions[0]
@@ -533,6 +613,9 @@ function show(initialVersionId?: string) {
 	} else {
 		selectedVersion.value = null
 		pendingInitialVersionId.value = initialVersionId
+		debug('show(): no versions yet, deferring selection', {
+			pendingInitialVersionId: initialVersionId,
+		})
 	}
 
 	modal.value?.show()

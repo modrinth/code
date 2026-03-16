@@ -36,7 +36,7 @@
 						: (updatingProject?.version?.id ?? '')
 				"
 				:is-app="true"
-				:is-modpack="updatingModpack"
+				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
 				:project-icon-url="
 					updatingModpack ? linkedModpackProject?.icon_url : updatingProject?.project?.icon_url
 				"
@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { ArrowLeftRightIcon, ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	ConfirmModpackUpdateModal,
 	type ContentItem,
@@ -73,6 +74,7 @@ import {
 	type OverflowMenuOption,
 	provideAppBackup,
 	provideContentManager,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
@@ -90,6 +92,7 @@ import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	add_project_from_version,
 	duplicate,
 	edit,
 	get,
@@ -157,6 +160,10 @@ const messages = defineMessages({
 		id: 'app.instance.mods.copy-link',
 		defaultMessage: 'Copy link',
 	},
+	switchVersion: {
+		id: 'app.instance.mods.switch-version',
+		defaultMessage: 'Switch version',
+	},
 })
 
 let savedModalState: ModpackContentModalState | null = null
@@ -165,10 +172,10 @@ const { formatMessage } = useVIntl()
 const { handleError, addNotification } = injectNotificationManager()
 const { installingItems } = injectContentInstall()
 const router = useRouter()
+const debug = useDebugLogger('Mods:ContentUpdate')
 
 const props = defineProps<{
 	instance: GameInstance
-	versions: Labrinth.Versions.v2.Version[]
 	isServerInstance?: boolean
 	openSettings?: () => void
 }>()
@@ -345,9 +352,49 @@ async function updateProject(mod: ContentItem) {
 	}
 }
 
+async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
+	try {
+		await remove_project(props.instance.path, mod.file_path!)
+		const newPath = await add_project_from_version(props.instance.path, version.id)
+
+		const profile = await get(props.instance.path).catch(handleError)
+		if (profile) {
+			await installVersionDependencies(profile, version).catch(handleError)
+		}
+
+		mod.file_path = newPath
+		if (mod.version) {
+			mod.version.id = version.id
+			mod.version.version_number = version.version_number
+		}
+
+		trackEvent('InstanceProjectSwitchVersion', {
+			loader: props.instance.loader,
+			game_version: props.instance.game_version,
+			id: mod.project?.id,
+			name: mod.project?.title ?? mod.file_name,
+			project_type: mod.project_type,
+		})
+	} catch (err) {
+		handleError(err as Error)
+	}
+}
+
 async function handleUpdate(id: string) {
 	const item = projects.value.find((p) => p.file_name === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
+
+	debug('handleUpdate triggered', {
+		fileName: item.file_name,
+		projectType: item.project_type,
+		projectId: item.project.id,
+		projectTitle: item.project.title,
+		currentVersionId: item.version.id,
+		currentVersionNumber: item.version.version_number,
+		updateVersionId: item.update_version_id,
+		instanceGameVersion: props.instance.game_version,
+		instanceLoader: props.instance.loader,
+	})
 
 	updatingModpack.value = false
 	updatingProject.value = item
@@ -358,6 +405,51 @@ async function handleUpdate(id: string) {
 	await nextTick()
 
 	contentUpdaterModal.value?.show(item.update_version_id ?? undefined)
+
+	const versions = (await get_project_versions(item.project.id).catch((e) => {
+		return handleError(e)
+	})) as Labrinth.Versions.v2.Version[] | null
+
+	loadingVersions.value = false
+
+	if (!versions) {
+		debug('handleUpdate: no versions returned', { projectId: item.project.id })
+		return
+	}
+
+	debug('handleUpdate: fetched versions', {
+		projectId: item.project.id,
+		projectType: item.project_type,
+		totalVersions: versions.length,
+		versionSample: versions.slice(0, 5).map((v) => ({
+			id: v.id,
+			number: v.version_number,
+			loaders: v.loaders,
+			gameVersions: v.game_versions,
+		})),
+		currentVersionInList: versions.some((v) => v.id === item.version?.id),
+		updateVersionInList: versions.some((v) => v.id === item.update_version_id),
+	})
+
+	versions.sort(
+		(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+	)
+
+	updatingProjectVersions.value = versions
+}
+
+async function handleSwitchVersion(item: ContentItem) {
+	if (!item.project?.id || !item.version?.id) return
+
+	updatingModpack.value = false
+	updatingProject.value = item
+	updatingProjectVersions.value = []
+	loadingVersions.value = true
+	loadingChangelog.value = false
+
+	await nextTick()
+
+	contentUpdaterModal.value?.show(item.version.id, { switchMode: true })
 
 	const versions = (await get_project_versions(item.project.id).catch((e) => {
 		return handleError(e)
@@ -493,15 +585,25 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
-async function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
+async function handleModalUpdate(
+	selectedVersion: Labrinth.Versions.v2.Version,
+	event?: MouseEvent,
+) {
 	if (updatingModpack.value) {
-		handleModpackUpdateRequest(selectedVersion)
+		if (event?.shiftKey) {
+			pendingModpackUpdateVersion.value = selectedVersion
+			await handleModpackUpdateConfirm()
+		} else {
+			handleModpackUpdateRequest(selectedVersion)
+		}
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 
-		mod.update_version_id = selectedVersion.id
-
-		await updateProject(mod)
+		if (mod.has_update && mod.update_version_id === selectedVersion.id) {
+			await updateProject(mod)
+		} else {
+			await switchProjectVersion(mod, selectedVersion)
+		}
 
 		resetUpdateState()
 	}
@@ -554,16 +656,26 @@ async function handleShareItems(
 }
 
 function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
-	const options: OverflowMenuOption[] = [
-		{
-			id: formatMessage(messages.showFile),
-			action: () => highlightModInProfile(props.instance.path, item.file_path),
-		},
-	]
+	const options: OverflowMenuOption[] = []
+
+	if (item.project?.id && item.version?.id && !item.has_update) {
+		options.push({
+			id: formatMessage(messages.switchVersion),
+			icon: ArrowLeftRightIcon,
+			action: () => handleSwitchVersion(item),
+		})
+	}
+
+	options.push({
+		id: formatMessage(messages.showFile),
+		icon: FolderOpenIcon,
+		action: () => highlightModInProfile(props.instance.path, item.file_path),
+	})
 
 	if (item.project?.slug) {
 		options.push({
 			id: formatMessage(messages.copyLink),
+			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(
 					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,

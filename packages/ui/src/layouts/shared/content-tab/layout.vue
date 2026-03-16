@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import {
-	ArrowUpDownIcon,
+	ArrowDownAZIcon,
+	ArrowDownZAIcon,
+	ClockArrowDownIcon,
+	ClockArrowUpIcon,
 	CodeIcon,
 	CompassIcon,
 	DownloadIcon,
@@ -77,9 +80,13 @@ const messages = defineMessages({
 		id: 'content.page-layout.sort.alphabetical',
 		defaultMessage: 'Alphabetical',
 	},
-	sortDateAdded: {
-		id: 'content.page-layout.sort.date-added',
-		defaultMessage: 'Date added',
+	sortDateAddedNewest: {
+		id: 'content.page-layout.sort.date-added-newest',
+		defaultMessage: 'Newest first',
+	},
+	sortDateAddedOldest: {
+		id: 'content.page-layout.sort.date-added-oldest',
+		defaultMessage: 'Oldest first',
 	},
 	updateAll: {
 		id: 'content.page-layout.update-all',
@@ -137,6 +144,10 @@ const messages = defineMessages({
 		id: 'content.page-layout.busy-description',
 		defaultMessage: 'Please wait for the operation to complete before editing content.',
 	},
+	pleaseWait: {
+		id: 'content.page-layout.please-wait',
+		defaultMessage: 'Please wait',
+	},
 })
 
 const ctx = injectContentManager()
@@ -147,34 +158,61 @@ const uploadOverallProgress = computed(() => {
 	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
 })
 
-type SortMode = 'alphabetical' | 'date-added'
-const sortMode = ref<SortMode>('alphabetical')
+type SortMode = 'alphabetical-asc' | 'alphabetical-desc' | 'date-added-newest' | 'date-added-oldest'
+const sortMode = ref<SortMode>('alphabetical-asc')
 
 const sortLabels: Record<SortMode, () => string> = {
-	alphabetical: () => formatMessage(messages.sortAlphabetical),
-	'date-added': () => formatMessage(messages.sortDateAdded),
+	'alphabetical-asc': () => formatMessage(messages.sortAlphabetical),
+	'alphabetical-desc': () => formatMessage(messages.sortAlphabetical),
+	'date-added-newest': () => formatMessage(messages.sortDateAddedNewest),
+	'date-added-oldest': () => formatMessage(messages.sortDateAddedOldest),
 }
 
 function cycleSortMode() {
-	const modes: SortMode[] = ['alphabetical', 'date-added']
+	const modes: SortMode[] = [
+		'alphabetical-asc',
+		'date-added-newest',
+		'alphabetical-desc',
+		'date-added-oldest',
+	]
 	const idx = modes.indexOf(sortMode.value)
 	sortMode.value = modes[(idx + 1) % modes.length]
 }
 
 const sortedItems = computed(() => {
 	const items = [...ctx.items.value]
-	if (sortMode.value === 'date-added') {
-		return items.sort((a, b) => {
-			const dateA = a.date_added ?? ''
-			const dateB = b.date_added ?? ''
-			return dateB.localeCompare(dateA)
-		})
+	switch (sortMode.value) {
+		case 'alphabetical-desc':
+			return items.sort((a, b) => {
+				const nameA = a.project?.title ?? a.file_name
+				const nameB = b.project?.title ?? b.file_name
+				return (
+					nameB.toLowerCase().localeCompare(nameA.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
+			})
+		case 'date-added-newest':
+			return items.sort((a, b) => {
+				const dateA = a.date_added ?? ''
+				const dateB = b.date_added ?? ''
+				return dateB.localeCompare(dateA) || a.file_name.localeCompare(b.file_name)
+			})
+		case 'date-added-oldest':
+			return items.sort((a, b) => {
+				const dateA = a.date_added ?? ''
+				const dateB = b.date_added ?? ''
+				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
+			})
+		default:
+			return items.sort((a, b) => {
+				const nameA = a.project?.title ?? a.file_name
+				const nameB = b.project?.title ?? b.file_name
+				return (
+					nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
+			})
 	}
-	return items.sort((a, b) => {
-		const nameA = a.project?.title ?? a.file_name
-		const nameB = b.project?.title ?? b.file_name
-		return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
-	})
 })
 
 const { searchQuery, search } = useContentSearch(sortedItems, [
@@ -223,20 +261,28 @@ async function handleRefresh() {
 	}
 }
 
-const filteredItems = computed(() => applyFilters(search(sortedItems.value)))
-const tableItems = computed<ContentCardTableItem[]>(() =>
-	filteredItems.value.map((item) => {
+const filteredItems = computed(() => {
+	const sorted = sortedItems.value
+	const searched = search(sorted)
+	return applyFilters(searched)
+})
+const tableItems = computed<ContentCardTableItem[]>(() => {
+	return filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		return {
 			...base,
-			disabled: isChanging(base.id) || ctx.isBusy.value || item.installing === true,
+			disabled:
+				isChanging(base.id) ||
+				ctx.isBusy.value ||
+				isBulkOperating.value ||
+				item.installing === true,
 			installing: item.installing === true,
 			hasUpdate: !ctx.isPackLocked.value && item.has_update,
 			isClientOnly: isClientOnlyEnvironment(item.environment),
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
-	}),
-)
+	})
+})
 
 const hasOutdatedProjects = computed(() => ctx.items.value.some((p) => p.has_update))
 
@@ -244,17 +290,25 @@ const hasOutdatedProjects = computed(() => ctx.items.value.some((p) => p.has_upd
 const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
-function handleDeleteById(id: string) {
+function handleDeleteById(id: string, event?: MouseEvent) {
 	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
-		confirmDeletionModal.value?.show()
+		if (event?.shiftKey) {
+			confirmDelete()
+		} else {
+			confirmDeletionModal.value?.show()
+		}
 	}
 }
 
-function showBulkDeleteModal() {
+function showBulkDeleteModal(event?: MouseEvent) {
 	pendingDeletionItems.value = [...selectedItems.value]
-	confirmDeletionModal.value?.show()
+	if (event?.shiftKey) {
+		confirmDelete()
+	} else {
+		confirmDeletionModal.value?.show()
+	}
 }
 
 async function confirmDelete() {
@@ -359,20 +413,28 @@ const pendingBulkUpdateItems = ref<ContentItem[]>([])
 
 const hasBulkUpdateSupport = computed(() => !!(ctx.bulkUpdateItem || ctx.bulkUpdateItems))
 
-function promptUpdateAll() {
+function promptUpdateAll(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
 	const items = ctx.items.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	confirmBulkUpdateModal.value?.show()
+	if (event?.shiftKey) {
+		confirmBulkUpdate()
+	} else {
+		confirmBulkUpdateModal.value?.show()
+	}
 }
 
-function promptUpdateSelected() {
+function promptUpdateSelected(event?: MouseEvent) {
 	if (!hasBulkUpdateSupport.value) return
 	const items = selectedItems.value.filter((item) => item.has_update)
 	if (items.length === 0) return
 	pendingBulkUpdateItems.value = items
-	confirmBulkUpdateModal.value?.show()
+	if (event?.shiftKey) {
+		confirmBulkUpdate()
+	} else {
+		confirmBulkUpdateModal.value?.show()
+	}
 }
 
 async function confirmBulkUpdate() {
@@ -441,7 +503,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				:categories="ctx.modpack.value.categories"
 				:has-update="ctx.modpack.value.hasUpdate"
 				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
-				:disabled-text="ctx.modpack.value.disabledText"
+				:disabled-text="
+					ctx.modpack.value.disabledText ??
+					ctx.busyMessage?.value ??
+					(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
+				"
 				:show-content-hint="
 					!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
 				"
@@ -505,8 +571,8 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							clearable
 							:placeholder="
 								formatMessage(messages.searchPlaceholder, {
-									count: ctx.items.value.length,
-									contentType: `${ctx.contentTypeLabel.value}${ctx.items.value.length === 1 ? '' : 's'}`,
+									count: tableItems.length,
+									contentType: `${ctx.contentTypeLabel.value}${tableItems.length === 1 ? '' : 's'}`,
 								})
 							"
 						/>
@@ -580,7 +646,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowUpDownIcon />
+										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 									</button>
 								</ButtonStyled>
@@ -596,7 +666,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowUpDownIcon />
+										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+											v-else-if="sortMode === 'date-added-newest'"
+										/><ClockArrowUpIcon
+											v-else-if="sortMode === 'date-added-oldest'"
+										/><ArrowDownAZIcon v-else />
 										{{ sortLabels[sortMode]() }}
 									</button>
 								</ButtonStyled>

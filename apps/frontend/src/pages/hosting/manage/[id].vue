@@ -311,6 +311,7 @@
 						</template>
 					</InstallingBanner>
 				</Transition>
+				<BackupProgressAdmonitions class="mb-4" />
 				<NuxtPage
 					:route="route"
 					:is-connected="isConnected"
@@ -357,6 +358,7 @@ import {
 } from '@modrinth/assets'
 import type { BusyReason } from '@modrinth/ui'
 import {
+	BackupProgressAdmonitions,
 	ButtonStyled,
 	defineMessage,
 	ErrorInformationCard,
@@ -483,7 +485,6 @@ const isServerRunning = computed(() => serverPowerState.value === 'running')
 const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
 const backupsState = reactive(new Map())
-const completedBackupTasks = new Set<string>()
 const cancelledBackups = new Set<string>()
 
 const markBackupCancelled = (backupId: string) => {
@@ -853,28 +854,22 @@ const handleAuthIncorrect = () => {
 }
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
-	// Ignore 'file' task events - these are per-file progress updates sent continuously
-	if (data.task === 'file') {
-		return
-	}
+	if (data.task === 'file') return
 
 	const backupId = data.id
-	const taskKey = `${backupId}:${data.task}`
 
-	if (completedBackupTasks.has(taskKey)) {
-		return
-	}
-
-	if (cancelledBackups.has(backupId)) {
-		return
-	}
+	if (cancelledBackups.has(backupId)) return
 
 	const current = backupsState.get(backupId) ?? {}
-	const previousState = current[data.task]?.state
-	const previousProgress = current[data.task]?.progress
+	const currentTaskState = current[data.task]?.state
+	const isIncomingTerminal =
+		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
 
-	if (previousState !== data.state || previousProgress !== data.progress) {
-		// (mutating same reference doesn't work)
+	// Skip duplicate terminal events, but allow retries (terminal → ongoing)
+	if (currentTaskState === data.state && isIncomingTerminal) return
+
+	const previousProgress = current[data.task]?.progress
+	if (currentTaskState !== data.state || previousProgress !== data.progress) {
 		backupsState.set(backupId, {
 			...current,
 			[data.task]: {
@@ -884,11 +879,7 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 		})
 	}
 
-	const isTerminalState =
-		data.state === 'done' || data.state === 'failed' || data.state === 'cancelled'
-	if (isTerminalState) {
-		completedBackupTasks.add(taskKey)
-
+	if (isIncomingTerminal) {
 		const attemptCleanup = (attempt: number = 1) => {
 			queryClient.invalidateQueries({ queryKey: ['backups', 'list', serverId] }).then(() => {
 				const backupData = queryClient.getQueryData<Archon.Backups.v1.Backup[]>([
@@ -897,12 +888,31 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 					serverId,
 				])
 				const backup = backupData?.find((b) => b.id === backupId)
+				const isStillActive =
+					backup && (backup.status === 'in_progress' || backup.status === 'pending')
 
-				if (backup?.ongoing && attempt < 3) {
-					// retry 3 times max, archon is slow compared to ws state
-					setTimeout(() => attemptCleanup(attempt + 1), 1000)
+				if (isStillActive && attempt < 6) {
+					setTimeout(() => attemptCleanup(attempt + 1), 1000 * Math.pow(2, attempt - 1))
 					return
 				}
+
+				if (isStillActive) {
+					queryClient.setQueryData<Archon.Backups.v1.Backup[]>(
+						['backups', 'list', serverId],
+						(old) =>
+							old?.map((b) => {
+								if (b.id !== backupId) return b
+								return {
+									...b,
+									status: data.state === 'done' ? ('done' as const) : ('error' as const),
+									ongoing: false,
+									interrupted: data.state === 'failed',
+								}
+							}),
+					)
+				}
+
+				backupsState.delete(backupId)
 			})
 		}
 
@@ -1325,7 +1335,6 @@ const cleanup = () => {
 	isReconnecting.value = false
 	isLoading.value = true
 
-	completedBackupTasks.clear()
 	cancelledBackups.clear()
 
 	clearNodeAuthState()
