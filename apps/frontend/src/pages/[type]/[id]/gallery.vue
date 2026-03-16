@@ -484,8 +484,8 @@ async function editGalleryItem() {
 	const imageUrl = filteredGallery.value[editIndex.value].url
 	const success = await contextEditGalleryItem(
 		imageUrl,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ? Number(editOrder.value) : undefined,
 	)
@@ -683,7 +683,7 @@ async function deleteGalleryImage() {
 		margin-bottom: 0;
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
-		min-height: 10rem;
+		aspect-ratio: 16 / 9;
 		object-fit: cover;
 	}
 

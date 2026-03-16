@@ -2071,10 +2071,10 @@ const createGalleryItemMutation = useMutation({
 			file.type.split('/')[file.type.split('/').length - 1]
 		}&featured=${featured ?? false}`
 
-		if (title) {
+		if (title != null) {
 			url += `&title=${encodeURIComponent(title)}`
 		}
-		if (description) {
+		if (description != null) {
 			url += `&description=${encodeURIComponent(description)}`
 		}
 		if (ordering !== null && ordering !== undefined) {
@@ -2132,10 +2132,10 @@ const editGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
 		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
 
-		if (title) {
+		if (title != null) {
 			url += `&title=${encodeURIComponent(title)}`
 		}
-		if (description) {
+		if (description != null) {
 			url += `&description=${encodeURIComponent(description)}`
 		}
 		if (ordering !== null && ordering !== undefined) {

@@ -427,8 +427,8 @@ const editGalleryItem = async () => {
 
 	const success = await editGalleryItemMutation(
 		filteredGallery.value[editIndex.value].url,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ?? undefined,
 	)
@@ -643,7 +643,7 @@ onUnmounted(() => {
 		margin-bottom: 0;
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
-		min-height: 10rem;
+		aspect-ratio: 16 / 9;
 		object-fit: cover;
 	}
 
