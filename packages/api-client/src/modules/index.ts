@@ -10,9 +10,11 @@ import { ISO3166Module } from './iso3166'
 import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
+import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
+import { LabrinthPayoutV3Module } from './labrinth/payout/v3'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthServerPingInternalModule } from './labrinth/server-ping/internal'
@@ -46,9 +48,11 @@ export const MODULE_REGISTRY = {
 	launchermeta_manifest_v0: LauncherMetaManifestV0Module,
 	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,
+	labrinth_auth_internal: LabrinthAuthInternalModule,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
 	labrinth_organizations_v3: LabrinthOrganizationsV3Module,
+	labrinth_payout_v3: LabrinthPayoutV3Module,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
 	labrinth_server_ping_internal: LabrinthServerPingInternalModule,

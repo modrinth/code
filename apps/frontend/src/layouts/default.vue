@@ -735,6 +735,7 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	defineMessages,
+	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
@@ -776,10 +777,11 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const client = injectModrinthClient()
 
 const { data: payoutBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
-	queryFn: () => useBaseFetch('payout/balance', { apiVersion: 3 }),
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
 	enabled: computed(() => !!auth.value.user),
 })
 
@@ -1142,7 +1144,7 @@ async function onKeyDown(event) {
 		rCount.value++
 
 		if (randomProjects.value.length < 3) {
-			randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+			randomProjects.value = await client.labrinth.projects_v2.getRandom(50).catch((err) => {
 				console.error(err)
 				return []
 			})

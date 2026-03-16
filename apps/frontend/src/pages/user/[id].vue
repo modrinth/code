@@ -508,6 +508,7 @@ import {
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { onServerPrefetch } from 'vue'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
@@ -684,7 +685,7 @@ const messages = defineMessages({
 
 const client = injectModrinthClient()
 
-const { data: user, error: userError } = useQuery({
+const { data: user, error: userError, suspense: userSuspense } = useQuery({
 	queryKey: computed(() => ['user', route.params.id]),
 	queryFn: () => client.labrinth.users_v2.get(route.params.id),
 })
@@ -704,10 +705,10 @@ watch(
 	{ immediate: true },
 )
 
-const { data: projects } = useQuery({
+const { data: projects, suspense: projectsSuspense } = useQuery({
 	queryKey: computed(() => ['user', route.params.id, 'projects']),
 	queryFn: async () => {
-		const projects = await useBaseFetch(`user/${route.params.id}/projects`)
+		const projects = await client.labrinth.users_v2.getProjects(route.params.id)
 		for (const project of projects) {
 			project.categories = project.categories.concat(project.loaders)
 			project.project_type = data.$getProjectTypeForUrl(
@@ -720,28 +721,72 @@ const { data: projects } = useQuery({
 	},
 })
 
-const { data: organizations } = useQuery({
+const { data: organizations, suspense: orgsSuspense } = useQuery({
 	queryKey: computed(() => ['user', route.params.id, 'organizations']),
-	queryFn: () =>
-		useBaseFetch(`user/${route.params.id}/organizations`, {
-			apiVersion: 3,
-		}),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(route.params.id),
 })
 
-const { data: collections } = useQuery({
+const { data: collections, suspense: collectionsSuspense } = useQuery({
 	queryKey: computed(() => ['user', route.params.id, 'collections']),
-	queryFn: () => useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
+	queryFn: () => client.labrinth.users_v2.getCollections(route.params.id),
 })
 
-watch(
-	user,
-	(userData) => {
-		if (userData && userData.username !== route.params.id) {
-			navigateTo(`/user/${userData.username}`, { redirectCode: 301 })
-		}
-	},
-	{ immediate: true },
-)
+onServerPrefetch(async () => {
+	const queryClient = useQueryClient()
+	console.log('[user/[id]] onServerPrefetch starting for:', route.params.id)
+	console.log(
+		'[user/[id]] cache BEFORE suspense:',
+		queryClient
+			.getQueryCache()
+			.getAll()
+			.map((q) => `${q.queryHash}: ${q.state.status}`),
+	)
+	try {
+		const results = await Promise.allSettled([
+			userSuspense(),
+			projectsSuspense(),
+			orgsSuspense(),
+			collectionsSuspense(),
+		])
+		console.log(
+			'[user/[id]] suspense results:',
+			results.map((r, i) => `${['user', 'projects', 'orgs', 'collections'][i]}: ${r.status}`),
+		)
+
+		// Check cache directly (bypass reactive refs)
+		console.log(
+			'[user/[id]] cache AFTER suspense:',
+			queryClient
+				.getQueryCache()
+				.getAll()
+				.map(
+					(q) =>
+						`${q.queryHash}: ${q.state.status}, hasData: ${q.state.data !== undefined}${q.state.error ? ', ERROR: ' + String(q.state.error?.message || q.state.error) : ''}`,
+				),
+		)
+
+		// Check reactive refs
+		console.log('[user/[id]] user.value:', user.value ? 'has data' : 'null/undefined')
+		console.log(
+			'[user/[id]] projects.value:',
+			projects.value ? `${projects.value.length} items` : 'null/undefined',
+		)
+
+		// Direct cache lookup for projects
+		const projectsKey = JSON.stringify(['user', route.params.id, 'projects'])
+		const projectsQuery = queryClient.getQueryCache().get(projectsKey)
+		console.log(
+			'[user/[id]] projects query direct lookup:',
+			projectsQuery
+				? `status=${projectsQuery.state.status}, data=${projectsQuery.state.data ? 'has data' : 'no data'}`
+				: 'NOT IN CACHE',
+		)
+	} catch (e) {
+		console.error('[user/[id]] onServerPrefetch error:', e)
+	}
+})
+
+
 
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
@@ -852,10 +897,7 @@ const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
 
 async function toggleAffiliate(id) {
-	await useBaseFetch(`user/${id}`, {
-		method: 'PATCH',
-		body: { badges: user.value.badges ^ (1 << 7) },
-	})
+	await client.labrinth.users_v2.patch(id, { badges: user.value.badges ^ (1 << 7) })
 	queryClient.invalidateQueries({ queryKey: ['user', route.params.id] })
 }
 
@@ -903,12 +945,7 @@ function saveRoleEdit() {
 
 	isSavingRole.value = true
 
-	useBaseFetch(`user/${user.value.id}`, {
-		method: 'PATCH',
-		body: {
-			role: selectedRole.value,
-		},
-	})
+	client.labrinth.users_v2.patch(user.value.id, { role: selectedRole.value })
 		.then(() => {
 			user.value.role = selectedRole.value
 

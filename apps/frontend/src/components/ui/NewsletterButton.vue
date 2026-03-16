@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { CheckIcon, MailIcon } from '@modrinth/assets'
-import { ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import { ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
-
-import { useBaseFetch } from '~/composables/fetch.js'
 
 const { formatMessage } = useVIntl()
 
@@ -26,6 +24,7 @@ const messages = defineMessages({
 const auth = (await useAuth()) as unknown as {
 	value: { user: { id: string; username: string; email: string; created: string } }
 }
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const showSubscriptionConfirmation = ref(false)
 
@@ -34,9 +33,7 @@ const { data: showSubscribeButton, isSuccess } = useQuery({
 	queryFn: async () => {
 		if (auth.value?.user) {
 			try {
-				const { subscribed } = (await useBaseFetch('auth/email/subscribe', {
-					method: 'GET',
-				})) as { subscribed: boolean }
+				const { subscribed } = await client.labrinth.auth_internal.getNewsletterStatus()
 				return !subscribed
 			} catch {
 				return true
@@ -50,9 +47,7 @@ const { data: showSubscribeButton, isSuccess } = useQuery({
 
 async function subscribe() {
 	try {
-		await useBaseFetch('auth/email/subscribe', {
-			method: 'POST',
-		})
+		await client.labrinth.auth_internal.subscribeNewsletter()
 		showSubscriptionConfirmation.value = true
 	} catch {
 		// Ignored

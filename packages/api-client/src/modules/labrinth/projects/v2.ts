@@ -240,4 +240,19 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			params: { url },
 		})
 	}
+
+	/**
+	 * Get random projects
+	 *
+	 * @param count - Number of random projects to return
+	 * @returns Promise resolving to an array of random projects
+	 */
+	public async getRandom(count: number): Promise<Labrinth.Projects.v2.Project[]> {
+		return this.client.request<Labrinth.Projects.v2.Project[]>('/projects_random', {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+			params: { count: String(count) },
+		})
+	}
 }
