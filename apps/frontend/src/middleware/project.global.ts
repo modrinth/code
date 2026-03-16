@@ -18,6 +18,8 @@ const PROJECT_TYPES = [
 ]
 
 export default defineNuxtRouteMiddleware(async (to) => {
+	// Only run this middleware on the server - it relies on server-only runtime config
+	if (import.meta.client) return
 	// Only handle project routes
 	if (!to.params.id || !PROJECT_TYPES.includes(to.params.type as string)) {
 		return
