@@ -71,6 +71,16 @@ export default new createRouter({
 					component: Library.Downloaded,
 				},
 				{
+					path: 'modpacks',
+					name: 'Modpacks',
+					component: Library.Modpacks,
+				},
+				{
+					path: 'servers',
+					name: 'LibraryServers',
+					component: Library.Servers,
+				},
+				{
 					path: 'custom',
 					name: 'Custom',
 					component: Library.Custom,

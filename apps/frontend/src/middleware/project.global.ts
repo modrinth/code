@@ -27,11 +27,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
 	const queryClient = useAppQueryClient()
 	const authToken = useCookie('auth-token')
-	const flags = useFeatureFlags()
-	const client = useServerModrinthClient({
-		authToken: authToken.value || undefined,
-		canaryCookie: flags.value.labrinthApiCanary,
-	})
+	const client = useServerModrinthClient({ authToken: authToken.value || undefined })
 	const tags = useGeneratedState()
 	const projectId = to.params.id as string
 

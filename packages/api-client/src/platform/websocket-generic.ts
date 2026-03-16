@@ -14,7 +14,7 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 
 	async connect(serverId: string, auth: Archon.Websocket.v0.WSAuth): Promise<void> {
 		if (this.connections.has(serverId)) {
-			this.disconnect(serverId)
+			this.closeConnection(serverId)
 		}
 
 		return new Promise((resolve, reject) => {
@@ -57,14 +57,30 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 				}
 
 				ws.onclose = (event) => {
+					console.debug(`[WebSocket] Closed for server ${serverId}:`, {
+						code: event.code,
+						reason: event.reason,
+						wasClean: event.wasClean,
+					})
 					if (event.code !== NORMAL_CLOSURE) {
 						this.scheduleReconnect(serverId, auth)
 					}
 				}
 
-				ws.onerror = (error) => {
-					console.error(`[WebSocket] Error for server ${serverId}:`, error)
-					reject(new Error(`WebSocket connection failed for server ${serverId}`))
+				ws.onerror = (event) => {
+					const url = ws.url
+					const readyState = ws.readyState
+					console.error(`[WebSocket] Error for server ${serverId}:`, {
+						url,
+						readyState,
+						readyStateLabel: ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][readyState],
+						type: (event as Event).type,
+					})
+					reject(
+						new Error(
+							`WebSocket connection failed for server ${serverId} (readyState: ${readyState})`,
+						),
+					)
 				}
 			} catch (error) {
 				reject(error)
@@ -73,6 +89,16 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 	}
 
 	disconnect(serverId: string): void {
+		this.closeConnection(serverId)
+
+		this.emitter.all.forEach((_handlers, type) => {
+			if (type.toString().startsWith(`${serverId}:`)) {
+				this.emitter.all.delete(type)
+			}
+		})
+	}
+
+	private closeConnection(serverId: string): void {
 		const connection = this.connections.get(serverId)
 		if (!connection) return
 
@@ -87,12 +113,6 @@ export class GenericWebSocketClient extends AbstractWebSocketClient {
 		) {
 			connection.socket.close(NORMAL_CLOSURE, 'Client disconnecting')
 		}
-
-		this.emitter.all.forEach((_handlers, type) => {
-			if (type.toString().startsWith(`${serverId}:`)) {
-				this.emitter.all.delete(type)
-			}
-		})
 
 		this.connections.delete(serverId)
 	}
