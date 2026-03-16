@@ -427,7 +427,7 @@ pub async fn index_local(
                     project_id: crate::models::ids::ProjectId::from(project.id)
                         .to_string(),
                     name: project.name.clone(),
-                    indexed_title: project.name.to_kebab_case(),
+                    indexed_name: project.name.to_kebab_case(),
                     summary: project.summary.clone(),
                     categories: categories.clone(),
                     display_categories: display_categories.clone(),
