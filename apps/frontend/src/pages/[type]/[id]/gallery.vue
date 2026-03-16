@@ -524,8 +524,8 @@ async function editGalleryItem() {
 	const imageUrl = filteredGallery.value[editIndex.value].url
 	const success = await contextEditGalleryItem(
 		imageUrl,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ? Number(editOrder.value) : undefined,
 	)

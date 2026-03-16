@@ -427,8 +427,8 @@ const editGalleryItem = async () => {
 
 	const success = await editGalleryItemMutation(
 		filteredGallery.value[editIndex.value].url,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ?? undefined,
 	)
