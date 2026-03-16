@@ -1,3 +1,19 @@
+- [Dependency Injection](#dependency-injection)
+	- [The `createContext` Factory](#the-createcontext-factory)
+	- [When to Use DI](#when-to-use-di)
+		- [Platform Abstraction (Primary Use Case)](#platform-abstraction-primary-use-case)
+		- [Page-Level Context](#page-level-context)
+	- [Creating a New Provider](#creating-a-new-provider)
+		- [1. Define the interface in `packages/ui/src/providers/`](#1-define-the-interface-in-packagesuisrcproviders)
+		- [2. For complex platform-specific logic, use an abstract class](#2-for-complex-platform-specific-logic-use-an-abstract-class)
+	- [Wiring Up Providers](#wiring-up-providers)
+		- [App Frontend (Tauri)](#app-frontend-tauri)
+		- [Website Frontend (Nuxt)](#website-frontend-nuxt)
+	- [Consuming Providers](#consuming-providers)
+	- [When NOT to Use DI](#when-not-to-use-di)
+	- [Existing Providers](#existing-providers)
+	- [Key Files](#key-files)
+
 # Dependency Injection
 
 Modrinth uses a lightweight DI layer built on Vue's `provide`/`inject` for sharing platform-specific capabilities and page-level state across shared UI components.
@@ -31,13 +47,13 @@ Use DI when:
 
 `packages/ui` components need capabilities that each frontend fulfils differently:
 
-| Provider | App Frontend | Website Frontend |
-|----------|-------------|-----------------|
-| API client | Tauri IPC client | REST fetch client |
-| Notifications | `ref()` state + app window mgmt | `useState()` for SSR hydration |
-| File picker | Native Tauri dialogs | Browser file inputs |
-| Tags | Tauri commands | Nuxt server state |
-| Page context | `sidebar: true`, ad window hooks | `sidebar: false`, no ads |
+| Provider      | App Frontend                     | Website Frontend               |
+| ------------- | -------------------------------- | ------------------------------ |
+| API client    | Tauri IPC client                 | REST fetch client              |
+| Notifications | `ref()` state + app window mgmt  | `useState()` for SSR hydration |
+| File picker   | Native Tauri dialogs             | Browser file inputs            |
+| Tags          | Tauri commands                   | Nuxt server state              |
+| Page context  | `sidebar: true`, ad window hooks | `sidebar: false`, no ads       |
 
 ### Page-Level Context
 
@@ -156,14 +172,14 @@ Default to props and emits. DI adds indirection — only use it with a concrete 
 
 ## Existing Providers
 
-| Provider | File | Purpose |
-|----------|------|---------|
-| `provideModrinthClient` | `providers/api-client.ts` | API client instance |
-| `provideNotificationManager` | `providers/web-notifications.ts` | Notification management |
-| `providePageContext` | `providers/page-context.ts` | Page config (sidebar, ads) |
-| `provideProjectPageContext` | `providers/project-page.ts` | Project page state + mutations |
-| `provideServerContext` | `providers/server-context.ts` | Server hosting state |
-| `provideUserPageContext` | `providers/user-page.ts` | User page state |
+| Provider                     | File                             | Purpose                        |
+| ---------------------------- | -------------------------------- | ------------------------------ |
+| `provideModrinthClient`      | `providers/api-client.ts`        | API client instance            |
+| `provideNotificationManager` | `providers/web-notifications.ts` | Notification management        |
+| `providePageContext`         | `providers/page-context.ts`      | Page config (sidebar, ads)     |
+| `provideProjectPageContext`  | `providers/project-page.ts`      | Project page state + mutations |
+| `provideServerContext`       | `providers/server-context.ts`    | Server hosting state           |
+| `provideUserPageContext`     | `providers/user-page.ts`         | User page state                |
 
 ## Key Files
 
