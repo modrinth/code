@@ -69,15 +69,13 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 
 ## Skills (`.claude/skills/`)
 
-Project-specific skill files with detailed patterns. Use them when the task matches:
+Task-oriented skills that reference the detailed standards in `standards/frontend/`:
 
-- **`api-module`** — Adding a new API endpoint module to `packages/api-client` (types, module class, registry registration)
-- **`cross-platform-pages`** — Building a page that needs to work in both the website (`apps/frontend`) and the desktop app (`apps/app-frontend`)
-- **`dependency-injection`** — Creating or wiring up a `provide`/`inject` context for platform abstraction or deep component state sharing
-- **`figma-mcp`** — Translating a Figma design into Vue components using the Figma MCP tools
-- **`i18n-convert`** — Converting hardcoded English strings in Vue SFCs into the `@modrinth/ui` i18n system (`defineMessages`, `formatMessage`, `IntlFormatted`)
-- **`multistage-modals`** — Building a wizard-like modal with multiple stages, progress tracking, and per-stage buttons using `MultiStageModal`
-- **`tanstack-query`** — Fetching, caching, or mutating server data with `@tanstack/vue-query` (queries, mutations, invalidation, optimistic updates)
+- **`api-module`** — Create a new API endpoint module from an OpenAPI schema
+- **`cross-platform-pages`** — Convert a page to the cross-platform shared/wrapped layout system
+- **`i18n-pass`** — Perform an i18n localization pass on changed files or a PR
+- **`figma-mcp`** — Draft a page layout from a Figma design using the MCP server
+- **`tanstack-query`** — Convert a page from `useAsyncData` / manual fetching to TanStack Query
 
 ## Code Guidelines
 
@@ -115,14 +113,6 @@ For Edit, use: `		private byte tag;` (copy everything after →, including the t
 
 **IMPORTANT**: Trust the Read tool output. Copy what's after `→` into Edit immediately. DO NOT verify with sed/od/grep first - that's wasting time and the instructions already tell you to stop if Edit fails, not to pre-verify.
 
-## Skills
+## Standards
 
-Project-specific skills (patterns, conventions, and implementation guides) are located in [`.claude/skills/`](./.claude/skills/). Each skill has a `SKILL.md` describing the pattern:
-
-- **[Dependency Injection](./.claude/skills/dependency-injection/SKILL.md)** — Vue provide/inject DI layer using `createContext`
-- **[Cross-Platform Pages](./.claude/skills/cross-platform-pages/SKILL.md)** — Shared component architecture across Nuxt and Tauri frontends
-- **[Multistage Modals](./.claude/skills/multistage-modals/SKILL.md)** — Wizard-like modal flows with `MultiStageModal`
-- **[Figma MCP](./.claude/skills/figma-mcp/SKILL.md)** — Translating Figma designs to Modrinth Vue components
-- **[i18n Convert](./.claude/skills/i18n-convert/SKILL.md)** — Converting hard-coded strings to vue-i18n localization
-- **[API Module](./.claude/skills/api-module/SKILL.md)** — Adding new endpoint modules to `@modrinth/api-client`
-- **[TanStack Query](./.claude/skills/tanstack-query/SKILL.md)** — Server state management with `@tanstack/vue-query` v5
+Standards available at the @standards/ folder.
