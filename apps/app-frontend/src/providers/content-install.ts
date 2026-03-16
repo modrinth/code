@@ -1,13 +1,20 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { ContentInstallInstance, ContentItem } from '@modrinth/ui'
+import type { ContentInstallInstance, ContentInstallProjectInfo, ContentItem } from '@modrinth/ui'
 import { createContext } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import dayjs from 'dayjs'
 import { nextTick, type Ref, ref } from 'vue'
 import type { Router } from 'vue-router'
 
 import { trackEvent } from '@/helpers/analytics'
-import { get_project, get_project_v3_many, get_version_many } from '@/helpers/cache.js'
+import {
+	get_organization,
+	get_project,
+	get_project_v3_many,
+	get_team,
+	get_version_many,
+} from '@/helpers/cache.js'
 import { create_profile_and_install as packInstall } from '@/helpers/pack'
 import {
 	add_project_from_version,
@@ -73,6 +80,7 @@ export interface ContentInstallContext {
 	preferredLoader: Ref<string | null>
 	preferredGameVersion: Ref<string | null>
 	releaseGameVersions: Ref<Set<string>>
+	projectInfo: Ref<ContentInstallProjectInfo | null>
 	handleInstallToInstance: (instance: ContentInstallInstance) => Promise<void>
 	handleCreateAndInstall: (data: {
 		name: string
@@ -93,7 +101,7 @@ export interface ContentInstallContext {
 		source?: string,
 		callback?: (versionId?: string) => void,
 		createInstanceCallback?: (profile: string) => void,
-		hints?: { preferredLoader?: string; preferredGameVersion?: string },
+		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) => Promise<void>
 	installingItems: Ref<Map<string, ContentItem[]>>
 }
@@ -116,6 +124,7 @@ export function createContentInstall(opts: {
 	const preferredGameVersion = ref<string | null>(null)
 	const releaseGameVersions = ref<Set<string>>(new Set())
 
+	const projectInfo = ref<ContentInstallProjectInfo | null>(null)
 	const installingItems = ref<Map<string, ContentItem[]>>(new Map())
 
 	function addInstallingItem(
@@ -193,6 +202,58 @@ export function createContentInstall(opts: {
 
 		instances.value = []
 		defaultTab.value = 'existing'
+
+		if (hints?.showProjectInfo) {
+			projectInfo.value = {
+				title: project.title,
+				iconUrl: project.icon_url,
+				link: `/project/${project.slug ?? project.id}`,
+			}
+			if (project.organization) {
+				get_organization(project.organization)
+					.then((org: { id: string; slug: string; name: string; icon_url?: string }) => {
+						if (projectInfo.value) {
+							const orgSlug = org.slug ?? org.id
+							projectInfo.value = {
+								...projectInfo.value,
+								owner: {
+									name: org.name,
+									iconUrl: org.icon_url,
+									circle: false,
+									link: () => openUrl(`https://modrinth.com/organization/${orgSlug}`),
+								},
+							}
+						}
+					})
+					.catch(() => {})
+			} else if (project.team) {
+				get_team(project.team)
+					.then(
+						(
+							members: {
+								user: { id: string; username: string; avatar_url?: string }
+								is_owner: boolean
+							}[],
+						) => {
+							const owner = members.find((m) => m.is_owner)
+							if (owner && projectInfo.value) {
+								projectInfo.value = {
+									...projectInfo.value,
+									owner: {
+										name: owner.user.username,
+										iconUrl: owner.user.avatar_url,
+										circle: true,
+										link: () => openUrl(`https://modrinth.com/user/${owner.user.username}`),
+									},
+								}
+							}
+						},
+					)
+					.catch(() => {})
+			}
+		} else {
+			projectInfo.value = null
+		}
 
 		const loaderSet = new Set<string>()
 		const gameVersionSet = new Set<string>()
@@ -402,7 +463,7 @@ export function createContentInstall(opts: {
 		source: string = 'unknown',
 		callback: (versionId?: string) => void = () => {},
 		createInstanceCallback: (profile: string) => void = () => {},
-		hints?: { preferredLoader?: string; preferredGameVersion?: string },
+		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) {
 		const project: Labrinth.Projects.v2.Project = await get_project(projectId, 'must_revalidate')
 
@@ -508,6 +569,7 @@ export function createContentInstall(opts: {
 		preferredLoader,
 		preferredGameVersion,
 		releaseGameVersions,
+		projectInfo,
 		handleInstallToInstance,
 		handleCreateAndInstall,
 		handleNavigate,

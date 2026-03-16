@@ -79,12 +79,11 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
-import { get_user } from '@/helpers/cache.js'
+import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
 import { create_profile_and_install_from_file } from '@/helpers/pack'
@@ -156,8 +155,6 @@ const {
 
 const news = ref([])
 const availableSurvey = ref(false)
-
-const urlModal = ref(null)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -421,6 +418,7 @@ const {
 	preferredLoader: contentInstallPreferredLoader,
 	preferredGameVersion: contentInstallPreferredGameVersion,
 	releaseGameVersions: contentInstallReleaseGameVersions,
+	projectInfo: contentInstallProjectInfo,
 	handleInstallToInstance,
 	handleCreateAndInstall,
 	handleNavigate: handleContentInstallNavigate,
@@ -436,6 +434,7 @@ const {
 	setInstallToPlayModal: setServerInstallToPlayModal,
 	setUpdateToPlayModal: setServerUpdateToPlayModal,
 	setAddServerToInstanceModal: setServerAddServerToInstanceModal,
+	playServerProject,
 } = serverInstall
 
 const modInstallModal = ref()
@@ -545,9 +544,19 @@ async function handleCommand(e) {
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
+	} else if (e.event === 'InstallVersion') {
+		const version = await get_version(e.id, 'must_revalidate').catch(handleError)
+		if (version) {
+			await contentInstall
+				.install(version.project_id, version.id, null, 'URLConfirmModal', undefined, undefined, {
+					showProjectInfo: true,
+				})
+				.catch(handleError)
+		}
 	} else {
-		// Other commands are URL-based (deep linking)
-		urlModal.value.show(e)
+		await contentInstall
+			.install(e.id, null, null, 'URLConfirmModal', undefined, undefined, { showProjectInfo: true })
+			.catch(handleError)
 	}
 }
 
@@ -1265,7 +1274,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</template>
 		</div>
 	</div>
-	<URLConfirmModal ref="urlModal" />
 	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
 	<PopupNotificationPanel has-sidebar />
@@ -1281,6 +1289,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		:preferred-loader="contentInstallPreferredLoader"
 		:preferred-game-version="contentInstallPreferredGameVersion"
 		:release-game-versions="contentInstallReleaseGameVersions"
+		:project-info="contentInstallProjectInfo"
 		@install="handleInstallToInstance"
 		@create-and-install="handleCreateAndInstall"
 		@navigate="handleContentInstallNavigate"
