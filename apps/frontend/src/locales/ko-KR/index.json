@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App은 단 150MB의 메모리만 사용합니다. 다른 모드 관리자보다 더 빠르겠죠!"
+    "message": "Modrinth App은 대다수 모드 매니저들보다 빠릅니다, 150 MB의 메모리만 사용하죠!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "아직 프로젝트에 컬렉션이 없습니다"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {프로젝트 없음} other {<stat>{count}</stat> 프로젝트}}"
+    "message": "{count, plural, =0 {프로젝트 없음} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} 전에 업데이트됨"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "첫 컬렉션을 만들어 시작하세요!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "아직 컬렉션이 없습니다"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "검색어와 일치하는 컬렉션이 없습니다"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "검색 필터 또는 검색어를 변경 해보세요."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} 프로젝트}}"
+    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "컬렉션 검색"
@@ -657,7 +669,7 @@
     "message": "사업체란 법인, 파트너십 또는 유한책임회사(LLC)와 같이 등록된 조직을 의미합니다."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "개인으로 출금하시나요, 아니면 사업체로 출금하시나요?"
+    "message": "개인으로 출금하시나요, 아니면 사업자로 출금하시나요?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "개인"
@@ -1131,7 +1143,7 @@
     "message": "Modrinth Hosting 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "네. 모든 Modrinth Hosting 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17Tbps의 용량을 제공합니다."
+    "message": "네. 모든 Modrinth 호스팅 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17 Tbps의 용량을 제공합니다."
   },
   "hosting-marketing.faq.heading": {
     "message": "자주 묻는 질문"
@@ -1239,7 +1251,7 @@
     "message": "정확히 필요한 것이 있나요?"
   },
   "hosting-marketing.medal.info": {
-    "message": "<orange>Medal</orange>에서 제공하는 <orange>3GB</orange> 서버를 5일 동안 무료로 사용해 보세요."
+    "message": "<orange>Medal</orange>에서 제공하는 <orange>3 GB</orange> 서버를 5일 동안 무료로 사용해 보세요"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "자세히 보기"
@@ -1425,7 +1437,7 @@
     "message": "플레이어를 위해"
   },
   "landing.section.for-players.tagline": {
-    "message": "{count}개 이상의 창작물을 찾으세요"
+    "message": "{count, number} 개 이상의 프로젝트를 만나보세요"
   },
   "landing.subheading": {
     "message": "커뮤니티를 위해 구축된 오픈소스 플랫폼을 통해 마인크래프트 콘텐츠를 찾고, 즐기고, 공유하세요."
@@ -2028,7 +2040,7 @@
     "message": "컬렉션"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {다운로드}}"
+    "message": "{count} {countPlural, plural, one {다운로드} other {다운로드}}"
   },
   "profile.label.joined": {
     "message": "가입"
@@ -2049,7 +2061,7 @@
     "message": "조직"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {프로젝트}}"
+    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "profile.label.saving": {
     "message": "저장..."
@@ -2673,7 +2685,7 @@
     "message": "신고 쓰기"
   },
   "scopes.sessionAccess.description": {
-    "message": "Modrinth 발급 세션에 접근하기"
+    "message": "Modrinth에서 발급한 세션 찾기"
   },
   "scopes.sessionAccess.label": {
     "message": "세션 접근"
@@ -2771,9 +2783,6 @@
   "search.filter.locked.server.sync": {
     "message": "서버와 동기화"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "백업 복원이 진행 중입니다"
-  },
   "servers.notice.actions": {
     "message": "활동"
   },
@@ -2826,7 +2835,7 @@
     "message": "추가하기"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "리디렉션 Uri를 추가하세요"
+    "message": "리디렉션 URI 를 추가하세요"
   },
   "settings.applications.button.cancel": {
     "message": "취소"
@@ -2889,7 +2898,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "리다이렉트 URIs"
+    "message": "URI 리다이렉트 하기"
   },
   "settings.applications.field.scopes": {
     "message": "범위"
@@ -3051,7 +3060,7 @@
     "message": "PAT 생성"
   },
   "settings.pats.description": {
-    "message": "PAT는 Modrinth API 접근에 사용됩니다. 자세한 내용 <doc-link>Modrinth API 문서</doc-link>를 확인하세요. 언제든지 생성 및 해지가 가능합니다."
+    "message": "개인 접속 토큰으로 Modrinth API에 접근 할 수 있습니다. 생성 및 해지가 언제든 가능합니다. <doc-link>Modrinth's API 문서</doc-link>를 확인해보세요."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT 생성"

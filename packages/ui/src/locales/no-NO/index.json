@@ -257,9 +257,6 @@
   "header.category.performance-impact": {
     "defaultMessage": "Ytelsespåvirkning"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "Oppløysing"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Burst opp til {cpus} CPU-er"
   },
@@ -314,17 +311,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukjent spillmodus"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Kople fra modpack"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Ikke kompatibel"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Gå ned i versjon til v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Oppdater versjon"
@@ -346,15 +337,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Vis manglende kompatibilitet"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Oppdater til v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for instansen din. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for verda di. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
   },
   "label.actions": {
     "defaultMessage": "Handlinger"
@@ -427,9 +409,6 @@
   },
   "label.password": {
     "defaultMessage": "Passord"
-  },
-  "label.played": {
-    "defaultMessage": "Spilt {time}"
   },
   "label.project": {
     "defaultMessage": "Prosjekt"
@@ -821,17 +800,8 @@
   "project.about.links.wiki": {
     "defaultMessage": "Besøk wiki"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {nedlasting} other {nedlastinger}}"
-  },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Både klient og server er påkrevd"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Klient og server, valgfritt på server"
@@ -842,9 +812,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Kun klient"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient og server, best når det er installert på begge"
   },
@@ -854,20 +821,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Klient og server, valgfritt på begge"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "All funksjonalitet kjøres på serveren og er kompatibel med vanlige klienter."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Kun server"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Klient og server, valgfritt på klient"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "All funksjonalitet køyrer på serveren og er kompatibel med vanlege klientar."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Bare serversidig, fungerer også på enkeltspiller"
@@ -889,9 +847,6 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ukjent miljø"
-  },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {følger} other {følgere}}"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
@@ -1130,9 +1085,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhetskopiplan"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Oppretter backup…"
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Kunne ikke gjenopprette fra backup"
   },
@@ -1142,20 +1094,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuell sikkerhetskopiering"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Sikkerhetskopiering i kø"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Gjenopprett i kø"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Endre navn"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Gjenopprett"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Gjenoppretter fra sikkerhetskopi..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avskjedige"
@@ -1618,9 +1561,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} klokken {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du har ulagrede endringer."

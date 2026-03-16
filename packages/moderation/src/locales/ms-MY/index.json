@@ -63,13 +63,19 @@
     "defaultMessage": "Tampilkan satu gambar galeri"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Lawat laman galeri"
+    "defaultMessage": "Kunjungi laman galeri"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "{type, select, mod {Mod} plugin {Pemalam} other {Projek}} anda sedang menggunakan lesen yang memerlukan kod sumber tersedia. Sila berikan pautan kod sumber atau fail sumber untuk setiap versi tambahan atau pertimbangkan untuk menggunakan lesen yang berbeza."
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Sediakan kod sumber"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Sesetengah daripada pautan luaran anda kelihatan sama. Setiap pautan hendaklah dimasukkan sekali sahaja dan dengan jenis pautan yang sesuai."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Pautan Serupa"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Keterangan anda harus mengandungi teks biasa atau teks alt gambar yang mencukupi, memastikan ia boleh diakses oleh mereka yang menggunakan pembaca skrin atau dengan sambungan internet yang perlahan."
@@ -120,7 +126,7 @@
     "defaultMessage": "Pindahkan pautan jemputan Discord"
   },
   "nags.moderation.title": {
-    "defaultMessage": "Lawat bebenang penyederhanaan"
+    "defaultMessage": "Kunjungi bebenang penyederhanaan"
   },
   "nags.moderator-feedback.description": {
     "defaultMessage": "Semak dan tangani semua kebimbangan daripada pasukan penyederhana sebelum menyerahkan semula."
@@ -134,8 +140,17 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Pilih resolusi yang betul"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Pilih versi yang disokong oleh pelayan anda, pilih Pek Mod, atau muat naik milik anda sendiri."
+  },
   "nags.select-compatibility.title": {
     "defaultMessage": "Pilih keserasian"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Beritahu pemain di rantau mana pelayan anda berada."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Pilih rantau"
   },
   "nags.select-language.description": {
     "defaultMessage": "Senaraikan bahasa-bahasa yang disokong oleh pelayan anda."
@@ -156,22 +171,22 @@
     "defaultMessage": "Pilih tag"
   },
   "nags.server.title": {
-    "defaultMessage": "Lawat tetapan pelayan"
+    "defaultMessage": "Kunjungi tetapan pelayan"
   },
   "nags.settings.description.title": {
-    "defaultMessage": "Lawat tetapan keterangan"
+    "defaultMessage": "Kunjungi tetapan keterangan"
   },
   "nags.settings.license.title": {
-    "defaultMessage": "Lawat tetapan lesen"
+    "defaultMessage": "Kunjungi tetapan lesen"
   },
   "nags.settings.links.title": {
-    "defaultMessage": "Lawat tetapan pautan"
+    "defaultMessage": "Kunjungi tetapan pautan"
   },
   "nags.settings.tags.title": {
-    "defaultMessage": "Lawat tetapan tag"
+    "defaultMessage": "Kunjungi tetapan tag"
   },
   "nags.settings.title": {
-    "defaultMessage": "Lawat tetapan umum"
+    "defaultMessage": "Kunjungi tetapan umum"
   },
   "nags.summary-same-as-title.description": {
     "defaultMessage": "Ringkasan anda tidak boleh sama dengan Nama projek anda. Adalah penting untuk mencipta Ringkasan yang bermaklumat dan menarik."
@@ -228,10 +243,10 @@
     "defaultMessage": "Sahkan pautan luaran"
   },
   "nags.versions.title": {
-    "defaultMessage": "Lawat laman versi"
+    "defaultMessage": "Kunjungi laman versi"
   },
   "nags.visit-links-settings.title": {
-    "defaultMessage": "Lawat tetapan pautan"
+    "defaultMessage": "Kunjungi tetapan pautan"
   }
 }
 

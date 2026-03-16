@@ -71,6 +71,12 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Bied bron code aan"
   },
+  "nags.identical-links.description": {
+    "defaultMessage": "Sommige van je externe links lijken identiek te zijn, elke link moet maar een keer worden ingevuld met de juiste link type."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Identieke links"
+  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Uw beschrijving moet voldoende platte tekst of alternatieve afbeeldingstekst bevatten, zodat deze ook toegankelijk is voor mensen die een schermlezer gebruiken of een trage internetverbinding hebben."
   },
@@ -139,6 +145,12 @@
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "Select compatibiliteit"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Laat de players weten welke regio de server in is."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Selecteer een regio"
   },
   "nags.select-language.description": {
     "defaultMessage": "Geef een lijst van de taal of talen die je server ondersteunt."

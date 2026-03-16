@@ -266,9 +266,6 @@
   "header.category.performance-impact": {
     "defaultMessage": "Impacto na performance"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "Resolução"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Turbo até {cpus} CPUs"
   },
@@ -323,26 +320,17 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Desassociar modpack"
-  },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Voltar"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copiar link"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Desativar"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Este modpack não inclui nenhum conteúdo adicional."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nenhum conteúdo encontrado"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Ativar"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "Tudo"
@@ -356,20 +344,11 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Nenhum projeto corresponde à tua pesquisa."
   },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Procura {count} projetos"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} selecionados"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Atual"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Incompatível"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Desatualizar para v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Atualizar versão"
@@ -391,15 +370,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Mostrar incompatíveis"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Atualizar para v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Não podemos garantir que atualizações são seguras para a tua instância. Revê a lista de alterações de todas as versões intermediárias e considera fazer uma cópia de segurança."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Não podemos garantir que atualizações são seguras para os teus mundos. Revê a lista de alterações de todas as versões intermediárias e considera fazer uma cópia de segurança."
   },
   "label.actions": {
     "defaultMessage": "Ações"
@@ -472,9 +442,6 @@
   },
   "label.password": {
     "defaultMessage": "Palavra-passe"
-  },
-  "label.played": {
-    "defaultMessage": "Jogado há {time}"
   },
   "label.project": {
     "defaultMessage": "Projeto"
@@ -908,17 +875,8 @@
   "project.about.server.title": {
     "defaultMessage": "Detalhes do servidor"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural,one {transferência} other {transferências}}"
-  },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Cliente e servidor, necessário em ambos"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Cliente e servidor, opcional no servidor"
@@ -929,9 +887,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Apenas no cliente"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Cliente e servidor, melhor quando instalado em ambos"
   },
@@ -941,20 +896,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Cliente e servidor, opcional em ambos"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes vanilla."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Apenas no servidor"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Tem alguma funcionalidade tanto no cliente como no servidor, mesmo que apenas parcialmente."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Cliente e servidor, opcional no cliente"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "Toda a funcionalidade é feita no servidor e é compatível com clientes vanilla."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Lado do servidor apenas, também funciona em um jogador"
@@ -976,18 +922,6 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente desconhecido"
-  },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural,one {seguidor} other {seguidores}}"
-  },
-  "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {jogou recentemente} other {jogaram recentemente}}"
-  },
-  "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Estatísticas"
@@ -1232,9 +1166,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Horário de Backup"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Criando backup..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Falha a criar backup"
   },
@@ -1244,20 +1175,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Fazer backup manual"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Backup em fila"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Restaurar em fila"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Renomear"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restaurar"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Restaurando do backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignorar"
@@ -1783,9 +1705,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} às {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Tens alterações por guardar."
