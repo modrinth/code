@@ -558,6 +558,7 @@ import {
 	Checkbox,
 	Combobox,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
@@ -566,9 +567,9 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 
 import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
-import { useBaseFetch } from '~/composables/fetch.js'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
@@ -623,10 +624,7 @@ const transferModal = ref(null)
 
 const { data: organizations } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
-	queryFn: () =>
-		useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
-			apiVersion: 3,
-		}),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(auth.value?.user.id),
 	enabled: computed(() => !!auth.value?.user?.id),
 })
 
@@ -655,12 +653,8 @@ const VIEW_PAYOUTS = 1 << 9
 const onAddToOrg = useClientTry(async () => {
 	if (!selectedOrganizationId.value) return
 
-	await useBaseFetch(`organization/${selectedOrganizationId.value}/projects`, {
-		method: 'POST',
-		body: JSON.stringify({
-			project_id: project.value.id,
-		}),
-		apiVersion: 3,
+	await client.labrinth.organizations_v3.addProject(selectedOrganizationId.value, {
+		project_id: project.value.id,
 	})
 
 	await updateMembers()
@@ -675,13 +669,11 @@ const onAddToOrg = useClientTry(async () => {
 const onRemoveFromOrg = useClientTry(async () => {
 	if (!project.value.organization || !auth.value?.user?.id) return
 
-	await useBaseFetch(`organization/${project.value.organization}/projects/${project.value.id}`, {
-		method: 'DELETE',
-		body: JSON.stringify({
-			new_owner: auth.value.user.id,
-		}),
-		apiVersion: 3,
-	})
+	await client.labrinth.organizations_v3.removeProject(
+		project.value.organization,
+		project.value.id,
+		{ new_owner: auth.value.user.id },
+	)
 
 	await updateMembers()
 
@@ -701,13 +693,9 @@ const inviteTeamMember = async () => {
 	startLoading()
 
 	try {
-		const user = await useBaseFetch(`user/${currentUsername.value}`)
-		const data = {
+		const user = await client.labrinth.users_v2.get(currentUsername.value)
+		await client.labrinth.teams_v2.addMember(project.value.team, {
 			user_id: user.id.trim(),
-		}
-		await useBaseFetch(`team/${project.value.team}/members`, {
-			method: 'POST',
-			body: data,
 		})
 		currentUsername.value = ''
 		await updateMembers()
@@ -726,11 +714,9 @@ const removeTeamMember = async (index) => {
 	startLoading()
 
 	try {
-		await useBaseFetch(
-			`team/${project.value.team}/members/${allTeamMembers.value[index].user.id}`,
-			{
-				method: 'DELETE',
-			},
+		await client.labrinth.teams_v2.removeMember(
+			project.value.team,
+			allTeamMembers.value[index].user.id,
 		)
 		await updateMembers()
 		addNotification({
@@ -764,12 +750,10 @@ const updateTeamMember = async (index) => {
 					role: allTeamMembers.value[index].role,
 				}
 
-		await useBaseFetch(
-			`team/${project.value.team}/members/${allTeamMembers.value[index].user.id}`,
-			{
-				method: 'PATCH',
-				body: data,
-			},
+		await client.labrinth.teams_v2.editMember(
+			project.value.team,
+			allTeamMembers.value[index].user.id,
+			data,
 		)
 		await updateMembers()
 		addNotification({
@@ -820,11 +804,8 @@ const transferOwnership = async (index) => {
 	startLoading()
 
 	try {
-		await useBaseFetch(`team/${project.value.team}/owner`, {
-			method: 'PATCH',
-			body: {
-				user_id: allTeamMembers.value[index].user.id,
-			},
+		await client.labrinth.teams_v2.transferOwnership(project.value.team, {
+			user_id: allTeamMembers.value[index].user.id,
 		})
 		addNotification({
 			title: 'Member ownership transferred',
@@ -848,32 +829,25 @@ async function updateOrgMember(index) {
 
 	try {
 		if (allOrgMembers.value[index].override && !allOrgMembers.value[index].oldOverride) {
-			await useBaseFetch(`team/${project.value.team}/members`, {
-				method: 'POST',
-				body: {
+			await client.labrinth.teams_v2.addMember(project.value.team, {
+				permissions: allOrgMembers.value[index].permissions,
+				role: allOrgMembers.value[index].role,
+				payouts_split: allOrgMembers.value[index].payouts_split,
+				user_id: allOrgMembers.value[index].user.id,
+			})
+		} else if (!allOrgMembers.value[index].override && allOrgMembers.value[index].oldOverride) {
+			await client.labrinth.teams_v2.removeMember(
+				project.value.team,
+				allOrgMembers.value[index].user.id,
+			)
+		} else {
+			await client.labrinth.teams_v2.editMember(
+				project.value.team,
+				allOrgMembers.value[index].user.id,
+				{
 					permissions: allOrgMembers.value[index].permissions,
 					role: allOrgMembers.value[index].role,
 					payouts_split: allOrgMembers.value[index].payouts_split,
-					user_id: allOrgMembers.value[index].user.id,
-				},
-			})
-		} else if (!allOrgMembers.value[index].override && allOrgMembers.value[index].oldOverride) {
-			await useBaseFetch(
-				`team/${project.value.team}/members/${allOrgMembers.value[index].user.id}`,
-				{
-					method: 'DELETE',
-				},
-			)
-		} else {
-			await useBaseFetch(
-				`team/${project.value.team}/members/${allOrgMembers.value[index].user.id}`,
-				{
-					method: 'PATCH',
-					body: {
-						permissions: allOrgMembers.value[index].permissions,
-						role: allOrgMembers.value[index].role,
-						payouts_split: allOrgMembers.value[index].payouts_split,
-					},
 				},
 			)
 		}

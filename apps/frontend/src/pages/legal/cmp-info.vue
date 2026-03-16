@@ -146,7 +146,7 @@
 			</thead>
 			<tbody>
 				<tr v-for="item in platformRevenueData" :key="item.time">
-					<td>{{ formatDate(dayjs.unix(item.time)) }}</td>
+					<td>{{ formatDate(dayjs.unix(item.time).toDate()) }}</td>
 					<td>{{ formatMoney(Number(item.revenue) + Number(item.creator_revenue)) }}</td>
 					<td>{{ formatMoney(Number(item.creator_revenue)) }}</td>
 					<td>{{ formatMoney(Number(item.revenue)) }}</td>
@@ -162,11 +162,12 @@
 </template>
 
 <script lang="ts" setup>
-import { StyledInput, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
+import { injectModrinthClient, StyledInput, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
 
+const client = injectModrinthClient()
 const formatMoney = useFormatMoney()
 const formatDate = useFormatDateTime({
 	month: 'long',
@@ -191,10 +192,7 @@ const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
 
 const { data: transparencyInformation } = useQuery({
 	queryKey: ['payout', 'platform_revenue'],
-	queryFn: () =>
-		useBaseFetch('payout/platform_revenue', {
-			apiVersion: 3,
-		}),
+	queryFn: () => client.labrinth.payouts_v3.getPlatformRevenue(),
 })
 
 const platformRevenue = (transparencyInformation.value as any)?.all_time

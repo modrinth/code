@@ -6,6 +6,7 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
@@ -43,29 +44,7 @@ export type PaymentProvider = 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
  **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
-export interface PayoutMethod {
-	id: string
-	type: string
-	name: string
-	category?: string
-	image_url: string | null
-	image_logo_url: string | null
-	interval: {
-		standard: {
-			min: number
-			max: number
-		}
-		fixed?: {
-			values: number[]
-		}
-	}
-	config?: {
-		fiat?: string | null
-		blockchain?: string[]
-	}
-	currency_code?: string | null
-	exchange_rate?: number | null
-}
+export type PayoutMethod = Labrinth.Payout.v3.PayoutMethod
 
 export interface PaymentOption {
 	value: string
