@@ -28,10 +28,11 @@ import {
 	UnknownIcon,
 	UpdatedIcon,
 	USDCColorIcon,
+	WorldIcon,
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { ProjectStatus, ProjectType } from '@modrinth/utils'
+import type { ProjectStatus, ProjectType as BaseProjectType } from '@modrinth/utils'
 import type { Component } from 'vue'
 
 import {
@@ -41,10 +42,13 @@ import {
 	FILE_TEXT_EXTENSIONS,
 } from './file-extensions'
 
+type ProjectType = BaseProjectType | 'map'
+
 export const PROJECT_TYPE_ICONS: Record<ProjectType, Component> = {
 	mod: BoxIcon,
 	modpack: PackageOpenIcon,
 	resourcepack: PaintbrushIcon,
+	map: WorldIcon,
 	shader: GlassesIcon,
 	plugin: PlugIcon,
 	datapack: BracesIcon,

@@ -253,6 +253,10 @@ const projectListLayouts = defineMessages({
 		id: 'settings.display.project-list-layouts.resourcepack',
 		defaultMessage: 'Resource Packs page',
 	},
+	map: {
+		id: 'settings.display.project-list-layouts.map',
+		defaultMessage: 'Maps page',
+	},
 	modpack: {
 		id: 'settings.display.project-list-layouts.modpack',
 		defaultMessage: 'Modpacks page',

@@ -9,6 +9,14 @@ const projectTypeMessages = defineMessages({
 		id: 'project-type.datapack.plural',
 		defaultMessage: 'Data Packs',
 	},
+	map: {
+		id: 'project-type.map.singular',
+		defaultMessage: 'Map',
+	},
+	maps: {
+		id: 'project-type.map.plural',
+		defaultMessage: 'Maps',
+	},
 	mod: {
 		id: 'project-type.mod.singular',
 		defaultMessage: 'Mod',

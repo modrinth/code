@@ -49,6 +49,7 @@ export type DisplayProjectType =
 	| 'plugin'
 	| 'datapack'
 	| 'resourcepack'
+	| 'map'
 	| 'modpack'
 	| 'shader'
 	| 'server'
@@ -244,6 +245,7 @@ export const PROJECT_TYPE_PRECEDENCE = [
 	'datapack',
 	'plugin',
 	'shader',
+	'map',
 	'resourcepack',
 	'mod',
 	'project',

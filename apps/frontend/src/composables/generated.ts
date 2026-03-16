@@ -88,6 +88,11 @@ export const useGeneratedState = () =>
 				display: 'resource pack',
 			},
 			{
+				actual: 'map',
+				id: 'map',
+				display: 'map',
+			},
+			{
 				actual: 'modpack',
 				id: 'modpack',
 				display: 'modpack',

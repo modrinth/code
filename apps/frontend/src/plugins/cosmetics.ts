@@ -6,9 +6,11 @@ export type DisplayLocation =
 	| 'mod'
 	| 'plugin'
 	| 'resourcepack'
+	| 'map'
 	| 'modpack'
 	| 'shader'
 	| 'datapack'
+	| 'server'
 	| 'user'
 	| 'collection'
 
@@ -45,6 +47,7 @@ export default defineNuxtPlugin({
 					mod: 'list',
 					plugin: 'list',
 					resourcepack: 'gallery',
+					map: 'gallery',
 					modpack: 'list',
 					shader: 'gallery',
 					datapack: 'list',

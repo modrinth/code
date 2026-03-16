@@ -120,6 +120,8 @@ export const formatProjectType = (name, short = false) => {
 	if (short) {
 		if (name === 'resourcepack') {
 			return 'RPK'
+		} else if (name === 'map') {
+			return 'MAP'
 		} else if (name === 'mod') {
 			return 'MOD'
 		} else if (name === 'modpack') {
@@ -135,6 +137,8 @@ export const formatProjectType = (name, short = false) => {
 
 	if (name === 'resourcepack') {
 		return 'Resource Pack'
+	} else if (name === 'map') {
+		return 'Map'
 	} else if (name === 'datapack') {
 		return 'Data Pack'
 	} else if (name === 'modpack') {
@@ -257,6 +261,8 @@ export const acceptFileFromProjectType = (projectType) => {
 		case 'plugin':
 			return `.jar,.zip,application/java-archive,application/x-java-archive,application/zip,${commonTypes}`
 		case 'resourcepack':
+			return `.zip,application/zip,${commonTypes}`
+		case 'map':
 			return `.zip,application/zip,${commonTypes}`
 		case 'shader':
 			return `.zip,application/zip,${commonTypes}`
