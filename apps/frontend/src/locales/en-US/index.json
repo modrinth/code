@@ -2177,6 +2177,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.map.plural": {
+    "message": "Maps"
+  },
+  "project-type.map.singular": {
+    "message": "Map"
+  },
   "project-type.minecraft_java_server.plural": {
     "message": "Servers"
   },

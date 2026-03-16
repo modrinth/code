@@ -623,6 +623,10 @@ export const commonProjectTypeCategoryMessages = defineMessages({
 		id: 'project-type.datapack.category',
 		defaultMessage: 'Data Packs',
 	},
+	map: {
+		id: 'project-type.map.category',
+		defaultMessage: 'Maps',
+	},
 	mod: {
 		id: 'project-type.mod.category',
 		defaultMessage: 'Mods',
@@ -658,6 +662,10 @@ export const commonProjectTypeTitleMessages = defineMessages({
 		id: 'project-type.datapack.capital',
 		defaultMessage: '{count, plural, one {Data Pack} other {Data Packs}}',
 	},
+	map: {
+		id: 'project-type.map.capital',
+		defaultMessage: '{count, plural, one {Map} other {Maps}}',
+	},
 	mod: {
 		id: 'project-type.mod.capital',
 		defaultMessage: '{count, plural, one {Mod} other {Mods}}',
@@ -692,6 +700,10 @@ export const commonProjectTypeSentenceMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.lowercase',
 		defaultMessage: '{count, plural, one {data pack} other {data packs}}',
+	},
+	map: {
+		id: 'project-type.map.lowercase',
+		defaultMessage: '{count, plural, one {map} other {maps}}',
 	},
 	mod: {
 		id: 'project-type.mod.lowercase',

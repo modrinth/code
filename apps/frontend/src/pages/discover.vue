@@ -23,6 +23,11 @@ const selectableProjectTypes = [
 		type: 'resourcepacks',
 	},
 	{
+		label: formatMessage(commonProjectTypeCategoryMessages.map),
+		href: `/discover/maps`,
+		type: 'maps',
+	},
+	{
 		label: formatMessage(commonProjectTypeCategoryMessages.datapack),
 		href: `/discover/datapacks`,
 		type: 'datapacks',

@@ -1340,6 +1340,15 @@
   "project-type.datapack.lowercase": {
     "defaultMessage": "{count, plural, one {data pack} other {data packs}}"
   },
+  "project-type.map.capital": {
+    "defaultMessage": "{count, plural, one {Map} other {Maps}}"
+  },
+  "project-type.map.category": {
+    "defaultMessage": "Maps"
+  },
+  "project-type.map.lowercase": {
+    "defaultMessage": "{count, plural, one {map} other {maps}}"
+  },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural, one {Mod} other {Mods}}"
   },

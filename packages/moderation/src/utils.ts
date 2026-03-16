@@ -241,6 +241,7 @@ export function formatProjectTypes(type: string, lower: boolean = false) {
 	let value = type
 	try {
 		value = value
+			.replaceAll('map', 'Map')
 			.replaceAll('mod', 'Mod')
 			.replaceAll('resourcepack', 'Resource Pack')
 			.replaceAll('datapack', 'Data Pack')

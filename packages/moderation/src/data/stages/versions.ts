@@ -50,6 +50,13 @@ const versions: Stage = {
 								(await import('../messages/versions/invalid-resourcepacks.md?raw')).default,
 						} as DropdownActionOption,
 						{
+							label: 'Map',
+							weight: 1001,
+							shouldShow: (project) => project.project_type !== 'map',
+							message: async () =>
+								(await import('../messages/versions/invalid-maps.md?raw')).default,
+						} as DropdownActionOption,
+						{
 							label: 'Data Pack',
 							weight: 1001,
 							shouldShow: (project) => !project.loaders.includes('datapack'),
@@ -90,7 +97,9 @@ const versions: Stage = {
 							label: 'Monofile',
 							weight: 1002,
 							shouldShow: (project) =>
-								project.project_type === 'resourcepack' || project.loaders.includes('datapack'),
+								project.project_type === 'resourcepack' ||
+								project.project_type === 'map' ||
+								project.loaders.includes('datapack'),
 							message: async () =>
 								(await import('../messages/versions/alternate_versions-mono.md?raw')).default,
 						} as DropdownActionOption,
