@@ -10,28 +10,15 @@ import { ISO3166Module } from './iso3166'
 import { KyrosContentV1Module } from './kyros/content/v1'
 import { KyrosFilesV0Module } from './kyros/files/v0'
 import { LabrinthVersionsV2Module, LabrinthVersionsV3Module } from './labrinth'
-import { LabrinthAffiliateInternalModule } from './labrinth/affiliate/internal'
 import { LabrinthAuthInternalModule } from './labrinth/auth/internal'
-import { LabrinthAuthV2Module } from './labrinth/auth/v2'
 import { LabrinthBillingInternalModule } from './labrinth/billing/internal'
-import { LabrinthGlobalsInternalModule } from './labrinth/globals/internal'
-import { LabrinthNotificationsV2Module } from './labrinth/notifications/v2'
-import { LabrinthOAuthInternalModule } from './labrinth/oauth/internal'
 import { LabrinthCollectionsModule } from './labrinth/collections'
 import { LabrinthOrganizationsV3Module } from './labrinth/organizations/v3'
-import { LabrinthPatsV2Module } from './labrinth/pats/v2'
-import { LabrinthLimitsV3Module } from './labrinth/limits/v3'
 import { LabrinthPayoutV3Module } from './labrinth/payout/v3'
-import { LabrinthPayoutsV3Module } from './labrinth/payouts/v3'
-import { LabrinthReportsV3Module } from './labrinth/reports/v3'
 import { LabrinthProjectsV2Module } from './labrinth/projects/v2'
 import { LabrinthProjectsV3Module } from './labrinth/projects/v3'
 import { LabrinthServerPingInternalModule } from './labrinth/server-ping/internal'
-import { LabrinthSessionsV2Module } from './labrinth/sessions/v2'
 import { LabrinthStateModule } from './labrinth/state'
-import { LabrinthTagsV2Module } from './labrinth/tags/v2'
-import { LabrinthTeamsV2Module } from './labrinth/teams/v2'
-import { LabrinthTeamsV3Module } from './labrinth/teams/v3'
 import { LabrinthTechReviewInternalModule } from './labrinth/tech-review/internal'
 import { LabrinthThreadsV3Module } from './labrinth/threads/v3'
 import { LabrinthUsersV2Module } from './labrinth/users/v2'
@@ -61,28 +48,15 @@ export const MODULE_REGISTRY = {
 	launchermeta_manifest_v0: LauncherMetaManifestV0Module,
 	kyros_content_v1: KyrosContentV1Module,
 	kyros_files_v0: KyrosFilesV0Module,
-	labrinth_affiliate_internal: LabrinthAffiliateInternalModule,
 	labrinth_auth_internal: LabrinthAuthInternalModule,
-	labrinth_auth_v2: LabrinthAuthV2Module,
 	labrinth_billing_internal: LabrinthBillingInternalModule,
 	labrinth_collections: LabrinthCollectionsModule,
-	labrinth_globals_internal: LabrinthGlobalsInternalModule,
-	labrinth_notifications_v2: LabrinthNotificationsV2Module,
-	labrinth_oauth_internal: LabrinthOAuthInternalModule,
 	labrinth_organizations_v3: LabrinthOrganizationsV3Module,
-	labrinth_pats_v2: LabrinthPatsV2Module,
-	labrinth_limits_v3: LabrinthLimitsV3Module,
 	labrinth_payout_v3: LabrinthPayoutV3Module,
-	labrinth_payouts_v3: LabrinthPayoutsV3Module,
 	labrinth_projects_v2: LabrinthProjectsV2Module,
 	labrinth_projects_v3: LabrinthProjectsV3Module,
-	labrinth_reports_v3: LabrinthReportsV3Module,
 	labrinth_server_ping_internal: LabrinthServerPingInternalModule,
-	labrinth_sessions_v2: LabrinthSessionsV2Module,
 	labrinth_state: LabrinthStateModule,
-	labrinth_tags_v2: LabrinthTagsV2Module,
-	labrinth_teams_v2: LabrinthTeamsV2Module,
-	labrinth_teams_v3: LabrinthTeamsV3Module,
 	labrinth_tech_review_internal: LabrinthTechReviewInternalModule,
 	labrinth_threads_v3: LabrinthThreadsV3Module,
 	labrinth_users_v2: LabrinthUsersV2Module,

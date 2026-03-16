@@ -74,7 +74,6 @@ import {
 	VenmoColorIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	BulletDivider,
 	ButtonStyled,
@@ -90,7 +89,31 @@ import { Tooltip } from 'floating-vue'
 import { useGeneratedState } from '~/composables/generated'
 import { findRail } from '~/utils/muralpay-rails'
 
-type Transaction = Labrinth.Payout.v3.TransactionItem
+type PayoutStatus = 'in-transit' | 'cancelling' | 'cancelled' | 'success' | 'failed'
+type PayoutMethodType = 'paypal' | 'venmo' | 'tremendous' | 'muralpay'
+type PayoutSource = 'creator_rewards' | 'affilites'
+
+type WithdrawalTransaction = {
+	type: 'withdrawal'
+	id: string
+	status: PayoutStatus
+	created: string
+	amount: number
+	fee?: number | null
+	method_type?: PayoutMethodType | null
+	method?: string
+	method_id?: string
+	method_address?: string | null
+}
+
+type PayoutAvailableTransaction = {
+	type: 'payout_available'
+	created: string
+	payout_source: PayoutSource
+	amount: number
+}
+
+type Transaction = WithdrawalTransaction | PayoutAvailableTransaction
 
 const props = defineProps<{
 	transaction: Transaction

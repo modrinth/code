@@ -97,7 +97,7 @@
 </template>
 <script setup>
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
-import { Avatar, injectModrinthClient } from '@modrinth/ui'
+import { Avatar } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import NotificationItem from '~/components/ui/NotificationItem.vue'
@@ -108,11 +108,10 @@ useHead({
 })
 
 const auth = await useAuth()
-const client = injectModrinthClient()
 
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
-	queryFn: () => client.labrinth.users_v2.getProjects(auth.value?.user?.id),
+	queryFn: async () => await useBaseFetch(`user/${auth.value?.user?.id}/projects`),
 	placeholderData: [],
 })
 
@@ -126,7 +125,7 @@ const followersProjectCount = computed(
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
 	queryFn: async () => {
-		const notifications = await client.labrinth.notifications_v2.getUserNotifications(auth.value?.user?.id)
+		const notifications = await useBaseFetch(`user/${auth.value?.user?.id}/notifications`)
 
 		const filteredNotifications = notifications.filter((notif) => !notif.read)
 		const slice = filteredNotifications.slice(0, 30)

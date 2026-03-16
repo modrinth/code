@@ -141,7 +141,6 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
@@ -152,7 +151,6 @@ import { useQuery } from '@tanstack/vue-query'
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.js'
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -207,10 +205,10 @@ const { data: globals } = useQuery({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
-			return await client.labrinth.globals_internal.get()
+			return await useBaseFetch('globals', { internal: true })
 		} catch (err) {
 			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+			return { captcha_enabled: true }
 		}
 	},
 })
@@ -237,12 +235,15 @@ async function createAccount() {
 			captcha.value?.reset()
 		}
 
-		const res = await client.labrinth.auth_v2.createAccount({
-			username: username.value,
-			password: password.value,
-			email: email.value,
-			challenge: token.value,
-			sign_up_newsletter: subscribe.value,
+		const res = await useBaseFetch('auth/create', {
+			method: 'POST',
+			body: {
+				username: username.value,
+				password: password.value,
+				email: email.value,
+				challenge: token.value,
+				sign_up_newsletter: subscribe.value,
+			},
 		})
 
 		await useAuth(res.session)

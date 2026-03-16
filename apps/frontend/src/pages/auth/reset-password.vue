@@ -69,7 +69,6 @@ import { KeyIcon, MailIcon, SendIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	StyledInput,
 	useVIntl,
@@ -78,7 +77,6 @@ import { useQuery } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -169,10 +167,10 @@ const { data: globals } = useQuery({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
-			return await client.labrinth.globals_internal.get()
+			return await useBaseFetch('globals', { internal: true })
 		} catch (err) {
 			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+			return { captcha_enabled: true }
 		}
 	},
 })
@@ -183,9 +181,12 @@ const token = ref('')
 async function recovery() {
 	startLoading()
 	try {
-		await client.labrinth.auth_v2.resetPasswordBegin({
-			username: email.value,
-			challenge: token.value,
+		await useBaseFetch('auth/password/reset', {
+			method: 'POST',
+			body: {
+				username: email.value,
+				challenge: token.value,
+			},
 		})
 
 		addNotification({
@@ -210,9 +211,12 @@ const confirmNewPassword = ref('')
 async function changePassword() {
 	startLoading()
 	try {
-		await client.labrinth.auth_v2.changePassword({
-			new_password: newPassword.value,
-			flow: route.query.flow,
+		await useBaseFetch('auth/password', {
+			method: 'PATCH',
+			body: {
+				new_password: newPassword.value,
+				flow: route.query.flow,
+			},
 		})
 
 		addNotification({

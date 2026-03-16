@@ -158,11 +158,11 @@ import {
 	StyledInput,
 	useCompactNumber,
 	useVIntl,
-	injectModrinthClient,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { formatMessage } = useVIntl()
 const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
@@ -216,7 +216,6 @@ useHead({
 
 const auth = await useAuth()
 const user = await useUser()
-const client = injectModrinthClient()
 
 if (import.meta.client) {
 	await initUserFollows()
@@ -226,7 +225,7 @@ const filterQuery = ref('')
 
 const { data: collections } = useQuery({
 	queryKey: ['user', auth.value.user.id, 'collections'],
-	queryFn: () => client.labrinth.users_v2.getCollections(auth.value.user.id),
+	queryFn: () => useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
 })
 
 const route = useNativeRoute()

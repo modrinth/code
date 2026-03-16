@@ -92,7 +92,6 @@ import {
 	Combobox,
 	defineMessages,
 	EmptyState,
-	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
@@ -112,7 +111,6 @@ const formatMonth = useFormatDateTime({
 	month: 'long',
 })
 
-const client = injectModrinthClient()
 const generatedState = useGeneratedState()
 
 useHead({
@@ -121,7 +119,10 @@ useHead({
 
 const { data: transactions, refetch } = useQuery({
 	queryKey: ['payout', 'history'],
-	queryFn: () => client.labrinth.payout_v3.getHistory(),
+	queryFn: () =>
+		useBaseFetch(`payout/history`, {
+			apiVersion: 3,
+		}),
 })
 
 const allTransactions = computed(() => {

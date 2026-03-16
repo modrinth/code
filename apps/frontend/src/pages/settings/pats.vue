@@ -196,7 +196,6 @@ import {
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
@@ -204,7 +203,7 @@ import {
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -216,8 +215,6 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
-const client = injectModrinthClient()
-const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -330,9 +327,9 @@ const deletePatIndex = ref(null)
 
 const loading = ref(false)
 
-const { data: pats } = useQuery({
+const { data: pats, refetch: refresh } = useQuery({
 	queryKey: ['pat'],
-	queryFn: () => client.labrinth.pats_v2.list(),
+	queryFn: () => useBaseFetch('pat'),
 	placeholderData: [],
 })
 const displayPats = computed(() => {
@@ -398,10 +395,13 @@ async function createPat() {
 	startLoading()
 	loading.value = true
 	try {
-		const res = await client.labrinth.pats_v2.create({
-			name: name.value,
-			scopes: Number(scopesVal.value),
-			expires: data.$dayjs(expires.value).toISOString(),
+		const res = await useBaseFetch('pat', {
+			method: 'POST',
+			body: {
+				name: name.value,
+				scopes: Number(scopesVal.value),
+				expires: data.$dayjs(expires.value).toISOString(),
+			},
 		})
 		pats.value.push(res)
 		patModal.value.hide()
@@ -420,12 +420,15 @@ async function editPat() {
 	startLoading()
 	loading.value = true
 	try {
-		await client.labrinth.pats_v2.modify(editPatId.value, {
-			name: name.value,
-			scopes: Number(scopesVal.value),
-			expires: data.$dayjs(expires.value).toISOString(),
+		await useBaseFetch(`pat/${editPatId.value}`, {
+			method: 'PATCH',
+			body: {
+				name: name.value,
+				scopes: Number(scopesVal.value),
+				expires: data.$dayjs(expires.value).toISOString(),
+			},
 		})
-		await queryClient.invalidateQueries({ queryKey: ['pat'] })
+		await refresh()
 		patModal.value.hide()
 	} catch (err) {
 		addNotification({
@@ -442,8 +445,10 @@ async function removePat(id) {
 	startLoading()
 	try {
 		pats.value = pats.value.filter((x) => x.id !== id)
-		await client.labrinth.pats_v2.delete(id)
-		await queryClient.invalidateQueries({ queryKey: ['pat'] })
+		await useBaseFetch(`pat/${id}`, {
+			method: 'DELETE',
+		})
+		await refresh()
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),

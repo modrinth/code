@@ -86,7 +86,6 @@ import {
 	Button,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
@@ -97,8 +96,8 @@ import { computed } from 'vue'
 
 import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
+import { useBaseFetch } from '@/composables/fetch.js'
 
-const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -140,16 +139,20 @@ const scope = router.query?.scope || false
 const state = router.query?.state || false
 
 const getFlowIdAuthorization = async () => {
-	const params = {
+	const query = {
 		client_id: clientId,
 		redirect_uri: redirectUri,
 		scope,
 	}
 	if (state) {
-		params.state = state
+		query.state = state
 	}
 
-	const authorization = await client.labrinth.oauth_internal.authorize(params)
+	const authorization = await useBaseFetch('oauth/authorize', {
+		method: 'GET',
+		internal: true,
+		query,
+	}) // This will contain the flow_id and oauth_client_id for accepting the oauth on behalf of the user
 
 	if (typeof authorization === 'string') {
 		await navigateTo(authorization, {
@@ -172,13 +175,21 @@ const {
 
 const { data: app } = useQuery({
 	queryKey: computed(() => ['oauth/app', clientId]),
-	queryFn: () => client.labrinth.oauth_internal.getApp(clientId),
+	queryFn: () =>
+		useBaseFetch('oauth/app/' + clientId, {
+			method: 'GET',
+			internal: true,
+		}),
 	enabled: computed(() => !!clientId),
 })
 
 const { data: createdBy } = useQuery({
 	queryKey: computed(() => ['user', app.value?.created_by]),
-	queryFn: () => client.labrinth.users_v2.get(app.value.created_by),
+	queryFn: () =>
+		useBaseFetch('user/' + app.value.created_by, {
+			method: 'GET',
+			apiVersion: 3,
+		}),
 	enabled: computed(() => !!app.value?.created_by),
 })
 
@@ -188,8 +199,12 @@ const scopeDefinitions = computed(() =>
 
 const onAuthorize = async () => {
 	try {
-		const res = await client.labrinth.oauth_internal.accept({
-			flow: authorizationData.value.flow_id,
+		const res = await useBaseFetch('oauth/accept', {
+			method: 'POST',
+			internal: true,
+			body: {
+				flow: authorizationData.value.flow_id,
+			},
 		})
 
 		if (typeof res === 'string') {
@@ -200,7 +215,7 @@ const onAuthorize = async () => {
 		}
 
 		throw new Error(formatMessage(messages.noRedirectUrlError))
-	} catch (err) {
+	} catch {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
@@ -211,8 +226,11 @@ const onAuthorize = async () => {
 
 const onReject = async () => {
 	try {
-		const res = await client.labrinth.oauth_internal.reject({
-			flow: authorizationData.value.flow_id,
+		const res = await useBaseFetch('oauth/reject', {
+			method: 'POST',
+			body: {
+				flow: authorizationData.value.flow_id,
+			},
 		})
 
 		if (typeof res === 'string') {
@@ -223,7 +241,7 @@ const onReject = async () => {
 		}
 
 		throw new Error(formatMessage(messages.noRedirectUrlError))
-	} catch (err) {
+	} catch {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,

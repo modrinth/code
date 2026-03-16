@@ -188,7 +188,7 @@
 			<div v-if="sortedPayouts.length > 0" class="flex flex-col gap-3 md:gap-4">
 				<RevenueTransaction
 					v-for="transaction in sortedPayouts.slice(0, 3)"
-					:key="('id' in transaction && transaction.id) || transaction.created"
+					:key="transaction.id || transaction.created"
 					:transaction="transaction"
 					@cancelled="refreshPayouts"
 				/>
@@ -260,18 +260,13 @@
 
 <script setup lang="ts">
 import { ArrowUpRightIcon, InProgressIcon, UnknownIcon } from '@modrinth/assets'
-import {
-	defineMessages,
-	injectModrinthClient,
-	useFormatDateTime,
-	useFormatMoney,
-	useVIntl,
-} from '@modrinth/ui'
+import { defineMessages, useFormatDateTime, useFormatMoney, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { Tooltip } from 'floating-vue'
 
 import { useUserCountry } from '@/composables/country.ts'
+import type { PayoutMethod } from '@/providers/creator-withdraw.ts'
 import CreatorWithdrawModal from '~/components/ui/dashboard/CreatorWithdrawModal.vue'
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
 
@@ -281,7 +276,20 @@ const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 await useAuth()
 
-const client = injectModrinthClient()
+// TODO: Deduplicate these types & interfaces in @modrinth/api-client PR.
+type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
+
+type UserBalanceResponse = {
+	available: number
+	withdrawn_lifetime: number
+	withdrawn_ytd: number
+	pending: number
+	// ISO 8601 date string -> amount
+	dates: Record<string, number>
+	// backend returns null when not applicable
+	requested_form_type: string | null
+	form_completion_status: FormCompletionStatus | null
+}
 
 type RevenueBarSegment = {
 	key: string
@@ -351,12 +359,26 @@ const messages = defineMessages({
 
 const { data: userBalance, refetch: refreshUserBalance } = useQuery({
 	queryKey: ['payout', 'balance'],
-	queryFn: () => client.labrinth.payout_v3.getBalance(),
+	queryFn: async () => {
+		const response = (await useBaseFetch(`payout/balance`, {
+			apiVersion: 3,
+		})) as UserBalanceResponse
+		return {
+			...response,
+			available: Number(response.available),
+			withdrawn_lifetime: Number(response.withdrawn_lifetime),
+			withdrawn_ytd: Number(response.withdrawn_ytd),
+			pending: Number(response.pending),
+		}
+	},
 })
 
 const { data: payouts, refetch: refreshPayouts } = useQuery({
 	queryKey: ['payout', 'history'],
-	queryFn: () => client.labrinth.payout_v3.getHistory(),
+	queryFn: () =>
+		useBaseFetch(`payout/history`, {
+			apiVersion: 3,
+		}),
 })
 
 const userCountry = useUserCountry()
@@ -367,7 +389,10 @@ const { data: preloadedPaymentMethods } = useQuery({
 		try {
 			return {
 				country: defaultCountry,
-				methods: await client.labrinth.payout_v3.getMethods(defaultCountry),
+				methods: (await useBaseFetch('payout/methods', {
+					apiVersion: 3,
+					query: { country: defaultCountry },
+				})) as PayoutMethod[],
 			}
 		} catch {
 			return null

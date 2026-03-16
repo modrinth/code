@@ -10,7 +10,8 @@
 			ref="purchaseModal"
 			:publishable-key="config.public.stripePublishableKey"
 			:initiate-payment="
-				async (body) => await client.labrinth.billing_internal.initiatePayment(body)
+				async (body) =>
+					await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
 			"
 			:available-products="pyroProducts"
 			:on-error="handleError"
@@ -640,7 +641,6 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
-	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
@@ -651,15 +651,16 @@ import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
+import { useBaseFetch } from '@/composables/fetch.js'
 import OptionGroup from '~/components/ui/OptionGroup.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const route = useRoute()
 const router = useRouter()
-const client = injectModrinthClient()
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -1016,7 +1017,7 @@ const { data: hasServers } = useQuery({
 	queryFn: async () => {
 		try {
 			if (!auth.value.user) return false
-			const response = await client.archon.servers_v0.list()
+			const response = await useServersFetch('servers')
 			return response.servers && response.servers.length > 0
 		} catch {
 			return false
@@ -1026,7 +1027,13 @@ const { data: hasServers } = useQuery({
 })
 
 function fetchStock(region, request) {
-	return client.archon.servers_v0.checkStock(region.shortcode, request).then((res) => res.available)
+	return useServersFetch(`stock?region=${region.shortcode}`, {
+		method: 'POST',
+		body: {
+			...request,
+		},
+		bypassAuth: true,
+	}).then((res) => res.available)
 }
 
 async function fetchCapacityStatuses(customProduct = null) {
@@ -1042,11 +1049,15 @@ async function fetchCapacityStatuses(customProduct = null) {
 		const capacityChecks = []
 		for (const product of productsToCheck) {
 			capacityChecks.push(
-				client.archon.servers_v0.checkStockGlobal({
-					cpu: product.metadata.cpu,
-					memory_mb: product.metadata.ram,
-					swap_mb: product.metadata.swap,
-					storage_mb: product.metadata.storage,
+				useServersFetch('stock', {
+					method: 'POST',
+					body: {
+						cpu: product.metadata.cpu,
+						memory_mb: product.metadata.ram,
+						swap_mb: product.metadata.swap,
+						storage_mb: product.metadata.storage,
+					},
+					bypassAuth: true,
 				}),
 			)
 		}
@@ -1118,8 +1129,8 @@ async function fetchPaymentData() {
 	if (!auth.value.user) return
 	try {
 		const [customerData, paymentMethodsData] = await Promise.all([
-			client.labrinth.billing_internal.getCustomer(),
-			client.labrinth.billing_internal.getPaymentMethods(),
+			useBaseFetch('billing/customer', { internal: true }),
+			useBaseFetch('billing/payment_methods', { internal: true }),
 		])
 		customer.value = customerData
 		paymentMethods.value = paymentMethodsData
@@ -1237,7 +1248,11 @@ const regions = ref([])
 const regionPings = ref([])
 
 function pingRegions() {
-	client.archon.servers_v1.getRegions().then((res) => {
+	useServersFetch('regions', {
+		method: 'GET',
+		version: 1,
+		bypassAuth: true,
+	}).then((res) => {
 		regions.value = res
 		regions.value.forEach((region) => {
 			runPingTest(region)

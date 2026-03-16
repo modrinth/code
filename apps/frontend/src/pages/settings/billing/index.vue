@@ -458,7 +458,8 @@
 			:country="country"
 			:publishable-key="config.public.stripePublishableKey"
 			:send-billing-request="
-				async (body) => await client.labrinth.billing_internal.initiatePayment(body)
+				async (body) =>
+					await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
 			"
 			:on-error="
 				(err) =>
@@ -612,7 +613,6 @@ import {
 	CopyCode,
 	defineMessages,
 	getPaymentMethodIcon,
-	injectModrinthClient,
 	injectNotificationManager,
 	OverflowMenu,
 	paymentMethodMessages,
@@ -626,12 +626,13 @@ import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
+import { useBaseFetch } from '@/composables/fetch.js'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
+import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const { addNotification, handleError } = injectNotificationManager()
-const client = injectModrinthClient()
 definePageMeta({
 	middleware: 'auth',
 })
@@ -741,27 +742,27 @@ const queryClient = useQueryClient()
 
 const { data: paymentMethods } = useQuery({
 	queryKey: ['billing', 'payment_methods'],
-	queryFn: () => client.labrinth.billing_internal.getPaymentMethods(),
+	queryFn: () => useBaseFetch('billing/payment_methods', { internal: true }),
 })
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],
-	queryFn: () => client.labrinth.billing_internal.getPayments(),
+	queryFn: () => useBaseFetch('billing/payments', { internal: true }),
 })
 const { data: customer } = useQuery({
 	queryKey: ['billing', 'customer'],
-	queryFn: () => client.labrinth.billing_internal.getCustomer(),
+	queryFn: () => useBaseFetch('billing/customer', { internal: true }),
 })
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
-	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+	queryFn: () => useBaseFetch('billing/subscriptions', { internal: true }),
 })
 const { data: productsData } = useQuery({
 	queryKey: ['billing', 'products'],
-	queryFn: () => client.labrinth.billing_internal.getProducts(),
+	queryFn: () => useBaseFetch('billing/products', { internal: true }),
 })
 const { data: serversData } = useQuery({
 	queryKey: ['servers'],
-	queryFn: () => client.archon.servers_v0.list(),
+	queryFn: () => useServersFetch('servers'),
 })
 
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
@@ -825,7 +826,10 @@ function addPaymentMethod() {
 }
 
 async function createSetupIntent() {
-	return await client.labrinth.billing_internal.addPaymentMethodFlow()
+	return await useBaseFetch('billing/payment_method', {
+		internal: true,
+		method: 'POST',
+	})
 }
 
 const removePaymentMethodIndex = ref()
@@ -840,8 +844,12 @@ async function switchMidasInterval(interval) {
 	changingInterval.value = true
 	startLoading()
 	try {
-		await client.labrinth.billing_internal.editSubscription(midasSubscription.value.id, {
-			interval,
+		await useBaseFetch(`billing/subscription/${midasSubscription.value.id}`, {
+			internal: true,
+			method: 'PATCH',
+			body: {
+				interval,
+			},
 		})
 		await refresh()
 	} catch (error) {
@@ -854,8 +862,12 @@ async function switchMidasInterval(interval) {
 async function editPaymentMethod(index, primary) {
 	startLoading()
 	try {
-		await client.labrinth.billing_internal.editPaymentMethod(paymentMethods.value[index].id, {
-			primary,
+		await useBaseFetch(`billing/payment_method/${paymentMethods.value[index].id}`, {
+			internal: true,
+			method: 'PATCH',
+			data: {
+				primary,
+			},
 		})
 		await refresh()
 	} catch (err) {
@@ -871,7 +883,10 @@ async function editPaymentMethod(index, primary) {
 async function removePaymentMethod(index) {
 	startLoading()
 	try {
-		await client.labrinth.billing_internal.removePaymentMethod(paymentMethods.value[index].id)
+		await useBaseFetch(`billing/payment_method/${paymentMethods.value[index].id}`, {
+			internal: true,
+			method: 'DELETE',
+		})
 		await refresh()
 	} catch (err) {
 		addNotification({
@@ -887,8 +902,12 @@ const cancelSubscriptionId = ref(null)
 async function cancelSubscription(id, cancelled) {
 	startLoading()
 	try {
-		await client.labrinth.billing_internal.editSubscription(id, {
-			cancelled,
+		await useBaseFetch(`billing/subscription/${id}`, {
+			internal: true,
+			method: 'PATCH',
+			body: {
+				cancelled,
+			},
 		})
 		await refresh()
 	} catch (err) {
@@ -956,8 +975,12 @@ const showPyroUpgradeModal = (subscription) => {
 
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
 	try {
-		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
-			cancelled: false,
+		await useBaseFetch(`billing/subscription/${subscriptionId}`, {
+			internal: true,
+			method: 'PATCH',
+			body: {
+				cancelled: false,
+			},
 		})
 		await refresh()
 		if (wasSuspended) {

@@ -30,7 +30,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 | `api-client`       | API client for Nuxt, Tauri, and Node/browser          |
 | `app-lib`          | Shared app library                                    |
 | `blog`             | Blog system and changelog data                        |
-| `utils`            | Shared utility functions (mostly deprecated)          |
+| `utils`            | Shared utility functions                              |
 | `moderation`       | Moderation utilities                                  |
 | `daedalus`         | Daedalus protocol                                     |
 | `tooling-config`   | ESLint, Prettier, TypeScript configs                  |
@@ -85,7 +85,6 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 ### General
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
 - For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
-- Types in `@modrinth/utils` are considered highly outdated, if a component needs them, check if you can switch said component to use types from `packages/api-client`
 
 ## Edit Tool - Whitespace Handling (CLAUDE ONLY)
 

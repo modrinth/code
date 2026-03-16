@@ -41,7 +41,7 @@ export class ArchonServersV0Module extends AbstractModule {
 
 	/**
 	 * Check stock availability for a region
-	 * POST /modrinth/v0/stock?region=:region
+	 * POST /modrinth/v0/stock
 	 */
 	public async checkStock(
 		region: string,
@@ -52,23 +52,6 @@ export class ArchonServersV0Module extends AbstractModule {
 			version: 'modrinth/v0',
 			method: 'POST',
 			body: request,
-			skipAuth: true,
-		})
-	}
-
-	/**
-	 * Check stock availability (without region filter)
-	 * POST /modrinth/v0/stock
-	 */
-	public async checkStockGlobal(
-		request: Archon.Servers.v0.StockRequest,
-	): Promise<Archon.Servers.v0.StockResponse> {
-		return this.client.request<Archon.Servers.v0.StockResponse>('/stock', {
-			api: 'archon',
-			version: 'modrinth/v0',
-			method: 'POST',
-			body: request,
-			skipAuth: true,
 		})
 	}
 

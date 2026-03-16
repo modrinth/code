@@ -5,7 +5,6 @@
 </template>
 
 <script setup>
-import { injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
@@ -19,12 +18,11 @@ useHead({
 })
 
 const auth = await useAuth()
-const client = injectModrinthClient()
 const id = auth.value?.user?.id
 
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['user', id, 'projects']),
-	queryFn: () => client.labrinth.users_v2.getProjects(id),
+	queryFn: () => useBaseFetch(`user/${id}/projects`),
 	enabled: computed(() => !!id),
 })
 </script>

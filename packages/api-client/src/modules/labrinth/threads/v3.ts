@@ -27,28 +27,6 @@ export class LabrinthThreadsV3Module extends AbstractModule {
 	}
 
 	/**
-	 * Get multiple threads by IDs (v3)
-	 *
-	 * @param ids - Array of thread IDs
-	 * @returns Promise resolving to an array of threads
-	 *
-	 * @example
-	 * ```typescript
-	 * const threads = await client.labrinth.threads_v3.getMultiple(['id1', 'id2'])
-	 * ```
-	 */
-	public async getMultiple(ids: string[]): Promise<Labrinth.Threads.v3.Thread[]> {
-		return this.client.request<Labrinth.Threads.v3.Thread[]>(
-			`/threads?ids=${encodeURIComponent(JSON.stringify(ids))}`,
-			{
-				api: 'labrinth',
-				version: 3,
-				method: 'GET',
-			},
-		)
-	}
-
-	/**
 	 * Send a message to a thread (v3)
 	 *
 	 * @param id - Thread ID

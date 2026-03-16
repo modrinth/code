@@ -83,7 +83,6 @@
 </template>
 <script setup lang="ts">
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	Accordion,
 	Admonition,
@@ -92,20 +91,20 @@ import {
 	Avatar,
 	ButtonStyled,
 	ConfirmModal,
-	injectModrinthClient,
 	injectNotificationManager,
 	StyledInput,
 } from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
+import type { AffiliateLink, User } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-const client = injectModrinthClient()
+import { useBaseFetch } from '~/composables/fetch.js'
+
 const { handleError } = injectNotificationManager()
 
 type UserGroup = {
 	user: User
-	affiliates: Labrinth.Affiliate.Internal.AffiliateCode[]
+	affiliates: AffiliateLink[]
 }
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
@@ -117,7 +116,8 @@ const {
 	refetch,
 } = useQuery({
 	queryKey: ['affiliate'],
-	queryFn: () => client.labrinth.affiliate_internal.getAll(),
+	queryFn: () =>
+		useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
 })
 
 const filterQuery = ref('')
@@ -130,9 +130,7 @@ const userIds = computed(() => {
 	const ids = new Set<string>()
 	affiliateCodes.value.forEach((code) => {
 		ids.add(code.affiliate)
-		if (code.created_by) {
-			ids.add(code.created_by)
-		}
+		ids.add(code.created_by)
 	})
 	return Array.from(ids)
 })
@@ -141,7 +139,7 @@ const { data: users } = useQuery({
 	queryKey: computed(() => ['users-bulk', userIds.value]),
 	queryFn: () => {
 		if (userIds.value.length === 0) return Promise.resolve([])
-		return client.labrinth.users_v2.getMultiple(userIds.value)
+		return useBaseFetch(`users?ids=${JSON.stringify(userIds.value)}`) as Promise<User[]>
 	},
 })
 
@@ -191,8 +189,7 @@ const filteredGroupedAffiliates = computed(() => {
 	)
 })
 
-function getCreatedByUsername(createdBy: string | null): string {
-	if (!createdBy) return 'Unknown'
+function getCreatedByUsername(createdBy: string): string {
 	const user = userMap.value.get(createdBy)
 	return user?.username || 'Unknown'
 }
@@ -210,7 +207,7 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 
 		if (!user) {
 			try {
-				user = await client.labrinth.users_v2.get(data.username)
+				user = (await useBaseFetch(`user/${data.username}`)) as User
 
 				if (users.value) {
 					users.value.push(user)
@@ -221,15 +218,19 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 			}
 		}
 
-		await client.labrinth.affiliate_internal.create({
-			affiliate: user.id,
-			source_name: data.sourceName,
+		await useBaseFetch('affiliate', {
+			method: 'PUT',
+			body: {
+				affiliate: user.id,
+				source_name: data.sourceName,
+			},
+			internal: true,
 		})
 
 		await refetch()
 		createModal.value?.close()
 	} catch (err) {
-		handleError(err as Error)
+		handleError(err)
 	} finally {
 		creatingLink.value = false
 	}
@@ -238,7 +239,7 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 const revokingAffiliateUsername = ref<string | null>(null)
 const revokingAffiliateId = ref<string | null>(null)
 
-function revokeAffiliateCode(affiliate: Labrinth.Affiliate.Internal.AffiliateCode) {
+function revokeAffiliateCode(affiliate: AffiliateLink) {
 	const user = userMap.value.get(affiliate.affiliate)
 	revokingAffiliateUsername.value = user?.username || 'Unknown'
 	revokingAffiliateId.value = affiliate.id
@@ -251,7 +252,10 @@ async function confirmRevokeAffiliateCode() {
 	}
 
 	try {
-		await client.labrinth.affiliate_internal.delete(revokingAffiliateId.value)
+		await useBaseFetch(`affiliate/${revokingAffiliateId.value}`, {
+			method: 'DELETE',
+			internal: true,
+		})
 
 		await refetch()
 		revokeModal.value?.hide()
