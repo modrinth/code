@@ -193,35 +193,7 @@
 				</div>
 			</div>
 		</div>
-		<Admonition v-if="!hideGalleryAdmonition && currentMember" type="info" class="mb-4">
-			Creating and editing gallery images can now be done directly from the
-			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
-				>project settings</NuxtLink
-			>.
-			<template #actions>
-				<div class="flex gap-2">
-					<ButtonStyled color="blue">
-						<button
-							aria-label="Project Settings"
-							class="!shadow-none"
-							@click="() => router.push('settings/gallery')"
-						>
-							<SettingsIcon />
-							Edit gallery
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="transparent">
-						<button
-							aria-label="Dismiss"
-							class="!shadow-none"
-							@click="() => (hideGalleryAdmonition = true)"
-						>
-							Dismiss
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-		</Admonition>
+
 		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
 			<FileInput
 				:max-size="5242880"
@@ -325,7 +297,6 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SettingsIcon,
 	StarIcon,
 	TransferIcon,
 	TrashIcon,
@@ -333,8 +304,6 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Admonition,
-	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
@@ -343,7 +312,7 @@ import {
 	StyledInput,
 	useFormatDateTime,
 } from '@modrinth/ui'
-import { useEventListener, useLocalStorage } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -352,9 +321,6 @@ const formatDate = useFormatDateTime({
 	month: 'long',
 	day: 'numeric',
 })
-
-// Router
-const router = useRouter()
 
 // Single DI injection
 const {
@@ -381,12 +347,6 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
-
-// Local storage state
-const hideGalleryAdmonition = useLocalStorage(
-	'hideGalleryHasMovedAdmonition',
-	!project.value.gallery?.length,
-)
 
 // Gallery item type matching actual v2 API response (LegacyGalleryItem in labrinth)
 // raw_url is optional in TS types but present in API response
@@ -524,8 +484,8 @@ async function editGalleryItem() {
 	const imageUrl = filteredGallery.value[editIndex.value].url
 	const success = await contextEditGalleryItem(
 		imageUrl,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ? Number(editOrder.value) : undefined,
 	)
@@ -723,7 +683,7 @@ async function deleteGalleryImage() {
 		margin-bottom: 0;
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
-		min-height: 10rem;
+		aspect-ratio: 16 / 9;
 		object-fit: cover;
 	}
 

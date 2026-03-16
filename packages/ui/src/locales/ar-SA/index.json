@@ -257,9 +257,6 @@
   "header.category.performance-impact": {
     "defaultMessage": "زيادة FPS"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "جود"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "تصل سرعة المعالجة إلى {cpus} وحدة معالجة مركزية"
   },
@@ -314,17 +311,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "وضع لعبة غير معروف"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "إلغاء الربط من حزمة المودات"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "حاضِر"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "غير متوافق"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "جار تنزيل الإصدار {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "تحديث الإصدار"
@@ -346,15 +337,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "عرض غير المتوافق"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "حدث إلى v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "لا يمكننا ضمان سلامة التحديثات للـinstance. راجع سجل التغييرات لجميع الإصدارات الوسيطة، وفكّر في إنشاء نسخة احتياطية. "
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "لا يمكننا ضمان سلامة التحديثات لعوالمك. راجع سجل التغييرات لجميع الإصدارات الوسيطة، وفكّر في إنشاء نسخة احتياطية. "
   },
   "label.actions": {
     "defaultMessage": "الأفعال"
@@ -427,9 +409,6 @@
   },
   "label.password": {
     "defaultMessage": "كلمة المرور"
-  },
-  "label.played": {
-    "defaultMessage": "تم اللعب لمدة {time}"
   },
   "label.project": {
     "defaultMessage": "مشروع"

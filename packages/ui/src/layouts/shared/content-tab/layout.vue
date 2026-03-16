@@ -144,6 +144,10 @@ const messages = defineMessages({
 		id: 'content.page-layout.busy-description',
 		defaultMessage: 'Please wait for the operation to complete before editing content.',
 	},
+	pleaseWait: {
+		id: 'content.page-layout.please-wait',
+		defaultMessage: 'Please wait',
+	},
 })
 
 const ctx = injectContentManager()
@@ -182,25 +186,31 @@ const sortedItems = computed(() => {
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
 				const nameB = b.project?.title ?? b.file_name
-				return nameB.toLowerCase().localeCompare(nameA.toLowerCase())
+				return (
+					nameB.toLowerCase().localeCompare(nameA.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
 			})
 		case 'date-added-newest':
 			return items.sort((a, b) => {
 				const dateA = a.date_added ?? ''
 				const dateB = b.date_added ?? ''
-				return dateB.localeCompare(dateA)
+				return dateB.localeCompare(dateA) || a.file_name.localeCompare(b.file_name)
 			})
 		case 'date-added-oldest':
 			return items.sort((a, b) => {
 				const dateA = a.date_added ?? ''
 				const dateB = b.date_added ?? ''
-				return dateA.localeCompare(dateB)
+				return dateA.localeCompare(dateB) || a.file_name.localeCompare(b.file_name)
 			})
 		default:
 			return items.sort((a, b) => {
 				const nameA = a.project?.title ?? a.file_name
 				const nameB = b.project?.title ?? b.file_name
-				return nameA.toLowerCase().localeCompare(nameB.toLowerCase())
+				return (
+					nameA.toLowerCase().localeCompare(nameB.toLowerCase()) ||
+					a.file_name.localeCompare(b.file_name)
+				)
 			})
 	}
 })
@@ -493,7 +503,11 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 				:categories="ctx.modpack.value.categories"
 				:has-update="ctx.modpack.value.hasUpdate"
 				:disabled="ctx.modpack.value.disabled || ctx.isBusy.value"
-				:disabled-text="ctx.modpack.value.disabledText"
+				:disabled-text="
+					ctx.modpack.value.disabledText ??
+					ctx.busyMessage?.value ??
+					(ctx.isBusy.value ? formatMessage(messages.pleaseWait) : undefined)
+				"
 				:show-content-hint="
 					!!(ctx.showContentHint?.value && ctx.modpack.value && ctx.items.value.length === 0)
 				"

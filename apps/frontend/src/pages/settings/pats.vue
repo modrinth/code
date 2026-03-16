@@ -10,7 +10,7 @@
 		<Modal
 			ref="patModal"
 			:header="
-				editPatIndex !== null
+				editPatId !== null
 					? formatMessage(createModalMessages.editTitle)
 					: formatMessage(createModalMessages.createTitle)
 			"
@@ -58,7 +58,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 					<button
-						v-if="editPatIndex !== null"
+						v-if="editPatId !== null"
 						:disabled="loading || !name || !expires"
 						type="button"
 						class="iconified-button brand-button"
@@ -92,7 +92,7 @@
 						name = null
 						scopesVal = 0
 						expires = null
-						editPatIndex = null
+						editPatId = null
 						$refs.patModal.show()
 					}
 				"
@@ -109,7 +109,7 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="(pat, index) in displayPats" :key="pat.id" class="universal-card recessed token">
+		<div v-for="pat in displayPats" :key="pat.id" class="universal-card recessed token">
 			<div>
 				<div>
 					<strong>{{ pat.name }}</strong>
@@ -162,7 +162,7 @@
 					class="iconified-button raised-button"
 					@click="
 						() => {
-							editPatIndex = index
+							editPatId = pat.id
 							name = pat.name
 							scopesVal = pat.scopes
 							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
@@ -317,7 +317,7 @@ const data = useNuxtApp()
 const { scopesToLabels } = useScopes()
 const patModal = ref()
 
-const editPatIndex = ref(null)
+const editPatId = ref(null)
 
 const name = ref(null)
 const scopesVal = ref(BigInt(0))
@@ -420,7 +420,7 @@ async function editPat() {
 	startLoading()
 	loading.value = true
 	try {
-		await useBaseFetch(`pat/${pats.value[editPatIndex.value].id}`, {
+		await useBaseFetch(`pat/${editPatId.value}`, {
 			method: 'PATCH',
 			body: {
 				name: name.value,

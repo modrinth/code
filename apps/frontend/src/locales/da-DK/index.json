@@ -39,7 +39,7 @@
     "message": "Download muligheder"
   },
   "app-marketing.download.terms": {
-    "message": "Ved at download Modrinth du acceptere vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
+    "message": "Ved at download Modrinth App, acceptere du vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Download Modrinth (Beta)"
@@ -106,9 +106,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150mb RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,6 +389,9 @@
   "collection.label.no-projects": {
     "message": "Ingen projekter i samlingen endnu"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Ingen projekter endnu} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Opdateret {ago}"
   },
@@ -539,9 +539,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Opret ny"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} other {{count} projekter}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Søg dine samlinger"
   },
@@ -607,9 +604,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En forretningsenhed refererer til en registreret organisation, såsom et virksomhed, et partnerskab eller et LLC."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Udbetaler du penge som en privatperson eller en forretning?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
@@ -962,9 +956,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hosting servere DDoS beskyttelse?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alle Modrinth servere kommer med DDoS beskyttelse, med op til 17 Tbps kapacitet i nogle lokationer."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Ofte Spurgt Spørgsmål"
   },
@@ -1069,9 +1060,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "Hvad har du præcis brug for?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Prøv en gratis <orange>3 GB server</orange> i 5 dage drevet af <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Lær mere"
@@ -1255,9 +1243,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Til Spillere"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Udforsk over {count} kreationer"
   },
   "landing.subheading": {
     "message": "Udforsk, spil, og del Minecraft indhold gennem vores open souce platform bygget for fællesskabet."
@@ -1631,9 +1616,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "Tilsluttet"
   },
@@ -1651,9 +1633,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisationer"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {projekt} other {projekter}}"
   },
   "profile.label.saving": {
     "message": "Gemmer..."
@@ -2015,6 +1994,9 @@
   "settings.applications.field.description": {
     "message": "Beskrivelse"
   },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Udløber {month}/{year}"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Side til datapakker"
   },
@@ -2039,14 +2021,32 @@
   "settings.pats.token.never-used": {
     "message": "Aldrig brugt"
   },
+  "settings.profile.bio.description": {
+    "message": "En kort beskrivelse, der fortæller alle lidt om dig selv."
+  },
+  "settings.profile.bio.title": {
+    "message": "Om dig"
+  },
+  "settings.profile.description": {
+    "message": "Dine profiloplysninger kan ses offentligt på Modrinth og via <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Profiloplysninger"
+  },
   "settings.profile.profile-picture.title": {
     "message": "Profilbillede"
+  },
+  "settings.profile.username.description": {
+    "message": "Et unikt, ikke-versalfølsomt navn til at identificere din profil."
   },
   "settings.sessions.created-ago": {
     "message": "Oprettet {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Nuværende session"
+  },
+  "settings.sessions.description": {
+    "message": "Her er alle enheder, der i øjeblikket er logget ind med din Modrinth-konto. Du kan logge ud af hver enhed individuelt.\n\nHvis du ser en enhed, du ikke genkender, bør du straks logge ud af den og ændre adgangskoden til din Modrinth-konto."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sidst tilgået {ago}"

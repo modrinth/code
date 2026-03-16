@@ -52,7 +52,7 @@ import ButtonStyled from './ButtonStyled.vue'
 
 withDefaults(
 	defineProps<{
-		type?: 'info' | 'warning' | 'critical'
+		type?: 'info' | 'warning' | 'critical' | 'success'
 		header?: string
 		body?: string
 		showActionsUnderneath?: boolean
@@ -75,17 +75,20 @@ const typeClasses = {
 	info: 'border-brand-blue bg-bg-blue',
 	warning: 'border-brand-orange bg-bg-orange',
 	critical: 'border-brand-red bg-bg-red',
+	success: 'border-brand-green bg-bg-green',
 }
 
 const iconClasses = {
 	info: 'text-brand-blue',
 	warning: 'text-brand-orange',
 	critical: 'text-brand-red',
+	success: 'text-brand-green',
 }
 
-const buttonColors: Record<string, 'blue' | 'orange' | 'red'> = {
+const buttonColors: Record<string, 'blue' | 'orange' | 'red' | 'green'> = {
 	info: 'blue',
 	warning: 'orange',
 	critical: 'red',
+	success: 'green',
 }
 </script>
