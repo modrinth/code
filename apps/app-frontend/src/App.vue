@@ -434,6 +434,7 @@ const {
 	setInstallToPlayModal: setServerInstallToPlayModal,
 	setUpdateToPlayModal: setServerUpdateToPlayModal,
 	setAddServerToInstanceModal: setServerAddServerToInstanceModal,
+	playServerProject
 } = serverInstall
 
 const modInstallModal = ref()
