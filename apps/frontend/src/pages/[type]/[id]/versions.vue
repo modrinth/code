@@ -307,8 +307,6 @@ const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
 
 const emit = defineEmits(['onDownload', 'deleteVersion'])
 
-const router = useNativeRouter()
-
 const baseDropdownId = useId()
 
 function getPrimaryFile(version) {

@@ -322,9 +322,6 @@ const formatDate = useFormatDateTime({
 	day: 'numeric',
 })
 
-// Router
-const router = useRouter()
-
 // Single DI injection
 const {
 	projectV2: project,
