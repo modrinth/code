@@ -97,6 +97,8 @@
 				</div>
 			</div>
 		</Accordion>
+
+		<InlineBackupCreator v-if="ctx.flowType === 'reset-server'" backup-name="Before reinstall" hide-shift-click-hint />
 	</div>
 </template>
 
@@ -106,6 +108,7 @@ import { computed, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
+import InlineBackupCreator from '../../../../layouts/shared/content-tab/components/modals/InlineBackupCreator.vue'
 import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
