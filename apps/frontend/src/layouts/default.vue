@@ -1370,7 +1370,7 @@ const { cycle: changeTheme } = useTheme()
 		&::after {
 			content: '';
 			position: absolute;
-			bottom: 0;
+			bottom: 2px;
 			left: 0;
 			width: 100%;
 			height: 300px;
