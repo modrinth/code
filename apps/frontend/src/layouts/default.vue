@@ -735,10 +735,12 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	defineMessages,
+	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -775,10 +777,12 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const client = injectModrinthClient()
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
-	if (!auth.value.user) return null
-	return useBaseFetch('payout/balance', { apiVersion: 3 })
+const { data: payoutBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
+	enabled: computed(() => !!auth.value.user),
 })
 
 const showTaxComplianceBanner = computed(() => {
@@ -1140,7 +1144,7 @@ async function onKeyDown(event) {
 		rCount.value++
 
 		if (randomProjects.value.length < 3) {
-			randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+			randomProjects.value = await client.labrinth.projects_v2.getRandom(50).catch((err) => {
 				console.error(err)
 				return []
 			})

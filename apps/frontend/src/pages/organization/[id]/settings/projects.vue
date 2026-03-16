@@ -334,6 +334,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
@@ -347,13 +348,12 @@ const { organization, projects, refresh } = injectOrganizationContext()
 
 const auth = await useAuth()
 
-const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
-	`user/${auth.value.user.id}/projects`,
-	() => useBaseFetch(`user/${auth.value.user.id}/projects`),
-	{
-		watch: [auth],
-	},
-)
+const { data: userProjects, refetch: refreshUserProjects } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
+	queryFn: () => useBaseFetch(`user/${auth.value.user.id}/projects`),
+	enabled: computed(() => !!auth.value?.user?.id),
+	placeholderData: [],
+})
 
 const usersOwnedProjects = ref([])
 

@@ -147,6 +147,28 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Payout {
+		export namespace v3 {
+			export type PayoutBalance = {
+				available: number
+				withdrawn_lifetime: number
+				withdrawn_ytd: number
+				pending: number
+				dates: Record<string, number>
+				requested_form_type: string | null
+				form_completion_status: string | null
+			}
+		}
+	}
+
+	export namespace Auth {
+		export namespace Internal {
+			export type SubscriptionStatus = {
+				subscribed: boolean
+			}
+		}
+	}
+
 	export namespace Projects {
 		export namespace v2 {
 			export type Environment = 'required' | 'optional' | 'unsupported' | 'unknown'
