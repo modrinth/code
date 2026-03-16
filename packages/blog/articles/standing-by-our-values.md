@@ -14,7 +14,7 @@ We had only that day to make a decision. The entire Modrinth team spent over 5 h
 
 Money did not factor into our decision. It costs Modrinth hundreds of dollars a month in bandwidth cost alone to serve content to Russian users while we do not make ad revenue from them.
 
-![A screenshot of the Modrinth ad revenue statistics showcasing Russian Ad revenue in the month of August 2025](./russia-ad-rev.png)
+![A screenshot of the Modrinth ad revenue statistics showcasing Russian Ad revenue in the month of August 2025](../public/standing-by-our-values/russia-ad-rev.png)
 _Ad revenue from Russian users for the month of September._
 
 In the end, we told ourselves we were choosing the path of “harm reduction.” We believed that removing the four projects was less censorship than losing access to Modrinth entirely for Russian users. But that choice, made under pressure and with little time, was short-sighted. It was not consistent with our values, our support of the LGBTQ+ community, or our stance against censorship.
@@ -28,7 +28,7 @@ Our values are not negotiable. Going forward, we will not comply with requests f
 
 We know Modrinth will be blocked by the Russian government at some point, but we will do everything we can to prepare Russian users for it. They will be informed of the upcoming ban and will be provided guidance on how they can continue accessing the website.
 
-![A screenshot of the upcoming notice we will be serving to Russian Modrinth users](./russia-notice.png)
+![A screenshot of the upcoming notice we will be serving to Russian Modrinth users](../public/standing-by-our-values/russia-notice.png)
 
 ## Impact on Creators
 
@@ -47,6 +47,6 @@ If you are in danger or need resources, please consider reaching out to [Rainbow
 
 💚 The Modrinth Team
 
-[Also available in Russian / Перевод на русский](../standing-by-our-values-russian)
+[Also available in Russian / Перевод на русский](standing-by-our-values-russian.md)
 
-Our previous, outdated post announcing the Russian censorship can be found archived [here](../russian-censorship).
+Our previous, outdated post announcing the Russian censorship can be found archived [here](russian-censorship.md).

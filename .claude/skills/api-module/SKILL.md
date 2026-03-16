@@ -75,17 +75,17 @@ export class LabrinthThingsV3Module extends AbstractModule {
 
 #### Request options
 
-| Field | Values | Purpose |
-|-------|--------|---------|
-| `api` | `'labrinth'`, `'archon'`, or a full URL | Which base URL to use |
-| `version` | `2`, `3`, `'internal'`, `'modrinth/v0'`, etc. | URL version segment |
-| `method` | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'` | HTTP method |
-| `body` | object | JSON request body |
-| `params` | `Record<string, string>` | Query parameters |
-| `skipAuth` | `boolean` | Skip auth feature for this request |
-| `useNodeAuth` | `boolean` | Use node-level auth (kyros) |
-| `timeout` | `number` | Request timeout in ms |
-| `retry` | `boolean \| number` | Override retry behavior |
+| Field         | Values                                            | Purpose                            |
+|---------------|---------------------------------------------------|------------------------------------|
+| `api`         | `'labrinth'`, `'archon'`, or a full URL           | Which base URL to use              |
+| `version`     | `2`, `3`, `'internal'`, `'modrinth/v0'`, etc.     | URL version segment                |
+| `method`      | `'GET'`, `'POST'`, `'PUT'`, `'PATCH'`, `'DELETE'` | HTTP method                        |
+| `body`        | object                                            | JSON request body                  |
+| `params`      | `Record<string, string>`                          | Query parameters                   |
+| `skipAuth`    | `boolean`                                         | Skip auth feature for this request |
+| `useNodeAuth` | `boolean`                                         | Use node-level auth (kyros)        |
+| `timeout`     | `number`                                          | Request timeout in ms              |
+| `retry`       | `boolean \| number`                               | Override retry behavior            |
 
 #### For uploads
 
@@ -140,12 +140,12 @@ export * from './<service>/types'
 
 ## Naming Conventions
 
-| Convention | Example |
-|-----------|---------|
-| Module class | `LabrinthThingsV3Module` — `{Api}{Domain}V{N}Module` |
-| Module ID | `labrinth_things_v3` — `{api}_{domain}_v{n}` |
-| Type namespace | `Labrinth.MyDomain.v3.Thing` |
-| File path | `modules/labrinth/things/v3.ts` |
+| Convention     | Example                                              |
+|----------------|------------------------------------------------------|
+| Module class   | `LabrinthThingsV3Module` — `{Api}{Domain}V{N}Module` |
+| Module ID      | `labrinth_things_v3` — `{api}_{domain}_v{n}`         |
+| Type namespace | `Labrinth.MyDomain.v3.Thing`                         |
+| File path      | `modules/labrinth/things/v3.ts`                      |
 
 ## Key Files
 

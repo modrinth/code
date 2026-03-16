@@ -15,7 +15,7 @@ unlisted: true
 
 Деньги не были фактором нашего решения. Мы теряем деньги на контенте, который скачивают российские пользователи, но мы всё равно продолжаем поддерживать их. Для нас были значимы последствия для людей.
 
-![A screenshot of the Modrinth ad revenue statistics showcasing Russian Ad revenue in the month of August 2025](../standing-by-our-values/russia-ad-rev.png)
+![A screenshot of the Modrinth ad revenue statistics showcasing Russian Ad revenue in the month of August 2025](../public/standing-by-our-values/russia-ad-rev.png)
 _Доход от рекламы, показанной в России, за август._
 
 В итоге, мы пришли к выводу, что мы выберем путь „наименьшего зла“. Мы были убеждены, что удалить те четыре проекта будет меньшей цензурой, чем если все пользователи из России утратят доступ к Modrinth. Но такое решение, сделанное под давлением и в отсутствие времени, было близоруким. Оно не соответствует нашим ценностям, нашей поддержке ЛГБТК+ сообщества и нашей позиции против цензуры.
@@ -30,7 +30,7 @@ _Доход от рекламы, показанной в России, за ав
 
 Мы знаем, что рано или поздно Modrinth будет заблокирован российским правительством, но мы постараемся сделать всё, что в наших силах, чтобы подготовить к этому российских пользователей. Мы оповестим их о надвигающемся бане и укажем как они могут сохранить доступ к веб-сайту.
 
-![A screenshot of the upcoming notice we will be serving to Russian Modrinth users](../standing-by-our-values/russia-notice.png)
+![A screenshot of the upcoming notice we will be serving to Russian Modrinth users](../public/standing-by-our-values/russia-notice.png)
 
 ## Последствия для авторов
 
@@ -50,4 +50,4 @@ _Доход от рекламы, показанной в России, за ав
 
 💚 The Modrinth Team
 
-(translated from [English](../standing-by-our-values))
+(translated from [English](standing-by-our-values.md))

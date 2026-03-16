@@ -5,7 +5,7 @@ date: 2025-09-30T18:30:00-07:00
 unlisted: true
 ---
 
-**This post has been preserved for archival reasons, but no longer reflects Modrinth policy on compliance with government censorship. Please see our updated post [here](../standing-by-our-values) on our choice to stand up to the Russian government.**
+**This post has been preserved for archival reasons, but no longer reflects Modrinth policy on compliance with government censorship. Please see our updated post [here](standing-by-our-values.md) on our choice to stand up to the Russian government.**
 
 Hi everyone,
 

@@ -11,7 +11,7 @@ We’ve got a big launch with tons of new stuff today and some important updates
 
 ## Modrinth+
 
-First off, we’re launching [Modrinth+](/plus), a monthly subscription to help support Modrinth and all of the creators on it directly!
+First off, we’re launching [Modrinth+](https://modrinth.com/plus), a monthly subscription to help support Modrinth and all of the creators on it directly!
 
 As a Modrinth+ subscriber, you will get:
 
@@ -69,7 +69,7 @@ Over the last few months, we’ve been overhauling the internals of the Modrinth
 - Fix freezing and include crash reports logs tab
 - And over one hundred more fixes!
 
-Don’t have the Modrinth App? Check it out [here](/app)!
+Don’t have the Modrinth App? Check it out [here](https://modrinth.com/app)!
 
 ## Conclusion
 

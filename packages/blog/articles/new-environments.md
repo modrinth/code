@@ -11,7 +11,7 @@ Over the years, we've taken in lots of feedback regarding how we identify client
 
 ## What do I need to do?
 
-If you want to jump right into what you need to do now, just visit your [Projects page](/dashboard/projects) and look for any of your mod or modpack projects with an orange warning button next to the settings button. This will take you to the new Environments page in your project's settings with a bunch of different options for configuring your project's environment.
+If you want to jump right into what you need to do now, just visit your [Projects page](https://modrinth.com/dashboard/projects) and look for any of your mod or modpack projects with an orange warning button next to the settings button. This will take you to the new Environments page in your project's settings with a bunch of different options for configuring your project's environment.
 
 ![Screenshot of the new Modrinth Environment settings page. A warning message explains that the environment system has been updated. Options are listed with radio buttons, including Client-side only (selected), Server-side only, Client and server, and Singleplayer only, each with descriptions and sub-options.](./env-settings.webp)
 
@@ -37,31 +37,31 @@ The new options are as follows:
 
 - **Client-side only** (`client_only`)
   - All functionality is performed exclusively on the client side. Should be compatible with vanilla servers.
-  - Example: [Mod Menu](/mod/modmenu). It only adds a menu to view the list of mods installed on your client, which doesn't need to be installed on the server.
+  - Example: [Mod Menu](https://modrinth.com/mod/modmenu). It only adds a menu to view the list of mods installed on your client, which doesn't need to be installed on the server.
 - **Server-side only / Works in singleplayer** (`server_only`)
   - All functionality is performed exclusively on the server side. Should be compatible with vanilla clients if only installed on the server. Also works in Singleplayer.
-  - Example: [YUNG's Bridges](/mod/yungs-bridges). It only adds structures which don't need to be present on the client-side.
+  - Example: [YUNG's Bridges](https://modrinth.com/mod/yungs-bridges). It only adds structures which don't need to be present on the client-side.
 - **Server-side only / Dedicated server only** (`dedicated_server_only`)
   - Only runs on a dedicated server, and not in Singleplayer.
-  - Example: [Better Fabric Console](/mod/better-fabric-console). Its functionality does not work in singleplayer, because it modifies the dedicated server console.
+  - Example: [Better Fabric Console](https://modrinth.com/mod/better-fabric-console). Its functionality does not work in singleplayer, because it modifies the dedicated server console.
 - **Client and server / Required on both** (`client_and_server`)
   - Must be installed on both the client and server.
-  - Example: [Cobblemon](/mod/cobblemon). It adds entities, blocks, and items that need to be on both the client and server to work.
+  - Example: [Cobblemon](https://modrinth.com/mod/cobblemon). It adds entities, blocks, and items that need to be on both the client and server to work.
 - **Client and server / Optional on client** (`server_only_client_optional`)
   - Must be on the server, but can be on the client as well for enhanced functionality
-  - Example: [Polymer](/mod/polymer). It functions on the server-side, but if installed on the client it can improve the experience when playing on a server running Polymer.
+  - Example: [Polymer](https://modrinth.com/mod/polymer). It functions on the server-side, but if installed on the client it can improve the experience when playing on a server running Polymer.
 - **Client and server / Optional on server** (`client_only_server_optional`)
   - Must be on the client, but can be on the server as well for enhanced functionality
-  - Example: [AppleSkin](/mod/appleskin). It functions on the client-side, but if installed on the server it can provide more accurate saturation information.
+  - Example: [AppleSkin](https://modrinth.com/mod/appleskin). It functions on the client-side, but if installed on the server it can provide more accurate saturation information.
 - **Client or server / Works best on both** (`client_or_server_prefers_both`)
   - Can be installed on just the client or just the server to function, but functionality is enhanced when it is on both.
-  - Example: [No Chat Reports](/mod/no-chat-reports). The mod functions on just the client or just the server, but each comes with drawbacks. For the best functionality, you need to install it on both.
+  - Example: [No Chat Reports](https://modrinth.com/mod/no-chat-reports). The mod functions on just the client or just the server, but each comes with drawbacks. For the best functionality, you need to install it on both.
 - **Client or server / Works the same on either** (`client_or_server`)
   - Can be installed on just the client or just the server, and either one would enable full functionality. There would be no reason to install it on both.
-  - Example: [Entity View Distance](/mod/entity-view-distance). It lets you perform the same functionality of limiting entity view distance on either the client or the server.
+  - Example: [Entity View Distance](https://modrinth.com/mod/entity-view-distance). It lets you perform the same functionality of limiting entity view distance on either the client or the server.
 - **Singleplayer only** (`singleplayer_only`)
   - Only works in Singleplayer, does not function in a Multiplayer environment.
-  - Example: [LAN Server Properties](/mod/lan-server-properties). It modifies a feature that only exists in Singleplayer, the Open to LAN menu.
+  - Example: [LAN Server Properties](https://modrinth.com/mod/lan-server-properties). It modifies a feature that only exists in Singleplayer, the Open to LAN menu.
 
 ## What's next
 

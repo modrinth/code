@@ -12,7 +12,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 ### Apps (`apps/`)
 
 | App               | Description                    |
-| ----------------- | ------------------------------ |
+|-------------------|--------------------------------|
 | `frontend`        | Main Modrinth website (Nuxt 3) |
 | `app-frontend`    | Desktop/app frontend (Vue 3)   |
 | `app`             | Desktop/app shell (Tauri)      |
@@ -24,7 +24,7 @@ This is the Modrinth monorepo — it contains all Modrinth projects, both fronte
 ### Packages (`packages/`)
 
 | Package            | Description                                           |
-| ------------------ | ----------------------------------------------------- |
+|--------------------|-------------------------------------------------------|
 | `ui`               | Shared Vue component library (`@modrinth/ui`)         |
 | `assets`           | Styling and auto-generated icons (`@modrinth/assets`) |
 | `api-client`       | API client for Nuxt, Tauri, and Node/browser          |
@@ -117,7 +117,7 @@ For Edit, use: `		private byte tag;` (copy everything after →, including the t
 
 ## Skills
 
-Project-specific skills (patterns, conventions, and implementation guides) are located in [`.claude/skills/`](./.claude/skills/). Each skill has a `SKILL.md` describing the pattern:
+Project-specific skills (patterns, conventions, and implementation guides) are located in [`.claude/skills/`](./.claude/skills). Each skill has a `SKILL.md` describing the pattern:
 
 - **[Dependency Injection](./.claude/skills/dependency-injection/SKILL.md)** — Vue provide/inject DI layer using `createContext`
 - **[Cross-Platform Pages](./.claude/skills/cross-platform-pages/SKILL.md)** — Shared component architecture across Nuxt and Tauri frontends

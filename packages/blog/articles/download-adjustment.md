@@ -10,15 +10,15 @@ While working on the upcoming analytics update for Modrinth, our team found an i
 
 A graph of many Modrinth projects and their download counts, showing a disproportionate amount of downloads from China.
 
-![Notice anything out of the ordinary?](./country-download-counts.jpg)
+![Notice anything out of the ordinary?](../public/download-adjustment/country-download-counts.jpg)
 
 More specifically, the issue we encountered is that the download counts from China were through the roof compared to the page view statistics.
 
-![A graph of many Modrinth projects and their page views, showing a relatively even distribution across countries.](./country-page-views.jpg)
+![A graph of many Modrinth projects and their page views, showing a relatively even distribution across countries.](../public/download-adjustment/country-page-views.jpg)
 
 Upon further investigation, there was one specific launcher that was repeatedly downloading the same files from Modrinth over and over again within a very short time span.
 
-![A table of downloads split into several parts.](./downloads-table.jpg)
+![A table of downloads split into several parts.](../public/download-adjustment/downloads-table.jpg)
 
 Notice how the downloads in each section (delineated by the bold line) have the same path and were created within the same second.
 
@@ -34,10 +34,10 @@ For the most part, this system works fairly well. The main issue comes in step 2
 
 In order to fix this, we entirely rewrote Sisyphus. It still uses Cloudflare Workers, but all of the processing of step 2 has been offloaded to the main Modrinth backend. This not only speeds up downloads (even if only briefly), but also makes download counts more reliable. Over the past few days, we've already implemented the necessary adjustments. Our observations have shown that the results are significantly more consistent in their accuracy. Instead of having strange spikes in activity, the graph of new downloads now follows the expected pattern.
 
-![A graph that is split up into two parts: on the left, a spiky graph with the text "old sisyphus". On the right, a graph with consistent dips and peaks.](./new-sisyphus.jpg)
+![A graph that is split up into two parts: on the left, a spiky graph with the text "old sisyphus". On the right, a graph with consistent dips and peaks.](../public/download-adjustment/new-sisyphus.jpg)
 
 Notice the spikes on the left? Compare that to the silky-smooth sinusoidal satisfaction on the right!
 
-To reiterate, the issue is now resolved and **payouts were not affected**. Payouts do not take into account downloads from launchers other than the [Modrinth App](/app); therefore, this adjustment has no bearing on payouts.
+To reiterate, the issue is now resolved and **payouts were not affected**. Payouts do not take into account downloads from launchers other than the [Modrinth App](https://modrinth.com/app); therefore, this adjustment has no bearing on payouts.
 
 P.S. Are you curious about why our download counter is called Sisyphus? In Greek mythology, Sisyphus rolls a boulder up a hill for the rest of eternity. Like Sisyphus, our download counter has no point other than to keep increasing for as long as Modrinth exists.

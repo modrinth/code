@@ -13,7 +13,7 @@ Modrinth Servers aims to provide the most seamless experience for running and pl
 
 For this beta launch, **all servers are US-only**. Please be aware of this if you are looking to purchase a server, as it may not be optimal for users outside of North America.
 
-![A screenshot of the fully-custom Modrinth Servers panel integrated into Modrinth](./panel.jpg)
+![A screenshot of the fully-custom Modrinth Servers panel integrated into Modrinth](../public/modrinth-servers-beta/panel.jpg)
 
 ## What makes Modrinth Servers unique?
 

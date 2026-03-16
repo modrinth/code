@@ -11,7 +11,7 @@ The past few months have been a bit quiet on our part, but that doesn’t mean w
 
 ## Modrinth App Beta
 
-Most of our time has been spent working on [Modrinth App](/app). This launcher integrates tightly with the website, bringing you the same bank of mods, modpacks, data packs, shaders, and resource packs already available for download on Modrinth.
+Most of our time has been spent working on [Modrinth App](https://modrinth.com/app). This launcher integrates tightly with the website, bringing you the same bank of mods, modpacks, data packs, shaders, and resource packs already available for download on Modrinth.
 
 Alongside that, there are a wealth of other features for you to find, including:
 
@@ -28,7 +28,7 @@ Alongside that, there are a wealth of other features for you to find, including:
 - Performance through the roof, backed by Rust and Tauri (not Electron!)
 - Fully open-source under the GNU GPLv3 license
 
-More features will, of course, be coming in the future. This is being considered a **beta release**. Nonetheless, we’re still very proud of what we’ve already created, and we’re pleased to say that it’s available for download on our website **right now** at [https://modrinth.app](/app). Check it out, play around with it, and have fun!
+More features will, of course, be coming in the future. This is being considered a **beta release**. Nonetheless, we’re still very proud of what we’ve already created, and we’re pleased to say that it’s available for download on our website **right now** at [https://modrinth.app](https://modrinth.com/app). Check it out, play around with it, and have fun!
 
 ## Authentication, scoped tokens, and security
 
@@ -36,6 +36,6 @@ The second major thing we’re releasing today is a wide range of changes to our
 
 ### In-house authentication and two-factor authentication
 
-![A screenshot of the new Modrinth sign-in page, showing options to sign in with Discord, GitHub, Microsoft, Google, Steam, GitLab, or with an email and password.](./auth.jpg)
+![A screenshot of the new Modrinth sign-in page, showing options to sign in with Discord, GitHub, Microsoft, Google, Steam, GitLab, or with an email and password.](../public/modrinth-app-beta/auth.jpg)
 
 Until today, Modrinth has always used GitHub accounts exclusively for authentication. That changes now. Starting today, you can now connect your Discord, Microsoft, Google, Steam, and/or GitLab accounts to your Modrinth account. You may also forgo all six of those options and elect to use a good ol’ fashioned email and password. No problems with that! (If you’re curious, we store passwords hashed with the Argon2id method, meaning we couldn't read them even if we wanted to.)

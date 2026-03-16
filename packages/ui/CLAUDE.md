@@ -45,7 +45,7 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 **Use `surface-*` variables for backgrounds — never aliased `bg-*` color variables:**
 
 | Token            | Usage                                     |
-| ---------------- | ----------------------------------------- |
+|------------------|-------------------------------------------|
 | `bg-surface-1`   | Deepest background layer                  |
 | `bg-surface-1.5` | Odd row background (tables)               |
 | `bg-surface-2`   | Even row background, secondary panels     |
@@ -56,7 +56,7 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 **For text colors:**
 
 | Class            | Usage                            |
-| ---------------- | -------------------------------- |
+|------------------|----------------------------------|
 | `text-contrast`  | Primary headings                 |
 | `text-primary`   | Default body text                |
 | `text-secondary` | Reduced emphasis, secondary info |

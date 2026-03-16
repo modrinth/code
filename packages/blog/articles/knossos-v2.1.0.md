@@ -13,19 +13,19 @@ We've added a number of new features to improve your experience.
 
 ### Click to expand gallery images
 
-![The new expanding gallery images](./expand-gallery.jpg)
+![The new expanding gallery images](../public/knossos-v2.1.0/expand-gallery.jpg)
 
 In the gallery page of a project, you can now click on the images to expand the image and view it more closely. You can also use the left arrow, right arrow, and Escape keyboard keys to aid navigation.
 
 ### Filters for the 'Changelog' and 'Versions' pages
 
-![The new changelog and versions filtering options](./version-filters.jpg)
+![The new changelog and versions filtering options](../public/knossos-v2.1.0/version-filters.jpg)
 
 Versions on the Changelog and Versions page can now be filtered by mod loader and Minecraft version.
 
 ### More easily access the list of projects you follow
 
-![The new 'Following' button in the profile dropdown](./following.jpg)
+![The new 'Following' button in the profile dropdown](../public/knossos-v2.1.0/following.jpg)
 
 The link to the list of your followed projects is now listed in your profile dropdown.
 
@@ -61,4 +61,4 @@ While new features are great, we've also been working on a bunch of bugfixes. Be
 
 These fixes should have been automatically pulled in, assuming you're using Minotaur `2.+`. If not, you should be upgrading to `2.0.2`.
 
-Need a guide to migrate from Minotaur v1 to v2? Check the migration guide on the [redesign post](../redesign/#minotaur).
+Need a guide to migrate from Minotaur v1 to v2? Check the migration guide on the [redesign post](redesign.md#minotaur).

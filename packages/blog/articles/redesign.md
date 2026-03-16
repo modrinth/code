@@ -17,7 +17,7 @@ As they say, a picture tells somewhere around nine-hundred odd words. As such, t
 
 ### Project pages
 
-![The new page design, shown for Iris](./iris.jpg)
+![The new page design, shown for Iris](../public/redesign/iris.jpg)
 
 _A beautiful project page for Iris to match its beautiful shaders_
 
@@ -25,7 +25,7 @@ On project pages, much of the focus has been shifted to the extended description
 
 ### Gallery
 
-![A preview of the gallery functionality](./consistency.jpg)
+![A preview of the gallery functionality](../public/redesign/consistency.jpg)
 
 _Pictures... pretty!_
 
@@ -33,7 +33,7 @@ Developers can now add a Gallery section on each project page! Each uploaded ima
 
 ### Changelog
 
-![The changelog page](./adorn.jpg)
+![The changelog page](../public/redesign/adorn.jpg)
 
 _A changelog page for showing the difference between updates!_
 
@@ -41,7 +41,7 @@ Version changelogs are automatically compiled together into a large changelog li
 
 ### Version creation and dependencies
 
-![The version creation page](./version-creation.jpg)
+![The version creation page](../public/redesign/version-creation.jpg)
 
 _Version creation has gotten an overhaul!_
 
@@ -49,17 +49,17 @@ While dependencies have existed in the backend for a while, their implementation
 
 ### Profile settings & dashboard
 
-![The profile settings page](./profile-settings.jpg)
+![The profile settings page](../public/redesign/profile-settings.jpg)
 
 _The new settings panel for managing your profile and other visual settings_
 
 The dashboard has been reworked and reorganized: the "My mods" section has been merged into the profile page itself, and the "Settings" page has been split into "Profile" and "Security". There are also options for switching the project and search information from the left side of the screen to the right.
 
-![A user's profile](./jellysquid.jpg)
+![A user's profile](../public/redesign/jellysquid.jpg)
 
 The notifications page is also now its own page separate from the dashboard, accessible only from the header. The notifications page also has a highly-requested "Clear all" button.
 
-![The notifications page](./notifications.jpg)
+![The notifications page](../public/redesign/notifications.jpg)
 
 ## Backend changes and API v2
 

@@ -33,12 +33,12 @@ Most of Modrinth's code is in our monorepo, which you can find [here](https://gi
 
 Follow the project-specific instructions below to get started:
 
-- [Knossos (frontend)](/contributing/knossos)
-- [Theseus (Modrinth App)](/contributing/theseus)
-- [Minotaur (Gradle plugin)](/contributing/minotaur)
-- [Labrinth (API/backend)](/contributing/labrinth)
-- [Daedalus (Metadata service)](/contributing/daedalus)
-- [Docs (Developer/Contributor Documentation)](/contributing/docs)
+- [Knossos (frontend)](knossos.md)
+- [Theseus (Modrinth App)](theseus.md)
+- [Minotaur (Gradle plugin)](minotaur.md)
+- [Labrinth (API/backend)](labrinth.md)
+- [Daedalus (Metadata service)](daedalus.md)
+- [Docs (Developer/Contributor Documentation)](docs.md)
 
 [Discord]: https://discord.modrinth.com
 [GitHub]: https://github.com/modrinth

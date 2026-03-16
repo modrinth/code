@@ -7,7 +7,7 @@ date: 2024-09-13T12:00:00-08:00
 authors: ['MpxzqsyW', 'Dc7EYhxG']
 ---
 
-Just over 3 weeks ago, we [launched](/news/article/introducing-modrinth-refreshed-site-look-new-advertising-system) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!
+Just over 3 weeks ago, we [launched](design-refresh.md) our new ads powered by [Aditude](https://www.aditude.com/). These ads have allowed us to improve creator revenue drastically and become sustainable. Read on for more info!
 
 ## Creator Revenue
 
@@ -15,7 +15,7 @@ We’re excited to share we have been able to increase creator revenue by 5-8x w
 
 There’s a couple changes to how revenue is distributed out to creators coming with this increase.
 
-First, revenue is no longer entirely paid out the day they are earned. Previously, we used our own in-house advertisement deal which paid us in advance for the entire month, and we divided that among each day in the month, as the month progressed. With the switch to a more traditional ad network, we are paid on a NET 60 basis, which is fairly standard with ad networks. What this means is that some of your revenue may be pending until the ad network pays us out. Exactly how this works is explained further [here](legal/cmp-info#pending).
+First, revenue is no longer entirely paid out the day they are earned. Previously, we used our own in-house advertisement deal which paid us in advance for the entire month, and we divided that among each day in the month, as the month progressed. With the switch to a more traditional ad network, we are paid on a NET 60 basis, which is fairly standard with ad networks. What this means is that some of your revenue may be pending until the ad network pays us out. Exactly how this works is explained further [here](https://modrinth.com/legal/cmp-info#pending).
 
 Second, the revenue split between Modrinth and Creators has changed. See the next section on sustainability for more on this.
 

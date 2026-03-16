@@ -8,7 +8,7 @@ Modrinth allows developers to create applications which, once authorized by a Mo
 If you're familiar with OAuth 2, these are the URLs you will need:
 
 | Name               | URL                                              |
-| ------------------ | ------------------------------------------------ |
+|--------------------|--------------------------------------------------|
 | Authorization page | `https://modrinth.com/auth/authorize`            |
 | Token exchange     | `https://api.modrinth.com/_internal/oauth/token` |
 
@@ -31,7 +31,7 @@ After you've registered your application, it is important that you take note of 
 Once the user is ready to authorize your application, you need to construct a URL to redirect them to. The authorization URL for Modrinth is `https://api.modrinth.com/_internal/oauth/token`. Supply the following query parameters:
 
 | Query parameter | Description                                                                               |
-| --------------- | ----------------------------------------------------------------------------------------- |
+|-----------------|-------------------------------------------------------------------------------------------|
 | `response_type` | In Modrinth this always needs to be `code`, since only code grants are supported          |
 | `client_id`     | The application identifier found in the settings                                          |
 | `scope`         | The permissions you need access to                                                        |
@@ -45,7 +45,7 @@ The scope identifiers are currently best found in the backend source code locate
 The redirect URI is the endpoint on your server that will receive the code which can eventually be used to act on the user's behalf. For security reasons the redirect URI used has to be allowlisted in your application settings. The redirect will contain the following query parameters:
 
 | Query parameter | Description                                        |
-| --------------- | -------------------------------------------------- |
+|-----------------|----------------------------------------------------|
 | `code`          | The code that can be exchanged for an access token |
 | `client_id`     | Your client id                                     |
 | `redirect_uri`  | The redirect URI which was used                    |
@@ -58,7 +58,7 @@ If you've followed the previous section on getting authorization, you should now
 In the body use these fields:
 
 | Field          | Description                                                  |
-| -------------- | ------------------------------------------------------------ |
+|----------------|--------------------------------------------------------------|
 | `code`         | The authorization code                                       |
 | `client_id`    | Your client id, the same as in the authorization request     |
 | `redirect_uri` | The redirect URI which was redirected to after authorization |
@@ -67,7 +67,7 @@ In the body use these fields:
 If the request succeeds, you should receive a JSON payload with these fields:
 
 | Field          | Description                                          |
-| -------------- | ---------------------------------------------------- |
+|----------------|------------------------------------------------------|
 | `access_token` | The access token you can use to access the API       |
 | `token_type`   | Currently only `Bearer`                              |
 | `expires_in`   | The amount of seconds until the access token expires |

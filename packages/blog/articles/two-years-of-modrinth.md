@@ -5,9 +5,9 @@ date: 2023-01-07
 authors: ['6plzAzU4']
 ---
 
-Modrinth initially [went into beta](../modrinth-beta) on November 30th, 2020. Just over a month ago was November 30th, 2022, marking **two years** since Modrinth was generally available as a platform for everyone to use. Today, we're proud to announce the Anniversary Update, celebrating both two years of Modrinth as well as the coming of the new year, and we'll be discussing our New Year's Resolutions for 2023.
+Modrinth initially [went into beta](modrinth-beta.md) on November 30th, 2020. Just over a month ago was November 30th, 2022, marking **two years** since Modrinth was generally available as a platform for everyone to use. Today, we're proud to announce the Anniversary Update, celebrating both two years of Modrinth as well as the coming of the new year, and we'll be discussing our New Year's Resolutions for 2023.
 
-Before you read this post, though, we recommend taking a look at [our retrospective on Modrinth's history through 2020—2022](../two-years-of-modrinth-history). It just wouldn't be right to take a look at the present and the future without also taking a look at our past, seeing how far we've come from our humble beginnings.
+Before you read this post, though, we recommend taking a look at [our retrospective on Modrinth's history through 2020—2022](two-years-of-modrinth-history.md). It just wouldn't be right to take a look at the present and the future without also taking a look at our past, seeing how far we've come from our humble beginnings.
 
 With that out of the way, this post primarily serves to announce a few of the smaller features we've been working on after the release of creator monetization. We've bundled these all together as the **Anniversary Update**.
 
@@ -19,35 +19,35 @@ Without further adieu, let's get right into what's new with this new year!
 
 The long-awaited arrival of shader packs and data packs is now here on Modrinth!
 
-Shader packs can be viewed in the [shaders tab](/shaders). This includes shaders that support [Iris](/mod/iris), [Canvas](/mod/canvas), and OptiFine, as well as vanilla core shaders. (Even though they're installed via the resource pack system, we have decided to put Canvas and core shaders in shader packs since most users will not search in resource packs for shader packs, even if that's how they're installed.)
+Shader packs can be viewed in the [shaders tab](https://modrinth.com/shaders). This includes shaders that support [Iris](https://modrinth.com/mod/iris), [Canvas](https://modrinth.com/mod/canvas), and OptiFine, as well as vanilla core shaders. (Even though they're installed via the resource pack system, we have decided to put Canvas and core shaders in shader packs since most users will not search in resource packs for shader packs, even if that's how they're installed.)
 
-Data packs can be found in the [data packs tab](/datapacks). These are implemented similarly to plugins, in that projects with a mod version can also upload a data pack version (and vice versa). Additionally, data pack authors can choose to have their data packs packaged as a mod using the handy-dandy button on the site.
+Data packs can be found in the [data packs tab](https://modrinth.com/datapacks). These are implemented similarly to plugins, in that projects with a mod version can also upload a data pack version (and vice versa). Additionally, data pack authors can choose to have their data packs packaged as a mod using the handy-dandy button on the site.
 
 Data packs can optionally upload a corresponding resource pack as a separate file. We discourage bundling data files and asset files in the same zip file.
 
 ## New landing page
 
-The [homepage](/) has been completely remade, featuring a scrolling list of random projects from Modrinth. Feel free to use this to discover new projects—just make sure you refresh occasionally, because they loop after a little while until you refresh!
+The [homepage](https://modrinth.com/) has been completely remade, featuring a scrolling list of random projects from Modrinth. Feel free to use this to discover new projects—just make sure you refresh occasionally, because they loop after a little while until you refresh!
 
-![A screenshot of the new homepage, with a maze background and projects scrolling across the bottom. Bold across the front is "The place for Minecraft mods".](./landing-page.jpg)
+![A screenshot of the new homepage, with a maze background and projects scrolling across the bottom. Bold across the front is "The place for Minecraft mods".](../public/two-years-of-modrinth/landing-page.jpg)
 
 ## Project overhaul for creators
 
 We're continuing to bring expansions to the creator dashboard introduced with monetization. The new **Projects** tab allows you to view all of your projects in a table and quickly access their information and settings.
 
-[![The new Modrinth project dashboard](./projects-dashboard.jpg)](/dashboard/projects)
+[![The new Modrinth project dashboard](../public/two-years-of-modrinth/projects-dashboard.jpg)](https://modrinth.com/dashboard/projects)
 
 The same page also introduces the ability to bulk-edit the external resource links without having to edit each page individually. For example, if your Discord invite expires, you used to have to edit each of your projects individually to add it back. Now you can just select the projects you want to edit the links for and edit them all at the same time!
 
-![A modal with several input fields for external resource links, listing multiple projects the input changes will be applied to.](./bulk-edit.jpg)
+![A modal with several input fields for external resource links, listing multiple projects the input changes will be applied to.](../public/two-years-of-modrinth/bulk-edit.jpg)
 
 Even better are the changes to the settings page for individual projects. Previously, the project settings page was disorganized and cluttered. The project settings page has been completely redone, inspired by GitHub's repository settings page.
 
-![The new project settings page, shown for Sodium.](./project-settings.jpg)
+![The new project settings page, shown for Sodium.](../public/two-years-of-modrinth/project-settings.jpg)
 
 Draft projects also now have a publishing checklist, making it more clear to authors as to what their next steps should look like. Red asterisks are items that must be completed before submitting and purple light bulbs are suggestions.
 
-![A card with several tasks for a draft project owner to do, such as adding a description and selecting the necessary information.](./publishing-checklist.jpg)
+![A card with several tasks for a draft project owner to do, such as adding a description and selecting the necessary information.](../public/two-years-of-modrinth/publishing-checklist.jpg)
 
 ## Version page overhaul
 
@@ -55,7 +55,7 @@ The layout of the individual version page has gotten a complete overhaul. It's m
 
 A screenshot of the way that individual versions look now:
 
-![A screenshot of the way that individual versions look now.](./version-page.jpg)
+![A screenshot of the way that individual versions look now.](../public/two-years-of-modrinth/version-page.jpg)
 
 That's not all, though. Version creation now automatically infers most details after you upload your first file. Try it out sometime—whenever you upload your first file, most stuff should already be filled in. This system is still in-development, so if you find any issues, please file an issue on [GitHub](https://github.com/modrinth/code).
 
@@ -63,9 +63,9 @@ That's not all, though. Version creation now automatically infers most details a
 
 Anywhere which lists projects, namely search and user pages, have gotten a great overhaul. You can choose between the classic list view, the grid view, and the gallery view.
 
-![A screenshot of the default view for the Modrinth shaders search.](./search-gallery-view.jpg)
+![A screenshot of the default view for the Modrinth shaders search.](../public/two-years-of-modrinth/search-gallery-view.jpg)
 
-By default, shader packs and resource packs use the gallery view, user pages use the grid view, and everywhere else use the list view. You can cycle through them near the top of each page or change them in your [display settings](/settings).
+By default, shader packs and resource packs use the gallery view, user pages use the grid view, and everywhere else use the list view. You can cycle through them near the top of each page or change them in your [display settings](https://modrinth.com/settings).
 
 The gallery image uses the featured gallery image on a project, so please ensure if you are a shader pack or resource pack author that you set a featured gallery image!
 
@@ -73,13 +73,13 @@ The gallery image uses the featured gallery image on a project, so please ensure
 
 The existing UI for gallery image creation, editing, and deletion was flawed in many ways, so we threw out the old way of doing it and created a whole new system for this. It should be less prone to the many many bugs that plagued the previous implementation.
 
-![The new gallery image editing UI, in a modal](./gallery-ui.jpg)
+![The new gallery image editing UI, in a modal](../public/two-years-of-modrinth/gallery-ui.jpg)
 
 ## New project webhook
 
 Our [Discord server](https://discord.modrinth.com) has a brand new channel: #new-projects. A webhook sends a message to this channel every time a new project gets approved. Check it out when you get a chance!
 
-![A screenshot of the new project webhook for Iris Shaders.](./project-webhook.jpg)
+![A screenshot of the new project webhook for Iris Shaders.](../public/two-years-of-modrinth/project-webhook.jpg)
 
 ## Miscellaneous additions
 

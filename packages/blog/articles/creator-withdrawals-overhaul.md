@@ -64,8 +64,8 @@ You can now withdraw directly to your bank account via wire or ACH, depending on
 
 We're working to expand this list, most notably to Canada, the UK, and countries across Asia, but there's no timeline _yet_.
 
-| Country         | Currency | Transaction Fee | FX Fee            | **Total Fee**     |
-| --------------- | -------- | --------------- | ----------------- | ----------------- |
+| Country           | Currency | Transaction Fee | FX Fee            | **Total Fee**     |
+|-------------------|----------|-----------------|-------------------|-------------------|
 | 🇺🇸 USA          | USD      | $0.50 + 1%      | 0.50%             | **~1.5% + $0.50** |
 | 🇪🇺 EU           | EUR      | €1.00 + 1%      | 0.60%             | **~1.6% + €1.00** |
 | 🇦🇷 Argentina    | ARS      | $0.00 + 1%      | 0.50%             | **~1.5%**         |
@@ -105,7 +105,7 @@ Last but not least, we're also rolling out our new tax compliance system. We par
 
 Creator withdrawals will now be limited to $600.00 USD per calendar year as of 2025, per U.S. regulations. As a creator approaches that threshold, they'll be prompted to fill out a W-8 or W-9 tax form, depending on their country.
 
-![A snippet of the tax form stage of the new withdraw modal.](./tax-compliance.png)
+![A snippet of the tax form stage of the new withdraw modal.](../public/creator-withdrawals-overhaul/tax-compliance.png)
 
 Completing this form helps Modrinth stay compliant and will automatically unlock withdrawals again once submitted. For non-US users, these details are not automatically sent to the US government! They are for our own records in the case of an audit and we need to prove where we're sending money to.
 

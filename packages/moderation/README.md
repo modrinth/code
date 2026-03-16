@@ -67,27 +67,27 @@ You can use variables in your messages that will be replaced with user input:
 
 1. Define a variable in the `relevantExtraInput` array of an action:
 
-```typescript
-relevantExtraInput: [
-  {
-    label: 'Explanation for the user',
-    variable: 'MESSAGE',
-    required: true,
-  },
-],
-```
+    ```typescript
+    relevantExtraInput: [
+      {
+        label: 'Explanation for the user',
+        variable: 'MESSAGE',
+        required: true,
+      },
+    ],
+    ```
 
 2. Use the variable in your message with `%VARIABLE%` syntax:
 
-```markdown
-# Your Message Title
-
-Here is some explanation about the issue.
-
-%MESSAGE%
-
-More text after the variable.
-```
+    ```markdown
+    # Your Message Title
+    
+    Here is some explanation about the issue.
+    
+    %MESSAGE%
+    
+    More text after the variable.
+    ```
 
 The `%MESSAGE%` placeholder will be replaced with the text entered by the moderator.
 

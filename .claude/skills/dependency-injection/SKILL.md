@@ -31,13 +31,13 @@ Use DI when:
 
 `packages/ui` components need capabilities that each frontend fulfils differently:
 
-| Provider | App Frontend | Website Frontend |
-|----------|-------------|-----------------|
-| API client | Tauri IPC client | REST fetch client |
-| Notifications | `ref()` state + app window mgmt | `useState()` for SSR hydration |
-| File picker | Native Tauri dialogs | Browser file inputs |
-| Tags | Tauri commands | Nuxt server state |
-| Page context | `sidebar: true`, ad window hooks | `sidebar: false`, no ads |
+| Provider      | App Frontend                     | Website Frontend               |
+|---------------|----------------------------------|--------------------------------|
+| API client    | Tauri IPC client                 | REST fetch client              |
+| Notifications | `ref()` state + app window mgmt  | `useState()` for SSR hydration |
+| File picker   | Native Tauri dialogs             | Browser file inputs            |
+| Tags          | Tauri commands                   | Nuxt server state              |
+| Page context  | `sidebar: true`, ad window hooks | `sidebar: false`, no ads       |
 
 ### Page-Level Context
 
@@ -156,14 +156,14 @@ Default to props and emits. DI adds indirection — only use it with a concrete 
 
 ## Existing Providers
 
-| Provider | File | Purpose |
-|----------|------|---------|
-| `provideModrinthClient` | `providers/api-client.ts` | API client instance |
-| `provideNotificationManager` | `providers/web-notifications.ts` | Notification management |
-| `providePageContext` | `providers/page-context.ts` | Page config (sidebar, ads) |
-| `provideProjectPageContext` | `providers/project-page.ts` | Project page state + mutations |
-| `provideServerContext` | `providers/server-context.ts` | Server hosting state |
-| `provideUserPageContext` | `providers/user-page.ts` | User page state |
+| Provider                     | File                             | Purpose                        |
+|------------------------------|----------------------------------|--------------------------------|
+| `provideModrinthClient`      | `providers/api-client.ts`        | API client instance            |
+| `provideNotificationManager` | `providers/web-notifications.ts` | Notification management        |
+| `providePageContext`         | `providers/page-context.ts`      | Page config (sidebar, ads)     |
+| `provideProjectPageContext`  | `providers/project-page.ts`      | Project page state + mutations |
+| `provideServerContext`       | `providers/server-context.ts`    | Server hosting state           |
+| `provideUserPageContext`     | `providers/user-page.ts`         | User page state                |
 
 ## Key Files
 

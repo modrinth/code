@@ -98,30 +98,30 @@ export const detailsStageConfig: StageConfigInput<MyModalContext> = {
 
 **Stage config fields:**
 
-| Field | Type | Purpose |
-|-------|------|---------|
-| `id` | `string` | Unique stage identifier (used with `setStage()`) |
-| `stageContent` | `Component` | Vue component to render (wrap with `markRaw()`) |
-| `title` | `MaybeCtxFn<T, string>` | Stage title in breadcrumbs |
-| `skip` | `MaybeCtxFn<T, boolean>` | Skip this stage conditionally |
-| `nonProgressStage` | `MaybeCtxFn<T, boolean>` | Exclude from progress bar (for edit sub-flows) |
-| `hideStageInBreadcrumb` | `MaybeCtxFn<T, boolean>` | Hide from breadcrumb nav |
-| `cannotNavigateForward` | `MaybeCtxFn<T, boolean>` | Block forward navigation (validation) |
-| `disableClose` | `MaybeCtxFn<T, boolean>` | Disable closing the modal |
-| `leftButtonConfig` | `MaybeCtxFn<T, StageButtonConfig \| null>` | Left action button |
-| `rightButtonConfig` | `MaybeCtxFn<T, StageButtonConfig \| null>` | Right action button |
-| `maxWidth` | `MaybeCtxFn<T, string>` | Per-stage max width (default `560px`) |
+| Field                   | Type                                       | Purpose                                          |
+|-------------------------|--------------------------------------------|--------------------------------------------------|
+| `id`                    | `string`                                   | Unique stage identifier (used with `setStage()`) |
+| `stageContent`          | `Component`                                | Vue component to render (wrap with `markRaw()`)  |
+| `title`                 | `MaybeCtxFn<T, string>`                    | Stage title in breadcrumbs                       |
+| `skip`                  | `MaybeCtxFn<T, boolean>`                   | Skip this stage conditionally                    |
+| `nonProgressStage`      | `MaybeCtxFn<T, boolean>`                   | Exclude from progress bar (for edit sub-flows)   |
+| `hideStageInBreadcrumb` | `MaybeCtxFn<T, boolean>`                   | Hide from breadcrumb nav                         |
+| `cannotNavigateForward` | `MaybeCtxFn<T, boolean>`                   | Block forward navigation (validation)            |
+| `disableClose`          | `MaybeCtxFn<T, boolean>`                   | Disable closing the modal                        |
+| `leftButtonConfig`      | `MaybeCtxFn<T, StageButtonConfig \| null>` | Left action button                               |
+| `rightButtonConfig`     | `MaybeCtxFn<T, StageButtonConfig \| null>` | Right action button                              |
+| `maxWidth`              | `MaybeCtxFn<T, string>`                    | Per-stage max width (default `560px`)            |
 
 **Button config fields:**
 
-| Field | Purpose |
-|-------|---------|
-| `label` | Button text |
-| `icon` | Icon component |
+| Field          | Purpose                 |
+|----------------|-------------------------|
+| `label`        | Button text             |
+| `icon`         | Icon component          |
 | `iconPosition` | `'before'` or `'after'` |
-| `color` | ButtonStyled color prop |
-| `disabled` | Disable the button |
-| `onClick` | Click handler |
+| `color`        | ButtonStyled color prop |
+| `disabled`     | Disable the button      |
+| `onClick`      | Click handler           |
 
 ### 3. Create stage components
 
@@ -170,14 +170,14 @@ defineExpose({ show: () => modal.value?.show() })
 
 `MultiStageModal` exposes via ref:
 
-| Method/Property | Description |
-|----------------|-------------|
-| `show()` | Open the modal |
-| `hide()` | Close the modal |
+| Method/Property       | Description                         |
+|-----------------------|-------------------------------------|
+| `show()`              | Open the modal                      |
+| `hide()`              | Close the modal                     |
 | `setStage(indexOrId)` | Jump to stage by index or string id |
-| `nextStage()` | Advance to next non-skipped stage |
-| `prevStage()` | Go back to previous stage |
-| `currentStageIndex` | Ref to current stage index |
+| `nextStage()`         | Advance to next non-skipped stage   |
+| `prevStage()`         | Go back to previous stage           |
+| `currentStageIndex`   | Ref to current stage index          |
 
 ## Non-Progress Stages (Edit Sub-Flows)
 
@@ -206,10 +206,10 @@ Navigate to it with `modal.value?.setStage('edit-loaders')` — it won't affect 
 
 The version creation/edit modal is the most complete example:
 
-| File | Purpose |
-|------|---------|
+| File                                                          | Purpose                           |
+|---------------------------------------------------------------|-----------------------------------|
 | `apps/frontend/src/providers/version/manage-version-modal.ts` | Context creation + business logic |
-| `apps/frontend/src/providers/version/stages/index.ts` | Stage config barrel export |
-| `apps/frontend/src/providers/version/stages/*-stage.ts` | Individual stage configs |
+| `apps/frontend/src/providers/version/stages/index.ts`         | Stage config barrel export        |
+| `apps/frontend/src/providers/version/stages/*-stage.ts`       | Individual stage configs          |
 
 The context includes computed properties for conditional UI, watchers for auto-fetching dependencies, loading states for granular button disabling, and both "create" and "edit" flows sharing the same stages with different button configs.

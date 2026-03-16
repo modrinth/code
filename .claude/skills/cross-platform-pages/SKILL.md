@@ -121,7 +121,7 @@ provideContentManager({
 ## When to Use Props vs DI
 
 | Use       | When                                                                                                     |
-| --------- | -------------------------------------------------------------------------------------------------------- |
+|-----------|----------------------------------------------------------------------------------------------------------|
 | **DI**    | The data depends on _how_ it's fetched (different per platform) — API calls, file operations, navigation |
 | **Props** | The data is the same regardless of platform — configuration flags, display options                       |
 
