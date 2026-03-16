@@ -514,6 +514,9 @@
 			</div>
 		</header>
 		<header class="mobile-navigation mobile-only">
+			<div class="nav-menu h-[500px]">
+				<!-- placeholder so other nav menus aren't visible -->
+			</div>
 			<div
 				class="nav-menu nav-menu-browse"
 				:class="{ expanded: isBrowseMenuOpen }"
