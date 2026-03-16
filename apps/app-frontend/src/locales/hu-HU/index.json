@@ -5,6 +5,75 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nem lehet elérni a hitelesítési kiszolgálókat"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Írd be a modcsomag leírását..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportálás"
+  },
+  "app.export-modal.header": {
+    "message": "Modcsomag exportálása"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "A modcsomag neve"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "A modcsomag neve"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Válaszd ki a csomagba felveendő fájlokat és mappákat"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Verziószám"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Az profilodhoz tartozó összes adat véglegesen törlődik, beleértve a világokat, a beállításokat és az összes telepített tartalmat."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Ezt a műveletet nem lehet visszavonni"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Profil törlése"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Profil törlése"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Link másolása"
+  },
+  "app.instance.mods.installing": {
+    "message": "Telepítés..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modcsomag"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": " „{name}” hozzá lett adva"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projekt került hozzáadásra"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Nézd meg, milyen projekteket használok a modcsomagomban!"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Fájl megjelenítése"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Sikeresen feltöltve"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Ismeretlen"
+  },
+  "app.instance.mods.updating": {
+    "message": "Frissítés..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Szükséges tartalom"
   },
@@ -32,35 +101,14 @@
   "app.modal.install-to-play.view-contents": {
     "message": "Tartalom megjelenítése"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} hozzáadva"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "Hozzáadva:"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "Eltávolítva:"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "Frissítve"
-  },
   "app.modal.update-to-play.header": {
     "message": "Frissítsd a játékhoz"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} eltávolítva"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Frissítés szükséges"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "\nFrissítés szükséges ehhez: {name}. Kérjük, frissíts a legújabb verzióra a játék elindításához"
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} frissítve"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Fejlesztői mód bekapcsolva."
@@ -230,12 +278,6 @@
   "instance.edit-world.title": {
     "message": "Világ szerkesztése"
   },
-  "instance.filter.disabled": {
-    "message": "Letiltott projektek"
-  },
-  "instance.filter.updates-available": {
-    "message": "Frissítések elérhetőek"
-  },
   "instance.server-modal.address": {
     "message": "Cím"
   },
@@ -344,149 +386,8 @@
   "instance.settings.tabs.installation": {
     "message": "Telepítés"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} a Minecraft {game_version} verziójához már telepítve van"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "A vanilla {game_version} már telepítve van"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Verzióváltás"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Telepítés"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Telepítés folyamatban"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Modpack verzióinak lekérése"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Új verzió telepítése"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Jelenleg telepítve"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Debug információ:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Modpack részleteinek lekérése"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Játék verziója"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Telepítés"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Telepítés folyamatban"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verzió"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Nem lehetséges a csatolt modpack részleteit lekérdezni. Kérlek nézd meg az internetkapcsolatod."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nem elérhető a Minecraft {version} verziójához. Próbálj meg egy másik modbetöltőt."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "A profilod linkelve van egy Modrinth modcsomaghoz, de a modcsomag nem található Modrinth-on."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Modpack újratelepítése"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Modpack újratelepítése"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Az újratelepítés visszaállítja az összes telepített vagy módosított tartalmat a modcsomag által biztosított állapotra, eltávolítva az eredeti telepítéshez hozzáadott modokat vagy tartalmakat. Ez megoldhatja a váratlan hibákat, de fontos tudni hogyha használsz világokat amelyekben utólagosan hozzáadott tartalom van, azok a világok elromolhatnak."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Biztosan szeretnéd újratelepíteni ezt a profilt?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Visszaállítja a profilod tartalmát az eredeti állapotába, eltávolítva az eredeti modpackhez hozzáadott összes modot és tartalmat."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Modpack újratelepítése"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Javítás"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Javítás folyamatban"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "A javítás újratelepíti a Minecraft alapját és ellenőrzi, hogy nincs-e sérülés. Ez megoldhatja a problémákat, ha a játék nem az indítóval kapcsolatos hibák miatt nem indul el, de nem oldja meg a telepített modokkal kapcsolatos problémákat vagy összeomlásokat."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Profil javítása?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Javítás folyamatban"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Visszaállítás az aktuális állapotra"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Összes verzió mutatása"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "verzió váltás"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "telepítés"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "újratelepítés"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "javítás"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Nem lehet {action}-t végrehajtani telepítés közben"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Offline állapotban nem lehet {action}-t végrehajtani"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Nem lehet {action}-t végrehajtani javítás közben"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(ismeretlen verzió)"
-  },
-  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
-    "message": "Ez az profil egy szerverhez van kapcsolva, ami azt jelenti, hogy nem lehet megváltoztatni a Minecraft verzióját. A kapcsolás megszüntetése véglegesen leválasztja ezt az profilt a szerverről."
-  },
-  "instance.settings.tabs.installation.unlink-server.description": {
-    "message": "Ez az profil egy szerverhez van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetők, és nem lehet megváltoztatni a modbetöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a profilt a szerverről."
-  },
-  "instance.settings.tabs.installation.unlink-server.title": {
-    "message": "Leválasztás a szerverről"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Profil leválasztása"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Ha folytatod, akkor nem tudod újra összekapcsolni anélkül, hogy egy teljesen új profilt hoznál létre. Többé nem fogja megkapni a modcsomag frissítéseit, és normál állapotba kerül."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Biztosan le szeretnéd választani ezt a profilt?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Ez az profil egy modcsomaghoz van kapcsolva, ami azt jelenti, hogy a modok nem frissíthetőek, és nem lehet megváltoztatni a modbetöltőt vagy a Minecraft verziót. A kapcsolódás megszüntetése véglegesen leválasztja ezt a profilt a modcsomagról."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Modpack-ről való leválasztás"
   },
   "instance.settings.tabs.java": {
     "message": "Java és memória"

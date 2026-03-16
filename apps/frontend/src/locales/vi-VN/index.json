@@ -39,7 +39,7 @@
     "message": "Tuỳ chọn tải về"
   },
   "app-marketing.download.terms": {
-    "message": "Bằng cách tải xuống Modrinth App, bạn đồng ý với <terms-link>Điều khoản</terms-link> và <privacy-link>Chính sách quyền riêng tư</privacy-link> của chúng tôi."
+    "message": "Khi bạn tải Modrinth, điều đó có nghĩa là bạn đã đồng ý với<terms-link>Điều khoản</terms-link> và<privacy-link>Chính sách bảo mật</privacy-link> của chúng tôi."
   },
   "app-marketing.download.title": {
     "message": "Tải xuống Modrinth App (Beta)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App hoạt động tốt hơn nhiều trình quản lý mod hàng đầu, chỉ sử dụng 150MB RAM!"
+    "message": "Modrinth hoạt động tốt hơn nhiều trình quản lý mod hàng đầu, chỉ sử dụng 150 MB RAM!\n"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +392,6 @@
   "collection.label.no-projects": {
     "message": "Chưa có dự án trong bộ sưu tập"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Chưa có dự án nào} other {<stat>{count}</stat> dự án}}"
-  },
   "collection.label.updated-at": {
     "message": "Đã cập nhật {ago}"
   },
@@ -554,9 +551,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Tạo mới"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} dự án}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Tìm kiếm các bộ sưu tập của bạn"
   },
@@ -631,9 +625,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Thực thể kinh doanh là một tổ chức đã được đăng ký, như là công ty, hợp danh hoặc LLC."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Bạn đang rút tiền với tư cách cá nhân hay doanh nghiệp?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Cá nhân"
@@ -1106,9 +1097,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Modrinth Hosting có hỗ trợ bảo vệ DDoS không?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Có. Tất cả máy chủ Modrinth Hosting được trang bị bảo vệ DDoS, với trọng tải bảo vệ lên đến 17Tbps ở một số khu vực."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Câu hỏi thường gặp"
   },
@@ -1354,9 +1342,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Dành cho người chơi"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Khám phá hơn {count} sáng tạo"
   },
   "landing.subheading": {
     "message": "Khám phá, chơi và chia sẻ nội dung Minecraft thông qua nền tảng nguồn mở được xây dựng cho cộng đồng."
@@ -1940,9 +1925,6 @@
   "profile.label.collection": {
     "message": "Bộ sưu tập"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, other {tải xuống}}"
-  },
   "profile.label.joined": {
     "message": "Đã tham gia"
   },
@@ -1960,9 +1942,6 @@
   },
   "profile.label.organizations": {
     "message": "Tổ chức"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, other {dự án}}"
   },
   "profile.label.saving": {
     "message": "Đang lưu..."
@@ -2522,9 +2501,6 @@
   "scopes.reportWrite.label": {
     "message": "Viết báo cáo"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Truy cập các phiên do Modrinth cấp"
-  },
   "scopes.sessionAccess.label": {
     "message": "Truy cập phiên"
   },
@@ -2617,9 +2593,6 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Đồng bộ với máy chủ"
-  },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Đang khôi phục bản sao lưu"
   },
   "servers.notice.actions": {
     "message": "Hành động"
@@ -2806,9 +2779,6 @@
   },
   "settings.pats.action.create": {
     "message": "Tạo PAT"
-  },
-  "settings.pats.description": {
-    "message": "PAT có thể được dùng để truy cập API của Modrinth. Để biết thêm thông tin, hãy xem <doc-link>tài liệu API của Modrinth</doc-link>. Bạn có thể tạo hoặc thu hồi PAT bất kỳ lúc nào."
   },
   "settings.pats.modal.create.action": {
     "message": "Tạo PAT"

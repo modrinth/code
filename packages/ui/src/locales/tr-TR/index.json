@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "İptal"
   },
+  "button.change-version": {
+    "defaultMessage": "Sürüm değiştir"
+  },
   "button.clear": {
     "defaultMessage": "Temizle"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Takip Et"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Snapshotları gizle"
+  },
   "button.max": {
     "defaultMessage": "Maksimum"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "Yenile"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Mod paketini yeniden kur"
+  },
   "button.remove": {
     "defaultMessage": "Kaldır"
   },
   "button.remove-image": {
     "defaultMessage": "Görseli kaldır"
   },
+  "button.repair": {
+    "defaultMessage": "Tamir et"
+  },
+  "button.repairing": {
+    "defaultMessage": "Tamir Ediliyor..."
+  },
   "button.report": {
     "defaultMessage": "Bildir"
   },
   "button.reset": {
     "defaultMessage": "Sıfırla"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Sunucuyu sıfırla"
   },
   "button.retry": {
     "defaultMessage": "Yeniden dene"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Kaydediliyor"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Tüm sürümleri göster"
+  },
   "button.sign-in": {
     "defaultMessage": "Giriş yap"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "Durdur"
   },
+  "button.switch-version": {
+    "defaultMessage": "Sürüm değiştir"
+  },
   "button.unfollow": {
     "defaultMessage": "Takibi bırak"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Mod paketi bağını kopar"
   },
   "button.update": {
     "defaultMessage": "Güncelle"
@@ -169,6 +196,123 @@
   },
   "collections.label.private": {
     "defaultMessage": "Gizli"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "{count, plural, one {# projeyi} other {# projeyi}} en yeni uyumlu sürümüne güncellemek istediğinden emin misin? İçeriklerin tek tek güncellenmesi önerilir."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Güncelleme uyarısı"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Projeleri güncelle"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "{count} projeyi güncelle"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Mod kaldırmak dünyanızı kalıcı şekilde etkileyebilir ve eksik içerik ve beklenmedik sorunlar yaşayabilirsiniz."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Kaldırma uyarısı"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "{count} {itemType} kaldır"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "{itemType} kaldır"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Mod paketinin üzerine eklediğiniz mod veya içerikler kaldırılacak."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "Mod paketini{action, select, downgrade {n sürümünü düşür} other { güncelle}}"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "Mod paketini{action, select, downgrade {n sürümünü düşür} other { güncelle}}"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Modlar ve içerikler, mod paketinin üzerine ekledikleriniz ile birleşicek ve güncelleme almayı durduracak."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Mod paketi bağlantısı kesiliyor"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Mod paketi bağlantısını kes"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Bağlantıyı kopar/kes"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} eklendi"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Kaldırıldı"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Güncellendi"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} kaldırıldı"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Sunucundaki bazı içerikler analiz edilemedi ve bu değişiklikten etkilenebilir."
+  },
+  "content.diff-modal.unknown-content-header": {
+    "defaultMessage": "Bilinmeyen içerik"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} güncellendi"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Yedekleniyor..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Yedek başarıyla oluşturuldu"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Yedek oluşturma başarısız. Yine de devam edebilirsiniz."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Bunu yapmadan önce yedek alma işleminin bitmesini beklemeniz önerilir."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Sunucunuzun boyutuna göre yedek oluşturmak bir kaç dakika alabilir."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Yedek oluştur"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Doğrulamayı atlamak için tıklarken Shift basılı tutun."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Herhangi bir şey bozulursa {type, select, server {dünyanızı} other {kurulumunuzu}} kurtarmak için devam etmeden önce yedek oluşturmanızı tavsiye ediyoruz."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Mod paketinizin içeriği artık burada bulunabilir!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Mod paketi içeriği taşındı"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Bir daha gösterme"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Bu mod paketinin üzerine ek içerik ekle"
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Lütfen bekleyin"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Önce en yeni"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Önce en eski"
+  },
+  "content.selection-bar.disable": {
+    "defaultMessage": "Devra Dışı Bırak"
   },
   "form.label.address-line": {
     "defaultMessage": "Adres satırı"
@@ -269,8 +413,23 @@
   "header.category.performance-impact": {
     "defaultMessage": "Performansa etkisi"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "Çözünürlükler"
+  "hosting.content.copy-link": {
+    "defaultMessage": "Bağlantıyı kopyala"
+  },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "İçeriği silmek başarısız"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "İçeriği kapatmak başarısız"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "İçeriği açmak başarısız"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "İçeriği güncelleme başarısız"
+  },
+  "hosting.content.switch-version": {
+    "defaultMessage": "Sürüm değiştir"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -311,6 +470,57 @@
   "input.view.list": {
     "defaultMessage": "Satır görünümü"
   },
+  "installation-settings.loader-version": {
+    "defaultMessage": "{loader} sürümü"
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Mod paketini yeniden kur"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Mod paketi yeniden kuruluyor"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Kaldırıldı (uyumsuz)"
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Kurulumu tamir et"
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Sunucuyu tamir et"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Kaydediliyor..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Oyun sürümü ara..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Bağlantıyı kopar"
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Doğrulanıyor..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Yeniden kurulum, mod paketinin üzerine yüklenmiş veya değişitirilmiş içeriği sıfırlar, orijinal kurulumun üzerine eklediğiniz herhangi mod veya içeriği kaldırır."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Yeniden kurulum uyarısı"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Mod paketini yeniden kur"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Mod paketini yeniden kur"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Tamir etmek yükleyiciyi ve Minecraft'ın çalışması için gereken dosyaları, sizin içeriğinizi silmeden tekrar yükler. Bu, {type, select, server {sunucunuz doğru başlamıyor ise} other {oyununuz yükleyici bazlı hatalardan dolayı başlamıyor ise}} sorunları çözebilir."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "{type, select, server {Sunucuyu} other {Kurulumu}} tamir et"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Tamir et"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Macera modu"
   },
@@ -326,8 +536,77 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Bilinmeyen oyun modu"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Mod paketi bağını kopar"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Dosyalar hâlâ yükleniyor. Bu sayfadan ayrılmak yüklemeyi iptal eder ve değişiklikleriniz yok olabilir."
+  },
+  "instances.confirm-leave-modal.leave": {
+    "defaultMessage": "Sayfadan ayrıl"
+  },
+  "instances.confirm-leave-modal.stay": {
+    "defaultMessage": "Sayfada kal"
+  },
+  "instances.confirm-leave-modal.title": {
+    "defaultMessage": "Sayfadan ayrıl?"
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Yükleme devam etmekte"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} uyumlu kurulum"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Var olan kurulum"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "Oyun sürümü"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Oyun sürümü seç"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Proje kur"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "Snapshotları gizle"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Yükle"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Yüklü"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "Kuruluyor..."
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Kurulum türü"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Yükleyici"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Ad"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Kurulum adı girin"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Yeni kurulum"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Uyumlu kurulum yok"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Simgeyi kaldır"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Kurulum ara"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Simge seç"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "Bütün sürümleri göster"
   },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Geri"
@@ -335,17 +614,11 @@
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Bağlantıyı kopyala"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Devre dışı"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Bu mod paketi başka hiç bir ekstra işerik içermez."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "İçerik bulunamadı"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Etkin"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "Tümü"
@@ -359,12 +632,6 @@
   "instances.modpack-content-modal.no-results": {
     "defaultMessage": "Aramanızla eşleşen proje yok."
   },
-  "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count} adet proje ara"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} adet seçildi"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Şu anki"
   },
@@ -372,13 +639,25 @@
     "defaultMessage": "Uyumsuz"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Sürümü v{version}'e düşür"
+    "defaultMessage": "Sürümü {version}'e düşür"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Güncelleme sürümü"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Mod paketi sürümünü değiştir"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Sürüm değiştir"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Uyumsuz olanları gizle"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Değişiklikler yükleniyor..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Sürümler yükleniyor..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Bu sürüm için güncelleme günlüğü sağlanmadı."
@@ -395,14 +674,17 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Uyumsuzları göster"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "{version} sürümüne geç"
+  },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Sürümü v{version}'e yükselt"
+    "defaultMessage": "{version}'e güncelle"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Güncellemelerin sizin kurulumunuz için güvenli olduğunu garanti edemeyiz. Ara sürümlerin tümünün değişiklik günlüğünü inceleyin ve yedekleme yapmayı düşünün."
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Güncellemek kurulumunuzu bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
   },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Güncellemelerin dünyalarınız için güvenli olduğunu garanti edemeyiz. Tüm ara sürümlerin güncelleme günlüğünü inceleyin ve yedekleme yapmayı düşünün."
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Güncellemek dünyanızı bozabilir. Sürüm değişikliklerini gözden geçirin ve yedek alın."
   },
   "label.actions": {
     "defaultMessage": "Eylemler"
@@ -415,6 +697,9 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Değişiklikler kaydedildi"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Bu istemci-tarafı bir mod ve sorun yaşatabilir. Kapatmadık çünkü bazen çevreler yanlış etiketli olabilir ve yükleyici sorunu çözer."
   },
   "label.collections": {
     "defaultMessage": "Koleksiyonlar"
@@ -433,6 +718,9 @@
   },
   "label.delete": {
     "defaultMessage": "Sil"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Hemen kaldır"
   },
   "label.description": {
     "defaultMessage": "Açıklama"
@@ -455,11 +743,26 @@
   "label.followed-projects": {
     "defaultMessage": "Takip edilen projeler"
   },
+  "label.game-version": {
+    "defaultMessage": "Oyun sürümü"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Kurulum bilgisi"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Yüklü mod paketi"
+  },
+  "label.installing": {
+    "defaultMessage": "Kuruluyor..."
+  },
   "label.loading": {
     "defaultMessage": "Yükleniyor..."
   },
   "label.moderation": {
     "defaultMessage": "Moderasyon"
+  },
+  "label.modpack": {
+    "defaultMessage": "Mod paketi"
   },
   "label.no": {
     "defaultMessage": "Hayır"
@@ -476,8 +779,8 @@
   "label.password": {
     "defaultMessage": "Parola"
   },
-  "label.played": {
-    "defaultMessage": "{time} kez oynandı"
+  "label.platform": {
+    "defaultMessage": "Platform"
   },
   "label.project": {
     "defaultMessage": "Projeler"
@@ -500,6 +803,12 @@
   "label.search": {
     "defaultMessage": "Ara"
   },
+  "label.select-all": {
+    "defaultMessage": "Hepsini seç"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Seçim eylemleri"
+  },
   "label.server": {
     "defaultMessage": "Sunucu"
   },
@@ -520,6 +829,9 @@
   },
   "label.title": {
     "defaultMessage": "Başlık"
+  },
+  "label.unknown": {
+    "defaultMessage": "Bilinmeyen"
   },
   "label.unlisted": {
     "defaultMessage": "Liste Dışı"
@@ -1008,16 +1320,10 @@
     "defaultMessage": "Sunucu detayları"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} indirme"
-  },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
+    "defaultMessage": "{count, number} indirme"
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "İstemci ve sunucu, ikisinde de gerekli"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "İstemci ve sunucu, sunucuda tercihe bağlı"
@@ -1028,9 +1334,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Sadece istemci taraflı"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "İstemci ve sunucu, ikisinde olması önerilir"
   },
@@ -1040,20 +1343,14 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "İstemci ve sunucu, ikisinde de tercihe bağlı"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Sadece sunucu taraflı"
-  },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "İstemci ve sunucunun her ikisinde de, kısmen bile olsa, bazı işlevlere sahiptir."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "İstemci ve sunucu, istemcide tercihe bağlı"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleştirilir ve vanilla istemcilerle uyumludur."
+    "defaultMessage": "Tüm işlevler sunucu tarafında gerçekleşir ve vanilla istemcilerle uyumludur. Tek oyuncuda dahili sunucuda da çalışır."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Yalnız Sunucu-taraflı, tek oyunculuda da çalışır"
@@ -1077,16 +1374,22 @@
     "defaultMessage": "Bilinmeyen ortam"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} takipçi"
+    "defaultMessage": "{count, number} takipçi"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count}{count, plural,one {çevrim içi}other {çevrim içi}}"
+    "defaultMessage": "{count, number} çevrim içi"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} çevrim içi oyuncu"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count}{count, plural,one {yakın zamanda}other {yakın zamanda}}"
+    "defaultMessage": "{count} oynama"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "Modrinth'den son 2 haftada {count} oynama"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Veriler"
@@ -1325,14 +1628,56 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Yükleyici"
   },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "{backupName} oluşturulamadı. Lütfen tekrar deneyin veya sorun devam ederse desteğe ulaşın."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Yedek başarısız"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} sırada ve yakında başlayacak."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Yedekleme sırada"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "{backupName} için dünya verisi ve sunucu ayarları kayıt ediliyor. Bu bir kaç dakika sürebilir."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Yedek oluşturuluyor"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "yedeğiniz"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "{backupName}'den geri yüklerken bir hata yaşandı. Lütfen tekrar deneyin veya sorun devam ederse desteğe ulaşın."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Yedekten geri yükleme başarısız"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "{backupName}'den geri yükleme sırada ve kısa sürede başlayacak."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Yedekten geri yükleme sırada"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "Sunucunuz {backupName} olarak kurtarıldı ve başlamaya hazır."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Yedekten geri yükleme başarılı"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Sunucunuz {backupName}'den geri yükleniyor. Bir kaç dakika sürebilir."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Yedekten geri yükleniyor"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Otomatik"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Yedekleme zamanları"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Yedekleniyor..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Yedekleme başarısız"
@@ -1343,20 +1688,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel yedekleme"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Yedekleme sırada"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Geri yükleme sırada"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Yeniden adlandır"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Geri yükle"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Yedekten geri yükleniyor..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Görmezden gel"
@@ -1453,6 +1789,24 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Batı Avrupa"
+  },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "Sınırlandırılıyorsunuz. Lütfen sonra tekrar deneyin."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Sunucu yeniden yüklenemiyor"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Yeniden yükleme sırasında beklenmedik hata ile karşılaşıldı. Lütfen sonra tekrar deneyin."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Yeniden Kurulum Başarısız"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Lütfen yükleme sırasında bu sayfayı kapatmayın."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Mod paketi yükleniyor"
   },
   "settings.account.title": {
     "defaultMessage": "Hesap ve güvenlik"
@@ -1957,9 +2311,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Kaydedilmemiş değişikliklerin var."
