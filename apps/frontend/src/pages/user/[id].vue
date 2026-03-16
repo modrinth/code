@@ -732,58 +732,12 @@ const { data: collections, suspense: collectionsSuspense } = useQuery({
 })
 
 onServerPrefetch(async () => {
-	const queryClient = useQueryClient()
-	console.log('[user/[id]] onServerPrefetch starting for:', route.params.id)
-	console.log(
-		'[user/[id]] cache BEFORE suspense:',
-		queryClient
-			.getQueryCache()
-			.getAll()
-			.map((q) => `${q.queryHash}: ${q.state.status}`),
-	)
-	try {
-		const results = await Promise.allSettled([
-			userSuspense(),
-			projectsSuspense(),
-			orgsSuspense(),
-			collectionsSuspense(),
-		])
-		console.log(
-			'[user/[id]] suspense results:',
-			results.map((r, i) => `${['user', 'projects', 'orgs', 'collections'][i]}: ${r.status}`),
-		)
-
-		// Check cache directly (bypass reactive refs)
-		console.log(
-			'[user/[id]] cache AFTER suspense:',
-			queryClient
-				.getQueryCache()
-				.getAll()
-				.map(
-					(q) =>
-						`${q.queryHash}: ${q.state.status}, hasData: ${q.state.data !== undefined}${q.state.error ? ', ERROR: ' + String(q.state.error?.message || q.state.error) : ''}`,
-				),
-		)
-
-		// Check reactive refs
-		console.log('[user/[id]] user.value:', user.value ? 'has data' : 'null/undefined')
-		console.log(
-			'[user/[id]] projects.value:',
-			projects.value ? `${projects.value.length} items` : 'null/undefined',
-		)
-
-		// Direct cache lookup for projects
-		const projectsKey = JSON.stringify(['user', route.params.id, 'projects'])
-		const projectsQuery = queryClient.getQueryCache().get(projectsKey)
-		console.log(
-			'[user/[id]] projects query direct lookup:',
-			projectsQuery
-				? `status=${projectsQuery.state.status}, data=${projectsQuery.state.data ? 'has data' : 'no data'}`
-				: 'NOT IN CACHE',
-		)
-	} catch (e) {
-		console.error('[user/[id]] onServerPrefetch error:', e)
-	}
+	await Promise.allSettled([
+		userSuspense(),
+		projectsSuspense(),
+		orgsSuspense(),
+		collectionsSuspense(),
+	])
 })
 
 

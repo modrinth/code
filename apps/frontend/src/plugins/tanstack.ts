@@ -19,30 +19,11 @@ export default defineNuxtPlugin((nuxt) => {
 
 	if (import.meta.server) {
 		nuxt.hooks.hook('app:rendered', () => {
-			const dehydrated = dehydrate(queryClient)
-			console.log(
-				'[tanstack SSR] dehydrating:',
-				dehydrated.queries.length,
-				'queries',
-				dehydrated.queries.map((q) => q.queryHash),
-			)
-			vueQueryState.value = dehydrated
+			vueQueryState.value = dehydrate(queryClient)
 		})
 	}
 
 	if (import.meta.client) {
-		console.log(
-			'[tanstack CLIENT] hydrating with state:',
-			vueQueryState.value
-				? `${vueQueryState.value.queries?.length ?? 0} queries`
-				: 'NULL',
-		)
 		hydrate(queryClient, vueQueryState.value)
-		console.log(
-			'[tanstack CLIENT] cache after hydrate:',
-			queryClient.getQueryCache().getAll().length,
-			'queries',
-			queryClient.getQueryCache().getAll().map((q) => q.queryHash),
-		)
 	}
 })
