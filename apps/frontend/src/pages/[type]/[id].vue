@@ -275,7 +275,9 @@
 								/>
 							</Accordion>
 							<ButtonStyled
-								v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
+								v-if="
+									project.loaders.length === 1 && !loaderFreeProjectTypes.has(project.project_type)
+								"
 							>
 								<div class="disabled button-like">
 									<WrenchIcon aria-hidden="true" />
@@ -298,7 +300,7 @@
 								</div>
 							</ButtonStyled>
 							<Accordion
-								v-else-if="project.project_type !== 'resourcepack'"
+								v-else-if="!loaderFreeProjectTypes.has(project.project_type)"
 								ref="platformAccordion"
 								class="accordion-with-bg"
 								@on-open="
@@ -1170,6 +1172,7 @@ const isServerProject = computed(() => projectV3.value?.minecraft_server != null
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
 const baseId = useId()
+const loaderFreeProjectTypes = new Set(['resourcepack', 'map'])
 
 const currentGameVersion = computed(() => {
 	if (!project.value) return null
@@ -1552,7 +1555,8 @@ const filteredVersions = computed(() => {
 	const result = versions.value.filter(
 		(x) =>
 			x.game_versions?.includes(currentGameVersion.value) &&
-			(x.loaders?.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
+			(x.loaders?.includes(currentPlatform.value) ||
+				loaderFreeProjectTypes.has(project.value.project_type)),
 	)
 	debug('filteredVersions', {
 		total: versions.value.length,

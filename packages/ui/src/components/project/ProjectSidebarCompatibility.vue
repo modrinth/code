@@ -12,7 +12,10 @@
 				</TagItem>
 			</div>
 		</section>
-		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
+		<section
+			v-if="!['resourcepack', 'map'].includes(project.project_type)"
+			class="flex flex-col gap-2"
+		>
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.platforms) }}</h3>
 			<div class="flex flex-wrap gap-1">
 				<TagItem

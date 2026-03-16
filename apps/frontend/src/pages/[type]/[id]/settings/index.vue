@@ -188,6 +188,7 @@
 						!flags.newProjectEnvironmentSettings &&
 						project.versions?.length !== 0 &&
 						project.project_type !== 'resourcepack' &&
+						project.project_type !== 'map' &&
 						project.project_type !== 'plugin' &&
 						project.project_type !== 'shader' &&
 						project.project_type !== 'datapack'

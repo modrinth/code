@@ -81,7 +81,12 @@
 					<li v-if="newFiles.length === 0 && version.files.length === 0 && !replaceFile">
 						Your version must have a file uploaded.
 					</li>
-					<li v-if="version.loaders.length === 0 && project.project_type !== 'resourcepack'">
+					<li
+						v-if="
+							version.loaders.length === 0 &&
+							!['resourcepack', 'map'].includes(project.project_type)
+						"
+					>
 						Your version must have the supported mod loaders selected.
 					</li>
 				</ul>
@@ -338,7 +343,7 @@
 					<h4>Version number</h4>
 					<span>{{ version.version_number }}</span>
 				</div>
-				<div v-if="project.project_type !== 'resourcepack'">
+				<div v-if="!['resourcepack', 'map'].includes(project.project_type)">
 					<h4>Loaders</h4>
 
 					<Categories :categories="version.loaders" :type="project.project_type" />
@@ -719,7 +724,8 @@ const fieldErrors = computed(
 	() =>
 		version.value.version_number === '' ||
 		(version.value.game_versions?.length ?? 0) === 0 ||
-		((version.value.loaders?.length ?? 0) === 0 && project.value.project_type !== 'resourcepack') ||
+		((version.value.loaders?.length ?? 0) === 0 &&
+			!['resourcepack', 'map'].includes(project.value.project_type)) ||
 		(newFiles.value.length === 0 && (version.value.files?.length ?? 0) === 0 && !replaceFile.value),
 )
 
@@ -970,7 +976,7 @@ async function createVersionRaw(versionData: Record<string, any>) {
 		fileParts.unshift(replaceFile.value.name.concat('-primary'))
 	}
 
-	if (project.value.project_type === 'resourcepack') {
+	if (['resourcepack', 'map'].includes(project.value.project_type)) {
 		versionData.loaders = ['minecraft']
 	}
 
