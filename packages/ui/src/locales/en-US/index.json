@@ -515,6 +515,9 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
+  "hosting.content.copy-link": {
+    "defaultMessage": "Copy link"
+  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
   },
@@ -547,6 +550,9 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
+  },
+  "hosting.content.switch-version": {
+    "defaultMessage": "Switch version"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -815,6 +821,9 @@
   "instances.updater-modal.header-modpack": {
     "defaultMessage": "Switch modpack version"
   },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Switch version"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hide incompatible"
   },
@@ -838,6 +847,9 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Show incompatible"
+  },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Switch to {version}"
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "Update to {version}"
@@ -987,7 +999,7 @@
     "defaultMessage": "Singleplayer"
   },
   "label.sort-by": {
-    "defaultMessage": "Sort by"
+    "defaultMessage": "Sort by: "
   },
   "label.success": {
     "defaultMessage": "Success"

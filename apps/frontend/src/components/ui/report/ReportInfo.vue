@@ -1,7 +1,8 @@
 <template>
-	<div class="report">
+	<div v-if="report" class="report">
 		<div v-if="report.item_type === 'project'" class="item-info">
 			<nuxt-link
+				v-if="report.project"
 				:to="`/${$getProjectTypeForUrl(report.project.project_type, report.project.loaders)}/${
 					report.project.slug
 				}`"
@@ -38,27 +39,29 @@
 			</div>
 		</div>
 		<div v-else-if="report.item_type === 'version'" class="item-info">
-			<nuxt-link
-				:to="`/project/${report.project.slug}/version/${report.version.id}`"
-				class="iconified-link"
-			>
-				<div class="backed-svg" :class="{ raised: raised }">
-					<VersionIcon />
-				</div>
-				<span class="title">{{ report.version.name }}</span>
-			</nuxt-link>
-			of
-			<nuxt-link :to="`/project/${report.project.slug}`" class="iconified-stacked-link">
-				<Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
-				<div class="stacked">
-					<span class="title">{{ report.project.title }}</span>
-					<span>{{
-						formatProjectType(
-							getProjectTypeForUrl(report.project.project_type, report.project.loaders),
-						)
-					}}</span>
-				</div>
-			</nuxt-link>
+			<template v-if="report.version && report.project">
+				<nuxt-link
+					:to="`/project/${report.project.slug}/version/${report.version.id}`"
+					class="iconified-link"
+				>
+					<div class="backed-svg" :class="{ raised: raised }">
+						<VersionIcon />
+					</div>
+					<span class="title">{{ report.version.name }}</span>
+				</nuxt-link>
+				of
+				<nuxt-link :to="`/project/${report.project.slug}`" class="iconified-stacked-link">
+					<Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
+					<div class="stacked">
+						<span class="title">{{ report.project.title }}</span>
+						<span>{{
+							formatProjectType(
+								getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+							)
+						}}</span>
+					</div>
+				</nuxt-link>
+			</template>
 		</div>
 		<div v-else class="item-info">
 			<div class="backed-svg" :class="{ raised: raised }">
@@ -79,7 +82,7 @@
 			:link="`/${moderation ? 'moderation' : 'dashboard'}/report/${report.id}`"
 			:auth="auth"
 		/>
-		<div class="reporter-info">
+		<div v-if="report.reporterUser" class="reporter-info">
 			<ReportIcon class="inline-svg" />
 			Reported by
 			<span v-if="auth.user.id === report.reporterUser.id">you</span>

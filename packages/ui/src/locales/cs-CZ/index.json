@@ -257,9 +257,6 @@
   "header.category.performance-impact": {
     "defaultMessage": "Dopad na výkon"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "Rozlišení"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Vylítne až na {cpus} CPUs"
   },
@@ -314,17 +311,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Neznámý typ hry"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Odpojit od modpacku"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Mometálně"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Nekompatibilní"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Downgradováni na v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Aktualizovat na verzi"
@@ -346,15 +337,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Ukázat nekompatibilní"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Aktualizovat na v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Nemůžeme garantovat že aktualizace jsou bezpečné pro vaše instance. koukněte se do seznamu změn pro všechny přechodové verze a zvažte backup."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Nemůžeme garantovat že aktualizace jsou bezpečné pro vaše světy. koukněte se do seznamu změn pro všechny přechodové verze a zvažte backup."
   },
   "label.actions": {
     "defaultMessage": "Akce"
@@ -427,9 +409,6 @@
   },
   "label.password": {
     "defaultMessage": "Heslo"
-  },
-  "label.played": {
-    "defaultMessage": "Hráno {time}"
   },
   "label.project": {
     "defaultMessage": "Projekt"
@@ -821,14 +800,8 @@
   "project.about.links.wiki": {
     "defaultMessage": "Navštivte wiki"
   },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client i server, nutný na obou"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client i server, volitelý na serveru"
@@ -848,20 +821,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Klient a server, volitelný na obojím"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Pouze na straně serveru"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Má některé funkce na klientu i serveru, i když jen částečně."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Klient a server, volitelný na klientu"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "Veškerá funkcionalita je na straně serveru a je kompatibilní s vanilla klienty."
   },
   "project.environment.singleplayer-only.title": {
     "defaultMessage": "Pouze hra jednoho hráče"
@@ -1088,9 +1052,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Plán zálohování"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Vytváření zálohy..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Nepodařilo se vytvořit zálohu"
   },
@@ -1100,20 +1061,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ruční zálohování"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Zálohování v pořadí"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Obnovit frontu"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Přejmenovat"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Obnovit"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Obnovení ze zálohy..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Zavřít"
@@ -1420,9 +1372,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} v {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Máš neuložené změny."

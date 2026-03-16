@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App presterar bättre än många av de ledande modhanterarna och använder bara 150mb RAM!"
+    "message": "Modrinth App presterar bättre än många av de ledande modhanterarna och använder bara 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Inga projekt i samlingen än"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Inga projekt än} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Inga projekt än} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Uppdaterad {ago}"
@@ -578,9 +578,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} other {{count} projekt}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Sök i dina samlingar"
   },
@@ -655,9 +652,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En affärsenhet är en registrerad organisation såsom ett aktiebolag, ett handelsbolag eller ett LLC-bolag."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Tar du ut pengar som en individ eller ett företag?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
@@ -1016,9 +1010,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hostings servrar DDoS-skydd?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alla Modrinth Hostings servrar medföljer DDoS-skydd, med upp mot 17Tbps kapacitet på vissa platser."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Vanliga frågor"
   },
@@ -1111,9 +1102,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "Vet du exakt vad du behöver?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Prova på en gratis <orange>3GB server</orange> i 5 dagar drivet av <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Läs mer"
@@ -1297,9 +1285,6 @@
   },
   "landing.section.for-players.label": {
     "message": "För spelare"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Upptäck över {count} skapelser"
   },
   "landing.subheading": {
     "message": "Upptäck, spela och dela Minecraftinnehåll via vår plattform med öppen källkod som skapades för communityn."
@@ -1730,9 +1715,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {nedladdning} other {nedladdningar}}"
-  },
   "profile.label.joined": {
     "message": "Gick med"
   },
@@ -1750,9 +1732,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisationer"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {projekt} other {projekt}}"
   },
   "profile.label.saving": {
     "message": "Sparar..."
@@ -1791,7 +1770,7 @@
     "message": "Du har gått med i projektets team"
   },
   "project-moderation-nags.publishing-checklist": {
-    "message": "Publicera checklista"
+    "message": "Publicerings-checklista"
   },
   "project-moderation-nags.required": {
     "message": "Krävs"
@@ -1803,7 +1782,7 @@
     "message": "Ditt projekt har blivit {status, select, rejected {nekat} withheld {tillbakahållen} other {{status}}} av Modrinths personal. I de flesta fall kan du skicka in din ansökan på nytt för granskning efter att du har åtgärdat det som personalen påpekat."
   },
   "project-moderation-nags.submit-checklist-tooltip": {
-    "message": "Du måste sltuföra alla steg i checklistan för publicering!"
+    "message": "Du måste slutföra alla steg i publicerings-checklistan!"
   },
   "project-moderation-nags.submit-for-review": {
     "message": "Begär granskning"
@@ -1887,7 +1866,7 @@
     "message": "Licensierat {license}"
   },
   "project.about.details.published": {
-    "message": "Publicerad {date}"
+    "message": "Skapades {date}"
   },
   "project.about.details.submitted": {
     "message": "Inskickad {date}"
@@ -2551,9 +2530,6 @@
   },
   "settings.pats.action.create": {
     "message": "Skapa en PAT"
-  },
-  "settings.pats.description": {
-    "message": "PAT:s kan användas för att komma åt Modrinths API. Se <doc-link>Modrinths API dokumentation</doc-link> för mer information. De kan skapas och återkallas när som helst."
   },
   "settings.pats.modal.create.action": {
     "message": "Skapa PAT"

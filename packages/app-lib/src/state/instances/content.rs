@@ -577,7 +577,10 @@ async fn profile_files_to_content_items(
             .as_ref()
             .map(|p| p.title.as_str())
             .unwrap_or(&b.file_name);
-        name_a.to_lowercase().cmp(&name_b.to_lowercase())
+        name_a
+            .to_lowercase()
+            .cmp(&name_b.to_lowercase())
+            .then_with(|| a.file_name.cmp(&b.file_name))
     });
 
     Ok(items)
@@ -765,7 +768,10 @@ pub async fn dependencies_to_content_items(
             .as_ref()
             .map(|p| p.title.as_str())
             .unwrap_or(&b.file_name);
-        name_a.to_lowercase().cmp(&name_b.to_lowercase())
+        name_a
+            .to_lowercase()
+            .cmp(&name_b.to_lowercase())
+            .then_with(|| a.file_name.cmp(&b.file_name))
     });
 
     Ok(items)

@@ -1,6 +1,9 @@
 <template>
+	<div v-if="isLoading" class="flex min-h-[50vh] items-center justify-center">
+		<SpinnerIcon class="h-12 w-12 animate-spin text-brand" />
+	</div>
 	<div
-		v-if="organization"
+		v-else-if="organization"
 		class="experimental-styles-within new-page sidebar"
 		:class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
 	>
@@ -240,10 +243,14 @@
 							:downloads="project.downloads"
 							:followers="project.followers"
 							:tags="project.categories"
-							:environment="{
-								clientSide: project.client_side,
-								serverSide: project.server_side,
-							}"
+							:environment="
+								project.client_side && project.server_side
+									? {
+											clientSide: project.client_side,
+											serverSide: project.server_side,
+										}
+									: undefined
+							"
 							:status="
 								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
@@ -282,6 +289,7 @@ import {
 	MoreVerticalIcon,
 	OrganizationIcon,
 	SettingsIcon,
+	SpinnerIcon,
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -290,6 +298,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	injectModrinthClient,
 	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
@@ -298,6 +307,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
@@ -342,70 +352,95 @@ if (route.path.includes('settings')) {
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
-const [
-	{ data: organization, refresh: refreshOrganization },
-	{ data: projects, refresh: refreshProjects },
-] = await Promise.all([
-	useAsyncData(
-		`organization/${orgId}`,
-		() => useBaseFetch(`organization/${orgId}`, { apiVersion: 3 }) as Promise<Organization>,
-	),
-	useAsyncData(
-		`organization/${orgId}/projects`,
-		() => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }) as Promise<ProjectV3[]>,
-		{
-			transform: (projects) => {
-				for (const project of projects) {
-					project.categories = project.categories.concat(project.loaders)
+const client = injectModrinthClient()
 
-					if (project.mrpack_loaders) {
-						project.categories = project.categories.concat(project.mrpack_loaders)
-					}
+const {
+	data: organization,
+	refetch: refreshOrganization,
+	error: orgError,
+	isPending: organizationIsPending,
+} = useQuery({
+	queryKey: computed(() => ['organization', orgId]),
+	// @ts-expect-error
+	queryFn: () => client.labrinth.organizations_v3.get(orgId),
+	enabled: !!orgId,
+})
 
-					const singleplayer = project.singleplayer && project.singleplayer[0]
-					const clientAndServer = project.client_and_server && project.client_and_server[0]
-					const clientOnly = project.client_only && project.client_only[0]
-					const serverOnly = project.server_only && project.server_only[0]
+watch(
+	orgError,
+	(error) => {
+		if (error) {
+			const status = (error as any).statusCode ?? (error as any).status ?? 404
+			showError({
+				fatal: true,
+				statusCode: status,
+				message: 'Organization not found',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
-					// quick and dirty hack to show envs as legacy
-					if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'unsupported'
-					} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-						project.client_side = 'unsupported'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-						project.client_side = 'optional'
-						project.server_side = 'optional'
-					}
-				}
+const {
+	data: projects,
+	refetch: refreshProjects,
+	isFetching: projectsIsFetching,
+} = useQuery({
+	queryKey: computed(() => ['organization', orgId, 'projects']),
+	queryFn: async () => {
+		// @ts-expect-error
+		const rawProjects = (await client.labrinth.organizations_v3.getProjects(orgId)) as ProjectV3[]
 
-				return projects
-			},
-		},
-	),
-])
+		return rawProjects.map((project) => {
+			let categories = project.categories.concat(project.loaders)
+			if (project.mrpack_loaders) {
+				categories = categories.concat(project.mrpack_loaders as string[])
+			}
+
+			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
+			const clientAndServer =
+				project.client_and_server && (project.client_and_server as string[])[0]
+			const clientOnly = project.client_only && (project.client_only as string[])[0]
+			const serverOnly = project.server_only && (project.server_only as string[])[0]
+
+			let client_side: ProjectV3['client_side'] | undefined
+			let server_side: ProjectV3['server_side'] | undefined
+
+			// quick and dirty hack to show envs as legacy
+			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
+				client_side = 'required'
+				server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
+				client_side = 'required'
+				server_side = 'unsupported'
+			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
+				client_side = 'unsupported'
+				server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
+				client_side = 'optional'
+				server_side = 'optional'
+			}
+
+			return { ...project, categories, client_side, server_side }
+		})
+	},
+	placeholderData: [],
+})
 
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])
 }
 
-if (!organization.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: 'Organization not found',
-	})
-}
+// Loading state
+const isLoading = computed(() => {
+	return organizationIsPending.value || projectsIsFetching.value
+})
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
 	const acceptedMembers = organization.value?.members?.filter((x) => x.accepted) ?? []
 	const owner = acceptedMembers.find((x) => x.is_owner)
-	const rest = acceptedMembers.filter((x) => !x.is_owner) || []
+	const rest = acceptedMembers.filter((x) => !x.is_owner) ?? []
 
 	rest.sort((a, b) => {
 		if (a.role === b.role) {
@@ -415,7 +450,7 @@ const acceptedMembers = computed(() => {
 		}
 	})
 
-	return [owner, ...rest]
+	return owner ? [owner, ...rest] : rest
 })
 
 const isInvited = computed(() => {
@@ -477,21 +512,35 @@ const onDeclineInvite = useClientTry(async () => {
 	await refreshOrganization()
 })
 
-const organizationContext = new OrganizationContext(organization, projects, auth, tags, refresh)
+const organizationContext = new OrganizationContext(
+	organization as Ref<Organization | null>,
+	projects as Ref<ProjectV3[] | null>,
+	auth,
+	tags,
+	refresh,
+)
 const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
 
-const title = `${organization.value.name} - Organization`
-const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`
+watch(
+	organization,
+	(org) => {
+		if (org) {
+			const title = `${org.name} - Organization`
+			const description = `${org.description} - View the organization ${org.name} on Modrinth`
 
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: organization.value.description,
-	ogImage: organization.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-})
+			useSeoMeta({
+				title,
+				description,
+				ogTitle: title,
+				ogDescription: org.description,
+				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 const navLinks = computed(() => [
 	{

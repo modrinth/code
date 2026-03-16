@@ -5,6 +5,8 @@
 </template>
 
 <script setup>
+import { useQuery } from '@tanstack/vue-query'
+
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
 definePageMeta({
@@ -18,7 +20,9 @@ useHead({
 const auth = await useAuth()
 const id = auth.value?.user?.id
 
-const { data: projects } = await useAsyncData(`user/${id}/projects`, () =>
-	useBaseFetch(`user/${id}/projects`),
-)
+const { data: projects } = useQuery({
+	queryKey: computed(() => ['user', id, 'projects']),
+	queryFn: () => useBaseFetch(`user/${id}/projects`),
+	enabled: computed(() => !!id),
+})
 </script>
