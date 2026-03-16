@@ -101,6 +101,18 @@
 					</ButtonStyled>
 					<ButtonStyled
 						type="transparent"
+						:highlighted="route.name === 'discover-maps' || route.path.startsWith('/map/')"
+						:highlighted-style="
+							route.name === 'discover-maps' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/maps">
+							<TagCategoryMapPinnedIcon aria-hidden="true" />
+							{{ formatMessage(getProjectTypeMessage('map', true)) }}
+						</nuxt-link>
+					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
 						:highlighted="
 							route.name === 'discover-datapacks' || route.path.startsWith('/datapack/')
 						"
@@ -179,6 +191,10 @@
 									action: '/discover/resourcepacks',
 								},
 								{
+									id: 'maps',
+									action: '/discover/maps',
+								},
+								{
 									id: 'datapacks',
 									action: '/discover/datapacks',
 								},
@@ -209,6 +225,10 @@
 								v-else-if="
 									route.name === 'discover-resourcepacks' || route.path.startsWith('/resourcepack/')
 								"
+								aria-hidden="true"
+							/>
+							<TagCategoryMapPinnedIcon
+								v-else-if="route.name === 'discover-maps' || route.path.startsWith('/map/')"
 								aria-hidden="true"
 							/>
 							<BracesIcon
@@ -247,6 +267,10 @@
 							<template #resourcepacks>
 								<PaintbrushIcon aria-hidden="true" />
 								{{ formatMessage(commonProjectTypeCategoryMessages.resourcepack) }}
+							</template>
+							<template #maps>
+								<TagCategoryMapPinnedIcon aria-hidden="true" />
+								{{ formatMessage(getProjectTypeMessage('map', true)) }}
 							</template>
 							<template #datapacks>
 								<BracesIcon aria-hidden="true" />
@@ -724,6 +748,7 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	TagCategoryMapPinnedIcon,
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
@@ -966,7 +991,7 @@ useSeoMeta({
 		formatMessage({
 			id: 'layout.meta.description',
 			defaultMessage:
-				'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
+				'Download Minecraft mods, plugins, datapacks, maps, shaders, resourcepacks, and modpacks on Modrinth. ' +
 				'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
 		}),
 	publisher: 'Modrinth',
@@ -1013,6 +1038,10 @@ const navRoutes = computed(() => [
 	{
 		label: formatMessage(getProjectTypeMessage('resourcepack', true)),
 		href: '/discover/resourcepacks',
+	},
+	{
+		label: formatMessage(getProjectTypeMessage('map', true)),
+		href: '/discover/maps',
 	},
 	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),

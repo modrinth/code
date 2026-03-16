@@ -70,6 +70,7 @@ export type ProjectType =
 	| 'mod'
 	| 'modpack'
 	| 'resourcepack'
+	| 'map'
 	| 'shader'
 	| 'datapack'
 	| 'plugin'
@@ -80,6 +81,7 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
 	'mod',
 	'modpack',
 	'resourcepack',
+	'map',
 	'shader',
 	'datapack',
 	'plugin',
@@ -379,7 +381,15 @@ export function useSearch(
 				formatted_name: formatMessage(
 					defineMessage({ id: 'search.filter_type.license', defaultMessage: 'License' }),
 				),
-				supported_project_types: ['mod', 'modpack', 'resourcepack', 'shader', 'plugin', 'datapack'],
+				supported_project_types: [
+					'mod',
+					'modpack',
+					'resourcepack',
+					'map',
+					'shader',
+					'plugin',
+					'datapack',
+				],
 				query_param: 'l',
 				supports_negative_filter: true,
 				display: 'all',

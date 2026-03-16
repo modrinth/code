@@ -10,6 +10,7 @@ const PROJECT_TYPES = [
 	'mod',
 	'plugin',
 	'datapack',
+	'map',
 	'shader',
 	'resourcepack',
 	'modpack',

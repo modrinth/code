@@ -307,6 +307,7 @@ const LOADER_FILTER_TYPES = [
 	'shader_loader',
 	'plugin_platform',
 ] as const
+const loaderOptionalTypes = new Set(['resourcepack', 'map'])
 
 const {
 	// Selections
@@ -343,7 +344,9 @@ const excludeLoaders = computed(
 	() =>
 		currentFilters.value.some((f) =>
 			LOADER_FILTER_TYPES.includes(f.type as (typeof LOADER_FILTER_TYPES)[number]),
-		) || ['resourcepack', 'datapack'].includes(currentType.value),
+		) ||
+		loaderOptionalTypes.has(currentType.value) ||
+		currentType.value === 'datapack',
 )
 
 const loadersNotForThisType = computed(() => {
