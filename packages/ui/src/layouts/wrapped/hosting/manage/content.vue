@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
+import { ArrowLeftRightIcon, ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -76,6 +77,14 @@ const messages = defineMessages({
 	failedToBulkUpdate: {
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
+	},
+	switchVersion: {
+		id: 'hosting.content.switch-version',
+		defaultMessage: 'Switch version',
+	},
+	copyLink: {
+		id: 'hosting.content.copy-link',
+		defaultMessage: 'Copy link',
 	},
 })
 
@@ -628,6 +637,38 @@ async function handleUpdateItem(fileNameKey: string) {
 	}
 }
 
+async function handleSwitchVersion(item: ContentItem) {
+	if (!item.project?.id || !item.version?.id) return
+
+	updatingModpack.value = false
+	updatingProject.value = item
+	updatingProjectVersions.value = []
+	loadingVersions.value = true
+	loadingChangelog.value = false
+
+	await nextTick()
+
+	contentUpdaterModal.value?.show(item.version.id, { switchMode: true })
+
+	try {
+		const versions = await client.labrinth.versions_v2.getProjectVersions(item.project.id, {
+			include_changelog: false,
+		})
+		versions.sort(
+			(a, b) => new Date(b.date_published).getTime() - new Date(a.date_published).getTime(),
+		)
+		updatingProjectVersions.value = versions
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			title: formatMessage(messages.failedToLoadVersions),
+			text: err instanceof Error ? err.message : undefined,
+		})
+	} finally {
+		loadingVersions.value = false
+	}
+}
+
 async function handleModpackUpdate() {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp?.spec.project_id) return
@@ -780,6 +821,32 @@ function handleModpackUpdateCancel() {
 	pendingModpackUpdateVersion.value = null
 }
 
+function getOverflowOptions(item: ContentItem) {
+	const options: { id: string; icon?: typeof ArrowLeftRightIcon; action: () => void }[] = []
+
+	if (item.project?.id && item.version?.id && !item.has_update) {
+		options.push({
+			id: formatMessage(messages.switchVersion),
+			icon: ArrowLeftRightIcon,
+			action: () => handleSwitchVersion(item),
+		})
+	}
+
+	if (item.project?.slug) {
+		options.push({
+			id: formatMessage(messages.copyLink),
+			icon: ClipboardCopyIcon,
+			action: async () => {
+				await navigator.clipboard.writeText(
+					`https://modrinth.com/${item.project_type}/${item.project?.slug}`,
+				)
+			},
+		})
+	}
+
+	return options
+}
+
 provideContentManager({
 	items: contentItems,
 	loading: computed(() => contentQuery.isLoading.value),
@@ -827,6 +894,7 @@ provideContentManager({
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
 	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	getOverflowOptions,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		return {

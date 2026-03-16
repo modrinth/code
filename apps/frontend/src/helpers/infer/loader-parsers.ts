@@ -236,6 +236,17 @@ export function createLoaderParsers(
 				loaders: ['sponge'],
 			}
 		},
+		// Geyser Extensions
+		'extension.yml': (file: string): InferredVersionInfo => {
+			const metadata = yaml.load(file) as any
+
+			return {
+				name: metadata.version ? `${project.title} ${metadata.version}` : '',
+				version_number: metadata.version,
+				version_type: versionType(metadata.version),
+				loaders: ['geyser'],
+			}
+		},
 		// Modpacks
 		'modrinth.index.json': (file: string): InferredVersionInfo => {
 			const metadata = JSON.parse(file) as any

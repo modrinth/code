@@ -5,6 +5,81 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ej nå autentiseringsservrarna"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Ange modpaketets beskrivning..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportera"
+  },
+  "app.export-modal.header": {
+    "message": "Exportera modpaket"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpaketets namn"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpaketets namn"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Välj filer och mappar att inkludera i paketet"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Versionsnummer"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "All data från din instans kommer att raderas permanent, inklusive dina världar, konfigurationer och allt installerat innehåll."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Detta kan inte ogöras"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Radera instans"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Radera instans"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Kopiera länk"
+  },
+  "app.instance.mods.installing": {
+    "message": "Installerar..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modd-paket"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" lades till"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projekt lades till"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Kolla in projekten jag använder i mitt modd-paket!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Delar innehåll från modd-paket"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Visa fil"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Uppladdning lyckades"
+  },
+  "app.instance.mods.switch-version": {
+    "message": "Byt version"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Okänt"
+  },
+  "app.instance.mods.updating": {
+    "message": "Uppdaterar..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Innehåll krävs"
   },
@@ -32,35 +107,14 @@
   "app.modal.install-to-play.view-contents": {
     "message": "Visa innehåll"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} tillagda"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "Tillagd"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "Borttaget"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "Uppdaterad"
-  },
   "app.modal.update-to-play.header": {
     "message": "Uppdatera för att spela"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} borttaget"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Uppdatering krävs"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "En uppdatering krävs för att spela {name}. Vänligen uppdatera till senaste version för att starta spelet."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} uppdaterade"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Utvecklarläge aktiverat."
@@ -230,12 +284,6 @@
   "instance.edit-world.title": {
     "message": "Redigera värld"
   },
-  "instance.filter.disabled": {
-    "message": "Avaktiverade projekt"
-  },
-  "instance.filter.updates-available": {
-    "message": "Uppdateringar tillgängliga"
-  },
   "instance.server-modal.address": {
     "message": "Adress"
   },
@@ -344,149 +392,8 @@
   "instance.settings.tabs.installation": {
     "message": "Installation"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} för Minecraft {game_version} är redan installerat"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} är redan installerad"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Ändra version"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Installera"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Installerar"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Hämtar modpack-versioner"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Installerar ny version"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "För närvarande installerat"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Felsökningsinformation:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Hämtar modpack-detaljer"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Spelversion"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Installera"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Installation pågår"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} version"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Kan inte hämta länkade modpack-detaljer. Vänligen kontrollera din internetanslutning."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} är inte tillgänglig för Minecraft {version}. Prova en annan modloader."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Denna instans är länkad till ett modpack, men modpacket kunde inte hittas på Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Plattform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Ominstallera modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Ominstallerar modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Ominstallation kommer att återställa allt installerat eller modifierat innehåll till det som tillhandahålls av modpaketet och ta bort eventuella moddar eller innehåll som du har lagt till ovanpå den ursprungliga installationen. Detta kan åtgärda oväntat beteende om ändringar har gjorts i instansen, men om dina världar nu är beroende av ytterligare installerat innehåll kan det skada befintliga världar."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Är du säker att du vill ominstallera denna instans?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Återställer instansens innehåll till dess ursprungliga tillstånd och tar bort eventuella moddar eller innehåll som du har lagt till ovanpå det ursprungliga modpaketet."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Ominstallera modpack"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Reparera"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Reparerar"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Reparation installerar om Minecraft-beroenden och kontrollerar efter korruption. Detta kan åtgärda problem om spelet inte startar på grund av launcher-relaterade fel, men löser inte problem eller krascher som är relaterade till installerade mods."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Reparera instans?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparation pågår"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Återställ till nuvarande"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Visa alla versioner"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "ändra version"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "installera"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "ominstallera"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "reparera"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Kan inte {action} medans installationen pågår"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Kan inte {action} medans offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Kan inte {action} medans reparationen pågår"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(okänd version)"
-  },
-  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
-    "message": "Denna instans är länkad till en server, vilket betyder att du inte kan ändra Minecraft-version. Att avlänka kommer koppla bort instansen från servern permanent."
-  },
-  "instance.settings.tabs.installation.unlink-server.description": {
-    "message": "Denna instans är länkad till en server, vilket innebär att moddar inte kan uppdateras och mod-loader eller Minecraft-version inte kan ändras. Att avlänka kommer koppla bort instansen från servern permanent."
-  },
-  "instance.settings.tabs.installation.unlink-server.title": {
-    "message": "Avlänka från server"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Ta bort koppling till instans"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Om du fortsätter kommer du inte kunna länka om den utan att skapa en helt ny instans. Du kommer inte längre att ta emot uppdateringar för modpacket och det kommer att bli en vanlig instans."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Är du säker att du vill ta bort koppling till denna instans?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Denna instans är länkad till ett modpaket, vilket innebär att moddar inte kan uppdateras och mod-loader eller Minecraft-version inte kan ändras. Att avlänka kommer koppla bort instansen från modpaketet permanent."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Ta bort koppling från modpack"
   },
   "instance.settings.tabs.java": {
     "message": "Java och minne"

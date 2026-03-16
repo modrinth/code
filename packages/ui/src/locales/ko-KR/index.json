@@ -282,10 +282,10 @@
     "defaultMessage": "{ram} GB RAM"
   },
   "hosting.specs.gb-storage": {
-    "defaultMessage": "{storage} GB 용량"
+    "defaultMessage": "{storage} GB 저장소"
   },
   "hosting.specs.shared-cpus": {
-    "defaultMessage": "{cpus} 공유 CPU"
+    "defaultMessage": "{cpus} 공유 코어 수"
   },
   "icon-select.edit": {
     "defaultMessage": "아이콘 설정"
@@ -326,26 +326,17 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "알 수 없는 게임 모드"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "모드팩 연결 해제"
-  },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "뒤로 가기"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "링크 복사"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "비활성화"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "이 모드팩에는 추가 콘텐츠가 포함되어 있지 않습니다."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "콘텐츠를 찾을 수 없습니다"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "활성화"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "전체"
@@ -360,19 +351,13 @@
     "defaultMessage": "검색 결과와 일치하는 프로젝트가 없습니다."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "{count}개의 프로젝트 검색"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count}개 선택됨"
+    "defaultMessage": "{count, number} {count, plural, one {프로젝트} other {프로젝트들}} 검색"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "현재"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "호환되지 않음"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "v{version}으로 다운그레이드"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "버전 업데이트"
@@ -394,15 +379,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "호환되지 않는 항목 보이기"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "v{version}으로 업데이트"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "업데이트가 인스턴스에 안전하다고 보장할 수 없습니다. 모든 중간 버전의 변경 사항을 확인하고, 백업을 고려하세요."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "업데이트가 월드에 안전하다고 보장할 수 없습니다. 모든 중간 버전의 변경 사항을 확인하고, 백업을 고려하세요."
   },
   "label.actions": {
     "defaultMessage": "활동"
@@ -477,7 +453,7 @@
     "defaultMessage": "비밀번호"
   },
   "label.played": {
-    "defaultMessage": "{time} 동안 플레이함"
+    "defaultMessage": "{ago} 에 플레이함"
   },
   "label.project": {
     "defaultMessage": "프로젝트"
@@ -541,6 +517,102 @@
   },
   "label.yes": {
     "defaultMessage": "예"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "체코어"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "덴마크어"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "독일어 (스위스)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "독일어 (독일)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "영어 (미국)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "스페인어 (라틴 아메리카)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "스페인어 (스페인)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "핀란드어"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "필리핀어"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "프랑스어"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "히브리어"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "헝가리어"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "인도네시아어"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "이탈리아어 (이탈리아)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "일본어"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "한국어"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "말레이어"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "네덜란드어"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "보크몰 노르웨이어"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "폴란드어"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "포트루갈어 (브라질)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "포르투갈어 (포르투갈)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "루마니아어"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "러시아어"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "세르비아어 (라틴)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "스웨덴어"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "태국어"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "튀르키예어"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "우크라이나어"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "베트남어"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "중국어 (간체)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "중국어 (번체)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "결제 수단 추가"
@@ -721,6 +793,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "{date}에 게시됨"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "{date}에 업데이트됨"
   },
   "project-card.environment.client": {
     "defaultMessage": ""
@@ -912,16 +990,16 @@
     "defaultMessage": "서버 세부정보"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} 다운로드"
+    "defaultMessage": "{count, number} {count, plural, one {다운로드} other {다운로드}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+    "defaultMessage": "클라이언트와 서버 양측에 필요함."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "클라이언트와 서버, 양쪽 모두에 필요함"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "일부 기능은 부분적일지라도 클라이언트와 서버 모두에서 작동합니다."
+    "defaultMessage": "주요 기능은 클라이언트 기반이지만, 서버에 설치하면 추가적인 기능을 사용할 수 있습니다."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "클라이언트와 서버, 서버에서는 선택 사항"
@@ -933,7 +1011,7 @@
     "defaultMessage": "클라이언트 측 전용"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+    "defaultMessage": "클라이언트와 서버측에 각각 기능이 존재하지만, 부분적입니다. 양측에 설치하는것이 가장 좋습니다."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "클라이언트와 서버, 양쪽에 설치할 때 최적"
@@ -945,19 +1023,19 @@
     "defaultMessage": "클라이언트와 서버, 양쪽 모두 선택 사항"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다. 전용 서버에서만 작동합니다."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "서버 측 전용"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "일부 기능은 부분적으로만이라도 클라이언트와 서버 양쪽에서 작동합니다."
+    "defaultMessage": "주요 기능은 클라이언트 기반이지만, 서버에 설치하면 추가적인 기능을 사용할 수 있습니다."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "클라이언트와 서버, 클라이언트에서는 선택 사항"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다."
+    "defaultMessage": "모든 기능은 서버 측에서만 처리되며 바닐라 클라이언트와 호환됩니다. 싱글플레이어 서버에서도 작동합니다."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "서버 측 전용, 싱글플레이에서도 작동"
@@ -981,16 +1059,22 @@
     "defaultMessage": "알 수 없는 실행 환경"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} 팔로워"
+    "defaultMessage": "{count, number} {count, plural, one {팔로워} other {팔로워}}"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, other {명 온라인}}"
+    "defaultMessage": "{count, number} 온라인"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {플레이어} other {플레이어}} 온라인"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, other {회 최근 플레이}}"
+    "defaultMessage": "{count} {countPlural, plural, one {회 최근 플레이} other {회 최근 플레이}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "모드린스에서 지난 2주동안 {count} {countPlural, plural, one {회 플레이} other {회 플레이}}"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "분석"
@@ -1235,9 +1319,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "백업 스케쥴"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "백업 생성 중..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "백업 생성에 실패했습니다"
   },
@@ -1247,20 +1328,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "백업 메뉴얼"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "백업 대기열"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "대기열 복원"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "이름 변경"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "복원"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "백업을 통해 복원하는 중..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "무시"
@@ -1861,9 +1933,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "저장하지 않은 번경사항이 있습니다."
