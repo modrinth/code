@@ -1,5 +1,6 @@
 <template>
 	<nav
+		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'card-shadow': mode === 'navigation' }"
@@ -10,6 +11,7 @@
 				v-show="link.shown ?? true"
 				:key="link.href"
 				ref="tabLinkElements"
+				:replace="replace"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
@@ -70,6 +72,7 @@ interface Tab {
 
 const props = withDefaults(
 	defineProps<{
+		replace?: boolean
 		links: Tab[]
 		query?: string
 		mode?: 'navigation' | 'local'
@@ -299,7 +302,14 @@ watch(
 	},
 )
 
-watch(() => props.links, updateActiveTab, { deep: true })
+watch(
+	() => props.links,
+	async () => {
+		await nextTick()
+		updateActiveTab()
+	},
+	{ deep: true },
+)
 </script>
 
 <style scoped>

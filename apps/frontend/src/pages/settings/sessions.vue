@@ -15,14 +15,7 @@
 				</div>
 				<div>
 					<template v-if="session.city">{{ session.city }}, {{ session.country }} ⋅ </template>
-					<span
-						v-tooltip="
-							formatMessage(commonMessages.dateAtTimeTooltip, {
-								date: new Date(session.last_login),
-								time: new Date(session.last_login),
-							})
-						"
-					>
+					<span v-tooltip="formatDateTime(session.last_login)">
 						{{
 							formatMessage(messages.lastAccessedAgoLabel, {
 								ago: formatRelativeTime(session.last_login),
@@ -30,14 +23,7 @@
 						}}
 					</span>
 					⋅
-					<span
-						v-tooltip="
-							formatMessage(commonMessages.dateAtTimeTooltip, {
-								date: new Date(session.created),
-								time: new Date(session.created),
-							})
-						"
-					>
+					<span v-tooltip="formatDateTime(session.created)">
 						{{
 							formatMessage(messages.createdAgoLabel, {
 								ago: formatRelativeTime(session.created),
@@ -62,9 +48,11 @@ import {
 	commonSettingsMessages,
 	defineMessages,
 	injectNotificationManager,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 definePageMeta({
 	middleware: 'auth',
@@ -73,6 +61,10 @@ definePageMeta({
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const messages = defineMessages({
 	currentSessionLabel: {
@@ -110,9 +102,10 @@ useHead({
 	title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 })
 
-const { data: sessions, refresh } = await useAsyncData('session/list', () =>
-	useBaseFetch('session/list'),
-)
+const { data: sessions, refetch: refresh } = useQuery({
+	queryKey: ['session', 'list'],
+	queryFn: () => useBaseFetch('session/list'),
+})
 
 async function revokeSession(id) {
 	startLoading()

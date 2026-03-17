@@ -31,7 +31,10 @@
 				that apply.
 			</p>
 
-			<p v-if="project.versions.length === 0" class="known-errors">
+			<p
+				v-if="project.versions.length === 0 && projectV3?.minecraft_server == null"
+				class="known-errors"
+			>
 				Please upload a version first in order to select tags!
 			</p>
 			<template v-else>
@@ -72,8 +75,8 @@
 						>
 							<div class="category-selector__label">
 								<component
-									:is="getCategoryIcon(category.name)"
-									v-if="header !== 'resolutions' && getCategoryIcon(category.name)"
+									:is="getTagIcon(category.name)"
+									v-if="header !== 'resolutions' && getTagIcon(category.name)"
 									aria-hidden="true"
 									class="icon"
 								/>
@@ -108,8 +111,8 @@
 					>
 						<div class="category-selector__label">
 							<component
-								:is="getCategoryIcon(category.name)"
-								v-if="category.header !== 'resolutions' && getCategoryIcon(category.name)"
+								:is="getTagIcon(category.name)"
+								v-if="category.header !== 'resolutions' && getTagIcon(category.name)"
 								aria-hidden="true"
 								class="icon"
 							/>
@@ -132,7 +135,12 @@
 </template>
 
 <script setup lang="ts">
-import { getCategoryIcon, StarIcon, TriangleAlertIcon } from '@modrinth/assets'
+import {
+	getCategoryIcon,
+	SERVER_CATEGORY_ICON_MAP,
+	StarIcon,
+	TriangleAlertIcon,
+} from '@modrinth/assets'
 import {
 	Checkbox,
 	formatCategory,
@@ -156,24 +164,39 @@ interface Category {
 const tags = useGeneratedState()
 const { formatMessage, locale } = useVIntl()
 
-const { projectV2: project, patchProject } = injectProjectPageContext()
+const { projectV2: project, projectV3, patchProject } = injectProjectPageContext()
 
 const formatCategoryName = (categoryName: string) => {
 	return formatCategory(formatMessage, categoryName)
+}
+
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
+const getTagIcon = (categoryName: string) => {
+	const iconName = isServerProject.value
+		? (SERVER_CATEGORY_ICON_MAP[categoryName] ?? categoryName)
+		: categoryName
+	return getCategoryIcon(iconName)
+}
+
+const matchesProjectType = (x: Category) => {
+	if (isServerProject.value) {
+		return x.project_type === 'minecraft_java_server'
+	} else {
+		return x.project_type === project.value.actualProjectType
+	}
 }
 
 const { saved, current, saving, reset, save } = useSavable(
 	() => ({
 		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
-				x.project_type === project.value.actualProjectType &&
+				matchesProjectType(x) &&
 				(project.value.categories.includes(x.name) ||
 					project.value.additional_categories.includes(x.name)),
 		) as Category[],
 		featuredTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
-			(x: Category) =>
-				x.project_type === project.value.actualProjectType &&
-				project.value.categories.includes(x.name),
+			(x: Category) => matchesProjectType(x) && project.value.categories.includes(x.name),
 		) as Category[],
 	}),
 	async () => {
@@ -217,7 +240,7 @@ const { saved, current, saving, reset, save } = useSavable(
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}
 	sortedCategories(tags.value, formatCategoryName, locale.value).forEach((x: Category) => {
-		if (x.project_type === project.value.actualProjectType) {
+		if (matchesProjectType(x)) {
 			const header = x.header
 			if (!lists[header]) {
 				lists[header] = []
@@ -225,12 +248,26 @@ const categoryLists = computed(() => {
 			lists[header].push(x)
 		}
 	})
+	const featuresKey = 'minecraft_server_features'
+	if (lists[featuresKey]) {
+		lists[featuresKey].sort((a, b) => {
+			if (a.name === 'pokemon') return -1
+			if (b.name === 'pokemon') return 1
+			return 0
+		})
+	}
 	return lists
 })
 
 const tooManyTagsWarning = computed(() => {
 	const tagCount = current.value.selectedTags.length
-	if (tagCount > 8) {
+	if (projectV3?.value?.minecraft_server != null) {
+		if (tagCount > 18) {
+			return `You've selected ${tagCount} tags. Please reduce to 18 or fewer to keep your server focused and easier to discover.`
+		} else if (tagCount > 12) {
+			return `You've selected ${tagCount} tags. Consider reducing to 12 or fewer to keep your server focused and easier to discover.`
+		}
+	} else if (tagCount > 8) {
 		return `You've selected ${tagCount} tags. Consider reducing to 8 or fewer to keep your project focused and easier to discover.`
 	}
 	return null
@@ -320,6 +357,7 @@ const toggleFeaturedCategory = (category: Category) => {
 		.category-selector__label {
 			display: flex;
 			align-items: center;
+			text-align: left;
 
 			.icon {
 				height: 1rem;

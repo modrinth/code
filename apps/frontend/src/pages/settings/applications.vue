@@ -182,7 +182,7 @@
 						<div>
 							{{
 								formatMessage(messages.createdOn, {
-									date: new Date(app.created).toLocaleDateString(),
+									date: formatDate(new Date(app.created)),
 								})
 							}}
 						</div>
@@ -257,8 +257,10 @@ import {
 	IntlFormatted,
 	normalizeChildren,
 	StyledInput,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -272,6 +274,7 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime()
 
 definePageMeta({
 	middleware: 'auth',
@@ -337,7 +340,7 @@ const messages = defineMessages({
 	},
 	redirectUrisLabel: {
 		id: 'settings.applications.field.redirect-uris',
-		defaultMessage: 'Redirect uris',
+		defaultMessage: 'Redirect URIs',
 	},
 	redirectUriPlaceholder: {
 		id: 'settings.applications.field.redirect-uri.placeholder',
@@ -349,7 +352,7 @@ const messages = defineMessages({
 	},
 	addRedirectUri: {
 		id: 'settings.applications.button.add-redirect-uri',
-		defaultMessage: 'Add a redirect uri',
+		defaultMessage: 'Add a redirect URI',
 	},
 	cancel: {
 		id: 'settings.applications.button.cancel',
@@ -489,16 +492,14 @@ const loading = ref(false)
 
 const auth = await useAuth()
 
-const { data: usersApps, refresh } = await useAsyncData(
-	'usersApps',
-	() =>
+const { data: usersApps, refetch: refresh } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'oauth_apps']),
+	queryFn: () =>
 		useBaseFetch(`user/${auth.value.user.id}/oauth_apps`, {
 			apiVersion: 3,
 		}),
-	{
-		watch: [auth],
-	},
-)
+	enabled: computed(() => !!auth.value?.user?.id),
+})
 
 const setForm = (app) => {
 	if (app?.id) {

@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { Avatar, ButtonStyled } from '@modrinth/ui'
-import type { User } from '@modrinth/utils'
+import { Avatar, ButtonStyled, injectModrinthClient, useFormatDateTime } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, onMounted } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
 import ShareArticleButtons from '~/components/ui/ShareArticleButtons.vue'
 
+const client = injectModrinthClient()
 const config = useRuntimeConfig()
 const route = useRoute()
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const rawArticle = rawArticles.find((article) => article.slug === route.params.slug)
 
@@ -22,21 +25,19 @@ if (!rawArticle) {
 	})
 }
 
-const authorsUrl = `users?ids=${JSON.stringify(rawArticle.authors)}`
+const { data: authors } = useQuery({
+	queryKey: computed(() => ['users', rawArticle.authors]),
+	queryFn: async () => {
+		const users = await client.labrinth.users_v2.getMultiple(rawArticle.authors)
+		users.sort((a, b) => {
+			return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
+		})
+		return users
+	},
+	enabled: computed(() => rawArticle.authors.length > 0),
+})
 
-const [authors, html] = await Promise.all([
-	rawArticle.authors
-		? useAsyncData(authorsUrl, () => useBaseFetch(authorsUrl)).then((data) => {
-				const users = data.data as Ref<User[]>
-				users.value.sort((a, b) => {
-					return rawArticle.authors.indexOf(a.id) - rawArticle.authors.indexOf(b.id)
-				})
-
-				return users
-			})
-		: Promise.resolve(),
-	rawArticle.html(),
-])
+const html = await rawArticle.html()
 
 const article = computed(() => ({
 	...rawArticle,
@@ -157,10 +158,10 @@ onMounted(() => {
 					</nuxt-link>
 				</template>
 				<span class="hidden md:block">•</span>
-				<span class="hidden md:block"> {{ dayjsDate.format('MMMM D, YYYY') }}</span>
+				<span class="hidden md:block"> {{ formatDate(dayjsDate.toDate()) }}</span>
 			</div>
 			<span class="text-sm text-secondary sm:text-base md:hidden">
-				Posted on {{ dayjsDate.format('MMMM D, YYYY') }}</span
+				Posted on {{ formatDate(dayjsDate.toDate()) }}</span
 			>
 			<ShareArticleButtons :title="article.title" :url="articleUrl" />
 			<img

@@ -24,7 +24,7 @@
     "message": "下载 RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "下载应用，请到 Flathub"
+    "message": "在 Flathub 上获取"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -192,7 +192,7 @@
     "message": "下载适用于 {os} 的 Modrinth App"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
-    "message": "一张截图，显示 Cobblemon 实例的主屏幕页面。"
+    "message": "Cobblemon 整合包主菜单屏幕截图。"
   },
   "app-marketing.hero.more-download-options": {
     "message": "更多下载选项"
@@ -420,7 +420,7 @@
     "message": "名称"
   },
   "create.collection.name-placeholder": {
-    "message": "输入收藏夹名称…"
+    "message": "输入收藏夹名称………"
   },
   "create.collection.summary-description": {
     "message": "一两句话描述你的收藏夹。"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "创建项目"
   },
+  "create.project.create-server-project": {
+    "message": "创建服务器"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "缺少字段：{fields}"
+  },
   "create.project.name-label": {
     "message": "名称"
   },
   "create.project.name-placeholder": {
     "message": "输入项目名称…"
+  },
+  "create.project.owner-description": {
+    "message": "将项目所有者设置为你自己或你所属的组织。"
+  },
+  "create.project.owner-label": {
+    "message": "所有者"
+  },
+  "create.project.server-project-title": {
+    "message": "创建服务器项目"
   },
   "create.project.summary-description": {
     "message": "一两句话描述你的项目。"
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "创建项目"
+  },
+  "create.project.type-label": {
+    "message": "类型"
+  },
+  "create.project.type-project": {
+    "message": "项目"
+  },
+  "create.project.type-server": {
+    "message": "服务器"
   },
   "create.project.url-label": {
     "message": "URL链接"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "新建"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "创建你的首个收藏夹，开始吧！"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "你还没有任何收藏夹"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "没有符合搜索条件的收藏夹"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "尝试调整你的过滤器或搜索词。"
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} 个项目}}"
+    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜索你的收藏夹"
@@ -990,7 +1026,7 @@
     "message": "你在找的页面似乎不存在。"
   },
   "error.generic.404.title": {
-    "message": "页面不存在"
+    "message": "未找到页面"
   },
   "error.generic.451.subtitle": {
     "message": "由于法律原因，例如政府审查或正在进行的法律诉讼，本页面已被屏蔽。"
@@ -1041,7 +1077,7 @@
     "message": "为什么？"
   },
   "error.project.404.title": {
-    "message": "项目不存在"
+    "message": "未找到项目"
   },
   "error.user.404.list_item.1": {
     "message": "你可能输错了这个用户的用户名。"
@@ -1107,7 +1143,7 @@
     "message": "Modrinth Hosting 服务器有 DDoS 防护吗？"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "有的。所有 Modrinth Hosting 服务器均配备 DDoS 防护，部分区域防护容量高达 17Tbps。"
+    "message": "有的。所有 Modrinth Hosting 服务器均配备 DDoS 防护，部分区域防护容量高达 17 Tbps。"
   },
   "hosting-marketing.faq.heading": {
     "message": "常见问题"
@@ -1268,6 +1304,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "随心选择原版、Fabric、Forge、Quilt 和 NeoForge。只要它在 Modrinth，你的服务器就能运行它。"
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "更改整合包版本失败"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "加载版本失败"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "重新下载整合包失败"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "修复服务器失败"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "保存安装设置失败"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "链接整合包包失败"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {加载器} other {{loader}}} 版本"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "你的服务器安装已被修复。"
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "修复完成"
+  },
+  "hosting.loader.reset-server": {
+    "message": "重置服务器"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
+  },
   "hosting.plan.out-of-stock": {
     "message": "缺货"
   },
@@ -1401,7 +1470,7 @@
     "message": "面向玩家"
   },
   "landing.section.for-players.tagline": {
-    "message": "探索超过 {count} 件作品"
+    "message": "探索超过 {count, number} 件作品"
   },
   "landing.subheading": {
     "message": "在我们为社区打造的开源平台上，探索、畅玩并分享 Minecraft 的无限可能。"
@@ -1432,6 +1501,12 @@
   },
   "layout.action.new-project": {
     "message": "新建项目"
+  },
+  "layout.action.new-server-project": {
+    "message": "新建服务器"
+  },
+  "layout.action.publish": {
+    "message": "发布"
   },
   "layout.action.reports": {
     "message": "审查举报"
@@ -1763,9 +1838,6 @@
   "muralpay.field.bank-account-number": {
     "message": "账号"
   },
-  "muralpay.field.branch-code": {
-    "message": "分行代码"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1867,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX 手机号"
+  },
+  "muralpay.field.random-key": {
+    "message": "随机密钥"
   },
   "muralpay.field.routing-number": {
     "message": "路由号码"
@@ -1856,9 +1931,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "输入账户号码"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "输入分行代码"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "输入 18 位 CLABE"
   },
@@ -1870,6 +1942,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "输入 PIX 邮箱"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "输入随机密钥"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "输入 9 位路由号码"
@@ -1998,7 +2073,7 @@
     "message": "收藏夹"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {次下载}}"
+    "message": "{count} {countPlural, plural, other {次下载}}"
   },
   "profile.label.joined": {
     "message": "加入于"
@@ -2019,7 +2094,7 @@
     "message": "组织"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {个项目}}"
+    "message": "{count} {countPlural, plural, other {个项目}}"
   },
   "profile.label.saving": {
     "message": "正在保存…"
@@ -2102,6 +2177,12 @@
   "project-type.datapack.singular": {
     "message": "数据包"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "服务器"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "服务器"
+  },
   "project-type.mod.plural": {
     "message": "模组"
   },
@@ -2131,6 +2212,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "资源包"
+  },
+  "project-type.server.plural": {
+    "message": "服务器"
+  },
+  "project-type.server.singular": {
+    "message": "服务器"
   },
   "project-type.shader.plural": {
     "message": "光影包"
@@ -2262,7 +2349,7 @@
     "message": "加载项目数据时出错{message}"
   },
   "project.error.page-not-found": {
-    "message": "找不到该页面"
+    "message": "未找到该页面"
   },
   "project.error.project-not-found": {
     "message": "未找到项目"
@@ -2729,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "跟随服务器"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "正在恢复备份"
+  "servers.busy.backup-creating": {
+    "message": "备份正在创建中"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "备份正在恢复"
+  },
+  "servers.busy.installing": {
+    "message": "正在安装服务器"
+  },
+  "servers.busy.syncing-content": {
+    "message": "进行内容同步中"
   },
   "servers.notice.actions": {
     "message": "操作"
@@ -2954,6 +3050,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "资源包页面"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "服务器页面"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "光影包页面"
   },
@@ -3006,7 +3105,7 @@
     "message": "创建个人访问令牌"
   },
   "settings.pats.description": {
-    "message": "个人访问令牌可用于访问 Modrinth 的 API。详情请参阅 <doc-link>Modrinth 的 API 文档</doc-link>。你可以随时创建和撤销这些令牌。"
+    "message": "个人访问令牌（PAT）可用于访问 Modrinth 的 API。这些令牌可随时创建和撤销。更多信息，请参阅 <doc-link>Modrinth API 文档</doc-link>。"
   },
   "settings.pats.modal.create.action": {
     "message": "创建个人访问令牌"

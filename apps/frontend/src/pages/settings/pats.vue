@@ -10,7 +10,7 @@
 		<Modal
 			ref="patModal"
 			:header="
-				editPatIndex !== null
+				editPatId !== null
 					? formatMessage(createModalMessages.editTitle)
 					: formatMessage(createModalMessages.createTitle)
 			"
@@ -58,7 +58,7 @@
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 					<button
-						v-if="editPatIndex !== null"
+						v-if="editPatId !== null"
 						:disabled="loading || !name || !expires"
 						type="button"
 						class="iconified-button brand-button"
@@ -92,7 +92,7 @@
 						name = null
 						scopesVal = 0
 						expires = null
-						editPatIndex = null
+						editPatId = null
 						$refs.patModal.show()
 					}
 				"
@@ -109,7 +109,7 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="(pat, index) in displayPats" :key="pat.id" class="universal-card recessed token">
+		<div v-for="pat in displayPats" :key="pat.id" class="universal-card recessed token">
 			<div>
 				<div>
 					<strong>{{ pat.name }}</strong>
@@ -119,16 +119,7 @@
 						<CopyCode :text="pat.access_token" />
 					</template>
 					<template v-else>
-						<span
-							v-tooltip="
-								pat.last_used
-									? formatMessage(commonMessages.dateAtTimeTooltip, {
-											date: new Date(pat.last_used),
-											time: new Date(pat.last_used),
-										})
-									: null
-							"
-						>
+						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
 							<template v-if="pat.last_used">
 								{{
 									formatMessage(tokenMessages.lastUsed, {
@@ -139,14 +130,7 @@
 							<template v-else>{{ formatMessage(tokenMessages.neverUsed) }}</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.expires),
-									time: new Date(pat.expires),
-								})
-							"
-						>
+						<span v-tooltip="Date.parse(pat.expires) ? formatDateTime(pat.expires) : null">
 							<template v-if="new Date(pat.expires) > new Date()">
 								{{
 									formatMessage(tokenMessages.expiresIn, {
@@ -163,14 +147,7 @@
 							</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.created),
-									time: new Date(pat.created),
-								})
-							"
-						>
+						<span v-tooltip="formatDateTime(pat.created)">
 							{{
 								formatMessage(commonMessages.createdAgoLabel, {
 									ago: formatRelativeTime(pat.created),
@@ -185,7 +162,7 @@
 					class="iconified-button raised-button"
 					@click="
 						() => {
-							editPatIndex = index
+							editPatId = pat.id
 							name = pat.name
 							scopesVal = pat.scopes
 							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
@@ -222,9 +199,11 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -240,6 +219,10 @@ const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const createModalMessages = defineMessages({
 	createTitle: {
@@ -287,7 +270,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.pats.description',
 		defaultMessage:
-			"PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time.",
+			"PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>.",
 	},
 	create: {
 		id: 'settings.pats.action.create',
@@ -334,7 +317,7 @@ const data = useNuxtApp()
 const { scopesToLabels } = useScopes()
 const patModal = ref()
 
-const editPatIndex = ref(null)
+const editPatId = ref(null)
 
 const name = ref(null)
 const scopesVal = ref(BigInt(0))
@@ -344,7 +327,11 @@ const deletePatIndex = ref(null)
 
 const loading = ref(false)
 
-const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
+const { data: pats, refetch: refresh } = useQuery({
+	queryKey: ['pat'],
+	queryFn: () => useBaseFetch('pat'),
+	placeholderData: [],
+})
 const displayPats = computed(() => {
 	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
 })
@@ -433,7 +420,7 @@ async function editPat() {
 	startLoading()
 	loading.value = true
 	try {
-		await useBaseFetch(`pat/${pats.value[editPatIndex.value].id}`, {
+		await useBaseFetch(`pat/${editPatId.value}`, {
 			method: 'PATCH',
 			body: {
 				name: name.value,

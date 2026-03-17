@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150MB RAM!"
+    "message": "Modrinth App berprestasi lebih baik daripada kebanyakan pengurus mod terkemuka, menggunakan hanya 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Cipta projek"
   },
+  "create.project.create-server-project": {
+    "message": "Cipta sebuah pelayan"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Medan yang hilang: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nama"
   },
   "create.project.name-placeholder": {
     "message": "Masukkan nama projek..."
+  },
+  "create.project.owner-description": {
+    "message": "Tetapkan pemilik projek sebagai diri anda atau organisasi yang anda sertai."
+  },
+  "create.project.owner-label": {
+    "message": "Pemilik"
+  },
+  "create.project.server-project-title": {
+    "message": "Mencipta sebuah projek pelayan"
   },
   "create.project.summary-description": {
     "message": "Satu atau dua ayat yang menerangkan projek anda."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Mencipta sebuah projek"
+  },
+  "create.project.type-label": {
+    "message": "Jenis"
+  },
+  "create.project.type-project": {
+    "message": "Projek"
+  },
+  "create.project.type-server": {
+    "message": "Pelayan"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Cipta baharu"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Cipta koleksi pertama anda untuk mulakan!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Anda tidak memiliki sebarang koleksi"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Tiada koleksi yang sepadan dengan carian anda"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Cuba laraskan penapis atau istilah carian anda."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} projek}}"
+    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi anda"
@@ -1215,7 +1251,7 @@
     "message": "Tahu apa yang anda perlukan dengan pasti?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Cuba pelayan <orange>3GB</orange> percuma selama 5 hari, dikuasakan oleh <orange>Medal</orange>"
+    "message": "Cuba pelayan <orange>3 GB</orange> percuma selama 5 hari, dikuasakan oleh <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Ketahui lebih lanjut"
@@ -1267,6 +1303,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Pilih antara Vanila, Fabric, Forge, Quilt dan NeoForge. Jika ia berada di Modrinth, ia boleh dijalankan pada pelayan anda."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Gagal menukar versi pek mod"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Gagal memuat versi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Gagal memasang semula pek mod"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Gagal membaiki pelayan"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Gagal menyimpan tetapan pemasangan"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Gagal menyahpaut pek mod"
+  },
+  "hosting.loader.loader-version": {
+    "message": "Versi {loader, select, null {Pemuat} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Pemasangan pelayan anda telah dibaiki."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Pembaikan selesai"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Tetap semula pelayan"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal tersedia dan boleh dipulihkan."
   },
   "hosting.plan.out-of-stock": {
     "message": "Kehabisan stok"
@@ -1401,7 +1470,7 @@
     "message": "Untuk Pemain"
   },
   "landing.section.for-players.tagline": {
-    "message": "Temui lebih daripada {count} ciptaan"
+    "message": "Temui lebih daripada {count, number} ciptaan"
   },
   "landing.subheading": {
     "message": "Temui, main dan kongsi kandungan Minecraft melalui platform sumber terbuka kami yang dibina untuk komuniti."
@@ -1433,6 +1502,12 @@
   "layout.action.new-project": {
     "message": "Projek baharu"
   },
+  "layout.action.new-server-project": {
+    "message": "Pelayan baharu"
+  },
+  "layout.action.publish": {
+    "message": "Terbitkan"
+  },
   "layout.action.reports": {
     "message": "Semak laporan"
   },
@@ -1449,7 +1524,7 @@
     "message": "Tindakan akaun diperlukan"
   },
   "layout.banner.add-email.button": {
-    "message": "Lawat tetapan akaun"
+    "message": "Kunjungi tetapan akaun"
   },
   "layout.banner.add-email.description": {
     "message": "Atas sebab keselamatan, Modrinth memerlukan anda mendaftarkan alamat e-mel ke akaun anda."
@@ -1461,7 +1536,7 @@
     "message": "Ralat menjana keadaan daripada API semasa membina."
   },
   "layout.banner.preview.description": {
-    "message": "Jika anda bermaksud untuk mengakses laman sesawang rasmi Modrinth, lawati <link>https://modrinth.com</link>. Pralihat pelaksanaan ini digunakan oleh kakitangan Modrinth untuk tujuan pengujian. Ia dibina menggunakan <branch-link>{owner}/{branch}</branch-link> @ {commit}."
+    "message": "Jika anda bermaksud untuk mengakses laman sesawang rasmi Modrinth, kunjungi <link>https://modrinth.com</link>. Pralihat pelaksanaan ini digunakan oleh kakitangan Modrinth untuk tujuan pengujian. Ia dibina menggunakan <branch-link>{owner}/{branch}</branch-link> @ {commit}."
   },
   "layout.banner.preview.title": {
     "message": "Ini ialah pengaturan pralihat laman sesawang Modrinth."
@@ -1763,9 +1838,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Nombor akaun"
   },
-  "muralpay.field.branch-code": {
-    "message": "Kod cawangan"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1867,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Telefon PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Kunci rawak"
   },
   "muralpay.field.routing-number": {
     "message": "Nombor penghalaan"
@@ -1856,9 +1931,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Masukkan nombor akaun"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Masukkan kod cawangan"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Masukkan CLABE 18 digit"
   },
@@ -1870,6 +1942,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Masukkan e-mel PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Masukkan kunci rawak"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Masukkan nombor penghalaan 9 digit"
@@ -1998,7 +2073,7 @@
     "message": "Koleksi"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {muat turun}}"
+    "message": "{count} {countPlural, plural, other {muat turun}}"
   },
   "profile.label.joined": {
     "message": "Telah menyertai"
@@ -2019,7 +2094,7 @@
     "message": "Organisasi"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {projek}}"
+    "message": "{count} {countPlural, plural, other {projek}}"
   },
   "profile.label.saving": {
     "message": "Sedang menyimpan..."
@@ -2085,7 +2160,7 @@
     "message": "Cadangan"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Lawat laman penyederhanaan"
+    "message": "Kunjungi laman penyederhanaan"
   },
   "project-moderation-nags.warning": {
     "message": "Amaran"
@@ -2101,6 +2176,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Pek Data"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Pelayan"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Pelayan"
   },
   "project-type.mod.plural": {
     "message": "Mod"
@@ -2131,6 +2212,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pek Sumber"
+  },
+  "project-type.server.plural": {
+    "message": "Pelayan"
+  },
+  "project-type.server.singular": {
+    "message": "Pelayan"
   },
   "project-type.shader.plural": {
     "message": "Pembayang"
@@ -2346,7 +2433,7 @@
     "message": "Tetapan"
   },
   "project.settings.visit-dashboard": {
-    "message": "Lawat papan pemuka projek"
+    "message": "Kunjungi papan pemuka projek"
   },
   "project.stats.downloads-label": {
     "message": "muat turun{count, plural, other {}}"
@@ -2631,7 +2718,7 @@
     "message": "Tulis laporan"
   },
   "scopes.sessionAccess.description": {
-    "message": "Mengakses sesi keluaran modrinth"
+    "message": "Mengakses sesi keluaran Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Akses sesi"
@@ -2729,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Selaraskan dengan pelayan"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "Penciptaan sandaran sedang dijalankan"
+  },
+  "servers.busy.backup-restoring": {
     "message": "Pemulihan sandaran sedang dijalankan"
+  },
+  "servers.busy.installing": {
+    "message": "Pelayan sedang dipasang"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Penyegerakan kandungan sedang dijalankan"
   },
   "servers.notice.actions": {
     "message": "Tindakan"
@@ -2954,6 +3050,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Halaman Pek Sumber"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Halaman Pelayan"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Halaman Pembayang"
   },
@@ -3006,7 +3105,7 @@
     "message": "Cipta PAT"
   },
   "settings.pats.description": {
-    "message": "PAT boleh digunakan untuk mengakses API Modrinth. Untuk mendapatkan maklumat lanjut, lihat <doc-link>Dokumentasi API Modrinth</doc-link>. Ia boleh dibuat dan dibatalkan pada bila-bila masa."
+    "message": "PAT boleh digunakan untuk mengakses API Modrinth. Ia boleh dicipta dan dibatalkan pada bila-bila masa. Untuk maklumat lanjut, lihat <doc-link>Dokumentasi API Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Cipta PAT"

@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Opciones de descarga"
   },
-  "app-marketing.download.terms": {
-    "message": "Al descargar la aplicación Modrinth, aceptas nuestros <terms-link>Términos</terms-link> y nuestra <privacy-link>Política de Privacidad</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Descargar la aplicación Modrinth (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "¡La aplicación Modrinth funciona mejor que muchos de los principales gestores de mods, y solo utiliza 150mb de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "No hay proyectos en colección todavía"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aún no hay proyectos} one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Actualizado hace {ago}"
   },
@@ -497,6 +488,9 @@
   "create.project.create-project": {
     "message": "Crear proyecto"
   },
+  "create.project.create-server-project": {
+    "message": "Crear servidor"
+  },
   "create.project.name-label": {
     "message": "Nombre"
   },
@@ -553,9 +547,6 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proyecto} other {{count} proyectos}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Buscar en tus colecciones"
@@ -631,9 +622,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Una entidad comercial se refiere a una organización registrada, como una corporación, sociedad o LLC."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "¿Estás realizando el retiro como particular o como empresa?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Persona física"
@@ -1106,9 +1094,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "¿Los servidores de Modrinth Hosting tienen protección DDoS?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Sí. Todos los servidores de Modrinth Hosting tienen protección DDos, hasta 17Tbps de capacidad en algunas ubicaciones."
-  },
   "hosting-marketing.faq.heading": {
     "message": "F.A.Q"
   },
@@ -1213,9 +1198,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "¿Sabes exactamente lo que necesitas?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Prueba gratuitamente un <orange>servidor de 3 Gb</orange> por 5 días proporcionado por <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Aprender más"
@@ -1400,9 +1382,6 @@
   "landing.section.for-players.label": {
     "message": "Para Jugadores"
   },
-  "landing.section.for-players.tagline": {
-    "message": "Descubre más de {count} creaciones"
-  },
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
   },
@@ -1432,6 +1411,12 @@
   },
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
+  },
+  "layout.action.new-server-project": {
+    "message": "Nuevo servidor"
+  },
+  "layout.action.publish": {
+    "message": "Publicar"
   },
   "layout.action.reports": {
     "message": "Revisar informes"
@@ -1763,9 +1748,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Número de cuenta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Código de sucursal"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1855,9 +1837,6 @@
   },
   "muralpay.placeholder.enter-account-number": {
     "message": "Introduce tú número de cuenta"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Ingrese el código de sucursal"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Ingrese el CLABE de 18 dígitos"
@@ -1997,9 +1976,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió hace"
   },
@@ -2017,9 +1993,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -2102,6 +2075,12 @@
   "project-type.datapack.singular": {
     "message": "Paquete de datos"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Servidor"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2110,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Paquete de recursos"
+  },
+  "project-type.server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.server.singular": {
+    "message": "Servidor"
   },
   "project-type.shader.plural": {
     "message": "Sombreadores"
@@ -2729,9 +2714,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restauración de copia de seguridad en curso"
-  },
   "servers.notice.actions": {
     "message": "Acciones"
   },
@@ -2784,7 +2766,7 @@
     "message": "Añadir más"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Agregar una URI de redireccionamiento"
+    "message": "Añadir una URI de redirección"
   },
   "settings.applications.button.cancel": {
     "message": "Cancelar"
@@ -2847,7 +2829,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Redirigir URI"
+    "message": "URIs de redirección"
   },
   "settings.applications.field.scopes": {
     "message": "Ámbitos"
@@ -2954,6 +2936,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Página de Paquetes de Recursos"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Página de servidores"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Página de Shaders"
   },
@@ -3006,7 +2991,7 @@
     "message": "Crear un PAT"
   },
   "settings.pats.description": {
-    "message": "Los PAT se pueden utilizar para acceder a la API de Modrinth. Para obtener más información, consulte <doc-link>la documentación de la API de Modrinth</doc-link>. Se pueden crear y revocar en cualquier momento."
+    "message": "Se pueden usar PAT para acceder a la API de Modrinth. Se pueden crear y revocar en cualquier momento. Para más información, ver la <doc-link>documentación de la API de Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Crear Pat"

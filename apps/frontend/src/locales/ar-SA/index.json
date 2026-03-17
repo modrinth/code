@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "خيارات التنزيل"
   },
-  "app-marketing.download.terms": {
-    "message": "خلال تنزيل Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "تنزيل Modrinth App (النسخة التجريبية)"
   },
@@ -107,9 +104,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
-  "app-marketing.features.performance.description": {
-    "message": "يعمل Modrinth App بشكل أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
   },
@@ -129,7 +123,7 @@
     "message": "< 150 ميغابايت"
   },
   "app-marketing.features.performance.modrinth-app": {
-    "message": "Modrinth App"
+    "message": "تطبيق مودرينث"
   },
   "app-marketing.features.performance.one-billion-percent": {
     "message": "% 1 مليار"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "لا توجد مشروعات في هذه المجموعة حتي الآن"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {لا توجد مشاريع بعد} one {<stat>{count}</stat> مشروع} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
   },
@@ -554,9 +545,6 @@
   "dashboard.collections.button.create-new": {
     "message": "إنشاء جديد"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": ""
-  },
   "dashboard.collections.label.search-input": {
     "message": "ابحث في مجموعاتك"
   },
@@ -632,9 +620,6 @@
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "تشير الكيان التجاري إلى منظمة مسجلة مثل شركة مساهمة أو شراكة أو شركة ذات مسؤولية محدودة."
   },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "هل تقوم بالسحب كفرد أم كشركة؟"
-  },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "فرد خاص"
   },
@@ -665,20 +650,353 @@
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "مالك الحساب"
   },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "صاحب حساب المصرف"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner-description": {
+    "message": "أدخل اسم الشخص المسموح له بتشغيل حساب المصرف هذا, نيابة عن الشركة."
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "عملة"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "تأكيد عنوان محفظتك "
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id": {
+    "message": "رقم الهوية الوطنية "
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
+    "message": "أدخل رقم الهوية الوطنية "
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "رقم جواز السفر"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
+    "message": "أدخل رقم جواز السفر"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
+    "message": "رقم هوية المقيم"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
+    "message": "أدخل رقم هوية المقيم"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
+    "message": "رقم RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
+    "message": "أدخل رقم RUC"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
+    "message": ""
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id-placeholder": {
+    "message": ""
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "شبكة"
+  },
+  "dashboard.creator-withdraw-modal.nearing-threshold": {
+    "message": "أنت تقترب من الحد الأقصى للسحب. يمكنك سحب <b>{amountRemaining}</b> الآن، ولكن يلزم تقديم نموذج ضريبي لسحب مبلغ أكبر."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.account": {
+    "message": "الحساب"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.disconnect-account": {
+    "message": "قم بفصل الحساب"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.payment-method": {
+    "message": "طريقة الدفع"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
+    "message": "حساب PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "قم بربط حسابك على باي بال لتلقي المدفوعات مباشرة."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.save-success": {
+    "message": "تم حفظ اسم المستخدم على Venmo بنجاح!"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "تسجيل دخول باستخدام PayPal"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-description": {
+    "message": "أدخل اسم المستخدم الخاص بك على Venmo لتلقي المدفوعات."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle": {
+    "message": "اسم المستخدم على Venmo"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@اسم المستخدم"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "مكتمل"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "طريقة"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "طريقة أيجار"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body": {
+    "message": "لسحب رصيدك المتاح بالكامل <b>{available}</b> يرجى تعبئة النموذج أدناه. هذا النموذج مطلوب لأغراض الإبلاغ الضريبي، ولا يلزم تعبئته إلا مرة واحدة."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.body-with-limit": {
+    "message": "يجب عليك إكمال نموذج W-9 أو W-8 لسجلات الضرائب الخاصة بشركة Modrinth حتى نبقى ملتزمين باللوائح الضريبية."
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "نموذج ضريبي مطلوب"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
+    "message": "الفئات المتاحة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
+    "message": "رصيدك الحالي من {usdBalance} يساوي {localBalance}."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "ابحث عن بطاقة هداية قريبة من هذه قيمة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "ضع مبلغ"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "طريقة دفع"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "جائزة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "اختر الجائزة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "جوائز"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.search-amount-label": {
+    "message": "ابحث عن مبلغ"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-hint": {
+    "message": "اختر فئة:"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.select-denomination-required": {
+    "message": "الرجاء اختيار فئة نقدية للمتابعة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "ايميل غير مؤكد"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
+    "message": "البريد الإلكتروني الذي أدخلته لا يرتبط بحسابك في Modrinth. لا يمكن Modrinth استرداد المكافآت المرسلة إلى عنوان بريد إلكتروني غير صحيح."
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "تتوفر أقساط مخفضة"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
+    "message": "لقد اخترت الدولار الأمريكي للدفع الدولي عبر باي بال. <direct-paypal-link>انتقل إلى باي بال المباشر</direct-paypal-link> للحصول على رسوم أفضل (حوالي 2% بدلاً من حوالي 6%)."
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "ينسحب "
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit": {
+    "message": "حد السحب "
+  },
+  "dashboard.creator-withdraw-modal.withdraw-limit-used": {
+    "message": "لقد استنفدت رصيدك <b>{withdrawLimit}</b> حد السحب. يجب عليك تعبئة نموذج ضريبي لسحب مبلغ أكبر."
+  },
   "dashboard.revenue.available-now": {
     "message": "متاح الآن"
   },
   "dashboard.revenue.balance": {
     "message": "الرصيد"
   },
+  "dashboard.revenue.estimated-tooltip.msg1": {
+    "message": "قد تخضع الإيرادات المقدرة للتغيير حتى يتم توفيرها. "
+  },
+  "dashboard.revenue.estimated-tooltip.msg2": {
+    "message": "اضغط لكي تعرف كيف Modrinth يستحمل إيراداتك"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "مقدر {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "معالجة"
+  },
+  "dashboard.revenue.processing.tooltip": {
+    "message": "تبقى الإيرادات قيد المعالجة حتى نهاية الشهر، ثم تصبح متاحة بعد 60 يومًا. "
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "تلقى "
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": ""
+  },
+  "dashboard.revenue.stats.withdrawn": {
+    "message": "تم سحبه "
+  },
+  "dashboard.revenue.tos": {
+    "message": "بتحميل المشاريع إلى مودرينث وسحب الأموال من حسابك، فإنك توافق على <terms-link> المكافآت. تعرّف على المزيد حول </info-link> برنامج المكافآت. "
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "قم بالتنزيل كملف CSV "
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "المعاملات "
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "لا توجد معاملات "
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "ستظهر علميات الدفع والسحب الخاصة بك هنا."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": ""
+  },
+  "dashboard.revenue.withdraw.blocked-tin-mismatch": {
+    "message": "تم تعليق عمليات السحب مؤقتًا لأن رقم التعريف الضريبي أو رقم الضمان الاجتماعي الخاص بك لم يتطابق مع سجلات مصلحة الضرائب الأمريكية. يرجى التواصل مع الدعم لإعادة تعيين رقم التعريف الضريبي وإعادة إرسال نموذجك الضريبي. "
+  },
+  "dashboard.revenue.withdraw.card.description": {
+    "message": "اسحب من رصيدك المتاح إلى أي طريقة دفع. "
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "ينسحب"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "ينسحب "
+  },
+  "dashboard.withdraw.completion.account": {
+    "message": "الحساب"
+  },
+  "dashboard.withdraw.completion.amount": {
+    "message": "مبلغ"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "موعد"
+  },
+  "dashboard.withdraw.completion.email-confirmation": {
+    "message": "ستتلقى رسالة بريد إلكتروني في <b>{email}<b> مع تعليمات لاسترداد المبلغ المسحوب. "
+  },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "سعر الصرف "
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "مصاريف "
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "طريقة "
+  },
+  "dashboard.withdraw.completion.net-amount": {
+    "message": "المبلغ الصافي "
+  },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "المستلم "
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "انسحاب كامل "
+  },
+  "dashboard.withdraw.completion.transactions-button": {
+    "message": "المعاملات"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "محفضة"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "يرجى ربط حساب الدفع الخاص بك قبل السحب."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "حساب غير مربوط"
+  },
+  "dashboard.withdraw.error.email-verification.text": {
+    "message": "يجب عليك التحقق من عنوان بريدك الإلكتروني قبل سحب الأموال."
+  },
+  "dashboard.withdraw.error.email-verification.title": {
+    "message": "تحقق باستخدام ايميل مطلوب"
+  },
+  "dashboard.withdraw.error.generic.text": {
+    "message": "لم نتمكن من إرسال طلب السحب الخاص بك، يرجى مراجعة بياناتك أو الاتصال بالدعم.\n{error}"
+  },
+  "dashboard.withdraw.error.generic.title": {
+    "message": "تعذر السحب"
+  },
+  "dashboard.withdraw.error.insufficient-balance.text": {
+    "message": "ليس لديك أموال كافية لإجراء هذا السحب."
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "رصيد غير كافٍ"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "لم يتم التحقق من العنوان الذي قدمته. يرجى مراجعة تفاصيل عنوانك."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "فشل التحقق من العنوان"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "بيانات الحساب البنكي التي قدمتها غير صحيحة. يرجى التحقق من معلوماتك."
+  },
+  "dashboard.withdraw.error.invalid-bank.title": {
+    "message": "بيانات مصرفية غير صحيحة"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "عنوان محفظة العملات الرقمية الذي أدخلته غير صالح. يرجى التحقق مرة أخرى والمحاولة مجدداً."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "عنوان محفظة غير صالح"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "مبلغ السحب (بعد خصم الرسوم) لا يفي بالحد الأدنى المطلوب. يرجى زيادة مبلغ السحب."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "المبلغ منخفض للغاية"
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.text": {
+    "message": "يرجى استخدام خيار التحويل الصحيح عبر PayPal لمنطقتك (الولايات المتحدة أو دوليًا)."
+  },
+  "dashboard.withdraw.error.paypal-country-mismatch.title": {
+    "message": "عدم تطابق المنطقة في PayPal"
+  },
+  "dashboard.withdraw.error.tax-form.text": {
+    "message": "يجب عليك تعبئة نموذج ضريبي لتقديم طلب السحب الخاص بك."
+  },
+  "dashboard.withdraw.error.tax-form.title": {
+    "message": "يرجى تعبئة نموذج الضريبة"
+  },
+  "error.collection.404.list_item.1": {
+    "message": "ربما تكون قد أخطأت في كتابة عنوان URL الخاص بالمجموعة."
+  },
+  "error.collection.404.list_item.2": {
+    "message": "قد تكون المجموعة خاصة."
+  },
   "error.collection.404.list_item.3": {
     "message": "قد تكون هذه المجموعة قد أزالها فريق مراقبة مودرنث لانتهاك <tou-link>شروط الاستخدام</tou-link> الخاصة بنا."
+  },
+  "error.collection.404.list_title": {
+    "message": "لماذا؟"
+  },
+  "error.collection.404.title": {
+    "message": "لم يتم العثور على المجموعة"
+  },
+  "error.generic.404.subtitle": {
+    "message": "يبدو أن الصفحة التي كنت تبحث عنها غير موجودة."
+  },
+  "error.generic.404.title": {
+    "message": "الصفحة غير موجودة"
+  },
+  "error.generic.451.subtitle": {
+    "message": "تم حظر هذه الصفحة لأسباب قانونية، مثل الرقابة الحكومية أو الإجراءات القانونية الجارية."
+  },
+  "error.generic.451.title": {
+    "message": "المحتوى غير متاح لأسباب قانونية"
   },
   "error.generic.default.list_item.1": {
     "message": "تحقق مما إذا كان مودرنث متوقفًا على <status-link>صفحة الحالة</status-link> الخاصة بنا."
   },
   "error.generic.default.list_item.2": {
     "message": "إذا استمر حدوث ذلك، قد ترغب في إعلام فريق مودرنث بالانضمام إلى <discord-link>سيرفر ديسكورد</discord-link> الخاص بنا."
+  },
+  "error.generic.default.list_title": {
+    "message": "يرجى المحاولة مرة أخرى بعد بضع دقائق."
+  },
+  "error.generic.default.subtitle": {
+    "message": "حدث خطأ ما."
+  },
+  "error.generic.default.title": {
+    "message": "أوه لا!"
   },
   "error.organization.404.list_item.1": {
     "message": "ربما أدخلت عنوان URL الخاص بالمؤسسة بشكل غير صحيح."
@@ -728,17 +1046,146 @@
   "frog": {
     "message": "لقد تم ضفدعتك! 🐸"
   },
+  "hosting-marketing.billing.save-with-quarterly": {
+    "message": "وفر 16% مع الدفع ربع السنوي!"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "تعمل استضافة خوادم مودرينث على AMD Ryzen 7900 و 7950X3D و وحدات معالجة مركزية مماثلة بسرعة 5+ غيغاهيرتز مقترنة بذاكرة وصول عشوائي من نوع DDR5"
+  },
+  "hosting-marketing.faq.location": {
+    "message": "أين تقع استضافة خوادم Modrinth؟ هل يمكنني اختيار منطقة؟"
+  },
+  "hosting-marketing.included.description": {
+    "message": "."
+  },
+  "hosting-marketing.included.with-your-server": {
+    "message": "مرفق مع خادمك"
+  },
+  "hosting-marketing.know-what-you-need": {
+    "message": "هل تعرف بالضبط ما تحتاجه؟"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "عرض لفترة محدودة. لا حاجة لبطاقة ائتمان. متوفر للخوادم الأمريكية."
+  },
+  "hosting-marketing.pick-customized-plan": {
+    "message": "اختر خطة مخصصة بالمواصفات التي تحتاجها فقط."
+  },
+  "hosting-marketing.server-for-everyone": {
+    "message": "يوجد خادم يناسب الجميع"
+  },
+  "hosting-marketing.why.all-on-modrinth": {
+    "message": "يمكنك إدارة كل شيء على مودرينث"
+  },
+  "hosting-marketing.why.all-on-modrinth.description": {
+    "message": "خادمك، وتعديلاتك، ولاعبوك، وغير ذلك الكثير موجود جميعها على Modrinth. لا حاجة للتبديل بين المنصات."
+  },
+  "hosting-marketing.why.consistently-fast": {
+    "message": "سريع باستمرار"
+  },
+  "hosting-marketing.why.consistently-fast.description": {
+    "message": "لا يتم تحميل بنيتنا التحتية بشكل زائد أبدًا، مما يعني أن كل خادم مستضاف مع Modrinth يعمل دائمًا بكامل طاقته."
+  },
+  "hosting-marketing.why.description": {
+    "message": "اختر من بين آلاف حزم التعديلات المتوفرة على موقع Modrinth أو أنشئ حزمتك الخاصة. ادعُ أصدقاءك عندما تكون مستعدًا للعب."
+  },
+  "hosting-marketing.why.heading": {
+    "message": "ابحث عن حزمة تعديلات. الآن أصبح خادمًا."
+  },
+  "hosting-marketing.why.modern-reliable-hosting": {
+    "message": "استمتع بتجربة استضافة عصرية وموثوقة"
+  },
+  "hosting-marketing.why.modern-reliable-hosting.description": {
+    "message": "يتم استضافة خوادم Modrinth Hosting على <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>، وتعمل على برمجيات مخصّصة لضمان تشغيل خادمك بسلاسة."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "العب حيث توجد تعديلاتك"
+  },
+  "hosting-marketing.why.where-mods-are.description": {
+    "message": "تدمج خدمة Modrinth Hosting عملية تثبيت التعديلات وحزم التعديلات بسلاسة في خادمك."
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "لماذا استضافة Modrinth؟"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "جميع التعديلات المفضلة لديك"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "اختر بين Vanilla و Fabric و Forge و Quilt و NeoForge. إذا كان البرنامج موجودًا على Modrinth، فيمكن تشغيله على خادمك."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "إنتهى من المخزن"
+  },
+  "hosting.plan.select-plan": {
+    "message": "اختر الخطة"
+  },
   "landing.button.discover-mods": {
     "message": "اكتشف المودات"
+  },
+  "landing.button.go-to-dashboard": {
+    "message": "انتقل إلى لوحة التحكم"
   },
   "landing.creator.feature.constantly-evolving.description": {
     "message": "احصل على أفضل تجربة مودات ممكنة مع تحديثات مستمرة من فريق مودرنث"
   },
+  "landing.creator.feature.constantly-evolving.title": {
+    "message": "يتطور باستمرار"
+  },
+  "landing.creator.feature.data-statistics.description": {
+    "message": "احصل على تقارير مفصلة حول عدد مشاهدات الصفحات، وعدد التنزيلات، والإيرادات"
+  },
+  "landing.creator.feature.data-statistics.title": {
+    "message": "البيانات والإحصاءات"
+  },
+  "landing.creator.feature.discovery.description": {
+    "message": "اجعل مشروعك معروفًا لدى آلاف المستخدمين من خلال البحث، وصفحتنا الرئيسية، وخادم Discord، والمزيد من الطرق التي ستأتي في المستقبل!"
+  },
+  "landing.creator.feature.discovery.title": {
+    "message": "اكتشاف"
+  },
+  "landing.creator.feature.diverse-ecosystem.description": {
+    "message": "قم بالتكامل مع أدوات البناء الخاصة بك من خلال Minotaur لتحميل الملفات تلقائيًا فور إصدار نسخة جديدة."
+  },
+  "landing.creator.feature.diverse-ecosystem.title": {
+    "message": "نظام بيئي متنوع"
+  },
+  "landing.creator.feature.monetization.description": {
+    "message": "احصل على عائدات إعلانية مدفوعة من صفحات مشروعك واسحب أموالك في أي وقت"
+  },
+  "landing.creator.feature.monetization.title": {
+    "message": "تحقيق الربح"
+  },
+  "landing.creator.feature.team-management.description": {
+    "message": "قم بدعوة زملائك في الفريق وإدارة الأدوار والصلاحيات بسهولة"
+  },
+  "landing.creator.feature.team-management.title": {
+    "message": "إدارة الفريق"
+  },
+  "landing.error.failedToLoadRandomProjects": {
+    "message": "فشل تحميل المشاريع العشوائية :("
+  },
+  "landing.feature.follow.description": {
+    "message": "احصل على إشعارات في كل مرة يتم فيها تحديث مشاريعك المفضلة وابقَ على اطلاع دائم."
+  },
+  "landing.feature.follow.heading": {
+    "message": "تابع المشاريع التي تحبها"
+  },
   "landing.feature.launcher.description": {
     "message": "واجهة برمجة التطبيقات مفتوحة المصدر لمودرنث تتيح للّانشرات إضافة تكامل عميق مع مودرنث. يمكنك استخدام مودرنث من خلال <link>تطبيقنا الخاص</link> وبعض أشهر اللانشرات مثل ATLauncher وMultiMC وPrism Launcher."
   },
+  "landing.feature.launcher.heading": {
+    "message": "استمتع باللعب باستخدام مشغل الألعاب المفضل لديك"
+  },
   "landing.feature.search.description": {
     "message": "تتيح لك ميزة البحث السريع والفلاتر القوية في مودرنث العثور على ما تريد أثناء الكتابة."
+  },
+  "landing.feature.search.heading": {
+    "message": "اعثر على ما تريد، بسرعة وسهولة"
+  },
+  "landing.heading.the-place-for-minecraft": {
+    "message": "المكان المناسب لمحتوى Minecraft {content}"
+  },
+  "landing.heading.the-place-for-minecraft.data-packs": {
+    "message": "داتاباك"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
     "message": "حزم المودات"
@@ -746,11 +1193,56 @@
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "مودات"
   },
+  "landing.heading.the-place-for-minecraft.plugins": {
+    "message": "بلوقن"
+  },
+  "landing.heading.the-place-for-minecraft.resource-packs": {
+    "message": "ريسورس باك"
+  },
+  "landing.heading.the-place-for-minecraft.servers": {
+    "message": "سيرفرات"
+  },
+  "landing.heading.the-place-for-minecraft.shaders": {
+    "message": "شادرز"
+  },
+  "landing.launcher.atlauncher-label": {
+    "message": "ATLauncher"
+  },
   "landing.launcher.graphic-alt": {
     "message": "تمثيل مبسط لنافذة ماين كرافت، مع شعار Mojang Studios باللون الأخضر الخاص بمودرنث."
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
+  },
+  "landing.launcher.prism-launcher-label": {
+    "message": "Prism Launcher"
+  },
+  "landing.notifications.has-been-updated": {
+    "message": "تم تحديث {title}!"
+  },
+  "landing.notifications.heading": {
+    "message": "إشعارات"
+  },
+  "landing.notifications.received-time": {
+    "message": "تم الاستلام في {time}"
+  },
+  "landing.notifications.version-released": {
+    "message": "تم إصدار النسخة {version} لجهاز {gameVersion}"
+  },
+  "landing.section.for-creators.description": {
+    "message": "Give an online home to your creations and reach a massive audience of dedicated players."
+  },
+  "landing.section.for-creators.label": {
+    "message": ""
+  },
+  "landing.section.for-creators.tagline": {
+    "message": ""
+  },
+  "landing.section.for-players.label": {
+    "message": "للاعبين"
+  },
+  "landing.subheading": {
+    "message": "اكتشف محتوى Minecraft والعب وشاركه من خلال منصتنا مفتوحة المصدر المصممة خصيصًا للمجتمع."
   },
   "layout.banner.add-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك تسجيل عنوان بريد إلكتروني في حسابك."
@@ -767,16 +1259,70 @@
   "layout.banner.verify-email.description": {
     "message": "لأسباب أمنية، يحتاج مودرنث منك التحقق من عنوان البريد الإلكتروني المرتبط بحسابك."
   },
+  "layout.footer.about": {
+    "message": "حول"
+  },
+  "layout.footer.about.careers": {
+    "message": "الوظائف"
+  },
+  "layout.footer.about.changelog": {
+    "message": "سجل التغييرات"
+  },
+  "layout.footer.about.news": {
+    "message": "أخبار"
+  },
+  "layout.footer.about.rewards-program": {
+    "message": "برنامج المكافآت"
+  },
+  "layout.footer.about.status": {
+    "message": "حالة"
+  },
+  "layout.footer.legal": {
+    "message": "قانوني"
+  },
+  "layout.footer.legal-disclaimer": {
+    "message": "ليست خدمة رسمية من خدمات MINECRAFT. غير معتمدة من قبل MOJANG أو MICROSOFT، وليست مرتبطة بهما."
+  },
+  "layout.footer.legal.copyright-policy": {
+    "message": "سياسة حقوق النشر و DMCA"
+  },
+  "layout.footer.legal.privacy-policy": {
+    "message": "سياسة الخصوصية"
+  },
+  "layout.footer.legal.rules": {
+    "message": "قواعد المحتوى"
+  },
+  "layout.footer.legal.security-notice": {
+    "message": "إشعار أمني"
+  },
+  "layout.footer.legal.terms-of-use": {
+    "message": "شروط الاستخدام"
+  },
   "layout.footer.modrinth-information": {
-    "message": "معلومات مودرنث"
+    "message": "معلومات Modrinth"
   },
   "layout.footer.open-source": {
-    "message": "مودرنث <github-link>مفتوح المصدر</github-link>."
+    "message": "Modrinth <github-link>مفتوح المصدر</github-link>."
+  },
+  "layout.footer.products": {
+    "message": "منتجات"
   },
   "layout.footer.products.app": {
     "message": "Modrinth App"
   },
   "layout.footer.products.plus": {
-    "message": "مودرنث+"
+    "message": "Modrinth+"
+  },
+  "layout.footer.products.servers": {
+    "message": "استضافة Modrinth"
+  },
+  "layout.footer.resources": {
+    "message": "موارد"
+  },
+  "layout.footer.resources.api-docs": {
+    "message": "وثائق واجهة برمجة التطبيقات API"
+  },
+  "layout.footer.resources.help-center": {
+    "message": "مركز المساعدة"
   }
 }

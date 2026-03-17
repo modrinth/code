@@ -1,7 +1,6 @@
 use crate::database::models::DelphiReportIssueDetailsId;
 use crate::env::ENV;
 use crate::file_hosting::FileHostingError;
-use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
 use actix_cors::Cors;
 use actix_files::Files;
@@ -16,7 +15,7 @@ pub mod v2;
 pub mod v2_reroute;
 pub mod v3;
 
-mod analytics;
+pub mod analytics;
 mod index;
 mod maven;
 mod not_found;
@@ -57,8 +56,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                     ])
                     .max_age(3600),
             )
-            .service(page_view_ingest)
-            .service(playtime_ingest),
+            .configure(analytics::config),
     );
     cfg.service(
         web::scope("api/v1")
@@ -95,8 +93,6 @@ pub enum ApiError {
     Auth(eyre::Report),
     #[error("Invalid input: {0}")]
     InvalidInput(String),
-    #[error("Environment error")]
-    Env(#[from] dotenvy::Error),
     #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
     #[error("database error")]
@@ -119,8 +115,6 @@ pub enum ApiError {
     Validation(String),
     #[error("Search error: {0}")]
     Search(#[from] meilisearch_sdk::errors::Error),
-    #[error("search indexing error")]
-    Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Payments error: {0}")]
     Payments(String),
     #[error("Discord error: {0}")]
@@ -178,7 +172,6 @@ impl ApiError {
                 Self::Internal(..) => "internal_error",
                 Self::Request(..) => "request_error",
                 Self::Auth(..) => "auth_error",
-                Self::Env(..) => "environment_error",
                 Self::Database(..) => "database_error",
                 Self::SqlxDatabase(..) => "database_error",
                 Self::RedisDatabase(..) => "database_error",
@@ -187,7 +180,6 @@ impl ApiError {
                 Self::Xml(..) => "xml_error",
                 Self::Json(..) => "json_error",
                 Self::Search(..) => "search_error",
-                Self::Indexing(..) => "indexing_error",
                 Self::FileHosting(..) => "file_hosting_error",
                 Self::InvalidInput(..) => "invalid_input",
                 Self::Validation(..) => "invalid_input",
@@ -216,9 +208,9 @@ impl ApiError {
                 }
             },
             description: match self {
-                Self::Internal(e) => format!("{e:#?}"),
-                Self::Request(e) => format!("{e:#?}"),
-                Self::Auth(e) => format!("{e:#?}"),
+                Self::Internal(e) => format!("{e:#}"),
+                Self::Request(e) => format!("{e:#}"),
+                Self::Auth(e) => format!("{e:#}"),
                 _ => self.to_string(),
             },
             details: match self {
@@ -243,7 +235,6 @@ impl actix_web::ResponseError for ApiError {
             Self::Request(..) => StatusCode::BAD_REQUEST,
             Self::Auth(..) => StatusCode::UNAUTHORIZED,
             Self::InvalidInput(..) => StatusCode::BAD_REQUEST,
-            Self::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::RedisDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -253,7 +244,6 @@ impl actix_web::ResponseError for ApiError {
             Self::Xml(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Json(..) => StatusCode::BAD_REQUEST,
             Self::Search(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::Indexing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
             Self::Validation(..) => StatusCode::BAD_REQUEST,
             Self::Payments(..) => StatusCode::FAILED_DEPENDENCY,

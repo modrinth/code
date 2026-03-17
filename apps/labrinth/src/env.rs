@@ -82,6 +82,7 @@ where
 }
 
 pub fn init() -> eyre::Result<()> {
+    dotenvy::dotenv().ok();
     EnvVars::from_env()?;
     LazyLock::force(&ENV);
     Ok(())
@@ -128,9 +129,6 @@ vars! {
     LABRINTH_EXTERNAL_NOTIFICATION_KEY: String;
     RATE_LIMIT_IGNORE_KEY: String;
     DATABASE_URL: String;
-    MEILISEARCH_READ_ADDR: String;
-    MEILISEARCH_WRITE_ADDRS: StringCsv;
-    MEILISEARCH_KEY: String;
     REDIS_URL: String;
     BIND_ADDR: String;
     SELF_ADDR: String;
@@ -141,6 +139,20 @@ vars! {
     WHITELISTED_MODPACK_DOMAINS: Json<Vec<String>>;
     ALLOWED_CALLBACK_URLS: Json<Vec<String>>;
     ANALYTICS_ALLOWED_ORIGINS: Json<Vec<String>>;
+
+    // search
+    SEARCH_BACKEND: crate::search::SearchBackendKind = crate::search::SearchBackendKind::Typesense;
+    MEILISEARCH_READ_ADDR: String;
+    MEILISEARCH_WRITE_ADDRS: StringCsv;
+    MEILISEARCH_KEY: String;
+    ELASTICSEARCH_URL: String;
+    ELASTICSEARCH_INDEX_PREFIX: String;
+    ELASTICSEARCH_USERNAME: String = "";
+    ELASTICSEARCH_PASSWORD: String = "";
+    SEARCH_INDEX_CHUNK_SIZE: i64 = 5000i64;
+    TYPESENSE_URL: String = "http://localhost:8108";
+    TYPESENSE_API_KEY: String = "modrinth";
+    TYPESENSE_INDEX_PREFIX: String = "labrinth";
 
     // storage
     STORAGE_BACKEND: crate::file_hosting::FileHostKind;
@@ -242,8 +254,6 @@ vars! {
     ANROK_API_URL: String;
     ANROK_API_KEY: String;
 
-    COMPLIANCE_PAYOUT_THRESHOLD: String;
-
     PAYOUT_ALERT_SLACK_WEBHOOK: String;
     CLOUDFLARE_INTEGRATION: bool = false;
 
@@ -277,4 +287,10 @@ vars! {
     DELPHI_SLACK_WEBHOOK: String = "";
 
     TREMENDOUS_CAMPAIGN_ID: String = "";
+
+    // server pinging
+    SERVER_PING_MAX_CONCURRENT: usize = 16usize;
+    SERVER_PING_RETRIES: usize = 3usize;
+    SERVER_PING_MIN_INTERVAL_SEC: u64 = 30u64 * 60;
+    SERVER_PING_TIMEOUT_MS: u64 = 3u64 * 1000;
 }

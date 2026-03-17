@@ -305,17 +305,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukendt gamemode"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Frakoble modpack"
-  },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nuværrende"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Inkompatibel"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Nedgrader til v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Opdater version"
@@ -337,15 +331,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Vis inkompatible"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Opdater til v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din instance. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Vi kan ikke garantere opdateringer er sikre for din verdener. Se på ændringslogen for alle mellemliggende versioner og overvej en sikkerhedskopi."
   },
   "label.actions": {
     "defaultMessage": "Handlinger"
@@ -415,9 +400,6 @@
   },
   "label.password": {
     "defaultMessage": "Adgangskode"
-  },
-  "label.played": {
-    "defaultMessage": "Spillet {time}"
   },
   "label.project": {
     "defaultMessage": "Projekt"
@@ -782,14 +764,8 @@
   "project.about.links.wiki": {
     "defaultMessage": "Besøg wiki"
   },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Klient og server, krav på begge"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Klient og server, valgfri på server"
@@ -800,9 +776,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Klient-sided kun"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient og server, bedst når installeret på begge"
   },
@@ -812,20 +785,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Klient og server, valgfri på begge"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Al' funktionalitet er lavet på serveren og er kompatibel med vanilla klienter."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Server-sided kun"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Har noget funktionalitet på både klienten og serveren, også selvom det kun er lidt."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Klient og server, valgfri på klient"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "Al' funktionalitet er lavet på serveren og er kompatibel med vanilla klienter."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Server-sided kun, virker i singleplayer også"
@@ -1085,9 +1049,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhedskopiering plan"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Tager sikkerhedskopiering..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Fejlede sikkerhedskopiering"
   },
@@ -1097,20 +1058,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuel sikkerhedskopiering"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Sikkerhedskopiering sat i kø"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Genopretning sat i klø"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Ændre navn"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Genopret"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Genopretter fra sikkerhedskopi..."
   },
   "servers.notice.heading.info": {
     "defaultMessage": "Information"
@@ -1221,10 +1173,13 @@
     "defaultMessage": "app"
   },
   "settings.language.platform.site": {
-    "defaultMessage": "side"
+    "defaultMessage": "hjemmeside"
   },
   "settings.language.title": {
     "defaultMessage": "Sprog"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Ændring af {platform} sproget kan gøre noget indhold bliver vist på engelsk hvis en oversættelse ikke er tilgænlig. {platform}en er ikke helt oversæt endnu, så noget indhold vil forblive på engelsk for nogle sprog."
   },
   "settings.pats.title": {
     "defaultMessage": "Personlige adgangstokens"

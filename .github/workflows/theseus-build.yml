@@ -21,6 +21,14 @@ on:
         type: boolean
         default: false
         required: false
+      environment:
+        description: Environment
+        type: choice
+        options:
+          - prod
+          - staging
+        default: prod
+        required: false
 
 jobs:
   build:
@@ -94,12 +102,14 @@ jobs:
         shell: bash
         run: |
           APP_VERSION="$(git describe --tags --always | sed -E 's/-([0-9]+)-(g[0-9a-fA-F]+)$/-canary+\1.\2/')"
+          BUILD_ENVIRONMENT="${{ inputs.environment || 'prod' }}"
           echo "Setting application version to $APP_VERSION"
+          echo "Using environment $BUILD_ENVIRONMENT"
           dasel put -f apps/app/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f packages/app-lib/Cargo.toml -t string -v "${APP_VERSION#v}" 'package.version'
           dasel put -f apps/app-frontend/package.json -t string -v "${APP_VERSION#v}" 'version'
 
-          cp packages/app-lib/.env.prod packages/app-lib/.env
+          cp "packages/app-lib/.env.${BUILD_ENVIRONMENT}" packages/app-lib/.env
 
       - name: Setup Turbo cache
         uses: rharkor/caching-for-turbo@v1.8

@@ -2,17 +2,31 @@ export function addReportMessage(thread, report) {
 	if (!thread || !report) {
 		return thread
 	}
-	if (
-		!thread.members.some((user) => {
-			return user.id === report.reporterUser.id
-		})
-	) {
-		thread.members.push(report.reporterUser)
+
+	const reporterId = report.reporterUser?.id ?? report.reporter
+	if (!reporterId) {
+		return thread
 	}
-	if (!thread.messages.some((message) => message.id === 'original')) {
-		thread.messages.push({
+
+	const members = Array.isArray(thread.members) ? [...thread.members] : []
+	const messages = Array.isArray(thread.messages) ? [...thread.messages] : []
+
+	let changed = false
+
+	if (
+		!members.some((user) => {
+			return user?.id === reporterId
+		}) &&
+		report.reporterUser
+	) {
+		members.push(report.reporterUser)
+		changed = true
+	}
+
+	if (!messages.some((message) => message?.id === 'original')) {
+		messages.push({
 			id: 'original',
-			author_id: report.reporterUser.id,
+			author_id: reporterId,
 			body: {
 				type: 'text',
 				body: report.body,
@@ -21,6 +35,16 @@ export function addReportMessage(thread, report) {
 			},
 			created: report.created,
 		})
+		changed = true
 	}
-	return thread
+
+	if (!changed) {
+		return thread
+	}
+
+	return {
+		...thread,
+		members,
+		messages,
+	}
 }

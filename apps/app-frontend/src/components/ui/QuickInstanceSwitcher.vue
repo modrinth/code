@@ -49,27 +49,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-	<NavButton
-		v-for="instance in recentInstances"
-		:key="instance.id"
-		v-tooltip.right="instance.name"
-		:to="`/instance/${encodeURIComponent(instance.path)}`"
-		class="relative"
-	>
-		<Avatar
-			:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
-			size="28px"
-			:tint-by="instance.path"
-			:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
-		/>
-		<div
-			v-if="instance.install_stage !== 'installed'"
-			class="absolute inset-0 flex items-center justify-center z-10"
-		>
-			<SpinnerIcon class="animate-spin w-4 h-4" />
-		</div>
-	</NavButton>
-	<div v-if="recentInstances.length > 0" class="h-px w-6 mx-auto my-2 bg-divider"></div>
+	<div v-for="instance in recentInstances" :key="instance.id" v-tooltip.right="instance.name">
+		<NavButton :to="`/instance/${encodeURIComponent(instance.path)}`" class="relative">
+			<Avatar
+				:src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+				size="28px"
+				:tint-by="instance.path"
+				:class="`transition-all ${instance.install_stage !== 'installed' ? `brightness-[0.25] scale-[0.85]` : `group-hover:brightness-75`}`"
+			/>
+			<div
+				v-if="instance.install_stage !== 'installed'"
+				class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+			>
+				<SpinnerIcon class="animate-spin w-4 h-4" />
+			</div>
+		</NavButton>
+	</div>
+	<div
+		v-if="instances && recentInstances.length > 0"
+		class="h-px w-6 mx-auto my-2 bg-divider"
+	></div>
 </template>
 
 <style scoped lang="scss"></style>

@@ -169,7 +169,7 @@
 						</span>
 						<div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
 							{{ capitalizeString(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
-							{{ dayjs(subscription.created).format('MMMM D, YYYY [at] h:mma') }} ({{
+							{{ formatDateTime(subscription.created) }} ({{
 								formatRelativeTime(subscription.created)
 							}})
 						</div>
@@ -239,7 +239,7 @@
 									</span>
 									<template v-if="charge.status !== 'cancelled'">
 										⋅
-										{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+										{{ formatPrice(charge.amount, charge.currency_code) }}
 									</template>
 								</span>
 								<span class="text-sm text-secondary">
@@ -252,13 +252,13 @@
 									<span v-else-if="charge.status === 'cancelled'" class="font-bold">Ends:</span>
 									<span v-else-if="charge.type === 'refund'" class="font-bold">Issued:</span>
 									<span v-else class="font-bold">Due:</span>
-									{{ dayjs(charge.due).format('MMMM D, YYYY [at] h:mma') }}
+									{{ formatDateTime(charge.due) }}
 									<span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
 								</span>
 								<span v-if="charge.last_attempt != null" class="text-sm text-secondary">
 									<span v-if="charge.status === 'failed'" class="font-bold">Last attempt:</span>
 									<span v-else class="font-bold">Charged:</span>
-									{{ dayjs(charge.last_attempt).format('MMMM D, YYYY [at] h:mma') }}
+									{{ formatDateTime(charge.last_attempt) }}
 									<span class="text-secondary"
 										>({{ formatRelativeTime(charge.last_attempt) }})
 									</span>
@@ -268,9 +268,9 @@
 									⋅
 									{{ charge.type }}
 									⋅
-									{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+									{{ formatPrice(charge.amount, charge.currency_code) }}
 									⋅
-									{{ dayjs(charge.due).format('YYYY-MM-DD h:mma') }}
+									{{ formatDateTimeShort(charge.due) }}
 									<template v-if="charge.subscription_interval">
 										⋅ {{ charge.subscription_interval }}
 									</template>
@@ -332,16 +332,32 @@ import {
 	NewModal,
 	StyledInput,
 	Toggle,
+	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, formatPrice } from '@modrinth/utils'
+import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { addNotification } = injectNotificationManager()
+const formatPrice = useFormatPrice()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDateTimeShort = useFormatDateTime({
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit',
+	hour: 'numeric',
+	minute: 'numeric',
+})
 
 const route = useRoute()
 const vintl = useVIntl()
@@ -356,39 +372,40 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user } = await useAsyncData(`user/${route.params.id}`, () =>
-	useBaseFetch(`user/${route.params.id}`),
-)
+const { data: user, error: userError } = useQuery({
+	queryKey: ['user', route.params.id],
+	queryFn: () => useBaseFetch(`user/${route.params.id}`),
+})
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+watch(userError, (error) => {
+	if (error) {
+		showError({
+			fatal: true,
+			statusCode: error.statusCode ?? error.status ?? 404,
+			message: formatMessage(messages.userNotFoundError),
+		})
+	}
+})
 
-let subscriptions, charges, refreshCharges
-try {
-	;[{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
-		useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-		useAsyncData(`billing/payments?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+const { data: subscriptions } = useQuery({
+	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
+	queryFn: () =>
+		useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
+			internal: true,
+		}),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
+
+const { data: charges, refetch: refreshCharges } = useQuery({
+	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
+	queryFn: () =>
+		useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
+			internal: true,
+		}),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
 
 const subscriptionCharges = computed(() => {
 	return subscriptions.value.map((subscription) => {

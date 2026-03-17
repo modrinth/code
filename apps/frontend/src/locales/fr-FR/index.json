@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de RAM !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -126,7 +126,7 @@
     "message": "∞ * ∞ Mo"
   },
   "app-marketing.features.performance.less-than-150mb": {
-    "message": "< 150 Mo"
+    "message": "moins de 150 Mo"
   },
   "app-marketing.features.performance.modrinth-app": {
     "message": "Modrinth App"
@@ -393,7 +393,7 @@
     "message": "Pas de projet dans la collection actuellement"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aucun projets actuellement} one {<stat>{count}</stat> projet} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Aucun projet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Créer un projet"
   },
+  "create.project.create-server-project": {
+    "message": "Créer un serveur"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Champs manquants : {fields}"
+  },
   "create.project.name-label": {
     "message": "Nom"
   },
   "create.project.name-placeholder": {
     "message": "Entrez le nom du projet..."
+  },
+  "create.project.owner-description": {
+    "message": "Définissez le propriétaire du projet comme étant vous-même ou une organisation dont vous êtes membre."
+  },
+  "create.project.owner-label": {
+    "message": "Propriétaire"
+  },
+  "create.project.server-project-title": {
+    "message": "Création d'un serveur"
   },
   "create.project.summary-description": {
     "message": "Une phrase ou deux qui décrivent votre projet."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Création d'un projet"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Projet"
+  },
+  "create.project.type-server": {
+    "message": "Serveur"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Créer votre première collection pour commencer !"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Vous n'avez toujours pas fait de collection"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Aucune collection correspond à votre recherche"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Essayez d'ajuster vos filtres ou vos termes de recherche."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projet} other {{count} projets}}"
+    "message": "{count} {countPlural, plural, one {projet} other {projets}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Rechercher dans vos collections"
@@ -825,7 +861,7 @@
     "message": "Les revenus estimés peuvent être modifiés jusqu'à leur publication."
   },
   "dashboard.revenue.estimated-tooltip.msg2": {
-    "message": "Clique pour lire comment Modrinth gère votre revenu."
+    "message": "Cliquez pour lire comment Modrinth gère votre revenu."
   },
   "dashboard.revenue.estimated-with-date": {
     "message": "Estimé pour {date}"
@@ -1068,7 +1104,7 @@
     "message": "Grenouille"
   },
   "hosting-marketing.available-locations": {
-    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une une couverture étendue."
+    "message": "Disponible en Amérique du Nord, en Europe et en Asie du Sud-Est pour une couverture étendue."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Payer mensuellement"
@@ -1107,7 +1143,7 @@
     "message": "Les serveurs de Modrinth Hosting ont-ils une protection DDoS ?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d’une protection DDoS, avec une capacité allant jusqu’à 17 Tbps dans certains endroits."
+    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d'une protection DDoS, avec une capacité allant jusqu'à 17 Tbps dans certains endroits."
   },
   "hosting-marketing.faq.heading": {
     "message": "Foire aux Questions"
@@ -1116,10 +1152,10 @@
     "message": "À quel point les serveurs de Modrinth Hosting sont-ils rapides ?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l’affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l’utilisateur."
+    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l'affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l'utilisateur."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d’un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
+    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d'un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Puis-je augmenter le stockage sur mon serveur ?"
@@ -1137,7 +1173,7 @@
     "message": "Quelles versions de Minecraft et loaders peuvent-être utilisés ?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n’importe quelle version de Minecraft : Java Edition jusqu’à la version 1.2.5, y compris les snapshots."
+    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n'importe quelle version de Minecraft : Java Edition jusqu'à la version 1.2.5, y compris les snapshots."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Nous prenons également en charge une large gamme de mod loaders et de plugins, y compris Fabric, Quilt, Forge et NeoForge pour les mods, ainsi que Paper et Purpur pour les plugins. La disponibilité dépend si le chargeur de mod ou de plugin prend en charge la version sélectionnée de Minecraft."
@@ -1164,7 +1200,7 @@
     "message": "Gestion de réseautage avancé"
   },
   "hosting-marketing.included.advanced-networking.description": {
-    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu’à 15 ports pour les mods qui en ont besoin, et plus encore."
+    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu'à 15 ports pour les mods qui en ont besoin, et plus encore."
   },
   "hosting-marketing.included.backups-included": {
     "message": "Sauvegardes de secours incluses"
@@ -1179,7 +1215,7 @@
     "message": "Partagez votre serveur avec une URL <contrast>modrinth.gg</contrast> personnalisée."
   },
   "hosting-marketing.included.description": {
-    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir."
+    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d'hébergement que seul Modrinth peut offrir."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Gestionnaire de fichiers facile à utiliser"
@@ -1194,7 +1230,7 @@
     "message": "De l'aide quand vous en avez besoin"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Contactez l’équipe Modrinth pour obtenir de l’aide avec votre serveur à tout moment."
+    "message": "Contactez l'équipe Modrinth pour obtenir de l'aide avec votre serveur à tout moment."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Une console puissante, un gestionnaire des propriétés du serveur, et plus encore"
@@ -1215,7 +1251,7 @@
     "message": "Déjà trouvé ce dont vous avez besoin ?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Essayez un <orange>serveur 3GB</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
+    "message": "Essayez un <orange>serveur 3 Go</orange> gratuit pour 5 jours alimenté par <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "En savoir plus"
@@ -1233,7 +1269,7 @@
     "message": "C'est sur Modrinth que ça se passe"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d’une plateforme à l’autre."
+    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d'une plateforme à l'autre."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Constamment rapide"
@@ -1251,13 +1287,13 @@
     "message": "Profitez d'un hébergement moderne et fiable"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Les serveurs d’hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
+    "message": "Les serveurs d'hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Jouez là où se trouvent vos mods"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting intègre parfaitement le processus d’installation de mods et de modpacks dans votre serveur."
+    "message": "Modrinth Hosting intègre parfaitement le processus d'installation de mods et de modpacks dans votre serveur."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Pourquoi Modrinth Hosting ?"
@@ -1267,6 +1303,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choisissez entre Vanilla, Fabric, Forge, Quilt et NeoForge. Tout le contenu de Modrinth est compatible avec votre serveur."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Impossible de changer la version du modpack"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Impossible de charger les versions"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Impossible de réinstaller le modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Impossible de réparer le serveur"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Impossible de sauvegarder les paramètres d'installation"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Impossible de délier le modpack"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Version} other {{version}}} du loader"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Votre installation serveur a été réparée."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Réparation terminée"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Réinitialiser le serveur"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Supprime définitivement toutes les données de votre serveur, y compris vos mondes, vos mods, et vos fichiers paramètres. Les sauvegardes resteront et pourront être restaurées."
   },
   "hosting.plan.out-of-stock": {
     "message": "En rupture de stock"
@@ -1401,7 +1470,7 @@
     "message": "Pour les joueurs"
   },
   "landing.section.for-players.tagline": {
-    "message": "Découvrez jusqu’à {count} créations"
+    "message": "Découvrez plus de {count, number} créations"
   },
   "landing.subheading": {
     "message": "Découvrez, jouez et partagez du contenu Minecraft grâce à notre plateforme open-source conçue pour la communauté."
@@ -1432,6 +1501,12 @@
   },
   "layout.action.new-project": {
     "message": "Nouveau projet"
+  },
+  "layout.action.new-server-project": {
+    "message": "Nouveau serveur"
+  },
+  "layout.action.publish": {
+    "message": "Publier"
   },
   "layout.action.reports": {
     "message": "Rapports d'examen"
@@ -1763,9 +1838,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numéro de compte"
   },
-  "muralpay.field.branch-code": {
-    "message": "Identifiant de branche"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1867,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Téléphone PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Clef aléatoire"
   },
   "muralpay.field.routing-number": {
     "message": "Numéro de routage"
@@ -1856,9 +1931,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Saisissez le numéro de compte"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Saisissez le code de l'agence"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Entrez la CLABE à 18 chiffres"
   },
@@ -1870,6 +1942,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Saisissez votre adresse e-mail PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Entrez une clef aléatoire"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Saisissez le numéro de routage à 9 chiffres"
@@ -1998,7 +2073,7 @@
     "message": "Collection"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
+    "message": "{count} {countPlural, plural, one {téléchargement} other {téléchargements}}"
   },
   "profile.label.joined": {
     "message": "Rejoint"
@@ -2019,7 +2094,7 @@
     "message": "Organisations"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {projet} other {projets}}"
+    "message": "{count} {countPlural, plural, one {projet} other {projets}}"
   },
   "profile.label.saving": {
     "message": "Sauvegarde en cours..."
@@ -2102,6 +2177,12 @@
   "project-type.datapack.singular": {
     "message": "Datapack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Serveurs"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Serveur"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2212,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Pack de ressources"
+  },
+  "project-type.server.plural": {
+    "message": "Serveurs"
+  },
+  "project-type.server.singular": {
+    "message": "Serveur"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2729,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "Création d'une sauvegarde en cours"
+  },
+  "servers.busy.backup-restoring": {
     "message": "Restauration de sauvegarde en cours"
+  },
+  "servers.busy.installing": {
+    "message": "Le serveur est en cours d'installation"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Synchronisation du contenu en cours"
   },
   "servers.notice.actions": {
     "message": "Actions"
@@ -2954,6 +3050,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Page des packs de ressources"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Page des serveurs"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Page des shaders"
   },
@@ -2979,7 +3078,7 @@
     "message": "Ouvre les liens externes dans un nouvel onglet"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Cache les boutons \"Obtenir Modrinth App\" de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
+    "message": "Cache les boutons « Obtenir Modrinth App » de la navigation principale. La page de Modrinth App peut toujours être trouvée sur la page d'accueil ou dans le pied de page."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Cache les publicités de Modrinth App"
@@ -3006,7 +3105,7 @@
     "message": "Créer un PAT"
   },
   "settings.pats.description": {
-    "message": "Des jetons d'accès personnels peuvent être utilisés pour accéder à l'API de Modrinth. Pour plus d'informations, consultez la <doc-link>documentation de l'API de Modrinth</doc-link>. Ils peuvent être créés et révoqués à tout moment."
+    "message": "Les PAT peuvent être utilisés pour accéder à l'API de Modrinth. Ils peuvent être créés et révoqués à tout moment. Pour plus d'informations, voir <doc-link>La documentation API de Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Créer un PAT"
@@ -3105,7 +3204,7 @@
     "message": "Aucun environnement choisi"
   },
   "version.environment.unknown.description": {
-    "message": "L'environnement \"{environment}\" na pas été reconnu."
+    "message": "L'environnement « {environment} » na pas été reconnu."
   },
   "version.environment.unknown.title": {
     "message": "Environnement Inconnue"

@@ -24,7 +24,7 @@
     "message": "Descargar RPM"
   },
   "app-marketing.download.flathub": {
-    "message": "Consígalo en Flathub"
+    "message": "Consíguelo en Flathub"
   },
   "app-marketing.download.linux": {
     "message": "Linux"
@@ -37,9 +37,6 @@
   },
   "app-marketing.download.options-title": {
     "message": "Opciones de descarga"
-  },
-  "app-marketing.download.terms": {
-    "message": "Al descargar la Modrinth App, aceptas nuestros <terms-link>Términos de uso</terms-link> y nuestra <privacy-link>Política de privacidad</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Descargar la Modrinth App (Beta)"
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "¡La Modrinth App funciona mejor que muchos de los principales gestores de mods, usando solo 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Aún no hay proyectos en la colección"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aún no hay proyectos} one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Actualizado {ago}"
   },
@@ -497,11 +488,26 @@
   "create.project.create-project": {
     "message": "Crear proyecto"
   },
+  "create.project.create-server-project": {
+    "message": "Crear servidor"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Campos faltantes: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nombre"
   },
   "create.project.name-placeholder": {
     "message": "Introduce el nombre del proyecto..."
+  },
+  "create.project.owner-description": {
+    "message": "Establécete como propietario del proyecto a ti o a una organización de la que seas miembro."
+  },
+  "create.project.owner-label": {
+    "message": "Propietario"
+  },
+  "create.project.server-project-title": {
+    "message": "Creando un proyecto de servidor"
   },
   "create.project.summary-description": {
     "message": "Una frase o dos que describan tu proyecto."
@@ -514,6 +520,15 @@
   },
   "create.project.title": {
     "message": "Creando un proyecto"
+  },
+  "create.project.type-label": {
+    "message": "Tipo"
+  },
+  "create.project.type-project": {
+    "message": "Proyecto"
+  },
+  "create.project.type-server": {
+    "message": "Servidor"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -553,9 +568,6 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proyecto} other {{count} proyectos}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Busca en tus colecciones"
@@ -631,9 +643,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Una entidad comercial se refiere a una organización registrada, como una sociedad anónima, una sociedad colectiva o una sociedad de responsabilidad limitada."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "¿Estás retirando como particular o como empresa?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particular"
@@ -1101,13 +1110,10 @@
     "message": "¿En que moneda están los precios?"
   },
   "hosting-marketing.faq.currency.answer": {
-    "message": "Todos los precios están en Dolares Estadounidenses (USD)."
+    "message": "Todos los precios están en dólares estadounidenses (USD)."
   },
   "hosting-marketing.faq.ddos-protection": {
     "message": "¿Los servidores de Modrinth Hosting tendrán protección contra DDoS?"
-  },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Si. Todos los servidores de Modrinth Hosting vienen con protección contra DDoS, con hasta 17 terabits por segundo (Tbps) en algunos lugares."
   },
   "hosting-marketing.faq.heading": {
     "message": "Preguntas Frecuentes (FAQ)"
@@ -1125,22 +1131,22 @@
     "message": "¿Puedo aumentar el almacenamiento en mi servidor?"
   },
   "hosting-marketing.faq.increase-storage.answer": {
-    "message": "Sí, se puede aumentar el almacenamiento en su servidor sin coste adicional. Si necesita más almacenamiento, póngase en contacto con el servicio de asistencia de Modrinth"
+    "message": "Sí, se puede aumentar el almacenamiento en tu servidor sin costo adicional. Si necesitas más almacenamiento, ponte en contacto con el soporte de Modrinth."
   },
   "hosting-marketing.faq.location": {
     "message": "¿Dónde se encuentran los servidores de Modrinth Hosting? ¿Puedo elegir una región?"
   },
   "hosting-marketing.faq.location.answer": {
-    "message": "Actualmente disponemos de servidores en Norteamérica, Europa y el Sudeste Asiático entre los que puede elegir al realizar la compra. ¡En el futuro añadiremos más regiones! Si desea cambiar de región, póngase en contacto con el servicio de asistencia."
+    "message": "Actualmente disponemos de servidores en Norteamérica, Europa y el Sudeste Asiático entre los que puede elegir al realizar la compra. ¡En el futuro añadiremos más regiones! Si deseas cambiar de región, ponte en contacto con soporte."
   },
   "hosting-marketing.faq.versions-loaders": {
-    "message": "¿Qué versiones y cargadores de Minecraft se pueden utilizar?"
+    "message": "¿Qué versiones y loaders de Minecraft se pueden utilizar?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
     "message": "Los servidores de Modrinth Hosting pueden ejecutar cualquier versión de Minecraft: Java Edition, incluidas las de prueba, a partir de la 1.2.5."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
-    "message": "También admitimos una amplia gama de cargadores de mods y plugins, incluidos Fabric, Quilt, Forge y NeoForge para mods, así como Paper y Purpur para plugins. La disponibilidad depende de si el cargador de mods o plugins es compatible con la versión seleccionada de Minecraft."
+    "message": "También admitimos una amplia gama de mod loaders y plugin loaders, incluidos Fabric, Quilt, Forge y NeoForge para mods, así como Paper y Purpur para plugins. La disponibilidad depende de si el loader de mods o plugins es compatible con la versión seleccionada de Minecraft."
   },
   "hosting-marketing.get-started": {
     "message": "Comenzar"
@@ -1214,9 +1220,6 @@
   "hosting-marketing.know-what-you-need": {
     "message": "¿Sabes exactamente lo que necesitas?"
   },
-  "hosting-marketing.medal.info": {
-    "message": "Prueba un <orange>servidor de 3GB</orange> gratis por 5 días a través de <orange>Medal</orange>"
-  },
   "hosting-marketing.medal.learn-more": {
     "message": "Aprender más"
   },
@@ -1248,7 +1251,7 @@
     "message": "Busca un modpack. Ahora es un servidor."
   },
   "hosting-marketing.why.modern-reliable-hosting": {
-    "message": "Disfrute de un alojamiento moderno y fiable"
+    "message": "Disfruta de un alojamiento moderno y fiable"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
     "message": "Los servidores de Modrinth Hosting están alojados en <contrast>Procesadores AMD de alto rendimiento con RAM DDR5</contrast>, y funcionan con software personalizado para garantizar el buen funcionamiento de su servidor."
@@ -1400,9 +1403,6 @@
   "landing.section.for-players.label": {
     "message": "Para jugadores"
   },
-  "landing.section.for-players.tagline": {
-    "message": "Descubre más de {count} creaciones"
-  },
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
   },
@@ -1432,6 +1432,12 @@
   },
   "layout.action.new-project": {
     "message": "Nuevo proyecto"
+  },
+  "layout.action.new-server-project": {
+    "message": "Nuevo servidor"
+  },
+  "layout.action.publish": {
+    "message": "Publicar"
   },
   "layout.action.reports": {
     "message": "Revisar reportes"
@@ -1763,9 +1769,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Número de cuenta"
   },
-  "muralpay.field.branch-code": {
-    "message": "Código de sucursal"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1798,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Teléfono PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Clave aleatoria"
   },
   "muralpay.field.routing-number": {
     "message": "Número de ruta"
@@ -1856,9 +1862,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Introduce el número de cuenta"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Introduce el código de sucursal"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Introduce la CLABE de 18 dígitos"
   },
@@ -1870,6 +1873,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Introduce tu correo electrónico de PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Introducir clave aleatoria"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Introduce el número de ruta de 9 dígitos"
@@ -1997,9 +2003,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió"
   },
@@ -2017,9 +2020,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -2102,6 +2102,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Servidor"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2137,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project-type.server.plural": {
+    "message": "Servidores"
+  },
+  "project-type.server.singular": {
+    "message": "Servidor"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2367,7 +2379,7 @@
     "message": "Ya tienes un reporte abierto para este {item, select, project {project} version {version} user {user} other {content}}. Puedes añadir más detalles a tu reporte si tienes más información que agregar."
   },
   "report.back-to-item": {
-    "message": "Volver a {item, select, project {project} version {version} user {user} other {content}}"
+    "message": "Volver a {item, select, project {proyecto} version {version} user {usuario} other {contenido}}"
   },
   "report.body.description": {
     "message": "Incluye enlaces e imágenes si es posible y relevante. Los reportes vacíos o insuficientes serán cerrados e ignorados."
@@ -2376,7 +2388,7 @@
     "message": "Por favor, proporciona contexto adicional acerca de tu reporte"
   },
   "report.checking": {
-    "message": "Revisando {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}..."
+    "message": "Revisando {item, select, project {proyecto} version {version} user {usuario} other {contenido}}..."
   },
   "report.could-not-find": {
     "message": "No se pudo encontrar {item, select, project {el proyecto} version {la version} user {el usuario} other {el contenido}}"
@@ -2631,7 +2643,7 @@
     "message": "Escribir reportes"
   },
   "scopes.sessionAccess.description": {
-    "message": "Acceder a sesiones emitidas por Modrinth"
+    "message": "Acceder a las sesiones emitidas por Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Sesiones de acceso"
@@ -2729,9 +2741,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restauración del respaldo en curso"
-  },
   "servers.notice.actions": {
     "message": "Acciones"
   },
@@ -2784,7 +2793,7 @@
     "message": "Añadir más"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Agregar una URI de redirección"
+    "message": "Añadir una URI de redirección"
   },
   "settings.applications.button.cancel": {
     "message": "Cancelar"
@@ -2954,6 +2963,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Página de Resource Packs"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Página de servidores"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Página de Shaders"
   },
@@ -3006,7 +3018,7 @@
     "message": "Crear un PAT"
   },
   "settings.pats.description": {
-    "message": "Los PAT se pueden usar para acceder a la API de Modrinth. Para más información, consulta <doc-link>la documentación de la API de Modrinth</doc-link>. Se pueden crear y revocar en cualquier momento."
+    "message": "Se pueden usar PAT para acceder a la API de Modrinth. Se pueden crear y revocar en cualquier momento. Para más información, ver la <doc-link>documentación de la API de Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Crear un PAT"

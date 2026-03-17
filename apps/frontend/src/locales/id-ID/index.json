@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Buat proyek"
   },
+  "create.project.create-server-project": {
+    "message": "Buat server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Bidang hilang: {fields}"
+  },
   "create.project.name-label": {
     "message": "Nama"
   },
   "create.project.name-placeholder": {
     "message": "Masukkan nama proyek..."
+  },
+  "create.project.owner-description": {
+    "message": "Buat diri Anda atau organisasi yang Anda sertai sebagai pemilik proyek."
+  },
+  "create.project.owner-label": {
+    "message": "Pemilik"
+  },
+  "create.project.server-project-title": {
+    "message": "Membuat proyek server"
   },
   "create.project.summary-description": {
     "message": "Satu atau dua kalimat yang menjelaskan proyek Anda."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Membuat proyek"
+  },
+  "create.project.type-label": {
+    "message": "Jenis"
+  },
+  "create.project.type-project": {
+    "message": "Proyek"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Buat baru"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Buat koleksi pertama Anda untuk memulai!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Anda belum memiliki koleksi"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Tidak ada koleksi yang cocok dengan pencarian Anda"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Coba sesuaikan kata kunci pencarian atau penyaringan Anda."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} proyek}}"
+    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi Anda"
@@ -1401,7 +1437,7 @@
     "message": "Untuk Pemain"
   },
   "landing.section.for-players.tagline": {
-    "message": "Temukan lebih dari {count} kreasi"
+    "message": "Temukan lebih dari {count, number} kreasi"
   },
   "landing.subheading": {
     "message": "Temukan, mainkan, dan bagikan konten Minecraft melalui platform sumber terbuka kami yang dibangun untuk komunitas."
@@ -1432,6 +1468,12 @@
   },
   "layout.action.new-project": {
     "message": "Proyek baru"
+  },
+  "layout.action.new-server-project": {
+    "message": "Server baru"
+  },
+  "layout.action.publish": {
+    "message": "Terbitkan"
   },
   "layout.action.reports": {
     "message": "Tinjau laporan"
@@ -1763,9 +1805,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Nomor rekening"
   },
-  "muralpay.field.branch-code": {
-    "message": "Kode cabang"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1834,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Gawai PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Kunci acak"
   },
   "muralpay.field.routing-number": {
     "message": "Nomor perutean"
@@ -1856,9 +1898,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Masukkan nomor rekening"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Masukkan kode cabang"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "Masukkan CLABE 18 digit"
   },
@@ -1870,6 +1909,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Masukkan sur-el PIX"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Masukkan kunci acak"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Masukkan nomor perutean 9 digit"
@@ -1998,7 +2040,7 @@
     "message": "Koleksi"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {unduhan}}"
+    "message": "{count} {countPlural, plural, other {pengunduhan}}"
   },
   "profile.label.joined": {
     "message": "Telah bergabung"
@@ -2019,7 +2061,7 @@
     "message": "Organisasi"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {proyek}}"
+    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "profile.label.saving": {
     "message": "Menyimpan..."
@@ -2102,6 +2144,12 @@
   "project-type.datapack.singular": {
     "message": "Paket Data"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mod"
   },
@@ -2131,6 +2179,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Paket Sumber"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Pencorak"
@@ -2729,9 +2783,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sinkronkan dengan server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Sedang memulihkan cadangan"
-  },
   "servers.notice.actions": {
     "message": "Tindakan"
   },
@@ -2784,7 +2835,7 @@
     "message": "Tambah lagi"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Tidak ada URI pengarahan ulang"
+    "message": "Tambah URI pengarahan ulang"
   },
   "settings.applications.button.cancel": {
     "message": "Batal"
@@ -2954,6 +3005,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Halaman Paket Sumber"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Halaman Server"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Halaman Pencorak (Shader)"
   },
@@ -3006,7 +3060,7 @@
     "message": "Buat PAT"
   },
   "settings.pats.description": {
-    "message": "PAT dapat digunakan untuk mengakses API Modrinth. Untuk informasi lebih lanjut, lihat <doc-link>Dokumentasi API Modrinth</doc-link>. Mereka dapat dibuat dan dicabut kapan saja."
+    "message": "PAT dapat digunakan untuk mengakses API Modrinth dan dapat dibuat dan dicabut kapan saja. Untuk informasi lebih lanjut, lihat <doc-link>dokumentasi API Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Buat PAT"
