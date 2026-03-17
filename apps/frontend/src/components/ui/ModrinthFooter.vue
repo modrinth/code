@@ -200,7 +200,8 @@ const developerModeCounter = ref(0)
 const state = useGeneratedState()
 
 function developerModeIncrement() {
-	if (developerModeCounter.value >= 4) {
+	developerModeCounter.value++
+	if (developerModeCounter.value >= 5) {
 		flags.value.developerMode = !flags.value.developerMode
 		developerModeCounter.value = 0
 		saveFeatureFlags()
@@ -217,8 +218,6 @@ function developerModeIncrement() {
 				type: 'success',
 			})
 		}
-	} else {
-		developerModeCounter.value++
 	}
 }
 </script>
