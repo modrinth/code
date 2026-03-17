@@ -4,10 +4,7 @@ import { computed, ref, watch } from 'vue'
 
 import type { ContentItem } from '../types'
 
-const CLIENT_ONLY_ENVIRONMENTS = new Set([
-	'client_only',
-	'singleplayer_only',
-])
+const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
 
 export function isClientOnlyEnvironment(env?: string | null): boolean {
 	return !!env && CLIENT_ONLY_ENVIRONMENTS.has(env)

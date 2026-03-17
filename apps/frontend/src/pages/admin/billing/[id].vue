@@ -373,7 +373,11 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user, error: userError, suspense: userSuspense } = useQuery({
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
 	queryKey: ['user', route.params.id],
 	queryFn: () => labrinth.users_v2.get(route.params.id),
 })
