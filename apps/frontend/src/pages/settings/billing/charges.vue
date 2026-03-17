@@ -38,7 +38,7 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs, useFormatDateTime, useFormatPrice } from '@modrinth/ui'
+import { Badge, Breadcrumbs, injectModrinthClient, useFormatDateTime, useFormatPrice } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'
@@ -46,6 +46,8 @@ import { products } from '~/generated/state.json'
 definePageMeta({
 	middleware: 'auth',
 })
+
+const client = injectModrinthClient()
 
 const formatPrice = useFormatPrice()
 const formatDate = useFormatDateTime({
@@ -57,7 +59,7 @@ const formatDate = useFormatDateTime({
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],
 	queryFn: async () => {
-		const charges = await useBaseFetch('billing/payments', { internal: true })
+		const charges = await client.labrinth.billing_internal.getPayments()
 		return charges
 			.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
 			.map((charge) => {

@@ -113,6 +113,54 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Get a user's notifications
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to an array of the user's notifications
+	 *
+	 * @example
+	 * ```typescript
+	 * const notifications = await client.labrinth.users_v2.getNotifications('my_user')
+	 * ```
+	 */
+	public async getNotifications(
+		idOrUsername: string,
+	): Promise<Labrinth.Notifications.v2.Notification[]> {
+		return this.client.request<Labrinth.Notifications.v2.Notification[]>(
+			`/user/${idOrUsername}/notifications`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
+	 * Get projects a user follows
+	 *
+	 * @param idOrUsername - The user's ID or username
+	 * @returns Promise resolving to an array of followed projects
+	 *
+	 * @example
+	 * ```typescript
+	 * const projects = await client.labrinth.users_v2.getFollowedProjects('my_user')
+	 * ```
+	 */
+	public async getFollowedProjects(
+		idOrUsername: string,
+	): Promise<Labrinth.Projects.v2.Project[]> {
+		return this.client.request<Labrinth.Projects.v2.Project[]>(
+			`/user/${idOrUsername}/follows`,
+			{
+				api: 'labrinth',
+				version: 2,
+				method: 'GET',
+			},
+		)
+	}
+
+	/**
 	 * Update a user
 	 *
 	 * @param idOrUsername - The user's ID or username

@@ -328,6 +328,7 @@ import {
 	CopyCode,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
@@ -343,9 +344,9 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
-import { useBaseFetch } from '~/composables/fetch.js'
 
 const { addNotification } = injectNotificationManager()
+const client = injectModrinthClient()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -374,7 +375,7 @@ const messages = defineMessages({
 
 const { data: user } = useQuery({
 	queryKey: ['user', route.params.id],
-	queryFn: () => useBaseFetch(`user/${route.params.id}`),
+	queryFn: () => client.labrinth.users_v2.get(route.params.id),
 })
 
 if (!user.value) {
@@ -387,20 +388,14 @@ if (!user.value) {
 
 const { data: subscriptions } = useQuery({
 	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
-	queryFn: () =>
-		useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
-			internal: true,
-		}),
+	queryFn: () => client.labrinth.billing_internal.getSubscriptions(user.value.id),
 	enabled: computed(() => !!user.value?.id),
 	placeholderData: [],
 })
 
 const { data: charges, refetch: refreshCharges } = useQuery({
 	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
-	queryFn: () =>
-		useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
-			internal: true,
-		}),
+	queryFn: () => client.labrinth.billing_internal.getPayments(user.value.id),
 	enabled: computed(() => !!user.value?.id),
 	placeholderData: [],
 })
@@ -461,15 +456,11 @@ async function applyCredit() {
 	crediting.value = true
 	try {
 		const daysParsed = Math.max(1, Math.floor(Number(creditDays.value) || 1))
-		await useBaseFetch('billing/credit', {
-			method: 'POST',
-			body: JSON.stringify({
-				subscription_ids: [selectedSubscription.value.id],
-				days: daysParsed,
-				send_email: creditSendEmail.value,
-				message: DEFAULT_CREDIT_EMAIL_MESSAGE,
-			}),
-			internal: true,
+		await client.labrinth.billing_internal.credit({
+			subscription_ids: [selectedSubscription.value.id],
+			days: daysParsed,
+			send_email: creditSendEmail.value,
+			message: DEFAULT_CREDIT_EMAIL_MESSAGE,
 		})
 		addNotification({
 			title: 'Credit applied',
@@ -499,11 +490,7 @@ async function refundCharge() {
 					? { type: 'none', unprovision: unprovision.value }
 					: { type: 'full', unprovision: unprovision.value }
 
-		await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
-			method: 'POST',
-			body: JSON.stringify(payload),
-			internal: true,
-		})
+		await client.labrinth.billing_internal.refundCharge(selectedCharge.value.id, payload)
 		await refreshCharges()
 		refundModal.value.hide()
 	} catch (err) {
@@ -519,12 +506,8 @@ async function refundCharge() {
 async function modifyCharge() {
 	modifying.value = true
 	try {
-		await useBaseFetch(`billing/subscription/${selectedSubscription.value.id}`, {
-			method: 'PATCH',
-			body: JSON.stringify({
-				cancelled: cancel.value,
-			}),
-			internal: true,
+		await client.labrinth.billing_internal.editSubscription(selectedSubscription.value.id, {
+			cancelled: cancel.value,
 		})
 		addNotification({
 			title: 'Modifications made',

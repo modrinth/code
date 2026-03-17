@@ -255,4 +255,31 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			params: { count: String(count) },
 		})
 	}
+
+	/**
+	 * Bulk edit multiple projects at once
+	 *
+	 * @param ids - Array of project IDs to edit
+	 * @param data - Fields to update across all specified projects
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.bulkEdit(['id1', 'id2'], {
+	 *   issues_url: 'https://github.com/issues',
+	 *   source_url: null,
+	 * })
+	 * ```
+	 */
+	public async bulkEdit(
+		ids: string[],
+		data: Labrinth.Projects.v2.BulkEditProjectRequest,
+	): Promise<void> {
+		return this.client.request(`/projects`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			params: { ids: JSON.stringify(ids) },
+			body: data,
+		})
+	}
 }

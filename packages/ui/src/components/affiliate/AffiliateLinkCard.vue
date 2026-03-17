@@ -32,14 +32,16 @@
 
 <script setup lang="ts">
 import { AffiliateIcon, XCircleIcon } from '@modrinth/assets'
-import type { AffiliateLink } from '@modrinth/utils'
+import type { Labrinth } from '@modrinth/api-client'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { AutoBrandIcon, ButtonStyled, CopyCode } from '../index'
 
+type AffiliateCode = Labrinth.Affiliate.Internal.AffiliateCode
+
 withDefaults(
 	defineProps<{
-		affiliate: AffiliateLink
+		affiliate: AffiliateCode
 		showRevoke?: boolean
 		createdBy?: string
 	}>(),
@@ -50,7 +52,7 @@ withDefaults(
 )
 
 const emit = defineEmits<{
-	(e: 'revoke', affiliate: AffiliateLink): void
+	(e: 'revoke', affiliate: AffiliateCode): void
 }>()
 
 const { formatMessage } = useVIntl()

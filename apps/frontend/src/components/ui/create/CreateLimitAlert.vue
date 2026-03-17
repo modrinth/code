@@ -42,13 +42,12 @@
 
 <script setup lang="ts">
 import { MessageIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import { Admonition, ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
-import { useBaseFetch } from '~/composables/fetch.js'
-
+const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -126,7 +125,16 @@ const apiEndpoint = computed(() => {
 
 const { data: limits } = useQuery({
 	queryKey: computed(() => ['limits', props.type]),
-	queryFn: () => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
+	queryFn: () => {
+		switch (props.type) {
+			case 'org':
+				return client.labrinth.limits_v3.getOrganizationLimits()
+			case 'collection':
+				return client.labrinth.limits_v3.getCollectionLimits()
+			default:
+				return client.labrinth.limits_v3.getProjectLimits()
+		}
+	},
 })
 
 const typeName = computed<{ singular: string; plural: string }>(() => {
