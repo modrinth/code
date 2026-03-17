@@ -5,7 +5,6 @@ import type { ContentItem } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set([
 	'client_only',
-	'client_only_server_optional',
 	'singleplayer_only',
 ])
 
