@@ -47,17 +47,20 @@ import {
 	commonMessages,
 	commonSettingsMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 definePageMeta({
 	middleware: 'auth',
 })
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
@@ -102,19 +105,17 @@ useHead({
 	title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 })
 
-const { data: sessions, refetch: refresh } = useQuery({
+const { data: sessions } = useQuery({
 	queryKey: ['session', 'list'],
-	queryFn: () => useBaseFetch('session/list'),
+	queryFn: () => client.labrinth.sessions_v2.list(),
 })
 
 async function revokeSession(id) {
 	startLoading()
 	try {
 		sessions.value = sessions.value.filter((x) => x.id !== id)
-		await useBaseFetch(`session/${id}`, {
-			method: 'DELETE',
-		})
-		await refresh()
+		await client.labrinth.sessions_v2.delete(id)
+		await queryClient.invalidateQueries({ queryKey: ['session', 'list'] })
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),

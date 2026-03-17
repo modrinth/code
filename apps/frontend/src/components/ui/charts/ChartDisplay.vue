@@ -357,7 +357,7 @@ const props = withDefaults(
 	},
 )
 
-const projects = ref(props.projects || [])
+const projects = computed(() => props.projects || [])
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
@@ -388,6 +388,13 @@ const tinyViewChart = ref()
 const tinyRevenueChart = ref()
 
 const selectedDisplayProjects = ref(props.projects || [])
+
+watch(
+	() => props.projects,
+	(newProjects) => {
+		selectedDisplayProjects.value = newProjects || []
+	},
+)
 
 const removeProjectFromDisplay = (id: string) => {
 	selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id)

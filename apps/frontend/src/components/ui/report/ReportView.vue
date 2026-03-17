@@ -21,13 +21,13 @@
 	</div>
 </template>
 <script setup>
+import { injectModrinthClient } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import ReportInfo from '~/components/ui/report/ReportInfo.vue'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import { useBaseFetch } from '~/composables/fetch.js'
 import { addReportMessage } from '~/helpers/threads.js'
 
 const props = defineProps({
@@ -45,16 +45,13 @@ const props = defineProps({
 	},
 })
 
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
 
 // Fetch raw report
 const { data: rawReport } = useQuery({
 	queryKey: computed(() => ['report', props.reportId]),
-	queryFn: async () => {
-		const data = await useBaseFetch(`report/${props.reportId}`)
-		data.item_id = data.item_id.replace(/"/g, '')
-		return data
-	},
+	queryFn: () => client.labrinth.reports_v3.get(props.reportId),
 })
 
 // Compute user IDs needed
@@ -70,7 +67,7 @@ const userIds = computed(() => {
 // Fetch users
 const { data: users } = useQuery({
 	queryKey: computed(() => ['users', userIds.value]),
-	queryFn: () => useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds.value))}`),
+	queryFn: () => client.labrinth.users_v2.getMultiple(userIds.value),
 	enabled: computed(() => userIds.value.length > 0),
 })
 
@@ -82,7 +79,7 @@ const versionId = computed(() =>
 // Fetch version
 const { data: version } = useQuery({
 	queryKey: computed(() => ['version', versionId.value]),
-	queryFn: () => useBaseFetch(`version/${versionId.value}`),
+	queryFn: () => client.labrinth.versions_v2.getVersion(versionId.value),
 	enabled: computed(() => !!versionId.value),
 })
 
@@ -96,7 +93,7 @@ const projectId = computed(() => {
 // Fetch project
 const { data: project } = useQuery({
 	queryKey: computed(() => ['project', projectId.value]),
-	queryFn: () => useBaseFetch(`project/${projectId.value}`),
+	queryFn: () => client.labrinth.projects_v2.get(projectId.value),
 	enabled: computed(() => !!projectId.value),
 })
 
@@ -118,7 +115,7 @@ const report = computed(() => {
 // Fetch thread
 const { data: rawThread } = useQuery({
 	queryKey: computed(() => ['thread', report.value?.thread_id]),
-	queryFn: () => useBaseFetch(`thread/${report.value.thread_id}`),
+	queryFn: () => client.labrinth.threads_v3.getThread(report.value.thread_id),
 	enabled: computed(() => !!report.value?.thread_id),
 })
 

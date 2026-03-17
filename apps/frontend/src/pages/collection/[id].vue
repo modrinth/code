@@ -418,7 +418,6 @@ import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()
@@ -589,7 +588,7 @@ const refreshCollection = async () => {
 // Query for creator (only for regular collections)
 const { data: fetchedCreator, isPending: creatorIsPending } = useQuery({
 	queryKey: computed(() => ['user', collection.value?.user]),
-	queryFn: () => useBaseFetch(`user/${collection.value?.user}`),
+	queryFn: () => api.labrinth.users_v2.get(collection.value.user),
 	enabled: computed(() => !isFollowingCollection.value && !!collection.value?.user),
 })
 
@@ -606,7 +605,7 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['user', auth.value.user?.id, 'follows']),
 	queryFn: async () => {
-		const projects = await useBaseFetch(`user/${auth.value.user.id}/follows`)
+		const projects = await api.labrinth.users_v2.getFollowedProjects(auth.value.user.id)
 		for (const project of projects) {
 			project.categories = project.categories.concat(project.loaders)
 		}
@@ -624,10 +623,16 @@ const {
 } = useQuery({
 	queryKey: computed(() => ['projects', collection.value?.projects]),
 	queryFn: async () => {
-		const projects = await fetchSegmented(
-			collection.value.projects,
-			(ids) => `projects?ids=${asEncodedJsonArray(ids)}`,
+		const projectIds = collection.value.projects
+		const segmentSize = 800
+		const segments = []
+		for (let i = 0; i < projectIds.length; i += segmentSize) {
+			segments.push(projectIds.slice(i, i + segmentSize))
+		}
+		const results = await Promise.all(
+			segments.map((ids) => api.labrinth.projects_v2.getMultiple(ids)),
 		)
+		const projects = results.flat()
 		for (const project of projects) {
 			project.categories = project.categories.concat(project.loaders)
 		}

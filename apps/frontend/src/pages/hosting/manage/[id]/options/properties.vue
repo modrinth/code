@@ -118,7 +118,7 @@ import {
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
-import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import Fuse from 'fuse.js'
 import { computed, ref, watch } from 'vue'
 

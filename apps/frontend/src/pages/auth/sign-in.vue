@@ -139,6 +139,7 @@ import {
 import {
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	StyledInput,
@@ -149,6 +150,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
+const client = injectModrinthClient()
 const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -211,10 +213,10 @@ const { data: globals } = useQuery({
 	queryKey: ['auth-globals'],
 	queryFn: async () => {
 		try {
-			return await useBaseFetch('globals', { internal: true })
+			return await client.labrinth.globals_internal.get()
 		} catch (err) {
 			console.error('Error fetching globals:', err)
-			return { captcha_enabled: true }
+			return { captcha_enabled: true, tax_compliance_thresholds: {} }
 		}
 	},
 })
@@ -228,13 +230,10 @@ const flow = ref(route.query.flow)
 async function beginPasswordSignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login', {
-			method: 'POST',
-			body: {
-				username: email.value,
-				password: password.value,
-				challenge: token.value,
-			},
+		const res = await client.labrinth.auth_v2.login({
+			username: email.value,
+			password: password.value,
+			challenge: token.value,
 		})
 
 		if (res.flow) {
@@ -257,12 +256,9 @@ const twoFactorCode = ref(null)
 async function begin2FASignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login/2fa', {
-			method: 'POST',
-			body: {
-				flow: flow.value,
-				code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
-			},
+		const res = await client.labrinth.auth_v2.login2FA({
+			flow: flow.value,
+			code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
 		})
 
 		await finishSignIn(res.session)

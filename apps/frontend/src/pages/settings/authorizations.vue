@@ -95,6 +95,7 @@ import {
 	Button,
 	commonSettingsMessages,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
@@ -102,6 +103,7 @@ import { useQuery } from '@tanstack/vue-query'
 
 import { useScopes } from '~/composables/auth/scopes.ts'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -119,32 +121,19 @@ useHead({
 
 const { data: usersApps, refetch: refresh } = useQuery({
 	queryKey: ['oauth', 'authorizations'],
-	queryFn: () =>
-		useBaseFetch(`oauth/authorizations`, {
-			internal: true,
-		}),
+	queryFn: () => client.labrinth.oauth_internal.getAuthorizations(),
 })
 
 const { data: appInformation } = useQuery({
 	queryKey: computed(() => ['oauth', 'apps', usersApps.value?.map((c) => c.app_id)]),
-	queryFn: () =>
-		useBaseFetch('oauth/apps', {
-			internal: true,
-			query: {
-				ids: JSON.stringify(usersApps.value.map((c) => c.app_id)),
-			},
-		}),
+	queryFn: () => client.labrinth.oauth_internal.getApps(usersApps.value.map((c) => c.app_id)),
 	enabled: computed(() => !!usersApps.value?.length),
 })
 
 const { data: appCreatorsInformation } = useQuery({
 	queryKey: computed(() => ['users', appInformation.value?.map((c) => c.created_by)]),
 	queryFn: () =>
-		useBaseFetch('users', {
-			query: {
-				ids: JSON.stringify(appInformation.value.map((c) => c.created_by)),
-			},
-		}),
+		client.labrinth.users_v2.getMultiple(appInformation.value.map((c) => c.created_by)),
 	enabled: computed(() => !!appInformation.value?.length),
 })
 
@@ -165,13 +154,7 @@ const appInfoLookup = computed(() => {
 
 async function revokeApp(id) {
 	try {
-		await useBaseFetch(`oauth/authorizations`, {
-			internal: true,
-			method: 'DELETE',
-			query: {
-				client_id: id,
-			},
-		})
+		await client.labrinth.oauth_internal.revokeAuthorization(id)
 		revokingId.value = null
 		await refresh()
 	} catch (err) {
