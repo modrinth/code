@@ -155,10 +155,12 @@ import {
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	StyledInput,
 	useCompactNumber,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
@@ -214,6 +216,7 @@ useHead({
 
 const auth = await useAuth()
 const user = await useUser()
+const client = injectModrinthClient()
 
 if (import.meta.client) {
 	await initUserFollows()
@@ -221,9 +224,10 @@ if (import.meta.client) {
 
 const filterQuery = ref('')
 
-const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/collections`, () =>
-	useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
-)
+const { data: collections } = useQuery({
+	queryKey: ['user', auth.value.user.id, 'collections'],
+	queryFn: () => client.labrinth.users_v2.getCollections(auth.value.user.id),
+})
 
 const route = useNativeRoute()
 const router = useNativeRouter()

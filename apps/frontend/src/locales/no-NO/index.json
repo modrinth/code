@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Nedlastingsalternativer"
   },
-  "app-marketing.download.terms": {
-    "message": "Ved å laste ned Modrinth-appen godtar du våre <terms-link>Brukervilkår</terms-link> og <privacy-link>Personvernerklæring</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Last ned Modrinth-appen (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth-appen yter bedre enn mange av de ledende mod-launcherne og bruker kun 150MB med RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Ingen prosjekter i samlingen ennå"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Ingen prosjekt ennå} one {<stat>{count}</stat> prosjekt} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Oppdatert {ago}"
   },
@@ -554,9 +545,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Lag ny"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} prosjekt} other {{count} prosjekter}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Søk i samlingene dine"
   },
@@ -631,9 +619,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En virksomhet (eller foretak) refererer til en registrert organisasjon, som for eksempel et aksjeselskap, ansvarlig selskap eller et selskap med begrenset ansvar."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Trekker du ut midler som privatperson eller som virksomhet?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privatperson"
@@ -1106,9 +1091,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hosting-serverne DDoS-beskyttelse?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alle Modrinth Hosting-serverne kommer med DDoS-beskyttelse, med en kapasitet opp til 17Tbps noen plasser."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Ofte Stilte Spørsmål"
   },
@@ -1213,9 +1195,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "Veit du nøyaktig hva du trenger?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Prøv en gratis <orange>3GB server</orange> i 5 dager, kjørt av <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Lær mer"
@@ -1399,9 +1378,6 @@
   },
   "landing.section.for-players.label": {
     "message": "For Spillerer"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Oppdag over {count} skaperer"
   },
   "landing.subheading": {
     "message": "Oppdag, spill, og del Minecraft-innhold gjennom den åpenkjeldekode-plattformen vår, bygd for fellesskapet."
@@ -1991,9 +1967,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {nedlasting} other {nedlastinger}}"
-  },
   "profile.label.joined": {
     "message": "Blei med"
   },
@@ -2011,9 +1984,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisasjoner"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {prosjekt} other {prosjekt}}"
   },
   "profile.label.saving": {
     "message": "Lagrer..."
@@ -2624,9 +2594,6 @@
   "scopes.reportWrite.label": {
     "message": "Skriv rapporter"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Gå inn i utstedte Modrinth-problem"
-  },
   "scopes.sessionAccess.label": {
     "message": "Gå inn i sesjoner"
   },
@@ -2723,9 +2690,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synkroniser med server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Gjennoppretting av sikkerhetskopier på veg"
-  },
   "servers.notice.actions": {
     "message": "Handlinger"
   },
@@ -2776,9 +2740,6 @@
   },
   "settings.applications.button.add-more": {
     "message": "Legg til mer"
-  },
-  "settings.applications.button.add-redirect-uri": {
-    "message": "Legg til en omdirigerings-uri"
   },
   "settings.applications.button.cancel": {
     "message": "Avbryt"
@@ -2839,9 +2800,6 @@
   },
   "settings.applications.field.redirect-uri.placeholder": {
     "message": "https://example.com/auth/callback"
-  },
-  "settings.applications.field.redirect-uris": {
-    "message": "Tilbakekall uri-er"
   },
   "settings.applications.field.scopes": {
     "message": "Tilganger"
@@ -2998,9 +2956,6 @@
   },
   "settings.pats.action.create": {
     "message": "Lag en PAT"
-  },
-  "settings.pats.description": {
-    "message": "PAT-er kan bli brukt for å få tilgang til API-en til Modrinth. For mer informasjon, gå til <doc-link>API-dokummentasjonen til Modrinth</doc-link>. De kan bli oppretta og tilbakekalt når som helst."
   },
   "settings.pats.modal.create.action": {
     "message": "Lag PAT"

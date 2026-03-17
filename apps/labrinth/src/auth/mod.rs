@@ -20,8 +20,6 @@ use thiserror::Error;
 pub enum AuthenticationError {
     #[error(transparent)]
     Internal(#[from] eyre::Report),
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
     #[error("An unknown database error occurred: {0}")]
     Sqlx(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
@@ -58,7 +56,6 @@ impl actix_web::ResponseError for AuthenticationError {
             AuthenticationError::Internal(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            AuthenticationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::Sqlx(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::Database(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
@@ -94,7 +91,6 @@ impl AuthenticationError {
     pub fn error_name(&self) -> &'static str {
         match self {
             AuthenticationError::Internal(..) => "internal_error",
-            AuthenticationError::Env(..) => "environment_error",
             AuthenticationError::Sqlx(..) => "database_error",
             AuthenticationError::Database(..) => "database_error",
             AuthenticationError::SerDe(..) => "invalid_input",

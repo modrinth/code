@@ -11,6 +11,61 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-17T12:40:00-08:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Fixed personal access token settings page erroring.`,
+	},
+	{
+		date: `2026-03-17T12:15:00-08:00`,
+		product: 'hosting',
+		body: `## [Content Management Overhaul](/news/article/content-management-overhaul)
+- We've overhauled the Content tab and improved parity with Modrinth App. Check out our [blog post](/news/article/content-management-overhaul) to learn more.`,
+	},
+	{
+		date: `2026-03-13T00:15:00-00:00`,
+		product: 'app',
+		version: '0.12.2',
+		body: `## Hotfixes
+- Fixed search pages not showing beyond the first page.`,
+	},
+	{
+		date: `2026-03-12T16:30:00-00:00`,
+		product: 'app',
+		version: '0.12.1',
+		body: `## Improvements
+- Added shift + click multiselect to the content tab.
+- Fixed overflow problem with the content sort button in the content tab.
+- Bulk enable, bulk disable and bulk delete actions are now done immediately all in one go, rather one by one.
+- Improved installing visual and state management for content on the content tab.`,
+	},
+	{
+		date: `2026-03-12T14:05:00-00:00`,
+		product: 'app',
+		version: '0.12.0',
+		body: `## Major changes
+- Overhauled the "Content" tab on instances
+	- Installed modpacks now display under the content tab
+	- Content that came bundled with a modpack is now separated from content you have installed on top of it. To view a modpack's content, click the "Content" button in the modpack's card.
+	- Added the ability to sort content by date added.
+	- Overhauled the pop-out screen for updating a modpack. It will now make it clearer when a version is likely incompatible, and will show you the changelogs of each version.
+	- Various bugs and inconsistencies with the content list has now been fixed.
+
+## Improvements
+- Fixed the "add server to instance" pop-out opening slowly.
+- Fixed project pages not showing organizations under "Creators" in the sidebar.
+- In the library, split "Downloaded" tab into "Modpacks" and "Servers" depending on instance type.`,
+	},
+	{
+		date: `2026-03-10T16:40:00-00:00`,
+		product: 'app',
+		version: '0.11.4',
+		body: `## Improvements
+- Fix PostHog analytics
+- Improve language selector
+- Improve server play analytics tracking`,
+	},
+	{
 		date: `2026-03-06T19:10:00-08:00`,
 		product: 'app',
 		version: '0.11.3',

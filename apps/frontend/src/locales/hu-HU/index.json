@@ -30,7 +30,7 @@
     "message": "Linux"
   },
   "app-marketing.download.linux-disclaimer": {
-    "message": "A Linux verziója a Modrinth Appnak <issues-link>problémái vannak</issues-link> bizonyos rendszereken és a konfigurációin. Ha a Modrinth App instabil a rendszereden akkor próbáld ki a <prism-link>Prism Launcher</prism-link>t, ahol nagyon könnyen lehet Modrinth tartalmat telepíteni."
+    "message": "A Linux verziója a Modrinth Appnak <issues-link>problémái vannak</issues-link> bizonyos rendszereken és a konfigurációkon. Ha a Modrinth App instabil a rendszereden akkor próbáld ki a <prism-link>Prism Launcher</prism-link>t, ahol nagyon könnyen lehet Modrinth tartalmat telepíteni."
   },
   "app-marketing.download.mac": {
     "message": "Mac"
@@ -393,7 +393,7 @@
     "message": "Még nincsenek projektek ebben a gyűjteményben"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Még nincsenek projektek} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural,=0 {Nincsen még projekt} other {<stat>{count}</stat>{type}}}"
   },
   "collection.label.updated-at": {
     "message": "Frissítve {ago}"
@@ -564,7 +564,7 @@
     "message": "A társulati linkjeid"
   },
   "dashboard.affiliate-links.revoke-confirm.body": {
-    "message": "Ez vissza fogja vonni a `{id}` számú társulati kódod, és bármely létező linket, ami ehhez a kódhoz van kötve, így a ezek a linkek többé nem lesznek validak."
+    "message": "Ez vissza fogja vonni a(z) `{id}` számú társulati kódod, és bármely létező linket, ami ehhez a kódhoz van kötve, így a ezek a linkek többé nem lesznek érvényesek."
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Visszavonás"
@@ -579,7 +579,7 @@
     "message": "Új létrehozása"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count} projekt"
+    "message": "{count} {countPlural, plural, one {projekt} other {projektek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Keresd meg a gyűjteményeidet"
@@ -1064,9 +1064,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "A Modrinth Hosting szerverei rendelkeznek DDoS védelemmel?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Igen. Az összes Modrinth Hosting szerver DDoS védelemmel rendelkezik, egyes helyszíneken akár 17 Tbps kapacitással."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Gyakori kérdések"
   },
@@ -1121,6 +1118,9 @@
   "hosting-marketing.included.advanced-networking": {
     "message": "Fejlett hálózatkezelés"
   },
+  "hosting-marketing.included.advanced-networking.description": {
+    "message": "."
+  },
   "hosting-marketing.included.backups-included": {
     "message": "Tartalmaz biztonsági másolatokat"
   },
@@ -1165,9 +1165,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "Pontosan tudod, mire van szükséged?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Próbálja ki 5 napig ingyenesen a <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít."
   },
   "hosting-marketing.medal.learn-more": {
     "message": "További információk"
@@ -1216,6 +1213,9 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Válassz a Vanilla, Fabric, Forge, Quilt és NeoForge közül. Ha Modrinthon fut, akkor a szervereden is futtatható."
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select,null {Betöltő} other {{loader}}} Verzió"
   },
   "hosting.plan.select-plan": {
     "message": "Csomag kiválasztása"
@@ -1347,7 +1347,7 @@
     "message": "Játékosoknak"
   },
   "landing.section.for-players.tagline": {
-    "message": "Fedezz fel több, mint {count} projektet"
+    "message": "Fedez fel több mint {count, number} alkotást"
   },
   "landing.subheading": {
     "message": "Fedezz fel, játssz és ossz meg Minecraft-tartalmakat a közösség számára létrehozott nyílt forráskódú platformunkon."
@@ -1637,6 +1637,9 @@
   "muralpay.document-type.passport": {
     "message": "Útlevél"
   },
+  "muralpay.document-type.ruc": {
+    "message": "RUC"
+  },
   "muralpay.document-type.tax-id": {
     "message": "Adó ID"
   },
@@ -1690,6 +1693,12 @@
   },
   "muralpay.field.random-key": {
     "message": "Random kulcs"
+  },
+  "muralpay.field.routing-number": {
+    "message": "Irányító szám"
+  },
+  "muralpay.field.swift-bic": {
+    "message": "SWIFT/BIC"
   },
   "muralpay.help.clabe": {
     "message": "Clave Bancaria Estandarizada (Mexikói bank fiók száma)"
@@ -1878,7 +1887,7 @@
     "message": "Gyűjtemény"
   },
   "profile.label.downloads": {
-    "message": "{count} letöltés"
+    "message": "{count} {countPlural, plural,one {letöltés} other {letöltések}}"
   },
   "profile.label.joined": {
     "message": "Csatlakozott"
@@ -1899,7 +1908,7 @@
     "message": "Szervezetek"
   },
   "profile.label.projects": {
-    "message": "{count} projekt"
+    "message": "{count} {countPlural, plural,one {projekt} other {projektek}}"
   },
   "profile.label.saving": {
     "message": "Mentés..."
@@ -1981,6 +1990,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Adatcsomag"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Szerverek"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Szerver"
   },
   "project-type.mod.plural": {
     "message": "Modok"
@@ -2303,8 +2318,23 @@
   "scopes.category.organizations": {
     "message": "Szervezetek"
   },
+  "scopes.category.pats": {
+    "message": "PAT-ek"
+  },
+  "scopes.category.payouts": {
+    "message": "Kifizetések"
+  },
   "scopes.category.projects": {
     "message": "Projektek"
+  },
+  "scopes.category.reports": {
+    "message": "Jelentések"
+  },
+  "scopes.category.sessions": {
+    "message": "Munkamenetek"
+  },
+  "scopes.category.threads": {
+    "message": "Szálak"
   },
   "scopes.category.user-account": {
     "message": "Felhasználói fiók"
@@ -2312,11 +2342,89 @@
   "scopes.category.versions": {
     "message": "Verziók"
   },
+  "scopes.collectionCreate.description": {
+    "message": "Gyűjtemények létrehozása"
+  },
+  "scopes.collectionCreate.label": {
+    "message": "Gyűjtemények létrehozása"
+  },
+  "scopes.collectionDelete.description": {
+    "message": "Gyűjtemények törlése"
+  },
+  "scopes.collectionDelete.label": {
+    "message": "Gyűjtemények törlése"
+  },
+  "scopes.collectionRead.description": {
+    "message": "Gyűjtemények olvasása"
+  },
+  "scopes.collectionRead.label": {
+    "message": "Gyűjtemények olvasása"
+  },
+  "scopes.collectionWrite.description": {
+    "message": "Gyűjteményekhez írás"
+  },
+  "scopes.collectionWrite.label": {
+    "message": "Gyűjtemények írása"
+  },
   "scopes.notificationRead.description": {
     "message": "Olvasd el az értesítéseidet"
   },
+  "scopes.notificationRead.label": {
+    "message": "Értesítések olvasása"
+  },
   "scopes.notificationWrite.description": {
     "message": "Töröld/Nézd meg az értesítéseidet"
+  },
+  "scopes.notificationWrite.label": {
+    "message": "Értesítések írása"
+  },
+  "scopes.organizationCreate.description": {
+    "message": "Szervezetek létrehozása"
+  },
+  "scopes.organizationCreate.label": {
+    "message": "Szervezetek létrehozása"
+  },
+  "scopes.organizationDelete.description": {
+    "message": "Szervezetek törlése"
+  },
+  "scopes.organizationDelete.label": {
+    "message": "Szervezetek törlése"
+  },
+  "scopes.organizationRead.description": {
+    "message": "Szervezetek olvasása"
+  },
+  "scopes.organizationRead.label": {
+    "message": "Szervezetek olvasása"
+  },
+  "scopes.organizationWrite.description": {
+    "message": "Szervezetekhez írás"
+  },
+  "scopes.organizationWrite.label": {
+    "message": "Szervezetekhez írás"
+  },
+  "scopes.patCreate.description": {
+    "message": "Személyes API tokenek létrehozása"
+  },
+  "scopes.patCreate.label": {
+    "message": "PAT-ek létrehozása"
+  },
+  "scopes.patDelete.description": {
+    "message": "Személyes API tokenek törlése"
+  },
+  "scopes.patDelete.label": {
+    "message": "PAT-ek törlése"
+  },
+  "scopes.patRead.description": {
+    "message": "Létrehozott API tokenek megtekintése"
+  },
+  "scopes.patRead.label": {
+    "message": "PAT-ek olvasása"
+  },
+  "scopes.patWrite.description": {
+    "message": "Személyes API tokenek szerkesztése"
+  },
+  "scopes.patWrite.label": {
+    "message": "PAT-ek írása"
   },
   "scopes.performAnalytics.description": {
     "message": "Analitikai tevékenységek végrehajtása"
@@ -2366,9 +2474,6 @@
   "scopes.reportWrite.label": {
     "message": "Jelentések írása"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Modrinth kiadott munkamenetek hozzáférés"
-  },
   "scopes.sessionAccess.label": {
     "message": "Munkamenetek hozzáférése"
   },
@@ -2402,11 +2507,26 @@
   "servers.notice.actions": {
     "message": "Akciók"
   },
+  "servers.notice.dismissable": {
+    "message": "Elutasítható"
+  },
+  "servers.notice.expires": {
+    "message": "Lejár"
+  },
   "servers.notice.id": {
     "message": "Azonosító"
   },
   "servers.notice.level": {
     "message": "Szint"
+  },
+  "servers.notice.undismissable": {
+    "message": "Elutasíthatatlan"
+  },
+  "servers.notices.create-notice": {
+    "message": "Értesítés létrehozása"
+  },
+  "servers.notices.no-notices": {
+    "message": "Nincsen értesítés"
   },
   "servers.plan.large.description": {
     "message": "Ideális 15–25 játékos számára, modcsomagokhoz vagy intenzív moddoláshoz."
@@ -2426,20 +2546,95 @@
   "servers.plan.small.name": {
     "message": "Kicsi"
   },
+  "settings.applications.about": {
+    "message": "Rólunk"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Több hozzáadása"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Átírányítás URI hozzáadása"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Megszakítás"
+  },
+  "settings.applications.button.create": {
+    "message": "Alkalmazás létrehozása"
+  },
+  "settings.applications.button.delete": {
+    "message": "Törlés"
+  },
   "settings.applications.button.edit": {
     "message": "Szerkesztés"
+  },
+  "settings.applications.button.new": {
+    "message": "Új alkalmazás"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Módosítások mentése"
   },
   "settings.applications.button.upload-icon": {
     "message": "Ikon feltöltése"
   },
+  "settings.applications.client-id": {
+    "message": "Kliens ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Kliens secret"
+  },
   "settings.applications.created-on": {
     "message": "Létrehozva: {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Alkamazás törlése"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Biztos törölni szeretnéd ezt az alkamazást?"
+  },
+  "settings.applications.field.description": {
+    "message": "Leírás"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Ad meg az alkamazás leírását..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Ikon"
+  },
+  "settings.applications.field.name": {
+    "message": "Név"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Ad meg az alkamazás nevét..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://pelda.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Átírányítás URI-relek"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Hatáskörök"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
   },
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.modal.header": {
+    "message": "Alkamazás információ"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Hiba történt"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Az alkamazásod ikonja frissítve lett."
+  },
   "settings.applications.notification.icon-updated.title": {
     "message": "Ikon frissítve"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "A secreteted most mentesd el, el lesz tüntetve mituán elhagyod ezt az oldalt!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Előfizetés lemondása"
@@ -2450,11 +2645,35 @@
   "settings.billing.modal.cancel.title": {
     "message": "Biztos, hogy le akarod mondani az előfizetésedet?"
   },
+  "settings.billing.modal.delete.action": {
+    "message": "Fizetési lehetőség törlése"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "Ez örökre törölni fogja ezt a fizetési lehetőséget (tényleg örökre)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Biztos törölni szeretnéd ezt a fizetési lehetőséget?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Fizetési lehetőség hozzáadása"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Elsődlegesé rakás"
+  },
   "settings.billing.payment_method.card_expiry": {
     "message": "Lejár: {month}/{year}"
   },
+  "settings.billing.payment_method.primary": {
+    "message": "Elsődleges"
+  },
+  "settings.billing.pyro_subscription.title": {
+    "message": "Modrinth Szerver Előfizetések"
+  },
   "settings.billing.subscription.title": {
     "message": "Előfizetések"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Fejlesztői mód deaktiválása"
   },
   "settings.display.banner.developer-mode.description": {
     "message": "A <strong>fejlesztői mód</strong> aktív. Ez lehetővé teszi, hogy megtekintsd a Modrinth különböző elemeinek belső azonosítóit, ami hasznos lehet, ha a Modrinth API-t használó fejlesztő vagy. Kattints ötször a lap alján található Modrinth logóra a fejlesztői mód bekapcsolásához."
@@ -2479,6 +2698,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Forráscsomagok oldal"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Szerverek oldal"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaferek oldal"
@@ -2516,11 +2738,53 @@
   "settings.display.theme.title": {
     "message": "Téma"
   },
+  "settings.pats.action.create": {
+    "message": "PAT létrehozása"
+  },
+  "settings.pats.modal.create.action": {
+    "message": "PAT létrehozása"
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "Lejár"
+  },
   "settings.pats.modal.create.name.label": {
     "message": "Név"
   },
+  "settings.pats.modal.create.name.placeholder": {
+    "message": "Írd be a PAT nevét..."
+  },
+  "settings.pats.modal.create.title": {
+    "message": "Személyes elérési token létrehozása"
+  },
+  "settings.pats.modal.delete.action": {
+    "message": "Token törlése"
+  },
+  "settings.pats.modal.delete.description": {
+    "message": "Ez örökre törölni fogja ezt a tokent (tényleg örökre)."
+  },
+  "settings.pats.modal.delete.title": {
+    "message": "Biztosan törölni akarod ezt a tokent?"
+  },
+  "settings.pats.modal.edit.title": {
+    "message": "Személyes elérési token szerkesztése"
+  },
+  "settings.pats.token.action.edit": {
+    "message": "Token szerkesztése"
+  },
   "settings.pats.token.action.revoke": {
     "message": "Tokened visszavonása"
+  },
+  "settings.pats.token.expired-ago": {
+    "message": "Lejárt {ago}"
+  },
+  "settings.pats.token.expires-in": {
+    "message": "Lejár {inTime}"
+  },
+  "settings.pats.token.last-used": {
+    "message": "Utoljára használva {ago}"
+  },
+  "settings.pats.token.never-used": {
+    "message": "Sohasem volt használva"
   },
   "settings.profile.bio.description": {
     "message": "Egy rövid leírás, hogy mindenki megismerjen téged."
@@ -2540,16 +2804,43 @@
   "settings.profile.username.description": {
     "message": "Egyedi, kis- és nagybetűktől független név a profilod azonosításához."
   },
+  "settings.sessions.action.revoke-session": {
+    "message": "Munkamenet visszavonása"
+  },
   "settings.sessions.created-ago": {
     "message": "Létrehozva {ago}"
   },
+  "settings.sessions.current-session": {
+    "message": "Jelenlegi munkamenet"
+  },
   "settings.sessions.description": {
     "message": "Itt találhatók azok az eszközök, amelyek jelenleg be vannak jelentkezve a Modrinth fiókodba. Mindegyikről külön-külön kijelentkezhetsz.\n\nHa nem ismerős bejegyzést látsz, jelentkezz ki az adott eszközről, és azonnal változtasd meg Modrinth fiókod jelszavát."
+  },
+  "settings.sessions.last-accessed-ago": {
+    "message": "Legutoljára hozzáférve {ago}"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Ismeretlen operációs rendszer"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Ismeretlen platform"
   },
   "ui.latest-news-row.latest-news": {
     "message": "A legújabb hírek a Modrinthról"
   },
   "ui.latest-news-row.view-all": {
     "message": "Összes hír"
+  },
+  "version.environment.none.description": {
+    "message": "A környezet erre a verzióra nem lett megadva."
+  },
+  "version.environment.none.title": {
+    "message": "Nincsen környezet beállítva"
+  },
+  "version.environment.unknown.description": {
+    "message": "A környezet: \"{environment}\" nem ismerthető."
+  },
+  "version.environment.unknown.title": {
+    "message": "Ismeretlen környezet"
   }
 }

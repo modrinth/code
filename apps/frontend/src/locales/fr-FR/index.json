@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n’utilisant que 150 Mo de RAM !"
+    "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de RAM !"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Pas de projet dans la collection actuellement"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aucun projets actuellement} one {<stat>{count}</stat> projet} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Aucun projet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Mis à jour {ago}"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Créer un nouveau"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Créer votre première collection pour commencer !"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Vous n'avez toujours pas fait de collection"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Aucune collection correspond à votre recherche"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Essayez d'ajuster vos filtres ou vos termes de recherche."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projet} other {{count} projets}}"
+    "message": "{count} {countPlural, plural, one {projet} other {projets}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Rechercher dans vos collections"
@@ -1131,7 +1143,7 @@
     "message": "Les serveurs de Modrinth Hosting ont-ils une protection DDoS ?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d’une protection DDoS, avec une capacité allant jusqu’à 17 Tbps dans certains endroits."
+    "message": "Oui. Tous les serveurs de Modrinth Hosting sont équipés d'une protection DDoS, avec une capacité allant jusqu'à 17 Tbps dans certains endroits."
   },
   "hosting-marketing.faq.heading": {
     "message": "Foire aux Questions"
@@ -1140,10 +1152,10 @@
     "message": "À quel point les serveurs de Modrinth Hosting sont-ils rapides ?"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l’affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l’utilisateur."
+    "message": "Les serveurs de Modrinth Hosting sont hébergés sur du matériel très moderne et performant, mais il est difficile de dire exactement comment cela se traduira par la vitesse à laquelle votre serveur fonctionnera, car il y a tellement de facteurs qui l'affectent, tels que les mods, les packs de données ou les plugins que vous exécutez sur votre serveur, et même le comportement de l'utilisateur."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d’un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
+    "message": "La plupart des problèmes de performance qui surviennent ont tendance à être la faute d'un modpack, mod, pack de données ou plugin non optimisé qui provoque du lag chez le serveur. Puisque nos serveurs sont très haut de gamme, vous ne devriez pas rencontrer beaucoup de problèmes tant que vous choisissez un plan approprié pour le contenu que vous diffusez sur le serveur."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Puis-je augmenter le stockage sur mon serveur ?"
@@ -1161,7 +1173,7 @@
     "message": "Quelles versions de Minecraft et loaders peuvent-être utilisés ?"
   },
   "hosting-marketing.faq.versions-loaders.answer.one": {
-    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n’importe quelle version de Minecraft : Java Edition jusqu’à la version 1.2.5, y compris les snapshots."
+    "message": "Les serveurs de Modrinth Hosting peuvent exécuter n'importe quelle version de Minecraft : Java Edition jusqu'à la version 1.2.5, y compris les snapshots."
   },
   "hosting-marketing.faq.versions-loaders.answer.two": {
     "message": "Nous prenons également en charge une large gamme de mod loaders et de plugins, y compris Fabric, Quilt, Forge et NeoForge pour les mods, ainsi que Paper et Purpur pour les plugins. La disponibilité dépend si le chargeur de mod ou de plugin prend en charge la version sélectionnée de Minecraft."
@@ -1188,7 +1200,7 @@
     "message": "Gestion de réseautage avancé"
   },
   "hosting-marketing.included.advanced-networking.description": {
-    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu’à 15 ports pour les mods qui en ont besoin, et plus encore."
+    "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu'à 15 ports pour les mods qui en ont besoin, et plus encore."
   },
   "hosting-marketing.included.backups-included": {
     "message": "Sauvegardes de secours incluses"
@@ -1203,7 +1215,7 @@
     "message": "Partagez votre serveur avec une URL <contrast>modrinth.gg</contrast> personnalisée."
   },
   "hosting-marketing.included.description": {
-    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d’hébergement que seul Modrinth peut offrir."
+    "message": "Chaque serveur inclus une suite de fonctionnalités conçues pour offrir une expérience d'hébergement que seul Modrinth peut offrir."
   },
   "hosting-marketing.included.file-manager": {
     "message": "Gestionnaire de fichiers facile à utiliser"
@@ -1218,7 +1230,7 @@
     "message": "De l'aide quand vous en avez besoin"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Contactez l’équipe Modrinth pour obtenir de l’aide avec votre serveur à tout moment."
+    "message": "Contactez l'équipe Modrinth pour obtenir de l'aide avec votre serveur à tout moment."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Une console puissante, un gestionnaire des propriétés du serveur, et plus encore"
@@ -1257,7 +1269,7 @@
     "message": "C'est sur Modrinth que ça se passe"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d’une plateforme à l’autre."
+    "message": "Vos serveurs, vos mods, vous joueurs, et plus encore, le tout sur Modrinth. Pas besoin de passer d'une plateforme à l'autre."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Constamment rapide"
@@ -1275,13 +1287,13 @@
     "message": "Profitez d'un hébergement moderne et fiable"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Les serveurs d’hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
+    "message": "Les serveurs d'hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Jouez là où se trouvent vos mods"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting intègre parfaitement le processus d’installation de mods et de modpacks dans votre serveur."
+    "message": "Modrinth Hosting intègre parfaitement le processus d'installation de mods et de modpacks dans votre serveur."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Pourquoi Modrinth Hosting ?"
@@ -1291,6 +1303,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choisissez entre Vanilla, Fabric, Forge, Quilt et NeoForge. Tout le contenu de Modrinth est compatible avec votre serveur."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Impossible de changer la version du modpack"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Impossible de charger les versions"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Impossible de réinstaller le modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Impossible de réparer le serveur"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Impossible de sauvegarder les paramètres d'installation"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Impossible de délier le modpack"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Version} other {{version}}} du loader"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Votre installation serveur a été réparée."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Réparation terminée"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Réinitialiser le serveur"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Supprime définitivement toutes les données de votre serveur, y compris vos mondes, vos mods, et vos fichiers paramètres. Les sauvegardes resteront et pourront être restaurées."
   },
   "hosting.plan.out-of-stock": {
     "message": "En rupture de stock"
@@ -1425,7 +1470,7 @@
     "message": "Pour les joueurs"
   },
   "landing.section.for-players.tagline": {
-    "message": "Découvrez jusqu’à {count} créations"
+    "message": "Découvrez plus de {count, number} créations"
   },
   "landing.subheading": {
     "message": "Découvrez, jouez et partagez du contenu Minecraft grâce à notre plateforme open-source conçue pour la communauté."
@@ -2028,7 +2073,7 @@
     "message": "Collection"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {téléchargement} other {téléchargements}}"
+    "message": "{count} {countPlural, plural, one {téléchargement} other {téléchargements}}"
   },
   "profile.label.joined": {
     "message": "Rejoint"
@@ -2049,7 +2094,7 @@
     "message": "Organisations"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {projet} other {projets}}"
+    "message": "{count} {countPlural, plural, one {projet} other {projets}}"
   },
   "profile.label.saving": {
     "message": "Sauvegarde en cours..."
@@ -2771,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "Création d'une sauvegarde en cours"
+  },
+  "servers.busy.backup-restoring": {
     "message": "Restauration de sauvegarde en cours"
+  },
+  "servers.busy.installing": {
+    "message": "Le serveur est en cours d'installation"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Synchronisation du contenu en cours"
   },
   "servers.notice.actions": {
     "message": "Actions"
@@ -3051,7 +3105,7 @@
     "message": "Créer un PAT"
   },
   "settings.pats.description": {
-    "message": "Des jetons d'accès personnels peuvent être utilisés pour accéder à l'API de Modrinth. Pour plus d'informations, consultez la <doc-link>documentation de l'API de Modrinth</doc-link>. Ils peuvent être créés et révoqués à tout moment."
+    "message": "Les PAT peuvent être utilisés pour accéder à l'API de Modrinth. Ils peuvent être créés et révoqués à tout moment. Pour plus d'informations, voir <doc-link>La documentation API de Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Créer un PAT"

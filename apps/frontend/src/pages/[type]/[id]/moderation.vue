@@ -100,7 +100,14 @@
 </template>
 <script setup>
 import { CheckIcon, IssuesIcon, XIcon } from '@modrinth/assets'
-import { Badge, injectNotificationManager, injectProjectPageContext } from '@modrinth/ui'
+import {
+	Badge,
+	injectModrinthClient,
+	injectNotificationManager,
+	injectProjectPageContext,
+} from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed } from 'vue'
 
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
@@ -116,26 +123,24 @@ const { addNotification } = injectNotificationManager()
 const { projectV2: project, currentMember, invalidate } = injectProjectPageContext()
 
 const auth = await useAuth()
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
-const { data: thread } = await useAsyncData(
-	() => `thread/${project.value.thread_id}`,
-	() => useBaseFetch(`thread/${project.value.thread_id}`),
-)
+const { data: thread } = useQuery({
+	queryKey: computed(() => ['thread', project.value?.thread_id]),
+	queryFn: () => client.labrinth.threads_v3.getThread(project.value.thread_id),
+	enabled: computed(() => !!project.value?.thread_id),
+})
 
 async function setStatus(status) {
 	startLoading()
 
 	try {
-		const data = {}
-		data.status = status
-		await useBaseFetch(`project/${project.value.id}`, {
-			method: 'PATCH',
-			body: data,
-		})
+		await client.labrinth.projects_v2.edit(project.value.id, { status })
 
 		project.value.status = status
 		await invalidate()
-		thread.value = await useBaseFetch(`thread/${thread.value.id}`)
+		await queryClient.invalidateQueries({ queryKey: ['thread', project.value?.thread_id] })
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',

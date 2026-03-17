@@ -2,7 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::profile::get_full_path;
 use crate::state::server_join_log::JoinLogEntry;
 use crate::state::{
-    CacheBehaviour, CachedEntry, CachedFileHash, cache_file_hash,
+    CacheBehaviour, CachedEntry, CachedFile, CachedFileHash, cache_file_hash,
 };
 use crate::util;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore, write_cached_icon};
@@ -409,6 +409,14 @@ macro_rules! select_profiles_with_predicate {
     };
 }
 
+struct InitialScanFile {
+    path: String,
+    file_name: String,
+    project_type: ProjectType,
+    size: u64,
+    cache_key: String,
+}
+
 impl Profile {
     pub async fn get(
         path: &str,
@@ -640,6 +648,8 @@ impl Profile {
                             && let Some(file_name) = subdirectory
                                 .file_name()
                                 .and_then(|x| x.to_str())
+                            && !(project_type == ProjectType::ShaderPack
+                                && file_name.ends_with(".txt"))
                         {
                             let file_size = subdirectory
                                 .metadata()
@@ -909,63 +919,8 @@ impl Profile {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<DashMap<String, ProfileFile>> {
-        let path = crate::api::profile::get_full_path(&self.path).await?;
-
-        struct InitialScanFile {
-            path: String,
-            file_name: String,
-            project_type: ProjectType,
-            size: u64,
-            cache_key: String,
-        }
-
-        let mut keys = vec![];
-
-        for project_type in ProjectType::iterator() {
-            let folder = project_type.get_folder();
-            let path = path.join(folder);
-
-            if path.exists() {
-                for subdirectory in std::fs::read_dir(&path)
-                    .map_err(|e| io::IOError::with_path(e, &path))?
-                {
-                    let subdirectory =
-                        subdirectory.map_err(io::IOError::from)?.path();
-                    if subdirectory.is_file()
-                        && let Some(file_name) =
-                            subdirectory.file_name().and_then(|x| x.to_str())
-                    {
-                        let file_size = subdirectory
-                            .metadata()
-                            .map_err(io::IOError::from)?
-                            .len();
-
-                        keys.push(InitialScanFile {
-                            path: format!(
-                                "{}/{folder}/{}",
-                                self.path,
-                                file_name.trim_end_matches(".disabled")
-                            ),
-                            file_name: file_name.to_string(),
-                            project_type,
-                            size: file_size,
-                            cache_key: format!(
-                                "{file_size}-{}/{folder}/{file_name}",
-                                self.path
-                            ),
-                        });
-                    }
-                }
-            }
-        }
-
-        let file_hashes = CachedEntry::get_file_hash_many(
-            &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
-            None,
-            pool,
-            fetch_semaphore,
-        )
-        .await?;
+        let (keys, file_hashes) =
+            self.scan_and_hash(pool, fetch_semaphore).await?;
 
         let file_updates = file_hashes
             .iter()
@@ -976,7 +931,7 @@ impl Profile {
             file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
         let file_updates_ref =
             file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
-        let (mut file_info, file_updates) = tokio::try_join!(
+        let (file_info, file_updates) = tokio::try_join!(
             CachedEntry::get_file_many(
                 &file_hashes_ref,
                 cache_behaviour,
@@ -991,18 +946,23 @@ impl Profile {
             )
         )?;
 
+        let mut keys_by_path: std::collections::HashMap<
+            String,
+            InitialScanFile,
+        > = keys.into_iter().map(|k| (k.path.clone(), k)).collect();
+
+        let mut file_info_by_hash: std::collections::HashMap<
+            String,
+            CachedFile,
+        > = file_info.into_iter().map(|f| (f.hash.clone(), f)).collect();
+
         let files = DashMap::new();
 
         for hash in file_hashes {
-            let info_index = file_info.iter().position(|x| x.hash == hash.hash);
-            let file = info_index.map(|x| file_info.remove(x));
+            let file = file_info_by_hash.remove(&hash.hash);
+            let trimmed = hash.path.trim_end_matches(".disabled");
 
-            if let Some(initial_file_index) = keys
-                .iter()
-                .position(|x| x.path == hash.path.trim_end_matches(".disabled"))
-            {
-                let initial_file = keys.remove(initial_file_index);
-
+            if let Some(initial_file) = keys_by_path.remove(trimmed) {
                 let path = format!(
                     "{}/{}",
                     initial_file.project_type.get_folder(),
@@ -1041,6 +1001,95 @@ impl Profile {
         }
 
         Ok(files)
+    }
+
+    pub async fn get_installed_project_ids(
+        &self,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<Vec<String>> {
+        let (_keys, file_hashes) =
+            self.scan_and_hash(pool, fetch_semaphore).await?;
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+
+        let file_info = CachedEntry::get_file_many(
+            &file_hashes_ref,
+            None,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+
+        let project_ids: Vec<String> = file_info
+            .into_iter()
+            .map(|f| f.project_id)
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
+        Ok(project_ids)
+    }
+
+    async fn scan_and_hash(
+        &self,
+        pool: &SqlitePool,
+        fetch_semaphore: &FetchSemaphore,
+    ) -> crate::Result<(Vec<InitialScanFile>, Vec<CachedFileHash>)> {
+        let path = crate::api::profile::get_full_path(&self.path).await?;
+
+        let mut keys = vec![];
+
+        for project_type in ProjectType::iterator() {
+            let folder = project_type.get_folder();
+            let path = path.join(folder);
+
+            if path.exists() {
+                for subdirectory in std::fs::read_dir(&path)
+                    .map_err(|e| io::IOError::with_path(e, &path))?
+                {
+                    let subdirectory =
+                        subdirectory.map_err(io::IOError::from)?.path();
+                    if subdirectory.is_file()
+                        && let Some(file_name) =
+                            subdirectory.file_name().and_then(|x| x.to_str())
+                        && !(project_type == ProjectType::ShaderPack
+                            && file_name.ends_with(".txt"))
+                    {
+                        let file_size = subdirectory
+                            .metadata()
+                            .map_err(io::IOError::from)?
+                            .len();
+
+                        keys.push(InitialScanFile {
+                            path: format!(
+                                "{}/{folder}/{}",
+                                self.path,
+                                file_name.trim_end_matches(".disabled")
+                            ),
+                            file_name: file_name.to_string(),
+                            project_type,
+                            size: file_size,
+                            cache_key: format!(
+                                "{file_size}-{}/{folder}/{file_name}",
+                                self.path
+                            ),
+                        });
+                    }
+                }
+            }
+        }
+
+        let file_hashes = CachedEntry::get_file_hash_many(
+            &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
+            None,
+            pool,
+            fetch_semaphore,
+        )
+        .await?;
+
+        Ok((keys, file_hashes))
     }
 
     fn get_cache_key(file: &CachedFileHash, profile: &Profile) -> String {
@@ -1174,20 +1223,41 @@ impl Profile {
     }
 
     /// Toggle a project's disabled state.
+    ///
+    /// Accepts either a bare file name (e.g. `mymod.jar`) or a relative
+    /// path (`mods/mymod.jar`). The function resolves the current on-disk
+    /// path (enabled or disabled) before renaming, so callers don't need
+    /// to track the `.disabled` suffix.
     #[tracing::instrument]
     pub async fn toggle_disable_project(
         profile_path: &str,
         project_path: &str,
     ) -> crate::Result<String> {
-        let path = crate::api::profile::get_full_path(profile_path).await?;
+        let base = crate::api::profile::get_full_path(profile_path).await?;
 
-        let new_path = if project_path.ends_with(".disabled") {
-            project_path.trim_end_matches(".disabled").to_string()
+        let trimmed = project_path.trim_end_matches(".disabled");
+
+        // Resolve the actual current path on disk
+        let current_path = if base.join(project_path).exists() {
+            project_path.to_string()
+        } else if base.join(format!("{trimmed}.disabled")).exists() {
+            format!("{trimmed}.disabled")
+        } else if base.join(trimmed).exists() {
+            trimmed.to_string()
         } else {
-            format!("{project_path}.disabled")
+            return Err(crate::ErrorKind::FSError(format!(
+                "Could not find project file for '{project_path}' in profile"
+            ))
+            .into());
         };
 
-        io::rename_or_move(&path.join(project_path), &path.join(&new_path))
+        let new_path = if current_path.ends_with(".disabled") {
+            current_path.trim_end_matches(".disabled").to_string()
+        } else {
+            format!("{current_path}.disabled")
+        };
+
+        io::rename_or_move(&base.join(&current_path), &base.join(&new_path))
             .await?;
 
         Ok(new_path)

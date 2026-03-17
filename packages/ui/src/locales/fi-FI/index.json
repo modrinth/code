@@ -131,6 +131,54 @@
   "collections.label.private": {
     "defaultMessage": "Yksityinen"
   },
+  "form.label.first-name": {
+    "defaultMessage": "Etunimi"
+  },
+  "form.label.last-name": {
+    "defaultMessage": "Sukunimi"
+  },
+  "form.label.postal-code": {
+    "defaultMessage": "Postinumero"
+  },
+  "form.label.state-province": {
+    "defaultMessage": "Maakunta"
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Syötä määrä"
+  },
+  "form.placeholder.business-name": {
+    "defaultMessage": "Syötä toiminimi"
+  },
+  "form.placeholder.city": {
+    "defaultMessage": "Syötä kaupunki"
+  },
+  "form.placeholder.country": {
+    "defaultMessage": "Valitse maa"
+  },
+  "form.placeholder.email": {
+    "defaultMessage": "Syötä sähköpostiosoite"
+  },
+  "form.placeholder.first-name": {
+    "defaultMessage": "Syötä etunimi"
+  },
+  "form.placeholder.last-name": {
+    "defaultMessage": "Syötä sukunimi"
+  },
+  "form.placeholder.postal-code": {
+    "defaultMessage": "Syötä postinumero"
+  },
+  "form.placeholder.state": {
+    "defaultMessage": "Syötä maakunta"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resoluutio"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": ""
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} Gt RAM"
+  },
   "icon-select.edit": {
     "defaultMessage": "Muokkaa kuvaketta"
   },
@@ -223,9 +271,6 @@
   },
   "label.password": {
     "defaultMessage": "Salasana"
-  },
-  "label.played": {
-    "defaultMessage": "Pelattu {time}"
   },
   "label.project": {
     "defaultMessage": "Projekti"
@@ -496,6 +541,9 @@
   },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
+  },
+  "settings.display.theme.system": {
+    "defaultMessage": "Synkronoi järjestelmän kanssa"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Väriteema"

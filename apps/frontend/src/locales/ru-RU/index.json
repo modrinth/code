@@ -39,7 +39,7 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
+    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Скачать Modrinth App (бета-версия)"
@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "В коллекции пока нет проектов"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Нет проектов} =1{<stat>{count}</stat> проект} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Нет проектов} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Обновлена {ago}"
@@ -510,7 +510,7 @@
     "message": "Введите название проекта..."
   },
   "create.project.owner-description": {
-    "message": "Укажите себя или организацию, в которой вы состоите."
+    "message": "Укажите себя или организацию, в которой состоите."
   },
   "create.project.owner-label": {
     "message": "Владелец"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Создать новую"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Создайте свою первую коллекцию!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Коллекций пока нет"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Коллекции не найдены"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Попробуйте изменить фильтры или запрос."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} проект} few {{count} проекта} other {{count} проектов}}"
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Поиск по коллекциям"
@@ -753,7 +765,7 @@
     "message": "Подключите свой PayPal и получайте выплаты напрямую."
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
-    "message": "Профиль Venmo успешно сохранён!\n"
+    "message": "Профиль Venmo успешно сохранён!"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Войти через PayPal"
@@ -1257,7 +1269,7 @@
     "message": "Управляйте всем на Modrinth"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Сервер, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
+    "message": "Сервера, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Всегда высокая скорость"
@@ -1291,6 +1303,30 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Modrinth, работает на сервере."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Не удалось загрузить версии наборов модов"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Не удалось загрузить версии"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Не удалось переустановить набор модов"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Не удалось восстановить сервер"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Не удалось сохранить установочные настройки"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Не удалось отвязать набор модов"
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Восстановление завершено"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Сбросить сервер"
   },
   "hosting.plan.out-of-stock": {
     "message": "Нет в наличии"
@@ -1425,7 +1461,7 @@
     "message": "Для игроков"
   },
   "landing.section.for-players.tagline": {
-    "message": "Более {count} творений"
+    "message": "Более {count, number} творений"
   },
   "landing.subheading": {
     "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
@@ -2028,7 +2064,7 @@
     "message": "Коллекция"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
   },
   "profile.label.joined": {
     "message": "Регистрация:"
@@ -2049,7 +2085,7 @@
     "message": "Организации"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {проект} few {проекта} other {проектов}}"
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "profile.label.saving": {
     "message": "Сохранение..."
@@ -2771,8 +2807,17 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Выполняется восстановление из резервной копии"
+  "servers.busy.backup-creating": {
+    "message": "Резервное копирование в процессе"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Восстановление из резервной копии в процессе"
+  },
+  "servers.busy.installing": {
+    "message": "Сервер устанавливается"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Синхронизация контента в процессе"
   },
   "servers.notice.actions": {
     "message": "Действия"
@@ -3051,7 +3096,7 @@
     "message": "Создать токен доступа"
   },
   "settings.pats.description": {
-    "message": "Токены доступа используются для обращения к API Modrinth. Подробнее — в <doc-link>документации</doc-link>. Их можно создавать и отзывать в любое время."
+    "message": "Токены доступа используются для обращения к API Modrinth. Их можно создавать и отзывать в любое время. Подробнее — в <doc-link>документации</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Создать токен доступа"

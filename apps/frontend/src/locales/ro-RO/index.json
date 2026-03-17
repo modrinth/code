@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Opțiuni descărcare"
   },
-  "app-marketing.download.terms": {
-    "message": "Prin descărcarea Modrinth App ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Descarcă Modrinth App (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App funcționează mai bine decât multe dintre cele mai populare aplicații de gestionare a modurilor, utilizând doar 150 MB de memorie RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -536,9 +530,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Creați nouă"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proiect} other {{count} proiecte}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Caută în colecțiile tale"
   },
@@ -806,9 +797,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Au serverele Modrinth Hosting protectie DDos?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Da. Toate serverele Modrinth Hosting vin cu protecție DDos, cu capacitate de pana la 17Tbps in unele locații."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Intrebari frecvente"
   },
@@ -841,9 +829,6 @@
   },
   "hosting-marketing.included.sftp-access": {
     "message": "Acces SFTP"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Testează pe un <orange>server de 3GB</orange> timp de 5 zile, provenit de către <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Afla mai multe"
@@ -994,9 +979,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Pentru Jucători"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Descoperă peste {count} creații"
   },
   "landing.subheading": {
     "message": "Descoperă, joacă, și distribuie conținut pentru Minecraft prin platforma noastră deschisă și construită pentru comunitate."
@@ -1892,9 +1874,6 @@
   "scopes.reportWrite.label": {
     "message": "Scrie rapoarte"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Accesează sesiunile emise de Modrinth"
-  },
   "scopes.sessionAccess.label": {
     "message": "Accesează sesiunile"
   },
@@ -1988,9 +1967,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizează cu serverul"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restaurare copie de rezervă în curs"
-  },
   "servers.notice.actions": {
     "message": "Acțiuni"
   },
@@ -2074,9 +2050,6 @@
   },
   "settings.applications.field.redirect-uri.placeholder": {
     "message": "https://exemplu.com/auth/callback"
-  },
-  "settings.applications.field.redirect-uris": {
-    "message": "Redirecționare URL"
   },
   "settings.applications.field.scopes": {
     "message": "Scopuri"
@@ -2221,9 +2194,6 @@
   },
   "settings.pats.action.create": {
     "message": "Creează un token PAT"
-  },
-  "settings.pats.description": {
-    "message": "Token-urile PAT pot fi folosite pentru a accesa API-ul Modrinths. Pentru mai multe informații, consultați <doc-link>Documentația API a Modrinth's</doc-link>. Acestea pot fi create și revocate în orice moment."
   },
   "settings.pats.modal.create.action": {
     "message": "Creează token PAT"

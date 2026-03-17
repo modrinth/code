@@ -148,8 +148,9 @@ function startAnimation() {
 	}
 }
 
-onMounted(() => {
+onMounted(async () => {
 	window.addEventListener('resize', pickLink)
+	await nextTick()
 	pickLink()
 })
 

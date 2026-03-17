@@ -1,188 +1,225 @@
-use crate::env::ENV;
+use crate::database::redis::RedisPool;
 use crate::models::exp;
 use crate::models::exp::minecraft::JavaServerPing;
-use crate::models::ids::ProjectId;
-use crate::models::projects::SearchRequest;
+use crate::models::ids::{ProjectId, VersionId};
 use crate::queue::server_ping;
-use crate::{database::models::DatabaseError, database::redis::RedisPool};
-use crate::{models::error::ApiError, search::indexing::IndexingError};
-use actix_web::HttpResponse;
-use actix_web::http::StatusCode;
+use crate::routes::ApiError;
+use crate::{database::PgPool, env::ENV};
 use ariadne::ids::base62_impl::parse_base62;
+use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use futures::TryStreamExt;
-use futures::stream::FuturesOrdered;
-use itertools::Itertools;
-use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::fmt::Write;
+use std::{collections::HashMap, str::FromStr};
 use thiserror::Error;
-use tracing::{Instrument, info_span};
+use utoipa::ToSchema;
 
+pub mod backend;
 pub mod indexing;
 
-#[derive(Error, Debug)]
-pub enum SearchError {
-    #[error("MeiliSearch Error: {0}")]
-    MeiliSearch(#[from] meilisearch_sdk::errors::Error),
-    #[error("Error while serializing or deserializing JSON: {0}")]
-    Serde(#[from] serde_json::Error),
-    #[error("Error while parsing an integer: {0}")]
-    IntParsing(#[from] std::num::ParseIntError),
-    #[error("Error while formatting strings: {0}")]
-    FormatError(#[from] std::fmt::Error),
-    #[error("Environment Error")]
-    Env(#[from] dotenvy::Error),
-    #[error("Invalid index to sort by: {0}")]
-    InvalidIndex(String),
-    #[error("Database error: {0}")]
-    Database(#[from] DatabaseError),
+/// Search parameters which can fit in a URL query string.
+///
+/// Used with `GET /*/search` endpoints.
+///
+/// Can be converted into a [`SearchRequest`] using [`From`].
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SearchQuery {
+    pub query: Option<String>,
+    pub offset: Option<String>,
+    pub index: Option<String>,
+    pub limit: Option<String>,
+
+    pub new_filters: Option<String>,
+
+    // TODO: Deprecated values below. WILL BE REMOVED V3!
+    pub facets: Option<String>,
+    pub filters: Option<String>,
+    pub version: Option<String>,
 }
 
-impl actix_web::ResponseError for SearchError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            SearchError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            SearchError::MeiliSearch(..) => StatusCode::BAD_REQUEST,
-            SearchError::Serde(..) => StatusCode::BAD_REQUEST,
-            SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
-            SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
-            SearchError::FormatError(..) => StatusCode::BAD_REQUEST,
-            SearchError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
+/// Search parameters which are more complicated and more suitable for a POST
+/// request body.
+///
+/// Used with `POST /*/search` endpoints.
+///
+/// Can be converted from a [`SearchQuery`] using [`From`].
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SearchRequest {
+    pub query: Option<String>,
+    pub offset: Option<String>,
+    pub index: Option<String>,
+    pub limit: Option<String>,
+    #[serde(default)]
+    pub show_metadata: bool,
+    #[serde(default)]
+    pub elasticsearch_config: backend::elasticsearch::RequestConfig,
+    #[serde(default)]
+    pub typesense_config: backend::typesense::RequestConfig,
+
+    pub new_filters: Option<String>,
+
+    pub facets: Option<String>,
+    pub filters: Option<String>,
+    pub version: Option<String>,
+}
+
+impl From<SearchQuery> for SearchRequest {
+    fn from(query: SearchQuery) -> Self {
+        Self {
+            query: query.query,
+            offset: query.offset,
+            index: query.index,
+            limit: query.limit,
+            show_metadata: false,
+            elasticsearch_config:
+                backend::elasticsearch::RequestConfig::default(),
+            typesense_config: backend::typesense::RequestConfig::default(),
+            new_filters: query.new_filters,
+            facets: query.facets,
+            filters: query.filters,
+            version: query.version,
         }
     }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                SearchError::Env(..) => "environment_error",
-                SearchError::MeiliSearch(..) => "meilisearch_error",
-                SearchError::Serde(..) => "invalid_input",
-                SearchError::IntParsing(..) => "invalid_input",
-                SearchError::InvalidIndex(..) => "invalid_input",
-                SearchError::FormatError(..) => "invalid_input",
-                SearchError::Database(..) => "database_error",
-            },
-            description: self.to_string(),
-            details: None,
-        })
-    }
 }
 
-#[derive(Debug, Clone)]
-pub struct MeilisearchReadClient {
-    pub client: Client,
-}
-
-impl std::ops::Deref for MeilisearchReadClient {
-    type Target = Client;
-
-    fn deref(&self) -> &Self::Target {
-        &self.client
-    }
-}
-
-pub struct BatchClient {
-    pub clients: Vec<Client>,
-}
-
-impl BatchClient {
-    pub fn new(clients: Vec<Client>) -> Self {
-        Self { clients }
-    }
-
-    pub async fn with_all_clients<'a, T, G, Fut>(
-        &'a self,
-        task_name: &str,
-        generator: G,
-    ) -> Result<Vec<T>, IndexingError>
-    where
-        G: Fn(&'a Client) -> Fut,
-        Fut: Future<Output = Result<T, IndexingError>> + 'a,
-    {
-        let mut tasks = FuturesOrdered::new();
-        for (idx, client) in self.clients.iter().enumerate() {
-            tasks.push_back(generator(client).instrument(info_span!(
-                "client_task",
-                task.name = task_name,
-                client.idx = idx,
-            )));
-        }
-
-        let results = tasks.try_collect::<Vec<T>>().await?;
+#[async_trait]
+pub trait SearchBackend: Send + Sync {
+    async fn search_for_project(
+        &self,
+        info: &SearchRequest,
+        redis: &RedisPool,
+    ) -> Result<SearchResults, ApiError> {
+        let mut results = self.search_for_project_raw(info).await?;
+        hydrate_search_results(&mut results.hits, redis)
+            .await
+            .map_err(ApiError::Internal)?;
         Ok(results)
     }
 
-    pub fn across_all<T, F, R>(&self, data: Vec<T>, mut predicate: F) -> Vec<R>
-    where
-        F: FnMut(T, &Client) -> R,
-    {
-        assert_eq!(
-            data.len(),
-            self.clients.len(),
-            "mismatch between data len and meilisearch client count"
-        );
-        self.clients
-            .iter()
-            .zip(data)
-            .map(|(client, item)| predicate(item, client))
-            .collect()
-    }
+    async fn search_for_project_raw(
+        &self,
+        info: &SearchRequest,
+    ) -> Result<SearchResults, ApiError>;
+
+    async fn index_projects(
+        &self,
+        ro_pool: PgPool,
+        redis: RedisPool,
+    ) -> eyre::Result<()>;
+
+    async fn remove_documents(&self, ids: &[VersionId]) -> eyre::Result<()>;
+
+    async fn tasks(&self) -> eyre::Result<Value>;
+
+    async fn tasks_cancel(
+        &self,
+        filter: &TasksCancelFilter,
+    ) -> eyre::Result<()>;
 }
 
-#[derive(Debug, Clone)]
-pub struct SearchConfig {
-    pub addresses: Vec<String>,
-    pub read_lb_address: String,
-    pub key: String,
-    pub meta_namespace: String,
-}
+async fn hydrate_search_results(
+    hits: &mut [ResultSearchProject],
+    redis_pool: &RedisPool,
+) -> eyre::Result<()> {
+    // Minecraft Java servers should fetch the latest player count that we have
+    // from Redis, rather than the (pretty stale) data from search backend
+    // TODO: this block should be made generic over the component type,
+    // for now we can hardcode MC java servers tho
 
-impl SearchConfig {
-    // Panics if the environment variables are not set,
-    // but these are already checked for on startup.
-    pub fn new(meta_namespace: Option<String>) -> Self {
-        Self {
-            addresses: ENV.MEILISEARCH_WRITE_ADDRS.0.clone(),
-            key: ENV.MEILISEARCH_KEY.clone(),
-            meta_namespace: meta_namespace.unwrap_or_default(),
-            read_lb_address: ENV.MEILISEARCH_READ_ADDR.clone(),
+    let project_ids = hits
+        .iter()
+        .filter(|hit| hit.components.minecraft_java_server.is_some())
+        .filter_map(|hit| parse_base62(&hit.project_id).ok().map(ProjectId))
+        .collect::<Vec<_>>();
+
+    let pings_by_project_id = if project_ids.is_empty() {
+        HashMap::new()
+    } else {
+        let mut redis = redis_pool.connect().await?;
+        let ping_results = redis
+            .get_many_deserialized_from_json::<JavaServerPing>(
+                server_ping::REDIS_NAMESPACE,
+                &project_ids
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>(),
+            )
+            .await?;
+
+        ping_results
+            .into_iter()
+            .enumerate()
+            .filter_map(|(idx, ping)| ping.map(|ping| (project_ids[idx], ping)))
+            .collect::<HashMap<_, _>>()
+    };
+
+    for hit in hits {
+        let Some(java_server) = hit.components.minecraft_java_server.as_mut()
+        else {
+            continue;
+        };
+        if let Ok(project_id) = parse_base62(&hit.project_id).map(ProjectId) {
+            java_server.ping = pings_by_project_id.get(&project_id).cloned();
+        } else {
+            java_server.ping = None;
         }
     }
 
-    pub fn make_loadbalanced_read_client(
-        &self,
-    ) -> Result<MeilisearchReadClient, meilisearch_sdk::errors::Error> {
-        Ok(MeilisearchReadClient {
-            client: Client::new(&self.read_lb_address, Some(&self.key))?,
+    Ok(())
+}
+
+#[derive(Deserialize, Serialize, ToSchema)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum TasksCancelFilter {
+    All,
+    AllEnqueued,
+    Indexes { indexes: Vec<String> },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SearchBackendKind {
+    Meilisearch,
+    Elasticsearch,
+    Typesense,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, strum::EnumIter)]
+pub enum SearchField {
+    Categories,
+    Name,
+    Author,
+    License,
+    ProjectTypes,
+    ProjectId,
+    OpenSource,
+    Environment,
+    GameVersions,
+    ClientSide,
+    ServerSide,
+    MinecraftServerRegion,
+    MinecraftServerLanguages,
+    MinecraftJavaServerContentKind,
+    MinecraftJavaServerContentSupportedGameVersions,
+    MinecraftJavaServerPingData,
+}
+
+#[derive(Debug, Error)]
+#[error("invalid search backend kind")]
+pub struct InvalidSearchBackendKind;
+
+impl FromStr for SearchBackendKind {
+    type Err = InvalidSearchBackendKind;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "meilisearch" => SearchBackendKind::Meilisearch,
+            "elasticsearch" => SearchBackendKind::Elasticsearch,
+            "typesense" => SearchBackendKind::Typesense,
+            _ => return Err(InvalidSearchBackendKind),
         })
-    }
-
-    pub fn make_batch_client(
-        &self,
-    ) -> Result<BatchClient, meilisearch_sdk::errors::Error> {
-        Ok(BatchClient::new(
-            self.addresses
-                .iter()
-                .map(|address| {
-                    Client::new(address.as_str(), Some(self.key.as_str()))
-                })
-                .collect::<Result<Vec<_>, _>>()?,
-        ))
-    }
-
-    // Next: true if we want the next index (we are preparing the next swap), false if we want the current index (searching)
-    pub fn get_index_name(&self, index: &str, next: bool) -> String {
-        let alt = if next { "_alt" } else { "" };
-        format!("{}_{}_{}", self.meta_namespace, index, alt)
     }
 }
 
-/// A project document used for uploading projects to MeiliSearch's indices.
-/// This contains some extra data that is not returned by search results.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     pub version_id: String,
@@ -191,12 +228,15 @@ pub struct UploadSearchProject {
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
+    pub indexed_author: String,
     pub name: String,
+    pub indexed_title: String,
     pub summary: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
+    pub log_downloads: f64,
     pub icon_url: Option<String>,
     pub license: String,
     pub gallery: Vec<String>,
@@ -263,281 +303,52 @@ pub struct ResultSearchProject {
     pub components: exp::ProjectQuery,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search_metadata: Option<Value>,
 }
 
-pub fn get_sort_index(
-    config: &SearchConfig,
-    index: &str,
-    new_filters: Option<&str>,
-) -> Result<(String, &'static [&'static str]), SearchError> {
-    let projects_name = config.get_index_name("projects", false);
-    let projects_filtered_name =
-        config.get_index_name("projects_filtered", false);
-
-    // TODO: this is a dumb hack, the frontend should pass the project type it's filtering directly
-    let is_server = new_filters
-        .is_some_and(|f| f.contains("project_types = minecraft_java_server"));
-
-    Ok(match index {
-        "relevance" => (
-            projects_name,
-            if is_server {
-                &[
-                    "minecraft_java_server.verified_plays_2w:desc",
-                    "minecraft_java_server.ping.data.players_online:desc",
-                    "version_published_timestamp:desc",
-                ]
-            } else {
-                &["downloads:desc", "version_published_timestamp:desc"]
-            },
-        ),
-        "downloads" => (
-            projects_filtered_name,
-            &["downloads:desc", "version_published_timestamp:desc"],
-        ),
-        "follows" => (
-            projects_name,
-            &["follows:desc", "version_published_timestamp:desc"],
-        ),
-        "updated" | "date_modified" => (
-            projects_name,
-            &["date_modified:desc", "version_published_timestamp:desc"],
-        ),
-        "newest" | "date_created" => (
-            projects_name,
-            &["date_created:desc", "version_published_timestamp:desc"],
-        ),
-        "minecraft_java_server.verified_plays_2w" => (
-            projects_name,
-            &[
-                "minecraft_java_server.verified_plays_2w:desc",
-                "version_published_timestamp:desc",
-            ],
-        ),
-        "minecraft_java_server.ping.data.players_online" => (
-            projects_name,
-            &[
-                "minecraft_java_server.ping.data.players_online:desc",
-                "version_published_timestamp:desc",
-            ],
-        ),
-        i => return Err(SearchError::InvalidIndex(i.to_string())),
-    })
-}
-
-fn normalize_filter_aliases(filters: &str) -> String {
-    let mut filters = filters.replace("components.", "");
-    for (from, to) in [
-        (
-            "minecraft_java_server.content =",
-            "minecraft_java_server.content.kind =",
-        ),
-        (
-            "minecraft_java_server.content !=",
-            "minecraft_java_server.content.kind !=",
-        ),
-        (
-            "minecraft_java_server.content IN ",
-            "minecraft_java_server.content.kind IN ",
-        ),
-        (
-            "minecraft_java_server.content NOT IN ",
-            "minecraft_java_server.content.kind NOT IN ",
-        ),
-    ] {
-        filters = filters.replace(from, to);
-    }
-    filters
-}
-
-pub async fn search_for_project(
-    info: &SearchRequest,
-    config: &SearchConfig,
-    redis_pool: &RedisPool,
-) -> Result<SearchResults, SearchError> {
-    let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
-    let index = info.index.as_deref().unwrap_or("relevance");
-    let limit = info
-        .limit
-        .as_deref()
-        .unwrap_or("10")
-        .parse::<usize>()?
-        .min(100);
-
-    let sort = get_sort_index(config, index, info.new_filters.as_deref())?;
-    let client = config.make_loadbalanced_read_client()?;
-    let meilisearch_index = client.get_index(sort.0).await?;
-
-    let mut filter_string = String::new();
-
-    // Convert offset and limit to page and hits_per_page
-    let hits_per_page = if limit == 0 { 1 } else { limit };
-
-    let page = offset / hits_per_page + 1;
-
-    let results = {
-        let mut query = meilisearch_index.search();
-        query
-            .with_page(page)
-            .with_hits_per_page(hits_per_page)
-            .with_query(info.query.as_deref().unwrap_or_default())
-            .with_sort(sort.1);
-
-        let normalized_new_filters =
-            info.new_filters.as_deref().map(normalize_filter_aliases);
-        if let Some(new_filters) = normalized_new_filters.as_deref() {
-            query.with_filter(new_filters);
-        } else {
-            let facets = if let Some(facets) = &info.facets {
-                Some(serde_json::from_str::<Vec<Vec<Value>>>(facets)?)
-            } else {
-                None
-            };
-
-            let filters: Cow<_> =
-                match (info.filters.as_deref(), info.version.as_deref()) {
-                    (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
-                    (Some(f), None) => f.into(),
-                    (None, Some(v)) => v.into(),
-                    (None, None) => "".into(),
-                };
-            let filters = normalize_filter_aliases(&filters);
-
-            if let Some(facets) = facets {
-                // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
-                // For every inner facet, we will check if it can be deserialized into a Vec<&str>, and do so.
-                // If not, we will assume it is a single facet and wrap it in a Vec.
-                let facets: Vec<Vec<Vec<String>>> = facets
-                    .into_iter()
-                    .map(|facets| {
-                        facets
-                            .into_iter()
-                            .map(|facet| {
-                                if facet.is_array() {
-                                    serde_json::from_value::<Vec<String>>(facet)
-                                        .unwrap_or_default()
-                                } else {
-                                    vec![
-                                        serde_json::from_value::<String>(facet)
-                                            .unwrap_or_default(),
-                                    ]
-                                }
-                            })
-                            .collect_vec()
-                    })
-                    .collect_vec();
-
-                filter_string.push('(');
-                for (index, facet_outer_list) in facets.iter().enumerate() {
-                    filter_string.push('(');
-
-                    for (facet_outer_index, facet_inner_list) in
-                        facet_outer_list.iter().enumerate()
-                    {
-                        filter_string.push('(');
-                        for (facet_inner_index, facet) in
-                            facet_inner_list.iter().enumerate()
-                        {
-                            let facet = normalize_filter_aliases(
-                                &facet.replace(':', " = "),
-                            );
-                            filter_string.push_str(&facet);
-                            if facet_inner_index != (facet_inner_list.len() - 1)
-                            {
-                                filter_string.push_str(" AND ")
-                            }
-                        }
-                        filter_string.push(')');
-
-                        if facet_outer_index != (facet_outer_list.len() - 1) {
-                            filter_string.push_str(" OR ")
-                        }
-                    }
-
-                    filter_string.push(')');
-
-                    if index != (facets.len() - 1) {
-                        filter_string.push_str(" AND ")
-                    }
-                }
-                filter_string.push(')');
-
-                if !filters.is_empty() {
-                    write!(filter_string, " AND ({filters})")?;
-                }
-            } else {
-                filter_string.push_str(&filters);
-            }
-
-            if !filter_string.is_empty() {
-                query.with_filter(&filter_string);
-            }
-        }
-
-        query.execute::<ResultSearchProject>().await?
-    };
-
-    // Minecraft Java servers should fetch the latest player count that we have
-    // from Redis, rather than the (pretty stale) data from search backend
-    // TODO: this block should be made generic over the component type,
-    // for now we can hardcode MC java servers tho
-    let mut hits = results.hits.into_iter().map(|r| r.result).collect_vec();
-
-    let project_ids = hits
-        .iter()
-        .filter(|hit| hit.components.minecraft_java_server.is_some())
-        .filter_map(|hit| parse_base62(&hit.project_id).ok().map(ProjectId))
-        .collect_vec();
-
-    let pings_by_project_id = if project_ids.is_empty() {
-        HashMap::new()
-    } else {
-        let mut redis = redis_pool.connect().await?;
-        let ping_results = redis
-            .get_many_deserialized_from_json::<JavaServerPing>(
-                server_ping::REDIS_NAMESPACE,
-                &project_ids.iter().map(ToString::to_string).collect_vec(),
-            )
-            .await?;
-
-        ping_results
-            .into_iter()
-            .enumerate()
-            .filter_map(|(idx, ping)| ping.map(|ping| (project_ids[idx], ping)))
-            .collect::<HashMap<_, _>>()
-    };
-
-    for hit in &mut hits {
-        let Some(java_server) = hit.components.minecraft_java_server.as_mut()
-        else {
-            continue;
-        };
-        if let Ok(project_id) = parse_base62(&hit.project_id).map(ProjectId) {
-            java_server.ping = pings_by_project_id.get(&project_id).cloned();
-        } else {
-            java_server.ping = None;
+impl From<UploadSearchProject> for ResultSearchProject {
+    fn from(source: UploadSearchProject) -> Self {
+        Self {
+            version_id: source.version_id,
+            project_id: source.project_id,
+            project_types: source.project_types,
+            slug: source.slug,
+            author: source.author,
+            name: source.name,
+            summary: source.summary,
+            categories: source.categories,
+            display_categories: source.display_categories,
+            downloads: source.downloads,
+            follows: source.follows,
+            icon_url: source.icon_url,
+            date_created: source.date_created.to_rfc3339(),
+            date_modified: source.date_modified.to_rfc3339(),
+            license: source.license,
+            gallery: source.gallery,
+            featured_gallery: source.featured_gallery,
+            color: source.color,
+            loaders: source.loaders,
+            project_loader_fields: source.project_loader_fields,
+            components: source.components,
+            loader_fields: source.loader_fields,
+            search_metadata: None,
         }
     }
-
-    Ok(SearchResults {
-        hits,
-        page: results.page.unwrap_or_default(),
-        hits_per_page: results.hits_per_page.unwrap_or_default(),
-        total_hits: results.total_hits.unwrap_or_default(),
-    })
 }
 
-#[cfg(test)]
-mod tests {
-    use super::normalize_filter_aliases;
-
-    #[test]
-    fn normalizes_component_filter_aliases() {
-        assert_eq!(
-            normalize_filter_aliases(
-                "components.minecraft_java_server.content = vanilla AND components.minecraft_server.country = US"
-            ),
-            "minecraft_java_server.content.kind = vanilla AND minecraft_server.country = US"
-        );
+pub fn backend(meta_namespace: Option<String>) -> Box<dyn SearchBackend> {
+    match ENV.SEARCH_BACKEND {
+        SearchBackendKind::Meilisearch => {
+            let config = backend::MeilisearchConfig::new(meta_namespace);
+            Box::new(backend::Meilisearch::new(config))
+        }
+        SearchBackendKind::Elasticsearch => {
+            Box::new(backend::Elasticsearch::new(meta_namespace).unwrap())
+        }
+        SearchBackendKind::Typesense => {
+            let config = backend::TypesenseConfig::new(meta_namespace);
+            Box::new(backend::Typesense::new(config))
+        }
     }
 }
