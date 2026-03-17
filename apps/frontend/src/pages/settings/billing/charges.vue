@@ -38,7 +38,13 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs, injectModrinthClient, useFormatDateTime, useFormatPrice } from '@modrinth/ui'
+import {
+	Badge,
+	Breadcrumbs,
+	injectModrinthClient,
+	useFormatDateTime,
+	useFormatPrice,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'

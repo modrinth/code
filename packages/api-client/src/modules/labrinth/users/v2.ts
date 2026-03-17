@@ -147,17 +147,12 @@ export class LabrinthUsersV2Module extends AbstractModule {
 	 * const projects = await client.labrinth.users_v2.getFollowedProjects('my_user')
 	 * ```
 	 */
-	public async getFollowedProjects(
-		idOrUsername: string,
-	): Promise<Labrinth.Projects.v2.Project[]> {
-		return this.client.request<Labrinth.Projects.v2.Project[]>(
-			`/user/${idOrUsername}/follows`,
-			{
-				api: 'labrinth',
-				version: 2,
-				method: 'GET',
-			},
-		)
+	public async getFollowedProjects(idOrUsername: string): Promise<Labrinth.Projects.v2.Project[]> {
+		return this.client.request<Labrinth.Projects.v2.Project[]>(`/user/${idOrUsername}/follows`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+		})
 	}
 
 	/**

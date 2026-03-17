@@ -82,8 +82,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import type { Labrinth } from '@modrinth/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Admonition,

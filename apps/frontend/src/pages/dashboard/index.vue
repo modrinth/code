@@ -126,7 +126,9 @@ const followersProjectCount = computed(
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
 	queryFn: async () => {
-		const notifications = await client.labrinth.notifications_v2.getUserNotifications(auth.value?.user?.id)
+		const notifications = await client.labrinth.notifications_v2.getUserNotifications(
+			auth.value?.user?.id,
+		)
 
 		const filteredNotifications = notifications.filter((notif) => !notif.read)
 		const slice = filteredNotifications.slice(0, 30)

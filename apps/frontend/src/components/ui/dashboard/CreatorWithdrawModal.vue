@@ -107,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -126,13 +127,11 @@ import {
 } from '@modrinth/ui'
 import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	createWithdrawContext,
 	getTaxThreshold,
 	getTaxThresholdActual,
 	type PaymentProvider,
-	type PayoutMethod,
 	provideWithdrawContext,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'

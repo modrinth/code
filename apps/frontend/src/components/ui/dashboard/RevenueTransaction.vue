@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowDownIcon,
 	ArrowUpIcon,
@@ -74,7 +75,6 @@ import {
 	VenmoColorIcon,
 	XIcon,
 } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	BulletDivider,
 	ButtonStyled,

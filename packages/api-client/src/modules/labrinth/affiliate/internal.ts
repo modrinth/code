@@ -61,10 +61,7 @@ export class LabrinthAffiliateInternalModule extends AbstractModule {
 	 * Update an affiliate code's source name
 	 * PATCH /_internal/affiliate/{id}
 	 */
-	public async patch(
-		id: string,
-		data: Labrinth.Affiliate.Internal.PatchRequest,
-	): Promise<void> {
+	public async patch(id: string, data: Labrinth.Affiliate.Internal.PatchRequest): Promise<void> {
 		return this.client.request<void>(`/affiliate/${id}`, {
 			api: 'labrinth',
 			version: 'internal',

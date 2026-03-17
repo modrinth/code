@@ -57,8 +57,8 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import type { Labrinth } from '@modrinth/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	AffiliateLinkCard,
@@ -95,14 +95,15 @@ const {
 const filterQuery = ref('')
 const creatingLink = ref(false)
 
-const filteredAffiliates = computed(() =>
-	affiliateLinks.value?.filter(
-		(link: Labrinth.Affiliate.Internal.AffiliateCode) =>
-			link.affiliate === auth.value?.user?.id &&
-			(filterQuery.value.trim()
-				? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
-				: true),
-	) ?? [],
+const filteredAffiliates = computed(
+	() =>
+		affiliateLinks.value?.filter(
+			(link: Labrinth.Affiliate.Internal.AffiliateCode) =>
+				link.affiliate === auth.value?.user?.id &&
+				(filterQuery.value.trim()
+					? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
+					: true),
+		) ?? [],
 )
 
 async function createAffiliateCode(data: { sourceName: string }) {

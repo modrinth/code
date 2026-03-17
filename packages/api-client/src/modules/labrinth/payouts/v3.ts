@@ -16,14 +16,11 @@ export class LabrinthPayoutsV3Module extends AbstractModule {
 		start?: string
 		end?: string
 	}): Promise<Labrinth.Payouts.v3.RevenueResponse> {
-		return this.client.request<Labrinth.Payouts.v3.RevenueResponse>(
-			'/payout/platform_revenue',
-			{
-				api: 'labrinth',
-				version: 3,
-				method: 'GET',
-				params: params as Record<string, string>,
-			},
-		)
+		return this.client.request<Labrinth.Payouts.v3.RevenueResponse>('/payout/platform_revenue', {
+			api: 'labrinth',
+			version: 3,
+			method: 'GET',
+			params: params as Record<string, string>,
+		})
 	}
 }

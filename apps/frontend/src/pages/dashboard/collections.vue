@@ -155,10 +155,10 @@ import {
 	commonMessages,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	StyledInput,
 	useCompactNumber,
 	useVIntl,
-	injectModrinthClient,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 

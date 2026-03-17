@@ -64,15 +64,12 @@ export class LabrinthOAuthInternalModule extends AbstractModule {
 	public async createApp(
 		data: Labrinth.OAuth.Internal.CreateOAuthAppRequest,
 	): Promise<Labrinth.OAuth.Internal.OAuthClientCreationResult> {
-		return this.client.request<Labrinth.OAuth.Internal.OAuthClientCreationResult>(
-			`/oauth/app`,
-			{
-				api: 'labrinth',
-				version: 'internal',
-				method: 'POST',
-				body: data,
-			},
-		)
+		return this.client.request<Labrinth.OAuth.Internal.OAuthClientCreationResult>(`/oauth/app`, {
+			api: 'labrinth',
+			version: 'internal',
+			method: 'POST',
+			body: data,
+		})
 	}
 
 	/**

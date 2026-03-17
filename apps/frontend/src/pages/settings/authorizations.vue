@@ -132,7 +132,8 @@ const { data: appInformation } = useQuery({
 
 const { data: appCreatorsInformation } = useQuery({
 	queryKey: computed(() => ['users', appInformation.value?.map((c) => c.created_by)]),
-	queryFn: () => client.labrinth.users_v2.getMultiple(appInformation.value.map((c) => c.created_by)),
+	queryFn: () =>
+		client.labrinth.users_v2.getMultiple(appInformation.value.map((c) => c.created_by)),
 	enabled: computed(() => !!appInformation.value?.length),
 })
 

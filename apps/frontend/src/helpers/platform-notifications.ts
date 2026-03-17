@@ -98,9 +98,7 @@ export async function fetchExtraNotificationData(
 			if (n.body.project_id)
 				n.extra_data.project = projects.find((x) => x.id === n.body!.project_id)
 			if (n.body.organization_id)
-				n.extra_data.organization = organizations.find(
-					(x) => x.id === n.body!.organization_id,
-				)
+				n.extra_data.organization = organizations.find((x) => x.id === n.body!.organization_id)
 			if (n.body.report_id) {
 				n.extra_data.report = reports.find((x) => x.id === n.body!.report_id)
 				const t = (n.extra_data.report as Report | undefined)?.item_type
@@ -121,8 +119,7 @@ export async function fetchExtraNotificationData(
 					)
 				}
 			}
-			if (n.body.thread_id)
-				n.extra_data.thread = threads.find((x) => x.id === n.body!.thread_id)
+			if (n.body.thread_id) n.extra_data.thread = threads.find((x) => x.id === n.body!.thread_id)
 			if (n.body.invited_by)
 				n.extra_data.invited_by = users.find((x) => x.id === n.body!.invited_by)
 			if (n.body.version_id)

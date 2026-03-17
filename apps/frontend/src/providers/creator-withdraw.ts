@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BadgeDollarSignIcon,
 	GiftIcon,
@@ -6,7 +7,6 @@ import {
 	PayPalColorIcon,
 	VenmoColorIcon,
 } from '@modrinth/assets'
-import type { Labrinth } from '@modrinth/api-client'
 import type { MessageDescriptor } from '@modrinth/ui'
 import { createContext, getCurrencyIcon, paymentMethodMessages, useDebugLogger } from '@modrinth/ui'
 import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
