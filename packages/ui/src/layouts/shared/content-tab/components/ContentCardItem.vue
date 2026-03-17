@@ -88,7 +88,7 @@ const deleteHovered = ref(false)
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div
-			class="flex min-w-0 items-center gap-4"
+			class="flex min-w-0 items-center gap-4 transition-[filter,opacity] duration-200"
 			:class="[
 				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none',
 				enabled === false && !disabled ? 'grayscale opacity-50' : '',
@@ -193,7 +193,7 @@ const deleteHovered = ref(false)
 		</div>
 
 		<div
-			class="hidden flex-col gap-0.5 @[800px]:flex"
+			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
 			:class="[
 				hideActions ? 'flex-1' : 'flex-1 min-w-0',
 				enabled === false && !disabled ? 'grayscale opacity-50' : '',
