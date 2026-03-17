@@ -372,18 +372,20 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user } = useQuery({
+const { data: user, error: userError } = useQuery({
 	queryKey: ['user', route.params.id],
 	queryFn: () => useBaseFetch(`user/${route.params.id}`),
 })
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+watch(userError, (error) => {
+	if (error) {
+		showError({
+			fatal: true,
+			statusCode: error.statusCode ?? error.status ?? 404,
+			message: formatMessage(messages.userNotFoundError),
+		})
+	}
+})
 
 const { data: subscriptions } = useQuery({
 	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
