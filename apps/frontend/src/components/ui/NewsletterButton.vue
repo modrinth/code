@@ -1,19 +1,39 @@
 <script setup lang="ts">
 import { CheckIcon, MailIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
-import { ref } from 'vue'
+import { ButtonStyled, defineMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref } from 'vue'
 
-import { useBaseFetch } from '~/composables/fetch.js'
+const { formatMessage } = useVIntl()
 
-const auth = await useAuth()
+const messages = defineMessages({
+	tooltipSubscribe: {
+		id: 'ui.newsletter-button.tooltip',
+		defaultMessage: 'Subscribe to the Modrinth newsletter',
+	},
+	subscribe: {
+		id: 'ui.newsletter-button.subscribe',
+		defaultMessage: 'Subscribe',
+	},
+	subscribed: {
+		id: 'ui.newsletter-button.subscribed',
+		defaultMessage: 'Subscribed!',
+	},
+})
+
+const auth = (await useAuth()) as unknown as {
+	value: { user: { id: string; username: string; email: string; created: string } }
+}
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const showSubscriptionConfirmation = ref(false)
-const showSubscribeButton = useAsyncData(
-	async () => {
+
+const { data: showSubscribeButton, isSuccess } = useQuery({
+	queryKey: computed(() => ['newsletter', 'subscribed', auth.value?.user?.id]),
+	queryFn: async () => {
 		if (auth.value?.user) {
 			try {
-				const { subscribed } = await useBaseFetch('auth/email/subscribe', {
-					method: 'GET',
-				})
+				const { subscribed } = await client.labrinth.auth_internal.getNewsletterStatus()
 				return !subscribed
 			} catch {
 				return true
@@ -22,36 +42,31 @@ const showSubscribeButton = useAsyncData(
 			return false
 		}
 	},
-	{ watch: [auth], server: false },
-)
+	enabled: computed(() => !!auth.value?.user),
+})
 
 async function subscribe() {
 	try {
-		await useBaseFetch('auth/email/subscribe', {
-			method: 'POST',
-		})
+		await client.labrinth.auth_internal.subscribeNewsletter()
 		showSubscriptionConfirmation.value = true
 	} catch {
 		// Ignored
 	} finally {
 		setTimeout(() => {
 			showSubscriptionConfirmation.value = false
-			showSubscribeButton.status.value = 'success'
-			showSubscribeButton.data.value = false
+			queryClient.setQueryData(['newsletter', 'subscribed', auth.value?.user?.id], false)
 		}, 2500)
 	}
 }
 </script>
 
 <template>
-	<ButtonStyled
-		v-if="showSubscribeButton.status.value === 'success' && showSubscribeButton.data.value"
-		color="brand"
-		type="outlined"
-	>
-		<button v-tooltip="`Subscribe to the Modrinth newsletter`" @click="subscribe">
-			<template v-if="!showSubscriptionConfirmation"> <MailIcon /> Subscribe </template>
-			<template v-else> <CheckIcon /> Subscribed! </template>
+	<ButtonStyled v-if="isSuccess && showSubscribeButton" color="brand" type="outlined">
+		<button v-tooltip="formatMessage(messages.tooltipSubscribe)" @click="subscribe">
+			<template v-if="!showSubscriptionConfirmation">
+				<MailIcon /> {{ formatMessage(messages.subscribe) }}
+			</template>
+			<template v-else> <CheckIcon /> {{ formatMessage(messages.subscribed) }} </template>
 		</button>
 	</ButtonStyled>
 </template>

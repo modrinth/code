@@ -3197,6 +3197,15 @@
   "ui.latest-news-row.view-all": {
     "message": "View all news"
   },
+  "ui.newsletter-button.subscribe": {
+    "message": "Subscribe"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Subscribed!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Subscribe to the Modrinth newsletter"
+  },
   "version.environment.none.description": {
     "message": "The environment for this version has not been specified."
   },
