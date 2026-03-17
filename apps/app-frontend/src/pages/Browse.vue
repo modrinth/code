@@ -489,17 +489,8 @@ async function refreshSearch() {
 			link: `/browse/${projectType.value}`,
 			query: params,
 		})
-		const queryString = Object.entries(params)
-			.flatMap(([key, value]) => {
-				const values = Array.isArray(value) ? value : [value]
-				return values
-					.filter((v): v is string => v != null)
-					.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
-			})
-			.join('&')
-		const newUrl = `${route.path}${queryString ? '?' + queryString : ''}`
-		debugLog('updating URL', newUrl)
-		window.history.replaceState(window.history.state, '', newUrl)
+		debugLog('updating URL', params)
+		router.replace({ path: route.path, query: params })
 
 		loading.value = false
 		debugLog('refreshSearch complete', { version })
