@@ -1,10 +1,10 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { getCategoryIcon, SERVER_CATEGORY_ICON_MAP } from '@modrinth/assets'
+import { getCategoryIcon, GlobeIcon, SERVER_CATEGORY_ICON_MAP, UserIcon } from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { defineMessage, useVIntl } from '../composables/i18n'
+import { defineMessage, LOCALES, useVIntl } from '../composables/i18n'
 import type { FilterType, FilterValue, SortType, Tags } from './search'
 import { formatCategory, formatCategoryHeader } from './tag-messages'
 
@@ -175,7 +175,16 @@ export function useServerSearch(opts: {
 			return aFormatted.localeCompare(bFormatted, locale.value)
 		})
 
-		const sortedLanguages = Object.entries(SERVER_LANGUAGES).sort(([_, a], [__, b]) => {
+		const localeDefinition = LOCALES.find((l) => l.code === locale.value)
+		const userLanguageCode =
+			localeDefinition?.serverLanguageCode ?? locale.value.substring(0, locale.value.indexOf('-'))
+		const sortedLanguages = Object.entries(SERVER_LANGUAGES).sort(([aCode, a], [bCode, b]) => {
+			if (aCode === 'en') return -1
+			if (bCode === 'en') return 1
+
+			if (aCode === userLanguageCode) return -1
+			if (bCode === userLanguageCode) return 1
+
 			const aFormatted = formatMessage(a)
 			const bFormatted = formatMessage(b)
 			return aFormatted.localeCompare(bFormatted, locale.value)
@@ -285,6 +294,7 @@ export function useServerSearch(opts: {
 				options: sortedLanguages.map(([code, name]) => ({
 					id: code,
 					formatted_name: formatMessage(name),
+					icon: code === 'en' ? GlobeIcon : code === userLanguageCode ? UserIcon : undefined,
 					method: 'or' as const,
 					value: code,
 				})),
