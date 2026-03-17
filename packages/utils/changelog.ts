@@ -11,7 +11,13 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-03-13T12:30:00-00:00`,
+		date: `2026-03-17T12:40:00-08:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Fixed personal access token settings page erroring.`,
+	},
+	{
+		date: `2026-03-17T12:15:00-08:00`,
 		product: 'hosting',
 		body: `## [Content Management Overhaul](/news/article/content-management-overhaul)
 - We've overhauled the Content tab and improved parity with Modrinth App. Check out our [blog post](/news/article/content-management-overhaul) to learn more.`,
