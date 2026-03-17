@@ -2,7 +2,6 @@
 import {
 	DownloadIcon,
 	MoreVerticalIcon,
-	OrganizationIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
@@ -158,10 +157,6 @@ const deleteHovered = ref(false)
 							class="flex shrink-0 items-center gap-1 !decoration-secondary"
 							:class="{ 'hover:underline': owner.link }"
 						>
-							<OrganizationIcon
-								v-if="owner.type === 'organization'"
-								class="size-4 text-secondary"
-							/>
 							<Avatar
 								:src="owner.avatar_url"
 								:alt="owner.name"
