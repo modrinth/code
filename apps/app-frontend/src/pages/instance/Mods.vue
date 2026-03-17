@@ -781,11 +781,17 @@ provideContentManager({
 		linkedModpackProject.value
 			? {
 					project: linkedModpackProject.value,
-					projectLink: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
+					projectLink: {
+						path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
+						query: { i: props.instance.path },
+					},
 					version: linkedModpackVersion.value ?? undefined,
 					versionLink:
 						linkedModpackProject.value && linkedModpackVersion.value
-							? `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`
+							? {
+									path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`,
+									query: { i: props.instance.path },
+								}
 							: undefined,
 					owner: linkedModpackOwner.value
 						? {
@@ -839,7 +845,9 @@ provideContentManager({
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink: item.project?.id
+			? { path: `/project/${item.project.id}`, query: { i: props.instance.path } }
+			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
 			version_number: formatMessage(messages.unknownVersion),
@@ -847,7 +855,10 @@ provideContentManager({
 		},
 		versionLink:
 			item.project?.id && item.version?.id
-				? `/project/${item.project.id}/version/${item.version.id}`
+				? {
+						path: `/project/${item.project.id}/version/${item.version.id}`,
+						query: { i: props.instance.path },
+					}
 				: undefined,
 		owner: item.owner
 			? {
@@ -857,6 +868,7 @@ provideContentManager({
 			: undefined,
 		enabled: item.enabled,
 	}),
+	filterPersistKey: props.instance.path,
 })
 
 await initProjects()

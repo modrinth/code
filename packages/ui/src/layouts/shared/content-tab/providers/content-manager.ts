@@ -103,6 +103,9 @@ export interface ContentManagerContext {
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
+
+	// Filter persistence key — when set, selected filters are saved/restored via sessionStorage
+	filterPersistKey?: string
 }
 
 export const [injectContentManager, provideContentManager] = createContext<ContentManagerContext>(

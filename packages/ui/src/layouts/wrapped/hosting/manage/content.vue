@@ -912,6 +912,7 @@ provideContentManager({
 			enabled: item.enabled,
 		}
 	},
+	filterPersistKey: `server:${serverId}:${worldId.value}`,
 })
 </script>
 

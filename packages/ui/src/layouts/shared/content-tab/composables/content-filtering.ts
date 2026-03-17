@@ -1,3 +1,4 @@
+import { useSessionStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
@@ -23,10 +24,13 @@ export interface ContentFilterConfig {
 	showClientOnlyFilter?: boolean
 	isPackLocked?: Ref<boolean>
 	formatProjectType?: (type: string) => string
+	persistKey?: string
 }
 
 export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFilterConfig) {
-	const selectedFilters = ref<string[]>([])
+	const selectedFilters = config?.persistKey
+		? useSessionStorage<string[]>(`content-filters:${config.persistKey}`, [])
+		: ref<string[]>([])
 
 	const filterOptions = computed<ContentFilterOption[]>(() => {
 		const options: ContentFilterOption[] = []
