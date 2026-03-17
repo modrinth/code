@@ -2,7 +2,6 @@
 import {
 	DownloadIcon,
 	MoreVerticalIcon,
-	OrganizationIcon,
 	SpinnerIcon,
 	TrashExclamationIcon,
 	TrashIcon,
@@ -88,7 +87,7 @@ const deleteHovered = ref(false)
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div
-			class="flex min-w-0 items-center gap-4"
+			class="flex min-w-0 items-center gap-4 transition-[filter,opacity] duration-200"
 			:class="[
 				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none',
 				enabled === false && !disabled ? 'grayscale opacity-50' : '',
@@ -158,10 +157,6 @@ const deleteHovered = ref(false)
 							class="flex shrink-0 items-center gap-1 !decoration-secondary"
 							:class="{ 'hover:underline': owner.link }"
 						>
-							<OrganizationIcon
-								v-if="owner.type === 'organization'"
-								class="size-4 text-secondary"
-							/>
 							<Avatar
 								:src="owner.avatar_url"
 								:alt="owner.name"
@@ -193,7 +188,7 @@ const deleteHovered = ref(false)
 		</div>
 
 		<div
-			class="hidden flex-col gap-0.5 @[800px]:flex"
+			class="hidden flex-col gap-0.5 transition-[filter,opacity] duration-200 @[800px]:flex"
 			:class="[
 				hideActions ? 'flex-1' : 'flex-1 min-w-0',
 				enabled === false && !disabled ? 'grayscale opacity-50' : '',

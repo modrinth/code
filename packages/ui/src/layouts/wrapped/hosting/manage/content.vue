@@ -872,7 +872,7 @@ provideContentManager({
 		})
 		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
-	getItemId: (item) => item.file_name,
+	getItemId: (item) => item.file_path ?? item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
@@ -898,7 +898,7 @@ provideContentManager({
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		return {
-			id: item.file_name,
+			id: item.file_path ?? item.file_name,
 			project: item.project,
 			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
 			version: item.version,
@@ -912,6 +912,7 @@ provideContentManager({
 			enabled: item.enabled,
 		}
 	},
+	filterPersistKey: `server:${serverId}:${worldId.value}`,
 })
 </script>
 

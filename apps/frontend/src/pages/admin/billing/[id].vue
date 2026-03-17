@@ -137,12 +137,12 @@
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<div class="flex items-center gap-2">
-				<Avatar :src="user.avatar_url" :alt="user.username" size="32px" circle />
-				<h1 class="m-0 text-2xl font-extrabold">{{ user.username }}'s subscriptions</h1>
+				<Avatar :src="user?.avatar_url" :alt="user?.username" size="32px" circle />
+				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
 			</div>
 			<div class="flex items-center gap-2">
 				<ButtonStyled>
-					<nuxt-link :to="`/user/${user.id}`">
+					<nuxt-link :to="`/user/${user?.id}`">
 						<UserIcon aria-hidden="true" />
 						User profile
 						<ExternalIcon class="h-4 w-4" />
@@ -346,7 +346,7 @@ import dayjs from 'dayjs'
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
-const client = injectModrinthClient()
+const { labrinth } = injectModrinthClient()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -373,10 +373,16 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user, error: userError } = useQuery({
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
 	queryKey: ['user', route.params.id],
-	queryFn: () => client.labrinth.users_v2.get(route.params.id),
+	queryFn: () => labrinth.users_v2.get(route.params.id),
 })
+
+onServerPrefetch(userSuspense)
 
 watch(userError, (error) => {
 	if (error) {
@@ -390,14 +396,14 @@ watch(userError, (error) => {
 
 const { data: subscriptions } = useQuery({
 	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
-	queryFn: () => client.labrinth.billing_internal.getSubscriptions(user.value.id),
+	queryFn: () => labrinth.billing_internal.getSubscriptions(user.value?.id),
 	enabled: computed(() => !!user.value?.id),
 	placeholderData: [],
 })
 
 const { data: charges, refetch: refreshCharges } = useQuery({
 	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
-	queryFn: () => client.labrinth.billing_internal.getPayments(user.value.id),
+	queryFn: () => labrinth.billing_internal.getPayments(user.value?.id),
 	enabled: computed(() => !!user.value?.id),
 	placeholderData: [],
 })
@@ -458,7 +464,7 @@ async function applyCredit() {
 	crediting.value = true
 	try {
 		const daysParsed = Math.max(1, Math.floor(Number(creditDays.value) || 1))
-		await client.labrinth.billing_internal.credit({
+		await labrinth.billing_internal.credit({
 			subscription_ids: [selectedSubscription.value.id],
 			days: daysParsed,
 			send_email: creditSendEmail.value,
@@ -492,7 +498,7 @@ async function refundCharge() {
 					? { type: 'none', unprovision: unprovision.value }
 					: { type: 'full', unprovision: unprovision.value }
 
-		await client.labrinth.billing_internal.refundCharge(selectedCharge.value.id, payload)
+		await labrinth.billing_internal.refundCharge(selectedCharge.value.id, payload)
 		await refreshCharges()
 		refundModal.value.hide()
 	} catch (err) {
@@ -508,7 +514,7 @@ async function refundCharge() {
 async function modifyCharge() {
 	modifying.value = true
 	try {
-		await client.labrinth.billing_internal.editSubscription(selectedSubscription.value.id, {
+		await labrinth.billing_internal.editSubscription(selectedSubscription.value.id, {
 			cancelled: cancel.value,
 		})
 		addNotification({
