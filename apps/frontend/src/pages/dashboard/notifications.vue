@@ -57,7 +57,7 @@
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
-import { Button, Chips, Pagination } from '@modrinth/ui'
+import { Button, Chips, injectModrinthClient, Pagination } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -73,6 +73,7 @@ useHead({
 	title: 'Notifications - Modrinth',
 })
 
+const client = injectModrinthClient()
 const auth = await useAuth()
 const route = useNativeRoute()
 const router = useNativeRouter()
@@ -94,7 +95,9 @@ const { data, isPending, error, refetch } = useQuery({
 	queryFn: async () => {
 		const pageNum = page.value - 1
 		const showRead = history.value
-		const notifications = await useBaseFetch(`user/${auth.value?.user?.id}/notifications`)
+		const notifications = await client.labrinth.notifications_v2.getUserNotifications(
+			auth.value?.user?.id,
+		)
 
 		const typesInFeed = [
 			...new Set(notifications.filter((n) => showRead || !n.read).map((n) => n.type)),
@@ -108,6 +111,7 @@ const { data, isPending, error, refetch } = useQuery({
 		const pages = Math.max(1, Math.ceil(filtered.length / perPage.value))
 
 		return fetchExtraNotificationData(
+			client,
 			filtered.slice(pageNum * perPage.value, pageNum * perPage.value + perPage.value),
 		).then((notifs) => ({
 			notifications: notifs,
@@ -121,7 +125,7 @@ const { data, isPending, error, refetch } = useQuery({
 })
 
 const notifications = computed(() =>
-	data.value ? groupNotifications(data.value.notifications, history.value) : [],
+	data.value ? groupNotifications(data.value.notifications) : [],
 )
 
 const notifTypes = computed(() => data.value?.notifTypes || [])
@@ -139,7 +143,7 @@ async function readAll() {
 		...(n.grouped_notifs ? n.grouped_notifs.map((g) => g.id) : []),
 	])
 
-	await markAsRead(ids)
+	await markAsRead(client, ids)
 	await refetch()
 }
 

@@ -253,6 +253,7 @@ import {
 	CopyCode,
 	defineMessages,
 	FileInput,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
@@ -272,6 +273,7 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatDate = useFormatDateTime()
@@ -494,10 +496,7 @@ const auth = await useAuth()
 
 const { data: usersApps, refetch: refresh } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'oauth_apps']),
-	queryFn: () =>
-		useBaseFetch(`user/${auth.value.user.id}/oauth_apps`, {
-			apiVersion: 3,
-		}),
+	queryFn: () => client.labrinth.oauth_internal.getUserApps(auth.value.user.id),
 	enabled: computed(() => !!auth.value?.user?.id),
 })
 
@@ -551,14 +550,7 @@ async function onImageSelection(files) {
 		const file = files[0]
 		const extFromType = file.type.split('/')[1]
 
-		await useBaseFetch('oauth/app/' + editingId.value + '/icon', {
-			method: 'PATCH',
-			internal: true,
-			body: file,
-			query: {
-				ext: extFromType,
-			},
-		})
+		await client.labrinth.oauth_internal.uploadAppIcon(editingId.value, file, extFromType).promise
 
 		await refresh()
 
@@ -579,15 +571,10 @@ async function createApp() {
 	startLoading()
 	loading.value = true
 	try {
-		const createdAppInfo = await useBaseFetch('oauth/app', {
-			method: 'POST',
-			internal: true,
-			body: {
-				name: name.value,
-				icon_url: icon.value,
-				max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
-				redirect_uris: redirectUris.value,
-			},
+		const createdAppInfo = await client.labrinth.oauth_internal.createApp({
+			name: name.value,
+			max_scopes: Number(scopesVal.value),
+			redirect_uris: redirectUris.value,
 		})
 
 		createdApps.value.push(createdAppInfo)
@@ -637,7 +624,7 @@ async function editApp() {
 
 		const body = {
 			name: name.value,
-			max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
+			max_scopes: Number(scopesVal.value),
 			redirect_uris: redirectUris.value,
 		}
 
@@ -653,11 +640,7 @@ async function editApp() {
 			body.icon_url = icon.value
 		}
 
-		await useBaseFetch('oauth/app/' + editingId.value, {
-			method: 'PATCH',
-			internal: true,
-			body,
-		})
+		await client.labrinth.oauth_internal.editApp(editingId.value, body)
 
 		await refresh()
 		setForm(null)
@@ -681,10 +664,7 @@ async function removeApp() {
 		if (!editingId.value) {
 			throw new Error('No editing id')
 		}
-		await useBaseFetch(`oauth/app/${editingId.value}`, {
-			internal: true,
-			method: 'DELETE',
-		})
+		await client.labrinth.oauth_internal.deleteApp(editingId.value)
 		await refresh()
 		editingId.value = null
 	} catch (err) {

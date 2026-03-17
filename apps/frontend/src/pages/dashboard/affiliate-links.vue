@@ -57,6 +57,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
@@ -65,11 +66,11 @@ import {
 	ButtonStyled,
 	ConfirmModal,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import type { AffiliateLink } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
@@ -77,6 +78,7 @@ const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 
 const auth = await useAuth()
 
+const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
@@ -87,41 +89,35 @@ const {
 	refetch,
 } = useQuery({
 	queryKey: ['affiliate'],
-	queryFn: () =>
-		useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
+	queryFn: () => client.labrinth.affiliate_internal.getAll(),
 })
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
 
-const filteredAffiliates = computed(() =>
-	affiliateLinks
-		? affiliateLinks.value?.filter(
-				(link: AffiliateLink) =>
-					link.affiliate === auth.value?.user?.id &&
-					(filterQuery.value.trim()
-						? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
-						: true),
-			)
-		: [],
+const filteredAffiliates = computed(
+	() =>
+		affiliateLinks.value?.filter(
+			(link: Labrinth.Affiliate.Internal.AffiliateCode) =>
+				link.affiliate === auth.value?.user?.id &&
+				(filterQuery.value.trim()
+					? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
+					: true),
+		) ?? [],
 )
 
 async function createAffiliateCode(data: { sourceName: string }) {
 	creatingLink.value = true
 
 	try {
-		await useBaseFetch('affiliate', {
-			method: 'PUT',
-			body: {
-				source_name: data.sourceName,
-			},
-			internal: true,
+		await client.labrinth.affiliate_internal.create({
+			source_name: data.sourceName,
 		})
 
 		await refetch()
 		createModal.value?.close()
 	} catch (err) {
-		handleError(err)
+		handleError(err as Error)
 	} finally {
 		creatingLink.value = false
 	}
@@ -130,7 +126,7 @@ async function createAffiliateCode(data: { sourceName: string }) {
 const revokingTitle = ref<string | null>(null)
 const revokingId = ref<string | null>(null)
 
-function revokeAffiliateLink(affiliate: AffiliateLink) {
+function revokeAffiliateLink(affiliate: Labrinth.Affiliate.Internal.AffiliateCode) {
 	revokingTitle.value = affiliate.source_name
 	revokingId.value = affiliate.id
 	revokeModal.value?.show()
@@ -142,10 +138,7 @@ async function confirmRevokeAffiliateLink() {
 	}
 
 	try {
-		await useBaseFetch(`affiliate/${revokingId.value}`, {
-			method: 'DELETE',
-			internal: true,
-		})
+		await client.labrinth.affiliate_internal.delete(revokingId.value)
 
 		await refetch()
 		revokeModal.value?.hide()

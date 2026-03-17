@@ -107,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -131,7 +132,6 @@ import {
 	getTaxThreshold,
 	getTaxThresholdActual,
 	type PaymentProvider,
-	type PayoutMethod,
 	provideWithdrawContext,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
@@ -146,21 +146,9 @@ import MuralpayKycStage from './withdraw-stages/MuralpayKycStage.vue'
 import TaxFormStage from './withdraw-stages/TaxFormStage.vue'
 import TremendousDetailsStage from './withdraw-stages/TremendousDetailsStage.vue'
 
-type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
-
-interface UserBalanceResponse {
-	available: number
-	withdrawn_lifetime: number
-	withdrawn_ytd: number
-	pending: number
-	dates: Record<string, number>
-	requested_form_type: string | null
-	form_completion_status: FormCompletionStatus | null
-}
-
 const props = defineProps<{
-	balance: UserBalanceResponse | null
-	preloadedPaymentData?: { country: string; methods: PayoutMethod[] } | null
+	balance: Labrinth.Payout.v3.PayoutBalance | null | undefined
+	preloadedPaymentData?: { country: string; methods: Labrinth.Payout.v3.PayoutMethod[] } | null
 }>()
 
 const emit = defineEmits<{

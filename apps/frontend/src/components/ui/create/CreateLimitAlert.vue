@@ -42,13 +42,18 @@
 
 <script setup lang="ts">
 import { MessageIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, defineMessages, useVIntl } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	defineMessages,
+	injectModrinthClient,
+	useVIntl,
+} from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 
-import { useBaseFetch } from '~/composables/fetch.js'
-
+const client = injectModrinthClient()
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -100,33 +105,24 @@ const messages = defineMessages({
 	},
 })
 
-interface UserLimits {
-	current: number
-	max: number
-}
-
 const props = defineProps<{
 	type: 'project' | 'org' | 'collection'
 }>()
 
 const model = defineModel<boolean>()
 
-const apiEndpoint = computed(() => {
-	switch (props.type) {
-		case 'project':
-			return 'limits/projects'
-		case 'org':
-			return 'limits/organizations'
-		case 'collection':
-			return 'limits/collections'
-		default:
-			return 'limits/projects'
-	}
-})
-
 const { data: limits } = useQuery({
 	queryKey: computed(() => ['limits', props.type]),
-	queryFn: () => useBaseFetch(apiEndpoint.value, { apiVersion: 3 }) as Promise<UserLimits>,
+	queryFn: () => {
+		switch (props.type) {
+			case 'org':
+				return client.labrinth.limits_v3.getOrganizationLimits()
+			case 'collection':
+				return client.labrinth.limits_v3.getCollectionLimits()
+			default:
+				return client.labrinth.limits_v3.getProjectLimits()
+		}
+	},
 })
 
 const typeName = computed<{ singular: string; plural: string }>(() => {

@@ -39,6 +39,7 @@ export class ArchonServersV1Module extends AbstractModule {
 			api: 'archon',
 			version: 1,
 			method: 'GET',
+			skipAuth: true,
 		})
 	}
 
