@@ -77,12 +77,8 @@ body {
 }
 
 a {
-	color: var(--color-link);
+	color: inherit;
 	text-decoration: none;
-
-	&:hover {
-		text-decoration: none;
-	}
 }
 
 .badge {

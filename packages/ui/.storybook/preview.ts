@@ -1,14 +1,16 @@
-import '@modrinth/assets/omorphia.scss'
+import '@modrinth/assets'
 import 'floating-vue/dist/style.css'
-import '../src/styles/tailwind.css'
+import '../../../apps/app-frontend/src/assets/stylesheets/global.scss' // theres also a global.scss for frontend, can switch out to test
+import '../../assets/styles/defaults.scss'
 
 import type { Labrinth } from '@modrinth/api-client'
 import { GenericModrinthClient } from '@modrinth/api-client'
 import { withThemeByClassName } from '@storybook/addon-themes'
 import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
-import { defineComponent, ref } from 'vue'
+import { computed, defineComponent, h, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
@@ -109,8 +111,60 @@ class StorybookPopupNotificationManager extends AbstractPopupNotificationManager
 	}
 }
 
+const StorybookLink = defineComponent({
+	name: 'StorybookLink',
+	inheritAttrs: false,
+	props: {
+		to: {
+			type: [String, Object],
+			default: '',
+		},
+	},
+	setup(props, { attrs, slots }) {
+		const href = computed(() => {
+			if (typeof props.to === 'string') return props.to || '#'
+			if (props.to && typeof props.to === 'object' && 'path' in props.to) {
+				const path = props.to.path
+				return typeof path === 'string' ? path : '#'
+			}
+			return '#'
+		})
+
+		return () =>
+			h(
+				'a',
+				{
+					...attrs,
+					href: href.value,
+				},
+				slots.default?.(),
+			)
+	},
+})
+
+const StorybookClientOnly = defineComponent({
+	name: 'StorybookClientOnly',
+	setup(_, { slots }) {
+		return () => slots.default?.()
+	},
+})
+
 setup((app) => {
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				retry: false,
+			},
+			mutations: {
+				retry: false,
+			},
+		},
+	})
+	app.use(VueQueryPlugin, { queryClient })
 	app.use(i18n)
+	app.component('NuxtLink', StorybookLink)
+	app.component('RouterLink', StorybookLink)
+	app.component('ClientOnly', StorybookClientOnly)
 
 	// Provide the custom I18nContext for components using injectI18n()
 	const i18nContext: I18nContext = {
