@@ -131,7 +131,7 @@ const { data, refetch } = useQuery({
 		const filteredNotifications = notifications.filter((notif) => !notif.read)
 		const slice = filteredNotifications.slice(0, 30)
 
-		return fetchExtraNotificationData(slice).then((notifications) => {
+		return fetchExtraNotificationData(client, slice).then((notifications) => {
 			notifications = groupNotifications(notifications).slice(0, 3)
 			return { notifications, extraNotifs: filteredNotifications.length - slice.length }
 		})
