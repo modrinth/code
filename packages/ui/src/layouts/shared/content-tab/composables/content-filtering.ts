@@ -82,14 +82,23 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 
 	function applyFilters(source: ContentItem[]): ContentItem[] {
 		if (selectedFilters.value.length === 0) return source
+
+		const attributeFilters = new Set(['updates', 'disabled', 'client-only'])
+		const typeFilters = selectedFilters.value.filter((f) => !attributeFilters.has(f))
+		const activeAttributes = selectedFilters.value.filter((f) => attributeFilters.has(f))
+
 		return source.filter((item) => {
-			for (const filter of selectedFilters.value) {
-				if (filter === 'updates' && item.has_update) return true
-				if (filter === 'disabled' && !item.enabled) return true
-				if (filter === 'client-only' && isClientOnlyEnvironment(item.environment)) return true
-				if (item.project_type === filter) return true
+			if (typeFilters.length > 0 && !typeFilters.includes(item.project_type)) {
+				return false
 			}
-			return false
+
+			for (const filter of activeAttributes) {
+				if (filter === 'updates' && !item.has_update) return false
+				if (filter === 'disabled' && item.enabled) return false
+				if (filter === 'client-only' && !isClientOnlyEnvironment(item.environment)) return false
+			}
+
+			return true
 		})
 	}
 
