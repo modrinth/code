@@ -71,6 +71,7 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			params: {
 				...params,
 				facets: params.facets ? JSON.stringify(params.facets) : undefined,
+				new_filters: params.new_filters ?? undefined,
 			},
 		})
 	}

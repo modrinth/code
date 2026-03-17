@@ -43,7 +43,7 @@
 				class="size-5 shrink-0 text-brand-orange hover:brightness-110"
 			/>
 		</div>
-		<span class="text-secondary">
+		<span v-if="!props.hideShiftClickHint" class="text-secondary">
 			{{ formatMessage(messages.shiftClickHint) }}
 		</span>
 	</div>
@@ -60,6 +60,7 @@ import { useInlineBackup } from '../../composables/use-inline-backup'
 
 const props = defineProps<{
 	backupName: string
+	hideShiftClickHint?: boolean
 }>()
 
 const emit = defineEmits<{

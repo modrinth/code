@@ -501,6 +501,7 @@ export namespace Labrinth {
 			export type ProjectSearchParams = {
 				query?: string
 				facets?: string[][] // in the format of [["categories:forge"],["versions:1.17.1"]]
+				new_filters?: string
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
