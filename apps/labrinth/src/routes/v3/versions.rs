@@ -26,8 +26,7 @@ use crate::models::projects::{Loader, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::delphi;
-use crate::search::SearchConfig;
-use crate::search::indexing::remove_documents;
+use crate::search::SearchBackend;
 use crate::util::error::Context;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
@@ -799,8 +798,6 @@ pub async fn version_list_internal(
         )
         .await?
         .into_iter()
-        .skip(filters.offset.unwrap_or(0))
-        .take(filters.limit.unwrap_or(usize::MAX))
         .filter(|x| {
             let mut bool = true;
 
@@ -825,6 +822,17 @@ pub async fn version_list_internal(
         })
         .collect::<Vec<_>>();
 
+        // Sort before applying limit/offset so that limit=N returns the N newest versions
+        versions.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
+
+        let versions: Vec<_> = versions
+            .into_iter()
+            .skip(filters.offset.unwrap_or(0))
+            .take(filters.limit.unwrap_or(usize::MAX))
+            .collect();
+
         let mut response = versions
             .iter()
             .filter(|version| {
@@ -834,10 +842,6 @@ pub async fn version_list_internal(
             })
             .cloned()
             .collect::<Vec<_>>();
-
-        versions.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty()
@@ -915,7 +919,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1022,10 +1026,10 @@ pub async fn version_delete(
         &redis,
     )
     .await?;
-    remove_documents(&[version.inner.id.into()], &search_config)
+    search_backend
+        .remove_documents(&[version.inner.id.into()])
         .await
         .wrap_internal_err("failed to remove documents")?;
-
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {

@@ -147,6 +147,28 @@ export namespace Labrinth {
 		}
 	}
 
+	export namespace Payout {
+		export namespace v3 {
+			export type PayoutBalance = {
+				available: number
+				withdrawn_lifetime: number
+				withdrawn_ytd: number
+				pending: number
+				dates: Record<string, number>
+				requested_form_type: string | null
+				form_completion_status: string | null
+			}
+		}
+	}
+
+	export namespace Auth {
+		export namespace Internal {
+			export type SubscriptionStatus = {
+				subscribed: boolean
+			}
+		}
+	}
+
 	export namespace Projects {
 		export namespace v2 {
 			export type Environment = 'required' | 'optional' | 'unsupported' | 'unknown'
@@ -285,6 +307,7 @@ export namespace Labrinth {
 			export type ProjectSearchParams = {
 				query?: string
 				facets?: string[][] // in the format of [["categories:forge"],["versions:1.17.1"]]
+				new_filters?: string
 				filters?: string
 				index?: 'relevance' | 'downloads' | 'follows' | 'newest' | 'updated'
 				offset?: number
@@ -617,6 +640,14 @@ export namespace Labrinth {
 				game_versions: string[]
 				loaders: string[]
 			}
+
+			export interface GetProjectVersionsParams {
+				game_versions?: string[]
+				loaders?: string[]
+				include_changelog?: boolean
+				limit?: number
+				offset?: number
+			}
 		}
 
 		// TODO: consolidate duplicated types between v2 and v3 versions
@@ -632,7 +663,8 @@ export namespace Labrinth {
 				game_versions?: string[]
 				loaders?: string[]
 				include_changelog?: boolean
-				apiVersion?: 2 | 3
+				limit?: number
+				offset?: number
 			}
 
 			export type VersionChannel = 'release' | 'beta' | 'alpha'

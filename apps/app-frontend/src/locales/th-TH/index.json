@@ -5,32 +5,14 @@
   "app.modal.install-to-play.install-button": {
     "message": "ติดตั้ง"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count}เพิ่มแล้ว"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "เพิ่มแล้ว"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "ลบทิ้งแล้ว"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "อัปเดตแล้ว"
-  },
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count}ลบออกแล้ว"
   },
   "app.modal.update-to-play.update-required": {
     "message": "ต้องมีการอัปเดต"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "ต้องอัปเดตอย่างหนึ่งเพื่อเล่น {name}. โปรดอัปเดตให้เป็นเวอร์ชั่นล่าสุดเพื่อเปิดเกมใ"
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count}อัปเดตแล้ว"
   },
   "app.settings.developer-mode-enabled": {
     "message": "กำลังอยู่ในโหมดผู้พัฒนา"
@@ -167,12 +149,6 @@
   "instance.edit-world.title": {
     "message": "แก้ไขโลก"
   },
-  "instance.filter.disabled": {
-    "message": "ปิดโปรเจ็ค"
-  },
-  "instance.filter.updates-available": {
-    "message": "พบอัพเดท"
-  },
   "instance.server-modal.address": {
     "message": "ที่อยู่เซิร์ฟเวอร์"
   },
@@ -245,46 +221,7 @@
   "instance.settings.tabs.installation": {
     "message": "การติดตั้ง"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} สำหรับ Minecraft {game_version} ติดตั้งไว้อยู่แล้ว"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "เปลี่ยนเวอร์ชั่น"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "ติดตั้ง"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "กำลังติดตั้ง"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "กำลังติดตั้งเวอร์ชั่นใหม่"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "ติดตั้งอยู่"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "เวอร์ชันของเกม"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "ติดตั้ง"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "กำลังคิดตั้งอยู่"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชั่น {loader}"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "ซ่อมแซม"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "กำลังซ่อมแซม"
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "ซ่อมแซมหรือไม่?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "กำลังซ่อมแซมอยู่ในขณะนี้"
   }
 }

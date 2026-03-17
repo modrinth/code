@@ -17,31 +17,17 @@
 					<tr class="content">
 						<td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
 						<td>
-							<multiselect
+							<Combobox
 								v-if="versions?.length > 1"
-								v-model="selectedVersion"
-								:options="versions"
+								v-model="selectedVersionId"
+								:options="versionOptions"
 								:searchable="true"
 								placeholder="Select version"
-								open-direction="top"
-								:show-labels="false"
-								:custom-label="
-									(version) =>
-										`${version?.name} (${version?.loaders
-											.map((name) => formatLoader(formatMessage, name))
-											.join(', ')} - ${version?.game_versions.join(', ')})`
-								"
+								force-direction="up"
 								:max-height="150"
 							/>
 							<span v-else>
-								<span>
-									{{ selectedVersion?.name }} ({{
-										selectedVersion?.loaders
-											.map((name) => formatLoader(formatMessage, name))
-											.join(', ')
-									}}
-									- {{ selectedVersion?.game_versions.join(', ') }})
-								</span>
+								<span>{{ selectedVersionLabel }}</span>
 							</span>
 						</td>
 					</tr>
@@ -59,9 +45,8 @@
 
 <script setup>
 import { DownloadIcon, XIcon } from '@modrinth/assets'
-import { Button, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
-import { ref } from 'vue'
-import Multiselect from 'vue-multiselect'
+import { Button, Combobox, formatLoader, injectNotificationManager, useVIntl } from '@modrinth/ui'
+import { computed, ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
@@ -79,11 +64,35 @@ const installing = ref(false)
 
 const onInstall = ref(() => {})
 
+const selectedVersionLabel = computed(() => {
+	if (!selectedVersion.value) return ''
+	return `${selectedVersion.value.name} (${selectedVersion.value.loaders
+		.map((name) => formatLoader(formatMessage, name))
+		.join(', ')} - ${selectedVersion.value.game_versions.join(', ')})`
+})
+
+const versionOptions = computed(() =>
+	(versions.value ?? []).map((version) => ({
+		value: version.id,
+		label: `${version.name} (${version.loaders
+			.map((name) => formatLoader(formatMessage, name))
+			.join(', ')} - ${version.game_versions.join(', ')})`,
+	})),
+)
+
+const selectedVersionId = computed({
+	get: () => selectedVersion.value?.id ?? null,
+	set: (value) => {
+		if (!value) return
+		selectedVersion.value = (versions.value ?? []).find((version) => version.id === value) ?? null
+	},
+})
+
 defineExpose({
 	show: (instanceVal, projectVal, projectVersions, selected, callback) => {
 		instance.value = instanceVal
-		versions.value = projectVersions
-		selectedVersion.value = selected ?? projectVersions[0]
+		versions.value = projectVersions ?? []
+		selectedVersion.value = selected ?? projectVersions?.[0] ?? null
 
 		project.value = projectVal
 
@@ -162,9 +171,5 @@ td:first-child {
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-
-	:deep(.animated-dropdown .options) {
-		max-height: 13.375rem;
-	}
 }
 </style>

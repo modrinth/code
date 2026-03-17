@@ -39,6 +39,7 @@
 </template>
 <script setup>
 import { Badge, Breadcrumbs, useFormatDateTime, useFormatPrice } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'
 
@@ -53,23 +54,22 @@ const formatDate = useFormatDateTime({
 	day: '2-digit',
 })
 
-const { data: charges } = await useAsyncData(
-	'billing/payments',
-	() => useBaseFetch('billing/payments', { internal: true }),
-	{
-		transform: (charges) => {
-			return charges
-				.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
-				.map((charge) => {
-					const product = products.find((product) =>
-						product.prices.some((price) => price.id === charge.price_id),
-					)
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: async () => {
+		const charges = await useBaseFetch('billing/payments', { internal: true })
+		return charges
+			.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
+			.map((charge) => {
+				const product = products.find((product) =>
+					product.prices.some((price) => price.id === charge.price_id),
+				)
 
-					charge.product = product
+				charge.product = product
 
-					return charge
-				})
-		},
+				return charge
+			})
 	},
-)
+	placeholderData: [],
+})
 </script>

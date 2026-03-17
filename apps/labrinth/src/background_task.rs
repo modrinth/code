@@ -1,3 +1,4 @@
+use crate::database;
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::queue::analytics::cache::cache_analytics;
@@ -8,9 +9,9 @@ use crate::queue::payouts::{
     insert_bank_balances_and_webhook, process_affiliate_payouts,
     process_payout, remove_payouts_for_refunded_charges,
 };
-use crate::search::indexing::index_projects;
+use crate::search::SearchBackend;
 use crate::util::anrok;
-use crate::{database, search};
+use actix_web::web;
 use clap::ValueEnum;
 use eyre::WrapErr;
 use tracing::info;
@@ -42,7 +43,7 @@ impl BackgroundTask {
         pool: PgPool,
         ro_pool: PgPool,
         redis_pool: RedisPool,
-        search_config: search::SearchConfig,
+        search_backend: web::Data<dyn SearchBackend>,
         clickhouse: clickhouse::Client,
         stripe_client: stripe::Client,
         anrok_client: anrok::Client,
@@ -53,7 +54,7 @@ impl BackgroundTask {
         match self {
             Migrations => run_migrations().await,
             IndexSearch => {
-                index_search(ro_pool, redis_pool, search_config).await
+                index_search(ro_pool, redis_pool, search_backend).await
             }
             ReleaseScheduled => release_scheduled(pool).await,
             UpdateVersions => update_versions(pool, redis_pool).await,
@@ -132,10 +133,10 @@ pub async fn run_migrations() -> eyre::Result<()> {
 pub async fn index_search(
     ro_pool: PgPool,
     redis_pool: RedisPool,
-    search_config: search::SearchConfig,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> eyre::Result<()> {
     info!("Indexing local database");
-    index_projects(ro_pool, redis_pool, &search_config).await
+    search_backend.index_projects(ro_pool, redis_pool).await
 }
 
 pub async fn release_scheduled(pool: PgPool) -> eyre::Result<()> {

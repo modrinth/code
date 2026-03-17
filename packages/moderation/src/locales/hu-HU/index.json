@@ -122,6 +122,12 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.select-country.title": {
+    "defaultMessage": "Régió választása"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Add meg hogy milyen nyelvet vagy nyelveket támogat a szervered."
+  },
   "nags.select-language.title": {
     "defaultMessage": "Nyelv kiválasztása"
   },
@@ -136,6 +142,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Válassz ki címkéket"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Szerver beállítások megtekintése"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Látogasd meg a leírás beállításait"

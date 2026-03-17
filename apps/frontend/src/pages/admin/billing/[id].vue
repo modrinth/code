@@ -339,9 +339,11 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import { useBaseFetch } from '~/composables/fetch.js'
 
 const { addNotification } = injectNotificationManager()
 const formatPrice = useFormatPrice()
@@ -370,39 +372,40 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user } = await useAsyncData(`user/${route.params.id}`, () =>
-	useBaseFetch(`user/${route.params.id}`),
-)
+const { data: user, error: userError } = useQuery({
+	queryKey: ['user', route.params.id],
+	queryFn: () => useBaseFetch(`user/${route.params.id}`),
+})
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+watch(userError, (error) => {
+	if (error) {
+		showError({
+			fatal: true,
+			statusCode: error.statusCode ?? error.status ?? 404,
+			message: formatMessage(messages.userNotFoundError),
+		})
+	}
+})
 
-let subscriptions, charges, refreshCharges
-try {
-	;[{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
-		useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-		useAsyncData(`billing/payments?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+const { data: subscriptions } = useQuery({
+	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
+	queryFn: () =>
+		useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
+			internal: true,
+		}),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
+
+const { data: charges, refetch: refreshCharges } = useQuery({
+	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
+	queryFn: () =>
+		useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
+			internal: true,
+		}),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
 
 const subscriptionCharges = computed(() => {
 	return subscriptions.value.map((subscription) => {

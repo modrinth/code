@@ -70,7 +70,7 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 ## Code Guidelines
 
 ### Comments
-- DO NOT use "heading" comments like: // === Helper methods === .
+- DO NOT use "heading" comments like: `=== Helper methods ===`.
 - Use doc comments, but avoid inline comments unless ABSOLUTELY necessary for clarity. Code should aim to be self documenting!
 
 ## Bash Guidelines
@@ -78,21 +78,31 @@ Each project may have its own `CLAUDE.md` with detailed instructions:
 ### Output handling
 - DO NOT pipe output through `head`, `tail`, `less`, or `more`
 - NEVER use `| head -n X` or `| tail -n X` to truncate output
-- Run commands directly without pipes when possible
-- If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
+- IMPORTANT: Run commands directly without pipes when possible
+- IMPORTANT: If you need to limit output, use command-specific flags (e.g. `git log -n 10` instead of `git log | head -10`)
 - ALWAYS read the full output — never pipe through filters
 
 ### General
 - Do not create new non-source code files (e.g. Bash scripts, SQL scripts) unless explicitly prompted to
+- For Frontend, when doing lint checks, only use the `prepr` commands, do not use `typecheck` or `tsc` etc.
 
-## Skills
+## Edit Tool - Whitespace Handling (CLAUDE ONLY)
 
-Project-specific skills (patterns, conventions, and implementation guides) are located in [`.claude/skills/`](./.claude/skills/). Each skill has a `SKILL.md` describing the pattern:
+The Read tool uses `→` to mark where line numbers end and file content begins.
 
-- **[Dependency Injection](./.claude/skills/dependency-injection/SKILL.md)** — Vue provide/inject DI layer using `createContext`
-- **[Cross-Platform Pages](./.claude/skills/cross-platform-pages/SKILL.md)** — Shared component architecture across Nuxt and Tauri frontends
-- **[Multistage Modals](./.claude/skills/multistage-modals/SKILL.md)** — Wizard-like modal flows with `MultiStageModal`
-- **[Figma MCP](./.claude/skills/figma-mcp/SKILL.md)** — Translating Figma designs to Modrinth Vue components
-- **[i18n Convert](./.claude/skills/i18n-convert/SKILL.md)** — Converting hard-coded strings to vue-i18n localization
-- **[API Module](./.claude/skills/api-module/SKILL.md)** — Adding new endpoint modules to `@modrinth/api-client`
-- **[TanStack Query](./.claude/skills/tanstack-query/SKILL.md)** — Server state management with `@tanstack/vue-query` v5
+**Rule:** Copy the EXACT whitespace that appears after the `→` marker.
+- Whatever appears between `→` and the code text is what's actually in the file
+- That whitespace must be used EXACTLY in Edit tool's old_string
+- Don't count arrows, don't interpret - just copy what's after the `→`
+
+**Example:**
+14→		private byte tag;
+For Edit, use: `		private byte tag;` (copy everything after →, including the two tabs)
+
+**If Edit fails:** Stop and explain the problem. Do not attempt sed/awk/bash workarounds.
+
+**IMPORTANT**: Trust the Read tool output. Copy what's after `→` into Edit immediately. DO NOT verify with sed/od/grep first - that's wasting time and the instructions already tell you to stop if Edit fails, not to pre-verify.
+
+## Standards
+
+Standards available at the @standards/ folder.

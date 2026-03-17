@@ -35,7 +35,7 @@
 						:auth="auth"
 						raised
 						compact
-						@update:notifications="() => refresh()"
+						@update:notifications="() => refetch()"
 					/>
 					<nuxt-link
 						v-if="extraNotifs > 0"
@@ -98,6 +98,7 @@
 <script setup>
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
 import { Avatar } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import NotificationItem from '~/components/ui/NotificationItem.vue'
 import { fetchExtraNotificationData, groupNotifications } from '~/helpers/platform-notifications.ts'
@@ -108,11 +109,11 @@ useHead({
 
 const auth = await useAuth()
 
-const [{ data: projects }] = await Promise.all([
-	useAsyncData(`user/${auth.value.user.id}/projects`, () =>
-		useBaseFetch(`user/${auth.value.user.id}/projects`),
-	),
-])
+const { data: projects } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
+	queryFn: async () => await useBaseFetch(`user/${auth.value?.user?.id}/projects`),
+	placeholderData: [],
+})
 
 const downloadsProjectCount = computed(
 	() => projects.value.filter((project) => project.downloads > 0).length,
@@ -121,23 +122,24 @@ const followersProjectCount = computed(
 	() => projects.value.filter((project) => project.followers > 0).length,
 )
 
-const { data, refresh } = await useAsyncData(async () => {
-	const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+const { data, refetch } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
+	queryFn: async () => {
+		const notifications = await useBaseFetch(`user/${auth.value?.user?.id}/notifications`)
 
-	const filteredNotifications = notifications.filter((notif) => !notif.read)
-	const slice = filteredNotifications.slice(0, 30) // send first 30 notifs to be grouped before trimming to 3
+		const filteredNotifications = notifications.filter((notif) => !notif.read)
+		const slice = filteredNotifications.slice(0, 30)
 
-	return fetchExtraNotificationData(slice).then((notifications) => {
-		notifications = groupNotifications(notifications).slice(0, 3)
-		return { notifications, extraNotifs: filteredNotifications.length - slice.length }
-	})
+		return fetchExtraNotificationData(slice).then((notifications) => {
+			notifications = groupNotifications(notifications).slice(0, 3)
+			return { notifications, extraNotifs: filteredNotifications.length - slice.length }
+		})
+	},
+	enabled: computed(() => !!auth.value?.user?.id),
 })
 
 const notifications = computed(() => {
-	if (data.value === null) {
-		return []
-	}
-	return data.value.notifications
+	return data.value?.notifications ?? []
 })
 
 const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0))

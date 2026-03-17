@@ -186,17 +186,12 @@
 					<div class="push-right">
 						<div class="labeled-control-row">
 							Sort by
-							<Multiselect
+							<DropdownSelect
 								v-model="sortBy"
-								:searchable="false"
-								class="small-select"
-								:options="['Name', 'Status', 'Type']"
-								:close-on-select="true"
-								:show-labels="false"
-								:allow-empty="false"
-								@update:model-value="
-									sortedProjects = updateSort(sortedProjects, sortBy, descending)
-								"
+								class="!w-auto"
+								name="Sort by"
+								:options="sortOptions"
+								@change="sortedProjects = updateSort(sortedProjects, sortBy, descending)"
 							/>
 							<button
 								v-tooltip="descending ? 'Descending' : 'Ascending'"
@@ -331,6 +326,7 @@ import {
 	Checkbox,
 	commonMessages,
 	CopyCode,
+	DropdownSelect,
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
@@ -338,7 +334,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
+import { useQuery } from '@tanstack/vue-query'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
@@ -352,13 +348,12 @@ const { organization, projects, refresh } = injectOrganizationContext()
 
 const auth = await useAuth()
 
-const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
-	`user/${auth.value.user.id}/projects`,
-	() => useBaseFetch(`user/${auth.value.user.id}/projects`),
-	{
-		watch: [auth],
-	},
-)
+const { data: userProjects, refetch: refreshUserProjects } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
+	queryFn: () => useBaseFetch(`user/${auth.value.user.id}/projects`),
+	enabled: computed(() => !!auth.value?.user?.id),
+	placeholderData: [],
+})
 
 const usersOwnedProjects = ref([])
 
@@ -466,6 +461,7 @@ const updateSort = (inputProjects, sort, descending) => {
 const sortedProjects = ref(updateSort(projects.value, 'Name'))
 const selectedProjects = ref([])
 const sortBy = ref('Name')
+const sortOptions = ['Name', 'Status', 'Type']
 const descending = ref(false)
 const editLinksModal = ref(null)
 
@@ -672,11 +668,6 @@ const onBulkEditLinks = async () => {
 	align-items: center;
 	gap: var(--spacing-card-md);
 	white-space: nowrap;
-}
-
-.small-select {
-	width: -moz-fit-content;
-	width: fit-content;
 }
 
 .label-button[data-active='true'] {

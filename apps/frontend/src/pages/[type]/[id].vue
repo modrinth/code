@@ -1,5 +1,5 @@
 <template>
-	<template v-if="project">
+	<template v-if="project && projectV3Loaded">
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
@@ -1672,10 +1672,9 @@ const {
 	error: _projectV3Error,
 	isPending: projectV3Pending,
 } = useQuery({
-	queryKey: computed(() => ['project', 'v3', projectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
+	queryKey: computed(() => ['project', 'v3', routeProjectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(routeProjectId.value),
 	staleTime: STALE_TIME,
-	enabled: computed(() => !!projectId.value),
 })
 
 // Server sidebar: modpack version + project for required content
@@ -1811,12 +1810,16 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organization } = useQuery({
+const { data: organizationRaw } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
+
+// When project is removed from org, enabled becomes false but TanStack keeps stale data.
+// Return null when the project no longer belongs to an organization.
+const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -2071,10 +2074,10 @@ const createGalleryItemMutation = useMutation({
 			file.type.split('/')[file.type.split('/').length - 1]
 		}&featured=${featured ?? false}`
 
-		if (title) {
+		if (title != null) {
 			url += `&title=${encodeURIComponent(title)}`
 		}
-		if (description) {
+		if (description != null) {
 			url += `&description=${encodeURIComponent(description)}`
 		}
 		if (ordering !== null && ordering !== undefined) {
@@ -2132,10 +2135,10 @@ const editGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
 		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
 
-		if (title) {
+		if (title != null) {
 			url += `&title=${encodeURIComponent(title)}`
 		}
-		if (description) {
+		if (description != null) {
 			url += `&description=${encodeURIComponent(description)}`
 		}
 		if (ordering !== null && ordering !== undefined) {

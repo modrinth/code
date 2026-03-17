@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tUPDATE oauth_clients\n\t\t\t\tSET created_by = $1\n\t\t\t\tWHERE created_by = $2\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "91a93e039827c4f5a9331e431b5f4563d1d38ced13890397d1ab55a97d186ea6"
+}

@@ -11,10 +11,45 @@ const description: Stage = {
 	navigate: '/',
 	actions: [
 		{
+			id: 'description_insufficient_packs',
+			type: 'button',
+			label: 'Insufficient',
+			weight: 400,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) =>
+				project.project_type === 'modpack' && !projectV3?.minecraft_server,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient-packs.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'description_insufficient_projects',
+			type: 'button',
+			label: 'Insufficient',
+			weight: 400,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) =>
+				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient-projects.md?raw')).default,
+		} as ButtonAction,
+		{
+			id: 'description_insufficient_servers',
+			type: 'button',
+			label: 'Insufficient',
+			weight: 400,
+			suggestedStatus: 'flagged',
+			severity: 'medium',
+			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
+			message: async () =>
+				(await import('../messages/description/insufficient/insufficient-servers.md?raw')).default,
+		} as ButtonAction,
+		{
 			id: 'description_insufficient',
 			type: 'button',
 			label: 'Insufficient (custom)',
-			weight: 400,
+			weight: 401,
 			suggestedStatus: 'flagged',
 			severity: 'medium',
 			message: async () =>
@@ -27,49 +62,6 @@ const description: Stage = {
 					required: true,
 				},
 			],
-			disablesActions: [
-				'description_insufficient_packs',
-				'description_insufficient_projects',
-				'description_insufficient_servers',
-			],
-		} as ButtonAction,
-		{
-			id: 'description_insufficient_packs',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 401,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) =>
-				project.project_type === 'modpack' && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-packs.md?raw')).default,
-			disablesActions: ['description_insufficient'],
-		} as ButtonAction,
-		{
-			id: 'description_insufficient_projects',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 401,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) =>
-				project.project_type !== 'modpack' && !projectV3?.minecraft_server,
-			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-projects.md?raw')).default,
-			disablesActions: ['description_insufficient'],
-		} as ButtonAction,
-		{
-			id: 'description_insufficient_servers',
-			type: 'button',
-			label: 'Insufficient',
-			weight: 401,
-			suggestedStatus: 'flagged',
-			severity: 'medium',
-			shouldShow: (project, projectV3) => !!projectV3?.minecraft_java_server,
-			message: async () =>
-				(await import('../messages/description/insufficient/insufficient-servers.md?raw')).default,
-			disablesActions: ['description_insufficient'],
 		} as ButtonAction,
 		{
 			id: 'description_non_english',

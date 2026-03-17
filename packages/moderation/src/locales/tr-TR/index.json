@@ -134,6 +134,9 @@
   "nags.select-compatibility.title": {
     "defaultMessage": "Uyumluluk seçiniz"
   },
+  "nags.select-country.description": {
+    "defaultMessage": "Sunucunuzun hangi bölgede bulunduğunu oyunculara belirtin."
+  },
   "nags.select-country.title": {
     "defaultMessage": "Bölge seç"
   },

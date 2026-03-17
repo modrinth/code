@@ -5,6 +5,9 @@
 	"private": true,
 	"main": "./index.ts",
 	"types": "./index.ts",
+	"imports": {
+		"#ui/*": "./src/*"
+	},
 	"exports": {
 		".": {
 			"types": "./index.ts",
@@ -77,7 +80,6 @@
 		"qrcode.vue": "^3.4.1",
 		"three": "^0.172.0",
 		"vue-i18n": "^10.0.0",
-		"vue-multiselect": "3.0.0",
 		"vue-select": "4.0.0-beta.6",
 		"vue-typed-virtual-list": "^1.0.10",
 		"vue3-ace-editor": "^2.2.4",

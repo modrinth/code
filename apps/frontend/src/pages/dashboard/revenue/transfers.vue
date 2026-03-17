@@ -67,19 +67,16 @@
 						v-for="transaction in transactions"
 						:key="transaction.id || transaction.created"
 						:transaction="transaction"
-						@cancelled="refresh"
+						@cancelled="refetch"
 					/>
 				</div>
 			</div>
 		</div>
-		<div v-else class="mx-auto flex flex-col justify-center p-6 text-center">
-			<span class="text-lg text-contrast md:text-xl">{{
-				formatMessage(messages.noTransactions)
-			}}</span>
-			<span class="max-w-[256px] text-base text-secondary md:text-lg">{{
-				formatMessage(messages.noTransactionsDesc)
-			}}</span>
-		</div>
+		<EmptyState
+			v-else
+			:heading="formatMessage(messages.noTransactions)"
+			:description="formatMessage(messages.noTransactionsDesc)"
+		/>
 	</div>
 </template>
 <script setup>
@@ -94,11 +91,13 @@ import {
 	ButtonStyled,
 	Combobox,
 	defineMessages,
+	EmptyState,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
@@ -118,11 +117,13 @@ useHead({
 	title: 'Transaction history - Modrinth',
 })
 
-const { data: transactions, refresh } = await useAsyncData(`payout-history`, () =>
-	useBaseFetch(`payout/history`, {
-		apiVersion: 3,
-	}),
-)
+const { data: transactions, refetch } = useQuery({
+	queryKey: ['payout', 'history'],
+	queryFn: () =>
+		useBaseFetch(`payout/history`, {
+			apiVersion: 3,
+		}),
+})
 
 const allTransactions = computed(() => {
 	if (!transactions.value) return []

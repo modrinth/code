@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Opciones de descarga"
   },
-  "app-marketing.download.terms": {
-    "message": "Al descargar la Modrinth App, aceptas nuestros <terms-link>Términos de uso</terms-link> y nuestra <privacy-link>Política de privacidad</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Descargar la Modrinth App (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "¡La Modrinth App funciona mejor que muchos de los principales gestores de mods, usando solo 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Aún no hay proyectos en la colección"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Aún no hay proyectos} one {<stat>{count}</stat> proyecto} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Actualizado {ago}"
   },
@@ -578,9 +569,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proyecto} other {{count} proyectos}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Busca en tus colecciones"
   },
@@ -655,9 +643,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Una entidad comercial se refiere a una organización registrada, como una sociedad anónima, una sociedad colectiva o una sociedad de responsabilidad limitada."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "¿Estás retirando como particular o como empresa?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particular"
@@ -1130,9 +1115,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "¿Los servidores de Modrinth Hosting tendrán protección contra DDoS?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Si. Todos los servidores de Modrinth Hosting vienen con protección contra DDoS, con hasta 17 terabits por segundo (Tbps) en algunos lugares."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Preguntas Frecuentes (FAQ)"
   },
@@ -1237,9 +1219,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "¿Sabes exactamente lo que necesitas?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "Prueba un <orange>servidor de 3GB</orange> gratis por 5 días a través de <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Aprender más"
@@ -1423,9 +1402,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Para jugadores"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Descubre más de {count} creaciones"
   },
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
@@ -2027,9 +2003,6 @@
   "profile.label.collection": {
     "message": "Colección"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {descarga} other {descargas}}"
-  },
   "profile.label.joined": {
     "message": "Se unió"
   },
@@ -2047,9 +2020,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -2673,7 +2643,7 @@
     "message": "Escribir reportes"
   },
   "scopes.sessionAccess.description": {
-    "message": "Acceder a sesiones emitidas por Modrinth"
+    "message": "Acceder a las sesiones emitidas por Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Sesiones de acceso"
@@ -2771,9 +2741,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restauración del respaldo en curso"
-  },
   "servers.notice.actions": {
     "message": "Acciones"
   },
@@ -2826,7 +2793,7 @@
     "message": "Añadir más"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Agregar una URI de redirección"
+    "message": "Añadir una URI de redirección"
   },
   "settings.applications.button.cancel": {
     "message": "Cancelar"
@@ -3051,7 +3018,7 @@
     "message": "Crear un PAT"
   },
   "settings.pats.description": {
-    "message": "Los PAT se pueden usar para acceder a la API de Modrinth. Para más información, consulta <doc-link>la documentación de la API de Modrinth</doc-link>. Se pueden crear y revocar en cualquier momento."
+    "message": "Se pueden usar PAT para acceder a la API de Modrinth. Se pueden crear y revocar en cualquier momento. Para más información, ver la <doc-link>documentación de la API de Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Crear un PAT"
