@@ -11,7 +11,7 @@
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
 			>
-				<ServerIcon v-if="status !== 'suspended'" :image="image" />
+				<ServerIcon v-if="status !== 'suspended'" :image="image ?? undefined" />
 				<div
 					v-else
 					class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
@@ -163,7 +163,7 @@ type ServerListingProps = {
 
 const props = defineProps<ServerListingProps>()
 
-const { archon, kyros, labrinth } = injectModrinthClient()
+const { kyros, labrinth } = injectModrinthClient()
 
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)
@@ -207,14 +207,8 @@ const { data: image } = useQuery({
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			const auth = await archon.servers_v0.getFilesystemAuth(props.server_id)
-
 			try {
-				const blob = await kyros.files_v0.downloadFile(
-					auth.url,
-					auth.token,
-					'/server-icon-original.png',
-				)
+				const blob = await kyros.files_v0.downloadFile('/server-icon-original.png')
 
 				return await processImageBlob(blob, 512)
 			} catch {
@@ -227,17 +221,12 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					await kyros.files_v0.uploadFile(auth.url, auth.token, '/server-icon.png', scaledFile)
+					kyros.files_v0.uploadFile('/server-icon.png', scaledFile)
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					await kyros.files_v0.uploadFile(
-						auth.url,
-						auth.token,
-						'/server-icon-original.png',
-						originalFile,
-					)
+					kyros.files_v0.uploadFile('/server-icon-original.png', originalFile)
 
 					return scaledDataUrl
 				}
