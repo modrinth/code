@@ -235,7 +235,6 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
-	ctx.getItemId,
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
@@ -292,7 +291,7 @@ const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
 function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
 		if (event?.shiftKey) {
@@ -334,7 +333,7 @@ async function confirmDelete() {
 
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
-		const id = ctx.getItemId(item)
+		const id = item.id
 		markChanging(id)
 		await ctx.deleteItem(item)
 		removeFromSelection(id)
@@ -347,14 +346,14 @@ async function confirmDelete() {
 		itemsToDelete,
 		async (item) => {
 			await ctx.deleteItem(item)
-			removeFromSelection(ctx.getItemId(item))
+			removeFromSelection(item.id)
 		},
 		{ onComplete: clearSelection },
 	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (!item) return
 	markChanging(id)
 	try {

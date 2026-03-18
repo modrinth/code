@@ -487,6 +487,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
+		id: addon.id,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,
@@ -872,7 +873,6 @@ provideContentManager({
 		})
 		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
-	getItemId: (item) => item.file_path ?? item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
@@ -898,7 +898,7 @@ provideContentManager({
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		return {
-			id: item.file_path ?? item.file_name,
+			id: item.id,
 			project: item.project,
 			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
 			version: item.version,

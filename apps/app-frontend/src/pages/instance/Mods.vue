@@ -814,7 +814,6 @@ provideContentManager({
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	isBulkOperating,
-	getItemId: (item) => item.file_path ?? item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
 	bulkEnableItems: (items) =>
@@ -838,7 +837,7 @@ provideContentManager({
 	dismissContentHint,
 	shareItems: handleShareItems,
 	mapToTableItem: (item) => ({
-		id: item.file_path ?? item.file_name,
+		id: item.id,
 		project: item.project ?? {
 			id: item.file_name,
 			slug: null,
