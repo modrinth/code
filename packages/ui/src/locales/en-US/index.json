@@ -2142,7 +2142,7 @@
     "defaultMessage": "Creating backup"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "your backup"
+    "defaultMessage": "Your backup"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."

@@ -109,7 +109,7 @@ const description = computed(() => {
 const messages = defineMessages({
 	fallbackName: {
 		id: 'servers.backups.admonition.fallback-name',
-		defaultMessage: 'your backup',
+		defaultMessage: 'Your backup',
 	},
 	backupQueuedTitle: {
 		id: 'servers.backups.admonition.backup-queued.title',
