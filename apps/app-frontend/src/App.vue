@@ -68,8 +68,8 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
-import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
+import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
@@ -151,6 +151,9 @@ const {
 	handleBrowseModpacks,
 	searchModpacks,
 	getProjectVersions,
+	setModpackAlreadyInstalledModal,
+	handleModpackDuplicateCreateAnyway,
+	handleModpackDuplicateGoToInstance,
 } = setupProviders(notificationManager)
 
 const news = ref([])
@@ -424,7 +427,9 @@ const {
 	handleNavigate: handleContentInstallNavigate,
 	handleCancel: handleContentInstallCancel,
 	setContentInstallModal,
-	setInstallConfirmModal: setContentInstallConfirmModal,
+	setModpackAlreadyInstalledModal: setContentInstallModpackAlreadyInstalledModal,
+	handleModpackDuplicateCreateAnyway: handleContentInstallModpackDuplicateCreateAnyway,
+	handleModpackDuplicateGoToInstance: handleContentInstallModpackDuplicateGoToInstance,
 	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
 } = contentInstall
 
@@ -438,8 +443,9 @@ const {
 } = serverInstall
 
 const modInstallModal = ref()
+const modpackAlreadyInstalledModal = ref()
+const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
-const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
@@ -519,8 +525,9 @@ onMounted(() => {
 	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
 
 	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
-	setContentInstallConfirmModal(installConfirmModal.value)
 	setContentInstallModal(modInstallModal.value)
+	setContentInstallModpackAlreadyInstalledModal(contentInstallModpackAlreadyInstalledModal.value)
+	setModpackAlreadyInstalledModal(modpackAlreadyInstalledModal.value)
 	setServerAddServerToInstanceModal(addServerToInstanceModal.value)
 	setServerInstallToPlayModal(installToPlayModal.value)
 	setServerUpdateToPlayModal(updateToPlayModal.value)
@@ -1295,9 +1302,18 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		@navigate="handleContentInstallNavigate"
 		@cancel="handleContentInstallCancel"
 	/>
+	<ModpackAlreadyInstalledModal
+		ref="modpackAlreadyInstalledModal"
+		@create-anyway="handleModpackDuplicateCreateAnyway"
+		@go-to-instance="handleModpackDuplicateGoToInstance"
+	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
-	<InstallConfirmModal ref="installConfirmModal" />
+	<ModpackAlreadyInstalledModal
+		ref="contentInstallModpackAlreadyInstalledModal"
+		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
+		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
+	/>
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>

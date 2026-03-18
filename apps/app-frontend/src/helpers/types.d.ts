@@ -1,6 +1,6 @@
 import type { ModrinthId } from '@modrinth/utils'
 
-type GameInstance = {
+export type GameInstance = {
 	path: string
 	install_stage: InstallStage
 
@@ -46,7 +46,7 @@ type LinkedData = {
 	locked: boolean
 }
 
-type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
+export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
 type ContentFile = {
 	metadata?: {
