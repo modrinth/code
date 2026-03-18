@@ -7,51 +7,65 @@
 			:proceed-label="formatMessage(deleteModalMessages.action)"
 			@proceed="removePat(deletePatIndex)"
 		/>
-		<Modal
+		<NewModal
 			ref="patModal"
 			:header="
 				editPatId !== null
 					? formatMessage(createModalMessages.editTitle)
 					: formatMessage(createModalMessages.createTitle)
 			"
+			:width="'550px'"
 		>
-			<div class="universal-modal">
-				<label for="pat-name">
-					<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
-				</label>
-				<StyledInput
-					id="pat-name"
-					v-model="name"
-					:maxlength="2048"
-					:placeholder="formatMessage(createModalMessages.namePlaceholder)"
-				/>
-				<label for="pat-scopes">
-					<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
-				</label>
-				<div
-					id="pat-scopes"
-					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
-				>
-					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
-						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
-							{{ category.name }}
-						</h4>
-						<div class="flex flex-col gap-2">
-							<Checkbox
-								v-for="scope in category.scopes"
-								:key="scope"
-								:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-								:model-value="hasScope(scopesVal, scope)"
-								@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
-							/>
+			<div class="flex flex-col gap-4">
+				<div class="flex w-full flex-col">
+					<label for="pat-name">
+						<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
+					</label>
+					<StyledInput
+						id="pat-name"
+						v-model="name"
+						:maxlength="2048"
+						:placeholder="formatMessage(createModalMessages.namePlaceholder)"
+					/>
+				</div>
+
+				<div class="flex w-full flex-col">
+					<label for="pat-scopes">
+						<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
+					</label>
+					<div
+						id="pat-scopes"
+						class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
+					>
+						<div
+							v-for="category in scopeCategories"
+							:key="category.name"
+							class="flex flex-col gap-2"
+						>
+							<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
+								{{ category.name }}
+							</h4>
+							<div class="flex flex-col gap-2">
+								<Checkbox
+									v-for="scope in category.scopes"
+									:key="scope"
+									:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+									:model-value="hasScope(scopesVal, scope)"
+									@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
-				<label for="pat-name" class="mt-4">
-					<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
-				</label>
-				<StyledInput id="pat-expires" v-model="expires" type="date" />
-				<p></p>
+
+				<div class="flex w-full flex-col">
+					<label for="pat-expires">
+						<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
+					</label>
+					<StyledInput id="pat-expires" v-model="expires" type="date" />
+					<p></p>
+				</div>
+
 				<div class="input-group push-right">
 					<button class="iconified-button" @click="$refs.patModal.hide()">
 						<XIcon />
@@ -79,7 +93,7 @@
 					</button>
 				</div>
 			</div>
-		</Modal>
+		</NewModal>
 
 		<div class="header__row">
 			<div class="header__title">
@@ -199,6 +213,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NewModal,
 	StyledInput,
 	useFormatDateTime,
 	useRelativeTime,
@@ -206,7 +221,6 @@ import {
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
-import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
@@ -403,7 +417,7 @@ async function createPat() {
 			scopes: Number(scopesVal.value),
 			expires: data.$dayjs(expires.value).toISOString(),
 		})
-		pats.value.push(res)
+		queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
 		patModal.value.hide()
 	} catch (err) {
 		addNotification({
