@@ -1,15 +1,14 @@
 <script lang="ts">
-export interface Tab<Props> {
+export interface Tab {
 	name: MessageDescriptor
 	icon: Component
 	content: Component
-	props?: Props
 	badge?: MessageDescriptor
 	shown?: boolean
 }
 </script>
 
-<script setup lang="ts" generic="T">
+<script setup lang="ts">
 import { type Component, computed, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
@@ -20,7 +19,7 @@ const { formatMessage } = useVIntl()
 
 const props = withDefaults(
 	defineProps<{
-		tabs: Tab<T>[]
+		tabs: Tab[]
 		header?: string
 		maxWidth?: string
 		width?: string
@@ -120,10 +119,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 					@scroll="checkScrollState"
 				>
 					<Suspense>
-						<component
-							:is="visibleTabs[selectedTab].content"
-							v-bind="visibleTabs[selectedTab].props ?? {}"
-						/>
+						<component :is="visibleTabs[selectedTab].content" />
 					</Suspense>
 				</div>
 

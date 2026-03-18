@@ -27,18 +27,29 @@ import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
 import { get_project_v3 } from '@/helpers/cache'
 import { get_linked_modpack_info } from '@/helpers/profile'
+import { provideInstanceSettings } from '@/providers/instance-settings'
 
-import type { InstanceSettingsTabProps } from '../../../helpers/types'
+import type { GameInstance } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const props = defineProps<{
+	instance: GameInstance
+	offline?: boolean
+}>()
 const emit = defineEmits<{
 	unlinked: []
 }>()
 
 const isMinecraftServer = ref(false)
 const handleUnlinked = () => emit('unlinked')
+
+provideInstanceSettings({
+	instance: props.instance,
+	offline: props.offline,
+	isMinecraftServer,
+	onUnlinked: handleUnlinked,
+})
 
 watch(
 	() => props.instance,
@@ -57,7 +68,7 @@ watch(
 	{ immediate: true },
 )
 
-const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
+const tabs = computed<TabbedModalTab[]>(() => [
 	{
 		name: defineMessage({
 			id: 'instance.settings.tabs.general',
@@ -121,16 +132,7 @@ defineExpose({ show })
 <template>
 	<TabbedModal
 		ref="tabbedModal"
-		:tabs="
-			tabs.map((tab) => ({
-				...tab,
-				props: {
-					...props,
-					isMinecraftServer,
-					onUnlinked: handleUnlinked,
-				},
-			}))
-		"
+		:tabs="tabs"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
 	>

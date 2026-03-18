@@ -10,22 +10,23 @@ import { computed, ref, watch } from 'vue'
 
 import { edit } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { AppSettings, Hooks, InstanceSettingsTabProps } from '../../../helpers/types'
+import type { AppSettings, Hooks } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideHooks = ref(
-	!!props.instance.hooks.pre_launch ||
-		!!props.instance.hooks.wrapper ||
-		!!props.instance.hooks.post_exit,
+	!!instance.hooks.pre_launch ||
+		!!instance.hooks.wrapper ||
+		!!instance.hooks.post_exit,
 )
-const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
+const hooks = ref(instance.hooks ?? globalSettings.hooks)
 
 const editProfileObject = computed(() => {
 	const editProfile: {
@@ -41,7 +42,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(props.instance.path, editProfileObject.value)
+		await edit(instance.path, editProfileObject.value)
 	},
 	{ deep: true },
 )

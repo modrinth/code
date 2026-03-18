@@ -289,49 +289,6 @@ export const ManyTabs: StoryObj = {
 	}),
 }
 
-export const WithTabProps: StoryObj = {
-	render: () => ({
-		components: { TabbedModal, ButtonStyled },
-		setup() {
-			const modalRef = ref<InstanceType<typeof TabbedModal> | null>(null)
-
-			const PropsDisplay = defineComponent({
-				props: { username: { type: String, default: '' }, role: { type: String, default: '' } },
-				render() {
-					return h('div', { class: 'space-y-2 py-2' }, [
-						h('h2', { class: 'text-xl font-bold text-contrast m-0' }, 'User Profile'),
-						h('p', { class: 'text-primary m-0' }, `Username: ${this.username}`),
-						h('p', { class: 'text-primary m-0' }, `Role: ${this.role}`),
-					])
-				},
-			})
-
-			const tabs = [
-				{
-					name: { id: 'profile', defaultMessage: 'Profile' },
-					icon: InfoIcon,
-					content: PropsDisplay,
-					props: { username: 'modrinth_user', role: 'Developer' },
-				},
-				{
-					name: { id: 'settings', defaultMessage: 'Settings' },
-					icon: PaintbrushIcon,
-					content: makeTabContent('Settings'),
-				},
-			]
-			return { modalRef, tabs }
-		},
-		template: /* html */ `
-			<div>
-				<ButtonStyled color="brand">
-					<button @click="modalRef?.show()">Open with Tab Props</button>
-				</ButtonStyled>
-				<TabbedModal ref="modalRef" header="User" :tabs="tabs" />
-			</div>
-		`,
-	}),
-}
-
 export const ScrollableContent: StoryObj = {
 	render: () => ({
 		components: { TabbedModal, ButtonStyled },
