@@ -24,14 +24,13 @@
 	<p v-if="filteredReports.length === 0">You don't have any active reports.</p>
 </template>
 <script setup>
-import { Chips } from '@modrinth/ui'
+import { Chips, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
 import ReportInfo from '~/components/ui/report/ReportInfo.vue'
-import { useBaseFetch } from '~/composables/fetch.js'
 import { addReportMessage } from '~/helpers/threads.js'
-import { asEncodedJsonArray, fetchSegmented } from '~/utils/fetch-helpers.ts'
+import { fetchSegmentedWith } from '~/utils/fetch-helpers.ts'
 
 const props = defineProps({
 	moderation: {
@@ -44,6 +43,7 @@ const props = defineProps({
 	},
 })
 
+const client = injectModrinthClient()
 const viewMode = ref('open')
 const reasonFilter = ref('All')
 
@@ -51,16 +51,11 @@ const MAX_REPORTS = 1500
 
 const { data: rawReportsData } = useQuery({
 	queryKey: ['reports', MAX_REPORTS],
-	queryFn: () => useBaseFetch(`report?count=${MAX_REPORTS}`),
+	queryFn: () => client.labrinth.reports_v3.list({ count: MAX_REPORTS }),
 	placeholderData: [],
 })
 
-const rawReports = computed(() =>
-	rawReportsData.value.map((report) => ({
-		...report,
-		item_id: report.item_id.replace(/"/g, ''),
-	})),
-)
+const rawReports = computed(() => rawReportsData.value)
 
 const reporterUsers = computed(() => rawReports.value.map((report) => report.reporter))
 const reportedUsers = computed(() =>
@@ -85,7 +80,8 @@ const reasons = computed(() => [
 
 const { data: users } = useQuery({
 	queryKey: computed(() => ['users', userIds.value]),
-	queryFn: () => fetchSegmented(userIds.value, (ids) => `users?ids=${asEncodedJsonArray(ids)}`),
+	queryFn: () =>
+		fetchSegmentedWith(userIds.value, (ids) => client.labrinth.users_v2.getMultiple(ids)),
 	enabled: computed(() => userIds.value.length > 0),
 	placeholderData: [],
 })
@@ -93,14 +89,15 @@ const { data: users } = useQuery({
 const { data: versions } = useQuery({
 	queryKey: computed(() => ['versions', versionIds.value]),
 	queryFn: () =>
-		fetchSegmented(versionIds.value, (ids) => `versions?ids=${asEncodedJsonArray(ids)}`),
+		fetchSegmentedWith(versionIds.value, (ids) => client.labrinth.versions_v2.getVersions(ids)),
 	enabled: computed(() => versionIds.value.length > 0),
 	placeholderData: [],
 })
 
 const { data: threads } = useQuery({
 	queryKey: computed(() => ['threads', threadIds.value]),
-	queryFn: () => fetchSegmented(threadIds.value, (ids) => `threads?ids=${asEncodedJsonArray(ids)}`),
+	queryFn: () =>
+		fetchSegmentedWith(threadIds.value, (ids) => client.labrinth.threads_v3.getMultiple(ids)),
 	enabled: computed(() => threadIds.value.length > 0),
 	placeholderData: [],
 })
@@ -118,7 +115,7 @@ const projectIds = computed(() => [
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['projects', projectIds.value]),
 	queryFn: () =>
-		fetchSegmented(projectIds.value, (ids) => `projects?ids=${asEncodedJsonArray(ids)}`),
+		fetchSegmentedWith(projectIds.value, (ids) => client.labrinth.projects_v2.getMultiple(ids)),
 	enabled: computed(() => projectIds.value.length > 0),
 	placeholderData: [],
 })

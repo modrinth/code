@@ -229,6 +229,7 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 		showClientOnlyFilter: ctx.showClientOnlyFilter ?? false,
 		isPackLocked: ctx.isPackLocked,
 		formatProjectType,
+		persistKey: ctx.filterPersistKey,
 	},
 )
 

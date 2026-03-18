@@ -97,7 +97,7 @@
 </template>
 <script setup>
 import { ChevronRightIcon, HistoryIcon } from '@modrinth/assets'
-import { Avatar } from '@modrinth/ui'
+import { Avatar, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import NotificationItem from '~/components/ui/NotificationItem.vue'
@@ -108,10 +108,11 @@ useHead({
 })
 
 const auth = await useAuth()
+const client = injectModrinthClient()
 
 const { data: projects } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
-	queryFn: async () => await useBaseFetch(`user/${auth.value?.user?.id}/projects`),
+	queryFn: () => client.labrinth.users_v2.getProjects(auth.value?.user?.id),
 	placeholderData: [],
 })
 
@@ -125,12 +126,14 @@ const followersProjectCount = computed(
 const { data, refetch } = useQuery({
 	queryKey: computed(() => ['user', auth.value?.user?.id, 'notifications']),
 	queryFn: async () => {
-		const notifications = await useBaseFetch(`user/${auth.value?.user?.id}/notifications`)
+		const notifications = await client.labrinth.notifications_v2.getUserNotifications(
+			auth.value?.user?.id,
+		)
 
 		const filteredNotifications = notifications.filter((notif) => !notif.read)
 		const slice = filteredNotifications.slice(0, 30)
 
-		return fetchExtraNotificationData(slice).then((notifications) => {
+		return fetchExtraNotificationData(client, slice).then((notifications) => {
 			notifications = groupNotifications(notifications).slice(0, 3)
 			return { notifications, extraNotifs: filteredNotifications.length - slice.length }
 		})

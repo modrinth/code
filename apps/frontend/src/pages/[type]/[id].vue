@@ -1541,7 +1541,7 @@ async function getLicenseData(event) {
 	modalLicense.value.show(event)
 
 	try {
-		const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
+		const text = await client.labrinth.tags_v2.getLicenseText(project.value.license.id)
 		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
 	} catch {
 		licenseText.value = formatMessage(messages.licenseErrorMessage)
@@ -1895,10 +1895,7 @@ async function invalidateProject() {
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: data,
-		})
+		await client.labrinth.projects_v2.edit(projectId, data)
 		return data
 	},
 
@@ -1942,10 +1939,7 @@ const patchProjectMutation = useMutation({
 // Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
 	mutationFn: async ({ projectId, status }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: { status },
-		})
+		await client.labrinth.projects_v2.edit(projectId, { status })
 	},
 
 	onMutate: async ({ projectId, status }) => {
@@ -2038,13 +2032,8 @@ const patchProjectV3Mutation = useMutation({
 // Mutation for patching project icon
 const patchIconMutation = useMutation({
 	mutationFn: async ({ projectId, icon }) => {
-		await useBaseFetch(
-			`project/${projectId}/icon?ext=${icon.type.split('/')[icon.type.split('/').length - 1]}`,
-			{
-				method: 'PATCH',
-				body: icon,
-			},
-		)
+		const ext = icon.type.split('/')[icon.type.split('/').length - 1]
+		await client.labrinth.projects_v3.changeIcon(projectId, icon, ext)
 	},
 
 	onSuccess: () => {
@@ -2070,23 +2059,13 @@ const patchIconMutation = useMutation({
 
 const createGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, file, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?ext=${
-			file.type.split('/')[file.type.split('/').length - 1]
-		}&featured=${featured ?? false}`
-
-		if (title != null) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description != null) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'POST',
-			body: file,
+		const ext = file.type.split('/')[file.type.split('/').length - 1]
+		await client.labrinth.projects_v2.createGalleryImage(projectId, file, {
+			ext,
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -2133,20 +2112,11 @@ const createGalleryItemMutation = useMutation({
 
 const editGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
-
-		if (title != null) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description != null) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'PATCH',
+		await client.labrinth.projects_v2.editGalleryImage(projectId, imageUrl, {
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -2195,9 +2165,7 @@ const editGalleryItemMutation = useMutation({
 
 const deleteGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl }) => {
-		await useBaseFetch(`project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}`, {
-			method: 'DELETE',
-		})
+		await client.labrinth.projects_v2.deleteGalleryImage(projectId, imageUrl)
 	},
 
 	onMutate: async ({ imageUrl }) => {
@@ -2562,9 +2530,7 @@ async function deleteVersion(id) {
 
 	startLoading()
 
-	await useBaseFetch(`version/${id}`, {
-		method: 'DELETE',
-	})
+	await client.labrinth.versions_v3.deleteVersion(id)
 
 	await invalidateProject()
 
