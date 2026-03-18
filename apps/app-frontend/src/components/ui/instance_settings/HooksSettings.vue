@@ -22,9 +22,7 @@ const { instance } = injectInstanceSettings()
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideHooks = ref(
-	!!instance.hooks.pre_launch ||
-		!!instance.hooks.wrapper ||
-		!!instance.hooks.post_exit,
+	!!instance.hooks.pre_launch || !!instance.hooks.wrapper || !!instance.hooks.post_exit,
 )
 const hooks = ref(instance.hooks ?? globalSettings.hooks)
 

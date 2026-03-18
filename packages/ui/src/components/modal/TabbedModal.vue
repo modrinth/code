@@ -1,12 +1,4 @@
-<script lang="ts">
-export interface Tab {
-	name: MessageDescriptor
-	icon: Component
-	content: Component
-	badge?: MessageDescriptor
-	shown?: boolean
-}
-</script>
+<script lang="ts"></script>
 
 <script setup lang="ts">
 import { type Component, computed, nextTick, ref } from 'vue'
@@ -14,6 +6,13 @@ import { type Component, computed, nextTick, ref } from 'vue'
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
 import NewModal from './NewModal.vue'
+export interface Tab {
+	name: MessageDescriptor
+	icon: Component
+	content: Component
+	badge?: MessageDescriptor
+	shown?: boolean
+}
 
 const { formatMessage } = useVIntl()
 

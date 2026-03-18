@@ -22,9 +22,7 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
-const overrideWindowSettings = ref(
-	!!instance.game_resolution || !!instance.force_fullscreen,
-)
+const overrideWindowSettings = ref(!!instance.game_resolution || !!instance.force_fullscreen)
 const resolution: Ref<[number, number]> = ref(
 	instance.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
 )
