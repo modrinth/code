@@ -15,7 +15,7 @@
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				backup-name="Before deletion"
+				:backup-name="backupTip ? `Before deletion (${backupTip})` : 'Before deletion'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -73,11 +73,12 @@ const messages = defineMessages({
 	},
 })
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
 		variant?: 'instance' | 'server'
+		backupTip?: string
 	}>(),
 	{
 		variant: 'instance',

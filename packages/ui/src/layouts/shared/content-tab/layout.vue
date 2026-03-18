@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
 	ArrowDownAZIcon,
-	ArrowDownZAIcon,
+	ArrowUpZAIcon,
 	ClockArrowDownIcon,
 	ClockArrowUpIcon,
 	CodeIcon,
@@ -171,8 +171,8 @@ const sortLabels: Record<SortMode, () => string> = {
 function cycleSortMode() {
 	const modes: SortMode[] = [
 		'alphabetical-asc',
-		'date-added-newest',
 		'alphabetical-desc',
+		'date-added-newest',
 		'date-added-oldest',
 	]
 	const idx = modes.indexOf(sortMode.value)
@@ -646,7 +646,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
 											v-else-if="sortMode === 'date-added-newest'"
 										/><ClockArrowUpIcon
 											v-else-if="sortMode === 'date-added-oldest'"
@@ -666,7 +666,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
 											v-else-if="sortMode === 'date-added-newest'"
 										/><ClockArrowUpIcon
 											v-else-if="sortMode === 'date-added-oldest'"
@@ -869,6 +869,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
+			:backup-tip="pendingDeletionItems.map((i) => i.project.title).join(', ')"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
@@ -882,6 +883,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
+			:backup-tip="ctx.modpack.value?.project.title"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

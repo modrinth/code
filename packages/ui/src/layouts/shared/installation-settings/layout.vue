@@ -679,6 +679,7 @@ const messages = defineMessages({
 			ref="modpackUpdateModal"
 			:downgrade="isUpdateDowngrade"
 			:server="ctx.isServer"
+			:backup-tip="[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')"
 			@confirm="handleModpackUpdateConfirm"
 			@cancel="handleModpackUpdateCancel"
 		/>
@@ -686,9 +687,15 @@ const messages = defineMessages({
 		<ConfirmReinstallModal
 			ref="reinstallModal"
 			:server="ctx.isServer"
+			:backup-tip="ctx.modpack.value?.title"
 			@reinstall="handleReinstall"
 		/>
-		<ConfirmUnlinkModal ref="unlinkModal" :server="ctx.isServer" @unlink="handleUnlink" />
+		<ConfirmUnlinkModal
+			ref="unlinkModal"
+			:server="ctx.isServer"
+			:backup-tip="ctx.modpack.value?.title"
+			@unlink="handleUnlink"
+		/>
 
 		<ContentDiffModal
 			v-if="form.pendingPreview.value"

@@ -605,8 +605,8 @@ async function handleBulkUpdate(items: ContentItem[]) {
 	}
 }
 
-async function handleUpdateItem(fileNameKey: string) {
-	const item = contentItems.value.find((i) => i.file_name === fileNameKey)
+async function handleUpdateItem(id: string) {
+	const item = contentItems.value.find((i) => i.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	updatingModpack.value = false
@@ -962,6 +962,7 @@ provideContentManager({
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"
+		:backup-tip="[modpack?.project.title, pendingModpackUpdateVersion?.version_number].filter(Boolean).join(' ')"
 		server
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"

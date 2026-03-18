@@ -12,7 +12,7 @@
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				backup-name="Before bulk update"
+				:backup-name="backupTip ? `Before bulk update (${backupTip})` : 'Before bulk update'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -70,9 +70,10 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	count: number
 	server?: boolean
+	backupTip?: string
 }>()
 
 const emit = defineEmits<{

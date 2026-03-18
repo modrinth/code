@@ -5,7 +5,7 @@
 		:context="ctx"
 		:fade="fade"
 		disable-progress
-		@hide="$emit('hide')"
+		@hide="handleHide"
 	/>
 </template>
 
@@ -87,6 +87,11 @@ async function show() {
 
 function hide() {
 	modal.value?.hide()
+}
+
+function handleHide() {
+	ctx.cancelBackup.value?.()
+	emit('hide')
 }
 
 defineExpose({ show, hide, ctx })

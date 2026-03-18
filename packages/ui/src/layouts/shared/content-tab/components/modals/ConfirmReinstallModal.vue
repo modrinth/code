@@ -12,7 +12,7 @@
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				backup-name="Before reinstall"
+				:backup-name="backupTip ? `Before reinstall (${backupTip})` : 'Before reinstall'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -70,8 +70,9 @@ const messages = defineMessages({
 	},
 })
 
-defineProps<{
+const props = defineProps<{
 	server?: boolean
+	backupTip?: string
 }>()
 
 const emit = defineEmits<{
