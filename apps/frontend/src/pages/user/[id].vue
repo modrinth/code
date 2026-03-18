@@ -155,27 +155,24 @@
 							{{
 								formatMessage(messages.profileProjectsLabel, {
 									count: formatCompactNumber(projects?.length || 0),
+									countPlural: formatCompactNumberPlural(projects?.length || 0),
 								})
 							}}
 						</div>
 						<div
-							v-tooltip="sumDownloads.toLocaleString()"
+							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileDownloadsLabel, {
 									count: formatCompactNumber(sumDownloads),
+									countPlural: formatCompactNumberPlural(sumDownloads),
 								})
 							}}
 						</div>
 						<div
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(user.created),
-									time: new Date(user.created),
-								})
-							"
+							v-tooltip="formatDateTime(user.created)"
 							class="flex items-center gap-2 font-semibold"
 						>
 							<CalendarIcon class="h-6 w-6 text-secondary" />
@@ -283,12 +280,12 @@
 			</div>
 			<div class="normal-page__content">
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" />
+					<NavTabs :links="navLinks" replace />
 				</div>
-				<div v-if="projects.length > 0">
-					<div
+				<div v-if="projects?.length > 0">
+					<ProjectCardList
 						v-if="route.params.projectType !== 'collections'"
-						:class="'project-list display-mode--' + cosmetics.searchDisplayMode.user"
+						:layout="cosmetics.searchDisplayMode.user"
 					>
 						<ProjectCard
 							v-for="project in (route.params.projectType !== undefined
@@ -301,34 +298,40 @@
 							)
 								.slice()
 								.sort((a, b) => b.downloads - a.downloads)"
-							:id="project.slug || project.id"
 							:key="project.id"
-							:name="project.title"
-							:display="cosmetics.searchDisplayMode.user"
-							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							:description="project.description"
-							:created-at="project.published"
-							:updated-at="project.updated"
-							:downloads="project.downloads.toString()"
-							:follows="project.followers.toString()"
+							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
+							:title="project.title"
 							:icon-url="project.icon_url"
-							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
-							:status="
-								auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
-									? project.status
-									: null
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:summary="project.description"
+							:tags="[...project.categories]"
+							:all-tags="[
+								...project.categories,
+								...project.loaders,
+								...project.additional_categories,
+							]"
+							:followers="project.followers"
+							:banner="project.gallery.find((element) => element.featured)?.url"
+							:color="project.color ?? undefined"
+							:environment="{
+								clientSide: project.client_side,
+								serverSide: project.server_side,
+							}"
+							:layout="
+								cosmetics.searchDisplayMode.user === 'grid' ||
+								cosmetics.searchDisplayMode.user === 'gallery'
+									? 'grid'
+									: 'list'
 							"
-							:type="project.project_type"
-							:color="project.color"
+							:status="project.status"
 						/>
-					</div>
+					</ProjectCardList>
 				</div>
 				<div
 					v-else-if="
 						(route.params.projectType && route.params.projectType !== 'collections') ||
-						(!route.params.projectType && collections.length === 0)
+						(!route.params.projectType && collections?.length === 0)
 					"
 					class="error"
 				>
@@ -350,7 +353,7 @@
 					class="collections-grid"
 				>
 					<nuxt-link
-						v-for="collection in collections.sort(
+						v-for="collection in (collections ?? []).sort(
 							(a, b) => new Date(b.created) - new Date(a.created),
 						)"
 						:key="collection.id"
@@ -401,7 +404,7 @@
 					</nuxt-link>
 				</div>
 				<div
-					v-if="route.params.projectType === 'collections' && collections.length === 0"
+					v-if="route.params.projectType === 'collections' && collections?.length === 0"
 					class="error"
 				>
 					<UpToDate class="icon" />
@@ -422,7 +425,7 @@
 				</div>
 			</div>
 			<div class="normal-page__sidebar">
-				<div v-if="organizations.length > 0" class="card flex-card">
+				<div v-if="organizations?.length > 0" class="card flex-card">
 					<h2 class="text-lg text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
@@ -489,15 +492,23 @@ import {
 	commonMessages,
 	ContentPageHeader,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
 	OverflowMenu,
+	ProjectCard,
+	ProjectCardList,
 	TagItem,
+	useCompactNumber,
+	useFormatDateTime,
+	useFormatNumber,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { onServerPrefetch } from 'vue'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
 import AlphaTesterBadge from '~/assets/images/badges/alpha-tester.svg?component'
@@ -511,7 +522,6 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
@@ -520,13 +530,16 @@ const auth = await useAuth()
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const config = useRuntimeConfig()
+const queryClient = useQueryClient()
 
-const vintl = useVIntl()
-const { formatMessage } = vintl
-
-const formatCompactNumber = useCompactNumber(true)
-
+const { formatMessage } = useVIntl()
+const formatNumber = useFormatNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const { addNotification } = injectNotificationManager()
 
@@ -535,11 +548,11 @@ const baseId = useId()
 const messages = defineMessages({
 	profileProjectsLabel: {
 		id: 'profile.label.projects',
-		defaultMessage: '{count} {count, plural, one {project} other {projects}}',
+		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
 	},
 	profileDownloadsLabel: {
 		id: 'profile.label.downloads',
-		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+		defaultMessage: '{count} {countPlural, plural, one {download} other {downloads}}',
 	},
 	profileJoinedLabel: {
 		id: 'profile.label.joined',
@@ -670,74 +683,81 @@ const messages = defineMessages({
 	},
 })
 
-let user, projects, organizations, collections, refreshUser
-try {
-	;[
-		{ data: user, refresh: refreshUser },
-		{ data: projects },
-		{ data: organizations },
-		{ data: collections },
-	] = await Promise.all([
-		useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
-		useAsyncData(
-			`user/${route.params.id}/projects`,
-			() => useBaseFetch(`user/${route.params.id}/projects`),
-			{
-				transform: (projects) => {
-					for (const project of projects) {
-						project.categories = project.categories.concat(project.loaders)
-						project.project_type = data.$getProjectTypeForUrl(
-							project.project_type,
-							project.categories,
-							tags.value,
-						)
-					}
+const client = injectModrinthClient()
 
-					return projects
-				},
-			},
-		),
-		useAsyncData(`user/${route.params.id}/organizations`, () =>
-			useBaseFetch(`user/${route.params.id}/organizations`, {
-				apiVersion: 3,
-			}),
-		),
-		useAsyncData(`user/${route.params.id}/collections`, () =>
-			useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
-		),
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
+	queryKey: computed(() => ['user', route.params.id]),
+	queryFn: () => client.labrinth.users_v2.get(route.params.id),
+})
+
+watch(
+	userError,
+	(error) => {
+		if (error) {
+			const status = error.statusCode ?? error.status ?? 404
+			showError({
+				fatal: true,
+				statusCode: status,
+				message: formatMessage(messages.userNotFoundError),
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+const { data: projects, suspense: projectsSuspense } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'projects']),
+	queryFn: async () => {
+		const projects = await client.labrinth.users_v2.getProjects(route.params.id)
+		for (const project of projects) {
+			project.categories = project.categories.concat(project.loaders)
+			project.project_type = data.$getProjectTypeForUrl(
+				project.project_type,
+				project.categories,
+				tags.value,
+			)
+		}
+		return projects
+	},
+})
+
+const { data: organizations, suspense: orgsSuspense } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'organizations']),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(route.params.id),
+})
+
+const { data: collections, suspense: collectionsSuspense } = useQuery({
+	queryKey: computed(() => ['user', route.params.id, 'collections']),
+	queryFn: () => client.labrinth.users_v2.getCollections(route.params.id),
+})
+
+onServerPrefetch(async () => {
+	await Promise.allSettled([
+		userSuspense(),
+		projectsSuspense(),
+		orgsSuspense(),
+		collectionsSuspense(),
 	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+})
 
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
-
-if (user.value.username !== route.params.id) {
-	await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 })
-}
-
-const title = computed(() => `${user.value.username} - Modrinth`)
+const title = computed(() => (user.value ? `${user.value.username} - Modrinth` : 'Modrinth'))
 const description = computed(() =>
-	user.value.bio
+	user.value?.bio
 		? formatMessage(messages.profileMetaDescriptionWithBio, {
 				bio: user.value.bio,
 				username: user.value.username,
 			})
-		: formatMessage(messages.profileMetaDescription, { username: user.value.username }),
+		: user.value
+			? formatMessage(messages.profileMetaDescription, { username: user.value.username })
+			: '',
 )
 
 useSeoMeta({
@@ -745,7 +765,7 @@ useSeoMeta({
 	description: () => description.value,
 	ogTitle: () => title.value,
 	ogDescription: () => description.value,
-	ogImage: () => user.value.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
+	ogImage: () => user.value?.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
 })
 
 const projectTypes = computed(() => {
@@ -829,15 +849,12 @@ async function copyPermalink() {
 	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
 }
 
-const isAffiliate = computed(() => user.value.badges & UserBadge.AFFILIATE)
+const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
 
 async function toggleAffiliate(id) {
-	await useBaseFetch(`user/${id}`, {
-		method: 'PATCH',
-		body: { badges: user.value.badges ^ (1 << 7) },
-	})
-	refreshUser()
+	await client.labrinth.users_v2.patch(id, { badges: user.value.badges ^ (1 << 7) })
+	queryClient.invalidateQueries({ queryKey: ['user', route.params.id] })
 }
 
 const navLinks = computed(() => [
@@ -856,7 +873,7 @@ const navLinks = computed(() => [
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
 
-const selectedRole = ref(user.value.role)
+const selectedRole = ref(user.value?.role)
 const isSavingRole = ref(false)
 
 const roleOptions = [
@@ -884,12 +901,8 @@ function saveRoleEdit() {
 
 	isSavingRole.value = true
 
-	useBaseFetch(`user/${user.value.id}`, {
-		method: 'PATCH',
-		body: {
-			role: selectedRole.value,
-		},
-	})
+	client.labrinth.users_v2
+		.patch(user.value.id, { role: selectedRole.value })
 		.then(() => {
 			user.value.role = selectedRole.value
 
@@ -925,7 +938,7 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-bottom: var(--gap-md);
+	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;

@@ -65,35 +65,11 @@
 						<button
 							class="preview-radio button-base"
 							:class="{
-								selected: cosmetics.searchDisplayMode[projectType.id] === 'grid',
+								selected:
+									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
+									cosmetics.searchDisplayMode[projectType.id] === 'grid',
 							}"
 							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
-						>
-							<div class="preview">
-								<div class="layout-grid-mode">
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-								</div>
-							</div>
-							<div class="label">
-								<RadioButtonCheckedIcon
-									v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
-									class="radio shrink-0"
-								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
-								{{ formatMessage(layoutMode.grid) }}
-							</div>
-						</button>
-						<button
-							class="preview-radio button-base"
-							:class="{
-								selected: cosmetics.searchDisplayMode[projectType.id] === 'gallery',
-							}"
-							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'gallery')"
 						>
 							<div class="preview">
 								<div class="layout-gallery-mode">
@@ -105,11 +81,14 @@
 							</div>
 							<div class="label">
 								<RadioButtonCheckedIcon
-									v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
+									v-if="
+										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
+										cosmetics.searchDisplayMode[projectType.id] === 'grid'
+									"
 									class="radio shrink-0"
 								/>
 								<RadioButtonIcon v-else class="radio shrink-0" />
-								{{ formatMessage(layoutMode.gallery) }}
+								{{ formatMessage(layoutMode.grid) }}
 							</div>
 						</button>
 					</div>
@@ -310,6 +289,10 @@ const projectListLayouts = defineMessages({
 	modpack: {
 		id: 'settings.display.project-list-layouts.modpack',
 		defaultMessage: 'Modpacks page',
+	},
+	server: {
+		id: 'settings.display.project-list-layouts.server',
+		defaultMessage: 'Servers page',
 	},
 	user: {
 		id: 'settings.display.project-list-layouts.user',

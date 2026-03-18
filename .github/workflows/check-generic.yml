@@ -13,13 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: crate-ci/typos@master
+      - uses: crate-ci/typos@v1.43.1
 
-  # broken: <https://github.com/SchemaStore/schemastore/issues/5108>
-  # tombi:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - uses: tombi-toml/setup-tombi@v1
-  #     - run: tombi lint
-  #     - run: tombi fmt --check
+  # see <https://github.com/influxdata/datafusion-udf-wasm/pull/275>
+  tombi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: tombi
+      - run: tombi lint
+      - run: tombi fmt --check

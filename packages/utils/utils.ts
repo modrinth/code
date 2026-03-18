@@ -60,55 +60,38 @@ export const computeVersions = (versions, members) => {
 		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
 
-export const sortedCategories = (tags) => {
+const SERVER_HEADER_ORDER = [
+	'minecraft_server_features',
+	'minecraft_server_gameplay',
+	'minecraft_server_meta',
+	'minecraft_server_community',
+]
+
+export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
+			const aServerIdx = SERVER_HEADER_ORDER.indexOf(a.header)
+			const bServerIdx = SERVER_HEADER_ORDER.indexOf(b.header)
+			if (aServerIdx !== -1 && bServerIdx !== -1) {
+				return aServerIdx - bServerIdx
+			}
+
 			return headerCompare
 		}
-		if (a.header === 'resolutions' && b.header === 'resolutions') {
-			return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-		} else if (a.header === 'performance impact' && b.header === 'performance impact') {
-			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
+		if (a.header === 'performance impact' && b.header === 'performance impact') {
+			const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
-		return 0
+
+		if (a.name === 'pokemon') return -1
+		if (b.name === 'pokemon') return 1
+
+		const aFormatted = formatCategoryName(a.name)
+		const bFormatted = formatCategoryName(b.name)
+		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })
 	})
-}
-
-export const formatNumber = (number, abbreviate = true) => {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `${(x / 1000).toFixed(1).toString()}k`
-	}
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
-export function formatDate(
-	date: dayjs.Dayjs,
-	options: Intl.DateTimeFormatOptions = {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	},
-): string {
-	return date.toDate().toLocaleDateString(undefined, options)
-}
-
-export function formatMoney(number, abbreviate = false) {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `$${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `$${(x / 1000).toFixed(2).toString()}k`
-	}
-	return `$${x
-		.toFixed(2)
-		.toString()
-		.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
 export const formatBytes = (bytes, decimals = 2) => {
@@ -157,12 +140,10 @@ export const formatProjectType = (name, short = false) => {
 		return 'Data Pack'
 	} else if (name === 'modpack') {
 		return 'Modpack'
+	} else if (name === 'minecraft_java_server') {
+		return 'Server'
 	}
 
-	return capitalizeString(name)
-}
-
-export const formatCategoryHeader = (name) => {
 	return capitalizeString(name)
 }
 
@@ -288,32 +269,6 @@ export const acceptFileFromProjectType = (projectType) => {
 			// all of the above
 			return `.jar,.zip,.litemod,.mrpack,application/java-archive,application/x-java-archive,application/zip,application/x-modrinth-modpack+zip,${commonTypes}`
 	}
-}
-
-// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
-// identifier[0], then if it ties, identifier[1], etc
-export const sortByNameOrNumber = (sortable, identifiers) => {
-	sortable.sort((a, b) => {
-		for (const identifier of identifiers) {
-			const aNum = parseFloat(a[identifier])
-			const bNum = parseFloat(b[identifier])
-			if (isNaN(aNum) && isNaN(bNum)) {
-				// Both are strings, sort alphabetically
-				const stringComp = a[identifier].localeCompare(b[identifier])
-				if (stringComp != 0) return stringComp
-			} else if (!isNaN(aNum) && !isNaN(bNum)) {
-				// Both are numbers, sort numerically
-				const numComp = aNum - bNum
-				if (numComp != 0) return numComp
-			} else {
-				// One is a number and one is a string, numbers go first
-				const numStringComp = isNaN(aNum) ? 1 : -1
-				if (numStringComp != 0) return numStringComp
-			}
-		}
-		return 0
-	})
-	return sortable
 }
 
 export const getArrayOrString = (x: string[] | string): string[] => {

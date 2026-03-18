@@ -39,7 +39,7 @@
 		<TaxComplianceBanner v-if="showTaxComplianceBanner" />
 		<VerifyEmailBanner
 			v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
-			:has-email="auth?.user?.email"
+			:has-email="!!auth?.user?.email"
 		/>
 		<SubscriptionPaymentFailedBanner
 			v-if="
@@ -69,7 +69,8 @@
 				</NuxtLink>
 			</div>
 			<div
-				:class="`col-span-2 row-start-2 flex flex-wrap justify-center ${flags.projectTypesPrimaryNav ? 'gap-2' : 'gap-4'} lg:col-span-1 lg:row-start-auto`"
+				class="col-span-2 row-start-2 flex flex-wrap justify-center lg:col-span-1 lg:row-start-auto"
+				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
 					<ButtonStyled
@@ -148,6 +149,18 @@
 							{{ formatMessage(commonProjectTypeCategoryMessages.plugin) }}
 						</nuxt-link>
 					</ButtonStyled>
+					<ButtonStyled
+						type="transparent"
+						:highlighted="route.name === 'discover-servers' || route.path.startsWith('/server/')"
+						:highlighted-style="
+							route.name === 'discover-servers' ? 'main-nav-primary' : 'main-nav-secondary'
+						"
+					>
+						<nuxt-link to="/discover/servers">
+							<ServerIcon aria-hidden="true" />
+							{{ formatMessage(commonProjectTypeCategoryMessages.server) }}
+						</nuxt-link>
+					</ButtonStyled>
 				</template>
 				<template v-else>
 					<ButtonStyled
@@ -184,7 +197,6 @@
 								{
 									id: 'servers',
 									action: '/discover/servers',
-									shown: flags.serverDiscovery,
 								},
 							]"
 							hoverable
@@ -399,6 +411,10 @@
 								action: (event) => $refs.modal_creation.show(event),
 							},
 							{
+								id: 'new-server-project',
+								action: (event) => $refs.modal_creation.show(event, { type: 'server' }),
+							},
+							{
 								id: 'new-collection',
 								action: (event) => $refs.modal_collection_creation.show(event),
 							},
@@ -410,9 +426,12 @@
 						]"
 					>
 						<PlusIcon aria-hidden="true" />
-						<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+						{{ formatMessage(messages.publish) }}
 						<template #new-project>
 							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newProject) }}
+						</template>
+						<template #new-server-project>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newServerProject) }}
 						</template>
 						<!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
 						<template #new-collection>
@@ -716,11 +735,14 @@ import {
 	commonMessages,
 	commonProjectTypeCategoryMessages,
 	defineMessages,
+	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
+import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
 import BatchCreditModal from '~/components/ui/admin/BatchCreditModal.vue'
 import GeneratedStateErrorsBanner from '~/components/ui/banner/GeneratedStateErrorsBanner.vue'
@@ -739,6 +761,8 @@ import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.v
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
+const generatedState = useGeneratedState()
+
 const country = useUserCountry()
 
 const { formatMessage } = useVIntl()
@@ -753,17 +777,20 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const client = injectModrinthClient()
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
-	if (!auth.value.user) return null
-	return useBaseFetch('payout/balance', { apiVersion: 3 })
+const { data: payoutBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
+	enabled: computed(() => !!auth.value.user),
 })
 
 const showTaxComplianceBanner = computed(() => {
 	if (flags.value.testTaxForm && auth.value.user) return true
 	const bal = payoutBalance.value
 	if (!bal) return false
-	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= 600
+	const threshold = getTaxThreshold(generatedState.value?.taxComplianceThresholds)
+	const thresholdMet = (bal.withdrawn_ytd ?? 0) >= threshold
 	const status = bal.form_completion_status ?? 'unknown'
 	const isComplete = status === 'complete'
 	const isTinMismatch = status === 'tin-mismatch'
@@ -831,6 +858,10 @@ const messages = defineMessages({
 		id: 'layout.action.create-new',
 		defaultMessage: 'Create new...',
 	},
+	publish: {
+		id: 'layout.action.publish',
+		defaultMessage: 'Publish',
+	},
 	reviewProjects: {
 		id: 'layout.action.review-projects',
 		defaultMessage: 'Project review',
@@ -862,6 +893,10 @@ const messages = defineMessages({
 	newProject: {
 		id: 'layout.action.new-project',
 		defaultMessage: 'New project',
+	},
+	newServerProject: {
+		id: 'layout.action.new-server-project',
+		defaultMessage: 'New server',
 	},
 	newCollection: {
 		id: 'layout.action.new-collection',
@@ -982,6 +1017,10 @@ const navRoutes = computed(() => [
 	{
 		label: formatMessage(getProjectTypeMessage('modpack', true)),
 		href: '/discover/modpacks',
+	},
+	{
+		label: formatMessage(getProjectTypeMessage('server', true)),
+		href: '/discover/servers',
 	},
 ])
 
@@ -1105,7 +1144,7 @@ async function onKeyDown(event) {
 		rCount.value++
 
 		if (randomProjects.value.length < 3) {
-			randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+			randomProjects.value = await client.labrinth.projects_v2.getRandom(50).catch((err) => {
 				console.error(err)
 				return []
 			})
@@ -1244,7 +1283,7 @@ const { cycle: changeTheme } = useTheme()
 		left: 0;
 		background-color: var(--color-raised-bg);
 		z-index: 11; // 20 = modals, 10 = svg icons
-		transform: translateY(100%);
+		transform: translateY(calc(100% + env(safe-area-inset-bottom)));
 		transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0);
@@ -1331,6 +1370,17 @@ const { cycle: changeTheme } = useTheme()
 		transition: border-radius 0.3s ease-out;
 		border-top: 2px solid rgba(0, 0, 0, 0);
 		box-sizing: border-box;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 2px;
+			left: 0;
+			width: 100%;
+			height: 300px;
+			background-color: var(--color-raised-bg);
+			transform: translateY(100%);
+		}
 
 		&.expanded {
 			box-shadow: none;
@@ -1558,4 +1608,3 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>

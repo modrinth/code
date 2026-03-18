@@ -60,7 +60,10 @@ export interface BaseAction {
 	 *
 	 * By default, it returns `true`, meaning the action is always shown.
 	 */
-	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
+	shouldShow?: (
+		project: Labrinth.Projects.v2.Project,
+		projectV3: Labrinth.Projects.v3.Project,
+	) => boolean
 }
 
 /**
@@ -165,7 +168,10 @@ export interface DropdownActionOption extends WeightedMessage {
 	 *
 	 * By default, it returns `true`, meaning the option is always shown.
 	 */
-	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
+	shouldShow?: (
+		project: Labrinth.Projects.v2.Project,
+		projectV3: Labrinth.Projects.v3.Project,
+	) => boolean
 }
 
 export interface DropdownAction extends BaseAction {
@@ -198,7 +204,10 @@ export interface MultiSelectChipsOption extends WeightedMessage {
 	 *
 	 * By default, it returns `true`, meaning the option is always shown.
 	 */
-	shouldShow?: (project: Labrinth.Projects.v2.Project) => boolean
+	shouldShow?: (
+		project: Labrinth.Projects.v2.Project,
+		projectV3: Labrinth.Projects.v3.Project,
+	) => boolean
 }
 
 export interface MultiSelectChipsAction extends BaseAction {

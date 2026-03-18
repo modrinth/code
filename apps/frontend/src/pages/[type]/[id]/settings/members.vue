@@ -1,11 +1,22 @@
 <template>
 	<div>
+		<ConfirmTransferProjectModal
+			v-if="transferData && project"
+			ref="transferModal"
+			:project="{ name: project.title, icon_url: project.icon_url }"
+			:current-owner="{
+				avatar_url: currentMember?.avatar_url,
+				username: currentMember?.user?.username ?? '',
+				role: currentMember?.role ?? 'Owner',
+			}"
+			:transfer-to="transferData.target"
+			:on-confirm="transferData.onConfirm"
+		/>
 		<ConfirmModal
 			ref="modal_remove"
 			title="Are you sure you want to remove this project from the organization?"
 			description="If you proceed, this project will no longer be managed by the organization."
 			proceed-label="Remove"
-			:noblur="!(cosmetics?.advancedRendering ?? true)"
 			@proceed="onRemoveFromOrg"
 		/>
 		<Card>
@@ -22,10 +33,9 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<input
+				<StyledInput
 					id="username"
 					v-model="currentUsername"
-					type="text"
 					placeholder="Username"
 					:disabled="(currentMember?.permissions & MANAGE_INVITES) !== MANAGE_INVITES"
 					@keypress.enter="inviteTeamMember()"
@@ -98,10 +108,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-role`"
 						v-model="allTeamMembers[index].role"
-						type="text"
 						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
 					/>
 				</div>
@@ -113,7 +122,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allTeamMembers[index].user.username}-monetization-weight`"
 						v-model="allTeamMembers[index].payouts_split"
 						type="number"
@@ -131,10 +140,11 @@
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allTeamMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -235,7 +245,7 @@
 					<button
 						v-if="!member.is_owner && currentMember?.is_owner && member.accepted"
 						class="iconified-button"
-						@click="transferOwnership(index)"
+						@click="openTransferModal(index, $event)"
 					>
 						<TransferIcon />
 						Transfer ownership
@@ -286,23 +296,22 @@
 				This project is not managed by an organization. If you are the member of any organizations,
 				you can transfer management to one of them.
 			</p>
-			<div v-if="!organization" class="input-group">
-				<Multiselect
-					id="organization-picker"
-					v-model="selectedOrganization"
-					class="large-multiselect"
-					track-by="id"
-					label="name"
-					open-direction="top"
-					:close-on-select="true"
-					:show-labels="false"
-					:allow-empty="false"
-					:options="organizations || []"
-					:disabled="!currentMember?.is_owner || organizations?.length === 0"
+			<div v-if="!organization" class="flex gap-2">
+				<Combobox
+					v-model="selectedOrganizationId"
+					:options="organizationOptions"
+					:searchable="true"
+					search-placeholder="Select organization..."
+					force-direction="up"
+					:disabled="!currentMember?.is_owner || organizationOptions.length === 0"
 				/>
-				<button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
+				<button
+					class="btn btn-primary"
+					:disabled="!selectedOrganization"
+					@click="openTransferToOrgModal($event)"
+				>
 					<CheckIcon />
-					Transfer management
+					<span class="w-max"> Transfer management </span>
 				</button>
 			</div>
 			<button v-if="organization" class="btn" @click="$refs.modal_remove.show()">
@@ -364,10 +373,9 @@
 							The title of the role that this member plays for this project.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-role`"
 						v-model="allOrgMembers[index].role"
-						type="text"
 						:disabled="
 							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
 							!allOrgMembers[index].override
@@ -382,7 +390,7 @@
 							this project's revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${allOrgMembers[index].user.username}-monetization-weight`"
 						v-model="allOrgMembers[index].payouts_split"
 						type="number"
@@ -404,10 +412,11 @@
 								(currentMember?.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION ||
 								!allOrgMembers[index].override
 							"
-							label="Upload version"
+							:label="isServerProject ? 'Update content' : 'Upload version'"
 							@update:model-value="allOrgMembers[index].permissions ^= UPLOAD_VERSION"
 						/>
 						<Checkbox
+							v-if="!isServerProject"
 							:model-value="(member?.permissions & DELETE_VERSION) === DELETE_VERSION"
 							:disabled="
 								(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -499,9 +508,26 @@
 					</div>
 				</template>
 				<div class="input-group">
+					<!--
+					if we save changes and update an org member which:
+					- is not currently overridden (!allOrgMembers[index].oldOverride)
+					- and we're not changing them to be overridden (!allOrgMembers[index].override)
+
+					then we end up editing an org member which, in the backend, doesn't exist.
+					the api doesn't let us do that, we can only do:
+					- !override -> override: POST member
+					- override -> !override: DELETE member
+					- override -> override: PATCH member
+					- !override -> !override: do nothing
+
+					we don't allow clicking the button in that last case.
+					-->
 					<button
 						class="iconified-button brand-button"
-						:disabled="(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
+						:disabled="
+							(currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+							(!allOrgMembers[index].oldOverride && !allOrgMembers[index].override)
+						"
 						@click="updateOrgMember(index)"
 					>
 						<SaveIcon />
@@ -530,27 +556,32 @@ import {
 	Badge,
 	Card,
 	Checkbox,
+	Combobox,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
+	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
-import { Multiselect } from 'vue-multiselect'
+import { useQuery } from '@tanstack/vue-query'
 
+import ConfirmTransferProjectModal from '~/components/ui/ConfirmTransferProjectModal.vue'
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
+	projectV3,
 	organization,
 	allMembers,
 	currentMember,
-	refreshProject,
-	refreshOrganization,
-	refreshMembers,
+	invalidate,
 } = injectProjectPageContext()
 
-const cosmetics = useCosmetics()
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
+
 const auth = await useAuth()
 
 const allTeamMembers = ref([])
@@ -565,22 +596,21 @@ function initMembers() {
 
 	const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
 		const foundMember = allMembers.value.find((tM) => tM.user.id === partialOrgMember.user.id)
-		const returnVal = foundMember ?? partialOrgMember
 
-		// If replacing a partial with a full member, we need to mark as such.
-		returnVal.override = !!foundMember
-		returnVal.oldOverride = !!foundMember
-
-		returnVal.is_owner = partialOrgMember.is_owner
-
-		return returnVal
+		const base = foundMember ?? partialOrgMember
+		return {
+			...base,
+			override: !!foundMember,
+			oldOverride: !!foundMember,
+			is_owner: partialOrgMember.is_owner,
+		}
 	})
 
 	allOrgMembers.value = selectedMembersForOrg
 
-	allTeamMembers.value = allMembers.value.filter(
-		(x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id),
-	)
+	allTeamMembers.value = allMembers.value
+		.filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
+		.map((x) => ({ ...x }))
 }
 
 watch([allMembers, organization, project, currentMember], initMembers)
@@ -588,13 +618,26 @@ initMembers()
 
 const currentUsername = ref('')
 const openTeamMembers = ref([])
-const selectedOrganization = ref(null)
+const selectedOrganizationId = ref('')
+const transferData = ref(null)
+const transferModal = ref(null)
 
-const { data: organizations } = useAsyncData('organizations', () => {
-	return useBaseFetch('user/' + auth.value?.user.id + '/organizations', {
-		apiVersion: 3,
-	})
+const { data: organizations } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'organizations']),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(auth.value?.user.id),
+	enabled: computed(() => !!auth.value?.user?.id),
 })
+
+const organizationOptions = computed(() =>
+	(organizations.value ?? []).map((organization) => ({
+		value: organization.id,
+		label: organization.name,
+	})),
+)
+
+const selectedOrganization = computed(() =>
+	(organizations.value ?? []).find((org) => org.id === selectedOrganizationId.value),
+)
 
 const UPLOAD_VERSION = 1 << 0
 const DELETE_VERSION = 1 << 1
@@ -608,14 +651,10 @@ const VIEW_ANALYTICS = 1 << 8
 const VIEW_PAYOUTS = 1 << 9
 
 const onAddToOrg = useClientTry(async () => {
-	if (!selectedOrganization.value) return
+	if (!selectedOrganizationId.value) return
 
-	await useBaseFetch(`organization/${selectedOrganization.value.id}/projects`, {
-		method: 'POST',
-		body: JSON.stringify({
-			project_id: project.value.id,
-		}),
-		apiVersion: 3,
+	await client.labrinth.organizations_v3.addProject(selectedOrganizationId.value, {
+		project_id: project.value.id,
 	})
 
 	await updateMembers()
@@ -630,13 +669,11 @@ const onAddToOrg = useClientTry(async () => {
 const onRemoveFromOrg = useClientTry(async () => {
 	if (!project.value.organization || !auth.value?.user?.id) return
 
-	await useBaseFetch(`organization/${project.value.organization}/projects/${project.value.id}`, {
-		method: 'DELETE',
-		body: JSON.stringify({
-			new_owner: auth.value.user.id,
-		}),
-		apiVersion: 3,
-	})
+	await client.labrinth.organizations_v3.removeProject(
+		project.value.organization,
+		project.value.id,
+		{ new_owner: auth.value.user.id },
+	)
 
 	await updateMembers()
 
@@ -656,13 +693,9 @@ const inviteTeamMember = async () => {
 	startLoading()
 
 	try {
-		const user = await useBaseFetch(`user/${currentUsername.value}`)
-		const data = {
+		const user = await client.labrinth.users_v2.get(currentUsername.value)
+		await client.labrinth.teams_v2.addMember(project.value.team, {
 			user_id: user.id.trim(),
-		}
-		await useBaseFetch(`team/${project.value.team}/members`, {
-			method: 'POST',
-			body: data,
 		})
 		currentUsername.value = ''
 		await updateMembers()
@@ -681,13 +714,16 @@ const removeTeamMember = async (index) => {
 	startLoading()
 
 	try {
-		await useBaseFetch(
-			`team/${project.value.team}/members/${allTeamMembers.value[index].user.id}`,
-			{
-				method: 'DELETE',
-			},
+		await client.labrinth.teams_v2.removeMember(
+			project.value.team,
+			allTeamMembers.value[index].user.id,
 		)
 		await updateMembers()
+		addNotification({
+			title: 'Member removed',
+			text: "Your project's member has been removed.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -714,12 +750,10 @@ const updateTeamMember = async (index) => {
 					role: allTeamMembers.value[index].role,
 				}
 
-		await useBaseFetch(
-			`team/${project.value.team}/members/${allTeamMembers.value[index].user.id}`,
-			{
-				method: 'PATCH',
-				body: data,
-			},
+		await client.labrinth.teams_v2.editMember(
+			project.value.team,
+			allTeamMembers.value[index].user.id,
+			data,
 		)
 		await updateMembers()
 		addNotification({
@@ -738,15 +772,45 @@ const updateTeamMember = async (index) => {
 	stopLoading()
 }
 
+const openTransferModal = (index, e) => {
+	transferData.value = {
+		target: {
+			avatar_url: allTeamMembers.value[index]?.avatar_url,
+			username: allTeamMembers.value[index]?.user?.username,
+			role: allTeamMembers.value[index]?.role || 'Member',
+		},
+		onConfirm: () => transferOwnership(index),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
+}
+
+const openTransferToOrgModal = (e) => {
+	if (!selectedOrganization.value) return
+	transferData.value = {
+		target: {
+			avatar_url: selectedOrganization.value.icon_url,
+			name: selectedOrganization.value.name,
+		},
+		onConfirm: () => onAddToOrg(),
+	}
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
+}
+
 const transferOwnership = async (index) => {
 	startLoading()
 
 	try {
-		await useBaseFetch(`team/${project.value.team}/owner`, {
-			method: 'PATCH',
-			body: {
-				user_id: allTeamMembers.value[index].user.id,
-			},
+		await client.labrinth.teams_v2.transferOwnership(project.value.team, {
+			user_id: allTeamMembers.value[index].user.id,
+		})
+		addNotification({
+			title: 'Member ownership transferred',
+			text: `${allTeamMembers.value[index].user.username} is now the owner of the project.`,
+			type: 'success',
 		})
 		await updateMembers()
 	} catch (err) {
@@ -765,36 +829,34 @@ async function updateOrgMember(index) {
 
 	try {
 		if (allOrgMembers.value[index].override && !allOrgMembers.value[index].oldOverride) {
-			await useBaseFetch(`team/${project.value.team}/members`, {
-				method: 'POST',
-				body: {
+			await client.labrinth.teams_v2.addMember(project.value.team, {
+				permissions: allOrgMembers.value[index].permissions,
+				role: allOrgMembers.value[index].role,
+				payouts_split: allOrgMembers.value[index].payouts_split,
+				user_id: allOrgMembers.value[index].user.id,
+			})
+		} else if (!allOrgMembers.value[index].override && allOrgMembers.value[index].oldOverride) {
+			await client.labrinth.teams_v2.removeMember(
+				project.value.team,
+				allOrgMembers.value[index].user.id,
+			)
+		} else {
+			await client.labrinth.teams_v2.editMember(
+				project.value.team,
+				allOrgMembers.value[index].user.id,
+				{
 					permissions: allOrgMembers.value[index].permissions,
 					role: allOrgMembers.value[index].role,
 					payouts_split: allOrgMembers.value[index].payouts_split,
-					user_id: allOrgMembers.value[index].user.id,
-				},
-			})
-		} else if (!allOrgMembers.value[index].override && allOrgMembers.value[index].oldOverride) {
-			await useBaseFetch(
-				`team/${project.value.team}/members/${allOrgMembers.value[index].user.id}`,
-				{
-					method: 'DELETE',
-				},
-			)
-		} else {
-			await useBaseFetch(
-				`team/${project.value.team}/members/${allOrgMembers.value[index].user.id}`,
-				{
-					method: 'PATCH',
-					body: {
-						permissions: allOrgMembers.value[index].permissions,
-						role: allOrgMembers.value[index].role,
-						payouts_split: allOrgMembers.value[index].payouts_split,
-					},
 				},
 			)
 		}
 		await updateMembers()
+		addNotification({
+			title: 'Member(s) updated',
+			text: "Your project's member(s) has been updated.",
+			type: 'success',
+		})
 	} catch (err) {
 		addNotification({
 			title: 'An error occurred',
@@ -807,7 +869,7 @@ async function updateOrgMember(index) {
 }
 
 const updateMembers = async () => {
-	await Promise.all([refreshProject(), refreshOrganization(), refreshMembers()])
+	await invalidate()
 }
 </script>
 
@@ -924,9 +986,5 @@ const updateMembers = async () => {
 			display: flex;
 		}
 	}
-}
-
-.large-multiselect {
-	max-width: 24rem;
 }
 </style>

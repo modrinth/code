@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App läuft besser als viele der führenden Mod Manager. Es verwendet nur 150mb Arbeitsspeicher!"
+    "message": "Modrinth App läuft besser als viele der führenden Mod Manager. Es verwendet nur 150 MB Arbeitsspeicher!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Noch keine Projekte in Sammlung"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Noch keine Projekte} one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Noch keine Projekte} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aktualisiert {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Projekt erstellen"
   },
+  "create.project.create-server-project": {
+    "message": "Server erstellen"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Fehlende Felder: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },
   "create.project.name-placeholder": {
     "message": "Projektnamen eingeben..."
+  },
+  "create.project.owner-description": {
+    "message": "Setze dich oder eine Organisation, bei der du Mitglied bist, als Projektbesitzer."
+  },
+  "create.project.owner-label": {
+    "message": "Besitzer"
+  },
+  "create.project.server-project-title": {
+    "message": "Ein Serverprojekt erstellen"
   },
   "create.project.summary-description": {
     "message": "Ein, zwei Sätze eingeben, um dein Projekt zu beschreiben."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Ein Projekt erstellen"
+  },
+  "create.project.type-label": {
+    "message": "Art"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Erstelle deine erste Kollektion um anzufangen!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du hast noch keine Kollektionen"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Keine Kollektion entspricht deiner Suche"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Versuch deine Filter oder Suchbegriffe anzupassen."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} Projekt} other {{count} Projekte}}"
+    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Deine Kollektionen durchsuchen"
@@ -1107,7 +1143,7 @@
     "message": "Haben die Server von Modrinth Hosting DDoS-Schutz?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alle Server von Modrinth Hosting sind mit DDoS-Schutz ausgestattet, an einigen Standorten mit einer Kapazität von bis zu 17 Tbit/s."
+    "message": "Ja. Alle Server von Modrinth Hosting sind mit DDoS-Schutz ausgestattet, an einigen Standorten mit bis zu 17 Tbit/s kapazität."
   },
   "hosting-marketing.faq.heading": {
     "message": "Häufig gestellte Fragen"
@@ -1268,6 +1304,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Wähle zwischen Vanilla, Fabric, Forge, Quilt und NeoForge. Was auf Modrinth ist, kann auf deinem Server laufen."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Änder der Modpackversion fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Versionen konnten nicht geladen werden"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Neuinstallation des Modpack fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Reparatur des Servers fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Speichern der Installationseinstellungen fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Entkoppeln von Modpack fehlgeschlagen"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Loader} other {{loader}}}version"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Deine Server-Installation wurde repariert."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparatur abgeschlossen"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Server zurücksetzen"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Entfernt sämtliche daten von deinem Server, inklusive deiner Welten, Mods und Konfigurationsdateien. Sicherung bleiben und können wiederhergestellt werden."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Nicht verfügbar"
   },
@@ -1401,7 +1470,7 @@
     "message": "Für Spieler"
   },
   "landing.section.for-players.tagline": {
-    "message": "Entdecke über {count} Kreationen"
+    "message": "Entdecke über {count, number} Kreationen"
   },
   "landing.subheading": {
     "message": "Entdecke, Spiele und teile Minecraft-Inhalte durch unsere quelloffene Platform, welche für die Community entwickelt wird."
@@ -1432,6 +1501,12 @@
   },
   "layout.action.new-project": {
     "message": "Neues Projekt"
+  },
+  "layout.action.new-server-project": {
+    "message": "Neuer Server"
+  },
+  "layout.action.publish": {
+    "message": "Veröffentlichen"
   },
   "layout.action.reports": {
     "message": "Meldungen einsehen"
@@ -1485,7 +1560,7 @@
     "message": "Steuerformular abschliessen"
   },
   "layout.banner.tax.description": {
-    "message": "Du hast bereits mehr als $600 von Modrinth für dieses Jahr abgehoben. Um geltende Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Abhebungen werden ausgesetzt, bis dieses Formular eingereicht wurde."
+    "message": "Du hast dieses Jahr bereits über {threshold} von Modrinth abgehoben. Um die Steuervorschriften einzuhalten, musst du ein Steuerformular ausfüllen. Deine Auszahlungen werden bis zur Einreichung dieses Formulars pausiert."
   },
   "layout.banner.tax.title": {
     "message": "Steuerformular benötigt"
@@ -1763,9 +1838,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Kontonummer"
   },
-  "muralpay.field.branch-code": {
-    "message": "Filialcode"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1867,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX-Telefon"
+  },
+  "muralpay.field.random-key": {
+    "message": "Zufälliger Schlüssel"
   },
   "muralpay.field.routing-number": {
     "message": "Bankleitzahl"
@@ -1856,9 +1931,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Kontonummer eingeben"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Filialcode eingeben"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "18-stelligen CLABE eingeben"
   },
@@ -1870,6 +1942,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "PIX-E-Mail eingeben"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Zufälligen Schlüssel eingeben"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "9-stellige Bankleitzahl eingeben"
@@ -1998,7 +2073,7 @@
     "message": "Kollektion"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {Download} other {Downloads}}"
+    "message": "{count} {countPlural, plural, one {Download} other {Downloads}}"
   },
   "profile.label.joined": {
     "message": "Beigetreten"
@@ -2019,7 +2094,7 @@
     "message": "Organisationen"
   },
   "profile.label.projects": {
-    "message": "{count} Projekt{count, plural, one {} other {e}}"
+    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "profile.label.saving": {
     "message": "Speichert..."
@@ -2102,6 +2177,12 @@
   "project-type.datapack.singular": {
     "message": "Datenpaket"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2212,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Ressourcenpaket"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shader"
@@ -2364,10 +2451,10 @@
     "message": "Du hast bereits {title} gemeldet"
   },
   "report.already-reported-description": {
-    "message": "Du hast bereits eine offene meldung für dieses/n {item}. Du kannst weitere Details zu deiner Meldung hinzufügen, solltest du weitere Informationen haben."
+    "message": "Du hast bereits eine offene Meldung für {item, select, project {dieses Projekt} version {diese Version} user {diesen Benutzer} other {diesen Inhalt}}. Du kannst deiner Meldung weitere Details hinzufügen, falls du weitere Informationen hast."
   },
   "report.back-to-item": {
-    "message": "Zurück zu {item}"
+    "message": "Zurück {item, select, project {zum Projekt} version {zur Version} user {zum Benutzer} other {zum Inhalt}}"
   },
   "report.body.description": {
     "message": "Füge Links und Bilder hinzu, sofern relevant. Leere oder unzureichender Meldungen werden geschlossen und ignoriert."
@@ -2376,10 +2463,10 @@
     "message": "Bitte gib weiteren Kontext über deine Meldung"
   },
   "report.checking": {
-    "message": "Überprüfe {item}..."
+    "message": "Überprüfe {item, select, project {Projekt} version {Version} user {Benutzer} other {Inhalt}}..."
   },
   "report.could-not-find": {
-    "message": "Konnte {item} nicht finden"
+    "message": "Konnte {item, select, project {Projekt} version {Version} user {Benutzer} other {Inhalt}} nicht finden"
   },
   "report.for.violation": {
     "message": "Verstoss gegen Modrinth's <rules-link>Regeln</rules-link> oder <terms-link>Nutzungsbedingungen</terms-link>"
@@ -2421,13 +2508,13 @@
     "message": "Bitte melde:"
   },
   "report.question.content-id": {
-    "message": "Was ist die ID von dem/der {item}?"
+    "message": "Was ist die ID {item, select, project {des Projekts} version {der Version} user {des Benutzers} other {des Inhalts}}?"
   },
   "report.question.content-type": {
     "message": "Welche Art an Inhalt meldest du?"
   },
   "report.question.report-reason": {
-    "message": "Gegen welche von Modrinth's Regeln verstösst dieses {item}?"
+    "message": "Welche von Modrinths Regeln verletzt {item, select, project {dieses Projekt} version {diese Version} user {dieser Benutzer} other {dieser Inhalt}}?"
   },
   "report.report-content": {
     "message": "Inhalt an Moderatoren melden"
@@ -2443,6 +2530,42 @@
   },
   "scopes.analytics.label": {
     "message": "Lesezugriff Analysen"
+  },
+  "scopes.category.analytics": {
+    "message": "Analysen"
+  },
+  "scopes.category.collections": {
+    "message": "Kollektionen"
+  },
+  "scopes.category.notifications": {
+    "message": "Benachrichtigungen"
+  },
+  "scopes.category.organizations": {
+    "message": "Organisationen"
+  },
+  "scopes.category.pats": {
+    "message": "PATs"
+  },
+  "scopes.category.payouts": {
+    "message": "Auszahlungen"
+  },
+  "scopes.category.projects": {
+    "message": "Projekte"
+  },
+  "scopes.category.reports": {
+    "message": "Meldungen"
+  },
+  "scopes.category.sessions": {
+    "message": "Sitzungen"
+  },
+  "scopes.category.threads": {
+    "message": "Threads"
+  },
+  "scopes.category.user-account": {
+    "message": "Benutzerkonto"
+  },
+  "scopes.category.versions": {
+    "message": "Versionen"
   },
   "scopes.collectionCreate.description": {
     "message": "Kollektionen erstellen"
@@ -2693,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Backup-Wiederherstellung im gange"
+  "servers.busy.backup-creating": {
+    "message": "Backup-Erstellung im gange"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Wiederherstellung aus Sicherung läuft"
+  },
+  "servers.busy.installing": {
+    "message": "Server wird installiert"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Inhalt wird synchronisiert"
   },
   "servers.notice.actions": {
     "message": "Aktionen"
@@ -2740,6 +2872,102 @@
   },
   "servers.plan.small.name": {
     "message": "Klein"
+  },
+  "settings.applications.about": {
+    "message": "Über"
+  },
+  "settings.applications.button.add-more": {
+    "message": "Weitere hinzufügen"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Weiterleitungs-URI hinzufügen"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Abbrechen"
+  },
+  "settings.applications.button.create": {
+    "message": "App erstellen"
+  },
+  "settings.applications.button.delete": {
+    "message": "Löschen"
+  },
+  "settings.applications.button.edit": {
+    "message": "Bearbeiten"
+  },
+  "settings.applications.button.new": {
+    "message": "Neue Anwendung"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Änderungen speichern"
+  },
+  "settings.applications.button.upload-icon": {
+    "message": "Icon hochladen"
+  },
+  "settings.applications.client-id": {
+    "message": "Client-ID"
+  },
+  "settings.applications.client-secret": {
+    "message": "Client Secret"
+  },
+  "settings.applications.created-on": {
+    "message": "Erstellt {date}"
+  },
+  "settings.applications.delete.confirm.button": {
+    "message": "Anwendung löschen"
+  },
+  "settings.applications.delete.confirm.description": {
+    "message": "Diese Aktion wird diese Anwendung permanent löschen und alle Zugrifftoken widerrufen (Für Immer!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Bist du sicher, dass du diese Anwendung löschen willst?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Anwendungen können verwendet werden, um Modrinth-Benutzer mit deinen Produkten zu authentifizieren. Weitere Informationen findest du in <docs-link>Modrinth's API-Dokumentation</docs-link>."
+  },
+  "settings.applications.field.description": {
+    "message": "Beschreibung"
+  },
+  "settings.applications.field.description.placeholder": {
+    "message": "Gib eine Anwendungsbeschreibung ein..."
+  },
+  "settings.applications.field.icon": {
+    "message": "Icon"
+  },
+  "settings.applications.field.name": {
+    "message": "Name"
+  },
+  "settings.applications.field.name.placeholder": {
+    "message": "Gib einen Anwendungsnamen ein..."
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.redirect-uris": {
+    "message": "Umleitungs-URIs"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Anwendungsbereich"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Anwendungsinformationen"
+  },
+  "settings.applications.notification.error.title": {
+    "message": "Ein Fehler ist aufgetreten"
+  },
+  "settings.applications.notification.icon-updated.description": {
+    "message": "Dein Anwendungsicon wurde aktualisiert."
+  },
+  "settings.applications.notification.icon-updated.title": {
+    "message": "Icon aktualisiert"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Speichere jetzt dein Geheimnis, da es nach dem verlassen dieser Seite versteckt wird!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Abonnement kündigen"
@@ -2822,6 +3050,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Ressourcenpakete-Seite"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Server-Seite"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Shader-Seite"
   },
@@ -2874,7 +3105,7 @@
     "message": "Erstelle einen PAT"
   },
   "settings.pats.description": {
-    "message": "PATs können für den Zugriff auf Modrinth's API verwendet werden. Siehe <doc-link>Modrinth's API Dokumentation</doc-link> für weitere Informationen. Sie können jederzeit erstellt und widerrufen werden."
+    "message": "PATs können verwendet werden, um auf Modrinth's API zuzugreifen. Sie können zu jeder zeit erstellt und gelöscht werden. Für weitere Informationen, schau dir <doc-link>Modrinth's API Dokumentation</doc-link> an."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT erstellen"

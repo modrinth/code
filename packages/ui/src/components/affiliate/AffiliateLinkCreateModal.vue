@@ -7,23 +7,17 @@
 				</span>
 				<span class="text-secondary mb-2">{{ formatMessage(messages.createUserDescription) }}</span>
 			</label>
-			<div v-if="showUserField" class="mb-4">
-				<div class="iconified-input">
-					<UserIcon aria-hidden="true" />
-					<input
-						id="create-affiliate-user-input"
-						v-model="affiliateUsername"
-						class="card-shadow"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="formatMessage(messages.createUserPlaceholder)"
-					/>
-					<Button v-if="affiliateUsername" class="r-btn" @click="() => (affiliateUsername = '')">
-						<XIcon />
-					</Button>
-				</div>
-			</div>
+			<StyledInput
+				v-if="showUserField"
+				id="create-affiliate-user-input"
+				v-model="affiliateUsername"
+				:icon="UserIcon"
+				autocomplete="off"
+				type="text"
+				:placeholder="formatMessage(messages.createUserPlaceholder)"
+				clearable
+				wrapper-class="mb-4"
+			/>
 			<label class="contents" for="create-affiliate-title-input">
 				<span class="text-lg font-semibold text-contrast mb-1">
 					{{ formatMessage(messages.createTitleLabel) }}
@@ -33,22 +27,24 @@
 				}}</span>
 			</label>
 			<div class="flex items-center gap-2">
-				<div class="iconified-input">
-					<AutoBrandIcon :keyword="affiliateLinkTitle" aria-hidden="true">
+				<div class="relative inline-flex items-center flex-1">
+					<AutoBrandIcon
+						:keyword="affiliateLinkTitle"
+						aria-hidden="true"
+						class="absolute left-3 h-5 w-5 z-[1] pointer-events-none text-secondary"
+					>
 						<AffiliateIcon />
 					</AutoBrandIcon>
-					<input
+					<StyledInput
 						id="create-affiliate-title-input"
 						v-model="affiliateLinkTitle"
-						class="card-shadow"
 						autocomplete="off"
-						spellcheck="false"
 						type="text"
 						:placeholder="formatMessage(messages.createTitlePlaceholder)"
+						clearable
+						wrapper-class="w-full"
+						input-class="pl-10"
 					/>
-					<Button v-if="affiliateLinkTitle" class="r-btn" @click="() => (affiliateLinkTitle = '')">
-						<XIcon />
-					</Button>
 				</div>
 				<ButtonStyled color="brand">
 					<button :disabled="creatingLink || !canCreate" @click="createAffiliateLink">
@@ -63,12 +59,12 @@
 </template>
 <script lang="ts"></script>
 <script setup lang="ts">
-import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon, XIcon } from '@modrinth/assets'
+import { AffiliateIcon, PlusIcon, SpinnerIcon, UserIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
-import { AutoBrandIcon, Button, ButtonStyled, NewModal } from '../index'
+import { AutoBrandIcon, ButtonStyled, NewModal, StyledInput } from '../index'
 export type CreateAffiliateProps = { sourceName: string; username?: string }
 
 const props = withDefaults(

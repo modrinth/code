@@ -506,23 +506,6 @@ const requestedStatus = computed(() => props.project.requested_status ?? 'approv
 	padding: var(--spacing-card-md);
 }
 
-.resizable-textarea-wrapper {
-	margin-bottom: var(--spacing-card-sm);
-
-	textarea {
-		padding: var(--spacing-card-bg);
-		width: 100%;
-	}
-
-	.chips {
-		margin-bottom: var(--spacing-card-md);
-	}
-
-	.preview {
-		overflow-y: auto;
-	}
-}
-
 .thread-id {
 	margin-bottom: var(--spacing-card-md);
 	font-weight: bold;

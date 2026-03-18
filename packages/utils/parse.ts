@@ -1,5 +1,8 @@
 import MarkdownIt from 'markdown-it'
-import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
+import xss from 'xss'
+
+// @ts-expect-error xss types don't reflect CJS default export shape
+const { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } = xss
 
 export const configuredXss = new FilterXSS({
 	whiteList: {
@@ -53,7 +56,7 @@ export const configuredXss = new FilterXSS({
 					continue
 				}
 
-				const newSearchParams = new URLSearchParams()
+				const newSearchParams = new URLSearchParams(url.searchParams)
 				url.searchParams.forEach((value, key) => {
 					if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
 						newSearchParams.delete(key)
@@ -106,7 +109,12 @@ export const configuredXss = new FilterXSS({
 					'bstats.org',
 				]
 
-				if (!allowedHostnames.includes(url.hostname)) {
+				const allowedHostnameSuffixes = ['.github.io']
+
+				if (
+					!allowedHostnames.includes(url.hostname) &&
+					!allowedHostnameSuffixes.some((suffix) => url.hostname.endsWith(suffix))
+				) {
 					return safeAttrValue(
 						tag,
 						name,

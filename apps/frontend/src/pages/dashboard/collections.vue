@@ -2,24 +2,48 @@
 	<div class="universal-card">
 		<CollectionCreateModal ref="modal_creation" />
 		<h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
-		<div class="search-row">
-			<div class="iconified-input">
-				<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
-				<SearchIcon aria-hidden="true" />
-				<input id="search-input" v-model="filterQuery" type="text" />
-				<Button
-					v-if="filterQuery"
-					class="r-btn"
-					aria-label="Clear search"
-					@click="() => (filterQuery = '')"
+		<div class="mb-3 flex flex-col gap-3">
+			<label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
+			<StyledInput
+				id="search-input"
+				v-model="filterQuery"
+				:icon="SearchIcon"
+				type="text"
+				clearable
+				placeholder="Search collections..."
+				wrapper-class="w-full"
+				input-class="!h-12"
+			/>
+
+			<div class="flex flex-wrap items-center gap-2">
+				<DropdownSelect
+					v-slot="{ selected }"
+					v-model="sortBy"
+					class="!w-auto flex-grow md:flex-grow-0"
+					name="Sort by"
+					:options="['updated', 'created', 'name']"
+					:display-name="
+						(option) =>
+							option === 'updated'
+								? 'Recently Updated'
+								: option === 'created'
+									? 'Recently Created'
+									: 'Name (A-Z)'
+					"
 				>
-					<XIcon aria-hidden="true" />
+					<span class="font-semibold text-primary">Sort by: </span>
+					<span class="font-semibold text-secondary">{{ selected }}</span>
+				</DropdownSelect>
+
+				<Button
+					color="primary"
+					class="ml-auto"
+					@click="(event) => $refs.modal_creation.show(event)"
+				>
+					<PlusIcon aria-hidden="true" />
+					{{ formatMessage(messages.createNewButton) }}
 				</Button>
 			</div>
-			<Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
-				<PlusIcon aria-hidden="true" />
-				{{ formatMessage(messages.createNewButton) }}
-			</Button>
 		</div>
 		<div class="collections-grid">
 			<nuxt-link
@@ -39,6 +63,7 @@
 							{{
 								formatMessage(messages.projectsCountLabel, {
 									count: formatCompactNumber(user ? user.follows.length : 0),
+									countPlural: formatCompactNumberPlural(user ? user.follows.length : 0),
 								})
 							}}
 						</div>
@@ -50,9 +75,7 @@
 				</div>
 			</nuxt-link>
 			<nuxt-link
-				v-for="collection in orderedCollections.sort(
-					(a, b) => new Date(b.created) - new Date(a.created),
-				)"
+				v-for="collection in orderedCollections"
 				:key="collection.id"
 				:to="`/collection/${collection.id}`"
 				class="universal-card recessed collection"
@@ -69,6 +92,7 @@
 							{{
 								formatMessage(messages.projectsCountLabel, {
 									count: formatCompactNumber(collection.projects?.length || 0),
+									countPlural: formatCompactNumberPlural(collection.projects?.length || 0),
 								})
 							}}
 						</div>
@@ -95,6 +119,25 @@
 			</nuxt-link>
 		</div>
 	</div>
+	<div v-if="orderedCollections.length === 0" class="empty-state-container">
+		<div class="py-12 text-center">
+			<BoxIcon class="mx-auto h-12 w-12 text-secondary opacity-50" aria-hidden="true" />
+			<p class="mt-4 text-lg font-medium text-contrast">
+				{{
+					filterQuery
+						? formatMessage(messages.emptyNoMatch)
+						: formatMessage(messages.emptyNoCollections)
+				}}
+			</p>
+			<p class="text-sm text-secondary">
+				{{
+					filterQuery
+						? formatMessage(messages.emptyNoMatchHint)
+						: formatMessage(messages.emptyGetStartedHint)
+				}}
+			</p>
+		</div>
+	</div>
 </template>
 <script setup>
 import {
@@ -106,12 +149,23 @@ import {
 	SearchIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
+import {
+	Avatar,
+	Button,
+	commonMessages,
+	defineMessages,
+	DropdownSelect,
+	injectModrinthClient,
+	StyledInput,
+	useCompactNumber,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 
 const { formatMessage } = useVIntl()
-const formatCompactNumber = useCompactNumber()
+const { formatCompactNumber, formatCompactNumberPlural } = useCompactNumber()
 
 const messages = defineMessages({
 	createNewButton: {
@@ -128,11 +182,27 @@ const messages = defineMessages({
 	},
 	projectsCountLabel: {
 		id: 'dashboard.collections.label.projects-count',
-		defaultMessage: '{count, plural, one {{count} project} other {{count} projects}}',
+		defaultMessage: '{count} {countPlural, plural, one {project} other {projects}}',
 	},
 	searchInputLabel: {
 		id: 'dashboard.collections.label.search-input',
 		defaultMessage: 'Search your collections',
+	},
+	emptyNoMatch: {
+		id: 'dashboard.collections.empty.no-match',
+		defaultMessage: 'No collections match your search',
+	},
+	emptyNoCollections: {
+		id: 'dashboard.collections.empty.no-collections',
+		defaultMessage: "You don't have any collections yet",
+	},
+	emptyNoMatchHint: {
+		id: 'dashboard.collections.empty.no-match-hint',
+		defaultMessage: 'Try adjusting your filters or search terms.',
+	},
+	emptyGetStartedHint: {
+		id: 'dashboard.collections.empty.get-started-hint',
+		defaultMessage: 'Create your first collection to get started!',
 	},
 })
 
@@ -146,6 +216,7 @@ useHead({
 
 const auth = await useAuth()
 const user = await useUser()
+const client = injectModrinthClient()
 
 if (import.meta.client) {
 	await initUserFollows()
@@ -153,22 +224,37 @@ if (import.meta.client) {
 
 const filterQuery = ref('')
 
-const { data: collections } = await useAsyncData(`user/${auth.value.user.id}/collections`, () =>
-	useBaseFetch(`user/${auth.value.user.id}/collections`, { apiVersion: 3 }),
-)
+const { data: collections } = useQuery({
+	queryKey: ['user', auth.value.user.id, 'collections'],
+	queryFn: () => client.labrinth.users_v2.getCollections(auth.value.user.id),
+})
+
+const route = useNativeRoute()
+const router = useNativeRouter()
+const validSortOptions = ['updated', 'created', 'name']
+const sortBy = ref(validSortOptions.includes(route.query.s) ? route.query.s : 'updated')
 
 const orderedCollections = computed(() => {
 	if (!collections.value) return []
-	return [...collections.value] // copy to avoid in-place mutation (no side effects)
+	return [...collections.value]
+		.filter(
+			(c) => !filterQuery.value || c.name.toLowerCase().includes(filterQuery.value.toLowerCase()),
+		)
 		.sort((a, b) => {
-			const aUpdated = new Date(a.updated)
-			const bUpdated = new Date(b.updated)
-			return bUpdated - aUpdated
+			if (sortBy.value === 'name') return a.name.localeCompare(b.name)
+			if (sortBy.value === 'created') return new Date(b.created) - new Date(a.created)
+			return new Date(b.updated) - new Date(a.updated)
 		})
-		.filter((collection) => {
-			if (!filterQuery.value) return true
-			return collection.name.toLowerCase().includes(filterQuery.value.toLowerCase())
-		})
+})
+
+watch(sortBy, (newVal) => {
+	router.replace({
+		path: route.path,
+		query: {
+			...route.query,
+			s: newVal,
+		},
+	})
 })
 </script>
 <style lang="scss">
@@ -202,6 +288,8 @@ const orderedCollections = computed(() => {
 			.description {
 				color: var(--color-secondary);
 				font-size: var(--font-size-sm);
+
+				word-break: break-word;
 			}
 
 			.stat-bar {
@@ -220,23 +308,6 @@ const orderedCollections = computed(() => {
 					color: var(--color-secondary);
 				}
 			}
-		}
-	}
-}
-
-.search-row {
-	margin-bottom: var(--gap-lg);
-	display: flex;
-	align-items: center;
-	gap: var(--gap-lg) var(--gap-sm);
-	flex-wrap: wrap;
-	justify-content: center;
-
-	.iconified-input {
-		flex-grow: 1;
-
-		input {
-			height: 2rem;
 		}
 	}
 }

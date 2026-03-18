@@ -18,10 +18,10 @@
 				<label for="email-input">
 					<span class="label__title">{{ formatMessage(messages.emailAddressLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="email-input"
 					v-model="email"
-					maxlength="2048"
+					:maxlength="2048"
 					type="email"
 					:placeholder="formatMessage(messages.emailAddressPlaceholder)"
 					@keyup.enter="saveEmail()"
@@ -69,11 +69,11 @@
 				<label v-else-if="auth.user.has_password" for="old-password">
 					<span class="label__title">{{ formatMessage(messages.oldPasswordLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="auth.user.has_password"
 					id="old-password"
 					v-model="oldPassword"
-					maxlength="2048"
+					:maxlength="2048"
 					type="password"
 					autocomplete="current-password"
 					:placeholder="
@@ -86,10 +86,10 @@
 					<label for="new-password"
 						><span class="label__title">{{ formatMessage(messages.newPasswordLabel) }}</span></label
 					>
-					<input
+					<StyledInput
 						id="new-password"
 						v-model="newPassword"
-						maxlength="2048"
+						:maxlength="2048"
 						type="password"
 						autocomplete="new-password"
 						:placeholder="formatMessage(messages.newPasswordPlaceholder)"
@@ -97,10 +97,10 @@
 					<label for="confirm-new-password">
 						<span class="label__title">{{ formatMessage(messages.confirmNewPasswordLabel) }}</span>
 					</label>
-					<input
+					<StyledInput
 						id="confirm-new-password"
 						v-model="confirmNewPassword"
-						maxlength="2048"
+						:maxlength="2048"
 						type="password"
 						autocomplete="new-password"
 						:placeholder="formatMessage(messages.confirmNewPasswordPlaceholder)"
@@ -162,11 +162,10 @@
 							formatMessage(messages.twoFactorEnterCodeDescription)
 						}}</span>
 					</label>
-					<input
+					<StyledInput
 						id="two-factor-code"
 						v-model="twoFactorCode"
-						maxlength="11"
-						type="text"
+						:maxlength="11"
 						:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
 						@keyup.enter="removeTwoFactor()"
 					/>
@@ -228,11 +227,10 @@
 								formatMessage(messages.twoFactorVerifyCodeDescription)
 							}}</span>
 						</label>
-						<input
+						<StyledInput
 							id="verify-code"
 							v-model="twoFactorCode"
-							maxlength="6"
-							type="text"
+							:maxlength="6"
 							autocomplete="one-time-code"
 							:placeholder="formatMessage(messages.twoFactorCodePlaceholder)"
 							@keyup.enter="verifyTwoFactorCode()"
@@ -466,6 +464,7 @@ import {
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
+	StyledInput,
 	IntlFormatted,
 	useVIntl,
 } from '@modrinth/ui'

@@ -3,6 +3,7 @@
 		<button
 			ref="triggerRef"
 			class="teleport-overflow-menu-trigger"
+			:class="btnClass"
 			:aria-expanded="isOpen"
 			:aria-haspopup="true"
 			@mousedown="handleMouseDown"
@@ -25,7 +26,7 @@
 					v-if="isOpen"
 					ref="menuRef"
 					data-pyro-telepopover-root
-					class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-divider bg-bg-raised p-2 shadow-lg"
+					class="experimental-styles-within fixed isolate z-[9999] flex w-fit flex-col gap-2 overflow-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
 					:style="menuStyle"
 					role="menu"
 					tabindex="-1"
@@ -45,6 +46,8 @@
 										if (el) menuItemsRef[index] = el as HTMLElement
 									}
 								"
+								v-tooltip="option.tooltip"
+								:disabled="option.disabled"
 								class="w-full !justify-start !whitespace-nowrap focus-visible:!outline-none"
 								:aria-selected="index === selectedIndex"
 								:style="index === selectedIndex ? { background: 'var(--color-button-bg)' } : {}"
@@ -52,7 +55,10 @@
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</button>
 							<AutoLink
 								v-else-if="typeof option.action === 'string'"
@@ -69,10 +75,16 @@
 								@focus="selectedIndex = index"
 								@mouseover="handleMouseOver(index)"
 							>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</AutoLink>
 							<span v-else>
-								<slot :name="option.id">{{ option.id }}</slot>
+								<slot :name="option.id">
+									<component :is="option.icon" v-if="option.icon" class="size-5" />
+									{{ option.id }}
+								</slot>
 							</span>
 						</ButtonStyled>
 					</template>
@@ -85,13 +97,16 @@
 <script setup lang="ts">
 import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { onClickOutside, useElementHover } from '@vueuse/core'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 interface Option {
 	id: string
+	icon?: Component
 	action?: (() => void) | string
 	shown?: boolean
 	color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple'
+	disabled?: boolean
+	tooltip?: string
 }
 
 type Divider = {
@@ -109,14 +124,17 @@ const props = withDefaults(
 	defineProps<{
 		options: Item[]
 		hoverable?: boolean
+		btnClass?: string | string[] | Record<string, boolean>
 	}>(),
 	{
 		hoverable: false,
+		btnClass: undefined,
 	},
 )
 
 const emit = defineEmits<{
 	select: [option: Option]
+	open: []
 }>()
 
 const isOpen = ref(false)
@@ -187,6 +205,7 @@ const toggleMenu = (event: MouseEvent) => {
 
 const openMenu = () => {
 	isOpen.value = true
+	emit('open')
 	disableBodyScroll()
 	nextTick(() => {
 		menuStyle.value = calculateMenuPosition()
@@ -255,6 +274,7 @@ const handleMouseMove = (event: MouseEvent) => {
 }
 
 const handleItemClick = (option: Option, index: number) => {
+	if (option.disabled) return
 	selectedIndex.value = index
 	selectOption(option)
 }

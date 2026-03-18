@@ -208,7 +208,7 @@
 		</ProjectPageVersions>
 
 		<template v-if="!versions?.length">
-			<div class="grid place-content-center py-10">
+			<div class="grid place-items-center py-10">
 				<svg
 					width="250"
 					height="200"
@@ -315,7 +315,7 @@ const {
 	projectV2: project,
 	currentMember,
 	versions,
-	refreshVersions,
+	invalidate,
 	loadVersions,
 } = injectProjectPageContext()
 
@@ -387,7 +387,7 @@ async function deleteVersion() {
 		})
 	}
 
-	refreshVersions()
+	await invalidate()
 	selectedVersion.value = null
 
 	stopLoading()

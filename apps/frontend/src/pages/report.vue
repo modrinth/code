@@ -136,14 +136,13 @@
 								}}
 							</span>
 							<div class="flex gap-4">
-								<input
+								<StyledInput
 									id="report-item-id"
 									v-model="reportItemID"
-									type="text"
 									placeholder="ex: Dc7EYhxG"
 									autocomplete="off"
 									:disabled="reportItem === ''"
-									class="w-40"
+									wrapper-class="w-40"
 									@blur="
 										() => {
 											prefilled = false
@@ -293,6 +292,7 @@ import {
 	type MessageDescriptor,
 	RadialHeader,
 	RadioButtons,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import type { Project, Report, User, Version } from '@modrinth/utils'
@@ -559,11 +559,12 @@ const messages = defineMessages({
 	alreadyReportedDescription: {
 		id: 'report.already-reported-description',
 		defaultMessage:
-			'You have an open report for this {item} already. You can add more details to your report if you have more information to add.',
+			'You have an open report for this {item, select, project {project} version {version} user {user} other {content}} already. You can add more details to your report if you have more information to add.',
 	},
 	backToItem: {
 		id: 'report.back-to-item',
-		defaultMessage: 'Back to {item}',
+		defaultMessage:
+			'Back to {item, select, project {project} version {version} user {user} other {content}}',
 	},
 	goToReport: {
 		id: 'report.go-to-report',
@@ -609,19 +610,23 @@ const messages = defineMessages({
 	},
 	whatContentId: {
 		id: 'report.question.content-id',
-		defaultMessage: 'What is the ID of the {item}?',
+		defaultMessage:
+			'What is the ID of the {item, select, project {project} version {version} user {user} other {content}}?',
 	},
 	whatReportReason: {
 		id: 'report.question.report-reason',
-		defaultMessage: "Which of Modrinth's rules is this {item} violating?",
+		defaultMessage:
+			"Which of Modrinth's rules is this {item, select, project {project} version {version} user {user} other {content}} violating?",
 	},
 	checking: {
 		id: 'report.checking',
-		defaultMessage: 'Checking {item}...',
+		defaultMessage:
+			'Checking {item, select, project {project} version {version} user {user} other {content}}...',
 	},
 	couldNotFind: {
 		id: 'report.could-not-find',
-		defaultMessage: 'Could not find {item}',
+		defaultMessage:
+			'Could not find {item, select, project {project} version {version} user {user} other {content}}',
 	},
 	reportBodyTitle: {
 		id: 'report.body.title',

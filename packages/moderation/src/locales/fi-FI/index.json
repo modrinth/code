@@ -11,6 +11,12 @@
   "nags.add-icon.title": {
     "defaultMessage": "Lisää kuvake"
   },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Lisää Java-osoite"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Lisää ulkoisia linkkejä"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Lisää mikä tahansa merkityksellinen linkki, joka ohjaa ulos Modrinthistä, kuten lähdekoodi, ongelmanseuranta tai Discord-kutsu."
   },
@@ -44,8 +50,47 @@
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Lisenssin URL-osoite on virheellinen."
   },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Lisenssin URL-osoite viittaa sivustoon {domain}, mikä ei sovellu lisenssitiedoille. Linkitä suoraan lisenssitiedostoon sosiaalisen median, pelialustojen jne. sijaan."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Lisenssin URL-osoite näyttää olevan viallinen. Ole hyvä ja ilmoita kelvollinen URL-osoite lisenssitekstiisi."
+  },
+  "nags.invalid-license-url.title": {
+    "defaultMessage": "Lisää kelvollinen lisenssilinkki"
+  },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Linkinlyhenteiden tai muiden linkin kohteen piilottavien menetelmien käyttö ulkoisissa linkeissä on kiellettyä. Ole hyvä ja käytä suoria ja täysmittaisia linkkejä."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "Älä käytä linkinlyhenteitä"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# otsikko} other {# otsikot}} kuvauksessasi {count, plural,one {on liian pitkä} other {ovat liian pitkiä}}. Otsikoiden tulisi olla tiiviitä ja toimia osioiden otsikkoina, eikä kokonaisina virkkeinä."
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "Lyhennä otsikoita"
+  },
   "nags.minecraft-title-clause.description": {
     "defaultMessage": "Projektit eivät saa käyttää Minecraftin brändäystä tai sisältää \"Minecraft\" sanaa suurena osana nimeä."
+  },
+  "nags.minecraft-title-clause.title": {
+    "defaultMessage": "Vältä tuotemerkin loukkauksia"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Joistain kuvistasi puuttuu vaihtoehtoinen teksti, joka on tärkeää saavutettavuudessa, varsinkin näkövammaisille."
+  },
+  "nags.missing-alt-text.title": {
+    "defaultMessage": "Lisää puuttuva vaihtoehtoinen teksti"
+  },
+  "nags.misused-discord-link.title": {
+    "defaultMessage": "Siirrä Discord-kutsu"
+  },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "Tarkista palaute"
+  },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Olet valinnut {count, plural, one {# resoluutiotunnisteen} other {# resoluutiotunnistetta}} ({tags}). Resurssipakkauksilla tulisi yleensä olla vain yksi niiden resoluutiota vastaava resoluutiotunniste."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Valitse oikea resoluutio"

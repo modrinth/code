@@ -19,20 +19,14 @@
 		>
 			<h1 class="m-0 grow text-2xl font-extrabold">Manage affiliate links</h1>
 			<div class="flex items-center gap-2">
-				<div class="iconified-input">
-					<SearchIcon aria-hidden="true" />
-					<input
-						v-model="filterQuery"
-						class="card-shadow"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="`Search affiliates...`"
-					/>
-					<Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="filterQuery"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					placeholder="Search affiliates..."
+					clearable
+				/>
 				<ButtonStyled color="brand">
 					<button @click="createModal?.show">
 						<PlusIcon />
@@ -88,25 +82,30 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Accordion,
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
 	Avatar,
-	Button,
 	ButtonStyled,
 	ConfirmModal,
+	injectModrinthClient,
 	injectNotificationManager,
+	StyledInput,
 } from '@modrinth/ui'
-import type { AffiliateLink, User } from '@modrinth/utils'
+import type { User } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, ref } from 'vue'
 
+const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 
 type UserGroup = {
 	user: User
-	affiliates: AffiliateLink[]
+	affiliates: Labrinth.Affiliate.Internal.AffiliateCode[]
 }
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
@@ -115,11 +114,11 @@ const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 const {
 	data: affiliateCodes,
 	error,
-	refresh,
-} = await useAsyncData(
-	'AffiliateLinks',
-	() => useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
-)
+	refetch,
+} = useQuery({
+	queryKey: ['affiliate'],
+	queryFn: () => client.labrinth.affiliate_internal.getAll(),
+})
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
@@ -131,21 +130,20 @@ const userIds = computed(() => {
 	const ids = new Set<string>()
 	affiliateCodes.value.forEach((code) => {
 		ids.add(code.affiliate)
-		ids.add(code.created_by)
+		if (code.created_by) {
+			ids.add(code.created_by)
+		}
 	})
 	return Array.from(ids)
 })
 
-const { data: users } = await useAsyncData(
-	'admin-affiliates-bulk-users',
-	() => {
+const { data: users } = useQuery({
+	queryKey: computed(() => ['users-bulk', userIds.value]),
+	queryFn: () => {
 		if (userIds.value.length === 0) return Promise.resolve([])
-		return useBaseFetch(`users?ids=${JSON.stringify(userIds.value)}`) as Promise<User[]>
+		return client.labrinth.users_v2.getMultiple(userIds.value)
 	},
-	{
-		watch: [userIds],
-	},
-)
+})
 
 const userMap = computed(() => {
 	if (!users.value) {
@@ -193,7 +191,8 @@ const filteredGroupedAffiliates = computed(() => {
 	)
 })
 
-function getCreatedByUsername(createdBy: string): string {
+function getCreatedByUsername(createdBy: string | null): string {
+	if (!createdBy) return 'Unknown'
 	const user = userMap.value.get(createdBy)
 	return user?.username || 'Unknown'
 }
@@ -211,7 +210,7 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 
 		if (!user) {
 			try {
-				user = (await useBaseFetch(`user/${data.username}`)) as User
+				user = await client.labrinth.users_v2.get(data.username)
 
 				if (users.value) {
 					users.value.push(user)
@@ -222,19 +221,15 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 			}
 		}
 
-		await useBaseFetch('affiliate', {
-			method: 'PUT',
-			body: {
-				affiliate: user.id,
-				source_name: data.sourceName,
-			},
-			internal: true,
+		await client.labrinth.affiliate_internal.create({
+			affiliate: user.id,
+			source_name: data.sourceName,
 		})
 
-		await refresh()
+		await refetch()
 		createModal.value?.close()
 	} catch (err) {
-		handleError(err)
+		handleError(err as Error)
 	} finally {
 		creatingLink.value = false
 	}
@@ -243,7 +238,7 @@ async function createAffiliateCode(data: { sourceName: string; username?: string
 const revokingAffiliateUsername = ref<string | null>(null)
 const revokingAffiliateId = ref<string | null>(null)
 
-function revokeAffiliateCode(affiliate: AffiliateLink) {
+function revokeAffiliateCode(affiliate: Labrinth.Affiliate.Internal.AffiliateCode) {
 	const user = userMap.value.get(affiliate.affiliate)
 	revokingAffiliateUsername.value = user?.username || 'Unknown'
 	revokingAffiliateId.value = affiliate.id
@@ -256,12 +251,9 @@ async function confirmRevokeAffiliateCode() {
 	}
 
 	try {
-		await useBaseFetch(`affiliate/${revokingAffiliateId.value}`, {
-			method: 'DELETE',
-			internal: true,
-		})
+		await client.labrinth.affiliate_internal.delete(revokingAffiliateId.value)
 
-		await refresh()
+		await refetch()
 		revokeModal.value?.hide()
 		revokingAffiliateUsername.value = null
 		revokingAffiliateId.value = null

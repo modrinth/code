@@ -6,6 +6,7 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
+	StyledInput,
 	TagItem,
 } from '@modrinth/ui'
 import type { ServerNotice as ServerNoticeType } from '@modrinth/utils'
@@ -180,11 +181,10 @@ defineExpose({ show, hide })
 					<span v-else class="mb-2"> No nodes assigned yet </span>
 				</div>
 				<div class="flex w-[45rem] items-center gap-2">
-					<input
+					<StyledInput
 						id="server-assign-field"
 						v-model="inputField"
-						class="w-full"
-						type="text"
+						wrapper-class="w-full"
 						autocomplete="off"
 					/>
 					<ButtonStyled color="green" color-fill="text">

@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "아이콘 추가"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Java Edition 플레이어가 서버에 접속할 때 사용할 IP 주소와 포트를 추가하세요."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Java 주소 추가"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "웹사이트, 스토어, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "외부 링크 추가"
+  },
   "nags.add-links.description": {
     "defaultMessage": "소스 코드, 이슈 트래커, Discord 초대 링크 등 Modrinth 외부로 연결되는 관련 링크를 추가하세요."
   },
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "소스 코드 제공"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "제공된 외부 링크가 동일합니다. 각 링크는 적절한 형식으로 한 번만 기입되어야 합니다."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "동일한 링크"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "설명에는 충분한 일반 텍스트 또는 이미지 대체 텍스트를 포함하여, 화면 읽기 도구를 사용하는 사용자나 인터넷 속도가 느린 사용자도 접근할 수 있도록 해야 합니다."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "올바른 해상도 선택"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "서버가 지원하는 버전을 선택하거나, 모드팩을 고르거나, 직접 업로드하세요."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "호환성 선택"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "서버가 위치한 지역을 플레이어에게 알려주세요."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "지역 선택"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "서버가 지원하는 언어를 입력하세요."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "언어 선택"
+  },
   "nags.select-license.description": {
     "defaultMessage": "{type, select, mod {모드} modpack {모드팩} resourcepack {리소스 팩} shader {셰이더} plugin {플러그인} datapack {데이터 팩} other {프로젝트}}에 적용되는 배포 라이선스를 선택하세요."
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "태그 선택"
+  },
+  "nags.server.title": {
+    "defaultMessage": "서버 설정으로 이동"
   },
   "nags.settings.description.title": {
     "defaultMessage": "설명 설정 방문"
@@ -173,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "이름 정리"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount, plural, other {# 태그}}를 선택하셨습니다. 서버가 관련 검색 결과에 표시될 수 있도록 {maxTagCount} 이하로 줄여주세요."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "올바른 태그를 선택해 주세요"
+  },
   "nags.too-many-tags.description": {
-    "defaultMessage": "{tagCount, plural, one {#개의 태그} other {#개의 태그}}를 선택했습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount}개 이하로 줄이는 것을 고려해 보세요."
+    "defaultMessage": "{tagCount, plural, other {# 태그}}를 선택하셨습니다. 프로젝트가 관련 검색 결과에 표시되도록 {maxTagCount} 이하로 줄이는 것을 고려해 보세요."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "올바른 태그를 선택해주세요"

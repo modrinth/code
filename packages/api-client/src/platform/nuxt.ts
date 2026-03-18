@@ -13,27 +13,32 @@ import { XHRUploadClient } from './xhr-upload-client'
  *
  * This provides cross-request persistence in SSR while also working in client-side.
  * State is shared between requests in the same Nuxt context.
+ *
+ * Note: useState must be called during initialization (in setup context) and cached,
+ * as it won't work during async operations when the Nuxt context may be lost.
  */
 export class NuxtCircuitBreakerStorage implements CircuitBreakerStorage {
-	private getState(): Map<string, CircuitBreakerState> {
+	private state: Map<string, CircuitBreakerState>
+
+	constructor() {
 		// @ts-expect-error - useState is provided by Nuxt runtime
-		const state = useState<Map<string, CircuitBreakerState>>(
+		const stateRef = useState<Map<string, CircuitBreakerState>>(
 			'circuit-breaker-state',
 			() => new Map(),
 		)
-		return state.value
+		this.state = stateRef.value
 	}
 
 	get(key: string): CircuitBreakerState | undefined {
-		return this.getState().get(key)
+		return this.state.get(key)
 	}
 
 	set(key: string, state: CircuitBreakerState): void {
-		this.getState().set(key, state)
+		this.state.set(key, state)
 	}
 
 	clear(key: string): void {
-		this.getState().delete(key)
+		this.state.delete(key)
 	}
 }
 
@@ -140,7 +145,7 @@ export class NuxtModrinthClient extends XHRUploadClient {
 
 	protected async executeRequest<T>(url: string, options: RequestOptions): Promise<T> {
 		try {
-			// @ts-expect-error - $fetch is provided by Nuxt runtime
+			// @ts-expect-error - $fetch is provided by Nuxt
 			const response = await $fetch<T>(url, {
 				method: options.method ?? 'GET',
 				headers: options.headers,
@@ -148,6 +153,8 @@ export class NuxtModrinthClient extends XHRUploadClient {
 				params: options.params,
 				timeout: options.timeout,
 				signal: options.signal,
+				// @ts-expect-error - import.meta is provided by Nuxt
+				cache: import.meta.server ? undefined : 'no-store',
 			})
 
 			return response

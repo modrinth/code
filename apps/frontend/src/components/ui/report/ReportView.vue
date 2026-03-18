@@ -9,7 +9,7 @@
 			<h2>Report details</h2>
 			<ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
 		</section>
-		<section class="universal-card">
+		<section v-if="report && thread" class="universal-card">
 			<h2>Messages</h2>
 			<ConversationThread
 				:thread="thread"
@@ -21,6 +21,10 @@
 	</div>
 </template>
 <script setup>
+import { injectModrinthClient } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed } from 'vue'
+
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import ReportInfo from '~/components/ui/report/ReportInfo.vue'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
@@ -41,74 +45,87 @@ const props = defineProps({
 	},
 })
 
-const report = ref(null)
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 
-await fetchReport().then((result) => {
-	report.value = result
+// Fetch raw report
+const { data: rawReport } = useQuery({
+	queryKey: computed(() => ['report', props.reportId]),
+	queryFn: () => client.labrinth.reports_v3.get(props.reportId),
 })
 
-const { data: rawThread } = await useAsyncData(`thread/${report.value.thread_id}`, () =>
-	useBaseFetch(`thread/${report.value.thread_id}`),
+// Compute user IDs needed
+const userIds = computed(() => {
+	if (!rawReport.value) return []
+	const ids = [rawReport.value.reporter]
+	if (rawReport.value.item_type === 'user') {
+		ids.push(rawReport.value.item_id)
+	}
+	return ids
+})
+
+// Fetch users
+const { data: users } = useQuery({
+	queryKey: computed(() => ['users', userIds.value]),
+	queryFn: () => client.labrinth.users_v2.getMultiple(userIds.value),
+	enabled: computed(() => userIds.value.length > 0),
+})
+
+// Version ID if applicable
+const versionId = computed(() =>
+	rawReport.value?.item_type === 'version' ? rawReport.value.item_id : null,
 )
-const thread = computed(() => addReportMessage(rawThread.value, report.value))
+
+// Fetch version
+const { data: version } = useQuery({
+	queryKey: computed(() => ['version', versionId.value]),
+	queryFn: () => client.labrinth.versions_v2.getVersion(versionId.value),
+	enabled: computed(() => !!versionId.value),
+})
+
+// Project ID
+const projectId = computed(() => {
+	if (version.value) return version.value.project_id
+	if (rawReport.value?.item_type === 'project') return rawReport.value.item_id
+	return null
+})
+
+// Fetch project
+const { data: project } = useQuery({
+	queryKey: computed(() => ['project', projectId.value]),
+	queryFn: () => client.labrinth.projects_v2.get(projectId.value),
+	enabled: computed(() => !!projectId.value),
+})
+
+// Assemble the full report object
+const report = computed(() => {
+	if (!rawReport.value) return null
+	return {
+		...rawReport.value,
+		project: project.value ?? null,
+		version: version.value ?? null,
+		reporterUser: (users.value || []).find((user) => user.id === rawReport.value.reporter),
+		user:
+			rawReport.value.item_type === 'user'
+				? (users.value || []).find((user) => user.id === rawReport.value.item_id)
+				: undefined,
+	}
+})
+
+// Fetch thread
+const { data: rawThread } = useQuery({
+	queryKey: computed(() => ['thread', report.value?.thread_id]),
+	queryFn: () => client.labrinth.threads_v3.getThread(report.value.thread_id),
+	enabled: computed(() => !!report.value?.thread_id),
+})
+
+const thread = computed(() =>
+	rawThread.value && report.value ? addReportMessage(rawThread.value, report.value) : null,
+)
 
 async function updateThread(newThread) {
-	rawThread.value = newThread
-	report.value = await fetchReport()
-}
-
-async function fetchReport() {
-	const { data: rawReport } = await useAsyncData(`report/${props.reportId}`, () =>
-		useBaseFetch(`report/${props.reportId}`),
-	)
-	rawReport.value.item_id = rawReport.value.item_id.replace(/"/g, '')
-
-	const userIds = []
-	userIds.push(rawReport.value.reporter)
-	if (rawReport.value.item_type === 'user') {
-		userIds.push(rawReport.value.item_id)
-	}
-
-	const versionId = rawReport.value.item_type === 'version' ? rawReport.value.item_id : null
-
-	let users = []
-	if (userIds.length > 0) {
-		const { data: usersVal } = await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
-			useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds))}`),
-		)
-		users = usersVal.value
-	}
-
-	let version = null
-	if (versionId) {
-		const { data: versionVal } = await useAsyncData(`version/${versionId}`, () =>
-			useBaseFetch(`version/${versionId}`),
-		)
-		version = versionVal.value
-	}
-
-	const projectId = version
-		? version.project_id
-		: rawReport.value.item_type === 'project'
-			? rawReport.value.item_id
-			: null
-
-	let project = null
-	if (projectId) {
-		const { data: projectVal } = await useAsyncData(`project/${projectId}`, () =>
-			useBaseFetch(`project/${projectId}`),
-		)
-		project = projectVal.value
-	}
-
-	const reportData = rawReport.value
-	reportData.project = project
-	reportData.version = version
-	reportData.reporterUser = users.find((user) => user.id === rawReport.value.reporter)
-	if (rawReport.value.item_type === 'user') {
-		reportData.user = users.find((user) => user.id === rawReport.value.item_id)
-	}
-	return reportData
+	queryClient.setQueryData(['thread', report.value?.thread_id], newThread)
+	await queryClient.invalidateQueries({ queryKey: ['report', props.reportId] })
 }
 </script>
 <style lang="scss" scoped>

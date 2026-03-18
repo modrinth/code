@@ -4,12 +4,14 @@ use crate::database::PgPool;
 use crate::database::models::DBUserId;
 use crate::database::models::{generate_payout_id, users_compliance};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus, Withdrawal};
 use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::routes::internal::globals::tax_compliance_payout_threshold;
 use crate::util::avalara1099;
 use crate::util::error::Context;
 use crate::util::gotenberg::GotenbergClient;
@@ -212,7 +214,7 @@ pub async fn paypal_webhook(
                     \"webhook_id\": \"{}\",
                     \"webhook_event\": {body}
                 }}",
-                dotenvy::var("PAYPAL_WEBHOOK_ID")?
+                ENV.PAYPAL_WEBHOOK_ID,
             )),
             None,
         )
@@ -322,7 +324,7 @@ pub async fn tremendous_webhook(
         })?;
 
     let mut mac: Hmac<Sha256> = Hmac::new_from_slice(
-        dotenvy::var("TREMENDOUS_PRIVATE_KEY")?.as_bytes(),
+        ENV.TREMENDOUS_PRIVATE_KEY.as_bytes(),
     )
     .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
     mac.update(body.as_bytes());
@@ -439,6 +441,7 @@ pub async fn calculate_fees(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {
@@ -471,6 +474,7 @@ pub async fn create_payout(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await?
     .ok_or_else(|| {
@@ -498,11 +502,19 @@ pub async fn create_payout(
     let balance = get_user_balance(user.id, &pool)
         .await
         .wrap_internal_err("failed to calculate user balance")?;
-    if balance.available < body.amount || body.amount < Decimal::ZERO {
+
+    if body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
-            "You do not have enough funds to make this payout!".to_string(),
+            "Amount must be positive!".to_string(),
         ));
     }
+
+    // Create the payout flow first so we can use the resolved USD amount
+    // for tax threshold checks. body.amount may be in local currency for
+    // gift cards (e.g. INR), so we must not compare it directly against
+    // USD thresholds.
+    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
+    let amount_usd = payout_flow.net_usd.get();
 
     let requires_manual_review;
 
@@ -529,7 +541,7 @@ pub async fn create_payout(
             };
 
         if !(tin_matched && signed)
-            && balance.withdrawn_ytd + body.amount >= threshold
+            && balance.withdrawn_ytd + amount_usd >= threshold
         {
             // We propagate the error this way because we don't want to block payouts
             // that would be acceptable regardless of the tax form submission status
@@ -566,7 +578,6 @@ pub async fn create_payout(
         ));
     }
 
-    let payout_flow = payouts_queue.create_payout_flow(body.0).await?;
     let payout_flow = match payout_flow.validate(balance.available) {
         Ok(flow) => flow,
         Err(err) => return Err(ApiError::InvalidInput(err.to_string())),
@@ -1104,12 +1115,6 @@ async fn update_compliance_status(
             compliance_api_check_failed,
         }))
     }
-}
-
-fn tax_compliance_payout_threshold() -> Option<Decimal> {
-    dotenvy::var("COMPLIANCE_PAYOUT_THRESHOLD")
-        .ok()
-        .and_then(|s| s.parse().ok())
 }
 
 #[derive(Deserialize)]

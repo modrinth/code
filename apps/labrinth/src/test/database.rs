@@ -1,8 +1,10 @@
 use crate::database::PgPool;
 use crate::database::redis::RedisPool;
 use crate::database::{MIGRATOR, ReadOnlyPgPool};
-use crate::search;
+use crate::env::ENV;
+use crate::search::{self, SearchBackend};
 use sqlx::postgres::PgPoolOptions;
+use std::sync::Arc;
 use std::time::Duration;
 use url::Url;
 
@@ -41,8 +43,8 @@ pub struct TemporaryDatabase {
     pub pool: PgPool,
     pub ro_pool: ReadOnlyPgPool,
     pub redis_pool: RedisPool,
-    pub search_config: crate::search::SearchConfig,
     pub database_name: String,
+    pub search_backend: Arc<dyn SearchBackend>,
 }
 
 impl TemporaryDatabase {
@@ -57,15 +59,14 @@ impl TemporaryDatabase {
         let temp_database_name = generate_random_name("labrinth_tests_db_");
         println!("Creating temporary database: {}", &temp_database_name);
 
-        let database_url =
-            dotenvy::var("DATABASE_URL").expect("No database URL");
+        let database_url = &ENV.DATABASE_URL;
 
         // Create the temporary (and template database, if needed)
-        Self::create_temporary(&database_url, &temp_database_name).await;
+        Self::create_temporary(database_url, &temp_database_name).await;
 
         // Pool to the temporary database
         let mut temporary_url =
-            Url::parse(&database_url).expect("Invalid database URL");
+            Url::parse(database_url).expect("Invalid database URL");
 
         temporary_url.set_path(&format!("/{}", &temp_database_name));
         let temp_db_url = temporary_url.to_string();
@@ -89,17 +90,16 @@ impl TemporaryDatabase {
         println!("Migrations complete");
 
         // Gets new Redis pool
-        let redis_pool = RedisPool::new(Some(temp_database_name.clone()));
+        let redis_pool = RedisPool::new(temp_database_name.clone());
 
-        // Create new meilisearch config
-        let search_config =
-            search::SearchConfig::new(Some(temp_database_name.clone()));
+        // Create search backend
+        let search_backend = search::backend(Some(temp_database_name.clone()));
         Self {
             pool,
             ro_pool,
             database_name: temp_database_name,
             redis_pool,
-            search_config,
+            search_backend: Arc::from(search_backend),
         }
     }
 
@@ -139,10 +139,8 @@ impl TemporaryDatabase {
                 }
 
                 // Switch to template
-                let url =
-                    dotenvy::var("DATABASE_URL").expect("No database URL");
-                let mut template_url =
-                    Url::parse(&url).expect("Invalid database URL");
+                let mut template_url = Url::parse(&ENV.DATABASE_URL)
+                    .expect("Invalid database URL");
                 template_url.set_path(&format!("/{TEMPLATE_DATABASE_NAME}"));
 
                 let pool = sqlx::PgPool::connect(template_url.as_str())
@@ -194,8 +192,10 @@ impl TemporaryDatabase {
                         pool: pool.clone(),
                         ro_pool: ReadOnlyPgPool::from(pool.clone()),
                         database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(Some(name.clone())),
-                        search_config: search::SearchConfig::new(Some(name)),
+                        redis_pool: RedisPool::new(name.clone()),
+                        search_backend: Arc::from(search::backend(Some(
+                            name.clone(),
+                        ))),
                     };
                     let setup_api =
                         TestEnvironment::<ApiV3>::build_setup_api(&db).await;
@@ -234,11 +234,10 @@ impl TemporaryDatabase {
     // If a temporary db is created, it must be cleaned up with cleanup.
     // This means that dbs will only 'remain' if a test fails (for examination of the db), and will be cleaned up otherwise.
     pub async fn cleanup(mut self) {
-        let database_url =
-            dotenvy::var("DATABASE_URL").expect("No database URL");
+        let database_url = &ENV.DATABASE_URL;
         self.pool.close().await;
 
-        self.pool = sqlx::PgPool::connect(&database_url)
+        self.pool = sqlx::PgPool::connect(database_url)
             .await
             .map(PgPool::from)
             .expect("Connection to main database failed");

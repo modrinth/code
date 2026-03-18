@@ -68,19 +68,28 @@
 		</nav>
 
 		<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-			<div class="iconified-input w-full sm:w-[280px]">
-				<SearchIcon aria-hidden="true" class="!text-secondary" />
-				<input
-					id="search-folder"
-					:value="searchQuery"
-					type="search"
-					name="search"
-					autocomplete="off"
-					class="h-10 w-full rounded-[14px] border-0 bg-surface-4 text-sm"
-					placeholder="Search files"
-					@input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-				/>
-			</div>
+			<StyledInput
+				id="search-folder"
+				:model-value="searchQuery"
+				:icon="SearchIcon"
+				type="search"
+				name="search"
+				autocomplete="off"
+				placeholder="Search files"
+				wrapper-class="w-full sm:w-[280px]"
+				@update:model-value="$emit('update:searchQuery', $event)"
+			/>
+
+			<ButtonStyled v-if="showRefreshButton" type="outlined">
+				<button
+					type="button"
+					class="flex h-10 items-center gap-2 !border-[1px] !border-surface-5"
+					@click="$emit('refresh')"
+				>
+					<RefreshCwIcon aria-hidden="true" class="h-5 w-5" />
+					Refresh
+				</button>
+			</ButtonStyled>
 
 			<ButtonStyled type="outlined">
 				<OverflowMenu
@@ -88,6 +97,8 @@
 					position="bottom"
 					direction="left"
 					aria-label="Create new..."
+					:disabled="disabled"
+					:tooltip="disabled ? disabledTooltip : undefined"
 					class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
 					:options="[
 						{ id: 'file', action: () => $emit('create', 'file') },
@@ -168,7 +179,7 @@ import {
 	ShareIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, OverflowMenu } from '@modrinth/ui'
+import { Button, ButtonStyled, OverflowMenu, StyledInput } from '@modrinth/ui'
 import { computed } from 'vue'
 
 import TeleportOverflowMenu from './explorer/TeleportOverflowMenu.vue'
@@ -180,7 +191,10 @@ const props = defineProps<{
 	editingFilePath?: string
 	isEditingImage?: boolean
 	searchQuery: string
+	showRefreshButton?: boolean
 	baseId: string
+	disabled?: boolean
+	disabledTooltip?: string
 }>()
 
 defineEmits<{
@@ -192,6 +206,7 @@ defineEmits<{
 	upload: []
 	uploadZip: []
 	unzipFromUrl: [cf: boolean]
+	refresh: []
 	save: []
 	saveAs: []
 	saveRestart: []

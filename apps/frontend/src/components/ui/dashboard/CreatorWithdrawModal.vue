@@ -107,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ArrowLeftRightIcon,
 	ChevronRightIcon,
@@ -128,12 +129,13 @@ import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 
 import {
 	createWithdrawContext,
+	getTaxThreshold,
+	getTaxThresholdActual,
 	type PaymentProvider,
-	type PayoutMethod,
 	provideWithdrawContext,
-	TAX_THRESHOLD_ACTUAL,
 	type WithdrawStage,
 } from '@/providers/creator-withdraw.ts'
+import { useGeneratedState } from '~/composables/generated'
 
 import CreatorTaxFormModal from './CreatorTaxFormModal.vue'
 import CompletionStage from './withdraw-stages/CompletionStage.vue'
@@ -144,21 +146,9 @@ import MuralpayKycStage from './withdraw-stages/MuralpayKycStage.vue'
 import TaxFormStage from './withdraw-stages/TaxFormStage.vue'
 import TremendousDetailsStage from './withdraw-stages/TremendousDetailsStage.vue'
 
-type FormCompletionStatus = 'unknown' | 'unrequested' | 'unsigned' | 'tin-mismatch' | 'complete'
-
-interface UserBalanceResponse {
-	available: number
-	withdrawn_lifetime: number
-	withdrawn_ytd: number
-	pending: number
-	dates: Record<string, number>
-	requested_form_type: string | null
-	form_completion_status: FormCompletionStatus | null
-}
-
 const props = defineProps<{
-	balance: UserBalanceResponse | null
-	preloadedPaymentData?: { country: string; methods: PayoutMethod[] } | null
+	balance: Labrinth.Payout.v3.PayoutBalance | null | undefined
+	preloadedPaymentData?: { country: string; methods: Labrinth.Payout.v3.PayoutMethod[] } | null
 }>()
 
 const emit = defineEmits<{
@@ -191,9 +181,13 @@ defineExpose({
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 
+const generatedState = useGeneratedState()
+const taxComplianceThresholds = computed(() => generatedState.value.taxComplianceThresholds)
+
 const withdrawContext = createWithdrawContext(
 	props.balance,
 	props.preloadedPaymentData || undefined,
+	taxComplianceThresholds.value,
 )
 provideWithdrawContext(withdrawContext)
 
@@ -249,13 +243,13 @@ const needsTaxForm = computed(() => {
 	const ytd = props.balance.withdrawn_ytd ?? 0
 	const available = props.balance.available ?? 0
 	const status = props.balance.form_completion_status
-	return status !== 'complete' && ytd + available >= 600
+	return status !== 'complete' && ytd + available >= getTaxThreshold(taxComplianceThresholds.value)
 })
 
 const remainingLimit = computed(() => {
 	if (!props.balance) return 0
 	const ytd = props.balance.withdrawn_ytd ?? 0
-	const raw = TAX_THRESHOLD_ACTUAL - ytd
+	const raw = getTaxThresholdActual(taxComplianceThresholds.value) - ytd
 	if (raw <= 0) return 0
 	const cents = Math.floor(raw * 100)
 	return cents / 100

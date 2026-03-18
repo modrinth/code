@@ -102,7 +102,7 @@
 				<tr>
 					<td>Revenue earned on</td>
 					<td>
-						<input id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
+						<StyledInput id="revenue-date-picker" v-model="rawSelectedDate" type="date" />
 						<noscript
 							>(JavaScript must be enabled for the date picker to function, example date:
 							2024-07-15)
@@ -111,7 +111,7 @@
 				</tr>
 				<tr>
 					<td>End of the month</td>
-					<td>{{ formatDate(endOfMonthDate) }}</td>
+					<td>{{ formatDate(endOfMonthDate.toDate()) }}</td>
 				</tr>
 				<tr>
 					<td>NET 60 policy applied</td>
@@ -119,7 +119,7 @@
 				</tr>
 				<tr class="final-result">
 					<td>Available for withdrawal</td>
-					<td>{{ formatDate(withdrawalDate) }}</td>
+					<td>{{ formatDate(withdrawalDate.toDate()) }}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -146,7 +146,7 @@
 			</thead>
 			<tbody>
 				<tr v-for="item in platformRevenueData" :key="item.time">
-					<td>{{ formatDate(dayjs.unix(item.time)) }}</td>
+					<td>{{ formatDate(dayjs.unix(item.time).toDate()) }}</td>
 					<td>{{ formatMoney(Number(item.revenue) + Number(item.creator_revenue)) }}</td>
 					<td>{{ formatMoney(Number(item.creator_revenue)) }}</td>
 					<td>{{ formatMoney(Number(item.revenue)) }}</td>
@@ -162,9 +162,18 @@
 </template>
 
 <script lang="ts" setup>
-import { formatDate, formatMoney } from '@modrinth/utils'
+import { injectModrinthClient, StyledInput, useFormatDateTime, useFormatMoney } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import { computed, ref } from 'vue'
+
+const client = injectModrinthClient()
+const formatMoney = useFormatMoney()
+const formatDate = useFormatDateTime({
+	month: 'long',
+	day: 'numeric',
+	year: 'numeric',
+})
 
 const description =
 	'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'
@@ -181,11 +190,10 @@ const selectedDate = computed(() => dayjs(rawSelectedDate.value))
 const endOfMonthDate = computed(() => selectedDate.value.endOf('month'))
 const withdrawalDate = computed(() => endOfMonthDate.value.add(60, 'days'))
 
-const { data: transparencyInformation } = await useAsyncData('payout/platform_revenue', () =>
-	useBaseFetch('payout/platform_revenue', {
-		apiVersion: 3,
-	}),
-)
+const { data: transparencyInformation } = useQuery({
+	queryKey: ['payout', 'platform_revenue'],
+	queryFn: () => client.labrinth.payouts_v3.getPlatformRevenue(),
+})
 
 const platformRevenue = (transparencyInformation.value as any)?.all_time
 const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? []

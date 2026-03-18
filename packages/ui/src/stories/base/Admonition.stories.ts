@@ -24,6 +24,7 @@ export const AllTypes: Story = {
 				<Admonition type="info" header="Info" body="This is an informational message." />
 				<Admonition type="warning" header="Warning" body="This is a warning message." />
 				<Admonition type="critical" header="Critical" body="This is a critical message." />
+				<Admonition type="success" header="Success" body="This operation completed successfully." />
 			</div>
 		`,
 	}),
@@ -34,5 +35,13 @@ export const WithHeader: Story = {
 		type: 'warning',
 		header: 'Important Notice',
 		body: 'Please read this carefully before proceeding.',
+	},
+}
+
+export const Success: Story = {
+	args: {
+		type: 'success',
+		header: 'Operation Complete',
+		body: 'Everything went smoothly.',
 	},
 }

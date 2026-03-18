@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "Descarcă RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "Descarca pe Flathub"
+  },
   "app-marketing.download.linux": {
     "message": "Linux"
   },
@@ -34,9 +37,6 @@
   },
   "app-marketing.download.options-title": {
     "message": "Opțiuni descărcare"
-  },
-  "app-marketing.download.terms": {
-    "message": "Prin descărcarea Modrinth App ești de acord cu ai noștri <terms-link>Termeni</terms-link> și <privacy-link>Politica de confidențialitate</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Descarcă Modrinth App (Beta)"
@@ -103,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App funcționează mai bine decât multe dintre cele mai populare aplicații de gestionare a modurilor, utilizând doar 150 MB de memorie RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -193,6 +190,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "Mai multe Opțiuni de Descărcare"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "Ascunde alte pachete"
+  },
+  "app-marketing.not-recommended": {
+    "message": "Nu recomandam sa folosești aceasta doar daca ști ce faci."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "Arata alte pachete"
   },
   "auth.authorize.action.authorize": {
     "message": "Autorizează"
@@ -338,8 +344,17 @@
   "collection.button.edit-icon": {
     "message": "Editează pictograma"
   },
+  "collection.button.remove-icon": {
+    "message": "Sterge iconita"
+  },
   "collection.button.remove-project": {
     "message": "Șterge proiectul"
+  },
+  "collection.button.replace-icon": {
+    "message": "Inlocuieste iconita"
+  },
+  "collection.button.select-icon": {
+    "message": "Selecteaza iconita"
   },
   "collection.button.unfollow-project": {
     "message": "Nu mai urmăriți proiectul"
@@ -353,6 +368,9 @@
   "collection.description.following": {
     "message": "Colecție generată automat cu toate proiectele pe care le urmăriți."
   },
+  "collection.editing": {
+    "message": "Editează colecția"
+  },
   "collection.error.not-found": {
     "message": "Colecția nu a fost găsită"
   },
@@ -362,8 +380,17 @@
   "collection.label.curated-by": {
     "message": "Creat de"
   },
+  "collection.label.no-projects": {
+    "message": "Nu exista proiecte in colecție"
+  },
   "collection.label.updated-at": {
     "message": "Actualizat acum {ago}"
+  },
+  "collection.return-link.dashboard-collections": {
+    "message": "Colectiile tale"
+  },
+  "collection.return-link.user": {
+    "message": "Profilul {user}"
   },
   "collection.title": {
     "message": "{name} - Colecție"
@@ -488,11 +515,20 @@
   "create.project.visibility-unlisted": {
     "message": "Nelistat"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "Creează un link de afiliere"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "Revoca"
+  },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Ești sigur ca dorești sa ștergi linkul de afiliere {title}?"
+  },
+  "dashboard.affiliate-links.search": {
+    "message": "Cauta linkuri de afiliere..."
+  },
   "dashboard.collections.button.create-new": {
     "message": "Creați nouă"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proiect} other {{count} proiecte}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Caută în colecțiile tale"
@@ -535,6 +571,111 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Ești cetățean american?"
+  },
+  "dashboard.creator-withdraw-modal.complete-tax-form": {
+    "message": "Completează formularul de taxa"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detalii"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "Taxa"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-gift-card-value": {
+    "message": "Valoarea cardului cadou"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-net-amount": {
+    "message": "Valoare Net"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
+    "message": "Echivalent USD"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "Selecteaza tara"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-search-placeholder": {
+    "message": "Cauta tari..."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "Regiune"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region-tooltip": {
+    "message": "Unele metode de plata nu sunt disponibile in anumite regiuni."
+  },
+  "dashboard.creator-withdraw-modal.method-selection.select-method": {
+    "message": "Selecteaza metoda de plata"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "Număr pașaport"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@numeutilizator"
+  },
+  "dashboard.creator-withdraw-modal.stage.completion": {
+    "message": "Complet"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "Metoda"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "Formular taxa"
+  },
+  "dashboard.creator-withdraw-modal.tax-form-required.header": {
+    "message": "Formular de taxa necesar"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "Introdu suma"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "Metodă de plată"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward": {
+    "message": "Premiu"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-placeholder": {
+    "message": "Selecteaza premiu"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.reward-plural": {
+    "message": "Premiu"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
+    "message": "Email neverificat"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "Disponibil acum"
+  },
+  "dashboard.revenue.balance": {
+    "message": "Balanta"
+  },
+  "dashboard.revenue.estimated-with-date": {
+    "message": "Estimat {date}"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Procesare"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "Primit"
+  },
+  "dashboard.revenue.stats.transactions": {
+    "message": "Tranzactii"
+  },
+  "dashboard.revenue.transactions.btn.download-csv": {
+    "message": "Descarca ca CSV"
+  },
+  "dashboard.revenue.transactions.header": {
+    "message": "Tranzactii"
+  },
+  "dashboard.revenue.transactions.none": {
+    "message": "Fara tranzactii"
+  },
+  "dashboard.revenue.transactions.none.desc": {
+    "message": "Plățile tale vor apărea aici."
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "Vezi toate"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "Data"
   },
   "error.collection.404.list_item.1": {
     "message": "Este posibil să fi tastat greșit URL-ul colecției."
@@ -631,6 +772,87 @@
   },
   "frog.title": {
     "message": "Broască"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "Disponibil in America de Nord, Europa si Asia de Sud-Est."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "Plateste lunar"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "Începând de la {price} / lună"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "Plateste anual"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "Cum funcționează extinderea de CPU?"
+  },
+  "hosting-marketing.faq.cpu-kind": {
+    "message": "Ce fel de CPU-uri folosesc serverele Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.cpu-kind.answer": {
+    "message": "Serverele Modrinth Hosting folosesc AMD Ryzen 7900 si 7950X3D sau echivalent la 5+ GHz, împreuna cu memorie DDR5."
+  },
+  "hosting-marketing.faq.ddos-protection": {
+    "message": "Au serverele Modrinth Hosting protectie DDos?"
+  },
+  "hosting-marketing.faq.heading": {
+    "message": "Intrebari frecvente"
+  },
+  "hosting-marketing.faq.how-fast": {
+    "message": "Cat de rapide sunt serverele Modrinth Hosting?"
+  },
+  "hosting-marketing.faq.increase-storage": {
+    "message": "Pot sa extind stocarea de pe server-ul meu?"
+  },
+  "hosting-marketing.get-started": {
+    "message": "Incepe acum"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "Vezi serverele tale"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "Creează un server nou"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "Creează-ți un server"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "Backup inclus"
+  },
+  "hosting-marketing.included.custom-url": {
+    "message": "URL personalizat"
+  },
+  "hosting-marketing.included.help": {
+    "message": "Ajutor cand ai nevoie"
+  },
+  "hosting-marketing.included.sftp-access": {
+    "message": "Acces SFTP"
+  },
+  "hosting-marketing.medal.learn-more": {
+    "message": "Afla mai multe"
+  },
+  "hosting-marketing.medal.text-secondary": {
+    "message": "Oferta limitata. Nu este necesar un card bancar. Disponibil pentru servere din SUA."
+  },
+  "hosting-marketing.why.where-mods-are": {
+    "message": "Joaca-te unde modurile tale se afla"
+  },
+  "hosting-marketing.why.why-modrinth-hosting": {
+    "message": "De ce Modrinth Hosting?"
+  },
+  "hosting-marketing.why.your-favorite-mods": {
+    "message": "Toate modurile tale preferate"
+  },
+  "hosting-marketing.why.your-favorite-mods.description": {
+    "message": "Alege intre Vanilla, Fabric, Forge, Quilt si NeoForge. Daca e pe Modrinth, poate să ruleze pe serverul tău."
+  },
+  "hosting.plan.out-of-stock": {
+    "message": "Fara stoc"
+  },
+  "hosting.plan.select-plan": {
+    "message": "Selecteaza un plan"
   },
   "landing.button.discover-mods": {
     "message": "Descoperă modurile"
@@ -757,9 +979,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Pentru Jucători"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Descoperă peste {count} creații"
   },
   "landing.subheading": {
     "message": "Descoperă, joacă, și distribuie conținut pentru Minecraft prin platforma noastră deschisă și construită pentru comunitate."
@@ -926,6 +1145,15 @@
   "layout.meta.og-description": {
     "message": "Descoperă și publică conținut pentru Minecraft!"
   },
+  "layout.mobile.close-menu": {
+    "message": "Inchide meniul"
+  },
+  "layout.mobile.open-menu": {
+    "message": "Deschide meniul"
+  },
+  "layout.nav.active-reports": {
+    "message": "Rapoarte active"
+  },
   "layout.nav.discover": {
     "message": "Descoperă"
   },
@@ -949,6 +1177,9 @@
   },
   "layout.nav.modrinth-home-page": {
     "message": "Pagina de pornire Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "Serverele mele"
   },
   "layout.nav.organizations": {
     "message": "Organizații"
@@ -983,6 +1214,69 @@
   "moderation.page.technicalReview": {
     "message": "Revizuire Tehnică"
   },
+  "muralpay.country.at": {
+    "message": "Austria"
+  },
+  "muralpay.country.be": {
+    "message": "Belgia"
+  },
+  "muralpay.country.cy": {
+    "message": "Cipru"
+  },
+  "muralpay.country.de": {
+    "message": "Germania"
+  },
+  "muralpay.country.ee": {
+    "message": "Estonia"
+  },
+  "muralpay.country.es": {
+    "message": "Spania"
+  },
+  "muralpay.country.fi": {
+    "message": "Finlanda"
+  },
+  "muralpay.country.fr": {
+    "message": "Franta"
+  },
+  "muralpay.country.gr": {
+    "message": "Grecia"
+  },
+  "muralpay.country.ie": {
+    "message": "Irlanda"
+  },
+  "muralpay.country.it": {
+    "message": "Italia"
+  },
+  "muralpay.country.lu": {
+    "message": "Luxemburg"
+  },
+  "muralpay.country.nl": {
+    "message": "Olanda"
+  },
+  "muralpay.country.pt": {
+    "message": "Portugalia"
+  },
+  "muralpay.country.sk": {
+    "message": "Slovacia"
+  },
+  "muralpay.document-type.passport": {
+    "message": "Pasaport"
+  },
+  "muralpay.pix-type.bank-account": {
+    "message": "Cont bancar"
+  },
+  "muralpay.placeholder.enter-iban": {
+    "message": "Introdu IBAN"
+  },
+  "muralpay.rail.fiat-usd.name": {
+    "message": "Transfer bancar (USD)"
+  },
+  "profile.bio.fallback.creator": {
+    "message": "Un creator Modrinth."
+  },
+  "profile.bio.fallback.user": {
+    "message": "Un utilizator Modrinth."
+  },
   "profile.button.billing": {
     "message": "Administrează facturarea utilizatorului"
   },
@@ -1015,6 +1309,9 @@
   },
   "profile.label.organizations": {
     "message": "Organizații"
+  },
+  "profile.label.saving": {
+    "message": "Salvare..."
   },
   "profile.meta.description": {
     "message": "Descarcă proiectele lui {username} pe Modrinth"
@@ -1346,23 +1643,11 @@
   "report.already-reported": {
     "message": "Ai raportat deja {title}"
   },
-  "report.already-reported-description": {
-    "message": "Ai deja un raport deschis pentru acest {item}. Poți adăuga mai multe detalii raportului dacă ai informații suplimentare."
-  },
-  "report.back-to-item": {
-    "message": "Înapoi la {item}"
-  },
   "report.body.description": {
     "message": "Include linkuri și imagini, dacă este posibil și relevant. Rapoartele goale sau insuficiente vor fi închise și ignorate."
   },
   "report.body.title": {
     "message": "Te rugăm să oferi context suplimentar raportului tău"
-  },
-  "report.checking": {
-    "message": "Se verifică {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nu s-a putut găsi {item}"
   },
   "report.for.violation": {
     "message": "Încălcarea <rules-link>Regulilor</rules-link> sau a <terms-link>Termenilor de Utilizare</terms-link> Modrinth"
@@ -1403,14 +1688,8 @@
   "report.please-report": {
     "message": "Te rugăm să raportezi:"
   },
-  "report.question.content-id": {
-    "message": "Care este ID-ul {item}?"
-  },
   "report.question.content-type": {
     "message": "Ce tip de conținut raportezi?"
-  },
-  "report.question.report-reason": {
-    "message": "Care dintre regulile Modrinth încalcă acest {item}?"
   },
   "report.report-content": {
     "message": "Raportează conținutul moderatorilor"
@@ -1426,6 +1705,24 @@
   },
   "scopes.analytics.label": {
     "message": "Citește analizele"
+  },
+  "scopes.category.organizations": {
+    "message": "Organizatii"
+  },
+  "scopes.category.projects": {
+    "message": "Proiecte"
+  },
+  "scopes.category.reports": {
+    "message": "Rapoarte"
+  },
+  "scopes.category.sessions": {
+    "message": "Sesiuni"
+  },
+  "scopes.category.user-account": {
+    "message": "Cont utilizator"
+  },
+  "scopes.category.versions": {
+    "message": "Versiuni"
   },
   "scopes.collectionCreate.description": {
     "message": "Creează colecții"
@@ -1577,9 +1874,6 @@
   "scopes.reportWrite.label": {
     "message": "Scrie rapoarte"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Accesează sesiunile emise de Modrinth"
-  },
   "scopes.sessionAccess.label": {
     "message": "Accesează sesiunile"
   },
@@ -1673,9 +1967,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizează cu serverul"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restaurare copie de rezervă în curs"
-  },
   "servers.notice.actions": {
     "message": "Acțiuni"
   },
@@ -1720,6 +2011,57 @@
   },
   "servers.plan.small.name": {
     "message": "Mic"
+  },
+  "settings.applications.about": {
+    "message": "Despre"
+  },
+  "settings.applications.button.cancel": {
+    "message": "Anuleaza"
+  },
+  "settings.applications.button.create": {
+    "message": "Creaza aplicația"
+  },
+  "settings.applications.button.delete": {
+    "message": "Sterge"
+  },
+  "settings.applications.button.edit": {
+    "message": "Editeaza"
+  },
+  "settings.applications.button.save-changes": {
+    "message": "Salvează schimbările"
+  },
+  "settings.applications.client-id": {
+    "message": "ID Client"
+  },
+  "settings.applications.client-secret": {
+    "message": "Secret Client"
+  },
+  "settings.applications.created-on": {
+    "message": "Create pe {date}"
+  },
+  "settings.applications.field.description": {
+    "message": "Descriere"
+  },
+  "settings.applications.field.icon": {
+    "message": "Iconita"
+  },
+  "settings.applications.field.name": {
+    "message": "Nume"
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://exemplu.com/auth/callback"
+  },
+  "settings.applications.field.scopes": {
+    "message": "Scopuri"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://exemplu.com"
+  },
+  "settings.applications.modal.header": {
+    "message": "Informații aplicație"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Anulează abonamentul"
@@ -1852,9 +2194,6 @@
   },
   "settings.pats.action.create": {
     "message": "Creează un token PAT"
-  },
-  "settings.pats.description": {
-    "message": "Token-urile PAT pot fi folosite pentru a accesa API-ul Modrinths. Pentru mai multe informații, consultați <doc-link>Documentația API a Modrinth's</doc-link>. Acestea pot fi create și revocate în orice moment."
   },
   "settings.pats.modal.create.action": {
     "message": "Creează token PAT"

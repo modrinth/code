@@ -1,5 +1,21 @@
 <template>
 	<div class="normal-page__content">
+		<ConfirmTransferOrgModal
+			v-if="transferTargetMember"
+			ref="transferModal"
+			:organization="{ name: organization.name, icon_url: organization.icon_url }"
+			:current-owner="{
+				avatar_url: currentMember.user?.avatar_url,
+				username: currentMember.user?.username ?? '',
+				role: currentMember.role ?? 'Owner',
+			}"
+			:transfer-to="{
+				avatar_url: transferTargetMember.user?.avatar_url,
+				username: transferTargetMember.user?.username ?? '',
+				role: transferTargetMember.role || 'Member',
+			}"
+			:on-confirm="() => onTransferOwnership(organization.team_id, transferTargetMember.user.id)"
+		/>
 		<div class="universal-card">
 			<div class="label">
 				<h3>
@@ -14,10 +30,9 @@
 				</span>
 			</span>
 			<div class="input-group">
-				<input
+				<StyledInput
 					id="username"
 					v-model="currentUsername"
-					type="text"
 					placeholder="Username"
 					:disabled="
 						!isPermission(
@@ -101,10 +116,9 @@
 							The title of the role that this member plays for this organization.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${member.user.id}-role`"
 						v-model="member.role"
-						type="text"
 						:disabled="
 							!isPermission(
 								currentMember.organization_permissions,
@@ -121,7 +135,7 @@
 							the organization projects' revenue goes to this member.
 						</span>
 					</label>
-					<input
+					<StyledInput
 						:id="`member-${member.user.id}-monetization-weight`"
 						v-model="member.payouts_split"
 						type="number"
@@ -207,7 +221,7 @@
 					</Button>
 					<Button
 						v-if="!member.is_owner && currentMember.is_owner && member.accepted"
-						@click="() => onTransferOwnership(organization.team_id, member.user.id)"
+						@click="(e) => openTransferModal(member, e)"
 					>
 						<TransferIcon />
 						Transfer ownership
@@ -227,9 +241,17 @@ import {
 	UserPlusIcon,
 	UserXIcon as UserRemoveIcon,
 } from '@modrinth/assets'
-import { Avatar, Badge, Button, Checkbox, injectNotificationManager } from '@modrinth/ui'
-import { ref } from 'vue'
+import {
+	Avatar,
+	Badge,
+	Button,
+	Checkbox,
+	injectNotificationManager,
+	StyledInput,
+} from '@modrinth/ui'
+import { nextTick, ref } from 'vue'
 
+import ConfirmTransferOrgModal from '~/components/ui/ConfirmTransferOrgModal.vue'
 import { removeTeamMember } from '~/helpers/teams.js'
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
 import { isPermission } from '~/utils/permissions.ts'
@@ -241,6 +263,8 @@ const auth = await useAuth()
 
 const currentUsername = ref('')
 const openTeamMembers = ref([])
+const transferTargetMember = ref(null)
+const transferModal = ref(null)
 
 const allTeamMembers = ref(organization.value.members)
 
@@ -338,6 +362,13 @@ const onUpdateTeamMember = useClientTry(async (teamId, member) => {
 		type: 'success',
 	})
 })
+
+const openTransferModal = (member, e) => {
+	transferTargetMember.value = member
+	nextTick(() => {
+		transferModal.value?.show(e)
+	})
+}
 
 const onTransferOwnership = useClientTry(async (teamId, uid) => {
 	const data = {

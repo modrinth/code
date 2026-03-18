@@ -14,7 +14,7 @@
 				'modal-overlay',
 				{
 					shown: visible,
-					noblur: props.noblur,
+					noblur: effectiveNoblur,
 				},
 				computedFade,
 			]"
@@ -28,21 +28,33 @@
 				'--_width': width,
 			}"
 		>
-			<div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
+			<div
+				ref="modalBodyRef"
+				role="dialog"
+				aria-modal="true"
+				:aria-labelledby="headerId"
+				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+				@keydown="handleKeyDown"
+			>
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-divider max-w-full"
+					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" class="text-lg font-extrabold text-contrast">
+							<span v-if="header" :id="headerId" class="text-2xl font-semibold text-contrast">
 								{{ header }}
 							</span>
 						</slot>
 					</div>
 					<ButtonStyled v-if="closable" circular>
-						<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
+						<button
+							v-tooltip="closeLabel"
+							:aria-label="closeLabel"
+							:disabled="disableClose"
+							@click="hide"
+						>
 							<XIcon aria-hidden="true" />
 						</button>
 					</ButtonStyled>
@@ -53,29 +65,35 @@
 					class="absolute top-4 right-4 z-10"
 					circular
 				>
-					<button v-tooltip="'Close'" aria-label="Close" :disabled="disableClose" @click="hide">
+					<button
+						v-tooltip="closeLabel"
+						:aria-label="closeLabel"
+						:disabled="disableClose"
+						@click="hide"
+					>
 						<XIcon aria-hidden="true" />
 					</button>
 				</ButtonStyled>
 
-				<div v-if="scrollable" class="relative">
+				<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-24"
+						enter-to-class="opacity-100 max-h-6"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-24"
+						leave-from-class="opacity-100 max-h-6"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-24 bg-gradient-to-b from-bg-raised to-transparent"
+							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-6 bg-gradient-to-b from-bg-raised to-transparent"
 						/>
 					</Transition>
 
 					<div
 						ref="scrollContainer"
 						:class="[
+							'flex-1 min-h-0',
 							props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
@@ -88,14 +106,14 @@
 					<Transition
 						enter-active-class="transition-all duration-200 ease-out"
 						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-24"
+						enter-to-class="opacity-100 max-h-6"
 						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-24"
+						leave-from-class="opacity-100 max-h-6"
 						leave-to-class="opacity-0 max-h-0"
 					>
 						<div
 							v-if="showBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-24 bg-gradient-to-t from-bg-raised to-transparent"
+							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-bg-raised to-transparent"
 						/>
 					</Transition>
 				</div>
@@ -110,21 +128,34 @@
 					<slot> You just lost the game.</slot>
 				</div>
 
-				<div v-if="$slots.actions" class="p-4">
+				<div v-if="$slots.actions" class="p-4 pt-0">
 					<slot name="actions" />
 				</div>
 			</div>
 		</div>
 	</div>
-	<div v-else></div>
 </template>
 
 <script setup lang="ts">
 import { XIcon } from '@modrinth/assets'
-import { computed, ref } from 'vue'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
 
+import { useVIntl } from '../../composables/i18n'
+import { useModalStack } from '../../composables/modal-stack'
 import { useScrollIndicator } from '../../composables/scroll-indicator'
+import { injectModalBehavior } from '../../providers'
+import { commonMessages } from '../../utils/common-messages'
 import ButtonStyled from '../base/ButtonStyled.vue'
+
+const { formatMessage } = useVIntl()
+
+const modalBehavior = injectModalBehavior(null)
+const {
+	push: pushModal,
+	pop: popModal,
+	isTopmost: isTopmostModal,
+	stackSize: modalStackSize,
+} = useModalStack()
 
 const props = withDefaults(
 	defineProps<{
@@ -154,6 +185,7 @@ const props = withDefaults(
 	}>(),
 	{
 		type: true,
+		noblur: undefined,
 		closable: true,
 		danger: false,
 		fade: undefined,
@@ -175,25 +207,45 @@ const props = withDefaults(
 	},
 )
 
+const effectiveNoblur = computed(() => props.noblur ?? modalBehavior?.noblur.value ?? false)
+
 const computedFade = computed(() => {
 	if (props.fade) return props.fade
 	if (props.danger) return 'danger'
 	return 'standard'
 })
 
+const modalId = `modal-${Math.random().toString(36).slice(2, 9)}`
+const headerId = `${modalId}-header`
+const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
+
 const open = ref(false)
 const visible = ref(false)
+const modalBodyRef = ref<HTMLElement | null>(null)
+let previousFocusEl: Element | null = null
 
 const scrollContainer = ref<HTMLElement | null>(null)
 const { showTopFade, showBottomFade, checkScrollState } = useScrollIndicator(scrollContainer)
 
+const FOCUSABLE_SELECTOR =
+	'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+function getFocusableElements(): HTMLElement[] {
+	if (!modalBodyRef.value) return []
+	return Array.from(modalBodyRef.value.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+}
+
 function show(event?: MouseEvent) {
 	props.onShow?.()
+	const wasEmpty = modalStackSize() === 0
 	open.value = true
+	previousFocusEl = document.activeElement
+	pushModal()
+	if (wasEmpty) modalBehavior?.onShow?.()
 
 	document.body.style.overflow = 'hidden'
+	window.addEventListener('keydown', handleWindowKeyDown)
 	window.addEventListener('mousedown', updateMousePosition)
-	window.addEventListener('keydown', handleKeyDown)
 	if (event) {
 		updateMousePosition(event)
 	} else {
@@ -202,6 +254,14 @@ function show(event?: MouseEvent) {
 	}
 	setTimeout(() => {
 		visible.value = true
+		nextTick(() => {
+			const focusable = getFocusableElements()
+			if (focusable.length > 0) {
+				focusable[0].focus()
+			} else {
+				modalBodyRef.value?.focus()
+			}
+		})
 	}, 50)
 }
 
@@ -209,9 +269,17 @@ function hide() {
 	if (props.disableClose) return
 	props.onHide?.()
 	visible.value = false
-	document.body.style.overflow = ''
+	popModal()
+	if (modalStackSize() === 0) {
+		modalBehavior?.onHide?.()
+		document.body.style.overflow = ''
+	}
+	window.removeEventListener('keydown', handleWindowKeyDown)
 	window.removeEventListener('mousedown', updateMousePosition)
-	window.removeEventListener('keydown', handleKeyDown)
+	if (previousFocusEl instanceof HTMLElement) {
+		previousFocusEl.focus()
+	}
+	previousFocusEl = null
 	setTimeout(() => {
 		open.value = false
 	}, 300)
@@ -231,11 +299,46 @@ function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseY.value = event.clientY
 }
 
-function handleKeyDown(event: KeyboardEvent) {
+onUnmounted(() => {
+	if (open.value) {
+		popModal()
+		window.removeEventListener('keydown', handleWindowKeyDown)
+		window.removeEventListener('mousedown', updateMousePosition)
+		if (modalStackSize() === 0) {
+			document.body.style.overflow = ''
+			modalBehavior?.onHide?.()
+		}
+	}
+})
+
+function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
+		if (!isTopmostModal()) return
 		hide()
 		mouseX.value = window.innerWidth / 2
 		mouseY.value = window.innerHeight / 2
+	}
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+	if (event.key === 'Tab') {
+		const focusable = getFocusableElements()
+		if (focusable.length === 0) return
+
+		const first = focusable[0]
+		const last = focusable[focusable.length - 1]
+
+		if (event.shiftKey) {
+			if (document.activeElement === first) {
+				event.preventDefault()
+				last.focus()
+			}
+		} else {
+			if (document.activeElement === last) {
+				event.preventDefault()
+				first.focus()
+			}
+		}
 	}
 }
 </script>

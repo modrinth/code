@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BadgeDollarSignIcon,
 	GiftIcon,
@@ -12,10 +13,20 @@ import { type Component, computed, type ComputedRef, type Ref, ref } from 'vue'
 
 import { getRailConfig } from '@/utils/muralpay-rails'
 
-// Tax form is required when withdrawn_ytd >= $600
-// Therefore, the maximum withdrawal without a tax form is $599.99
-export const TAX_THRESHOLD_REQUIREMENT = 600
-export const TAX_THRESHOLD_ACTUAL = 599.99
+export function getTaxThreshold(thresholds: Record<string, number> | undefined): number {
+	if (!thresholds || Object.keys(thresholds).length === 0) return 600
+	const currentYear = new Date().getFullYear()
+	const years = Object.keys(thresholds)
+		.map(Number)
+		.sort((a, b) => a - b)
+	if (currentYear <= years[0]) return thresholds[String(years[0])]
+	if (currentYear >= years[years.length - 1]) return thresholds[String(years[years.length - 1])]
+	return thresholds[String(currentYear)] ?? thresholds[String(years[years.length - 1])]
+}
+
+export function getTaxThresholdActual(thresholds: Record<string, number> | undefined): number {
+	return getTaxThreshold(thresholds) - 0.01
+}
 
 export type WithdrawStage =
 	| 'tax-form'
@@ -33,29 +44,7 @@ export type PaymentProvider = 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
  **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
-export interface PayoutMethod {
-	id: string
-	type: string
-	name: string
-	category?: string
-	image_url: string | null
-	image_logo_url: string | null
-	interval: {
-		standard: {
-			min: number
-			max: number
-		}
-		fixed?: {
-			values: number[]
-		}
-	}
-	config?: {
-		fiat?: string | null
-		blockchain?: string[]
-	}
-	currency_code?: string | null
-	exchange_rate?: number | null
-}
+export type PayoutMethod = Labrinth.Payout.v3.PayoutMethod
 
 export interface PaymentOption {
 	value: string
@@ -379,6 +368,7 @@ const STATE_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
 export function createWithdrawContext(
 	balance: any,
 	preloadedPaymentData?: { country: string; methods: PayoutMethod[] },
+	taxComplianceThresholds?: Record<string, number>,
 ): WithdrawContextValue {
 	const debug = useDebugLogger('CreatorWithdraw')
 	const currentStage = ref<WithdrawStage | undefined>()
@@ -422,14 +412,18 @@ export function createWithdrawContext(
 		const available = balance?.available ?? 0
 
 		const needsTaxForm =
-			balance?.form_completion_status !== 'complete' && usedLimit + available >= 600
+			balance?.form_completion_status !== 'complete' &&
+			usedLimit + available >= getTaxThreshold(taxComplianceThresholds)
 
+		const threshold = getTaxThreshold(taxComplianceThresholds)
 		debug('Tax form check:', {
 			usedLimit,
 			available,
 			total: usedLimit + available,
 			status: balance?.form_completion_status,
 			needsTaxForm,
+			taxThreshold: threshold,
+			taxComplianceFilled: `${((usedLimit / threshold) * 100).toFixed(1)}%`,
 		})
 
 		if (needsTaxForm) {
@@ -462,7 +456,7 @@ export function createWithdrawContext(
 		}
 
 		const usedLimit = balance?.withdrawn_ytd ?? 0
-		const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - usedLimit)
+		const remainingLimit = Math.max(0, getTaxThresholdActual(taxComplianceThresholds) - usedLimit)
 		return Math.max(0, Math.min(remainingLimit, availableBalance))
 	})
 
@@ -627,9 +621,9 @@ export function createWithdrawContext(
 			case 'tax-form': {
 				if (!balanceRef.value) return true
 				const ytd = balanceRef.value.withdrawn_ytd ?? 0
-				const remainingLimit = Math.max(0, TAX_THRESHOLD_ACTUAL - ytd)
+				const remainingLimit = Math.max(0, getTaxThresholdActual(taxComplianceThresholds) - ytd)
 				const form_completion_status = balanceRef.value.form_completion_status
-				if (ytd < 600) return true
+				if (ytd < getTaxThreshold(taxComplianceThresholds)) return true
 				if (withdrawData.value.tax.skipped && remainingLimit > 0) return true
 				return form_completion_status === 'complete'
 			}
@@ -651,15 +645,27 @@ export function createWithdrawContext(
 				)
 
 				if (selectedMethod?.interval) {
-					const userMax = Math.floor(maxWithdrawAmount.value * 100) / 100
+					const userMaxUsd = Math.floor(maxWithdrawAmount.value * 100) / 100
+
+					const exchangeRate = selectedMethod.exchange_rate
+					const isNonUsdCurrency =
+						selectedMethod.currency_code &&
+						selectedMethod.currency_code !== 'USD' &&
+						exchangeRate &&
+						exchangeRate > 0
+
+					const userMaxInLocalCurrency = isNonUsdCurrency ? userMaxUsd * exchangeRate : userMaxUsd
+
 					if (selectedMethod.interval.standard) {
 						const { min, max } = selectedMethod.interval.standard
-						const effectiveMax = Math.min(userMax, max)
+						const effectiveMax = Math.min(userMaxInLocalCurrency, max)
 						const effectiveMin = Math.min(min, effectiveMax)
 						if (amount < effectiveMin || amount > effectiveMax) return false
 					}
 					if (selectedMethod.interval.fixed) {
-						const validValues = selectedMethod.interval.fixed.values.filter((v) => v <= userMax)
+						const validValues = selectedMethod.interval.fixed.values.filter(
+							(v) => v <= userMaxInLocalCurrency,
+						)
 						if (!validValues.includes(amount)) return false
 					}
 				}
@@ -817,6 +823,7 @@ export function createWithdrawContext(
 			calculation: {
 				amount: 0,
 				fee: null,
+				netUsd: null,
 				exchangeRate: null,
 			},
 			providerData: {

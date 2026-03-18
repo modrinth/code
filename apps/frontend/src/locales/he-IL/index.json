@@ -23,6 +23,9 @@
   "app-marketing.download.download-rpm": {
     "message": "הורד את קובץ ה-RPM"
   },
+  "app-marketing.download.flathub": {
+    "message": "השג בFlathub"
+  },
   "app-marketing.download.linux": {
     "message": "לינוקס"
   },
@@ -34,9 +37,6 @@
   },
   "app-marketing.download.options-title": {
     "message": "אפשרויות הורדה"
-  },
-  "app-marketing.download.terms": {
-    "message": "בהורדת אפליקציית מודרינת' אתה מסכים ל<terms-link>תנאים</terms-link> ול<privacy-link>מדיניות הפרטיות</privacy-link> שלנו."
   },
   "app-marketing.download.title": {
     "message": "הורד את אפליקציית מודרינת' (בטא)"
@@ -104,9 +104,6 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% מעבד"
   },
-  "app-marketing.features.performance.description": {
-    "message": "אפליקציית מודרינת' פועל עם ביצועים טובים יותר ממנהלי מודים מובילים רבים, תוך שימוש בכ-150 מגה בייט זיכרון (RAM) בלבד!"
-  },
   "app-marketing.features.performance.discord": {
     "message": "דיסקורד"
   },
@@ -153,7 +150,7 @@
     "message": "בנה, שתף ושחק בחבילות מודים עם כל אחד מאלפי המודים וחבילות המודים שיש כאן במודרינת'."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "מודפק"
+    "message": "חבילת מודים"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "שתף"
@@ -193,6 +190,15 @@
   },
   "app-marketing.hero.more-download-options": {
     "message": "אפשרויות הורדה נוספות"
+  },
+  "app-marketing.hide-other-packages": {
+    "message": "הסתר חבילות אחרות"
+  },
+  "app-marketing.not-recommended": {
+    "message": "אנחנו לא ממליצים שתשמש באלה אלא אם אתה יודע מה אתה עושה."
+  },
+  "app-marketing.show-other-packages": {
+    "message": "הצג חבילות אחרות"
   },
   "auth.authorize.action.authorize": {
     "message": "אימות"
@@ -386,6 +392,9 @@
   "collection.return-link.dashboard-collections": {
     "message": "האוספים שלך"
   },
+  "collection.return-link.user": {
+    "message": "פרופיל {user}"
+  },
   "collection.title": {
     "message": "{name} - אוסף"
   },
@@ -476,11 +485,17 @@
   "create.project.create-project": {
     "message": "צור פרויקט"
   },
+  "create.project.create-server-project": {
+    "message": "צור שרת"
+  },
   "create.project.name-label": {
     "message": "שם"
   },
   "create.project.name-placeholder": {
     "message": "הכנס שם פרויקט..."
+  },
+  "create.project.owner-label": {
+    "message": "בעלים"
   },
   "create.project.summary-description": {
     "message": "משפט או שניים שמפרטים על הפרויקט שלך."
@@ -493,6 +508,15 @@
   },
   "create.project.title": {
     "message": "יוצר פרויקט"
+  },
+  "create.project.type-label": {
+    "message": "סוג"
+  },
+  "create.project.type-project": {
+    "message": "פרויקט"
+  },
+  "create.project.type-server": {
+    "message": "שרת"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -509,11 +533,14 @@
   "create.project.visibility-unlisted": {
     "message": "לא מוגדר"
   },
+  "dashboard.affiliate-links.create.button": {
+    "message": "צור קישור שותפות"
+  },
+  "dashboard.affiliate-links.revoke-confirm.button": {
+    "message": "ביטול"
+  },
   "dashboard.collections.button.create-new": {
     "message": "צור חדש"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural,one {{count} פרוייקט}other {{count} פרוייקטים}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "חפש את האוספים שלך"
@@ -559,6 +586,78 @@
   },
   "dashboard.creator-withdraw-modal.details-label": {
     "message": "פרטים"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-amount": {
+    "message": "כמות"
+  },
+  "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
+    "message": "תשלום"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.country-placeholder": {
+    "message": "בחר את מדינתך"
+  },
+  "dashboard.creator-withdraw-modal.method-selection.region": {
+    "message": "אזור"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
+    "message": "חשבון בעלים"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.coin": {
+    "message": "מטבע"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "אשר את כתובת הארנק שלך"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
+    "message": "מספר דרכון"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.network": {
+    "message": "רשת"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.venmo-handle-placeholder": {
+    "message": "@שם משתמש"
+  },
+  "dashboard.creator-withdraw-modal.stage.method-selection": {
+    "message": "שיטה"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": "קובץ מס"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
+    "message": "הכנס כמות"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.payment-method": {
+    "message": "שיטת תשלום"
+  },
+  "dashboard.creator-withdraw-modal.withdraw-button": {
+    "message": "למשוך"
+  },
+  "dashboard.revenue.available-now": {
+    "message": "זמין כעת"
+  },
+  "dashboard.revenue.stats.received": {
+    "message": "זמן קבלה"
+  },
+  "dashboard.revenue.transactions.see-all": {
+    "message": "ראה הכל"
+  },
+  "dashboard.revenue.withdraw.card.title": {
+    "message": "למשוך"
+  },
+  "dashboard.revenue.withdraw.header": {
+    "message": "למשוך"
+  },
+  "dashboard.withdraw.completion.date": {
+    "message": "תאריך"
+  },
+  "dashboard.withdraw.completion.fee": {
+    "message": "תשלום"
+  },
+  "dashboard.withdraw.completion.method": {
+    "message": "שיטה"
+  },
+  "dashboard.withdraw.completion.wallet": {
+    "message": "ארנק"
   },
   "error.collection.404.list_item.1": {
     "message": "ייתכן שהקלדת כתובת URL שגויה של האוסף."
@@ -656,6 +755,18 @@
   "frog.title": {
     "message": "צפרדע"
   },
+  "hosting-marketing.faq.burst-threads.answer": {
+    "message": "כאשר השרת שלך נמצא תחת עומס כבד, אנו מעניקים לו באופן זמני גישה ל-threads נוספים של המעבד כדי לסייע במתן קפיצות השהייה וחוסר יציבות. זה עוזר למנוע מה-TPS לרדת מתחת ל-20, מה שמבטיח את החוויה החלקה ביותר האפשרית. מכיוון שה-threads הנוספים של המעבד זמינים רק לזמן קצר בתקופות עומס גבוה, ייתכן שהם לא יופיעו בדוחות Spark או בכלי פרופילציה אחרים."
+  },
+  "hosting-marketing.faq.how-fast.answer.one": {
+    "message": "שרתי Modrinth Hosting מאוחסנים על חומרה מודרנית מאוד בעלת ביצועים גבוהים, אך קשה לומר כיצד בדיוק זה יתורגם למהירות הפעלת השרת שלכם מכיוון שיש כל כך הרבה גורמים שמשפיעים על כך, כמו המודים, חבילות הנתונים או התוספים שאתם מפעילים בשרת שלכם, ואפילו התנהגות המשתמש."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "רוב בעיות הביצועים שמתעוררות נובעות בדרך כלל מחבילת מוד, מוד, חבילת נתונים או תוסף לא אופטימליים שגורמים לשרת להשהות. מכיוון שהשרתים שלנו הם מתקדמים מאוד, לא אמורים להיתקל בבעיות גדולות כל עוד תבחרו תוכנית מתאימה לתוכן שאתם מפעילים בשרת."
+  },
+  "hosting-marketing.faq.versions-loaders.answer.two": {
+    "message": "אנו תומכים גם במגוון רחב של טועני מודים ותוספים, כולל Fabric, Quilt, Forge ו-NeoForge עבור מודים, כמו גם Paper ו-Purpur עבור תוספים. הזמינות תלויה בתמיכה של טוען המודים או התוספים בגרסת Minecraft שנבחרה."
+  },
   "landing.button.discover-mods": {
     "message": "גלה מודים"
   },
@@ -717,16 +828,16 @@
     "message": "מערכת החיפוש הזריזה והפילטרים העוצמתיים של Modrinth מאפשרים למצוא את מה שמחפשים בזמן כתיבה."
   },
   "landing.feature.search.heading": {
-    "message": "מצא/י מה שתרצה/י, במהירות וקלות"
+    "message": "מצא מה שתרצא, בקלות ובמהירות"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "המקום ל{content} מיינקראפט"
   },
   "landing.heading.the-place-for-minecraft.data-packs": {
-    "message": "חבילות תוכן / Data Packs"
+    "message": "חבילות נתונים"
   },
   "landing.heading.the-place-for-minecraft.modpacks": {
-    "message": "חבילות מודים / Modpacks"
+    "message": "חבילות מודים"
   },
   "landing.heading.the-place-for-minecraft.mods": {
     "message": "מודים"
@@ -735,13 +846,13 @@
     "message": "פלאגינים"
   },
   "landing.heading.the-place-for-minecraft.resource-packs": {
-    "message": "טקסטורות"
+    "message": "חבילות משאבים"
   },
   "landing.heading.the-place-for-minecraft.servers": {
     "message": "שרתים"
   },
   "landing.heading.the-place-for-minecraft.shaders": {
-    "message": "הצללות / שיידרים"
+    "message": "שיידרים"
   },
   "landing.launcher.atlauncher-label": {
     "message": "ATLauncher"
@@ -767,8 +878,14 @@
   "landing.notifications.version-released": {
     "message": "גרסא {version} יצאה לגרסאת המשחק {gameVersion}"
   },
+  "landing.section.for-players.description": {
+    "message": "מביומות קסומות למערות מקוללות, אפשר להיות בטוח שתמצא את התוכן כדי להביא את המשחק שלך לשלב הבא."
+  },
   "landing.section.for-players.label": {
     "message": "בשביל שחקנים"
+  },
+  "landing.subheading": {
+    "message": "גלה, שחק, ושתף תוכן לMinecraft דרך הפלטפורמת קוד-פתוח שלנו שפותחה עבור הקהילה."
   },
   "layout.action.change-theme": {
     "message": "לשנות מצב צבע"
@@ -799,6 +916,9 @@
   },
   "layout.banner.add-email.button": {
     "message": "בקר הגדרות חשבון"
+  },
+  "layout.banner.staging.description": {
+    "message": "סביבת ההפעלה (staging) נפרדת לחלוטין ממסד הנתונים של Modrinth בתקופת הייצור. מסד הנתונים משמש למטרות בדיקה וניפוי שגיאות, וייתכן שהוא מפעיל גרסאות פיתוח של קצה השרת או הקצה הקדמי של Modrinth, חדשות יותר מדגם הייצור."
   },
   "layout.footer.about": {
     "message": "אודות"
@@ -884,11 +1004,158 @@
   "layout.footer.social.x": {
     "message": "X"
   },
+  "layout.nav.active-reports": {
+    "message": "דוחות פעילים"
+  },
+  "layout.nav.discover": {
+    "message": "גלה"
+  },
+  "layout.nav.discover-content": {
+    "message": "גלה תוכן"
+  },
+  "layout.nav.feature-flags": {
+    "message": "הגדרות ניסיוניות"
+  },
+  "layout.nav.get-modrinth-app": {
+    "message": "להוריד אפליקציאת Modrinth"
+  },
+  "layout.nav.home": {
+    "message": "דף בית"
+  },
   "layout.nav.modrinth-app": {
     "message": "Modrinth App"
   },
+  "layout.nav.modrinth-home-page": {
+    "message": "דף הבית של Modrinth"
+  },
+  "layout.nav.my-servers": {
+    "message": "השרתים שלי"
+  },
+  "layout.nav.organizations": {
+    "message": "ארגונים"
+  },
+  "layout.nav.profile": {
+    "message": "פרופיל"
+  },
+  "layout.nav.projects": {
+    "message": "פרויקטים"
+  },
+  "layout.nav.revenue": {
+    "message": "הכנסות"
+  },
+  "layout.nav.saved-projects": {
+    "message": "פרויקטים שנשמרו"
+  },
+  "layout.nav.search": {
+    "message": "חיפוש"
+  },
+  "layout.nav.upgrade-to-modrinth-plus": {
+    "message": "שדרגו ל-Modrinth+"
+  },
   "moderation.page.projects": {
     "message": "פרויקטים"
+  },
+  "moderation.page.reports": {
+    "message": "דיווחים"
+  },
+  "muralpay.account-type.savings": {
+    "message": "שומר"
+  },
+  "muralpay.country.at": {
+    "message": "אוסטריה"
+  },
+  "muralpay.country.be": {
+    "message": "בלגיה"
+  },
+  "muralpay.country.cy": {
+    "message": "קפריסין"
+  },
+  "muralpay.country.de": {
+    "message": "גרמניה"
+  },
+  "muralpay.country.ee": {
+    "message": "אסטוניה"
+  },
+  "muralpay.country.es": {
+    "message": "ספרד"
+  },
+  "muralpay.country.fi": {
+    "message": "פינלנד"
+  },
+  "muralpay.country.fr": {
+    "message": "צרפת"
+  },
+  "muralpay.country.gr": {
+    "message": "יוון"
+  },
+  "muralpay.country.ie": {
+    "message": "אירלנד"
+  },
+  "muralpay.country.it": {
+    "message": "איטליה"
+  },
+  "muralpay.country.lt": {
+    "message": "ליטא"
+  },
+  "muralpay.country.lu": {
+    "message": "לוקסמבורג"
+  },
+  "muralpay.country.lv": {
+    "message": "לטביה"
+  },
+  "muralpay.country.mt": {
+    "message": "מלטה"
+  },
+  "muralpay.country.nl": {
+    "message": "הולנד"
+  },
+  "muralpay.country.pt": {
+    "message": "פורטוגל"
+  },
+  "muralpay.country.sk": {
+    "message": "סלובקיה"
+  },
+  "muralpay.document-type.passport": {
+    "message": "דרכון"
+  },
+  "muralpay.field.clabe": {
+    "message": "CLABE"
+  },
+  "muralpay.field.country": {
+    "message": "מדינה"
+  },
+  "muralpay.field.cpf-cnpj": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.field.cuit-cuil": {
+    "message": "CUIT/CUIL"
+  },
+  "muralpay.field.phone-number": {
+    "message": "מספר טלפון"
+  },
+  "muralpay.pix-type.document": {
+    "message": "CPF/CNPJ"
+  },
+  "muralpay.pix-type.email": {
+    "message": "אימייל"
+  },
+  "muralpay.pix-type.phone": {
+    "message": "מספר טלפון"
+  },
+  "muralpay.placeholder.phone-cop": {
+    "message": "+57..."
+  },
+  "muralpay.placeholder.pix-phone": {
+    "message": "+55..."
+  },
+  "muralpay.placeholder.wallet-address-eth": {
+    "message": "0x..."
+  },
+  "profile.label.organizations": {
+    "message": "ארגונים"
+  },
+  "project-moderation-nags.warning": {
+    "message": "אזהרה"
   },
   "project-type.datapack.plural": {
     "message": "חבילות נתונים"
@@ -896,11 +1163,50 @@
   "project-type.datapack.singular": {
     "message": "חבילת נתונים"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "שרתים"
+  },
   "project-type.mod.plural": {
     "message": "מודים"
   },
   "project-type.mod.singular": {
     "message": "מוד"
+  },
+  "project-type.modpack.plural": {
+    "message": "חבילות מודים"
+  },
+  "project-type.modpack.singular": {
+    "message": "חבילת מודים"
+  },
+  "project-type.plugin.plural": {
+    "message": "תוספים"
+  },
+  "project-type.plugin.singular": {
+    "message": "תוסף"
+  },
+  "project-type.project.plural": {
+    "message": "פרויקטים"
+  },
+  "project-type.project.singular": {
+    "message": "פרויקט"
+  },
+  "project-type.resourcepack.plural": {
+    "message": "חבילות משאבים"
+  },
+  "project-type.resourcepack.singular": {
+    "message": "חבילת משאבים"
+  },
+  "project-type.server.plural": {
+    "message": "שרתים"
+  },
+  "project-type.shader.plural": {
+    "message": "שיידרים"
+  },
+  "project-type.shader.singular": {
+    "message": "שיידר"
+  },
+  "project.about.details.title": {
+    "message": "פרטים"
   },
   "project.actions.dont-show-again": {
     "message": "אל תציג שוב"
@@ -911,14 +1217,71 @@
   "project.download.install-with-app": {
     "message": "התקן באמצעות Modrinth App"
   },
+  "project.gallery.title": {
+    "message": "גלריה"
+  },
+  "project.license.title": {
+    "message": "רישיון"
+  },
   "project.settings.general.name.title": {
     "message": "שם"
+  },
+  "project.settings.general.url.title": {
+    "message": "URL"
   },
   "project.settings.title": {
     "message": "הגדרות"
   },
+  "project.versions.title": {
+    "message": "גרסאות"
+  },
+  "scopes.category.payouts": {
+    "message": "תשלומים"
+  },
+  "scopes.category.projects": {
+    "message": "פרויקטים"
+  },
+  "scopes.category.versions": {
+    "message": "גרסאות"
+  },
+  "search.filter.game-version-shader-message": {
+    "message": "חבילות שיידרים לגרסאות ישנות לרוב עובדות גם על גרסאות חדשות, עם בעיות מינוריות בלבד."
+  },
+  "servers.notice.actions": {
+    "message": "פעולות"
+  },
+  "servers.notice.expires": {
+    "message": "פג תוקף"
+  },
+  "servers.notice.id": {
+    "message": "ID"
+  },
+  "settings.applications.button.edit": {
+    "message": "ערוך"
+  },
+  "settings.applications.field.name": {
+    "message": "שם"
+  },
+  "settings.applications.field.redirect-uri.placeholder": {
+    "message": "https://example.com/auth/callback"
+  },
+  "settings.applications.field.url": {
+    "message": "URL"
+  },
+  "settings.applications.field.url.placeholder": {
+    "message": "https://example.com"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong> מצב מפתח </strong> פעיל. זה יאפשר לך להציג את המזהים הפנימיים של דברים שונים ברחבי המודרינץ 'שעשויים להועיל אם אתה מפתח המשתמש בממשק ה- API של Modrinth. לחץ על הלוגו של Modrinth בתחתית העמוד 5 פעמים כדי לעבור את מצב המפתח."
+  },
+  "settings.pats.modal.create.expires.label": {
+    "message": "פג תוקף"
+  },
   "settings.pats.modal.create.name.label": {
     "message": "שם"
+  },
+  "settings.profile.bio.title": {
+    "message": "תיאור"
   },
   "settings.profile.profile-picture.title": {
     "message": "תמונת פרופיל"

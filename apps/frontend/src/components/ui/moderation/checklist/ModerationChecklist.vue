@@ -57,7 +57,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
@@ -90,7 +90,7 @@
 				</div>
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled @click="reviewAnyway">
@@ -148,14 +148,15 @@
 								placeholder="No message generated."
 								:disabled="false"
 								:heading-buttons="false"
+								:on-image-upload="onUploadHandler"
 							/>
-							<textarea
+							<StyledInput
 								v-else
 								v-model="message"
-								type="text"
-								class="bg-bg-input h-[400px] w-full rounded-lg border border-solid border-divider px-3 py-2 font-mono text-base"
+								multiline
 								placeholder="No message generated."
 								autocomplete="off"
+								input-class="h-[400px] font-mono"
 								@input="persistState"
 							/>
 						</div>
@@ -288,6 +289,7 @@
 												:max-height="300"
 												:disabled="false"
 												:heading-buttons="false"
+												:on-image-upload="onUploadHandler"
 												@input="persistState"
 											/>
 										</template>
@@ -298,13 +300,12 @@
 													<span v-if="input.required" class="required">*</span>
 												</span>
 											</label>
-											<input
+											<StyledInput
 												:id="`input-${getActionId(action)}-${inputIndex}`"
 												v-model="textInputValues[`${getActionId(action)}-${inputIndex}`]"
-												type="text"
 												:placeholder="input.placeholder"
 												autocomplete="off"
-												@input="persistState"
+												@update:model-value="persistState"
 											/>
 										</template>
 									</div>
@@ -317,7 +318,7 @@
 				<!-- Stage control buttons -->
 				<div class="mt-auto">
 					<div
-						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-divider pt-4"
+						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
 							<ButtonStyled v-if="!done && !generatedMessage && moderationStore.hasItems">
@@ -471,6 +472,7 @@ import {
 	MarkdownEditor,
 	OverflowMenu,
 	type OverflowMenuOption,
+	StyledInput,
 	useDebugLogger,
 } from '@modrinth/ui'
 import {
@@ -482,6 +484,7 @@ import {
 import { computedAsync, useDebounceFn, useLocalStorage } from '@vueuse/core'
 
 import { useGeneratedState } from '~/composables/generated'
+import { useImageUpload } from '~/composables/image-upload.ts'
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 import { useModerationStore } from '~/store/moderation.ts'
 
@@ -674,6 +677,14 @@ const modpackJudgements = ref<ModerationJudgements>({})
 const isModpackPermissionsStage = computed(() => {
 	return currentStageObj.value.id === 'modpack-permissions'
 })
+
+async function onUploadHandler(file: File) {
+	const response = await useImageUpload(file, {
+		context: 'thread_message',
+		projectID: projectV2.value.id,
+	})
+	return response.url
+}
 
 const useSimpleEditor = ref(false)
 const message = ref('')
@@ -1654,7 +1665,7 @@ function shouldShowStage(stage: Stage): boolean {
 
 function shouldShowAction(action: Action): boolean {
 	if (typeof action.shouldShow === 'function') {
-		return action.shouldShow(projectV2.value)
+		return action.shouldShow(projectV2.value, projectV3.value)
 	}
 
 	return true
@@ -1663,7 +1674,7 @@ function shouldShowAction(action: Action): boolean {
 function getVisibleDropdownOptions(action: DropdownAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value)
+			return option.shouldShow(projectV2.value, projectV3.value)
 		}
 		return true
 	})
@@ -1672,7 +1683,7 @@ function getVisibleDropdownOptions(action: DropdownAction) {
 function getVisibleMultiSelectOptions(action: MultiSelectChipsAction) {
 	return action.options.filter((option) => {
 		if (typeof option.shouldShow === 'function') {
-			return option.shouldShow(projectV2.value)
+			return option.shouldShow(projectV2.value, projectV3.value)
 		}
 		return true
 	})

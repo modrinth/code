@@ -4,10 +4,11 @@ import {
 	DownloadIcon,
 	PlusIcon,
 	RightArrowIcon,
+	SearchIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Card, injectNotificationManager } from '@modrinth/ui'
+import { Avatar, Button, Card, injectNotificationManager, StyledInput } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { computed, ref } from 'vue'
@@ -15,6 +16,7 @@ import { useRouter } from 'vue-router'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import { trackEvent } from '@/helpers/analytics'
+import { get_project_v3_many } from '@/helpers/cache.js'
 import {
 	add_project_from_version as installMod,
 	check_installed,
@@ -48,18 +50,13 @@ const creatingInstance = ref(false)
 const profiles = ref([])
 
 const shownProfiles = computed(() =>
-	profiles.value
-		.filter((profile) => {
-			return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-		})
-		.filter((profile) => {
-			const version = {
-				game_versions: versions.value.flatMap((v) => v.game_versions),
-				loaders: versions.value.flatMap((v) => v.loaders),
-			}
-			return isVersionCompatible(version, project.value, profile)
-		}),
+	profiles.value.filter((profile) => {
+		return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+	}),
 )
+
+const isProfileCompatible = (profile) =>
+	versions.value?.some((version) => isVersionCompatible(version, project.value, profile))
 
 const onInstall = ref(() => {})
 
@@ -85,6 +82,22 @@ defineExpose({
 				handleError,
 			)
 		}
+
+		const linkedProjectIds = profilesVal
+			.filter((p) => p.linked_data?.project_id)
+			.map((p) => p.linked_data.project_id)
+		if (linkedProjectIds.length > 0) {
+			const linkedProjects = await get_project_v3_many(linkedProjectIds, 'must_revalidate').catch(
+				() => [],
+			)
+			const serverProjectIds = new Set(
+				linkedProjects.filter((p) => p?.minecraft_server != null).map((p) => p.id),
+			)
+			for (const profile of profilesVal) {
+				profile.isServerInstance = serverProjectIds.has(profile.linked_data?.project_id)
+			}
+		}
+
 		profiles.value = profilesVal
 
 		installModal.value.show()
@@ -163,13 +176,13 @@ const createInstance = async () => {
 	const gameVersion = gameVersions[0]
 
 	const loaders = versions.value[0].loaders
-	const loader = loaders.contains('fabric')
+	const loader = loaders.includes('fabric')
 		? 'fabric'
-		: loaders.contains('neoforge')
+		: loaders.includes('neoforge')
 			? 'neoforge'
-			: loaders.contains('forge')
+			: loaders.includes('forge')
 				? 'forge'
-				: loaders.contains('quilt')
+				: loaders.includes('quilt')
 					? 'quilt'
 					: 'vanilla'
 
@@ -211,12 +224,12 @@ const createInstance = async () => {
 <template>
 	<ModalWrapper ref="installModal" header="Install project to instance" :on-hide="onInstall">
 		<div class="modal-body">
-			<input
+			<StyledInput
 				v-model="searchFilter"
-				autocomplete="off"
-				type="text"
-				class="search"
+				:icon="SearchIcon"
+				type="search"
 				placeholder="Search for an instance"
+				autocomplete="off"
 			/>
 			<div class="profiles" :class="{ 'hide-creation': !showCreation }">
 				<div v-for="profile in shownProfiles" :key="profile.name" class="option">
@@ -239,17 +252,23 @@ const createInstance = async () => {
 						"
 					>
 						<Button
-							:disabled="profile.installedMod || profile.installing"
+							:disabled="
+								!isProfileCompatible(profile) || profile.installedMod || profile.installing
+							"
 							@click="install(profile)"
 						>
-							<DownloadIcon v-if="!profile.installedMod && !profile.installing" />
+							<DownloadIcon
+								v-if="isProfileCompatible(profile) && !profile.installedMod && !profile.installing"
+							/>
 							<CheckIcon v-else-if="profile.installedMod" />
 							{{
 								profile.installing
 									? 'Installing...'
 									: profile.installedMod
 										? 'Installed'
-										: 'Install'
+										: !isProfileCompatible(profile)
+											? 'Incompatible'
+											: 'Install'
 							}}
 						</Button>
 					</div>
@@ -271,7 +290,7 @@ const createInstance = async () => {
 						</div>
 					</div>
 					<div class="creation-settings">
-						<input
+						<StyledInput
 							v-model="name"
 							autocomplete="off"
 							type="text"

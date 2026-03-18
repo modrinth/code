@@ -5,6 +5,30 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Nainstaluj ke hraní"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Instalovat"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one  {#mód} other  {#módy}}"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Sdílená instance"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Sdílená serverová instance"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Updatuj ke hraní"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Je vyžadována aktualizace"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Je nutná aktualizace ke hraní {name}. Prosím updatuj na nejnovější verzi k spuštění hry."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Vývojářský režim povolen."
   },
@@ -31,39 +55,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Správa zdrojů"
-  },
-  "app.update-toast.body": {
-    "message": "Aplikace Modrinth v{version} je připravena k instalaci! Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Stahování aplikace Modrinth v{version} bylo dokončeno. Nainstalujte aktualizaci nyní nebo automaticky po zavření aplikace Modrinth."
-  },
-  "app.update-toast.body.linux": {
-    "message": "Modrinth App v{version} je k dispozici. Aktualizujte pomocí svého správce balíčků, abyste získali nejnovější funkce a opravy!"
-  },
-  "app.update-toast.body.metered": {
-    "message": "Aplikace Modrinth v{version} je nyní k dispozici! Protože jste v měřené síti, nebyla stažena automaticky."
-  },
-  "app.update-toast.changelog": {
-    "message": "Seznam změn"
-  },
-  "app.update-toast.download": {
-    "message": "Stahování ({size})"
-  },
-  "app.update-toast.download-page": {
-    "message": "Stáhnout"
-  },
-  "app.update-toast.downloading": {
-    "message": "Stahování..."
-  },
-  "app.update-toast.reload": {
-    "message": "Načíst znovu"
-  },
-  "app.update-toast.title": {
-    "message": "Aktualizace je k dispozici"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Stahování bylo dokončeno"
   },
   "app.update.complete-toast.text": {
     "message": "Kliknutím sem zobrazíte seznam změn."
@@ -179,12 +170,6 @@
   "instance.edit-world.title": {
     "message": "Upravit svět"
   },
-  "instance.filter.disabled": {
-    "message": "Vypnuté projekty"
-  },
-  "instance.filter.updates-available": {
-    "message": "K dispozice jsou aktualizace"
-  },
   "instance.server-modal.address": {
     "message": "Adresa"
   },
@@ -293,140 +278,8 @@
   "instance.settings.tabs.installation": {
     "message": "Instalace"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} pro Minecraft {game_version} již je nainstalována"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} již je nainstalována"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Změnit verzi"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Instalovat"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Instalování"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Načítání verzí modpacku"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Instalace nové verze"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Aktuálně nainstalováno"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Debugové informace:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Načítání detailů modpacku"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Verze hry"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Instalovat"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Probíhá instalace"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} verze"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Nelze načíst podrobnosti o modpacku. Prosím, zkontrolujte své připojení k internetu."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} není dostupný pro Minecraft {version}. Zkuste jiný mod loader."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Tato instalace je připojená k modpacku, který ake nebyl najit na Modrinthu."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platforma"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Přeinstalovat modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Přeinstalovávání modpacku"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Přeinstalace resetuje veškerý nainstalovaný nebo upravený obsah kromě toho, co poskytuje modpack, a odstraní všechny módy nebo obsah, které jste přidali do původní instalace. To může opravit neočekávané chyby, ale pokud vaše světy závisejí na doinstalovaném obsahu, možná budou poškozeny."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Opravdu si přejete přeinstalovat tuto instalaci?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Obnoví obsah instance do původního stavu a odstraní všechny mody nebo obsah, které jste přidali nad původní modpack."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Přeinstalovat modpack"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Opravit"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Opravováno"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Oprava přeinstaluje závislosti Minecraftu a zkontroluje poškození. To může vyřešit problémy, pokud se hra nespustí kvůli chybám souvisejícím s launcherem, ale nevyřeší to problémy nebo pády související s nainstalovanými mody."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Opravit instanci?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Probíhá oprava"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Resetovat na aktuální"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Ukázat všechny verze"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "změnit verzi"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "Instalovat"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "přeinstalovat"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "opravit"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Nelze {action} při instalaci"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Nelze {action} když offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Nelze {action} při opravě"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(neznámá verze)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Odpojit instanci"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Pokud budete pokračovat, nebudete ji moci znovu propojit bez vytvoření zcela nové instance. Již nebudete dostávat aktualizace modpacku a stane se z něj běžná instance."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Opravdu si přejete odpojit tuto instanci?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Tato instance je připojena k modpacku, což znamená, že módy nemohou být aktualizované a nelze změnit mod loader ani verze minecraftu. Odpojení permanentně rozváže tuto instanci od modpacku."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Odpojit od modpacku"
   },
   "instance.settings.tabs.java": {
     "message": "Java a pamět"

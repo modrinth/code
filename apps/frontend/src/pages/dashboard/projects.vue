@@ -15,7 +15,7 @@
 						<span class="label__title">Issue tracker</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="issue-tracker-input"
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
@@ -23,7 +23,7 @@
 							:placeholder="
 								editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
-							maxlength="2048"
+							:maxlength="2048"
 						/>
 						<button
 							v-tooltip="'Clear link'"
@@ -42,12 +42,12 @@
 						<span class="label__title">Source code</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="source-code-input"
 							v-model="editLinks.source.val"
 							:disabled="editLinks.source.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -69,12 +69,12 @@
 						<span class="label__title">Wiki page</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="wiki-page-input"
 							v-model="editLinks.wiki.val"
 							:disabled="editLinks.wiki.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -93,12 +93,12 @@
 						<span class="label__title">Discord invite</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="discord-invite-input"
 							v-model="editLinks.discord.val"
 							:disabled="editLinks.discord.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.discord.clear
 									? 'Existing link will be cleared'
@@ -159,7 +159,7 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">Projects</h2>
 				<div class="input-group">
-					<button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
+					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
 						<PlusIcon />
 						{{ formatMessage(commonMessages.createAProjectButton) }}
 					</button>
@@ -182,14 +182,11 @@
 					<div class="push-right">
 						<div class="labeled-control-row">
 							Sort by
-							<Multiselect
+							<Combobox
 								v-model="sortBy"
 								:searchable="false"
 								class="small-select"
-								:options="['Name', 'Status', 'Type']"
-								:close-on-select="true"
-								:show-labels="false"
-								:allow-empty="false"
+								:options="sortOptions"
 								@update:model-value="projects = updateSort(projects, sortBy, descending)"
 							/>
 							<button
@@ -207,12 +204,8 @@
 					<div class="grid-table__row grid-table__header">
 						<div>
 							<Checkbox
-								:model-value="selectedProjects === projects"
-								@update:model-value="
-									selectedProjects === projects
-										? (selectedProjects = [])
-										: (selectedProjects = projects)
-								"
+								:model-value="allBulkEditableProjectsSelected"
+								@update:model-value="toggleAllBulkEditableProjects()"
 							/>
 						</div>
 						<div>Icon</div>
@@ -225,13 +218,10 @@
 					<div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
 						<div>
 							<Checkbox
-								:disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+								v-tooltip="getBulkEditDisabledTooltip(project)"
+								:disabled="isProjectBulkEditDisabled(project)"
 								:model-value="selectedProjects.includes(project)"
-								@update:model-value="
-									selectedProjects.includes(project)
-										? (selectedProjects = selectedProjects.filter((it) => it !== project))
-										: selectedProjects.push(project)
-								"
+								@update:model-value="toggleProjectSelection(project)"
 							/>
 						</div>
 						<div>
@@ -330,15 +320,16 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	Combobox,
 	commonMessages,
 	CopyCode,
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -362,6 +353,11 @@ const projects = ref([])
 const projectsWithMigrationWarning = ref([])
 const selectedProjects = ref([])
 const sortBy = ref('Name')
+const sortOptions = [
+	{ value: 'Name', label: 'Name' },
+	{ value: 'Status', label: 'Status' },
+	{ value: 'Type', label: 'Type' },
+]
 const descending = ref(false)
 const editLinks = reactive({
 	showAffected: false,
@@ -373,6 +369,50 @@ const editLinks = reactive({
 
 const editLinksModal = ref(null)
 const modal_creation = ref(null)
+
+function isProjectBulkEditDisabled(project) {
+	return (
+		(project.permissions & EDIT_DETAILS) === EDIT_DETAILS ||
+		project.project_type === 'minecraft_java_server'
+	)
+}
+
+const bulkEditableProjects = computed(() =>
+	projects.value.filter((project) => !isProjectBulkEditDisabled(project)),
+)
+
+const allBulkEditableProjectsSelected = computed(
+	() =>
+		bulkEditableProjects.value.length > 0 &&
+		bulkEditableProjects.value.every((project) => selectedProjects.value.includes(project)),
+)
+
+function toggleAllBulkEditableProjects() {
+	selectedProjects.value = allBulkEditableProjectsSelected.value
+		? []
+		: bulkEditableProjects.value.slice()
+}
+
+function toggleProjectSelection(project) {
+	if (isProjectBulkEditDisabled(project)) {
+		return
+	}
+
+	if (selectedProjects.value.includes(project)) {
+		selectedProjects.value = selectedProjects.value.filter((it) => it !== project)
+		return
+	}
+
+	selectedProjects.value = [...selectedProjects.value, project]
+}
+
+function getBulkEditDisabledTooltip(project) {
+	if (project.project_type === 'minecraft_java_server') {
+		return 'Server projects do not support bulk editing'
+	}
+
+	return ''
+}
 
 function updateSort(list, sort, desc) {
 	let sortedArray = list
@@ -453,6 +493,14 @@ async function bulkEditLinks() {
 await initUserProjects()
 if (user.value?.projects) {
 	projects.value = updateSort(user.value.projects, 'Name', false)
+
+	// minecraft_java_server type determined from component on projectV3
+	projects.value = projects.value.map((project) => {
+		const projectV3 = user.value?.projectsV3?.find((p) => p.id === project.id)
+		if (projectV3?.minecraft_server != null)
+			return { ...project, project_type: 'minecraft_java_server' }
+		return project
+	})
 	user.value?.projectsV3?.forEach((project) => {
 		if (
 			project.side_types_migration_review_status === 'pending' &&

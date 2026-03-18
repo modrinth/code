@@ -32,59 +32,49 @@
 		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
 
 		<section class="auth-form">
-			<div class="iconified-input">
-				<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
-				<MailIcon />
-				<input
-					id="email"
-					v-model="email"
-					type="email"
-					autocomplete="username"
-					class="auth-form__input"
-					:placeholder="formatMessage(commonMessages.emailLabel)"
-				/>
-			</div>
+			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
+			<StyledInput
+				id="email"
+				v-model="email"
+				:icon="MailIcon"
+				type="email"
+				autocomplete="username"
+				:placeholder="formatMessage(commonMessages.emailLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
-				<UserIcon />
-				<input
-					id="username"
-					v-model="username"
-					type="text"
-					autocomplete="username"
-					class="auth-form__input"
-					:placeholder="formatMessage(commonMessages.usernameLabel)"
-				/>
-			</div>
+			<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
+			<StyledInput
+				id="username"
+				v-model="username"
+				:icon="UserIcon"
+				type="text"
+				autocomplete="username"
+				:placeholder="formatMessage(commonMessages.usernameLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-				<KeyIcon />
-				<input
-					id="password"
-					v-model="password"
-					class="auth-form__input"
-					type="password"
-					autocomplete="new-password"
-					:placeholder="formatMessage(commonMessages.passwordLabel)"
-				/>
-			</div>
+			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+			<StyledInput
+				id="password"
+				v-model="password"
+				:icon="KeyIcon"
+				type="password"
+				autocomplete="new-password"
+				:placeholder="formatMessage(commonMessages.passwordLabel)"
+				wrapper-class="w-full"
+			/>
 
-			<div class="iconified-input">
-				<label for="confirm-password" hidden>{{
-					formatMessage(commonMessages.passwordLabel)
-				}}</label>
-				<KeyIcon />
-				<input
-					id="confirm-password"
-					v-model="confirmPassword"
-					type="password"
-					autocomplete="new-password"
-					class="auth-form__input"
-					:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
-				/>
-			</div>
+			<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+			<StyledInput
+				id="confirm-password"
+				v-model="confirmPassword"
+				:icon="KeyIcon"
+				type="password"
+				autocomplete="new-password"
+				:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
+				wrapper-class="w-full"
+			/>
 
 			<Checkbox
 				v-model="subscribe"
@@ -108,11 +98,11 @@
 				</IntlFormatted>
 			</p>
 
-			<HCaptcha ref="captcha" v-model="token" />
+			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
 			<button
 				class="btn btn-primary continue-btn centered-btn"
-				:disabled="!token"
+				:disabled="globals?.captcha_enabled ? !token : false"
 				@click="createAccount"
 			>
 				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
@@ -151,14 +141,18 @@ import {
 	Checkbox,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.js'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -209,6 +203,18 @@ if (auth.value.user) {
 
 const captcha = ref()
 
+const { data: globals } = useQuery({
+	queryKey: ['auth-globals'],
+	queryFn: async () => {
+		try {
+			return await client.labrinth.globals_internal.get()
+		} catch (err) {
+			console.error('Error fetching globals:', err)
+			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+		}
+	},
+})
+
 const email = ref('')
 const username = ref('')
 const password = ref('')
@@ -231,15 +237,12 @@ async function createAccount() {
 			captcha.value?.reset()
 		}
 
-		const res = await useBaseFetch('auth/create', {
-			method: 'POST',
-			body: {
-				username: username.value,
-				password: password.value,
-				email: email.value,
-				challenge: token.value,
-				sign_up_newsletter: subscribe.value,
-			},
+		const res = await client.labrinth.auth_v2.createAccount({
+			username: username.value,
+			password: password.value,
+			email: email.value,
+			challenge: token.value,
+			sign_up_newsletter: subscribe.value,
 		})
 
 		await useAuth(res.session)

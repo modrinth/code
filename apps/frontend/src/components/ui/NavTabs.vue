@@ -1,5 +1,6 @@
 <template>
 	<nav
+		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'card-shadow': mode === 'navigation' }"
@@ -10,6 +11,7 @@
 				v-show="link.shown ?? true"
 				:key="link.href"
 				ref="tabLinkElements"
+				:replace="replace"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
@@ -55,7 +57,7 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const route = useNativeRoute()
 
@@ -70,6 +72,7 @@ interface Tab {
 
 const props = withDefaults(
 	defineProps<{
+		replace?: boolean
 		links: Tab[]
 		query?: string
 		mode?: 'navigation' | 'local'
@@ -104,6 +107,9 @@ const subpageSelected = ref(false)
 const sliderReady = ref(false) // Slider is positioned and should be visible
 const transitionsEnabled = ref(false) // CSS transitions should apply (after first paint)
 
+// Stagger delays for the trailing edges of the slider animation
+const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
+
 const filteredLinks = computed(() => props.links.filter((link) => link.shown ?? true))
 
 const sliderStyle = computed(() => ({
@@ -113,6 +119,11 @@ const sliderStyle = computed(() => ({
 	bottom: `${sliderBottom.value}px`,
 	opacity: sliderReady.value && currentActiveIndex.value !== -1 ? 1 : 0,
 }))
+
+const leftDelay = computed(() => sliderDelays.value.left)
+const rightDelay = computed(() => sliderDelays.value.right)
+const topDelay = computed(() => sliderDelays.value.top)
+const bottomDelay = computed(() => sliderDelays.value.bottom)
 
 const isActiveAndNotSubpage = computed(
 	() => (index: number) => currentActiveIndex.value === index && !subpageSelected.value,
@@ -183,12 +194,20 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 }
 
 function getTabElement(index: number): HTMLElement | null {
-	if (!tabLinkElements.value?.[index]) return null
+	if (index === -1) return null
 
-	// In navigation mode, elements are NuxtLinks with $el property
-	// In local mode, elements are plain divs
-	const element = tabLinkElements.value[index]
-	return props.mode === 'navigation' ? (element as any).$el : element
+	const container = scrollContainer.value as HTMLElement | undefined
+	if (!container) return null
+
+	const tabs = container.querySelectorAll('.button-animation')
+	const element = tabs[index] as HTMLElement | undefined
+
+	if (!element) return null
+
+	// In navigation mode, elements are NuxtLinks, but since we used querySelectorAll,
+	// we already have the raw HTMLElement ($el), so no further conversion is needed.
+	// In local mode, elements are already plain divs.
+	return element
 }
 
 function positionSlider() {
@@ -229,34 +248,30 @@ function animateSliderTo(newPosition: {
 	right: number
 	bottom: number
 }) {
-	const STAGGER_DELAY = 200
+	const STAGGER_DELAY = '200ms'
 
-	// Horizontal animation - lead with the direction of movement
-	if (newPosition.left < sliderLeft.value) {
-		sliderLeft.value = newPosition.left
-		setTimeout(() => (sliderRight.value = newPosition.right), STAGGER_DELAY)
-	} else {
-		sliderRight.value = newPosition.right
-		setTimeout(() => (sliderLeft.value = newPosition.left), STAGGER_DELAY)
+	// Set stagger delays: leading edge moves immediately, trailing edge is delayed
+	sliderDelays.value = {
+		left: newPosition.left < sliderLeft.value ? '0ms' : STAGGER_DELAY,
+		right: newPosition.left < sliderLeft.value ? STAGGER_DELAY : '0ms',
+		top: newPosition.top < sliderTop.value ? '0ms' : STAGGER_DELAY,
+		bottom: newPosition.top < sliderTop.value ? STAGGER_DELAY : '0ms',
 	}
 
-	// Vertical animation - lead with the direction of movement
-	if (newPosition.top < sliderTop.value) {
-		sliderTop.value = newPosition.top
-		setTimeout(() => (sliderBottom.value = newPosition.bottom), STAGGER_DELAY)
-	} else {
-		sliderBottom.value = newPosition.bottom
-		setTimeout(() => (sliderTop.value = newPosition.top), STAGGER_DELAY)
-	}
+	sliderLeft.value = newPosition.left
+	sliderRight.value = newPosition.right
+	sliderTop.value = newPosition.top
+	sliderBottom.value = newPosition.bottom
 }
 
-function updateActiveTab() {
+async function updateActiveTab() {
+	await nextTick()
 	const { index, isSubpage } = computeActiveIndex()
 	currentActiveIndex.value = index
 	subpageSelected.value = isSubpage
 
 	if (index !== -1) {
-		nextTick(positionSlider)
+		positionSlider()
 	} else {
 		sliderLeft.value = 0
 		sliderRight.value = 0
@@ -287,13 +302,23 @@ watch(
 	},
 )
 
-watch(() => props.links, updateActiveTab, { deep: true })
+watch(
+	() => props.links,
+	async () => {
+		await nextTick()
+		updateActiveTab()
+	},
+	{ deep: true },
+)
 </script>
 
 <style scoped>
 .navtabs-transition {
 	transition:
-		all 150ms cubic-bezier(0.4, 0, 0.2, 1),
+		left 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(leftDelay),
+		right 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(rightDelay),
+		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
+		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay),
 		opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
 }
 

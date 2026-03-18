@@ -1,6 +1,6 @@
 <template>
 	<div class="space-y-2.5">
-		<div class="flex items-center justify-between">
+		<div v-if="!noHeader" class="flex items-center justify-between">
 			<span class="font-semibold text-contrast">
 				Minecraft versions <span class="text-red">*</span>
 			</span>
@@ -13,10 +13,13 @@
 				size="small"
 			/>
 		</div>
-		<div class="iconified-input w-full">
-			<SearchIcon aria-hidden="true" />
-			<input v-model="searchQuery" type="text" placeholder="Search versions" />
-		</div>
+		<StyledInput
+			v-model="searchQuery"
+			:icon="SearchIcon"
+			type="text"
+			placeholder="Search versions"
+			wrapper-class="w-full"
+		/>
 		<div
 			class="flex h-72 select-none flex-col gap-3 overflow-y-auto rounded-xl border border-solid border-surface-5 p-3 py-4"
 		>
@@ -42,6 +45,7 @@
 								versionType === 'all' && !group.isReleaseGroup ? 'w-max' : 'w-16',
 								modelValue.includes(version) ? '!text-contrast' : '',
 							]"
+							:disabled="disabled"
 							@click="() => handleToggleVersion(version)"
 							@blur="
 								() => {
@@ -64,7 +68,7 @@
 <script lang="ts" setup>
 import type { Labrinth } from '@modrinth/api-client'
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, Chips } from '@modrinth/ui'
+import { ButtonStyled, Chips, StyledInput } from '@modrinth/ui'
 import { useMagicKeys } from '@vueuse/core'
 import { computed, nextTick, onMounted, ref } from 'vue'
 
@@ -73,6 +77,8 @@ type GameVersion = Labrinth.Tags.v2.GameVersion
 const props = defineProps<{
 	modelValue: string[]
 	gameVersions: Labrinth.Tags.v2.GameVersion[]
+	noHeader?: boolean
+	disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -155,7 +161,7 @@ function groupVersions(gameVersions: GameVersion[]) {
 
 	const groups: Record<string, string[]> = {}
 
-	let currentGroupKey
+	let currentGroupKey: string
 
 	gameVersions.forEach((gameVersion) => {
 		if (gameVersion.version_type === 'release') {

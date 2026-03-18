@@ -5,12 +5,14 @@ pub mod delphi;
 pub mod external_notifications;
 pub mod flows;
 pub mod gdpr;
+pub mod globals;
 pub mod gotenberg;
 pub mod medal;
 pub mod moderation;
 pub mod mural;
 pub mod pats;
 pub mod search;
+pub mod server_ping;
 pub mod session;
 pub mod statuses;
 
@@ -55,5 +57,15 @@ pub fn utoipa_config(
         utoipa_actix_web::scope("/_internal/search-management")
             .wrap(default_cors())
             .configure(search::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/globals")
+            .wrap(default_cors())
+            .configure(globals::config),
+    )
+    .service(
+        utoipa_actix_web::scope("/_internal/server-ping")
+            .wrap(default_cors())
+            .configure(server_ping::config),
     );
 }

@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Icon hinzufügen"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Füge die IP-Adresse und den Port hinzu, über die Java Edition-Spieler deinem Server beitreten können."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Javaadresse hinzufügen"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Füge alle relevanten Links hinzu, die außerhalb von Modrinth liegen, wie z. B. eine Website, einen Shop oder eine Discord-Einladung."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Externe Links hinzufügen"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Füge alle relevanten Links hinzu, die außerhalb von Modrinth liegen, wie zum Beispiel Quellcode, ein Issue-Tracker oder eine Discord-Einladung."
   },
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Quellcode bereitstellen"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Einige deiner externen Links scheinen identisch zu sein. Jeder Link sollte nur einmal und mit dem entsprechenden Linktyp eingegeben werden."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Identische Links"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Deine Beschreibung sollte ausreichend Klartext oder Alt-Text für Bilder enthalten, damit sie für Nutzer mit Bildschirmleseprogrammen oder langsamer Internetverbindung zugänglich bleibt."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Richtige Auflösung auswählen"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Wähle aus, welche Versionen dein Server unterstützt, wähle ein Modpack aus oder lade dein eigenes hoch."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Kompatibilität auswählen"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Lass die Spieler wissen, in welcher Region sich dein Server befindet."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Wählen eine Region aus"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Wähle die Sprache oder Sprachen, welche auf deinem Server unterstützt werden."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Sprache auswählen"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Wähle die Lizenz aus, unter der dein {type, select, mod {Mod} modpack {Modpack} resourcepack {Ressourcenpaket} shader {Shader} plugin {Plugin} datapack {Datenpaket} other {Projekt}} veröffentlicht wird."
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Tags auswählen"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Servereinstellungen ansehen"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Beschreibungseinstellungen ansehen"
@@ -150,7 +189,7 @@
     "defaultMessage": "Einstellungen aufrufen"
   },
   "nags.summary-same-as-title.description": {
-    "defaultMessage": "Deine Zusammenfassung darf nicht mit dem Namen deines Projekts identisch sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
+    "defaultMessage": "Deine Zusammenfassung darf nicht identisch mit dem Namen deines Projekts sein. Es ist wichtig, eine informative und ansprechende Zusammenfassung zu erstellen."
   },
   "nags.summary-same-as-title.title": {
     "defaultMessage": "Mach die Zusammenfassung einzigartig"
@@ -173,6 +212,12 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Namen bereinigen"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Bitte reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Server in relevanten Suchen erscheint."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Wähle passende Tags"
+  },
   "nags.too-many-tags.description": {
     "defaultMessage": "Du hast {tagCount, plural, one {# Tag} other {# Tags}} ausgewählt. Reduziere die Anzahl auf {maxTagCount} oder weniger, damit dein Projekt in den relevanten Suchergebnissen erscheint."
   },
@@ -186,7 +231,7 @@
     "defaultMessage": "Galeriebild hochladen"
   },
   "nags.upload-version.description": {
-    "defaultMessage": "Mindestens eine Version ist erforderlich, damit ein Projekt zur Prüfung eingereicht werden kann."
+    "defaultMessage": "Mindestens eine Version ist erforderlich, damit ein Projekt zur Überprüfung eingereicht werden kann."
   },
   "nags.upload-version.title": {
     "defaultMessage": "Version hochladen"

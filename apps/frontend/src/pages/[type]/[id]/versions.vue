@@ -25,36 +25,6 @@
 				@proceed="deleteVersion()"
 			/>
 
-			<Admonition v-if="!hideVersionsAdmonition && currentMember" type="info" class="mb-4">
-				Creating and editing project versions can now be done directly from the
-				<NuxtLink to="settings/versions" class="font-medium text-blue hover:underline"
-					>project settings</NuxtLink
-				>.
-				<template #actions>
-					<div class="flex gap-2">
-						<ButtonStyled color="blue">
-							<button
-								aria-label="Project Settings"
-								class="!shadow-none"
-								@click="() => router.push('settings/versions')"
-							>
-								<SettingsIcon />
-								Edit versions
-							</button>
-						</ButtonStyled>
-						<ButtonStyled type="transparent">
-							<button
-								aria-label="Dismiss"
-								class="!shadow-none"
-								@click="() => (hideVersionsAdmonition = true)"
-							>
-								Dismiss
-							</button>
-						</ButtonStyled>
-					</div>
-				</template>
-			</Admonition>
-
 			<ProjectPageVersions
 				v-if="versions?.length"
 				:project="project"
@@ -283,13 +253,11 @@ import {
 	LinkIcon,
 	MoreVerticalIcon,
 	ReportIcon,
-	SettingsIcon,
 	ShareIcon,
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import {
-	Admonition,
 	ButtonStyled,
 	ConfirmModal,
 	injectModrinthClient,
@@ -298,7 +266,6 @@ import {
 	OverflowMenu,
 	ProjectPageVersions,
 } from '@modrinth/ui'
-import { useLocalStorage } from '@vueuse/core'
 import { onMounted, useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
@@ -313,7 +280,7 @@ const { addNotification } = injectNotificationManager()
 const {
 	projectV2: project,
 	currentMember,
-	refreshVersions,
+	invalidate,
 	versions,
 	versionsLoading,
 	loadVersions,
@@ -338,14 +305,7 @@ const handleOpenEditVersionModal = (versionId, projectId, stageId) => {
 	createProjectVersionModal.value?.openEditVersionModal(versionId, projectId, stageId)
 }
 
-const hideVersionsAdmonition = useLocalStorage(
-	'hideVersionsHasMovedAdmonition',
-	!versions.value?.length,
-)
-
 const emit = defineEmits(['onDownload', 'deleteVersion'])
-
-const router = useNativeRouter()
 
 const baseDropdownId = useId()
 
@@ -379,7 +339,7 @@ async function deleteVersion() {
 		})
 	}
 
-	refreshVersions()
+	await invalidate()
 	selectedVersion.value = null
 
 	stopLoading()

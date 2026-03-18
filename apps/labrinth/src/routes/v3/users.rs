@@ -2,6 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use super::{ApiError, oauth_clients::get_user_clients};
 use crate::database::PgPool;
+use crate::util::error::Context;
 use crate::{
     auth::{
         checks::is_visible_organization, filter_visible_collections,
@@ -680,7 +681,7 @@ pub async fn user_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
+) -> Result<(), ApiError> {
     let user = get_user_from_headers(
         &req,
         &**pool,
@@ -690,26 +691,33 @@ pub async fn user_delete(
     )
     .await?
     .1;
-    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis).await?;
+    let id_option = DBUser::get(&info.into_inner().0, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to get user")?;
 
-    if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete this user!".to_string(),
-            ));
-        }
+    let id = id_option.map(|x| x.id).ok_or(ApiError::NotFound)?;
+    if !user.role.is_admin() && user.id != id.into() {
+        return Err(ApiError::CustomAuthentication(
+            "You do not have permission to delete this user!".to_string(),
+        ));
+    }
 
-        let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to begin transaction")?;
 
-        let result = DBUser::remove(id, &mut transaction, &redis).await?;
+    let result = DBUser::remove(id, &mut transaction, &redis)
+        .await
+        .wrap_internal_err("failed to remove user")?;
 
-        transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
-        if result.is_some() {
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::NotFound)
-        }
+    if result.is_some() {
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }

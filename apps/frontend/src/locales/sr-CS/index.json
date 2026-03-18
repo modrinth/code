@@ -1,6 +1,66 @@
 {
+  "action.cancel": {
+    "message": "Otkaži"
+  },
+  "action.continue": {
+    "message": "Nastavi"
+  },
   "admin.billing.error.not-found": {
     "message": "Korisnik nije pronađen"
+  },
+  "app-marketing.download.description": {
+    "message": "Naša desktop aplikacija je dostupna na svim platformama, izaberite željenu verziju."
+  },
+  "app-marketing.download.download-beta": {
+    "message": "Preuzmite beta verziju"
+  },
+  "app-marketing.download.linux": {
+    "message": "Linux"
+  },
+  "app-marketing.download.mac": {
+    "message": "Mac"
+  },
+  "app-marketing.download.options-title": {
+    "message": "Opcije preuzimanja"
+  },
+  "app-marketing.download.title": {
+    "message": "Preuzmite aplikaciju Modrint (Beta verzija)"
+  },
+  "app-marketing.download.windows": {
+    "message": "Windows"
+  },
+  "app-marketing.features.follow.title": {
+    "message": "Pratite projekte"
+  },
+  "app-marketing.features.mod-management.installed-mods": {
+    "message": "Instalirani modovi"
+  },
+  "app-marketing.features.mod-management.name": {
+    "message": "Ime"
+  },
+  "app-marketing.features.mod-management.search-mods": {
+    "message": "Pretraži modove"
+  },
+  "app-marketing.features.mod-management.title": {
+    "message": "Upravljanje modovima"
+  },
+  "app-marketing.features.mod-management.version": {
+    "message": "Verzija"
+  },
+  "app-marketing.features.offline.description": {
+    "message": "Igrajte svoje modove, bez obzira da li ste povezani na internet ili ne."
+  },
+  "app-marketing.features.performance.discord": {
+    "message": "Discord"
+  },
+  "app-marketing.features.performance.google-chrome": {
+    "message": "Google Chrome"
+  },
+  "app-marketing.features.sharing.share-button": {
+    "message": "Deli"
+  },
+  "app-marketing.hero.download-button": {
+    "message": "Preuzmite aplikaciju Modrint"
   },
   "auth.authorize.action.authorize": {
     "message": "Odobri"
@@ -175,9 +235,6 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Kreiraj novo"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekat} other {{count} projekata}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Pretražite svoje kolekcije"
@@ -572,23 +629,11 @@
   "report.already-reported": {
     "message": "Već ste prijavili {title}"
   },
-  "report.already-reported-description": {
-    "message": "Već imate otvorenu prijavu za ovaj {item}. Ako imate dodatne informacije, možete dodati detalje toj prijavi."
-  },
-  "report.back-to-item": {
-    "message": "Nazad na {item}"
-  },
   "report.body.description": {
     "message": "Uključite linkove i slike kad je moguće i relevantno. Prazne ili nedovoljne prijave biće zatvorene i ignorisane."
   },
   "report.body.title": {
     "message": "Molimo navedite dodatni kontekst za vašu prijavu"
-  },
-  "report.checking": {
-    "message": "Proveravam {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nije moguće pronaći {item}"
   },
   "report.for.violation": {
     "message": "Kršenje Modrinth-ovih <rules-link>Pravila</rules-link> ili <terms-link>Uslova korišćenja</terms-link>"
@@ -629,14 +674,8 @@
   "report.please-report": {
     "message": "Molimo prijavite:"
   },
-  "report.question.content-id": {
-    "message": "Koji je ID {item}?"
-  },
   "report.question.content-type": {
     "message": "Koju vrstu sadržaja prijavljujete?"
-  },
-  "report.question.report-reason": {
-    "message": "Koje pravilo Modrintha krši ovaj {item}?"
   },
   "report.report-content": {
     "message": "Prijavi sadržaj moderatorima"
@@ -803,9 +842,6 @@
   "scopes.reportWrite.label": {
     "message": "Uređivanje prijava"
   },
-  "scopes.sessionAccess.description": {
-    "message": "Omogućava pristup Modrinth-izdatim sesijama"
-  },
   "scopes.sessionAccess.label": {
     "message": "Pristup sesijama"
   },
@@ -898,9 +934,6 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sinhronizuj sa serverom"
-  },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Vraćanje iz backupa u toku"
   },
   "servers.notice.actions": {
     "message": "Radnje"
@@ -1078,9 +1111,6 @@
   },
   "settings.pats.action.create": {
     "message": "Kreirajte PAT"
-  },
-  "settings.pats.description": {
-    "message": "PAT-ovi se mogu koristiti za pristup Modrinth API-ju. Za više informacija, pogledajte <doc-link>dokumentaciju Modrinth API-ja</doc-link>. Mogu se kreirati i opozvati u bilo kom trenutku."
   },
   "settings.pats.modal.create.action": {
     "message": "Kreirajte PAT"

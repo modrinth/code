@@ -18,20 +18,14 @@
 				{{ formatMessage(messages.yourAffiliateLinks) }}
 			</h1>
 			<div class="flex items-center gap-2">
-				<div class="iconified-input">
-					<SearchIcon aria-hidden="true" />
-					<input
-						v-model="filterQuery"
-						class="card-shadow"
-						autocomplete="off"
-						spellcheck="false"
-						type="text"
-						:placeholder="formatMessage(messages.searchAffiliateLinks)"
-					/>
-					<Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
-						<XIcon />
-					</Button>
-				</div>
+				<StyledInput
+					v-model="filterQuery"
+					:icon="SearchIcon"
+					type="text"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.searchAffiliateLinks)"
+					clearable
+				/>
 				<ButtonStyled color="brand">
 					<button @click="createModal?.show">
 						<PlusIcon />
@@ -63,25 +57,28 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, XCircleIcon, XIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import { PlusIcon, SearchIcon, XCircleIcon } from '@modrinth/assets'
 import {
 	Admonition,
 	AffiliateLinkCard,
 	AffiliateLinkCreateModal,
-	Button,
 	ButtonStyled,
 	ConfirmModal,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import type { AffiliateLink } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 const createModal = useTemplateRef<typeof AffiliateLinkCreateModal>('createModal')
 const revokeModal = useTemplateRef<typeof ConfirmModal>('revokeModal')
 
 const auth = await useAuth()
 
+const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 
 const { formatMessage } = useVIntl()
@@ -89,43 +86,38 @@ const { formatMessage } = useVIntl()
 const {
 	data: affiliateLinks,
 	error,
-	refresh,
-} = await useAsyncData(
-	'affiliateLinks',
-	() => useBaseFetch('affiliate', { method: 'GET', internal: true }) as Promise<AffiliateLink[]>,
-)
+	refetch,
+} = useQuery({
+	queryKey: ['affiliate'],
+	queryFn: () => client.labrinth.affiliate_internal.getAll(),
+})
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
 
-const filteredAffiliates = computed(() =>
-	affiliateLinks
-		? affiliateLinks.value?.filter(
-				(link: AffiliateLink) =>
-					link.affiliate === auth.value?.user?.id &&
-					(filterQuery.value.trim()
-						? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
-						: true),
-			)
-		: [],
+const filteredAffiliates = computed(
+	() =>
+		affiliateLinks.value?.filter(
+			(link: Labrinth.Affiliate.Internal.AffiliateCode) =>
+				link.affiliate === auth.value?.user?.id &&
+				(filterQuery.value.trim()
+					? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
+					: true),
+		) ?? [],
 )
 
 async function createAffiliateCode(data: { sourceName: string }) {
 	creatingLink.value = true
 
 	try {
-		await useBaseFetch('affiliate', {
-			method: 'PUT',
-			body: {
-				source_name: data.sourceName,
-			},
-			internal: true,
+		await client.labrinth.affiliate_internal.create({
+			source_name: data.sourceName,
 		})
 
-		await refresh()
+		await refetch()
 		createModal.value?.close()
 	} catch (err) {
-		handleError(err)
+		handleError(err as Error)
 	} finally {
 		creatingLink.value = false
 	}
@@ -134,7 +126,7 @@ async function createAffiliateCode(data: { sourceName: string }) {
 const revokingTitle = ref<string | null>(null)
 const revokingId = ref<string | null>(null)
 
-function revokeAffiliateLink(affiliate: AffiliateLink) {
+function revokeAffiliateLink(affiliate: Labrinth.Affiliate.Internal.AffiliateCode) {
 	revokingTitle.value = affiliate.source_name
 	revokingId.value = affiliate.id
 	revokeModal.value?.show()
@@ -146,12 +138,9 @@ async function confirmRevokeAffiliateLink() {
 	}
 
 	try {
-		await useBaseFetch(`affiliate/${revokingId.value}`, {
-			method: 'DELETE',
-			internal: true,
-		})
+		await client.labrinth.affiliate_internal.delete(revokingId.value)
 
-		await refresh()
+		await refetch()
 		revokeModal.value?.hide()
 		revokingTitle.value = null
 		revokingId.value = null

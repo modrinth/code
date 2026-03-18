@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Batal"
   },
+  "button.change-version": {
+    "defaultMessage": "Tukar versi"
+  },
   "button.clear": {
     "defaultMessage": "Kosongkan"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Ikut"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Sembunyikan petikan"
+  },
   "button.max": {
     "defaultMessage": "Maks"
   },
@@ -107,11 +113,20 @@
   "button.refresh": {
     "defaultMessage": "Segar Semula"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Pasang semula pek mod"
+  },
   "button.remove": {
     "defaultMessage": "Alih keluar"
   },
   "button.remove-image": {
     "defaultMessage": "Alih keluar gambar"
+  },
+  "button.repair": {
+    "defaultMessage": "Baiki"
+  },
+  "button.repairing": {
+    "defaultMessage": "Sedang membaiki..."
   },
   "button.report": {
     "defaultMessage": "Lapor"
@@ -169,6 +184,9 @@
   },
   "collections.label.private": {
     "defaultMessage": "Peribadi"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Kemas kini {count, plural, other {# projek}}"
   },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
@@ -248,6 +266,30 @@
   "form.placeholder.state": {
     "defaultMessage": "Masukkan negeri/wilayah"
   },
+  "header.category.category": {
+    "defaultMessage": "Kategori"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Ciri"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Komuniti"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Ciri"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Tatamain"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Kesan prestasi"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resolusi"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Boleh memecut sehingga {cpus} CPU"
   },
@@ -287,6 +329,27 @@
   "input.view.list": {
     "defaultMessage": "Bentuk barisan"
   },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Memasang semula kebergantungan Minecraft dan memeriksa kerosakan. Ini mungkin dapat menyelesaikan isu jika permainan anda tidak dilancarkan kerana ralat berkaitan pelancar."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Baiki pemasangan"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Pembaikan ini akan memasang semula pemuat dan kebergantungan Minecraft tanpa memadamkan kandungan anda. Ini mungkin menyelesaikan masalah jika pelayan anda tidak dimulakan dengan betul."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Baiki pelayan"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Pembaikan ini akan memasang semula pemuat dan kebergantungan Minecraft tanpa memadamkan kandungan anda. Ini mungkin menyelesaikan masalah jika {type, select, server {pelayan anda tidak dimulakan dengan betul} other {permainan anda tidak dilancarkan kerana ralat berkaitan pelancar}}."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Baiki {type, select, server {pelayan} other {pemasangan}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Baiki"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Mod pengembaraan"
   },
@@ -302,17 +365,38 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod permainan yang tidak diketahui"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Nyahpaut pek mod"
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Kembali"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Salin pautan"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Pek mod ini tidak menyertakan sebarang kandungan tambahan."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Tiada kandungan dijumpai"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Semua"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Kandungan pek mod"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Sedang memuatkan kandungan..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Tiada projek yang sepadan dengan carian anda."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Cari {count, number} {count, plural, other {projek}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Semasa"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Tidak serasi"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Turun taraf ke v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Kemas kini versi"
@@ -334,15 +418,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Tunjukkan versi tidak serasi"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Kemas kini ke v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Kami tidak dapat menjamin kemas kini ini selamat untuk pemasangan anda. Semak log perubahan untuk semua versi pertengahan dan pertimbangkan untuk membuat sandaran."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Kami tidak dapat menjamin kemas kini ini selamat untuk dunia anda. Semak log perubahan untuk semua versi pertengahan dan pertimbangkan untuk membuat sandaran."
   },
   "label.actions": {
     "defaultMessage": "Tindakan"
@@ -417,7 +492,7 @@
     "defaultMessage": "Kata laluan"
   },
   "label.played": {
-    "defaultMessage": "Dimainkan selama {time}"
+    "defaultMessage": "Dimainkan {ago}"
   },
   "label.project": {
     "defaultMessage": "Projek"
@@ -477,16 +552,136 @@
     "defaultMessage": "Keterlihatan"
   },
   "label.visit-your-profile": {
-    "defaultMessage": "Lawat profil anda"
+    "defaultMessage": "Kunjungi profil anda"
   },
   "label.yes": {
     "defaultMessage": "Ya"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "Bahasa Czech"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Bahasa Denmark"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Bahasa Jerman (Switzerland)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Bahasa Jerman (Jerman)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Bahasa Inggeris (Amerika Syarikat)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Bahasa Sepanyol (Amerika Latin)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Bahasa Sepanyol (Sepanyol)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Bahasa Finland"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Bahasa Filipina"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Bahasa Perancis"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Bahasa Ibrani"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Bahasa Hungary"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Bahasa Indonesia"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Bahasa Itali (Itali)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Bahasa Jepun"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Bahasa Korea"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Bahasa Melayu"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Bahasa Belanda"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Bahasa Norway (Bokmål)"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Bahasa Poland"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Bahasa Portugis (Brazil)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Bahasa Portugis (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Bahasa Romania"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Bahasa Rusia"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Bahasa Serbia (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Bahasa Sweden"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Bahasa Thai"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Bahasa Turki"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Bahasa Ukraine"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Bahasa Vietnam"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Bahasa Cina (Mudah)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Bahasa Cina (Tradisional)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Tambah kaedah pembayaran"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Sedang menambah kaedah pembayaran"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Pasang kandungan yang diperlukan secara automatik"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Lancarkan permainan terus ke dalam pelayan"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Memastikan fail dikemas kini apabila pelayan berubah"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Tutup"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Dapatkan Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App akan dibuka secara automatik..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Membuka Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Mengapa menggunakan Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "Sebuah ralat telah berlaku"
@@ -638,6 +833,24 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Diterbitkan {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Dikemas kini {date}"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Pelanggan"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Pelanggan dan pelayan"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Pelanggan atau pelayan"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Pelayan"
+  },
   "project-type.all": {
     "defaultMessage": "Semua"
   },
@@ -676,6 +889,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, other {pemalam}}"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, other {Projek}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Projek"
@@ -785,23 +1001,44 @@
   "project.about.links.issues": {
     "defaultMessage": "Laporkan isu"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Kunjungi laman sesawang"
+  },
   "project.about.links.source": {
     "defaultMessage": "Lihat sumber"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Kunjungi laman kedai"
   },
   "project.about.links.title": {
     "defaultMessage": "Pautan"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "Lawat wiki"
+    "defaultMessage": "Kunjungi wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Disalin!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP pelayan disalin ke papan keratan"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Kelewatan"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Butiran pelayan"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {muat turun}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+    "defaultMessage": "Diperlukan pada kedua-dua pelanggan dan pelayan."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Pelanggan dan pelayan, diperlukan pada kedua-duanya"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+    "defaultMessage": "Kebanyakan fungsi adalah pada bahagian pelanggan, tetapi memasangnya pada pelayan akan mendayakan fungsi yang dipertingkatkan."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Pelanggan dan pelayan, tidak wajib pada pelayan"
@@ -813,7 +1050,7 @@
     "defaultMessage": "Bahagian pelanggan sahaja"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya. Memasangnya pada kedua-duanya akan membawa kepada pengalaman terbaik."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Pelanggan dan pelayan, terbaik apabila dipasang pada kedua-duanya"
@@ -825,19 +1062,19 @@
     "defaultMessage": "Pelanggan dan pelayan, tidak wajib pada kedua-duanya"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
+    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila. Hanya berfungsi pada pelayan khusus."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Bahagian pelayan sahaja"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Mempunyai beberapa fungsi pada kedua-dua pelanggan dan pelayan, walaupun hanya sebahagiannya."
+    "defaultMessage": "Kebanyakan fungsi adalah pada bahagian pelayan, tetapi memasangnya pada pelanggan akan mendayakan fungsi yang dipertingkatkan."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Pelanggan dan pelayan, tidak wajib pada bahagian pelanggan"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila."
+    "defaultMessage": "Semua fungsi dilakukan pada bahagian pelayan dan serasi dengan pelanggan vanila. Juga berfungsi pada pelayan dalaman dalam ekapemain."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Bahagian pelayan sahaja, berfungsi dalam ekapemain juga"
@@ -860,8 +1097,29 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Persekitaran yang tidak diketahui"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, other {pengikut}}"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count, number} dalam talian"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {pemain}} dalam talian"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, other {sesi permainan terkini}} daripada Modrinth dalam 2 minggu yang lalu"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitik"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Kandungan"
   },
   "project.settings.description.title": {
     "defaultMessage": "Keterangan"
@@ -970,6 +1228,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Tiada kebenaran"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Pelayan"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tag"
@@ -1097,9 +1358,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Jadual penyandaran"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Sedang mencipta sandaran..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Gagal mencipta sandaran"
   },
@@ -1109,20 +1367,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Penyandaran manual"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Penyandaran dibariskan"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Pemulihan dibariskan"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Namakan semula"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Pulihkan"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Sedang memulihkan daripada sandaran..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ketepikan"
@@ -1328,11 +1577,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Pengembaraan"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Mod Pengembaraan"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarki"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Atmosfera"
   },
   "tag.category.audio": {
     "defaultMessage": "Audio"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle Royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Bed Wars"
   },
   "tag.category.blocks": {
     "defaultMessage": "Blok"
@@ -1340,11 +1601,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Sinaran"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Bos"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Kartun"
   },
   "tag.category.challenging": {
     "defaultMessage": "Mencabar"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Kelas"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Cahaya Berwarna"
@@ -1352,14 +1619,32 @@
   "tag.category.combat": {
     "defaultMessage": "Pertempuran"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Kompetitif"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Pembayang Teras"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Mod Kreatif"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Komuniti Pencipta"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Rentas Platform"
   },
   "tag.category.cursed": {
     "defaultMessage": "Pelik"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Kandungan Tersuai"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Hiasan"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Dungeons"
   },
   "tag.category.economy": {
     "defaultMessage": "Ekonomi"
@@ -1371,7 +1656,10 @@
     "defaultMessage": "Persekitaran"
   },
   "tag.category.equipment": {
-    "defaultMessage": "Peralatan"
+    "defaultMessage": "Perlengkapan"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Factions"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Fantasi"
@@ -1388,8 +1676,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Mekanik Permainan"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Penjanaan"
+  },
   "tag.category.gui": {
     "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Mod Tegar"
   },
   "tag.category.high": {
     "defaultMessage": "Tinggi"
@@ -1397,11 +1691,20 @@
   "tag.category.items": {
     "defaultMessage": "Item"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Inventori Kekal"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Pelbagai Rasa"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PVP"
+  },
   "tag.category.library": {
     "defaultMessage": "Pustaka"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Ringan"
@@ -1418,11 +1721,23 @@
   "tag.category.management": {
     "defaultMessage": "Pengurusan"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Sederhana"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Permainan Mikro"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Permainan Mini"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Permainan Mini"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Makhluk"
@@ -1436,8 +1751,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Multipemain"
   },
+  "tag.category.network": {
+    "defaultMessage": "Rangkaian"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Mod Luar Talian"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Satu Blok"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Pengoptimuman"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Penjejakan Jejak Cahaya"
@@ -1445,17 +1775,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Dunia Peribadi"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Plot"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokemon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Kentang"
   },
+  "tag.category.prison": {
+    "defaultMessage": "Penjara"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Misi"
+  },
   "tag.category.quests": {
-    "defaultMessage": "Pencarian"
+    "defaultMessage": "Misi"
+  },
+  "tag.category.racing": {
+    "defaultMessage": "Perlumbaan"
   },
   "tag.category.realistic": {
     "defaultMessage": "Realistik"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Perakaman SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Pantulan"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Lakonan"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Tangkapan Layar"
@@ -1469,17 +1832,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Ringkas"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Sosial"
   },
   "tag.category.storage": {
     "defaultMessage": "Penyimpanan"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Mod Kemandirian"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Pasukan"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Teknikal"
+  },
   "tag.category.technology": {
     "defaultMessage": "Teknologi"
   },
   "tag.category.themed": {
     "defaultMessage": "Bertema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Bandar"
   },
   "tag.category.transportation": {
     "defaultMessage": "Pengangkutan"
@@ -1492,6 +1873,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Seperti Vanila"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Bersenarai Putih"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Penetapan Semula Dunia"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Penjanaan Dunia"
@@ -1585,9 +1972,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} pada jam {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Anda mempunyai perubahan yang belum disimpan."

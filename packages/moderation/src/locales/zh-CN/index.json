@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "添加图标"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "添加IP地址和端口，Java 版玩家可以使用它们加入你的服务器。"
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "添加 Java 地址"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如一个网站、商店或 Discord 频道邀请。"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "添加外部链接"
+  },
   "nags.add-links.description": {
     "defaultMessage": "添加一些 Modrinth 站外的相关链接，例如源代码仓库、问题追踪器或 Discord 频道邀请。"
   },
@@ -45,19 +57,25 @@
     "defaultMessage": "编辑标题"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "精选的图库图片往往就是你的项目给人留下的第一印象。"
+    "defaultMessage": "精选展示图往往决定了玩家对你的项目的第一印象。"
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "精选为图库图片"
+    "defaultMessage": "精选一张展示图"
   },
   "nags.gallery.title": {
-    "defaultMessage": "访问图库界面"
+    "defaultMessage": "前往图库页"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "你的{type, select, mod {模组} plugin {插件} other {项目}}所使用的许可证要求源代码必须公开。请为每个新增版本提供源代码地址或源文件，或考虑使用其他的许可证。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供源代码"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "你的一些外部链接似乎重复了。每个链接只应输入一次，并设置合适的链接类型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "链接重复"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "你的介绍描述应包含足够的纯文本或图片替代文本，确保使用屏幕阅读器的用户或网速较慢的用户也能正常访问。"
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "选择正确的分辨率"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "选择你的服务器支持的版本；挑一个整合包，或者自行上传。"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "选择兼容版本"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "让玩家知道你的服务器所在的地区。"
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "选择地区"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "列出你的服务器支持的一个或多个语言。"
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "选择一个语言"
+  },
   "nags.select-license.description": {
     "defaultMessage": "请选择你的{type, select, mod {模组} modpack {整合包} resourcepack {资源包} shader {着色器} plugin {插件} datapack {数据包} other {项目}}所遵循的发布许可证。"
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "选择标签"
+  },
+  "nags.server.title": {
+    "defaultMessage": "访问服务器设置"
   },
   "nags.settings.description.title": {
     "defaultMessage": "访问描述设置"
@@ -159,7 +198,7 @@
     "defaultMessage": "你的简介不应包含任何格式、换行符、特殊字符或链接，因为简介仅会以纯文本形式展示。"
   },
   "nags.summary-special-formatting.title": {
-    "defaultMessage": "清理简介"
+    "defaultMessage": "清除简介"
   },
   "nags.summary-too-short.description": {
     "defaultMessage": "你的简介包含 {length, plural, other {# 个字符}}。建议至少包含 {minChars, plural, other {# 个字符}}，来让简介既丰富又引人入胜。"
@@ -172,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名称"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。请将其数量减少到 {maxTagCount} 个或更少，以确保你的服务器能正常出现在相关搜索结果中。"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "选择准确的标签"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "你已选择 {tagCount, plural, other {# 个标签}}。建议将其数量减少到 {maxTagCount} 个或更少，以确保你的项目能正常出现在相关搜索结果中。"

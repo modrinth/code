@@ -2,15 +2,16 @@
 	<div class="contents">
 		<div class="flex items-center gap-4">
 			<div class="relative w-full">
-				<input
+				<StyledInput
 					v-model="searchInput"
-					type="text"
+					type="search"
+					:icon="SearchIcon"
 					placeholder="Search logs"
-					class="h-12 !w-full !pl-10 !pr-48"
+					wrapper-class="h-12 !w-full"
+					input-class="!pr-48"
 					:disabled="loading"
 					@keydown.escape="clearSearch"
 				/>
-				<SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2" />
 				<ButtonStyled v-if="searchInput && !loading" @click="clearSearch">
 					<button class="absolute right-2 top-1/2 -translate-y-1/2">
 						<XIcon class="h-5 w-5" />
@@ -298,7 +299,7 @@
 
 <script setup lang="ts">
 import { CopyIcon, EyeIcon, RightArrowIcon, SearchIcon, XIcon } from '@modrinth/assets'
-import { NewModal } from '@modrinth/ui'
+import { NewModal, StyledInput } from '@modrinth/ui'
 import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import { useDebounceFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'

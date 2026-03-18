@@ -1,21 +1,17 @@
 <template>
 	<div class="flex flex-col gap-4">
 		<div class="flex flex-col justify-between gap-3 lg:flex-row">
-			<div class="iconified-input flex-1 lg:max-w-md">
-				<SearchIcon aria-hidden="true" class="text-lg" />
-				<input
-					v-model="query"
-					class="h-[40px]"
-					autocomplete="off"
-					spellcheck="false"
-					type="text"
-					:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-					@input="goToPage(1)"
-				/>
-				<Button v-if="query" class="r-btn" @click="() => (query = '')">
-					<XIcon />
-				</Button>
-			</div>
+			<StyledInput
+				v-model="query"
+				:icon="SearchIcon"
+				type="text"
+				autocomplete="off"
+				:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+				clearable
+				wrapper-class="flex-1 lg:max-w-52"
+				input-class="h-[40px]"
+				@input="goToPage(1)"
+			/>
 
 			<div v-if="totalPages > 1" class="hidden flex-1 justify-center lg:flex">
 				<Pagination :page="currentPage" :count="totalPages" @switch-page="goToPage" />
@@ -99,16 +95,8 @@
 	</div>
 </template>
 <script setup lang="ts">
+import { ListFilterIcon, ScaleIcon, SearchIcon, SortAscIcon, SortDescIcon } from '@modrinth/assets'
 import {
-	ListFilterIcon,
-	ScaleIcon,
-	SearchIcon,
-	SortAscIcon,
-	SortDescIcon,
-	XIcon,
-} from '@modrinth/assets'
-import {
-	Button,
 	ButtonStyled,
 	Combobox,
 	type ComboboxOption,
@@ -116,6 +104,7 @@ import {
 	defineMessages,
 	injectNotificationManager,
 	Pagination,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import Fuse from 'fuse.js'
@@ -232,6 +221,7 @@ const filterTypes: ComboboxOption<string>[] = [
 	{ value: 'Data Packs', label: 'Data Packs' },
 	{ value: 'Plugins', label: 'Plugins' },
 	{ value: 'Shaders', label: 'Shaders' },
+	{ value: 'Servers', label: 'Servers' },
 ]
 
 const currentSortType = ref('Oldest')
@@ -293,15 +283,17 @@ const typeFiltered = computed(() => {
 		'Data Packs': 'datapack',
 		Plugins: 'plugin',
 		Shaders: 'shader',
+		Servers: 'minecraft_java_server',
 	}
-
 	const projectType = filterMap[currentFilterType.value]
 	if (!projectType) return baseFiltered.value
 
 	return baseFiltered.value.filter(
 		(queueItem) =>
-			queueItem.project.project_types.length > 0 &&
-			queueItem.project.project_types[0] === projectType,
+			(queueItem.project.project_types.length > 0 &&
+				queueItem.project.project_types[0] === projectType) ||
+			(projectType === 'minecraft_java_server' &&
+				queueItem.project.project_types.includes('minecraft_java_server')),
 	)
 })
 

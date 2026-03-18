@@ -11,11 +11,14 @@
   "affiliate.create.title.label": {
     "defaultMessage": "Titlul linkului de afiliere"
   },
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "de exemplu, YouTube"
+  },
   "affiliate.create.user.description": {
     "defaultMessage": "Numele de utilizator al utilizatorului pentru care se creează codul de afiliere"
   },
   "affiliate.create.user.placeholder": {
-    "defaultMessage": "Introdu numele de utilizator"
+    "defaultMessage": "Introdu numele de utilizator..."
   },
   "affiliate.createdBy": {
     "defaultMessage": "Creat de {user}"
@@ -144,7 +147,7 @@
     "defaultMessage": "Nu mai urmări"
   },
   "button.update": {
-    "defaultMessage": ""
+    "defaultMessage": "Actualizare"
   },
   "button.upload-image": {
     "defaultMessage": "Încarcă o imagine"
@@ -157,6 +160,9 @@
   },
   "changelog.product.app": {
     "defaultMessage": "Aplicație"
+  },
+  "changelog.product.hosting": {
+    "defaultMessage": "Găzduire"
   },
   "changelog.product.web": {
     "defaultMessage": "Website"
@@ -188,6 +194,9 @@
   "form.label.date-of-birth": {
     "defaultMessage": "Data Nașterii"
   },
+  "form.label.email": {
+    "defaultMessage": "Email"
+  },
   "form.label.first-name": {
     "defaultMessage": "Prenume"
   },
@@ -205,6 +214,9 @@
   },
   "form.placeholder.address-2": {
     "defaultMessage": "Apartament, Bloc, etc."
+  },
+  "form.placeholder.amount": {
+    "defaultMessage": "Introdu suma"
   },
   "form.placeholder.bank-name": {
     "defaultMessage": "Introduceți numele băncii"
@@ -233,8 +245,47 @@
   "form.placeholder.postal-code": {
     "defaultMessage": "Introduceți codul poștal"
   },
+  "form.placeholder.state": {
+    "defaultMessage": "Introdu statul/provincia"
+  },
+  "header.category.category": {
+    "defaultMessage": "Categorie"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Caracteristici"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Comunitate"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Caracteristici"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Stil de joc"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Meta"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Impactul performantei"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Rezoluție"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Extinde pana la {cpus}-CPU"
+  },
   "hosting.specs.burst.tooltip": {
-    "defaultMessage": "Burstingul CPU permite serverului dvs. să utilizeze temporar thread-uri suplimentare pentru a ajuta la atenuarea vârfurilor TPS. Faceți clic pentru mai multe informații."
+    "defaultMessage": "Izbucnind CPU permite serverului dvs. să utilizeze temporar thread-uri suplimentare pentru a ajuta la atenuarea vârfurilor TPS. Faceți clic pentru mai multe informații."
+  },
+  "hosting.specs.gb-ram": {
+    "defaultMessage": "{ram} GB RAM"
+  },
+  "hosting.specs.gb-storage": {
+    "defaultMessage": "{storage} GB Stocare"
+  },
+  "hosting.specs.shared-cpus": {
+    "defaultMessage": "{cpus} CPU-uri Shared"
   },
   "icon-select.edit": {
     "defaultMessage": "Editează pictograma"
@@ -275,26 +326,65 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod de joc necunoscut"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Înapoi"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Copiați linkul"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Acest modpack nu include niciun conținut suplimentar."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Nu a fost găsit niciun conținut"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Toate"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Conținutul Modpack"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Se încarcă materialul..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Niciun proiect nu corespunde căutării dvs."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Căutare {count, number}{count, plural,one {proiect}other {proiecte}}"
+  },
+  "instances.updater-modal.badge.current": {
+    "defaultMessage": "Curent"
+  },
+  "instances.updater-modal.badge.incompatible": {
+    "defaultMessage": "Incompatibil"
+  },
+  "instances.updater-modal.header": {
+    "defaultMessage": "Actualizează versiunea"
+  },
+  "instances.updater-modal.hide-incompatible": {
+    "defaultMessage": "Ascunde incompatibil"
+  },
+  "instances.updater-modal.no-changelog": {
+    "defaultMessage": "Nu au fost furnizate schimbări pentru aceasta versiune."
+  },
+  "instances.updater-modal.no-versions": {
+    "defaultMessage": "Nu au fost găsite versiuni"
+  },
   "instances.updater-modal.search-placeholder": {
     "defaultMessage": "Caută o versiune..."
   },
   "instances.updater-modal.select-version": {
     "defaultMessage": "Selectați o versiune pentru a vizualiza jurnalul modificărilor acesteia"
   },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Actualizare la v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Nu putem garanta că actualizările sunt sigure pentru instanța dvs. Consultați jurnalul de modificări pentru toate versiunile intermediare și luați în considerare o copie de rezervă."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Nu putem garanta că actualizările sunt sigure pentru lumile voastre. Consultați jurnalul de modificări pentru toate versiunile intermediare și luați în considerare o copie de rezervă."
+  "instances.updater-modal.show-incompatible": {
+    "defaultMessage": "Arata incompatibile"
   },
   "label.actions": {
     "defaultMessage": "Acțiuni"
   },
   "label.available": {
-    "defaultMessage": "{amount} disponibilă."
+    "defaultMessage": "{amount} Disponibil."
   },
   "label.changelog": {
     "defaultMessage": "Jurnal de modificări"
@@ -350,6 +440,9 @@
   "label.no": {
     "defaultMessage": "Nu"
   },
+  "label.no-items": {
+    "defaultMessage": "Fără articole"
+  },
   "label.notifications": {
     "defaultMessage": "Notificări"
   },
@@ -360,7 +453,7 @@
     "defaultMessage": "Parolă"
   },
   "label.played": {
-    "defaultMessage": "Timp jucat {time}"
+    "defaultMessage": "Jucat {ago}"
   },
   "label.project": {
     "defaultMessage": "Proiect"
@@ -393,7 +486,7 @@
     "defaultMessage": "Setări"
   },
   "label.singleplayer": {
-    "defaultMessage": "Singleplayer"
+    "defaultMessage": "Un singur jucător"
   },
   "label.sort-by": {
     "defaultMessage": "Filtrează după"
@@ -425,11 +518,131 @@
   "label.yes": {
     "defaultMessage": "Da"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Cehă"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Daneză"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Germană (Elveția)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Germană (Germania)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Engleză(Statele Unite)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spaniolă(America Latină)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spaniolă(Spania)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finlandeză"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipineză"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Franceză"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Ebraică"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Maghiară"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indoneziană"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italiană(Italia)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japoneză"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Coreeană"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malaieză"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Olandeză"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norvegiană"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Poloneză"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portugheză(Brazilia)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portugheză(Portugalia)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Română"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Rusă"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Sârbă (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Suedeză"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thailandeză"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turcă"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ucraineană"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnameză"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chineză(Simplificată)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chineză(Tradițională)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Adaugă metodă de plată"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Adaugă o metodă de plată"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Instalați automat conținutul necesar"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Lansați jocul direct pe server"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Mențineți fișierele actualizate atunci când serverul se modifică"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Închide"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Descărcați aplicația Modrinth"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Aplicația Modrinth se va deschide automat..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Deschiderea aplicației Modrinth"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "De ce să folosiți aplicația Modrinth"
   },
   "notification.error.title": {
     "defaultMessage": "A avut loc o eroare"
@@ -479,6 +692,9 @@
   "omorphia.component.badge.label.returned": {
     "defaultMessage": "Returnat"
   },
+  "omorphia.component.badge.label.safe": {
+    "defaultMessage": "Sigur"
+  },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Programat"
   },
@@ -487,6 +703,9 @@
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "Nelistat"
+  },
+  "omorphia.component.badge.label.unsafe": {
+    "defaultMessage": "Esuat"
   },
   "omorphia.component.badge.label.withheld": {
     "defaultMessage": "Reținut"
@@ -512,11 +731,86 @@
   "omorphia.component.environment-indicator.label.unsupported": {
     "defaultMessage": "Nesuportat"
   },
+  "payment-method.amazon_pay": {
+    "defaultMessage": "Amazon Plată"
+  },
+  "payment-method.amex": {
+    "defaultMessage": "American Express"
+  },
   "payment-method.card_display": {
-    "defaultMessage": "{card_brand} care se termină în {last_four}"
+    "defaultMessage": "{card_brand} Care se termină în {last_four}"
+  },
+  "payment-method.cashapp": {
+    "defaultMessage": "CashApp"
+  },
+  "payment-method.charity": {
+    "defaultMessage": "Caritate"
+  },
+  "payment-method.charity-plural": {
+    "defaultMessage": "Carități"
+  },
+  "payment-method.diners": {
+    "defaultMessage": "Clubul Diners"
+  },
+  "payment-method.discover": {
+    "defaultMessage": "Descoperi"
+  },
+  "payment-method.eftpos": {
+    "defaultMessage": "EFTPOS"
+  },
+  "payment-method.gift-card": {
+    "defaultMessage": "Card cadou"
+  },
+  "payment-method.gift-card-plural": {
+    "defaultMessage": "Carduri cadou"
+  },
+  "payment-method.jcb": {
+    "defaultMessage": "JCB"
+  },
+  "payment-method.mastercard": {
+    "defaultMessage": "MasterCard"
+  },
+  "payment-method.paypal": {
+    "defaultMessage": "PayPal"
+  },
+  "payment-method.paypal_international": {
+    "defaultMessage": "PayPal Internațional"
+  },
+  "payment-method.unionpay": {
+    "defaultMessage": "UnionPay"
   },
   "payment-method.unknown": {
     "defaultMessage": "Metodă de plată necunoscută"
+  },
+  "payment-method.venmo": {
+    "defaultMessage": "Venmo"
+  },
+  "payment-method.virtual-visa": {
+    "defaultMessage": "Visa Virtual"
+  },
+  "payment-method.virtual-visa-plural": {
+    "defaultMessage": "Vize Virtuale"
+  },
+  "payment-method.visa": {
+    "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Publicat {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Actualizat {date}"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Client si server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Client sau server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
   },
   "project-type.all": {
     "defaultMessage": "Toate"
@@ -557,6 +851,15 @@
   "project-type.plugin.lowercase": {
     "defaultMessage": "{count, plural, one {plugin} other {pluginuri}}"
   },
+  "project-type.project.capital": {
+    "defaultMessage": "{count, plural, one {Proiect} other {Proiecte}}"
+  },
+  "project-type.project.category": {
+    "defaultMessage": "Proiecte"
+  },
+  "project-type.project.lowercase": {
+    "defaultMessage": "{count, plural, one {proiect} other {proiecte}}"
+  },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural, one {Pachet} other {Pachete}} de Resurse"
   },
@@ -565,6 +868,15 @@
   },
   "project-type.resourcepack.lowercase": {
     "defaultMessage": "{count, plural, one {pachet} other {pachete}} de resurse"
+  },
+  "project-type.server.capital": {
+    "defaultMessage": "{count, plural, one {Server} other {Servere}}"
+  },
+  "project-type.server.category": {
+    "defaultMessage": "Servere"
+  },
+  "project-type.server.lowercase": {
+    "defaultMessage": "{count, plural,one {server} other {servere}}"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural, one {Shader} other {Shadere}}"
@@ -589,6 +901,9 @@
   },
   "project.about.compatibility.environments.server-side": {
     "defaultMessage": ""
+  },
+  "project.about.compatibility.environments.singleplayer": {
+    "defaultMessage": "Singleplayer"
   },
   "project.about.compatibility.environments.singleplayer-only": {
     "defaultMessage": "Doar singleplayer"
@@ -647,8 +962,14 @@
   "project.about.links.issues": {
     "defaultMessage": "Raportează o problemă"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Vizitați site-ul web"
+  },
   "project.about.links.source": {
     "defaultMessage": "Afișează sursa"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Vizitați pagina magazinului"
   },
   "project.about.links.title": {
     "defaultMessage": "Link-uri"
@@ -656,23 +977,110 @@
   "project.about.links.wiki": {
     "defaultMessage": "Vizitează wiki-ul"
   },
+  "project.about.server.copied": {
+    "defaultMessage": "Copiată!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Adresa IP copiată în clipboard"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latență"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Detalii server"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {descărcare} other {descărcări}}"
+  },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Are unele funcționalități atât pe client, cât și pe server, chiar dacă doar parțial."
+    "defaultMessage": "Necesar atât pe client, cât și pe server."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client și server, necesare pe ambele"
   },
+  "project.environment.client-only-server-optional.description": {
+    "defaultMessage": "Majoritatea funcționalităților sunt pe partea clientului, dar instalarea pe server permite funcționalități îmbunătățite."
+  },
+  "project.environment.client-only-server-optional.title": {
+    "defaultMessage": "Client și server, opțional pe server"
+  },
+  "project.environment.client-only.description": {
+    "defaultMessage": "Toate funcționalitățile sunt realizate pe partea clientului și sunt compatibile cu serverele vanilla."
+  },
+  "project.environment.client-only.title": {
+    "defaultMessage": "Doar pe client"
+  },
+  "project.environment.client-or-server-prefers-both.description": {
+    "defaultMessage": "Are unele funcționalități atât pe client, cât și pe server, chiar dacă doar parțial. Instalarea pe ambele dispozitive asigură cea mai bună experiență."
+  },
+  "project.environment.client-or-server-prefers-both.title": {
+    "defaultMessage": "Client si server, cel mai bine când este instalat pe ambele"
+  },
+  "project.environment.client-or-server.description": {
+    "defaultMessage": "Are unele funcționalități atât pe client, cât și pe server, chiar dacă doar parțial."
+  },
+  "project.environment.client-or-server.title": {
+    "defaultMessage": "Client și server, opțional pe ambele"
+  },
+  "project.environment.dedicated-server-only.description": {
+    "defaultMessage": "Toate funcționalitățile sunt realizate pe partea de server și sunt compatibile cu clienții vanilla. Funcționează numai pe servere dedicate."
+  },
+  "project.environment.dedicated-server-only.title": {
+    "defaultMessage": "Doar pe server"
+  },
+  "project.environment.server-only-client-optional.description": {
+    "defaultMessage": "Majoritatea funcționalităților sunt pe partea de server, dar instalarea pe client permite funcționalități îmbunătățite."
+  },
+  "project.environment.server-only-client-optional.title": {
+    "defaultMessage": "Client si server, opțional pe client"
+  },
+  "project.environment.server-only.description": {
+    "defaultMessage": "Toate funcționalitățile sunt realizate pe server și sunt compatibile cu clienții vanilla. Funcționează și pe serverul intern în modul singleplayer."
+  },
+  "project.environment.server-only.title": {
+    "defaultMessage": "Doar pe partea de server, funcționează și în modul singleplayer"
+  },
   "project.environment.singleplayer-only.description": {
-    "defaultMessage": "Funcționează doar în modul Singleplayer sau când nu este conectat la un server Multiplayer."
+    "defaultMessage": "Funcționează doar în modul Single player sau când nu este conectat la un server Multiplayer."
+  },
+  "project.environment.singleplayer-only.title": {
+    "defaultMessage": "Doar single player"
+  },
+  "project.environment.tag.not-applicable": {
+    "defaultMessage": "N/A"
   },
   "project.environment.tag.unknown": {
     "defaultMessage": "Necunoscut"
   },
+  "project.environment.unknown.description": {
+    "defaultMessage": "Mediul pentru această versiune nu a putut fi determinat."
+  },
   "project.environment.unknown.title": {
     "defaultMessage": "Mediu necunoscut"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {urmăritor} other {urmăritori}}"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count, number} activi"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {jucător} other {jucători}} online"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {recent jucat} other {recent jucate}} de la Modrinth în ultimele 2 săptămâni"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitice"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Conținut"
   },
   "project.settings.description.title": {
     "defaultMessage": "Descriere"
@@ -704,8 +1112,29 @@
   "project.settings.environment.client_only.title": {
     "defaultMessage": "Doar pe partea de client"
   },
+  "project.settings.environment.notice.missing-env.description": {
+    "defaultMessage": "Proiectul dvs. nu conține metadate de mediu. Vă rugăm să selectați opțiunea corespunzătoare de mai jos."
+  },
+  "project.settings.environment.notice.missing-env.title": {
+    "defaultMessage": "Selectați un mediu pentru proiectul dvs"
+  },
+  "project.settings.environment.notice.multiple-environments.description": {
+    "defaultMessage": "Diferitele versiuni ale proiectului dvs. au medii selectate diferite, astfel încât nu le puteți edita global în acest moment."
+  },
+  "project.settings.environment.notice.multiple-environments.title": {
+    "defaultMessage": "Proiectul tău are mai multe environment-uri"
+  },
+  "project.settings.environment.notice.review-options.description": {
+    "defaultMessage": "Tocmai am revizuit sistemul Environments pe Modrinth și acum sunt disponibile noi opțiuni. Asigurați-vă că ați selectat opțiunea corectă mai jos și apoi faceți clic pe „Verificați” când ați terminat!"
+  },
   "project.settings.environment.notice.review-options.title": {
     "defaultMessage": "Vă rugăm să examinați opțiunile de mai jos"
+  },
+  "project.settings.environment.notice.wrong-project-type.description": {
+    "defaultMessage": "Numai proiectele mod sau modpack pot avea metadate de mediu."
+  },
+  "project.settings.environment.notice.wrong-project-type.title": {
+    "defaultMessage": "Acest tip de proiect nu acceptă metadatele de mediu"
   },
   "project.settings.environment.server_only.dedicated_only.title": {
     "defaultMessage": "Doar servere dedicate"
@@ -737,6 +1166,9 @@
   "project.settings.environment.verification.verify-button": {
     "defaultMessage": "Verifică"
   },
+  "project.settings.environment.verification.verify-text": {
+    "defaultMessage": "Verificați dacă mediul acestui proiect este setat corect."
+  },
   "project.settings.gallery.title": {
     "defaultMessage": "Galerie"
   },
@@ -757,6 +1189,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Fără permisiune"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Etichete"
@@ -819,10 +1254,13 @@
     "defaultMessage": "Sincronizează filtrul"
   },
   "search.filter.locked.default.title": {
-    "defaultMessage": "{type} este blocat"
+    "defaultMessage": "{type} Este blocat"
   },
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Deblochează filtrul"
+  },
+  "search.filter.option.exclusion.add.tooltip": {
+    "defaultMessage": "Exclude"
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Șterge căutarea"
@@ -875,11 +1313,11 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.item.auto": {
+    "defaultMessage": "Auto"
+  },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Programul de backup"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Se creează o copie de rezervă..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Nu s-a putut crea o copie de rezervă"
@@ -895,9 +1333,6 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restaurează"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Restaurare din copie de rezervă..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignoră"
@@ -924,7 +1359,7 @@
     "defaultMessage": "Avertisment"
   },
   "servers.notice.undismissable": {
-    "defaultMessage": "Neignorabil"
+    "defaultMessage": "De nerenunțat"
   },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "Nu vei fi taxat încă."
@@ -936,7 +1371,7 @@
     "defaultMessage": "Metodă de plată"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "facturat {interval}"
+    "defaultMessage": "Facturat {interval}"
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Alege un plan personalizat, cu specificațiile exacte de care ai nevoie."
@@ -986,6 +1421,9 @@
   "servers.region.prompt": {
     "defaultMessage": "Unde ți-ar plăcea ca serverul să fie localizat?"
   },
+  "servers.region.region-unsupported": {
+    "defaultMessage": "Regiunea nu este listată? <link>Spuneți-ne unde doriți să vedeți în continuare Modrinth Hosting!</link>"
+  },
   "servers.region.southeast-asia": {
     "defaultMessage": "Asia Sud-Estică"
   },
@@ -1034,8 +1472,35 @@
   "settings.display.theme.title": {
     "defaultMessage": "Culoarea temei"
   },
+  "settings.language.categories.default": {
+    "defaultMessage": "Limbi standard"
+  },
+  "settings.language.categories.search-result": {
+    "defaultMessage": "Rezultate gasite"
+  },
+  "settings.language.description": {
+    "defaultMessage": "Alege limba preferata pentru {platform}. Traducerile sunt contribuite de voluntari <crowdin-link>de pe Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "defaultMessage": "Cauta o limba..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural,=0 {Nicio limbă nu se potrivește} one {#potriviri de limbă} other {#limbile se potrivesc}} căutarea ta."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Nicio limbă nu corespunde căutării dvs."
+  },
+  "settings.language.platform.app": {
+    "defaultMessage": "aplicatie"
+  },
+  "settings.language.platform.site": {
+    "defaultMessage": "site"
+  },
   "settings.language.title": {
     "defaultMessage": "Limbă"
+  },
+  "settings.language.warning": {
+    "defaultMessage": "Schimbarea limbii {platform} poate cauza ca un anumit conținut să apară in engleza daca traducerea nu este disponibila. {platform} nu este complet tradus așa ca anumit conținut poate să rămână in engleza pentru anumite limbi."
   },
   "settings.pats.title": {
     "defaultMessage": "Token-urile personale de acces"
@@ -1046,8 +1511,428 @@
   "settings.sessions.title": {
     "defaultMessage": "Sesiuni"
   },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} la {time, time, short}"
+  "tag.category.128x": {
+    "defaultMessage": "128x"
+  },
+  "tag.category.16x": {
+    "defaultMessage": "16x"
+  },
+  "tag.category.256x": {
+    "defaultMessage": "256x"
+  },
+  "tag.category.32x": {
+    "defaultMessage": "32x"
+  },
+  "tag.category.48x": {
+    "defaultMessage": "48x"
+  },
+  "tag.category.512x+": {
+    "defaultMessage": "512x sau mai mult"
+  },
+  "tag.category.64x": {
+    "defaultMessage": "64x"
+  },
+  "tag.category.8x-": {
+    "defaultMessage": "8x sau mai puțin"
+  },
+  "tag.category.adventure": {
+    "defaultMessage": "Aventură"
+  },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Modul Aventură"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarhie"
+  },
+  "tag.category.atmosphere": {
+    "defaultMessage": "Atmosfera"
+  },
+  "tag.category.audio": {
+    "defaultMessage": "Audio"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Bătălie Regală"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Războiul Patului"
+  },
+  "tag.category.blocks": {
+    "defaultMessage": "Blocuri"
+  },
+  "tag.category.bloom": {
+    "defaultMessage": "Efect de Strălucire"
+  },
+  "tag.category.bosses": {
+    "defaultMessage": "Șefii"
+  },
+  "tag.category.cartoon": {
+    "defaultMessage": "Desene animate"
+  },
+  "tag.category.challenging": {
+    "defaultMessage": "Provocare"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Clasele"
+  },
+  "tag.category.colored-lighting": {
+    "defaultMessage": "Lumina colorata"
+  },
+  "tag.category.combat": {
+    "defaultMessage": "Luptă"
+  },
+  "tag.category.competitive": {
+    "defaultMessage": "Competitiv"
+  },
+  "tag.category.core-shaders": {
+    "defaultMessage": "Shadere de Bază"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Modul Creativ"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Comunitatea Creatorilor"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Joc Încrucișat"
+  },
+  "tag.category.cursed": {
+    "defaultMessage": "Ciudat"
+  },
+  "tag.category.custom-content": {
+    "defaultMessage": "Conținut Personalizat"
+  },
+  "tag.category.decoration": {
+    "defaultMessage": "Decor"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Temnițe"
+  },
+  "tag.category.economy": {
+    "defaultMessage": "Economie"
+  },
+  "tag.category.entities": {
+    "defaultMessage": "Entitati"
+  },
+  "tag.category.environment": {
+    "defaultMessage": "Mediu"
+  },
+  "tag.category.equipment": {
+    "defaultMessage": "Echipament"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Fracțiunile"
+  },
+  "tag.category.fantasy": {
+    "defaultMessage": "Fantezie"
+  },
+  "tag.category.foliage": {
+    "defaultMessage": "Vegetație"
+  },
+  "tag.category.fonts": {
+    "defaultMessage": "Fonturi"
+  },
+  "tag.category.food": {
+    "defaultMessage": "Mancare"
+  },
+  "tag.category.game-mechanics": {
+    "defaultMessage": "Mecanici in joc"
+  },
+  "tag.category.gens": {
+    "defaultMessage": "Genă"
+  },
+  "tag.category.gui": {
+    "defaultMessage": "GUI"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Modul Extrem"
+  },
+  "tag.category.high": {
+    "defaultMessage": "Greu"
+  },
+  "tag.category.items": {
+    "defaultMessage": "Lucruri"
+  },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Păstrați inventarul"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Cu de toate"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PVP"
+  },
+  "tag.category.library": {
+    "defaultMessage": "Librărie"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Furt de viață"
+  },
+  "tag.category.lightweight": {
+    "defaultMessage": "Ușor"
+  },
+  "tag.category.locale": {
+    "defaultMessage": "Local"
+  },
+  "tag.category.low": {
+    "defaultMessage": "Scăzut"
+  },
+  "tag.category.magic": {
+    "defaultMessage": "Magie"
+  },
+  "tag.category.management": {
+    "defaultMessage": "Administrare"
+  },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
+  "tag.category.medium": {
+    "defaultMessage": "Mediu"
+  },
+  "tag.category.microgames": {
+    "defaultMessage": "Micro jocuri"
+  },
+  "tag.category.minigame": {
+    "defaultMessage": "Minigame"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Mini jocuri"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
+  },
+  "tag.category.mobs": {
+    "defaultMessage": "Mobi"
+  },
+  "tag.category.modded": {
+    "defaultMessage": "Modat"
+  },
+  "tag.category.models": {
+    "defaultMessage": "Modele"
+  },
+  "tag.category.multiplayer": {
+    "defaultMessage": "Multiplayer"
+  },
+  "tag.category.network": {
+    "defaultMessage": "Rețea"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Modul Off line"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Un bloc"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
+  "tag.category.optimization": {
+    "defaultMessage": "Optimizare"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
+  },
+  "tag.category.path-tracing": {
+    "defaultMessage": "Trasarea Căii"
+  },
+  "tag.category.pbr": {
+    "defaultMessage": "PBR"
+  },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Lumi Personale"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Loturi"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokemon"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Cartof"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Închisoare"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PVE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PVP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Căutare"
+  },
+  "tag.category.quests": {
+    "defaultMessage": "Misiuni"
+  },
+  "tag.category.racing": {
+    "defaultMessage": "Curse"
+  },
+  "tag.category.realistic": {
+    "defaultMessage": "Realistic"
+  },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Înregistrarea SMP"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Reflectii"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Joc de rol"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
+  },
+  "tag.category.screenshot": {
+    "defaultMessage": "Captură de ecran"
+  },
+  "tag.category.semi-realistic": {
+    "defaultMessage": "Semi Realist"
+  },
+  "tag.category.shadows": {
+    "defaultMessage": "Umbre"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Simplu"
+  },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
+  "tag.category.social": {
+    "defaultMessage": "Socializare"
+  },
+  "tag.category.storage": {
+    "defaultMessage": "Stocare"
+  },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Modul Supraviețuire"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Echipe"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Tehnic"
+  },
+  "tag.category.technology": {
+    "defaultMessage": "Tehnologie"
+  },
+  "tag.category.themed": {
+    "defaultMessage": "Tema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Orașe"
+  },
+  "tag.category.transportation": {
+    "defaultMessage": "Transport"
+  },
+  "tag.category.tweaks": {
+    "defaultMessage": "Schimbari"
+  },
+  "tag.category.utility": {
+    "defaultMessage": "Utilitate"
+  },
+  "tag.category.vanilla-like": {
+    "defaultMessage": "Similar cu Vanilla"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Pe lista albă"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Resetări Lume"
+  },
+  "tag.category.worldgen": {
+    "defaultMessage": "Generarea lumii"
+  },
+  "tag.loader.babric": {
+    "defaultMessage": "Babric"
+  },
+  "tag.loader.bta-babric": {
+    "defaultMessage": "BTA (Babric)"
+  },
+  "tag.loader.bukkit": {
+    "defaultMessage": "Bukkit"
+  },
+  "tag.loader.bungeecord": {
+    "defaultMessage": "BungeeCord"
+  },
+  "tag.loader.canvas": {
+    "defaultMessage": "Canva"
+  },
+  "tag.loader.datapack": {
+    "defaultMessage": "Pachet de date"
+  },
+  "tag.loader.fabric": {
+    "defaultMessage": "Fabric"
+  },
+  "tag.loader.folia": {
+    "defaultMessage": "Folia"
+  },
+  "tag.loader.forge": {
+    "defaultMessage": "Forge"
+  },
+  "tag.loader.geyser": {
+    "defaultMessage": "Extensie Geyser"
+  },
+  "tag.loader.iris": {
+    "defaultMessage": "Iris"
+  },
+  "tag.loader.java-agent": {
+    "defaultMessage": "Agent Java"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
+  },
+  "tag.loader.liteloader": {
+    "defaultMessage": "LiteLoader"
+  },
+  "tag.loader.minecraft": {
+    "defaultMessage": "Resource Pack"
+  },
+  "tag.loader.modloader": {
+    "defaultMessage": "Risugami's ModLoader"
+  },
+  "tag.loader.mrpack": {
+    "defaultMessage": "Modpack"
+  },
+  "tag.loader.neoforge": {
+    "defaultMessage": "NeoForge"
+  },
+  "tag.loader.nilloader": {
+    "defaultMessage": "NilLoader"
+  },
+  "tag.loader.optifine": {
+    "defaultMessage": "OptiFine"
+  },
+  "tag.loader.ornithe": {
+    "defaultMessage": "Ornithe"
+  },
+  "tag.loader.paper": {
+    "defaultMessage": "Paper"
+  },
+  "tag.loader.purpur": {
+    "defaultMessage": "Purpur"
+  },
+  "tag.loader.quilt": {
+    "defaultMessage": "Pilota"
+  },
+  "tag.loader.rift": {
+    "defaultMessage": "Rift"
+  },
+  "tag.loader.spigot": {
+    "defaultMessage": "Spigot"
+  },
+  "tag.loader.sponge": {
+    "defaultMessage": "Burete"
+  },
+  "tag.loader.vanilla": {
+    "defaultMessage": "Shader Vanilla"
+  },
+  "tag.loader.velocity": {
+    "defaultMessage": "Velocity"
+  },
+  "tag.loader.waterfall": {
+    "defaultMessage": "Cascadă"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Ai schimbări nesalvate."

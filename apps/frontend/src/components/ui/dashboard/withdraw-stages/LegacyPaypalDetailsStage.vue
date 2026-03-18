@@ -41,11 +41,10 @@
 				>
 			</label>
 			<div class="flex flex-row gap-2">
-				<input
+				<StyledInput
 					v-model="venmoHandle"
-					type="text"
 					:placeholder="formatMessage(messages.venmoHandlePlaceholder)"
-					class="w-full rounded-[14px] bg-surface-4 px-4 py-3 text-contrast placeholder:text-secondary sm:py-2.5"
+					wrapper-class="w-full"
 				/>
 				<ButtonStyled color="brand">
 					<button
@@ -113,6 +112,7 @@ import {
 	formFieldLabels,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useDebounceFn } from '@vueuse/core'

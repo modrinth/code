@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Annulla"
   },
+  "button.change-version": {
+    "defaultMessage": "Cambia versione"
+  },
   "button.clear": {
     "defaultMessage": "Cancella"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Segui"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Nascondi versioni snapshot"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -102,10 +108,13 @@
     "defaultMessage": "Apri cartella"
   },
   "button.play": {
-    "defaultMessage": "Gioca"
+    "defaultMessage": "Avvia"
   },
   "button.refresh": {
     "defaultMessage": "Ricarica"
+  },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Reinstalla pacchetto di mod"
   },
   "button.remove": {
     "defaultMessage": "Rimuovi"
@@ -113,11 +122,20 @@
   "button.remove-image": {
     "defaultMessage": "Rimuovi immagine"
   },
+  "button.repair": {
+    "defaultMessage": "Ripara"
+  },
+  "button.repairing": {
+    "defaultMessage": "Riparando..."
+  },
   "button.report": {
     "defaultMessage": "Segnala"
   },
   "button.reset": {
     "defaultMessage": "Ripristina"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Reimposta server"
   },
   "button.retry": {
     "defaultMessage": "Riprova"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Salvando"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Mostra tutte le versioni"
+  },
   "button.sign-in": {
     "defaultMessage": "Accedi"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "Interrompi"
   },
+  "button.switch-version": {
+    "defaultMessage": "Cambia versione"
+  },
   "button.unfollow": {
     "defaultMessage": "Smetti di seguire"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Scollega pacchetto"
   },
   "button.update": {
     "defaultMessage": "Aggiorna"
@@ -169,6 +196,222 @@
   },
   "collections.label.private": {
     "defaultMessage": "Privata"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Vuoi davvero aggiornare {count, plural, one {# progetto alla sua} other {# progetti alla loro}} ultima versione compatibile? È consigliabile aggiornare i contenuti uno ad uno."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Avviso di aggiornamento"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Aggiornamento progetti"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Aggiorna {count, plural, one {# progetto} other {# progetti}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Rimuovere una mod potrebbe causare danni permanenti al tuo mondo, come contenuto mancante o problemi inaspettati dopo un ricaricamento."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Avviso di rimozione"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Elimina {count} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Elimina {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà rimosso."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Avviso di {action, select, downgrade {retrocessione} other {aggiornamento}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Retrocedi} other {Aggiorna}} pacchetto"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Retrocedi} other {Aggiorna}} pacchetto"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mod e contenuti saranno uniti con quelli aggiunti al pacchetto, ma smetterà di ricevere aggiornamenti."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Scollegamento del pacchetto"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Scollega pacchetto"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Scollega"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count, plural, one {# aggiunta} other {# aggiunte}}"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Aggiunto (dipendenza)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Rimosso"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Aggiornato"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count, plural, one {# rimozione} other {# rimozioni}}"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Alcuni contenuti sul tuo server non sono stati analizzati e potrebbero essere affetti da questa modifica."
+  },
+  "content.diff-modal.unknown-content-header": {
+    "defaultMessage": "Contenuto sconosciuto"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count, plural, one {# aggiornamento} other {# aggiornamenti}}"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Creando il backup..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Backup creato con successo"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Errore nella creazione del backup. Puoi comunque procedere."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "È in corso un backup, aspetta che finisca prima di compiere questa azione."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Creare un backup potrebbe richiedere diversi minuti, a seconda dalla dimensione del tuo server."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Crea backup"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Tieni premuto Maiusc mentre clicchi per evitare la conferma."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Si consiglia di creare un backup prima di procedere, così da poterlo ripristinare nel caso qualcosa {type, select, server {nel tuo mondo} other {nella tua istanza}} vada storto."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "I contenuti del tuo pacchetto ora si trovano qui!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Contenuti del pacchetto spostati"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Non mostrare più"
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Aggiornando..."
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Contenuto aggiuntivo"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Esplora contenuti"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Aspetta che l'operazione giunga al termine prima di modificare i contenuti."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Inizia esplorando o caricando {contentType}"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Aggiungi contenuto aggiuntivo a questo pacchetto"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Nessun contenuto installato"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Nessun contenuto aggiuntivo installato"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Errore nel caricamento dei contenuti"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Caricando i contenuti..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Nessun contenuto trovato."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Attendere"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Cerca tra {count} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Nomi dei file"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Condividi"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Link markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Link dei progetti"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Nomi dei progetti"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "ordine alfabetico"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Più recenti prima"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Meno recenti prima"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Ordina per {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Aggiorna tutto"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Carica file"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Caricando i file ({completed}/{total})..."
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Rimuovendo {contentType} ({progress}/{total})..."
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Rimuovendo {contentType}..."
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Disabilitando {contentType} ({progress}/{total})..."
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Disabilitando {contentType}..."
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Abilitando {contentType} ({progress}/{total})..."
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Abilitando {contentType}..."
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Aggiornando {contentType} ({progress}/{total})..."
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Aggiornando {contentType}..."
+  },
+  "content.selection-bar.disable": {
+    "defaultMessage": "Disabilita"
+  },
+  "content.selection-bar.enable": {
+    "defaultMessage": "Abilita"
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} {count, plural, one {selezionato} other {selezionati}}"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "{count, number} {count, plural, one {selezionato} other {selezionati}}"
   },
   "form.label.address-line": {
     "defaultMessage": "Riga indirizzo"
@@ -248,6 +491,69 @@
   "form.placeholder.state": {
     "defaultMessage": "Inserisci stato/provincia"
   },
+  "header.category.category": {
+    "defaultMessage": "Categoria"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Funzionalità"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Comunità"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Caratteristiche"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Stile di gioco"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Configurazione"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Impatto"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Risoluzione"
+  },
+  "hosting.content.copy-link": {
+    "defaultMessage": "Copia link"
+  },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Errore nella rimozione dei contenuti"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Errore nella disabilitazione dei contenuti"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Errore nell'abilitazione dei contenuti"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "Errore nell'aggiornamento dei contenuti"
+  },
+  "hosting.content.failed-to-load-modpack-content": {
+    "defaultMessage": "Errore nel caricamento dei contenuti del pacchetto"
+  },
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Errore nel caricamento delle versioni"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Errore nella rimozione dei contenuti"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Impossibile cambiare lo stato di \"{name}\""
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Errore nello scollegamento del pacchetto"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Errore nell'aggiornamento"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Errore nel caricamento del file"
+  },
+  "hosting.content.switch-version": {
+    "defaultMessage": "Cambia versione"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
   },
@@ -275,8 +581,14 @@
   "icon-select.select": {
     "defaultMessage": "Seleziona icona"
   },
+  "input.search-version.placeholder": {
+    "defaultMessage": "Cerca una versione..."
+  },
   "input.search.placeholder": {
     "defaultMessage": "Cerca..."
+  },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Seleziona versione"
   },
   "input.view.gallery": {
     "defaultMessage": "Vista galleria"
@@ -286,6 +598,102 @@
   },
   "input.view.list": {
     "defaultMessage": "Vista righe"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Seleziona versione del gioco"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Seleziona versione di {loader}"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Seleziona piattaforma"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Conferma"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Passare alla {gameVersion} modificherà i seguenti contenuti nel tuo server."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Conferma le modifiche"
+  },
+  "installation-settings.edit-installation.title": {
+    "defaultMessage": "Modifica installazione"
+  },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "Non consigliamo di modificare l'installazione dopo aver installato dei contenuti. Se vuoi modificarla, fai attenzione in quanto potrebbe causare problemi."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "Non consigliamo di modificare l'installazione dopo aver installato dei contenuti. Se vuoi modificarla, reimposta il server."
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "{projectType, select, server {Server} other {Pacchetto}} collegato"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "Versione di {loader}"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Dovrai reimpostare il server prima di cambiare loader."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Reinstallare il pacchetto di mod reimposterà i contenuti {type, select, server {del tuo server} other {della tua istanza}} al loro stato originario, rimuovendo qualsiasi mod o contenuti aggiunti."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Reinstalla pacchetto di mod"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Reinstallando pacchetto di mod..."
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Rimozione (incompatibile)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Reinstalla le dipendenze di Minecraft e controlla eventuali corruzioni. Se il tuo gioco non si avvia per colpa del launcher, prova questa opzione."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Riparazione dell'istanza"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Reinstalla il loader e le dipendenze di Minecraft senza rimuovere i contenuti. Se il tuo server non si avvia correttamente, prova questa opzione."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Riparazione del server"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Salvando..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Cerca versione del gioco..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Scollega"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Scollegare disconnetterà {type, select, server {questo server} other {questa istanza}} dal {projectType, select, server {server} other {pacchetto di mod}} permanentemente. Questo ti permetterà di cambiare loader e versione di Minecraft, ma non riceverai aggiornamenti futuri."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Verificando..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Reinstallare reimposterà tutti i contenuti installati o modificati a quelli forniti dal pacchetto di mod, rimuovendo qualsiasi mod o contenuti aggiunti all'installazione originale."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Avviso di reinstallazione"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Reinstalla pacchetto di mod"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Reinstalla pacchetto"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Riparare reinstallerà il loader e le dipendenze di Minecraft senza rimuovere i contenuti. Se il tuo {type, select, server {server non si avvia correttamente} other {gioco non si avvia per colpa del launcher}}, prova questa opzione."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Riparazione {type, select, server {del server} other {dell'istanza}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Ripara"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modalità avventura"
@@ -302,8 +710,104 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modalità sconosciuta"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Scollega pacchetto"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "I file sono ancora in fase di caricamento. Lasciare questa pagina annullerà questa operazione e le tue modifiche andranno perse."
+  },
+  "instances.confirm-leave-modal.leave": {
+    "defaultMessage": "Abbandona"
+  },
+  "instances.confirm-leave-modal.stay": {
+    "defaultMessage": "Rimani"
+  },
+  "instances.confirm-leave-modal.title": {
+    "defaultMessage": "Abbandonare la pagina?"
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Caricando..."
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} {count, plural, one {istanza compatibile} other {istanze compatibili}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Istanza esistente"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "Versione del gioco"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Seleziona versione del gioco"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Installa progetto"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "Nascondi versioni snapshot"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Installa"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installata"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "Installando..."
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Tipo di istanza"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Loader"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Nome"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Inserisci nome istanza"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Nuova istanza"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Nessuna istanza compatibile trovata"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Rimuovi icona"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Cerca istanza"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Seleziona icona"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "Mostra tutte le versioni"
+  },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Indietro"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Copia link"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Questo pacchetto di mod non include alcun contenuto aggiuntivo."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Nessun contenuto trovato"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Tutto"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Contenuto del pacchetto"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Caricando il contenuto..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Nessun progetto corrisponde alla tua ricerca."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Cerca tra {count, number} {count, plural, one {progetto} other {progetti}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Attuale"
@@ -312,13 +816,25 @@
     "defaultMessage": "Incompatibile"
   },
   "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Torna alla v{version}"
+    "defaultMessage": "Retrocedi alla {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Aggiorna versione"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Cambia versione del pacchetto"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Cambia versione"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Nascondi incompatibili"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Caricando le informazioni..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Caricando le versioni..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Nessuna novità elencata per questa versione."
@@ -335,14 +851,17 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Mostra incompatibili"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Passa alla {version}"
+  },
   "instances.updater-modal.update-to": {
-    "defaultMessage": "Aggiorna alla v{version}"
+    "defaultMessage": "Aggiorna alla {version}"
   },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Non possiamo garantire che gli aggiornamenti siano sicuri per la tua istanza. Controlla le novità di tutte le versioni intermedie e assicurati di fare un backup."
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Aggiornare potrebbe portare problemi alla tua istanza. Controlla i cambiamenti e fai prima un backup."
   },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Non possiamo garantire che gli aggiornamenti siano sicuri per i tuoi mondi. Controlla le novità di tutte le versioni intermedie e assicurati di fare un backup."
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Aggiornare potrebbe portare problemi al tuo mondo. Controlla i cambiamenti e fai prima un backup."
   },
   "label.actions": {
     "defaultMessage": "Azioni"
@@ -355,6 +874,9 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Questa è una mod lato client e potrebbe causare problemi. L'abbiamo lasciata abilitata in quando alcuni autori sbagliano a selezionare l'ambiente, e il loader dovrebbe risolvere il conflitto."
   },
   "label.collections": {
     "defaultMessage": "Raccolte"
@@ -373,6 +895,9 @@
   },
   "label.delete": {
     "defaultMessage": "Elimina"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Elimina subito"
   },
   "label.description": {
     "defaultMessage": "Descrizione"
@@ -395,11 +920,26 @@
   "label.followed-projects": {
     "defaultMessage": "Progetti seguiti"
   },
+  "label.game-version": {
+    "defaultMessage": "Versione del gioco"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Informazioni"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Pacchetti di mod installati"
+  },
+  "label.installing": {
+    "defaultMessage": "Installando..."
+  },
   "label.loading": {
     "defaultMessage": "Caricamento..."
   },
   "label.moderation": {
     "defaultMessage": "Moderazione"
+  },
+  "label.modpack": {
+    "defaultMessage": "Pacchetto di mod"
   },
   "label.no": {
     "defaultMessage": "No"
@@ -416,8 +956,11 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.platform": {
+    "defaultMessage": "Piattaforma"
+  },
   "label.played": {
-    "defaultMessage": "Giocato {time}"
+    "defaultMessage": "Avviato {ago}"
   },
   "label.project": {
     "defaultMessage": "Progetto"
@@ -440,6 +983,12 @@
   "label.search": {
     "defaultMessage": "Cerca"
   },
+  "label.select-all": {
+    "defaultMessage": "Seleziona tutto"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Azioni di selezione"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -460,6 +1009,9 @@
   },
   "label.title": {
     "defaultMessage": "Titolo"
+  },
+  "label.unknown": {
+    "defaultMessage": "Sconosciuto"
   },
   "label.unlisted": {
     "defaultMessage": "Non in elenco"
@@ -482,11 +1034,131 @@
   "label.yes": {
     "defaultMessage": "Sì"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Ceco"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Danese"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Tedesco (Svizzera)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Tedesco (Germania)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Inglese (Stati Uniti)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Spagnolo (America Latina)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spagnolo (Spagna)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finlandese"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filippino"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Francese"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Ebraico"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Ungherese"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesiano"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italiano (Italia)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Giapponese"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Coreano"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malese"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Olandese"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norvegese Bokmål"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polacco"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portoghese (Brasile)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portoghese (Portogallo)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Rumeno"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russo"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbo (Latino)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Svedese"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thailandese"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turco"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ucraino"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamita"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Cinese (Semplificato)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Cinese (Tradizionale)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Aggiungi un metodo di pagamento"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Aggiungere un metodo di pagamento"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Installa automaticamente i contenuti richiesti"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Entra nei server appena avviato il gioco"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Mantieni i file aggiornati coi server"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Chiudi"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Scarica Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App si aprirà automaticamente..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Aprendo Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Perché usare Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "Si è verificato un errore"
@@ -638,8 +1310,26 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Pubblicato {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Aggiornato {date}"
+  },
+  "project-card.environment.client": {
+    "defaultMessage": "Client"
+  },
+  "project-card.environment.client-and-server": {
+    "defaultMessage": "Client e server"
+  },
+  "project-card.environment.client-or-server": {
+    "defaultMessage": "Client o server"
+  },
+  "project-card.environment.server": {
+    "defaultMessage": "Server"
+  },
   "project-type.all": {
-    "defaultMessage": "Tutti"
+    "defaultMessage": "Tutto"
   },
   "project-type.datapack.capital": {
     "defaultMessage": "Pacchett{count, plural, one {o} other {i}} di dati"
@@ -676,6 +1366,9 @@
   },
   "project-type.plugin.lowercase": {
     "defaultMessage": "plugin"
+  },
+  "project-type.project.capital": {
+    "defaultMessage": "Progett{count, plural, one {o} other {i}}"
   },
   "project-type.project.category": {
     "defaultMessage": "Progetti"
@@ -785,23 +1478,44 @@
   "project.about.links.issues": {
     "defaultMessage": "Segnala problemi"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Visita il sito"
+  },
   "project.about.links.source": {
     "defaultMessage": "Visualizza sorgente"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Visita il negozio"
   },
   "project.about.links.title": {
     "defaultMessage": "Collegamenti"
   },
   "project.about.links.wiki": {
-    "defaultMessage": "Consulta la Wiki"
+    "defaultMessage": "Consulta la wiki"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Copiato!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Indirizzo IP copiato negli appunti"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Latenza"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Dettagli sul server"
+  },
+  "project.download-count-tooltip": {
+    "defaultMessage": "{count, number} download"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Necessario sul client e sul server."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client e server, necessario su entrambi"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Molte funzioni sono eseguite lato client, ma installare anche sul server sblocca funzionalità avanzate."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client e server, opzionale sul server"
@@ -813,31 +1527,31 @@
     "defaultMessage": "Solo lato client"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Ha funzioni sul client e sul server, anche se parzialmente. Installare su entrambi porta a un'esperienza migliore."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client e server, meglio se installato su entrambi"
   },
   "project.environment.client-or-server.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Ha funzionalità sul client e sul server, anche solo parziali."
   },
   "project.environment.client-or-server.title": {
     "defaultMessage": "Client e server, opzionale su entrambi"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
+    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla. Funziona solo su server dedicati."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Solo lato server"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Molte funzioni sono eseguite lato server, ma installare anche sul client sblocca funzionalità avanzate."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client e server, opzionale sul client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla."
+    "defaultMessage": "Tutte le funzioni sono eseguite lato server e sono quindi compatibili con client vanilla. Funziona anche in giocatore singolo."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Solo lato server e in giocatore singolo"
@@ -860,14 +1574,35 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente sconosciuto"
   },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} follower"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {giocatore} other {giocatori}} online"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {avvio recente} other {avvii recenti}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {avvio recente} other {avvii recenti}} da Modrinth nelle ultime 2 settimane"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} ms"
+  },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitiche"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Contenuto"
   },
   "project.settings.description.title": {
     "defaultMessage": "Descrizione"
   },
   "project.settings.environment.client_and_server.description": {
-    "defaultMessage": "Ha funzionalità sia sul client sia sul server, anche solo parziali."
+    "defaultMessage": "Ha funzionalità sul client e sul server, anche solo parziali."
   },
   "project.settings.environment.client_and_server.optional_both.title": {
     "defaultMessage": "Facoltativo su entrambi, funziona ugualmente se installato su qualsiasi lato dei due"
@@ -970,6 +1705,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Nessun permesso"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tag"
@@ -1091,14 +1829,56 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Qualcosa è andato storto nella creazione di \"{backupName}\". Riprova più tardi o contatta l'assistenza se il problema persiste."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Impossibile creare il backup"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "\"{backupName}\" è in attesa e inizierà a momenti."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Backup in attesa"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "Salvando i dati del mondo e le configurazioni del server per \"{backupName}\". Ciò potrà richiedere alcuni minuti."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Creazione del backup"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "il mio backup"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Qualcosa è andato storto nel ripristino di \"{backupName}\". Riprova più tardi o contatta l'assistenza se il problema persiste."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Errore nel ripristino del backup"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Il ripristino da \"{backupName}\" è in attesa e inizierà a momenti."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Ripristino del backup in attesa"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "\"{backupName}\" è stato ripristinato e ora il server è pronto a essere avviato."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Backup ripristinato con successo"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Ripristinando il server da \"{backupName}\". Ciò potrà richiedere alcuni minuti."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Ripristino dal backup"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatico"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Pianificazione del backup"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Creando il backup..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Errore nella creazione del backup"
@@ -1109,20 +1889,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Backup manuale"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Backup messo in coda"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Ripristina coda"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Rinomina"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Ripristina"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Ripristinando dal backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignora"
@@ -1220,6 +1991,24 @@
   "servers.region.western-europe": {
     "defaultMessage": "Europa occidentale"
   },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "Stai andando troppo veloce. Riprova più tardi."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Impossibile reinstallare il server"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "C'è stato un problema inaspettato nella reinstallazione. Riprova più tardi."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Errore nella reinstallazione"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Non chiudere la pagina prima del termine dell'operazione."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Caricamento del pacchetto"
+  },
   "settings.account.title": {
     "defaultMessage": "Account e sicurezza"
   },
@@ -1239,7 +2028,7 @@
     "defaultMessage": "Scuro"
   },
   "settings.display.theme.description": {
-    "defaultMessage": "Scegli il tema che preferisci per Modrinth su questo dispositivo."
+    "defaultMessage": "Scegli il tema che Modrinth userà su questo dispositivo."
   },
   "settings.display.theme.light": {
     "defaultMessage": "Chiaro"
@@ -1257,7 +2046,7 @@
     "defaultMessage": "Retrò"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Sincronizza con il sistema"
+    "defaultMessage": "Automatico"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Tema"
@@ -1293,7 +2082,7 @@
     "defaultMessage": "È possibile che alcune frasi rimangano in inglese in quanto la piattaforma non è ancora stata tradotta del tutto e per tutte le lingue."
   },
   "settings.pats.title": {
-    "defaultMessage": "Token di accesso personali (PAT)"
+    "defaultMessage": "Token di accesso (PAT)"
   },
   "settings.profile.title": {
     "defaultMessage": "Profilo pubblico"
@@ -1328,11 +2117,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Avventura"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Modalità avventura"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Anarchia"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Atmosfera"
   },
   "tag.category.audio": {
     "defaultMessage": "Suoni"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Battle royale"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "BedWars"
   },
   "tag.category.blocks": {
     "defaultMessage": "Blocchi"
@@ -1340,11 +2141,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Risalto"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Boss"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Cartone"
   },
   "tag.category.challenging": {
     "defaultMessage": "Impegnativa"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Ceti"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Luci colorate"
@@ -1352,14 +2159,32 @@
   "tag.category.combat": {
     "defaultMessage": "Combattimento"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Competizione"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Core shader"
   },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Modalità creativa"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Creatività"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Multipiattaforma"
+  },
   "tag.category.cursed": {
-    "defaultMessage": "Grottesco"
+    "defaultMessage": "Grottesca"
+  },
+  "tag.category.custom-content": {
+    "defaultMessage": "Contenuti personalizzati"
   },
   "tag.category.decoration": {
     "defaultMessage": "Decorazione"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Segrete"
   },
   "tag.category.economy": {
     "defaultMessage": "Economia"
@@ -1373,6 +2198,9 @@
   "tag.category.equipment": {
     "defaultMessage": "Equipaggiamento"
   },
+  "tag.category.factions": {
+    "defaultMessage": "Fazioni"
+  },
   "tag.category.fantasy": {
     "defaultMessage": "Fantasia"
   },
@@ -1383,13 +2211,19 @@
     "defaultMessage": "Caratteri"
   },
   "tag.category.food": {
-    "defaultMessage": "Cibo"
+    "defaultMessage": "Pietanze"
   },
   "tag.category.game-mechanics": {
     "defaultMessage": "Meccaniche di gioco"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Generazioni"
+  },
   "tag.category.gui": {
     "defaultMessage": "Interfaccia"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Modalità estrema"
   },
   "tag.category.high": {
     "defaultMessage": "Alto"
@@ -1397,14 +2231,23 @@
   "tag.category.items": {
     "defaultMessage": "Strumenti"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Mantieni inventario"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Di tutto e di più"
+  },
+  "tag.category.kitpvp": {
+    "defaultMessage": "KitPvP"
   },
   "tag.category.library": {
     "defaultMessage": "Libreria"
   },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Rubavita"
+  },
   "tag.category.lightweight": {
-    "defaultMessage": "Leggero"
+    "defaultMessage": "Leggera"
   },
   "tag.category.locale": {
     "defaultMessage": "Lingua"
@@ -1418,11 +2261,23 @@
   "tag.category.management": {
     "defaultMessage": "Gestione"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Medio"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Microgiochi"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minigioco"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Minigiochi"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Mostri"
@@ -1436,8 +2291,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Multigiocatore"
   },
+  "tag.category.network": {
+    "defaultMessage": "Federazione"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Modalità offline"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "OneBlock"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Ottimizzazione"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Path tracing"
@@ -1445,17 +2315,50 @@
   "tag.category.pbr": {
     "defaultMessage": "Rendering fisico"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Mondi personali"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Lotti"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Molto basso"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Prigione"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Missioni"
   },
   "tag.category.quests": {
     "defaultMessage": "Missioni"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Gare"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistica"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "SMP registrato"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Riflessi"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Recitazione"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Per foto"
@@ -1469,17 +2372,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Basilare"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "SkyBlock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
-    "defaultMessage": "Comunità"
+    "defaultMessage": "Società"
   },
   "tag.category.storage": {
     "defaultMessage": "Immagazzinamento"
+  },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Modalità sopravvivenza"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "A squadre"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Tecnico"
   },
   "tag.category.technology": {
     "defaultMessage": "Tecnologia"
   },
   "tag.category.themed": {
     "defaultMessage": "A tema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Città"
   },
   "tag.category.transportation": {
     "defaultMessage": "Trasporto"
@@ -1492,6 +2413,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Simil-Vanilla"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Con whitelist"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Ripristini regolari"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Generazione del mondo"
@@ -1533,7 +2460,7 @@
     "defaultMessage": "Java Agent"
   },
   "tag.loader.legacy-fabric": {
-    "defaultMessage": "Fabric Legacy"
+    "defaultMessage": "Legacy Fabric"
   },
   "tag.loader.liteloader": {
     "defaultMessage": "LiteLoader"
@@ -1585,9 +2512,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} alle {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Hai modifiche non salvate."

@@ -24,11 +24,10 @@
 				<label for="notice-title" class="flex flex-col gap-1">
 					<span class="text-lg font-semibold text-contrast"> Title </span>
 				</label>
-				<input
+				<StyledInput
 					id="notice-title"
 					v-model="newNoticeTitle"
 					placeholder="E.g. Maintenance"
-					type="text"
 					autocomplete="off"
 				/>
 			</div>
@@ -39,17 +38,20 @@
 						<span class="text-brand-red">*</span>
 					</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="newNoticeSurvey"
 					id="notice-message"
 					v-model="newNoticeMessage"
 					placeholder="E.g. rXGtq2"
-					type="text"
 					autocomplete="off"
 				/>
-				<div v-else class="textarea-wrapper h-32">
-					<textarea id="notice-message" v-model="newNoticeMessage" />
-				</div>
+				<StyledInput
+					v-else
+					id="notice-message"
+					v-model="newNoticeMessage"
+					multiline
+					wrapper-class="h-32"
+				/>
 			</div>
 			<div v-if="!newNoticeSurvey" class="flex items-center justify-between gap-2">
 				<label for="dismissable-toggle" class="flex flex-col gap-1">
@@ -63,7 +65,7 @@
 					<span class="text-lg font-semibold text-contrast"> Announcement date </span>
 					<span>Leave blank for notice to be available immediately.</span>
 				</label>
-				<input
+				<StyledInput
 					id="scheduled-date"
 					v-model="newNoticeScheduledDate"
 					type="datetime-local"
@@ -75,7 +77,7 @@
 					<span class="text-lg font-semibold text-contrast"> Expiration date </span>
 					<span>The notice will automatically be deleted after this date.</span>
 				</label>
-				<input
+				<StyledInput
 					id="expiration-date"
 					v-model="newNoticeExpiresDate"
 					type="datetime-local"
@@ -157,16 +159,13 @@
 						</div>
 						<div class="text-sm">
 							<span v-if="notice.announce_at">
-								{{ dayjs(notice.announce_at).format('MMM D, YYYY [at] h:mm A') }}
+								{{ formatDateTimeShortMonth(notice.announce_at) }}
 								({{ formatRelativeTime(notice.announce_at) }})
 							</span>
 							<template v-else> Never begins </template>
 						</div>
 						<div class="text-sm">
-							<span
-								v-if="notice.expires"
-								v-tooltip="dayjs(notice.expires).format('MMMM D, YYYY [at] h:mm A')"
-							>
+							<span v-if="notice.expires" v-tooltip="formatDateTime(notice.expires)">
 								{{ formatRelativeTime(notice.expires) }}
 							</span>
 							<template v-else> Never expires </template>
@@ -271,8 +270,10 @@ import {
 	injectNotificationManager,
 	NewModal,
 	ServerNotice,
+	StyledInput,
 	TagItem,
 	Toggle,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -287,6 +288,14 @@ import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDateTimeShortMonth = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'medium',
+})
 
 const notices = ref<ServerNoticeType[]>([])
 const createNoticeModal = ref<InstanceType<typeof NewModal>>()

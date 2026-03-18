@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Додайте значок"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Додайте IP-адресу та порт Java Edition, аби гравці могли приєднатися до сервера."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Додайте адресу Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Додайте будь-які доречні посилання, націлені за межі Modrinth, наприклад вебсайт, крамниця або запрошення Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Додайте зовнішні посилання"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Додайте будь-які необхідні посилання на вебсайти поза Modrinth, як-от, на вихідний код, систему відстеження проблем чи запрошення до Discord."
   },
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Надайте вихідний код"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Деякі з ваших посилань, схоже, однакові. Кожне посилання слід вводити лише один раз й у відповідне для нього поле."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Однакові посилання"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Ваш опис повинен містити достатню кількість простого тексту або альтернативного тексту зображень, щоби він був зрозумілим для тих, хто використовує читачі екрану або має повільне з’єднання з інтернетом."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Виберіть правильну роздільність"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Виберіть, які версії підтримує ваш сервер, виберіть збірку або завантажте власний."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Виберіть сумісність"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Повідомте гравцям, у якому регіоні знаходиться ваш сервер."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Виберіть регіон"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Перелічіть мову або мови, підтримувані вашим сервером."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Виберіть мову"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Виберіть ліцезію під якою поширюється {type, select, mod {ваш мод} modpack {ваша збірка} resourcepack {ваш пакет ресурсів} shader {ваш шейдер} plugin {ваш плаґін} datapack {ваш пакет даних} other {ваш проєкт}}."
   },
@@ -129,10 +165,13 @@
     "defaultMessage": "Виберіть ліцензію"
   },
   "nags.select-tags.description": {
-    "defaultMessage": "Виберіть теґи, котрі правильно описують ваш проєкт, щоби допомогти користувачам знайти його."
+    "defaultMessage": "Виберіть теґи, які правильно описують ваш проєкт, щоби допомогти користувачам знайти його."
   },
   "nags.select-tags.title": {
     "defaultMessage": "Виберіть теґи"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Відвідайте налаштування сервера"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Відвідайте налаштування опису"
@@ -172,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Скоротіть назву"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Вами вибрано {tagCount, plural, one {# теґ} few {# теґи} other {# теґів}}. Будь ласка, зменште їх кількість до {maxTagCount}, щоб переконатися, що ваш сервер видно в доречних результатах пошуку."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Виберіть відповідні теґи"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Ви вибрали {tagCount, plural, one {# теґ} few {# теґи} other {# теґів}}. Зменште кількість до {maxTagCount} або менше, щоб ваш проєкт показувався у відповідних результатах пошуку."

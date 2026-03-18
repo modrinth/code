@@ -5,6 +5,63 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.export-modal.export-button": {
+    "message": "Iluwas"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Ang lahat ng data ng iyong instansiya ay tuluyang mawawala, kabilang na ang iyong mga mundo, kumpigurasyon, at lahat ng na-install na kontento."
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyekto"
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Ang \"{name}\" ay nadagdag"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Hindi kilala"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "Nangangailangan ng kontento"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Mag-install upang malaro"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "I-install"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {# mod} other {# na mod}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Kinailangan na modpack"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Ang server rna ito ay nangangailangan ng mga mod upang makalaro. Pindutin ang install upang maihanda ang mga kinakailangang file galing sa Modrinth, matapos ay ilunsad nang diretso sa server."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Binahaging instansiya"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Binahaging instansiyang pang-server"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Tingnan ang mga kontento"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Mag-update upang malaro"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Kailangang mag-update"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Nakabukas ang moda ng nagdidibelop."
   },
@@ -32,38 +89,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Pamamahala ng paglalaan"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Ang Modrinth App v{version} ay handa nang ma-install. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
+  "app.update-popup.body.download-complete": {
     "message": "Tapos nang ma-download ang Modrinth App v{version}. Mag-reload upang ma-update ngayon, o awtomatiko sa pagsara ng Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}. Gamitin ang iyong package manager upang i-update sa pinabagong tampok at pag-aayos!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Magagamit na ngayon ang Modrinth App v{version}! Hindi namin dinanload kaagad dahil naka-metro ang inyong network."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Changelog"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "I-download ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "I-download"
+  "app.update-popup.download-complete": {
+    "message": "Nakumpleto ang pagdownload"
   },
-  "app.update-toast.downloading": {
-    "message": "Nagda-download..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Mag-reload"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "May bagong update"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Nakumpleto ang pagdownload"
   },
   "app.update.complete-toast.text": {
     "message": "Dito pumindot upang matingnan ang changelog."
@@ -179,12 +230,6 @@
   "instance.edit-world.title": {
     "message": "Baguhin ang mundo"
   },
-  "instance.filter.disabled": {
-    "message": "Mga hindi pinapagang proyekto"
-  },
-  "instance.filter.updates-available": {
-    "message": "May bagong mga update"
-  },
   "instance.server-modal.address": {
     "message": "Adres"
   },
@@ -258,7 +303,7 @@
     "message": "Mga custom na launch hook"
   },
   "instance.settings.tabs.hooks.description": {
-    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga system command bago at pagkatapos ma-launch ang laro."
+    "message": "Binibigyan-daan ng mga hook ang mga ekspertong tagagamit na makapagtakbo ng mga pansistemang utos o system command bago at pagkatapos ma-launch ang laro."
   },
   "instance.settings.tabs.hooks.post-exit": {
     "message": "Post-exist"
@@ -293,140 +338,8 @@
   "instance.settings.tabs.installation": {
     "message": "Instalasyon"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Naka-install naman ang {platform} {version} para sa Minecraft {game_version}"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Naka-install naman ang Vanilla {game_version}"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Palitan ang bersiyon"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "I-install"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Ini-install"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Nagfe-fetch ng mga bersiyon ng modpack"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Ini-install ang bagong bersiyon"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Kasalukuyang naka-install"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Impormasyon sa pagdebug:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Nagfe-fetch ng mga detalye ng modpack"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Bersiyon ng laro"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "I-install"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Nag-i-install ngayon"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Bersiyon ng {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Hindi maka-fetch ng mga detalye ng linked modpack. Mangyaring tingnan ang iyong internet connection."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "Hindi magagamit ang {loader} sa Minecraft {version}. Sumubok ng ibang mod loader."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Naka-link itong instansiya sa isang modpack, pero ang modpack na ito ay hindi makikita sa Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Plataporma"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "I-reinstall ang modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Ini-re-reinstall ang modpack"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Ang pagrere-install ay maaaring ma-reset ang lahat ng na-install at binago na kontento sa kung anong hinahandog ng modpack, tatanggalin ang mga mods at kontentong idinagdag mo sa orihinal na modpack. Maaari nitong masiayos ang mga hindi inaasahang pag-uugali kung may pagbabagong naganap sa instansiya, ngunit kung dumedepende na ang iyong mundo sa karagdagang kontento, maaari nitong masira ang mga umiiral na mundo."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Sigurado ka bang gusto mong i-reinstall ang instansiyang ito?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mare-reset ang mga kontento ng instansiya sa orihinal niyang estado, tatanggalin ang mga mods at kontentong idinagdag mo sa orihinal na modpack."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "I-reinstall ang modpack"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Ayusin"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Inaayos"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Sa pagre-repair, mare-reinstall ang mga dependency ng Minecraft at maghahanap ng mga kurapsiyon. Maaaring maresolbe nito ang mga isyu kung hindi malu-launch ang laro dahil sa mga launcher-related error, ngunit hindi nito mareresolbe ang mga isyu at pag-crash na dulot ng mga na-install na mod."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Ayusin ang instansiya?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Inaayos ngayon"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Sa kasalukuyan i-reset"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Ipakita ang lahat ng bersiyon"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "palitan ang bersiyon"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "i-install"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "i-reinstall"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "ayusin"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Hindi makaka-{action} habang nag-i-install"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Hindi makaka-{action} habang nasa offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Hindi makaka-{action} habang nag-aayos"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(hindi kilalang bersiyon)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "I-unlink sa instansiya"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Kapag ipagpatuloy mo, hindi mo na itong mai-link muli ng hindi gagawa ng bagong instansiya. Hindi ka makakatanggap ng mga update ng modpack at magiging normal na itong."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Sigurado ka bang gusto mong i-unlik ang instansiyang ito?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Ang instansiyang ito ay naka-link sa isang modpack, ibig sabihin ang mga mod ay hindi mai-update at hindi mo mapapalitan ang mod loader at ang bersiyon ng Minecraft. Permanenteng madi-diskonekta ang instansiyang ito sa modpack kung mag-unlink."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "I-unlink sa modpack"
   },
   "instance.settings.tabs.java": {
     "message": "Java at memorya"
@@ -500,6 +413,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Hindi magkatugma sa server"
   },
+  "instance.worlds.linked_server": {
+    "message": "Pinamamahala ng proyektong server"
+  },
   "instance.worlds.no_contact": {
     "message": "Hindi makontak ang server"
   },
@@ -535,5 +451,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Maki-sync sa instansiya"
+  },
+  "search.filter.locked.server": {
+    "message": "Handog ng server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Mga mod sa panig ng client lamang ang maidadaragdag sa instansiyang server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Ang bersiyon ng laro ay handog ng server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Ang loader ay handog na ng server"
   }
 }

@@ -4,21 +4,21 @@ use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use clap::Parser;
 
-use labrinth::app_config;
 use labrinth::background_task::BackgroundTask;
 use labrinth::database::redis::RedisPool;
-use labrinth::file_hosting::{S3BucketConfig, S3Host};
+use labrinth::env::ENV;
+use labrinth::file_hosting::{FileHostKind, S3BucketConfig, S3Host};
 use labrinth::queue::email::EmailQueue;
 use labrinth::search;
 use labrinth::util::anrok;
-use labrinth::util::env::parse_var;
 use labrinth::util::gotenberg::GotenbergClient;
 use labrinth::util::ratelimit::rate_limit_middleware;
 use labrinth::utoipa_app_config;
-use labrinth::{check_env_vars, clickhouse, database, file_hosting};
+use labrinth::{app_config, env};
+use labrinth::{clickhouse, database, file_hosting};
 use std::ffi::CStr;
 use std::sync::Arc;
-use tracing::{Instrument, error, info, info_span};
+use tracing::{Instrument, info, info_span};
 use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
@@ -56,13 +56,8 @@ struct Args {
 
 fn main() -> std::io::Result<()> {
     color_eyre::install().expect("failed to install `color-eyre`");
-    dotenvy::dotenv().ok();
     modrinth_util::log::init().expect("failed to initialize logging");
-
-    if check_env_vars() {
-        error!("Some environment variables are missing!");
-        std::process::exit(1);
-    }
+    env::init().expect("failed to initialize environment variables");
 
     // Sentry must be set up before the async runtime is started
     // <https://docs.sentry.io/platforms/rust/guides/actix-web/>
@@ -70,11 +65,8 @@ fn main() -> std::io::Result<()> {
     // Has no effect if not set.
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
-        traces_sample_rate: dotenvy::var("SENTRY_TRACES_SAMPLE_RATE")
-            .unwrap()
-            .parse()
-            .expect("failed to parse `SENTRY_TRACES_SAMPLE_RATE` as number"),
-        environment: Some(dotenvy::var("SENTRY_ENVIRONMENT").unwrap().into()),
+        traces_sample_rate: ENV.SENTRY_TRACES_SAMPLE_RATE,
+        environment: Some((&ENV.SENTRY_ENVIRONMENT).into()),
         ..Default::default()
     });
     if sentry.is_enabled() {
@@ -99,10 +91,7 @@ async fn app() -> std::io::Result<()> {
         .unwrap();
 
     if args.run_background_task.is_none() {
-        info!(
-            "Starting labrinth on {}",
-            dotenvy::var("BIND_ADDR").unwrap()
-        );
+        info!("Starting labrinth on {}", &ENV.BIND_ADDR);
 
         if !args.no_migrations {
             database::check_for_migrations()
@@ -117,51 +106,55 @@ async fn app() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_pool = RedisPool::new(None);
+    let redis_pool = RedisPool::new("");
 
-    let storage_backend =
-        dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
-
+    let storage_backend = ENV.STORAGE_BACKEND;
     let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        match storage_backend.as_str() {
-            "s3" => {
-                let config_from_env = |bucket_type| S3BucketConfig {
-                    name: parse_var(&format!("S3_{bucket_type}_BUCKET_NAME"))
-                        .unwrap(),
-                    uses_path_style: parse_var(&format!(
-                        "S3_{bucket_type}_USES_PATH_STYLE_BUCKET"
-                    ))
-                    .unwrap(),
-                    region: parse_var(&format!("S3_{bucket_type}_REGION"))
-                        .unwrap(),
-                    url: parse_var(&format!("S3_{bucket_type}_URL")).unwrap(),
-                    access_token: parse_var(&format!(
-                        "S3_{bucket_type}_ACCESS_TOKEN"
-                    ))
-                    .unwrap(),
-                    secret: parse_var(&format!("S3_{bucket_type}_SECRET"))
-                        .unwrap(),
+        match storage_backend {
+            FileHostKind::S3 => {
+                let not_empty = |v: &str| -> String {
+                    assert!(!v.is_empty(), "S3 env var is empty");
+                    v.to_string()
                 };
 
                 Arc::new(
                     S3Host::new(
-                        config_from_env("PUBLIC"),
-                        config_from_env("PRIVATE"),
+                        S3BucketConfig {
+                            name: not_empty(&ENV.S3_PUBLIC_BUCKET_NAME),
+                            uses_path_style: ENV
+                                .S3_PUBLIC_USES_PATH_STYLE_BUCKET,
+                            region: not_empty(&ENV.S3_PUBLIC_REGION),
+                            url: not_empty(&ENV.S3_PUBLIC_URL),
+                            access_token: not_empty(
+                                &ENV.S3_PUBLIC_ACCESS_TOKEN,
+                            ),
+                            secret: not_empty(&ENV.S3_PUBLIC_SECRET),
+                        },
+                        S3BucketConfig {
+                            name: not_empty(&ENV.S3_PRIVATE_BUCKET_NAME),
+                            uses_path_style: ENV
+                                .S3_PRIVATE_USES_PATH_STYLE_BUCKET,
+                            region: not_empty(&ENV.S3_PRIVATE_REGION),
+                            url: not_empty(&ENV.S3_PRIVATE_URL),
+                            access_token: not_empty(
+                                &ENV.S3_PRIVATE_ACCESS_TOKEN,
+                            ),
+                            secret: not_empty(&ENV.S3_PRIVATE_SECRET),
+                        },
                     )
                     .unwrap(),
                 )
             }
-            "local" => Arc::new(file_hosting::MockHost::new()),
-            _ => panic!("Invalid storage backend specified. Aborting startup!"),
+            FileHostKind::Local => Arc::new(file_hosting::MockHost::new()),
         };
 
     info!("Initializing clickhouse connection");
     let mut clickhouse = clickhouse::init_client().await.unwrap();
 
-    let search_config = search::SearchConfig::new(None);
+    let search_backend =
+        actix_web::web::Data::from(Arc::from(search::backend(None)));
 
-    let stripe_client =
-        stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    let stripe_client = stripe::Client::new(ENV.STRIPE_API_KEY.clone());
 
     let anrok_client = anrok::Client::from_env().unwrap();
     let email_queue =
@@ -178,14 +171,15 @@ async fn app() -> std::io::Result<()> {
             pool,
             ro_pool.into_inner(),
             redis_pool,
-            search_config,
+            search_backend,
             clickhouse,
             stripe_client,
             anrok_client.clone(),
             email_queue,
             muralpay,
         )
-        .await;
+        .await
+        .map_err(std::io::Error::other)?;
         return Ok(());
     }
 
@@ -213,7 +207,7 @@ async fn app() -> std::io::Result<()> {
         pool.clone(),
         ro_pool.clone(),
         redis_pool.clone(),
-        search_config.clone(),
+        search_backend.clone(),
         &mut clickhouse,
         file_host.clone(),
         stripe_client,
@@ -272,7 +266,7 @@ async fn app() -> std::io::Result<()> {
             .into_app()
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
-    .bind(dotenvy::var("BIND_ADDR").unwrap())?
+    .bind(&ENV.BIND_ADDR)?
     .run()
     .await
 }

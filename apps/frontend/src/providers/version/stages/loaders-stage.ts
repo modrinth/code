@@ -10,8 +10,14 @@ export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'add-loaders',
 	stageContent: markRaw(LoadersStage),
 	title: (ctx) => (ctx.editingVersion.value ? 'Edit loaders' : 'Loaders'),
-	skip: (ctx) =>
-		(ctx.inferredVersionData.value?.loaders?.length ?? 0) > 0 || ctx.editingVersion.value,
+	skip: (ctx) => {
+		const inferredLoadersLength = ctx.inferredVersionData.value?.loaders?.length ?? 0
+		return (
+			inferredLoadersLength > 0 ||
+			ctx.editingVersion.value ||
+			(inferredLoadersLength === 0 && ctx.projectType.value === 'modpack')
+		)
+	},
 	hideStageInBreadcrumb: (ctx) => !ctx.primaryFile.value || ctx.handlingNewFiles.value,
 	cannotNavigateForward: (ctx) => ctx.draftVersion.value.loaders.length === 0,
 	leftButtonConfig: (ctx) => ({
@@ -36,20 +42,22 @@ export const fromDetailsStageConfig: StageConfigInput<ManageVersionContextValue>
 	leftButtonConfig: (ctx) => ({
 		label: 'Back',
 		icon: LeftArrowIcon,
-		disabled: ctx.draftVersion.value.loaders.length === 0,
+		disabled: ctx.draftVersion.value.loaders.length === 0 && ctx.projectType.value !== 'modpack',
 		onClick: () => ctx.modal.value?.setStage('metadata'),
 	}),
 	rightButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {
 					...ctx.saveButtonConfig(),
-					disabled: ctx.draftVersion.value.loaders.length === 0,
+					disabled:
+						ctx.draftVersion.value.loaders.length === 0 && ctx.projectType.value !== 'modpack',
 				}
 			: {
 					label: 'Add details',
 					icon: RightArrowIcon,
 					iconPosition: 'after',
-					disabled: ctx.draftVersion.value.loaders.length === 0,
+					disabled:
+						ctx.draftVersion.value.loaders.length === 0 && ctx.projectType.value !== 'modpack',
 					onClick: () => ctx.modal.value?.setStage('add-details'),
 				},
 }

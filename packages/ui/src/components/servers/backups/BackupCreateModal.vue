@@ -4,14 +4,13 @@
 			<label for="backup-name-input">
 				<span class="text-lg font-semibold text-contrast">Name</span>
 			</label>
-			<input
+			<StyledInput
 				id="backup-name-input"
 				ref="input"
 				v-model="backupName"
-				type="text"
-				class="w-full rounded-lg bg-bg-input p-4"
 				:placeholder="`Backup #${newBackupAmount}`"
-				maxlength="48"
+				:maxlength="48"
+				wrapper-class="w-full"
 			/>
 			<Transition
 				enter-active-class="transition-all duration-300 ease-out"
@@ -76,6 +75,7 @@ import {
 	injectNotificationManager,
 } from '../../../providers'
 import ButtonStyled from '../../base/ButtonStyled.vue'
+import StyledInput from '../../base/StyledInput.vue'
 import NewModal from '../../modal/NewModal.vue'
 
 const { addNotification } = injectNotificationManager()
@@ -90,7 +90,8 @@ const props = defineProps<{
 const backupsQueryKey = ['backups', 'list', ctx.serverId]
 
 const createMutation = useMutation({
-	mutationFn: (name: string) => client.archon.backups_v0.create(ctx.serverId, { name }),
+	mutationFn: (name: string) =>
+		client.archon.backups_v1.create(ctx.serverId, ctx.worldId.value!, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

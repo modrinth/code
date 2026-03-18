@@ -12,11 +12,10 @@
 				<label for="app-name"
 					><span class="label__title">{{ formatMessage(messages.nameLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					id="app-name"
 					v-model="name"
-					maxlength="2048"
-					type="text"
+					:maxlength="2048"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.namePlaceholder)"
 				/>
@@ -38,11 +37,11 @@
 				<label v-if="editingId" for="app-url">
 					<span class="label__title">{{ formatMessage(messages.urlLabel) }}</span>
 				</label>
-				<input
+				<StyledInput
 					v-if="editingId"
 					id="app-url"
 					v-model="url"
-					maxlength="255"
+					:maxlength="255"
 					type="url"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.urlPlaceholder)"
@@ -50,15 +49,15 @@
 				<label v-if="editingId" for="app-description">
 					<span class="label__title">{{ formatMessage(messages.descriptionLabel) }}</span>
 				</label>
-				<textarea
+				<StyledInput
 					v-if="editingId"
 					id="app-description"
 					v-model="description"
-					class="description-textarea"
-					maxlength="255"
-					type="text"
+					multiline
+					:maxlength="255"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.descriptionPlaceholder)"
+					input-class="h-24 resize-y"
 				/>
 				<label for="app-scopes"
 					><span class="label__title">{{ formatMessage(messages.scopesLabel) }}</span>
@@ -88,9 +87,9 @@
 				<div class="uri-input-list">
 					<div v-for="(_, index) in redirectUris" :key="index">
 						<div class="input-group url-input-group-fixes">
-							<input
+							<StyledInput
 								v-model="redirectUris[index]"
-								maxlength="2048"
+								:maxlength="2048"
 								type="url"
 								autocomplete="off"
 								:placeholder="formatMessage(messages.redirectUriPlaceholder)"
@@ -183,7 +182,7 @@
 						<div>
 							{{
 								formatMessage(messages.createdOn, {
-									date: new Date(app.created).toLocaleDateString(),
+									date: formatDate(new Date(app.created)),
 								})
 							}}
 						</div>
@@ -255,11 +254,15 @@ import {
 	CopyCode,
 	defineMessages,
 	FileInput,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
+	StyledInput,
+	useFormatDateTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import Modal from '~/components/ui/Modal.vue'
 import {
@@ -271,8 +274,10 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+const formatDate = useFormatDateTime()
 
 definePageMeta({
 	middleware: 'auth',
@@ -342,7 +347,7 @@ const messages = defineMessages({
 	},
 	redirectUrisLabel: {
 		id: 'settings.applications.field.redirect-uris',
-		defaultMessage: 'Redirect uris',
+		defaultMessage: 'Redirect URIs',
 	},
 	redirectUriPlaceholder: {
 		id: 'settings.applications.field.redirect-uri.placeholder',
@@ -354,7 +359,7 @@ const messages = defineMessages({
 	},
 	addRedirectUri: {
 		id: 'settings.applications.button.add-redirect-uri',
-		defaultMessage: 'Add a redirect uri',
+		defaultMessage: 'Add a redirect URI',
 	},
 	cancel: {
 		id: 'settings.applications.button.cancel',
@@ -490,16 +495,11 @@ const loading = ref(false)
 
 const auth = await useAuth()
 
-const { data: usersApps, refresh } = await useAsyncData(
-	'usersApps',
-	() =>
-		useBaseFetch(`user/${auth.value.user.id}/oauth_apps`, {
-			apiVersion: 3,
-		}),
-	{
-		watch: [auth],
-	},
-)
+const { data: usersApps, refetch: refresh } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'oauth_apps']),
+	queryFn: () => client.labrinth.oauth_internal.getUserApps(auth.value.user.id),
+	enabled: computed(() => !!auth.value?.user?.id),
+})
 
 const setForm = (app) => {
 	if (app?.id) {
@@ -551,14 +551,7 @@ async function onImageSelection(files) {
 		const file = files[0]
 		const extFromType = file.type.split('/')[1]
 
-		await useBaseFetch('oauth/app/' + editingId.value + '/icon', {
-			method: 'PATCH',
-			internal: true,
-			body: file,
-			query: {
-				ext: extFromType,
-			},
-		})
+		await client.labrinth.oauth_internal.uploadAppIcon(editingId.value, file, extFromType).promise
 
 		await refresh()
 
@@ -579,15 +572,10 @@ async function createApp() {
 	startLoading()
 	loading.value = true
 	try {
-		const createdAppInfo = await useBaseFetch('oauth/app', {
-			method: 'POST',
-			internal: true,
-			body: {
-				name: name.value,
-				icon_url: icon.value,
-				max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
-				redirect_uris: redirectUris.value,
-			},
+		const createdAppInfo = await client.labrinth.oauth_internal.createApp({
+			name: name.value,
+			max_scopes: Number(scopesVal.value),
+			redirect_uris: redirectUris.value,
 		})
 
 		createdApps.value.push(createdAppInfo)
@@ -637,7 +625,7 @@ async function editApp() {
 
 		const body = {
 			name: name.value,
-			max_scopes: Number(scopesVal.value), // JS is 52 bit for ints so we're good for now
+			max_scopes: Number(scopesVal.value),
 			redirect_uris: redirectUris.value,
 		}
 
@@ -653,11 +641,7 @@ async function editApp() {
 			body.icon_url = icon.value
 		}
 
-		await useBaseFetch('oauth/app/' + editingId.value, {
-			method: 'PATCH',
-			internal: true,
-			body,
-		})
+		await client.labrinth.oauth_internal.editApp(editingId.value, body)
 
 		await refresh()
 		setForm(null)
@@ -681,10 +665,7 @@ async function removeApp() {
 		if (!editingId.value) {
 			throw new Error('No editing id')
 		}
-		await useBaseFetch(`oauth/app/${editingId.value}`, {
-			internal: true,
-			method: 'DELETE',
-		})
+		await client.labrinth.oauth_internal.deleteApp(editingId.value)
 		await refresh()
 		editingId.value = null
 	} catch (err) {
@@ -698,11 +679,6 @@ async function removeApp() {
 }
 </script>
 <style lang="scss" scoped>
-.description-textarea {
-	height: 6rem;
-	resize: vertical;
-}
-
 .secret_disclaimer {
 	font-size: var(--font-size-sm);
 }

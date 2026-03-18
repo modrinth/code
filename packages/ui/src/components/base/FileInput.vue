@@ -86,7 +86,7 @@ label {
 	flex-direction: unset;
 	max-height: unset;
 	&:focus-within {
-		outline: 0.25rem solid #ea80ff;
+		outline: 0.25rem solid var(--color-focus-ring);
 	}
 
 	svg {

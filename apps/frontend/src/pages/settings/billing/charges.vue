@@ -29,12 +29,12 @@
 							</template>
 						</span>
 						⋅
-						<span>{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}</span>
+						<span>{{ formatPrice(charge.amount, charge.currency_code) }}</span>
 					</div>
 					<div class="flex items-center gap-1">
 						<Badge :color="charge.status === 'succeeded' ? 'green' : 'red'" :type="charge.status" />
 						⋅
-						{{ $dayjs(charge.due).format('YYYY-MM-DD') }}
+						{{ formatDate(charge.due) }}
 					</div>
 				</div>
 			</div>
@@ -42,8 +42,14 @@
 	</div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs, commonSettingsMessages, defineMessages, useVIntl } from '@modrinth/ui'
-import { formatPrice } from '@modrinth/utils'
+import {
+	Badge,
+	Breadcrumbs, commonSettingsMessages, defineMessages,
+	injectModrinthClient,
+	useFormatDateTime,
+	useFormatPrice,
+} from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import { products } from '~/generated/state.json'
 
@@ -52,6 +58,14 @@ definePageMeta({
 })
 
 const { formatMessage } = useVIntl()
+const client = injectModrinthClient()
+
+const formatPrice = useFormatPrice()
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit',
+})
 
 const messages = defineMessages({
 	description: {
@@ -72,23 +86,22 @@ const messages = defineMessages({
 	},
 })
 
-const { data: charges } = await useAsyncData(
-	'billing/payments',
-	() => useBaseFetch('billing/payments', { internal: true }),
-	{
-		transform: (charges) => {
-			return charges
-				.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
-				.map((charge) => {
-					const product = products.find((product) =>
-						product.prices.some((price) => price.id === charge.price_id),
-					)
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: async () => {
+		const charges = await client.labrinth.billing_internal.getPayments()
+		return charges
+			.filter((charge) => charge.status !== 'open' && charge.status !== 'cancelled')
+			.map((charge) => {
+				const product = products.find((product) =>
+					product.prices.some((price) => price.id === charge.price_id),
+				)
 
-					charge.product = product
+				charge.product = product
 
-					return charge
-				})
-		},
+				return charge
+			})
 	},
-)
+	placeholderData: [],
+})
 </script>

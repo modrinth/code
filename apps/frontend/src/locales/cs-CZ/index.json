@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Stahovácí možnosti"
   },
-  "app-marketing.download.terms": {
-    "message": "Stažením aplikace Modrinth souhlasíte s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Stáhnout Modrinth App (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Aplikace Modrinth je výkonnější než mnoho předních správců modů a využívá pouze 150MB paměti RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Zatím žádné projekty v kolekci"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Zatím žádné projektyt} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
   },
@@ -548,9 +539,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} few {{count} projekty} many {{count} projektů} other {{count} projektů}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Hledat ve vašich kolekcích"
   },
@@ -562,6 +550,9 @@
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
     "message": "Jste občan USA?"
+  },
+  "dashboard.creator-withdraw-modal.details-label": {
+    "message": "Detaily"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-fee": {
     "message": "Poplatek"
@@ -577,6 +568,9 @@
   },
   "dashboard.creator-withdraw-modal.muralpay-details.account-owner": {
     "message": "Majitel účtu"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.bank-account-owner": {
+    "message": "Vlastník bankovního účtu"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
     "message": "Kryptoměna"
@@ -601,6 +595,15 @@
   },
   "dashboard.creator-withdraw-modal.paypal-details.paypal-account": {
     "message": "PayPal účet"
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.paypal-auth-description": {
+    "message": "Připojte svůj PayPal účet a přijímej platby."
+  },
+  "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
+    "message": "Přihlásit přes PayPal"
+  },
+  "dashboard.creator-withdraw-modal.stage.tax-form": {
+    "message": ""
   },
   "dashboard.creator-withdraw-modal.tremendous-details.reward": {
     "message": "Odměna"
@@ -1193,23 +1196,11 @@
   "report.already-reported": {
     "message": "Již jste nahlásili {title}"
   },
-  "report.already-reported-description": {
-    "message": "Už máte otevřené hlášení pro tento {item}. Můžete přidat detaily k vašemu hlášení pokud máte více informací."
-  },
-  "report.back-to-item": {
-    "message": "Zpět k {item}"
-  },
   "report.body.description": {
     "message": "Přidejte odkazy a obrázky, pokud je to možné a relevantní. Prázdná nebo nedostatečná hlášení budou uzavřena a ignorována."
   },
   "report.body.title": {
     "message": "Uveďte prosím další kontext k vaší zprávě"
-  },
-  "report.checking": {
-    "message": "Kontroluje se {item}..."
-  },
-  "report.could-not-find": {
-    "message": "Nepodařilo se najít {item}"
   },
   "report.for.violation": {
     "message": "Porušení <rules-link>Pravidel</rules-link> nebo <terms-link>Podmínek Užívání</terms-link> Modrinthu"
@@ -1250,14 +1241,8 @@
   "report.please-report": {
     "message": "Prosím nahlaste:"
   },
-  "report.question.content-id": {
-    "message": "Jaké je ID {item}?"
-  },
   "report.question.content-type": {
     "message": "Jaký druh obsahu nahlašujete?"
-  },
-  "report.question.report-reason": {
-    "message": "Které z pravidel Modrinthu {item} porušuje?"
   },
   "report.report-content": {
     "message": "Nahlašte obsah moderátorům"

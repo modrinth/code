@@ -13,15 +13,13 @@
 					{{ formatMessage(messages.twoFactorCodeLabelDescription) }}
 				</span>
 			</label>
-			<input
+			<StyledInput
 				id="two-factor-code"
 				v-model="twoFactorCode"
-				maxlength="11"
-				type="text"
+				:maxlength="11"
 				inputmode="numeric"
 				:placeholder="formatMessage(messages.twoFactorCodeInputPlaceholder)"
 				autocomplete="one-time-code"
-				autofocus
 				@keyup.enter="begin2FASignIn"
 			/>
 
@@ -62,38 +60,34 @@
 			<h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
 
 			<section class="auth-form">
-				<div class="iconified-input">
-					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
-					<MailIcon />
-					<input
-						id="email"
-						v-model="email"
-						type="text"
-						inputmode="email"
-						autocomplete="username"
-						class="auth-form__input"
-						:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
-					/>
-				</div>
+				<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
+				<StyledInput
+					id="email"
+					v-model="email"
+					:icon="MailIcon"
+					type="text"
+					inputmode="email"
+					autocomplete="username"
+					:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
+					wrapper-class="w-full"
+				/>
 
-				<div class="iconified-input">
-					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-					<KeyIcon />
-					<input
-						id="password"
-						v-model="password"
-						type="password"
-						autocomplete="current-password"
-						class="auth-form__input"
-						:placeholder="formatMessage(commonMessages.passwordLabel)"
-					/>
-				</div>
+				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+				<StyledInput
+					id="password"
+					v-model="password"
+					:icon="KeyIcon"
+					type="password"
+					autocomplete="current-password"
+					:placeholder="formatMessage(commonMessages.passwordLabel)"
+					wrapper-class="w-full"
+				/>
 
-				<HCaptcha ref="captcha" v-model="token" />
+				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
 
 				<button
 					class="btn btn-primary continue-btn centered-btn"
-					:disabled="!token"
+					:disabled="globals?.captcha_enabled ? !token : false"
 					@click="beginPasswordSignIn()"
 				>
 					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
@@ -145,14 +139,19 @@ import {
 import {
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 import HCaptcha from '@/components/ui/HCaptcha.vue'
 import { getAuthUrl, getLauncherRedirectUrl } from '@/composables/auth.js'
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -210,6 +209,18 @@ if (auth.value.user) {
 
 const captcha = ref()
 
+const { data: globals } = useQuery({
+	queryKey: ['auth-globals'],
+	queryFn: async () => {
+		try {
+			return await client.labrinth.globals_internal.get()
+		} catch (err) {
+			console.error('Error fetching globals:', err)
+			return { captcha_enabled: true, tax_compliance_thresholds: {} }
+		}
+	},
+})
+
 const email = ref('')
 const password = ref('')
 const token = ref('')
@@ -219,13 +230,10 @@ const flow = ref(route.query.flow)
 async function beginPasswordSignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login', {
-			method: 'POST',
-			body: {
-				username: email.value,
-				password: password.value,
-				challenge: token.value,
-			},
+		const res = await client.labrinth.auth_v2.login({
+			username: email.value,
+			password: password.value,
+			challenge: token.value,
 		})
 
 		if (res.flow) {
@@ -248,12 +256,9 @@ const twoFactorCode = ref(null)
 async function begin2FASignIn() {
 	startLoading()
 	try {
-		const res = await useBaseFetch('auth/login/2fa', {
-			method: 'POST',
-			body: {
-				flow: flow.value,
-				code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
-			},
+		const res = await client.labrinth.auth_v2.login2FA({
+			flow: flow.value,
+			code: twoFactorCode.value ? twoFactorCode.value.toString() : twoFactorCode.value,
 		})
 
 		await finishSignIn(res.session)
@@ -297,6 +302,7 @@ async function finishSignIn(token) {
 	if (token) {
 		await useAuth(token)
 		await useUser()
+		queryClient.clear()
 	}
 
 	if (route.query.redirect) {

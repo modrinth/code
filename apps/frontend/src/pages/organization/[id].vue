@@ -1,6 +1,9 @@
 <template>
+	<div v-if="isLoading" class="flex min-h-[50vh] items-center justify-center">
+		<SpinnerIcon class="h-12 w-12 animate-spin text-brand" />
+	</div>
 	<div
-		v-if="organization"
+		v-else-if="organization"
 		class="experimental-styles-within new-page sidebar"
 		:class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
 	>
@@ -19,7 +22,7 @@
 								</nuxt-link>
 							</h2>
 							<span>
-								{{ formatNumber(acceptedMembers?.length || 0) }}
+								{{ formatCompactNumber(acceptedMembers?.length || 0) }}
 								member<template v-if="acceptedMembers?.length !== 1">s</template>
 							</span>
 						</div>
@@ -89,7 +92,7 @@
 							projects
 						</div>
 						<div
-							v-tooltip="sumDownloads.toLocaleString()"
+							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 font-semibold"
 						>
 							<DownloadIcon class="h-6 w-6 text-secondary" />
@@ -144,7 +147,7 @@
 				<div class="card flex-card">
 					<h2>Members</h2>
 					<div class="details-list">
-						<template v-for="member in acceptedMembers" :key="member.user.id">
+						<template v-for="member in acceptedMembers" :key="member?.user.id">
 							<nuxt-link
 								class="details-list__item details-list__item--type-large"
 								:to="`/user/${member?.user?.username}`"
@@ -184,53 +187,80 @@
 					</div>
 				</div>
 				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
-					<NavTabs :links="navLinks" />
+					<NavTabs :links="navLinks" replace />
 				</div>
-				<template v-if="projects && projects.length > 0">
-					<div class="project-list display-mode--list">
+				<ProjectCardList v-if="projects && projects.length > 0">
+					<template
+						v-for="project in (route.params.projectType !== undefined
+							? (projects ?? []).filter((x) =>
+									x.project_types.includes(
+										typeof route.params.projectType === 'string'
+											? route.params.projectType.slice(0, route.params.projectType.length - 1)
+											: route.params.projectType[0]?.slice(
+													0,
+													route.params.projectType[0].length - 1,
+												) || '',
+									),
+								)
+							: (projects ?? [])
+						)
+							.slice()
+							.sort((a, b) => b.downloads - a.downloads)"
+						:key="project.id"
+					>
 						<ProjectCard
-							v-for="project in (route.params.projectType !== undefined
-								? (projects ?? []).filter((x) =>
-										x.project_types.includes(
-											typeof route.params.projectType === 'string'
-												? route.params.projectType.slice(0, route.params.projectType.length - 1)
-												: route.params.projectType[0]?.slice(
-														0,
-														route.params.projectType[0].length - 1,
-													) || '',
-										),
-									)
-								: (projects ?? [])
-							)
-								.slice()
-								.sort((a, b) => b.downloads - a.downloads)"
-							:id="project.slug || project.id"
-							:key="project.id"
-							:name="project.name"
-							:display="cosmetics.searchDisplayMode.user"
-							:featured-image="project.gallery.find((element) => element.featured)?.url"
-							project-type-url="project"
-							:description="project.summary"
-							:created-at="project.published"
-							:updated-at="project.updated"
-							:downloads="project.downloads.toString()"
-							:follows="project.followers.toString()"
+							v-if="isProjectServer(project)"
+							:link="`/server/${project.slug || project.id}`"
+							:title="project.name"
 							:icon-url="project.icon_url"
-							:categories="project.categories"
-							:client-side="project.client_side"
-							:server-side="project.server_side"
+							:summary="project.summary"
+							:tags="project.categories"
+							:server-online-players="
+								project.minecraft_java_server?.ping?.data?.players_online ?? 0
+							"
+							:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
+							:server-region="project.minecraft_server?.region"
+							:server-status-online="!!project.minecraft_java_server?.ping?.data"
+							:server-modpack-content="getServerModpackContent(project)"
 							:status="
-								auth.user &&
-								(auth.user.id! === (user as any).id || tags.staffRoles.includes(auth.user.role))
+								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
 									? (project.status as ProjectStatus)
 									: undefined
 							"
-							:type="project.project_types[0] ?? 'project'"
-							:color="project.color"
+							:max-tags="2"
+							layout="list"
+							is-server-project
+							exclude-loaders
 						/>
-					</div>
-				</template>
-
+						<ProjectCard
+							v-else
+							:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
+							:title="project.name"
+							:icon-url="project.icon_url"
+							:banner="project.gallery.find((element) => element.featured)?.url"
+							:summary="project.summary"
+							:date-updated="project.updated"
+							:downloads="project.downloads"
+							:followers="project.followers"
+							:tags="project.categories"
+							:environment="
+								project.client_side && project.server_side
+									? {
+											clientSide: project.client_side,
+											serverSide: project.server_side,
+										}
+									: undefined
+							"
+							:status="
+								auth.user && (auth.user.id! === user.id || tags.staffRoles.includes(auth.user.role))
+									? (project.status as ProjectStatus)
+									: undefined
+							"
+							:color="project.color"
+							layout="list"
+						/>
+					</template>
+				</ProjectCardList>
 				<div v-else-if="true" class="error">
 					<UpToDate class="icon" />
 					<br />
@@ -238,7 +268,7 @@
 						This organization doesn't have any projects yet.
 						<template v-if="isPermission(currentMember?.permissions, 1 << 4)">
 							Would you like to
-							<a class="link" @click="($refs as any).modal_creation?.show()">create one</a>?
+							<a class="link" @click="modal_creation?.show()">create one</a>?
 						</template>
 					</span>
 				</div>
@@ -248,6 +278,7 @@
 </template>
 
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BoxIcon,
 	ChartIcon,
@@ -258,6 +289,7 @@ import {
 	MoreVerticalIcon,
 	OrganizationIcon,
 	SettingsIcon,
+	SpinnerIcon,
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -266,18 +298,22 @@ import {
 	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
+	injectModrinthClient,
 	OverflowMenu,
+	ProjectCard,
+	ProjectCardList,
+	useCompactNumber,
+	useFormatNumber,
 	useVIntl,
 } from '@modrinth/ui'
-import type { Organization, ProjectStatus, ProjectType, ProjectV3 } from '@modrinth/utils'
-import { formatNumber } from '@modrinth/utils'
+import type { Organization, ProjectStatus, ProjectType } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavTabs from '~/components/ui/NavTabs.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,
@@ -285,10 +321,16 @@ import {
 } from '~/providers/organization-context.ts'
 import { isPermission } from '~/utils/permissions.ts'
 
+type ProjectV3 = Labrinth.Projects.v3.Project & {
+	client_side: 'required' | 'optional' | 'unsupported'
+	server_side: 'required' | 'optional' | 'unsupported'
+}
+
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
-const formatCompactNumber = useCompactNumber(true)
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
 
 const auth: { user: any } & any = await useAuth()
 const user = await useUser()
@@ -297,6 +339,7 @@ const route = useNativeRoute()
 const router = useRouter()
 const tags = useGeneratedState()
 const config = useRuntimeConfig()
+const modal_creation = useTemplateRef('modal_creation')
 
 const orgId = useRouteId()
 
@@ -309,70 +352,95 @@ if (route.path.includes('settings')) {
 // hacky way to show the edit button on the corner of the card.
 const routeHasSettings = computed(() => route.path.includes('settings'))
 
-const [
-	{ data: organization, refresh: refreshOrganization },
-	{ data: projects, refresh: refreshProjects },
-] = await Promise.all([
-	useAsyncData(
-		`organization/${orgId}`,
-		() => useBaseFetch(`organization/${orgId}`, { apiVersion: 3 }) as Promise<Organization>,
-	),
-	useAsyncData(
-		`organization/${orgId}/projects`,
-		() => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }) as Promise<ProjectV3[]>,
-		{
-			transform: (projects) => {
-				for (const project of projects) {
-					project.categories = project.categories.concat(project.loaders)
+const client = injectModrinthClient()
 
-					if (project.mrpack_loaders) {
-						project.categories = project.categories.concat(project.mrpack_loaders)
-					}
+const {
+	data: organization,
+	refetch: refreshOrganization,
+	error: orgError,
+	isPending: organizationIsPending,
+} = useQuery({
+	queryKey: computed(() => ['organization', orgId]),
+	// @ts-expect-error
+	queryFn: () => client.labrinth.organizations_v3.get(orgId),
+	enabled: !!orgId,
+})
 
-					const singleplayer = project.singleplayer && project.singleplayer[0]
-					const clientAndServer = project.client_and_server && project.client_and_server[0]
-					const clientOnly = project.client_only && project.client_only[0]
-					const serverOnly = project.server_only && project.server_only[0]
+watch(
+	orgError,
+	(error) => {
+		if (error) {
+			const status = (error as any).statusCode ?? (error as any).status ?? 404
+			showError({
+				fatal: true,
+				statusCode: status,
+				message: 'Organization not found',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
-					// quick and dirty hack to show envs as legacy
-					if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
-						project.client_side = 'required'
-						project.server_side = 'unsupported'
-					} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
-						project.client_side = 'unsupported'
-						project.server_side = 'required'
-					} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
-						project.client_side = 'optional'
-						project.server_side = 'optional'
-					}
-				}
+const {
+	data: projects,
+	refetch: refreshProjects,
+	isFetching: projectsIsFetching,
+} = useQuery({
+	queryKey: computed(() => ['organization', orgId, 'projects']),
+	queryFn: async () => {
+		// @ts-expect-error
+		const rawProjects = (await client.labrinth.organizations_v3.getProjects(orgId)) as ProjectV3[]
 
-				return projects
-			},
-		},
-	),
-])
+		return rawProjects.map((project) => {
+			let categories = project.categories.concat(project.loaders)
+			if (project.mrpack_loaders) {
+				categories = categories.concat(project.mrpack_loaders as string[])
+			}
+
+			const singleplayer = project.singleplayer && (project.singleplayer as string[])[0]
+			const clientAndServer =
+				project.client_and_server && (project.client_and_server as string[])[0]
+			const clientOnly = project.client_only && (project.client_only as string[])[0]
+			const serverOnly = project.server_only && (project.server_only as string[])[0]
+
+			let client_side: ProjectV3['client_side'] | undefined
+			let server_side: ProjectV3['server_side'] | undefined
+
+			// quick and dirty hack to show envs as legacy
+			if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
+				client_side = 'required'
+				server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
+				client_side = 'required'
+				server_side = 'unsupported'
+			} else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
+				client_side = 'unsupported'
+				server_side = 'required'
+			} else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
+				client_side = 'optional'
+				server_side = 'optional'
+			}
+
+			return { ...project, categories, client_side, server_side }
+		})
+	},
+	placeholderData: [],
+})
 
 const refresh = async () => {
 	await Promise.all([refreshOrganization(), refreshProjects()])
 }
 
-if (!organization.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: 'Organization not found',
-	})
-}
+// Loading state
+const isLoading = computed(() => {
+	return organizationIsPending.value || projectsIsFetching.value
+})
 
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
 	const acceptedMembers = organization.value?.members?.filter((x) => x.accepted) ?? []
 	const owner = acceptedMembers.find((x) => x.is_owner)
-	const rest = acceptedMembers.filter((x) => !x.is_owner) || []
+	const rest = acceptedMembers.filter((x) => !x.is_owner) ?? []
 
 	rest.sort((a, b) => {
 		if (a.role === b.role) {
@@ -382,7 +450,7 @@ const acceptedMembers = computed(() => {
 		}
 	})
 
-	return [owner, ...rest]
+	return owner ? [owner, ...rest] : rest
 })
 
 const isInvited = computed(() => {
@@ -400,6 +468,30 @@ const projectTypes = computed(() => {
 
 	return Object.keys(obj)
 })
+function isProjectServer(project: ProjectV3): boolean {
+	return project.minecraft_server != null
+}
+
+function getServerModpackContent(project: ProjectV3) {
+	const content = project.minecraft_java_server?.content
+	if (content?.kind === 'modpack') {
+		const { project_name, project_icon, project_id } = content
+		if (!project_name) return undefined
+		return {
+			name: project_name,
+			icon: project_icon,
+			onclick:
+				project_id !== project.id
+					? () => {
+							navigateTo(`/project/${project_id}`)
+						}
+					: undefined,
+			showCustomModpackTooltip: project_id === project.id,
+		}
+	}
+	return undefined
+}
+
 const sumDownloads = computed(() => {
 	let sum = 0
 
@@ -420,21 +512,35 @@ const onDeclineInvite = useClientTry(async () => {
 	await refreshOrganization()
 })
 
-const organizationContext = new OrganizationContext(organization, projects, auth, tags, refresh)
+const organizationContext = new OrganizationContext(
+	organization as Ref<Organization | null>,
+	projects as Ref<ProjectV3[] | null>,
+	auth,
+	tags,
+	refresh,
+)
 const { currentMember } = organizationContext
 
 provideOrganizationContext(organizationContext)
 
-const title = `${organization.value.name} - Organization`
-const description = `${organization.value.description} - View the organization ${organization.value.name} on Modrinth`
+watch(
+	organization,
+	(org) => {
+		if (org) {
+			const title = `${org.name} - Organization`
+			const description = `${org.description} - View the organization ${org.name} on Modrinth`
 
-useSeoMeta({
-	title,
-	description,
-	ogTitle: title,
-	ogDescription: organization.value.description,
-	ogImage: organization.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-})
+			useSeoMeta({
+				title,
+				description,
+				ogTitle: title,
+				ogDescription: org.description,
+				ogImage: org.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 const navLinks = computed(() => [
 	{

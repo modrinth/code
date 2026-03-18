@@ -15,7 +15,7 @@
 						<span class="label__title">Issue tracker</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="issue-tracker-input"
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
@@ -23,7 +23,7 @@
 							:placeholder="
 								editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
-							maxlength="2048"
+							:maxlength="2048"
 						/>
 						<button
 							v-tooltip="'Clear link'"
@@ -42,12 +42,12 @@
 						<span class="label__title">Source code</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="source-code-input"
 							v-model="editLinks.source.val"
 							:disabled="editLinks.source.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -69,12 +69,12 @@
 						<span class="label__title">Wiki page</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="wiki-page-input"
 							v-model="editLinks.wiki.val"
 							:disabled="editLinks.wiki.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
 							"
@@ -93,12 +93,12 @@
 						<span class="label__title">Discord invite</span>
 					</label>
 					<div class="input-group shrink-first">
-						<input
+						<StyledInput
 							id="discord-invite-input"
 							v-model="editLinks.discord.val"
 							:disabled="editLinks.discord.clear"
 							type="url"
-							maxlength="2048"
+							:maxlength="2048"
 							:placeholder="
 								editLinks.discord.clear
 									? 'Existing link will be cleared'
@@ -159,7 +159,7 @@
 			<div class="header__row">
 				<h2 class="header__title text-2xl">Projects</h2>
 				<div class="input-group">
-					<button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
+					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
 						<PlusIcon />
 						{{ formatMessage(commonMessages.createAProjectButton) }}
 					</button>
@@ -186,17 +186,12 @@
 					<div class="push-right">
 						<div class="labeled-control-row">
 							Sort by
-							<Multiselect
+							<DropdownSelect
 								v-model="sortBy"
-								:searchable="false"
-								class="small-select"
-								:options="['Name', 'Status', 'Type']"
-								:close-on-select="true"
-								:show-labels="false"
-								:allow-empty="false"
-								@update:model-value="
-									sortedProjects = updateSort(sortedProjects, sortBy, descending)
-								"
+								class="!w-auto"
+								name="Sort by"
+								:options="sortOptions"
+								@change="sortedProjects = updateSort(sortedProjects, sortBy, descending)"
 							/>
 							<button
 								v-tooltip="descending ? 'Descending' : 'Ascending'"
@@ -331,19 +326,23 @@ import {
 	Checkbox,
 	commonMessages,
 	CopyCode,
+	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	ProjectStatusBadge,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
+import { useQuery } from '@tanstack/vue-query'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 import { injectOrganizationContext } from '~/providers/organization-context.ts'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -351,13 +350,12 @@ const { organization, projects, refresh } = injectOrganizationContext()
 
 const auth = await useAuth()
 
-const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
-	`user/${auth.value.user.id}/projects`,
-	() => useBaseFetch(`user/${auth.value.user.id}/projects`),
-	{
-		watch: [auth],
-	},
-)
+const { data: userProjects, refetch: refreshUserProjects } = useQuery({
+	queryKey: computed(() => ['user', auth.value?.user?.id, 'projects']),
+	queryFn: () => client.labrinth.users_v2.getProjects(auth.value.user.id),
+	enabled: computed(() => !!auth.value?.user?.id),
+	placeholderData: [],
+})
 
 const usersOwnedProjects = ref([])
 
@@ -370,11 +368,7 @@ watch(
 		const projects = userProjects.value.filter((project) => project.organization === null)
 
 		const teamIds = projects.map((project) => project?.team).filter((x) => x)
-		// Shape of teams is member[][]
-		const teams = await useBaseFetch(`teams?ids=${JSON.stringify(teamIds)}`, {
-			apiVersion: 3,
-		})
-		// for each team id, figure out if the user is a member, and is_owner. Then filter the projects to only include those that are owned by the user
+		const teams = await client.labrinth.teams_v3.getMultiple(teamIds)
 		const ownedTeamIds = teamIds.filter((_tid, i) => {
 			const team = teams?.[i]
 			if (!team) return false
@@ -383,19 +377,15 @@ watch(
 		})
 		const ownedProjects = projects.filter((project) => ownedTeamIds.includes(project.team))
 		usersOwnedProjects.value = ownedProjects
-	}, // watch options
+	},
 	{ immediate: true, deep: true },
 )
 
 const onProjectTransferSubmit = async (projects) => {
 	try {
 		for (const project of projects) {
-			await useBaseFetch(`organization/${organization.value.id}/projects`, {
-				method: 'POST',
-				body: JSON.stringify({
-					project_id: project.id,
-				}),
-				apiVersion: 3,
+			await client.labrinth.organizations_v3.addProject(organization.value.id, {
+				project_id: project.id,
 			})
 		}
 
@@ -465,6 +455,7 @@ const updateSort = (inputProjects, sort, descending) => {
 const sortedProjects = ref(updateSort(projects.value, 'Name'))
 const selectedProjects = ref([])
 const sortBy = ref('Name')
+const sortOptions = ['Name', 'Status', 'Type']
 const descending = ref(false)
 const editLinksModal = ref(null)
 
@@ -491,17 +482,17 @@ const updateDescending = () => {
 const onBulkEditLinks = async () => {
 	try {
 		const baseData = {
-			issues_url: editLinks.value.issues.clear ? null : editLinks.value.issues.val.trim(),
-			source_url: editLinks.value.source.clear ? null : editLinks.value.source.val.trim(),
-			wiki_url: editLinks.value.wiki.clear ? null : editLinks.value.wiki.val.trim(),
-			discord_url: editLinks.value.discord.clear ? null : editLinks.value.discord.val.trim(),
+			issues_url: editLinks.issues.clear ? null : editLinks.issues.val.trim(),
+			source_url: editLinks.source.clear ? null : editLinks.source.val.trim(),
+			wiki_url: editLinks.wiki.clear ? null : editLinks.wiki.val.trim(),
+			discord_url: editLinks.discord.clear ? null : editLinks.discord.val.trim(),
 		}
 		const filteredData = Object.fromEntries(Object.entries(baseData).filter(([, v]) => v !== ''))
 
-		await useBaseFetch(`projects?ids=${JSON.stringify(selectedProjects.value.map((x) => x.id))}`, {
-			method: 'PATCH',
-			body: JSON.stringify(filteredData),
-		})
+		await client.labrinth.projects_v2.bulkEdit(
+			selectedProjects.value.map((x) => x.id),
+			filteredData,
+		)
 
 		editLinksModal.value?.hide()
 		addNotification({
@@ -511,14 +502,14 @@ const onBulkEditLinks = async () => {
 		})
 		selectedProjects.value = []
 
-		editLinks.value.issues.val = ''
-		editLinks.value.source.val = ''
-		editLinks.value.wiki.val = ''
-		editLinks.value.discord.val = ''
-		editLinks.value.issues.clear = false
-		editLinks.value.source.clear = false
-		editLinks.value.wiki.clear = false
-		editLinks.value.discord.clear = false
+		editLinks.issues.val = ''
+		editLinks.source.val = ''
+		editLinks.wiki.val = ''
+		editLinks.discord.val = ''
+		editLinks.issues.clear = false
+		editLinks.source.clear = false
+		editLinks.wiki.clear = false
+		editLinks.discord.clear = false
 	} catch (e) {
 		addNotification({
 			title: 'An error occurred',
@@ -671,11 +662,6 @@ const onBulkEditLinks = async () => {
 	align-items: center;
 	gap: var(--spacing-card-md);
 	white-space: nowrap;
-}
-
-.small-select {
-	width: -moz-fit-content;
-	width: fit-content;
 }
 
 .label-button[data-active='true'] {

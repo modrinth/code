@@ -380,18 +380,18 @@ a {
 }
 
 h1 {
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 h2 {
 	margin-top: 0;
 	margin-bottom: 1rem;
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 h3 {
 	margin-block: var(--spacing-card-md) var(--spacing-card-sm);
-	color: var(--color-text-dark);
+	color: var(--color-text-primary);
 }
 
 input {
@@ -466,14 +466,6 @@ kbd {
 @import '~/assets/styles/layout.scss';
 @import '~/assets/styles/utils.scss';
 @import '~/assets/styles/components.scss';
-
-button:focus-visible,
-a:focus-visible,
-[tabindex='0']:focus-visible,
-[type='button']:focus-visible {
-	outline: 0.25rem solid #ea80ff;
-	border-radius: 0.25rem;
-}
 
 // OMORPHIA FIXES
 .card {
