@@ -84,7 +84,28 @@
 				Your server has been cancelled. Please update your billing information or contact Modrinth
 				Support for more information.
 			</div>
-			<CopyCode :text="`${server_id}`" class="ml-auto" />
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+					<button
+						class="!border-surface-5"
+						v-tooltip="'Copy code to clipboard'"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<AutoLink :to="`/settings/billing#server-${server_id}`">
+						<RotateCounterClockwiseIcon /> Resubscribe
+					</AutoLink>
+				</ButtonStyled>
+			</div>
 		</div>
 		<div v-else-if="status === 'suspended' && suspension_reason" class="server-listing-notice">
 			<div class="flex flex-row gap-2">
@@ -92,14 +113,56 @@
 				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
 				for more information.
 			</div>
-			<CopyCode :text="`${server_id}`" class="ml-auto" />
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+					<button
+						class="!border-surface-5"
+						v-tooltip="'Copy code to clipboard'"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<AutoLink :to="`/settings/billing#server-${server_id}`">
+						<CardIcon /> Manage billing
+					</AutoLink>
+				</ButtonStyled>
+			</div>
 		</div>
 		<div v-else-if="status === 'suspended'" class="server-listing-notice">
 			<div class="flex flex-row gap-2">
 				Your server has been suspended. Please update your billing information or contact Modrinth
 				Support for more information.
 			</div>
-			<CopyCode :text="`${server_id}`" class="ml-auto" />
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+					<button
+						class="!border-surface-5"
+						v-tooltip="'Copy code to clipboard'"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<AutoLink :to="`/settings/billing#server-${server_id}`">
+						<CardIcon /> Manage billing
+					</AutoLink>
+				</ButtonStyled>
+			</div>
 		</div>
 		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
@@ -108,7 +171,7 @@
 				}}" plan on {{ formatDate(pendingChange.date) }}.
 			</div>
 			<ServersSpecs
-				class="!font-normal !text-contrast"
+				class="!font-normal !text-primary"
 				:ram="Math.round((pendingChange.ramGb ?? 0) * 1024)"
 				:storage="Math.round((pendingChange.storageGb ?? 0) * 1024)"
 				:cpus="pendingChange.cpuBurst"
@@ -120,14 +183,20 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { LoaderCircleIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
+import { LoaderCircleIcon, LockIcon, MessagesSquareIcon, SparklesIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
+import { AutoLink, ButtonStyled } from '@modrinth/ui'
+import {
+	CardIcon,
+	CheckIcon,
+	CopyIcon,
+	RotateCounterClockwiseIcon,
+} from '../../../../assets/generated-icons'
 import { useFormatDateTime } from '../../composables'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
-import CopyCode from '../base/CopyCode.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
@@ -248,6 +317,16 @@ const { data: image } = useQuery({
 })
 
 const isConfiguring = computed(() => props.flows?.intro)
+
+const copied = ref(false)
+
+async function copyToClipboard(text: string) {
+	await navigator.clipboard.writeText(text)
+	copied.value = true
+	setTimeout(() => {
+		copied.value = false
+	}, 3000)
+}
 </script>
 
 <style scoped>

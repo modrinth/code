@@ -87,7 +87,7 @@ export const SuspendedCancelled: Story = {
 	},
 }
 
-export const SuspendedPaymentFailed: Story = {
+export const SuspendedWithReason: Story = {
 	args: {
 		...baseServer,
 		name: 'Minigames Network',
