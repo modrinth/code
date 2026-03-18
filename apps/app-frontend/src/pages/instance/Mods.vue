@@ -471,7 +471,7 @@ async function handleModpackContentToggle(item: ContentItem) {
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[]) {
-	await Promise.all(items.map((item) => toggleDisableMod(item)))
+	await Promise.all(items.map((item) => _toggleDisableMod(item)))
 }
 
 async function handleModpackContent() {
@@ -817,9 +817,9 @@ provideContentManager({
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
 	toggleEnabled: toggleDisableMod,
 	bulkEnableItems: (items) =>
-		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+		Promise.all(items.map((item) => _toggleDisableMod(item))).then(() => {}),
 	bulkDisableItems: (items) =>
-		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+		Promise.all(items.map((item) => _toggleDisableMod(item))).then(() => {}),
 	deleteItem: removeMod,
 	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
