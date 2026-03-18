@@ -1275,4 +1275,31 @@ impl Profile {
 
         Ok(())
     }
+
+    /// Rename shader's settings file, if exists, to match the updated shader path.
+    #[tracing::instrument]
+    pub async fn rename_shader_settings_file(
+        profile_path: &str,
+        old_project_path: &str,
+        new_project_path: &str,
+    ) -> crate::Result<()> {
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            let old_settings_path = path.join(format!(
+                "{}.txt",
+                old_project_path.trim_end_matches(".disabled")
+            ));
+            let new_settings_path = path.join(format!(
+                "{}.txt",
+                new_project_path.trim_end_matches(".disabled")
+            ));
+
+            if old_settings_path.exists() && !new_settings_path.exists() {
+                io::rename_or_move(&old_settings_path, &new_settings_path)
+                    .await?;
+            }
+        }
+
+        Ok(())
+    }
 }

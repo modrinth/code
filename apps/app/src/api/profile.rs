@@ -34,6 +34,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_add_project_from_path,
             profile_toggle_disable_project,
             profile_remove_project,
+            profile_rename_shader_settings_file,
             profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
@@ -284,6 +285,23 @@ pub async fn profile_remove_project(
     project_path: &str,
 ) -> Result<()> {
     profile::remove_project(path, project_path).await?;
+    Ok(())
+}
+
+// Renames shader's settings file, if exists, to match updated shader path
+// invoke('plugin:profile|profile_rename_shader_settings_file')
+#[tauri::command]
+pub async fn profile_rename_shader_settings_file(
+    path: &str,
+    project_old_path: &str,
+    project_new_path: &str,
+) -> Result<()> {
+    profile::rename_shader_settings_file(
+        path,
+        project_old_path,
+        project_new_path,
+    )
+    .await?;
     Ok(())
 }
 

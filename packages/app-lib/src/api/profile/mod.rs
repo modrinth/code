@@ -575,6 +575,24 @@ pub async fn remove_project(
     Ok(())
 }
 
+/// Rename shader's settings file, if exists, to match updated shader path
+/// Project old and new paths should be relative to the profile
+#[tracing::instrument]
+pub async fn rename_shader_settings_file(
+    profile_path: &str,
+    project_old: &str,
+    project_new: &str,
+) -> crate::Result<()> {
+    Profile::rename_shader_settings_file(
+        profile_path,
+        project_old,
+        project_new,
+    )
+    .await?;
+
+    Ok(())
+}
+
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]

@@ -212,6 +212,19 @@ export async function remove_project(path: string, projectPath: string): Promise
 	return await invoke('plugin:profile|profile_remove_project', { path, projectPath })
 }
 
+// Rename shader's settings file, if exists, to match updated shader path
+export async function rename_shader_settings_file(
+	path: string,
+	projectOldPath: string,
+	projectNewPath: string,
+): Promise<void> {
+	return await invoke('plugin:profile|profile_rename_shader_settings_file', {
+		path,
+		projectOldPath,
+		projectNewPath,
+	})
+}
+
 // Update a managed Modrinth profile to a specific version
 export async function update_managed_modrinth_version(
 	path: string,

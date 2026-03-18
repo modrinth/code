@@ -183,6 +183,7 @@ fn main() {
                         "profile_add_project_from_path",
                         "profile_toggle_disable_project",
                         "profile_remove_project",
+                        "profile_rename_shader_settings_file",
                         "profile_update_managed_modrinth_version",
                         "profile_repair_managed_modrinth",
                         "profile_run",
