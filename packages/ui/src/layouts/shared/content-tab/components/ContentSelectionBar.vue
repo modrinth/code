@@ -61,6 +61,14 @@ const messages = defineMessages({
 		id: 'content.selection-bar.bulk.deleting-waiting',
 		defaultMessage: 'Deleting {contentType}...',
 	},
+	allAlreadyEnabled: {
+		id: 'content.selection-bar.all-already-enabled',
+		defaultMessage: 'All selected content is already enabled',
+	},
+	allAlreadyDisabled: {
+		id: 'content.selection-bar.all-already-disabled',
+		defaultMessage: 'All selected content is already disabled',
+	},
 })
 
 interface Props {
@@ -95,6 +103,7 @@ const emit = defineEmits<{
 const shown = computed(() => props.selectedItems.length > 0 || props.isBulkOperating)
 
 const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
+const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
 
 const selectedCountText = computed(() => {
 	const count = props.selectedItems.length || props.bulkTotal
@@ -148,14 +157,22 @@ const bulkProgressMessage = computed(() => {
 		<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 			<slot name="actions" />
 
-			<ButtonStyled v-if="allDisabled" type="transparent">
-				<button :disabled="isBusy" @click="emit('enable')">
+			<ButtonStyled type="transparent">
+				<button
+					v-tooltip="allEnabled ? formatMessage(messages.allAlreadyEnabled) : undefined"
+					:disabled="isBusy || allEnabled"
+					@click="emit('enable')"
+				>
 					<PowerIcon />
 					{{ formatMessage(messages.enable) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled v-else type="transparent">
-				<button :disabled="isBusy" @click="emit('disable')">
+			<ButtonStyled type="transparent">
+				<button
+					v-tooltip="allDisabled ? formatMessage(messages.allAlreadyDisabled) : undefined"
+					:disabled="isBusy || allDisabled"
+					@click="emit('disable')"
+				>
 					<PowerOffIcon />
 					{{ formatMessage(messages.disable) }}
 				</button>
