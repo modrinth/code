@@ -42,9 +42,9 @@ These guidelines apply to all Modrinth projects. Following them will help your c
 
 We strongly encourage small, focused pull requests over large, sweeping changes. Bug fixes, QOL improvements, and other incremental contributions are much easier to review and more likely to be merged quickly. If you're looking for something to work on, check out the [GitHub issues](https://github.com/modrinth/code/issues) tab for open tasks and known bugs.
 
-### Reference issues in your pull request
+### Pull request descriptions
 
-If your pull request fixes or relates to an existing issue, mention the issue number in your PR description (e.g., `Fixes #1234`). When applicable, include the issue number in your commit messages as well. This helps maintain traceability and automatically closes issues when PRs are merged.
+Every PR should include a clear description of what it does. Briefly explain what was added, updated, or fixed, and provide any relevant context for reviewers. If your PR fixes or relates to an existing issue, reference the issue number in the description (e.g., `Fixes #1234`) as this helps maintain traceability and automatically closes issues when the PR is merged.
 
 ### Pull request titles
 
