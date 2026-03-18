@@ -1,35 +1,32 @@
 ---
-title: Knossos (Frontend)
+title: Knossos (Website frontend)
 description: Guide for contributing to Modrinth's frontend
+sidebar:
+  order: 2
 ---
 
-This project is part of our [monorepo](https://github.com/modrinth/code). You can find it in the `apps/frontend` directory.
+[Knossos] is the Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
 
-[knossos] is the Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
+## Setup
 
-```bash
-pnpm install
-pnpm run web:dev
-```
+### 1. Install prerequisites
 
-Once that's done, you'll be serving knossos on `localhost:3000` with hot reloading. You can replace the `dev` in `pnpm run dev` with `build` to build for a production server and `start` to start the server. You can also use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing those problems.
+- Install the package manager [pnpm](https://pnpm.io/)
 
-<details>
-<summary>.env variables & command line options</summary>
+### 2. Install dependencies & set up .env
 
-#### Basic configuration
+- Clone [`https://github.com/modrinth/code`](https://github.com/modrinth/code) and run `pnpm install` in the workspace root folder.
+- In `apps/frontend` you should be able to see `.env.prod`, `.env.staging` — for basic work, it's recommended to use `.env.prod`. Copy the relevant file into a new `.env` file within the `apps/frontend` folder.
 
-`SITE_URL`: The URL of the site (used for auth redirects). Default: `http://localhost:3000`
-`BASE_URL`: The base URL for the API. Default: `https://staging-api.modrinth.com/v2/`
-`BROWSER_BASE_URL`: The base URL for the API used in the browser. Default: `https://staging-api.modrinth.com/v2/`
+### 3. Run the frontend
 
-</details>
+- Run `pnpm web:dev` in the workspace root folder. Once that's done, you'll be serving knossos on `localhost:3000` with hot reloading.
 
-#### Ready to open a PR?
+## Ready to open a PR?
 
 If you're prepared to contribute by submitting a pull request, ensure you have met the following criteria:
 
-- `pnpm run fix` has been run.
+- `pnpm prepr:frontend` has been run.
 
 [knossos]: https://github.com/modrinth/code/tree/main/apps/frontend
 [pnpm]: https://pnpm.io

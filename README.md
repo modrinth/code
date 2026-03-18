@@ -15,10 +15,10 @@ If you're not a developer and you've stumbled upon this repository, you can acce
 
 ## Development
 
-This repository contains two primary packages. For detailed development information, please refer to their respective READMEs:
+This repository contains two primary packages. For detailed development information, please refer to their respective guides:
 
-- [Web Interface](apps/frontend/README.md)
-- [Desktop App](apps/app/README.md)
+- [Website frontend](https://docs.modrinth.com/contributing/knossos/)
+- [Desktop app](https://docs.modrinth.com/contributing/theseus/)
 
 ## Contributing
 
