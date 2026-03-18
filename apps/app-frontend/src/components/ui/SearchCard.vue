@@ -20,6 +20,14 @@
 		:date-updated="project.date_modified"
 		:banner="project.featured_gallery ?? undefined"
 		:color="project.color ?? undefined"
+		:environment="
+			['mod', 'modpack'].includes(projectType)
+				? {
+						clientSide: project.client_side?.[0],
+						serverSide: project.server_side?.[0],
+					}
+				: undefined
+		"
 		layout="list"
 	>
 		<template #actions>
