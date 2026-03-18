@@ -255,7 +255,7 @@ const deleteHovered = ref(false)
 				:model-value="enabled"
 				:disabled="disabled"
 				:aria-label="project.title"
-				class="mr-2 my-auto"
+				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 
