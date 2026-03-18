@@ -1,11 +1,11 @@
 ---
-title: Knossos (Website frontend)
+title: Modrinth Website
 description: Guide for contributing to Modrinth's frontend
 sidebar:
   order: 2
 ---
 
-[Knossos] is the Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
+The [Modrinth Website], codename Knossos, is a Nuxt.js frontend. You will need to install [pnpm] and run the standard commands:
 
 ## Setup
 
@@ -20,7 +20,7 @@ sidebar:
 
 ### 3. Run the frontend
 
-- Run `pnpm web:dev` in the workspace root folder. Once that's done, you'll be serving knossos on `localhost:3000` with hot reloading.
+- Run `pnpm web:dev` in the workspace root folder. Once that's done, you'll be serving the website on `localhost:3000` with hot reloading.
 
 ## Ready to open a PR?
 
@@ -28,5 +28,5 @@ If you're prepared to contribute by submitting a pull request, ensure you have m
 
 - `pnpm prepr:frontend` has been run.
 
-[knossos]: https://github.com/modrinth/code/tree/main/apps/frontend
+[Modrinth website]: https://github.com/modrinth/code/tree/main/apps/frontend
 [pnpm]: https://pnpm.io
