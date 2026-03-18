@@ -12,14 +12,13 @@ import {
 	Avatar,
 	commonMessages,
 	defineMessage,
-	NewModal,
 	TabbedModal,
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
@@ -102,8 +101,7 @@ const tabs = computed<TabbedModalTab<InstanceSettingsTabProps>[]>(() => [
 ])
 
 const queryClient = useQueryClient()
-const modal = ref()
-const tabbedModal = useTemplateRef('tabbedModal')
+const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
 function show(tabIndex?: number) {
 	if (props.instance.linked_data?.project_id) {
@@ -112,7 +110,7 @@ function show(tabIndex?: number) {
 			queryFn: () => get_linked_modpack_info(props.instance.path, 'stale_while_revalidate'),
 		})
 	}
-	modal.value.show()
+	tabbedModal.value?.show()
 	if (tabIndex !== undefined) {
 		nextTick(() => tabbedModal.value?.setTab(tabIndex))
 	}
@@ -121,8 +119,18 @@ function show(tabIndex?: number) {
 defineExpose({ show })
 </script>
 <template>
-	<NewModal
-		ref="modal"
+	<TabbedModal
+		ref="tabbedModal"
+		:tabs="
+			tabs.map((tab) => ({
+				...tab,
+				props: {
+					...props,
+					isMinecraftServer,
+					onUnlinked: handleUnlinked,
+				},
+			}))
+		"
 		:max-width="'min(928px, calc(95vw - 10rem))'"
 		:width="'min(928px, calc(95vw - 10rem))'"
 	>
@@ -139,19 +147,5 @@ defineExpose({ show })
 				}}</span>
 			</span>
 		</template>
-
-		<TabbedModal
-			ref="tabbedModal"
-			:tabs="
-				tabs.map((tab) => ({
-					...tab,
-					props: {
-						...props,
-						isMinecraftServer,
-						onUnlinked: handleUnlinked,
-					},
-				}))
-			"
-		/>
-	</NewModal>
+	</TabbedModal>
 </template>
