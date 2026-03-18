@@ -1,7 +1,11 @@
-import '@modrinth/assets'
 import 'floating-vue/dist/style.css'
-import '../../../apps/app-frontend/src/assets/stylesheets/global.scss' // theres also a global.scss for frontend, can switch out to test
 import '../../assets/styles/defaults.scss'
+// frontend css imports
+// import '../../../apps/frontend/src/assets/styles/global.scss'
+// import '../../../apps/frontend/src/assets/styles/tailwind.css'
+// ---
+// app-frontend css imports
+import '../../../apps/app-frontend/src/assets/stylesheets/global.scss'
 
 import type { Labrinth } from '@modrinth/api-client'
 import { GenericModrinthClient } from '@modrinth/api-client'
