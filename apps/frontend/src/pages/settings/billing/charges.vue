@@ -44,7 +44,9 @@
 <script setup>
 import {
 	Badge,
-	Breadcrumbs, commonSettingsMessages, defineMessages,
+	Breadcrumbs,
+	commonSettingsMessages,
+	defineMessages,
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatPrice,

@@ -464,8 +464,8 @@ import {
 	ConfirmModal,
 	defineMessages,
 	injectNotificationManager,
-	StyledInput,
 	IntlFormatted,
+	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import KeyIcon from 'assets/icons/auth/key.svg'

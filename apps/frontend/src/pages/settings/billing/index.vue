@@ -64,10 +64,7 @@
 							<template v-else>
 								{{
 									formatMessage(messages.pricePerInterval, {
-										price: formatPrice(
-											price.prices.intervals.monthly,
-											price.currency_code,
-										),
+										price: formatPrice(price.prices.intervals.monthly, price.currency_code),
 										interval: formatMessage(messages.intervalMonth),
 									})
 								}}
@@ -156,10 +153,7 @@
 						<span v-else class="text-sm text-secondary">
 							{{
 								formatMessage(messages.orYearlySave, {
-									price: formatPrice(
-										price.prices.intervals.yearly,
-										price.currency_code,
-									),
+									price: formatPrice(price.prices.intervals.yearly, price.currency_code),
 									percent: calculateSavings(
 										price.prices.intervals.monthly,
 										price.prices.intervals.yearly,
@@ -833,7 +827,7 @@ const messages = defineMessages({
 		id: 'settings.billing.pyro_subscription.description',
 		defaultMessage: 'Manage your Modrinth Server subscriptions.',
 	},
-    intervalMonth: {
+	intervalMonth: {
 		id: 'settings.billing.interval.month',
 		defaultMessage: 'month',
 	},
