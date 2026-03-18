@@ -48,7 +48,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from './InlineBackupCreator.vue'
 
-const props = defineProps<{
+defineProps<{
 	server?: boolean
 	backupTip?: string
 }>()

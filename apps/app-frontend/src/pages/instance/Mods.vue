@@ -20,7 +20,11 @@
 			<ConfirmModpackUpdateModal
 				ref="modpackUpdateConfirmModal"
 				:downgrade="isModpackUpdateDowngrade"
-				:backup-tip="[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number].filter(Boolean).join(' ')"
+				:backup-tip="
+					[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
+						.filter(Boolean)
+						.join(' ')
+				"
 				@confirm="handleModpackUpdateConfirm"
 				@cancel="handleModpackUpdateCancel"
 			/>

@@ -1,10 +1,5 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="formatMessage(messages.header)"
-		fade="warning"
-		max-width="500px"
-	>
+	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="500px">
 		<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
 			{{ formatMessage(messages.admonitionBody, { instanceName }) }}
 		</Admonition>
@@ -30,13 +25,7 @@
 
 <script setup lang="ts">
 import { ExternalIcon, PlusIcon } from '@modrinth/assets'
-import {
-	Admonition,
-	ButtonStyled,
-	defineMessages,
-	NewModal,
-	useVIntl,
-} from '@modrinth/ui'
+import { Admonition, ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
 import { ref } from 'vue'
 
 const { formatMessage } = useVIntl()
@@ -52,8 +41,7 @@ const messages = defineMessages({
 	},
 	admonitionBody: {
 		id: 'app.instance.modpack-already-installed.admonition-body',
-		defaultMessage:
-			'This modpack is already installed in the "{instanceName}" instance.',
+		defaultMessage: 'This modpack is already installed in the "{instanceName}" instance.',
 	},
 	goToInstance: {
 		id: 'app.instance.modpack-already-installed.go-to-instance',

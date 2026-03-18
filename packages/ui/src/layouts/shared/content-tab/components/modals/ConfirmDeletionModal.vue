@@ -73,7 +73,7 @@ const messages = defineMessages({
 	},
 })
 
-const props = withDefaults(
+withDefaults(
 	defineProps<{
 		count: number
 		itemType: string
@@ -82,6 +82,7 @@ const props = withDefaults(
 	}>(),
 	{
 		variant: 'instance',
+		backupTip: undefined,
 	},
 )
 

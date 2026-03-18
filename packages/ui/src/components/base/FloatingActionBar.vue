@@ -29,15 +29,19 @@ function checkCompact() {
 
 let observer: ResizeObserver | null = null
 
-watch(toolbarEl, (el) => {
-	observer?.disconnect()
-	if (!el) return
-	observer = new ResizeObserver(() => {
+watch(
+	toolbarEl,
+	(el) => {
+		observer?.disconnect()
+		if (!el) return
+		observer = new ResizeObserver(() => {
+			checkCompact()
+		})
+		observer.observe(el.parentElement!)
 		checkCompact()
-	})
-	observer.observe(el.parentElement!)
-	checkCompact()
-}, { immediate: true })
+	},
+	{ immediate: true },
+)
 
 watch(
 	() => props.shown,

@@ -161,7 +161,9 @@ const bulkProgressMessage = computed(() => {
 
 			<ButtonStyled type="transparent">
 				<button
-					v-tooltip="allEnabled ? formatMessage(messages.allAlreadyEnabled) : formatMessage(messages.enable)"
+					v-tooltip="
+						allEnabled ? formatMessage(messages.allAlreadyEnabled) : formatMessage(messages.enable)
+					"
 					:disabled="isBusy || allEnabled"
 					@click="emit('enable')"
 				>
@@ -171,7 +173,11 @@ const bulkProgressMessage = computed(() => {
 			</ButtonStyled>
 			<ButtonStyled type="transparent">
 				<button
-					v-tooltip="allDisabled ? formatMessage(messages.allAlreadyDisabled) : formatMessage(messages.disable)"
+					v-tooltip="
+						allDisabled
+							? formatMessage(messages.allAlreadyDisabled)
+							: formatMessage(messages.disable)
+					"
 					:disabled="isBusy || allDisabled"
 					@click="emit('disable')"
 				>

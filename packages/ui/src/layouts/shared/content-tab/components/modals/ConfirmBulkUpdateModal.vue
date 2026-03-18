@@ -70,7 +70,7 @@ const messages = defineMessages({
 	},
 })
 
-const props = defineProps<{
+defineProps<{
 	count: number
 	server?: boolean
 	backupTip?: string

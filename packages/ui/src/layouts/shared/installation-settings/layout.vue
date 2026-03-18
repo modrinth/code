@@ -679,7 +679,9 @@ const messages = defineMessages({
 			ref="modpackUpdateModal"
 			:downgrade="isUpdateDowngrade"
 			:server="ctx.isServer"
-			:backup-tip="[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')"
+			:backup-tip="
+				[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
+			"
 			@confirm="handleModpackUpdateConfirm"
 			@cancel="handleModpackUpdateCancel"
 		/>
