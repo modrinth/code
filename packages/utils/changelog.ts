@@ -11,14 +11,14 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-03-17T19:00:00-08:00`,
-		product: 'website',
+		date: `2026-03-17T19:30:00-08:00`,
+		product: 'web',
 		body: `## Improvements
 - Sorted server project categories, regions, and language filter options.
 - Added GitHub Pages image links to the list of domains that can bypass the wsrv.nl image proxy for more real-time dynamic images.`,
 	},
 	{
-		date: `2026-03-17T19:00:00-08:00`,
+		date: `2026-03-17T19:30:00-08:00`,
 		product: 'hosting',
 		body: `## Improvements
 - Fixed being unable to sort by project type and updates at the same time on the Content tab.
@@ -27,7 +27,7 @@ const VERSIONS: VersionEntry[] = [
 	},
 	{
 		date: `2026-03-17T12:40:00-08:00`,
-		product: 'website',
+		product: 'web',
 		body: `## Improvements
 - Fixed personal access token settings page erroring.`,
 	},

@@ -23,7 +23,7 @@ const changelogEntry = computed(() =>
 const isFirst = computed(() => changelogEntry.value?.date === getChangelog()[0].date)
 
 if (!changelogEntry.value) {
-	createError({ statusCode: 404, statusMessage: 'Version not found' })
+	throw createError({ statusCode: 404, statusMessage: 'Version not found' })
 }
 </script>
 
