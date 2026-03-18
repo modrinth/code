@@ -99,10 +99,6 @@ import {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
-})
-
 definePageMeta({
 	middleware: 'auth',
 })
@@ -137,6 +133,10 @@ const messages = defineMessages({
 		id: 'settings.profile.bio.description',
 		defaultMessage: 'A short description to tell everyone a little bit about you.',
 	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const auth = await useAuth()

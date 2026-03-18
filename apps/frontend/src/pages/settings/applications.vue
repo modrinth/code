@@ -283,10 +283,6 @@ definePageMeta({
 	middleware: 'auth',
 })
 
-useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
-})
-
 const messages = defineMessages({
 	headTitle: {
 		id: 'settings.applications.head-title',
@@ -418,6 +414,10 @@ const messages = defineMessages({
 		id: 'settings.applications.notification.icon-updated.description',
 		defaultMessage: 'Your application icon has been updated.',
 	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const { scopesToLabels } = useScopes()
