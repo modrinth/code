@@ -950,6 +950,21 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Custom"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Large"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Medium"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Small"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Unknown"
+  },
   "label.platform": {
     "defaultMessage": "Platform"
   },

@@ -450,6 +450,26 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	planUnknownLabel: {
+		id: 'label.plan-unknown',
+		defaultMessage: 'Unknown',
+	},
+	planSmallLabel: {
+		id: 'label.plan-small',
+		defaultMessage: 'Small',
+	},
+	planMediumLabel: {
+		id: 'label.plan-medium',
+		defaultMessage: 'Medium',
+	},
+	planLargeLabel: {
+		id: 'label.plan-large',
+		defaultMessage: 'Large',
+	},
+	planCustomLabel: {
+		id: 'label.plan-custom',
+		defaultMessage: 'Custom',
+	},
 	switchVersionButton: {
 		id: 'button.switch-version',
 		defaultMessage: 'Switch version',
