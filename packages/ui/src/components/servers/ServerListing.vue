@@ -2,7 +2,7 @@
 	<div>
 		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${server_id}`">
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
+				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
 					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
 					'opacity-75': status === 'suspended',
@@ -56,46 +56,39 @@
 		</NuxtLink>
 		<div
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
+			class="server-listing-notice"
 		>
-			<LoaderCircleIcon class="size-5 animate-spin" />
-			Your server's hardware is currently being upgraded and will be back online shortly.
+			<div class="flex gap-2">
+				<LoaderCircleIcon class="size-5 animate-spin" />
+				Your server's hardware is currently being upgraded and will be back online shortly.
+			</div>
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="server-listing-notice"
 		>
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been cancelled. Please update your
-				billing information or contact Modrinth Support for more information.
+				Your server has been cancelled. Please update your billing information or contact Modrinth
+				Support for more information.
 			</div>
 			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
-		>
+		<div v-else-if="status === 'suspended' && suspension_reason" class="server-listing-notice">
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
+				Your server has been suspended:
 				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
 				for more information.
 			</div>
 			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
-		<div
-			v-else-if="status === 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
-		>
+		<div v-else-if="status === 'suspended'" class="server-listing-notice">
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
-				billing information or contact Modrinth Support for more information.
+				Your server has been suspended. Please update your billing information or contact Modrinth
+				Support for more information.
 			</div>
 			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
-		<div
-			v-if="pendingChange && status !== 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
-		>
+		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
 				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
 					pendingChange.planSize
@@ -114,13 +107,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import {
-	ChevronRightIcon,
-	LoaderCircleIcon,
-	LockIcon,
-	SparklesIcon,
-	TriangleAlertIcon,
-} from '@modrinth/assets'
+import { ChevronRightIcon, LoaderCircleIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
@@ -159,6 +146,12 @@ type ServerListingProps = {
 	upstream?: Archon.Servers.v0.Upstream | null
 	flows?: Archon.Servers.v0.Flows
 	pendingChange?: PendingChange
+	ip?: string
+	online?: boolean
+	playerCount?: {
+		currentPlayerCount?: number
+		maxPlayerCount?: number
+	}
 }
 
 const props = defineProps<ServerListingProps>()
@@ -243,3 +236,9 @@ const { data: image } = useQuery({
 
 const isConfiguring = computed(() => props.flows?.intro)
 </script>
+
+<style scoped>
+.server-listing-notice {
+	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-2 border-surface-5 bg-bg-raised text-primary;
+}
+</style>

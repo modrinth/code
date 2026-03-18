@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import ServerListing from '../../components/servers/ServerListing.vue'
 
 const baseServer = {
-	server_id: 'srv_2n5x8j9k',
+	server_id: '8759b459-6f9e-49e0-aa70-dfab5b2abb2f',
 	name: 'Survival SMP',
 	status: 'available',
 	game: 'Minecraft',
@@ -53,7 +53,6 @@ export const Default: Story = {
 export const ConfiguringNewServer: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_new_flow',
 		name: 'Fresh Vanilla World',
 		status: 'installing',
 		flows: { intro: true },
@@ -65,7 +64,6 @@ export const ConfiguringNewServer: Story = {
 export const WithPendingChange: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_pending',
 		name: 'Competitive UHC',
 		pendingChange,
 	},
@@ -74,7 +72,6 @@ export const WithPendingChange: Story = {
 export const SuspendedUpgrading: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_suspended_upgrade',
 		name: 'Creative Build Team',
 		status: 'suspended',
 		suspension_reason: 'upgrading',
@@ -84,7 +81,6 @@ export const SuspendedUpgrading: Story = {
 export const SuspendedCancelled: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_suspended_cancelled',
 		name: 'Old Event Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
@@ -94,7 +90,6 @@ export const SuspendedCancelled: Story = {
 export const SuspendedPaymentFailed: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_suspended_reason',
 		name: 'Minigames Network',
 		status: 'suspended',
 		suspension_reason: 'paymentfailed',
@@ -104,7 +99,6 @@ export const SuspendedPaymentFailed: Story = {
 export const SuspendedGeneric: Story = {
 	args: {
 		...baseServer,
-		server_id: 'srv_suspended_generic',
 		name: 'Archive Server',
 		status: 'suspended',
 	},
