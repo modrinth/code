@@ -35,8 +35,9 @@ pub struct ContentItem {
     pub file_name: String,
     /// Relative path to the file within the profile
     pub file_path: String,
-    /// SHA1 hash of the file
-    pub hash: String,
+    /// Stable frontend identifier (SHA1 hash of file content, survives renames).
+    /// Not a project or version ID.
+    pub id: String,
     /// File size in bytes
     pub size: u64,
     /// Whether the file is enabled (not .disabled)
@@ -542,7 +543,7 @@ async fn profile_files_to_content_items(
             ContentItem {
                 file_name: file.file_name.clone(),
                 file_path: path.clone(),
-                hash: file.hash.clone(),
+                id: file.hash.clone(),
                 size: file.size,
                 enabled: !file.file_name.ends_with(".disabled"),
                 project_type: file.project_type,
@@ -726,7 +727,7 @@ pub async fn dependencies_to_content_items(
                         )
                     }),
                 file_path: String::new(),
-                hash: String::new(),
+                id: String::new(),
                 size: version
                     .and_then(|v| v.files.first())
                     .map(|f| f.size as u64)

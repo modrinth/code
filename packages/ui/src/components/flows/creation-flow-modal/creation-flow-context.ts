@@ -115,6 +115,10 @@ export interface CreationFlowContextValue {
 	// Loading state (set when finish() is called, cleared on reset)
 	loading: Ref<boolean>
 
+	// Backup state (set by InlineBackupCreator in reset-server flow)
+	isBackingUp: Ref<boolean>
+	cancelBackup: Ref<(() => void) | null>
+
 	// Modal
 	modal: ShallowRef<ComponentExposed<typeof MultiStageModal> | null>
 	stageConfigs: StageConfigInput<CreationFlowContextValue>[]
@@ -240,6 +244,8 @@ export function createCreationFlowContext(
 
 	const hardReset = ref(isInitialSetup)
 	const loading = ref(false)
+	const isBackingUp = ref(false)
+	const cancelBackup = ref<(() => void) | null>(null)
 
 	// hideLoaderChips: hides the entire loader chips section (only for vanilla world type in world/server flows)
 	const hideLoaderChips = computed(() => setupType.value === 'vanilla')
@@ -292,6 +298,8 @@ export function createCreationFlowContext(
 
 		hardReset.value = isInitialSetup
 		loading.value = false
+		isBackingUp.value = false
+		cancelBackup.value = null
 	}
 
 	function setSetupType(type: SetupType) {
@@ -401,6 +409,8 @@ export function createCreationFlowContext(
 		importSearchQuery,
 		hardReset,
 		loading,
+		isBackingUp,
+		cancelBackup,
 		modal,
 		stageConfigs: resolvedStageConfigs,
 		onBack,

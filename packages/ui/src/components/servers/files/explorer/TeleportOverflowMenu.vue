@@ -178,10 +178,10 @@ const calculateMenuPosition = () => {
 		top = Math.max(margin, window.innerHeight - menuHeight - margin)
 	}
 
-	if (triggerRect.left + menuWidth + margin <= window.innerWidth) {
-		left = triggerRect.left
-	} else if (triggerRect.right - menuWidth - margin >= 0) {
+	if (triggerRect.right - menuWidth >= margin) {
 		left = triggerRect.right - menuWidth
+	} else if (triggerRect.left + menuWidth + margin <= window.innerWidth) {
+		left = triggerRect.left
 	} else {
 		left = Math.max(margin, window.innerWidth - menuWidth - margin)
 	}

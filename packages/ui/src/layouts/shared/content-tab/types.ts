@@ -44,9 +44,9 @@ export interface ContentItem extends Omit<
 	ContentCardTableItem,
 	'id' | 'projectLink' | 'disabled' | 'overflowOptions'
 > {
+	id: string
 	file_name: string
 	file_path?: string
-	hash?: string
 	size?: number
 	project_type: string
 	has_update: boolean

@@ -84,10 +84,10 @@ const admonitions = computed<AdmonitionEntry[]>(() => {
 	// 1. Active WS entries (real-time progress from backupsState)
 	for (const [id, entry] of backupsState.entries()) {
 		const backup = findBackup(id)
+		seenIds.add(id)
 		if (entry.create && entry.create.state === 'ongoing') {
 			const key = `${id}:create`
 			if (!dismissedIds.has(key)) {
-				seenIds.add(id)
 				result.push({
 					key,
 					backupId: id,
@@ -102,7 +102,6 @@ const admonitions = computed<AdmonitionEntry[]>(() => {
 		if (entry.restore && entry.restore.state === 'ongoing') {
 			const key = `${id}:restore`
 			if (!dismissedIds.has(key)) {
-				seenIds.add(id)
 				result.push({
 					key,
 					backupId: id,

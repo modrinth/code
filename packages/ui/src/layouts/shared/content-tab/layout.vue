@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
 	ArrowDownAZIcon,
-	ArrowDownZAIcon,
+	ArrowUpZAIcon,
 	ClockArrowDownIcon,
 	ClockArrowUpIcon,
 	CodeIcon,
@@ -171,8 +171,8 @@ const sortLabels: Record<SortMode, () => string> = {
 function cycleSortMode() {
 	const modes: SortMode[] = [
 		'alphabetical-asc',
-		'date-added-newest',
 		'alphabetical-desc',
+		'date-added-newest',
 		'date-added-oldest',
 	]
 	const idx = modes.indexOf(sortMode.value)
@@ -235,7 +235,6 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 
 const { selectedIds, selectedItems, clearSelection, removeFromSelection } = useContentSelection(
 	ctx.items,
-	ctx.getItemId,
 )
 
 const { isBulkOperating, bulkProgress, bulkTotal, bulkOperation, runBulk } = useBulkOperation()
@@ -292,7 +291,7 @@ const pendingDeletionItems = ref<ContentItem[]>([])
 const confirmDeletionModal = ref<InstanceType<typeof ConfirmDeletionModal>>()
 
 function handleDeleteById(id: string, event?: MouseEvent) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (item) {
 		pendingDeletionItems.value = [item]
 		if (event?.shiftKey) {
@@ -334,7 +333,7 @@ async function confirmDelete() {
 
 	if (itemsToDelete.length === 1) {
 		const item = itemsToDelete[0]
-		const id = ctx.getItemId(item)
+		const id = item.id
 		markChanging(id)
 		await ctx.deleteItem(item)
 		removeFromSelection(id)
@@ -347,14 +346,14 @@ async function confirmDelete() {
 		itemsToDelete,
 		async (item) => {
 			await ctx.deleteItem(item)
-			removeFromSelection(ctx.getItemId(item))
+			removeFromSelection(item.id)
 		},
 		{ onComplete: clearSelection },
 	)
 }
 
 async function handleToggleEnabledById(id: string, _value: boolean) {
-	const item = ctx.items.value.find((i) => ctx.getItemId(i) === id)
+	const item = ctx.items.value.find((i) => i.id === id)
 	if (!item) return
 	markChanging(id)
 	try {
@@ -647,7 +646,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
 											v-else-if="sortMode === 'date-added-newest'"
 										/><ClockArrowUpIcon
 											v-else-if="sortMode === 'date-added-oldest'"
@@ -667,7 +666,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 										"
 										@click="cycleSortMode"
 									>
-										<ArrowDownZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
+										<ArrowUpZAIcon v-if="sortMode === 'alphabetical-desc'" /><ClockArrowDownIcon
 											v-else-if="sortMode === 'date-added-newest'"
 										/><ClockArrowUpIcon
 											v-else-if="sortMode === 'date-added-oldest'"
@@ -790,9 +789,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
+					<button
+						v-tooltip="formatMessage(commonMessages.updateButton)"
+						:disabled="ctx.isBusy.value"
+						@click="promptUpdateSelected"
+					>
 						<DownloadIcon />
-						{{ formatMessage(commonMessages.updateButton) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 					</button>
 				</ButtonStyled>
 
@@ -818,7 +821,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						]"
 					>
 						<ShareIcon />
-						{{ formatMessage(messages.share) }}
+						<span class="bar-label">{{ formatMessage(messages.share) }}</span>
 						<DropdownIcon />
 						<template #share-names>
 							<TextCursorInputIcon />
@@ -849,9 +852,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
+					<button
+						v-tooltip="formatMessage(commonMessages.deleteLabel)"
+						:disabled="ctx.isBusy.value"
+						@click="showBulkDeleteModal"
+					>
 						<TrashIcon />
-						{{ formatMessage(commonMessages.deleteLabel) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 					</button>
 				</ButtonStyled>
 			</template>
@@ -862,6 +869,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
+			:backup-tip="pendingDeletionItems.map((i) => i.project.title).join(', ')"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal
@@ -875,6 +883,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			v-if="ctx.unlinkModpack"
 			ref="confirmUnlinkModal"
 			:server="ctx.deletionContext === 'server'"
+			:backup-tip="ctx.modpack.value?.project.title"
 			@unlink="ctx.unlinkModpack!()"
 		/>
 

@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "This modpack is already installed in the \"{instanceName}\" instance."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Duplicate modpack"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Create anyway"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Go to instance"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack already installed"
+  },
   "app.instance.mods.content-type-project": {
     "message": "project"
   },

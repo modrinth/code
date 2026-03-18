@@ -487,6 +487,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
+		id: addon.id,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,
@@ -604,8 +605,8 @@ async function handleBulkUpdate(items: ContentItem[]) {
 	}
 }
 
-async function handleUpdateItem(fileNameKey: string) {
-	const item = contentItems.value.find((i) => i.file_name === fileNameKey)
+async function handleUpdateItem(id: string) {
+	const item = contentItems.value.find((i) => i.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	updatingModpack.value = false
@@ -872,7 +873,6 @@ provideContentManager({
 		})
 		return filteredReasons.length > 0 ? formatMessage(filteredReasons[0].reason) : null
 	}),
-	getItemId: (item) => item.file_path ?? item.file_name,
 	contentTypeLabel: type,
 	toggleEnabled: handleToggleEnabled,
 	deleteItem: handleDeleteItem,
@@ -898,7 +898,7 @@ provideContentManager({
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
 		return {
-			id: item.file_path ?? item.file_name,
+			id: item.id,
 			project: item.project,
 			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
 			version: item.version,
@@ -962,6 +962,11 @@ provideContentManager({
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"
+		:backup-tip="
+			[modpack?.project.title, pendingModpackUpdateVersion?.version_number]
+				.filter(Boolean)
+				.join(' ')
+		"
 		server
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"

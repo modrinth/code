@@ -19,6 +19,7 @@ import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
+import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
@@ -404,6 +405,7 @@ export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
+export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon
 export const BadgeCheckIcon = _BadgeCheckIcon
 export const BadgeDollarSignIcon = _BadgeDollarSignIcon

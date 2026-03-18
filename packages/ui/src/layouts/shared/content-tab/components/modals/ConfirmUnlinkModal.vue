@@ -12,7 +12,7 @@
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
-				backup-name="Before unlink"
+				:backup-name="backupTip ? `Before unlink (${backupTip})` : 'Before unlink'"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -50,6 +50,7 @@ import InlineBackupCreator from './InlineBackupCreator.vue'
 
 defineProps<{
 	server?: boolean
+	backupTip?: string
 }>()
 
 const { formatMessage } = useVIntl()

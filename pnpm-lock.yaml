@@ -350,6 +350,9 @@ importers:
       vue-confetti-explosion:
         specifier: ^1.0.2
         version: 1.0.2(vue@3.5.27(typescript@5.9.3))
+      vue-router:
+        specifier: '*'
+        version: 4.6.4(vue@3.5.27(typescript@5.9.3))
       vue-typed-virtual-list:
         specifier: ^1.0.10
         version: 1.0.10(vue@3.5.27(typescript@5.9.3))
@@ -8689,6 +8692,7 @@ packages:
   tar@7.5.7:
     resolution: {integrity: sha512-fov56fJiRuThVFXD6o6/Q354S7pnWMJIVlDBYijsTNx6jKSE4pvrDTs6lUnmGvNyfJwFQQwWy3owKz1ucIhveQ==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   terser@5.46.0:
     resolution: {integrity: sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==}
@@ -8975,6 +8979,7 @@ packages:
 
   unplugin-vue-router@0.19.2:
     resolution: {integrity: sha512-u5dgLBarxE5cyDK/hzJGfpCTLIAyiTXGlo85COuD4Nssj6G7NxS+i9mhCWz/1p/ud1eMwdcUbTXehQe41jYZUA==}
+    deprecated: 'Merged into vuejs/router. Migrate: https://router.vuejs.org/guide/migration/v4-to-v5.html'
     peerDependencies:
       '@vue/compiler-sfc': ^3.5.17
       vue-router: ^4.6.0
@@ -9406,8 +9411,8 @@ packages:
   vue-component-type-helpers@3.2.4:
     resolution: {integrity: sha512-05lR16HeZDcDpB23ku5b5f1fBOoHqFnMiKRr2CiEvbG5Ux4Yi0McmQBOET0dR0nxDXosxyVqv67q6CzS3AK8rw==}
 
-  vue-component-type-helpers@3.2.5:
-    resolution: {integrity: sha512-tkvNr+bU8+xD/onAThIe7CHFvOJ/BO6XCOrxMzeytJq40nTfpGDJuVjyCM8ccGZKfAbGk2YfuZyDMXM56qheZQ==}
+  vue-component-type-helpers@3.2.6:
+    resolution: {integrity: sha512-O02tnvIfOQVmnvoWwuSydwRoHjZVt8UEBR+2p4rT35p8GAy5VTlWP8o5qXfJR/GWCN0nVZoYWsVUvx2jwgdBmQ==}
 
   vue-confetti-explosion@1.0.2:
     resolution: {integrity: sha512-80OboM3/6BItIoZ6DpNcZFqGpF607kjIVc5af56oKgtFmt5yWehvJeoYhkzYlqxrqdBe0Ko4Ie3bWrmLau+dJw==}
@@ -12755,7 +12760,7 @@ snapshots:
       storybook: 10.2.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       type-fest: 2.19.0
       vue: 3.5.27(typescript@5.9.3)
-      vue-component-type-helpers: 3.2.5
+      vue-component-type-helpers: 3.2.6
 
   '@stripe/stripe-js@7.9.0': {}
 
@@ -19524,7 +19529,7 @@ snapshots:
 
   vue-component-type-helpers@3.2.4: {}
 
-  vue-component-type-helpers@3.2.5: {}
+  vue-component-type-helpers@3.2.6: {}
 
   vue-confetti-explosion@1.0.2(vue@3.5.27(typescript@5.9.3)):
     dependencies:

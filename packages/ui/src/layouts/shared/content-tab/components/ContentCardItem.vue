@@ -87,22 +87,23 @@ const deleteHovered = ref(false)
 		:class="{ 'opacity-50': disabled }"
 	>
 		<div
-			class="flex min-w-0 items-center gap-4 transition-[filter,opacity] duration-200"
-			:class="[
-				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none',
-				enabled === false && !disabled ? 'grayscale opacity-50' : '',
-			]"
+			class="flex min-w-0 items-center gap-4"
+			:class="
+				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+			"
 		>
 			<Checkbox
 				v-if="showCheckbox"
 				:model-value="selected ?? false"
-				:disabled="disabled"
 				:aria-label="`Select ${project.title}`"
 				class="shrink-0"
 				@update:model-value="selected = $event"
 			/>
 
-			<div class="flex min-w-0 items-center gap-3">
+			<div
+				class="flex min-w-0 items-center gap-3 transition-[filter,opacity] duration-200"
+				:class="enabled === false && !disabled ? 'grayscale opacity-50' : ''"
+			>
 				<div
 					v-tooltip="installing ? formatMessage(commonMessages.installingLabel) : undefined"
 					class="relative shrink-0"
@@ -256,7 +257,7 @@ const deleteHovered = ref(false)
 				:model-value="enabled"
 				:disabled="disabled"
 				:aria-label="project.title"
-				class="mr-2 my-auto"
+				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
 			/>
 

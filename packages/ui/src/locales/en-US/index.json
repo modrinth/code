@@ -374,6 +374,12 @@
   "content.page-layout.uploading-files": {
     "defaultMessage": "Uploading files ({completed}/{total})"
   },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "All selected content is already disabled"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "All selected content is already enabled"
+  },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Deleting {progress}/{total} {contentType}..."
   },
@@ -2151,7 +2157,7 @@
     "defaultMessage": "Creating backup"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "your backup"
+    "defaultMessage": "Your backup"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."

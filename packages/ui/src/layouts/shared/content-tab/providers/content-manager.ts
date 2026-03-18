@@ -51,8 +51,7 @@ export interface ContentManagerContext {
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 
-	// Identity & labelling
-	getItemId: (item: ContentItem) => string
+	// Labelling
 	contentTypeLabel: Ref<string> | ComputedRef<string>
 
 	// Core actions
