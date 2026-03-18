@@ -160,7 +160,7 @@
 						:show-loader-label="showLoaderLabel"
 						:uptime-seconds="uptimeSeconds"
 						:linked="true"
-						class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+						class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</div>
@@ -1135,7 +1135,8 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 }
 
 const updateStats = (currentStats: Stats['current']) => {
-	isConnected.value = true
+	if (!isMounted.value) return
+	if (!isConnected.value) isConnected.value = true
 	stats.value = {
 		current: currentStats,
 		past: { ...stats.value.current },

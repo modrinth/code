@@ -16,6 +16,7 @@ import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
 import { computed, defineComponent, h, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
+import { createMemoryHistory, createRouter } from 'vue-router'
 
 import NotificationPanel from '../src/components/nav/NotificationPanel.vue'
 import PopupNotificationPanel from '../src/components/nav/PopupNotificationPanel.vue'
@@ -166,6 +167,13 @@ setup((app) => {
 	})
 	app.use(VueQueryPlugin, { queryClient })
 	app.use(i18n)
+
+	const router = createRouter({
+		history: createMemoryHistory(),
+		routes: [{ path: '/:pathMatch(.*)*', component: { render: () => null } }],
+	})
+	app.use(router)
+
 	app.component('NuxtLink', StorybookLink)
 	app.component('RouterLink', StorybookLink)
 	app.component('ClientOnly', StorybookClientOnly)

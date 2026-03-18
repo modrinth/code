@@ -2,11 +2,12 @@
 	<div
 		v-if="subdomain && !isHidden"
 		v-tooltip="'Copy custom URL'"
-		class="flex min-w-0 flex-row items-center gap-4 truncate hover:cursor-pointer"
+		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
 	>
-		<div v-if="!noSeparator" class="experimental-styles-within h-1.5 w-1.5 bg-button-border"></div>
-		<div class="flex flex-row items-center gap-2">
-			<LinkIcon class="flex size-5 shrink-0" />
+		<Separator v-if="!noSeparator" />
+
+		<div class="flex flex-row items-center gap-1.5">
+			<LinkIcon />
 			<div
 				class="flex min-w-0 text-sm font-semibold"
 				:class="serverId ? 'hover:underline' : ''"
@@ -24,6 +25,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import Separator from './Separator.vue'
 
 const { addNotification } = injectNotificationManager()
 

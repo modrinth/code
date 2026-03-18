@@ -2,13 +2,13 @@
 	<div
 		v-if="uptimeSeconds || uptimeSeconds !== 0"
 		v-tooltip="`Online for ${verboseUptime}`"
-		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-4"
+		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-2"
 		data-pyro-uptime
 	>
-		<div v-if="!noSeparator" class="experimental-styles-within h-1.5 w-1.5 bg-button-border"></div>
+		<Separator v-if="!noSeparator" />
 
-		<div class="flex gap-2">
-			<TimerIcon class="flex size-5 shrink-0" />
+		<div class="flex gap-1.5">
+			<TimerIcon />
 			<time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
 				{{ formattedUptime }}
 			</time>
@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+import Separator from './Separator.vue'
 
 const props = defineProps<{
 	uptimeSeconds: number

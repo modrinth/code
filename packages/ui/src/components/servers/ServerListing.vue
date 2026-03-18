@@ -5,7 +5,7 @@
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
 					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
-					'opacity-75': status === 'suspended',
+					'opacity-50 bg-surface-2': status === 'suspended',
 					'active:scale-95': status !== 'suspended' && !pendingChange,
 				}"
 				data-pyro-server-listing
@@ -23,9 +23,9 @@
 						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
 						<div
 							v-if="isConfiguring"
-							class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 py-1"
+							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
 						>
-							<SparklesIcon class="size-5 shrink-0" /> New
+							<SparklesIcon class="size-5 shrink-0 font-semibold" /> New
 						</div>
 					</div>
 
@@ -44,12 +44,25 @@
 
 					<ServerInfoLabels
 						:server-data="
-							isConfiguring ? { net } : { game, mc_version, loader, loader_version, net }
+							isConfiguring
+								? { net }
+								: {
+										game,
+										mc_version,
+										loader,
+										loader_version,
+										net,
+										online,
+										players: playerCount
+											? { current: playerCount.current, max: playerCount.max }
+											: undefined,
+									}
 						"
 						:show-game-label="showGameLabel"
 						:show-loader-label="showLoaderLabel"
+						:show-player-count="showPlayerCount"
 						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</div>
@@ -146,11 +159,10 @@ type ServerListingProps = {
 	upstream?: Archon.Servers.v0.Upstream | null
 	flows?: Archon.Servers.v0.Flows
 	pendingChange?: PendingChange
-	ip?: string
 	online?: boolean
 	playerCount?: {
-		currentPlayerCount?: number
-		maxPlayerCount?: number
+		current?: number
+		max?: number
 	}
 }
 
@@ -160,6 +172,7 @@ const { kyros, labrinth } = injectModrinthClient()
 
 const showGameLabel = computed(() => !!props.game && !isConfiguring.value)
 const showLoaderLabel = computed(() => !!props.loader && !isConfiguring.value)
+const showPlayerCount = computed(() => !!props.playerCount && !isConfiguring.value)
 
 const { data: projectData } = useQuery({
 	queryKey: ['project', props.upstream?.project_id] as const,

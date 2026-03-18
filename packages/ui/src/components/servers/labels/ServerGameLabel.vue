@@ -2,9 +2,11 @@
 	<div
 		v-if="game"
 		v-tooltip="'Change server version'"
-		class="min-w-0 flex-none flex-row items-center gap-2 first:!flex"
+		class="min-w-0 flex-none flex-row items-center gap-1.5 first:!flex"
 	>
-		<GameIcon aria-hidden="true" class="size-5 shrink-0" />
+		<Separator v-if="!noSeparator" />
+
+		<GameIcon aria-hidden="true" />
 		<AutoLink
 			v-if="isLink"
 			:to="serverId ? `/hosting/manage/${serverId}/options/loader` : ''"
@@ -30,11 +32,13 @@ import { GameIcon } from '@modrinth/assets'
 import { useRoute } from 'vue-router'
 
 import AutoLink from '../../base/AutoLink.vue'
+import Separator from './Separator.vue'
 
 defineProps<{
 	game: string
 	mcVersion: string
 	isLink?: boolean
+	noSeparator?: boolean
 }>()
 
 const route = useRoute()

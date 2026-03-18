@@ -1,8 +1,8 @@
 <template>
-	<div v-tooltip="'Change server loader'" class="flex min-w-0 flex-row items-center gap-4 truncate">
-		<div v-if="!noSeparator" class="experimental-styles-within h-1.5 w-1.5 bg-button-border"></div>
-		<div class="flex flex-row items-center gap-2">
-			<LoaderIcon v-if="loader" :loader="loader" class="flex shrink-0 [&&]:size-5" />
+	<div v-tooltip="'Change server loader'" class="flex min-w-0 flex-row items-center gap-2 truncate">
+		<Separator v-if="!noSeparator" />
+		<div class="flex flex-row items-center gap-1.5">
+			<LoaderIcon v-if="loader" :loader="loader" />
 			<div v-else class="size-5 shrink-0 animate-pulse rounded-full bg-button-border"></div>
 			<AutoLink
 				v-if="isLink"
@@ -38,6 +38,7 @@ import { useRoute } from 'vue-router'
 
 import AutoLink from '../../base/AutoLink.vue'
 import LoaderIcon from '../icons/LoaderIcon.vue'
+import Separator from './Separator.vue'
 
 defineProps<{
 	noSeparator?: boolean

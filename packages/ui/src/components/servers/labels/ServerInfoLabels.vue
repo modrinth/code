@@ -1,9 +1,16 @@
 <template>
 	<div>
+		<ServerPlayerCount
+			v-if="showPlayerCount"
+			:current-players="serverData.players.current"
+			:max-players="serverData.players.max"
+			:online="serverData.online"
+		/>
 		<ServerGameLabel
 			v-if="showGameLabel"
 			:game="serverData.game"
 			:mc-version="serverData.mc_version ?? ''"
+			:no-separator="column || !showPlayerCount"
 			:is-link="linked"
 		/>
 		<ServerLoaderLabel
@@ -30,6 +37,7 @@
 <script setup lang="ts">
 import ServerGameLabel from './ServerGameLabel.vue'
 import ServerLoaderLabel from './ServerLoaderLabel.vue'
+import ServerPlayerCount from './ServerPlayerCount.vue'
 import ServerSubdomainLabel from './ServerSubdomainLabel.vue'
 import ServerUptimeLabel from './ServerUptimeLabel.vue'
 
@@ -38,6 +46,7 @@ interface ServerInfoLabelsProps {
 	serverData: Record<string, any>
 	showGameLabel: boolean
 	showLoaderLabel: boolean
+	showPlayerCount?: boolean
 	uptimeSeconds?: number
 	column?: boolean
 	linked?: boolean
