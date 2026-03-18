@@ -336,7 +336,7 @@ impl AutomatedModerationQueue {
                                             || file.name().starts_with("overrides/resourcepacks")
                                             || file.name().starts_with("client-overrides/resourcepacks")
                                         {
-                                            if file.name().matches('/').count() > 2 || file.name().ends_with(".txt") {
+                                            if file.name().matches('/').count() > 2 || file.name().ends_with(".txt") || file.name().ends_with(".rpo") {
                                                 continue;
                                             }
 
