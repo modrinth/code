@@ -7,7 +7,7 @@ use itertools::Itertools;
 use regex::Regex;
 use std::collections::HashMap;
 use std::sync::LazyLock;
-use tracing::info;
+use tracing::{info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
@@ -271,7 +271,7 @@ pub async fn index_local(
             {
                 team_owner
             } else {
-                println!(
+                warn!(
                     "org owner not found for project {} id: {}!",
                     project.name, project.id.0
                 );
