@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT id, title, status, link, exceptions, proof, flame_project_id\n        FROM moderation_external_licenses\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "exceptions",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "proof",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "6a13f8ac9ca0d69badc7434b70327093e056fbd512d88afa7e79c7ba1ce3fe7f"
+}

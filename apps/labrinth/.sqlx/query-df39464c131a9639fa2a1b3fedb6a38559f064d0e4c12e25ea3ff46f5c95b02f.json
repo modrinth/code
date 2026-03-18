@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\tINSERT INTO versions (\n\t\t\t\tid, mod_id, author_id, name, version_number,\n\t\t\t\tchangelog, date_published, downloads,\n\t\t\t\tversion_type, featured, status, locked, ordering,\n\t\t\t\tcomponents\n\t\t\t)\n\t\t\tVALUES (\n\t\t\t\t$1, $2, $3, $4, $5,\n\t\t\t\t$6, $7, $8,\n\t\t\t\t$9, $10, $11, $12, $13,\n\t\t\t\t$14\n\t\t\t)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Timestamptz",
+        "Int4",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Bool",
+        "Int4",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "df39464c131a9639fa2a1b3fedb6a38559f064d0e4c12e25ea3ff46f5c95b02f"
+}

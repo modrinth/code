@@ -17,6 +17,7 @@ use ownership::get_projects_ownership;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+mod license;
 mod ownership;
 mod tech_review;
 
@@ -28,6 +29,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_lock_status)
         .service(release_lock)
         .service(delete_all_locks)
+        .configure(license::config)
         .service(
             utoipa_actix_web::scope("/tech-review")
                 .configure(tech_review::config),

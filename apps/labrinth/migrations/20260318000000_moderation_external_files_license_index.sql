@@ -1,0 +1,1 @@
+CREATE INDEX idx_moderation_external_files_license_id ON moderation_external_files (external_license_id);

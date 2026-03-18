@@ -46,6 +46,7 @@ pub struct CommonProject {
     pub queued: Option<DateTime<Utc>>,
     pub status: ProjectStatus,
     pub requested_status: Option<ProjectStatus>,
+    pub locked: bool,
     pub moderator_message: Option<ModeratorMessage>,
     pub license: License,
     pub downloads: u32,
@@ -75,6 +76,7 @@ pub struct CommonVersion {
     pub version_type: VersionType,
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
+    pub locked: bool,
     pub files: Vec<VersionFile>,
     pub dependencies: Vec<Dependency>,
 }

@@ -450,6 +450,7 @@ async fn version_create_inner(
         version_type: version_data.release_channel,
         status: builder.status,
         requested_status: builder.requested_status,
+        locked: false,
         ordering: builder.ordering,
         files: builder
             .files

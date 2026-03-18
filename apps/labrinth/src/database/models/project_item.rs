@@ -206,6 +206,7 @@ impl ProjectBuilder {
             },
             status: self.status,
             requested_status: self.requested_status,
+            locked: false,
             downloads: 0,
             follows: 0,
             icon_url: self.icon_url,
@@ -287,6 +288,7 @@ pub struct DBProject {
     pub queued: Option<DateTime<Utc>>,
     pub status: ProjectStatus,
     pub requested_status: Option<ProjectStatus>,
+    pub locked: bool,
     pub downloads: i32,
     pub follows: i32,
     pub icon_url: Option<String>,
@@ -311,22 +313,22 @@ impl DBProject {
     ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
-            INSERT INTO mods (
-                id, team_id, name, summary, description,
-                published, downloads, icon_url, raw_icon_url, status, requested_status,
-                license_url, license,
-                slug, color, monetization_status, organization_id,
-                side_types_migration_review_status,
-                components
-            )
-            VALUES (
-                $1, $2, $3, $4, $5, $6,
-                $7, $8, $9, $10, $11,
-                $12, $13,
-                LOWER($14), $15, $16, $17,
-                $18,
-                $19
-            )
+			INSERT INTO mods (
+				id, team_id, name, summary, description,
+				published, downloads, icon_url, raw_icon_url, status, requested_status,
+				locked, license_url, license,
+				slug, color, monetization_status, organization_id,
+				side_types_migration_review_status,
+				components
+			)
+			VALUES (
+				$1, $2, $3, $4, $5, $6,
+				$7, $8, $9, $10, $11,
+				$12, $13, $14,
+				LOWER($15), $16, $17, $18,
+				$19,
+				$20
+			)
             ",
             self.id as DBProjectId,
             self.team_id as DBTeamId,
@@ -339,6 +341,7 @@ impl DBProject {
             self.raw_icon_url.as_ref(),
             self.status.as_str(),
             self.requested_status.map(|x| x.as_str()),
+            self.locked,
             self.license_url.as_ref(),
             &self.license,
             self.slug.as_ref(),
@@ -346,7 +349,8 @@ impl DBProject {
             self.monetization_status.as_str(),
             self.organization_id.map(|x| x.0 as i64),
             self.side_types_migration_review_status.as_str(),
-            serde_json::to_value(&self.components).expect("serialization shouldn't fail"),
+            serde_json::to_value(&self.components)
+                .expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -807,8 +811,8 @@ impl DBProject {
                     r#"
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
                     m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
-                    m.approved approved, m.queued, m.status status, m.requested_status requested_status,
-                    m.license_url license_url,
+					m.approved approved, m.queued, m.status status, m.requested_status requested_status, m.locked,
+					m.license_url license_url,
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                     m.webhook_sent, m.color,
                     t.id thread_id, m.monetization_status monetization_status,
@@ -894,13 +898,15 @@ impl DBProject {
                                 published: m.published,
                                 updated: versions.iter().map(|x| x.1).next_back().unwrap_or(m.published),
                                 license_url: m.license_url.clone(),
-                                status: ProjectStatus::from_string(
-                                    &m.status,
-                                ),
-                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
-                                    &x,
-                                )),
-                                license: m.license.clone(),
+								status: ProjectStatus::from_string(
+									&m.status,
+								),
+								requested_status: m
+									.requested_status
+									.as_deref()
+									.map(ProjectStatus::from_string),
+								locked: m.locked,
+								license: m.license.clone(),
                                 slug: m.slug.clone(),
                                 description: m.description.clone(),
                                 follows: m.follows,

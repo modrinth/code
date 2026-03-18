@@ -29,7 +29,8 @@
                 "low",
                 "medium",
                 "high",
-                "severe"
+                "severe",
+                "malware"
               ]
             }
           }
@@ -45,7 +46,7 @@
       false,
       true,
       false,
-      false
+      true
     ]
   },
   "hash": "10e2a3b31ba94b93ed2d6c9753a5aabf13190a0b336089e6521022069813cf17"

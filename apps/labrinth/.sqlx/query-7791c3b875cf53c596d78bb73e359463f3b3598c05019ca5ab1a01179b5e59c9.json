@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT mel.id, mel.title, mel.status, mel.link, mel.exceptions, mel.proof, mel.flame_project_id\n        FROM moderation_external_files mef\n        INNER JOIN moderation_external_licenses mel ON mef.external_license_id = mel.id\n        WHERE mef.sha1 = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "link",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "exceptions",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "proof",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "flame_project_id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Bytea"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "7791c3b875cf53c596d78bb73e359463f3b3598c05019ca5ab1a01179b5e59c9"
+}

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT encode(sha1, 'hex') as \"sha1!\"\n        FROM moderation_external_files\n        WHERE external_license_id = $1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "sha1!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "33eecf7a14eaeb4548332eed187d00a82cba1e15c4cb742875999de639ceeb5d"
+}

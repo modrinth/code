@@ -994,6 +994,7 @@ async fn project_create_inner(
             queued: None,
             status,
             requested_status: project_builder.requested_status,
+            locked: false,
             moderator_message: None,
             license: License {
                 id: project_create_data.license_id.clone(),

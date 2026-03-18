@@ -44,7 +44,8 @@
                 "low",
                 "medium",
                 "high",
-                "severe"
+                "severe",
+                "malware"
               ]
             }
           }
@@ -79,7 +80,7 @@
       true,
       false,
       false,
-      false,
+      true,
       null
     ]
   },

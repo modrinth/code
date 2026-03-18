@@ -52,6 +52,8 @@ pub struct Project {
     pub status: ProjectStatus,
     /// The requested status of this project
     pub requested_status: Option<ProjectStatus>,
+    /// Whether versions on this project are locked against author changes.
+    pub locked: bool,
 
     /// DEPRECATED: moved to threads system
     /// The rejection data of the project
@@ -155,6 +157,7 @@ impl From<ProjectQueryResult> for Project {
             queued: m.queued,
             status: m.status,
             requested_status: m.requested_status,
+            locked: m.locked,
             moderator_message: if let Some(message) = m.moderation_message {
                 Some(ModeratorMessage {
                     message,
@@ -678,6 +681,8 @@ pub struct Version {
     pub status: VersionStatus,
     /// The requested status of the version (used for scheduling)
     pub requested_status: Option<VersionStatus>,
+    /// Whether this version is locked against author changes.
+    pub locked: bool,
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
@@ -734,6 +739,7 @@ impl From<VersionQueryResult> for Version {
 
             status: v.status,
             requested_status: v.requested_status,
+            locked: v.locked,
             files: data
                 .files
                 .into_iter()

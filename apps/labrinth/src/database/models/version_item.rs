@@ -210,6 +210,7 @@ impl VersionBuilder {
             version_type: self.version_type,
             status: self.status,
             requested_status: self.requested_status,
+            locked: false,
             ordering: self.ordering,
             components: self.components,
         };
@@ -305,6 +306,7 @@ pub struct DBVersion {
     pub featured: bool,
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
+    pub locked: bool,
     pub ordering: Option<i32>,
     pub components: exp::VersionSerial,
 }
@@ -324,18 +326,18 @@ impl DBVersion {
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
             "
-            INSERT INTO versions (
-                id, mod_id, author_id, name, version_number,
-                changelog, date_published, downloads,
-                version_type, featured, status, ordering,
-                components
-            )
-            VALUES (
-                $1, $2, $3, $4, $5,
-                $6, $7, $8,
-                $9, $10, $11, $12,
-                $13
-            )
+			INSERT INTO versions (
+				id, mod_id, author_id, name, version_number,
+				changelog, date_published, downloads,
+				version_type, featured, status, locked, ordering,
+				components
+			)
+			VALUES (
+				$1, $2, $3, $4, $5,
+				$6, $7, $8,
+				$9, $10, $11, $12, $13,
+				$14
+			)
             ",
             self.id as DBVersionId,
             self.project_id as DBProjectId,
@@ -348,6 +350,7 @@ impl DBVersion {
             &self.version_type,
             self.featured,
             self.status.as_str(),
+            self.locked,
             self.ordering,
             serde_json::to_value(&self.components)
                 .expect("serialization shouldn't fail"),
@@ -741,8 +744,8 @@ impl DBVersion {
                     r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                     v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
-                    v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
+					v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.locked, v.ordering ordering,
+					v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
                     FROM versions v
                     WHERE v.id = ANY($1);
                     "#,
@@ -779,10 +782,13 @@ impl DBVersion {
                                 downloads: v.downloads,
                                 version_type: v.version_type,
                                 featured: v.featured,
-                                status: VersionStatus::from_string(&v.status),
-                                requested_status: v.requested_status
-                                    .map(|x| VersionStatus::from_string(&x)),
-                                ordering: v.ordering,
+								status: VersionStatus::from_string(&v.status),
+								requested_status: v
+									.requested_status
+									.as_deref()
+									.map(VersionStatus::from_string),
+								locked: v.locked,
+								ordering: v.ordering,
                                 components: components_serial,
                             },
                             files: {
@@ -1095,6 +1101,7 @@ mod tests {
             featured: false,
             status: VersionStatus::Listed,
             requested_status: None,
+            locked: false,
             components: exp::VersionSerial::default(),
         }
     }

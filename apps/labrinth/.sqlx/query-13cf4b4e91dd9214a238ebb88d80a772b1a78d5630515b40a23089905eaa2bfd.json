@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                    SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                    v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,\n                    v.components AS \"components: sqlx::types::Json<exp::VersionSerial>\"\n                    FROM versions v\n                    WHERE v.id = ANY($1);\n                    ",
+  "query": "\n                    SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                    v.changelog changelog, v.date_published date_published, v.downloads downloads,\n\t\t\t\t\tv.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.locked, v.ordering ordering,\n\t\t\t\t\tv.components AS \"components: sqlx::types::Json<exp::VersionSerial>\"\n                    FROM versions v\n                    WHERE v.id = ANY($1);\n                    ",
   "describe": {
     "columns": [
       {
@@ -65,11 +65,16 @@
       },
       {
         "ordinal": 12,
+        "name": "locked",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 13,
         "name": "ordering",
         "type_info": "Int4"
       },
       {
-        "ordinal": 13,
+        "ordinal": 14,
         "name": "components: sqlx::types::Json<exp::VersionSerial>",
         "type_info": "Jsonb"
       }
@@ -92,9 +97,10 @@
       false,
       false,
       true,
+      false,
       true,
       false
     ]
   },
-  "hash": "760df5118dcd1f9d28db991caabb3c1ce6fb8ac08829345445b027e5a46c4860"
+  "hash": "13cf4b4e91dd9214a238ebb88d80a772b1a78d5630515b40a23089905eaa2bfd"
 }
