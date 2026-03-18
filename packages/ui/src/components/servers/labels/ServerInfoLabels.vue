@@ -7,15 +7,16 @@
 			:is-link="linked"
 		/>
 		<ServerLoaderLabel
+			v-if="showLoaderLabel"
 			:loader="serverData.loader"
 			:loader-version="serverData.loader_version ?? ''"
-			:no-separator="column"
+			:no-separator="column || !showGameLabel"
 			:is-link="linked"
 		/>
 		<ServerSubdomainLabel
 			v-if="serverData.net?.domain"
 			:subdomain="serverData.net.domain"
-			:no-separator="column"
+			:no-separator="column || (!showLoaderLabel && !showGameLabel)"
 			:is-link="linked"
 		/>
 		<ServerUptimeLabel

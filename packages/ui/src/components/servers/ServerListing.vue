@@ -21,7 +21,12 @@
 				<div class="ml-4 flex flex-col gap-2.5">
 					<div class="flex flex-row items-center gap-2">
 						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
-						<ChevronRightIcon />
+						<div
+							v-if="isConfiguring"
+							class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 py-1"
+						>
+							<SparklesIcon class="size-5 shrink-0" /> New
+						</div>
 					</div>
 
 					<div
@@ -37,15 +42,10 @@
 						Using {{ projectData?.title || 'Unknown' }}
 					</div>
 
-					<div
-						v-if="isConfiguring"
-						class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand"
-					>
-						<SparklesIcon class="size-5 shrink-0" /> New server
-					</div>
 					<ServerInfoLabels
-						v-else
-						:server-data="{ game, mc_version, loader, loader_version, net }"
+						:server-data="
+							isConfiguring ? { net } : { game, mc_version, loader, loader_version, net }
+						"
 						:show-game-label="showGameLabel"
 						:show-loader-label="showLoaderLabel"
 						:linked="false"
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { ChevronRightIcon, LoaderCircleIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
+import { LoaderCircleIcon, LockIcon, SparklesIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
@@ -158,8 +158,8 @@ const props = defineProps<ServerListingProps>()
 
 const { kyros, labrinth } = injectModrinthClient()
 
-const showGameLabel = computed(() => !!props.game)
-const showLoaderLabel = computed(() => !!props.loader)
+const showGameLabel = computed(() => !!props.game && !isConfiguring.value)
+const showLoaderLabel = computed(() => !!props.loader && !isConfiguring.value)
 
 const { data: projectData } = useQuery({
 	queryKey: ['project', props.upstream?.project_id] as const,

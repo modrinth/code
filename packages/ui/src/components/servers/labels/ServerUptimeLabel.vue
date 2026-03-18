@@ -5,7 +5,7 @@
 		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-4"
 		data-pyro-uptime
 	>
-		<div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
+		<div v-if="!noSeparator" class="experimental-styles-within h-1.5 w-1.5 bg-button-border"></div>
 
 		<div class="flex gap-2">
 			<TimerIcon class="flex size-5 shrink-0" />
