@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
+		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
@@ -69,7 +69,7 @@
 				<TriangleAlertIcon class="!size-5" /> Your server has been cancelled. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
+			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason"
@@ -80,7 +80,7 @@
 				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
 				for more information.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
+			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
 		<div
 			v-else-if="status === 'suspended'"
@@ -90,7 +90,7 @@
 				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
 				billing information or contact Modrinth Support for more information.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
+			<CopyCode :text="`${server_id}`" class="ml-auto" />
 		</div>
 		<div
 			v-if="pendingChange && status !== 'suspended'"
