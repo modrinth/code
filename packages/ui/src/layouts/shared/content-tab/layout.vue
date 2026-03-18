@@ -789,9 +789,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="promptUpdateSelected">
+					<button
+						v-tooltip="formatMessage(commonMessages.updateButton)"
+						:disabled="ctx.isBusy.value"
+						@click="promptUpdateSelected"
+					>
 						<DownloadIcon />
-						{{ formatMessage(commonMessages.updateButton) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.updateButton) }}</span>
 					</button>
 				</ButtonStyled>
 
@@ -817,7 +821,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						]"
 					>
 						<ShareIcon />
-						{{ formatMessage(messages.share) }}
+						<span class="bar-label">{{ formatMessage(messages.share) }}</span>
 						<DropdownIcon />
 						<template #share-names>
 							<TextCursorInputIcon />
@@ -848,9 +852,13 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					color-fill="text"
 					hover-color-fill="background"
 				>
-					<button :disabled="ctx.isBusy.value" @click="showBulkDeleteModal">
+					<button
+						v-tooltip="formatMessage(commonMessages.deleteLabel)"
+						:disabled="ctx.isBusy.value"
+						@click="showBulkDeleteModal"
+					>
 						<TrashIcon />
-						{{ formatMessage(commonMessages.deleteLabel) }}
+						<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 					</button>
 				</ButtonStyled>
 			</template>

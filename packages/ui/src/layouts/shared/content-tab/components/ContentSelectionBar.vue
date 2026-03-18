@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PowerIcon, PowerOffIcon } from '@modrinth/assets'
+import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -144,12 +144,14 @@ const bulkProgressMessage = computed(() => {
 			<div class="mx-1 h-6 w-px bg-surface-5" />
 			<ButtonStyled type="transparent">
 				<button
+					v-tooltip="formatMessage(commonMessages.clearButton)"
 					class="!text-primary"
 					:disabled="isBulkOperating"
 					:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
 					@click="emit('clear')"
 				>
-					{{ formatMessage(commonMessages.clearButton) }}
+					<XIcon class="hidden cq-show-icon" />
+					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -159,22 +161,22 @@ const bulkProgressMessage = computed(() => {
 
 			<ButtonStyled type="transparent">
 				<button
-					v-tooltip="allEnabled ? formatMessage(messages.allAlreadyEnabled) : undefined"
+					v-tooltip="allEnabled ? formatMessage(messages.allAlreadyEnabled) : formatMessage(messages.enable)"
 					:disabled="isBusy || allEnabled"
 					@click="emit('enable')"
 				>
 					<PowerIcon />
-					{{ formatMessage(messages.enable) }}
+					<span class="bar-label">{{ formatMessage(messages.enable) }}</span>
 				</button>
 			</ButtonStyled>
 			<ButtonStyled type="transparent">
 				<button
-					v-tooltip="allDisabled ? formatMessage(messages.allAlreadyDisabled) : undefined"
+					v-tooltip="allDisabled ? formatMessage(messages.allAlreadyDisabled) : formatMessage(messages.disable)"
 					:disabled="isBusy || allDisabled"
 					@click="emit('disable')"
 				>
 					<PowerOffIcon />
-					{{ formatMessage(messages.disable) }}
+					<span class="bar-label">{{ formatMessage(messages.disable) }}</span>
 				</button>
 			</ButtonStyled>
 
