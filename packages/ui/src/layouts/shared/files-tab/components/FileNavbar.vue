@@ -179,10 +179,13 @@ import {
 	ShareIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { Button, ButtonStyled, OverflowMenu, StyledInput } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import TeleportOverflowMenu from './explorer/TeleportOverflowMenu.vue'
+import Button from '#ui/components/base/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
+import StyledInput from '#ui/components/base/StyledInput.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 
 const props = defineProps<{
 	breadcrumbs: string[]

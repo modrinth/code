@@ -1,5 +1,1 @@
-export { default as FileItem } from './FileItem.vue'
-export { default as FileLabelBar } from './FileLabelBar.vue'
-export { default as FileManagerError } from './FileManagerError.vue'
-export { default as FileVirtualList } from './FileVirtualList.vue'
-export { default as TeleportOverflowMenu } from './TeleportOverflowMenu.vue'
+export { default as TeleportOverflowMenu } from '#ui/components/base/TeleportOverflowMenu.vue'

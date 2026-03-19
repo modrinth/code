@@ -38,6 +38,7 @@
 					@move="$emit('move', item)"
 					@move-direct-to="$emit('moveDirectTo', $event)"
 					@edit="$emit('edit', item)"
+					@navigate="$emit('navigate', item)"
 					@hover="$emit('hover', item)"
 					@contextmenu="(x, y) => $emit('contextmenu', item, x, y)"
 					@toggle-select="$emit('toggle-select', item.path)"
@@ -48,29 +49,31 @@
 </template>
 
 <script setup lang="ts">
-import type { Kyros } from '@modrinth/api-client'
 import { toRef } from 'vue'
 
-import { useVirtualScroll } from '../../../../composables/virtual-scroll'
-import FileItem from './FileItem.vue'
+import { useVirtualScroll } from '#ui/composables/virtual-scroll'
+
+import type { FileItem as FileItemType } from '../types'
+import FileItem from './FileTableRow.vue'
 
 const props = defineProps<{
-	items: Kyros.Files.v0.DirectoryItem[]
+	items: FileItemType[]
 	selectedItems: Set<string>
 	writeDisabled?: boolean
 	writeDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{
-	delete: [item: Kyros.Files.v0.DirectoryItem]
-	rename: [item: Kyros.Files.v0.DirectoryItem]
-	download: [item: Kyros.Files.v0.DirectoryItem]
-	move: [item: Kyros.Files.v0.DirectoryItem]
-	edit: [item: Kyros.Files.v0.DirectoryItem]
+	delete: [item: FileItemType]
+	rename: [item: FileItemType]
+	download: [item: FileItemType]
+	move: [item: FileItemType]
+	edit: [item: FileItemType]
+	navigate: [item: FileItemType]
 	moveDirectTo: [item: { name: string; type: string; path: string; destination: string }]
-	extract: [item: Kyros.Files.v0.DirectoryItem]
-	hover: [item: Kyros.Files.v0.DirectoryItem]
-	contextmenu: [item: Kyros.Files.v0.DirectoryItem, x: number, y: number]
+	extract: [item: FileItemType]
+	hover: [item: FileItemType]
+	contextmenu: [item: FileItemType, x: number, y: number]
 	loadMore: []
 	'toggle-select': [path: string]
 }>()
@@ -78,7 +81,7 @@ const emit = defineEmits<{
 const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
 	toRef(props, 'items'),
 	{
-		itemHeight: 61,
+		itemHeight: 74,
 		bufferSize: 5,
 		onNearEnd: () => emit('loadMore'),
 	},

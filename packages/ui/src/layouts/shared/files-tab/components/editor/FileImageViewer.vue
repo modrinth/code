@@ -54,8 +54,9 @@
 
 <script setup lang="ts">
 import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 const ZOOM_MIN = 0.1
 const ZOOM_MAX = 5

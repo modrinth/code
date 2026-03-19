@@ -102,8 +102,11 @@
 
 <script setup lang="ts">
 import { CheckCircleIcon, FolderOpenIcon, SpinnerIcon, XCircleIcon } from '@modrinth/assets'
-import { ButtonStyled, injectModrinthClient, injectNotificationManager } from '@modrinth/ui'
 import { computed, nextTick, ref, watch } from 'vue'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { injectModrinthClient } from '#ui/providers/api-client'
+import { injectNotificationManager } from '#ui/providers/web-notifications'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

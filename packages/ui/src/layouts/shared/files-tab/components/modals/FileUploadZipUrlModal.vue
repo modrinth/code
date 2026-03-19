@@ -111,16 +111,14 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import {
-	injectModrinthClient,
-	injectModrinthServerContext,
-	injectNotificationManager,
-} from '../../../../providers'
-import Admonition from '../../../base/Admonition.vue'
-import AutoLink from '../../../base/AutoLink.vue'
-import ButtonStyled from '../../../base/ButtonStyled.vue'
-import StyledInput from '../../../base/StyledInput.vue'
-import NewModal from '../../../modal/NewModal.vue'
+import Admonition from '#ui/components/base/Admonition.vue'
+import AutoLink from '#ui/components/base/AutoLink.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import StyledInput from '#ui/components/base/StyledInput.vue'
+import NewModal from '#ui/components/modal/NewModal.vue'
+import { injectModrinthClient } from '#ui/providers/api-client'
+import { injectModrinthServerContext } from '#ui/providers/server-context'
+import { injectNotificationManager } from '#ui/providers/web-notifications'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()

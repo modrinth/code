@@ -26,7 +26,8 @@
 
 <script setup lang="ts">
 import { FileIcon, HomeIcon, RefreshCwIcon } from '@modrinth/assets'
-import { ButtonStyled } from '@modrinth/ui'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 defineProps<{
 	title: string

@@ -1,6 +1,8 @@
 <template>
 	<div class="flex h-full w-full flex-col gap-4">
-		<div class="flex flex-col overflow-hidden rounded-[20px] shadow-md">
+		<div
+			class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		>
 			<div class="h-full w-full flex-grow">
 				<component
 					:is="props.editorComponent"
@@ -27,17 +29,12 @@
 
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
-import {
-	getEditorLanguage,
-	getFileExtension,
-	injectModrinthClient,
-	injectModrinthServerContext,
-	injectNotificationManager,
-	isImageFile,
-} from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
-import { type Component, computed, inject, onMounted, onUnmounted, ref, watch } from 'vue'
+import { type Component, computed, onUnmounted, ref, watch } from 'vue'
 
+import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
+
+import { injectFileManager } from '../../providers/file-manager'
 import FileImageViewer from './FileImageViewer.vue'
 
 interface MclogsResponse {
@@ -55,14 +52,8 @@ const emit = defineEmits<{
 	close: []
 }>()
 
-const notifications = injectNotificationManager()
-const { addNotification } = notifications
-const client = injectModrinthClient()
-const serverContext = injectModrinthServerContext()
-const { serverId } = serverContext
-const queryClient = useQueryClient()
-
-const modulesLoaded = inject<Promise<void>>('modulesLoaded')
+const { addNotification } = injectNotificationManager()
+const ctx = injectFileManager()
 
 const fileContent = ref('')
 const isEditingImage = ref(false)
@@ -95,22 +86,12 @@ async function loadFileContent(file: { name: string; type: string; path: string 
 		const normalizedPath = file.path.startsWith('/') ? file.path : `/${file.path}`
 
 		if (file.type === 'file' && isImageFile(extension)) {
-			const content = await client.kyros.files_v0.downloadFile(normalizedPath)
+			const content = await ctx.readFileAsBlob(normalizedPath)
 			isEditingImage.value = true
 			imagePreview.value = content
 		} else {
 			isEditingImage.value = false
-			const cachedContent = queryClient.getQueryData<string>([
-				'file-content',
-				serverId,
-				normalizedPath,
-			])
-			if (cachedContent) {
-				fileContent.value = cachedContent
-			} else {
-				const content = await client.kyros.files_v0.downloadFile(normalizedPath)
-				fileContent.value = await content.text()
-			}
+			fileContent.value = await ctx.readFile(normalizedPath)
 		}
 	} catch (error) {
 		console.error('Error fetching file content:', error)
@@ -154,10 +135,9 @@ async function saveFileContent(exit: boolean = true) {
 
 	try {
 		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`
-		await client.kyros.files_v0.updateFile(normalizedPath, fileContent.value)
+		await ctx.writeFile(normalizedPath, fileContent.value)
 
 		if (exit) {
-			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 			emit('close')
 		}
 
@@ -174,18 +154,25 @@ async function saveFileContent(exit: boolean = true) {
 
 async function saveAndRestart() {
 	await saveFileContent(false)
-	await client.archon.servers_v0.power(serverId, 'Restart')
 
-	addNotification({
-		title: 'Server restarted',
-		text: 'Your server has been restarted.',
-		type: 'success',
-	})
+	if (ctx.restartServer) {
+		await ctx.restartServer()
+		addNotification({
+			title: 'Server restarted',
+			text: 'Your server has been restarted.',
+			type: 'success',
+		})
+	}
 
 	emit('close')
 }
 
 async function shareToMclogs() {
+	if (ctx.shareToMclogs) {
+		await ctx.shareToMclogs(fileContent.value)
+		return
+	}
+
 	try {
 		const response = await fetch('https://api.mclo.gs/1/log', {
 			method: 'POST',
@@ -219,12 +206,6 @@ function close() {
 	resetState()
 	emit('close')
 }
-
-onMounted(async () => {
-	if (modulesLoaded) {
-		await modulesLoaded
-	}
-})
 
 onUnmounted(() => {
 	editorInstance.value = null

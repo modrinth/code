@@ -74,19 +74,18 @@ import {
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
+import { computed, ref } from 'vue'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Checkbox from '#ui/components/base/Checkbox.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import { useFormatDateTime } from '#ui/composables/format-date-time'
+import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import {
-	ButtonStyled,
-	Checkbox,
 	getFileExtension,
-	getFileExtensionIcon,
 	isEditableFile as isEditableFileExt,
 	isImageFile,
-	useFormatDateTime,
-} from '@modrinth/ui'
-import { computed, ref, shallowRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-
-import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
+} from '#ui/utils/file-extensions'
 
 interface FileItemProps {
 	name: string
@@ -113,6 +112,7 @@ const emit = defineEmits<{
 	edit: [item: { name: string; type: string; path: string }]
 	extract: [item: { name: string; type: string; path: string }]
 	hover: [item: { name: string; type: string; path: string }]
+	navigate: [item: { name: string; type: string; path: string }]
 	moveDirectTo: [item: { name: string; type: string; path: string; destination: string }]
 	contextmenu: [x: number, y: number]
 	'toggle-select': []
@@ -123,9 +123,6 @@ const isDragging = ref(false)
 
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
-const route = shallowRef(useRoute())
-const router = useRouter()
-
 const formatDateTime = useFormatDateTime({
 	year: '2-digit',
 	month: '2-digit',
@@ -135,9 +132,9 @@ const formatDateTime = useFormatDateTime({
 })
 
 const containerClasses = computed(() => [
-	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-3 px-4 py-3 focus:!outline-none',
-	props.selected ? 'bg-surface-3' : props.index % 2 === 0 ? 'bg-surface-2' : 'file-row-alt',
-	props.isLast ? 'rounded-b-[20px] border-b' : '',
+	'group m-0 flex h-[74px] w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 focus:!outline-none',
+	props.selected ? 'bg-surface-2.5' : props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
+	props.isLast ? 'rounded-b-[20px]' : '',
 	isEditableFile.value ? 'cursor-pointer' : props.type === 'directory' ? 'cursor-pointer' : '',
 	isDragOver.value ? '!bg-brand-highlight' : '',
 	'transition-colors duration-100 hover:!bg-surface-4 hover:!brightness-100 focus:!bg-surface-4 focus:!brightness-100',
@@ -242,24 +239,17 @@ function handleMouseEnter() {
 	emit('hover', { name: props.name, type: props.type, path: props.path })
 }
 
-function navigateToFolder() {
-	const currentPath = route.value.query.path?.toString() || ''
-	const newPath = currentPath.endsWith('/')
-		? `${currentPath}${props.name}`
-		: `${currentPath}/${props.name}`
-	router.push({ query: { path: newPath } })
-}
-
 const isNavigating = ref(false)
 
 function selectItem() {
 	if (isNavigating.value) return
 	isNavigating.value = true
 
+	const item = { name: props.name, type: props.type, path: props.path }
 	if (props.type === 'directory') {
-		navigateToFolder()
+		emit('navigate', item)
 	} else if (props.type === 'file' && isEditableFile.value) {
-		emit('edit', { name: props.name, type: props.type, path: props.path })
+		emit('edit', item)
 	}
 
 	setTimeout(() => {
@@ -346,15 +336,3 @@ function handleDrop(event: DragEvent) {
 	}
 }
 </script>
-
-<style scoped>
-.file-row-alt {
-	background: color-mix(in srgb, var(--surface-2), black 3%);
-}
-
-:global(.dark-mode) .file-row-alt,
-:global(.dark) .file-row-alt,
-:global(.oled-mode) .file-row-alt {
-	background: color-mix(in srgb, var(--surface-2), black 10%);
-}
-</style>
