@@ -1,47 +1,34 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="cf ? `Installing a CurseForge modpack` : `Uploading .zip contents from URL`"
+		:header="cf ? `Install a CurseForge modpack` : `Uploading .zip contents from URL`"
 	>
-		<form class="flex flex-col gap-5 md:w-[620px]" @submit.prevent="handleSubmit">
+		<form class="flex flex-col gap-6 md:w-[620px]" @submit.prevent="handleSubmit">
 			<!-- CurseForge stepper cards -->
-			<div v-if="cf" class="flex flex-col gap-2 w-full">
-				<div class="grid gap-2 sm:grid-cols-3">
-					<div
-						v-for="(step, i) in steps"
-						:key="i"
-						class="flex flex-col gap-2 rounded-xl border border-solid border-surface-5 bg-surface-4 p-4"
+			<div v-if="cf" class="flex gap-4">
+				<div
+					v-for="(step, i) in steps"
+					:key="i"
+					class="flex flex-1 flex-col gap-2 overflow-clip rounded-[20px] bg-surface-2 p-3"
+				>
+					<span
+						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 text-sm font-medium text-contrast"
 					>
-						<div class="flex items-center gap-2">
-							<span
-								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-highlight text-xs font-bold text-brand"
-							>
-								{{ i + 1 }}
-							</span>
-						</div>
-						<div class="text-sm font-semibold leading-snug text-contrast">
-							{{ step.title }}
-						</div>
-						<div class="text-xs leading-relaxed text-secondary">
-							{{ step.description }}
-						</div>
-						<a
-							v-if="step.link"
-							:href="step.link"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="mt-auto inline-flex items-center gap-1 text-xs font-semibold text-[#F16436] transition-all hover:underline"
-						>
-							Browse CurseForge
-							<ExternalIcon class="h-3 w-3" />
-						</a>
+						{{ i + 1 }}
+					</span>
+					<div class="text-sm font-semibold leading-snug text-contrast">
+						{{ step.title }}
+					</div>
+					<div class="text-xs leading-relaxed text-secondary">
+						{{ step.description }}
 					</div>
 				</div>
 			</div>
 
 			<!-- URL input -->
-			<div class="flex flex-col gap-2">
-				<div v-if="!cf" class="text-sm text-secondary">
+			<div class="flex flex-col gap-2.5">
+				<label v-if="cf" class="text-base font-semibold text-contrast">Enter link</label>
+				<div v-else class="text-sm text-secondary">
 					Copy and paste the direct download URL of a .zip file.
 				</div>
 				<StyledInput
@@ -61,37 +48,31 @@
 				<div v-if="touched && error" class="text-xs text-red">{{ error }}</div>
 			</div>
 
-			<!-- Backup warning -->
-			<Admonition type="warning">
-				You may want to
-				<AutoLink
-					:to="`/hosting/manage/${serverId}/backups`"
-					class="font-semibold text-orange hover:underline"
-					>create a backup</AutoLink
-				>
-				before proceeding, as this process is irreversible and may permanently alter your world or
-				the files on your server.
-			</Admonition>
+			<!-- Inline backup creator -->
+			<InlineBackupCreator
+				:backup-name="'CurseForge modpack install'"
+				hide-shift-click-hint
+				@update:buttons-disabled="backupInProgress = $event"
+			/>
 		</form>
 
 		<template #actions>
-			<div class="flex gap-2 justify-start">
+			<div class="flex w-full items-center justify-end gap-2">
+				<ButtonStyled>
+					<button type="button" @click="hide">
+						{{ submitted ? 'Close' : 'Cancel' }}
+					</button>
+				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button
 						v-tooltip="error"
-						:disabled="submitted || !!error"
+						:disabled="submitted || !!error || backupInProgress"
 						type="submit"
 						@click="handleSubmit"
 					>
 						<SpinnerIcon v-if="submitted" class="animate-spin" />
 						<DownloadIcon v-else />
 						{{ submitted ? 'Installing...' : 'Install' }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button type="button" @click="hide">
-						<XIcon />
-						{{ submitted ? 'Close' : 'Cancel' }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -102,7 +83,6 @@
 <script setup lang="ts">
 import {
 	DownloadIcon,
-	ExternalIcon,
 	FileTextIcon,
 	LinkIcon,
 	SearchIcon,
@@ -111,25 +91,22 @@ import {
 } from '@modrinth/assets'
 import { computed, nextTick, ref } from 'vue'
 
-import Admonition from '#ui/components/base/Admonition.vue'
-import AutoLink from '#ui/components/base/AutoLink.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { injectModrinthClient } from '#ui/providers/api-client'
-import { injectModrinthServerContext } from '#ui/providers/server-context'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+
+import InlineBackupCreator from '../../../content-tab/components/modals/InlineBackupCreator.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { serverId } = injectModrinthServerContext()
 
 const steps = [
 	{
 		icon: SearchIcon,
 		title: 'Find the modpack',
 		description: 'Browse CurseForge and locate the modpack you want.',
-		link: 'https://www.curseforge.com/minecraft/search?page=1&pageSize=40&sortBy=relevancy&class=modpacks',
 	},
 	{
 		icon: FileTextIcon,
@@ -149,6 +126,7 @@ const modal = ref<InstanceType<typeof NewModal>>()
 const url = ref('')
 const submitted = ref(false)
 const touched = ref(false)
+const backupInProgress = ref(false)
 
 const trimmedUrl = computed(() => url.value.trim())
 
@@ -201,6 +179,7 @@ const show = (isCf: boolean) => {
 	url.value = ''
 	submitted.value = false
 	touched.value = false
+	backupInProgress.value = false
 	modal.value?.show()
 	nextTick(() => {
 		setTimeout(() => {

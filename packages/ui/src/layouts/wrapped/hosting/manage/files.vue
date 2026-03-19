@@ -52,7 +52,8 @@ const busyWarning = computed(() =>
 const currentPath = computed(() => (typeof route.query.path === 'string' ? route.query.path : '/'))
 
 function navigateTo(path: string) {
-	router.push({ query: { ...route.query, path } })
+	const { editing: _, ...query } = route.query
+	router.push({ query: { ...query, path } })
 }
 
 // Editing state (synced with URL)

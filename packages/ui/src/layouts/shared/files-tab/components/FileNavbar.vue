@@ -57,7 +57,7 @@
 								</div>
 							</li>
 						</TransitionGroup>
-						<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-sm">
+						<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
 							<span class="font-semibold !text-contrast" aria-current="location">
 								{{ editingFileName }}
 							</span>
