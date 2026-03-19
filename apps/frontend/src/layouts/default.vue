@@ -69,7 +69,7 @@
 				</NuxtLink>
 			</div>
 			<div
-				class="col-span-2 row-start-2 flex flex-wrap justify-center lg:col-span-1 lg:row-start-auto"
+				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
 				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">

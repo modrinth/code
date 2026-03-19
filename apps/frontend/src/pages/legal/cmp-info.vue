@@ -195,6 +195,8 @@ const { data: transparencyInformation } = useQuery({
 	queryFn: () => client.labrinth.payouts_v3.getPlatformRevenue(),
 })
 
-const platformRevenue = (transparencyInformation.value as any)?.all_time
-const platformRevenueData = (transparencyInformation.value as any)?.data?.slice(0, 5) ?? []
+const platformRevenue = computed(() => (transparencyInformation.value as any)?.all_time)
+const platformRevenueData = computed(
+	() => (transparencyInformation.value as any)?.data?.slice(0, 5) ?? [],
+)
 </script>

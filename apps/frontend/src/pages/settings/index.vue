@@ -193,12 +193,12 @@ import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
+const { addNotification } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
 useHead({
 	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
-
-const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
 	headTitle: {
