@@ -27,9 +27,25 @@ jobs:
             echo "found=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: 💬 Update PR Health
+      - name: 💬 Update PR Health (changelog found)
+        if: steps.changelog.outputs.found == 'true'
         uses: ./.github/actions/pr-health-comment
         with:
           section: changelog
-          content: "${{ steps.changelog.outputs.found == 'true' && '✅ changelog' || '⚠️ changelog • `pnpm changelog <product> \"description\"`' }}"
+          content: |
+            **Changelog**
+            ✅ A changelog fragment was added to this pull request.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 💬 Update PR Health (no changelog)
+        if: steps.changelog.outputs.found == 'false'
+        uses: ./.github/actions/pr-health-comment
+        with:
+          section: changelog
+          content: |
+            **Changelog**
+            ⚠️ No changelog fragment was found for this pull request. If this includes user-facing changes, create one:
+            ```
+            pnpm changelog <platform|app|hosting> "description"
+            ```
           github-token: ${{ secrets.GITHUB_TOKEN }}

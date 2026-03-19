@@ -6,7 +6,7 @@ inputs:
     description: Section name (e.g. changelog, deploy)
     required: true
   content:
-    description: Inline content for this section
+    description: Markdown content for this section (can be multi-line)
     required: true
   github-token:
     description: GitHub token for API calls
@@ -43,7 +43,7 @@ runs:
             const sectionRegex = /<!-- section:(\w+) -->([\s\S]*?)<!-- \/section:\w+ -->/g;
             let match;
             while ((match = sectionRegex.exec(existing.body)) !== null) {
-              sections[match[1]] = match[2];
+              sections[match[1]] = match[2].trim();
             }
           }
 
@@ -51,9 +51,9 @@ runs:
 
           const parts = SECTION_ORDER
             .filter(s => sections[s])
-            .map(s => `<!-- section:${s} -->${sections[s]}<!-- /section:${s} -->`);
+            .map(s => `<!-- section:${s} -->\n${sections[s]}\n<!-- /section:${s} -->`);
 
-          const body = `${marker}\n**PR Health** • ${parts.join(' • ')}`;
+          const body = `${marker}\n### Pull Request Health\n\n${parts.join('\n\n')}`;
 
           if (existing) {
             await github.rest.issues.updateComment({

@@ -50,5 +50,10 @@ jobs:
         uses: ./.github/actions/pr-health-comment
         with:
           section: deploy
-          content: "🔗 [staging](${{ steps.urls.outputs.staging }}) • 🔗 [production](${{ steps.urls.outputs.production }})"
+          content: |
+            **Deployments**
+            | Environment | URL |
+            |-------------|-----|
+            | Staging | ${{ steps.urls.outputs.staging }} |
+            | Production | ${{ steps.urls.outputs.production }} |
           github-token: ${{ secrets.GITHUB_TOKEN }}
