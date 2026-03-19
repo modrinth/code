@@ -201,8 +201,7 @@
 										@move-direct-to="handleDirectMove"
 										@edit="editFile"
 										@hover="handleItemHover"
-										@load-more="handleLoadMore"
-										@toggle-select="toggleItemSelection"
+		@toggle-select="toggleItemSelection"
 									/>
 								</div>
 								<div
@@ -277,7 +276,7 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import { formatBytes } from '@modrinth/utils'
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, inject, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -441,44 +440,28 @@ const {
 	data: directoryData,
 	isLoading,
 	error: loadError,
-	fetchNextPage,
-	hasNextPage,
-	isFetchingNextPage,
-} = useInfiniteQuery({
+} = useQuery({
 	queryKey: computed(() => ['files', serverId, currentPath.value]),
-	queryFn: async ({ pageParam = 1 }) => {
+	queryFn: async () => {
 		if (modulesLoaded) await modulesLoaded
-		return client.kyros.files_v0.listDirectory(currentPath.value, pageParam, 100)
-	},
-	getNextPageParam: (lastPage, allPages) => {
-		const pageSize = 100
-		if (lastPage.items.length >= pageSize) {
-			return allPages.length + 1
-		}
-
-		if (lastPage.current < lastPage.total) {
-			return lastPage.current + 1
-		}
-		return undefined
+		return client.kyros.files_v0.listDirectory(currentPath.value, 1, 2000)
 	},
 	staleTime: 30_000,
-	initialPageParam: 1,
 })
 
-const items = computed(() => directoryData.value?.pages.flatMap((page) => page.items) ?? [])
+const items = computed(() => directoryData.value?.items ?? [])
 
 function prefetchDirectory(path: string) {
-	queryClient.prefetchInfiniteQuery({
+	queryClient.prefetchQuery({
 		queryKey: ['files', serverId, path],
 		queryFn: async () => {
 			if (modulesLoaded) await modulesLoaded
 			try {
-				return await client.kyros.files_v0.listDirectory(path, 1, 100)
+				return await client.kyros.files_v0.listDirectory(path, 1, 2000)
 			} catch {
 				return { items: [], total: 0, current: 1 }
 			}
 		},
-		initialPageParam: 1,
 		staleTime: 30_000,
 	})
 }
@@ -1067,10 +1050,6 @@ const filteredItems = computed(() => {
 	return applySort(result)
 })
 
-async function handleLoadMore() {
-	if (isFetchingNextPage.value || !hasNextPage.value) return
-	await fetchNextPage()
-}
 
 function onKeydown(e: KeyboardEvent) {
 	if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'z') {

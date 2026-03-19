@@ -4,7 +4,7 @@
 			<div class="h-full w-full flex-grow">
 				<component
 					:is="props.editorComponent"
-					v-if="!isEditingImage && props.editorComponent"
+					v-if="!isEditingImage && !isLoading && props.editorComponent"
 					v-model:value="fileContent"
 					:lang="editorLanguage"
 					theme="modrinth"
