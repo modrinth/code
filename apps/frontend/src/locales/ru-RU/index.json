@@ -39,7 +39,7 @@
     "message": "Варианты установки"
   },
   "app-marketing.download.terms": {
-    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
+    "message": "Скачивая Modrinth App, вы принимаете наши <terms-link>условия</terms-link> и <privacy-link>политику конфиденци­аль­ности</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Скачать Modrinth App (бета-версия)"
@@ -108,7 +108,7 @@
     "message": "% ЦП"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
+    "message": "Modrinth App работает лучше многих популярных лаунчеров, используя лишь 150 МБ ОЗУ!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "В коллекции пока нет проектов"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Нет проектов} =1{<stat>{count}</stat> проект} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Нет проектов} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Обновлена {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Создать проект"
   },
+  "create.project.create-server-project": {
+    "message": "Создать сервер"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Не заполнены поля: {fields}"
+  },
   "create.project.name-label": {
     "message": "Название"
   },
   "create.project.name-placeholder": {
     "message": "Введите название проекта..."
+  },
+  "create.project.owner-description": {
+    "message": "Укажите себя или организацию, в которой состоите."
+  },
+  "create.project.owner-label": {
+    "message": "Владелец"
+  },
+  "create.project.server-project-title": {
+    "message": "Создание серверного проекта"
   },
   "create.project.summary-description": {
     "message": "Пара предложений про проект."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Создание проекта"
+  },
+  "create.project.type-label": {
+    "message": "Тип"
+  },
+  "create.project.type-project": {
+    "message": "Проект"
+  },
+  "create.project.type-server": {
+    "message": "Сервер"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Создать новую"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Создайте свою первую коллекцию!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Коллекций пока нет"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Коллекции не найдены"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Попробуйте изменить фильтры или запрос."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} проект} few {{count} проекта} other {{count} проектов}}"
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Поиск по коллекциям"
@@ -681,13 +717,13 @@
     "message": "Номер национального удостоверения"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "Введите номер национального удостоверения"
+    "message": "Введите номер национального удостоверения личности"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
-    "message": "Номер паспорта"
+    "message": "Номер загранпаспорта"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport-placeholder": {
-    "message": "Введите номер паспорта"
+    "message": "Введите номер загранпаспорта"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
     "message": "Номер вида на жительство"
@@ -729,7 +765,7 @@
     "message": "Подключите свой PayPal и получайте выплаты напрямую."
   },
   "dashboard.creator-withdraw-modal.paypal-details.save-success": {
-    "message": "Профиль Venmo успешно сохранён!\n"
+    "message": "Профиль Venmo успешно сохранён!"
   },
   "dashboard.creator-withdraw-modal.paypal-details.sign-in-with-paypal": {
     "message": "Войти через PayPal"
@@ -1089,7 +1125,7 @@
     "message": "Как работают с высокой нагрузкой на CPU?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "Когда сервер испытывает высокую нагрузку, ему временно выделяются дополнительные потоки CPU. Это помогает показателю TPS не упасть ниже 20 и обеспечивает максимально плавный игровой процесс. Из‑за своей кратковременности такие потоки могут не отображаться в отчётах Spark и других инструментах профилирования."
+    "message": "Когда ваш сервер испытывает высокую нагрузку, мы временно предоставляем ему доступ к дополнительным потокам CPU, чтобы уменьшить лаги и нестабильность. Это помогает предотвратить падение TPS ниже 20 и обеспечить максимально плавную работу. Поскольку эти дополнительные потоки доступны только на короткое время во время периодов высокой нагрузки, они могут не отображаться в отчётах Spark или других инструментах профилирования."
   },
   "hosting-marketing.faq.cpu-kind": {
     "message": "Какие процессоры используются на серверах Modrinth Hosting?"
@@ -1194,7 +1230,7 @@
     "message": "Поддержка в нужный момент"
   },
   "hosting-marketing.included.help.description": {
-    "message": "Команда Modrinth готова помочь с сервером в любое время."
+    "message": "Обращайтесь в команду Modrinth за помощью по вопросам, связанным с вашим сервером, в любое время."
   },
   "hosting-marketing.included.powerful-console": {
     "message": "Мощная консоль, удобная настройка и многое другое"
@@ -1233,7 +1269,7 @@
     "message": "Управляйте всем на Modrinth"
   },
   "hosting-marketing.why.all-on-modrinth.description": {
-    "message": "Сервер, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
+    "message": "Сервера, моды, игроки — всё уже есть на Modrinth. Не нужно переключаться между платформами."
   },
   "hosting-marketing.why.consistently-fast": {
     "message": "Всегда высокая скорость"
@@ -1267,6 +1303,30 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Modrinth, работает на сервере."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Не удалось загрузить версии наборов модов"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Не удалось загрузить версии"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Не удалось переустановить набор модов"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Не удалось восстановить сервер"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Не удалось сохранить установочные настройки"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Не удалось отвязать набор модов"
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Восстановление завершено"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Сбросить сервер"
   },
   "hosting.plan.out-of-stock": {
     "message": "Нет в наличии"
@@ -1401,7 +1461,7 @@
     "message": "Для игроков"
   },
   "landing.section.for-players.tagline": {
-    "message": "Более {count} творений"
+    "message": "Более {count, number} творений"
   },
   "landing.subheading": {
     "message": "Находите, играйте и делитесь творениями для Minecraft на платформе с открытым кодом, созданной для сообщества."
@@ -1432,6 +1492,12 @@
   },
   "layout.action.new-project": {
     "message": "Новый проект"
+  },
+  "layout.action.new-server-project": {
+    "message": "Новый сервер"
+  },
+  "layout.action.publish": {
+    "message": "Опубликовать"
   },
   "layout.action.reports": {
     "message": "Рассмотреть жалобы"
@@ -1485,7 +1551,7 @@
     "message": "Заполнить налоговую форму"
   },
   "layout.banner.tax.description": {
-    "message": "В этом году вы вывели уже более $600 из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую форму. Вывод средств приостановлен, пока форма не будет заполнена."
+    "message": "В этом году вы вывели уже более {threshold} из Modrinth. В соответствии с налоговым законодательством необходимо заполнить налоговую форму. Вывод средств приостановлен, пока форма не будет заполнена."
   },
   "layout.banner.tax.title": {
     "message": "Требуется налоговая форма"
@@ -1734,7 +1800,7 @@
     "message": "Национальное удостоверение личности"
   },
   "muralpay.document-type.passport": {
-    "message": "Паспорт"
+    "message": "Загранпаспорт"
   },
   "muralpay.document-type.resident-id": {
     "message": "Вид на жительство"
@@ -1762,9 +1828,6 @@
   },
   "muralpay.field.bank-account-number": {
     "message": "Номер счёта"
-  },
-  "muralpay.field.branch-code": {
-    "message": "Код филиала"
   },
   "muralpay.field.clabe": {
     "message": "CLABE"
@@ -1795,6 +1858,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "Телефон PIX"
+  },
+  "muralpay.field.random-key": {
+    "message": "Случайный ключ"
   },
   "muralpay.field.routing-number": {
     "message": "Маршрутный номер"
@@ -1848,7 +1914,7 @@
     "message": "CBU или CVU"
   },
   "muralpay.placeholder.cci": {
-    "message": "Введите 20-значный CCI"
+    "message": "Введите 20‑значный CCI"
   },
   "muralpay.placeholder.cuit-cuil": {
     "message": "Введите CUIT или CUIL"
@@ -1856,11 +1922,8 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Введите номер счёта"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Введите код филиала"
-  },
   "muralpay.placeholder.enter-clabe": {
-    "message": "Введите 18-значный CLABE"
+    "message": "Введите 18‑значный CLABE"
   },
   "muralpay.placeholder.enter-cpf-cnpj": {
     "message": "Введите CPF или CNPJ"
@@ -1871,8 +1934,11 @@
   "muralpay.placeholder.enter-pix-email": {
     "message": "Введите электронную почту PIX"
   },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Введите случайный ключ"
+  },
   "muralpay.placeholder.enter-routing-number": {
-    "message": "Введите 9-значный маршрутный номер"
+    "message": "Введите 9‑значный маршрутный номер"
   },
   "muralpay.placeholder.enter-swift-bic": {
     "message": "Введите SWIFT/BIC-код"
@@ -1998,7 +2064,7 @@
     "message": "Коллекция"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {скачивание} few {скачивания} other {скачиваний}}"
+    "message": "{count} {countPlural, plural, one {скачивание} few {скачивания} other {скачиваний}}"
   },
   "profile.label.joined": {
     "message": "Регистрация:"
@@ -2019,7 +2085,7 @@
     "message": "Организации"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {проект} few {проекта} other {проектов}}"
+    "message": "{count} {countPlural, plural, one {проект} few {проекта} other {проектов}}"
   },
   "profile.label.saving": {
     "message": "Сохранение..."
@@ -2085,7 +2151,7 @@
     "message": "Предложение"
   },
   "project-moderation-nags.visit-moderation-page": {
-    "message": "Связаться с модератором"
+    "message": "Связаться с модератором"
   },
   "project-moderation-nags.warning": {
     "message": "Предупреждение"
@@ -2101,6 +2167,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Набор данных"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Серверы"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Сервер"
   },
   "project-type.mod.plural": {
     "message": "Моды"
@@ -2131,6 +2203,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Набор ресурсов"
+  },
+  "project-type.server.plural": {
+    "message": "Серверы"
+  },
+  "project-type.server.singular": {
+    "message": "Сервер"
   },
   "project-type.shader.plural": {
     "message": "Шейдеры"
@@ -2178,7 +2256,7 @@
     "message": "Создайте сервер"
   },
   "project.collections.create-new": {
-    "message": "Создать коллекцию"
+    "message": "Создать новую коллекцию"
   },
   "project.collections.none-found": {
     "message": "Коллекции не найдены."
@@ -2247,7 +2325,7 @@
     "message": "Необходимо проверить метаданные среды"
   },
   "project.environment.migration.learn-more": {
-    "message": "Узнайте больше об этом изменении"
+    "message": "Подробнее об этом изменении..."
   },
   "project.environment.migration.message": {
     "message": "Мы переработали систему сред на Modrinth, и теперь доступны новые варианты. Убедитесь, что метаданные указаны верно."
@@ -2355,7 +2433,7 @@
     "message": "подписчик{count, plural, one {} few {а} other {ов}}"
   },
   "project.status.archived.message": {
-    "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
+    "message": "{title} помещён в архив. {title} больше не будет получать обновления, если только автор не решит разархивировать проект."
   },
   "project.versions.title": {
     "message": "Версии"
@@ -2370,7 +2448,7 @@
     "message": "Вернуться к {item, select, project {проекту} version {версии} user {пользователю} other {контенту}}"
   },
   "report.body.description": {
-    "message": "При необходимости прикрепите ссылки и изображения. Пустые и неполные жалобы закрываются без рассмотрения."
+    "message": "При желании прикрепите ссылки и изображения. Неполные жалобы закрываются без рассмотрения."
   },
   "report.body.title": {
     "message": "Добавьте подробности к жалобе"
@@ -2415,7 +2493,7 @@
     "message": "Жалобы на вредоносный или обманный контент должны содержать веские доказательства, например фрагменты кода."
   },
   "report.note.malicious.2": {
-    "message": "Отчёты от Microsoft Defender, VirusTotal или ИИ-систем обнаружения вредоносного ПО не считаются доказательством и рассматриваться не будут."
+    "message": "Отчёты от Microsoft Defender, VirusTotal или Систем обнаружения вредоносного ПО не считаются доказательством и рассматриваться не будут."
   },
   "report.please-report": {
     "message": "На что жаловаться:"
@@ -2511,7 +2589,7 @@
     "message": "Просмотр уведомлений"
   },
   "scopes.notificationWrite.description": {
-    "message": "Удалять и просматривать уведомления"
+    "message": "Управлять уведомлениями"
   },
   "scopes.notificationWrite.label": {
     "message": "Изменение уведомлений"
@@ -2541,31 +2619,31 @@
     "message": "Изменение организаций"
   },
   "scopes.patCreate.description": {
-    "message": "Создавать токены доступа"
+    "message": "Создавать личные токены доступа"
   },
   "scopes.patCreate.label": {
-    "message": "Создание токенов доступа"
+    "message": "Создание токенов"
   },
   "scopes.patDelete.description": {
-    "message": "Удалять токены доступа"
+    "message": "Удалять личные токены доступа"
   },
   "scopes.patDelete.label": {
-    "message": "Удаление токенов доступа"
+    "message": "Удаление токенов"
   },
   "scopes.patRead.description": {
-    "message": "Просматривать токены доступа"
+    "message": "Просматривать личные токены доступа"
   },
   "scopes.patRead.label": {
-    "message": "Просмотр токенов доступа"
+    "message": "Просмотр токенов"
   },
   "scopes.patWrite.description": {
-    "message": "Изменять токены доступа"
+    "message": "Изменять личные токены доступа"
   },
   "scopes.patWrite.label": {
-    "message": "Изменение токенов доступа"
+    "message": "Изменение токенов"
   },
   "scopes.payoutsRead.description": {
-    "message": "Просматривать данные о выплатах"
+    "message": "Просматривать данные о выплатах"
   },
   "scopes.payoutsRead.label": {
     "message": "Просмотр выплат"
@@ -2655,10 +2733,10 @@
     "message": "Просмотр веток"
   },
   "scopes.threadWrite.description": {
-    "message": "Отправлять сообщения в ветках"
+    "message": "Отправлять сообщения в ветках"
   },
   "scopes.threadWrite.label": {
-    "message": "Отправка в ветках"
+    "message": "Отправка в ветках"
   },
   "scopes.userAuthWrite.description": {
     "message": "Изменять данные аутентификации"
@@ -2667,10 +2745,10 @@
     "message": "Изменение данных входа"
   },
   "scopes.userDelete.description": {
-    "message": "Удалить учётную запись"
+    "message": "Удалить аккаунт"
   },
   "scopes.userDelete.label": {
-    "message": "Удаление учётной записи"
+    "message": "Удаление аккаунта"
   },
   "scopes.userRead.description": {
     "message": "Просматривать публичный профиль"
@@ -2682,7 +2760,7 @@
     "message": "Просматривать адрес электронной почты"
   },
   "scopes.userReadEmail.label": {
-    "message": "Просмотр электронного адреса"
+    "message": "Просмотр почты"
   },
   "scopes.userWrite.description": {
     "message": "Изменять профиль"
@@ -2709,7 +2787,7 @@
     "message": "Просмотр версий"
   },
   "scopes.versionWrite.description": {
-    "message": "Изменять данные версий"
+    "message": "Изменять версии"
   },
   "scopes.versionWrite.label": {
     "message": "Изменение версий"
@@ -2729,8 +2807,17 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Выполняется восстановление из резервной копии"
+  "servers.busy.backup-creating": {
+    "message": "Резервное копирование в процессе"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Восстановление из резервной копии в процессе"
+  },
+  "servers.busy.installing": {
+    "message": "Сервер устанавливается"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Синхронизация контента в процессе"
   },
   "servers.notice.actions": {
     "message": "Действия"
@@ -2954,6 +3041,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Страница наборов ресурсов"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Страница серверов"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Страница шейдеров"
   },
@@ -3006,7 +3096,7 @@
     "message": "Создать токен доступа"
   },
   "settings.pats.description": {
-    "message": "Токены доступа используются для обращения к API Modrinth. Подробнее — в <doc-link>документации</doc-link>. Их можно создавать и отзывать в любое время."
+    "message": "Токены доступа используются для обращения к API Modrinth. Их можно создавать и отзывать в любое время. Подробнее — в <doc-link>документации</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Создать токен доступа"
@@ -3075,7 +3165,7 @@
     "message": "Завершить сеанс"
   },
   "settings.sessions.created-ago": {
-    "message": "Запущен {ago}"
+    "message": "Создано {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Текущий сеанс"
@@ -3084,7 +3174,7 @@
     "message": "Ниже представлены все устройства, с которых осуществлён вход в вашу учётную запись Modrinth. Вы можете управлять сеансом каждого из них по отдельности.\n\nЕсли среди них присутствует незнакомое устройство, незамедлительно завершите его сеанс и смените пароль своей учётной записи."
   },
   "settings.sessions.last-accessed-ago": {
-    "message": "Активность: {ago}"
+    "message": "Последняя активность {ago}"
   },
   "settings.sessions.unknown-os": {
     "message": "Неизвестная ОС"

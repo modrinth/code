@@ -14,34 +14,31 @@ import JavaSelector from '@/components/ui/JavaSelector.vue'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { AppSettings, InstanceSettingsTabProps } from '../../../helpers/types'
+import type { AppSettings } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
-const overrideJavaInstall = ref(!!props.instance.java_path)
-const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
-const javaInstall = ref({ path: optimalJava.path ?? props.instance.java_path })
+const overrideJavaInstall = ref(!!instance.java_path)
+const optimalJava = readonly(await get_optimal_jre_key(instance.path).catch(handleError))
+const javaInstall = ref({ path: optimalJava.path ?? instance.java_path })
 
-const overrideJavaArgs = ref((props.instance.extra_launch_args?.length ?? 0) > 0)
-const javaArgs = ref(
-	(props.instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
-)
+const overrideJavaArgs = ref((instance.extra_launch_args?.length ?? 0) > 0)
+const javaArgs = ref((instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '))
 
-const overrideEnvVars = ref((props.instance.custom_env_vars?.length ?? 0) > 0)
+const overrideEnvVars = ref((instance.custom_env_vars?.length ?? 0) > 0)
 const envVars = ref(
-	(props.instance.custom_env_vars ?? globalSettings.custom_env_vars)
-		.map((x) => x.join('='))
-		.join(' '),
+	(instance.custom_env_vars ?? globalSettings.custom_env_vars).map((x) => x.join('=')).join(' '),
 )
 
-const overrideMemorySettings = ref(!!props.instance.memory)
-const memory = ref(props.instance.memory ?? globalSettings.memory)
+const overrideMemorySettings = ref(!!instance.memory)
+const memory = ref(instance.memory ?? globalSettings.memory)
 const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
 	maxMemory: number
 	snapPoints: number[]
@@ -79,7 +76,7 @@ watch(
 		memory,
 	],
 	async () => {
-		await edit(props.instance.path, editProfileObject.value)
+		await edit(instance.path, editProfileObject.value)
 	},
 	{ deep: true },
 )

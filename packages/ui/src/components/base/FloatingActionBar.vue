@@ -1,14 +1,75 @@
 <script setup lang="ts">
-defineProps<{
+import { onUnmounted, ref, watch } from 'vue'
+
+const props = defineProps<{
 	shown: boolean
+	ariaLabel?: string
 }>()
+
+const toolbarEl = ref<HTMLElement | null>(null)
+const compact = ref(false)
+
+function checkCompact() {
+	const el = toolbarEl.value
+	if (!el) return
+
+	const clone = el.cloneNode(true) as HTMLElement
+	clone.classList.remove('bar-compact')
+	clone.style.position = 'absolute'
+	clone.style.visibility = 'hidden'
+	clone.style.pointerEvents = 'none'
+	clone.style.width = `${el.offsetWidth}px`
+
+	el.parentElement!.appendChild(clone)
+	const needsCompact = clone.offsetHeight > 70
+	clone.remove()
+
+	compact.value = needsCompact
+}
+
+let observer: ResizeObserver | null = null
+
+watch(
+	toolbarEl,
+	(el) => {
+		observer?.disconnect()
+		if (!el) return
+		observer = new ResizeObserver(() => {
+			checkCompact()
+		})
+		observer.observe(el.parentElement!)
+		checkCompact()
+	},
+	{ immediate: true },
+)
+
+watch(
+	() => props.shown,
+	(shown) => {
+		document?.body.classList.toggle('floating-action-bar-shown', shown)
+	},
+	{ immediate: true },
+)
+
+onUnmounted(() => {
+	observer?.disconnect()
+	document?.body.classList.remove('floating-action-bar-shown')
+})
 </script>
 
 <template>
 	<Transition name="floating-action-bar" appear>
-		<div v-if="shown" class="floating-action-bar fixed w-full z-10 left-0 p-4 bottom-0">
+		<div
+			v-if="shown"
+			class="floating-action-bar drop-shadow-2xl fixed z-10 p-4 bottom-0"
+			aria-live="polite"
+		>
 			<div
-				class="flex items-center gap-2 rounded-2xl bg-bg-raised border-2 border-divider border-solid mx-auto max-w-[77rem] p-4"
+				ref="toolbarEl"
+				role="toolbar"
+				:aria-label="ariaLabel"
+				class="relative overflow-clip flex items-center gap-2 rounded-[20px] bg-surface-3 border border-surface-5 border-solid mx-auto max-w-[60vw] px-4 py-3 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.3),0px_6px_10px_0px_rgba(0,0,0,0.15)]"
+				:class="{ 'bar-compact': compact }"
 			>
 				<slot />
 			</div>
@@ -18,6 +79,8 @@ defineProps<{
 
 <style scoped>
 .floating-action-bar {
+	left: var(--left-bar-width, 0px);
+	right: var(--right-bar-width, 0px);
 	transition: bottom 0.25s ease-in-out;
 }
 
@@ -51,5 +114,19 @@ defineProps<{
 	.expanded-mobile-nav .floating-action-bar {
 		bottom: var(--size-mobile-navbar-height-expanded);
 	}
+}
+</style>
+
+<style>
+.intercom-lightweight-app-launcher {
+	z-index: 9 !important;
+}
+
+.bar-compact .bar-label {
+	display: none;
+}
+
+.bar-compact .cq-show-icon {
+	display: block;
 }
 </style>

@@ -20,8 +20,8 @@
 		<!-- Multiline textarea -->
 		<textarea
 			v-if="multiline"
-			ref="inputRef"
 			:id="id"
+			ref="inputRef"
 			:value="model"
 			:placeholder="placeholder"
 			:disabled="disabled"
@@ -46,8 +46,8 @@
 		<!-- Single-line input -->
 		<input
 			v-else
-			ref="inputRef"
 			:id="id"
+			ref="inputRef"
 			:type="type"
 			:value="model"
 			:placeholder="placeholder"

@@ -77,7 +77,13 @@
 						</TagItem>
 					</template>
 
-					<span v-if="!draftVersion.loaders.length">No loaders selected.</span>
+					<TagItem
+						v-if="!draftVersionLoaders.length && projectType === 'modpack'"
+						class="border !border-solid border-surface-5 hover:no-underline"
+					>
+						No mod loader
+					</TagItem>
+					<span v-else-if="!draftVersionLoaders.length">No loaders selected.</span>
 				</div>
 			</div>
 		</div>

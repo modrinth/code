@@ -137,12 +137,12 @@
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<div class="flex items-center gap-2">
-				<Avatar :src="user.avatar_url" :alt="user.username" size="32px" circle />
-				<h1 class="m-0 text-2xl font-extrabold">{{ user.username }}'s subscriptions</h1>
+				<Avatar :src="user?.avatar_url" :alt="user?.username" size="32px" circle />
+				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
 			</div>
 			<div class="flex items-center gap-2">
 				<ButtonStyled>
-					<nuxt-link :to="`/user/${user.id}`">
+					<nuxt-link :to="`/user/${user?.id}`">
 						<UserIcon aria-hidden="true" />
 						User profile
 						<ExternalIcon class="h-4 w-4" />
@@ -169,7 +169,7 @@
 						</span>
 						<div class="mb-4 mt-2 flex w-full items-center gap-1 text-sm text-secondary">
 							{{ capitalizeString(subscription.interval) }} ⋅ {{ subscription.status }} ⋅
-							{{ dayjs(subscription.created).format('MMMM D, YYYY [at] h:mma') }} ({{
+							{{ formatDateTime(subscription.created) }} ({{
 								formatRelativeTime(subscription.created)
 							}})
 						</div>
@@ -239,7 +239,7 @@
 									</span>
 									<template v-if="charge.status !== 'cancelled'">
 										⋅
-										{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+										{{ formatPrice(charge.amount, charge.currency_code) }}
 									</template>
 								</span>
 								<span class="text-sm text-secondary">
@@ -252,13 +252,13 @@
 									<span v-else-if="charge.status === 'cancelled'" class="font-bold">Ends:</span>
 									<span v-else-if="charge.type === 'refund'" class="font-bold">Issued:</span>
 									<span v-else class="font-bold">Due:</span>
-									{{ dayjs(charge.due).format('MMMM D, YYYY [at] h:mma') }}
+									{{ formatDateTime(charge.due) }}
 									<span class="text-secondary">({{ formatRelativeTime(charge.due) }}) </span>
 								</span>
 								<span v-if="charge.last_attempt != null" class="text-sm text-secondary">
 									<span v-if="charge.status === 'failed'" class="font-bold">Last attempt:</span>
 									<span v-else class="font-bold">Charged:</span>
-									{{ dayjs(charge.last_attempt).format('MMMM D, YYYY [at] h:mma') }}
+									{{ formatDateTime(charge.last_attempt) }}
 									<span class="text-secondary"
 										>({{ formatRelativeTime(charge.last_attempt) }})
 									</span>
@@ -268,9 +268,9 @@
 									⋅
 									{{ charge.type }}
 									⋅
-									{{ formatPrice(vintl.locale, charge.amount, charge.currency_code) }}
+									{{ formatPrice(charge.amount, charge.currency_code) }}
 									⋅
-									{{ dayjs(charge.due).format('YYYY-MM-DD h:mma') }}
+									{{ formatDateTimeShort(charge.due) }}
 									<template v-if="charge.subscription_interval">
 										⋅ {{ charge.subscription_interval }}
 									</template>
@@ -328,20 +328,37 @@ import {
 	CopyCode,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
 	Toggle,
+	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, formatPrice } from '@modrinth/utils'
+import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
+const { labrinth } = injectModrinthClient()
+const formatPrice = useFormatPrice()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDateTimeShort = useFormatDateTime({
+	year: 'numeric',
+	month: '2-digit',
+	day: '2-digit',
+	hour: 'numeric',
+	minute: 'numeric',
+})
 
 const route = useRoute()
 const vintl = useVIntl()
@@ -356,39 +373,40 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user } = await useAsyncData(`user/${route.params.id}`, () =>
-	useBaseFetch(`user/${route.params.id}`),
-)
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
+	queryKey: ['user', route.params.id],
+	queryFn: () => labrinth.users_v2.get(route.params.id),
+})
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+onServerPrefetch(userSuspense)
 
-let subscriptions, charges, refreshCharges
-try {
-	;[{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
-		useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-		useAsyncData(`billing/payments?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+watch(userError, (error) => {
+	if (error) {
+		showError({
+			fatal: true,
+			statusCode: error.statusCode ?? error.status ?? 404,
+			message: formatMessage(messages.userNotFoundError),
+		})
+	}
+})
+
+const { data: subscriptions } = useQuery({
+	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
+	queryFn: () => labrinth.billing_internal.getSubscriptions(user.value?.id),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
+
+const { data: charges, refetch: refreshCharges } = useQuery({
+	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
+	queryFn: () => labrinth.billing_internal.getPayments(user.value?.id),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
 
 const subscriptionCharges = computed(() => {
 	return subscriptions.value.map((subscription) => {
@@ -446,15 +464,11 @@ async function applyCredit() {
 	crediting.value = true
 	try {
 		const daysParsed = Math.max(1, Math.floor(Number(creditDays.value) || 1))
-		await useBaseFetch('billing/credit', {
-			method: 'POST',
-			body: JSON.stringify({
-				subscription_ids: [selectedSubscription.value.id],
-				days: daysParsed,
-				send_email: creditSendEmail.value,
-				message: DEFAULT_CREDIT_EMAIL_MESSAGE,
-			}),
-			internal: true,
+		await labrinth.billing_internal.credit({
+			subscription_ids: [selectedSubscription.value.id],
+			days: daysParsed,
+			send_email: creditSendEmail.value,
+			message: DEFAULT_CREDIT_EMAIL_MESSAGE,
 		})
 		addNotification({
 			title: 'Credit applied',
@@ -484,11 +498,7 @@ async function refundCharge() {
 					? { type: 'none', unprovision: unprovision.value }
 					: { type: 'full', unprovision: unprovision.value }
 
-		await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
-			method: 'POST',
-			body: JSON.stringify(payload),
-			internal: true,
-		})
+		await labrinth.billing_internal.refundCharge(selectedCharge.value.id, payload)
 		await refreshCharges()
 		refundModal.value.hide()
 	} catch (err) {
@@ -504,12 +514,8 @@ async function refundCharge() {
 async function modifyCharge() {
 	modifying.value = true
 	try {
-		await useBaseFetch(`billing/subscription/${selectedSubscription.value.id}`, {
-			method: 'PATCH',
-			body: JSON.stringify({
-				cancelled: cancel.value,
-			}),
-			internal: true,
+		await labrinth.billing_internal.editSubscription(selectedSubscription.value.id, {
+			cancelled: cancel.value,
 		})
 		addNotification({
 			title: 'Modifications made',

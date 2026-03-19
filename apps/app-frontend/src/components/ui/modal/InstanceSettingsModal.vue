@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ChevronRightIcon,
 	CodeIcon,
@@ -15,23 +16,59 @@ import {
 	type TabbedModalTab,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 import GeneralSettings from '@/components/ui/instance_settings/GeneralSettings.vue'
 import HooksSettings from '@/components/ui/instance_settings/HooksSettings.vue'
 import InstallationSettings from '@/components/ui/instance_settings/InstallationSettings.vue'
 import JavaSettings from '@/components/ui/instance_settings/JavaSettings.vue'
 import WindowSettings from '@/components/ui/instance_settings/WindowSettings.vue'
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import { get_project_v3 } from '@/helpers/cache'
+import { get_linked_modpack_info } from '@/helpers/profile'
+import { provideInstanceSettings } from '@/providers/instance-settings'
 
-import type { InstanceSettingsTabProps } from '../../../helpers/types'
+import type { GameInstance } from '../../../helpers/types'
 
 const { formatMessage } = useVIntl()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const props = defineProps<{
+	instance: GameInstance
+	offline?: boolean
+}>()
+const emit = defineEmits<{
+	unlinked: []
+}>()
 
-const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
+const isMinecraftServer = ref(false)
+const handleUnlinked = () => emit('unlinked')
+
+provideInstanceSettings({
+	instance: props.instance,
+	offline: props.offline,
+	isMinecraftServer,
+	onUnlinked: handleUnlinked,
+})
+
+watch(
+	() => props.instance,
+	(instance) => {
+		isMinecraftServer.value = false
+		if (instance.linked_data?.project_id) {
+			get_project_v3(instance.linked_data.project_id, 'must_revalidate')
+				.then((project: Labrinth.Projects.v3.Project | undefined) => {
+					if (project?.minecraft_server != null) {
+						isMinecraftServer.value = true
+					}
+				})
+				.catch(() => {})
+		}
+	},
+	{ immediate: true },
+)
+
+const tabs = computed<TabbedModalTab[]>(() => [
 	{
 		name: defineMessage({
 			id: 'instance.settings.tabs.general',
@@ -72,18 +109,33 @@ const tabs: TabbedModalTab<InstanceSettingsTabProps>[] = [
 		icon: CodeIcon,
 		content: HooksSettings,
 	},
-]
+])
 
-const modal = ref()
+const queryClient = useQueryClient()
+const tabbedModal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
-function show() {
-	modal.value.show()
+function show(tabIndex?: number) {
+	if (props.instance.linked_data?.project_id) {
+		queryClient.prefetchQuery({
+			queryKey: ['linkedModpackInfo', props.instance.path],
+			queryFn: () => get_linked_modpack_info(props.instance.path, 'stale_while_revalidate'),
+		})
+	}
+	tabbedModal.value?.show()
+	if (tabIndex !== undefined) {
+		nextTick(() => tabbedModal.value?.setTab(tabIndex))
+	}
 }
 
 defineExpose({ show })
 </script>
 <template>
-	<ModalWrapper ref="modal">
+	<TabbedModal
+		ref="tabbedModal"
+		:tabs="tabs"
+		:max-width="'min(928px, calc(95vw - 10rem))'"
+		:width="'min(928px, calc(95vw - 10rem))'"
+	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
 				<Avatar
@@ -97,7 +149,5 @@ defineExpose({ show })
 				}}</span>
 			</span>
 		</template>
-
-		<TabbedModal :tabs="tabs.map((tab) => ({ ...tab, props }))" />
-	</ModalWrapper>
+	</TabbedModal>
 </template>

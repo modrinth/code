@@ -1,3 +1,4 @@
+use std::any::type_name;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -7,34 +8,36 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{DBGalleryItem, DBModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::models::{
-    DBModerationLock, DBTeamMember, ids as db_ids, image_item,
+    DBModerationLock, DBProjectId, DBTeamMember, ids as db_ids, image_item,
 };
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
-use crate::models;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    MonetizationStatus, Project, ProjectStatus, SearchRequest,
-    SideTypesMigrationReviewStatus,
+    MonetizationStatus, Project, ProjectStatus, SideTypesMigrationReviewStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
+use crate::models::{self, exp};
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::search::indexing::remove_documents;
-use crate::search::{SearchConfig, SearchError, search_for_project};
+use crate::routes::internal::delphi;
+use crate::search::{SearchBackend, SearchQuery, SearchRequest, SearchResults};
+use crate::util::error::Context;
 use crate::util::img;
 use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_limited_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use chrono::Utc;
+use eyre::eyre;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -43,41 +46,31 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("search", web::get().to(project_search));
+    cfg.service(project_search_post);
     cfg.route("projects", web::get().to(projects_get));
     cfg.route("projects", web::patch().to(projects_edit));
     cfg.route("projects_random", web::get().to(random_projects_get));
+}
 
-    cfg.service(
-        web::scope("project")
-            .route("{id}", web::get().to(project_get))
-            .route("{id}/check", web::get().to(project_get_check))
-            .route("{id}", web::delete().to(project_delete))
-            .route("{id}", web::patch().to(project_edit))
-            .route("{id}/icon", web::patch().to(project_icon_edit))
-            .route("{id}/icon", web::delete().to(delete_project_icon))
-            .route("{id}/gallery", web::post().to(add_gallery_item))
-            .route("{id}/gallery", web::patch().to(edit_gallery_item))
-            .route("{id}/gallery", web::delete().to(delete_gallery_item))
-            .route("{id}/follow", web::post().to(project_follow))
-            .route("{id}/follow", web::delete().to(project_unfollow))
-            .route("{id}/organization", web::get().to(project_get_organization))
-            .service(
-                web::scope("{project_id}")
-                    .route(
-                        "members",
-                        web::get().to(super::teams::team_members_get_project),
-                    )
-                    .route(
-                        "version",
-                        web::get().to(super::versions::version_list),
-                    )
-                    .route(
-                        "version/{slug}",
-                        web::get().to(super::versions::version_project_get),
-                    )
-                    .route("dependencies", web::get().to(dependency_list)),
-            ),
-    );
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_get)
+        .service(project_get_check)
+        .service(project_delete)
+        .service(project_edit)
+        .service(project_icon_edit)
+        .service(delete_project_icon)
+        .service(add_gallery_item)
+        .service(edit_gallery_item)
+        .service(delete_gallery_item)
+        .service(project_follow)
+        .service(project_unfollow)
+        .service(project_get_organization)
+        .service(super::teams::team_members_get_project)
+        .service(super::versions::version_list)
+        .service(super::versions::version_project_get)
+        .service(dependency_list);
 }
 
 #[derive(Deserialize, Validate)]
@@ -161,17 +154,30 @@ pub async fn projects_get(
     Ok(HttpResponse::Ok().json(projects))
 }
 
-pub async fn project_get(
+#[utoipa::path]
+#[get("/{id}")]
+async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let string = info.into_inner().0;
+) -> Result<web::Json<Project>, ApiError> {
+    project_get_internal(req, info, pool, redis, session_queue).await
+}
 
-    let project_data =
-        db_models::DBProject::get(&string, &**pool, &redis).await?;
+pub async fn project_get_internal(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<web::Json<Project>, ApiError> {
+    let (string,) = info.into_inner();
+
+    let project_data = db_models::DBProject::get(&string, &**pool, &redis)
+        .await
+        .wrap_internal_err("failed to fetch project")?;
     let user_option = get_user_from_headers(
         &req,
         &**pool,
@@ -180,18 +186,20 @@ pub async fn project_get(
         Scopes::PROJECT_READ,
     )
     .await
-    .map(|x| x.1)
+    .map(|(_, user)| user)
     .ok();
 
     if let Some(data) = project_data
-        && is_visible_project(&data.inner, &user_option, &pool, false).await?
+        && is_visible_project(&data.inner, &user_option, &pool, false)
+            .await
+            .wrap_internal_err("failed to check project visibility")?
     {
-        return Ok(HttpResponse::Ok().json(Project::from(data)));
+        return Ok(web::Json(Project::from(data)));
     }
     Err(ApiError::NotFound)
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Debug, Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditProject {
     #[validate(
         length(min = 3, max = 64),
@@ -253,15 +261,61 @@ pub struct EditProject {
         Option<SideTypesMigrationReviewStatus>,
     #[serde(flatten)]
     pub loader_fields: HashMap<String, serde_json::Value>,
+
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub minecraft_server: Option<Option<exp::minecraft::ServerProjectEdit>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub minecraft_java_server:
+        Option<Option<exp::minecraft::JavaServerProjectEdit>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "serde_with::rust::double_option"
+    )]
+    pub minecraft_bedrock_server:
+        Option<Option<exp::minecraft::BedrockServerProjectEdit>>,
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn project_edit(
+#[utoipa::path]
+#[patch("/{id}")]
+async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    search_config: web::Data<SearchConfig>,
-    new_project: web::Json<EditProject>,
+    search_backend: web::Data<dyn SearchBackend>,
+    web::Json(new_project): web::Json<EditProject>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    moderation_queue: web::Data<AutomatedModerationQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_edit_internal(
+        req,
+        info,
+        pool,
+        search_backend,
+        web::Json(new_project),
+        redis,
+        session_queue,
+        moderation_queue,
+    )
+    .await
+}
+
+pub async fn project_edit_internal(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    search_backend: web::Data<dyn SearchBackend>,
+    web::Json(new_project): web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
@@ -280,7 +334,7 @@ pub async fn project_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let Some(project_item) =
+    let Some(mut project_item) =
         db_models::DBProject::get(&info.into_inner().0, &**pool, &redis)
             .await?
     else {
@@ -425,13 +479,14 @@ pub async fn project_edit(
 
         if status.is_searchable()
             && !project_item.inner.webhook_sent
-            && let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
+            && !ENV.PUBLIC_DISCORD_WEBHOOK.is_empty()
+            && project_item.inner.components.minecraft_server.is_none()
         {
             crate::util::webhook::send_discord_webhook(
                 project_item.inner.id.into(),
                 &pool,
                 &redis,
-                webhook_url,
+                &ENV.PUBLIC_DISCORD_WEBHOOK,
                 None,
             )
             .await
@@ -449,18 +504,16 @@ pub async fn project_edit(
             .await?;
         }
 
-        if user.role.is_mod()
-            && let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK")
-        {
+        if user.role.is_mod() && !ENV.MODERATION_SLACK_WEBHOOK.is_empty() {
             crate::util::webhook::send_slack_project_webhook(
                     project_item.inner.id.into(),
                     &pool,
                     &redis,
-                    webhook_url,
+                    &ENV.MODERATION_SLACK_WEBHOOK,
                     Some(
                         format!(
                             "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
-                            dotenvy::var("SITE_URL")?,
+                            ENV.SITE_URL,
                             user.username,
                             user.username,
                             &project_item.inner.status.as_friendly_str(),
@@ -937,6 +990,106 @@ pub async fn project_edit(
         }
     }
 
+    // components
+
+    async fn update<E: exp::component::ComponentEdit>(
+        _txn: &mut PgTransaction<'_>,
+        _project_id: DBProjectId,
+        edit: Option<Option<E>>,
+        mut component: &mut Option<E::Component>,
+        perms: ProjectPermissions,
+    ) -> Result<(), ApiError> {
+        let Some(edit) = edit else {
+            // component is not specified in the input JSON - leave alone
+            return Ok(());
+        };
+
+        if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have the permissions to edit the components of this project!"
+                    .to_string(),
+            ));
+        }
+
+        match (&mut component, edit) {
+            (None, None) => {}
+            (Some(_), None) => {
+                // component is `null` in the input JSON - remove component
+                *component = None;
+            }
+            (None, Some(edit)) => {
+                // component is specified in the JSON and is non-null - create new component
+                *component =
+                    Some(edit.create().wrap_request_err_with(|| {
+                        eyre!(
+                            "failed to create `{}` component",
+                            type_name::<E::Component>()
+                        )
+                    })?);
+            }
+            (Some(component), Some(edit)) => {
+                // edit component
+                edit.apply_to(component).await.wrap_internal_err_with(
+                    || {
+                        eyre!(
+                            "failed to update `{}` component",
+                            type_name::<E::Component>()
+                        )
+                    },
+                )?;
+            }
+        }
+
+        Ok(())
+    }
+
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_server,
+        &mut project_item.inner.components.minecraft_server,
+        perms,
+    )
+    .await?;
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_java_server,
+        &mut project_item.inner.components.minecraft_java_server,
+        perms,
+    )
+    .await?;
+    update(
+        &mut transaction,
+        id,
+        new_project.minecraft_bedrock_server,
+        &mut project_item.inner.components.minecraft_bedrock_server,
+        perms,
+    )
+    .await?;
+
+    let components_serial = project_item.inner.components.clone();
+
+    exp::component::kinds_valid(
+        &components_serial.component_kinds(),
+        &exp::PROJECT_COMPONENT_RELATIONS,
+    )
+    .wrap_request_err("invalid component kinds")?;
+
+    sqlx::query!(
+        "
+        UPDATE mods
+        SET components = $1
+        WHERE id = $2
+        ",
+        serde_json::to_value(&components_serial)
+            .expect("serialization shouldn't fail"),
+        id as db_ids::DBProjectId,
+    )
+    .execute(&mut transaction)
+    .await
+    .wrap_internal_err("failed to update components")?;
+
     // check new description and body for links to associated images
     // if they no longer exist in the description or body, delete them
     let checkable_strings: Vec<&str> =
@@ -972,15 +1125,16 @@ pub async fn project_edit(
         project_item.inner.status.is_searchable(),
         new_project.status.map(|status| status.is_searchable()),
     ) {
-        remove_documents(
-            &project_item
-                .versions
-                .into_iter()
-                .map(|x| x.into())
-                .collect::<Vec<_>>(),
-            &search_config,
-        )
-        .await?;
+        search_backend
+            .remove_documents(
+                &project_item
+                    .versions
+                    .into_iter()
+                    .map(|x| x.into())
+                    .collect::<Vec<_>>(),
+            )
+            .await
+            .wrap_internal_err("failed to remove documents")?;
     }
 
     Ok(HttpResponse::NoContent().body(""))
@@ -1035,10 +1189,13 @@ pub async fn edit_project_categories(
 // }
 
 pub async fn project_search(
-    web::Query(info): web::Query<SearchRequest>,
-    config: web::Data<SearchConfig>,
-) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &config).await?;
+    web::Query(info): web::Query<SearchQuery>,
+    search_backend: web::Data<dyn SearchBackend>,
+    redis: web::Data<RedisPool>,
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend
+        .search_for_project(&SearchRequest::from(info), &redis)
+        .await?;
 
     // TODO: add this back
     // let results = ReturnSearchResults {
@@ -1052,11 +1209,32 @@ pub async fn project_search(
     //     total_hits: results.total_hits,
     // };
 
-    Ok(HttpResponse::Ok().json(results))
+    Ok(web::Json(results))
+}
+
+// for more complicated search queries
+#[post("/search")]
+pub async fn project_search_post(
+    web::Json(info): web::Json<SearchRequest>,
+    search_backend: web::Data<dyn SearchBackend>,
+    redis: web::Data<RedisPool>,
+) -> Result<web::Json<SearchResults>, ApiError> {
+    let results = search_backend.search_for_project(&info, &redis).await?;
+    Ok(web::Json(results))
 }
 
 //checks the validity of a project id or slug
-pub async fn project_get_check(
+#[utoipa::path]
+#[get("/{id}/check")]
+async fn project_get_check(
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    project_get_check_internal(info, pool, redis).await
+}
+
+pub async fn project_get_check_internal(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -1081,7 +1259,19 @@ pub struct DependencyInfo {
     pub versions: Vec<models::projects::Version>,
 }
 
+#[utoipa::path]
+#[get("/{project_id}/dependencies")]
 pub async fn dependency_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    dependency_list_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn dependency_list_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1139,7 +1329,11 @@ pub async fn dependency_list(
             .collect::<Vec<db_models::DBVersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
             database::DBProject::get_many_ids(&project_ids, &**pool, &redis),
-            database::DBVersion::get_many(&dep_version_ids, &**pool, &redis),
+            async {
+                database::DBVersion::get_many(&dep_version_ids, &**pool, &redis)
+                    .await
+                    .wrap_internal_err("failed to fetch dependency versions")
+            },
         )
         .await?;
 
@@ -1491,7 +1685,32 @@ pub struct Extension {
 }
 
 #[allow(clippy::too_many_arguments)]
-pub async fn project_icon_edit(
+#[utoipa::path]
+#[patch("/{id}/icon")]
+async fn project_icon_edit(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::Payload,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_icon_edit_internal(
+        web::Query(ext),
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
+        payload,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn project_icon_edit_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1606,7 +1825,28 @@ pub async fn project_icon_edit(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-pub async fn delete_project_icon(
+#[utoipa::path]
+#[delete("/{id}/icon")]
+async fn delete_project_icon(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    delete_project_icon_internal(
+        req,
+        info,
+        pool,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn delete_project_icon_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -1707,7 +1947,34 @@ pub struct GalleryCreateQuery {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[utoipa::path]
+#[post("/{id}/gallery")]
 pub async fn add_gallery_item(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryCreateQuery>,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    payload: web::Payload,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    add_gallery_item_internal(
+        web::Query(ext),
+        req,
+        web::Query(item),
+        info,
+        pool,
+        redis,
+        file_host,
+        payload,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn add_gallery_item_internal(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
     web::Query(item): web::Query<GalleryCreateQuery>,
@@ -1874,7 +2141,26 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-pub async fn edit_gallery_item(
+#[utoipa::path]
+#[patch("/{id}/gallery")]
+async fn edit_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryEditQuery>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    edit_gallery_item_internal(
+        req,
+        web::Query(item),
+        pool,
+        redis,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn edit_gallery_item_internal(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
     pool: web::Data<PgPool>,
@@ -2040,7 +2326,28 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-pub async fn delete_gallery_item(
+#[utoipa::path]
+#[delete("/{id}/gallery")]
+async fn delete_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryDeleteQuery>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    delete_gallery_item_internal(
+        req,
+        web::Query(item),
+        pool,
+        redis,
+        file_host,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn delete_gallery_item_internal(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
     pool: web::Data<PgPool>,
@@ -2150,32 +2457,57 @@ pub async fn delete_gallery_item(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-pub async fn project_delete(
+#[utoipa::path]
+#[delete("/{id}")]
+async fn project_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
     session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
+) -> Result<(), ApiError> {
+    project_delete_internal(
+        req,
+        info,
+        pool,
+        redis,
+        search_backend,
+        session_queue,
+    )
+    .await
+}
+
+pub async fn project_delete_internal(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    search_backend: web::Data<dyn SearchBackend>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<(), ApiError> {
+    let (_, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Scopes::PROJECT_DELETE,
     )
-    .await?
-    .1;
+    .await?;
     let string = info.into_inner().0;
 
+    // In two cases, we return `The specified project does not exist!`:
+    // - the project really doesn't exist
+    // - the project is hidden from the user
+    //
+    // We use an `ApiError::Auth` for this case instead of a `ApiError::Request`,
+    // because our permissions tests assert that failing under the 2nd use                  case
+    // gives a 401 or 404, but `Request` gives only a 400.
+
     let project = db_models::DBProject::get(&string, &**pool, &redis)
-        .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
-        })?;
+        .await
+        .wrap_internal_err("failed to get project")?
+        .wrap_auth_err("The specified project does not exist!")?;
 
     if !user.role.is_admin() {
         let (team_member, organization_team_member) =
@@ -2184,13 +2516,14 @@ pub async fn project_delete(
                 user.id.into(),
                 &**pool,
             )
-            .await?;
+            .await
+            .wrap_internal_err("failed to get user team member permissions")?;
 
         // Hide the project
         if team_member.is_none() && organization_team_member.is_none() {
-            return Err(ApiError::CustomAuthentication(
-                "The specified project does not exist!".to_string(),
-            ));
+            return Err(ApiError::Auth(eyre!(
+                "The specified project does not exist!"
+            )));
         }
 
         let permissions = ProjectPermissions::get_permissions_by_role(
@@ -2207,15 +2540,35 @@ pub async fn project_delete(
         }
     }
 
-    let mut transaction = pool.begin().await?;
+    let mut transaction = pool
+        .begin()
+        .await
+        .wrap_internal_err("failed to start transaction")?;
+    let was_in_tech_review =
+        delphi::is_project_in_tech_review(project.inner.id, &mut transaction)
+            .await?;
+
+    if was_in_tech_review {
+        delphi::send_tech_review_exit_file_deleted_message(
+            project.inner.id,
+            &mut transaction,
+        )
+        .await?;
+    }
+
     let context = ImageContext::Project {
         project_id: Some(project.inner.id.into()),
     };
     let uploaded_images =
         db_models::DBImage::get_many_contexted(context, &mut transaction)
-            .await?;
+            .await
+            .wrap_internal_err("failed to get project images")?;
     for image in uploaded_images {
-        image_item::DBImage::remove(image.id, &mut transaction, &redis).await?;
+        image_item::DBImage::remove(image.id, &mut transaction, &redis)
+            .await
+            .wrap_internal_err_with(|| {
+                eyre!("failed to remove project image `{:?}`", image.id)
+            })?;
     }
 
     sqlx::query!(
@@ -2226,35 +2579,53 @@ pub async fn project_delete(
         project.inner.id as db_ids::DBProjectId,
     )
     .execute(&mut transaction)
-    .await?;
+    .await
+    .wrap_internal_err("failed to delete project from collections_mods")?;
 
     let result = db_models::DBProject::remove(
         project.inner.id,
         &mut transaction,
         &redis,
     )
-    .await?;
+    .await
+    .wrap_internal_err("failed to remove project")?;
 
-    transaction.commit().await?;
+    transaction
+        .commit()
+        .await
+        .wrap_internal_err("failed to commit transaction")?;
 
-    remove_documents(
-        &project
-            .versions
-            .into_iter()
-            .map(|x| x.into())
-            .collect::<Vec<_>>(),
-        &search_config,
-    )
-    .await?;
+    search_backend
+        .remove_documents(
+            &project
+                .versions
+                .into_iter()
+                .map(|x| x.into())
+                .collect::<Vec<_>>(),
+        )
+        .await
+        .wrap_internal_err("failed to remove project version documents")?;
 
     if result.is_some() {
-        Ok(HttpResponse::NoContent().body(""))
+        Ok(())
     } else {
         Err(ApiError::NotFound)
     }
 }
 
-pub async fn project_follow(
+#[utoipa::path]
+#[post("/{id}/follow")]
+async fn project_follow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_follow_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn project_follow_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2334,7 +2705,19 @@ pub async fn project_follow(
     }
 }
 
-pub async fn project_unfollow(
+#[utoipa::path]
+#[delete("/{id}/follow")]
+async fn project_unfollow(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    project_unfollow_internal(req, info, pool, redis, session_queue).await
+}
+
+pub async fn project_unfollow_internal(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -2410,6 +2793,8 @@ pub async fn project_unfollow(
     }
 }
 
+#[utoipa::path]
+#[get("/{id}/organization")]
 pub async fn project_get_organization(
     req: HttpRequest,
     info: web::Path<(String,)>,

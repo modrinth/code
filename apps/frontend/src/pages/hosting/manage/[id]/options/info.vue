@@ -8,14 +8,15 @@
 						<span> SFTP allows you to access your server's files from outside of Modrinth. </span>
 					</label>
 					<ButtonStyled>
-						<button
+						<a
 							v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
 							class="!w-full sm:!w-auto"
-							@click="openSftp"
+							:href="sftpUrl"
+							target="_blank"
 						>
 							<ExternalIcon class="h-5 w-5" />
 							Launch SFTP
-						</button>
+						</a>
 					</ButtonStyled>
 				</div>
 
@@ -118,22 +119,18 @@
 
 <script setup lang="ts">
 import { CopyIcon, ExternalIcon, EyeIcon, EyeOffIcon } from '@modrinth/assets'
-import { ButtonStyled, CopyCode, injectNotificationManager } from '@modrinth/ui'
-
-import type { ModrinthServer } from '~/composables/servers/modrinth-servers.ts'
+import {
+	ButtonStyled,
+	CopyCode,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '@modrinth/ui'
 
 const { addNotification } = injectNotificationManager()
-const props = defineProps<{
-	server: ModrinthServer
-}>()
-
-const data = computed(() => props.server.general)
+const { server: data, serverId } = injectModrinthServerContext()
 const showPassword = ref(false)
 
-const openSftp = () => {
-	const sftpUrl = `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`
-	window.open(sftpUrl, '_blank')
-}
+const sftpUrl = computed(() => `sftp://${data.value?.sftp_username}@${data.value?.sftp_host}`)
 
 const togglePassword = () => {
 	showPassword.value = !showPassword.value
@@ -148,7 +145,7 @@ const copyToClipboard = (name: string, textToCopy?: string) => {
 }
 
 const properties = [
-	{ name: 'Server ID', value: props.server.serverId ?? 'Unknown' },
+	{ name: 'Server ID', value: serverId ?? 'Unknown' },
 	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown' },
 	{ name: 'Kind', value: data.value?.upstream?.kind ?? data.value?.loader ?? 'Unknown' },
 	{ name: 'Project ID', value: data.value?.upstream?.project_id ?? 'Unknown' },

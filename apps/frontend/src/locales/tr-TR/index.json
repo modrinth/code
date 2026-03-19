@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "İndirme seçenekleri"
   },
-  "app-marketing.download.terms": {
-    "message": "Modrinth App indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
-  },
   "app-marketing.download.title": {
     "message": "Modrinth App'i İndir (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App, öne çıkan çoğu mod yöneticisinden daha hafiftir, sadece 150mb RAM kullanır!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -180,7 +174,7 @@
     "message": "Cobblemon kurulumunun ‘İçerik’ sayfasında olduğu Modrinth App ekran görüntüsü."
   },
   "app-marketing.hero.description": {
-    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcı."
+    "message": "Modrinth App, favori modlarınızı güncel şekilde oynayabileceğiniz özgün ve açık kaynaklı bir başlatıcıdır."
   },
   "app-marketing.hero.download-button": {
     "message": "Modrinth App İndir"
@@ -336,7 +330,7 @@
     "message": "Modrinth'le ilgili güncellemelere abone ol"
   },
   "auth.welcome.description": {
-    "message": "Artık çoktan kurulumu yapan, indiren ve inanılmaz modlarla güncelde kalan yaratıcıların ve kaşiflerin havalı topluluğunun bir parçasısın."
+    "message": "Artık inanılmaz modlar yapan, indiren ve geride kalmayan yaratıcıların ve kaşiflerin havalı topluluğunun bir parçasısın."
   },
   "auth.welcome.label.tos": {
     "message": "Bir hesap oluşturarak, Modrinth'in <terms-link>Şartlar</terms-link>'ını ve <privacy-policy-link>Gizlilik İlkeleri</privacy-policy-link>'ni kabul etmiş sayılırsınız."
@@ -391,9 +385,6 @@
   },
   "collection.label.no-projects": {
     "message": "Koleksiyonda henüz proje yok"
-  },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Henüz proje yok} one {<stat>{count}</stat> proje} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} güncellendi"
@@ -497,11 +488,26 @@
   "create.project.create-project": {
     "message": "Proje oluştur"
   },
+  "create.project.create-server-project": {
+    "message": "Sunucu oluştur"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Eksik alanlar:{fields}"
+  },
   "create.project.name-label": {
     "message": "İsim"
   },
   "create.project.name-placeholder": {
     "message": "Projenin ismini girin..."
+  },
+  "create.project.owner-description": {
+    "message": "Proje sahibini kendin ya da üyesi olduğun bir organizasyon olarak ayarla."
+  },
+  "create.project.owner-label": {
+    "message": "Sahip"
+  },
+  "create.project.server-project-title": {
+    "message": "Sunucu Projesi oluştur"
   },
   "create.project.summary-description": {
     "message": "Projenizi anlatan bir iki cümle."
@@ -514,6 +520,15 @@
   },
   "create.project.title": {
     "message": "Proje oluştur"
+  },
+  "create.project.type-label": {
+    "message": "Tür"
+  },
+  "create.project.type-project": {
+    "message": "Proje"
+  },
+  "create.project.type-server": {
+    "message": "Sunucu"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,9 +569,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proje} other {{count} proje}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Koleksiyonlarında ara"
   },
@@ -573,7 +585,7 @@
     "message": "Artık özgürce çekim yapabilirsiniz. Sorunuz varsa veya bilgilerinizi güncellemeniz gerekiyorsa <support-link>desteğe başvurun</support-link>."
   },
   "dashboard.creator-tax-form-modal.confirmation.title": {
-    "message": "Hazırsın! 🎉"
+    "message": "Hazırsınız! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
     "message": "Yabancı kuruluş, Amerika Birleşik Devletleri dışında kurulmuş bir ticari kuruluş (örneğin, ABD dışı şirket, ortaklık veya LLC) anlamına gelir."
@@ -632,9 +644,6 @@
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
   },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Bireysel mi yoksa işletme olarak mı para çekiyorsunuz?"
-  },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Özel şahıs"
   },
@@ -681,7 +690,7 @@
     "message": "Ulusal kimlik numarası"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-national-id-placeholder": {
-    "message": "T.C. kimlik numaranızı giriniz"
+    "message": "Ulusal kimlik numaranızı giriniz"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-passport": {
     "message": "Pasaport numarası"
@@ -1106,9 +1115,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Evet. Tüm Modrinth Hosting sunucuları, bazı konumlarda 17 Tbps'ye kadar kapasiteye sahip DDoS koruması ile birlikte gelir."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
   },
@@ -1214,9 +1220,6 @@
   "hosting-marketing.know-what-you-need": {
     "message": "İhtiyacınız olan şeyi tam olarak biliyor musunuz?"
   },
-  "hosting-marketing.medal.info": {
-    "message": "<orange>Medal</orange> tarafından desteklenen 5 gün boyunca ücretsiz <orange>3 Gb sunucu</orange> deneyin"
-  },
   "hosting-marketing.medal.learn-more": {
     "message": "Daha fazla öğrenin"
   },
@@ -1287,19 +1290,19 @@
     "message": "Sürekli Gelişen"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Sayfa görüntülenmeleri, indirme sayısı ve hasılat üzerine detaylı raporlar edin."
+    "message": "Sayfa görüntülenmeleri, indirme sayısı ve hasılat üzerine detaylı raporlar elde edin."
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Veriler ve İstatistikler"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Arama, ana sayfamız, Discord sunucumuz ve gelecek daha çok yollar üzerinden binlerce kullanıcılar tarafından projenizin keşfedilmesini sağlayın!"
+    "message": "Arama, ana sayfamız, Discord sunucumuz ve gelecek yollar üzerinden binlerce kullanıcı tarafından projenizin keşfedilmesini sağlayın!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Keşif"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
-    "message": "Siz yeni bir sürüm çıkarır çıkarmaz otomatik yüklemeler için Minotaur üzerinden yapım araçlarıyla entegre edin."
+    "message": "Siz yeni bir sürüm çıkarır çıkarmaz otomatik yüklemeler için Minotaur üzerinden yapım araçlanızı entegre edin."
   },
   "landing.creator.feature.diverse-ecosystem.title": {
     "message": "Çeşitli Ekosistem"
@@ -1320,13 +1323,13 @@
     "message": "Rastgele proje yüklenemedi :("
   },
   "landing.feature.follow.description": {
-    "message": "Favori projeleriniz güncellendiğinde bildirilin ve haberdar olun."
+    "message": "Favori projeleriniz güncellendiğinde bildirilin ve geride kalmayın."
   },
   "landing.feature.follow.heading": {
     "message": "Sevdiğiniz projeleri takip edin"
   },
   "landing.feature.launcher.description": {
-    "message": "Modrinth'in açık-kaynak API'ı başlatıcıların Modrinth ile tam bağlantı kurmasını sağlar. Modrinth, <link>bizim kendi uygulamamızdan</link> veya ATLauncher, MultiMC ve Prism Launcher gibi öne çıkan başlatıcılardan kullanılbilir."
+    "message": "Modrinth'in açık-kaynak API'ı başlatıcıların Modrinth ile tam bağlantı kurmasını sağlar. Modrinth; <link>kendi uygulamamız</link> veya ATLauncher, MultiMC ve Prism Launcher gibi öne çıkan başlatıcılar aracığılıyla kullanılabilir."
   },
   "landing.feature.launcher.heading": {
     "message": "Favori başlatıcınız ile oynayın"
@@ -1335,7 +1338,7 @@
     "message": "Modrinth'in ışık hızı araması ve güçlü filtreleriyle istediğinizi bulun."
   },
   "landing.feature.search.heading": {
-    "message": "Ne istediğinizi kolay ve hızlı şekilde bulun"
+    "message": "İstediğinizi kolay ve hızlıca bulun"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Minecraft {content} için bir numaralı yer"
@@ -1395,16 +1398,13 @@
     "message": "İçeriğinizi dünya ile paylaşın"
   },
   "landing.section.for-players.description": {
-    "message": "Büyüsel biyomlardan lanetli zindanlara kadar, oyununuzu sonraki seviyeye taşıyacak içeriği bulacağınızdan emin olabilirsiniz."
+    "message": "Büyülü biyomlardan lanetli zindanlara kadar, oyununu sonraki seviyeye taşıyacak içerikler bulacağından emin olabilirsin."
   },
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
   },
-  "landing.section.for-players.tagline": {
-    "message": "{count}+ içerik keşfedin"
-  },
   "landing.subheading": {
-    "message": "Topluluk için geliştirilmiş açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
+    "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
   },
   "layout.action.change-theme": {
     "message": "Tema değiştir"
@@ -1432,6 +1432,12 @@
   },
   "layout.action.new-project": {
     "message": "Yeni proje"
+  },
+  "layout.action.new-server-project": {
+    "message": "Yeni Sunucu"
+  },
+  "layout.action.publish": {
+    "message": "Yayınla"
   },
   "layout.action.reports": {
     "message": "Raporları incele"
@@ -1485,7 +1491,7 @@
     "message": "Vergi formunu doldurun"
   },
   "layout.banner.tax.description": {
-    "message": "Bu yıl Modrinth'ten $600'dan fazla para çektiniz. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekiyor. Bu form gönderilene kadar para çekme işlemleriniz durdurulmuştur."
+    "message": "Bu yıl Modrinth'ten {threshold} üzerinde çekim yaptınız. Vergi düzenlemelerine uymak için bir vergi formu doldurmanız gerekmektedir. Bu form teslim edilene kadar para çekme işlemleriniz durdurulmuştur."
   },
   "layout.banner.tax.title": {
     "message": "Vergi formu gereklidir"
@@ -1620,7 +1626,7 @@
     "message": "Özellik bayrakları"
   },
   "layout.nav.get-modrinth-app": {
-    "message": "Modrinth App Edin"
+    "message": "Modrinth App yükle"
   },
   "layout.nav.home": {
     "message": "Anasayfa"
@@ -1763,9 +1769,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Hesap numarası"
   },
-  "muralpay.field.branch-code": {
-    "message": "Şube kodu"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1798,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX telefon"
+  },
+  "muralpay.field.random-key": {
+    "message": "Rastgele anahtar"
   },
   "muralpay.field.routing-number": {
     "message": "Routing numarası"
@@ -1856,9 +1862,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Hesap numarasını girin"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Şube kodunu girin"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "18 haneli CLABE girin"
   },
@@ -1870,6 +1873,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "PIX e-posta girin"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Rastgele anahtar giriniz"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "9 haneli routing numarasını girin"
@@ -1997,9 +2003,6 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {indirme} other {indirme}}"
-  },
   "profile.label.joined": {
     "message": "Katılma:"
   },
@@ -2017,9 +2020,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizasyonlar"
-  },
-  "profile.label.projects": {
-    "message": "{count}{count, plural, one { proje} other { proje}}"
   },
   "profile.label.saving": {
     "message": "Kaydediliyor..."
@@ -2102,6 +2102,12 @@
   "project-type.datapack.singular": {
     "message": "Veri Paketi"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Sunucular"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Sunucu"
+  },
   "project-type.mod.plural": {
     "message": "Modlar"
   },
@@ -2131,6 +2137,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Kaynak Paketi"
+  },
+  "project-type.server.plural": {
+    "message": "Sunucular"
+  },
+  "project-type.server.singular": {
+    "message": "Sunucu"
   },
   "project-type.shader.plural": {
     "message": "Shaderlar"
@@ -2363,11 +2375,23 @@
   "report.already-reported": {
     "message": "Zaten {title} ögesini bildirdiniz"
   },
+  "report.already-reported-description": {
+    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} için zaten açık bir raporunuz bulunuyor. Eklemek istediğiniz yeni bilgiler varsa mevcut raporunuza detay ekleyebilirsiniz."
+  },
+  "report.back-to-item": {
+    "message": "{item, select, project {projeye} version {sürüme} user {kullanıcıya} other {içeriğe}} geri dön"
+  },
   "report.body.description": {
     "message": "Eğer mümkünse ve alakalıysa bağlantılar ve görseller ekleyin. Boş ve yetersiz raporlar kapatılacak ve yok sayılacak."
   },
   "report.body.title": {
     "message": "Lütfen raporunuzla ilgili ekstra bağlam sağlayın"
+  },
+  "report.checking": {
+    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} kontrol ediliyor..."
+  },
+  "report.could-not-find": {
+    "message": "{item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} bulunamadı"
   },
   "report.for.violation": {
     "message": "Modrinth <rules-link>Kuralları</rules-link> veya <terms-link>Kullanım Koşulları</terms-link> İhlali"
@@ -2408,8 +2432,14 @@
   "report.please-report": {
     "message": "Lütfen bildirin:"
   },
+  "report.question.content-id": {
+    "message": "{item, select, project {projenin} version {sürümün} user {kullanıcının} other {içeriğin}} kimliği nedir?"
+  },
   "report.question.content-type": {
     "message": "Ne tür bir içerik bildiriyorsunuz?"
+  },
+  "report.question.report-reason": {
+    "message": "Bu {item, select, project {proje} version {sürüm} user {kullanıcı} other {içerik}} Modrinth kurallarından hangisini ihlal ediyor?"
   },
   "report.report-content": {
     "message": "Moderatörlere içerik bildir"
@@ -2696,6 +2726,9 @@
   "scopes.versionWrite.label": {
     "message": "Sürüm yaz"
   },
+  "search.filter.game-version-shader-message": {
+    "message": "Eski sürümler için olan shader paketleri, büyük olasılıkla yeni sürümlerde de sadece küçük sorunlarla çalışacaktır."
+  },
   "search.filter.locked.server": {
     "message": "Sunucu tarafından sağlanıyor"
   },
@@ -2707,9 +2740,6 @@
   },
   "search.filter.locked.server.sync": {
     "message": "Sunucuyla eşle"
-  },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Yedek geri yükleme devam ediyor"
   },
   "servers.notice.actions": {
     "message": "Eylemler"
@@ -2763,7 +2793,7 @@
     "message": "Daha fazla ekle"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": ""
+    "message": "Yönlendirme URI'ları ekle"
   },
   "settings.applications.button.cancel": {
     "message": "İptal"
@@ -2798,6 +2828,15 @@
   "settings.applications.delete.confirm.button": {
     "message": "Bu uygulamayı sil"
   },
+  "settings.applications.delete.confirm.description": {
+    "message": "Bu işlem, uygulamayı kalıcı olarak silecek ve tüm erişim jetonlarını iptal edecektir. (sonsuza dek!)"
+  },
+  "settings.applications.delete.confirm.title": {
+    "message": "Bu uygulamayı silmek istediğinizden emin misiniz?"
+  },
+  "settings.applications.description.intro": {
+    "message": "Uygulamalar, Modrinth kullanıcılarının ürünlerinizde kimlik doğrulaması yapması için kullanılabilir. Daha fazla bilgi için <docs-link>Modrinth'in API belgelerine</docs-link> göz atın."
+  },
   "settings.applications.field.description": {
     "message": "Açıklama"
   },
@@ -2816,6 +2855,9 @@
   "settings.applications.field.redirect-uri.placeholder": {
     "message": ""
   },
+  "settings.applications.field.redirect-uris": {
+    "message": "Yönlendirme URI'ları"
+  },
   "settings.applications.field.scopes": {
     "message": "Kapsamlar"
   },
@@ -2825,6 +2867,9 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://ornek.com"
   },
+  "settings.applications.modal.header": {
+    "message": "Proje bilgileri"
+  },
   "settings.applications.notification.error.title": {
     "message": "Bir hata oluştu"
   },
@@ -2833,6 +2878,9 @@
   },
   "settings.applications.notification.icon-updated.title": {
     "message": "Simge güncellendi"
+  },
+  "settings.applications.secret.disclaimer": {
+    "message": "Gizli anahtar sadece bir kez gösterilir. Pencereyi kapadığınızda kaybolacaktır. Güvenliğiniz için paylaşmayın!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
@@ -2915,6 +2963,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Kaynak Paketleri sayfası"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Sunucular sayfası"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaderlar sayfası"
   },
@@ -2965,9 +3016,6 @@
   },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
-  },
-  "settings.pats.description": {
-    "message": "PAT'lar Modrinth'in API'sine erişmekte kullanılabilir. Daha fazla bilgi için, <doc-link>Modrinth API dokümantasyonununa</doc-link>na bakın. Bunlar her zaman oluşturulabilir veya iptal edilebilir."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT oluştur"
@@ -3054,7 +3102,7 @@
     "message": "Bilinmeyen platform"
   },
   "ui.latest-news-row.latest-news": {
-    "message": "Modrinth'ten en yeni haberler"
+    "message": "Modrinth'ten haberler"
   },
   "ui.latest-news-row.view-all": {
     "message": "Bütün haberleri gör"

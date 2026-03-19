@@ -5,6 +5,30 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentiseringsservere"
   },
+  "app.modal.install-to-play.header": {
+    "message": "Installer for å spille"
+  },
+  "app.modal.install-to-play.install-button": {
+    "message": "Installer"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural, one {#mod} other {# mods}}"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Delt instans"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Delt serverinstans"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Oppdater for å spille"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Krever oppdatering"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Ei oppdatering er påkrevd for å spille {name}. Vær så snill å oppdater til den siste versjonen av spillet for å spille det."
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Utviklermodus aktivert."
   },
@@ -31,33 +55,6 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Ressursforvaltning"
-  },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version} er klar for installering! Last inn på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
-  },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} er ferdig lastet ned. Last in på nytt for å oppdatere nå, eller automatisk når du lukker Modrinth App."
-  },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version} er tilgjengelig nå! Siden du er på en forbruksmålt tilkobling, lastet vi den ikke ned automatisk."
-  },
-  "app.update-toast.changelog": {
-    "message": "Endringslogg"
-  },
-  "app.update-toast.download": {
-    "message": "Last ned ({size})"
-  },
-  "app.update-toast.downloading": {
-    "message": "Laster ned..."
-  },
-  "app.update-toast.reload": {
-    "message": "Last inn på nytt"
-  },
-  "app.update-toast.title": {
-    "message": "Oppdatering tilgjengelig"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Ferdig lastet ned"
   },
   "app.update.complete-toast.text": {
     "message": "Klikk her for å se endringsloggen."
@@ -173,12 +170,6 @@
   "instance.edit-world.title": {
     "message": "Rediger verden"
   },
-  "instance.filter.disabled": {
-    "message": "Deaktiverte prosjekt"
-  },
-  "instance.filter.updates-available": {
-    "message": "Oppdateringer tiljengelige"
-  },
   "instance.server-modal.address": {
     "message": "Adresse"
   },
@@ -287,140 +278,8 @@
   "instance.settings.tabs.installation": {
     "message": "Installasjon"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} for Minecraft {game_version} er allerede installert"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} er allerede installert"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Endre versjon"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Installer"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Installerer"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Henter modpakkeversjoner"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Installerer ny versjon"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "For tiden installert"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Feilsøkingsinformasjon:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Henter modpakkedetaljer"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Spillversjon"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Installer"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Installasjon pågår"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} versjon"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Kan ikke hente detaljer for tilknyttet modpakke."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} er ikke tilgjengelig for Minecraft {version}. Prøv en annen mod laster."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Denne instansen er tilknyttet til en modpakke, men modpakken er ikke funnet på Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Re-installer modpakke"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Re-installerer modpakke"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Reinstallering vil tilbakestille alt installert eller endret innhold til det som tilbys av modpakken, og fjerne alle mods eller innhold du har lagt til i tillegg til den opprinnelige installasjonen. Dette kan løse uventet oppførsel hvis det er gjort endringer i instansen, men hvis verdenene dine nå er avhengige av ekstra installert innhold, kan det ødelegge eksisterende verdener."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Er du sikker på at du vil reinstallere denne instansen?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resetter innholdet til instansen til sin opprinnelige tilstand, som fjerner alle mods eller innhold som du har lagd til på toppen av originalpakken."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstaller modpakke"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Reparer"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Reparerer"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Reparasjon reinstallerer Minecraft-avhengigheter og sjekker for korrupsjon. Dette kan fikse problemer hvis spillet ikke starter grunnet launcher-relaterte feil, men vil ikke løse problemer eller krasj relatert til installerte mods."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Reparer instanse?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Reparasjon pågår"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Reset til nåværende"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Vis alle versjoner"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "endre versjon"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "installer"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "reinstaller"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "reparer"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Kan ikke {action} mens en installasjon pågår"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Kan ikke {action} når man er offline"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Kan ikke {action} mens en reparasjon pågår"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(ukjent versjon)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Koble fra instanse"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Hvis du fortsetter, vil du ikke kunne koble det på nytt uten å lage en helt ny instans. Du vil ikke kunne få oppdateringer for modpakker lenger og det vil bli til en normal instans."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Er du sikker på at du vil koble fra denne instansen?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Denne instansen er koblet til en modpakke, som betyr at mods ikke kan bli oppdatert og at du ikke kan endre modloaderen eller Minecraft-versjonen. Å avlenke vil permanent koble fra instansen fra modpakken."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Koble fra modpakke"
   },
   "instance.settings.tabs.java": {
     "message": "Java og minne"

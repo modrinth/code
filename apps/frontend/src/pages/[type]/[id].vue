@@ -1,5 +1,5 @@
 <template>
-	<template v-if="project">
+	<template v-if="project && projectV3Loaded">
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
@@ -73,6 +73,7 @@
 					"
 				/>
 			</NewModal>
+			<OpenInAppModal ref="openInAppModal" />
 			<div
 				class="over-the-top-download-animation"
 				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
@@ -97,12 +98,14 @@
 				ref="downloadModal"
 				:on-show="
 					() => {
-						navigateTo({ query: route.query, hash: '#download' })
+						debug('on-show fired')
+						loadVersions()
+						navigateTo({ query: route.query, hash: '#download' }, { replace: true })
 					}
 				"
 				:on-hide="
 					() => {
-						navigateTo({ query: route.query, hash: '' })
+						navigateTo({ query: route.query, hash: '' }, { replace: true })
 					}
 				"
 			>
@@ -113,7 +116,7 @@
 					</div>
 				</template>
 				<template #default>
-					<div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+					<div class="mx-auto flex max-w-[44rem] flex-col gap-4 md:w-[30rem]">
 						<div
 							v-if="
 								project.project_type !== 'plugin' ||
@@ -240,18 +243,21 @@
 														platformAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -341,18 +347,21 @@
 														gameVersionAccordion.open()
 													}
 
-													navigateTo({
-														query: {
-															...route.query,
-															...(userSelectedGameVersion && {
-																version: userSelectedGameVersion,
-															}),
-															...(userSelectedPlatform && {
-																loader: userSelectedPlatform,
-															}),
+													navigateTo(
+														{
+															query: {
+																...route.query,
+																...(userSelectedGameVersion && {
+																	version: userSelectedGameVersion,
+																}),
+																...(userSelectedPlatform && {
+																	loader: userSelectedPlatform,
+																}),
+															},
+															hash: route.hash,
 														},
-														hash: route.hash,
-													})
+														{ replace: true },
+													)
 												}
 											"
 										>
@@ -388,7 +397,9 @@
 									currentGameVersion &&
 									!filteredRelease &&
 									!filteredBeta &&
-									!filteredAlpha
+									!filteredAlpha &&
+									!versionsLoading &&
+									versions.length > 0
 								"
 							>
 								{{
@@ -428,9 +439,34 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
-					<ProjectHeader :project="project" :member="!!currentMember">
+					<ProjectHeader
+						v-if="projectV3Loaded"
+						:project="project"
+						:project-v3="projectV3"
+						:member="!!currentMember"
+					>
 						<template #actions>
-							<ButtonStyled v-if="auth.user && currentMember" size="large" color="brand">
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="lg:!hidden"
+								circular
+							>
+								<nuxt-link
+									v-tooltip="'Edit project'"
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="!font-bold"
+								>
+									<SettingsIcon aria-hidden="true" />
+								</nuxt-link>
+							</ButtonStyled>
+							<ButtonStyled
+								v-if="auth.user && currentMember"
+								size="large"
+								color="brand"
+								class="max-lg:!hidden"
+							>
 								<nuxt-link
 									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
 									class="!font-bold"
@@ -442,6 +478,7 @@
 
 							<div class="hidden sm:contents">
 								<ButtonStyled
+									v-if="!isServerProject"
 									size="large"
 									:color="
 										(auth.user && currentMember) || route.name === 'type-id-version-version'
@@ -454,8 +491,6 @@
 										v-tooltip="
 											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
 										"
-										@mouseenter="loadVersions"
-										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
@@ -464,22 +499,57 @@
 										}}
 									</button>
 								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									:color="
+										(auth.user && currentMember) || route.name === 'type-id-version-version'
+											? `standard`
+											: `brand`
+									"
+									:circular="!!auth.user && !!currentMember"
+								>
+									<button
+										v-tooltip="auth.user && currentMember && !openInAppModal?.open ? 'Play' : ''"
+										@click="handlePlayServerProject"
+									>
+										<PlayIcon aria-hidden="true" />
+										{{ auth.user && currentMember ? '' : 'Play' }}
+									</button>
+								</ButtonStyled>
 							</div>
 
 							<div class="contents sm:hidden">
 								<ButtonStyled
+									v-if="!isServerProject"
 									size="large"
 									circular
-									:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
 								>
 									<button
 										:aria-label="formatMessage(commonMessages.downloadButton)"
 										class="flex sm:hidden"
-										@mouseenter="loadVersions"
-										@focus="loadVersions"
 										@click="(event) => downloadModal.show(event)"
 									>
 										<DownloadIcon aria-hidden="true" />
+									</button>
+								</ButtonStyled>
+								<ButtonStyled
+									v-else
+									size="large"
+									circular
+									:color="
+										route.name === 'type-id-version-version' || (auth.user && currentMember)
+											? `standard`
+											: `brand`
+									"
+								>
+									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
+										<PlayIcon aria-hidden="true" />
 									</button>
 								</ButtonStyled>
 							</div>
@@ -543,7 +613,7 @@
 											<IntlFormatted
 												:message-id="messages.serversPromoPricing"
 												:values="{
-													price: formatPrice(locale, 500, 'USD', true),
+													price: formatPrice(500, 'USD', true),
 												}"
 											>
 												<template #small="{ children }">
@@ -792,7 +862,19 @@
 				</div>
 
 				<div class="normal-page__sidebar">
+					<ProjectSidebarServerInfo
+						v-if="isServerProject && serverDataLoaded"
+						:project-v3="projectV3"
+						:tags="tags"
+						:required-content="serverRequiredContent"
+						:recommended-version="serverRecommendedVersion"
+						:supported-versions="serverSupportedVersions"
+						:loaders="serverModpackLoaders"
+						:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
+						class="card flex-card experimental-styles-within"
+					/>
 					<ProjectSidebarCompatibility
+						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
 						:v3-metadata="projectV3"
@@ -801,7 +883,12 @@
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
 					<ProjectSidebarLinks
 						:project="project"
+						:project-v3="projectV3"
 						:link-target="$external()"
+						class="card flex-card experimental-styles-within"
+					/>
+					<ProjectSidebarTags
+						:project="project"
 						class="card flex-card experimental-styles-within"
 					/>
 					<ProjectSidebarCreators
@@ -817,13 +904,14 @@
 						:project="project"
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
+						:show-followers="isServerProject"
 						class="card flex-card experimental-styles-within"
 					/>
 					<div class="card flex-card experimental-styles-within">
 						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
-							<div class="details-list__item">
+							<div v-if="projectV3Loaded && !isServerProject" class="details-list__item">
 								<BookTextIcon aria-hidden="true" />
 								<div>
 									{{ formatMessage(messages.licensedLabel) }}
@@ -851,55 +939,71 @@
 								</div>
 							</div>
 
+							<div v-if="isServerProject" class="details-list__item">
+								<HeartIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(
+											formatMessage(commonMessages.projectFollowers, {
+												count: project.followers,
+											}),
+										)
+									}}
+								</div>
+							</div>
 							<div
 								v-if="project.approved"
-								v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.approved)"
 								class="details-list__item"
 							>
 								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.published, {
-											date: publishedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.published, {
+												date: publishedDate,
+											}),
+										)
+									}}
+								</div>
+							</div>
+
+							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
+								<CalendarIcon aria-hidden="true" />
+								<div>
+									{{
+										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
 									}}
 								</div>
 							</div>
 
 							<div
-								v-else
-								v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-								class="details-list__item"
-							>
-								<CalendarIcon aria-hidden="true" />
-								<div>
-									{{ formatMessage(detailsMessages.created, { date: createdDate }) }}
-								</div>
-							</div>
-
-							<div
 								v-if="project.status === 'processing' && project.queued"
-								v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.queued)"
 								class="details-list__item"
 							>
 								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
-										formatMessage(detailsMessages.submitted, {
-											date: submittedDate,
-										})
+										capitalizeString(
+											formatMessage(detailsMessages.submitted, {
+												date: submittedDate,
+											}),
+										)
 									}}
 								</div>
 							</div>
 
 							<div
 								v-if="versions.length > 0 && project.updated"
-								v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
+								v-tooltip="formatDateTime(project.updated)"
 								class="details-list__item"
 							>
 								<VersionIcon aria-hidden="true" />
 								<div>
-									{{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
+									{{
+										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
+									}}
 								</div>
 							</div>
 						</div>
@@ -907,7 +1011,7 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" class="mb-4" /></div>
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
 					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
 				</div>
 			</div>
@@ -949,6 +1053,7 @@ import {
 	ListIcon,
 	ModrinthIcon,
 	MoreVerticalIcon,
+	PlayIcon,
 	PlusIcon,
 	ReportIcon,
 	ScaleIcon,
@@ -972,6 +1077,7 @@ import {
 	injectNotificationManager,
 	IntlFormatted,
 	NewModal,
+	OpenInAppModal,
 	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
@@ -981,16 +1087,21 @@ import {
 	ProjectSidebarCreators,
 	ProjectSidebarDetails,
 	ProjectSidebarLinks,
+	ProjectSidebarServerInfo,
+	ProjectSidebarTags,
 	provideProjectPageContext,
 	ScrollablePanel,
 	ServersPromo,
 	StyledInput,
 	TagItem,
+	useDebugLogger,
+	useFormatDateTime,
+	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
 import VersionSummary from '@modrinth/ui/src/components/version/VersionSummary.vue'
-import { formatPrice, formatProjectType, renderString } from '@modrinth/utils'
+import { capitalizeString, formatProjectType, renderString } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -1008,6 +1119,7 @@ import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
+import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
@@ -1030,10 +1142,18 @@ const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
-const { locale, formatMessage } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+
+const debug = useDebugLogger('DownloadModal')
 
 const settingsModal = ref()
 const downloadModal = ref()
+const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
 
 const userSelectedGameVersion = ref(null)
@@ -1043,6 +1163,9 @@ const showAllVersions = ref(false)
 const gameVersionFilterInput = ref()
 
 const versionFilter = ref('')
+
+const projectV3Loaded = computed(() => !projectV3Pending.value || projectV3.value != null)
+const isServerProject = computed(() => projectV3.value?.minecraft_server != null)
 
 const projectEnvironmentModal = useTemplateRef('projectEnvironmentModal')
 
@@ -1075,9 +1198,10 @@ const currentPlatform = computed(() => {
 	)
 })
 
-const currentPlatformText = computed(() =>
-	formatMessage(getTagMessage(currentPlatform.value, 'loader')),
-)
+const currentPlatformText = computed(() => {
+	if (!currentPlatform.value) return null
+	return formatMessage(getTagMessage(currentPlatform.value, 'loader'))
+})
 
 const releaseVersions = computed(() => {
 	const set = new Set()
@@ -1112,6 +1236,21 @@ const showVersionsCheckbox = computed(() => {
 	}
 	return false
 })
+
+const serverProject = computed(() => ({
+	name: project.value.title,
+	slug: project.value.slug || project.value.id,
+	numPlayers: projectV3.value?.minecraft_java_server?.ping?.data?.players_online,
+	icon: project.value.icon_url,
+	statusOnline: !!projectV3.value?.minecraft_java_server?.ping?.data,
+	region: projectV3.value?.minecraft_server?.region,
+}))
+
+function handlePlayServerProject() {
+	openInAppModal.value?.show({
+		serverProject: serverProject.value,
+	})
+}
 
 function installWithApp() {
 	setTimeout(() => {
@@ -1402,7 +1541,7 @@ async function getLicenseData(event) {
 	modalLicense.value.show(event)
 
 	try {
-		const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
+		const text = await client.labrinth.tags_v2.getLicenseText(project.value.license.id)
 		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
 	} catch {
 		licenseText.value = formatMessage(messages.licenseErrorMessage)
@@ -1410,11 +1549,21 @@ async function getLicenseData(event) {
 }
 
 const filteredVersions = computed(() => {
-	return versions.value.filter(
+	const result = versions.value.filter(
 		(x) =>
-			x.game_versions.includes(currentGameVersion.value) &&
-			(x.loaders.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
+			x.game_versions?.includes(currentGameVersion.value) &&
+			(x.loaders?.includes(currentPlatform.value) || project.value.project_type === 'resourcepack'),
 	)
+	debug('filteredVersions', {
+		total: versions.value.length,
+		filtered: result.length,
+		currentGameVersion: currentGameVersion.value,
+		currentPlatform: currentPlatform.value,
+		versionsEnabled: versionsEnabled.value,
+		versionsLoading: versionsV3Loading.value,
+		sampleLoaders: versions.value.slice(0, 3).map((v) => v.loaders),
+	})
+	return result
 })
 
 const filteredRelease = computed(() => {
@@ -1518,11 +1667,95 @@ const project = computed(() => {
 const projectId = computed(() => projectRaw.value?.id)
 
 // V3 Project
-const { data: projectV3, error: _projectV3Error } = useQuery({
-	queryKey: computed(() => ['project', 'v3', projectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
+const {
+	data: projectV3,
+	error: _projectV3Error,
+	isPending: projectV3Pending,
+} = useQuery({
+	queryKey: computed(() => ['project', 'v3', routeProjectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(routeProjectId.value),
 	staleTime: STALE_TIME,
-	enabled: computed(() => !!projectId.value),
+})
+
+// Server sidebar: modpack version + project for required content
+const serverModpackVersionId = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	return content?.kind === 'modpack' ? content.version_id : null
+})
+
+const { data: serverModpackVersion, isPending: serverModpackVersionPending } = useQuery({
+	queryKey: computed(() => ['version', 'v3', serverModpackVersionId.value]),
+	queryFn: () => client.labrinth.versions_v3.getVersion(serverModpackVersionId.value),
+	staleTime: STALE_TIME,
+	enabled: computed(() => !!serverModpackVersionId.value),
+})
+
+const serverDataLoaded = computed(() => {
+	if (!projectV3.value) return false
+	if (serverModpackVersionId.value && serverModpackVersionPending.value) return false
+	return true
+})
+
+const serverRequiredContent = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content || content.kind !== 'modpack') return null
+	const primaryFile =
+		serverModpackVersion.value?.files?.find((f) => f.primary) ??
+		serverModpackVersion.value?.files?.[0]
+	return {
+		name: content.project_name ?? '',
+		versionNumber: serverModpackVersion.value?.version_number ?? '',
+		icon: content.project_icon,
+		onclickName:
+			content.project_id && content.project_id !== projectId.value
+				? () => navigateTo(`/project/${content.project_id}`)
+				: undefined,
+		onclickVersion:
+			content.project_id && content.project_id !== projectId.value
+				? () =>
+						navigateTo(`/project/${content.project_id}/version/${serverModpackVersion.value?.id}`)
+				: undefined,
+		onclickDownload: primaryFile?.url
+			? () => navigateTo(primaryFile.url, { external: true })
+			: undefined,
+		showCustomModpackTooltip: content.project_id === projectId.value,
+	}
+})
+
+const serverRecommendedVersion = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content) return null
+
+	if (content.kind === 'modpack') {
+		return serverModpackVersion.value?.game_versions?.[0] ?? null
+	}
+
+	if (content.kind === 'vanilla') {
+		return content.recommended_game_version ?? null
+	}
+
+	return null
+})
+
+const serverSupportedVersions = computed(() => {
+	const content = projectV3.value?.minecraft_java_server?.content
+	if (!content) return []
+
+	if (content.kind === 'vanilla') {
+		return content.supported_game_versions?.filter((v) => !!v) ?? []
+	}
+
+	return []
+})
+
+const serverModpackLoaders = computed(() => {
+	if (!serverModpackVersion.value) return []
+	return serverModpackVersion.value.mrpack_loaders ?? []
+})
+
+watch(serverModpackVersionId, (versionId) => {
+	if (!versionId) return
+	queryClient.prefetchQuery(versionQueryOptions.v3(versionId, client))
 })
 
 // Members
@@ -1577,12 +1810,16 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organization } = useQuery({
+const { data: organizationRaw } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
+
+// When project is removed from org, enabled becomes false but TanStack keeps stale data.
+// Return null when the project no longer belongs to an organization.
+const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -1607,6 +1844,10 @@ const versionsLoading = computed(() => versionsV3Loading.value)
 
 // Load versions on demand (client-side only)
 function loadVersions() {
+	debug('loadVersions called', {
+		projectId: projectId.value,
+		alreadyEnabled: versionsEnabled.value,
+	})
 	versionsEnabled.value = true
 }
 
@@ -1642,8 +1883,10 @@ async function updateProjectRoute() {
 
 async function invalidateProject() {
 	await queryClient.invalidateQueries({ queryKey: ['project', 'v2', routeProjectId.value] })
+	await queryClient.invalidateQueries({ queryKey: ['project', 'v3', routeProjectId.value] })
 	if (routeProjectId.value !== projectId.value) {
 		await queryClient.invalidateQueries({ queryKey: ['project', 'v2', projectId.value] })
+		await queryClient.invalidateQueries({ queryKey: ['project', 'v3', projectId.value] })
 	}
 	// Prefix match — invalidates members, versions, dependencies, organization
 	await queryClient.invalidateQueries({ queryKey: ['project', projectId.value] })
@@ -1652,10 +1895,7 @@ async function invalidateProject() {
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: data,
-		})
+		await client.labrinth.projects_v2.edit(projectId, data)
 		return data
 	},
 
@@ -1689,7 +1929,6 @@ const patchProjectMutation = useMutation({
 			text: err.data ? err.data.description : err.message,
 			type: 'error',
 		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
 	onSettled: async () => {
@@ -1700,10 +1939,7 @@ const patchProjectMutation = useMutation({
 // Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
 	mutationFn: async ({ projectId, status }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: { status },
-		})
+		await client.labrinth.projects_v2.edit(projectId, { status })
 	},
 
 	onMutate: async ({ projectId, status }) => {
@@ -1742,16 +1978,62 @@ const patchStatusMutation = useMutation({
 	},
 })
 
+// Mutation for patching V3 project data
+const patchProjectV3Mutation = useMutation({
+	mutationFn: async ({ projectId, data }) => {
+		await client.labrinth.projects_v3.edit(projectId, data)
+		return data
+	},
+
+	onMutate: async ({ projectId, data }) => {
+		await queryClient.cancelQueries({ queryKey: ['project', 'v3', projectId] })
+
+		const previousProject = queryClient.getQueryData(['project', 'v3', projectId])
+
+		queryClient.setQueryData(['project', 'v3', projectId], (old) => {
+			if (!old) return old
+			const merged = { ...old }
+			for (const [key, value] of Object.entries(data)) {
+				if (
+					value &&
+					typeof value === 'object' &&
+					!Array.isArray(value) &&
+					merged[key] &&
+					typeof merged[key] === 'object' &&
+					!Array.isArray(merged[key])
+				) {
+					merged[key] = { ...merged[key], ...value }
+				} else {
+					merged[key] = value
+				}
+			}
+			return merged
+		})
+
+		return { previousProject, projectId }
+	},
+
+	onError: (err, _variables, context) => {
+		if (context?.previousProject) {
+			queryClient.setQueryData(['project', 'v3', context.projectId], context.previousProject)
+		}
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err.message,
+			type: 'error',
+		})
+	},
+
+	onSettled: async () => {
+		await invalidateProject()
+	},
+})
+
 // Mutation for patching project icon
 const patchIconMutation = useMutation({
 	mutationFn: async ({ projectId, icon }) => {
-		await useBaseFetch(
-			`project/${projectId}/icon?ext=${icon.type.split('/')[icon.type.split('/').length - 1]}`,
-			{
-				method: 'PATCH',
-				body: icon,
-			},
-		)
+		const ext = icon.type.split('/')[icon.type.split('/').length - 1]
+		await client.labrinth.projects_v3.changeIcon(projectId, icon, ext)
 	},
 
 	onSuccess: () => {
@@ -1768,7 +2050,6 @@ const patchIconMutation = useMutation({
 			text: err.data ? err.data.description : err.message,
 			type: 'error',
 		})
-		window.scrollTo({ top: 0, behavior: 'smooth' })
 	},
 
 	onSettled: async () => {
@@ -1778,23 +2059,13 @@ const patchIconMutation = useMutation({
 
 const createGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, file, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?ext=${
-			file.type.split('/')[file.type.split('/').length - 1]
-		}&featured=${featured ?? false}`
-
-		if (title) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'POST',
-			body: file,
+		const ext = file.type.split('/')[file.type.split('/').length - 1]
+		await client.labrinth.projects_v2.createGalleryImage(projectId, file, {
+			ext,
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -1841,20 +2112,11 @@ const createGalleryItemMutation = useMutation({
 
 const editGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
-
-		if (title) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'PATCH',
+		await client.labrinth.projects_v2.editGalleryImage(projectId, imageUrl, {
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -1903,9 +2165,7 @@ const editGalleryItemMutation = useMutation({
 
 const deleteGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl }) => {
-		await useBaseFetch(`project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}`, {
-			method: 'DELETE',
-		})
+		await client.labrinth.projects_v2.deleteGalleryImage(projectId, imageUrl)
 	},
 
 	onMutate: async ({ imageUrl }) => {
@@ -2070,14 +2330,34 @@ if (project.value && loader !== undefined && project.value.loaders.includes(load
 	userSelectedPlatform.value = loader
 }
 
+if (route.hash === '#download' || version !== undefined || loader !== undefined) {
+	debug('eager loadVersions from setup', { hash: route.hash, version, loader })
+	loadVersions()
+}
+
 watch(downloadModal, (modal) => {
 	if (!modal) return
 
 	// route.hash returns everything in the hash string, including the # itself
 	if (route.hash === '#download') {
+		debug('hash #download watch fired, opening modal')
+		loadVersions()
 		modal.show()
 	}
 })
+
+watch(
+	[versionsV3, _versionsV3Error],
+	([data, error]) => {
+		debug('versionsV3 query changed', {
+			hasData: !!data,
+			count: data?.length ?? 0,
+			error: error?.message ?? null,
+			projectId: projectId.value,
+		})
+	},
+	{ immediate: true },
+)
 
 async function setProcessing() {
 	// Guard against multiple submissions while mutation is pending
@@ -2105,7 +2385,30 @@ async function patchProject(resData, quiet = false) {
 							text: formatMessage(messages.projectUpdatedMessage),
 							type: 'success',
 						})
-						window.scrollTo({ top: 0, behavior: 'smooth' })
+					}
+					resolve(true)
+				},
+				onError: () => resolve(false),
+				onSettled: () => stopLoading(),
+			},
+		)
+	})
+}
+
+async function patchProjectV3(resData, quiet = false) {
+	startLoading()
+
+	return new Promise((resolve) => {
+		patchProjectV3Mutation.mutate(
+			{ projectId: project.value.id, data: resData },
+			{
+				onSuccess: async () => {
+					if (!quiet) {
+						addNotification({
+							title: formatMessage(messages.projectUpdated),
+							text: formatMessage(messages.projectUpdatedMessage),
+							type: 'success',
+						})
 					}
 					resolve(true)
 				},
@@ -2227,9 +2530,7 @@ async function deleteVersion(id) {
 
 	startLoading()
 
-	await useBaseFetch(`version/${id}`, {
-		method: 'DELETE',
-	})
+	await client.labrinth.versions_v3.deleteVersion(id)
 
 	await invalidateProject()
 
@@ -2237,7 +2538,13 @@ async function deleteVersion(id) {
 }
 
 const navLinks = computed(() => {
-	const projectUrl = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`
+	const routeType = route.params.type || project.value.project_type
+	const projectUrl = `/${routeType}/${project.value.slug ? project.value.slug : project.value.id}`
+
+	const galleryCount =
+		routeType === 'server'
+			? project.value.gallery.filter((item) => item.name === '__mc_server_banner__').length
+			: project.value.gallery.length
 
 	return [
 		{
@@ -2247,18 +2554,24 @@ const navLinks = computed(() => {
 		{
 			label: formatMessage(messages.galleryTab),
 			href: `${projectUrl}/gallery`,
-			shown: project.value.gallery.length > 0 || !!currentMember.value,
+			shown: galleryCount > 0 || !!currentMember.value,
 		},
 		{
 			label: formatMessage(messages.changelogTab),
 			href: `${projectUrl}/changelog`,
-			shown: hasVersions.value,
+			shown:
+				hasVersions.value &&
+				projectV3Loaded.value &&
+				projectV3.value?.minecraft_server === undefined,
 			onHover: loadVersions,
 		},
 		{
 			label: formatMessage(messages.versionsTab),
 			href: `${projectUrl}/versions`,
-			shown: hasVersions.value || !!currentMember.value,
+			shown:
+				(hasVersions.value || !!currentMember.value) &&
+				projectV3Loaded.value &&
+				projectV3.value?.minecraft_server === undefined,
 			subpages: [`${projectUrl}/version/`],
 			onHover: loadVersions,
 		},
@@ -2293,6 +2606,7 @@ provideProjectPageContext({
 
 	// Mutation functions
 	patchProject,
+	patchProjectV3,
 	patchIcon,
 	setProcessing,
 
@@ -2465,9 +2779,16 @@ provideProjectPageContext({
 	right: 1rem;
 	overflow-y: auto;
 	z-index: 50;
+	transition: bottom 0.25s ease-in-out;
 
 	> div {
 		box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 	}
+}
+</style>
+
+<style lang="scss">
+body.floating-action-bar-shown .moderation-checklist {
+	bottom: 6rem;
 }
 </style>

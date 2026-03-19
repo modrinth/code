@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat mencapai pelayan pengesahan"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "Kandungan yang diperlukan"
+  },
   "app.modal.install-to-play.header": {
     "message": "Pasang untuk mainkan"
   },
@@ -14,11 +17,11 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {# mod}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "Pelayan ini memerlukan mod untuk dimainkan. Klik pasang untuk menyediakan fail yang diperlukan daripada Modrinth."
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Pek mod yang diperlukan"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} berkongsi pemasangan ini dengan anda hari ini."
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Pelayan ini memerlukan mod untuk dimainkan. Klik Pasang untuk menyediakan fail yang diperlukan daripada Modrinth, kemudian lancarkan permainan terus ke dalam pelayan."
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "Pemasangan yang dikongsi"
@@ -26,35 +29,17 @@
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Pemasangan pelayan yang dikongsi"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} ditambah"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "Ditambah"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "Dialih keluar"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "Dikemas kini"
+  "app.modal.install-to-play.view-contents": {
+    "message": "Lihat kandungan"
   },
   "app.modal.update-to-play.header": {
     "message": "Kemas kini untuk mainkan"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} dialih keluar"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Kemas kini diperlukan"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "Kemas kini diperlukan untuk memainkan {name}. Sila kemas kini kepada versi terkini untuk melancarkan permainan."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} dikemas kini"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mod pembangun didayakan."
@@ -83,38 +68,32 @@
   "app.settings.tabs.resource-management": {
     "message": "Pengurusan sumber"
   },
-  "app.update-toast.body": {
+  "app.update-popup.body": {
     "message": "Modrinth App v{version} sudah bersedia untuk dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version} sudah selesai dipasang! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} sudah selesai dimuat turun! Muat semula untuk kemas kini sekarang, atau kemas kini secara automatik apabila anda menutup Modrinth App."
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} tersedia. Gunakan pengurus pakej anda untuk mengemas kini dan mendapatkan ciri-ciri dan pembetulan terkini!"
   },
-  "app.update-toast.body.metered": {
+  "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} kini tersedia! Memandangkan anda sedang menggunakan rangkaian bermeter, kami tidak memuat turunnya secara automatik."
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "Log perubahan"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "Muat turun ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "Muat turun"
+  "app.update-popup.download-complete": {
+    "message": "Muat turun selesai"
   },
-  "app.update-toast.downloading": {
-    "message": "Sedang memuat turun..."
-  },
-  "app.update-toast.reload": {
+  "app.update-popup.reload": {
     "message": "Muat semula"
   },
-  "app.update-toast.title": {
+  "app.update-popup.title": {
     "message": "Kemas kini tersedia"
-  },
-  "app.update-toast.title.download-complete": {
-    "message": "Muat turun selesai"
   },
   "app.update.complete-toast.text": {
     "message": "Klik di sini untuk melihat log perubahan."
@@ -230,12 +209,6 @@
   "instance.edit-world.title": {
     "message": "Sunting dunia"
   },
-  "instance.filter.disabled": {
-    "message": "Projek yang dinyahdayakan"
-  },
-  "instance.filter.updates-available": {
-    "message": "Kemas kini tersedia"
-  },
   "instance.server-modal.address": {
     "message": "Alamat"
   },
@@ -344,140 +317,8 @@
   "instance.settings.tabs.installation": {
     "message": "Pemasangan"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} untuk Minecraft {game_version} sudah pun dipasang"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "{game_version} vanila sudah pun dipasang"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Tukar versi"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Pasang"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Sedang memasang"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Sedang mengambil versi pek mod"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Sedang memasang versi baharu"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Dipasang pada masa ini"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Maklumat nyahpepijat:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Sedang mengambil maklumat pek mod"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Versi permainan"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Pasang"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Pemasangan sedang dijalankan"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Tidak dapat mengambil butiran pek mod yang terpaut. Sila semak sambungan internet anda."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} tidak tersedia untuk Minecraft {version}. Cuba pemuat mod yang lain."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Pemasangan ini dipautkan kepada sebuah pek mod, tetapi pek mod tersebut tidak dapat dijumpai pada Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Pasang semula pek mod"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Sedang memasang semula pek mod"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Pemasangan semula akan menetapkan semula semua kandungan yang dipasang atau diubah suai kepada apa yang disediakan oleh pek mod, mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan di atas pemasangan asal. Ini mungkin dapat membetulkan tingkah laku yang tidak dijangka jika perubahan telah dibuat pada pemasangan, tetapi jika dunia anda kini bergantung pada kandungan tambahan yang dipasang, ia mungkin akan merosakkan dunia sedia ada."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Adakah anda pasti mahu memasang semula pemasangan ini?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Menetapkan semula kandungan pemasangan kepada keadaan asalnya, mengalih keluar sebarang mod atau kandungan yang telah anda tambahkan di atas pek mod asal."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Pasang semula pek mod"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Perbaiki"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Sedang memperbaiki"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Pembaikan ini akan memasang semula kebergantungan Minecraft dan memeriksa kerosakan. Ini mungkin dapat menyelesaikan isu jika permainan anda tidak dilancarkan kerana ralat berkaitan pelancar, tetapi tidak akan menyelesaikan isu atau ranap yang berkaitan dengan mod yang dipasang."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Perbaiki pemasangan?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Pembaikan sedang dijalankan"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Tetap semula kepada semasa"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Tunjukkan semua versi"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "mengubah versi"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "memasang"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "memasang semula"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "memperbaiki"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Tidak boleh {action} semasa memasang"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Tidak boleh {action} semasa berada di luar talian"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Tidak boleh {action} semasa memperbaiki"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(versi tidak diketahui)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Nyahpautkan pemasangan"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Jika anda meneruskan, anda tidak akan dapat memautkannya semula tanpa membuat pemasangan yang baharu sepenuhnya. Anda tidak akan menerima kemas kini pek mod lagi dan ia akan menjadi pemasangan biasa."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Adakah anda pasti mahu menyahpautkan pemasangan ini?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Pemasangan ini dipautkan kepada pek mod, yang bermaksud mod tidak boleh dikemas kini dan anda tidak boleh menukar pemuat mod atau versi Minecraft. Menyahpaut pemasangan ini akan memutuskan sambungan pemasangan ini secara kekal daripada pek mod."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Nyahpaut daripada pek mod"
   },
   "instance.settings.tabs.java": {
     "message": "Java dan ingatan"
@@ -551,6 +392,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Pelayan tidak serasi"
   },
+  "instance.worlds.linked_server": {
+    "message": "Diurus oleh projek pelayan"
+  },
   "instance.worlds.no_contact": {
     "message": "Pelayan tidak dapat dihubungi"
   },
@@ -586,5 +430,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Selaraskan dengan pemasangan"
+  },
+  "search.filter.locked.server": {
+    "message": "Disediakan oleh pelayan"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Hanya mod bahagian pelanggan sahaja yang boleh ditambah pada pemasangan pelayan"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versi permainan adalah disediakan oleh pelayan"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Pemuat adalah disediakan oleh pelayan"
   }
 }

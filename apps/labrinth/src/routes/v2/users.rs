@@ -251,6 +251,7 @@ pub async fn user_delete(
     // Returns NoContent, so we don't need to convert to V2
     v3::users::user_delete(req, info, pool, redis, session_queue)
         .await
+        .map(|()| HttpResponse::NoContent().body(""))
         .or_else(v2_reroute::flatten_404_error)
 }
 

@@ -12,7 +12,7 @@
     "defaultMessage": "Заголовок партнерського посилання"
   },
   "affiliate.create.title.placeholder": {
-    "defaultMessage": "напр., YouTube"
+    "defaultMessage": "як-от YouTube"
   },
   "affiliate.create.user.description": {
     "defaultMessage": "Ім’я користувача особи, для якої створити код партнера"
@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Скасувати"
   },
+  "button.change-version": {
+    "defaultMessage": "Змінити версію"
+  },
   "button.clear": {
     "defaultMessage": "Очистити"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Відстежувати"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Приховати знімки"
+  },
   "button.max": {
     "defaultMessage": "Максимум"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "Оновити"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Перевстановити збірку"
+  },
   "button.remove": {
     "defaultMessage": "Видалити"
   },
   "button.remove-image": {
-    "defaultMessage": "Вилучити зображення"
+    "defaultMessage": "Видалити зображення"
+  },
+  "button.repair": {
+    "defaultMessage": "Полагодити"
+  },
+  "button.repairing": {
+    "defaultMessage": "Лагодження…"
   },
   "button.report": {
     "defaultMessage": "Поскаржитися"
   },
   "button.reset": {
     "defaultMessage": "Скинути"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Скинути сервер"
   },
   "button.retry": {
     "defaultMessage": "Повторити"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Збереження"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Показати всі версії"
+  },
   "button.sign-in": {
     "defaultMessage": "Увійти"
   },
@@ -143,14 +164,20 @@
   "button.stop": {
     "defaultMessage": "Зупинити"
   },
+  "button.switch-version": {
+    "defaultMessage": "Змінити версію"
+  },
   "button.unfollow": {
     "defaultMessage": "Не слідкувати"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Відв’язати збірку"
   },
   "button.update": {
     "defaultMessage": "Оновити"
   },
   "button.upload-image": {
-    "defaultMessage": "Завантажити фото"
+    "defaultMessage": "Завантажити зображення"
   },
   "changelog.justNow": {
     "defaultMessage": "Щойно"
@@ -169,6 +196,69 @@
   },
   "collections.label.private": {
     "defaultMessage": "Приватно"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Ви впевнені, що хочете оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}} до їхньої останньої сумісної версії? Рекомендується оновлювати вміст по одному."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Попередження щодо оновлення"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Оновлення проєктів"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Видалення моду може назавжди вплинути на ваш світ й спричинити втрату вмісту або несподівані проблеми при його повторному завантаженні."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Попередження щодо видалення"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Видалити {count} {itemType}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Видалення {itemType}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Усі моди та вміст, який ви додали до збірки, буде видалено."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Попередження щодо {action, select, downgrade {відкату оновлень} other {оновлень}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Відкотити} other {Оновити}} збірку"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Відкочення} other {Оновлення}} збірки"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Моди та вміст будуть об’єднані з тим, що ви додали до збірки самостійно, й перестануть отримувати оновлення."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Відв’язання збірки"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Відв’язання збірки"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Відв’язати"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "Додано {count}"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Додано (залежності)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Видалено"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Оновлено"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "Видалено {count}"
   },
   "form.label.address-line": {
     "defaultMessage": "Рядок адреси"
@@ -254,11 +344,35 @@
   "header.category.feature": {
     "defaultMessage": "Особливість"
   },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Спільнота"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Особливості"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Ігровий процес"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Властивості"
+  },
   "header.category.performance-impact": {
     "defaultMessage": "Вплив на продуктивність"
   },
   "header.category.resolutions": {
     "defaultMessage": "Роздільність"
+  },
+  "hosting.content.failed-to-bulk-delete": {
+    "defaultMessage": "Не вдалося видалити вміст"
+  },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Не вдалося вимкнути вміст"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Не вдалося ввімкнути вміст"
+  },
+  "hosting.content.failed-to-bulk-update": {
+    "defaultMessage": "Не вдалося оновити вміст"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
@@ -314,17 +428,38 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Невідомий режим"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Відв’язати збірку"
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Назад"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Копіювати посилання"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Збірка не включає додатковий уміст."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Умісту не знайдено"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Усі"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Уміст збірки"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Завантаження вмісту…"
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "За вашим запитом не знайдено жодного проєкту."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Пошук {count, number} {count, plural, one {проєкту} other {проєктів}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Поточна"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Несумісна"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Відкотити до {version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Оновити версію"
@@ -339,22 +474,13 @@
     "defaultMessage": "Версій не знайдено"
   },
   "instances.updater-modal.search-placeholder": {
-    "defaultMessage": "Пошук версій…"
+    "defaultMessage": "Пошук версії…"
   },
   "instances.updater-modal.select-version": {
     "defaultMessage": "Виберіть версію, щоб переглянути її журнал змін"
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Показати несумісні"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Оновити до {version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Ми не можемо гарантувати безпеку оновлень для вашого профілю. Перегляньте журнал змін для всіх проміжних версій і розгляньте можливість створення резервної копії."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Ми не можемо гарантувати безпеку оновлень для ваших світів. Перегляньте журнал змін для всіх проміжних версій і розгляньте можливість створення резервної копії."
   },
   "label.actions": {
     "defaultMessage": "Дії"
@@ -407,6 +533,9 @@
   "label.followed-projects": {
     "defaultMessage": "Відстежуванні проєкти"
   },
+  "label.installing": {
+    "defaultMessage": "Установлення…"
+  },
   "label.loading": {
     "defaultMessage": "Завантаження…"
   },
@@ -429,7 +558,7 @@
     "defaultMessage": "Пароль"
   },
   "label.played": {
-    "defaultMessage": "Зіграно {time}"
+    "defaultMessage": "Зіграно {ago}"
   },
   "label.project": {
     "defaultMessage": "Проєкт"
@@ -494,11 +623,131 @@
   "label.yes": {
     "defaultMessage": "Так"
   },
+  "locale.cs-CZ": {
+    "defaultMessage": "Чеська"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Данська"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Німецька (Швейцарія)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Німецька (Німеччина)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Англійська (США)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Іспанська (Латинська Америка)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Іспанська (Іспанія)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Фінська"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Філіппінська"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Французька"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Іврит"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Угорська"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Індонезійська"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Італійська (Італія)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Японська"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Корейська"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Малайська"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Нідерландська"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Норвезька (букмол)"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Польська"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Португальська (Бразилія)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Португальська (Португалія)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Румунська"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "російська"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Сербська (латиниця)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Шведська"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Тайська"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Турецька"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Українська"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Вʼєтнамська"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Китайська (спрощена)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Китайська (традиційна)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Додати спосіб оплати"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Додавання способу оплати"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Автоматично встановлюється потрібний уміст"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Запуск гри з підключенням до сервера"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Зберігання файлів оновленими, попри зміни сервера"
+  },
+  "modal.open-in-app.close": {
+    "defaultMessage": "Закрити"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Отримати Modrinth App"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App відкриється автоматично…"
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Відкриття Modrinth App"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Навіщо використовувати Modrinth App"
   },
   "notification.error.title": {
     "defaultMessage": "Виникла помилка"
@@ -549,7 +798,7 @@
     "defaultMessage": "Повернено"
   },
   "omorphia.component.badge.label.safe": {
-    "defaultMessage": "Успіх"
+    "defaultMessage": "Пройдено"
   },
   "omorphia.component.badge.label.scheduled": {
     "defaultMessage": "Заплановано"
@@ -573,7 +822,7 @@
     "defaultMessage": "Клієнт"
   },
   "omorphia.component.environment-indicator.label.client-and-server": {
-    "defaultMessage": "Клієнт і сервер"
+    "defaultMessage": "Клієнт та сервер"
   },
   "omorphia.component.environment-indicator.label.client-or-server": {
     "defaultMessage": "Клієнт чи сервер"
@@ -649,6 +898,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Опубліковано {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Оновлено {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Клієнт"
@@ -810,10 +1065,16 @@
     "defaultMessage": "Підтримати на PayPal"
   },
   "project.about.links.issues": {
-    "defaultMessage": "Сповістити про проблеми"
+    "defaultMessage": "Звітувати проблеми"
+  },
+  "project.about.links.site": {
+    "defaultMessage": "Відвідати вебсайт"
   },
   "project.about.links.source": {
     "defaultMessage": "Вихідний код"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Відвідати крамницю"
   },
   "project.about.links.title": {
     "defaultMessage": "Посилання"
@@ -821,17 +1082,29 @@
   "project.about.links.wiki": {
     "defaultMessage": "Відвідати вікі"
   },
+  "project.about.server.copied": {
+    "defaultMessage": "Скопійовано!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "IP-адресу скопійовано до буфера обміну"
+  },
+  "project.about.server.latency": {
+    "defaultMessage": "Затримка"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Подробиці сервера"
+  },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {завантаження} few {завантаження} other {завантажень}}"
+    "defaultMessage": "{count, number} {count, plural, one {завантаження} few {завантаження} other {завантажень}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Має певну функціональність як на клієнті, так і на сервері, навіть якщо лише частково."
+    "defaultMessage": "Необхідно й на клієнті й на сервері."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Сервер та клієнт, потрібно обидва"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Має трохи функціоналу на клієнті та сервері, навіть якщо лише частково."
+    "defaultMessage": "Більшість функцій працює на стороні клієнта, але встановлення на сервер покращує функціональність."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Сервер та клієнт, необов’язково на сервері"
@@ -843,7 +1116,7 @@
     "defaultMessage": "Лише клієнтська сторона"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Має трохи функціоналу на клієнті та сервері, навіть якщо лише частково."
+    "defaultMessage": "Має деякі функції як на клієнті, так і на сервері, навіть якщо вони неповні. Установлення його на обох сторонах забезпечує найкращий досвід використання."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Сервер та клієнт, краще коли встановлено на обидва"
@@ -855,19 +1128,19 @@
     "defaultMessage": "Сервер та клієнт, обидва необов’язкові"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Уся функціональність виконана на клієнтському боці, та сумісна зі стандартними серверами."
+    "defaultMessage": "Уся функціональність знаходиться на стороні сервера та сумісна із ванільними клієнтами. Працює лише на виділених серверах."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Лише серверна сторона"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Має певну функціональність як на клієнті, так і на сервері, навіть якщо лише частково."
+    "defaultMessage": "Більшість функцій працює на стороні сервера, але встановлення на сторону клієнта покращує функціональність."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Сервер та клієнт, необов’язково на клієнті"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Уся функціональність знаходиться на стороні сервера та сумісна зі стандартними серверами."
+    "defaultMessage": "Уся функціональність знаходиться на стороні сервера та сумісна із ванільними клієнтами. Також працює лише на внутрішніх серверах у грі наодинці."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Лише серверний, також для гри наодинці"
@@ -891,10 +1164,28 @@
     "defaultMessage": "Невідоме середовище"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {відстежує} other {відстежують}}"
+    "defaultMessage": "{count, number} {count, plural, one {відстужує} few {відстужують} many {відстужують} other {відстужують}}"
+  },
+  "project.online-player-count": {
+    "defaultMessage": "{count, number} у мережі"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {гравець} few {гравці} many {гравців} other {гравців}} у мережі"
+  },
+  "project.recent-plays": {
+    "defaultMessage": "{count} {countPlural, plural, one {нещодавно грав} few {нещодавно грали} many {нещодавно грали} other {нещодавно грали}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {нещодавно грав} other {нещодавно грали}} з Modrinth за останні 2 тижні"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} мс"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Аналітика"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Уміст"
   },
   "project.settings.description.title": {
     "defaultMessage": "Опис"
@@ -1004,6 +1295,9 @@
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Немає дозволу"
   },
+  "project.settings.server.title": {
+    "defaultMessage": "Сервер"
+  },
   "project.settings.tags.title": {
     "defaultMessage": "Теґи"
   },
@@ -1089,7 +1383,7 @@
     "defaultMessage": "Середовище"
   },
   "search.filter_type.environment.client": {
-    "defaultMessage": "Для клієнта"
+    "defaultMessage": "Клієнт"
   },
   "search.filter_type.environment.server": {
     "defaultMessage": "Для сервера"
@@ -1130,9 +1424,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Розклад резервного копіювання"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Створення резервної копії…"
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Не вдалося створити резервну копію"
   },
@@ -1142,20 +1433,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ручне резервне копіювання"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Резервне копіювання в черзі"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Відновлення в черзі"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Перейменувати"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Відновлення"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Відновлення з резервної копії…"
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Відхилити"
@@ -1290,7 +1572,7 @@
     "defaultMessage": "Ретро"
   },
   "settings.display.theme.system": {
-    "defaultMessage": "Синхронізувати з системою"
+    "defaultMessage": "Системна"
   },
   "settings.display.theme.title": {
     "defaultMessage": "Колірна тема"
@@ -1326,7 +1608,7 @@
     "defaultMessage": "Зміна мови {platform} може призвести до показу деякого вмісту англійською мовою, якщо переклад недоступний. Переклад {platform} ще не завершений, тому деякий уміст може залишатися англійською мовою для певних мов."
   },
   "settings.pats.title": {
-    "defaultMessage": "Персональний токен доступу"
+    "defaultMessage": "Особистий токен доступу"
   },
   "settings.profile.title": {
     "defaultMessage": "Публічний профіль"
@@ -1361,11 +1643,23 @@
   "tag.category.adventure": {
     "defaultMessage": "Пригоди"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Режим пригод"
+  },
+  "tag.category.anarchy": {
+    "defaultMessage": "Анархія"
+  },
   "tag.category.atmosphere": {
     "defaultMessage": "Атмосфера"
   },
   "tag.category.audio": {
     "defaultMessage": "Звуки"
+  },
+  "tag.category.battle-royale": {
+    "defaultMessage": "Королівська битва"
+  },
+  "tag.category.bedwars": {
+    "defaultMessage": "Бед-варс"
   },
   "tag.category.blocks": {
     "defaultMessage": "Блоки"
@@ -1373,11 +1667,17 @@
   "tag.category.bloom": {
     "defaultMessage": "Сяяння"
   },
+  "tag.category.bosses": {
+    "defaultMessage": "Боси"
+  },
   "tag.category.cartoon": {
     "defaultMessage": "Художні"
   },
   "tag.category.challenging": {
     "defaultMessage": "Зі складністю"
+  },
+  "tag.category.classes": {
+    "defaultMessage": "Класи"
   },
   "tag.category.colored-lighting": {
     "defaultMessage": "Кольорове світло"
@@ -1385,14 +1685,32 @@
   "tag.category.combat": {
     "defaultMessage": "Бої"
   },
+  "tag.category.competitive": {
+    "defaultMessage": "Змагання"
+  },
   "tag.category.core-shaders": {
     "defaultMessage": "Базові шейдери"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Режим творчости"
+  },
+  "tag.category.creator-community": {
+    "defaultMessage": "Спільнота творців"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Міжплатформова гра"
   },
   "tag.category.cursed": {
     "defaultMessage": "Дивне"
   },
+  "tag.category.custom-content": {
+    "defaultMessage": "Власний уміст"
+  },
   "tag.category.decoration": {
     "defaultMessage": "Оздоблення"
+  },
+  "tag.category.dungeons": {
+    "defaultMessage": "Підземелля"
   },
   "tag.category.economy": {
     "defaultMessage": "Економіка"
@@ -1405,6 +1723,9 @@
   },
   "tag.category.equipment": {
     "defaultMessage": "Спорядження"
+  },
+  "tag.category.factions": {
+    "defaultMessage": "Фракції"
   },
   "tag.category.fantasy": {
     "defaultMessage": "Фентезі"
@@ -1421,8 +1742,14 @@
   "tag.category.game-mechanics": {
     "defaultMessage": "Ігрові механіки"
   },
+  "tag.category.gens": {
+    "defaultMessage": "Гени"
+  },
   "tag.category.gui": {
     "defaultMessage": "Інтерфейс"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Режим гардкору"
   },
   "tag.category.high": {
     "defaultMessage": "Високий"
@@ -1430,11 +1757,20 @@
   "tag.category.items": {
     "defaultMessage": "Предмети"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Збереження інвентарю"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Усе підряд"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Комплект PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Бібліотека"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Крадіжка життя"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Легка"
@@ -1451,11 +1787,23 @@
   "tag.category.management": {
     "defaultMessage": "Управління"
   },
+  "tag.category.media": {
+    "defaultMessage": "Медіа"
+  },
   "tag.category.medium": {
     "defaultMessage": "Середній"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Мікроігри"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Мінігра"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Мініігри"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "ММО"
   },
   "tag.category.mobs": {
     "defaultMessage": "Моби"
@@ -1469,8 +1817,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Гри в мережі"
   },
+  "tag.category.network": {
+    "defaultMessage": "Мережа"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Поза мережею"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "One Block"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Оптимізація"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Паркур"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Трасування шляхів"
@@ -1478,17 +1841,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Особисті світи"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Ділянки"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Покемон"
+  },
   "tag.category.potato": {
     "defaultMessage": "Картопля"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "В'язниця"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Проходження"
   },
   "tag.category.quests": {
     "defaultMessage": "Завдання"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Перегони"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Реалізм"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Запис SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Відбиття"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Рольова гра"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Для знімка екрана"
@@ -1502,17 +1898,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Простий"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Взаємодія"
   },
   "tag.category.storage": {
     "defaultMessage": "Сховище"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Режим виживання"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Команди"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Технічний"
+  },
   "tag.category.technology": {
     "defaultMessage": "Технології"
   },
   "tag.category.themed": {
     "defaultMessage": "Тематичне"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Міста"
   },
   "tag.category.transportation": {
     "defaultMessage": "Пересування"
@@ -1525,6 +1939,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Як стандартна гра"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Білий список"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Скидання світу"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Генерація світу"
@@ -1618,9 +2038,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long}, {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "У вас є незбережені зміни."

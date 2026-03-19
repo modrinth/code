@@ -19,6 +19,7 @@ type BaseOption = {
 	toggle_group?: string
 	icon?: string | Component
 	query_value?: string
+	group?: string
 }
 
 export type FilterOption = BaseOption &
@@ -65,7 +66,15 @@ export interface GameVersion {
 	major: boolean
 }
 
-export type ProjectType = 'mod' | 'modpack' | 'resourcepack' | 'shader' | 'datapack' | 'plugin'
+export type ProjectType =
+	| 'mod'
+	| 'modpack'
+	| 'resourcepack'
+	| 'shader'
+	| 'datapack'
+	| 'plugin'
+	| 'server'
+	| 'project'
 
 const ALL_PROJECT_TYPES: ProjectType[] = [
 	'mod',
@@ -74,6 +83,7 @@ const ALL_PROJECT_TYPES: ProjectType[] = [
 	'shader',
 	'datapack',
 	'plugin',
+	'server',
 ]
 
 export interface Tags {
@@ -217,7 +227,7 @@ export function useSearch(
 				options: tags.value.gameVersions.map((gameVersion) => ({
 					id: gameVersion.version,
 					toggle_group: gameVersion.version_type !== 'release' ? 'all_versions' : undefined,
-					value: `versions:${gameVersion.version}`,
+					value: `game_versions:${gameVersion.version}`,
 					query_value: gameVersion.version,
 					method: 'or',
 				})),
@@ -415,7 +425,7 @@ export function useSearch(
 			.sort((a, b) => (b.ordering ?? 0) - (a.ordering ?? 0))
 	})
 
-	const facets = computed(() => {
+	const newFilters = computed(() => {
 		const validProvidedFilters = providedFilters.value.filter(
 			(providedFilter) => !overriddenProvidedFilterTypes.value.includes(providedFilter.type),
 		)
@@ -425,8 +435,10 @@ export function useSearch(
 		)
 		const filterValues = [...filteredFilters, ...validProvidedFilters]
 
-		const andFacets: string[][] = []
-		const orFacets: Record<string, string[]> = {}
+		const parts: string[] = []
+		const orGroups: Record<string, string[]> = {}
+		const negativeByType: Record<string, string[]> = {}
+
 		for (const filterValue of filterValues) {
 			const type = filters.value.find((type) => type.id === filterValue.type)
 			if (!type) {
@@ -448,41 +460,69 @@ export function useSearch(
 			}
 
 			if (option.method === 'or' || option.method === 'and') {
+				const [field, val] = option.value.split(':')
+				if (!field || !val) continue
+
 				if (filterValue.negative) {
-					andFacets.push([option.value.replace(':', '!=')])
-				} else {
-					if (option.method === 'or') {
-						if (!orFacets[type.id]) {
-							orFacets[type.id] = []
-						}
-						orFacets[type.id].push(option.value)
-					} else if (option.method === 'and') {
-						andFacets.push([option.value])
+					if (!negativeByType[field]) {
+						negativeByType[field] = []
 					}
+					negativeByType[field].push(val)
+				} else if (option.method === 'or') {
+					if (!orGroups[field]) {
+						orGroups[field] = []
+					}
+					orGroups[field].push(val)
+				} else {
+					parts.push(`${field} = "${val}"`)
 				}
 			}
 		}
 
-		Object.values(orFacets).forEach((facets) => andFacets.push(facets))
+		for (const [field, values] of Object.entries(orGroups)) {
+			if (values.length === 1) {
+				parts.push(`${field} = "${values[0]}"`)
+			} else {
+				const quoted = values.map((v) => `"${v}"`).join(', ')
+				parts.push(`${field} IN [${quoted}]`)
+			}
+		}
 
-		/*
-       Add environment facets, separate from the rest because it oddly depends on the combination
-       of filters selected to determine which facets to add.
-     */
-		const client = currentFilters.value.some(
+		for (const [field, values] of Object.entries(negativeByType)) {
+			const quoted = values.map((v) => `"${v}"`).join(', ')
+			parts.push(`${field} NOT IN [${quoted}]`)
+		}
+
+		// Environment facets
+		const client = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'client',
 		)
-		const server = currentFilters.value.some(
+		const server = filterValues.some(
 			(filter) => filter.type === 'environment' && filter.option === 'server',
 		)
-		andFacets.push(...createEnvironmentFacets(client, server))
-
-		const projectType = projectTypes.value.map((projectType) => `project_type:${projectType}`)
-		if (andFacets.length > 0) {
-			return [projectType, ...andFacets]
-		} else {
-			return [projectType]
+		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
+			if (envGroup.length === 1) {
+				const [field, val] = envGroup[0].split(':')
+				parts.push(`${field} = "${val}"`)
+			} else if (envGroup.length > 1) {
+				const conditions = envGroup.map((f) => {
+					const [field, val] = f.split(':')
+					return `${field} = "${val}"`
+				})
+				parts.push(`(${conditions.join(' OR ')})`)
+			}
 		}
+
+		// Project types
+		const mappedProjectTypes = projectTypes.value.map(mapProjectTypeToSearch)
+		if (mappedProjectTypes.length === 1) {
+			parts.push(`project_types = "${mappedProjectTypes[0]}"`)
+		} else if (mappedProjectTypes.length > 1) {
+			const quoted = mappedProjectTypes.map((v) => `"${v}"`).join(', ')
+			parts.push(`project_types IN [${quoted}]`)
+		}
+
+		return parts.join(' AND ')
 	})
 
 	const requestParams: Ref<string> = computed(() => {
@@ -492,7 +532,9 @@ export function useSearch(
 			params.push(`query=${encodeURIComponent(query.value)}`)
 		}
 
-		params.push(`facets=${encodeURIComponent(JSON.stringify(facets.value))}`)
+		if (newFilters.value) {
+			params.push(`new_filters=${encodeURIComponent(newFilters.value)}`)
+		}
 
 		const offset = (currentPage.value - 1) * maxResults.value
 		if (currentPage.value !== 1) {
@@ -704,7 +746,7 @@ export function useSearch(
 		filters,
 
 		// Computed
-		facets,
+		newFilters,
 		requestParams,
 
 		// Functions
@@ -713,22 +755,30 @@ export function useSearch(
 	}
 }
 
-export function createEnvironmentFacets(client: boolean, server: boolean): string[][] {
-	const facets: string[][] = []
+const PROJECT_TYPE_SEARCH_MAP: Partial<Record<ProjectType, string>> = {
+	server: 'minecraft_java_server',
+}
+
+function mapProjectTypeToSearch(projectType: ProjectType): string {
+	return PROJECT_TYPE_SEARCH_MAP[projectType] ?? projectType
+}
+
+function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
+	const groups: string[][] = []
 	if (client && server) {
-		facets.push(['client_side:required'], ['server_side:required'])
+		groups.push(['client_side:required'], ['server_side:required'])
 	} else if (client) {
-		facets.push(
+		groups.push(
 			['client_side:optional', 'client_side:required'],
 			['server_side:optional', 'server_side:unsupported'],
 		)
 	} else if (server) {
-		facets.push(
+		groups.push(
 			['client_side:optional', 'client_side:unsupported'],
 			['server_side:optional', 'server_side:required'],
 		)
 	}
-	return facets
+	return groups
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {

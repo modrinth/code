@@ -1,3 +1,5 @@
+use crate::env::ENV;
+
 use super::models::DatabaseError;
 use ariadne::ids::base62_impl::{parse_base62, to_base62};
 use chrono::{TimeZone, Utc};
@@ -42,44 +44,26 @@ impl RedisPool {
     // testing pool uses a hashmap to mimic redis behaviour for very small data sizes (ie: tests)
     // PANICS: production pool will panic if redis url is not set
     pub fn new(meta_namespace: impl Into<Arc<str>>) -> Self {
-        let wait_timeout =
-            dotenvy::var("REDIS_WAIT_TIMEOUT_MS").ok().map_or_else(
-                || Duration::from_millis(15000),
-                |x| {
-                    Duration::from_millis(
-                        x.parse::<u64>().expect(
-                            "REDIS_WAIT_TIMEOUT_MS must be a valid u64",
-                        ),
-                    )
-                },
-            );
+        let wait_timeout = Duration::from_millis(ENV.REDIS_WAIT_TIMEOUT_MS);
 
-        let url = dotenvy::var("REDIS_URL").expect("Redis URL not set");
+        let url = &ENV.REDIS_URL;
         let pool = Config::from_url(url.clone())
             .builder()
             .expect("Error building Redis pool")
-            .max_size(
-                dotenvy::var("REDIS_MAX_CONNECTIONS")
-                    .ok()
-                    .and_then(|x| x.parse().ok())
-                    .unwrap_or(10000),
-            )
+            .max_size(ENV.REDIS_MAX_CONNECTIONS as usize)
             .wait_timeout(Some(wait_timeout))
             .runtime(Runtime::Tokio1)
             .build()
             .expect("Redis connection failed");
 
         let pool = RedisPool {
-            url,
+            url: url.clone(),
             pool,
             cache_list: Arc::new(DashMap::with_capacity(2048)),
             meta_namespace: meta_namespace.into(),
         };
 
-        let redis_min_connections = dotenvy::var("REDIS_MIN_CONNECTIONS")
-            .ok()
-            .and_then(|x| x.parse::<usize>().ok())
-            .unwrap_or(0);
+        let redis_min_connections = ENV.REDIS_MIN_CONNECTIONS;
         let spawn_min_connections = (0..redis_min_connections)
             .map(|_| {
                 let pool = pool.clone();

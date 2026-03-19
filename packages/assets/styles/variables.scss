@@ -2,6 +2,7 @@
 	--surface-1: #ebebeb;
 	--surface-1-5: #ededed;
 	--surface-2: #f5f5f5;
+	--surface-2-5: #eef1f5;
 	--surface-3: #f8f8f8;
 	--surface-4: #ffffff;
 	--surface-5: #dddddd;
@@ -226,6 +227,7 @@ html {
 	--surface-1: #16181c;
 	--surface-1-5: #1a1c20;
 	--surface-2: #1d1f23;
+	--surface-2-5: #222429;
 	--surface-3: #27292e;
 	--surface-4: #34363c;
 	--surface-5: #42444a;
@@ -320,7 +322,7 @@ html {
 
 	--color-button-bg: var(--surface-4);
 	--color-button-border: rgba(193, 190, 209, 0.12);
-	--color-scrollbar: var(--color-button-bg);
+	--color-scrollbar: var(--surface-5);
 
 	--color-divider: var(--color-button-bg);
 	--color-divider-dark: #646c75;
@@ -398,6 +400,7 @@ html {
 	--surface-1: #000000;
 	--surface-1-5: #050506;
 	--surface-2: #09090a;
+	--surface-2-5: #0c0d11;
 	--surface-3: #101013;
 	--surface-4: #1b1b20;
 	--surface-5: #25262b;
@@ -419,5 +422,6 @@ html {
 }
 
 .retro-mode {
+	--surface-2-5: #3a3c3e;
 	--brand-gradient-strong-bg: #3a3b38;
 }

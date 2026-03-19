@@ -15,14 +15,7 @@
 				</div>
 				<div>
 					<template v-if="session.city">{{ session.city }}, {{ session.country }} ⋅ </template>
-					<span
-						v-tooltip="
-							formatMessage(commonMessages.dateAtTimeTooltip, {
-								date: new Date(session.last_login),
-								time: new Date(session.last_login),
-							})
-						"
-					>
+					<span v-tooltip="formatDateTime(session.last_login)">
 						{{
 							formatMessage(messages.lastAccessedAgoLabel, {
 								ago: formatRelativeTime(session.last_login),
@@ -30,14 +23,7 @@
 						}}
 					</span>
 					⋅
-					<span
-						v-tooltip="
-							formatMessage(commonMessages.dateAtTimeTooltip, {
-								date: new Date(session.created),
-								time: new Date(session.created),
-							})
-						"
-					>
+					<span v-tooltip="formatDateTime(session.created)">
 						{{
 							formatMessage(messages.createdAgoLabel, {
 								ago: formatRelativeTime(session.created),
@@ -61,18 +47,27 @@ import {
 	commonMessages,
 	commonSettingsMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 definePageMeta({
 	middleware: 'auth',
 })
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const messages = defineMessages({
 	currentSessionLabel: {
@@ -110,18 +105,17 @@ useHead({
 	title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 })
 
-const { data: sessions, refresh } = await useAsyncData('session/list', () =>
-	useBaseFetch('session/list'),
-)
+const { data: sessions } = useQuery({
+	queryKey: ['session', 'list'],
+	queryFn: () => client.labrinth.sessions_v2.list(),
+})
 
 async function revokeSession(id) {
 	startLoading()
 	try {
 		sessions.value = sessions.value.filter((x) => x.id !== id)
-		await useBaseFetch(`session/${id}`, {
-			method: 'DELETE',
-		})
-		await refresh()
+		await client.labrinth.sessions_v2.delete(id)
+		await queryClient.invalidateQueries({ queryKey: ['session', 'list'] })
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),

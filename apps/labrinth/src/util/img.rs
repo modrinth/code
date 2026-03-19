@@ -1,6 +1,7 @@
 use crate::database::models::image_item;
 use crate::database::redis::RedisPool;
 use crate::database::{self, PgTransaction};
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
 use crate::models::images::ImageContext;
 use crate::routes::ApiError;
@@ -59,7 +60,7 @@ pub async fn upload_image_optimized(
             ))
         })?;
 
-    let cdn_url = dotenvy::var("CDN_URL")?;
+    let cdn_url = &ENV.CDN_URL;
 
     let hash = sha1::Sha1::digest(&bytes).encode_hex::<String>();
     let (processed_image, processed_image_ext) = process_image(
@@ -175,7 +176,7 @@ pub async fn delete_old_images(
     publicity: FileHostPublicity,
     file_host: &dyn FileHost,
 ) -> Result<(), ApiError> {
-    let cdn_url = dotenvy::var("CDN_URL")?;
+    let cdn_url = &ENV.CDN_URL;
     let cdn_url_start = format!("{cdn_url}/");
     if let Some(image_url) = image_url {
         let name = image_url.split(&cdn_url_start).nth(1);

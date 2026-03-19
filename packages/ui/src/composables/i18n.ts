@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { CompileError, MessageCompiler, MessageContext } from 'vue-i18n'
 
 import { injectI18n } from '../providers/i18n'
+import { injectI18nDebug } from './i18n-debug'
 
 export interface MessageDescriptor {
 	id: string
@@ -27,74 +28,190 @@ export function defineMessages<K extends string, T extends MessageDescriptorMap<
 export interface LocaleDefinition {
 	code: string
 	name: string
+	translatedName: MessageDescriptor
 	numeric?: Intl.RelativeTimeFormatNumeric
 	dir?: 'ltr' | 'rtl'
-	iso?: string
-	file?: string
+	serverLanguageCode?: string
 }
 
 export const LOCALES: LocaleDefinition[] = [
-	// { code: 'af-ZA', name: 'Afrikaans' },
-	// { code: 'ar-EG', name: 'العربية (مصر)', dir: 'rtl' },
-	// { code: 'ar-SA', name: 'العربية (السعودية)', dir: 'rtl' },
-	// { code: 'az-AZ', name: 'Azərbaycan' },
-	// { code: 'be-BY', name: 'Беларуская' },
-	// { code: 'bg-BG', name: 'Български' },
-	// { code: 'bn-BD', name: 'বাংলা' },
-	// { code: 'ca-ES', name: 'Català' },
-	// { code: 'ceb-PH', name: 'Cebuano' },
-	// { code: 'cs-CZ', name: 'Čeština' },
-	// { code: 'da-DK', name: 'Dansk' },
-	{ code: 'de-CH', name: 'Deutsch (Schweiz)' },
-	{ code: 'de-DE', name: 'Deutsch' },
-	// { code: 'el-GR', name: 'Ελληνικά' },
-	// { code: 'en-PT', name: 'Pirate English' },
-	// { code: 'en-UD', name: 'Upside Down' },
-	{ code: 'en-US', name: 'English (United States)' },
-	// { code: 'eo-UY', name: 'Esperanto' },
-	{ code: 'es-419', name: 'Español (Latinoamérica)' },
-	{ code: 'es-ES', name: 'Español (España)' },
-	// { code: 'et-EE', name: 'Eesti' },
-	// { code: 'fa-IR', name: 'فارسی', dir: 'rtl' },
-	// { code: 'fi-FI', name: 'Suomi' },
-	{ code: 'fil-PH', name: 'Filipino' },
-	{ code: 'fr-FR', name: 'Français' },
-	// { code: 'he-IL', name: 'עברית', dir: 'rtl' },
-	// { code: 'hi-IN', name: 'हिन्दी' },
-	// { code: 'hr-HR', name: 'Hrvatski' },
-	// { code: 'hu-HU', name: 'Magyar' },
-	{ code: 'id-ID', name: 'Bahasa Indonesia' },
-	// { code: 'is-IS', name: 'Íslenska' },
-	{ code: 'it-IT', name: 'Italiano', numeric: 'always' },
-	// { code: 'ja-JP', name: '日本語' },
-	// { code: 'kk-KZ', name: 'Қазақша' },
-	{ code: 'ko-KR', name: '한국어' },
-	// { code: 'ky-KG', name: 'Кыргызча' },
-	// { code: 'lol-US', name: 'LOLCAT' },
-	// { code: 'lt-LT', name: 'Lietuvių' },
-	// { code: 'lv-LV', name: 'Latviešu' },
-	// { code: 'ms-Arab', name: 'بهاس ملايو (جاوي)', dir: 'rtl' },
-	{ code: 'ms-MY', name: 'Bahasa Melayu' },
-	{ code: 'nl-NL', name: 'Nederlands' },
-	// { code: 'no-NO', name: 'Norsk' },
-	{ code: 'pl-PL', name: 'Polski' },
-	{ code: 'pt-BR', name: 'Português (Brasil)' },
-	{ code: 'pt-PT', name: 'Português (Portugal)' },
-	// { code: 'ro-RO', name: 'Română' },
-	{ code: 'ru-RU', name: 'Русский', numeric: 'always' },
-	// { code: 'sk-SK', name: 'Slovenčina' },
-	// { code: 'sl-SI', name: 'Slovenščina' },
-	// { code: 'sr-CS', name: 'Српски (ћирилица)' },
-	// { code: 'sr-SP', name: 'Srpski (latinica)' },
-	// { code: 'sv-SE', name: 'Svenska' },
-	// { code: 'th-TH', name: 'ไทย' },
-	// { code: 'tl-PH', name: 'Tagalog' },
-	{ code: 'tr-TR', name: 'Türkçe' },
-	// { code: 'tt-RU', name: 'Татарча' },
-	{ code: 'uk-UA', name: 'Українська' },
-	{ code: 'vi-VN', name: 'Tiếng Việt' },
-	{ code: 'zh-CN', name: '简体中文' },
-	{ code: 'zh-TW', name: '繁體中文' },
+	// Commented out as it's RTL - will enable when we have better RTL support
+	// {
+	// 	code: 'ar-SA',
+	// 	name: 'العربية (السعودية)',
+	// 	translatedName: defineMessage({ id: 'locale.ar-SA', defaultMessage: 'Arabic' }),
+	// 	dir: 'rtl',
+	// },
+	{
+		code: 'cs-CZ',
+		name: 'Čeština',
+		translatedName: defineMessage({ id: 'locale.cs-CZ', defaultMessage: 'Czech' }),
+	},
+	{
+		code: 'da-DK',
+		name: 'Dansk',
+		translatedName: defineMessage({ id: 'locale.da-DK', defaultMessage: 'Danish' }),
+	},
+	{
+		code: 'de-CH',
+		name: 'Deutsch (Schweiz)',
+		translatedName: defineMessage({ id: 'locale.de-CH', defaultMessage: 'German (Switzerland)' }),
+	},
+	{
+		code: 'de-DE',
+		name: 'Deutsch (Deutschland)',
+		translatedName: defineMessage({ id: 'locale.de-DE', defaultMessage: 'German (Germany)' }),
+	},
+	{
+		code: 'en-US',
+		name: 'English (United States)',
+		translatedName: defineMessage({
+			id: 'locale.en-US',
+			defaultMessage: 'English (United States)',
+		}),
+	},
+	{
+		code: 'es-419',
+		name: 'Español (Latinoamérica)',
+		translatedName: defineMessage({
+			id: 'locale.es-419',
+			defaultMessage: 'Spanish (Latin America)',
+		}),
+	},
+	{
+		code: 'es-ES',
+		name: 'Español (España)',
+		translatedName: defineMessage({ id: 'locale.es-ES', defaultMessage: 'Spanish (Spain)' }),
+	},
+	{
+		code: 'fi-FI',
+		name: 'Suomi',
+		translatedName: defineMessage({ id: 'locale.fi-FI', defaultMessage: 'Finnish' }),
+	},
+	{
+		code: 'fil-PH',
+		name: 'Filipino',
+		translatedName: defineMessage({ id: 'locale.fil-PH', defaultMessage: 'Filipino' }),
+		serverLanguageCode: 'tl',
+	},
+	{
+		code: 'fr-FR',
+		name: 'Français',
+		translatedName: defineMessage({ id: 'locale.fr-FR', defaultMessage: 'French' }),
+	},
+	{
+		code: 'he-IL',
+		name: 'עברית',
+		translatedName: defineMessage({ id: 'locale.he-IL', defaultMessage: 'Hebrew' }),
+		dir: 'rtl',
+	},
+	{
+		code: 'hu-HU',
+		name: 'Magyar',
+		translatedName: defineMessage({ id: 'locale.hu-HU', defaultMessage: 'Hungarian' }),
+	},
+	{
+		code: 'id-ID',
+		name: 'Bahasa Indonesia',
+		translatedName: defineMessage({ id: 'locale.id-ID', defaultMessage: 'Indonesian' }),
+	},
+	{
+		code: 'it-IT',
+		name: 'Italiano (Italia)',
+		translatedName: defineMessage({ id: 'locale.it-IT', defaultMessage: 'Italian (Italy)' }),
+		numeric: 'always',
+	},
+	{
+		code: 'ja-JP',
+		name: '日本語',
+		translatedName: defineMessage({ id: 'locale.ja-JP', defaultMessage: 'Japanese' }),
+	},
+	{
+		code: 'ko-KR',
+		name: '한국어',
+		translatedName: defineMessage({ id: 'locale.ko-KR', defaultMessage: 'Korean' }),
+	},
+	{
+		code: 'ms-MY',
+		name: 'Bahasa Melayu',
+		translatedName: defineMessage({ id: 'locale.ms-MY', defaultMessage: 'Malay' }),
+	},
+	{
+		code: 'nl-NL',
+		name: 'Nederlands',
+		translatedName: defineMessage({ id: 'locale.nl-NL', defaultMessage: 'Dutch' }),
+	},
+	{
+		code: 'no-NO',
+		name: 'Norsk (Bokmål)',
+		translatedName: defineMessage({ id: 'locale.no-NO', defaultMessage: 'Norwegian Bokmål' }),
+	},
+	{
+		code: 'pl-PL',
+		name: 'Polski',
+		translatedName: defineMessage({ id: 'locale.pl-PL', defaultMessage: 'Polish' }),
+	},
+	{
+		code: 'pt-BR',
+		name: 'Português (Brasil)',
+		translatedName: defineMessage({ id: 'locale.pt-BR', defaultMessage: 'Portuguese (Brazil)' }),
+	},
+	{
+		code: 'pt-PT',
+		name: 'Português (Portugal)',
+		translatedName: defineMessage({ id: 'locale.pt-PT', defaultMessage: 'Portuguese (Portugal)' }),
+	},
+	{
+		code: 'ro-RO',
+		name: 'Română',
+		translatedName: defineMessage({ id: 'locale.ro-RO', defaultMessage: 'Romanian' }),
+	},
+	{
+		code: 'ru-RU',
+		name: 'Русский',
+		translatedName: defineMessage({ id: 'locale.ru-RU', defaultMessage: 'Russian' }),
+		numeric: 'always',
+	},
+	{
+		code: 'sr-CS',
+		name: 'Srpski (latinica)',
+		translatedName: defineMessage({ id: 'locale.sr-CS', defaultMessage: 'Serbian (Latin)' }),
+	},
+	{
+		code: 'sv-SE',
+		name: 'Svenska',
+		translatedName: defineMessage({ id: 'locale.sv-SE', defaultMessage: 'Swedish' }),
+	},
+	{
+		code: 'th-TH',
+		name: 'ไทย',
+		translatedName: defineMessage({ id: 'locale.th-TH', defaultMessage: 'Thai' }),
+	},
+	{
+		code: 'tr-TR',
+		name: 'Türkçe',
+		translatedName: defineMessage({ id: 'locale.tr-TR', defaultMessage: 'Turkish' }),
+	},
+	{
+		code: 'uk-UA',
+		name: 'Українська',
+		translatedName: defineMessage({ id: 'locale.uk-UA', defaultMessage: 'Ukrainian' }),
+	},
+	{
+		code: 'vi-VN',
+		name: 'Tiếng Việt',
+		translatedName: defineMessage({ id: 'locale.vi-VN', defaultMessage: 'Vietnamese' }),
+	},
+	{
+		code: 'zh-CN',
+		name: '简体中文',
+		translatedName: defineMessage({ id: 'locale.zh-CN', defaultMessage: 'Chinese (Simplified)' }),
+	},
+	{
+		code: 'zh-TW',
+		name: '繁體中文',
+		translatedName: defineMessage({ id: 'locale.zh-TW', defaultMessage: 'Chinese (Traditional)' }),
+	},
 ]
 
 export function transformCrowdinMessages(messages: CrowdinMessages): Record<string, string> {
@@ -120,17 +237,20 @@ const LOCALE_CODES = new Set(LOCALES.map((l) => l.code))
  * Usage: buildLocaleMessages(import.meta.glob('./locales/* /index.json', { eager: true }))
  */
 export function buildLocaleMessages(
-	modules: Record<string, { default: CrowdinMessages }>,
+	...allModules: Record<string, { default: CrowdinMessages }>[]
 ): Record<string, Record<string, string>> {
 	const messages: Record<string, Record<string, string>> = {}
-	for (const [path, module] of Object.entries(modules)) {
-		// Extract locale code from path like './locales/en-US/index.json' or './src/locales/en-US/index.json'
-		const match = path.match(/\/([^/]+)\/index\.json$/)
-		if (match) {
-			const locale = match[1]
-			// Only include locales that are in our LOCALES list
-			if (LOCALE_CODES.has(locale)) {
-				messages[locale] = transformCrowdinMessages(module.default)
+	for (const modules of allModules) {
+		for (const [path, module] of Object.entries(modules)) {
+			// Extract locale code from path like './locales/en-US/index.json', './src/locales/en-US/index.json' or './locales/en-US/meta.json'
+			const match = path.match(/\/([^/]+)\/(index|meta)\.json$/)
+			if (match) {
+				const locale = match[1]
+				// Only include locales that are in our LOCALES list
+				if (LOCALE_CODES.has(locale)) {
+					const mergedMessages = messages[locale] ?? {}
+					messages[locale] = Object.assign(mergedMessages, transformCrowdinMessages(module.default))
+				}
 			}
 		}
 	}
@@ -179,6 +299,7 @@ export interface VIntlFormatters {
  */
 export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 	const { t, locale } = injectI18n()
+	const debugContext = injectI18nDebug()
 
 	function formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string {
 		// Read locale.value to ensure Vue tracks this as a reactive dependency
@@ -188,18 +309,33 @@ export function useVIntl(): VIntlFormatters & { locale: Ref<string> } {
 		const key = descriptor.id
 		const translation = t(key, values ?? {})
 
+		let result: string
 		if (translation && translation !== key) {
-			return translation as string
+			result = translation as string
+		} else {
+			// Fallback to defaultMessage if key not found
+			const defaultMsg = descriptor.defaultMessage ?? key
+			try {
+				const formatter = new IntlMessageFormat(defaultMsg, locale.value)
+				result = formatter.format(values ?? {}) as string
+			} catch {
+				result = defaultMsg
+			}
 		}
 
-		// Fallback to defaultMessage if key not found
-		const defaultMsg = descriptor.defaultMessage ?? key
-		try {
-			const formatter = new IntlMessageFormat(defaultMsg, locale.value)
-			return formatter.format(values ?? {}) as string
-		} catch {
-			return defaultMsg
+		if (debugContext?.enabled.value) {
+			debugContext.registry.set(key, {
+				key,
+				value: result,
+				defaultMessage: descriptor.defaultMessage,
+				timestamp: Date.now(),
+			})
+			if (debugContext.keyReveal.value) {
+				return `\u300C${key}\u300D`
+			}
 		}
+
+		return result
 	}
 
 	return { formatMessage, locale }

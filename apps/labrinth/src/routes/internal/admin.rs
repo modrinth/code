@@ -7,8 +7,9 @@ use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::search::SearchConfig;
+use crate::search::SearchBackend;
 use crate::util::date::get_current_tenths_of_ms;
+use crate::util::error::Context;
 use crate::util::guards::admin_key_guard;
 use actix_web::{HttpRequest, HttpResponse, patch, post, web};
 use serde::Deserialize;
@@ -57,6 +58,7 @@ pub async fn count_download(
         &**pool,
         &redis,
         &session_queue,
+        false,
     )
     .await
     .ok()
@@ -152,10 +154,12 @@ pub async fn count_download(
 pub async fn force_reindex(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
-    use crate::search::indexing::index_projects;
     let redis = redis.get_ref();
-    index_projects(pool.as_ref().clone(), redis.clone(), &config).await?;
+    search_backend
+        .index_projects(pool.as_ref().clone(), redis.clone())
+        .await
+        .wrap_internal_err("failed to index projects")?;
     Ok(HttpResponse::NoContent().finish())
 }

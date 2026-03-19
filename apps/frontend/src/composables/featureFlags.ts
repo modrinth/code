@@ -32,16 +32,19 @@ export const DEFAULT_FEATURE_FLAGS = validateValues({
 	projectBackground: false,
 	searchBackground: false,
 	advancedDebugInfo: false,
+	FilesRefreshButton: false,
 	showProjectPageDownloadModalServersPromo: false,
 	showProjectPageCreateServersTooltip: true,
 	showProjectPageQuickServerButton: false,
 	newProjectGeneralSettings: false,
 	newProjectEnvironmentSettings: true,
 	hideRussiaCensorshipBanner: false,
-	serverDiscovery: false,
 	disablePrettyProjectUrlRedirects: false,
 	hidePreviewBanner: false,
+	i18nDebug: false,
 	showDiscoverProjectButtons: false,
+	useV1ContentTabAPI: true,
+	labrinthApiCanary: false,
 } as const)
 
 export type FeatureFlag = keyof typeof DEFAULT_FEATURE_FLAGS

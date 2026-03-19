@@ -22,12 +22,14 @@
 		"prepr:frontend:web": "turbo run prepr --filter=@modrinth/frontend",
 		"prepr:frontend:app": "turbo run prepr --filter=@modrinth/app-frontend",
 		"storybook": "pnpm --filter @modrinth/ui storybook",
+		"build-storybook": "pnpm --filter @modrinth/ui build-storybook",
 		"icons:add": "pnpm --filter @modrinth/assets icons:add",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {
 		"@clack/prompts": "^1.0.0",
 		"@modrinth/tooling-config": "workspace:*",
+		"@tailwindcss/container-queries": "^0.1.1",
 		"@types/node": "^20.1.0",
 		"@vue/compiler-dom": "^3.5.26",
 		"@vue/compiler-sfc": "^3.5.26",

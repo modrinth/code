@@ -1,5 +1,6 @@
 <template>
 	<nav
+		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'card-shadow': mode === 'navigation' }"
@@ -10,6 +11,7 @@
 				v-show="link.shown ?? true"
 				:key="link.href"
 				ref="tabLinkElements"
+				:replace="replace"
 				:to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
 				class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
 				:class="getSSRFallbackClasses(index)"
@@ -70,6 +72,7 @@ interface Tab {
 
 const props = withDefaults(
 	defineProps<{
+		replace?: boolean
 		links: Tab[]
 		query?: string
 		mode?: 'navigation' | 'local'
@@ -191,12 +194,20 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 }
 
 function getTabElement(index: number): HTMLElement | null {
-	if (!tabLinkElements.value?.[index]) return null
+	if (index === -1) return null
 
-	// In navigation mode, elements are NuxtLinks with $el property
-	// In local mode, elements are plain divs
-	const element = tabLinkElements.value[index]
-	return props.mode === 'navigation' ? (element as any).$el : element
+	const container = scrollContainer.value as HTMLElement | undefined
+	if (!container) return null
+
+	const tabs = container.querySelectorAll('.button-animation')
+	const element = tabs[index] as HTMLElement | undefined
+
+	if (!element) return null
+
+	// In navigation mode, elements are NuxtLinks, but since we used querySelectorAll,
+	// we already have the raw HTMLElement ($el), so no further conversion is needed.
+	// In local mode, elements are already plain divs.
+	return element
 }
 
 function positionSlider() {
@@ -253,7 +264,8 @@ function animateSliderTo(newPosition: {
 	sliderBottom.value = newPosition.bottom
 }
 
-function updateActiveTab() {
+async function updateActiveTab() {
+	await nextTick()
 	const { index, isSubpage } = computeActiveIndex()
 	currentActiveIndex.value = index
 	subpageSelected.value = isSubpage
@@ -290,7 +302,14 @@ watch(
 	},
 )
 
-watch(() => props.links, updateActiveTab, { deep: true })
+watch(
+	() => props.links,
+	async () => {
+		await nextTick()
+		updateActiveTab()
+	},
+	{ deep: true },
+)
 </script>
 
 <style scoped>

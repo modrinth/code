@@ -59,7 +59,7 @@
 									class="radio shrink-0"
 								/>
 								<RadioButtonIcon v-else class="radio shrink-0" />
-								List
+								{{ formatMessage(layoutMode.rows) }}
 							</div>
 						</button>
 						<button
@@ -88,7 +88,7 @@
 									class="radio shrink-0"
 								/>
 								<RadioButtonIcon v-else class="radio shrink-0" />
-								Grid
+								{{ formatMessage(layoutMode.grid) }}
 							</div>
 						</button>
 					</div>
@@ -193,12 +193,19 @@ import MessageBanner from '~/components/ui/MessageBanner.vue'
 import type { DisplayLocation } from '~/plugins/cosmetics'
 import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
-useHead({
-	title: 'Display settings - Modrinth',
-})
-
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
+})
+
+const messages = defineMessages({
+	headTitle: {
+		id: 'settings.head-title',
+		defaultMessage: 'Display settings',
+	},
+})
 
 const developerModeBanner = defineMessages({
 	description: {
@@ -209,6 +216,32 @@ const developerModeBanner = defineMessages({
 	deactivate: {
 		id: 'settings.display.banner.developer-mode.button',
 		defaultMessage: 'Deactivate developer mode',
+	},
+})
+
+const layoutMode = defineMessages({
+	rows: {
+		id: 'settings.display.project-list-layouts.mode.rows',
+		defaultMessage: 'Rows',
+	},
+	grid: {
+		id: 'settings.display.project-list-layouts.mode.grid',
+		defaultMessage: 'Grid',
+	},
+	gallery: {
+		id: 'settings.display.project-list-layouts.mode.gallery',
+		defaultMessage: 'Gallery',
+	},
+})
+
+const notifications = defineMessages({
+	developerModeDeactivatedTitle: {
+		id: 'settings.display.notification.developer-mode-deactivated.title',
+		defaultMessage: 'Developer mode deactivated',
+	},
+	developerModeDeactivatedText: {
+		id: 'settings.display.notification.developer-mode-deactivated.text',
+		defaultMessage: 'Developer mode has been disabled',
 	},
 })
 
@@ -256,6 +289,10 @@ const projectListLayouts = defineMessages({
 	modpack: {
 		id: 'settings.display.project-list-layouts.modpack',
 		defaultMessage: 'Modpacks page',
+	},
+	server: {
+		id: 'settings.display.project-list-layouts.server',
+		defaultMessage: 'Servers page',
 	},
 	user: {
 		id: 'settings.display.project-list-layouts.user',
@@ -366,8 +403,8 @@ function disableDeveloperMode() {
 	flags.value.developerMode = !flags.value.developerMode
 	saveFeatureFlags()
 	addNotification({
-		title: 'Developer mode deactivated',
-		text: 'Developer mode has been disabled',
+		title: formatMessage(notifications.developerModeDeactivatedTitle),
+		text: formatMessage(notifications.developerModeDeactivatedText),
 		type: 'success',
 	})
 }

@@ -7,58 +7,72 @@
 			:proceed-label="formatMessage(deleteModalMessages.action)"
 			@proceed="removePat(deletePatIndex)"
 		/>
-		<Modal
+		<NewModal
 			ref="patModal"
 			:header="
-				editPatIndex !== null
+				editPatId !== null
 					? formatMessage(createModalMessages.editTitle)
 					: formatMessage(createModalMessages.createTitle)
 			"
+			:width="'550px'"
 		>
-			<div class="universal-modal">
-				<label for="pat-name">
-					<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
-				</label>
-				<StyledInput
-					id="pat-name"
-					v-model="name"
-					:maxlength="2048"
-					:placeholder="formatMessage(createModalMessages.namePlaceholder)"
-				/>
-				<label for="pat-scopes">
-					<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
-				</label>
-				<div
-					id="pat-scopes"
-					class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
-				>
-					<div v-for="category in scopeCategories" :key="category.name" class="flex flex-col gap-2">
-						<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
-							{{ category.name }}
-						</h4>
-						<div class="flex flex-col gap-2">
-							<Checkbox
-								v-for="scope in category.scopes"
-								:key="scope"
-								:label="scopesToLabels(getScopeValue(scope)).join(', ')"
-								:model-value="hasScope(scopesVal, scope)"
-								@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
-							/>
+			<div class="flex flex-col gap-4">
+				<div class="flex w-full flex-col">
+					<label for="pat-name">
+						<span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
+					</label>
+					<StyledInput
+						id="pat-name"
+						v-model="name"
+						:maxlength="2048"
+						:placeholder="formatMessage(createModalMessages.namePlaceholder)"
+					/>
+				</div>
+
+				<div class="flex w-full flex-col">
+					<label for="pat-scopes">
+						<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
+					</label>
+					<div
+						id="pat-scopes"
+						class="scope-items mt-2 grid grid-cols-1 gap-x-6 gap-y-4 min-[600px]:grid-cols-2"
+					>
+						<div
+							v-for="category in scopeCategories"
+							:key="category.name"
+							class="flex flex-col gap-2"
+						>
+							<h4 class="m-0 border-b border-divider pb-1 text-base font-bold text-contrast">
+								{{ category.name }}
+							</h4>
+							<div class="flex flex-col gap-2">
+								<Checkbox
+									v-for="scope in category.scopes"
+									:key="scope"
+									:label="scopesToLabels(getScopeValue(scope)).join(', ')"
+									:model-value="hasScope(scopesVal, scope)"
+									@update:model-value="scopesVal = toggleScope(scopesVal, scope)"
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
-				<label for="pat-name" class="mt-4">
-					<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
-				</label>
-				<StyledInput id="pat-expires" v-model="expires" type="date" />
-				<p></p>
+
+				<div class="flex w-full flex-col">
+					<label for="pat-expires">
+						<span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
+					</label>
+					<StyledInput id="pat-expires" v-model="expires" type="date" />
+					<p></p>
+				</div>
+
 				<div class="input-group push-right">
 					<button class="iconified-button" @click="$refs.patModal.hide()">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 					<button
-						v-if="editPatIndex !== null"
+						v-if="editPatId !== null"
 						:disabled="loading || !name || !expires"
 						type="button"
 						class="iconified-button brand-button"
@@ -79,7 +93,7 @@
 					</button>
 				</div>
 			</div>
-		</Modal>
+		</NewModal>
 
 		<div class="header__row">
 			<div class="header__title">
@@ -92,7 +106,7 @@
 						name = null
 						scopesVal = 0
 						expires = null
-						editPatIndex = null
+						editPatId = null
 						$refs.patModal.show()
 					}
 				"
@@ -109,7 +123,7 @@
 				</template>
 			</IntlFormatted>
 		</p>
-		<div v-for="(pat, index) in displayPats" :key="pat.id" class="universal-card recessed token">
+		<div v-for="pat in displayPats" :key="pat.id" class="universal-card recessed token">
 			<div>
 				<div>
 					<strong>{{ pat.name }}</strong>
@@ -119,16 +133,7 @@
 						<CopyCode :text="pat.access_token" />
 					</template>
 					<template v-else>
-						<span
-							v-tooltip="
-								pat.last_used
-									? formatMessage(commonMessages.dateAtTimeTooltip, {
-											date: new Date(pat.last_used),
-											time: new Date(pat.last_used),
-										})
-									: null
-							"
-						>
+						<span v-tooltip="pat.last_used ? formatDateTime(pat.last_used) : null">
 							<template v-if="pat.last_used">
 								{{
 									formatMessage(tokenMessages.lastUsed, {
@@ -139,14 +144,7 @@
 							<template v-else>{{ formatMessage(tokenMessages.neverUsed) }}</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.expires),
-									time: new Date(pat.expires),
-								})
-							"
-						>
+						<span v-tooltip="Date.parse(pat.expires) ? formatDateTime(pat.expires) : null">
 							<template v-if="new Date(pat.expires) > new Date()">
 								{{
 									formatMessage(tokenMessages.expiresIn, {
@@ -163,14 +161,7 @@
 							</template>
 						</span>
 						⋅
-						<span
-							v-tooltip="
-								formatMessage(commonMessages.dateAtTimeTooltip, {
-									date: new Date(pat.created),
-									time: new Date(pat.created),
-								})
-							"
-						>
+						<span v-tooltip="formatDateTime(pat.created)">
 							{{
 								formatMessage(commonMessages.createdAgoLabel, {
 									ago: formatRelativeTime(pat.created),
@@ -185,7 +176,7 @@
 					class="iconified-button raised-button"
 					@click="
 						() => {
-							editPatIndex = index
+							editPatId = pat.id
 							name = pat.name
 							scopesVal = pat.scopes
 							expires = $dayjs(pat.expires).format('YYYY-MM-DD')
@@ -219,14 +210,17 @@ import {
 	ConfirmModal,
 	CopyCode,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NewModal,
 	StyledInput,
+	useFormatDateTime,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
-import Modal from '~/components/ui/Modal.vue'
 import {
 	getScopeValue,
 	hasScope,
@@ -236,10 +230,16 @@ import {
 	useScopes,
 } from '~/composables/auth/scopes.ts'
 
+const client = injectModrinthClient()
+const queryClient = useQueryClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const createModalMessages = defineMessages({
 	createTitle: {
@@ -287,7 +287,7 @@ const messages = defineMessages({
 	description: {
 		id: 'settings.pats.description',
 		defaultMessage:
-			"PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time.",
+			"PATs can be used to access Modrinth's API. They can be created and revoked at any time. For more information, see <doc-link>Modrinth's API documentation</doc-link>.",
 	},
 	create: {
 		id: 'settings.pats.action.create',
@@ -334,7 +334,7 @@ const data = useNuxtApp()
 const { scopesToLabels } = useScopes()
 const patModal = ref()
 
-const editPatIndex = ref(null)
+const editPatId = ref(null)
 
 const name = ref(null)
 const scopesVal = ref(BigInt(0))
@@ -344,7 +344,11 @@ const deletePatIndex = ref(null)
 
 const loading = ref(false)
 
-const { data: pats, refresh } = await useAsyncData('pat', () => useBaseFetch('pat'))
+const { data: pats } = useQuery({
+	queryKey: ['pat'],
+	queryFn: () => client.labrinth.pats_v2.list(),
+	placeholderData: [],
+})
 const displayPats = computed(() => {
 	return pats.value.toSorted((a, b) => new Date(b.created) - new Date(a.created))
 })
@@ -408,15 +412,12 @@ async function createPat() {
 	startLoading()
 	loading.value = true
 	try {
-		const res = await useBaseFetch('pat', {
-			method: 'POST',
-			body: {
-				name: name.value,
-				scopes: Number(scopesVal.value),
-				expires: data.$dayjs(expires.value).toISOString(),
-			},
+		const res = await client.labrinth.pats_v2.create({
+			name: name.value,
+			scopes: Number(scopesVal.value),
+			expires: data.$dayjs(expires.value).toISOString(),
 		})
-		pats.value.push(res)
+		queryClient.setQueryData(['pat'], (old) => [...(old || []), res])
 		patModal.value.hide()
 	} catch (err) {
 		addNotification({
@@ -433,15 +434,12 @@ async function editPat() {
 	startLoading()
 	loading.value = true
 	try {
-		await useBaseFetch(`pat/${pats.value[editPatIndex.value].id}`, {
-			method: 'PATCH',
-			body: {
-				name: name.value,
-				scopes: Number(scopesVal.value),
-				expires: data.$dayjs(expires.value).toISOString(),
-			},
+		await client.labrinth.pats_v2.modify(editPatId.value, {
+			name: name.value,
+			scopes: Number(scopesVal.value),
+			expires: data.$dayjs(expires.value).toISOString(),
 		})
-		await refresh()
+		await queryClient.invalidateQueries({ queryKey: ['pat'] })
 		patModal.value.hide()
 	} catch (err) {
 		addNotification({
@@ -458,10 +456,8 @@ async function removePat(id) {
 	startLoading()
 	try {
 		pats.value = pats.value.filter((x) => x.id !== id)
-		await useBaseFetch(`pat/${id}`, {
-			method: 'DELETE',
-		})
-		await refresh()
+		await client.labrinth.pats_v2.delete(id)
+		await queryClient.invalidateQueries({ queryKey: ['pat'] })
 	} catch (err) {
 		addNotification({
 			title: formatMessage(commonMessages.errorNotificationTitle),

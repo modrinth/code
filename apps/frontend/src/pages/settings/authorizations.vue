@@ -2,19 +2,17 @@
 	<div class="universal-card">
 		<ConfirmModal
 			ref="modal_confirm"
-			title="Are you sure you want to revoke this application?"
-			description="This will revoke the application's access to your account. You can always re-authorize it later."
-			proceed-label="Revoke"
+			:title="formatMessage(messages.revokeConfirmTitle)"
+			:description="formatMessage(messages.revokeConfirmDescription)"
+			:proceed-label="formatMessage(messages.revokeAction)"
 			@proceed="revokeApp(revokingId)"
 		/>
 		<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
 		<p>
-			When you authorize an application with your Modrinth account, you grant it access to your
-			account. You can manage and review access to your account here at any time.
+			{{ formatMessage(messages.description) }}
 		</p>
 		<div v-if="appInfoLookup.length === 0" class="universal-card recessed">
-			We currently can't display your authorized apps, we're working to fix this. Please visit this
-			page at a later date!
+			{{ formatMessage(messages.emptyState) }}
 		</div>
 		<div
 			v-for="authorization in appInfoLookup"
@@ -30,7 +28,7 @@
 								{{ authorization.app.name }}
 							</h2>
 							<div>
-								by
+								{{ formatMessage(messages.byLabel) }}
 								<nuxt-link class="text-link" :to="'/user/' + authorization.owner.id">{{
 									authorization.owner.username
 								}}</nuxt-link>
@@ -47,13 +45,13 @@
 				<div>
 					<template v-if="authorization.app.description">
 						<label for="app-description">
-							<span class="label__title"> About this app </span>
+							<span class="label__title">{{ formatMessage(messages.aboutThisAppLabel) }}</span>
 						</label>
 						<div id="app-description">{{ authorization.app.description }}</div>
 					</template>
 
 					<label for="app-scope-list">
-						<span class="label__title">Scopes</span>
+						<span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
 					</label>
 					<div class="scope-list">
 						<div
@@ -82,7 +80,7 @@
 					"
 				>
 					<TrashIcon />
-					Revoke
+					{{ formatMessage(messages.revokeAction) }}
 				</Button>
 			</div>
 		</div>
@@ -93,16 +91,59 @@ import { CheckIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
+	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import { useScopes } from '~/composables/auth/scopes.ts'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	headTitle: {
+		id: 'settings.authorizations.head-title',
+		defaultMessage: 'Authorizations',
+	},
+	description: {
+		id: 'settings.authorizations.description',
+		defaultMessage:
+			'When you authorize an application with your Modrinth account, you grant it access to your account. You can manage and review access to your account here at any time.',
+	},
+	emptyState: {
+		id: 'settings.authorizations.empty-state',
+		defaultMessage:
+			"We currently can't display your authorized apps, we're working to fix this. Please visit this page at a later date!",
+	},
+	revokeConfirmTitle: {
+		id: 'settings.authorizations.revoke.confirm.title',
+		defaultMessage: 'Are you sure you want to revoke this application?',
+	},
+	revokeConfirmDescription: {
+		id: 'settings.authorizations.revoke.confirm.description',
+		defaultMessage:
+			"This will revoke the application's access to your account. You can always re-authorize it later.",
+	},
+	revokeAction: {
+		id: 'settings.authorizations.revoke.action',
+		defaultMessage: 'Revoke',
+	},
+	byLabel: {
+		id: 'settings.authorizations.by',
+		defaultMessage: 'by',
+	},
+	aboutThisAppLabel: {
+		id: 'settings.authorizations.about-this-app',
+		defaultMessage: 'About this app',
+	},
+})
 
 const { scopesToDefinitions } = useScopes()
 
@@ -113,45 +154,26 @@ definePageMeta({
 })
 
 useHead({
-	title: 'Authorizations - Modrinth',
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
-const { data: usersApps, refresh } = await useAsyncData('userAuthorizations', () =>
-	useBaseFetch(`oauth/authorizations`, {
-		internal: true,
-	}),
-)
+const { data: usersApps, refetch: refresh } = useQuery({
+	queryKey: ['oauth', 'authorizations'],
+	queryFn: () => client.labrinth.oauth_internal.getAuthorizations(),
+})
 
-const { data: appInformation } = await useAsyncData(
-	'appInfo',
-	() => {
-		if (!usersApps.value?.length) return null
-		return useBaseFetch('oauth/apps', {
-			internal: true,
-			query: {
-				ids: JSON.stringify(usersApps.value.map((c) => c.app_id)),
-			},
-		})
-	},
-	{
-		watch: usersApps,
-	},
-)
+const { data: appInformation } = useQuery({
+	queryKey: computed(() => ['oauth', 'apps', usersApps.value?.map((c) => c.app_id)]),
+	queryFn: () => client.labrinth.oauth_internal.getApps(usersApps.value.map((c) => c.app_id)),
+	enabled: computed(() => !!usersApps.value?.length),
+})
 
-const { data: appCreatorsInformation } = await useAsyncData(
-	'appCreatorsInfo',
-	() => {
-		if (!appInformation.value?.length) return null
-		return useBaseFetch('users', {
-			query: {
-				ids: JSON.stringify(appInformation.value.map((c) => c.created_by)),
-			},
-		})
-	},
-	{
-		watch: appInformation,
-	},
-)
+const { data: appCreatorsInformation } = useQuery({
+	queryKey: computed(() => ['users', appInformation.value?.map((c) => c.created_by)]),
+	queryFn: () =>
+		client.labrinth.users_v2.getMultiple(appInformation.value.map((c) => c.created_by)),
+	enabled: computed(() => !!appInformation.value?.length),
+})
 
 const appInfoLookup = computed(() => {
 	if (!usersApps.value || !appInformation.value || !appCreatorsInformation.value) {
@@ -170,18 +192,12 @@ const appInfoLookup = computed(() => {
 
 async function revokeApp(id) {
 	try {
-		await useBaseFetch(`oauth/authorizations`, {
-			internal: true,
-			method: 'DELETE',
-			query: {
-				client_id: id,
-			},
-		})
+		await client.labrinth.oauth_internal.revokeAuthorization(id)
 		revokingId.value = null
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
