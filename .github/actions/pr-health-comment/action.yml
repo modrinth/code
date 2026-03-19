@@ -17,12 +17,15 @@ runs:
   steps:
     - name: Update PR Health comment
       uses: actions/github-script@v7
+      env:
+        SECTION: ${{ inputs.section }}
+        CONTENT: ${{ inputs.content }}
       with:
         github-token: ${{ inputs.github-token }}
         script: |
           const marker = '<!-- pr-health -->';
-          const section = '${{ inputs.section }}';
-          const content = `${{ inputs.content }}`;
+          const section = process.env.SECTION;
+          const content = process.env.CONTENT;
 
           // Fixed ordering of sections
           const SECTION_ORDER = ['changelog', 'deploy'];
