@@ -27,17 +27,15 @@ import {
 	update_repair_modrinth,
 } from '@/helpers/profile'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { InstanceSettingsTabProps, Manifest } from '../../../helpers/types'
+import type { Manifest } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
 
-const props = defineProps<InstanceSettingsTabProps>()
-const emit = defineEmits<{
-	unlinked: []
-}>()
+const { instance, offline, isMinecraftServer, onUnlinked } = injectInstanceSettings()
 
 const [
 	fabric_versions,
@@ -75,9 +73,9 @@ const [
 ])
 
 const { data: modpackInfo } = useQuery({
-	queryKey: computed(() => ['linkedModpackInfo', props.instance.path]),
-	queryFn: () => get_linked_modpack_info(props.instance.path, 'must_revalidate'),
-	enabled: computed(() => !!props.instance.linked_data?.project_id && !props.offline),
+	queryKey: computed(() => ['linkedModpackInfo', instance.path]),
+	queryFn: () => get_linked_modpack_info(instance.path, 'must_revalidate'),
+	enabled: computed(() => !!instance.linked_data?.project_id && !offline),
 })
 
 const repairing = ref(false)
@@ -103,13 +101,13 @@ function getManifest(loader: string) {
 provideAppBackup({
 	async createBackup() {
 		const allProfiles = await list()
-		const prefix = `${props.instance.name} - Backup #`
+		const prefix = `${instance.name} - Backup #`
 		const existingNums = allProfiles
 			.filter((p) => p.name.startsWith(prefix))
 			.map((p) => parseInt(p.name.slice(prefix.length), 10))
 			.filter((n) => !isNaN(n))
 		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const newPath = await duplicate(props.instance.path)
+		const newPath = await duplicate(instance.path)
 		await edit(newPath, { name: `${prefix}${nextNum}` })
 	},
 })
@@ -120,30 +118,27 @@ provideInstallationSettings({
 		const rows = [
 			{
 				label: formatMessage(commonMessages.platformLabel),
-				value: formatLoaderLabel(props.instance.loader),
+				value: formatLoaderLabel(instance.loader),
 			},
 			{
 				label: formatMessage(commonMessages.gameVersionLabel),
-				value: props.instance.game_version,
+				value: instance.game_version,
 			},
 		]
-		if (props.instance.loader !== 'vanilla' && props.instance.loader_version) {
+		if (instance.loader !== 'vanilla' && instance.loader_version) {
 			rows.push({
 				label: formatMessage(messages.loaderVersion, {
-					loader: formatLoaderLabel(props.instance.loader),
+					loader: formatLoaderLabel(instance.loader),
 				}),
-				value: props.instance.loader_version,
+				value: instance.loader_version,
 			})
 		}
 		return rows
 	}),
-	isLinked: computed(() => !!props.instance.linked_data?.locked),
+	isLinked: computed(() => !!instance.linked_data?.locked),
 	isBusy: computed(
 		() =>
-			props.instance.install_stage !== 'installed' ||
-			repairing.value ||
-			reinstalling.value ||
-			!!props.offline,
+			instance.install_stage !== 'installed' || repairing.value || reinstalling.value || !!offline,
 	),
 	modpack: computed(() => {
 		if (!modpackInfo.value) return null
@@ -154,9 +149,9 @@ provideInstallationSettings({
 			versionNumber: modpackInfo.value.version?.version_number,
 		}
 	}),
-	currentPlatform: computed(() => props.instance.loader),
-	currentGameVersion: computed(() => props.instance.game_version),
-	currentLoaderVersion: computed(() => props.instance.loader_version ?? ''),
+	currentPlatform: computed(() => instance.loader),
+	currentGameVersion: computed(() => instance.game_version),
+	currentLoaderVersion: computed(() => instance.loader_version ?? ''),
 	availablePlatforms: loaders?.value?.map((x) => x.name) ?? [],
 
 	resolveGameVersions(loader, showSnapshots) {
@@ -199,50 +194,50 @@ provideInstallationSettings({
 		if (platform !== 'vanilla' && loaderVersionId) {
 			editProfile.loader_version = loaderVersionId
 		}
-		await edit(props.instance.path, editProfile).catch(handleError)
+		await edit(instance.path, editProfile).catch(handleError)
 	},
 
 	afterSave: async () => {
-		await install(props.instance.path, false).catch(handleError)
+		await install(instance.path, false).catch(handleError)
 		trackEvent('InstanceRepair', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
+			loader: instance.loader,
+			game_version: instance.game_version,
 		})
 	},
 
 	async repair() {
 		repairing.value = true
-		await install(props.instance.path, true).catch(handleError)
+		await install(instance.path, true).catch(handleError)
 		repairing.value = false
 		trackEvent('InstanceRepair', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
+			loader: instance.loader,
+			game_version: instance.game_version,
 		})
 	},
 
 	async reinstallModpack() {
 		reinstalling.value = true
-		await update_repair_modrinth(props.instance.path).catch(handleError)
+		await update_repair_modrinth(instance.path).catch(handleError)
 		reinstalling.value = false
 		trackEvent('InstanceRepair', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
+			loader: instance.loader,
+			game_version: instance.game_version,
 		})
 	},
 
 	async unlinkModpack() {
-		await edit(props.instance.path, {
+		await edit(instance.path, {
 			linked_data: null as unknown as undefined,
 		})
 		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', props.instance.path],
+			queryKey: ['linkedModpackInfo', instance.path],
 		})
-		emit('unlinked')
+		onUnlinked()
 	},
 
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
-		const versions = await get_project_versions(props.instance.linked_data!.project_id!).catch(
+		const versions = await get_project_versions(instance.linked_data!.project_id!).catch(
 			handleError,
 		)
 		return (versions ?? []) as Labrinth.Versions.v2.Version[]
@@ -255,25 +250,25 @@ provideInstallationSettings({
 	},
 
 	async onModpackVersionConfirm(version) {
-		await update_managed_modrinth_version(props.instance.path, version.id)
+		await update_managed_modrinth_version(instance.path, version.id)
 		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', props.instance.path],
+			queryKey: ['linkedModpackInfo', instance.path],
 		})
 	},
 
 	updaterModalProps: computed(() => ({
 		isApp: true,
 		currentVersionId:
-			modpackInfo.value?.update_version_id ?? props.instance.linked_data?.version_id ?? '',
+			modpackInfo.value?.update_version_id ?? instance.linked_data?.version_id ?? '',
 		projectIconUrl: modpackInfo.value?.project?.icon_url,
 		projectName: modpackInfo.value?.project?.title ?? 'Modpack',
-		currentGameVersion: props.instance.game_version,
-		currentLoader: props.instance.loader,
+		currentGameVersion: instance.game_version,
+		currentLoader: instance.loader,
 	})),
 
 	isServer: false,
 	isApp: true,
-	showModpackVersionActions: !props.isMinecraftServer,
+	showModpackVersionActions: !isMinecraftServer.value,
 	repairing,
 	reinstalling,
 })

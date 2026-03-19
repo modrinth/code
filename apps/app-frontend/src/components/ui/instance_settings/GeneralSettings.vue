@@ -18,8 +18,9 @@ import { useRouter } from 'vue-router'
 import ConfirmDeleteInstanceModal from '@/components/ui/modal/ConfirmDeleteInstanceModal.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { duplicate, edit, edit_icon, list, remove } from '@/helpers/profile'
+import { injectInstanceSettings } from '@/providers/instance-settings'
 
-import type { GameInstance, InstanceSettingsTabProps } from '../../../helpers/types'
+import type { GameInstance } from '../../../helpers/types'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -27,21 +28,21 @@ const router = useRouter()
 
 const deleteConfirmModal = ref()
 
-const props = defineProps<InstanceSettingsTabProps>()
+const { instance } = injectInstanceSettings()
 
-const title = ref(props.instance.name)
-const icon: Ref<string | undefined> = ref(props.instance.icon_path)
-const groups = ref(props.instance.groups)
+const title = ref(instance.name)
+const icon: Ref<string | undefined> = ref(instance.icon_path)
+const groups = ref(instance.groups)
 
 const newCategoryInput = ref('')
 
-const installing = computed(() => props.instance.install_stage !== 'installed')
+const installing = computed(() => instance.install_stage !== 'installed')
 
 async function duplicateProfile() {
-	await duplicate(props.instance.path).catch(handleError)
+	await duplicate(instance.path).catch(handleError)
 	trackEvent('InstanceDuplicate', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
+		loader: instance.loader,
+		game_version: instance.game_version,
 	})
 }
 
@@ -52,7 +53,7 @@ const availableGroups = computed(() => [
 
 async function resetIcon() {
 	icon.value = undefined
-	await edit_icon(props.instance.path, null).catch(handleError)
+	await edit_icon(instance.path, null).catch(handleError)
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -70,7 +71,7 @@ async function setIcon() {
 	if (!value) return
 
 	icon.value = value
-	await edit_icon(props.instance.path, icon.value).catch(handleError)
+	await edit_icon(instance.path, icon.value).catch(handleError)
 
 	trackEvent('InstanceSetIcon')
 }
@@ -101,7 +102,7 @@ watch(
 	[title, groups, groups],
 	async () => {
 		if (removing.value) return
-		await edit(props.instance.path, editProfileObject.value).catch(handleError)
+		await edit(instance.path, editProfileObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -109,11 +110,11 @@ watch(
 const removing = ref(false)
 async function removeProfile() {
 	removing.value = true
-	const path = props.instance.path
+	const path = instance.path
 
 	trackEvent('InstanceRemove', {
-		loader: props.instance.loader,
-		game_version: props.instance.game_version,
+		loader: instance.loader,
+		game_version: instance.game_version,
 	})
 
 	await router.push({ path: '/' })
@@ -218,7 +219,7 @@ const messages = defineMessages({
 					:src="icon ? convertFileSrc(icon) : icon"
 					size="108px"
 					class="!border-4 group-hover:brightness-75"
-					:tint-by="props.instance.path"
+					:tint-by="instance.path"
 					no-shadow
 				/>
 				<div class="absolute top-0 right-0 m-2">
