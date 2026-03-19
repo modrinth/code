@@ -58,8 +58,9 @@
 
 		<template #actions>
 			<div class="flex w-full items-center justify-end gap-2">
-				<ButtonStyled>
-					<button type="button" @click="hide">
+				<ButtonStyled type="outlined">
+					<button type="button" class="!border !border-surface-4" @click="hide">
+						<XIcon />
 						{{ submitted ? 'Close' : 'Cancel' }}
 					</button>
 				</ButtonStyled>

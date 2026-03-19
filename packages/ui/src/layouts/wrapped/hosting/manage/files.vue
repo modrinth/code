@@ -13,7 +13,7 @@ import {
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem, FileOperation } from '../../../shared/files-tab/types'
+import type { EditingFile, FileItem, FileOperation, UploadState } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -414,6 +414,82 @@ async function restartServer() {
 	await client.archon.servers_v0.power(serverId, 'Restart')
 }
 
+// Upload state
+const uploadState = ref<UploadState>({
+	isUploading: false,
+	currentFileName: null,
+	currentFileProgress: 0,
+	uploadedBytes: 0,
+	totalBytes: 0,
+	completedFiles: 0,
+	totalFiles: 0,
+})
+
+let activeUploadCancel: (() => void) | null = null
+
+async function uploadFiles(files: File[]) {
+	if (files.length === 0) return
+
+	const totalBytes = files.reduce((sum, f) => sum + f.size, 0)
+	uploadState.value = {
+		isUploading: true,
+		currentFileName: files[0].name,
+		currentFileProgress: 0,
+		uploadedBytes: 0,
+		totalBytes,
+		completedFiles: 0,
+		totalFiles: files.length,
+	}
+
+	let completedBytes = 0
+
+	for (let i = 0; i < files.length; i++) {
+		const file = files[i]
+		const filePath = `${currentPath.value}/${file.name}`.replace('//', '/')
+
+		uploadState.value.currentFileName = file.name
+		uploadState.value.currentFileProgress = 0
+
+		try {
+			const uploader = client.kyros.files_v0.uploadFile(filePath, file, {
+				onProgress: ({ progress }) => {
+					uploadState.value.currentFileProgress = progress
+					uploadState.value.uploadedBytes = completedBytes + Math.round(file.size * progress)
+				},
+			})
+			activeUploadCancel = () => uploader.cancel()
+
+			await uploader.promise
+			completedBytes += file.size
+			uploadState.value.completedFiles = i + 1
+			uploadState.value.uploadedBytes = completedBytes
+		} catch (err) {
+			if (err instanceof Error && err.message === 'Upload cancelled') break
+			addNotification({
+				title: 'Upload failed',
+				text: `Failed to upload ${file.name}`,
+				type: 'error',
+			})
+		}
+	}
+
+	activeUploadCancel = null
+	refreshList()
+	uploadState.value = {
+		isUploading: false,
+		currentFileName: null,
+		currentFileProgress: 0,
+		uploadedBytes: 0,
+		totalBytes: 0,
+		completedFiles: 0,
+		totalFiles: 0,
+	}
+}
+
+function cancelUpload() {
+	activeUploadCancel?.()
+}
+
 // Provide the file manager context
 provideFileManager({
 	items,
@@ -441,7 +517,9 @@ provideFileManager({
 	readFileAsBlob,
 	writeFile,
 	downloadFile,
-	uploadFile: () => {},
+	uploadFiles,
+	cancelUpload,
+	uploadState,
 	refresh: refreshList,
 	isBusy: serverBusy,
 	busyTooltip,

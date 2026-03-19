@@ -2,7 +2,7 @@ import type { Component, ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
-import type { EditingFile, ExtractDryRunResult, FileItem, FileOperation } from '../types'
+import type { EditingFile, ExtractDryRunResult, FileItem, FileOperation, UploadState } from '../types'
 
 export interface FileManagerContext {
 	// === Data ===
@@ -32,7 +32,9 @@ export interface FileManagerContext {
 	downloadFile: (path: string, fileName: string) => Promise<void>
 
 	// === Upload ===
-	uploadFile: (file: File) => void
+	uploadFiles: (files: File[]) => void
+	cancelUpload?: () => void
+	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
 	// === Refresh ===
 	refresh: () => void

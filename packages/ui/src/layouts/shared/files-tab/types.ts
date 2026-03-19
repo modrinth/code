@@ -55,8 +55,12 @@ export interface ExtractDryRunResult {
 	conflicting_files: string[]
 }
 
-export interface FileUploadHandle {
-	promise: Promise<void>
-	cancel: () => void
-	onProgress: (cb: (progress: { progress: number; loaded: number; total: number }) => void) => void
+export interface UploadState {
+	isUploading: boolean
+	currentFileName: string | null
+	currentFileProgress: number
+	uploadedBytes: number
+	totalBytes: number
+	completedFiles: number
+	totalFiles: number
 }

@@ -81,7 +81,7 @@ const emit = defineEmits<{
 const { listContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
 	toRef(props, 'items'),
 	{
-		itemHeight: 53,
+		itemHeight: 48,
 		bufferSize: 5,
 		onNearEnd: () => emit('loadMore'),
 	},

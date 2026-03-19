@@ -11,6 +11,13 @@
 		@move="handleMoveItem"
 	/>
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
+	<FileContextMenu ref="contextMenuRef">
+		<template #extract><PackageOpenIcon class="size-5" /> Extract</template>
+		<template #rename><EditIcon class="size-5" /> Rename</template>
+		<template #move><RightArrowIcon class="size-5" /> Move</template>
+		<template #download><DownloadIcon class="size-5" /> Download</template>
+		<template #delete><TrashIcon class="size-5" /> Delete</template>
+	</FileContextMenu>
 	<Transition name="fade" mode="out-in">
 		<div
 			v-if="ctx.loading.value && items.length === 0"
@@ -25,6 +32,72 @@
 			<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
 				<template #header>{{ ctx.busyWarning.value }}</template>
 				File operations are disabled while the operation is in progress.
+			</Admonition>
+			<Transition
+				enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+				enter-from-class="opacity-0 max-h-0"
+				enter-to-class="opacity-100 max-h-40"
+				leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+				leave-from-class="opacity-100 max-h-40"
+				leave-to-class="opacity-0 max-h-0"
+			>
+				<Admonition
+					v-if="ctx.uploadState?.value?.isUploading"
+					type="info"
+					class="mb-4"
+					show-actions-underneath
+				>
+					<template #icon>
+						<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
+					</template>
+					<template #header>
+						Uploading files ({{ ctx.uploadState.value.completedFiles }}/{{
+							ctx.uploadState.value.totalFiles
+						}})
+						<span v-if="ctx.uploadState.value.currentFileName" class="font-normal text-secondary">
+							— {{ ctx.uploadState.value.currentFileName }}
+						</span>
+					</template>
+					<span class="text-secondary">
+						{{ formatBytes(ctx.uploadState.value.uploadedBytes) }}
+						/ {{ formatBytes(ctx.uploadState.value.totalBytes) }}
+						({{ Math.round(uploadOverallProgress * 100) }}%)
+					</span>
+					<template #actions>
+						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+					</template>
+				</Admonition>
+			</Transition>
+			<Admonition
+				v-for="op in activeOperations"
+				:key="`fs-op-${op.op}-${op.src}`"
+				:type="op.state === 'done' ? 'success' : op.state?.startsWith('fail') ? 'error' : 'info'"
+				class="mb-4"
+				show-actions-underneath
+			>
+				<template #icon>
+					<PackageOpenIcon class="h-6 w-6 flex-none text-brand-blue" />
+				</template>
+				<template #header>
+					Extracting {{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
+					<span v-if="op.state === 'done'" class="font-normal text-green"> — Done</span>
+					<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red"> — Failed</span>
+				</template>
+				<span class="text-secondary">
+					{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B' }} extracted
+					<template v-if="'current_file' in op && op.current_file">
+						— {{ op.current_file?.split('/')?.pop() }}
+					</template>
+				</span>
+				<template #actions>
+					<ProgressBar
+						:progress="'progress' in op ? (op.progress ?? 0) : 0"
+						:max="1"
+						:color="op.state === 'done' ? 'green' : op.state?.startsWith('fail') ? 'red' : 'blue'"
+						:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
+						full-width
+					/>
+				</template>
 			</Admonition>
 			<div class="relative flex w-full flex-col">
 				<div class="relative isolate flex w-full flex-col gap-2">
@@ -69,128 +142,7 @@
 								@sort="handleSort"
 								@toggle-all="toggleSelectAll"
 							/>
-							<div
-								v-for="op in activeOperations"
-								:key="`fs-op-${op.op}-${op.src}`"
-								class="sticky top-12 z-[9] grid grid-cols-[auto_1fr_auto] items-center gap-2 border-0 border-b-[1px] border-solid border-surface-4 bg-surface-1.5 px-4 py-2 md:grid-cols-[auto_1fr_1fr_2fr_auto]"
-							>
-								<div>
-									<PackageOpenIcon class="h-5 w-5 text-secondary" />
-								</div>
-								<div class="flex flex-wrap gap-x-4 gap-y-1 md:contents">
-									<div
-										class="flex items-center text-wrap break-all text-sm font-bold text-contrast"
-									>
-										Extracting
-										{{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
-									</div>
-									<span
-										class="flex items-center gap-2 text-sm font-semibold"
-										:class="{
-											'text-green': op.state === 'done',
-											'text-red': op.state?.startsWith('fail'),
-											'text-orange': !op.state?.startsWith('fail') && op.state !== 'done',
-										}"
-									>
-										<template v-if="op.state === 'done'">
-											Done
-											<CheckIcon style="stroke-width: 3px" />
-										</template>
-										<template v-else-if="op.state?.startsWith('fail')">
-											Failed
-											<XIcon style="stroke-width: 3px" />
-										</template>
-										<template v-else-if="op.state === 'cancelled'">
-											<SpinnerIcon class="animate-spin" />
-											Cancelling
-										</template>
-										<template v-else-if="op.state === 'queued'">
-											<SpinnerIcon class="animate-spin" />
-											Queued...
-										</template>
-										<template v-else-if="op.state === 'ongoing'">
-											<SpinnerIcon class="animate-spin" />
-											Extracting...
-										</template>
-										<template v-else>
-											<UnknownIcon />
-											Unknown state: {{ op.state }}
-										</template>
-									</span>
-									<div class="col-span-2 flex grow flex-col gap-1 md:col-span-1 md:items-end">
-										<div class="text-xs font-semibold text-contrast opacity-80">
-											<span
-												:class="{
-													invisible: 'current_file' in op && !op.current_file,
-												}"
-											>
-												{{
-													'current_file' in op
-														? (op.current_file?.split('/')?.pop() ?? 'unknown')
-														: 'unknown'
-												}}
-											</span>
-										</div>
-										<ProgressBar
-											:progress="'progress' in op ? op.progress : 0"
-											:max="1"
-											:color="
-												op.state === 'done'
-													? 'green'
-													: op.state?.startsWith('fail')
-														? 'red'
-														: op.state === 'cancelled'
-															? 'gray'
-															: 'orange'
-											"
-											:waiting="op.state === 'queued' || !op.progress || op.progress === 0"
-										/>
-										<div
-											class="text-xs text-secondary opacity-80"
-											:class="{
-												invisible: 'bytes_processed' in op && !op.bytes_processed,
-											}"
-										>
-											{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed) : '0 B' }}
-											extracted
-										</div>
-									</div>
-								</div>
-
-								<div>
-									<ButtonStyled circular>
-										<button
-											:disabled="!('id' in op) || !op.id"
-											class="radial-progress-animation-overlay"
-											:class="{ active: op.state === 'done' }"
-											@click="
-												() => {
-													if ('id' in op && op.id) {
-														ctx.dismissOperation?.(
-															op.id,
-															op.state === 'done' ? 'dismiss' : 'cancel',
-														)
-													}
-												}
-											"
-										>
-											<XIcon />
-										</button>
-									</ButtonStyled>
-								</div>
-								<pre
-									v-if="showDebugInfo"
-									class="markdown-body col-span-full m-0 rounded-xl bg-button-bg text-xs"
-									>{{ op }}</pre
-								>
-							</div>
-							<FileUploadDropdown
-								ref="uploadDropdownRef"
-								class="border-0 border-t border-solid border-surface-4 bg-surface-1.5"
-								:current-path="ctx.currentPath.value"
-								@upload-complete="ctx.refresh()"
-							/>
-							<Transition name="fade" mode="out-in">
+								<Transition name="fade" mode="out-in">
 								<div v-if="items.length > 0" key="list" class="h-full w-full overflow-hidden">
 									<FileVirtualList
 										:items="filteredItems"
@@ -206,6 +158,7 @@
 										@edit="handleEditFile"
 										@navigate="handleNavigateToFolder"
 										@hover="handleItemHover"
+										@contextmenu="handleContextMenu"
 										@toggle-select="toggleItemSelection"
 									/>
 								</div>
@@ -270,13 +223,14 @@
 
 <script setup lang="ts">
 import {
-	CheckIcon,
+	DownloadIcon,
+	EditIcon,
 	FolderOpenIcon,
 	PackageOpenIcon,
 	RightArrowIcon,
 	SpinnerIcon,
 	TrashIcon,
-	UnknownIcon,
+	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { formatBytes } from '@modrinth/utils'
@@ -288,8 +242,10 @@ import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { getFileExtension } from '#ui/utils/file-extensions'
 
 import FileEditor from './components/editor/FileEditor.vue'
+import FileContextMenu from './components/FileContextMenu.vue'
 import FileManagerError from './components/FileManagerError.vue'
 import FileNavbar from './components/FileNavbar.vue'
 import FileTableHeader from './components/FileTableHeader.vue'
@@ -301,7 +257,6 @@ import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
 import FileUploadDragAndDrop from './components/upload/FileUploadDragAndDrop.vue'
-import FileUploadDropdown from './components/upload/FileUploadDropdown.vue'
 import { useFileSearch } from './composables/file-search'
 import { useFileSelection } from './composables/file-selection'
 import { useFileSorting } from './composables/file-sorting'
@@ -324,6 +279,12 @@ const isEditing = computed(() => ctx.editingFile.value !== null)
 const isBusy = computed(() => ctx.isBusy?.value ?? false)
 const busyTooltip = computed(() => ctx.busyTooltip?.value)
 const activeOperations = computed(() => ctx.activeOperations?.value ?? [])
+
+const uploadOverallProgress = computed(() => {
+	const state = ctx.uploadState?.value
+	if (!state || !state.isUploading || state.totalFiles === 0) return 0
+	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
+})
 
 const breadcrumbSegments = computed(() => {
 	const path = ctx.currentPath.value
@@ -366,13 +327,13 @@ const { isStuck: isLabelBarStuck } = useStickyObserver(fileUploadEl)
 
 // Refs
 const fileEditorRef = ref<InstanceType<typeof FileEditor>>()
-const uploadDropdownRef = ref<InstanceType<typeof FileUploadDropdown>>()
 const createItemModal = ref<InstanceType<typeof FileCreateItemModal>>()
 const renameItemModal = ref<InstanceType<typeof FileRenameItemModal>>()
 const moveItemModal = ref<InstanceType<typeof FileMoveItemModal>>()
 const deleteItemModal = ref<InstanceType<typeof FileDeleteItemModal>>()
 const uploadConflictModal = ref<InstanceType<typeof FileUploadConflictModal>>()
 const uploadZipUrlModal = ref<InstanceType<typeof FileUploadZipUrlModal>>()
+const contextMenuRef = ref<InstanceType<typeof FileContextMenu>>()
 
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<FileItem | null>(null)
@@ -580,9 +541,7 @@ function showBulkDeleteModal() {
 // Upload
 function handleDroppedFiles(files: File[]) {
 	if (isEditing.value || isBusy.value) return
-	files.forEach((file) => {
-		uploadDropdownRef.value?.uploadFile(file)
-	})
+	ctx.uploadFiles(files)
 }
 
 function initiateFileUpload() {
@@ -592,9 +551,7 @@ function initiateFileUpload() {
 	input.multiple = true
 	input.onchange = () => {
 		if (input.files) {
-			Array.from(input.files).forEach((file) => {
-				uploadDropdownRef.value?.uploadFile(file)
-			})
+			ctx.uploadFiles(Array.from(input.files))
 		}
 	}
 	input.click()
@@ -635,6 +592,50 @@ function handlePrefetchHome() {
 	}, 150)
 }
 
+// Context menu
+function handleContextMenu(item: FileItem, x: number, y: number) {
+	const wd = isBusy.value
+	const wdTooltip = busyTooltip.value
+	const isZip = getFileExtension(item.name) === 'zip'
+
+	const options = [
+		{
+			id: 'extract',
+			shown: isZip && !!ctx.extractFile,
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => handleExtractItem(item),
+		},
+		{ divider: true, shown: isZip && !!ctx.extractFile },
+		{
+			id: 'rename',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => showRenameModal(item),
+		},
+		{
+			id: 'move',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => showMoveModal(item),
+		},
+		{
+			id: 'download',
+			action: () => handleDownload(item),
+			shown: item.type !== 'directory',
+		},
+		{
+			id: 'delete',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => showDeleteModal(item),
+			color: 'red',
+		},
+	]
+
+	contextMenuRef.value?.show(item, x, y, options)
+}
+
 // Reset search/sort/selection on path change
 watch(
 	() => ctx.currentPath.value,
@@ -656,45 +657,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.radial-progress-animation-overlay {
-	position: relative;
-}
-
-@property --_radial-percentage {
-	syntax: '<percentage>';
-	inherits: false;
-	initial-value: 0%;
-}
-
-.radial-progress-animation-overlay.active::before {
-	animation: radial-progress 3s linear forwards;
-}
-
-.radial-progress-animation-overlay::before {
-	content: '';
-	inset: -2px;
-	position: absolute;
-	border-radius: 50%;
-	box-sizing: content-box;
-	border: 2px solid var(--color-button-bg);
-	filter: brightness(var(--hover-brightness));
-	mask-image: conic-gradient(
-		black 0%,
-		black var(--_radial-percentage),
-		transparent var(--_radial-percentage),
-		transparent 100%
-	);
-}
-
-@keyframes radial-progress {
-	from {
-		--_radial-percentage: 0%;
-	}
-	to {
-		--_radial-percentage: 100%;
-	}
-}
-
 .fade-enter-active,
 .fade-leave-active {
 	transition:

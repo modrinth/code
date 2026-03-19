@@ -76,6 +76,8 @@
 				name="search"
 				autocomplete="off"
 				placeholder="Search files"
+				class="!h-10"
+				input-class="!h-10"
 				wrapper-class="w-full sm:w-[280px]"
 				@update:model-value="$emit('update:searchQuery', $event)"
 			/>

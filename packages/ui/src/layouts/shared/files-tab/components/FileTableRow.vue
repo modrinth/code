@@ -27,7 +27,7 @@
 				@update:model-value="emit('toggle-select')"
 			/>
 			<div class="pointer-events-none flex size-5 items-center justify-center">
-				<component :is="iconComponent" class="size-5" />
+				<component :is="iconComponent" class="size-5 group-hover:text-contrast group-focus:text-contrast" />
 			</div>
 			<div class="pointer-events-none flex flex-col truncate">
 				<span
@@ -132,12 +132,14 @@ const formatDateTime = useFormatDateTime({
 })
 
 const containerClasses = computed(() => [
-	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
+	'group m-0 flex h-[48px] w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 focus:!outline-none',
 	props.selected ? 'bg-surface-2.5' : props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
 	props.isLast ? 'rounded-b-[20px]' : '',
-	isEditableFile.value ? 'cursor-pointer' : props.type === 'directory' ? 'cursor-pointer' : '',
+	isEditableFile.value || props.type === 'directory'
+		? 'cursor-pointer hover:bg-surface-2.5'
+		: '',
 	isDragOver.value ? '!bg-brand-highlight' : '',
-	'transition-colors duration-100 hover:!bg-surface-4 hover:!brightness-100 focus:!bg-surface-4 focus:!brightness-100',
+	'transition-colors duration-100 focus:!outline-none',
 ])
 
 const fileExtension = computed(() => getFileExtension(props.name))
