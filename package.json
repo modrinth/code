@@ -24,6 +24,8 @@
 		"storybook": "pnpm --filter @modrinth/ui storybook",
 		"build-storybook": "pnpm --filter @modrinth/ui build-storybook",
 		"icons:add": "pnpm --filter @modrinth/assets icons:add",
+		"changelog": "node scripts/run.mjs new-changelog",
+		"changelog:bake": "node scripts/run.mjs bake-changelog",
 		"scripts": "node scripts/run.mjs"
 	},
 	"devDependencies": {

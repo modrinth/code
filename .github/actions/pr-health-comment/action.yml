@@ -1,0 +1,84 @@
+name: PR Health Comment
+description: Update a section of the unified PR Health comment
+
+inputs:
+  section:
+    description: Section name (e.g. changelog, deploy)
+    required: true
+  content:
+    description: Inline content for this section
+    required: true
+  github-token:
+    description: GitHub token for API calls
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Update PR Health comment
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const marker = '<!-- pr-health -->';
+          const section = '${{ inputs.section }}';
+          const content = `${{ inputs.content }}`;
+
+          // Fixed ordering of sections
+          const SECTION_ORDER = ['changelog', 'deploy'];
+
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+
+          const existing = comments.find(c => c.body.includes(marker));
+
+          let sections = {};
+          if (existing) {
+            const sectionRegex = /<!-- section:(\w+) -->([\s\S]*?)<!-- \/section:\w+ -->/g;
+            let match;
+            while ((match = sectionRegex.exec(existing.body)) !== null) {
+              sections[match[1]] = match[2];
+            }
+          }
+
+          sections[section] = content;
+
+          const parts = SECTION_ORDER
+            .filter(s => sections[s])
+            .map(s => `<!-- section:${s} -->${sections[s]}<!-- /section:${s} -->`);
+
+          const body = `${marker}\n**PR Health** · ${parts.join(' · ')}`;
+
+          if (existing) {
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body,
+            });
+          } else {
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });
+          }
+
+          // Clean up old standalone comments from previous system
+          const oldMarkers = ['<!-- changelog-check -->', 'Frontend previews'];
+          for (const comment of comments) {
+            if (comment.id === existing?.id) continue;
+            if (oldMarkers.some(m => comment.body.includes(m))) {
+              await github.graphql(`
+                mutation($id: ID!) {
+                  minimizeComment(input: { subjectId: $id, classifier: OUTDATED }) {
+                    minimizedComment { isMinimized }
+                  }
+                }
+              `, { id: comment.node_id });
+            }
+          }

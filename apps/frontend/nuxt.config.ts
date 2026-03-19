@@ -115,7 +115,7 @@ export default defineNuxtConfig({
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
 			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/utils')
+			const { getChangelog } = await import('@modrinth/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []
