@@ -10,7 +10,7 @@
 				:icon="SearchIcon"
 				type="text"
 				clearable
-				placeholder="Search collections..."
+				:placeholder="formatMessage(messages.searchCollectionsPlaceholder)"
 				wrapper-class="w-full"
 				input-class="!h-12"
 			/>
@@ -20,18 +20,13 @@
 					v-slot="{ selected }"
 					v-model="sortBy"
 					class="!w-auto flex-grow md:flex-grow-0"
-					name="Sort by"
+					:name="formatMessage(messages.sortByControlName)"
 					:options="['updated', 'created', 'name']"
-					:display-name="
-						(option) =>
-							option === 'updated'
-								? 'Recently Updated'
-								: option === 'created'
-									? 'Recently Created'
-									: 'Name (A-Z)'
-					"
+					:display-name="formatCollectionSortOption"
 				>
-					<span class="font-semibold text-primary">Sort by: </span>
+					<span class="font-semibold text-primary">{{
+						formatMessage(commonMessages.sortByLabel)
+					}}</span>
 					<span class="font-semibold text-secondary">{{ selected }}</span>
 				</DropdownSelect>
 
@@ -47,7 +42,7 @@
 		</div>
 		<div class="collections-grid">
 			<nuxt-link
-				v-if="'followed projects'.includes(filterQuery.toLowerCase())"
+				v-if="showFollowedProjectsCollection"
 				:to="`/collection/following`"
 				class="universal-card recessed collection"
 			>
@@ -188,6 +183,26 @@ const messages = defineMessages({
 		id: 'dashboard.collections.label.search-input',
 		defaultMessage: 'Search your collections',
 	},
+	searchCollectionsPlaceholder: {
+		id: 'dashboard.collections.placeholder.search',
+		defaultMessage: 'Search collections...',
+	},
+	sortByControlName: {
+		id: 'dashboard.collections.sort.control-name',
+		defaultMessage: 'Sort by',
+	},
+	sortRecentlyUpdated: {
+		id: 'dashboard.collections.sort.recently-updated',
+		defaultMessage: 'Recently Updated',
+	},
+	sortRecentlyCreated: {
+		id: 'dashboard.collections.sort.recently-created',
+		defaultMessage: 'Recently Created',
+	},
+	sortNameAscending: {
+		id: 'dashboard.collections.sort.name-ascending',
+		defaultMessage: 'Name (A-Z)',
+	},
 	emptyNoMatch: {
 		id: 'dashboard.collections.empty.no-match',
 		defaultMessage: 'No collections match your search',
@@ -233,6 +248,24 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const validSortOptions = ['updated', 'created', 'name']
 const sortBy = ref(validSortOptions.includes(route.query.s) ? route.query.s : 'updated')
+
+const showFollowedProjectsCollection = computed(() =>
+	formatMessage(commonMessages.followedProjectsLabel)
+		.toLowerCase()
+		.includes(filterQuery.value.toLowerCase()),
+)
+
+function formatCollectionSortOption(option) {
+	if (option === 'updated') {
+		return formatMessage(messages.sortRecentlyUpdated)
+	}
+
+	if (option === 'created') {
+		return formatMessage(messages.sortRecentlyCreated)
+	}
+
+	return formatMessage(messages.sortNameAscending)
+}
 
 const orderedCollections = computed(() => {
 	if (!collections.value) return []

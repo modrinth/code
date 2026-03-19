@@ -8,7 +8,9 @@
 				<Combobox
 					v-model="selectedYear"
 					:options="yearOptions"
-					:display-value="selectedYear === 'all' ? 'All years' : String(selectedYear)"
+					:display-value="
+						selectedYear === 'all' ? formatMessage(messages.allYears) : String(selectedYear)
+					"
 					listbox
 				/>
 				<ButtonStyled circular>
@@ -90,6 +92,7 @@ import {
 import {
 	ButtonStyled,
 	Combobox,
+	commonMessages,
 	defineMessages,
 	EmptyState,
 	injectModrinthClient,
@@ -97,7 +100,6 @@ import {
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
@@ -116,7 +118,7 @@ const client = injectModrinthClient()
 const generatedState = useGeneratedState()
 
 useHead({
-	title: 'Transaction history - Modrinth',
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const { data: transactions, refetch } = useQuery({
@@ -143,7 +145,7 @@ const yearOptions = computed(() => {
 
 	return yearValues.map((year) => ({
 		value: year,
-		label: year === 'all' ? 'All years' : String(year),
+		label: year === 'all' ? formatMessage(messages.allYears) : String(year),
 	}))
 })
 
@@ -161,11 +163,11 @@ function getPeriodLabel(date) {
 	const now = dayjs()
 
 	if (txnDate.isSame(now, 'month')) {
-		return 'This month'
+		return formatMessage(messages.thisMonth)
 	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
-		return 'Last month'
+		return formatMessage(messages.lastMonth)
 	} else {
-		return capitalizeString(formatMonth(txnDate.toDate()))
+		return formatMonth(txnDate.toDate())
 	}
 }
 
@@ -212,18 +214,28 @@ function transactionsToCSV() {
 	}
 
 	const newline = '\n'
-	const header = ['Date', 'Type', 'Source', 'Status', 'Amount', 'Fee'].join(',')
+	const header = [
+		formatMessage(messages.csvDateHeader),
+		formatMessage(messages.csvTypeHeader),
+		formatMessage(messages.csvSourceHeader),
+		formatMessage(messages.csvStatusHeader),
+		formatMessage(messages.csvAmountHeader),
+		formatMessage(messages.csvFeeHeader),
+	].join(',')
 
 	const rows = filteredTransactions.value.map((txn) => {
 		const date = dayjs(txn.created).format('YYYY-MM-DD HH:mm:ss')
-		const type = txn.type === 'withdrawal' ? 'Withdrawal' : 'Payout'
+		const type =
+			txn.type === 'withdrawal'
+				? formatMessage(messages.csvTypeWithdrawal)
+				: formatMessage(messages.csvTypePayout)
 
 		let methodOrSource = ''
 		let status = ''
 		let fee = ''
 
 		if (txn.type === 'withdrawal') {
-			const method = txn.method_type || txn.method || 'Unknown'
+			const method = txn.method_type || txn.method || 'unknown'
 			switch (method) {
 				case 'paypal':
 					methodOrSource = 'PayPal'
@@ -249,15 +261,20 @@ function transactionsToCSV() {
 							break
 						}
 					}
-					methodOrSource = 'Mural Pay (Unknown)'
+					methodOrSource = formatMessage(messages.muralPayUnknown, {
+						unknown: formatMessage(commonMessages.unknownLabel),
+					})
 					break
 				default:
-					methodOrSource = method.charAt(0).toUpperCase() + method.slice(1)
+					methodOrSource =
+						method === 'unknown'
+							? formatMessage(commonMessages.unknownLabel)
+							: method.charAt(0).toUpperCase() + method.slice(1)
 			}
 
 			status = txn.status
 				? txn.status.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-				: 'Unknown'
+				: formatMessage(commonMessages.unknownLabel)
 
 			fee = txn.fee ? Number(txn.fee).toFixed(2) : '0.00'
 		} else {
@@ -266,9 +283,9 @@ function transactionsToCSV() {
 						.split('_')
 						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 						.join(' ')
-				: 'Unknown'
-			status = 'N/A'
-			fee = 'N/A'
+				: formatMessage(commonMessages.unknownLabel)
+			status = formatMessage(messages.notApplicable)
+			fee = formatMessage(messages.notApplicable)
 		}
 
 		const amount = Number(txn.amount).toFixed(2)
@@ -322,6 +339,10 @@ const messages = defineMessages({
 		id: 'dashboard.revenue.transactions.header',
 		defaultMessage: 'Transactions',
 	},
+	headTitle: {
+		id: 'dashboard.revenue.transactions.head-title',
+		defaultMessage: 'Transaction history',
+	},
 	received: {
 		id: 'dashboard.revenue.stats.received',
 		defaultMessage: 'Received',
@@ -345,6 +366,58 @@ const messages = defineMessages({
 	downloadCsv: {
 		id: 'dashboard.revenue.transactions.btn.download-csv',
 		defaultMessage: 'Download as CSV',
+	},
+	allYears: {
+		id: 'dashboard.revenue.transactions.year.all',
+		defaultMessage: 'All years',
+	},
+	thisMonth: {
+		id: 'dashboard.revenue.transactions.period.this-month',
+		defaultMessage: 'This month',
+	},
+	lastMonth: {
+		id: 'dashboard.revenue.transactions.period.last-month',
+		defaultMessage: 'Last month',
+	},
+	notApplicable: {
+		id: 'dashboard.revenue.transactions.not-applicable',
+		defaultMessage: 'N/A',
+	},
+	csvDateHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.date',
+		defaultMessage: 'Date',
+	},
+	csvTypeHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.type',
+		defaultMessage: 'Type',
+	},
+	csvSourceHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.source',
+		defaultMessage: 'Source',
+	},
+	csvStatusHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.status',
+		defaultMessage: 'Status',
+	},
+	csvAmountHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.amount',
+		defaultMessage: 'Amount',
+	},
+	csvFeeHeader: {
+		id: 'dashboard.revenue.transactions.csv.header.fee',
+		defaultMessage: 'Fee',
+	},
+	csvTypeWithdrawal: {
+		id: 'dashboard.revenue.transactions.csv.type.withdrawal',
+		defaultMessage: 'Withdrawal',
+	},
+	csvTypePayout: {
+		id: 'dashboard.revenue.transactions.csv.type.payout',
+		defaultMessage: 'Payout',
+	},
+	muralPayUnknown: {
+		id: 'dashboard.revenue.transactions.csv.source.mural-pay-unknown',
+		defaultMessage: 'Mural Pay ({unknown})',
 	},
 })
 </script>

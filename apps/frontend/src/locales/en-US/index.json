@@ -554,6 +554,9 @@
   "dashboard.affiliate-links.create.button": {
     "message": "Create affiliate link"
   },
+  "dashboard.affiliate-links.empty.no-codes": {
+    "message": "No affiliate codes found."
+  },
   "dashboard.affiliate-links.error.title": {
     "message": "Error loading affiliate links"
   },
@@ -571,6 +574,15 @@
   },
   "dashboard.affiliate-links.search": {
     "message": "Search affiliate links..."
+  },
+  "dashboard.analytics.from-projects": {
+    "message": "from {count} {count, plural, one {project} other {projects}}"
+  },
+  "dashboard.analytics.total-downloads": {
+    "message": "Total downloads"
+  },
+  "dashboard.analytics.total-followers": {
+    "message": "Total followers"
   },
   "dashboard.collections.button.create-new": {
     "message": "Create new"
@@ -595,6 +607,21 @@
   },
   "dashboard.collections.long-title": {
     "message": "Your collections"
+  },
+  "dashboard.collections.placeholder.search": {
+    "message": "Search collections..."
+  },
+  "dashboard.collections.sort.control-name": {
+    "message": "Sort by"
+  },
+  "dashboard.collections.sort.name-ascending": {
+    "message": "Name (A-Z)"
+  },
+  "dashboard.collections.sort.recently-created": {
+    "message": "Recently Created"
+  },
+  "dashboard.collections.sort.recently-updated": {
+    "message": "Recently Updated"
   },
   "dashboard.creator-tax-form-modal.confirmation.download-button": {
     "message": "Download {formType}"
@@ -848,6 +875,189 @@
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "You've used up your <b>{withdrawLimit}</b> withdrawal limit. You must complete a tax form to withdraw more."
   },
+  "dashboard.head-title": {
+    "message": "Dashboard"
+  },
+  "dashboard.notifications.button.mark-all-as-read": {
+    "message": "Mark all as read"
+  },
+  "dashboard.notifications.button.view-history": {
+    "message": "View history"
+  },
+  "dashboard.notifications.empty.no-unread": {
+    "message": "You don't have any unread notifications."
+  },
+  "dashboard.notifications.error.loading": {
+    "message": "Error loading notifications:"
+  },
+  "dashboard.notifications.history.label": {
+    "message": "History"
+  },
+  "dashboard.notifications.history.title": {
+    "message": "Notification history"
+  },
+  "dashboard.notifications.link.see-all": {
+    "message": "See all"
+  },
+  "dashboard.notifications.link.view-history": {
+    "message": "View notification history"
+  },
+  "dashboard.notifications.link.view-more": {
+    "message": "View {extraNotifs} more {extraNotifs, plural, one {notification} other {notifications}}"
+  },
+  "dashboard.notifications.loading": {
+    "message": "Loading notifications..."
+  },
+  "dashboard.notifications.type.moderator-messages": {
+    "message": "Moderator messages"
+  },
+  "dashboard.notifications.type.organization-invites": {
+    "message": "Organization invites"
+  },
+  "dashboard.notifications.type.other": {
+    "message": "Other notifications"
+  },
+  "dashboard.notifications.type.project-updates": {
+    "message": "Project updates"
+  },
+  "dashboard.notifications.type.status-changes": {
+    "message": "Status changes"
+  },
+  "dashboard.notifications.type.team-invites": {
+    "message": "Team invites"
+  },
+  "dashboard.organizations.button.create": {
+    "message": "Create organization"
+  },
+  "dashboard.organizations.empty.cta": {
+    "message": "Make an organization!"
+  },
+  "dashboard.organizations.error.fetch": {
+    "message": "Failed to fetch organizations"
+  },
+  "dashboard.organizations.member-count": {
+    "message": "{count} {count, plural, one {member} other {members}}"
+  },
+  "dashboard.organizations.title": {
+    "message": "Organizations"
+  },
+  "dashboard.projects.bulk-edit-hint": {
+    "message": "You can edit multiple projects at once by selecting them below."
+  },
+  "dashboard.projects.bulk-edit.server-disabled": {
+    "message": "Server projects do not support bulk editing"
+  },
+  "dashboard.projects.empty": {
+    "message": "You don't have any projects yet. Click the green button above to begin."
+  },
+  "dashboard.projects.head-title": {
+    "message": "Projects"
+  },
+  "dashboard.projects.links.and-more": {
+    "message": "and {count} more..."
+  },
+  "dashboard.projects.links.button.clear-link": {
+    "message": "Clear link"
+  },
+  "dashboard.projects.links.button.edit": {
+    "message": "Edit links"
+  },
+  "dashboard.projects.links.changes-applied": {
+    "message": "Changes will be applied to <strong>{count}</strong> {count, plural, one {project} other {projects}}."
+  },
+  "dashboard.projects.links.description": {
+    "message": "Any links you specify below will be overwritten on each of the selected projects. Any you leave blank will be ignored. You can clear a link from all selected projects using the trash can button."
+  },
+  "dashboard.projects.links.discord-invite.description": {
+    "message": "An invitation link to your Discord server."
+  },
+  "dashboard.projects.links.discord-invite.label": {
+    "message": "Discord invite"
+  },
+  "dashboard.projects.links.issue-tracker.description": {
+    "message": "A place for users to report bugs, issues, and concerns about your project."
+  },
+  "dashboard.projects.links.issue-tracker.label": {
+    "message": "Issue tracker"
+  },
+  "dashboard.projects.links.placeholder.cleared": {
+    "message": "Existing link will be cleared"
+  },
+  "dashboard.projects.links.placeholder.valid-discord-url": {
+    "message": "Enter a valid Discord invite URL"
+  },
+  "dashboard.projects.links.placeholder.valid-url": {
+    "message": "Enter a valid URL"
+  },
+  "dashboard.projects.links.show-all-projects": {
+    "message": "Show all projects"
+  },
+  "dashboard.projects.links.source-code.description": {
+    "message": "A page/repository containing the source code for your project"
+  },
+  "dashboard.projects.links.source-code.label": {
+    "message": "Source code"
+  },
+  "dashboard.projects.links.wiki-page.description": {
+    "message": "A page containing information, documentation, and help for the project."
+  },
+  "dashboard.projects.links.wiki-page.label": {
+    "message": "Wiki page"
+  },
+  "dashboard.projects.notification.bulk-edit-success": {
+    "message": "Bulk edited selected project's links."
+  },
+  "dashboard.projects.project.icon-alt": {
+    "message": "Icon for {title}"
+  },
+  "dashboard.projects.project.moderator-message-aria": {
+    "message": "Project has a message from the moderators. View the project to see more."
+  },
+  "dashboard.projects.project.review-environment-metadata": {
+    "message": "Please review environment metadata"
+  },
+  "dashboard.projects.sort.ascending": {
+    "message": "Ascending"
+  },
+  "dashboard.projects.sort.descending": {
+    "message": "Descending"
+  },
+  "dashboard.projects.sort.label": {
+    "message": "Sort by"
+  },
+  "dashboard.projects.sort.option.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.sort.option.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.sort.option.type": {
+    "message": "Type"
+  },
+  "dashboard.projects.table.icon": {
+    "message": "Icon"
+  },
+  "dashboard.projects.table.id": {
+    "message": "ID"
+  },
+  "dashboard.projects.table.name": {
+    "message": "Name"
+  },
+  "dashboard.projects.table.status": {
+    "message": "Status"
+  },
+  "dashboard.projects.table.type": {
+    "message": "Type"
+  },
+  "dashboard.report.title": {
+    "message": "Report {id}"
+  },
+  "dashboard.reports.active-title": {
+    "message": "Active reports"
+  },
+  "dashboard.reports.title": {
+    "message": "Reports"
+  },
   "dashboard.revenue.available-now": {
     "message": "Available now"
   },
@@ -884,6 +1094,36 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Download as CSV"
   },
+  "dashboard.revenue.transactions.csv.header.amount": {
+    "message": "Amount"
+  },
+  "dashboard.revenue.transactions.csv.header.date": {
+    "message": "Date"
+  },
+  "dashboard.revenue.transactions.csv.header.fee": {
+    "message": "Fee"
+  },
+  "dashboard.revenue.transactions.csv.header.source": {
+    "message": "Source"
+  },
+  "dashboard.revenue.transactions.csv.header.status": {
+    "message": "Status"
+  },
+  "dashboard.revenue.transactions.csv.header.type": {
+    "message": "Type"
+  },
+  "dashboard.revenue.transactions.csv.source.mural-pay-unknown": {
+    "message": "Mural Pay ({unknown})"
+  },
+  "dashboard.revenue.transactions.csv.type.payout": {
+    "message": "Payout"
+  },
+  "dashboard.revenue.transactions.csv.type.withdrawal": {
+    "message": "Withdrawal"
+  },
+  "dashboard.revenue.transactions.head-title": {
+    "message": "Transaction history"
+  },
   "dashboard.revenue.transactions.header": {
     "message": "Transactions"
   },
@@ -893,8 +1133,20 @@
   "dashboard.revenue.transactions.none.desc": {
     "message": "Your payouts and withdrawals will appear here."
   },
+  "dashboard.revenue.transactions.not-applicable": {
+    "message": "N/A"
+  },
+  "dashboard.revenue.transactions.period.last-month": {
+    "message": "Last month"
+  },
+  "dashboard.revenue.transactions.period.this-month": {
+    "message": "This month"
+  },
   "dashboard.revenue.transactions.see-all": {
     "message": "See all"
+  },
+  "dashboard.revenue.transactions.year.all": {
+    "message": "All years"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "Your withdrawals are temporarily locked because your TIN or SSN didn't match IRS records. Please contact support to reset and resubmit your tax form."

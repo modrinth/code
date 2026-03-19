@@ -3,22 +3,31 @@
 		<section class="universal-card">
 			<Breadcrumbs
 				v-if="history"
-				current-title="History"
-				:link-stack="[{ href: `/dashboard/notifications`, label: 'Notifications' }]"
+				:current-title="formatMessage(messages.historyLabel)"
+				:link-stack="[
+					{
+						href: `/dashboard/notifications`,
+						label: formatMessage(commonMessages.notificationsLabel),
+					},
+				]"
 			/>
 			<div class="header__row">
 				<div class="header__title">
-					<h2 v-if="history" class="text-2xl">Notification history</h2>
-					<h2 v-else class="text-2xl">Notifications</h2>
+					<h2 v-if="history" class="text-2xl">
+						{{ formatMessage(messages.notificationHistoryTitle) }}
+					</h2>
+					<h2 v-else class="text-2xl">
+						{{ formatMessage(commonMessages.notificationsLabel) }}
+					</h2>
 				</div>
 				<template v-if="!history">
 					<Button v-if="data.hasRead" @click="updateRoute()">
 						<HistoryIcon />
-						View history
+						{{ formatMessage(messages.viewHistory) }}
 					</Button>
 					<Button v-if="notifications.length > 0" color="danger" @click="readAll()">
 						<CheckCheckIcon />
-						Mark all as read
+						{{ formatMessage(messages.markAllAsRead) }}
 					</Button>
 				</template>
 			</div>
@@ -26,12 +35,12 @@
 				v-if="notifTypes.length > 1"
 				v-model="selectedType"
 				:items="notifTypes"
-				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
+				:format-label="formatNotificationTypeLabel"
 				:capitalize="false"
 			/>
-			<p v-if="isPending">Loading notifications...</p>
+			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
 			<template v-else-if="error">
-				<p>Error loading notifications:</p>
+				<p>{{ formatMessage(messages.errorLoadingNotifications) }}</p>
 				<pre>
           {{ error }}
         </pre>
@@ -48,7 +57,7 @@
 					@update:notifications="() => refetch()"
 				/>
 			</template>
-			<p v-else>You don't have any unread notifications.</p>
+			<p v-else>{{ formatMessage(messages.noUnreadNotifications) }}</p>
 			<div class="flex justify-end">
 				<Pagination :page="page" :count="pages" @switch-page="changePage" />
 			</div>
@@ -57,8 +66,15 @@
 </template>
 <script setup>
 import { CheckCheckIcon, HistoryIcon } from '@modrinth/assets'
-import { Button, Chips, injectModrinthClient, Pagination } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
+import {
+	Button,
+	Chips,
+	commonMessages,
+	defineMessages,
+	injectModrinthClient,
+	Pagination,
+	useVIntl,
+} from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
@@ -69,8 +85,61 @@ import {
 	markAsRead,
 } from '~/helpers/platform-notifications.ts'
 
-useHead({
-	title: 'Notifications - Modrinth',
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	historyLabel: {
+		id: 'dashboard.notifications.history.label',
+		defaultMessage: 'History',
+	},
+	notificationHistoryTitle: {
+		id: 'dashboard.notifications.history.title',
+		defaultMessage: 'Notification history',
+	},
+	viewHistory: {
+		id: 'dashboard.notifications.button.view-history',
+		defaultMessage: 'View history',
+	},
+	markAllAsRead: {
+		id: 'dashboard.notifications.button.mark-all-as-read',
+		defaultMessage: 'Mark all as read',
+	},
+	loadingNotifications: {
+		id: 'dashboard.notifications.loading',
+		defaultMessage: 'Loading notifications...',
+	},
+	errorLoadingNotifications: {
+		id: 'dashboard.notifications.error.loading',
+		defaultMessage: 'Error loading notifications:',
+	},
+	noUnreadNotifications: {
+		id: 'dashboard.notifications.empty.no-unread',
+		defaultMessage: "You don't have any unread notifications.",
+	},
+	projectUpdatesType: {
+		id: 'dashboard.notifications.type.project-updates',
+		defaultMessage: 'Project updates',
+	},
+	teamInvitesType: {
+		id: 'dashboard.notifications.type.team-invites',
+		defaultMessage: 'Team invites',
+	},
+	organizationInvitesType: {
+		id: 'dashboard.notifications.type.organization-invites',
+		defaultMessage: 'Organization invites',
+	},
+	statusChangesType: {
+		id: 'dashboard.notifications.type.status-changes',
+		defaultMessage: 'Status changes',
+	},
+	moderatorMessagesType: {
+		id: 'dashboard.notifications.type.moderator-messages',
+		defaultMessage: 'Moderator messages',
+	},
+	otherNotificationsType: {
+		id: 'dashboard.notifications.type.other',
+		defaultMessage: 'Other notifications',
+	},
 })
 
 const client = injectModrinthClient()
@@ -79,9 +148,31 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 
 const history = computed(() => route.name === 'dashboard-notifications-history')
+
+useHead({
+	title: () =>
+		`${formatMessage(history.value ? messages.notificationHistoryTitle : commonMessages.notificationsLabel)} - Modrinth`,
+})
+
 const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)
+
+function formatNotificationTypeLabel(type) {
+	if (type === 'all') {
+		return formatMessage(commonMessages.allProjectType)
+	}
+
+	const notificationTypeMessages = {
+		project_update: messages.projectUpdatesType,
+		team_invite: messages.teamInvitesType,
+		organization_invite: messages.organizationInvitesType,
+		status_change: messages.statusChangesType,
+		moderator_message: messages.moderatorMessagesType,
+	}
+
+	return formatMessage(notificationTypeMessages[type] ?? messages.otherNotificationsType)
+}
 
 const { data, isPending, error, refetch } = useQuery({
 	queryKey: computed(() => [

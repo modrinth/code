@@ -1,18 +1,11 @@
 <template>
 	<div>
-		<NewModal ref="editLinksModal" header="Edit links">
+		<NewModal ref="editLinksModal" :header="formatMessage(messages.editLinksButton)">
 			<div class="universal-modal links-modal !p-0">
-				<p>
-					Any links you specify below will be overwritten on each of the selected projects. Any you
-					leave blank will be ignored. You can clear a link from all selected projects using the
-					trash can button.
-				</p>
+				<p>{{ formatMessage(messages.editLinksDescription) }}</p>
 				<section class="links">
-					<label
-						for="issue-tracker-input"
-						title="A place for users to report bugs, issues, and concerns about your project."
-					>
-						<span class="label__title">Issue tracker</span>
+					<label for="issue-tracker-input" :title="formatMessage(messages.issueTrackerDescription)">
+						<span class="label__title">{{ formatMessage(messages.issueTrackerLabel) }}</span>
 					</label>
 					<div class="input-group shrink-first">
 						<StyledInput
@@ -20,14 +13,12 @@
 							v-model="editLinks.issues.val"
 							:disabled="editLinks.issues.clear"
 							type="url"
-							:placeholder="
-								editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
-							"
+							:placeholder="getLinkInputPlaceholder(editLinks.issues.clear)"
 							:maxlength="2048"
 						/>
 						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
+							v-tooltip="formatMessage(messages.clearLinkLabel)"
+							:aria-label="formatMessage(messages.clearLinkLabel)"
 							class="square-button label-button"
 							:data-active="editLinks.issues.clear"
 							@click="editLinks.issues.clear = !editLinks.issues.clear"
@@ -35,11 +26,8 @@
 							<TrashIcon />
 						</button>
 					</div>
-					<label
-						for="source-code-input"
-						title="A page/repository containing the source code for your project"
-					>
-						<span class="label__title">Source code</span>
+					<label for="source-code-input" :title="formatMessage(messages.sourceCodeDescription)">
+						<span class="label__title">{{ formatMessage(messages.sourceCodeLabel) }}</span>
 					</label>
 					<div class="input-group shrink-first">
 						<StyledInput
@@ -48,13 +36,11 @@
 							:disabled="editLinks.source.clear"
 							type="url"
 							:maxlength="2048"
-							:placeholder="
-								editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
-							"
+							:placeholder="getLinkInputPlaceholder(editLinks.source.clear)"
 						/>
 						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
+							v-tooltip="formatMessage(messages.clearLinkLabel)"
+							:aria-label="formatMessage(messages.clearLinkLabel)"
 							class="square-button label-button"
 							:data-active="editLinks.source.clear"
 							@click="editLinks.source.clear = !editLinks.source.clear"
@@ -62,11 +48,8 @@
 							<TrashIcon />
 						</button>
 					</div>
-					<label
-						for="wiki-page-input"
-						title="A page containing information, documentation, and help for the project."
-					>
-						<span class="label__title">Wiki page</span>
+					<label for="wiki-page-input" :title="formatMessage(messages.wikiPageDescription)">
+						<span class="label__title">{{ formatMessage(messages.wikiPageLabel) }}</span>
 					</label>
 					<div class="input-group shrink-first">
 						<StyledInput
@@ -75,13 +58,11 @@
 							:disabled="editLinks.wiki.clear"
 							type="url"
 							:maxlength="2048"
-							:placeholder="
-								editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
-							"
+							:placeholder="getLinkInputPlaceholder(editLinks.wiki.clear)"
 						/>
 						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
+							v-tooltip="formatMessage(messages.clearLinkLabel)"
+							:aria-label="formatMessage(messages.clearLinkLabel)"
 							class="square-button label-button"
 							:data-active="editLinks.wiki.clear"
 							@click="editLinks.wiki.clear = !editLinks.wiki.clear"
@@ -89,8 +70,11 @@
 							<TrashIcon />
 						</button>
 					</div>
-					<label for="discord-invite-input" title="An invitation link to your Discord server.">
-						<span class="label__title">Discord invite</span>
+					<label
+						for="discord-invite-input"
+						:title="formatMessage(messages.discordInviteDescription)"
+					>
+						<span class="label__title">{{ formatMessage(messages.discordInviteLabel) }}</span>
 					</label>
 					<div class="input-group shrink-first">
 						<StyledInput
@@ -99,15 +83,11 @@
 							:disabled="editLinks.discord.clear"
 							type="url"
 							:maxlength="2048"
-							:placeholder="
-								editLinks.discord.clear
-									? 'Existing link will be cleared'
-									: 'Enter a valid Discord invite URL'
-							"
+							:placeholder="getLinkInputPlaceholder(editLinks.discord.clear, true)"
 						/>
 						<button
-							v-tooltip="'Clear link'"
-							aria-label="Clear link"
+							v-tooltip="formatMessage(messages.clearLinkLabel)"
+							:aria-label="formatMessage(messages.clearLinkLabel)"
 							class="square-button label-button"
 							:data-active="editLinks.discord.clear"
 							@click="editLinks.discord.clear = !editLinks.discord.clear"
@@ -117,10 +97,14 @@
 					</div>
 				</section>
 				<p>
-					Changes will be applied to
-					<strong>{{ selectedProjects.length }}</strong> project{{
-						selectedProjects.length > 1 ? 's' : ''
-					}}.
+					<IntlFormatted
+						:message-id="messages.changesAppliedTo"
+						:values="{ count: selectedProjects.length }"
+					>
+						<template #strong="{ children }">
+							<strong><component :is="() => children" /></strong>
+						</template>
+					</IntlFormatted>
 				</p>
 				<ul>
 					<li
@@ -133,23 +117,25 @@
 						{{ project.title }}
 					</li>
 					<li v-if="!editLinks.showAffected && selectedProjects.length > 3">
-						<strong>and {{ selectedProjects.length - 3 }} more...</strong>
+						<strong>{{
+							formatMessage(messages.andMore, { count: selectedProjects.length - 3 })
+						}}</strong>
 					</li>
 				</ul>
 				<Checkbox
 					v-if="selectedProjects.length > 3"
 					v-model="editLinks.showAffected"
-					label="Show all projects"
-					description="Show all projects"
+					:label="formatMessage(messages.showAllProjects)"
+					:description="formatMessage(messages.showAllProjects)"
 				/>
 				<div class="push-right input-group">
 					<button class="iconified-button" @click="$refs.editLinksModal.hide()">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 					<button class="iconified-button brand-button" @click="bulkEditLinks()">
 						<SaveIcon />
-						Save changes
+						{{ formatMessage(commonMessages.saveChangesButton) }}
 					</button>
 				</div>
 			</div>
@@ -157,7 +143,7 @@
 		<ModalCreation ref="modal_creation" />
 		<section class="universal-card">
 			<div class="header__row">
-				<h2 class="header__title text-2xl">Projects</h2>
+				<h2 class="header__title text-2xl">{{ formatMessage(messages.headTitle) }}</h2>
 				<div class="input-group">
 					<button class="iconified-button brand-button" @click="$refs.modal_creation.show($event)">
 						<PlusIcon />
@@ -166,10 +152,10 @@
 				</div>
 			</div>
 			<p v-if="projects.length < 1">
-				You don't have any projects yet. Click the green button above to begin.
+				{{ formatMessage(messages.noProjectsYet) }}
 			</p>
 			<template v-else>
-				<p>You can edit multiple projects at once by selecting them below.</p>
+				<p>{{ formatMessage(messages.bulkEditHint) }}</p>
 				<div class="input-group">
 					<button
 						class="iconified-button"
@@ -177,11 +163,11 @@
 						@click="$refs.editLinksModal.show()"
 					>
 						<EditIcon />
-						Edit links
+						{{ formatMessage(messages.editLinksButton) }}
 					</button>
 					<div class="push-right">
 						<div class="labeled-control-row">
-							Sort by
+							{{ formatMessage(messages.sortByLabel) }}
 							<Combobox
 								v-model="sortBy"
 								:searchable="false"
@@ -190,7 +176,7 @@
 								@update:model-value="projects = updateSort(projects, sortBy, descending)"
 							/>
 							<button
-								v-tooltip="descending ? 'Descending' : 'Ascending'"
+								v-tooltip="formatMessage(descending ? messages.descending : messages.ascending)"
 								class="square-button"
 								@click="updateDescending()"
 							>
@@ -208,11 +194,11 @@
 								@update:model-value="toggleAllBulkEditableProjects()"
 							/>
 						</div>
-						<div>Icon</div>
-						<div>Name</div>
-						<div>ID</div>
-						<div>Type</div>
-						<div>Status</div>
+						<div>{{ formatMessage(messages.iconHeader) }}</div>
+						<div>{{ formatMessage(messages.nameHeader) }}</div>
+						<div>{{ formatMessage(messages.idHeader) }}</div>
+						<div>{{ formatMessage(messages.typeHeader) }}</div>
+						<div>{{ formatMessage(messages.statusHeader) }}</div>
 						<div />
 					</div>
 					<div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
@@ -234,7 +220,7 @@
 								<Avatar
 									:src="project.icon_url"
 									aria-hidden="true"
-									:alt="'Icon for ' + project.title"
+									:alt="formatMessage(messages.projectIconAlt, { title: project.title })"
 									no-shadow
 								/>
 							</nuxt-link>
@@ -244,7 +230,7 @@
 							<span class="project-title">
 								<IssuesIcon
 									v-if="project.moderator_message"
-									aria-label="Project has a message from the moderators. View the project to see more."
+									:aria-label="formatMessage(messages.projectModeratorMessageAriaLabel)"
 								/>
 
 								<nuxt-link
@@ -263,7 +249,7 @@
 						</div>
 
 						<div>
-							{{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
+							{{ formatProjectTypeLabel(project) }}
 						</div>
 
 						<div>
@@ -277,7 +263,7 @@
 								color="orange"
 							>
 								<nuxt-link
-									v-tooltip="'Please review environment metadata'"
+									v-tooltip="formatMessage(messages.reviewEnvironmentMetadata)"
 									:to="`/${getProjectTypeForUrl(project.project_type, project.loaders)}/${
 										project.slug ? project.slug : project.id
 									}?showEnvironmentMigrationWarning=true`"
@@ -322,19 +308,19 @@ import {
 	Checkbox,
 	Combobox,
 	commonMessages,
+	commonProjectTypeTitleMessages,
 	CopyCode,
+	defineMessages,
 	injectNotificationManager,
+	IntlFormatted,
 	NewModal,
 	ProjectStatusBadge,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
-
-useHead({ title: 'Projects - Modrinth' })
 
 // const UPLOAD_VERSION = 1 << 0
 // const DELETE_VERSION = 1 << 1
@@ -348,16 +334,167 @@ const EDIT_DETAILS = 1 << 2
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
+const messages = defineMessages({
+	headTitle: {
+		id: 'dashboard.projects.head-title',
+		defaultMessage: 'Projects',
+	},
+	editLinksButton: {
+		id: 'dashboard.projects.links.button.edit',
+		defaultMessage: 'Edit links',
+	},
+	editLinksDescription: {
+		id: 'dashboard.projects.links.description',
+		defaultMessage:
+			'Any links you specify below will be overwritten on each of the selected projects. Any you leave blank will be ignored. You can clear a link from all selected projects using the trash can button.',
+	},
+	issueTrackerLabel: {
+		id: 'dashboard.projects.links.issue-tracker.label',
+		defaultMessage: 'Issue tracker',
+	},
+	issueTrackerDescription: {
+		id: 'dashboard.projects.links.issue-tracker.description',
+		defaultMessage: 'A place for users to report bugs, issues, and concerns about your project.',
+	},
+	sourceCodeLabel: {
+		id: 'dashboard.projects.links.source-code.label',
+		defaultMessage: 'Source code',
+	},
+	sourceCodeDescription: {
+		id: 'dashboard.projects.links.source-code.description',
+		defaultMessage: 'A page/repository containing the source code for your project',
+	},
+	wikiPageLabel: {
+		id: 'dashboard.projects.links.wiki-page.label',
+		defaultMessage: 'Wiki page',
+	},
+	wikiPageDescription: {
+		id: 'dashboard.projects.links.wiki-page.description',
+		defaultMessage: 'A page containing information, documentation, and help for the project.',
+	},
+	discordInviteLabel: {
+		id: 'dashboard.projects.links.discord-invite.label',
+		defaultMessage: 'Discord invite',
+	},
+	discordInviteDescription: {
+		id: 'dashboard.projects.links.discord-invite.description',
+		defaultMessage: 'An invitation link to your Discord server.',
+	},
+	existingLinkWillBeCleared: {
+		id: 'dashboard.projects.links.placeholder.cleared',
+		defaultMessage: 'Existing link will be cleared',
+	},
+	enterValidUrl: {
+		id: 'dashboard.projects.links.placeholder.valid-url',
+		defaultMessage: 'Enter a valid URL',
+	},
+	enterValidDiscordInviteUrl: {
+		id: 'dashboard.projects.links.placeholder.valid-discord-url',
+		defaultMessage: 'Enter a valid Discord invite URL',
+	},
+	clearLinkLabel: {
+		id: 'dashboard.projects.links.button.clear-link',
+		defaultMessage: 'Clear link',
+	},
+	changesAppliedTo: {
+		id: 'dashboard.projects.links.changes-applied',
+		defaultMessage:
+			'Changes will be applied to <strong>{count}</strong> {count, plural, one {project} other {projects}}.',
+	},
+	andMore: {
+		id: 'dashboard.projects.links.and-more',
+		defaultMessage: 'and {count} more...',
+	},
+	showAllProjects: {
+		id: 'dashboard.projects.links.show-all-projects',
+		defaultMessage: 'Show all projects',
+	},
+	noProjectsYet: {
+		id: 'dashboard.projects.empty',
+		defaultMessage: "You don't have any projects yet. Click the green button above to begin.",
+	},
+	bulkEditHint: {
+		id: 'dashboard.projects.bulk-edit-hint',
+		defaultMessage: 'You can edit multiple projects at once by selecting them below.',
+	},
+	sortByLabel: {
+		id: 'dashboard.projects.sort.label',
+		defaultMessage: 'Sort by',
+	},
+	ascending: {
+		id: 'dashboard.projects.sort.ascending',
+		defaultMessage: 'Ascending',
+	},
+	descending: {
+		id: 'dashboard.projects.sort.descending',
+		defaultMessage: 'Descending',
+	},
+	sortOptionName: {
+		id: 'dashboard.projects.sort.option.name',
+		defaultMessage: 'Name',
+	},
+	sortOptionStatus: {
+		id: 'dashboard.projects.sort.option.status',
+		defaultMessage: 'Status',
+	},
+	sortOptionType: {
+		id: 'dashboard.projects.sort.option.type',
+		defaultMessage: 'Type',
+	},
+	iconHeader: {
+		id: 'dashboard.projects.table.icon',
+		defaultMessage: 'Icon',
+	},
+	nameHeader: {
+		id: 'dashboard.projects.table.name',
+		defaultMessage: 'Name',
+	},
+	idHeader: {
+		id: 'dashboard.projects.table.id',
+		defaultMessage: 'ID',
+	},
+	typeHeader: {
+		id: 'dashboard.projects.table.type',
+		defaultMessage: 'Type',
+	},
+	statusHeader: {
+		id: 'dashboard.projects.table.status',
+		defaultMessage: 'Status',
+	},
+	projectIconAlt: {
+		id: 'dashboard.projects.project.icon-alt',
+		defaultMessage: 'Icon for {title}',
+	},
+	projectModeratorMessageAriaLabel: {
+		id: 'dashboard.projects.project.moderator-message-aria',
+		defaultMessage: 'Project has a message from the moderators. View the project to see more.',
+	},
+	reviewEnvironmentMetadata: {
+		id: 'dashboard.projects.project.review-environment-metadata',
+		defaultMessage: 'Please review environment metadata',
+	},
+	serverBulkEditDisabled: {
+		id: 'dashboard.projects.bulk-edit.server-disabled',
+		defaultMessage: 'Server projects do not support bulk editing',
+	},
+	bulkEditSuccessText: {
+		id: 'dashboard.projects.notification.bulk-edit-success',
+		defaultMessage: "Bulk edited selected project's links.",
+	},
+})
+
+useHead({ title: () => `${formatMessage(messages.headTitle)} - Modrinth` })
+
 const user = await useUser()
 const projects = ref([])
 const projectsWithMigrationWarning = ref([])
 const selectedProjects = ref([])
-const sortBy = ref('Name')
-const sortOptions = [
-	{ value: 'Name', label: 'Name' },
-	{ value: 'Status', label: 'Status' },
-	{ value: 'Type', label: 'Type' },
-]
+const sortBy = ref('name')
+const sortOptions = computed(() => [
+	{ value: 'name', label: formatMessage(messages.sortOptionName) },
+	{ value: 'status', label: formatMessage(messages.sortOptionStatus) },
+	{ value: 'type', label: formatMessage(messages.sortOptionType) },
+])
 const descending = ref(false)
 const editLinks = reactive({
 	showAffected: false,
@@ -369,6 +506,27 @@ const editLinks = reactive({
 
 const editLinksModal = ref(null)
 const modal_creation = ref(null)
+
+function getLinkInputPlaceholder(clearLink, isDiscord = false) {
+	if (clearLink) {
+		return formatMessage(messages.existingLinkWillBeCleared)
+	}
+
+	return isDiscord
+		? formatMessage(messages.enterValidDiscordInviteUrl)
+		: formatMessage(messages.enterValidUrl)
+}
+
+function getProjectTypeTitleMessage(type) {
+	return commonProjectTypeTitleMessages[type] ?? commonProjectTypeTitleMessages.project
+}
+
+function formatProjectTypeLabel(project) {
+	return formatMessage(
+		getProjectTypeTitleMessage(getProjectTypeForUrl(project.project_type, project.loaders)),
+		{ count: 1 },
+	)
+}
 
 function isProjectBulkEditDisabled(project) {
 	return (
@@ -408,7 +566,7 @@ function toggleProjectSelection(project) {
 
 function getBulkEditDisabledTooltip(project) {
 	if (project.project_type === 'minecraft_java_server') {
-		return 'Server projects do not support bulk editing'
+		return formatMessage(messages.serverBulkEditDisabled)
 	}
 
 	return ''
@@ -417,17 +575,17 @@ function getBulkEditDisabledTooltip(project) {
 function updateSort(list, sort, desc) {
 	let sortedArray = list
 	switch (sort) {
-		case 'Name':
+		case 'name':
 			sortedArray = list.slice().sort((a, b) => a.title.localeCompare(b.title))
 			break
-		case 'Status':
+		case 'status':
 			sortedArray = list.slice().sort((a, b) => {
 				if (a.status < b.status) return -1
 				if (a.status > b.status) return 1
 				return 0
 			})
 			break
-		case 'Type':
+		case 'type':
 			sortedArray = list.slice().sort((a, b) => {
 				if (a.project_type < b.project_type) return -1
 				if (a.project_type > b.project_type) return 1
@@ -467,8 +625,8 @@ async function bulkEditLinks() {
 
 		editLinksModal.value?.hide()
 		addNotification({
-			title: 'Success',
-			text: "Bulk edited selected project's links.",
+			title: formatMessage(commonMessages.successLabel),
+			text: formatMessage(messages.bulkEditSuccessText),
 			type: 'success',
 		})
 		selectedProjects.value = []
@@ -483,7 +641,7 @@ async function bulkEditLinks() {
 		editLinks.discord.clear = false
 	} catch (e) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: e,
 			type: 'error',
 		})
@@ -492,7 +650,7 @@ async function bulkEditLinks() {
 
 await initUserProjects()
 if (user.value?.projects) {
-	projects.value = updateSort(user.value.projects, 'Name', false)
+	projects.value = updateSort(user.value.projects, 'name', false)
 
 	// minecraft_java_server type determined from component on projectV3
 	projects.value = projects.value.map((project) => {

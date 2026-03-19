@@ -5,17 +5,19 @@
 </template>
 
 <script setup>
-import { injectModrinthClient } from '@modrinth/ui'
+import { commonMessages, injectModrinthClient, useVIntl } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
+
+const { formatMessage } = useVIntl()
 
 definePageMeta({
 	middleware: 'auth',
 })
 
 useHead({
-	title: 'Analytics - Modrinth',
+	title: () => `${formatMessage(commonMessages.analyticsButton)} - Modrinth`,
 })
 
 const auth = await useAuth()
