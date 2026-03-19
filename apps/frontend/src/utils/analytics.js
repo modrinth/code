@@ -1,4 +1,4 @@
-import { injectI18n } from '@modrinth/ui'
+import { injectI18n, useDebugLogger } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import { computed, ref, watch } from 'vue'
 
@@ -314,8 +314,15 @@ export const useFetchAllAnalytics = (
 	startDate = ref(dayjs().subtract(30, 'days')),
 	endDate = ref(dayjs()),
 	timeResolution = ref(1440),
-	isInitialized = ref(false),
 ) => {
+	const debug = useDebugLogger('useFetchAllAnalytics')
+	debug('init', {
+		projectCount: projects.value?.length,
+		personalRevenue,
+		startDate: startDate.value?.toISOString(),
+		endDate: endDate.value?.toISOString(),
+	})
+
 	const downloadData = ref(null)
 	const viewData = ref(null)
 	const revenueData = ref(null)
@@ -340,7 +347,22 @@ export const useFetchAllAnalytics = (
 		revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
 	}))
 
+	const buildQuery = () => {
+		const q = {
+			start_date: startDate.value.toISOString(),
+			end_date: endDate.value.toISOString(),
+			resolution_minutes: timeResolution.value,
+		}
+
+		if (projects.value?.length) {
+			q.project_ids = JSON.stringify(projects.value.map((p) => p.id))
+		}
+
+		return q
+	}
+
 	const fetchData = async (query) => {
+		debug('fetchData called', { query })
 		const normalQuery = new URLSearchParams(query)
 		const revenueQuery = new URLSearchParams(query)
 
@@ -355,6 +377,7 @@ export const useFetchAllAnalytics = (
 			loading.value = true
 			error.value = null
 
+			debug('fetching all 5 endpoints...')
 			const responses = await Promise.all([
 				useFetchAnalytics(`analytics/downloads?${qs}`),
 				useFetchAnalytics(`analytics/views?${qs}`),
@@ -362,15 +385,20 @@ export const useFetchAllAnalytics = (
 				useFetchAnalytics(`analytics/countries/downloads?${qs}`),
 				useFetchAnalytics(`analytics/countries/views?${qs}`),
 			])
+			debug('all 5 endpoints resolved', {
+				downloads: Object.keys(responses[0] || {}).length,
+				views: Object.keys(responses[1] || {}).length,
+				revenue: Object.keys(responses[2] || {}).length,
+			})
 
-			// collect project ids from projects.value into a set
 			const projectIds = new Set()
 			if (projects.value) {
 				projects.value.forEach((p) => projectIds.add(p.id))
 			} else {
-				// if projects.value is not set, we assume that we want all project ids
 				Object.keys(responses[0] || {}).forEach((id) => projectIds.add(id))
 			}
+
+			debug('filtering to projectIds', { count: projectIds.size })
 
 			const filterProjectIds = (data) => {
 				const filtered = {}
@@ -389,43 +417,27 @@ export const useFetchAllAnalytics = (
 			downloadsByCountry.value = responses[3] || {}
 			viewsByCountry.value = responses[4] || {}
 		} catch (e) {
+			debug('fetchData error', e)
 			error.value = e
 		} finally {
 			loading.value = false
+			debug('fetchData done, loading=false')
+		}
+	}
+
+	const fetch = async () => {
+		debug('fetch() called', { projectCount: projects.value?.length })
+		await fetchData(buildQuery())
+		if (onDataRefresh) {
+			onDataRefresh()
 		}
 	}
 
 	watch(
-		[
-			() => startDate.value,
-			() => endDate.value,
-			() => timeResolution.value,
-			() => projects.value,
-			() => isInitialized.value,
-		],
-		async () => {
-			if (!isInitialized.value) {
-				return
-			}
-
-			const q = {
-				start_date: startDate.value.toISOString(),
-				end_date: endDate.value.toISOString(),
-				resolution_minutes: timeResolution.value,
-			}
-
-			if (projects.value?.length) {
-				q.project_ids = JSON.stringify(projects.value.map((p) => p.id))
-			}
-
-			await fetchData(q)
-
-			if (onDataRefresh) {
-				onDataRefresh()
-			}
-		},
-		{
-			immediate: true,
+		[() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
+		(newVals, oldVals) => {
+			debug('watch triggered', { new: newVals, old: oldVals })
+			fetch()
 		},
 	)
 
@@ -474,6 +486,6 @@ export const useFetchAllAnalytics = (
 		totalData,
 		loading,
 		error,
-		isInitialized,
+		fetch,
 	}
 }

@@ -1,14 +1,22 @@
 <template>
 	<div>
-		<ChartDisplay :projects="projects ?? undefined" :personal="true" />
+		<Suspense>
+			<ChartDisplay :projects="projects" :personal="true" />
+			<template #fallback>
+				<div class="universal-card">
+					<h2><span class="label__title">Loading analytics...</span></h2>
+				</div>
+			</template>
+		</Suspense>
 	</div>
 </template>
 
 <script setup>
-import { injectModrinthClient } from '@modrinth/ui'
-import { useQuery } from '@tanstack/vue-query'
+import { injectModrinthClient, useDebugLogger } from '@modrinth/ui'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
+
+const debug = useDebugLogger('analytics.vue')
 
 definePageMeta({
 	middleware: 'auth',
@@ -22,9 +30,9 @@ const auth = await useAuth()
 const client = injectModrinthClient()
 const id = auth.value?.user?.id
 
-const { data: projects } = useQuery({
-	queryKey: computed(() => ['user', id, 'projects']),
-	queryFn: () => client.labrinth.users_v2.getProjects(id),
-	enabled: computed(() => !!id),
-})
+debug('auth resolved', { id })
+
+const projects = await client.labrinth.users_v2.getProjects(id)
+
+debug('projects resolved', { count: projects?.length })
 </script>
