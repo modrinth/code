@@ -53,7 +53,7 @@ runs:
             .filter(s => sections[s])
             .map(s => `<!-- section:${s} -->${sections[s]}<!-- /section:${s} -->`);
 
-          const body = `${marker}\n**PR Health** · ${parts.join(' · ')}`;
+          const body = `${marker}\n**PR Health** • ${parts.join(' • ')}`;
 
           if (existing) {
             await github.rest.issues.updateComment({

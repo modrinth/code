@@ -31,5 +31,5 @@ jobs:
         uses: ./.github/actions/pr-health-comment
         with:
           section: changelog
-          content: "${{ steps.changelog.outputs.found == 'true' && '✅ changelog' || '⚠️ changelog · `pnpm changelog <product> \"description\"`' }}"
+          content: "${{ steps.changelog.outputs.found == 'true' && '✅ changelog' || '⚠️ changelog • `pnpm changelog <product> \"description\"`' }}"
           github-token: ${{ secrets.GITHUB_TOKEN }}
