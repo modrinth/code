@@ -363,7 +363,10 @@ const props = withDefaults(
 
 const projects = computed(() => props.projects || [])
 
-debug('projects from props', { count: projects.value.length, ids: projects.value.map((p: any) => p.id) })
+debug('projects from props', {
+	count: projects.value.length,
+	ids: projects.value.map((p: any) => p.id),
+})
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
@@ -454,7 +457,12 @@ const startDate = ref(initialDates.startDate)
 const endDate = ref(initialDates.endDate)
 const timeResolution = ref(defaultRange.timeResolution)
 
-debug('default range initialized', { range: defaultRange.getLabel([dayjs(), dayjs()]), startDate: startDate.value.toISOString(), endDate: endDate.value.toISOString(), timeResolution: timeResolution.value })
+debug('default range initialized', {
+	range: defaultRange.getLabel([dayjs(), dayjs()]),
+	startDate: startDate.value.toISOString(),
+	endDate: endDate.value.toISOString(),
+	timeResolution: timeResolution.value,
+})
 
 onBeforeMount(() => {
 	debug('onBeforeMount')
@@ -470,7 +478,11 @@ onBeforeMount(() => {
 				timeResolution.value = range.timeResolution
 				startDate.value = dates.startDate
 				endDate.value = dates.endDate
-				debug('range overridden from localStorage', { startDate: dates.startDate.toISOString(), endDate: dates.endDate.toISOString(), timeResolution: range.timeResolution })
+				debug('range overridden from localStorage', {
+					startDate: dates.startDate.toISOString(),
+					endDate: dates.endDate.toISOString(),
+					timeResolution: range.timeResolution,
+				})
 			}
 		}
 	}
@@ -510,7 +522,10 @@ const analytics = useFetchAllAnalytics(
 
 debug('awaiting analytics.fetch()')
 await analytics.fetch()
-debug('analytics.fetch() resolved', { loading: analytics.loading.value, error: analytics.error.value })
+debug('analytics.fetch() resolved', {
+	loading: analytics.loading.value,
+	error: analytics.error.value,
+})
 
 const formattedCategorySubtitle = computed(() => {
 	return (

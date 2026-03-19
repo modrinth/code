@@ -316,7 +316,12 @@ export const useFetchAllAnalytics = (
 	timeResolution = ref(1440),
 ) => {
 	const debug = useDebugLogger('useFetchAllAnalytics')
-	debug('init', { projectCount: projects.value?.length, personalRevenue, startDate: startDate.value?.toISOString(), endDate: endDate.value?.toISOString() })
+	debug('init', {
+		projectCount: projects.value?.length,
+		personalRevenue,
+		startDate: startDate.value?.toISOString(),
+		endDate: endDate.value?.toISOString(),
+	})
 
 	const downloadData = ref(null)
 	const viewData = ref(null)
@@ -429,12 +434,7 @@ export const useFetchAllAnalytics = (
 	}
 
 	watch(
-		[
-			() => startDate.value,
-			() => endDate.value,
-			() => timeResolution.value,
-			() => projects.value,
-		],
+		[() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
 		(newVals, oldVals) => {
 			debug('watch triggered', { new: newVals, old: oldVals })
 			fetch()
