@@ -87,9 +87,8 @@
 								@sort="handleSort"
 								@toggle-all="toggleSelectAll"
 							/>
-							<Transition name="fade" mode="out-in">
-								<div v-if="items.length > 0" key="list" class="h-full w-full overflow-hidden">
-									<FileVirtualList
+							<div v-if="items.length > 0" class="h-full w-full overflow-hidden">
+								<FileVirtualList
 										:items="filteredItems"
 										:selected-items="selectedItems"
 										:write-disabled="isBusy"
@@ -107,31 +106,28 @@
 										@toggle-select="toggleItemSelection"
 									/>
 								</div>
-								<div
-									v-else-if="items.length === 0 && !ctx.error.value"
-									key="empty"
-									class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
-								>
-									<div class="flex flex-col items-center gap-4 text-center">
-										<FolderOpenIcon class="h-16 w-16 text-secondary" />
-										<h3 class="m-0 text-2xl font-bold text-contrast">
-											{{ formatMessage(messages.emptyFolderTitle) }}
-										</h3>
-										<p class="m-0 text-sm text-secondary">
-											{{ formatMessage(messages.emptyFolderDescription) }}
-										</p>
-									</div>
+							<div
+								v-else-if="items.length === 0 && !ctx.error.value"
+								class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
+							>
+								<div class="flex flex-col items-center gap-4 text-center">
+									<FolderOpenIcon class="h-16 w-16 text-secondary" />
+									<h3 class="m-0 text-2xl font-bold text-contrast">
+										{{ formatMessage(messages.emptyFolderTitle) }}
+									</h3>
+									<p class="m-0 text-sm text-secondary">
+										{{ formatMessage(messages.emptyFolderDescription) }}
+									</p>
 								</div>
-								<FileManagerError
-									v-else-if="ctx.error.value"
-									key="error"
-									class="rounded-b-[20px]"
-									:title="formatMessage(messages.errorTitle)"
-									:message="formatMessage(messages.errorMessage)"
-									@refetch="ctx.refresh"
-									@home="navigateToSegment(-1)"
-								/>
-							</Transition>
+							</div>
+							<FileManagerError
+								v-else-if="ctx.error.value"
+								class="rounded-b-[20px]"
+								:title="formatMessage(messages.errorTitle)"
+								:message="formatMessage(messages.errorMessage)"
+								@refetch="ctx.refresh"
+								@home="navigateToSegment(-1)"
+							/>
 						</FileUploadDragAndDrop>
 					</div>
 					<FileEditor
