@@ -285,6 +285,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
@@ -302,6 +303,7 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TerminalSquareIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -329,7 +331,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
@@ -451,14 +453,22 @@ const tabs = computed(() => [
 	{
 		label: 'Content',
 		href: `${basePath.value}`,
+		icon: BoxesIcon,
 	},
 	{
 		label: 'Worlds',
 		href: `${basePath.value}/worlds`,
+		icon: GlobeIcon,
+	},
+	{
+		label: 'Files',
+		href: `${basePath.value}/files`,
+		icon: FolderOpenIcon,
 	},
 	{
 		label: 'Logs',
 		href: `${basePath.value}/logs`,
+		icon: TerminalSquareIcon,
 	},
 ])
 

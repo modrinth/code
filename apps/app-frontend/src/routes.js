@@ -179,6 +179,15 @@ export default new createRouter({
 					},
 				},
 				{
+					path: 'files',
+					name: 'Files',
+					component: Instance.Files,
+					meta: {
+						useRootContext: true,
+						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Files' }],
+					},
+				},
+				{
 					path: 'logs',
 					name: 'Logs',
 					component: Instance.Logs,

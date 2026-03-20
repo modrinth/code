@@ -31,9 +31,9 @@
 				/>
 			</button>
 		</div>
-		<div class="flex shrink-0 items-center gap-4 md:gap-12">
+		<div class="flex shrink-0 items-center gap-4 @[800px]:gap-12">
 			<button
-				class="hidden w-[100px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
+				class="hidden w-[100px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
 				@click="$emit('sort', 'size')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.size) }}</span>
@@ -49,7 +49,7 @@
 				/>
 			</button>
 			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
+				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
 				@click="$emit('sort', 'created')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.created) }}</span>
@@ -65,7 +65,7 @@
 				/>
 			</button>
 			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
+				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
 				@click="$emit('sort', 'modified')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.modified) }}</span>

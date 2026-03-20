@@ -152,6 +152,7 @@ fn main() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_window_state::Builder::default()
@@ -229,6 +230,7 @@ fn main() {
         .plugin(api::tags::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())
+        .plugin(api::files::init())
         .plugin(api::ads::init())
         .plugin(api::friends::init())
         .plugin(api::worlds::init())

@@ -56,10 +56,8 @@ const dragCounter = ref(0)
 
 const handleDragEnter = (event: DragEvent) => {
 	event.preventDefault()
-	if (!event.dataTransfer?.types.includes('application/modrinth-file-move')) {
-		dragCounter.value++
-		isDragging.value = true
-	}
+	dragCounter.value++
+	isDragging.value = true
 }
 
 const handleDragOver = (event: DragEvent) => {
@@ -78,9 +76,6 @@ const handleDrop = (event: DragEvent) => {
 	event.preventDefault()
 	isDragging.value = false
 	dragCounter.value = 0
-
-	const isInternalMove = event.dataTransfer?.types.includes('application/modrinth-file-move')
-	if (isInternalMove) return
 
 	const files = event.dataTransfer?.files
 	if (files) {

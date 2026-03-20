@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Archon, Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { type Component, computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useVIntl } from '#ui/composables/i18n'
@@ -377,39 +377,7 @@ watch(
 	},
 )
 
-// Editor component (lazy loaded)
-const VAceEditor = ref<Component | null>(null)
-
 onMounted(async () => {
-	if (typeof window !== 'undefined') {
-		const { VAceEditor: Ace } = await import('vue3-ace-editor')
-		await Promise.all([
-			import('ace-builds/src-noconflict/mode-json'),
-			import('ace-builds/src-noconflict/mode-yaml'),
-			import('ace-builds/src-noconflict/mode-toml'),
-			import('ace-builds/src-noconflict/mode-sh'),
-			import('ace-builds/src-noconflict/mode-batchfile'),
-			import('ace-builds/src-noconflict/mode-powershell'),
-			import('ace-builds/src-noconflict/mode-java'),
-			import('ace-builds/src-noconflict/mode-javascript'),
-			import('ace-builds/src-noconflict/mode-typescript'),
-			import('ace-builds/src-noconflict/mode-python'),
-			import('ace-builds/src-noconflict/mode-ruby'),
-			import('ace-builds/src-noconflict/mode-php'),
-			import('ace-builds/src-noconflict/mode-html'),
-			import('ace-builds/src-noconflict/mode-css'),
-			import('ace-builds/src-noconflict/mode-c_cpp'),
-			import('ace-builds/src-noconflict/mode-rust'),
-			import('ace-builds/src-noconflict/mode-golang'),
-			import('ace-builds/src-noconflict/mode-markdown'),
-			import('ace-builds/src-noconflict/mode-properties'),
-			import('ace-builds/src-noconflict/mode-ini'),
-			import('ace-builds/src-noconflict/mode-text'),
-			import('#ui/utils/ace-theme.ts'),
-		])
-		VAceEditor.value = Ace
-	}
-
 	initializeFileEdit()
 	localQueuedOps.value = []
 })
@@ -534,7 +502,7 @@ provideFileManager({
 	dismissOperation,
 	prefetchDirectory,
 	prefetchFile,
-	editorComponent: VAceEditor,
+	showInstallFromUrl: true,
 	canRestart: true,
 	restartServer,
 	canShareToMclogs: true,

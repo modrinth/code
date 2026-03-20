@@ -13,10 +13,15 @@
 			</template>
 			<template #header>
 				{{
-					formatMessage(messages.uploadingFiles, {
-						completed: ctx.uploadState.value.completedFiles,
-						total: ctx.uploadState.value.totalFiles,
-					})
+					ctx.uploadingLabel
+						? ctx.uploadingLabel(
+								ctx.uploadState.value.completedFiles,
+								ctx.uploadState.value.totalFiles,
+							)
+						: formatMessage(messages.uploadingFiles, {
+								completed: ctx.uploadState.value.completedFiles,
+								total: ctx.uploadState.value.totalFiles,
+							})
 				}}
 				<span v-if="ctx.uploadState.value.currentFileName" class="font-normal text-secondary">
 					— {{ ctx.uploadState.value.currentFileName }}

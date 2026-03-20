@@ -25,6 +25,32 @@
 			"allow": [{ "url": "https://modrinth.com/*" }, { "url": "https://*.modrinth.com/*" }]
 		},
 
+		"dialog:allow-save",
+
+		"fs:allow-read-dir",
+		"fs:allow-read-file",
+		"fs:allow-read-text-file",
+		"fs:allow-write-file",
+		"fs:allow-write-text-file",
+		"fs:allow-create",
+		"fs:allow-remove",
+		"fs:allow-rename",
+		"fs:allow-copy-file",
+		"fs:allow-stat",
+		"fs:allow-exists",
+		"fs:allow-mkdir",
+		{
+			"identifier": "fs:scope",
+			"allow": [
+				{ "path": "$APPDATA/profiles" },
+				{ "path": "$APPDATA/profiles/**" },
+				{ "path": "$APPCONFIG/profiles" },
+				{ "path": "$APPCONFIG/profiles/**" },
+				{ "path": "$CONFIG/profiles" },
+				{ "path": "$CONFIG/profiles/**" }
+			]
+		},
+
 		"auth:default",
 		"import:default",
 		"jre:default",
@@ -37,6 +63,7 @@
 		"process:default",
 		"profile:default",
 		"cache:default",
+		"files:default",
 		"settings:default",
 		"tags:default",
 		"utils:default",

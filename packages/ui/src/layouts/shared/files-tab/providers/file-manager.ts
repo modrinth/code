@@ -1,4 +1,4 @@
-import type { Component, ComputedRef, Ref } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
@@ -63,8 +63,12 @@ export interface FileManagerContext {
 	prefetchDirectory?: (path: string) => void
 	prefetchFile?: (path: string) => void
 
-	// === Editor (provider supplies the lazy-loaded component) ===
-	editorComponent: Ref<Component | null>
+	// === Feature flags ===
+	showInstallFromUrl?: boolean
+
+	// === Label overrides ===
+	downloadButtonLabel?: string
+	uploadingLabel?: (completed: number, total: number) => string
 
 	// === Optional capabilities ===
 	canRestart?: boolean

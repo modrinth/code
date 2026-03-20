@@ -381,7 +381,7 @@ import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'

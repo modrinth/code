@@ -2,11 +2,11 @@
 	<nav
 		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
-		class="experimental-styles-within relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
-		:class="{ 'card-shadow': mode === 'navigation' }"
+		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
+		:class="{ 'shadow-sm': mode === 'navigation' }"
 	>
 		<template v-if="mode === 'navigation'">
-			<NuxtLink
+			<RouterLink
 				v-for="(link, index) in filteredLinks"
 				v-show="link.shown ?? true"
 				:key="link.href"
@@ -22,7 +22,7 @@
 				<span class="text-nowrap" :class="getLabelClasses(index)">
 					{{ link.label }}
 				</span>
-			</NuxtLink>
+			</RouterLink>
 		</template>
 
 		<template v-else>
@@ -57,9 +57,10 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 
-const route = useNativeRoute()
+const route = useRoute()
 
 interface Tab {
 	label: string
@@ -104,8 +105,8 @@ const currentActiveIndex = ref(-1)
 const subpageSelected = ref(false)
 
 // SSR state
-const sliderReady = ref(false) // Slider is positioned and should be visible
-const transitionsEnabled = ref(false) // CSS transitions should apply (after first paint)
+const sliderReady = ref(false)
+const transitionsEnabled = ref(false)
 
 // Stagger delays for the trailing edges of the slider animation
 const sliderDelays = ref({ left: '0ms', top: '0ms', right: '0ms', bottom: '0ms' })
@@ -165,8 +166,8 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 		const decodedPath = decodeURIComponent(route.path)
+		const decodedHref = decodeURIComponent(link.href)
 
-		// Query-based matching
 		if (props.query) {
 			const queryValue = route.query[props.query]
 			if (queryValue === link.href || (!queryValue && !link.href)) {
@@ -175,14 +176,12 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 			continue
 		}
 
-		// Exact path match
-		if (decodedPath === link.href) {
+		if (decodedPath === decodedHref) {
 			return { index: i, isSubpage: false }
 		}
 
-		// Subpage match
 		const isSubpageMatch =
-			decodedPath.includes(link.href) ||
+			decodedPath.includes(decodedHref) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
 		if (isSubpageMatch) {
@@ -204,9 +203,6 @@ function getTabElement(index: number): HTMLElement | null {
 
 	if (!element) return null
 
-	// In navigation mode, elements are NuxtLinks, but since we used querySelectorAll,
-	// we already have the raw HTMLElement ($el), so no further conversion is needed.
-	// In local mode, elements are already plain divs.
 	return element
 }
 
@@ -225,7 +221,6 @@ function positionSlider() {
 	const isInitialPosition = sliderLeft.value === 4 && sliderRight.value === 4
 
 	if (isInitialPosition) {
-		// Initial positioning: set position instantly, no animation
 		sliderLeft.value = newPosition.left
 		sliderRight.value = newPosition.right
 		sliderTop.value = newPosition.top
@@ -233,7 +228,6 @@ function positionSlider() {
 
 		sliderReady.value = true
 
-		// enable transitions after slider is painted, so future changes animate
 		requestAnimationFrame(() => {
 			transitionsEnabled.value = true
 		})
@@ -250,7 +244,6 @@ function animateSliderTo(newPosition: {
 }) {
 	const STAGGER_DELAY = '200ms'
 
-	// Set stagger delays: leading edge moves immediately, trailing edge is delayed
 	sliderDelays.value = {
 		left: newPosition.left < sliderLeft.value ? '0ms' : STAGGER_DELAY,
 		right: newPosition.left < sliderLeft.value ? STAGGER_DELAY : '0ms',
@@ -320,9 +313,5 @@ watch(
 		top 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(topDelay),
 		bottom 150ms cubic-bezier(0.4, 0, 0.2, 1) v-bind(bottomDelay),
 		opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
-}
-
-.card-shadow {
-	box-shadow: var(--shadow-card);
 }
 </style>

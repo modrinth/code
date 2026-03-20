@@ -8,6 +8,7 @@ repository = "https://github.com/modrinth/code/apps/app/"
 license = "GPL-3.0-only"
 
 [dependencies]
+async_zip = { workspace = true, features = ["tokio-fs", "deflate"] }
 chrono = { workspace = true }
 daedalus = { workspace = true }
 dashmap = { workspace = true }
@@ -28,6 +29,7 @@ tauri = { workspace = true, features = [
 ] }
 tauri-plugin-deep-link = { workspace = true }
 tauri-plugin-dialog = { workspace = true }
+tauri-plugin-fs = { workspace = true }
 tauri-plugin-http = { workspace = true }
 tauri-plugin-opener = { workspace = true }
 tauri-plugin-os = { workspace = true }

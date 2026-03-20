@@ -5,7 +5,7 @@ import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import NavTabs from '@/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import { profile_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/profile.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs.js'

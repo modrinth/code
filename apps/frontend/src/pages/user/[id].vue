@@ -521,7 +521,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()

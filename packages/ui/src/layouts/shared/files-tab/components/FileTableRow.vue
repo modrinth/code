@@ -3,21 +3,16 @@
 		role="button"
 		:class="[
 			containerClasses,
-			isDragOver && type === 'directory' ? 'bg-brand-highlight' : '',
-			isDragging ? 'opacity-50' : '',
+			isDragSource ? 'opacity-50' : '',
 		]"
 		tabindex="0"
-		draggable="true"
+		:data-file-path="path"
+		:data-file-type="type"
 		@click="selectItem"
 		@contextmenu="openContextMenu"
 		@keydown="(e) => e.key === 'Enter' && selectItem()"
 		@mouseenter="handleMouseEnter"
-		@dragstart="handleDragStart"
-		@dragend="handleDragEnd"
-		@dragenter.prevent="handleDragEnter"
-		@dragover.prevent="handleDragOver"
-		@dragleave.prevent="handleDragLeave"
-		@drop.prevent="handleDrop"
+		@pointerdown="handlePointerDown"
 	>
 		<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
 			<Checkbox
@@ -40,14 +35,14 @@
 				</span>
 			</div>
 		</div>
-		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 md:gap-12">
-			<span class="hidden w-[100px] text-nowrap text-sm text-secondary md:block">
+		<div class="pointer-events-auto flex w-fit flex-shrink-0 items-center gap-4 @[800px]:gap-12">
+			<span class="hidden w-[100px] text-nowrap text-sm text-secondary @[800px]:block">
 				{{ formattedSize }}
 			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary md:block">
+			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
 				{{ formattedCreationDate }}
 			</span>
-			<span class="hidden w-[160px] text-nowrap text-sm text-secondary md:block">
+			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
 				{{ formattedModifiedDate }}
 			</span>
 			<ButtonStyled circular type="transparent">
@@ -59,7 +54,8 @@
 					<template #rename><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template>
 					<template #move><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template>
 					<template #download
-						><DownloadIcon /> {{ formatMessage(commonMessages.downloadButton) }}</template
+						><DownloadIcon />
+						{{ ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton) }}</template
 					>
 					<template #delete><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template>
 				</TeleportOverflowMenu>
@@ -70,14 +66,17 @@
 
 <script setup lang="ts">
 import {
+	BoxIcon,
+	BracesIcon,
 	DownloadIcon,
 	EditIcon,
 	FolderCogIcon,
 	FolderOpenIcon,
+	GlassesIcon,
 	GlobeIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
-	PaletteIcon,
+	PaintbrushIcon,
 	RightArrowIcon,
 	TrashIcon,
 } from '@modrinth/assets'
@@ -96,6 +95,9 @@ import {
 	isImageFile,
 } from '#ui/utils/file-extensions'
 
+import { fileDragActive, fileDragData, fileDragTarget, startFileDrag, wasRecentDrag } from '../composables/file-drag-state'
+import { injectFileManager } from '../providers/file-manager'
+
 interface FileItemProps {
 	name: string
 	type: 'directory' | 'file'
@@ -112,6 +114,7 @@ interface FileItemProps {
 }
 
 const { formatMessage } = useVIntl()
+const ctx = injectFileManager()
 
 const messages = defineMessages({
 	extractLabel: {
@@ -148,8 +151,8 @@ const emit = defineEmits<{
 	'toggle-select': []
 }>()
 
-const isDragOver = ref(false)
-const isDragging = ref(false)
+const isDropTarget = computed(() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory')
+const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
 
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])
 
@@ -161,14 +164,22 @@ const formatDateTime = useFormatDateTime({
 	minute: 'numeric',
 })
 
-const containerClasses = computed(() => [
-	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
-	props.selected ? 'bg-surface-2.5' : props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
-	props.isLast ? 'rounded-b-[20px]' : '',
-	isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
-	isDragOver.value ? '!bg-brand-highlight' : '',
-	'transition-colors duration-100 focus:!outline-none',
-])
+const containerClasses = computed(() => {
+	const dropTarget = isDropTarget.value
+	return [
+		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
+		dropTarget
+			? '!bg-brand-highlight'
+			: props.selected
+				? 'bg-surface-2.5'
+				: props.index % 2 === 0
+					? 'bg-surface-2'
+					: 'bg-surface-1.5',
+		props.isLast ? 'rounded-b-[20px]' : '',
+		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
+		'transition-colors duration-100 focus:!outline-none',
+	]
+})
 
 const fileExtension = computed(() => getFileExtension(props.name))
 
@@ -220,8 +231,11 @@ const menuOptions = computed(() => {
 const iconComponent = computed(() => {
 	if (props.type === 'directory') {
 		if (props.name === 'config') return FolderCogIcon
-		if (props.name === 'world') return GlobeIcon
-		if (props.name === 'resourcepacks') return PaletteIcon
+		if (props.name === 'world' || props.name === 'saves') return GlobeIcon
+		if (props.name === 'mods') return BoxIcon
+		if (props.name === 'resourcepacks') return PaintbrushIcon
+		if (props.name === 'shaderpacks') return GlassesIcon
+		if (props.name === 'datapacks') return BracesIcon
 		return FolderOpenIcon
 	}
 
@@ -272,7 +286,7 @@ function handleMouseEnter() {
 const isNavigating = ref(false)
 
 function selectItem() {
-	if (isNavigating.value) return
+	if (isNavigating.value || wasRecentDrag()) return
 	isNavigating.value = true
 
 	const item = { name: props.name, type: props.type, path: props.path }
@@ -287,82 +301,19 @@ function selectItem() {
 	}, 500)
 }
 
-function handleDragStart(event: DragEvent) {
-	if (!event.dataTransfer) return
-	isDragging.value = true
-
-	const dragGhost = document.createElement('div')
-	dragGhost.className =
-		'fixed left-0 top-0 flex items-center max-w-[500px] flex-row gap-3 rounded-lg bg-bg-raised p-3 shadow-lg pointer-events-none'
-
-	const nameSpan = document.createElement('span')
-	nameSpan.className = 'font-bold truncate text-contrast'
-	nameSpan.textContent = props.name
-
-	dragGhost.appendChild(nameSpan)
-	document.body.appendChild(dragGhost)
-
-	event.dataTransfer.setDragImage(dragGhost, 0, 0)
-
-	requestAnimationFrame(() => {
-		document.body.removeChild(dragGhost)
-	})
-
-	event.dataTransfer.setData(
-		'application/modrinth-file-move',
-		JSON.stringify({
-			name: props.name,
-			type: props.type,
-			path: props.path,
-		}),
+function handlePointerDown(e: PointerEvent) {
+	if (e.button !== 0) return
+	startFileDrag(
+		{ name: props.name, type: props.type, path: props.path },
+		e,
+		(source, destination) => {
+			emit('moveDirectTo', {
+				name: source.name,
+				type: source.type,
+				path: source.path,
+				destination,
+			})
+		},
 	)
-	event.dataTransfer.effectAllowed = 'move'
-}
-
-function isChildPath(parentPath: string, childPath: string) {
-	return childPath.startsWith(parentPath + '/')
-}
-
-function handleDragEnd() {
-	isDragging.value = false
-}
-
-function handleDragEnter() {
-	if (props.type !== 'directory') return
-	isDragOver.value = true
-}
-
-function handleDragOver(event: DragEvent) {
-	if (props.type !== 'directory' || !event.dataTransfer) return
-	event.dataTransfer.dropEffect = 'move'
-}
-
-function handleDragLeave() {
-	isDragOver.value = false
-}
-
-function handleDrop(event: DragEvent) {
-	isDragOver.value = false
-	if (props.type !== 'directory' || !event.dataTransfer) return
-
-	try {
-		const dragData = JSON.parse(event.dataTransfer.getData('application/modrinth-file-move'))
-
-		if (dragData.path === props.path) return
-
-		if (dragData.type === 'directory' && isChildPath(dragData.path, props.path)) {
-			console.error('Cannot move a folder into its own subfolder')
-			return
-		}
-
-		emit('moveDirectTo', {
-			name: dragData.name,
-			type: dragData.type,
-			path: dragData.path,
-			destination: props.path,
-		})
-	} catch (error) {
-		console.error('Error handling file drop:', error)
-	}
 }
 </script>

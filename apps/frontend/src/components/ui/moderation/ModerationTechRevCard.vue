@@ -41,7 +41,7 @@ import dayjs from 'dayjs'
 import { computed, reactive, ref, watch } from 'vue'
 
 import type { UnsafeFile } from '~/components/ui/moderation/MaliciousSummaryModal.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import ThreadView from '~/components/ui/thread/ThreadView.vue'
 
 const auth = await useAuth()

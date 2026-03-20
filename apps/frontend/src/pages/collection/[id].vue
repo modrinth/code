@@ -417,7 +417,7 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

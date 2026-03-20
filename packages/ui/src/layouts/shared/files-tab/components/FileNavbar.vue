@@ -85,7 +85,7 @@
 			<ButtonStyled v-if="showRefreshButton" type="outlined">
 				<button
 					type="button"
-					class="flex h-10 items-center gap-2 !border-[1px] !border-surface-5"
+					class="flex !h-10 items-center gap-2 !border-[1px] !border-surface-5"
 					@click="$emit('refresh')"
 				>
 					<RefreshCwIcon aria-hidden="true" class="h-5 w-5" />
@@ -106,10 +106,18 @@
 						{ id: 'file', action: () => $emit('create', 'file') },
 						{ id: 'directory', action: () => $emit('create', 'directory') },
 						{ id: 'upload', action: () => $emit('upload') },
-						{ divider: true },
+						{ divider: true, shown: showInstallFromUrl ?? false },
 						{ id: 'upload-zip', shown: false, action: () => $emit('uploadZip') },
-						{ id: 'install-from-url', action: () => $emit('unzipFromUrl', false) },
-						{ id: 'install-cf-pack', action: () => $emit('unzipFromUrl', true) },
+						{
+							id: 'install-from-url',
+							shown: showInstallFromUrl ?? false,
+							action: () => $emit('unzipFromUrl', false),
+						},
+						{
+							id: 'install-cf-pack',
+							shown: showInstallFromUrl ?? false,
+							action: () => $emit('unzipFromUrl', true),
+						},
 					]"
 				>
 					<PlusIcon aria-hidden="true" class="h-5 w-5" />
@@ -283,6 +291,7 @@ const props = defineProps<{
 	isEditingImage?: boolean
 	searchQuery: string
 	showRefreshButton?: boolean
+	showInstallFromUrl?: boolean
 	baseId: string
 	disabled?: boolean
 	disabledTooltip?: string

@@ -2,7 +2,7 @@
 	<slot name="modals" />
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
-	<FileUploadZipUrlModal ref="uploadZipUrlModal" />
+	<FileUploadZipUrlModal v-if="ctx.showInstallFromUrl" ref="uploadZipUrlModal" />
 	<FileRenameItemModal ref="renameItemModal" :item="selectedItem" @rename="handleRenameItem" />
 	<FileMoveItemModal
 		ref="moveItemModal"
@@ -22,7 +22,8 @@
 			><RightArrowIcon class="size-5" /> {{ formatMessage(messages.moveLabel) }}</template
 		>
 		<template #download
-			><DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}</template
+			><DownloadIcon class="size-5" />
+			{{ ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton) }}</template
 		>
 		<template #delete
 			><TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}</template
@@ -54,6 +55,7 @@
 						:is-editing-image="fileEditorRef?.isEditingImage"
 						:search-query="searchQuery"
 						:show-refresh-button="showRefreshButton"
+						:show-install-from-url="ctx.showInstallFromUrl"
 						:base-id="baseId"
 						:disabled="isBusy"
 						:disabled-tooltip="busyTooltip"
@@ -75,7 +77,7 @@
 					<div v-if="!isEditing" class="contents">
 						<FileUploadDragAndDrop
 							ref="fileUploadRef"
-							class="relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
+							class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
 							@files-dropped="handleDroppedFiles"
 						>
 							<FileTableHeader
@@ -87,25 +89,42 @@
 								@sort="handleSort"
 								@toggle-all="toggleSelectAll"
 							/>
-							<div v-if="items.length > 0" class="h-full w-full overflow-hidden">
-								<FileVirtualList
-										:items="filteredItems"
-										:selected-items="selectedItems"
+							<div
+								v-if="filteredItems.length > 0"
+								ref="virtualListContainer"
+								class="relative w-full"
+								:style="{ minHeight: `${totalHeight}px`, overflowAnchor: 'none' }"
+							>
+								<div class="absolute w-full" :style="{ top: `${visibleTop}px` }">
+									<FileTableRow
+										v-for="(item, idx) in visibleItems"
+										:key="item.path"
+										:count="item.count"
+										:created="item.created"
+										:modified="item.modified"
+										:name="item.name"
+										:path="item.path"
+										:type="item.type"
+										:size="item.size"
+										:index="visibleRange.start + idx"
+										:is-last="visibleRange.start + idx === filteredItems.length - 1"
+										:selected="selectedItems.has(item.path)"
 										:write-disabled="isBusy"
 										:write-disabled-tooltip="busyTooltip"
-										@extract="handleExtractItem"
-										@delete="showDeleteModal"
-										@rename="showRenameModal"
-										@download="handleDownload"
-										@move="showMoveModal"
+										@extract="() => handleExtractItem(item)"
+										@delete="() => showDeleteModal(item)"
+										@rename="() => showRenameModal(item)"
+										@download="() => handleDownload(item)"
+										@move="() => showMoveModal(item)"
 										@move-direct-to="handleDirectMove"
-										@edit="handleEditFile"
-										@navigate="handleNavigateToFolder"
-										@hover="handleItemHover"
-										@contextmenu="handleContextMenu"
-										@toggle-select="toggleItemSelection"
+										@edit="() => handleEditFile(item)"
+										@navigate="() => handleNavigateToFolder(item)"
+										@hover="() => handleItemHover(item)"
+										@contextmenu="(x, y) => handleContextMenu(item, x, y)"
+										@toggle-select="() => toggleItemSelection(item.path)"
 									/>
 								</div>
+							</div>
 							<div
 								v-else-if="items.length === 0 && !ctx.error.value"
 								class="flex h-full w-full items-center justify-center rounded-b-[20px] bg-surface-2 p-20"
@@ -134,7 +153,7 @@
 						v-else
 						ref="fileEditorRef"
 						:file="ctx.editingFile.value"
-						:editor-component="ctx.editorComponent.value"
+						:editor-component="editorComponent"
 						@close="handleEditorClose"
 					/>
 				</div>
@@ -183,13 +202,15 @@ import {
 	TrashIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import type { Component } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
+import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { commonMessages } from '#ui/utils/common-messages'
 import { getFileExtension } from '#ui/utils/file-extensions'
@@ -200,7 +221,7 @@ import FileManagerError from './components/FileManagerError.vue'
 import FileNavbar from './components/FileNavbar.vue'
 import FileOperationAdmonitions from './components/FileOperationAdmonitions.vue'
 import FileTableHeader from './components/FileTableHeader.vue'
-import FileVirtualList from './components/FileVirtualList.vue'
+import FileTableRow from './components/FileTableRow.vue'
 import FileCreateItemModal from './components/modals/FileCreateItemModal.vue'
 import FileDeleteItemModal from './components/modals/FileDeleteItemModal.vue'
 import FileMoveItemModal from './components/modals/FileMoveItemModal.vue'
@@ -284,6 +305,12 @@ defineProps<{
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 
+const editorComponent = shallowRef<Component | null>(null)
+import('vue3-ace-editor').then(async (mod) => {
+	await import('#ui/utils/ace-theme')
+	editorComponent.value = mod.VAceEditor
+})
+
 const baseId = `files-${Math.random().toString(36).slice(2, 9)}`
 
 const items = computed(() => ctx.items.value)
@@ -323,6 +350,15 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 	(source, dest) => ctx.moveItem(source, dest),
 	() => ctx.refresh(),
 	(title, text, type) => addNotification({ title, text, type }),
+)
+
+// Virtual scroll
+const { listContainer: virtualListContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
+	filteredItems,
+	{
+		itemHeight: 61,
+		bufferSize: 5,
+	},
 )
 
 // Sticky observer for the table header

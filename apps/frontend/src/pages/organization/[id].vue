@@ -313,7 +313,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import NavStack from '~/components/ui/NavStack.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 import {
 	OrganizationContext,

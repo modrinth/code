@@ -3,7 +3,7 @@ import { ChangelogEntry } from '@modrinth/ui'
 import Timeline from '@modrinth/ui/src/components/base/Timeline.vue'
 import { getChangelog, type Product } from '@modrinth/utils'
 
-import NavTabs from '~/components/ui/NavTabs.vue'
+import { NavTabs } from '@modrinth/ui'
 
 const route = useRoute()
 const router = useRouter()
