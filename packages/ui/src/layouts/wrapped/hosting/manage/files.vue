@@ -13,7 +13,12 @@ import {
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type { EditingFile, FileItem, FileOperation, UploadState } from '../../../shared/files-tab/types'
+import type {
+	EditingFile,
+	FileItem,
+	FileOperation,
+	UploadState,
+} from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean

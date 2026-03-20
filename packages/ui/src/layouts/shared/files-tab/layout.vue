@@ -60,8 +60,9 @@
 					</template>
 					<span class="text-secondary">
 						{{ formatBytes(ctx.uploadState.value.uploadedBytes) }}
-						/ {{ formatBytes(ctx.uploadState.value.totalBytes) }}
-						({{ Math.round(uploadOverallProgress * 100) }}%)
+						/ {{ formatBytes(ctx.uploadState.value.totalBytes) }} ({{
+							Math.round(uploadOverallProgress * 100)
+						}}%)
 					</span>
 					<template #actions>
 						<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
@@ -81,7 +82,9 @@
 				<template #header>
 					Extracting {{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
 					<span v-if="op.state === 'done'" class="font-normal text-green"> — Done</span>
-					<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red"> — Failed</span>
+					<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red">
+						— Failed</span
+					>
 				</template>
 				<span class="text-secondary">
 					{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B' }} extracted
@@ -142,7 +145,7 @@
 								@sort="handleSort"
 								@toggle-all="toggleSelectAll"
 							/>
-								<Transition name="fade" mode="out-in">
+							<Transition name="fade" mode="out-in">
 								<div v-if="items.length > 0" key="list" class="h-full w-full overflow-hidden">
 									<FileVirtualList
 										:items="filteredItems"
@@ -216,11 +219,7 @@
 						color-fill="text"
 						hover-color-fill="background"
 					>
-						<button
-							v-tooltip="busyTooltip"
-							:disabled="isBusy"
-							@click="showBulkDeleteModal"
-						>
+						<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
 							<TrashIcon />
 							<span class="bar-label">Delete</span>
 						</button>

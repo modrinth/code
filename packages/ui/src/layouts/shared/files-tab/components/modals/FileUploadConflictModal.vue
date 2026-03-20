@@ -42,8 +42,8 @@
 					</div>
 					<span class="text-sm shrink-0 whitespace-nowrap">Overwritten</span>
 					<span
-						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
 						v-tooltip="file"
+						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
 					>
 						{{ file }}
 					</span>
@@ -54,7 +54,7 @@
 		<template #actions>
 			<div class="flex justify-end gap-2 pt-4">
 				<ButtonStyled type="outlined">
-					<button @click="hide" class="!border !border-surface-4">
+					<button class="!border !border-surface-4" @click="hide">
 						<XIcon />
 						Cancel
 					</button>

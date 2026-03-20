@@ -1,9 +1,8 @@
 <template>
-	<div class="relative flex h-[750px] items-center justify-center overflow-hidden rounded-[20px] bg-black">
-		<div
-			v-if="state.hasError"
-			class="flex flex-col items-center justify-center gap-4"
-		>
+	<div
+		class="relative flex h-[750px] items-center justify-center overflow-hidden rounded-[20px] bg-black"
+	>
+		<div v-if="state.hasError" class="flex flex-col items-center justify-center gap-4">
 			<TriangleAlertIcon class="size-8 text-red" />
 			<p class="m-0 text-secondary">{{ state.errorMessage || 'Invalid or empty image file.' }}</p>
 		</div>

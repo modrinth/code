@@ -2,7 +2,13 @@ import type { Component, ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
-import type { EditingFile, ExtractDryRunResult, FileItem, FileOperation, UploadState } from '../types'
+import type {
+	EditingFile,
+	ExtractDryRunResult,
+	FileItem,
+	FileOperation,
+	UploadState,
+} from '../types'
 
 export interface FileManagerContext {
 	// === Data ===

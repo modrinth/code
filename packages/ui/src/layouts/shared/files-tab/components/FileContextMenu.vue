@@ -39,7 +39,10 @@
 				</ButtonStyled>
 				<div class="h-px w-full bg-surface-5" />
 				<template v-for="(option, index) in menuOptions" :key="index">
-					<div v-if="'divider' in option && option.divider && option.shown !== false" class="h-px w-full bg-surface-5" />
+					<div
+						v-if="'divider' in option && option.divider && option.shown !== false"
+						class="h-px w-full bg-surface-5"
+					/>
 					<ButtonStyled
 						v-else-if="'id' in option && option.shown !== false"
 						type="transparent"
@@ -77,15 +80,20 @@ const menuRef = ref<HTMLElement>()
 const position = ref({ x: 0, y: 0 })
 const currentItem = ref<FileItem | null>(null)
 const menuOptions = ref<
-	({ id: string; action?: () => void; disabled?: boolean; tooltip?: string; color?: string; shown?: boolean } | { divider: true; shown?: boolean })[]
+	(
+		| {
+				id: string
+				action?: () => void
+				disabled?: boolean
+				tooltip?: string
+				color?: string
+				shown?: boolean
+		  }
+		| { divider: true; shown?: boolean }
+	)[]
 >([])
 
-function show(
-	item: FileItem,
-	x: number,
-	y: number,
-	options: typeof menuOptions.value,
-) {
+function show(item: FileItem, x: number, y: number, options: typeof menuOptions.value) {
 	currentItem.value = item
 	menuOptions.value = options
 	position.value = { x, y }

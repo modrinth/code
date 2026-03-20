@@ -27,7 +27,10 @@
 				@update:model-value="emit('toggle-select')"
 			/>
 			<div class="pointer-events-none flex size-5 items-center justify-center">
-				<component :is="iconComponent" class="size-5 group-hover:text-contrast group-focus:text-contrast" />
+				<component
+					:is="iconComponent"
+					class="size-5 group-hover:text-contrast group-focus:text-contrast"
+				/>
 			</div>
 			<div class="pointer-events-none flex flex-col truncate">
 				<span
@@ -135,9 +138,7 @@ const containerClasses = computed(() => [
 	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
 	props.selected ? 'bg-surface-2.5' : props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
 	props.isLast ? 'rounded-b-[20px]' : '',
-	isEditableFile.value || props.type === 'directory'
-		? 'cursor-pointer hover:bg-surface-2.5'
-		: '',
+	isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
 	isDragOver.value ? '!bg-brand-highlight' : '',
 	'transition-colors duration-100 focus:!outline-none',
 ])
