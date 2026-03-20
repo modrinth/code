@@ -50,14 +50,15 @@ jobs:
         uses: peter-evans/find-comment@v3
         id: fc
         with:
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
           body-includes: Frontend previews
 
       - name: Comment deploy URL on PR
         if: github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v5
         with:
+          token: ${{ secrets.CROWDIN_GH_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           comment-id: ${{ steps.fc.outputs.comment-id }}
           body: |
