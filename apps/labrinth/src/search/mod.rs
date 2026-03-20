@@ -230,7 +230,7 @@ pub struct UploadSearchProject {
     pub author: String,
     pub indexed_author: String,
     pub name: String,
-    pub indexed_title: String,
+    pub indexed_name: String,
     pub summary: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,
