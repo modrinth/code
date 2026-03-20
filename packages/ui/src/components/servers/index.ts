@@ -1,5 +1,4 @@
 export * from './backups'
-export * from './files'
 export * from './flows'
 export * from './icons'
 export { default as InstallingBanner } from './InstallingBanner.vue'

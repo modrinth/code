@@ -4,7 +4,9 @@
 	>
 		<div v-if="state.hasError" class="flex flex-col items-center justify-center gap-4">
 			<TriangleAlertIcon class="size-8 text-red" />
-			<p class="m-0 text-secondary">{{ state.errorMessage || 'Invalid or empty image file.' }}</p>
+			<p class="m-0 text-secondary">
+				{{ state.errorMessage || formatMessage(messages.invalidImage) }}
+			</p>
 		</div>
 		<img
 			v-show="isReady"
@@ -12,7 +14,7 @@
 			:src="imageObjectUrl"
 			class="max-h-full max-w-full rounded-lg object-contain"
 			:class="{ 'cursor-zoom-in': !zoomed, 'cursor-zoom-out': zoomed }"
-			alt="Viewed image"
+			:alt="formatMessage(messages.viewedImageAlt)"
 			@load="handleImageLoad"
 			@error="handleImageError"
 			@click="toggleZoom"
@@ -23,18 +25,18 @@
 			class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-surface-3/80 p-1.5 backdrop-blur-sm"
 		>
 			<ButtonStyled type="transparent">
-				<button v-tooltip="'Zoom in'" @click="zoomIn">
+				<button v-tooltip="formatMessage(messages.zoomIn)" @click="zoomIn">
 					<ZoomInIcon />
 				</button>
 			</ButtonStyled>
 			<ButtonStyled type="transparent">
-				<button v-tooltip="'Zoom out'" @click="zoomOut">
+				<button v-tooltip="formatMessage(messages.zoomOut)" @click="zoomOut">
 					<ZoomOutIcon />
 				</button>
 			</ButtonStyled>
 			<div class="mx-1 h-6 w-px bg-surface-5" />
 			<ButtonStyled type="transparent">
-				<button v-tooltip="'Reset zoom'" @click="resetZoom">
+				<button v-tooltip="formatMessage(messages.resetZoom)" @click="resetZoom">
 					<span class="px-1 text-sm tabular-nums">{{ Math.round(scale * 100) }}%</span>
 				</button>
 			</ButtonStyled>
@@ -47,6 +49,40 @@ import { TriangleAlertIcon, ZoomInIcon, ZoomOutIcon } from '@modrinth/assets'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	invalidImage: {
+		id: 'files.image_viewer.invalid_image',
+		defaultMessage: 'Invalid or empty image file.',
+	},
+	viewedImageAlt: {
+		id: 'files.image_viewer.viewed_image_alt',
+		defaultMessage: 'Viewed image',
+	},
+	zoomIn: {
+		id: 'files.image_viewer.zoom_in',
+		defaultMessage: 'Zoom in',
+	},
+	zoomOut: {
+		id: 'files.image_viewer.zoom_out',
+		defaultMessage: 'Zoom out',
+	},
+	resetZoom: {
+		id: 'files.image_viewer.reset_zoom',
+		defaultMessage: 'Reset zoom',
+	},
+	imageTooLarge: {
+		id: 'files.image_viewer.image_too_large',
+		defaultMessage: 'Image too large to view (max {maxDimension}x{maxDimension} pixels)',
+	},
+	loadFailed: {
+		id: 'files.image_viewer.load_failed',
+		defaultMessage: 'Failed to load image',
+	},
+})
 
 const MAX_IMAGE_DIMENSION = 4096
 
@@ -76,7 +112,9 @@ function handleImageLoad() {
 	const img = imageRef.value
 	if (img && (img.naturalWidth > MAX_IMAGE_DIMENSION || img.naturalHeight > MAX_IMAGE_DIMENSION)) {
 		state.value.hasError = true
-		state.value.errorMessage = `Image too large to view (max ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels)`
+		state.value.errorMessage = formatMessage(messages.imageTooLarge, {
+			maxDimension: MAX_IMAGE_DIMENSION,
+		})
 	}
 	state.value.isLoading = false
 }
@@ -84,7 +122,7 @@ function handleImageLoad() {
 function handleImageError() {
 	state.value.isLoading = false
 	state.value.hasError = true
-	state.value.errorMessage = 'Failed to load image'
+	state.value.errorMessage = formatMessage(messages.loadFailed)
 }
 
 function toggleZoom() {

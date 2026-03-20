@@ -12,9 +12,17 @@
 							<FolderOpenIcon class="size-4" />
 							<span>
 								<span class="capitalize">
-									{{ props.fileType ? props.fileType : 'File' }} uploads
+									{{
+										formatMessage(messages.fileUploads, {
+											fileType: props.fileType ? props.fileType : formatMessage(messages.file),
+										})
+									}}
 								</span>
-								<span>{{ activeUploads.length > 0 ? ` - ${activeUploads.length} left` : '' }}</span>
+								<span>{{
+									activeUploads.length > 0
+										? formatMessage(messages.uploadsLeft, { count: activeUploads.length })
+										: ''
+								}}</span>
 							</span>
 						</div>
 					</div>
@@ -52,18 +60,20 @@
 							</div>
 							<div class="flex min-w-[80px] items-center justify-end gap-2">
 								<template v-if="item.status === 'completed'">
-									<span>Done</span>
+									<span>{{ formatMessage(messages.done) }}</span>
 								</template>
 								<template v-else-if="item.status === 'error-file-exists'">
-									<span class="text-red">Failed - File already exists</span>
+									<span class="text-red">{{ formatMessage(messages.failedFileExists) }}</span>
 								</template>
 								<template v-else-if="item.status === 'error-generic'">
-									<span class="text-red"
-										>Failed - {{ item.error?.message || 'An unexpected error occured.' }}</span
-									>
+									<span class="text-red">{{
+										formatMessage(messages.failedGeneric, {
+											error: item.error?.message || formatMessage(messages.unexpectedError),
+										})
+									}}</span>
 								</template>
 								<template v-else-if="item.status === 'incorrect-type'">
-									<span class="text-red">Failed - Incorrect file type</span>
+									<span class="text-red">{{ formatMessage(messages.failedIncorrectType) }}</span>
 								</template>
 								<template v-else>
 									<template v-if="item.status === 'uploading'">
@@ -75,11 +85,11 @@
 											/>
 										</div>
 										<ButtonStyled color="red" type="transparent" @click="cancelUpload(item)">
-											<button>Cancel</button>
+											<button>{{ formatMessage(commonMessages.cancelButton) }}</button>
 										</ButtonStyled>
 									</template>
 									<template v-else-if="item.status === 'cancelled'">
-										<span class="text-red">Cancelled</span>
+										<span class="text-red">{{ formatMessage(messages.cancelled) }}</span>
 									</template>
 									<template v-else>
 										<span>{{ item.progress }}%</span>
@@ -105,11 +115,65 @@ import { CheckCircleIcon, FolderOpenIcon, SpinnerIcon, XCircleIcon } from '@modr
 import { computed, nextTick, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { commonMessages } from '#ui/utils/common-messages'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+
+const messages = defineMessages({
+	file: {
+		id: 'files.upload-dropdown.file',
+		defaultMessage: 'File',
+	},
+	fileUploads: {
+		id: 'files.upload-dropdown.file-uploads',
+		defaultMessage: '{fileType} uploads',
+	},
+	uploadsLeft: {
+		id: 'files.upload-dropdown.uploads-left',
+		defaultMessage: ' - {count} left',
+	},
+	done: {
+		id: 'files.upload-dropdown.done',
+		defaultMessage: 'Done',
+	},
+	failedFileExists: {
+		id: 'files.upload-dropdown.failed-file-exists',
+		defaultMessage: 'Failed - File already exists',
+	},
+	failedGeneric: {
+		id: 'files.upload-dropdown.failed-generic',
+		defaultMessage: 'Failed - {error}',
+	},
+	unexpectedError: {
+		id: 'files.upload-dropdown.unexpected-error',
+		defaultMessage: 'An unexpected error occurred.',
+	},
+	failedIncorrectType: {
+		id: 'files.upload-dropdown.failed-incorrect-type',
+		defaultMessage: 'Failed - Incorrect file type',
+	},
+	cancelled: {
+		id: 'files.upload-dropdown.cancelled',
+		defaultMessage: 'Cancelled',
+	},
+	incorrectFileType: {
+		id: 'files.upload-dropdown.incorrect-file-type',
+		defaultMessage: 'Upload had incorrect file type',
+	},
+	uploadFailed: {
+		id: 'files.upload-dropdown.upload-failed',
+		defaultMessage: 'Upload failed',
+	},
+	failedToUpload: {
+		id: 'files.upload-dropdown.failed-to-upload',
+		defaultMessage: 'Failed to upload {fileName}',
+	},
+})
 
 interface UploadItem {
 	file: File
@@ -206,7 +270,7 @@ const cancelUpload = (item: UploadItem) => {
 	}
 }
 
-const badFileTypeMsg = 'Upload had incorrect file type'
+const badFileTypeMsg = formatMessage(messages.incorrectFileType)
 
 const uploadFile = async (file: File) => {
 	const uploadItem: UploadItem = {
@@ -286,8 +350,8 @@ const uploadFile = async (file: File) => {
 
 		if (error instanceof Error && error.message !== 'Upload cancelled') {
 			addNotification({
-				title: 'Upload failed',
-				text: `Failed to upload ${file.name}`,
+				title: formatMessage(messages.uploadFailed),
+				text: formatMessage(messages.failedToUpload, { fileName: file.name }),
 				type: 'error',
 			})
 		}

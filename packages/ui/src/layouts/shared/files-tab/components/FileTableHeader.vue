@@ -18,7 +18,7 @@
 				class="flex appearance-none items-center gap-1.5 bg-transparent font-semibold text-secondary"
 				@click="$emit('sort', 'name')"
 			>
-				<span>Name</span>
+				<span>{{ formatMessage(messages.name) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'name' && !sortDesc"
 					class="h-4 w-4"
@@ -36,7 +36,7 @@
 				class="hidden w-[100px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
 				@click="$emit('sort', 'size')"
 			>
-				<span class="ml-2">Size</span>
+				<span class="ml-2">{{ formatMessage(messages.size) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'size' && !sortDesc"
 					class="h-4 w-4"
@@ -52,7 +52,7 @@
 				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
 				@click="$emit('sort', 'created')"
 			>
-				<span class="ml-2">Created</span>
+				<span class="ml-2">{{ formatMessage(messages.created) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'created' && !sortDesc"
 					class="h-4 w-4"
@@ -68,7 +68,7 @@
 				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary md:flex"
 				@click="$emit('sort', 'modified')"
 			>
-				<span class="ml-2">Modified</span>
+				<span class="ml-2">{{ formatMessage(messages.modified) }}</span>
 				<ChevronUpIcon
 					v-if="sortField === 'modified' && !sortDesc"
 					class="h-4 w-4"
@@ -80,7 +80,9 @@
 					aria-hidden="true"
 				/>
 			</button>
-			<span class="w-[51px] text-right font-semibold text-secondary">Actions</span>
+			<span class="w-[51px] text-right font-semibold text-secondary">{{
+				formatMessage(commonMessages.actionsLabel)
+			}}</span>
 		</div>
 	</div>
 </template>
@@ -89,6 +91,29 @@
 import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 
 import Checkbox from '#ui/components/base/Checkbox.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	name: {
+		id: 'files.table-header.name',
+		defaultMessage: 'Name',
+	},
+	size: {
+		id: 'files.table-header.size',
+		defaultMessage: 'Size',
+	},
+	created: {
+		id: 'files.table-header.created',
+		defaultMessage: 'Created',
+	},
+	modified: {
+		id: 'files.table-header.modified',
+		defaultMessage: 'Modified',
+	},
+})
 
 defineProps<{
 	sortField: string

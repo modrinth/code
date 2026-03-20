@@ -1,6 +1,0 @@
-export { default as FileCreateItemModal } from '#ui/layouts/shared/files-tab/components/modals/FileCreateItemModal.vue'
-export { default as FileDeleteItemModal } from '#ui/layouts/shared/files-tab/components/modals/FileDeleteItemModal.vue'
-export { default as FileMoveItemModal } from '#ui/layouts/shared/files-tab/components/modals/FileMoveItemModal.vue'
-export { default as FileRenameItemModal } from '#ui/layouts/shared/files-tab/components/modals/FileRenameItemModal.vue'
-export { default as FileUploadConflictModal } from '#ui/layouts/shared/files-tab/components/modals/FileUploadConflictModal.vue'
-export { default as FileUploadZipUrlModal } from '#ui/layouts/shared/files-tab/components/modals/FileUploadZipUrlModal.vue'

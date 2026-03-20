@@ -1,7 +1,7 @@
 <template>
 	<NewModal
 		ref="modal"
-		:header="cf ? `Install a CurseForge modpack` : `Uploading .zip contents from URL`"
+		:header="cf ? formatMessage(messages.cfHeader) : formatMessage(messages.zipHeader)"
 	>
 		<form class="flex flex-col gap-6 md:w-[620px]" @submit.prevent="handleSubmit">
 			<!-- CurseForge stepper cards -->
@@ -27,9 +27,11 @@
 
 			<!-- URL input -->
 			<div class="flex flex-col gap-2.5">
-				<label v-if="cf" class="text-base font-semibold text-contrast">Enter link</label>
+				<label v-if="cf" class="text-base font-semibold text-contrast">{{
+					formatMessage(messages.enterLink)
+				}}</label>
 				<div v-else class="text-sm text-secondary">
-					Copy and paste the direct download URL of a .zip file.
+					{{ formatMessage(messages.zipDescription) }}
 				</div>
 				<StyledInput
 					v-model="url"
@@ -50,7 +52,7 @@
 
 			<!-- Inline backup creator -->
 			<InlineBackupCreator
-				:backup-name="'CurseForge modpack install'"
+				:backup-name="formatMessage(messages.backupName)"
 				hide-shift-click-hint
 				@update:buttons-disabled="backupInProgress = $event"
 			/>
@@ -61,7 +63,11 @@
 				<ButtonStyled type="outlined">
 					<button type="button" class="!border !border-surface-4" @click="hide">
 						<XIcon />
-						{{ submitted ? 'Close' : 'Cancel' }}
+						{{
+							submitted
+								? formatMessage(commonMessages.closeButton)
+								: formatMessage(commonMessages.cancelButton)
+						}}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
@@ -73,7 +79,11 @@
 					>
 						<SpinnerIcon v-if="submitted" class="animate-spin" />
 						<DownloadIcon v-else />
-						{{ submitted ? 'Installing...' : 'Install' }}
+						{{
+							submitted
+								? formatMessage(commonMessages.installingLabel)
+								: formatMessage(messages.installButton)
+						}}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -95,29 +105,111 @@ import { computed, nextTick, ref } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectModrinthClient } from '#ui/providers/api-client'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import InlineBackupCreator from '../../../content-tab/components/modals/InlineBackupCreator.vue'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	cfHeader: {
+		id: 'files.zip-url-modal.cf-header',
+		defaultMessage: 'Install a CurseForge modpack',
+	},
+	zipHeader: {
+		id: 'files.zip-url-modal.zip-header',
+		defaultMessage: 'Uploading .zip contents from URL',
+	},
+	enterLink: {
+		id: 'files.zip-url-modal.enter-link',
+		defaultMessage: 'Enter link',
+	},
+	zipDescription: {
+		id: 'files.zip-url-modal.zip-description',
+		defaultMessage: 'Copy and paste the direct download URL of a .zip file.',
+	},
+	installButton: {
+		id: 'files.zip-url-modal.install-button',
+		defaultMessage: 'Install',
+	},
+	stepFindTitle: {
+		id: 'files.zip-url-modal.step-find-title',
+		defaultMessage: 'Find the modpack',
+	},
+	stepFindDescription: {
+		id: 'files.zip-url-modal.step-find-description',
+		defaultMessage: 'Browse CurseForge and locate the modpack you want.',
+	},
+	stepSelectTitle: {
+		id: 'files.zip-url-modal.step-select-title',
+		defaultMessage: 'Select a version',
+	},
+	stepSelectDescription: {
+		id: 'files.zip-url-modal.step-select-description',
+		defaultMessage: 'Go to the "Files" tab and pick the version to install.',
+	},
+	stepCopyTitle: {
+		id: 'files.zip-url-modal.step-copy-title',
+		defaultMessage: 'Copy the URL',
+	},
+	stepCopyDescription: {
+		id: 'files.zip-url-modal.step-copy-description',
+		defaultMessage: 'Copy the version page URL and paste it below.',
+	},
+	errorUrlRequired: {
+		id: 'files.zip-url-modal.error-url-required',
+		defaultMessage: 'URL is required.',
+	},
+	errorCfUrl: {
+		id: 'files.zip-url-modal.error-cf-url',
+		defaultMessage: 'URL must be a CurseForge modpack version URL.',
+	},
+	errorUrlInvalid: {
+		id: 'files.zip-url-modal.error-url-invalid',
+		defaultMessage: 'URL must be valid.',
+	},
+	cfNotFoundTitle: {
+		id: 'files.zip-url-modal.cf-not-found-title',
+		defaultMessage: 'CurseForge modpack not found',
+	},
+	cfNotFoundText: {
+		id: 'files.zip-url-modal.cf-not-found-text',
+		defaultMessage: 'Could not find CurseForge modpack at that URL.',
+	},
+	installFailedTitle: {
+		id: 'files.zip-url-modal.install-failed-title',
+		defaultMessage: 'Installation failed',
+	},
+	unknownError: {
+		id: 'files.zip-url-modal.unknown-error',
+		defaultMessage: 'An unknown error occurred',
+	},
+	backupName: {
+		id: 'files.zip-url-modal.backup-name',
+		defaultMessage: 'CurseForge modpack install',
+	},
+})
 
 const steps = [
 	{
 		icon: SearchIcon,
-		title: 'Find the modpack',
-		description: 'Browse CurseForge and locate the modpack you want.',
+		title: formatMessage(messages.stepFindTitle),
+		description: formatMessage(messages.stepFindDescription),
 	},
 	{
 		icon: FileTextIcon,
-		title: 'Select a version',
-		description: 'Go to the "Files" tab and pick the version to install.',
+		title: formatMessage(messages.stepSelectTitle),
+		description: formatMessage(messages.stepSelectDescription),
 	},
 	{
 		icon: LinkIcon,
-		title: 'Copy the URL',
-		description: 'Copy the version page URL and paste it below.',
+		title: formatMessage(messages.stepCopyTitle),
+		description: formatMessage(messages.stepCopyDescription),
 	},
 ]
 
@@ -135,12 +227,12 @@ const regex = /https:\/\/(www\.)?curseforge\.com\/minecraft\/modpacks\/[^/]+\/fi
 
 const error = computed(() => {
 	if (trimmedUrl.value.length === 0) {
-		return 'URL is required.'
+		return formatMessage(messages.errorUrlRequired)
 	}
 	if (cf.value && !regex.test(trimmedUrl.value)) {
-		return 'URL must be a CurseForge modpack version URL.'
+		return formatMessage(messages.errorCfUrl)
 	} else if (!cf.value && !trimmedUrl.value.includes('/')) {
-		return 'URL must be valid.'
+		return formatMessage(messages.errorUrlInvalid)
 	}
 	return ''
 })
@@ -159,8 +251,8 @@ const handleSubmit = async () => {
 		} else {
 			submitted.value = false
 			addNotification({
-				title: 'CurseForge modpack not found',
-				text: `Could not find CurseForge modpack at that URL.`,
+				title: formatMessage(messages.cfNotFoundTitle),
+				text: formatMessage(messages.cfNotFoundText),
 				type: 'error',
 			})
 		}
@@ -168,8 +260,8 @@ const handleSubmit = async () => {
 		submitted.value = false
 		console.error('Error installing:', err)
 		addNotification({
-			title: 'Installation failed',
-			text: err instanceof Error ? err.message : 'An unknown error occurred',
+			title: formatMessage(messages.installFailedTitle),
+			text: err instanceof Error ? err.message : formatMessage(messages.unknownError),
 			type: 'error',
 		})
 	}

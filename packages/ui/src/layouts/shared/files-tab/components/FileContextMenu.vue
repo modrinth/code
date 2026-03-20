@@ -24,7 +24,7 @@
 						@click="handleCopyFilename"
 					>
 						<ClipboardCopyIcon class="size-5" />
-						Copy filename
+						{{ formatMessage(messages.copyFilename) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
@@ -34,7 +34,7 @@
 						@click="handleCopyPath"
 					>
 						<ClipboardCopyIcon class="size-5" />
-						Copy full path
+						{{ formatMessage(messages.copyFullPath) }}
 					</button>
 				</ButtonStyled>
 				<div class="h-px w-full bg-surface-5" />
@@ -69,11 +69,32 @@ import { ClipboardCopyIcon } from '@modrinth/assets'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 
 import type { FileItem } from '../types'
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+
+const messages = defineMessages({
+	copyFilename: {
+		id: 'files.context-menu.copy-filename',
+		defaultMessage: 'Copy filename',
+	},
+	copyFullPath: {
+		id: 'files.context-menu.copy-full-path',
+		defaultMessage: 'Copy full path',
+	},
+	copiedFilename: {
+		id: 'files.context-menu.copied-filename',
+		defaultMessage: 'Copied filename',
+	},
+	copiedPath: {
+		id: 'files.context-menu.copied-path',
+		defaultMessage: 'Copied path',
+	},
+})
 
 const visible = ref(false)
 const menuRef = ref<HTMLElement>()
@@ -120,14 +141,14 @@ function hide() {
 function handleCopyFilename() {
 	if (!currentItem.value) return
 	navigator.clipboard.writeText(currentItem.value.name)
-	addNotification({ title: 'Copied filename', type: 'success' })
+	addNotification({ title: formatMessage(messages.copiedFilename), type: 'success' })
 	hide()
 }
 
 function handleCopyPath() {
 	if (!currentItem.value) return
 	navigator.clipboard.writeText(currentItem.value.path)
-	addNotification({ title: 'Copied path', type: 'success' })
+	addNotification({ title: formatMessage(messages.copiedPath), type: 'success' })
 	hide()
 }
 

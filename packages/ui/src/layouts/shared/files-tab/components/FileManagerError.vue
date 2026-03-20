@@ -10,13 +10,13 @@
 				<ButtonStyled>
 					<button size="sm" @click="$emit('refetch')">
 						<RefreshCwIcon class="h-5 w-5" />
-						Try again
+						{{ formatMessage(messages.tryAgain) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
 					<button size="sm" @click="$emit('home')">
 						<HomeIcon class="h-5 w-5" />
-						Go to home folder
+						{{ formatMessage(messages.goToHome) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -28,6 +28,20 @@
 import { FileIcon, HomeIcon, RefreshCwIcon } from '@modrinth/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	tryAgain: {
+		id: 'files.error.try-again',
+		defaultMessage: 'Try again',
+	},
+	goToHome: {
+		id: 'files.error.go-to-home',
+		defaultMessage: 'Go to home folder',
+	},
+})
 
 defineProps<{
 	title: string

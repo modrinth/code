@@ -12,22 +12,30 @@
 				<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
 			</template>
 			<template #header>
-				Uploading files ({{ ctx.uploadState.value.completedFiles }}/{{
-					ctx.uploadState.value.totalFiles
-				}})
+				{{
+					formatMessage(messages.uploadingFiles, {
+						completed: ctx.uploadState.value.completedFiles,
+						total: ctx.uploadState.value.totalFiles,
+					})
+				}}
 				<span v-if="ctx.uploadState.value.currentFileName" class="font-normal text-secondary">
 					— {{ ctx.uploadState.value.currentFileName }}
 				</span>
 			</template>
 			<span class="text-secondary">
-				{{ formatBytes(ctx.uploadState.value.uploadedBytes) }}
-				/ {{ formatBytes(ctx.uploadState.value.totalBytes) }} ({{
-					Math.round(uploadOverallProgress * 100)
-				}}%)
+				{{
+					formatMessage(messages.uploadProgress, {
+						uploaded: formatBytes(ctx.uploadState.value.uploadedBytes),
+						total: formatBytes(ctx.uploadState.value.totalBytes),
+						percent: Math.round(uploadOverallProgress * 100),
+					})
+				}}
 			</span>
 			<template v-if="ctx.cancelUpload" #top-right-actions>
 				<ButtonStyled type="outlined" color="blue">
-					<button class="!border" @click="ctx.cancelUpload?.()">Cancel</button>
+					<button class="!border" @click="ctx.cancelUpload?.()">
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 			</template>
 			<template #progress>
@@ -54,12 +62,24 @@
 				<PackageOpenIcon :class="iconClass" />
 			</template>
 			<template #header>
-				Extracting {{ op.src.includes('https://') ? 'modpack from URL' : op.src }}
-				<span v-if="op.state === 'done'" class="font-normal text-green"> — Done</span>
-				<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red"> — Failed</span>
+				{{
+					formatMessage(messages.extracting, {
+						source: op.src.includes('https://') ? formatMessage(messages.modpackFromUrl) : op.src,
+					})
+				}}
+				<span v-if="op.state === 'done'" class="font-normal text-green">
+					— {{ formatMessage(messages.done) }}</span
+				>
+				<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red">
+					— {{ formatMessage(messages.failed) }}</span
+				>
 			</template>
 			<span class="text-secondary">
-				{{ 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B' }} extracted
+				{{
+					formatMessage(messages.extracted, {
+						size: 'bytes_processed' in op ? formatBytes(op.bytes_processed ?? 0) : '0 B',
+					})
+				}}
 				<template v-if="'current_file' in op && op.current_file">
 					— {{ op.current_file?.split('/')?.pop() }}
 				</template>
@@ -70,7 +90,9 @@
 					type="outlined"
 					color="blue"
 				>
-					<button class="!border" @click="ctx.dismissOperation?.(op.id!, 'cancel')">Cancel</button>
+					<button class="!border" @click="ctx.dismissOperation?.(op.id!, 'cancel')">
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
 				</ButtonStyled>
 				<ButtonStyled
 					v-if="op.state === 'done' || op.state?.startsWith('fail')"
@@ -105,8 +127,43 @@ import { computed } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectFileManager } from '../providers/file-manager'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	uploadingFiles: {
+		id: 'files.operations.uploading-files',
+		defaultMessage: 'Uploading files ({completed}/{total})',
+	},
+	uploadProgress: {
+		id: 'files.operations.upload-progress',
+		defaultMessage: '{uploaded} / {total} ({percent}%)',
+	},
+	extracting: {
+		id: 'files.operations.extracting',
+		defaultMessage: 'Extracting {source}',
+	},
+	modpackFromUrl: {
+		id: 'files.operations.modpack-from-url',
+		defaultMessage: 'modpack from URL',
+	},
+	done: {
+		id: 'files.operations.done',
+		defaultMessage: 'Done',
+	},
+	failed: {
+		id: 'files.operations.failed',
+		defaultMessage: 'Failed',
+	},
+	extracted: {
+		id: 'files.operations.extracted',
+		defaultMessage: '{size} extracted',
+	},
+})
 
 const ctx = injectFileManager()
 

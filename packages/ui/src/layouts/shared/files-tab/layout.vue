@@ -12,11 +12,21 @@
 	/>
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<FileContextMenu ref="contextMenuRef">
-		<template #extract><PackageOpenIcon class="size-5" /> Extract</template>
-		<template #rename><EditIcon class="size-5" /> Rename</template>
-		<template #move><RightArrowIcon class="size-5" /> Move</template>
-		<template #download><DownloadIcon class="size-5" /> Download</template>
-		<template #delete><TrashIcon class="size-5" /> Delete</template>
+		<template #extract
+			><PackageOpenIcon class="size-5" /> {{ formatMessage(messages.extractLabel) }}</template
+		>
+		<template #rename
+			><EditIcon class="size-5" /> {{ formatMessage(messages.renameLabel) }}</template
+		>
+		<template #move
+			><RightArrowIcon class="size-5" /> {{ formatMessage(messages.moveLabel) }}</template
+		>
+		<template #download
+			><DownloadIcon class="size-5" /> {{ formatMessage(commonMessages.downloadButton) }}</template
+		>
+		<template #delete
+			><TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}</template
+		>
 	</FileContextMenu>
 	<Transition name="fade" mode="out-in">
 		<div
@@ -25,13 +35,13 @@
 			class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
 		>
 			<SpinnerIcon class="animate-spin" />
-			Loading files...
+			{{ formatMessage(messages.loadingFiles) }}
 		</div>
 
 		<div v-else key="content" class="contents">
 			<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
 				<template #header>{{ ctx.busyWarning.value }}</template>
-				File operations are disabled while the operation is in progress.
+				{{ formatMessage(messages.busyWarning) }}
 			</Admonition>
 			<FileOperationAdmonitions />
 			<div class="relative flex w-full flex-col">
@@ -104,16 +114,20 @@
 								>
 									<div class="flex flex-col items-center gap-4 text-center">
 										<FolderOpenIcon class="h-16 w-16 text-secondary" />
-										<h3 class="m-0 text-2xl font-bold text-contrast">This folder is empty</h3>
-										<p class="m-0 text-sm text-secondary">There are no files or folders.</p>
+										<h3 class="m-0 text-2xl font-bold text-contrast">
+											{{ formatMessage(messages.emptyFolderTitle) }}
+										</h3>
+										<p class="m-0 text-sm text-secondary">
+											{{ formatMessage(messages.emptyFolderDescription) }}
+										</p>
 									</div>
 								</div>
 								<FileManagerError
 									v-else-if="ctx.error.value"
 									key="error"
 									class="rounded-b-[20px]"
-									title="Unable to load files"
-									message="The folder may not exist."
+									:title="formatMessage(messages.errorTitle)"
+									:message="formatMessage(messages.errorMessage)"
 									@refetch="ctx.refresh"
 									@home="navigateToSegment(-1)"
 								/>
@@ -133,13 +147,13 @@
 			<FloatingActionBar :shown="selectedItems.size > 0">
 				<div class="flex items-center gap-0.5">
 					<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
-						{{ selectedItems.size }} selected
+						{{ formatMessage(messages.selectedCount, { count: selectedItems.size }) }}
 					</span>
 					<div class="mx-1 h-6 w-px bg-surface-5" />
 					<ButtonStyled type="transparent">
 						<button class="!text-primary" @click="deselectAll">
 							<XIcon />
-							<span class="bar-label">Clear</span>
+							<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
 						</button>
 					</ButtonStyled>
 				</div>
@@ -153,7 +167,7 @@
 					>
 						<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
 							<TrashIcon />
-							<span class="bar-label">Delete</span>
+							<span class="bar-label">{{ formatMessage(commonMessages.deleteLabel) }}</span>
 						</button>
 					</ButtonStyled>
 				</div>
@@ -178,8 +192,10 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { commonMessages } from '#ui/utils/common-messages'
 import { getFileExtension } from '#ui/utils/file-extensions'
 
 import FileEditor from './components/editor/FileEditor.vue'
@@ -202,6 +218,67 @@ import { useFileSorting } from './composables/file-sorting'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import { injectFileManager } from './providers/file-manager'
 import type { FileItem } from './types'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	loadingFiles: {
+		id: 'files.layout.loading',
+		defaultMessage: 'Loading files...',
+	},
+	busyWarning: {
+		id: 'files.layout.busy-warning',
+		defaultMessage: 'File operations are disabled while the operation is in progress.',
+	},
+	emptyFolderTitle: {
+		id: 'files.layout.empty-folder-title',
+		defaultMessage: 'This folder is empty',
+	},
+	emptyFolderDescription: {
+		id: 'files.layout.empty-folder-description',
+		defaultMessage: 'There are no files or folders.',
+	},
+	errorTitle: {
+		id: 'files.layout.error-title',
+		defaultMessage: 'Unable to load files',
+	},
+	errorMessage: {
+		id: 'files.layout.error-message',
+		defaultMessage: 'The folder may not exist.',
+	},
+	selectedCount: {
+		id: 'files.layout.selected-count',
+		defaultMessage: '{count} selected',
+	},
+	extractLabel: {
+		id: 'files.action.extract',
+		defaultMessage: 'Extract',
+	},
+	renameLabel: {
+		id: 'files.action.rename',
+		defaultMessage: 'Rename',
+	},
+	moveLabel: {
+		id: 'files.action.move',
+		defaultMessage: 'Move',
+	},
+	dryRunFailedTitle: {
+		id: 'files.layout.dry-run-failed-title',
+		defaultMessage: 'Dry run failed',
+	},
+	dryRunFailedText: {
+		id: 'files.layout.dry-run-failed-text',
+		defaultMessage: 'Error running dry run',
+	},
+	extractFailedTitle: {
+		id: 'files.layout.extract-failed-title',
+		defaultMessage: 'Extract failed',
+	},
+	extractionStartedTitle: {
+		id: 'files.layout.extraction-started-title',
+		defaultMessage: 'Extraction started',
+	},
+})
 
 defineProps<{
 	showDebugInfo?: boolean
@@ -390,15 +467,15 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 			}
 		} else {
 			addNotification({
-				title: 'Dry run failed',
-				text: 'Error running dry run',
+				title: formatMessage(messages.dryRunFailedTitle),
+				text: formatMessage(messages.dryRunFailedText),
 				type: 'error',
 			})
 		}
 	} catch (error) {
 		addNotification({
-			title: 'Extract failed',
-			text: error instanceof Error ? error.message : 'Unknown error',
+			title: formatMessage(messages.extractFailedTitle),
+			text: error instanceof Error ? error.message : '',
 			type: 'error',
 		})
 	}
@@ -408,11 +485,11 @@ async function handleExtractConfirm(path: string) {
 	if (!ctx.extractFile) return
 	try {
 		await ctx.extractFile(path, true, false)
-		addNotification({ title: 'Extraction started', type: 'success' })
+		addNotification({ title: formatMessage(messages.extractionStartedTitle), type: 'success' })
 	} catch (error) {
 		addNotification({
-			title: 'Extract failed',
-			text: error instanceof Error ? error.message : 'Unknown error',
+			title: formatMessage(messages.extractFailedTitle),
+			text: error instanceof Error ? error.message : '',
 			type: 'error',
 		})
 	}

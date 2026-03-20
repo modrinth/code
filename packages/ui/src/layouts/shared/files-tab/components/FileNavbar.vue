@@ -1,24 +1,24 @@
 <template>
 	<header
 		class="flex select-none flex-col justify-between gap-2 sm:flex-row sm:items-center"
-		aria-label="File navigation"
+		:aria-label="formatMessage(messages.fileNavigation)"
 	>
 		<nav
-			aria-label="Breadcrumb navigation"
+			:aria-label="formatMessage(messages.breadcrumbNavigation)"
 			class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
 		>
 			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
 				<li class="mr-4 flex-shrink-0">
 					<ButtonStyled circular>
 						<button
-							v-tooltip="'Back to home'"
+							v-tooltip="formatMessage(messages.backToHome)"
 							type="button"
 							class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 							@click="$emit('navigateHome')"
 							@mouseenter="$emit('prefetchHome')"
 						>
 							<HomeIcon />
-							<span class="sr-only">Home</span>
+							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
 						</button>
 					</ButtonStyled>
 				</li>
@@ -75,7 +75,7 @@
 				type="search"
 				name="search"
 				autocomplete="off"
-				placeholder="Search files"
+				:placeholder="formatMessage(messages.searchFiles)"
 				class="!h-10"
 				input-class="!h-10"
 				wrapper-class="w-full sm:w-[280px]"
@@ -89,7 +89,7 @@
 					@click="$emit('refresh')"
 				>
 					<RefreshCwIcon aria-hidden="true" class="h-5 w-5" />
-					Refresh
+					{{ formatMessage(commonMessages.refreshButton) }}
 				</button>
 			</ButtonStyled>
 
@@ -98,7 +98,7 @@
 					:dropdown-id="`create-new-${baseId}`"
 					position="bottom"
 					direction="left"
-					aria-label="Create new..."
+					:aria-label="formatMessage(messages.createNew)"
 					:disabled="disabled"
 					:tooltip="disabled ? disabledTooltip : undefined"
 					class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
@@ -114,17 +114,24 @@
 				>
 					<PlusIcon aria-hidden="true" class="h-5 w-5" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-					<template #file> <BoxIcon aria-hidden="true" /> New file </template>
-					<template #directory> <FolderOpenIcon aria-hidden="true" /> New folder </template>
-					<template #upload> <UploadIcon aria-hidden="true" /> Upload file </template>
+					<template #file>
+						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
+					</template>
+					<template #directory>
+						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
+					</template>
+					<template #upload>
+						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
+					</template>
 					<template #upload-zip>
-						<FileArchiveIcon aria-hidden="true" /> Upload from .zip file
+						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
 					</template>
 					<template #install-from-url>
-						<LinkIcon aria-hidden="true" /> Upload from .zip URL
+						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
 					</template>
 					<template #install-cf-pack>
-						<CurseForgeIcon aria-hidden="true" /> Install CurseForge pack
+						<CurseForgeIcon aria-hidden="true" />
+						{{ formatMessage(messages.installCurseForgePack) }}
 					</template>
 				</OverflowMenu>
 			</ButtonStyled>
@@ -133,17 +140,17 @@
 		<div v-else-if="!isEditingImage" class="flex gap-2">
 			<Button
 				v-if="isLogFile"
-				v-tooltip="'Share to mclo.gs'"
+				v-tooltip="formatMessage(messages.shareToMclogs)"
 				icon-only
 				transparent
-				aria-label="Share to mclo.gs"
+				:aria-label="formatMessage(messages.shareToMclogs)"
 				@click="$emit('share')"
 			>
 				<ShareIcon />
 			</Button>
 			<ButtonStyled type="transparent">
 				<TeleportOverflowMenu
-					aria-label="Save file"
+					:aria-label="formatMessage(messages.saveFile)"
 					:options="[
 						{ id: 'save', action: () => $emit('save') },
 						{ id: 'save-as', action: () => $emit('saveAs') },
@@ -152,11 +159,15 @@
 				>
 					<SaveIcon aria-hidden="true" />
 					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-					<template #save> <SaveIcon aria-hidden="true" /> Save </template>
-					<template #save-as> <SaveIcon aria-hidden="true" /> Save as... </template>
+					<template #save>
+						<SaveIcon aria-hidden="true" /> {{ formatMessage(messages.save) }}
+					</template>
+					<template #save-as>
+						<SaveIcon aria-hidden="true" /> {{ formatMessage(messages.saveAs) }}
+					</template>
 					<template #save-restart>
 						<RefreshCwIcon aria-hidden="true" />
-						Save & restart
+						{{ formatMessage(messages.saveAndRestart) }}
 					</template>
 				</TeleportOverflowMenu>
 			</ButtonStyled>
@@ -188,6 +199,81 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	fileNavigation: {
+		id: 'files.navbar.file-navigation',
+		defaultMessage: 'File navigation',
+	},
+	breadcrumbNavigation: {
+		id: 'files.navbar.breadcrumb-navigation',
+		defaultMessage: 'Breadcrumb navigation',
+	},
+	backToHome: {
+		id: 'files.navbar.back-to-home',
+		defaultMessage: 'Back to home',
+	},
+	home: {
+		id: 'files.navbar.home',
+		defaultMessage: 'Home',
+	},
+	searchFiles: {
+		id: 'files.navbar.search-files',
+		defaultMessage: 'Search files',
+	},
+	createNew: {
+		id: 'files.navbar.create-new',
+		defaultMessage: 'Create new...',
+	},
+	newFile: {
+		id: 'files.navbar.new-file',
+		defaultMessage: 'New file',
+	},
+	newFolder: {
+		id: 'files.navbar.new-folder',
+		defaultMessage: 'New folder',
+	},
+	uploadFile: {
+		id: 'files.navbar.upload-file',
+		defaultMessage: 'Upload file',
+	},
+	uploadFromZip: {
+		id: 'files.navbar.upload-from-zip',
+		defaultMessage: 'Upload from .zip file',
+	},
+	uploadFromZipUrl: {
+		id: 'files.navbar.upload-from-zip-url',
+		defaultMessage: 'Upload from .zip URL',
+	},
+	installCurseForgePack: {
+		id: 'files.navbar.install-curseforge-pack',
+		defaultMessage: 'Install CurseForge pack',
+	},
+	shareToMclogs: {
+		id: 'files.navbar.share-to-mclogs',
+		defaultMessage: 'Share to mclo.gs',
+	},
+	saveFile: {
+		id: 'files.navbar.save-file',
+		defaultMessage: 'Save file',
+	},
+	save: {
+		id: 'files.navbar.save',
+		defaultMessage: 'Save',
+	},
+	saveAs: {
+		id: 'files.navbar.save-as',
+		defaultMessage: 'Save as...',
+	},
+	saveAndRestart: {
+		id: 'files.navbar.save-and-restart',
+		defaultMessage: 'Save & restart',
+	},
+})
 
 const props = defineProps<{
 	breadcrumbs: string[]

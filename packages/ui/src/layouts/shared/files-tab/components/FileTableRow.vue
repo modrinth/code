@@ -53,11 +53,15 @@
 			<ButtonStyled circular type="transparent">
 				<TeleportOverflowMenu :options="menuOptions">
 					<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-					<template #extract><PackageOpenIcon /> Extract</template>
-					<template #rename><EditIcon /> Rename</template>
-					<template #move><RightArrowIcon /> Move</template>
-					<template #download><DownloadIcon /> Download</template>
-					<template #delete><TrashIcon /> Delete</template>
+					<template #extract
+						><PackageOpenIcon /> {{ formatMessage(messages.extractLabel) }}</template
+					>
+					<template #rename><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template>
+					<template #move><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template>
+					<template #download
+						><DownloadIcon /> {{ formatMessage(commonMessages.downloadButton) }}</template
+					>
+					<template #delete><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template>
 				</TeleportOverflowMenu>
 			</ButtonStyled>
 		</div>
@@ -83,7 +87,9 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
+import { commonMessages } from '#ui/utils/common-messages'
 import {
 	getFileExtension,
 	isEditableFile as isEditableFileExt,
@@ -104,6 +110,27 @@ interface FileItemProps {
 	writeDisabled?: boolean
 	writeDisabledTooltip?: string
 }
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	extractLabel: {
+		id: 'files.row.extract',
+		defaultMessage: 'Extract',
+	},
+	renameLabel: {
+		id: 'files.row.rename',
+		defaultMessage: 'Rename',
+	},
+	moveLabel: {
+		id: 'files.row.move',
+		defaultMessage: 'Move',
+	},
+	itemCount: {
+		id: 'files.row.item-count',
+		defaultMessage: '{count, plural, one {# item} other {# items}}',
+	},
+})
 
 const props = defineProps<FileItemProps>()
 
@@ -221,7 +248,7 @@ const isEditableFile = computed(() => {
 
 const formattedSize = computed(() => {
 	if (props.type === 'directory') {
-		return `${props.count} ${props.count === 1 ? 'item' : 'items'}`
+		return formatMessage(messages.itemCount, { count: props.count ?? 0 })
 	}
 
 	if (props.size === undefined) return ''

@@ -1,8 +1,12 @@
 <template>
-	<NewModal ref="modal" :header="`Rename ${item?.name}`" max-width="500px">
+	<NewModal
+		ref="modal"
+		:header="formatMessage(messages.header, { name: item?.name })"
+		max-width="500px"
+	>
 		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
 			<label class="flex flex-col gap-2">
-				<span class="font-semibold text-contrast">New name</span>
+				<span class="font-semibold text-contrast">{{ formatMessage(messages.newNameLabel) }}</span>
 				<StyledInput ref="renameInput" v-model="itemName" wrapper-class="w-full" />
 				<div v-if="submitted && error" class="text-sm text-red">{{ error }}</div>
 			</label>
@@ -12,13 +16,13 @@
 				<ButtonStyled type="outlined">
 					<button class="!border !border-surface-4" @click="hide">
 						<XIcon class="h-5 w-5" />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button :disabled="!!error && submitted" @click="handleSubmit">
 						<EditIcon class="h-5 w-5" />
-						Rename
+						{{ formatMessage(messages.renameButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -33,6 +37,27 @@ import { computed, nextTick, ref } from 'vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+import { fileValidationMessages } from './file-validation-messages'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	header: {
+		id: 'files.rename-modal.header',
+		defaultMessage: 'Rename {name}',
+	},
+	newNameLabel: {
+		id: 'files.rename-modal.new-name-label',
+		defaultMessage: 'New name',
+	},
+	renameButton: {
+		id: 'files.rename-modal.rename-button',
+		defaultMessage: 'Rename',
+	},
+})
 
 const props = defineProps<{
 	item: { name: string; type: string } | null
@@ -49,17 +74,17 @@ const submitted = ref(false)
 
 const error = computed(() => {
 	if (!itemName.value) {
-		return 'Name is required.'
+		return formatMessage(fileValidationMessages.nameRequired)
 	}
 	if (props.item?.type === 'file') {
 		const validPattern = /^[a-zA-Z0-9-_.\s]+$/
 		if (!validPattern.test(itemName.value)) {
-			return 'Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces.'
+			return formatMessage(fileValidationMessages.nameInvalidFile)
 		}
 	} else {
 		const validPattern = /^[a-zA-Z0-9-_\s]+$/
 		if (!validPattern.test(itemName.value)) {
-			return 'Name must contain only alphanumeric characters, dashes, underscores, or spaces.'
+			return formatMessage(fileValidationMessages.nameInvalidDirectory)
 		}
 	}
 	return ''

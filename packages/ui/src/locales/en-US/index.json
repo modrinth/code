@@ -416,6 +416,393 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
   },
+  "files.action.extract": {
+    "defaultMessage": "Extract"
+  },
+  "files.action.move": {
+    "defaultMessage": "Move"
+  },
+  "files.action.rename": {
+    "defaultMessage": "Rename"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Extract summary"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Overwrite"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Over 100 files will be overwritten if you proceed with extraction; here are some of them."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "The following {count} files already exist on your server, and will be overwritten if you proceed with extraction."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} overwritten"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Overwritten"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Files will be overwritten"
+  },
+  "files.context-menu.copied-filename": {
+    "defaultMessage": "Copied filename"
+  },
+  "files.context-menu.copied-path": {
+    "defaultMessage": "Copied path"
+  },
+  "files.context-menu.copy-filename": {
+    "defaultMessage": "Copy filename"
+  },
+  "files.context-menu.copy-full-path": {
+    "defaultMessage": "Copy full path"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Create {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Create a {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "e.g. plugins"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "e.g. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Deleting \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Delete file"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {This folder and all its contents will be permanently deleted. This action cannot be undone.} other {This file will be permanently deleted. This action cannot be undone.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Could not load file contents."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Failed to open file"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Could not upload to mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Failed to share file"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Your file has been saved."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "File saved"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "Your log file URL has been copied to your clipboard."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "Log URL copied"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Could not save the file."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Save failed"
+  },
+  "files.editor.server-restarted-text": {
+    "defaultMessage": "Your server has been restarted."
+  },
+  "files.editor.server-restarted-title": {
+    "defaultMessage": "Server restarted"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Go to home folder"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Try again"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Image too large to view (max {maxDimension}x{maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Invalid or empty image file."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Failed to load image"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Reset zoom"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Viewed image"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Zoom in"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Zoom out"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "File operations are disabled while the operation is in progress."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Error running dry run"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Dry run failed"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "There are no files or folders."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "This folder is empty"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "The folder may not exist."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Unable to load files"
+  },
+  "files.layout.extract-failed-title": {
+    "defaultMessage": "Extract failed"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Extraction started"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Loading files..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} selected"
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Current location"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Destination path"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "e.g. /mods"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+  },
+  "files.move-modal.move-button": {
+    "defaultMessage": "Move"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Back to home"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Breadcrumb navigation"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Create new..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "File navigation"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Home"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Install CurseForge pack"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "New file"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "New folder"
+  },
+  "files.navbar.save": {
+    "defaultMessage": "Save"
+  },
+  "files.navbar.save-and-restart": {
+    "defaultMessage": "Save & restart"
+  },
+  "files.navbar.save-as": {
+    "defaultMessage": "Save as..."
+  },
+  "files.navbar.save-file": {
+    "defaultMessage": "Save file"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Search files"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Share to mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Upload file"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Upload from .zip file"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Upload from .zip URL"
+  },
+  "files.operations.done": {
+    "defaultMessage": "Done"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} extracted"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Extracting {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Failed"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpack from URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent}%)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Rename {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "New name"
+  },
+  "files.rename-modal.rename-button": {
+    "defaultMessage": "Rename"
+  },
+  "files.row.extract": {
+    "defaultMessage": "Extract"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "files.row.move": {
+    "defaultMessage": "Move"
+  },
+  "files.row.rename": {
+    "defaultMessage": "Rename"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Created"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modified"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Name"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Size"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
+  "files.upload-dropdown.done": {
+    "defaultMessage": "Done"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Failed - File already exists"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Failed - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Failed - Incorrect file type"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Failed to upload {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "File"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "{fileType} uploads"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Upload had incorrect file type"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "An unexpected error occurred."
+  },
+  "files.upload-dropdown.upload-failed": {
+    "defaultMessage": "Upload failed"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} left"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Drop {type, select, undefined {files} other {{type}s}} here to upload"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Name must contain only alphanumeric characters, dashes, underscores, or spaces."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Name"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Name is required."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "CurseForge modpack install"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Install a CurseForge modpack"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Could not find CurseForge modpack at that URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpack not found"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Enter link"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "URL must be a CurseForge modpack version URL."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "URL must be valid."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URL is required."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Install"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Installation failed"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Copy the version page URL and paste it below."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Copy the URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Browse CurseForge and locate the modpack you want."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Find the modpack"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Go to the \"Files\" tab and pick the version to install."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Select a version"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "An unknown error occurred"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Copy and paste the direct download URL of a .zip file."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Uploading .zip contents from URL"
+  },
   "form.label.address-line": {
     "defaultMessage": "Address line"
   },

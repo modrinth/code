@@ -1,8 +1,0 @@
-export * from './editor'
-export * from './explorer'
-export * from './modals'
-export * from './upload'
-export { default as FileManagerError } from '#ui/layouts/shared/files-tab/components/FileManagerError.vue'
-export { default as FileNavbar } from '#ui/layouts/shared/files-tab/components/FileNavbar.vue'
-export { default as FileLabelBar } from '#ui/layouts/shared/files-tab/components/FileTableHeader.vue'
-export { default as FileVirtualList } from '#ui/layouts/shared/files-tab/components/FileVirtualList.vue'

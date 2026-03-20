@@ -1,16 +1,14 @@
 <template>
-	<NewModal ref="modal" header="Extract summary" :closable="true" no-padding>
+	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="true" no-padding>
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
-				<Admonition type="warning" header="Files will be overwritten">
+				<Admonition type="warning" :header="formatMessage(messages.warningHeader)">
 					<span>
 						<template v-if="hasMany">
-							Over 100 files will be overwritten if you proceed with extraction; here are some of
-							them.
+							{{ formatMessage(messages.overwriteManyWarning) }}
 						</template>
 						<template v-else>
-							The following {{ files.length }} files already exist on your server, and will be
-							overwritten if you proceed with extraction.
+							{{ formatMessage(messages.overwriteWarning, { count: files.length }) }}
 						</template>
 					</span>
 				</Admonition>
@@ -18,7 +16,7 @@
 				<div v-if="files.length" class="flex gap-2">
 					<div class="flex items-center gap-1">
 						<MinusIcon />
-						{{ files.length }} overwritten
+						{{ formatMessage(messages.overwrittenCount, { count: files.length }) }}
 					</div>
 				</div>
 			</div>
@@ -40,7 +38,9 @@
 							class="w-[1px] h-2 relative top-1"
 						></div>
 					</div>
-					<span class="text-sm shrink-0 whitespace-nowrap">Overwritten</span>
+					<span class="text-sm shrink-0 whitespace-nowrap">{{
+						formatMessage(messages.overwrittenLabel)
+					}}</span>
 					<span
 						v-tooltip="file"
 						class="text-sm text-contrast font-medium whitespace-nowrap overflow-hidden text-ellipsis"
@@ -56,13 +56,13 @@
 				<ButtonStyled type="outlined">
 					<button class="!border !border-surface-4" @click="hide">
 						<XIcon />
-						Cancel
+						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
 					<button @click="handleProceed">
 						<CheckIcon />
-						Overwrite
+						{{ formatMessage(messages.overwriteButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -77,6 +77,43 @@ import { computed, ref } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { commonMessages } from '#ui/utils/common-messages'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	header: {
+		id: 'files.conflict-modal.header',
+		defaultMessage: 'Extract summary',
+	},
+	warningHeader: {
+		id: 'files.conflict-modal.warning-header',
+		defaultMessage: 'Files will be overwritten',
+	},
+	overwriteManyWarning: {
+		id: 'files.conflict-modal.overwrite-many-warning',
+		defaultMessage:
+			'Over 100 files will be overwritten if you proceed with extraction; here are some of them.',
+	},
+	overwriteWarning: {
+		id: 'files.conflict-modal.overwrite-warning',
+		defaultMessage:
+			'The following {count} files already exist on your server, and will be overwritten if you proceed with extraction.',
+	},
+	overwrittenCount: {
+		id: 'files.conflict-modal.overwritten-count',
+		defaultMessage: '{count} overwritten',
+	},
+	overwrittenLabel: {
+		id: 'files.conflict-modal.overwritten-label',
+		defaultMessage: 'Overwritten',
+	},
+	overwriteButton: {
+		id: 'files.conflict-modal.overwrite-button',
+		defaultMessage: 'Overwrite',
+	},
+})
 
 const path = ref('')
 const files = ref<string[]>([])

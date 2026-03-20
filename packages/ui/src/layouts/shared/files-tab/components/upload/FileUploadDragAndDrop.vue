@@ -16,7 +16,11 @@
 			<div class="text-center">
 				<UploadIcon class="mx-auto h-16 w-16 shadow-2xl" />
 				<p class="mt-2 text-xl">
-					Drop {{ type ? type.toLocaleLowerCase() : 'file' }}s here to upload
+					{{
+						formatMessage(messages.dropToUpload, {
+							type: type ? type.toLocaleLowerCase() : undefined,
+						})
+					}}
 				</p>
 			</div>
 		</div>
@@ -27,6 +31,10 @@
 import { UploadIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
+
+const { formatMessage } = useVIntl()
+
 const emit = defineEmits<{
 	filesDropped: [files: File[]]
 }>()
@@ -35,6 +43,13 @@ defineProps<{
 	overlayClass?: string
 	type?: string
 }>()
+
+const messages = defineMessages({
+	dropToUpload: {
+		id: 'files.upload.drag-and-drop.drop-to-upload',
+		defaultMessage: 'Drop {type, select, undefined {files} other {{type}s}} here to upload',
+	},
+})
 
 const isDragging = ref(false)
 const dragCounter = ref(0)

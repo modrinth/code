@@ -31,6 +31,7 @@
 import { SpinnerIcon } from '@modrinth/assets'
 import { type Component, computed, onUnmounted, ref, watch } from 'vue'
 
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
@@ -52,8 +53,60 @@ const emit = defineEmits<{
 	close: []
 }>()
 
+const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+
+const messages = defineMessages({
+	failedToOpenTitle: {
+		id: 'files.editor.failed-to-open-title',
+		defaultMessage: 'Failed to open file',
+	},
+	failedToOpenText: {
+		id: 'files.editor.failed-to-open-text',
+		defaultMessage: 'Could not load file contents.',
+	},
+	fileSavedTitle: {
+		id: 'files.editor.file-saved-title',
+		defaultMessage: 'File saved',
+	},
+	fileSavedText: {
+		id: 'files.editor.file-saved-text',
+		defaultMessage: 'Your file has been saved.',
+	},
+	saveFailedTitle: {
+		id: 'files.editor.save-failed-title',
+		defaultMessage: 'Save failed',
+	},
+	saveFailedText: {
+		id: 'files.editor.save-failed-text',
+		defaultMessage: 'Could not save the file.',
+	},
+	serverRestartedTitle: {
+		id: 'files.editor.server-restarted-title',
+		defaultMessage: 'Server restarted',
+	},
+	serverRestartedText: {
+		id: 'files.editor.server-restarted-text',
+		defaultMessage: 'Your server has been restarted.',
+	},
+	logUrlCopiedTitle: {
+		id: 'files.editor.log-url-copied-title',
+		defaultMessage: 'Log URL copied',
+	},
+	logUrlCopiedText: {
+		id: 'files.editor.log-url-copied-text',
+		defaultMessage: 'Your log file URL has been copied to your clipboard.',
+	},
+	failedToShareTitle: {
+		id: 'files.editor.failed-to-share-title',
+		defaultMessage: 'Failed to share file',
+	},
+	failedToShareText: {
+		id: 'files.editor.failed-to-share-text',
+		defaultMessage: 'Could not upload to mclo.gs.',
+	},
+})
 
 const fileContent = ref('')
 const isEditingImage = ref(false)
@@ -96,8 +149,8 @@ async function loadFileContent(file: { name: string; type: string; path: string 
 	} catch (error) {
 		console.error('Error fetching file content:', error)
 		addNotification({
-			title: 'Failed to open file',
-			text: 'Could not load file contents.',
+			title: formatMessage(messages.failedToOpenTitle),
+			text: formatMessage(messages.failedToOpenText),
 			type: 'error',
 		})
 		emit('close')
@@ -142,13 +195,17 @@ async function saveFileContent(exit: boolean = true) {
 		}
 
 		addNotification({
-			title: 'File saved',
-			text: 'Your file has been saved.',
+			title: formatMessage(messages.fileSavedTitle),
+			text: formatMessage(messages.fileSavedText),
 			type: 'success',
 		})
 	} catch (error) {
 		console.error('Error saving file content:', error)
-		addNotification({ title: 'Save failed', text: 'Could not save the file.', type: 'error' })
+		addNotification({
+			title: formatMessage(messages.saveFailedTitle),
+			text: formatMessage(messages.saveFailedText),
+			type: 'error',
+		})
 	}
 }
 
@@ -158,8 +215,8 @@ async function saveAndRestart() {
 	if (ctx.restartServer) {
 		await ctx.restartServer()
 		addNotification({
-			title: 'Server restarted',
-			text: 'Your server has been restarted.',
+			title: formatMessage(messages.serverRestartedTitle),
+			text: formatMessage(messages.serverRestartedText),
 			type: 'success',
 		})
 	}
@@ -185,8 +242,8 @@ async function shareToMclogs() {
 		if (data.success && data.url) {
 			await navigator.clipboard.writeText(data.url)
 			addNotification({
-				title: 'Log URL copied',
-				text: 'Your log file URL has been copied to your clipboard.',
+				title: formatMessage(messages.logUrlCopiedTitle),
+				text: formatMessage(messages.logUrlCopiedText),
 				type: 'success',
 			})
 		} else {
@@ -195,8 +252,8 @@ async function shareToMclogs() {
 	} catch (error) {
 		console.error('Error sharing file:', error)
 		addNotification({
-			title: 'Failed to share file',
-			text: 'Could not upload to mclo.gs.',
+			title: formatMessage(messages.failedToShareTitle),
+			text: formatMessage(messages.failedToShareText),
 			type: 'error',
 		})
 	}
