@@ -1,41 +1,46 @@
 <template>
-	<NewModal ref="modal" :header="`Moving ${item?.name}`">
-		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
-			<div class="flex flex-col gap-2">
+	<NewModal
+		ref="modal"
+		:header="`Move ${item?.type === 'directory' ? 'folder' : 'file'}`"
+		max-width="500px"
+	>
+		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
+			<div class="flex flex-col gap-1">
+				<span class="font-semibold text-contrast">Current location</span>
+				<span class="text-secondary">{{ `${currentPath}/${item?.name}`.replace('//', '/') }}</span>
+			</div>
+			<label class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Destination path</span>
 				<StyledInput
 					ref="destinationInput"
 					v-model="destination"
-					placeholder="e.g. /mods/modname"
+					placeholder="e.g. /mods"
 					wrapper-class="w-full"
 				/>
-			</div>
-			<div class="flex items-center gap-2 text-nowrap">
-				New location:
-				<div class="w-full rounded-lg bg-table-alternateRow p-2 font-bold text-contrast">
-					<span class="text-secondary">/root</span>{{ newpath }}
-				</div>
-			</div>
-			<div class="flex justify-start gap-4">
-				<ButtonStyled color="brand">
-					<button type="submit">
-						<ArrowBigUpDashIcon class="h-5 w-5" />
-						Move
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button type="button" @click="hide">
+			</label>
+		</form>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
 						<XIcon class="h-5 w-5" />
 						Cancel
 					</button>
 				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button @click="handleSubmit">
+						<RightArrowIcon class="h-5 w-5" />
+						Move
+					</button>
+				</ButtonStyled>
 			</div>
-		</form>
+		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { ArrowBigUpDashIcon, XIcon } from '@modrinth/assets'
-import { computed, nextTick, ref } from 'vue'
+import { RightArrowIcon, XIcon } from '@modrinth/assets'
+import { nextTick, ref } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -43,8 +48,8 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 
 const destinationInput = ref<HTMLInputElement | null>(null)
 
-const props = defineProps<{
-	item: { name: string } | null
+defineProps<{
+	item: { name: string; type: string } | null
 	currentPath: string
 }>()
 
@@ -54,18 +59,16 @@ const emit = defineEmits<{
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const destination = ref('')
-const newpath = computed(() => {
-	const path = destination.value.replace('//', '/')
-	return path.startsWith('/') ? path : `/${path}`
-})
 
 const handleSubmit = () => {
-	emit('move', newpath.value)
+	const path = destination.value.replace('//', '/')
+	const normalized = path.startsWith('/') ? path : `/${path}`
+	emit('move', normalized)
 	hide()
 }
 
 const show = () => {
-	destination.value = props.currentPath
+	destination.value = ''
 	modal.value?.show()
 	nextTick(() => {
 		setTimeout(() => {

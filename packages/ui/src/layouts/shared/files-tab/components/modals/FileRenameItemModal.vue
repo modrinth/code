@@ -1,26 +1,28 @@
 <template>
-	<NewModal ref="modal" :header="`Renaming ${item?.type}`">
-		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
-			<div class="flex flex-col gap-2">
-				<div class="font-semibold text-contrast">Name</div>
+	<NewModal ref="modal" :header="`Rename ${item?.name}`" max-width="500px">
+		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
+			<label class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">New name</span>
 				<StyledInput ref="renameInput" v-model="itemName" wrapper-class="w-full" />
-				<div v-if="submitted && error" class="text-red">{{ error }}</div>
-			</div>
-			<div class="flex justify-start gap-4">
-				<ButtonStyled color="brand">
-					<button :disabled="!!error" type="submit">
-						<EditIcon class="h-5 w-5" />
-						Rename
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button type="button" @click="hide">
+				<div v-if="submitted && error" class="text-sm text-red">{{ error }}</div>
+			</label>
+		</form>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
 						<XIcon class="h-5 w-5" />
 						Cancel
 					</button>
 				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!!error && submitted" @click="handleSubmit">
+						<EditIcon class="h-5 w-5" />
+						Rename
+					</button>
+				</ButtonStyled>
 			</div>
-		</form>
+		</template>
 	</NewModal>
 </template>
 

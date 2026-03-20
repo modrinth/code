@@ -1,31 +1,33 @@
 <template>
-	<NewModal ref="modal" :header="`Creating a ${displayType}`">
-		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
-			<div class="flex flex-col gap-2">
-				<div class="font-semibold text-contrast">Name</div>
+	<NewModal ref="modal" :header="`Create a ${displayType}`" max-width="500px">
+		<form class="space-y-6 md:min-w-[400px]" @submit.prevent="handleSubmit">
+			<label class="flex flex-col gap-2">
+				<span class="font-semibold text-contrast">Name</span>
 				<StyledInput
 					ref="createInput"
 					v-model="itemName"
 					:placeholder="`e.g. ${type === 'file' ? 'config.yml' : 'plugins'}`"
 					wrapper-class="w-full"
 				/>
-				<div v-if="submitted && error" class="text-red">{{ error }}</div>
-			</div>
-			<div class="flex justify-start gap-4">
-				<ButtonStyled color="brand">
-					<button :disabled="!!error" type="submit">
-						<PlusIcon class="h-5 w-5" />
-						Create {{ displayType }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button type="button" @click="hide">
+				<div v-if="submitted && error" class="text-sm text-red">{{ error }}</div>
+			</label>
+		</form>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
 						<XIcon class="h-5 w-5" />
 						Cancel
 					</button>
 				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button :disabled="!!error && submitted" @click="handleSubmit">
+						<PlusIcon class="h-5 w-5" />
+						Create {{ displayType }}
+					</button>
+				</ButtonStyled>
 			</div>
-		</form>
+		</template>
 	</NewModal>
 </template>
 

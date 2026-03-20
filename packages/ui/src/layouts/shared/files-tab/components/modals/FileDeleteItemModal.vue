@@ -1,50 +1,33 @@
 <template>
-	<NewModal ref="modal" fade="danger" :header="`Deleting ${item?.type}`">
-		<form class="flex flex-col gap-4 md:w-[600px]" @submit.prevent="handleSubmit">
-			<div
-				class="relative flex w-full items-center gap-2 rounded-2xl border border-solid border-brand-red bg-bg-red p-6 shadow-md"
-			>
-				<div
-					class="flex h-9 w-9 items-center justify-center rounded-full bg-highlight-red p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
-				>
-					<FolderOpenIcon v-if="item?.type === 'directory'" class="h-5 w-5" />
-					<FileIcon v-else-if="item?.type === 'file'" class="h-5 w-5" />
-				</div>
-				<div class="flex flex-col">
-					<span class="font-bold group-hover:text-contrast">{{ item?.name }}</span>
-					<span
-						v-if="item?.type === 'directory'"
-						class="text-xs text-secondary group-hover:text-primary"
-					>
-						{{ item?.count }} items
-					</span>
-					<span v-else class="text-xs text-secondary group-hover:text-primary">
-						{{ ((item?.size ?? 0) / 1024 / 1024).toFixed(2) }} MB
-					</span>
-				</div>
-			</div>
-			<div class="flex justify-start gap-4">
-				<ButtonStyled color="red">
-					<button type="submit">
-						<TrashIcon class="h-5 w-5" />
-						Delete {{ item?.type }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button type="button" @click="hide">
+	<NewModal ref="modal" fade="danger" :header="`Delete ${item?.name}`" max-width="500px">
+		<Admonition type="critical" class="md:min-w-[400px]">
+			This {{ item?.type === 'directory' ? 'folder and all its contents' : 'file' }} will be
+			permanently deleted. This action cannot be undone.
+		</Admonition>
+		<template #actions>
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="hide">
 						<XIcon class="h-5 w-5" />
 						Cancel
 					</button>
 				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button @click="handleSubmit">
+						<TrashIcon class="h-5 w-5" />
+						Delete
+					</button>
+				</ButtonStyled>
 			</div>
-		</form>
+		</template>
 	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { FileIcon, FolderOpenIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import { TrashIcon, XIcon } from '@modrinth/assets'
 import { ref } from 'vue'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 
@@ -52,8 +35,6 @@ defineProps<{
 	item: {
 		name: string
 		type: string
-		count?: number
-		size?: number
 	} | null
 }>()
 
