@@ -410,7 +410,7 @@ provideInstallationSettings({
 					project_id: modpack.value.spec.project_id,
 					version_id: modpack.value.spec.version_id,
 				},
-				soft_override: false,
+				soft_override: true,
 			})
 			debug('reinstallModpack: installContent succeeded, invalidating')
 			invalidateServerState()
