@@ -90,16 +90,17 @@ export const SetToCancel: Story = {
 	args: {
 		...baseServer,
 		name: 'Survival SMP',
-		cancellationDate: new Date(2025, 1, 17).toISOString(),
+		cancellationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+		onResubscribe: () => alert('Resubscribe clicked'),
+		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }
 
-export const SetToCancelWithResubscribe: Story = {
+export const SetToCancelFilesExpired: Story = {
 	args: {
 		...baseServer,
 		name: 'Survival SMP',
 		cancellationDate: new Date(2025, 1, 17).toISOString(),
-		onResubscribe: () => alert('Resubscribe clicked'),
 	},
 }
 
@@ -109,19 +110,21 @@ export const SuspendedCancelled: Story = {
 		name: 'Old Event Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
-		cancellationDate: new Date(2025, 1, 17).toISOString(),
+		cancellationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+		onResubscribe: () => alert('Resubscribe clicked'),
+		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }
 
-export const SuspendedCancelledWithActions: Story = {
+export const SuspendedCancelledFilesExpired: Story = {
 	args: {
 		...baseServer,
+		onDownloadBackup: null,
 		name: 'Old Event Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
 		cancellationDate: new Date(2025, 1, 17).toISOString(),
 		onResubscribe: () => alert('Resubscribe clicked'),
-		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }
 

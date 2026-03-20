@@ -93,14 +93,15 @@
 			class="server-listing-notice"
 		>
 			<div>
-				Your subscription was cancelled
-				<template v-if="cancellationDate">
+				Your subscription was cancelled<template v-if="cancellationDate">
 					on
 					<span class="font-medium text-contrast">
 						{{ formatDate(cancellationDate) }}
-					</span> </template
-				>. Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
-				downloaded below before they're deleted.
+					</span></template
+				>.<template v-if="!isFilesExpired">
+					Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
+					downloaded below before they're deleted.</template
+				>
 			</div>
 			<div class="flex gap-2">
 				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
@@ -194,16 +195,26 @@
 			class="server-listing-notice"
 		>
 			<div>
-				Your subscription is set to cancel
-				<template v-if="cancellationDate">
+				Your subscription is set to cancel<template v-if="cancellationDate">
 					on
 					<span class="font-medium text-contrast">
 						{{ formatDate(cancellationDate) }}
-					</span> </template
-				>. Your files will be preserved for <span class="font-medium text-red">30 days</span> after
-				cancellation.
+					</span></template
+				>.<template v-if="!isFilesExpired">
+					Your files will be preserved for
+					<span class="font-medium text-red">30 days</span> after cancellation.</template
+				>
 			</div>
 			<div class="flex gap-2">
+				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
+					<button
+						class="!border-surface-5"
+						v-tooltip="'Download latest backup'"
+						@click="onDownloadBackup"
+					>
+						<DownloadIcon />
+					</button>
+				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button
 						class="!border-surface-5 w-28"
@@ -312,6 +323,12 @@ const isConfiguring = computed(() => props.flows?.intro)
 const isProvisioning = computed(() => props.status === 'installing' && !isConfiguring.value)
 const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
 const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
+const isFilesExpired = computed(() => {
+	if (!props.cancellationDate) return false
+	const cancellation = new Date(props.cancellationDate)
+	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+	return new Date() > thirtyDaysLater
+})
 const hasNotice = computed(
 	() =>
 		isProvisioning.value ||
@@ -410,6 +427,6 @@ async function copyToClipboard(text: string) {
 
 <style scoped>
 .server-listing-notice {
-	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-2 border-surface-5 bg-bg-raised text-primary;
+	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
 }
 </style>
