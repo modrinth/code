@@ -158,6 +158,9 @@
 						v-for="server in filteredData.filter((s) => !s.is_medal)"
 						:key="server.server_id"
 						v-bind="server"
+						:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+						:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
+						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
 				</TransitionGroup>
 				<div v-else class="flex h-full items-center justify-center">
@@ -171,9 +174,16 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient, StyledInput } from '@modrinth/ui'
+import {
+	AutoLink,
+	ButtonStyled,
+	CopyCode,
+	injectModrinthClient,
+	injectNotificationManager,
+	StyledInput,
+} from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type { ComponentPublicInstance } from 'vue'
@@ -307,6 +317,83 @@ const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null)
 function openUpgradeModal(serverId: string) {
 	upgradeModal.value?.open(serverId)
 }
+
+const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
+
+const { data: subscriptions } = useQuery({
+	queryKey: ['billing', 'subscriptions'],
+	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+})
+
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: () => client.labrinth.billing_internal.getPayments(),
+})
+
+type ServerBillingInfo = {
+	cancellationDate?: string | null
+	onResubscribe?: () => void
+	onDownloadBackup?: () => void
+}
+
+const serverBillingMap = computed(() => {
+	const map = new Map<string, ServerBillingInfo>()
+	if (!subscriptions.value || !charges.value) return map
+
+	const pyroSubs = subscriptions.value.filter((s) => s?.metadata?.type === 'pyro')
+	for (const sub of pyroSubs) {
+		const serverId = (sub.metadata as { id?: string })?.id
+		if (!serverId) continue
+
+		const charge = charges.value.find(
+			(c) => c.subscription_id === sub.id && c.status !== 'succeeded',
+		)
+
+		const info: ServerBillingInfo = {}
+
+		if (charge?.status === 'cancelled') {
+			info.cancellationDate = charge.due
+
+			const subId = sub.id
+			const wasSuspended = dayjs(charge.due).isBefore(dayjs())
+			info.onResubscribe = async () => {
+				try {
+					await client.labrinth.billing_internal.editSubscription(subId, {
+						cancelled: false,
+					})
+					await Promise.all([
+						queryClient.invalidateQueries({ queryKey: ['billing'] }),
+						queryClient.invalidateQueries({ queryKey: ['servers'] }),
+					])
+					if (wasSuspended) {
+						addNotification({
+							title: 'Resubscription request submitted',
+							text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+							type: 'success',
+						})
+					} else {
+						addNotification({
+							title: 'Success',
+							text: 'Server subscription resubscribed successfully',
+							type: 'success',
+						})
+					}
+				} catch {
+					addNotification({
+						title: 'Error resubscribing',
+						text: 'An error occurred while resubscribing to your Modrinth server.',
+						type: 'error',
+					})
+				}
+			}
+		}
+
+		map.set(serverId, info)
+	}
+
+	return map
+})
 </script>
 
 <style scoped>

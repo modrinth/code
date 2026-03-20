@@ -1,23 +1,30 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${server_id}`">
+		<NuxtLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
-					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
-					'opacity-50 bg-surface-2': status === 'suspended',
-					'active:scale-95': status !== 'suspended' && !pendingChange,
+					'!rounded-b-none border-b-0': hasNotice,
+					'opacity-50 bg-surface-2': isDisabled,
+					'active:scale-95': !isDisabled && !hasNotice,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
 			>
-				<ServerIcon v-if="status !== 'suspended'" :image="image ?? undefined" />
 				<div
-					v-else
+					v-if="isProvisioning"
+					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+				>
+					<ServerIcon :image="image ?? undefined" />
+					<LoaderCircleIcon class="size-10 animate-spin text-constrast brightness-200 absolute" />
+				</div>
+				<div
+					v-else-if="status === 'suspended'"
 					class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
 					<LockIcon class="size-12 text-secondary" />
 				</div>
+				<ServerIcon v-else :image="image ?? undefined" />
 				<div class="ml-4 flex flex-col gap-2.5">
 					<div class="flex flex-row items-center gap-2">
 						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
@@ -67,8 +74,13 @@
 				</div>
 			</div>
 		</NuxtLink>
+		<div v-if="isProvisioning" class="server-listing-notice">
+			<div class="flex gap-2">
+				Please wait while we set up your server. This should only take a minute.
+			</div>
+		</div>
 		<div
-			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
+			v-else-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="server-listing-notice"
 		>
 			<div class="flex gap-2">
@@ -80,12 +92,27 @@
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
 			class="server-listing-notice"
 		>
-			<div class="flex flex-row gap-2">
-				Your server has been cancelled. Please update your billing information or contact Modrinth
-				Support for more information.
+			<div>
+				Your subscription was cancelled
+				<template v-if="cancellationDate">
+					on
+					<span class="font-medium text-contrast">
+						{{ formatDate(cancellationDate) }}
+					</span> </template
+				>. Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
+				downloaded below before they're deleted.
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
+					<button
+						class="!border-surface-5"
+						v-tooltip="'Download latest backup'"
+						@click="onDownloadBackup"
+					>
+						<DownloadIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="outlined">
 					<button
 						class="!border-surface-5"
 						v-tooltip="'Copy code to clipboard'"
@@ -100,10 +127,8 @@
 						><MessagesSquareIcon /> Support
 					</a>
 				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<AutoLink :to="`/settings/billing#server-${server_id}`">
-						<RotateCounterClockwiseIcon /> Resubscribe
-					</AutoLink>
+				<ButtonStyled v-if="onResubscribe" color="brand">
+					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -114,7 +139,7 @@
 				for more information.
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+				<ButtonStyled type="outlined">
 					<button
 						class="!border-surface-5"
 						v-tooltip="'Copy code to clipboard'"
@@ -142,9 +167,9 @@
 				Support for more information.
 			</div>
 			<div class="flex gap-2">
-				<ButtonStyled type="outlined" @click="copyToClipboard(server_id)">
+				<ButtonStyled type="outlined">
 					<button
-						class="!border-surface-5"
+						class="!border-surface-5 w-28"
 						v-tooltip="'Copy code to clipboard'"
 						@click="copyToClipboard(server_id)"
 					>
@@ -161,6 +186,41 @@
 					<AutoLink :to="`/settings/billing#server-${server_id}`">
 						<CardIcon /> Manage billing
 					</AutoLink>
+				</ButtonStyled>
+			</div>
+		</div>
+		<div
+			v-if="isSetToCancel && status !== 'suspended' && !isProvisioning"
+			class="server-listing-notice"
+		>
+			<div>
+				Your subscription is set to cancel
+				<template v-if="cancellationDate">
+					on
+					<span class="font-medium text-contrast">
+						{{ formatDate(cancellationDate) }}
+					</span> </template
+				>. Your files will be preserved for <span class="font-medium text-red">30 days</span> after
+				cancellation.
+			</div>
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined">
+					<button
+						class="!border-surface-5 w-28"
+						v-tooltip="'Copy code to clipboard'"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /></template>
+						<template v-else> Copy ID <CopyIcon /></template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
+				</ButtonStyled>
+				<ButtonStyled color="brand" v-if="onResubscribe">
+					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -183,7 +243,13 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { LoaderCircleIcon, LockIcon, MessagesSquareIcon, SparklesIcon } from '@modrinth/assets'
+import {
+	DownloadIcon,
+	LoaderCircleIcon,
+	LockIcon,
+	MessagesSquareIcon,
+	SparklesIcon,
+} from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
@@ -233,11 +299,26 @@ type ServerListingProps = {
 		current?: number
 		max?: number
 	}
+	cancellationDate?: string | Date | null
+	onResubscribe?: (() => void) | null
+	onDownloadBackup?: (() => void) | null
 }
 
 const props = defineProps<ServerListingProps>()
 
 const { kyros, labrinth } = injectModrinthClient()
+
+const isConfiguring = computed(() => props.flows?.intro)
+const isProvisioning = computed(() => props.status === 'installing' && !isConfiguring.value)
+const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
+const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
+const hasNotice = computed(
+	() =>
+		isProvisioning.value ||
+		props.status === 'suspended' ||
+		isSetToCancel.value ||
+		!!props.pendingChange,
+)
 
 const showGameLabel = computed(() => !!props.game && !isConfiguring.value)
 const showLoaderLabel = computed(() => !!props.loader && !isConfiguring.value)
@@ -315,8 +396,6 @@ const { data: image } = useQuery({
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
-
-const isConfiguring = computed(() => props.flows?.intro)
 
 const copied = ref(false)
 

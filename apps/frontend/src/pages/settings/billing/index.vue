@@ -233,6 +233,7 @@
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
+								:cancellation-date="getCancellationDate(subscription)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -917,6 +918,13 @@ const getPyroCharge = (subscription) => {
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
+}
+
+const getCancellationDate = (subscription) => {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return null
+	if (charge.status === 'cancelled') return charge.due
+	return null
 }
 
 const getProductSize = (product) => {

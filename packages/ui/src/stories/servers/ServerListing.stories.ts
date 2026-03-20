@@ -78,12 +78,50 @@ export const SuspendedUpgrading: Story = {
 	},
 }
 
+export const Provisioning: Story = {
+	args: {
+		...baseServer,
+		name: 'My New Server',
+		status: 'installing',
+	},
+}
+
+export const SetToCancel: Story = {
+	args: {
+		...baseServer,
+		name: 'Survival SMP',
+		cancellationDate: new Date(2025, 1, 17).toISOString(),
+	},
+}
+
+export const SetToCancelWithResubscribe: Story = {
+	args: {
+		...baseServer,
+		name: 'Survival SMP',
+		cancellationDate: new Date(2025, 1, 17).toISOString(),
+		onResubscribe: () => alert('Resubscribe clicked'),
+	},
+}
+
 export const SuspendedCancelled: Story = {
 	args: {
 		...baseServer,
 		name: 'Old Event Server',
 		status: 'suspended',
 		suspension_reason: 'cancelled',
+		cancellationDate: new Date(2025, 1, 17).toISOString(),
+	},
+}
+
+export const SuspendedCancelledWithActions: Story = {
+	args: {
+		...baseServer,
+		name: 'Old Event Server',
+		status: 'suspended',
+		suspension_reason: 'cancelled',
+		cancellationDate: new Date(2025, 1, 17).toISOString(),
+		onResubscribe: () => alert('Resubscribe clicked'),
+		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }
 
