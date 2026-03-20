@@ -213,7 +213,7 @@ import { useFileSelection } from './composables/file-selection'
 import { useFileSorting } from './composables/file-sorting'
 import { useFileUndoRedo } from './composables/file-undo-redo'
 import { injectFileManager } from './providers/file-manager'
-import type { FileItem } from './types'
+import type { FileContextMenuOption, FileItem } from './types'
 
 const { formatMessage } = useVIntl()
 
@@ -595,7 +595,7 @@ function handleContextMenu(item: FileItem, x: number, y: number) {
 	const wdTooltip = busyTooltip.value
 	const isZip = getFileExtension(item.name) === 'zip'
 
-	const options = [
+	const options: FileContextMenuOption[] = [
 		{
 			id: 'extract',
 			shown: isZip && !!ctx.extractFile,

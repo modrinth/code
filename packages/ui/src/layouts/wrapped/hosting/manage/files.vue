@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Archon, Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onMounted, ref, watch } from 'vue'
+import { type Component, computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useVIntl } from '#ui/composables/i18n'
@@ -378,7 +378,7 @@ watch(
 )
 
 // Editor component (lazy loaded)
-const VAceEditor = ref(null)
+const VAceEditor = ref<Component | null>(null)
 
 onMounted(async () => {
 	if (typeof window !== 'undefined') {

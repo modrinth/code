@@ -72,7 +72,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 
-import type { FileItem } from '../types'
+import type { FileContextMenuOption, FileItem } from '../types'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
@@ -100,19 +100,7 @@ const visible = ref(false)
 const menuRef = ref<HTMLElement>()
 const position = ref({ x: 0, y: 0 })
 const currentItem = ref<FileItem | null>(null)
-const menuOptions = ref<
-	(
-		| {
-				id: string
-				action?: () => void
-				disabled?: boolean
-				tooltip?: string
-				color?: string
-				shown?: boolean
-		  }
-		| { divider: true; shown?: boolean }
-	)[]
->([])
+const menuOptions = ref<FileContextMenuOption[]>([])
 
 function show(item: FileItem, x: number, y: number, options: typeof menuOptions.value) {
 	currentItem.value = item

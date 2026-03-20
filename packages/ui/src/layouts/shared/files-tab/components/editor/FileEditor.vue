@@ -36,6 +36,7 @@ import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
 import { injectFileManager } from '../../providers/file-manager'
+import type { EditingFile } from '../../types'
 import FileImageViewer from './FileImageViewer.vue'
 
 interface MclogsResponse {
@@ -45,7 +46,7 @@ interface MclogsResponse {
 }
 
 const props = defineProps<{
-	file: { name: string; type: string; path: string } | null
+	file: EditingFile | null
 	editorComponent: Component | null
 }>()
 

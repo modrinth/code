@@ -93,6 +93,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+import type { FileSortField } from '../types'
 
 const { formatMessage } = useVIntl()
 
@@ -116,7 +117,7 @@ const messages = defineMessages({
 })
 
 defineProps<{
-	sortField: string
+	sortField: FileSortField
 	sortDesc: boolean
 	allSelected: boolean
 	someSelected: boolean
@@ -124,7 +125,7 @@ defineProps<{
 }>()
 
 defineEmits<{
-	sort: [field: string]
+	sort: [field: FileSortField]
 	'toggle-all': []
 }>()
 </script>
