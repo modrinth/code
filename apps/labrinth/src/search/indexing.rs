@@ -29,7 +29,7 @@ use crate::util::error::Context;
 
 fn normalize_for_search(s: &str) -> String {
     static SPECIAL_CHARS_RE: LazyLock<Regex> =
-        LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-\s]").expect("valid regex"));
+        LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
 
     SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
 }
