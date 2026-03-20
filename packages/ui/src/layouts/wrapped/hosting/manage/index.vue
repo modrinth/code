@@ -3,12 +3,26 @@
 		data-pyro-server-list-root
 		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
 	>
-		<ServersUpgradeModalWrapper
-			v-if="isNuxt"
-			ref="upgradeModal"
-			:stripe-publishable-key
-			:site-url
-			:products
+		<ModrinthServersPurchaseModal
+			v-if="customer && regions"
+			:key="`purchase-modal-${customer.id}`"
+			ref="purchaseModal"
+			:publishable-key="props.stripePublishableKey"
+			:initiate-payment="
+				async (body) => await client.labrinth.billing_internal.initiatePayment(body)
+			"
+			:available-products="pyroProducts"
+			:on-error="handleError"
+			:customer="customer"
+			:payment-methods="paymentMethods ?? []"
+			:currency="selectedCurrency"
+			:return-url="`${props.siteUrl}/hosting/manage`"
+			:pings="regionPings"
+			:regions="regions"
+			:refresh-payment-methods="fetchPaymentData"
+			:fetch-stock="fetchStock"
+			:affiliate-code="affiliateCode"
+			plan-stage
 		/>
 
 		<div
@@ -98,7 +112,10 @@
 				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
 				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
 				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink to="/servers#plan">Create a server</AutoLink>
+					<AutoLink v-if="isNuxt" to="/servers#plan">Create a server</AutoLink>
+					<button v-else :disabled="!canOpenPurchaseModal" @click="openPurchaseModal">
+						Create a server
+					</button>
 				</ButtonStyled>
 			</div>
 
@@ -116,11 +133,15 @@
 							placeholder="Search servers..."
 							wrapper-class="w-full md:w-72"
 						/>
-						<ButtonStyled v-if="isNuxt" type="standard">
-							<AutoLink :to="{ path: '/servers', hash: '#plan' }">
+						<ButtonStyled type="standard">
+							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
 								New server
 							</AutoLink>
+							<button v-else :disabled="!canOpenPurchaseModal" @click="openPurchaseModal">
+								<PlusIcon />
+								New server
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -152,7 +173,7 @@
 						v-for="server in filteredData.filter((s) => s.is_medal)"
 						:key="server.server_id"
 						v-bind="server"
-						@upgrade="openUpgradeModal(server.server_id)"
+						@upgrade="openPurchaseModal"
 					/>
 					<ServerListing
 						v-for="server in filteredData.filter((s) => !s.is_medal)"
@@ -180,24 +201,24 @@ import {
 	CopyCode,
 	injectModrinthClient,
 	injectNotificationManager,
+	ModrinthServersPurchaseModal,
 	StyledInput,
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
-import type { ComponentPublicInstance } from 'vue'
+import type Stripe from 'stripe'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
 
-defineProps<{
-	stripePublishableKey?: string
-	siteUrl?: string
-	products?: Labrinth.Billing.Internal.Product[]
+const props = defineProps<{
+	stripePublishableKey: string
+	siteUrl: string
+	products: Labrinth.Billing.Internal.Product[]
 }>()
 
 const router = useRouter()
@@ -213,6 +234,155 @@ const pollingState = ref({
 	count: 0,
 	initialServers: [] as Archon.Servers.v0.Server[],
 })
+
+const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
+const affiliateCode = ref<string | null>(null)
+const selectedCurrency = ref<string>('USD')
+const regionPings = ref<
+	{
+		region: string
+		ping: number
+	}[]
+>([])
+
+const pyroProducts = computed(() => {
+	return [...props.products]
+		.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
+		.sort((a, b) => {
+			const aRam =
+				a?.metadata?.type === 'pyro' || a?.metadata?.type === 'medal' ? a.metadata.ram : 0
+			const bRam =
+				b?.metadata?.type === 'pyro' || b?.metadata?.type === 'medal' ? b.metadata.ram : 0
+			return aRam - bRam
+		})
+})
+
+const {
+	data: customer,
+	refetch: refetchCustomer,
+	isLoading: customerLoading,
+} = useQuery({
+	queryKey: ['billing', 'customer'],
+	queryFn: () => client.labrinth.billing_internal.getCustomer() as Promise<Stripe.Customer>,
+})
+
+const {
+	data: paymentMethods,
+	refetch: refetchPaymentMethods,
+	isLoading: paymentMethodsLoading,
+} = useQuery({
+	queryKey: ['billing', 'payment-methods'],
+	queryFn: () =>
+		client.labrinth.billing_internal.getPaymentMethods() as Promise<Stripe.PaymentMethod[]>,
+})
+
+const { data: regions, isLoading: regionsLoading } = useQuery({
+	queryKey: ['servers', 'regions'],
+	queryFn: () => client.archon.servers_v1.getRegions(),
+})
+
+watch(
+	regions,
+	(newRegions) => {
+		regionPings.value = []
+		if (newRegions) {
+			newRegions.forEach((region) => {
+				runPingTest(region)
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+async function fetchPaymentData() {
+	await Promise.all([refetchCustomer(), refetchPaymentMethods()])
+}
+
+async function fetchStock(
+	region: Archon.Servers.v1.Region,
+	request: Archon.Servers.v0.StockRequest,
+): Promise<number> {
+	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
+	return result.available
+}
+
+const PING_COUNT = 20
+const PING_INTERVAL = 200
+const MAX_PING_TIME = 1000
+
+function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
+	if (index > 10) {
+		regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
+		regionPings.value.push({
+			region: region.shortcode,
+			ping: -1,
+		})
+		return
+	}
+
+	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
+	try {
+		const socket = new WebSocket(wsUrl)
+		const pings: number[] = []
+		let finalized = false
+
+		const finalize = (ping: number) => {
+			if (finalized) return
+			finalized = true
+			clearTimeout(connectTimeout)
+			regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
+			regionPings.value.push({
+				region: region.shortcode,
+				ping,
+			})
+			socket.close()
+		}
+
+		const retryNext = () => {
+			if (finalized) return
+			finalized = true
+			clearTimeout(connectTimeout)
+			socket.close()
+			runPingTest(region, index + 1)
+		}
+
+		// Prevent hangs where the socket never opens or errors.
+		const connectTimeout = setTimeout(() => {
+			retryNext()
+		}, 3000)
+
+		socket.onopen = () => {
+			clearTimeout(connectTimeout)
+
+			for (let i = 0; i < PING_COUNT; i++) {
+				setTimeout(() => {
+					socket.send(String(performance.now()))
+				}, i * PING_INTERVAL)
+			}
+			setTimeout(
+				() => {
+					const median =
+						pings.length > 0
+							? Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
+							: -1
+					finalize(median)
+				},
+				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
+			)
+		}
+
+		socket.onmessage = (event) => {
+			const start = Number(event.data)
+			pings.push(performance.now() - start)
+		}
+
+		socket.onerror = () => {
+			retryNext()
+		}
+	} catch {
+		runPingTest(region, index + 1)
+	}
+}
 
 const {
 	data: serverResponse,
@@ -309,17 +479,42 @@ watch(serverResponse, (response) => {
 	}
 })
 
-type ServersUpgradeModalWrapperRef = ComponentPublicInstance<{
-	open: (id: string) => void | Promise<void>
-}>
-
-const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null)
-function openUpgradeModal(serverId: string) {
-	upgradeModal.value?.open(serverId)
-}
-
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+
+const canOpenPurchaseModal = computed(() => {
+	return (
+		Boolean(props.stripePublishableKey) &&
+		Boolean(customer.value) &&
+		paymentMethods.value !== undefined &&
+		Boolean(regions.value) &&
+		!customerLoading.value &&
+		!paymentMethodsLoading.value &&
+		!regionsLoading.value
+	)
+})
+
+function handleError(err: unknown) {
+	const error = err as Error & { data?: { description?: string } }
+	addNotification({
+		title: 'An error occurred',
+		type: 'error',
+		text: error?.message ?? error?.data?.description ?? String(err),
+	})
+}
+
+function openPurchaseModal() {
+	if (!canOpenPurchaseModal.value || !purchaseModal.value) {
+		addNotification({
+			title: 'Purchase unavailable',
+			text: 'Payment information is still loading. Please try again in a moment.',
+			type: 'warning',
+		})
+		return
+	}
+
+	purchaseModal.value.show('quarterly')
+}
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
