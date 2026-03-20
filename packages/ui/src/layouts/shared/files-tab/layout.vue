@@ -196,23 +196,33 @@
 			</div>
 
 			<FloatingActionBar :shown="selectedItems.size > 0">
-				<ButtonStyled circular>
-					<button @click="deselectAll">
-						<XIcon class="h-4 w-4" />
-					</button>
-				</ButtonStyled>
-				<span class="text-sm font-medium text-contrast"> {{ selectedItems.size }} selected </span>
-				<div class="ml-auto flex items-center gap-2">
-					<ButtonStyled>
-						<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkMoveModal">
-							<RightArrowIcon class="h-4 w-4" />
-							Move
+				<div class="flex items-center gap-0.5">
+					<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
+						{{ selectedItems.size }} selected
+					</span>
+					<div class="mx-1 h-6 w-px bg-surface-5" />
+					<ButtonStyled type="transparent">
+						<button class="!text-primary" @click="deselectAll">
+							<XIcon />
+							<span class="bar-label">Clear</span>
 						</button>
 					</ButtonStyled>
-					<ButtonStyled color="red">
-						<button v-tooltip="busyTooltip" :disabled="isBusy" @click="showBulkDeleteModal">
-							<TrashIcon class="h-4 w-4" />
-							Delete
+				</div>
+				<div class="ml-auto flex items-center gap-0.5">
+					<div class="mx-1 h-6 w-px bg-surface-5" />
+					<ButtonStyled
+						type="transparent"
+						color="red"
+						color-fill="text"
+						hover-color-fill="background"
+					>
+						<button
+							v-tooltip="busyTooltip"
+							:disabled="isBusy"
+							@click="showBulkDeleteModal"
+						>
+							<TrashIcon />
+							<span class="bar-label">Delete</span>
 						</button>
 					</ButtonStyled>
 				</div>
@@ -514,14 +524,6 @@ function showDeleteModal(item: FileItem) {
 	if (isBusy.value) return
 	selectedItem.value = item
 	deleteItemModal.value?.show()
-}
-
-function showBulkMoveModal() {
-	addNotification({
-		title: 'Bulk move',
-		text: `Moving ${selectedItems.value.size} items is not yet implemented`,
-		type: 'info',
-	})
 }
 
 function showBulkDeleteModal() {

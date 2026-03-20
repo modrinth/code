@@ -1,51 +1,42 @@
 <template>
-	<div class="flex h-[calc(100vh-12rem)] w-full flex-col items-center">
+	<div class="relative flex h-[750px] items-center justify-center overflow-hidden rounded-[20px] bg-black">
 		<div
-			ref="container"
-			class="relative w-full flex-grow cursor-grab overflow-hidden rounded-[20px] bg-black active:cursor-grabbing"
-			@mousedown="startPan"
-			@mousemove="handlePan"
-			@mouseup="stopPan"
-			@mouseleave="stopPan"
-			@wheel.prevent="handleWheel"
+			v-if="state.hasError"
+			class="flex flex-col items-center justify-center gap-4"
 		>
-			<div v-if="state.isLoading" />
-			<div
-				v-if="state.hasError"
-				class="flex h-full w-full flex-col items-center justify-center gap-8"
-			>
-				<TriangleAlertIcon class="size-8 text-red" />
-				<p class="m-0">{{ state.errorMessage || 'Invalid or empty image file.' }}</p>
-			</div>
-			<img
-				v-show="isReady"
-				ref="imageRef"
-				:src="imageObjectUrl"
-				class="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform"
-				:style="imageStyle"
-				alt="Viewed image"
-				@load="handleImageLoad"
-				@error="handleImageError"
-			/>
+			<TriangleAlertIcon class="size-8 text-red" />
+			<p class="m-0 text-secondary">{{ state.errorMessage || 'Invalid or empty image file.' }}</p>
 		</div>
+		<img
+			v-show="isReady"
+			ref="imageRef"
+			:src="imageObjectUrl"
+			class="max-h-full max-w-full rounded-lg object-contain"
+			:class="{ 'cursor-zoom-in': !zoomed, 'cursor-zoom-out': zoomed }"
+			alt="Viewed image"
+			@load="handleImageLoad"
+			@error="handleImageError"
+			@click="toggleZoom"
+		/>
+
 		<div
-			v-if="!state.hasError"
-			class="absolute bottom-0 mb-2 flex w-fit justify-center gap-2 space-x-4 rounded-2xl bg-bg p-2"
+			v-if="isReady"
+			class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-surface-3/80 p-1.5 backdrop-blur-sm"
 		>
-			<ButtonStyled type="transparent" @click="zoom(ZOOM_IN_FACTOR)">
-				<button v-tooltip="'Zoom in'">
+			<ButtonStyled type="transparent">
+				<button v-tooltip="'Zoom in'" @click="zoomIn">
 					<ZoomInIcon />
 				</button>
 			</ButtonStyled>
-			<ButtonStyled type="transparent" @click="zoom(ZOOM_OUT_FACTOR)">
-				<button v-tooltip="'Zoom out'">
+			<ButtonStyled type="transparent">
+				<button v-tooltip="'Zoom out'" @click="zoomOut">
 					<ZoomOutIcon />
 				</button>
 			</ButtonStyled>
-			<ButtonStyled type="transparent" @click="reset">
-				<button>
-					<span class="font-mono">{{ Math.round(state.scale * 100) }}%</span>
-					<span class="ml-4 text-sm text-blue">Reset</span>
+			<div class="mx-1 h-6 w-px bg-surface-5" />
+			<ButtonStyled type="transparent">
+				<button v-tooltip="'Reset zoom'" @click="resetZoom">
+					<span class="px-1 text-sm tabular-nums">{{ Math.round(scale * 100) }}%</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -58,11 +49,6 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
-const ZOOM_MIN = 0.1
-const ZOOM_MAX = 5
-const ZOOM_IN_FACTOR = 1.2
-const ZOOM_OUT_FACTOR = 0.8
-const INITIAL_SCALE = 0.5
 const MAX_IMAGE_DIMENSION = 4096
 
 const props = defineProps<{
@@ -70,93 +56,68 @@ const props = defineProps<{
 }>()
 
 const state = ref({
-	scale: INITIAL_SCALE,
-	translateX: 0,
-	translateY: 0,
-	isPanning: false,
-	startX: 0,
-	startY: 0,
-	isLoading: false,
+	isLoading: true,
 	hasError: false,
 	errorMessage: '',
 })
 
 const imageRef = ref<HTMLImageElement | null>(null)
-const container = ref<HTMLElement | null>(null)
 const imageObjectUrl = ref('')
-const rafId = ref(0)
+const scale = ref(1)
+const zoomed = ref(false)
 
 const isReady = computed(() => !state.value.isLoading && !state.value.hasError)
 
-const imageStyle = computed(() => ({
-	transform: `translate(-50%, -50%) scale(${state.value.scale}) translate(${state.value.translateX}px, ${state.value.translateY}px)`,
-	transition: state.value.isPanning ? 'none' : 'transform 0.3s ease-out',
-}))
-
-const validateImageDimensions = (img: HTMLImageElement): boolean => {
-	if (img.naturalWidth > MAX_IMAGE_DIMENSION || img.naturalHeight > MAX_IMAGE_DIMENSION) {
-		state.value.hasError = true
-		state.value.errorMessage = `Image too large to view (max ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels)`
-		return false
-	}
-	return true
-}
-
-const updateImageUrl = (blob: Blob) => {
+function updateImageUrl(blob: Blob) {
 	if (imageObjectUrl.value) URL.revokeObjectURL(imageObjectUrl.value)
 	imageObjectUrl.value = URL.createObjectURL(blob)
 }
 
-const handleImageLoad = () => {
-	if (!imageRef.value || !validateImageDimensions(imageRef.value)) {
-		state.value.isLoading = false
-		return
+function handleImageLoad() {
+	const img = imageRef.value
+	if (img && (img.naturalWidth > MAX_IMAGE_DIMENSION || img.naturalHeight > MAX_IMAGE_DIMENSION)) {
+		state.value.hasError = true
+		state.value.errorMessage = `Image too large to view (max ${MAX_IMAGE_DIMENSION}x${MAX_IMAGE_DIMENSION} pixels)`
 	}
 	state.value.isLoading = false
-	reset()
 }
 
-const handleImageError = () => {
+function handleImageError() {
 	state.value.isLoading = false
 	state.value.hasError = true
 	state.value.errorMessage = 'Failed to load image'
 }
 
-const zoom = (factor: number) => {
-	const newScale = state.value.scale * factor
-	state.value.scale = Math.max(ZOOM_MIN, Math.min(newScale, ZOOM_MAX))
+function toggleZoom() {
+	if (zoomed.value) {
+		resetZoom()
+	} else {
+		scale.value = 2
+		zoomed.value = true
+	}
 }
 
-const reset = () => {
-	state.value.scale = INITIAL_SCALE
-	state.value.translateX = 0
-	state.value.translateY = 0
+function zoomIn() {
+	scale.value = Math.min(scale.value * 1.25, 5)
+	zoomed.value = scale.value > 1
 }
 
-const startPan = (e: MouseEvent) => {
-	state.value.isPanning = true
-	state.value.startX = e.clientX - state.value.translateX
-	state.value.startY = e.clientY - state.value.translateY
+function zoomOut() {
+	scale.value = Math.max(scale.value * 0.8, 0.1)
+	zoomed.value = scale.value > 1
 }
 
-const handlePan = (e: MouseEvent) => {
-	if (!state.value.isPanning) return
-	cancelAnimationFrame(rafId.value)
-	rafId.value = requestAnimationFrame(() => {
-		state.value.translateX = e.clientX - state.value.startX
-		state.value.translateY = e.clientY - state.value.startY
-	})
+function resetZoom() {
+	scale.value = 1
+	zoomed.value = false
 }
 
-const stopPan = () => {
-	state.value.isPanning = false
-}
-
-const handleWheel = (e: WheelEvent) => {
-	const delta = e.deltaY * -0.001
-	const factor = 1 + delta
-	zoom(factor)
-}
+watch(scale, (s) => {
+	if (imageRef.value) {
+		imageRef.value.style.transform = s === 1 ? '' : `scale(${s})`
+		imageRef.value.style.transition = 'transform 0.2s ease-out'
+	}
+})
 
 watch(
 	() => props.imageBlob,
@@ -164,6 +125,8 @@ watch(
 		if (!newBlob) return
 		state.value.isLoading = true
 		state.value.hasError = false
+		scale.value = 1
+		zoomed.value = false
 		updateImageUrl(newBlob)
 	},
 )
@@ -174,6 +137,5 @@ onMounted(() => {
 
 onUnmounted(() => {
 	if (imageObjectUrl.value) URL.revokeObjectURL(imageObjectUrl.value)
-	cancelAnimationFrame(rafId.value)
 })
 </script>

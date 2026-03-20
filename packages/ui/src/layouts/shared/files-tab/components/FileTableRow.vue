@@ -132,7 +132,7 @@ const formatDateTime = useFormatDateTime({
 })
 
 const containerClasses = computed(() => [
-	'group m-0 flex h-[48px] w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 focus:!outline-none',
+	'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
 	props.selected ? 'bg-surface-2.5' : props.index % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5',
 	props.isLast ? 'rounded-b-[20px]' : '',
 	isEditableFile.value || props.type === 'directory'

@@ -85,7 +85,7 @@ async function loadFileContent(file: { name: string; type: string; path: string 
 		const extension = getFileExtension(file.name)
 		const normalizedPath = file.path.startsWith('/') ? file.path : `/${file.path}`
 
-		if (file.type === 'file' && isImageFile(extension)) {
+		if (isImageFile(extension)) {
 			const content = await ctx.readFileAsBlob(normalizedPath)
 			isEditingImage.value = true
 			imagePreview.value = content
