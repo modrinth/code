@@ -3,26 +3,26 @@
 		<div class="normal-page__sidebar">
 			<NavStack
 				:items="[
-					{ type: 'heading', label: 'Dashboard' },
-					{ link: '/dashboard', label: 'Overview', icon: DashboardIcon },
-					{ link: '/dashboard/notifications', label: 'Notifications', icon: NotificationsIcon },
-					{ link: '/dashboard/reports', label: 'Active reports', icon: ReportIcon },
+					{ type: 'heading', label: formatMessage(messages.dashboard) },
+					{ link: '/dashboard', label: formatMessage(messages.overview), icon: DashboardIcon },
+					{ link: '/dashboard/notifications', label: formatMessage(messages.notifications), icon: NotificationsIcon },
+					{ link: '/dashboard/reports', label: formatMessage(messages.activeReports), icon: ReportIcon },
 					{
 						link: '/dashboard/collections',
 						label: formatMessage(commonMessages.collectionsLabel),
 						icon: LibraryIcon,
 					},
-					{ type: 'heading', label: 'Creators' },
-					{ link: '/dashboard/projects', label: 'Projects', icon: ListIcon },
-					{ link: '/dashboard/organizations', label: 'Organizations', icon: OrganizationIcon },
-					{ link: '/dashboard/analytics', label: 'Analytics', icon: ChartIcon },
+					{ type: 'heading', label: formatMessage(messages.creators) },
+					{ link: '/dashboard/projects', label: formatMessage(messages.projects), icon: ListIcon },
+					{ link: '/dashboard/organizations', label: formatMessage(messages.organizations), icon: OrganizationIcon },
+					{ link: '/dashboard/analytics', label: formatMessage(messages.analytics), icon: ChartIcon },
 					{
 						link: '/dashboard/affiliate-links',
 						label: formatMessage(commonMessages.affiliateLinksButton),
 						icon: AffiliateIcon,
 						shown: !!isAffiliate,
 					},
-					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon, matchNested: true },
+					{ link: '/dashboard/revenue', label: formatMessage(messages.revenue), icon: CurrencyIcon, matchNested: true },
 				]"
 			/>
 		</div>
@@ -43,7 +43,7 @@ import {
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
-import { commonMessages, useVIntl } from '@modrinth/ui'
+import { defineMessages, commonMessages, useVIntl } from '@modrinth/ui'
 import { type User, UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'
@@ -55,6 +55,45 @@ const isAffiliate = computed(() => {
 })
 
 const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	dashboard: {
+		id: 'dashboard.sidebar.label.dashboard',
+		defaultMessage: 'Dashboard',
+	},
+	overview: {
+		id: 'dashboard.sidebar.label.overview',
+		defaultMessage: 'Overview',
+	},
+	notifications: {
+		id: 'dashboard.sidebar.label.notifications',
+		defaultMessage: 'Notifications',
+	},
+	activeReports: {
+		id: 'dashboard.sidebar.label.activeReports',
+		defaultMessage: 'Active reports',
+	},
+	creators: {
+		id: 'dashboard.sidebar.label.creators',
+		defaultMessage: 'Creators',
+	},
+	projects: {
+		id: 'dashboard.sidebar.label.projects',
+		defaultMessage: 'Projects',
+	},
+	organizations: {
+		id: 'dashboard.sidebar.label.organizations',
+		defaultMessage: 'Organizations',
+	},
+	analytics: {
+		id: 'dashboard.sidebar.label.analytics',
+		defaultMessage: 'Analytics',
+	},
+	revenue: {
+		id: 'dashboard.sidebar.label.revenue',
+		defaultMessage: 'Revenue',
+	},
+})
 
 definePageMeta({
 	middleware: 'auth',
