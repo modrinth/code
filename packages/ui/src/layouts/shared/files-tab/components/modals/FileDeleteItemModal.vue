@@ -1,8 +1,9 @@
 <template>
-	<NewModal ref="modal" fade="danger" :header="`Delete ${item?.name}`" max-width="500px">
+	<NewModal ref="modal" fade="danger" header="Delete file" max-width="500px">
 		<Admonition type="critical" class="md:min-w-[400px]">
+			<template #header>Deleting "{{ item?.name }}"</template>
 			This {{ item?.type === 'directory' ? 'folder and all its contents' : 'file' }} will be
-			permanently deleted. This action cannot be undone.
+			permanently deleted. This action is permament and cannot be undone.
 		</Admonition>
 		<template #actions>
 			<div class="flex gap-2 justify-end">
