@@ -6,12 +6,10 @@
 <script setup lang="ts">
 import {
 	CardIcon,
-	InfoIcon,
 	ListIcon,
 	ModrinthIcon,
 	SettingsIcon,
 	TextQuoteIcon,
-	UserIcon,
 	VersionIcon,
 	WrenchIcon,
 } from '@modrinth/assets'
@@ -36,8 +34,7 @@ const isAdmin = computed(() => isUserAdmin(auth.value?.user))
 
 const navLinks = computed(() => [
 	{ icon: SettingsIcon, label: 'General', href: `/hosting/manage/${serverId}/options` },
-	{ icon: WrenchIcon, label: 'Platform', href: `/hosting/manage/${serverId}/options/loader` },
-	{ icon: TextQuoteIcon, label: 'Startup', href: `/hosting/manage/${serverId}/options/startup` },
+	{ icon: WrenchIcon, label: 'Installation', href: `/hosting/manage/${serverId}/options/loader` },
 	{ icon: VersionIcon, label: 'Network', href: `/hosting/manage/${serverId}/options/network` },
 	{
 		icon: ListIcon,
@@ -45,11 +42,7 @@ const navLinks = computed(() => [
 		href: `/hosting/manage/${serverId}/options/properties`,
 		shown: server.value?.status !== 'installing',
 	},
-	{
-		icon: UserIcon,
-		label: 'Preferences',
-		href: `/hosting/manage/${serverId}/options/preferences`,
-	},
+	{ icon: TextQuoteIcon, label: 'Advanced', href: `/hosting/manage/${serverId}/options/advanced` },
 	{
 		icon: CardIcon,
 		label: 'Billing',
@@ -64,6 +57,5 @@ const navLinks = computed(() => [
 		external: true,
 		shown: isAdmin.value,
 	},
-	{ icon: InfoIcon, label: 'Info', href: `/hosting/manage/${serverId}/options/info` },
 ])
 </script>
