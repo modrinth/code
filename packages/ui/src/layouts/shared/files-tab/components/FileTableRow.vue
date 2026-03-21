@@ -1,10 +1,7 @@
 <template>
 	<li
 		role="button"
-		:class="[
-			containerClasses,
-			isDragSource ? 'opacity-50' : '',
-		]"
+		:class="[containerClasses, isDragSource ? 'opacity-50' : '']"
 		tabindex="0"
 		:data-file-path="path"
 		:data-file-type="type"
@@ -61,12 +58,8 @@
 						<template #extract
 							><PackageOpenIcon /> {{ formatMessage(messages.extractLabel) }}</template
 						>
-						<template #rename
-							><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template
-						>
-						<template #move
-							><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template
-						>
+						<template #rename><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template>
+						<template #move><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template>
 						<template #download
 							><DownloadIcon />
 							{{
@@ -107,6 +100,7 @@ import Checkbox from '#ui/components/base/Checkbox.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useFormatDateTime } from '#ui/composables/format-date-time'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getFileExtensionIcon } from '#ui/utils/auto-icons'
 import { commonMessages } from '#ui/utils/common-messages'
 import {
@@ -115,9 +109,13 @@ import {
 	isImageFile,
 } from '#ui/utils/file-extensions'
 
-import { injectNotificationManager } from '#ui/providers/web-notifications'
-
-import { fileDragActive, fileDragData, fileDragTarget, startFileDrag, wasRecentDrag } from '../composables/file-drag-state'
+import {
+	fileDragActive,
+	fileDragData,
+	fileDragTarget,
+	startFileDrag,
+	wasRecentDrag,
+} from '../composables/file-drag-state'
 import { injectFileManager } from '../providers/file-manager'
 import type { FileItem } from '../types'
 
@@ -175,13 +173,21 @@ const props = defineProps<
 >()
 
 const emit = defineEmits<{
-	(e: 'rename' | 'move' | 'download' | 'delete' | 'edit' | 'extract' | 'hover' | 'navigate', item: Pick<FileItem, 'name' | 'type' | 'path'>): void
-	(e: 'moveDirectTo', item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string }): void
+	(
+		e: 'rename' | 'move' | 'download' | 'delete' | 'edit' | 'extract' | 'hover' | 'navigate',
+		item: Pick<FileItem, 'name' | 'type' | 'path'>,
+	): void
+	(
+		e: 'moveDirectTo',
+		item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string },
+	): void
 	(e: 'contextmenu', x: number, y: number): void
 	(e: 'toggle-select'): void
 }>()
 
-const isDropTarget = computed(() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory')
+const isDropTarget = computed(
+	() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory',
+)
 const isDragSource = computed(() => fileDragActive.value && fileDragData.value?.path === props.path)
 
 const units = Object.freeze(['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'])

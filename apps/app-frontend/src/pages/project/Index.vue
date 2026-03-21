@@ -224,6 +224,7 @@ import {
 import {
 	ButtonStyled,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	ProjectBackgroundGradient,
 	ProjectHeader,
@@ -242,7 +243,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import { NavTabs } from '@modrinth/ui'
 import {
 	get_organization,
 	get_project,

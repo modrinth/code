@@ -314,6 +314,7 @@ import {
 	ContentPageHeader,
 	injectNotificationManager,
 	LoadingIndicator,
+	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
@@ -331,7 +332,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
-import { NavTabs } from '@modrinth/ui'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'

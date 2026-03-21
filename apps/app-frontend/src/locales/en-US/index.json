@@ -299,6 +299,30 @@
   "instance.edit-world.title": {
     "message": "Edit world"
   },
+  "instance.files.adding-files": {
+    "message": "Adding files ({completed}/{total})"
+  },
+  "instance.files.create-failed": {
+    "message": "Create failed"
+  },
+  "instance.files.delete-failed": {
+    "message": "Delete failed"
+  },
+  "instance.files.extract-failed": {
+    "message": "Extract failed"
+  },
+  "instance.files.move-failed": {
+    "message": "Move failed"
+  },
+  "instance.files.rename-failed": {
+    "message": "Rename failed"
+  },
+  "instance.files.save-as": {
+    "message": "Save as..."
+  },
+  "instance.files.upload-failed": {
+    "message": "Upload failed"
+  },
   "instance.server-modal.address": {
     "message": "Address"
   },

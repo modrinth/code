@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
 import {
 	defineMessages,
 	FilePageLayout,
@@ -7,7 +8,6 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
 import { invoke } from '@tauri-apps/api/core'
 import {
 	mkdir,
@@ -24,8 +24,8 @@ import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { profile_listener } from '@/helpers/events'
 import { get_full_path } from '@/helpers/profile'
-import { highlightInFolder } from '@/helpers/utils'
 import type { GameInstance } from '@/helpers/types'
+import { highlightInFolder } from '@/helpers/utils'
 
 const props = defineProps<{
 	instance: GameInstance
@@ -93,9 +93,7 @@ onMounted(async () => {
 })
 
 function resolvePath(relativePath: string): string {
-	return relativePath
-		? `${instanceRoot.value}/${relativePath}`
-		: instanceRoot.value
+	return relativePath ? `${instanceRoot.value}/${relativePath}` : instanceRoot.value
 }
 
 async function listDirectory(dirPath: string): Promise<FileItem[]> {
@@ -317,10 +315,7 @@ debug('setup: registering profile_listener')
 const unlistenProfiles = await profile_listener(
 	async (event: { event: string; profile_path_id: string }) => {
 		debug('profile_listener: event =', event.event, 'path =', event.profile_path_id)
-		if (
-			event.profile_path_id === props.instance.path &&
-			event.event === 'synced'
-		) {
+		if (event.profile_path_id === props.instance.path && event.event === 'synced') {
 			debug('profile_listener: synced event matched, calling refresh')
 			await refresh()
 		}

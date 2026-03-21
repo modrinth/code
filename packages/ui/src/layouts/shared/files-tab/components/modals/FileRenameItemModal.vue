@@ -40,8 +40,8 @@ import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import { fileValidationMessages } from './file-validation-messages'
 import type { FileItem } from '../../types'
+import { fileValidationMessages } from './file-validation-messages'
 
 const { formatMessage } = useVIntl()
 

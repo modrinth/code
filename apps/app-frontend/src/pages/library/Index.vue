@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { PlusIcon } from '@modrinth/assets'
-import { Button, injectNotificationManager } from '@modrinth/ui'
+import { Button, injectNotificationManager, NavTabs } from '@modrinth/ui'
 import { inject, onUnmounted, ref, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { NewInstanceImage } from '@/assets/icons'
-import { NavTabs } from '@modrinth/ui'
 import { profile_listener } from '@/helpers/events.js'
 import { list } from '@/helpers/profile.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs.js'

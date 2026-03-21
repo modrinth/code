@@ -51,6 +51,7 @@ import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+
 import type { FileItem } from '../../types'
 
 const { formatMessage } = useVIntl()

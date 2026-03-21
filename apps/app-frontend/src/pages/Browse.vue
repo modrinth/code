@@ -18,6 +18,7 @@ import {
 	DropdownSelect,
 	injectNotificationManager,
 	LoadingIndicator,
+	NavTabs,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -38,7 +39,6 @@ import { useRoute, useRouter } from 'vue-router'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import { NavTabs } from '@modrinth/ui'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'

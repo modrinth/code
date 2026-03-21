@@ -18,9 +18,7 @@
 
 <script setup lang="ts">
 import { FolderIcon, ReportIcon, ShieldCheckIcon } from '@modrinth/assets'
-import { Chips, defineMessages, useVIntl } from '@modrinth/ui'
-
-import { NavTabs } from '@modrinth/ui'
+import { Chips, defineMessages, NavTabs, useVIntl } from '@modrinth/ui'
 
 definePageMeta({
 	middleware: 'auth',

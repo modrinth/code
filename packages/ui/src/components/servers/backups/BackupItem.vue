@@ -154,7 +154,11 @@ const messages = defineMessages({
 <template>
 	<div
 		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
-		:class="preview ? 'grid-cols-1' : 'grid-cols-[auto_1fr_auto] md:grid-cols-[minmax(0,1fr)_400px_minmax(0,1fr)]'"
+		:class="
+			preview
+				? 'grid-cols-1'
+				: 'grid-cols-[auto_1fr_auto] md:grid-cols-[minmax(0,1fr)_400px_minmax(0,1fr)]'
+		"
 	>
 		<div class="flex flex-row gap-4 items-center">
 			<div

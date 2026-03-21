@@ -458,6 +458,9 @@
   "files.context-menu.copy-full-path": {
     "defaultMessage": "Copy full path"
   },
+  "files.context-menu.open-in-folder": {
+    "defaultMessage": "Open in folder"
+  },
   "files.create-modal.create-button": {
     "defaultMessage": "Create {type, select, directory {folder} other {file}}"
   },
@@ -671,6 +674,18 @@
   "files.rename-modal.rename-button": {
     "defaultMessage": "Rename"
   },
+  "files.row.copied-filename": {
+    "defaultMessage": "Copied filename"
+  },
+  "files.row.copied-path": {
+    "defaultMessage": "Copied path"
+  },
+  "files.row.copy-filename": {
+    "defaultMessage": "Copy filename"
+  },
+  "files.row.copy-full-path": {
+    "defaultMessage": "Copy full path"
+  },
   "files.row.extract": {
     "defaultMessage": "Extract"
   },
@@ -679,6 +694,9 @@
   },
   "files.row.move": {
     "defaultMessage": "Move"
+  },
+  "files.row.open-in-folder": {
+    "defaultMessage": "Open in folder"
   },
   "files.row.rename": {
     "defaultMessage": "Rename"

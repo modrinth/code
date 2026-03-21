@@ -1076,6 +1076,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NavTabs,
 	NewModal,
 	OpenInAppModal,
 	OverflowMenu,
@@ -1115,7 +1116,6 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import { NavTabs } from '@modrinth/ui'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'

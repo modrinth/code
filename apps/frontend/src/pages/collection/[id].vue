@@ -397,6 +397,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NavTabs,
 	NewModal,
 	normalizeChildren,
 	NormalPage,
@@ -417,7 +418,6 @@ import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
-import { NavTabs } from '@modrinth/ui'
 
 const { handleError } = injectNotificationManager()
 const api = injectModrinthClient()

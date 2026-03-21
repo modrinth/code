@@ -119,49 +119,51 @@
 				{{ serverData.name }}
 			</template>
 			<template #stats>
-				<div v-if="serverData.flows?.intro" class="flex items-center gap-2 font-semibold text-secondary">
+				<div
+					v-if="serverData.flows?.intro"
+					class="flex items-center gap-2 font-semibold text-secondary"
+				>
 					<SettingsIcon /> Configuring server...
 				</div>
-				<div v-else class="flex items-center flex-wrap gap-2">
-					<div v-if="serverData.loader" class="flex items-center gap-2 capitalize font-medium">
+				<div v-else class="flex flex-wrap items-center gap-2">
+					<div v-if="serverData.loader" class="flex items-center gap-2 font-medium capitalize">
 						<LoaderIcon :loader="serverData.loader" class="flex shrink-0 [&&]:size-5" />
 						{{ serverData.loader }} {{ serverData.mc_version }}
 					</div>
 
-					<div v-if="serverData.loader && serverData.net?.domain" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+					<div
+						v-if="serverData.loader && serverData.net?.domain"
+						class="h-1.5 w-1.5 rounded-full bg-surface-5"
+					></div>
 
 					<div
 						v-if="serverData.net?.domain"
 						v-tooltip="'Copy server address'"
-						class="flex items-center gap-2 font-medium cursor-pointer hover:underline"
+						class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
 						@click="copyServerAddress"
 					>
-						<LinkIcon class="flex shrink-0 size-5" />
+						<LinkIcon class="flex size-5 shrink-0" />
 						{{ serverData.net.domain }}.modrinth.gg
 					</div>
 
-					<div v-if="uptimeSeconds" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+					<div v-if="uptimeSeconds" class="h-1.5 w-1.5 rounded-full bg-surface-5"></div>
 
 					<div v-if="uptimeSeconds" class="flex items-center gap-2 font-medium">
-						<TimerIcon class="flex shrink-0 size-5" />
+						<TimerIcon class="flex size-5 shrink-0" />
 						{{ formattedUptime }}
 					</div>
 
-					<div v-if="serverProject && (serverData.loader || serverData.net?.domain || uptimeSeconds)" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
 					<div
-						v-if="serverProject"
-						class="flex gap-1.5 items-center font-medium text-primary"
-					>
+						v-if="serverProject && (serverData.loader || serverData.net?.domain || uptimeSeconds)"
+						class="h-1.5 w-1.5 rounded-full bg-surface-5"
+					></div>
+
+					<div v-if="serverProject" class="flex items-center gap-1.5 font-medium text-primary">
 						Linked to
-						<Avatar
-							:src="serverProject.icon_url"
-							:alt="serverProject.title"
-							size="24px"
-						/>
+						<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
 						<NuxtLink
 							:to="`/project/${serverProject.slug ?? serverProject.id}`"
-							class="hover:underline text-primary truncate"
+							class="truncate text-primary hover:underline"
 						>
 							{{ serverProject.title }}
 						</NuxtLink>
@@ -169,10 +171,7 @@
 				</div>
 			</template>
 			<template #actions>
-				<div
-					v-if="isConnected && !serverData.flows?.intro"
-					class="flex gap-2"
-				>
+				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
 					<PanelServerActionButton
 						:is-online="isServerRunning"
 						:is-actioning="isActioning"
@@ -181,9 +180,7 @@
 						:server-name="serverData.name"
 						:server-data="serverData"
 						:uptime-seconds="uptimeSeconds"
-						:busy-reason="
-							busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined
-						"
+						:busy-reason="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
 						@action="sendPowerAction"
 					/>
 				</div>
@@ -395,6 +392,7 @@ import {
 	injectNotificationManager,
 	InstallingBanner,
 	LoaderIcon,
+	NavTabs,
 	provideModrinthServerContext,
 	ServerIcon,
 	ServerNotice,
@@ -409,7 +407,6 @@ import DOMPurify from 'dompurify'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
-import { NavTabs } from '@modrinth/ui'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
 import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
@@ -679,7 +676,6 @@ const stats = ref<Stats>({
 		ram: [],
 	},
 })
-
 
 const navLinks = [
 	{

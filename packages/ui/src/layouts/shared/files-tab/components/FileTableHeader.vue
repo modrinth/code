@@ -97,6 +97,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@modrinth/assets'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+
 import type { FileSortField } from '../types'
 
 const { formatMessage } = useVIntl()
