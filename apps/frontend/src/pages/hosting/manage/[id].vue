@@ -103,68 +103,92 @@
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
-		<div class="border-0 border-b border-solid border-divider pb-4">
-			<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
-				<LeftArrowIcon />
-				All servers
-			</NuxtLink>
-			<div class="flex w-full min-w-0 select-none flex-col items-center gap-4 pt-4 sm:flex-row">
+		<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
+			<LeftArrowIcon />
+			All servers
+		</NuxtLink>
+		<ContentPageHeader>
+			<template #icon>
 				<ServerIcon
 					:image="
 						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverImage
 					"
-					class="drop-shadow-lg sm:drop-shadow-none"
 				/>
-				<div
-					class="flex min-w-0 flex-1 flex-col-reverse items-center gap-2 sm:flex-col sm:items-start"
-				>
-					<div class="flex w-full flex-col items-center gap-4 sm:flex-row">
-						<h1
-							class="m-0 w-screen flex-shrink gap-3 truncate px-3 text-center text-2xl font-bold text-contrast sm:w-full sm:p-0 sm:text-left"
-						>
-							{{ serverData.name }}
-						</h1>
-						<div
-							v-if="isConnected"
-							data-pyro-server-action-buttons
-							class="server-action-buttons-anim flex w-fit flex-shrink-0"
-						>
-							<PanelServerActionButton
-								v-if="!serverData.flows?.intro"
-								class="flex-shrink-0"
-								:is-online="isServerRunning"
-								:is-actioning="isActioning"
-								:is-installing="serverData.status === 'installing'"
-								:disabled="isActioning || !!error"
-								:server-name="serverData.name"
-								:server-data="serverData"
-								:uptime-seconds="uptimeSeconds"
-								:busy-reason="
-									busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined
-								"
-								@action="sendPowerAction"
-							/>
-						</div>
+			</template>
+			<template #title>
+				{{ serverData.name }}
+			</template>
+			<template #stats>
+				<div v-if="serverData.flows?.intro" class="flex items-center gap-2 font-semibold text-secondary">
+					<SettingsIcon /> Configuring server...
+				</div>
+				<div v-else class="flex items-center flex-wrap gap-2">
+					<div v-if="serverData.loader" class="flex items-center gap-2 capitalize font-medium">
+						<LoaderIcon :loader="serverData.loader" class="flex shrink-0 [&&]:size-5" />
+						{{ serverData.loader }} {{ serverData.mc_version }}
 					</div>
 
+					<div v-if="serverData.loader && serverData.net?.domain" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
 					<div
-						v-if="serverData.flows?.intro"
-						class="flex items-center gap-2 font-semibold text-secondary"
+						v-if="serverData.net?.domain"
+						v-tooltip="'Copy server address'"
+						class="flex items-center gap-2 font-medium cursor-pointer hover:underline"
+						@click="copyServerAddress"
 					>
-						<SettingsIcon /> Configuring server...
+						<LinkIcon class="flex shrink-0 size-5" />
+						{{ serverData.net.domain }}.modrinth.gg
 					</div>
-					<ServerInfoLabels
-						v-else
+
+					<div v-if="uptimeSeconds" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+					<div v-if="uptimeSeconds" class="flex items-center gap-2 font-medium">
+						<TimerIcon class="flex shrink-0 size-5" />
+						{{ formattedUptime }}
+					</div>
+
+					<div v-if="serverProject && (serverData.loader || serverData.net?.domain || uptimeSeconds)" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
+
+					<div
+						v-if="serverProject"
+						class="flex gap-1.5 items-center font-medium text-primary"
+					>
+						Linked to
+						<Avatar
+							:src="serverProject.icon_url"
+							:alt="serverProject.title"
+							size="24px"
+						/>
+						<NuxtLink
+							:to="`/project/${serverProject.slug ?? serverProject.id}`"
+							class="hover:underline text-primary truncate"
+						>
+							{{ serverProject.title }}
+						</NuxtLink>
+					</div>
+				</div>
+			</template>
+			<template #actions>
+				<div
+					v-if="isConnected && !serverData.flows?.intro"
+					class="flex gap-2"
+				>
+					<PanelServerActionButton
+						:is-online="isServerRunning"
+						:is-actioning="isActioning"
+						:is-installing="serverData.status === 'installing'"
+						:disabled="isActioning || !!error"
+						:server-name="serverData.name"
 						:server-data="serverData"
-						:show-game-label="showGameLabel"
-						:show-loader-label="showLoaderLabel"
 						:uptime-seconds="uptimeSeconds"
-						:linked="true"
-						class="server-action-buttons-anim flex min-w-0 flex-col flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+						:busy-reason="
+							busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined
+						"
+						@action="sendPowerAction"
 					/>
 				</div>
-			</div>
-		</div>
+			</template>
+		</ContentPageHeader>
 
 		<ServerOnboardingPanelPage v-if="serverData.flows?.intro" />
 
@@ -351,24 +375,28 @@ import {
 	IssuesIcon,
 	LayoutTemplateIcon,
 	LeftArrowIcon,
+	LinkIcon,
 	LockIcon,
 	RightArrowIcon,
 	SettingsIcon,
+	TimerIcon,
 	TransferIcon,
 } from '@modrinth/assets'
 import type { BusyReason } from '@modrinth/ui'
 import {
+	Avatar,
 	BackupProgressAdmonitions,
 	ButtonStyled,
+	ContentPageHeader,
 	defineMessage,
 	ErrorInformationCard,
 	formatLoaderLabel,
 	injectModrinthClient,
 	injectNotificationManager,
 	InstallingBanner,
+	LoaderIcon,
 	provideModrinthServerContext,
 	ServerIcon,
-	ServerInfoLabels,
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
@@ -589,6 +617,30 @@ provideModrinthServerContext({
 })
 
 const uptimeSeconds = ref(0)
+
+const formattedUptime = computed(() => {
+	const days = Math.floor(uptimeSeconds.value / (24 * 3600))
+	const hours = Math.floor((uptimeSeconds.value % (24 * 3600)) / 3600)
+	const minutes = Math.floor((uptimeSeconds.value % 3600) / 60)
+	const seconds = uptimeSeconds.value % 60
+
+	let formatted = ''
+	if (days > 0) formatted += `${days}d `
+	if (hours > 0 || days > 0) formatted += `${hours}h `
+	formatted += `${minutes}m ${seconds}s`
+	return formatted.trim()
+})
+
+function copyServerAddress() {
+	if (!serverData.value?.net?.domain) return
+	navigator.clipboard.writeText(serverData.value.net.domain + '.modrinth.gg')
+	addNotification({
+		title: 'Server address copied',
+		text: "Your server's address has been copied to your clipboard.",
+		type: 'success',
+	})
+}
+
 const copied = ref(false)
 const error = ref<Error | null>(null)
 
@@ -628,8 +680,6 @@ const stats = ref<Stats>({
 	},
 })
 
-const showGameLabel = computed(() => !!serverData.value?.game)
-const showLoaderLabel = computed(() => !!serverData.value?.loader)
 
 const navLinks = [
 	{

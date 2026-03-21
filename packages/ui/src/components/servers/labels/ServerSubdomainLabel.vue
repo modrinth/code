@@ -2,9 +2,9 @@
 	<div
 		v-if="subdomain && !isHidden"
 		v-tooltip="'Copy custom URL'"
-		class="flex min-w-0 flex-row items-center gap-4 truncate hover:cursor-pointer"
+		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
 	>
-		<div v-if="!noSeparator" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
+		<div v-if="!noSeparator" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
 		<div class="flex flex-row items-center gap-2">
 			<LinkIcon class="flex size-5 shrink-0" />
 			<div
