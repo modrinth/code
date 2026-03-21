@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">
 				<div class="text-2xl font-semibold text-contrast">Server details</div>
@@ -161,6 +162,7 @@ import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	ConfirmLeaveModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -169,6 +171,7 @@ import {
 	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 	useVIntl,
 } from '@modrinth/ui'
 
@@ -363,6 +366,19 @@ const modified = computed(() => ({
 	region: region.value,
 	languages: languages.value,
 }))
+
+const hasChanges = computed(() =>
+	Object.keys(original.value).some((key) => {
+		const a = original.value[key]
+		const b = modified.value[key]
+		if (Array.isArray(a) && Array.isArray(b)) {
+			return a.length !== b.length || a.some((v, i) => v !== b[i])
+		}
+		return a !== b
+	}),
+)
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
 	javaAddress.value = projectV3.value?.minecraft_java_server?.address ?? ''

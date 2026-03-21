@@ -81,14 +81,6 @@ const messages = defineMessages({
 		id: 'files.editor.save-failed-text',
 		defaultMessage: 'Could not save the file.',
 	},
-	serverRestartedTitle: {
-		id: 'files.editor.server-restarted-title',
-		defaultMessage: 'Server restarted',
-	},
-	serverRestartedText: {
-		id: 'files.editor.server-restarted-text',
-		defaultMessage: 'Your server has been restarted.',
-	},
 	logUrlCopiedTitle: {
 		id: 'files.editor.log-url-copied-title',
 		defaultMessage: 'Log URL copied',
@@ -108,6 +100,7 @@ const messages = defineMessages({
 })
 
 const fileContent = ref('')
+const originalContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
@@ -159,7 +152,9 @@ async function loadFileContent(file: { name: string; path: string }) {
 			imagePreview.value = content
 		} else {
 			isEditingImage.value = false
-			fileContent.value = await ctx.readFile(normalizedPath)
+			const content = await ctx.readFile(normalizedPath)
+			fileContent.value = content
+			originalContent.value = content
 		}
 	} catch (error) {
 		console.error('Error fetching file content:', error)
@@ -174,8 +169,17 @@ async function loadFileContent(file: { name: string; path: string }) {
 	}
 }
 
+const hasUnsavedChanges = computed(
+	() => !isEditingImage.value && !isLoading.value && fileContent.value !== originalContent.value,
+)
+
+function revertChanges() {
+	fileContent.value = originalContent.value
+}
+
 function resetState() {
 	fileContent.value = ''
+	originalContent.value = ''
 	isEditingImage.value = false
 	imagePreview.value = null
 }
@@ -198,12 +202,14 @@ function onEditorInit(editor: {
 	})
 }
 
-async function saveFileContent(exit: boolean = true) {
+async function saveFileContent(exit: boolean = false) {
 	if (!props.file) return
 
 	try {
 		const normalizedPath = props.file.path.startsWith('/') ? props.file.path : `/${props.file.path}`
 		await ctx.writeFile(normalizedPath, fileContent.value)
+
+		originalContent.value = fileContent.value
 
 		if (exit) {
 			emit('close')
@@ -222,21 +228,6 @@ async function saveFileContent(exit: boolean = true) {
 			type: 'error',
 		})
 	}
-}
-
-async function saveAndRestart() {
-	await saveFileContent(false)
-
-	if (ctx.restartServer) {
-		await ctx.restartServer()
-		addNotification({
-			title: formatMessage(messages.serverRestartedTitle),
-			text: formatMessage(messages.serverRestartedText),
-			type: 'success',
-		})
-	}
-
-	emit('close')
 }
 
 async function shareToMclogs() {
@@ -287,10 +278,11 @@ onUnmounted(() => {
 
 defineExpose({
 	saveFileContent,
-	saveAndRestart,
 	shareToMclogs,
 	close,
 	isEditingImage,
 	fileContent,
+	hasUnsavedChanges,
+	revertChanges,
 })
 </script>

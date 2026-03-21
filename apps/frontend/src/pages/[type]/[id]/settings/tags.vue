@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="label">
 				<h3>
@@ -143,11 +144,13 @@ import {
 } from '@modrinth/assets'
 import {
 	Checkbox,
+	ConfirmLeaveModal,
 	formatCategory,
 	formatCategoryHeader,
 	FormattedTag,
 	injectProjectPageContext,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
@@ -187,7 +190,7 @@ const matchesProjectType = (x: Category) => {
 	}
 }
 
-const { saved, current, saving, reset, save } = useSavable(
+const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({
 		selectedTags: sortedCategories(tags.value, formatCategoryName, locale.value).filter(
 			(x: Category) =>
@@ -236,6 +239,8 @@ const { saved, current, saving, reset, save } = useSavable(
 		await patchProject(data)
 	},
 )
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const categoryLists = computed(() => {
 	const lists: Record<string, Category[]> = {}

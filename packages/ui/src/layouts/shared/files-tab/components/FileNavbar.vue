@@ -145,9 +145,8 @@
 			</ButtonStyled>
 		</div>
 
-		<div v-else-if="!isEditingImage" class="flex gap-2">
+		<div v-else-if="!isEditingImage && isLogFile" class="flex gap-2">
 			<Button
-				v-if="isLogFile"
 				v-tooltip="formatMessage(messages.shareToMclogs)"
 				icon-only
 				transparent
@@ -156,29 +155,6 @@
 			>
 				<ShareIcon />
 			</Button>
-			<ButtonStyled type="transparent">
-				<TeleportOverflowMenu
-					:aria-label="formatMessage(messages.saveFile)"
-					:options="[
-						{ id: 'save', action: () => $emit('save') },
-						{ id: 'save-as', action: () => $emit('saveAs') },
-						{ id: 'save-restart', action: () => $emit('saveRestart') },
-					]"
-				>
-					<SaveIcon aria-hidden="true" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-					<template #save>
-						<SaveIcon aria-hidden="true" /> {{ formatMessage(messages.save) }}
-					</template>
-					<template #save-as>
-						<SaveIcon aria-hidden="true" /> {{ formatMessage(messages.saveAs) }}
-					</template>
-					<template #save-restart>
-						<RefreshCwIcon aria-hidden="true" />
-						{{ formatMessage(messages.saveAndRestart) }}
-					</template>
-				</TeleportOverflowMenu>
-			</ButtonStyled>
 		</div>
 	</header>
 </template>
@@ -195,7 +171,6 @@ import {
 	LinkIcon,
 	PlusIcon,
 	RefreshCwIcon,
-	SaveIcon,
 	SearchIcon,
 	ShareIcon,
 	UploadIcon,
@@ -206,7 +181,6 @@ import Button from '#ui/components/base/Button.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -265,22 +239,6 @@ const messages = defineMessages({
 		id: 'files.navbar.share-to-mclogs',
 		defaultMessage: 'Share to mclo.gs',
 	},
-	saveFile: {
-		id: 'files.navbar.save-file',
-		defaultMessage: 'Save file',
-	},
-	save: {
-		id: 'files.navbar.save',
-		defaultMessage: 'Save',
-	},
-	saveAs: {
-		id: 'files.navbar.save-as',
-		defaultMessage: 'Save as...',
-	},
-	saveAndRestart: {
-		id: 'files.navbar.save-and-restart',
-		defaultMessage: 'Save & restart',
-	},
 })
 
 const props = defineProps<{
@@ -307,9 +265,6 @@ defineEmits<{
 	uploadZip: []
 	unzipFromUrl: [cf: boolean]
 	refresh: []
-	save: []
-	saveAs: []
-	saveRestart: []
 	share: []
 }>()
 

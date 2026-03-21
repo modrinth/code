@@ -302,6 +302,7 @@
 			@reset="resetChanges"
 			@save="handleSave"
 		/>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 	</div>
 </template>
 
@@ -319,12 +320,14 @@ import { MIN_SUMMARY_CHARS } from '@modrinth/moderation'
 import {
 	Avatar,
 	Combobox,
+	ConfirmLeaveModal,
 	ConfirmModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
 	StyledInput,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 } from '@modrinth/ui'
 import { fileIsValid, formatProjectStatus, formatProjectType } from '@modrinth/utils'
 
@@ -479,6 +482,14 @@ const modified = computed(() => ({
 	bannerFile: bannerFile.value,
 	deletedBanner: deletedBanner.value,
 }))
+
+const hasChanges = computed(() =>
+	Object.keys(modified.value).some(
+		(key) => original.value[key] !== modified.value[key],
+	),
+)
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
 	name.value = project.value.title

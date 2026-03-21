@@ -24,7 +24,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ConfirmLeaveModal from '../content-tab/components/modals/ConfirmLeaveModal.vue'
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'

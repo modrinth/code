@@ -1,5 +1,12 @@
 <template>
 	<slot name="modals" />
+	<ConfirmLeaveModal
+		ref="confirmLeaveModal"
+		:title="formatMessage(messages.leaveEditorTitle)"
+		:body="formatMessage(messages.leaveEditorBody)"
+		:stay-label="formatMessage(messages.leaveEditorStay)"
+		:leave-label="formatMessage(messages.leaveEditorLeave)"
+	/>
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
 	<FileUploadZipUrlModal v-if="ctx.showInstallFromUrl" ref="uploadZipUrlModal" />
@@ -68,9 +75,6 @@
 						@upload-zip="() => {}"
 						@unzip-from-url="showUnzipFromUrlModal"
 						@refresh="ctx.refresh"
-						@save="() => fileEditorRef?.saveFileContent(true)"
-						@save-as="() => fileEditorRef?.saveFileContent(false)"
-						@save-restart="() => fileEditorRef?.saveAndRestart()"
 						@share="() => fileEditorRef?.shareToMclogs()"
 					/>
 
@@ -159,6 +163,23 @@
 				</div>
 			</div>
 
+			<FloatingActionBar :shown="hasUnsavedChanges">
+				<p class="m-0 text-sm font-semibold md:text-base">
+					{{ formatMessage(messages.unsavedChanges) }}
+				</p>
+				<div class="ml-auto flex gap-2">
+					<ButtonStyled type="transparent">
+						<button @click="fileEditorRef?.revertChanges()">
+							<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled color="brand">
+						<button @click="fileEditorRef?.saveFileContent(false)">
+							<SaveIcon /> {{ formatMessage(messages.saveButton) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</FloatingActionBar>
 			<FloatingActionBar :shown="selectedItems.size > 0">
 				<div class="flex items-center gap-0.5">
 					<span class="px-4 py-2.5 text-base font-semibold text-contrast tabular-nums">
@@ -195,17 +216,21 @@ import {
 	DownloadIcon,
 	EditIcon,
 	FolderOpenIcon,
+	HistoryIcon,
 	PackageOpenIcon,
 	RightArrowIcon,
+	SaveIcon,
 	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import type { Component } from 'vue'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
+import { usePageLeaveSafety } from '#ui/composables/page-leave-safety'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
@@ -292,6 +317,31 @@ const messages = defineMessages({
 	extractionStartedTitle: {
 		id: 'files.layout.extraction-started-title',
 		defaultMessage: 'Extraction started',
+	},
+	unsavedChanges: {
+		id: 'files.layout.unsaved-changes',
+		defaultMessage: 'You have unsaved changes.',
+	},
+	saveButton: {
+		id: 'files.layout.save',
+		defaultMessage: 'Save',
+	},
+	leaveEditorTitle: {
+		id: 'files.layout.leave-editor-title',
+		defaultMessage: 'Leave editor?',
+	},
+	leaveEditorBody: {
+		id: 'files.layout.leave-editor-body',
+		defaultMessage:
+			'You have unsaved changes that will be lost if you leave the editor.',
+	},
+	leaveEditorStay: {
+		id: 'files.layout.leave-editor-stay',
+		defaultMessage: 'Stay in editor',
+	},
+	leaveEditorLeave: {
+		id: 'files.layout.leave-editor-leave',
+		defaultMessage: 'Leave editor',
 	},
 })
 
@@ -380,8 +430,17 @@ const contextMenuRef = ref<InstanceType<typeof FileContextMenu>>()
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<FileItem | null>(null)
 
+const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasUnsavedChanges)
+
+async function confirmDiscardChanges(): Promise<boolean> {
+	if (!hasUnsavedChanges.value) return true
+	return (await confirmLeaveModal.value?.prompt()) ?? false
+}
+
 // Navigation
-function navigateToSegment(index: number) {
+async function navigateToSegment(index: number) {
 	const newPath = index === -1 ? '/' : breadcrumbSegments.value.slice(0, index + 1).join('/')
 
 	if (newPath === ctx.currentPath.value && !isEditing.value) {
@@ -389,6 +448,7 @@ function navigateToSegment(index: number) {
 	}
 
 	if (isEditing.value) {
+		if (!(await confirmDiscardChanges())) return
 		ctx.stopEditing()
 	}
 
@@ -408,7 +468,8 @@ function handleEditFile(item: { name: string; type: string; path: string }) {
 	ctx.startEditing({ name: item.name, path: item.path })
 }
 
-function handleEditorClose() {
+async function handleEditorClose() {
+	if (!(await confirmDiscardChanges())) return
 	ctx.stopEditing()
 }
 

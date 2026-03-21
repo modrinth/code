@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<h2 class="label__title size-card-header">License</h2>
 			<p class="label__description">
@@ -154,10 +155,12 @@
 <script setup lang="ts">
 import {
 	Checkbox,
+	ConfirmLeaveModal,
 	DropdownSelect,
 	injectProjectPageContext,
 	StyledInput,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
 import {
@@ -169,6 +172,7 @@ import {
 import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
+
 
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id
@@ -194,7 +198,7 @@ function getInitialLicense() {
 	)
 }
 
-const { saved, current, saving, reset, save } = useSavable(
+const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({
 		license: getInitialLicense(),
 		licenseUrl: project.value.license.url ?? '',
@@ -218,6 +222,8 @@ const { saved, current, saving, reset, save } = useSavable(
 		await patchProject(payload)
 	},
 )
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const hasPermission = computed(() => {
 	return (currentMember.value?.permissions ?? 0) & TeamMemberPermission.EDIT_DETAILS

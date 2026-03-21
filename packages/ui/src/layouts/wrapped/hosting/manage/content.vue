@@ -13,7 +13,7 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ConfirmLeaveModal from '../../../shared/content-tab/components/modals/ConfirmLeaveModal.vue'
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
@@ -85,6 +85,18 @@ const messages = defineMessages({
 	copyLink: {
 		id: 'hosting.content.copy-link',
 		defaultMessage: 'Copy link',
+	},
+})
+
+const leaveMessages = defineMessages({
+	uploadInProgress: {
+		id: 'instances.confirm-leave-modal.upload-in-progress',
+		defaultMessage: 'Upload in progress',
+	},
+	leavePageBody: {
+		id: 'instances.confirm-leave-modal.body',
+		defaultMessage:
+			'Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost.',
 	},
 })
 
@@ -971,5 +983,10 @@ provideContentManager({
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>
-	<ConfirmLeaveModal ref="confirmLeaveModal" />
+	<ConfirmLeaveModal
+		ref="confirmLeaveModal"
+		:header="formatMessage(leaveMessages.uploadInProgress)"
+		:body="formatMessage(leaveMessages.leavePageBody)"
+		admonition-type="critical"
+	/>
 </template>
