@@ -8,7 +8,7 @@ repository = "https://github.com/modrinth/code/apps/app/"
 license = "GPL-3.0-only"
 
 [dependencies]
-async_zip = { workspace = true, features = ["tokio-fs", "deflate"] }
+async_zip = { workspace = true, features = ["deflate", "tokio-fs"] }
 chrono = { workspace = true }
 daedalus = { workspace = true }
 dashmap = { workspace = true }
