@@ -24,34 +24,22 @@ jobs:
             const marker = '<!-- changelog -->';
             const mergedMarker = '<!-- changelog-merged -->';
 
+            const sections = ['### Added', '', '### Changed', '', '### Deprecated', '', '### Removed', '', '### Fixed', '', '### Security'].join('\n');
+            const productBlock = (name) => `<details>\n<summary>${name}</summary>\n\n${sections}\n\n</details>`;
+
             const template = [
               marker,
               '## Pull request changelog',
               '',
-              '<!-- Check the product areas this PR affects. Fill in the sections below',
-              '     with your changes. Empty sections will be ignored. -->',
+              '<!-- Fill in the changelog under each product area this PR affects.',
+              '     Empty sections are ignored. Leave a product collapsed/empty',
+              '     if it doesn\'t apply. -->',
               '',
-              '**Product area:**',
-              '- [ ] App',
-              '- [ ] Website',
-              '- [ ] Hosting',
-              '- [ ] No changelog',
+              productBlock('App'),
               '',
-              '<!-- Use the sections below following the Keep a Changelog format',
-              '     (https://keepachangelog.com). Write entries as bullet points under',
-              '     each relevant section. Leave empty any sections that don\'t apply. -->',
+              productBlock('Website'),
               '',
-              '### Added',
-              '',
-              '### Changed',
-              '',
-              '### Deprecated',
-              '',
-              '### Removed',
-              '',
-              '### Fixed',
-              '',
-              '### Security',
+              productBlock('Hosting'),
             ].join('\n');
 
             // Resolve PR number from event or workflow_dispatch input

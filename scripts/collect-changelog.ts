@@ -16,7 +16,7 @@ const SECTION_HEADERS: Record<string, string> = {
 	security: '## Security',
 }
 
-const PRODUCT_CHECKBOX_MAP: Record<string, Product> = {
+const PRODUCT_SUMMARY_MAP: Record<string, Product> = {
 	App: 'app',
 	Website: 'web',
 	Hosting: 'hosting',
@@ -26,8 +26,7 @@ const GITHUB_API = 'https://api.github.com'
 const REPO = 'modrinth/code'
 
 interface ParsedChangelog {
-	products: Product[]
-	sections: Map<string, string[]>
+	entries: Map<Product, Map<string, string[]>>
 }
 
 interface PRInfo {
@@ -81,43 +80,54 @@ async function getParser() {
 function parseChangelogComment(body: string, parse: Function): ParsedChangelog | null {
 	if (!body.includes(CHANGELOG_MARKER)) return null
 
-	const products: Product[] = []
-	for (const [label, product] of Object.entries(PRODUCT_CHECKBOX_MAP)) {
-		if (new RegExp(`- \\[x\\] ${label}`, 'i').test(body)) {
-			products.push(product)
+	const entries = new Map<Product, Map<string, string[]>>()
+
+	const detailsRegex = /<details>\s*<summary>(.*?)<\/summary>([\s\S]*?)<\/details>/g
+	let match
+	while ((match = detailsRegex.exec(body)) !== null) {
+		const summaryLabel = match[1].trim()
+		const product = PRODUCT_SUMMARY_MAP[summaryLabel]
+		if (!product) continue
+
+		const content = match[2].replace(/<!--[\s\S]*?-->/g, '').trim()
+		const firstSection = content.search(/^### /m)
+		if (firstSection === -1) continue
+
+		const changelogMd = `# Changelog\n\n## [Unreleased]\n${content.slice(firstSection)}`
+
+		let changelog
+		try {
+			changelog = parse(changelogMd)
+		} catch {
+			continue
+		}
+
+		const unreleased = changelog.findRelease()
+		if (!unreleased || unreleased.isEmpty()) continue
+
+		const sections = new Map<string, string[]>()
+		for (const type of SECTION_ORDER) {
+			const changes = unreleased.changes.get(type)
+			if (changes && changes.length > 0) {
+				sections.set(type, changes.map((c: { title: string }) => c.title))
+			}
+		}
+
+		if (sections.size > 0) {
+			entries.set(product, sections)
 		}
 	}
 
-	if (/- \[x\] No changelog/i.test(body)) return null
-	if (products.length === 0) return null
+	if (entries.size === 0) return null
 
-	const sectionContent = body.replace(/<!--[\s\S]*?-->/g, '')
-	const firstSection = sectionContent.search(/^### /m)
-	if (firstSection === -1) return null
+	return { entries }
+}
 
-	const changelogMd = `# Changelog\n\n## [Unreleased]\n${sectionContent.slice(firstSection)}`
-
-	let changelog
-	try {
-		changelog = parse(changelogMd)
-	} catch {
-		return null
-	}
-
-	const unreleased = changelog.findRelease()
-	if (!unreleased || unreleased.isEmpty()) return null
-
-	const sections = new Map<string, string[]>()
-	for (const type of SECTION_ORDER) {
-		const changes = unreleased.changes.get(type)
-		if (changes && changes.length > 0) {
-			sections.set(type, changes.map((c: { title: string }) => c.title))
-		}
-	}
-
-	if (sections.size === 0) return null
-
-	return { products, sections }
+function linkifyIssues(text: string): string {
+	return text.replace(
+		/\[#(\d+)\]/g,
+		'[#$1](https://github.com/modrinth/code/issues/$1)',
+	)
 }
 
 function buildBody(sections: Map<string, string[]>): string {
@@ -127,7 +137,7 @@ function buildBody(sections: Map<string, string[]>): string {
 		const entries = sections.get(type)
 		if (!entries || entries.length === 0) continue
 
-		const lines = entries.map((e) => `- ${e}`)
+		const lines = entries.map((e) => `- ${linkifyIssues(e)}`)
 		parts.push(`${SECTION_HEADERS[type]}\n${lines.join('\n')}`)
 	}
 
@@ -325,7 +335,7 @@ async function main() {
 		return
 	}
 
-	const entries = new Map<Product, { sections: Map<string, string[]>; prNumber: number }[]>()
+	const allEntries = new Map<Product, { sections: Map<string, string[]>; prNumber: number }[]>()
 	const processedComments: { commentId: number; body: string }[] = []
 
 	for (const pr of prs) {
@@ -346,36 +356,34 @@ async function main() {
 			continue
 		}
 
-		console.log(
-			chalk.cyan(
-				`PR #${pr.number}: ${parsed.products.join(', ')} — ${[...parsed.sections.keys()].join(', ')}`,
-			),
-		)
+		const products = [...parsed.entries.keys()]
+		const types = [...new Set([...parsed.entries.values()].flatMap((s) => [...s.keys()]))]
+		console.log(chalk.cyan(`PR #${pr.number}: ${products.join(', ')} — ${types.join(', ')}`))
 
-		for (const product of parsed.products) {
-			if (!entries.has(product)) {
-				entries.set(product, [])
+		for (const [product, sections] of parsed.entries) {
+			if (!allEntries.has(product)) {
+				allEntries.set(product, [])
 			}
-			entries.get(product)!.push({ sections: parsed.sections, prNumber: pr.number })
+			allEntries.get(product)!.push({ sections, prNumber: pr.number })
 		}
 
 		processedComments.push({ commentId: comment.id, body: comment.body })
 	}
 
-	if (entries.size === 0) {
+	if (allEntries.size === 0) {
 		console.log(chalk.yellow('No changelog entries found in merged PRs'))
 		return
 	}
 
-	const hasApp = entries.has('app')
+	const hasApp = allEntries.has('app')
 	if (hasApp && !args.version) {
 		console.error(chalk.red('--version is required when app changelog entries exist'))
 		process.exit(1)
 	}
 
-	const products = [...entries.keys()].reverse()
+	const products = [...allEntries.keys()].reverse()
 	for (const product of products) {
-		const productEntries = entries.get(product)!
+		const productEntries = allEntries.get(product)!
 		const mergedSections = mergeSections(productEntries)
 		const body = buildBody(mergedSections)
 
