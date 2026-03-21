@@ -1,10 +1,5 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="localizeIfPossible(title)"
-		fade="warning"
-		max-width="500px"
-	>
+	<NewModal ref="modal" :header="localizeIfPossible(title)" fade="warning" max-width="500px">
 		<div class="flex flex-col gap-6">
 			<Admonition :type="admonitionType" :header="localizeIfPossible(header)">
 				{{ localizeIfPossible(body) }}
@@ -36,11 +31,7 @@ import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import {
-	defineMessage,
-	type MessageDescriptor,
-	useVIntl,
-} from '#ui/composables/i18n'
+import { defineMessage, type MessageDescriptor, useVIntl } from '#ui/composables/i18n'
 
 import NewModal from './NewModal.vue'
 
@@ -69,8 +60,7 @@ withDefaults(
 		body: () =>
 			defineMessage({
 				id: 'ui.confirm-leave-modal.body',
-				defaultMessage:
-					'You have unsaved changes that will be lost if you leave this page.',
+				defaultMessage: 'You have unsaved changes that will be lost if you leave this page.',
 			}),
 		stayLabel: () =>
 			defineMessage({

@@ -484,9 +484,7 @@ const modified = computed(() => ({
 }))
 
 const hasChanges = computed(() =>
-	Object.keys(modified.value).some(
-		(key) => original.value[key] !== modified.value[key],
-	),
+	Object.keys(modified.value).some((key) => original.value[key] !== modified.value[key]),
 )
 
 const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)

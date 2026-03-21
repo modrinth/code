@@ -512,12 +512,6 @@
   "files.editor.save-failed-title": {
     "defaultMessage": "Save failed"
   },
-  "files.editor.server-restarted-text": {
-    "defaultMessage": "Your server has been restarted."
-  },
-  "files.editor.server-restarted-title": {
-    "defaultMessage": "Server restarted"
-  },
   "files.error.go-to-home": {
     "defaultMessage": "Go to home folder"
   },
@@ -572,11 +566,29 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
   },
+  "files.layout.leave-editor-body": {
+    "defaultMessage": "You have unsaved changes that will be lost if you leave the editor."
+  },
+  "files.layout.leave-editor-leave": {
+    "defaultMessage": "Leave editor"
+  },
+  "files.layout.leave-editor-stay": {
+    "defaultMessage": "Stay in editor"
+  },
+  "files.layout.leave-editor-title": {
+    "defaultMessage": "Leave editor?"
+  },
   "files.layout.loading": {
     "defaultMessage": "Loading files..."
   },
+  "files.layout.save": {
+    "defaultMessage": "Save"
+  },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selected"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "You have unsaved changes."
   },
   "files.move-modal.current-location": {
     "defaultMessage": "Current location"
@@ -616,18 +628,6 @@
   },
   "files.navbar.new-folder": {
     "defaultMessage": "New folder"
-  },
-  "files.navbar.save": {
-    "defaultMessage": "Save"
-  },
-  "files.navbar.save-and-restart": {
-    "defaultMessage": "Save & restart"
-  },
-  "files.navbar.save-as": {
-    "defaultMessage": "Save as..."
-  },
-  "files.navbar.save-file": {
-    "defaultMessage": "Save file"
   },
   "files.navbar.search-files": {
     "defaultMessage": "Search files"
@@ -1120,15 +1120,6 @@
   },
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost."
-  },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Leave page"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Stay on page"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Leave page?"
   },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "Upload in progress"
@@ -3229,5 +3220,20 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "You have unsaved changes."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "You have unsaved changes that will be lost if you leave this page."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "You have unsaved changes"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Leave page"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Stay on page"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Leave page?"
   }
 }

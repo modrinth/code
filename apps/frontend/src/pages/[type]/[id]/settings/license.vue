@@ -173,7 +173,6 @@ import { computed } from 'vue'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-
 function getInitialLicense() {
 	const oldLicenseId = project.value.license.id
 	const trimmedLicenseId = oldLicenseId

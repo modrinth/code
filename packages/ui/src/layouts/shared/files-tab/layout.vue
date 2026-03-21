@@ -230,8 +230,8 @@ import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
-import { usePageLeaveSafety } from '#ui/composables/page-leave-safety'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { usePageLeaveSafety } from '#ui/composables/page-leave-safety'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -332,8 +332,7 @@ const messages = defineMessages({
 	},
 	leaveEditorBody: {
 		id: 'files.layout.leave-editor-body',
-		defaultMessage:
-			'You have unsaved changes that will be lost if you leave the editor.',
+		defaultMessage: 'You have unsaved changes that will be lost if you leave the editor.',
 	},
 	leaveEditorStay: {
 		id: 'files.layout.leave-editor-stay',
