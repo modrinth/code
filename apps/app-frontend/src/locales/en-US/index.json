@@ -86,9 +86,6 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Switch version"
-  },
   "app.instance.mods.unknown-version": {
     "message": "Unknown"
   },

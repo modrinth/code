@@ -258,11 +258,7 @@ const deleteHovered = ref(false)
 						<DownloadIcon class="size-5" />
 					</button>
 				</ButtonStyled>
-				<ButtonStyled
-					v-else-if="hasSwitchVersionListener && version"
-					circular
-					type="transparent"
-				>
+				<ButtonStyled v-else-if="hasSwitchVersionListener && version" circular type="transparent">
 					<button
 						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
 						:disabled="disabled"
