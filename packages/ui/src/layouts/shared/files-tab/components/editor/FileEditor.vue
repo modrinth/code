@@ -1,35 +1,33 @@
 <template>
-	<div class="flex h-full w-full flex-col gap-4">
+	<div
+		ref="editorContainer"
+		class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+	>
+		<component
+			:is="props.editorComponent"
+			v-if="!isEditingImage && !isLoading && props.editorComponent"
+			v-model:value="fileContent"
+			:lang="editorLanguage"
+			theme="modrinth"
+			:print-margin="false"
+			:style="{ height: editorHeight, fontSize: '0.875rem' }"
+			class="ace-modrinth rounded-[20px]"
+			@init="onEditorInit"
+		/>
+		<FileImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
 		<div
-			class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+			v-else-if="isLoading || !props.editorComponent"
+			class="flex items-center justify-center rounded-[20px] bg-bg-raised"
+			:style="{ height: editorHeight }"
 		>
-			<div class="h-full w-full flex-grow">
-				<component
-					:is="props.editorComponent"
-					v-if="!isEditingImage && !isLoading && props.editorComponent"
-					v-model:value="fileContent"
-					:lang="editorLanguage"
-					theme="modrinth"
-					:print-margin="false"
-					style="height: 750px; font-size: 1rem"
-					class="ace-modrinth rounded-[20px]"
-					@init="onEditorInit"
-				/>
-				<FileImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
-				<div
-					v-else-if="isLoading || !props.editorComponent"
-					class="flex h-[750px] items-center justify-center rounded-[20px] bg-bg-raised"
-				>
-					<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
-				</div>
-			</div>
+			<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
-import { type Component, computed, onUnmounted, ref, watch } from 'vue'
+import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -114,6 +112,21 @@ const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
 const editorInstance = ref<unknown>(null)
+const editorContainer = ref<HTMLElement | null>(null)
+const editorHeight = ref('300px')
+
+function updateEditorHeight() {
+	if (editorContainer.value) {
+		const top = editorContainer.value.getBoundingClientRect().top
+		const padding = 24
+		editorHeight.value = `${Math.max(300, window.innerHeight - top - padding)}px`
+	}
+}
+
+onMounted(() => {
+	nextTick(updateEditorHeight)
+	window.addEventListener('resize', updateEditorHeight)
+})
 
 const editorLanguage = computed(() => {
 	const ext = getFileExtension(props.file?.name ?? '')
@@ -125,6 +138,7 @@ watch(
 	async (newFile) => {
 		if (newFile) {
 			await loadFileContent(newFile)
+			nextTick(updateEditorHeight)
 		} else {
 			resetState()
 		}
@@ -132,7 +146,7 @@ watch(
 	{ immediate: true },
 )
 
-async function loadFileContent(file: { name: string; type: string; path: string }) {
+async function loadFileContent(file: { name: string; path: string }) {
 	isLoading.value = true
 	try {
 		window.scrollTo(0, 0)
@@ -266,6 +280,7 @@ function close() {
 }
 
 onUnmounted(() => {
+	window.removeEventListener('resize', updateEditorHeight)
 	editorInstance.value = null
 	resetState()
 })

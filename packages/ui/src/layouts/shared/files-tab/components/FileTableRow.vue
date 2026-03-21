@@ -45,21 +45,40 @@
 			<span class="hidden w-[160px] text-nowrap text-sm text-secondary @[800px]:block">
 				{{ formattedModifiedDate }}
 			</span>
-			<ButtonStyled circular type="transparent">
-				<TeleportOverflowMenu :options="menuOptions">
-					<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
-					<template #extract
-						><PackageOpenIcon /> {{ formatMessage(messages.extractLabel) }}</template
-					>
-					<template #rename><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template>
-					<template #move><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template>
-					<template #download
-						><DownloadIcon />
-						{{ ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton) }}</template
-					>
-					<template #delete><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template>
-				</TeleportOverflowMenu>
-			</ButtonStyled>
+			<div class="flex min-w-[51px] shrink-0 items-center justify-end">
+				<ButtonStyled circular type="transparent">
+					<TeleportOverflowMenu :options="menuOptions">
+						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+						<template #copy-filename
+							><ClipboardCopyIcon /> {{ formatMessage(messages.copyFilename) }}</template
+						>
+						<template #copy-full-path
+							><ClipboardCopyIcon /> {{ formatMessage(messages.copyFullPath) }}</template
+						>
+						<template #open-in-folder
+							><FolderOpenIcon /> {{ formatMessage(messages.openInFolder) }}</template
+						>
+						<template #extract
+							><PackageOpenIcon /> {{ formatMessage(messages.extractLabel) }}</template
+						>
+						<template #rename
+							><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template
+						>
+						<template #move
+							><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template
+						>
+						<template #download
+							><DownloadIcon />
+							{{
+								ctx.downloadButtonLabel ?? formatMessage(commonMessages.downloadButton)
+							}}</template
+						>
+						<template #delete
+							><TrashIcon /> {{ formatMessage(commonMessages.deleteLabel) }}</template
+						>
+					</TeleportOverflowMenu>
+				</ButtonStyled>
+			</div>
 		</div>
 	</li>
 </template>
@@ -68,6 +87,7 @@
 import {
 	BoxIcon,
 	BracesIcon,
+	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	FolderCogIcon,
@@ -95,25 +115,14 @@ import {
 	isImageFile,
 } from '#ui/utils/file-extensions'
 
+import { injectNotificationManager } from '#ui/providers/web-notifications'
+
 import { fileDragActive, fileDragData, fileDragTarget, startFileDrag, wasRecentDrag } from '../composables/file-drag-state'
 import { injectFileManager } from '../providers/file-manager'
-
-interface FileItemProps {
-	name: string
-	type: 'directory' | 'file'
-	size?: number
-	count?: number
-	modified: number
-	created: number
-	path: string
-	index: number
-	isLast: boolean
-	selected: boolean
-	writeDisabled?: boolean
-	writeDisabledTooltip?: string
-}
+import type { FileItem } from '../types'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 
 const messages = defineMessages({
@@ -129,26 +138,47 @@ const messages = defineMessages({
 		id: 'files.row.move',
 		defaultMessage: 'Move',
 	},
+	copyFilename: {
+		id: 'files.row.copy-filename',
+		defaultMessage: 'Copy filename',
+	},
+	copyFullPath: {
+		id: 'files.row.copy-full-path',
+		defaultMessage: 'Copy full path',
+	},
+	copiedFilename: {
+		id: 'files.row.copied-filename',
+		defaultMessage: 'Copied filename',
+	},
+	copiedPath: {
+		id: 'files.row.copied-path',
+		defaultMessage: 'Copied path',
+	},
+	openInFolder: {
+		id: 'files.row.open-in-folder',
+		defaultMessage: 'Open in folder',
+	},
 	itemCount: {
 		id: 'files.row.item-count',
 		defaultMessage: '{count, plural, one {# item} other {# items}}',
 	},
 })
 
-const props = defineProps<FileItemProps>()
+const props = defineProps<
+	FileItem & {
+		index: number
+		isLast: boolean
+		selected: boolean
+		writeDisabled?: boolean
+		writeDisabledTooltip?: string
+	}
+>()
 
 const emit = defineEmits<{
-	rename: [item: { name: string; type: string; path: string }]
-	move: [item: { name: string; type: string; path: string }]
-	download: [item: { name: string; type: string; path: string }]
-	delete: [item: { name: string; type: string; path: string }]
-	edit: [item: { name: string; type: string; path: string }]
-	extract: [item: { name: string; type: string; path: string }]
-	hover: [item: { name: string; type: string; path: string }]
-	navigate: [item: { name: string; type: string; path: string }]
-	moveDirectTo: [item: { name: string; type: string; path: string; destination: string }]
-	contextmenu: [x: number, y: number]
-	'toggle-select': []
+	(e: 'rename' | 'move' | 'download' | 'delete' | 'edit' | 'extract' | 'hover' | 'navigate', item: Pick<FileItem, 'name' | 'type' | 'path'>): void
+	(e: 'moveDirectTo', item: Pick<FileItem, 'name' | 'type' | 'path'> & { destination: string }): void
+	(e: 'contextmenu', x: number, y: number): void
+	(e: 'toggle-select'): void
 }>()
 
 const isDropTarget = computed(() => fileDragActive.value && fileDragTarget.value === props.path && props.type === 'directory')
@@ -167,7 +197,7 @@ const formatDateTime = useFormatDateTime({
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 px-3 py-3 focus:!outline-none',
+		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.selected
@@ -185,11 +215,39 @@ const fileExtension = computed(() => getFileExtension(props.name))
 
 const isZip = computed(() => fileExtension.value === 'zip')
 
+function getFullPath() {
+	const basePath = ctx.basePath?.value
+	return basePath ? `${basePath}/${props.path}`.replace(/\/+/g, '/') : props.path
+}
+
 const menuOptions = computed(() => {
 	const item = { name: props.name, type: props.type, path: props.path }
 	const wd = props.writeDisabled
 	const wdTooltip = props.writeDisabledTooltip
 	return [
+		{
+			id: 'copy-filename',
+			icon: ClipboardCopyIcon,
+			action: () => {
+				navigator.clipboard.writeText(props.name)
+				addNotification({ title: formatMessage(messages.copiedFilename), type: 'success' })
+			},
+		},
+		{
+			id: 'copy-full-path',
+			icon: ClipboardCopyIcon,
+			action: () => {
+				navigator.clipboard.writeText(getFullPath())
+				addNotification({ title: formatMessage(messages.copiedPath), type: 'success' })
+			},
+		},
+		{
+			id: 'open-in-folder',
+			icon: FolderOpenIcon,
+			shown: !!ctx.openInFolder,
+			action: () => ctx.openInFolder?.(getFullPath()),
+		},
+		{ divider: true },
 		{
 			id: 'extract',
 			shown: isZip.value,

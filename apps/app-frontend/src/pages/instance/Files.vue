@@ -4,6 +4,7 @@ import {
 	FilePageLayout,
 	injectNotificationManager,
 	provideFileManager,
+	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
@@ -23,6 +24,7 @@ import { onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { profile_listener } from '@/helpers/events'
 import { get_full_path } from '@/helpers/profile'
+import { highlightInFolder } from '@/helpers/utils'
 import type { GameInstance } from '@/helpers/types'
 
 const props = defineProps<{
@@ -36,6 +38,7 @@ const props = defineProps<{
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const debug = useDebugLogger('Files')
 
 const messages = defineMessages({
 	saveAs: {
@@ -79,9 +82,14 @@ const error = ref<Error | null>(null)
 const currentPath = ref('')
 const editingFile = ref<EditingFile | null>(null)
 
+debug('setup: start, instance.path =', props.instance.path)
+
 onMounted(async () => {
+	debug('onMounted: fired')
 	instanceRoot.value = await get_full_path(props.instance.path)
+	debug('onMounted: instanceRoot =', instanceRoot.value)
 	await refresh()
+	debug('onMounted: refresh complete, items =', items.value.length, 'error =', error.value)
 })
 
 function resolvePath(relativePath: string): string {
@@ -92,12 +100,20 @@ function resolvePath(relativePath: string): string {
 
 async function listDirectory(dirPath: string): Promise<FileItem[]> {
 	const absPath = resolvePath(dirPath)
+	debug('listDirectory: dirPath =', dirPath, 'absPath =', absPath)
 	const entries = await readDir(absPath)
+	debug('listDirectory: got', entries.length, 'entries')
 
 	const results = await Promise.all(
 		entries.map(async (entry) => {
 			const entryAbsPath = `${absPath}/${entry.name}`
-			const metadata = await stat(entryAbsPath)
+			let metadata
+			try {
+				metadata = await stat(entryAbsPath)
+			} catch {
+				debug('listDirectory: stat failed for', entry.name, '- skipping')
+				return null
+			}
 			const item: FileItem = {
 				name: entry.name,
 				type: entry.isDirectory ? 'directory' : 'file',
@@ -119,15 +135,18 @@ async function listDirectory(dirPath: string): Promise<FileItem[]> {
 			return item
 		}),
 	)
-	return results
+	return results.filter((item): item is FileItem => item !== null)
 }
 
 async function refresh() {
+	debug('refresh: called, currentPath =', currentPath.value, 'instanceRoot =', instanceRoot.value)
 	loading.value = true
 	error.value = null
 	try {
 		items.value = await listDirectory(currentPath.value)
+		debug('refresh: success, items =', items.value.length)
 	} catch (e) {
+		debug('refresh: error =', e)
 		error.value = e instanceof Error ? e : new Error(String(e))
 		items.value = []
 	} finally {
@@ -136,6 +155,7 @@ async function refresh() {
 }
 
 function navigateTo(path: string) {
+	debug('navigateTo:', path)
 	currentPath.value = path.startsWith('/') ? path.slice(1) : path
 	refresh()
 }
@@ -293,16 +313,20 @@ async function handleExtractFile(path: string, override: boolean, dry: boolean) 
 	}
 }
 
+debug('setup: registering profile_listener')
 const unlistenProfiles = await profile_listener(
 	async (event: { event: string; profile_path_id: string }) => {
+		debug('profile_listener: event =', event.event, 'path =', event.profile_path_id)
 		if (
 			event.profile_path_id === props.instance.path &&
 			event.event === 'synced'
 		) {
+			debug('profile_listener: synced event matched, calling refresh')
 			await refresh()
 		}
 	},
 )
+debug('setup: profile_listener registered')
 
 onUnmounted(() => {
 	unlistenProfiles()
@@ -311,6 +335,7 @@ onUnmounted(() => {
 watch(
 	() => props.instance.path,
 	async () => {
+		debug('watch instance.path: changed to', props.instance.path)
 		instanceRoot.value = await get_full_path(props.instance.path)
 		currentPath.value = ''
 		await refresh()
@@ -338,6 +363,8 @@ provideFileManager({
 	uploadState,
 	extractFile: handleExtractFile,
 	refresh,
+	basePath: instanceRoot,
+	openInFolder: (path: string) => highlightInFolder(path),
 	downloadButtonLabel: formatMessage(messages.saveAs),
 	uploadingLabel: (completed: number, total: number) =>
 		formatMessage(messages.addingFiles, { completed, total }),

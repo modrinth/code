@@ -37,6 +37,16 @@
 						{{ formatMessage(messages.copyFullPath) }}
 					</button>
 				</ButtonStyled>
+				<ButtonStyled v-if="ctx.openInFolder" type="transparent">
+					<button
+						class="w-full !justify-start !whitespace-nowrap"
+						role="menuitem"
+						@click="handleOpenInFolder"
+					>
+						<FolderOpenIcon class="size-5" />
+						{{ formatMessage(messages.openInFolder) }}
+					</button>
+				</ButtonStyled>
 				<div class="h-px w-full bg-surface-5" />
 				<template v-for="(option, index) in menuOptions" :key="index">
 					<div
@@ -65,17 +75,19 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 
+import { injectFileManager } from '../providers/file-manager'
 import type { FileContextMenuOption, FileItem } from '../types'
 
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
+const ctx = injectFileManager()
 
 const messages = defineMessages({
 	copyFilename: {
@@ -93,6 +105,10 @@ const messages = defineMessages({
 	copiedPath: {
 		id: 'files.context-menu.copied-path',
 		defaultMessage: 'Copied path',
+	},
+	openInFolder: {
+		id: 'files.context-menu.open-in-folder',
+		defaultMessage: 'Open in folder',
 	},
 })
 
@@ -133,10 +149,23 @@ function handleCopyFilename() {
 	hide()
 }
 
+function getFullPath() {
+	if (!currentItem.value) return ''
+	const basePath = ctx.basePath?.value
+	const itemPath = currentItem.value.path
+	return basePath ? `${basePath}/${itemPath}`.replace(/\/+/g, '/') : itemPath
+}
+
 function handleCopyPath() {
 	if (!currentItem.value) return
-	navigator.clipboard.writeText(currentItem.value.path)
+	navigator.clipboard.writeText(getFullPath())
 	addNotification({ title: formatMessage(messages.copiedPath), type: 'success' })
+	hide()
+}
+
+function handleOpenInFolder() {
+	if (!currentItem.value) return
+	ctx.openInFolder?.(getFullPath())
 	hide()
 }
 

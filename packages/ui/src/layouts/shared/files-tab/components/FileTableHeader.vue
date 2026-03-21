@@ -1,7 +1,7 @@
 <template>
 	<div
 		aria-hidden="true"
-		class="sticky top-0 z-10 flex h-12 w-full select-none flex-row items-center justify-between bg-surface-3 px-3 text-sm font-medium transition-[border-radius] duration-100"
+		class="sticky top-0 z-10 flex h-12 w-full select-none flex-row items-center justify-between bg-surface-3 pl-3 pr-4 font-medium transition-[border-radius] duration-100"
 		:class="
 			isStuck
 				? 'rounded-none border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
@@ -15,7 +15,8 @@
 				@update:model-value="$emit('toggle-all')"
 			/>
 			<button
-				class="flex appearance-none items-center gap-1.5 bg-transparent font-semibold text-secondary"
+				class="flex appearance-none items-center gap-1.5 border-0 bg-transparent p-0 font-semibold hover:text-primary"
+				:class="sortField === 'name' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'name')"
 			>
 				<span>{{ formatMessage(messages.name) }}</span>
@@ -33,7 +34,8 @@
 		</div>
 		<div class="flex shrink-0 items-center gap-4 @[800px]:gap-12">
 			<button
-				class="hidden w-[100px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
+				class="hidden w-[100px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+				:class="sortField === 'size' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'size')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.size) }}</span>
@@ -49,7 +51,8 @@
 				/>
 			</button>
 			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
+				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+				:class="sortField === 'created' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'created')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.created) }}</span>
@@ -65,7 +68,8 @@
 				/>
 			</button>
 			<button
-				class="hidden w-[160px] appearance-none items-center justify-start gap-1 bg-transparent font-semibold text-secondary @[800px]:flex"
+				class="hidden w-[160px] appearance-none items-center justify-start gap-1 border-0 bg-transparent p-0 font-semibold hover:text-primary @[800px]:flex"
+				:class="sortField === 'modified' ? 'text-contrast' : 'text-secondary'"
 				@click="$emit('sort', 'modified')"
 			>
 				<span class="ml-2">{{ formatMessage(messages.modified) }}</span>
@@ -80,7 +84,7 @@
 					aria-hidden="true"
 				/>
 			</button>
-			<span class="w-[51px] text-right font-semibold text-secondary">{{
+			<span class="min-w-[51px] shrink-0 text-right font-semibold text-secondary">{{
 				formatMessage(commonMessages.actionsLabel)
 			}}</span>
 		</div>

@@ -3,7 +3,7 @@
 		ref="modal"
 		:header="cf ? formatMessage(messages.cfHeader) : formatMessage(messages.zipHeader)"
 	>
-		<form class="flex flex-col gap-6 md:w-[620px]" @submit.prevent="handleSubmit">
+		<form class="flex flex-col gap-6 md:w-[700px]" @submit.prevent="handleSubmit">
 			<!-- CurseForge stepper cards -->
 			<div v-if="cf" class="flex gap-4">
 				<div
@@ -12,15 +12,17 @@
 					class="flex flex-1 flex-col gap-2 overflow-clip rounded-[20px] bg-surface-2 p-3"
 				>
 					<span
-						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 text-sm font-medium text-contrast"
+						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 font-medium text-contrast"
 					>
 						{{ i + 1 }}
 					</span>
-					<div class="text-sm font-semibold leading-snug text-contrast">
-						{{ step.title }}
-					</div>
-					<div class="text-xs leading-relaxed text-secondary">
-						{{ step.description }}
+					<div class="flex flex-col">
+						<div class="font-semibold leading-snug text-contrast">
+							{{ step.title }}
+						</div>
+						<div class="text-sm leading-relaxed text-secondary">
+							{{ step.description }}
+						</div>
 					</div>
 				</div>
 			</div>

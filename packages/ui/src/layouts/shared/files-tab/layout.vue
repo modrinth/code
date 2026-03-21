@@ -46,7 +46,7 @@
 			</Admonition>
 			<FileOperationAdmonitions />
 			<div class="relative flex w-full flex-col">
-				<div class="relative isolate flex w-full flex-col gap-2">
+				<div class="relative isolate flex w-full flex-col gap-4">
 					<FileNavbar
 						:breadcrumbs="breadcrumbSegments"
 						:is-editing="isEditing"
@@ -74,7 +74,7 @@
 						@share="() => fileEditorRef?.shareToMclogs()"
 					/>
 
-					<div v-if="!isEditing" class="contents">
+					<div v-if="!isEditing">
 						<FileUploadDragAndDrop
 							ref="fileUploadRef"
 							class="@container relative flex flex-col overflow-clip rounded-[20px] border border-solid border-surface-4 shadow-sm"
@@ -167,7 +167,6 @@
 					<div class="mx-1 h-6 w-px bg-surface-5" />
 					<ButtonStyled type="transparent">
 						<button class="!text-primary" @click="deselectAll">
-							<XIcon />
 							<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
 						</button>
 					</ButtonStyled>
@@ -200,7 +199,6 @@ import {
 	RightArrowIcon,
 	SpinnerIcon,
 	TrashIcon,
-	XIcon,
 } from '@modrinth/assets'
 import type { Component } from 'vue'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
@@ -307,7 +305,7 @@ const ctx = injectFileManager()
 
 const editorComponent = shallowRef<Component | null>(null)
 import('vue3-ace-editor').then(async (mod) => {
-	await import('#ui/utils/ace-theme')
+	await Promise.all([import('#ui/utils/ace-theme'), import('#ui/utils/ace-mode-log.ts')])
 	editorComponent.value = mod.VAceEditor
 })
 
@@ -353,13 +351,16 @@ const { recordOperation, onKeydown } = useFileUndoRedo(
 )
 
 // Virtual scroll
-const { listContainer: virtualListContainer, totalHeight, visibleRange, visibleTop, visibleItems } = useVirtualScroll(
-	filteredItems,
-	{
-		itemHeight: 61,
-		bufferSize: 5,
-	},
-)
+const {
+	listContainer: virtualListContainer,
+	totalHeight,
+	visibleRange,
+	visibleTop,
+	visibleItems,
+} = useVirtualScroll(filteredItems, {
+	itemHeight: 61,
+	bufferSize: 5,
+})
 
 // Sticky observer for the table header
 const fileUploadRef = ref<InstanceType<typeof FileUploadDragAndDrop>>()

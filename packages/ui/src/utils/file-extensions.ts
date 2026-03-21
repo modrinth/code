@@ -146,6 +146,8 @@ export function getEditorLanguage(ext: string): string {
 		case 'cfg':
 		case 'conf':
 			return 'ini'
+		case 'log':
+			return 'mclog'
 		default:
 			return 'text'
 	}

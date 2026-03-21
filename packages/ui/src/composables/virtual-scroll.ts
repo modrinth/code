@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 
 export interface VirtualScrollOptions {
 	itemHeight: number
@@ -16,6 +16,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	const scrollContainer = ref<HTMLElement | Window | null>(null)
 	const scrollTop = ref(0)
 	const viewportHeight = ref(0)
+	const containerOffset = ref(0)
 
 	const totalHeight = computed(() => items.value.length * itemHeight)
 
@@ -41,13 +42,25 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		return container instanceof Window ? window.innerHeight : container.clientHeight
 	}
 
-	function getContainerOffset(listEl: HTMLElement, container: HTMLElement | Window): number {
+	function updateContainerOffset() {
+		const listEl = listContainer.value
+		const container = scrollContainer.value
+		if (!listEl || !container) return
+
 		if (container instanceof Window) {
-			return listEl.getBoundingClientRect().top + window.scrollY
+			containerOffset.value = listEl.getBoundingClientRect().top + window.scrollY
+		} else {
+			const listRect = listEl.getBoundingClientRect()
+			const containerRect = container.getBoundingClientRect()
+			containerOffset.value = listRect.top - containerRect.top + container.scrollTop
 		}
-		const listRect = listEl.getBoundingClientRect()
-		const containerRect = container.getBoundingClientRect()
-		return listRect.top - containerRect.top + container.scrollTop
+	}
+
+	function syncScrollState() {
+		if (!scrollContainer.value) return
+		scrollTop.value = getScrollTop(scrollContainer.value)
+		viewportHeight.value = getViewportHeight(scrollContainer.value)
+		updateContainerOffset()
 	}
 
 	const visibleRange = computed(() => {
@@ -57,15 +70,17 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 
 		if (!listContainer.value || !scrollContainer.value) return { start: 0, end: 0 }
 
-		const containerOffset = getContainerOffset(listContainer.value, scrollContainer.value)
-		const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset)
+		const relativeScrollTop = Math.max(0, scrollTop.value - containerOffset.value)
 
 		const start = Math.floor(relativeScrollTop / itemHeight)
 		const visibleCount = Math.ceil(viewportHeight.value / itemHeight)
 
+		const rangeStart = Math.max(0, start - bufferSize)
+		const rangeEnd = Math.min(items.value.length, start + visibleCount + bufferSize * 2)
+
 		return {
-			start: Math.max(0, start - bufferSize),
-			end: Math.min(items.value.length, start + visibleCount + bufferSize * 2),
+			start: Math.min(rangeStart, rangeEnd),
+			end: rangeEnd,
 		}
 	})
 
@@ -91,15 +106,19 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 	function handleScroll() {
 		if (scrollContainer.value) {
 			scrollTop.value = getScrollTop(scrollContainer.value)
+			updateContainerOffset()
 		}
 		checkNearEnd()
 	}
 
 	function handleResize() {
-		if (scrollContainer.value) {
-			viewportHeight.value = getViewportHeight(scrollContainer.value)
-		}
+		syncScrollState()
 	}
+
+	// Re-sync scroll state when items change to avoid stale scrollTop/offset
+	watch(items, () => {
+		syncScrollState()
+	})
 
 	watchEffect((onCleanup) => {
 		if (typeof window === 'undefined') return
@@ -109,15 +128,24 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 
 		const container = findScrollableAncestor(listEl)
 		scrollContainer.value = container
-		viewportHeight.value = getViewportHeight(container)
-		scrollTop.value = getScrollTop(container)
+		syncScrollState()
 
 		container.addEventListener('scroll', handleScroll, { passive: true })
 		window.addEventListener('resize', handleResize, { passive: true })
 
+		// Use ResizeObserver for element scroll containers
+		let resizeObserver: ResizeObserver | undefined
+		if (!(container instanceof Window)) {
+			resizeObserver = new ResizeObserver(() => {
+				syncScrollState()
+			})
+			resizeObserver.observe(container)
+		}
+
 		onCleanup(() => {
 			container.removeEventListener('scroll', handleScroll)
 			window.removeEventListener('resize', handleResize)
+			resizeObserver?.disconnect()
 		})
 	})
 

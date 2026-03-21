@@ -32,6 +32,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+import type { FileItem } from '../../types'
 
 const { formatMessage } = useVIntl()
 
@@ -52,10 +53,7 @@ const messages = defineMessages({
 })
 
 defineProps<{
-	item: {
-		name: string
-		type: string
-	} | null
+	item: Pick<FileItem, 'name' | 'type'> | null
 }>()
 
 const emit = defineEmits<{

@@ -41,6 +41,7 @@ import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
 import { fileValidationMessages } from './file-validation-messages'
+import type { FileItem } from '../../types'
 
 const { formatMessage } = useVIntl()
 
@@ -60,7 +61,7 @@ const messages = defineMessages({
 })
 
 const props = defineProps<{
-	item: { name: string; type: string } | null
+	item: Pick<FileItem, 'name' | 'type'> | null
 }>()
 
 const emit = defineEmits<{
