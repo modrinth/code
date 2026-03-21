@@ -19,7 +19,6 @@ export const fileDragData = activeDrag
 export const fileDragTarget = dragTarget
 export const fileDragActive = dragStarted
 
-
 function createGhost(name: string): HTMLElement {
 	const el = document.createElement('div')
 	el.className =
