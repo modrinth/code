@@ -31,7 +31,6 @@
 						v-model="languages"
 						:options="languageOptions"
 						searchable
-						include-select-all-option
 						:max-tag-rows="2"
 						placeholder="Select languages"
 						:disabled="!hasPermission"
