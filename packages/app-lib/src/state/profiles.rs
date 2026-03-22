@@ -1285,18 +1285,29 @@ impl Profile {
     ) -> crate::Result<()> {
         if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
         {
-            let old_settings_path = path.join(format!(
-                "{}.txt",
-                old_project_path.trim_end_matches(".disabled")
-            ));
-            let new_settings_path = path.join(format!(
-                "{}.txt",
-                new_project_path.trim_end_matches(".disabled")
-            ));
+            let project_type =
+                ProjectType::get_from_parent_folder(new_project_path)
+                    .ok_or_else(|| {
+                        crate::ErrorKind::InputError(format!(
+                            "Unable to determine project type."
+                        ))
+                        .as_error()
+                    })?;
 
-            if old_settings_path.exists() && !new_settings_path.exists() {
-                io::rename_or_move(&old_settings_path, &new_settings_path)
-                    .await?;
+            if project_type == ProjectType::ShaderPack {
+                let old_settings_path = path.join(format!(
+                    "{}.txt",
+                    old_project_path.trim_end_matches(".disabled")
+                ));
+                let new_settings_path = path.join(format!(
+                    "{}.txt",
+                    new_project_path.trim_end_matches(".disabled")
+                ));
+
+                if old_settings_path.exists() && !new_settings_path.exists() {
+                    io::rename_or_move(&old_settings_path, &new_settings_path)
+                        .await?;
+                }
             }
         }
 
