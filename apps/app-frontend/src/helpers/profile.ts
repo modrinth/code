@@ -212,13 +212,14 @@ export async function remove_project(path: string, projectPath: string): Promise
 	return await invoke('plugin:profile|profile_remove_project', { path, projectPath })
 }
 
-// Rename shader's settings file, if exists, to match updated shader path
-export async function rename_shader_settings_file(
+// Rename existing project-related files, such as shader config,
+// to match the new project path
+export async function rename_project_companion_files(
 	path: string,
 	projectOldPath: string,
 	projectNewPath: string,
 ): Promise<void> {
-	return await invoke('plugin:profile|profile_rename_shader_settings_file', {
+	return await invoke('plugin:profile|profile_rename_project_companion_files', {
 		path,
 		projectOldPath,
 		projectNewPath,

@@ -24,7 +24,7 @@ import {
 	get_projects,
 	list,
 	remove_project,
-	rename_shader_settings_file,
+	rename_project_companion_files,
 } from '@/helpers/profile.js'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
@@ -547,7 +547,7 @@ export function createContentInstall(opts: {
 					)
 
 					if (project.project_type == 'shader' && projectOldPath) {
-						await rename_shader_settings_file(instance.path, projectOldPath, projectPath)
+						await rename_project_companion_files(instance.path, projectOldPath, projectPath)
 					}
 
 					trackEvent('ProjectInstall', {

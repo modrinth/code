@@ -1276,9 +1276,13 @@ impl Profile {
         Ok(())
     }
 
-    /// Rename shader's settings file, if exists, to match the updated shader path.
+    /// Rename existing project-related files, such as shader config,
+    /// to match the new project path. It does not overwrite anything.
+    ///
+    /// Accepts relative paths (e.g. `shaderpacks/myshader_old.zip`
+    /// and `shaderpacks/myshader_new.zip`)
     #[tracing::instrument]
-    pub async fn rename_shader_settings_file(
+    pub async fn rename_project_companion_files(
         profile_path: &str,
         old_project_path: &str,
         new_project_path: &str,

@@ -575,15 +575,16 @@ pub async fn remove_project(
     Ok(())
 }
 
-/// Rename shader's settings file, if exists, to match updated shader path
-/// Project old and new paths should be relative to the profile
+/// Rename existing project-related files, such as shader config,
+/// to match the new project path
+/// Both project paths should be relative to the profile
 #[tracing::instrument]
-pub async fn rename_shader_settings_file(
+pub async fn rename_project_companion_files(
     profile_path: &str,
     project_old: &str,
     project_new: &str,
 ) -> crate::Result<()> {
-    Profile::rename_shader_settings_file(
+    Profile::rename_project_companion_files(
         profile_path,
         project_old,
         project_new,
