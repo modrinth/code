@@ -1292,9 +1292,9 @@ impl Profile {
             let project_type =
                 ProjectType::get_from_parent_folder(new_project_path)
                     .ok_or_else(|| {
-                        crate::ErrorKind::InputError(format!(
-                            "Unable to determine project type."
-                        ))
+                        crate::ErrorKind::InputError(
+                            "Unable to determine project type.".to_string(),
+                        )
                         .as_error()
                     })?;
 
