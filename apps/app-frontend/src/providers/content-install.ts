@@ -24,6 +24,7 @@ import {
 	get_projects,
 	list,
 	remove_project,
+	rename_shader_settings_file,
 } from '@/helpers/profile.js'
 import { get_game_versions } from '@/helpers/tags'
 import type { GameInstance, InstanceLoader } from '@/helpers/types'
@@ -520,16 +521,19 @@ export function createContentInstall(opts: {
 			if (!version) version = projectVersions[0]
 
 			if (isVersionCompatible(version, project, instance)) {
+				let projectOldPath: string | null = null
+
 				for (const [path, file] of Object.entries(instanceProjects)) {
 					if (file.metadata?.project_id === project.id) {
 						await remove_project(instance.path, path)
+						projectOldPath = path
 					}
 				}
 
 				const installedProjectIds: string[] = [project.id]
 				addInstallingItem(instancePath, project, version)
 				try {
-					await add_project_from_version(instance.path, version.id)
+					const projectPath = await add_project_from_version(instance.path, version.id)
 					await installVersionDependencies(
 						instance,
 						version,
@@ -541,6 +545,10 @@ export function createContentInstall(opts: {
 							installedProjectIds.push(depProject.id)
 						},
 					)
+
+					if (project.project_type == 'shader' && projectOldPath) {
+						await rename_shader_settings_file(instance.path, projectOldPath, projectPath)
+					}
 
 					trackEvent('ProjectInstall', {
 						loader: instance.loader,
