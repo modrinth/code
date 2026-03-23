@@ -73,6 +73,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { DownloadIcon, EyeIcon, XIcon } from '@modrinth/assets'
+import type { ContentItem } from '@modrinth/ui'
 import {
 	Admonition,
 	Avatar,
@@ -88,9 +89,7 @@ import { computed, ref } from 'vue'
 
 import { hide_ads_window, show_ads_window } from '@/helpers/ads'
 import { get_project, get_project_many, get_version, get_version_many } from '@/helpers/cache.js'
-import { installServerProject, useInstall } from '@/store/install.js'
-
-import type { ContentItem } from '../../../../../../packages/ui/src/components/instances/types'
+import { injectServerInstall } from '@/providers/server-install'
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const modpackVersionId = ref<string | null>(null)
@@ -99,7 +98,7 @@ const project = ref<Labrinth.Projects.v3.Project | null>(null)
 const requiredContentProject = ref<Labrinth.Projects.v2.Project | null>(null)
 const onInstallComplete = ref<() => void>(() => {})
 const { formatMessage } = useVIntl()
-const installStore = useInstall()
+const { installServerProject, startInstallingServer, stopInstallingServer } = injectServerInstall()
 
 const usingCustomModpack = computed(() => {
 	return requiredContentProject.value?.id === project.value?.id
@@ -125,14 +124,14 @@ async function fetchData(versionId: string) {
 async function handleAccept() {
 	hide()
 	const serverProjectId = project.value?.id
-	installStore.startInstallingServer(serverProjectId)
+	startInstallingServer(serverProjectId)
 	try {
 		await installServerProject(serverProjectId)
 		onInstallComplete.value()
 	} catch (error) {
 		console.error('Failed to install server project from InstallToPlayModal:', error)
 	} finally {
-		installStore.stopInstallingServer(serverProjectId)
+		stopInstallingServer(serverProjectId)
 	}
 }
 

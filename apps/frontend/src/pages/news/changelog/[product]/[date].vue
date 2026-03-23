@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronLeftIcon } from '@modrinth/assets'
+import { getChangelog } from '@modrinth/blog'
 import { ChangelogEntry, Timeline } from '@modrinth/ui'
-import { getChangelog } from '@modrinth/utils'
 
 const route = useRoute()
 
@@ -23,7 +23,7 @@ const changelogEntry = computed(() =>
 const isFirst = computed(() => changelogEntry.value?.date === getChangelog()[0].date)
 
 if (!changelogEntry.value) {
-	createError({ statusCode: 404, statusMessage: 'Version not found' })
+	throw createError({ statusCode: 404, statusMessage: 'Version not found' })
 }
 </script>
 

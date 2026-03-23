@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150mb pamięci RAM!"
+    "message": "Modrinth App działa wydajniej niż wiele popularnych menedżerów modów, zużywając zaledwie 150 MB pamięci RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -258,10 +258,10 @@
     "message": "Zresetuj swoje hasło"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Proszę wprowadzić kod otrzymany kod 2FA, aby kontynuować."
+    "message": "Wprowadź otrzymany kod 2FA, aby kontynuować."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Wprowadź otrzymany kod 2FA, aby kontynuować"
+    "message": "Wprowadź otrzymany kod 2FA"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Wprowadź kod..."
@@ -393,7 +393,7 @@
     "message": "Brak projektów w kolekcji"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Brak projektów} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Nie ma jeszcze żadnych projektów} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Zaktualizowany {ago}"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Stwórz nową"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Utwórz swoją pierwszą kolekcję, by rozpocząć!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Nie masz jeszcze żadnych kolekcji"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Nie znaleziono żadnej kolekcji pasującej do Twojego wyszukiwania"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Spróbuj zmienić filtry wyszukiwania lub zapytanie."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} few {{count} projekty} other {{count} projektów}}"
+    "message": "{count} {countPlural, plural, one {projekt} few {projekty} other {projektów}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Szukaj swoich kolekcji"
@@ -1239,7 +1251,7 @@
     "message": "Wiesz dokładnie, czego potrzebujesz?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Wypróbuj darmowy serwer <orange>3GB</orange> przez 5 dni dzięki <orange>Medal</orange>"
+    "message": "Wypróbuj darmowy serwer <orange>3 GB</orange> przez 5 dni dzięki <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Dowiedz się więcej"
@@ -1425,7 +1437,7 @@
     "message": "Dla graczy"
   },
   "landing.section.for-players.tagline": {
-    "message": "Odkryj ponad {count} kreacji"
+    "message": "Odkryj ponad {count, number} kreacji"
   },
   "landing.subheading": {
     "message": "Odkrywaj, graj i udostępniaj treści Minecraft poprzez naszą otwartoźródłową platformę, stworzoną dla społeczności."
@@ -2028,7 +2040,7 @@
     "message": "Kolekcja"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
+    "message": "{count} {countPlural, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "profile.label.joined": {
     "message": "Dołączył(-a)"
@@ -2049,7 +2061,7 @@
     "message": "Organizacje"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {projekt} few {projekty} other {projektów}}"
+    "message": "{count} {countPlural, plural, one {projekt} few {projekty} other {projektów}}"
   },
   "profile.label.saving": {
     "message": "Zapisywanie..."
@@ -2771,9 +2783,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synchronizuj z serwerem"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Trwa przywracanie kopii zapasowej"
-  },
   "servers.notice.actions": {
     "message": "Akcje"
   },
@@ -3051,7 +3060,7 @@
     "message": "Utwórz PAT"
   },
   "settings.pats.description": {
-    "message": "PATy zezwalają na dostęp do API Modrinth. Więcej informacji znajdziesz w <doc-link>dokumentacji API Modrinth</doc-link>. Mogą być dowolnie tworzone i unieważniane."
+    "message": "PATy zezwalają na dostęp do API Modrinth. Mogą być dowolnie tworzone bądź unieważniane. Więcej informacji zawarte jest w <doc-link>dokumentacji API Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Utwórz PAT"

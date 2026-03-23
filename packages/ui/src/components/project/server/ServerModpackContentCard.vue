@@ -4,7 +4,7 @@
 			<Avatar :src="icon" size="34px" class="!rounded-xl !shadow-none" />
 			<div class="flex flex-col items-start overflow-hidden">
 				<div
-					v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : name"
+					v-tooltip="showCustomModpackTooltip ? formatMessage(messages.customModpackTooltip) : name"
 					class="truncate font-semibold text-sm max-w-full"
 					:class="onclickName ? 'hover:underline cursor-pointer' : ''"
 					@click="onclickName"
@@ -22,7 +22,7 @@
 			</div>
 		</div>
 		<ButtonStyled v-if="onclickDownload" circular type="transparent">
-			<button v-tooltip="'Download modpack'" @click="onclickDownload">
+			<button v-tooltip="formatMessage(messages.downloadModpack)" @click="onclickDownload">
 				<DownloadIcon />
 			</button>
 		</ButtonStyled>
@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { DownloadIcon } from '@modrinth/assets/generated-icons'
 
+import { defineMessages, useVIntl } from '../../../composables'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 
@@ -44,4 +45,17 @@ defineProps<{
 	onclickDownload?: () => void
 	showCustomModpackTooltip?: boolean
 }>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	customModpackTooltip: {
+		id: `project.server.customModpackTooltip`,
+		defaultMessage: 'This project uses a custom modpack',
+	},
+	downloadModpack: {
+		id: `project.about.server.downloadModpack`,
+		defaultMessage: 'Download modpack',
+	},
+})
 </script>

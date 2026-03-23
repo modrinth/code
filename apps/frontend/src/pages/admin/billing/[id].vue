@@ -137,12 +137,12 @@
 			class="mb-4 flex items-center justify-between border-0 border-b border-solid border-divider pb-4"
 		>
 			<div class="flex items-center gap-2">
-				<Avatar :src="user.avatar_url" :alt="user.username" size="32px" circle />
-				<h1 class="m-0 text-2xl font-extrabold">{{ user.username }}'s subscriptions</h1>
+				<Avatar :src="user?.avatar_url" :alt="user?.username" size="32px" circle />
+				<h1 class="m-0 text-2xl font-extrabold">{{ user?.username }}'s subscriptions</h1>
 			</div>
 			<div class="flex items-center gap-2">
 				<ButtonStyled>
-					<nuxt-link :to="`/user/${user.id}`">
+					<nuxt-link :to="`/user/${user?.id}`">
 						<UserIcon aria-hidden="true" />
 						User profile
 						<ExternalIcon class="h-4 w-4" />
@@ -328,6 +328,7 @@ import {
 	CopyCode,
 	defineMessages,
 	DropdownSelect,
+	injectModrinthClient,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
@@ -339,11 +340,13 @@ import {
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
 import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
+const { labrinth } = injectModrinthClient()
 const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
@@ -370,39 +373,40 @@ const messages = defineMessages({
 	},
 })
 
-const { data: user } = await useAsyncData(`user/${route.params.id}`, () =>
-	useBaseFetch(`user/${route.params.id}`),
-)
+const {
+	data: user,
+	error: userError,
+	suspense: userSuspense,
+} = useQuery({
+	queryKey: ['user', route.params.id],
+	queryFn: () => labrinth.users_v2.get(route.params.id),
+})
 
-if (!user.value) {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+onServerPrefetch(userSuspense)
 
-let subscriptions, charges, refreshCharges
-try {
-	;[{ data: subscriptions }, { data: charges, refresh: refreshCharges }] = await Promise.all([
-		useAsyncData(`billing/subscriptions?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/subscriptions?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-		useAsyncData(`billing/payments?user_id=${route.params.id}`, () =>
-			useBaseFetch(`billing/payments?user_id=${user.value.id}`, {
-				internal: true,
-			}),
-		),
-	])
-} catch {
-	throw createError({
-		fatal: true,
-		statusCode: 404,
-		message: formatMessage(messages.userNotFoundError),
-	})
-}
+watch(userError, (error) => {
+	if (error) {
+		showError({
+			fatal: true,
+			statusCode: error.statusCode ?? error.status ?? 404,
+			message: formatMessage(messages.userNotFoundError),
+		})
+	}
+})
+
+const { data: subscriptions } = useQuery({
+	queryKey: computed(() => ['billing', 'subscriptions', user.value?.id]),
+	queryFn: () => labrinth.billing_internal.getSubscriptions(user.value?.id),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
+
+const { data: charges, refetch: refreshCharges } = useQuery({
+	queryKey: computed(() => ['billing', 'payments', user.value?.id]),
+	queryFn: () => labrinth.billing_internal.getPayments(user.value?.id),
+	enabled: computed(() => !!user.value?.id),
+	placeholderData: [],
+})
 
 const subscriptionCharges = computed(() => {
 	return subscriptions.value.map((subscription) => {
@@ -460,15 +464,11 @@ async function applyCredit() {
 	crediting.value = true
 	try {
 		const daysParsed = Math.max(1, Math.floor(Number(creditDays.value) || 1))
-		await useBaseFetch('billing/credit', {
-			method: 'POST',
-			body: JSON.stringify({
-				subscription_ids: [selectedSubscription.value.id],
-				days: daysParsed,
-				send_email: creditSendEmail.value,
-				message: DEFAULT_CREDIT_EMAIL_MESSAGE,
-			}),
-			internal: true,
+		await labrinth.billing_internal.credit({
+			subscription_ids: [selectedSubscription.value.id],
+			days: daysParsed,
+			send_email: creditSendEmail.value,
+			message: DEFAULT_CREDIT_EMAIL_MESSAGE,
 		})
 		addNotification({
 			title: 'Credit applied',
@@ -498,11 +498,7 @@ async function refundCharge() {
 					? { type: 'none', unprovision: unprovision.value }
 					: { type: 'full', unprovision: unprovision.value }
 
-		await useBaseFetch(`billing/charge/${selectedCharge.value.id}/refund`, {
-			method: 'POST',
-			body: JSON.stringify(payload),
-			internal: true,
-		})
+		await labrinth.billing_internal.refundCharge(selectedCharge.value.id, payload)
 		await refreshCharges()
 		refundModal.value.hide()
 	} catch (err) {
@@ -518,12 +514,8 @@ async function refundCharge() {
 async function modifyCharge() {
 	modifying.value = true
 	try {
-		await useBaseFetch(`billing/subscription/${selectedSubscription.value.id}`, {
-			method: 'PATCH',
-			body: JSON.stringify({
-				cancelled: cancel.value,
-			}),
-			internal: true,
+		await labrinth.billing_internal.editSubscription(selectedSubscription.value.id, {
+			cancelled: cancel.value,
 		})
 		addNotification({
 			title: 'Modifications made',

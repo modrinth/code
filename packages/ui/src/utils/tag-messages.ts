@@ -324,7 +324,7 @@ export const categoryMessages = defineMessages({
 	},
 	kitpvp: {
 		id: 'tag.category.kitpvp',
-		defaultMessage: 'Kit PVP',
+		defaultMessage: 'Kit PvP',
 	},
 	library: {
 		id: 'tag.category.library',
@@ -436,7 +436,7 @@ export const categoryMessages = defineMessages({
 	},
 	pokemon: {
 		id: 'tag.category.pokemon',
-		defaultMessage: 'Pokemon',
+		defaultMessage: 'Pokémon',
 	},
 	potato: {
 		id: 'tag.category.potato',
@@ -448,11 +448,11 @@ export const categoryMessages = defineMessages({
 	},
 	pve: {
 		id: 'tag.category.pve',
-		defaultMessage: 'PVE',
+		defaultMessage: 'PvE',
 	},
 	pvp: {
 		id: 'tag.category.pvp',
-		defaultMessage: 'PVP',
+		defaultMessage: 'PvP',
 	},
 	questing: {
 		id: 'tag.category.questing',

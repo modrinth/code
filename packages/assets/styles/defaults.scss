@@ -158,11 +158,11 @@ h3 {
 }
 
 ::-webkit-scrollbar-thumb {
-	background: var(--color-button-bg);
+	background: var(--color-scrollbar);
 }
 
 // Firefox scrollbar
 * {
 	scrollbar-width: thin;
-	scrollbar-color: var(--color-button-bg) transparent;
+	scrollbar-color: var(--color-scrollbar) transparent;
 }

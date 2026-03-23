@@ -24,6 +24,7 @@ import {
 	SearchFilterControl,
 	SearchSidebarFilter,
 	StyledInput,
+	useDebugLogger,
 	useSearch,
 	useServerSearch,
 	useVIntl,
@@ -39,32 +40,37 @@ import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import { get_project_v3, get_search_results, get_search_results_v3 } from '@/helpers/cache.js'
+import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
 	get as getInstance,
-	get_projects as getInstanceProjects,
+	get_installed_project_ids as getInstalledProjectIds,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { getServerLatency } from '@/helpers/worlds'
+import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { getServerAddress, playServerProject, useInstall } from '@/store/install.js'
+import { getServerAddress } from '@/store/install.js'
 
 const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
-const installStore = useInstall()
+const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
+	injectServerInstall()
+const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
 
 const projectTypes = computed(() => {
+	debugLog('projectTypes computed', route.params.projectType)
 	return [route.params.projectType as ProjectType]
 })
 
+debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
 	get_categories()
 		.catch(handleError)
@@ -97,61 +103,66 @@ type Instance = {
 	}
 }
 
-type InstanceProject = {
-	metadata: {
-		project_id: string
-	}
-}
-
 const instance: Ref<Instance | null> = ref(null)
-const instanceProjects: Ref<InstanceProject[] | null> = ref(null)
+const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
 
-const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
-
-await updateInstanceContext()
-
-watch(
-	() => [route.query.i, route.query.ai, route.path],
-	() => {
-		updateInstanceContext()
-	},
+const allInstalledIds = computed(
+	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
 )
 
-async function updateInstanceContext() {
-	if (route.query.i) {
-		;[instance.value, instanceProjects.value] = await Promise.all([
-			getInstance(route.query.i).catch(handleError),
-			getInstanceProjects(route.query.i).catch(handleError),
-		])
-		newlyInstalled.value = []
+const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
 
-		isServerInstance.value = false
+await initInstanceContext()
+
+async function initInstanceContext() {
+	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
+	if (route.query.i) {
+		instance.value = await getInstance(route.query.i).catch(handleError)
+		debugLog('instance loaded', {
+			name: instance.value?.name,
+			loader: instance.value?.loader,
+			gameVersion: instance.value?.game_version,
+		})
+
+		// Load installed project IDs in background — the page and initial search render immediately.
+		// When this resolves, instanceFilters recomputes and triggers a search refresh
+		// that applies the "hide installed" negative filters and marks installed badges.
+		getInstalledProjectIds(route.query.i)
+			.then((ids) => {
+				debugLog('installedProjectIds loaded', { count: ids?.length })
+				installedProjectIds.value = ids
+			})
+			.catch(handleError)
+
 		if (instance.value?.linked_data?.project_id) {
+			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
 			const projectV3 = await get_project_v3(
 				instance.value.linked_data.project_id,
 				'must_revalidate',
 			).catch(handleError)
 			if (projectV3?.minecraft_server != null) {
+				debugLog('instance is a server instance')
 				isServerInstance.value = true
 			}
 		}
 	}
 
 	if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
+		debugLog('setting instanceHideInstalled from query', route.query.ai)
 		instanceHideInstalled.value = route.query.ai === 'true'
-	}
-
-	if (instance.value && instance.value.path !== route.query.i && route.path.startsWith('/browse')) {
-		instance.value = null
-		instanceHideInstalled.value = false
 	}
 }
 
 const instanceFilters = computed(() => {
 	const filters = []
+	debugLog('instanceFilters recomputing', {
+		hasInstance: !!instance.value,
+		isServer: isServerInstance.value,
+		hideInstalled: instanceHideInstalled.value,
+	})
 
 	if (instance.value) {
 		const gameVersion = instance.value.game_version
@@ -180,15 +191,14 @@ const instanceFilters = computed(() => {
 			})
 		}
 
-		if (instanceHideInstalled.value && instanceProjects.value) {
-			const installedMods = Object.values(instanceProjects.value)
-				.filter((x) => x.metadata)
-				.map((x) => x.metadata.project_id)
+		if (
+			instanceHideInstalled.value &&
+			(installedProjectIds.value || newlyInstalled.value.length > 0)
+		) {
+			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
 
-			installedMods.push(...newlyInstalled.value)
-
-			installedMods
-				?.map((x) => ({
+			allInstalled
+				.map((x) => ({
 					type: 'project_id',
 					option: `project_id:${x}`,
 					negative: true,
@@ -197,6 +207,7 @@ const instanceFilters = computed(() => {
 		}
 	}
 
+	debugLog('instanceFilters result', filters)
 	return filters
 })
 
@@ -221,11 +232,25 @@ const {
 	createPageParams,
 } = useSearch(projectTypes, tags, instanceFilters)
 
+const activeLoader = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'mod_loader')
+	if (filter) return filter.option
+	if (projectType.value === 'datapack' || projectType.value === 'resourcepack') return 'vanilla'
+	return instance.value?.loader ?? null
+})
+
+const activeGameVersion = computed(() => {
+	const filter = currentFilters.value.find((f) => f.type === 'game_version')
+	if (filter) return filter.option
+	return instance.value?.game_version ?? null
+})
+
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
 async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	debugLog('checkServerRunningStates', { hitCount: hits.length })
 	const packs = await listInstances()
 	const newRunning: Record<string, string> = {}
 	for (const hit of hits) {
@@ -237,10 +262,12 @@ async function checkServerRunningStates(hits: Labrinth.Search.v3.ResultSearchPro
 			}
 		}
 	}
+	debugLog('runningServerProjects updated', newRunning)
 	runningServerProjects.value = newRunning
 }
 
 async function handleStopServerProject(projectId: string) {
+	debugLog('handleStopServerProject', projectId)
 	const instancePath = runningServerProjects.value[projectId]
 	if (!instancePath) return
 	await kill(instancePath).catch(() => {})
@@ -249,18 +276,21 @@ async function handleStopServerProject(projectId: string) {
 }
 
 async function handlePlayServerProject(projectId: string) {
+	debugLog('handlePlayServerProject', projectId)
 	await playServerProject(projectId)
 	checkServerRunningStates(serverHits.value)
 }
 
 function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
+	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
 	const address = getServerAddress(project.minecraft_java_server)
 	if (!address) return
-	installStore.showAddServerToInstanceModal(project.name, address)
+	showAddServerToInstanceModal(project.name, address)
 }
 
 const unlistenProcesses = await process_listener(
 	(e: { event: string; profile_path_id: string }) => {
+		debugLog('process event', e)
 		if (e.event === 'finished') {
 			const projectId = Object.entries(runningServerProjects.value).find(
 				([, path]) => path === e.profile_path_id,
@@ -288,6 +318,7 @@ const {
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	debugLog('pingServerHits', { hitCount: hits.length })
 	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
 	await Promise.all(
 		pingsToFetch.map(async (hit) => {
@@ -303,13 +334,15 @@ async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 }
 
 const previousFilterState = ref('')
-const isRefreshing = ref(false)
+let searchVersion = 0
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
+	debugLog('went offline')
 	offline.value = true
 })
 window.addEventListener('online', () => {
+	debugLog('went online')
 	offline.value = false
 })
 
@@ -324,78 +357,97 @@ watch(projectType, () => {
 	loading.value = true
 })
 
-interface SearchResults extends Labrinth.Search.v2.SearchResults {
-	hits: (Labrinth.Search.v2.ResultSearchProject & { installed?: boolean })[]
+interface SearchResults extends Labrinth.Search.v3.SearchResults {
+	hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
 }
 
 const results: Ref<SearchResults | null> = shallowRef(null)
 const pageCount = computed(() =>
-	results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
+	results.value ? Math.ceil(results.value.total_hits / results.value.hits_per_page) : 1,
 )
 
 const effectiveRequestParams = computed(() => {
-	return projectType.value === 'server' ? serverRequestParams.value : requestParams.value
+	const isServer = projectType.value === 'server'
+	debugLog('effectiveRequestParams computed', { isServer })
+	return isServer ? serverRequestParams.value : requestParams.value
 })
 
-watch(effectiveRequestParams, async () => {
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(effectiveRequestParams, () => {
 	if (!route.params.projectType) return
-	await nextTick()
-	refreshSearch()
+	debugLog('effectiveRequestParams changed, debouncing search')
+	if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+	searchDebounceTimer = setTimeout(() => {
+		refreshSearch()
+	}, 200)
 })
 
 async function refreshSearch() {
-	if (isRefreshing.value) return
-	isRefreshing.value = true
+	const version = ++searchVersion
+	debugLog('refreshSearch start', { version, projectType: projectType.value })
 
 	try {
 		const isServer = projectType.value === 'server'
+		const searchParams = isServer ? serverRequestParams.value : requestParams.value
+
+		debugLog('searching v3', searchParams)
+		let rawResults = (await get_search_results_v3(searchParams)) as {
+			result: SearchResults
+		} | null
+
+		if (version !== searchVersion) {
+			debugLog('search version stale, discarding', { version, current: searchVersion })
+			return
+		}
+
+		if (!rawResults) {
+			rawResults = {
+				result: {
+					hits: [],
+					total_hits: 0,
+					hits_per_page: maxResults.value,
+					page: 1,
+				},
+			}
+		}
 
 		if (isServer) {
-			const rawResults = (await get_search_results_v3(serverRequestParams.value)) as {
-				result: Labrinth.Search.v3.SearchResults
-			} | null
-
-			const searchResults = rawResults?.result ?? { hits: [], total_hits: 0 }
-			const hits = searchResults.hits ?? []
+			const hits = rawResults.result.hits ?? []
+			debugLog('server search results', {
+				hitCount: hits.length,
+				totalHits: rawResults.result.total_hits,
+			})
 			serverHits.value = hits
 			serverPings.value = {}
 			pingServerHits(hits)
 			checkServerRunningStates(hits)
 			results.value = {
 				hits: [],
-				total_hits: searchResults.total_hits ?? 0,
-				limit: maxResults.value,
-				offset: 0,
+				total_hits: rawResults.result.total_hits ?? 0,
+				hits_per_page: maxResults.value,
+				page: 1,
 			}
 		} else {
-			let rawResults = (await get_search_results(requestParams.value)) as {
-				result: SearchResults
-			} | null
-
-			if (!rawResults) {
-				rawResults = {
-					result: {
-						hits: [],
-						total_hits: 0,
-						limit: 1,
-						offset: 0,
-					},
-				}
-			}
 			if (instance.value) {
-				const installedProjectIds = new Set([
+				const allInstalledIds = new Set([
 					...newlyInstalled.value,
-					...Object.values(instanceProjects.value ?? {})
-						.filter((x) => x.metadata)
-						.map((x) => x.metadata.project_id),
+					...(installedProjectIds.value ?? []),
 				])
 
 				rawResults.result.hits = rawResults.result.hits.map((val) => ({
 					...val,
-					installed: installedProjectIds.has(val.project_id),
+					installed: allInstalledIds.has(val.project_id),
 				}))
 			}
-			results.value = rawResults.result
+			debugLog('v3 search results', {
+				hitCount: rawResults.result.hits.length,
+				totalHits: rawResults.result.total_hits,
+			})
+			results.value = {
+				...rawResults.result,
+				hits_per_page: maxResults.value,
+			}
 		}
 
 		const currentFilterState = JSON.stringify({
@@ -407,6 +459,7 @@ async function refreshSearch() {
 		})
 
 		if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
+			debugLog('filters changed, resetting to page 1')
 			currentPage.value = 1
 		}
 
@@ -436,25 +489,21 @@ async function refreshSearch() {
 			link: `/browse/${projectType.value}`,
 			query: params,
 		})
-		const queryString = Object.entries(params)
-			.flatMap(([key, value]) => {
-				const values = Array.isArray(value) ? value : [value]
-				return values
-					.filter((v): v is string => v != null)
-					.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
-			})
-			.join('&')
-		const newUrl = `${route.path}${queryString ? '?' + queryString : ''}`
-		window.history.replaceState(window.history.state, '', newUrl)
-	} catch (err) {
-		console.error('Error refreshing search:', err)
-	} finally {
+		debugLog('updating URL', params)
+		router.replace({ path: route.path, query: params })
+
 		loading.value = false
-		isRefreshing.value = false
+		debugLog('refreshSearch complete', { version })
+	} catch (err) {
+		debugLog('refreshSearch error', err)
+		if (version === searchVersion) {
+			loading.value = false
+		}
 	}
 }
 
 async function setPage(newPageNumber: number) {
+	debugLog('setPage', newPageNumber)
 	currentPage.value = newPageNumber
 
 	await onSearchChangeToTop()
@@ -469,6 +518,7 @@ async function onSearchChangeToTop() {
 }
 
 function clearSearch() {
+	debugLog('clearSearch')
 	query.value = ''
 	currentPage.value = 1
 }
@@ -479,6 +529,7 @@ watch(
 		// Check if the newType is not the same as the current value
 		if (!newType || newType === projectType.value) return
 
+		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
 		currentSortType.value = { display: 'Relevance', name: 'relevance' }
@@ -495,7 +546,8 @@ const selectableProjectTypes = computed(() => {
 		if (
 			availableGameVersions.value &&
 			availableGameVersions.value.findIndex((x) => x.version === instance.value?.game_version) <=
-				availableGameVersions.value.findIndex((x) => x.version === '1.13')
+				availableGameVersions.value.findIndex((x) => x.version === '1.13') &&
+			!isServerInstance.value
 		) {
 			dataPacks = true
 		}
@@ -614,16 +666,17 @@ const handleRightClick = (event, result) => {
 const handleOptionsClick = (args) => {
 	switch (args.option) {
 		case 'open_link':
-			openUrl(`https://modrinth.com/${args.item.project_type}/${args.item.slug}`)
+			openUrl(`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`)
 			break
 		case 'copy_link':
 			navigator.clipboard.writeText(
-				`https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+				`https://modrinth.com/${args.item.project_types?.[0] ?? 'project'}/${args.item.slug}`,
 			)
 			break
 	}
 }
 
+debugLog('performing initial search')
 await refreshSearch()
 
 // Initialize previousFilterState after first search
@@ -829,7 +882,7 @@ previousFilterState.value = JSON.stringify({
 						exclude-loaders
 						@contextmenu.prevent.stop="
 							(event: any) =>
-								handleRightClick(event, { project_type: 'server', slug: project.slug })
+								handleRightClick(event, { project_types: ['server'], slug: project.slug })
 						"
 					>
 						<template #actions>
@@ -854,18 +907,12 @@ previousFilterState.value = JSON.stringify({
 								</ButtonStyled>
 								<ButtonStyled v-else color="brand" type="outlined">
 									<button
-										:disabled="
-											(installStore.installingServerProjects as string[]).includes(
-												project.project_id,
-											)
-										"
+										:disabled="(installingServerProjects as string[]).includes(project.project_id)"
 										@click="() => handlePlayServerProject(project.project_id)"
 									>
 										<PlayIcon />
 										{{
-											(installStore.installingServerProjects as string[]).includes(
-												project.project_id,
-											)
+											(installingServerProjects as string[]).includes(project.project_id)
 												? 'Installing...'
 												: 'Play'
 										}}
@@ -882,7 +929,20 @@ previousFilterState.value = JSON.stringify({
 						:project-type="projectType"
 						:project="result"
 						:instance="instance ?? undefined"
-						:installed="result.installed || newlyInstalled.includes(result.project_id || '')"
+						:active-loader="activeLoader ?? undefined"
+						:active-game-version="activeGameVersion ?? undefined"
+						:categories="[
+							...(categories ?? []).filter(
+								(cat) =>
+									result?.display_categories.includes(cat.name) && cat.project_type === projectType,
+							),
+							...(loaders ?? []).filter(
+								(loader) =>
+									result?.display_categories.includes(loader.name) &&
+									loader.supported_project_types?.includes(projectType),
+							),
+						]"
+						:installed="result.installed || allInstalledIds.has(result.project_id || '')"
 						@install="
 							(id) => {
 								newlyInstalled.push(id)

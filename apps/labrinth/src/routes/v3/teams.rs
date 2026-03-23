@@ -904,7 +904,7 @@ pub async fn transfer_ownership(
             && project_item.inner.organization_id.is_some()
         {
             return Err(ApiError::InvalidInput(
-                    "You cannot transfer ownership of a project team that is owend by an organization"
+                    "You cannot transfer ownership of a project team that is owned by an organization"
                         .to_string(),
                 ));
         }

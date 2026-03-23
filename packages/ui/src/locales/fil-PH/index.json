@@ -113,6 +113,9 @@
   "button.remove-image": {
     "defaultMessage": "Tanggalin ang imahe"
   },
+  "button.repair": {
+    "defaultMessage": "Ayusin"
+  },
   "button.report": {
     "defaultMessage": "Isumbong"
   },
@@ -169,6 +172,60 @@
   },
   "collections.label.private": {
     "defaultMessage": "Pribado"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Ang kahit anong mod o kontentong dinagdag sa itaas ng modpack ay matatanggal."
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "I-unlink"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Dinagdag (dependency)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Tinanggal"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Na-update"
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Matagumpay na nilikha ang backup"
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Kasalukuyang nagba-backup, inimumungkahi na maghintay upang matapos ito bago magawa ang aksiyong ito."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Lumikha ng backup"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Idiin ang Shift habang pumipindot upang laktawan ang kumpirmasyon."
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Karagdagang kontento"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Dargdagan ng karagdagang kontento sa itaas ng modpack na ito"
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Mangyaring maghintay"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Ibahagi"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alpabetiko"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Pinakabago ang mauuna"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Pinakaluma ang mauuna"
+  },
+  "content.selection-bar.disable": {
+    "defaultMessage": "Patayin"
+  },
+  "content.selection-bar.enable": {
+    "defaultMessage": "Buksan"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -311,6 +368,15 @@
   "input.view.list": {
     "defaultMessage": "Tanawing row"
   },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Kumpirmahin"
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Mag-unlink"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Ayusin"
+  },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Modong panglakbayan"
   },
@@ -326,8 +392,14 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Hindi kilalang modo ng laro"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "I-unlink ang modpack"
+  "instances.content-install.install-button": {
+    "defaultMessage": "I-install"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Loader"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Pangalan"
   },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Bumalik"
@@ -335,17 +407,11 @@
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Kopyahin ang link"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Nakapatay"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Walang mahanap na kontento"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Nakabukas"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "Lahat"
@@ -360,19 +426,13 @@
     "defaultMessage": "Walang proyektong tumugma sa iyong paghanap."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Maghanap nang {count} proyekto"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} pinili"
+    "defaultMessage": "Maghanap sa {count, number} {count, plural, one {proyekto} other {na proyekto}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Kasalukuyan"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Hindi magkatugma"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Ibaba sa v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "I-update ang bersiyon"
@@ -394,15 +454,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Ipakita ang hindi magkatugma"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "I-update sa v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Hindi namin matantiya na ligtas ang update para sa iyong instansiya. Siyasatin ang changelog para sa lahat ng pumagitnang bersiyon at isaalang-alang na mag-backup."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Hindi namin matantiya na ligtas ang update para sa iyong mundo. Siyasatin ang changelog para sa lahat ng pumagitnang bersiyon at isaalang-alang na mag-backup."
   },
   "label.actions": {
     "defaultMessage": "Mga Aksiyon"
@@ -434,6 +485,9 @@
   "label.delete": {
     "defaultMessage": "Tanggalin"
   },
+  "label.delete-immediately": {
+    "defaultMessage": "Tanggalin kaagad"
+  },
   "label.description": {
     "defaultMessage": "Paglalarawan"
   },
@@ -461,6 +515,9 @@
   "label.moderation": {
     "defaultMessage": "Moderasyon"
   },
+  "label.modpack": {
+    "defaultMessage": "Modpack"
+  },
   "label.no": {
     "defaultMessage": "Hindi"
   },
@@ -477,7 +534,7 @@
     "defaultMessage": "Password"
   },
   "label.played": {
-    "defaultMessage": "Naglaro {time}"
+    "defaultMessage": "Linaro {ago}"
   },
   "label.project": {
     "defaultMessage": "Proyekto"
@@ -495,7 +552,7 @@
     "defaultMessage": "Na-save"
   },
   "label.scopes": {
-    "defaultMessage": "Mga Sakop"
+    "defaultMessage": "Mga sakop"
   },
   "label.search": {
     "defaultMessage": "Maghanap"
@@ -541,6 +598,102 @@
   },
   "label.yes": {
     "defaultMessage": "Oo"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "Tseko"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Danes"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Jerman (Suwisa)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Jerman (Alemanya)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Ingles (Estados Unidos)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Espanyol (Amerikanong Latino)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Espanyol (Espanya)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Finlandes"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipino"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Pranses"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebreo"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Ungaro"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indones"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italyano (Italya)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Hapon"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Koreano"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malayo"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Olandes"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norwegong Bokmål"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polako"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portuges (Brasil)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portuges (Portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Rumano"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Ruso"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbiyo (Latin)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Suweko"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Taylandes"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turko"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukranyo"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Biyetnamita"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Tsino (Simple)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Tsino (Tradisyonal)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Magdagdag ng paraan ng pagbabayad"
@@ -721,6 +874,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Inilathala {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "In-update {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
@@ -912,16 +1071,16 @@
     "defaultMessage": "Detalye ng server"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {download} other {na download}}"
+    "defaultMessage": "{count, number} {count, plural, one {download} other {na download}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
+    "defaultMessage": "Kinakailangan sa client at sa server."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client at server, kailangan sa dalawa"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
+    "defaultMessage": "Karamihan sa mga tungkulin ay nasa panig ng client, ngunit kapag na-install sa server ay makapagbubukas ng pinahusay na tungkulin."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client at server, di-sapilitan sa server"
@@ -933,7 +1092,7 @@
     "defaultMessage": "Panig ng client lamang"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
+    "defaultMessage": "May mga tungkulin sa client at server, kahit bahagya lamang. Sa pag-install nito sa dalawa ay magreresulta sa pinakamahusay na karanasan."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client at server, pinakamainam kapag na-install sa dalawa"
@@ -945,19 +1104,19 @@
     "defaultMessage": "Client at server, di-sapilitan sa dalawa"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at uugma sa mga vanilla client. Gagana lamang sa mga dedikadong server."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Panig ng server lamang"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "May mga tungkulin sa client at server, o kaya bahagya lamang."
+    "defaultMessage": "Karamihan sa mga tungkulin ay nasa panig ng server, ngunit kapag na-install sa client ay makapagbubukas ng pinahusay na tungkulin."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client at server, di-sapilitan sa client"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at maaaring gumana sa mga vanilla client."
+    "defaultMessage": "Lahat ng mga tungkulin ay nasa panig ng server at uugma sa mga vanilla client. Gagana rin sa internal server ng pang-isahang laro."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Sa panig ng server lamang, gagana rin sa pang-isahang laro"
@@ -981,16 +1140,22 @@
     "defaultMessage": "Hindi kilalang environment"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {follower} other {na follower}}"
+    "defaultMessage": "{count, number} {count, plural, one {follower} other {na follower}}"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {online} other {na online}}"
+    "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {online na manlalaro} other {na online na manlalaro}}"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {kamakailang paglaro} other {na kamakailang paglaro}}"
+    "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}} galing sa Modrinth sa nakalipas na 2 linggo"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitika"
@@ -1229,14 +1394,26 @@
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
   },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "May maling nangyari habang nililikha ang {backupName}. Mangyaring subukan muli o abutin ang suporta kung magpapatuloy ang suliranin."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Nabigo ang pag-backup"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "Ang {backupName} ay nakalinya at magsisimula sa madaling panahon."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Nakalinya ang backup"
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Nililikha ang backup"
+  },
   "servers.backups.item.auto": {
     "defaultMessage": "Auto"
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Backup schedule"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Naglilikha ng backup..."
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Bigong makalikha ng backup"
@@ -1247,20 +1424,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manual backup"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Backup queued"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Restore queued"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "I-rename"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "I-restore"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Nag-restore galing sa backup..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Alisin"
@@ -1357,6 +1525,9 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "Kanlurang Yuropa"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Isang di-inaasahang kamaliang nangyari habang nagre-reinstall. Mangyraing subukan muli makaya."
   },
   "settings.account.title": {
     "defaultMessage": "Account at seguridad"
@@ -1861,9 +2032,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} sa {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Mayroon kang hindi na-save na pagbabago."

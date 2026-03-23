@@ -182,14 +182,11 @@
 					<div class="push-right">
 						<div class="labeled-control-row">
 							Sort by
-							<Multiselect
+							<Combobox
 								v-model="sortBy"
 								:searchable="false"
 								class="small-select"
-								:options="['Name', 'Status', 'Type']"
-								:close-on-select="true"
-								:show-labels="false"
-								:allow-empty="false"
+								:options="sortOptions"
 								@update:model-value="projects = updateSort(projects, sortBy, descending)"
 							/>
 							<button
@@ -323,6 +320,7 @@ import {
 	Avatar,
 	ButtonStyled,
 	Checkbox,
+	Combobox,
 	commonMessages,
 	CopyCode,
 	injectNotificationManager,
@@ -332,7 +330,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -356,6 +353,11 @@ const projects = ref([])
 const projectsWithMigrationWarning = ref([])
 const selectedProjects = ref([])
 const sortBy = ref('Name')
+const sortOptions = [
+	{ value: 'Name', label: 'Name' },
+	{ value: 'Status', label: 'Status' },
+	{ value: 'Type', label: 'Type' },
+]
 const descending = ref(false)
 const editLinks = reactive({
 	showAffected: false,

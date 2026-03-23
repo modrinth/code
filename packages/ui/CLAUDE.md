@@ -8,6 +8,7 @@ The shared UI package used by both `apps/frontend` (Nuxt 3) and `apps/app-fronte
 src/
 ├── components/       # Vue components organized by feature domain
 ├── composables/      # Vue 3 composition API hooks
+├── layouts/          # Self-contained page layouts (see below)
 ├── providers/        # Dependency injection contexts (createContext pattern)
 ├── utils/            # Utility functions and constants
 ├── pages/            # Cross platform page components (used in both app-frontend and frontend)
@@ -17,6 +18,15 @@ src/
 ```
 
 Each subdirectory under `components/` has an `index.ts` barrel file. All public API is re-exported from the root `index.ts`.
+
+### `src/layouts/`
+
+Self-contained page layouts shared across frontends. Split into two categories:
+
+- **`shared/`** — Reusable layout modules with their own components, composables, providers, and types. Each module is a self-contained unit (e.g. `shared/content-tab/` contains the content/mods tab layout with its own `layout.vue`, `components/`, `composables/`, `providers/`, and `types.ts`).
+- **`wrapped/`** — Page-level Vue components that mirror route structures (e.g. `wrapped/hosting/manage/`). These are full page implementations consumed by both `apps/frontend` and `apps/app-frontend`.
+
+Files inside `layouts/` use the `#ui/*` import alias (resolved via the `"imports"` field in `package.json`) to reference other `src/` modules like `#ui/components/base/ButtonStyled.vue` or `#ui/composables/i18n`.
 
 # Code Guidelines
 

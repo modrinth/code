@@ -1,12 +1,12 @@
 [package]
 name = "async-minecraft-ping"
 version = "0.8.0"
-authors = ["Jay Vana <jaysvana@gmail.com>"]
+# authors = ["Jay Vana <jaysvana@gmail.com>"] # deprecated
 edition = "2021"
-license = "MIT OR Apache-2.0"
 description = "An async Rust client for the Minecraft ServerListPing protocol"
 readme = "README.md"
 repository = "https://github.com/jsvana/async-minecraft-ping/"
+license = "MIT OR Apache-2.0"
 keywords = ["mc", "minecraft", "serverlistping"]
 categories = ["api-bindings", "asynchronous"]
 

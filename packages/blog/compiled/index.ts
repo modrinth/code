@@ -4,6 +4,7 @@ import { article as accelerating_development } from "./accelerating_development"
 import { article as becoming_sustainable } from "./becoming_sustainable";
 import { article as capital_return } from "./capital_return";
 import { article as carbon_ads } from "./carbon_ads";
+import { article as content_management_overhaul } from "./content_management_overhaul";
 import { article as creator_monetization } from "./creator_monetization";
 import { article as creator_update } from "./creator_update";
 import { article as creator_updates_july_2025 } from "./creator_updates_july_2025";
@@ -41,6 +42,7 @@ export const articles = [
   becoming_sustainable,
   capital_return,
   carbon_ads,
+  content_management_overhaul,
   creator_monetization,
   creator_update,
   creator_updates_july_2025,

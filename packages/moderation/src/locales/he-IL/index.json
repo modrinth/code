@@ -11,14 +11,32 @@
   "nags.add-icon.title": {
     "defaultMessage": "הוסף אייקון"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "הוסף את כתובת ה-IP והפורט שבהם נגני Java Edition יכולים להשתמש כדי להצטרף לשרת שלך."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "הוסף כתובת ג'אווה"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "הוסיפו קישורים רלוונטיים מחוץ ל-Modrinth, כגון אתר אינטרנט, חנות או הזמנה לדיסקורד."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "הוסף קישורים חיצוניים"
+  },
   "nags.add-links.description": {
     "defaultMessage": "הוסף קישורים רלוונטיים מחוץ ל-Modrinth, כגון קוד מקור, מעקב אחר בעיות או הזמנה לשרת דיסקורד."
   },
   "nags.add-links.title": {
     "defaultMessage": "הוסף קישורים חיצוניים"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "בחרת את כל {totalAvailableTags, plural, one {# תג זמין} other {# תגיות זמינות}}. זה סותר את המטרה של תגים, שנועדו לעזור למשתמשים למצוא פרויקטים רלוונטיים. אנא בחר רק את התגים הרלוונטיים לפרויקט שלך."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "בחר תגיות מדויקות"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "התיאור שלך הוא {length, plural, one {# דמות} other {# דמויות}}. מומלץ להשתמש לפחות ב-{minChars, plural, one {# דמות} other {# דמויות}} כדי ליצור תיאור ברור ואינפורמטיבי."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "הרחב את התיאור"
@@ -47,8 +65,17 @@
   "nags.gallery.title": {
     "defaultMessage": "בקר בדף הגלריה"
   },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "התוסף {סוג, select, מוד{מוד} תוסף{תוסף} other {פרויקט}} שלך משתמש ברישיון הדורש זמינות של קוד מקור. אנא ספק קישור לקוד מקור או קובץ מקורות עבור כל גרסה נוספת, או שקול להשתמש ברישיון אחר."
+  },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ספק קוד מקור"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "חלק מהקישורים החיצוניים שלך נראים זהים. יש להזין כל קישור פעם אחת בלבד ועם סוג הקישור המתאים."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "קישורים זהים"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "התיאור שלך צריך להכיל מספיק טקסט פשוט או טקסט חלופי לתמונה, כדי שיישאר נגיש למשתמשים עם הקראות מסך או חיבורי אינטרנט איטיים."
@@ -104,8 +131,29 @@
   "nags.moderator-feedback.description": {
     "defaultMessage": "עיין בחוות הדעת של צוות הפיקוח והבקרה וטפל בכל הבעיות לפני הגשה חוזרת."
   },
+  "nags.moderator-feedback.title": {
+    "defaultMessage": "משוב סקירה"
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "בחר רזולוציה נכונה"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "בחר באילו גרסאות השרת שלך תומך, בחר חבילת מודדים, או העלה משלך."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "בחר תאימות"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "תן לשחקנים לדעת באיזה אזור נמצא השרת שלך."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "בחר אזור"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "רשום את השפה או השפות הנתמכות על ידי השרת שלך."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "בחירת שפה"
   },
   "nags.select-license.title": {
     "defaultMessage": "בחירת רישיון"
@@ -115,6 +163,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "בחר תגיות"
+  },
+  "nags.server.title": {
+    "defaultMessage": "בקר בהגדרות השרת"
   },
   "nags.settings.description.title": {
     "defaultMessage": "בקר בהגדרות התיאור"
@@ -146,8 +197,14 @@
   "nags.summary-too-short.title": {
     "defaultMessage": "הארך את התקציר"
   },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "שמירה על שם הפרויקט נקי הופכת אותו לזכיר וקל יותר למציאה. פרטי הגרסה והטוען מוצגים אוטומטית לצד הפרויקט."
+  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "נקה את השם"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "בחר תגים מדוייקים"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "בחר תגים מדוייקים"

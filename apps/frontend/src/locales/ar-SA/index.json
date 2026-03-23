@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "خيارات التنزيل"
   },
-  "app-marketing.download.terms": {
-    "message": "خلال تنزيل Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "تنزيل Modrinth App (النسخة التجريبية)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "يعمل Modrinth App بشكل أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
   },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "لا توجد مشروعات في هذه المجموعة حتي الآن"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {لا توجد مشاريع بعد} one {<stat>{count}</stat> مشروع} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
   },
@@ -554,9 +545,6 @@
   "dashboard.collections.button.create-new": {
     "message": "إنشاء جديد"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": ""
-  },
   "dashboard.collections.label.search-input": {
     "message": "ابحث في مجموعاتك"
   },
@@ -631,9 +619,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "تشير الكيان التجاري إلى منظمة مسجلة مثل شركة مساهمة أو شراكة أو شركة ذات مسؤولية محدودة."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "هل تقوم بالسحب كفرد أم كشركة؟"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "فرد خاص"
@@ -1078,9 +1063,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "هل تعرف بالضبط ما تحتاجه؟"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "جرب <orange>خادم 3 جيجابايت</orange> مجاني لمدة 5 أيام بدعم من <orange>Medal</orange>"
   },
   "hosting-marketing.medal.text-secondary": {
     "message": "عرض لفترة محدودة. لا حاجة لبطاقة ائتمان. متوفر للخوادم الأمريكية."

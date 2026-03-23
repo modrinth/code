@@ -200,6 +200,7 @@ const developerModeCounter = ref(0)
 const state = useGeneratedState()
 
 function developerModeIncrement() {
+	developerModeCounter.value++
 	if (developerModeCounter.value >= 5) {
 		flags.value.developerMode = !flags.value.developerMode
 		developerModeCounter.value = 0
@@ -217,8 +218,6 @@ function developerModeIncrement() {
 				type: 'success',
 			})
 		}
-	} else {
-		developerModeCounter.value++
 	}
 }
 </script>

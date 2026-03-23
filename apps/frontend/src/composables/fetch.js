@@ -3,6 +3,8 @@
  * This composable is kept for legacy code that hasn't been migrated yet.
  */
 
+import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
+
 let cachedRateLimitKey = undefined
 let rateLimitKeyPromise = undefined
 
@@ -33,6 +35,8 @@ export const useBaseFetch = async (url, options = {}, skipAuth = false) => {
 	if (!options.headers) {
 		options.headers = {}
 	}
+
+	options.headers = withLabrinthCanaryHeader(options.headers)
 
 	if (import.meta.server) {
 		options.headers['x-ratelimit-key'] = await getRateLimitKey(config)

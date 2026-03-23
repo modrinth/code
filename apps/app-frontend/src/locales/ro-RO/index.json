@@ -5,8 +5,44 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
   },
+  "app.instance.mods.copy-link": {
+    "message": "Copiază linkul"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "Conținut necesar"
+  },
+  "app.modal.install-to-play.header": {
+    "message": "Instalați pentru a juca"
+  },
   "app.modal.install-to-play.install-button": {
     "message": "Instalează"
+  },
+  "app.modal.install-to-play.mod-count": {
+    "message": "{count, plural,one {#mod} other {# moduri}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Pachet de mod necesar"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Acest server necesită modificări pentru a juca. Faceți clic pe Instalare pentru a configura fișierele necesare din Modrinth, apoi lansați direct pe server."
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "Instanță comună"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "Instanță de server partajată"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Vizualizați conținutul"
+  },
+  "app.modal.update-to-play.header": {
+    "message": "Actualizați pentru a juca"
+  },
+  "app.modal.update-to-play.update-required": {
+    "message": "Actualizare necesară"
+  },
+  "app.modal.update-to-play.update-required-description": {
+    "message": "Este necesară o actualizare pentru a juca {name}. Vă rugăm să actualizați la cea mai recentă versiune pentru a lansa jocul."
   },
   "app.settings.developer-mode-enabled": {
     "message": "Modul dezvoltator activat."
@@ -35,6 +71,33 @@
   "app.settings.tabs.resource-management": {
     "message": "Administrare resurse"
   },
+  "app.update-popup.body": {
+    "message": "Aplicația Modrinth v{version} este gata de instalat! Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Aplicația Modrinth v{version} a terminat descărcarea. Reîncărcați pentru a actualiza acum sau automat când închideți aplicația Modrinth."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Aplicația Modrinth v{version} este disponibil. Utilizați managerul de pachete pentru a actualiza pentru cele mai recente funcții și remedieri!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Aplicația Modrinth v{version} este disponibil acum! Deoarece sunteți într-o rețea cu contorizare, nu am descărcat-o automat."
+  },
+  "app.update-popup.changelog": {
+    "message": "Jurnalul modificărilor"
+  },
+  "app.update-popup.download": {
+    "message": "Descărcați ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "Descărcare finalizată"
+  },
+  "app.update-popup.reload": {
+    "message": "Reîncărcați"
+  },
+  "app.update-popup.title": {
+    "message": "Actualizare disponibilă"
+  },
   "app.update.complete-toast.text": {
     "message": "Apasă aici pentru a vedea istoricul de modificări."
   },
@@ -52,6 +115,9 @@
   },
   "friends.action.add-friend": {
     "message": "Adaugă un prieten"
+  },
+  "friends.action.view-friend-requests": {
+    "message": "{count} prieten {count, plural,one {cerere} other {cerere}}"
   },
   "friends.add-friend.submit": {
     "message": "Trimite cerere de prietenie"
@@ -104,6 +170,9 @@
   "friends.search-friends-placeholder": {
     "message": "Caută prieteni..."
   },
+  "friends.section.heading": {
+    "message": "{title} - {count}"
+  },
   "friends.sign-in-to-add-friends": {
     "message": "<link>Conectează-te la un cont Modrinth</link> pentru a adăuga prieteni și a vedea ce joacă!"
   },
@@ -142,12 +211,6 @@
   },
   "instance.edit-world.title": {
     "message": "Editează lumea"
-  },
-  "instance.filter.disabled": {
-    "message": "Proiecte dezactivate"
-  },
-  "instance.filter.updates-available": {
-    "message": "Actualizări disponibile"
   },
   "instance.server-modal.address": {
     "message": "Adresă"
@@ -257,140 +320,8 @@
   "instance.settings.tabs.installation": {
     "message": "Instalare"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Versiunea {version} a platformei {platform} pentru Minecraft {game_version} este deja instalată"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Versiunea Vanilla {game_version} este deja instalată"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Schimbă versiunea"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Instalează"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Se instalează"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Se obțin versiunile pachetului de moduri"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Se instalează noua versiune"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Instalat în prezent"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Informații de depanare:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Se obțin detaliile pachetului de moduri"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Versiune joc"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Instalează"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Instalare în progres"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versiune {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Nu s-au putut obține detaliile pachetului de moduri. Te tog verifică-ți conexiunea la internet."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} nu este valabil pentru Minecraft {version}. Te rog încercă alt loader de moduri."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Instanța este legată de un pachet de moduri, dar pachetul de moduri nu a putut fi găsit pe Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platformă"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Reinstalează pachetul de moduri"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Se reinstalează pachetul de moduri"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Reinstalarea va reseta tot conținutul instalat sau modificat la starea inițială a pachetului de moduri, eliminând orice moduri sau conținut pe care le-ai adăugat tu. Acest lucru poate rezolva un comportament neașteptat dacă s-au făcut modificări instanței, dar dacă lumile tale depind acum de conținut suplimentar instalat, este posibil ca ele să nu mai funcționeze corect."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Ești sigur că dorești să reinstalezi această instanță?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Resetează conținutul instanței la starea sa inițială, eliminând orice moduri sau conținut pe care le-ai adăugat peste pachetul de moduri original."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Reinstalează pachetul de moduri"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Repară"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Se repară"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Repararea reinstalează dependențele Minecraft și verifică dacă există corupție. Acest lucru poate rezolva problemele în cazul în care jocul tău nu pornește din cauza erorilor legate de lansator, dar nu va rezolva problemele sau blocările legate de modurile instalate."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Repară instanța?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Repararea în progres"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Resetează la starea actuală"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Afișează toate versiunile"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "schimbă versiunea"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "instalează"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "reinstalează"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "repară"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Nu poți {action} în timp ce se instalează"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Nu poți {action} în timp ce ești neconectat"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Nu poți {action} în timp ce se repară"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(versiune necunoscută)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Dezleagă instanța"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Dacă continui, nu o vei mai putea lega din nou fără a crea o instanță complet nouă. Nu vei mai primi actualizări ale pachetului de moduri, iar acesta va deveni o instanță normală."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Ești sigur că dorești să dezlegi această instanță?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Această instanță este legată de un pachet de moduri, ceea ce înseamnă că modurile nu pot fi actualizate și nu poți schimba loader-ul de moduri sau versiunea de Minecraft. Dezlegarea va deconecta permanent această instanță de pachetul de moduri."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Dezleagă de pachetul de moduri"
   },
   "instance.settings.tabs.java": {
     "message": "Java și memorie"
@@ -464,6 +395,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Serverul este incompatibil"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gestionat de proiect server"
+  },
   "instance.worlds.no_contact": {
     "message": "Serverul nu a putut fi contactat"
   },
@@ -499,5 +433,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizează cu instanța"
+  },
+  "search.filter.locked.server": {
+    "message": "Furnizat de server"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Numai modurile de pe partea clientului pot fi adăugate la instanța serverului"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versiunea jocului este furnizată de server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Încărcătorul este furnizat de server"
   }
 }

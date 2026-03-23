@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "İndirme seçenekleri"
   },
-  "app-marketing.download.terms": {
-    "message": "Modrinth App indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
-  },
   "app-marketing.download.title": {
     "message": "Modrinth App'i İndir (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Modrinth App, öne çıkan çoğu mod yöneticisinden daha hafiftir, sadece 150mb RAM kullanır!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Koleksiyonda henüz proje yok"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Henüz proje yok} one {<stat>{count}</stat> proje} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "{ago} güncellendi"
   },
@@ -578,9 +569,6 @@
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proje} other {{count} proje}}"
-  },
   "dashboard.collections.label.search-input": {
     "message": "Koleksiyonlarında ara"
   },
@@ -655,9 +643,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Bireysel mi yoksa işletme olarak mı para çekiyorsunuz?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Özel şahıs"
@@ -1130,9 +1115,6 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
   },
-  "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Evet. Tüm Modrinth Hosting sunucuları, bazı konumlarda 17 Tbps'ye kadar kapasiteye sahip DDoS koruması ile birlikte gelir."
-  },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
   },
@@ -1237,9 +1219,6 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "İhtiyacınız olan şeyi tam olarak biliyor musunuz?"
-  },
-  "hosting-marketing.medal.info": {
-    "message": "<orange>Medal</orange> tarafından desteklenen 5 gün boyunca ücretsiz <orange>3 Gb sunucu</orange> deneyin"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Daha fazla öğrenin"
@@ -1423,9 +1402,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "{count}+ içerik keşfedin"
   },
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
@@ -2027,9 +2003,6 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {indirme} other {indirme}}"
-  },
   "profile.label.joined": {
     "message": "Katılma:"
   },
@@ -2047,9 +2020,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizasyonlar"
-  },
-  "profile.label.projects": {
-    "message": "{count}{count, plural, one { proje} other { proje}}"
   },
   "profile.label.saving": {
     "message": "Kaydediliyor..."
@@ -2771,9 +2741,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sunucuyla eşle"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Yedek geri yükleme devam ediyor"
-  },
   "servers.notice.actions": {
     "message": "Eylemler"
   },
@@ -2826,7 +2793,7 @@
     "message": "Daha fazla ekle"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": ""
+    "message": "Yönlendirme URI'ları ekle"
   },
   "settings.applications.button.cancel": {
     "message": "İptal"
@@ -3049,9 +3016,6 @@
   },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
-  },
-  "settings.pats.description": {
-    "message": "PAT'lar Modrinth'in API'sine erişmekte kullanılabilir. Daha fazla bilgi için, <doc-link>Modrinth API dokümantasyonununa</doc-link>na bakın. Bunlar her zaman oluşturulabilir veya iptal edilebilir."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT oluştur"

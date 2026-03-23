@@ -21,6 +21,16 @@ export function fetchSegmented<T>(
 	).then((results) => results.flat())
 }
 
+export function fetchSegmentedWith<TId, TResult>(
+	data: TId[],
+	fetchFn: (ids: TId[]) => Promise<TResult[]>,
+	segmentSize = 800,
+): Promise<TResult[]> {
+	return Promise.all(segmentData(data, segmentSize).map((ids) => fetchFn(ids))).then((results) =>
+		results.flat(),
+	)
+}
+
 export function asEncodedJsonArray<T>(data: T[]): string {
 	return encodeURIComponent(JSON.stringify(data))
 }

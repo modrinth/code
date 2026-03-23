@@ -270,7 +270,7 @@
     "defaultMessage": "Wpływ na wydajność"
   },
   "header.category.resolutions": {
-    "defaultMessage": "Rozdzielczości"
+    "defaultMessage": "Rozdzielczość"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Możliwość burstu do {cpus} procesorów"
@@ -326,26 +326,17 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Nieznany tryb gry"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Rozłącz od paczki modów"
-  },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Powrót"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Kopiuj łącze"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Wyłącz"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Ta paczka modów nie zawiera żadnych innych treści."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nie znaleziono treści"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Włącz"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "Wszystko"
@@ -360,19 +351,13 @@
     "defaultMessage": "Nie znaleziono żadnego projektu pasującego do Twojego wyszukiwania."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Szukaj wśród {count} {count, plural, one {projektu} other {projektów}}"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "Wybrano {count}"
+    "defaultMessage": "Szukaj wśród {count, number} {count, plural, one {projektu} other {projektów}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Aktualny"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Niekompatybilny"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Powrót do v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Zaktualizuj wersje"
@@ -394,15 +379,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Pokaż niekompatybilne"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Zaktualizuj do v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Nie możemy zapewnić, że aktualizacje są bezpieczne dla twojej instalacji. Przejrzyj dziennik zmian wszystkich wersji między starą a aktualną i rozważ zrobienie kopii zapasowej."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Nie możemy zagwarantować, że aktualizacje są bezpieczna dla Twoich światów. Przejrzyj dzienniki zmian dla wszystkich wersji między starą a aktualną i rozważ zrobienie kopii zapasowej."
   },
   "label.actions": {
     "defaultMessage": "Akcje"
@@ -477,7 +453,7 @@
     "defaultMessage": "Hasło"
   },
   "label.played": {
-    "defaultMessage": "Grano {time}"
+    "defaultMessage": "Grano {ago}"
   },
   "label.project": {
     "defaultMessage": "Projekt"
@@ -541,6 +517,102 @@
   },
   "label.yes": {
     "defaultMessage": "Tak"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "Czeski"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Duński"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Niemiecki (Szwajcaria)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Niemiecki (Niemcy)"
+  },
+  "locale.en-US": {
+    "defaultMessage": "Angielski (Stany Zjednoczone)"
+  },
+  "locale.es-419": {
+    "defaultMessage": "Hiszpański (Ameryka Łacińska)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Hiszpański (Hiszpania)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Fiński"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipiński"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Francuski"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebrajski"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Węgierski"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonezyjski"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Włoski (Włochy)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japoński"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Koreański"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malajski"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Holenderski"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norweski (Książkowy)"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polski"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portugalski (Brazylia)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portugalski (Portugalia)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Rumuński"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Rosyjski"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbski (Łaciński)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Szwedzki"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Tajski"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turecki"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukraiński"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Wietnamski"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Chiński (Uproszczony)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Chiński (Tradycyjny)"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Dodaj metodę płatności"
@@ -721,6 +793,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Opublikowany {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Zaktualizowany {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Klient"
@@ -912,16 +990,16 @@
     "defaultMessage": "Szczegóły o serwerze"
   },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
+    "defaultMessage": "{count, number} {count, plural, one {pobranie} few {pobrania} other {pobrań}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Wymagany i na kliencie, i na serwerze."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Klient i serwer, wymagane po obu stronach"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta, jak i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Większość funkcji jest po stronie klienta, ale zainstalowanie po stronie serwera umożliwia korzystanie z dodatkowych funkcji."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Klient i serwer, opcjonalne na serwerze"
@@ -933,7 +1011,7 @@
     "defaultMessage": "Tylko po stronie klienta"
   },
   "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta, jak i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Ma funkcjonalność i po stronie klienta, i po stronie serwera, nawet jeśli tylko częściowo. Zainstalowanie po obu stronach daje najlepsze rezultaty."
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient i serwer, najlepiej zainstalowane po obu stronach"
@@ -945,19 +1023,19 @@
     "defaultMessage": "Klient i serwer, opcjonalne po obu stronach"
   },
   "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
+    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla. Działa tylko na serwerach dedykowanych."
   },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Tylko po stronie serwera"
   },
   "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Posiada pewne funkcje zarówno po stronie klienta i serwera, nawet jeśli tylko częściowo."
+    "defaultMessage": "Większość funkcji jest po stronie serwera, ale zainstalowanie po stronie klienta umożliwia korzystanie z dodatkowych funkcji."
   },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Klient i serwer, opcjonalne na kliencie"
   },
   "project.environment.server-only.description": {
-    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla."
+    "defaultMessage": "Wszystkie funkcje są realizowane po stronie serwera i są kompatybilne z klientami vanilla. Działa także na wbudowanym serwerze w trybie jednoosobowym."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Tylko po stronie serwera, działa też w trybie jednoosobowym"
@@ -981,16 +1059,22 @@
     "defaultMessage": "Nieznane środowisko"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {obserwujący} other {obserwujących}}"
+    "defaultMessage": "{count, number} {count, plural, one {obserwujący} other {obserwujących}}"
   },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {gracz online} other {graczy online}}"
+    "defaultMessage": "{count, number} online"
+  },
+  "project.online-player-count.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {gracz} other {graczy}} online"
   },
   "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {grał ostatnio} other {grało ostatnio}}"
+    "defaultMessage": "{count} {countPlural, plural, one {grał ostatnio} other {grało ostatnio}}"
+  },
+  "project.recent-plays.tooltip": {
+    "defaultMessage": "{count} {countPlural, plural, one {grał ostatnio} other {grało ostatnio}} poprzez Modrinth przez ostatnie 2 tygodnie"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analityka"
@@ -1235,9 +1319,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Harmonogram kopii zapasowych"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Tworzenie kopii zapasowej..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Nie udało się utworzyć kopii zapasowej"
   },
@@ -1247,20 +1328,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Ręczne kopie zapasowe"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Kopia zapasowa w kolejce"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Przywrócenie kopii zapasowej w kolejce"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Zmień nazwę"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Przywróć"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Przywracanie z kopii zapasowej..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Odrzuć"
@@ -1861,9 +1933,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} o {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Masz niezapisane zmiany."

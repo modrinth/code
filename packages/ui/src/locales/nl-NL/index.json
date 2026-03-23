@@ -81,7 +81,7 @@
     "defaultMessage": "Downloaden"
   },
   "button.downloading": {
-    "defaultMessage": "Downloading"
+    "defaultMessage": "Downloaden"
   },
   "button.edit": {
     "defaultMessage": "Bewerk"
@@ -270,7 +270,7 @@
     "defaultMessage": "Prestatie-impact"
   },
   "header.category.resolutions": {
-    "defaultMessage": "Resoluties"
+    "defaultMessage": "Resolutie"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Burst tot {cpus} CPU's"
@@ -326,26 +326,17 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Ontkoppel modpack"
-  },
   "instances.modpack-content-modal.back-button": {
     "defaultMessage": "Terug"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Kopieer link"
   },
-  "instances.modpack-content-modal.disable": {
-    "defaultMessage": "Zet uit"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Deze modpack bevat geen extra inhoud."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Geen inhoud gevonden"
-  },
-  "instances.modpack-content-modal.enable": {
-    "defaultMessage": "Zet aan"
   },
   "instances.modpack-content-modal.filter-all": {
     "defaultMessage": "Alles"
@@ -360,19 +351,13 @@
     "defaultMessage": "Geen projecten komen overeen met je zoekopdracht."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Zoek {count} projecten"
-  },
-  "instances.modpack-content-modal.selected-count": {
-    "defaultMessage": "{count} geselecteerd"
+    "defaultMessage": "Zoek {count, number} {count, plural, one {project} other {projecten}}"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Huidige"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Niet compatibel"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Verlaag naar v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Update versie"
@@ -394,15 +379,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Toon compatibele"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Update naar v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "We kunnen niet garanderen dat updates veilig zijn voor jouw instantie. Bekijk de wijzigingen voor alle tussenliggende versies en overweeg een back-up te maken."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "We kunnen niet garanderen dat updates veilig zijn voor jouw werelden. Bekijk de wijzigingen voor alle tussenliggende versies en overweeg een back-up te maken."
   },
   "label.actions": {
     "defaultMessage": "Acties"
@@ -477,7 +453,7 @@
     "defaultMessage": "Wachtwoord"
   },
   "label.played": {
-    "defaultMessage": "Gespeeld voor {time}"
+    "defaultMessage": "Gespeeld {ago}"
   },
   "label.project": {
     "defaultMessage": "Project"
@@ -541,6 +517,45 @@
   },
   "label.yes": {
     "defaultMessage": "Ja"
+  },
+  "locale.cs-CZ": {
+    "defaultMessage": "Tsjechisch"
+  },
+  "locale.da-DK": {
+    "defaultMessage": "Deens"
+  },
+  "locale.de-CH": {
+    "defaultMessage": "Duits (Zweden)"
+  },
+  "locale.de-DE": {
+    "defaultMessage": "Duits (Duitsland)"
+  },
+  "locale.es-ES": {
+    "defaultMessage": "Spaans (Spanje)"
+  },
+  "locale.fi-FI": {
+    "defaultMessage": "Fins"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Frans"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japans"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Korenaans"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Nederlands"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Pools"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Zweeds"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Turks"
   },
   "modal.add-payment-method.action": {
     "defaultMessage": "Voeg betaalmethode toe"
@@ -721,6 +736,12 @@
   },
   "payment-method.visa": {
     "defaultMessage": "Visa"
+  },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Gepubliceerd op {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Geüpdatet op {date}"
   },
   "project-card.environment.client": {
     "defaultMessage": "Client"
@@ -911,17 +932,8 @@
   "project.about.server.title": {
     "defaultMessage": "Server details"
   },
-  "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural,one {download}other {downloads}}"
-  },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Client en server op beide verreist"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Client en server optioneel op server"
@@ -932,9 +944,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Slechts clientzijde"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Heeft enig functionaliteit op client en server, al is het minder compleet."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Client en server beste wanneer op beide is geinstalleerd"
   },
@@ -944,20 +953,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Client en server optioneel voor beide"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Enkel serverzijde"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Heeft functionaliteit op zowel client en server, eventueel deels."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Client en server optioneel voor client"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "Alle functionaliteit ligt op de server, en is volledig bruikbaar met vanilla clients."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Alleen server kant, werkt op singleplayer"
@@ -980,17 +980,11 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Onbekende omgeving"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count}{count, plural,one {volger}other {volgers}}"
-  },
   "project.online-player-count": {
-    "defaultMessage": "{count} {count, plural, one {online} other {online}}"
-  },
-  "project.recent-plays": {
-    "defaultMessage": "{count} {count, plural, one {recente speler} other {recente spelers}}"
+    "defaultMessage": "{count, number} online"
   },
   "project.server.ping.ms": {
-    "defaultMessage": "{ping} ms"
+    "defaultMessage": "{ping, number} ms"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytica"
@@ -1235,9 +1229,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Back-up planning"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Back-up maken..."
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Het maken van een back-up is mislukt"
   },
@@ -1247,20 +1238,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Handmatige back-up"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Back-up in wachtrij"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Herstellen in wachtrij"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Hernoemen"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Herstel"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Herstellen vanuit back-up..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Negeer"
@@ -1580,6 +1562,9 @@
   "tag.category.items": {
     "defaultMessage": "Spullen"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Behou Inventaris"
+  },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Overige"
   },
@@ -1601,11 +1586,23 @@
   "tag.category.management": {
     "defaultMessage": "Beheer"
   },
+  "tag.category.media": {
+    "defaultMessage": "Media"
+  },
   "tag.category.medium": {
     "defaultMessage": "Gemiddeld"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Minigames"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minigame"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Mini games"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Mobs"
@@ -1619,8 +1616,17 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Multiplayer"
   },
+  "tag.category.network": {
+    "defaultMessage": "Netwerk"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Offline modus"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimalisatie"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Padtracering"
@@ -1628,8 +1634,20 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Persoonlijke wereld"
+  },
   "tag.category.potato": {
     "defaultMessage": "Aardappel"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Gevangenis"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
   },
   "tag.category.quests": {
     "defaultMessage": "Missies"
@@ -1639,6 +1657,12 @@
   },
   "tag.category.reflections": {
     "defaultMessage": "Reflecties"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Rolen spel"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Schermafbeelding"
@@ -1652,17 +1676,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Simplistisch"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Sociaal"
   },
   "tag.category.storage": {
     "defaultMessage": "Opslag"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Overlevingsmodus"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Teams"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Technisch"
+  },
   "tag.category.technology": {
     "defaultMessage": "Technologie"
   },
   "tag.category.themed": {
     "defaultMessage": "Thema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Start"
   },
   "tag.category.transportation": {
     "defaultMessage": "Transport"
@@ -1675,6 +1717,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Vanilla-achtig"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Whitelisten"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Wereld resets"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Wereld generatie"
@@ -1768,9 +1816,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} om {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Sommigen wijzigingen zijn nog niet opgeslagen."

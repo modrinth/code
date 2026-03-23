@@ -4,6 +4,7 @@
 		:stages="ctx.stageConfigs"
 		:context="ctx"
 		:breadcrumbs="!editingVersion"
+		:close-on-click-outside="false"
 		@hide="() => (modalOpen = false)"
 	/>
 	<DropArea

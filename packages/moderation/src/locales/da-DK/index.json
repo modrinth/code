@@ -17,6 +17,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Tilføj en Java adresse"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Tilføje alle relevante links ude for Modrinth, så som en hjemmeside, butik, eller en Discord invite."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Tilføj eksterne links"
   },
@@ -82,6 +85,12 @@
   },
   "nags.select-license.description": {
     "defaultMessage": "Vælg den licens {type, select, mod {dit mod} modpack {din modpack} resourcepack {din ressourcepakke} shader {din shader} plugin {dit plugin} datapack {din datapakke} other {dit projekt}} distribueres under."
+  },
+  "nags.server.title": {
+    "defaultMessage": "Besøg server indstillinger"
+  },
+  "nags.settings.description.title": {
+    "defaultMessage": "Besøg beskrivelse indstillinger"
   }
 }
 

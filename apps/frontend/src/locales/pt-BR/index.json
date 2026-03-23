@@ -108,7 +108,7 @@
     "message": "Uso de CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "O Modrinth App tem um desempenho melhor que muitos dos principais gerenciadores de mods, usando apenas 150mb de RAM!"
+    "message": "O Modrinth App tem um desempenho melhor que muitos dos principais gerenciadores de mods, usando apenas 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Nenhum projeto em coleção ainda"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Ainda não há projetos} one {<stat>{count}</stat> projeto} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Nenhum projeto ainda} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Atualizado em {ago}"
@@ -577,6 +577,18 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Criar nova"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Crie sua primeira coleção para começar!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Você ainda não tem nenhuma coleção"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Nenhuma coleção corresponde com sua busca"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Tente ajustar seus filtros ou termos de busca."
   },
   "dashboard.collections.label.projects-count": {
     "message": "{count, plural, =0 {Nenhum projeto} one {{count} projeto} other {{count} projetos}}"
@@ -1131,7 +1143,7 @@
     "message": "Os servidores da Modrinth Hosting têm proteção contra DDoS?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Sim. Todos os servidores da Modrinth Hosting vêm com proteção contra DDoS, com capacidade de até 17Tbps em alguns locais."
+    "message": "Sim. Todos os servidores da Modrinth Hosting vêm com proteção contra DDoS, com capacidade de até 17 Tbps em alguns locais."
   },
   "hosting-marketing.faq.heading": {
     "message": "Perguntas frequentes"
@@ -1191,10 +1203,10 @@
     "message": "Adicione seu próprio domínio ao servidor, reserve até 15 portas para mods que as necessitem e muito mais."
   },
   "hosting-marketing.included.backups-included": {
-    "message": "Backups incluídos"
+    "message": "Cópias de segurança incluídas"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "Cada servidor vem com 15 backups armazenados de forma segura fora do local."
+    "message": "Cada servidor vem com 15 cópias de segurança armazenadas de forma segura fora do local."
   },
   "hosting-marketing.included.custom-url": {
     "message": "URL personalizado"
@@ -1239,7 +1251,7 @@
     "message": "Sabe exatamente o que precisa?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Experimente um <orange>servidor gratuito de 3GB</orange> por 5 dias com tecnologia <orange>Medal</orange>"
+    "message": "Experimente um <orange>servidor gratuito de 3 GB</orange> por 5 dias, fornecido pela <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Saiba mais"
@@ -1291,6 +1303,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Escolha entre Vanilla, Fabric, Forge, Quilt e NeoForge. Se estiver no Modrinth, pode ser executado no seu servidor."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Falha ao alterar a versão do pacote de mods"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Falha ao carregar as versões"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Falha ao reinstalar o pacote de mods"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Falha ao reparar o servidor"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Falha ao salvar as configurações de instalação"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Falha ao desvincular o pacote de mods"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Carregador} other {{loader}}} versão"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "A instalação do seu servidor foi reparada."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparo concluído"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Reiniciar servidor"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Remove todos os dados do seu servidor, incluindo seus mundos, mods e arquivos de configuração. As cópias de segurança permanecerão e poderão ser restauradas."
   },
   "hosting.plan.out-of-stock": {
     "message": "Esgotado"
@@ -1425,7 +1470,7 @@
     "message": "Para jogadores"
   },
   "landing.section.for-players.tagline": {
-    "message": "Descubra mais de {count} criações"
+    "message": "Descubra mais de {count, number} criações"
   },
   "landing.subheading": {
     "message": "Descubra, jogue e compartilhe conteúdo de Minecraft por meio de nossa plataforma de código aberto criada para a comunidade."
@@ -2771,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Restauração de backup em andamento"
+  "servers.busy.backup-creating": {
+    "message": "Criação de cópia de segurança em andamento"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Restauração da cópia de segurança em andamento"
+  },
+  "servers.busy.installing": {
+    "message": "O servidor está sendo instalado"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Sincronização de conteúdo em andamento"
   },
   "servers.notice.actions": {
     "message": "Ações"
@@ -2826,7 +2880,7 @@
     "message": "Adicionar mais"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Adicionar URL de redirecionamento"
+    "message": "Adicionar URI de redirecionamento"
   },
   "settings.applications.button.cancel": {
     "message": "Cancelar"
@@ -2889,7 +2943,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "URLs de redirecionamento"
+    "message": "URIs de redirecionamento"
   },
   "settings.applications.field.scopes": {
     "message": "Escopos"
@@ -3051,7 +3105,7 @@
     "message": "Criar um TAP"
   },
   "settings.pats.description": {
-    "message": "Os TAPs podem ser usados ​​para acessar a API do Modrinth. Para mais informações, consulte a <doc-link>documentação da API do Modrinth</doc-link>. Eles podem ser criados e revogados a qualquer momento."
+    "message": "PATs podem ser usados para acessar a API do Modrinth. Eles podem ser criados e revogados a qualquer momento. Para mais informações, veja a <doc-link>documentação da API do Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Criar TAP"

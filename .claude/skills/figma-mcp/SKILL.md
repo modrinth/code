@@ -1,45 +1,22 @@
-# Figma MCP Usage
+---
+name: figma-mcp
+description: Use the Figma MCP server to translate a Figma design into a Vue page or component layout. Use when the user provides a Figma URL, asks to implement a design, or wants to draft a page layout from Figma.
+argument-hint: <figma-url>
+---
 
-When the Figma MCP server is connected, use it to translate Figma designs into production-ready Vue components for this monorepo.
+Refer to the standard: @standards/frontend/FIGMA_MCP_USAGE.md
+Also read @packages/ui/CLAUDE.md for color token mapping and component conventions.
 
-## Workflow
+## Steps
 
-### 1. Get the design context
-
-Use `get_design_context` with the node ID from a Figma URL. If the URL is `https://figma.com/design/:fileKey/:fileName?node-id=1-2`, the node ID is `1:2`.
-
-```
-get_design_context(nodeId: "1:2", clientLanguages: "typescript,html,css", clientFrameworks: "vue")
-```
-
-This returns reference code, a screenshot, and metadata. Always start here.
-
-### 2. Get a screenshot for visual reference
-
-Use `get_screenshot` if you need to see the design without full code context:
-
-```
-get_screenshot(nodeId: "1:2")
-```
-
-### 3. Get variable definitions
-
-Use `get_variable_defs` to see what design tokens are applied to a node:
-
-```
-get_variable_defs(nodeId: "1:2")
-```
-
-### 4. Get metadata for structure overview
-
-Use `get_metadata` to get an XML overview of node IDs, layer types, names, positions and sizes — useful for understanding the structure of a complex frame before diving into individual nodes.
-
-## Adapting Figma Output
-
-The Figma MCP returns generic reference code. Adapt it to match the Modrinth codebase:
-
-1. **Read `packages/ui/CLAUDE.md`** for color usage rules, surface token mapping, and component patterns.
-2. **Map Figma color variables to `surface-*` tokens** — never use Figma's aliased names like `bg/default` or `bg/raised` directly. The CLAUDE.md has the full mapping table.
-3. **Check `packages/assets/styles/variables.scss`** for tokens not exposed in Figma (brand highlights, semantic backgrounds, shadows).
-4. **Check for existing components** in `packages/ui/src/components/` before building from scratch.
-5. **Match spacing exactly** — do not approximate values from the design.
+1. **Parse the Figma URL** from `$ARGUMENTS` — extract the `fileKey` and `nodeId`. Convert `-` to `:` in the node ID.
+2. **Read the standards above** for the available tools, adaptation rules, and color usage.
+3. **Call `get_design_context`** with the extracted `nodeId` and `fileKey`, using `clientLanguages: "typescript,html,css"` and `clientFrameworks: "vue"`. This is always the first tool to call.
+5. **Adapt the output to the Modrinth codebase:**
+   - Map Figma color variables to `surface-*` / `text-*` tokens — never use Figma's aliased names directly.
+   - Check `packages/ui/src/components/` for existing components that match elements in the design (buttons, cards, modals, inputs, etc.).
+   - Check `packages/assets/styles/variables.scss` for tokens not exposed in Figma.
+   - Match spacing values exactly from the design.
+6. **Use `get_screenshot`** if you need a closer visual reference of specific nodes.
+7. **Use `get_variable_defs`** to verify which design tokens are applied to ambiguous elements.
+8. **Build the component** as a Vue SFC using Tailwind classes and the project's existing component library.

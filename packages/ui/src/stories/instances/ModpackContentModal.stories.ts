@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
-import ModpackContentModal from '../../components/instances/modals/ModpackContentModal.vue'
-import type { ContentItem } from '../../components/instances/types'
+import ModpackContentModal from '../../layouts/shared/content-tab/components/modals/ModpackContentModal.vue'
+import type { ContentItem } from '../../layouts/shared/content-tab/types'
 
 // Sample modpack content items (representing mods included in a modpack)
 const sodiumItem: ContentItem = {

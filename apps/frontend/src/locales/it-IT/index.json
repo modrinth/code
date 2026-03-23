@@ -39,7 +39,7 @@
     "message": "Opzioni download"
   },
   "app-marketing.download.terms": {
-    "message": "Scaricando Modrinth App accetti i nostri <terms-link>termini d''uso</terms-link> e l''<privacy-link>informativa sulla privacy</privacy-link>."
+    "message": "Scaricando Modrinth App, accetti i nostri <terms-link>termini d''uso</terms-link> e l''<privacy-link>informativa sulla privacy</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Scarica Modrinth App (Beta)"
@@ -321,7 +321,7 @@
     "message": "Non è stato possibile verificare la tua email. Prova a reinviare l'email di verifica con il pulsante sotto."
   },
   "auth.verify-email.failed-verification.title": {
-    "message": "Verifica email fallita"
+    "message": "Errore nella verifica dell'email"
   },
   "auth.verify-email.post-verification.description": {
     "message": "Il tuo indirizzo email è stato verificato con successo!"
@@ -393,7 +393,7 @@
     "message": "Nessun progetto nella raccolta"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {<stat>Un</stat> progetto} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Nessun progetto} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aggiornata {ago}"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Crea nuova"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Inizia creando la tua prima raccolta!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Non hai ancora alcuna raccolta"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Nessuna raccolta corrisponde alla tua ricerca"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Prova a modificare i filtri o i termini di ricerca."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
+    "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cerca fra le tue raccolte"
@@ -885,7 +897,7 @@
     "message": "I tuoi pagamenti e prelievi appariranno qui."
   },
   "dashboard.revenue.transactions.see-all": {
-    "message": "Mostra tutti"
+    "message": "Mostra tutto"
   },
   "dashboard.revenue.withdraw.blocked-tin-mismatch": {
     "message": "I tuoi prelievi sono temporaneamente bloccati perché il tuo TIN o SSN non corrisponde ai registri dell'IRS. Contatta l'assistenza per resettare e reinviare il tuo modulo fiscale."
@@ -963,7 +975,7 @@
     "message": "Impossibile verificare l'indirizzo fornito. Controlla di averlo inserito correttamente."
   },
   "dashboard.withdraw.error.invalid-address.title": {
-    "message": "Verifica indirizzo fallita"
+    "message": "Errore nella verifica dell'indirizzo"
   },
   "dashboard.withdraw.error.invalid-bank.text": {
     "message": "I dati bancari forniti non sono validi. Controlla di averli inseriti correttamente."
@@ -1292,6 +1304,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Scegli tra Vanilla, Fabric, Forge, Quilt e NeoForge. Se è su Modrinth, il tuo server può usarlo."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Errore nella modifica della versione del pacchetto"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Errore nel caricamento delle versioni"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Errore nel reinstallare il pacchetto"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Errore nella riparazione del server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Errore nel salvataggio delle impostazioni"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Errore nello scollegamento del pacchetto"
+  },
+  "hosting.loader.loader-version": {
+    "message": "Versione {loader, select, null {del loader} other {di {loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "L'installazione del server è stata riparata."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Riparazione completata"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Reimposta server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Non disponibile"
   },
@@ -1389,7 +1434,7 @@
     "message": "ATLauncher"
   },
   "landing.launcher.graphic-alt": {
-    "message": "Una rappresentazione stilizzata di una finestra Minecraft, con il logo di Mojang Studios di colore verde come Modrinth."
+    "message": "Una rappresentazione stilizzata di una finestra di Minecraft con il logo di Mojang Studios colorato del verde di Modrinth."
   },
   "landing.launcher.modrinth-app-label": {
     "message": "Modrinth App"
@@ -1425,7 +1470,7 @@
     "message": "Per i giocatori"
   },
   "landing.section.for-players.tagline": {
-    "message": "Scopri oltre {count} creazioni"
+    "message": "Scopri oltre {count, number} creazioni"
   },
   "landing.subheading": {
     "message": "Scopri, gioca e condividi contenuti per Minecraft attraverso la nostra piattaforma open source creata per la community."
@@ -1527,7 +1572,7 @@
     "message": "I tuoi prelievi sono temporaneamente bloccati perché il tuo TIN o SSN non corrisponde ai registri dell'IRS. Contatta l'assistenza per resettare e reinviare il tuo modulo fiscale."
   },
   "layout.banner.tin-mismatch.title": {
-    "message": "Modulo fiscale fallito"
+    "message": "Errore nel modulo fiscale"
   },
   "layout.banner.verify-email.action": {
     "message": "Reinvia email di verifica"
@@ -1557,7 +1602,7 @@
     "message": "Note legali"
   },
   "layout.footer.legal-disclaimer": {
-    "message": "NON UN SERVIZIO UFFICIALE DI MINECRAFT, NON APPROVATO DA NÉ ASSOCIATO CON MOJANG O MICROSOFT."
+    "message": "NON UN SERVIZIO UFFICIALE DI MINECRAFT. NON APPROVATO DA NÉ ASSOCIATO CON MOJANG O MICROSOFT."
   },
   "layout.footer.legal.copyright-policy": {
     "message": "Politica copyright e DMCA"
@@ -2028,7 +2073,7 @@
     "message": "Raccolta"
   },
   "profile.label.downloads": {
-    "message": "{count, plural, =0 {Nessun} one {Un} other {{count}}} download"
+    "message": "{count} download"
   },
   "profile.label.joined": {
     "message": "Account creato"
@@ -2049,7 +2094,7 @@
     "message": "Organizzazioni"
   },
   "profile.label.projects": {
-    "message": "{count, plural, =0 {Nessun progetto} one {Un progetto} other {{count} progetti}}"
+    "message": "{count} {countPlural, plural, one {progetto} other {progetti}}"
   },
   "profile.label.saving": {
     "message": "Salvando..."
@@ -2061,7 +2106,7 @@
     "message": "{bio} - Scarica i progetti di {username} su Modrinth"
   },
   "profile.stats.projects-followers": {
-    "message": "<stat>{count, plural, =0 {Nessun} one {Un} other {{count}}}</stat> follower del progetto"
+    "message": "<stat>{count, plural, =0 {Nessun} other {{count}}}</stat> follower del progetto"
   },
   "profile.user-id": {
     "message": "ID utente: {id}"
@@ -2771,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizza col server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Ripristino backup in corso"
+  "servers.busy.backup-creating": {
+    "message": "Creando il backup..."
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Ripristinando il backup..."
+  },
+  "servers.busy.installing": {
+    "message": "Installando il server..."
+  },
+  "servers.busy.syncing-content": {
+    "message": "Sincronizzando i contenuti..."
   },
   "servers.notice.actions": {
     "message": "Azioni"
@@ -3051,7 +3105,7 @@
     "message": "Crea un token"
   },
   "settings.pats.description": {
-    "message": "I PAT possono essere utilizzati per accedere all'API di Modrinth. Per maggiori informazioni, vedi la <doc-link>documentazione dell'API di Modrinth</doc-link>. Possono essere creati e revocati in qualsiasi momento."
+    "message": "I token di accesso (PAT) possono essere usati per accedere all'API di Modrinth. Puoi crearli o revocarli in qualsiasi momento. Per maggiori informazioni, consulta la <doc-link>documentazione dell''API di Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Crea PAT"

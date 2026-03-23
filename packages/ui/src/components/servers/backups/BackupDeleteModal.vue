@@ -1,17 +1,13 @@
 <template>
 	<NewModal ref="modal" header="Delete backup" fade="danger">
-		<div class="flex flex-col gap-6">
+		<div class="flex flex-col gap-6 max-w-[400px]">
 			<Admonition type="critical" header="Delete warning">
 				This backup will be permanently deleted. This action cannot be undone.
 			</Admonition>
 
 			<div v-if="currentBackup" class="flex flex-col gap-2">
 				<span class="font-semibold text-contrast">Backup</span>
-				<BackupItem
-					:backup="currentBackup"
-					preview
-					class="!bg-surface-2 border-solid border-[1px] border-surface-5"
-				/>
+				<BackupItem :backup="currentBackup" preview class="!bg-surface-2 !shadow-none" />
 			</div>
 		</div>
 

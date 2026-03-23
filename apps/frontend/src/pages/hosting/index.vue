@@ -10,8 +10,7 @@
 			ref="purchaseModal"
 			:publishable-key="config.public.stripePublishableKey"
 			:initiate-payment="
-				async (body) =>
-					await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
+				async (body) => await client.labrinth.billing_internal.initiatePayment(body)
 			"
 			:available-products="pyroProducts"
 			:on-error="handleError"
@@ -641,6 +640,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
 	ModrinthServersPurchaseModal,
@@ -648,18 +648,18 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { useBaseFetch } from '@/composables/fetch.js'
 import OptionGroup from '~/components/ui/OptionGroup.vue'
 import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
 import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
 import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
-import { useServersFetch } from '~/composables/servers/servers-fetch.ts'
 import { products } from '~/generated/state.json'
 
 const route = useRoute()
 const router = useRouter()
+const client = injectModrinthClient()
 
 const { setAffiliateCode, getAffiliateCode } = useAffiliates()
 
@@ -1011,24 +1011,22 @@ const selectedCurrency = ref('USD')
 const loggedOut = computed(() => !auth.value.user)
 const outOfStockUrl = 'https://discord.modrinth.com'
 
-const { data: hasServers } = await useAsyncData('ServerListCountCheck', async () => {
-	try {
-		if (!auth.value.user) return false
-		const response = await useServersFetch('servers')
-		return response.servers && response.servers.length > 0
-	} catch {
-		return false
-	}
+const { data: hasServers } = useQuery({
+	queryKey: computed(() => ['servers', 'list-count', auth.value?.user?.id]),
+	queryFn: async () => {
+		try {
+			if (!auth.value.user) return false
+			const response = await client.archon.servers_v0.list()
+			return response.servers && response.servers.length > 0
+		} catch {
+			return false
+		}
+	},
+	enabled: computed(() => !!auth.value?.user),
 })
 
 function fetchStock(region, request) {
-	return useServersFetch(`stock?region=${region.shortcode}`, {
-		method: 'POST',
-		body: {
-			...request,
-		},
-		bypassAuth: true,
-	}).then((res) => res.available)
+	return client.archon.servers_v0.checkStock(region.shortcode, request).then((res) => res.available)
 }
 
 async function fetchCapacityStatuses(customProduct = null) {
@@ -1044,15 +1042,11 @@ async function fetchCapacityStatuses(customProduct = null) {
 		const capacityChecks = []
 		for (const product of productsToCheck) {
 			capacityChecks.push(
-				useServersFetch('stock', {
-					method: 'POST',
-					body: {
-						cpu: product.metadata.cpu,
-						memory_mb: product.metadata.ram,
-						swap_mb: product.metadata.swap,
-						storage_mb: product.metadata.storage,
-					},
-					bypassAuth: true,
+				client.archon.servers_v0.checkStockGlobal({
+					cpu: product.metadata.cpu,
+					memory_mb: product.metadata.ram,
+					swap_mb: product.metadata.swap,
+					storage_mb: product.metadata.storage,
 				}),
 			)
 		}
@@ -1080,15 +1074,12 @@ async function fetchCapacityStatuses(customProduct = null) {
 	}
 }
 
-const { data: capacityStatuses, refresh: refreshCapacity } = await useAsyncData(
-	'ServerCapacityAll',
-	fetchCapacityStatuses,
-	{
-		getCachedData() {
-			return null // Dont cache stock data.
-		},
-	},
-)
+const { data: capacityStatuses, refetch: refreshCapacity } = useQuery({
+	queryKey: ['server', 'capacity', 'all'],
+	queryFn: fetchCapacityStatuses,
+	staleTime: 0, // Dont cache stock data
+	gcTime: 0,
+})
 
 const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.available === 0)
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0)
@@ -1127,8 +1118,8 @@ async function fetchPaymentData() {
 	if (!auth.value.user) return
 	try {
 		const [customerData, paymentMethodsData] = await Promise.all([
-			useBaseFetch('billing/customer', { internal: true }),
-			useBaseFetch('billing/payment_methods', { internal: true }),
+			client.labrinth.billing_internal.getCustomer(),
+			client.labrinth.billing_internal.getPaymentMethods(),
 		])
 		customer.value = customerData
 		paymentMethods.value = paymentMethodsData
@@ -1246,11 +1237,7 @@ const regions = ref([])
 const regionPings = ref([])
 
 function pingRegions() {
-	useServersFetch('regions', {
-		method: 'GET',
-		version: 1,
-		bypassAuth: true,
-	}).then((res) => {
+	client.archon.servers_v1.getRegions().then((res) => {
 		regions.value = res
 		regions.value.forEach((region) => {
 			runPingTest(region)

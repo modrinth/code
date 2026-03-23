@@ -99,6 +99,8 @@ interface FileItemProps {
 	index: number
 	isLast: boolean
 	selected: boolean
+	writeDisabled?: boolean
+	writeDisabledTooltip?: string
 }
 
 const props = defineProps<FileItemProps>()
@@ -145,35 +147,48 @@ const fileExtension = computed(() => getFileExtension(props.name))
 
 const isZip = computed(() => fileExtension.value === 'zip')
 
-const menuOptions = computed(() => [
-	{
-		id: 'extract',
-		shown: isZip.value,
-		action: () => emit('extract', { name: props.name, type: props.type, path: props.path }),
-	},
-	{
-		divider: true,
-		shown: isZip.value,
-	},
-	{
-		id: 'rename',
-		action: () => emit('rename', { name: props.name, type: props.type, path: props.path }),
-	},
-	{
-		id: 'move',
-		action: () => emit('move', { name: props.name, type: props.type, path: props.path }),
-	},
-	{
-		id: 'download',
-		action: () => emit('download', { name: props.name, type: props.type, path: props.path }),
-		shown: props.type !== 'directory',
-	},
-	{
-		id: 'delete',
-		action: () => emit('delete', { name: props.name, type: props.type, path: props.path }),
-		color: 'red' as const,
-	},
-])
+const menuOptions = computed(() => {
+	const item = { name: props.name, type: props.type, path: props.path }
+	const wd = props.writeDisabled
+	const wdTooltip = props.writeDisabledTooltip
+	return [
+		{
+			id: 'extract',
+			shown: isZip.value,
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => emit('extract', item),
+		},
+		{
+			divider: true,
+			shown: isZip.value,
+		},
+		{
+			id: 'rename',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => emit('rename', item),
+		},
+		{
+			id: 'move',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => emit('move', item),
+		},
+		{
+			id: 'download',
+			action: () => emit('download', item),
+			shown: props.type !== 'directory',
+		},
+		{
+			id: 'delete',
+			disabled: wd,
+			tooltip: wd ? wdTooltip : undefined,
+			action: () => emit('delete', item),
+			color: 'red' as const,
+		},
+	]
+})
 
 const iconComponent = computed(() => {
 	if (props.type === 'directory') {

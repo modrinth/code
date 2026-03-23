@@ -32,35 +32,14 @@
   "app.modal.install-to-play.view-contents": {
     "message": "Lihat konten"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} ditambahkan"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "Ditambahkan"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "Dihapus"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "Diperbarui"
-  },
   "app.modal.update-to-play.header": {
     "message": "Perbarui untuk memainkan"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} dihapus"
   },
   "app.modal.update-to-play.update-required": {
     "message": "Perlu diperbarui"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name} perlu diperbarui sebelum dimainkan. Mohon perbarui ke versi terkini untuk meluncurkan permainan."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} diperbarui"
   },
   "app.settings.developer-mode-enabled": {
     "message": "Mode pengembang dihidupkan."
@@ -230,12 +209,6 @@
   "instance.edit-world.title": {
     "message": "Sunting dunia"
   },
-  "instance.filter.disabled": {
-    "message": "Proyek takaktif"
-  },
-  "instance.filter.updates-available": {
-    "message": "Pembaruan tersedia"
-  },
   "instance.server-modal.address": {
     "message": "Alamat"
   },
@@ -344,149 +317,8 @@
   "instance.settings.tabs.installation": {
     "message": "Pemasangan"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} untuk Minecraft {game_version} sudah terpasang"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "{game_version} murni sudah terpasang"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "Ubah versi"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "Pasang"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "Memasang"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "Memperoleh versi paket mod"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "Memasang versi baru"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "Saat ini terpasang"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "Informasi awakutu:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "Memperoleh perincian paket mod"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "Versi permainan"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "Pasang"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "Pemasangan sedang berjalan"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "Versi {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "Tidak dapat memperoleh perincian paket mod terkait. Mohon periksa sambungan internet Anda."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} tidak tersedia untuk Minecraft {version}. Mohon coba peluncur mod yang lain."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "Instans ini berkaitan dengan paket mod, tetapi paket mod tersebut tidak dapat ditemukan pada Modrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "Platform"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Pasang ulang paket mod"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Memasang ulang paket mod"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "Memasang ulang akan mengatur ulang semua konten yang terpasang atau termodifikasi pada apa yang telah disediakan oleh paket mod, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal. Hal ini dapat memperbaiki perilaku tidak terduga bila ada perubahan pada instans, tetapi bila dunia Anda sekarang bergantung pada konten terpasang tambahan, hal ini dapat merusak dunia yang ada."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "Apakah Anda yakin ingin memasang ulang instans ini?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "Mengatur ulang konten instans menjadi keadaan awal, menghapus mod atau konten apa pun yang telah Anda tambahkan di atas pemasangan awal."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Pasang ulang paket mod"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "Perbaiki"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "Memperbaiki"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "Memperbaiki akan memasangkan ulang pustaka dependen dan memeriksa kerusakan. Ini dapat memecahkan masalah bila permainan Anda tidak memulai sebab kesalahan pada peluncur, tetapi tidak akan memecahkan masalah atau kemogokan yang disebabkan oleh mod terpasang."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "Perbaiki instans?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "Perbaikan sedang berlangsung"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "Atur ulang ke saat ini"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "Tampilkan semua versi"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "mengubah versi"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "memasang"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "memasang ulang"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "memperbaiki"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "Tidak dapat {action} saat memasang"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "Tidak dapat {action} saat luring"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "Tidak dapat {action} saat memperbaiki"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(versi tidak dikenal)"
-  },
-  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
-    "message": "Instans ini berkaitan dengan suatu server, yang berarti Anda tidak dapat mengubah versi Minecraft. Melepas kaitan akan memutuskan instans ini dari server secara permanen."
-  },
-  "instance.settings.tabs.installation.unlink-server.description": {
-    "message": "Instans ini berkaitan dengan suatu server, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan instans ini dari server secara permanen."
-  },
-  "instance.settings.tabs.installation.unlink-server.title": {
-    "message": "Lepas kaitan dari server"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "Lepas kaitan instans"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "Bila Anda melanjutkan, Anda tidak akan dapat mengaitkannya lagi tanpa membuat instans baru. Anda tidak akan mendapatkan pembaruan paket mod dan menjadi instans normal."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "Apakah Anda yakin ingin melepas kaitan instans ini?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "Instans ini berkaitan dengan paket mod, yang berarti mod tidak dapat diperbarui dan Anda tidak dapat mengubah versi peluncur mod atau Minecraft. Melepas kaitan akan memutuskan instans ini dari paket mod secara permanen."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "Lepas kaitan dari paket mod"
   },
   "instance.settings.tabs.java": {
     "message": "Java dan memori"

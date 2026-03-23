@@ -97,6 +97,8 @@
 					position="bottom"
 					direction="left"
 					aria-label="Create new..."
+					:disabled="disabled"
+					:tooltip="disabled ? disabledTooltip : undefined"
 					class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
 					:options="[
 						{ id: 'file', action: () => $emit('create', 'file') },
@@ -191,6 +193,8 @@ const props = defineProps<{
 	searchQuery: string
 	showRefreshButton?: boolean
 	baseId: string
+	disabled?: boolean
+	disabledTooltip?: string
 }>()
 
 defineEmits<{

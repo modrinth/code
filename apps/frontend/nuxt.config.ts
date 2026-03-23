@@ -68,6 +68,9 @@ export default defineNuxtConfig({
 		ssr: {
 			// https://github.com/Akryum/floating-vue/issues/809#issuecomment-1002996240
 			noExternal: ['v-tooltip'],
+			optimizeDeps: {
+				include: ['vue-router'],
+			},
 		},
 		define: {
 			global: {},
@@ -112,7 +115,7 @@ export default defineNuxtConfig({
 				await import('./src/templates/docs/index.ts').then((m) => m.default),
 			)
 			const blogArticles = await import('@modrinth/blog').then((m) => m.articles)
-			const { getChangelog } = await import('@modrinth/utils')
+			const { getChangelog } = await import('@modrinth/blog')
 
 			nitroConfig.prerender = nitroConfig.prerender || {}
 			nitroConfig.prerender.routes = nitroConfig.prerender.routes || []

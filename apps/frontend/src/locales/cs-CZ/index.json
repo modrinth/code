@@ -38,9 +38,6 @@
   "app-marketing.download.options-title": {
     "message": "Stahovácí možnosti"
   },
-  "app-marketing.download.terms": {
-    "message": "Stažením aplikace Modrinth souhlasíte s našimi <terms-link>Podmínkami</terms-link> a <privacy-link>Zásadami ochrany osobních údajů</privacy-link>."
-  },
   "app-marketing.download.title": {
     "message": "Stáhnout Modrinth App (Beta)"
   },
@@ -106,9 +103,6 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
-  },
-  "app-marketing.features.performance.description": {
-    "message": "Aplikace Modrinth je výkonnější než mnoho předních správců modů a využívá pouze 150MB paměti RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,9 +386,6 @@
   "collection.label.no-projects": {
     "message": "Zatím žádné projekty v kolekci"
   },
-  "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Zatím žádné projektyt} one {<stat>{count}</stat> projekt} other {<stat>{count}</stat> {type}}}"
-  },
   "collection.label.updated-at": {
     "message": "Aktualizováno {ago}"
   },
@@ -547,9 +538,6 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
-  },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} few {{count} projekty} many {{count} projektů} other {{count} projektů}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Hledat ve vašich kolekcích"

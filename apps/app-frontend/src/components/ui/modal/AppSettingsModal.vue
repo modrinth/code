@@ -20,9 +20,8 @@ import {
 } from '@modrinth/ui'
 import { getVersion } from '@tauri-apps/api/app'
 import { platform as getOsPlatform, version as getOsVersion } from '@tauri-apps/plugin-os'
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 
-import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import AppearanceSettings from '@/components/ui/settings/AppearanceSettings.vue'
 import DefaultInstanceSettings from '@/components/ui/settings/DefaultInstanceSettings.vue'
 import FeatureFlagSettings from '@/components/ui/settings/FeatureFlagSettings.vue'
@@ -106,15 +105,13 @@ const tabs = [
 	},
 ]
 
-const modal = ref()
+const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
 function show() {
-	modal.value.show()
+	modal.value?.show()
 }
 
-const isOpen = computed(() => modal.value?.isOpen)
-
-defineExpose({ show, isOpen })
+defineExpose({ show })
 
 const { progress, version: downloadingVersion } = injectAppUpdateDownloadProgress()
 
@@ -138,8 +135,8 @@ function devModeCount() {
 		settings.value.developer_mode = !!themeStore.devMode
 		devModeCounter.value = 0
 
-		if (!themeStore.devMode && tabs[modal.value.selectedTab].developerOnly) {
-			modal.value.setTab(0)
+		if (!themeStore.devMode && tabs[modal.value!.selectedTab].developerOnly) {
+			modal.value!.setTab(0)
 		}
 	}
 }
@@ -152,49 +149,46 @@ const messages = defineMessages({
 })
 </script>
 <template>
-	<ModalWrapper ref="modal">
+	<TabbedModal ref="modal" :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-extrabold text-contrast">
 				<SettingsIcon /> Settings
 			</span>
 		</template>
-
-		<TabbedModal :tabs="tabs.filter((t) => !t.developerOnly || themeStore.devMode)">
-			<template #footer>
-				<div class="mt-auto text-secondary text-sm">
-					<div class="mb-3">
-						<template v-if="progress > 0 && progress < 1">
-							<p class="m-0 mb-2">
-								{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
-							</p>
-							<ProgressBar :progress="progress" />
-						</template>
-					</div>
-					<p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
-						{{ formatMessage(developerModeEnabled) }}
-					</p>
-					<div class="flex items-center gap-3">
-						<button
-							class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
-							:class="{
-								'text-brand': themeStore.devMode,
-								'text-secondary': !themeStore.devMode,
-							}"
-							@click="devModeCount"
-						>
-							<ModrinthIcon class="w-6 h-6" />
-						</button>
-						<div>
-							<p class="m-0">Modrinth App {{ version }}</p>
-							<p class="m-0">
-								<span v-if="osPlatform === 'macos'">macOS</span>
-								<span v-else class="capitalize">{{ osPlatform }}</span>
-								{{ osVersion }}
-							</p>
-						</div>
+		<template #footer>
+			<div class="mt-auto text-secondary text-sm">
+				<div class="mb-3">
+					<template v-if="progress > 0 && progress < 1">
+						<p class="m-0 mb-2">
+							{{ formatMessage(messages.downloading, { version: downloadingVersion }) }}
+						</p>
+						<ProgressBar :progress="progress" />
+					</template>
+				</div>
+				<p v-if="themeStore.devMode" class="text-brand font-semibold m-0 mb-2">
+					{{ formatMessage(developerModeEnabled) }}
+				</p>
+				<div class="flex items-center gap-3">
+					<button
+						class="p-0 m-0 bg-transparent border-none cursor-pointer button-animation"
+						:class="{
+							'text-brand': themeStore.devMode,
+							'text-secondary': !themeStore.devMode,
+						}"
+						@click="devModeCount"
+					>
+						<ModrinthIcon class="w-6 h-6" />
+					</button>
+					<div>
+						<p class="m-0">Modrinth App {{ version }}</p>
+						<p class="m-0">
+							<span v-if="osPlatform === 'macos'">macOS</span>
+							<span v-else class="capitalize">{{ osPlatform }}</span>
+							{{ osVersion }}
+						</p>
 					</div>
 				</div>
-			</template>
-		</TabbedModal>
-	</ModalWrapper>
+			</div>
+		</template>
+	</TabbedModal>
 </template>

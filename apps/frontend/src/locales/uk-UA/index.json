@@ -393,7 +393,7 @@
     "message": "У добірці поки немає проєктів"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Ще немає проєктів} one {<stat>{count}</stat> проєкт} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Проєктів ще немає} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Оновлено {ago}"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Створити нову"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Щоби почати, створіть свою першу колекцію!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "У вас ще немає колекцій"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Жодна колекція не відповідає вашому пошуку"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Спробуйте налаштувати фільтри або пошукові терміни."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} проєкт} few {{count} проєкти} other {{count} проєктів}}"
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Пошук у ваших добірках"
@@ -1292,6 +1304,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Вибирайте між ванільною грою, Fabric, Forge, Quilt і NeoForge. Якщо воно є Modrinth — значить воно працюватиме на вашому сервері."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Не вдалося змінити версію збірки"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Не вдалося завантажити версії"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Не вдалося перевстановити збірку"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Не вдалося полагодити сервер"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Не вдалося зберегти налаштування інсталяції"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Не вдалося відв’язати збірку"
+  },
+  "hosting.loader.loader-version": {
+    "message": "Версія {loader, select, null {завантажувача} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Інсталяція вашого сервера була полагоджена."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Лагодження завершено"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Скинути сервер"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Немає в наявності"
   },
@@ -1425,7 +1470,7 @@
     "message": "Для гравців"
   },
   "landing.section.for-players.tagline": {
-    "message": "Відкрийте для себе понад {count} творінь"
+    "message": "Відкрийте для себе понад {count} {countPlural, plural, one {творіння} few {творінь} many {творінь} other {творінь}}"
   },
   "landing.subheading": {
     "message": "Досліджуйте, грайте, та діліться вмістом Minecraft через нашу платформу з відкритим кодом, розроблену для спільноти."
@@ -2028,7 +2073,7 @@
     "message": "Добірка"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, many {завантажень} other {завантаження}}"
+    "message": "{count} {countPlural, plural, one {завантаження} few {завантаження} many {завантажень} other {завантажень}}"
   },
   "profile.label.joined": {
     "message": "Приєднався"
@@ -2049,7 +2094,7 @@
     "message": "Організації"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
+    "message": "{count} {countPlural, plural, one {проєкт} few {проєкти} many {проєктів} other {проєктів}}"
   },
   "profile.label.saving": {
     "message": "Збереження…"
@@ -2771,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Синхронізувати з сервером"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Відновлення резервної копії триває"
+  "servers.busy.backup-creating": {
+    "message": "Триває створення резервної копії"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Триває відновлення резервної копії"
+  },
+  "servers.busy.installing": {
+    "message": "Сервер установлюється"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Триває синхронізація вмісту"
   },
   "servers.notice.actions": {
     "message": "Дії"
@@ -3051,7 +3105,7 @@
     "message": "Створити токен"
   },
   "settings.pats.description": {
-    "message": "Особисті токени доступу можуть знадобитися для доступу до Modrinth API. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>. Вони можуть бути створені та відкликані у будь-який час."
+    "message": "Особисті токени доступу можуть знадобитися для доступу до Modrinth API. Вони можуть бути створені та відкликані у будь-який час. Для детальної інформації перегляньте <doc-link>документацію Modrinth API</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Створити токен"

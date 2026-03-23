@@ -1,1 +1,86 @@
-{}
+{
+  "app.export-modal.export-button": {
+    "message": "Izvoz"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Broj verzije"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Kopiraj link"
+  },
+  "app.instance.mods.installing": {
+    "message": "Instaliranje..."
+  },
+  "app.instance.mods.show-file": {
+    "message": "Prikaži datoteku"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Uspešno otpremljeno"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Nepoznato"
+  },
+  "app.instance.mods.updating": {
+    "message": "Ažuriranje..."
+  },
+  "app.settings.tabs.appearance": {
+    "message": "Izgled"
+  },
+  "app.settings.tabs.java-installations": {
+    "message": "Java instalacije"
+  },
+  "app.settings.tabs.language": {
+    "message": "Jezik"
+  },
+  "app.settings.tabs.privacy": {
+    "message": "Privatnost"
+  },
+  "friends.friend.cancel-request": {
+    "message": "Otkaži zahtev"
+  },
+  "friends.friend.remove-friend": {
+    "message": "Ukloni prijatelja"
+  },
+  "friends.friend.request-sent": {
+    "message": "Zahtev za prijateljstvo poslat"
+  },
+  "friends.friend.view-profile": {
+    "message": "Pogledaj profil"
+  },
+  "friends.heading": {
+    "message": "Prijatelji"
+  },
+  "instance.add-server.title": {
+    "message": "Dodaj server"
+  },
+  "instance.edit-server.title": {
+    "message": "Izmeni server"
+  },
+  "instance.edit-world.hide-from-home": {
+    "message": "Sakrij sa početne stranice"
+  },
+  "instance.edit-world.name": {
+    "message": "Ime"
+  },
+  "instance.edit-world.placeholder-name": {
+    "message": "Minecraft svet"
+  },
+  "instance.edit-world.title": {
+    "message": "Izmeni svet"
+  },
+  "instance.server-modal.placeholder-name": {
+    "message": "Minecraft Server"
+  },
+  "instance.settings.tabs.general.deleting.button": {
+    "message": "Brisanje..."
+  },
+  "instance.settings.tabs.general.library-groups.create": {
+    "message": "Kreiraj novu grupu"
+  },
+  "instance.settings.tabs.general.name": {
+    "message": "Ime"
+  }
+}

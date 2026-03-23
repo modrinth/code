@@ -5,6 +5,9 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
+  "app.modal.install-to-play.content-required": {
+    "message": "תוכן נדרש"
+  },
   "app.modal.install-to-play.header": {
     "message": "צריך להתקין כדי לשחק"
   },
@@ -14,41 +17,29 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {מוד אחד} other {# מודים}}"
   },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "חבילת מודים נדרשת"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "שרת זה דורש מודים כדי לשחק. לחץ על \"התקן\" כדי להגדיר את הקבצים הנדרשים מ-Modrinth, ולאחר מכן הפעל ישירות לשרת."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "התקנה משותפת"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "התקנת שרת משותפת"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} נוספו"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "נוסף"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "הוסר"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "עודכן"
+  "app.modal.install-to-play.view-contents": {
+    "message": "הצג תוכן"
   },
   "app.modal.update-to-play.header": {
     "message": "צריך לעדכן כדי לשחק"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} הוסרו"
   },
   "app.modal.update-to-play.update-required": {
     "message": "עדכון נדרש"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "עדכון נדרש כדי לשחק ב{name}. ניתן להתחיל את המשחק רק לאחר עדכון לגרסה החדשה."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} עודכנו"
   },
   "app.settings.developer-mode-enabled": {
     "message": "מצב מפתח מופעל."
@@ -76,6 +67,33 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "ניהול משאבים"
+  },
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} מוכנה להורדה!\nיש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} סיימה את תהליך ההורדה. יש לרענן כדי לעדכן עכשיו, או באופן אוטומטי בעת סגירת האפליקציה."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} זמין. יש להשתמש במנהל חבילות שלך כדי לעדכן בשביל התכונות החדשות ותיקונים!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} זמינה עכשיו! בגלל החיבור לפי שימוש, לא הורדנו אותה אוטומטית."
+  },
+  "app.update-popup.changelog": {
+    "message": "יומן שינויים"
+  },
+  "app.update-popup.download": {
+    "message": "הורדה ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "הורדה הושלמה"
+  },
+  "app.update-popup.reload": {
+    "message": "רענן"
+  },
+  "app.update-popup.title": {
+    "message": "עדכון זמין"
   },
   "app.update.complete-toast.text": {
     "message": "לחיצה כדי לראות את יומן השינויים."
@@ -191,12 +209,6 @@
   "instance.edit-world.title": {
     "message": "ערוך עולם"
   },
-  "instance.filter.disabled": {
-    "message": "פרויקטים מושבתים"
-  },
-  "instance.filter.updates-available": {
-    "message": "עדכונים זמינים"
-  },
   "instance.server-modal.address": {
     "message": "כתובת"
   },
@@ -305,140 +317,8 @@
   "instance.settings.tabs.installation": {
     "message": "התקנה"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} בשביל Minecraft {game_version} כבר מותקן"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "וונילה {game_version} כבר מותקן"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "שינוי גרסה"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "התקן"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "מתקין"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "מאחזר גרסאות חבילת מודים"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "מתקין גרסה חדשה"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "מותקן כעת"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "מידע ניפוי שגיאות:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "מאחזר פרטי חבילת מודים"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "גרסת משחק"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "התקן"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "ההתקנה בתהליך"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} גרסה"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "לא ניתן לאחזר את פרטי חבילת המודים המקושרת. יש לבדוק את חיבור האינטרנט שלך."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} אינו זמין עבור Minecraft {version}. אנא נסה טוען מודים אחר."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "התקנה זאת מקושרת לחבילת מודים, אך חבילת המודים לא נמצאה בModrinth."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "פלטפורמה"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "התקן מחדש את חבילת המודים"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "מתקין מחדש את חבילת המודים"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "התקנה מחדש תאפס את כל התוכן המותקן או ששונה, ותחזיר אותו למצב שסופק על ידי חבילת המודים, תוך הסרת כל מוד או תוכן שהוספתם מעבר להתקנה המקורית. פעולה זו עשויה לתקן תקלות שנגרמו משינויים בהתקנה, אך אם העולמות שלכם תלויים בתוכן נוסף שהותקן, היא עלולה לשבש אותם."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "האם אתה בטוח שברצונך להתקין מחדש instance זה?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "מאפס את התוכן שנמצא בהתקנה למצבו המקורי, תוך הסרת כל מוד או תוכן ששונה מעבר לחבילת המודים המקורית."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "התקן מחדש חבילת מודים"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "תיקון"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "מתקן"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "התיקון מתקין מחדש את התלויות של מיינקראפט ובודק דברים מקולקלים. פעולה זו עשויה לפתור בעיות שמונעות את הפעלת המשחק עקב שגיאות הקשורות למשגר, אך לא תפתור בעיות או קריסות הקשורות למודים המותקנים."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "לתקן את המכונה?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "תיקון בתהליך"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "אפס לגרסה הנוכחית"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "הצג את כל הגרסאות"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "שנה גרסה"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "התקן"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "התקן מחדש"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "תקן"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "לא ניתן לבצע {action} בזמן ההתקנה"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "לא ניתן לבצע {action} במצב לא מקוון"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "לא יכול {action} בזמן תיקון"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(גרסה לא ידועה)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "לבטל את הקישור של ההתקנה הזו"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "אם תמשיך, לא תוכל לקשר אותה מחדש מבלי ליצור התקנה חדשה לחלוטין. לא תקבל עוד עדכונים לחבילת המודים, והיא תהפוך להתקנה רגילה."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "האם אתה בטוח שברצונך לנתק את הקישור ל-instance הזה?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "התקנה זאת מקושרת לחבילת מודים, מה שאומר שלא ניתן לעדכן מודים ולא ניתן לשנות את טוען המודים או את גרסת המיינקראפט. הניתוק יבטל לצמיתות את הקישור של התקנה זאת לחבילת המודים."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "נתק קישור מחבילת מודים"
   },
   "instance.settings.tabs.java": {
     "message": "ג'אווה וזיכרון"
@@ -512,6 +392,9 @@
   "instance.worlds.incompatible_server": {
     "message": "שרת לא מתאים"
   },
+  "instance.worlds.linked_server": {
+    "message": "מנוהל על ידי פרויקט שרת"
+  },
   "instance.worlds.no_contact": {
     "message": "לא ניתן ליצור קשר עם השרת"
   },
@@ -547,5 +430,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "סנכרן עם התקנה"
+  },
+  "search.filter.locked.server": {
+    "message": "מסופק על ידי השרת"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "ניתן להוסיף רק מודים בצד הלקוח לשרת"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "גרסת המשחק מסופקת על ידי השרת"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "הטוען מסופק על ידי השרת"
   }
 }

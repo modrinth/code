@@ -37,17 +37,21 @@ defineExpose({
 		searchFilter.value = ''
 
 		const profilesVal = await list().catch(handleError)
-		for (const profile of profilesVal) {
-			profile.adding = false
-			profile.added = false
+		await Promise.allSettled(
+			profilesVal.map(async (profile) => {
+				profile.adding = false
+				profile.added = false
 
-			try {
-				const worlds = await get_profile_worlds(profile.path)
-				profile.added = worlds.some((w) => w.type === 'server' && w.address === serverAddress.value)
-			} catch {
-				// Ignore - will show as not added
-			}
-		}
+				try {
+					const worlds = await get_profile_worlds(profile.path)
+					profile.added = worlds.some(
+						(w) => w.type === 'server' && w.address === serverAddress.value,
+					)
+				} catch {
+					// Ignore - will show as not added
+				}
+			}),
+		)
 
 		profiles.value = profilesVal
 		modal.value.show()

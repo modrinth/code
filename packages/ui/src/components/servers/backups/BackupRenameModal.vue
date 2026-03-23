@@ -71,7 +71,7 @@ const backupsQueryKey = ['backups', 'list', ctx.serverId]
 
 const renameMutation = useMutation({
 	mutationFn: ({ backupId, name }: { backupId: string; name: string }) =>
-		client.archon.backups_v0.rename(ctx.serverId, backupId, { name }),
+		client.archon.backups_v1.rename(ctx.serverId, ctx.worldId.value!, backupId, { name }),
 	onSuccess: () => queryClient.invalidateQueries({ queryKey: backupsQueryKey }),
 })
 

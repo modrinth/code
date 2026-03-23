@@ -134,7 +134,6 @@ import {
 	RadialHeader,
 	StyledInput,
 } from '@modrinth/ui'
-import type { Version } from '@modrinth/utils'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -176,13 +175,11 @@ import {
 	start_join_singleplayer_world,
 	type World,
 } from '@/helpers/worlds.ts'
-import {
-	ensureManagedServerWorldExists,
-	getServerAddress,
-	playServerProject,
-} from '@/store/install'
+import { injectServerInstall } from '@/providers/server-install'
+import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const { handleError } = injectNotificationManager()
+const { playServerProject } = injectServerInstall()
 const route = useRoute()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
@@ -204,7 +201,6 @@ const props = defineProps<{
 	options: InstanceType<typeof ContextMenu> | null
 	offline: boolean
 	playing: boolean
-	versions: Version[]
 	installed: boolean
 }>()
 

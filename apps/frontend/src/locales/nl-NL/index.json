@@ -39,7 +39,7 @@
     "message": "Download opties"
   },
   "app-marketing.download.terms": {
-    "message": "Door het downloaden van de Modrinth-app gaat uw akkoord met onze <terms-link>algemene voorwaarden</terms-link> en <privacy-link>privacyverklaring</privacy-link>."
+    "message": "Bij het Downloaden van Modrinth App, ga je akkoord met de <terms-link>Terms</terms-link> en <privacy-link>Privacy Policy</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Download de Modrinth-app (Bètaversie)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "De Modrinth-app presteert beter dan veel van de leidende concurrenten, met een geheugengebruik van maar liefst 150mb!"
+    "message": "Modrinth App presenteert beter dan vele andere mod managers, het gebruikt maar 150 MB aan RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Nog geen projecten in verzameling"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Nog geen projecten}one {<stat>{count}</stat> project} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Nog geen projectent} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} bijgewerkt"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Maak nieuwe"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Maak je eerste collectie om te beginnen!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Je hebt nog geen collecties"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Geen collectie kunnen met je zoek opdracht"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Probeer je filters en zoek termen aan te passen."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural,one {{count} project} other {{count} projecten}}"
+    "message": "{count} {countPlural, plural, one {project} other {projecten}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Zoek in je collecties"
@@ -657,7 +669,7 @@
     "message": "Een bedrijfsentiteit is een geregistreerde organisatie, zoals een vennootschap, maatschap of LLC."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Neemt u als particulier of als bedrijf geld op?"
+    "message": "Wil je je terug trekken als individu of als bedrijf?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particulier"
@@ -1131,7 +1143,7 @@
     "message": "Hebben Modrinth Hosting servers ook DDoS-bescherming?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Ja. Alle servers van Modrinth Hosting zijn voorzien van DDoS-bescherming, met een capaciteit van tot wel 17Tbps op sommige locaties."
+    "message": "Ja. Alle Modrinth Hosting servers komen met DDoS bescherming, met tot 17 Tbps capaciteit in sommige regios."
   },
   "hosting-marketing.faq.heading": {
     "message": "Veelgestelde vragen"
@@ -1239,7 +1251,7 @@
     "message": "Weet je precies wat je nodig hebt?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Probeer een gratis <orange>3 GB server</orange> voor 5 dagen. Mogelijk gemaakt door <orange>Medal<orange>"
+    "message": "Probeer een <orange>3 GB server</orange> gratis voor 5 dagen, powered bij<orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Leer meer"
@@ -1291,6 +1303,9 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Kies tussen Vanilla, Fabric, Forge, Quilt en NeoForge. Als het op Modrinth is kan het op uw server."
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Jou server installatie is gerepareerd."
   },
   "hosting.plan.out-of-stock": {
     "message": "Uitverkocht"
@@ -1425,7 +1440,7 @@
     "message": "Voor Spelers"
   },
   "landing.section.for-players.tagline": {
-    "message": "Ontdek meer dan {count} creaties"
+    "message": "Ontdek meer dan {count, number} projecten"
   },
   "landing.subheading": {
     "message": "Ontdek, speel en deel Minecraft content via ons open bron platform, speciaal ontwikkeld voor de community."
@@ -2028,7 +2043,7 @@
     "message": "Collectie"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {downloads}}"
+    "message": "{count} {countPlural, plural, one {download} other {downloads}}"
   },
   "profile.label.joined": {
     "message": "Lid geworden"
@@ -2049,7 +2064,7 @@
     "message": "Organisaties"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {project} other {projects}}"
+    "message": "{count} {countPlural, plural, one {project} other {projecten}}"
   },
   "profile.label.saving": {
     "message": "Opslaan..."
@@ -2131,6 +2146,12 @@
   },
   "project-type.datapack.singular": {
     "message": "Data Pack"
+  },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servers"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
   },
   "project-type.mod.plural": {
     "message": "Mods"
@@ -2667,7 +2688,7 @@
     "message": "Schrijf rapporten"
   },
   "scopes.sessionAccess.description": {
-    "message": "Bekijk Modrinth sessies"
+    "message": "Ga naar Modrinth-issue sessies"
   },
   "scopes.sessionAccess.label": {
     "message": "Toegang tot sessies"
@@ -2765,9 +2786,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Backup creatie in de werken"
-  },
   "servers.notice.actions": {
     "message": "Acties"
   },
@@ -2820,7 +2838,7 @@
     "message": "Voeg meer toe"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Voeg een redirect-URI toe."
+    "message": "Voeg een URI toe"
   },
   "settings.applications.button.cancel": {
     "message": "Annuleren"
@@ -2883,7 +2901,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Uris omleiden"
+    "message": "Omleidings-URL"
   },
   "settings.applications.field.scopes": {
     "message": "Permissiebereik"
@@ -2990,6 +3008,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Resource Packs pagina"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Servers pagina"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Shaders pagina"
   },
@@ -3042,7 +3063,7 @@
     "message": "Creëer een PAT"
   },
   "settings.pats.description": {
-    "message": "PAT's kunnen gebruikt worden om Modrinths API te gebruiken. Voor meer informatie, zie <doc-link> Modrinth's API-documentatie </doc-link>. Ze kunnen altijd gemaakt en teruggetrokken worden."
+    "message": "PAT kunnen gebruik worden om Modrinth's API te bereiken, deze kunnen elk moment gemaakt en terug getrokken worden. Voor meer informatie ga naar <doc-link>Modrinth's API-documentatie</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Creëer PAT"

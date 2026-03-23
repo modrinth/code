@@ -171,7 +171,9 @@ pub fn get_default_launcher_path(
     r#type: ImportLauncherType,
 ) -> Option<PathBuf> {
     let path = match r#type {
-        ImportLauncherType::MultiMC => None, // multimc data is *in* app dir
+        ImportLauncherType::MultiMC => {
+            return find_multimc_path();
+        }
         ImportLauncherType::PrismLauncher => {
             Some(dirs::data_dir()?.join("PrismLauncher"))
         }
@@ -182,12 +184,65 @@ pub fn get_default_launcher_path(
             Some(dirs::data_dir()?.join("gdlauncher_next"))
         }
         ImportLauncherType::Curseforge => {
-            Some(dirs::home_dir()?.join("curseforge").join("minecraft"))
+            let home = dirs::home_dir()?;
+            let primary = home.join("curseforge").join("minecraft");
+            if primary.exists() {
+                return Some(primary);
+            }
+            Some(dirs::document_dir()?.join("curseforge").join("minecraft"))
         }
         ImportLauncherType::Unknown => None,
     };
     let path = path?;
     if path.exists() { Some(path) } else { None }
+}
+
+/// Searches common locations for a MultiMC installation.
+/// MultiMC stores data in its own application directory (not a standard data dir)
+fn find_multimc_path() -> Option<PathBuf> {
+    let mut candidates: Vec<PathBuf> = Vec::new();
+
+    // Linux/macOS: ~/.local/share/multimc is the typical location
+    if let Some(data_dir) = dirs::data_dir() {
+        candidates.push(data_dir.join("multimc"));
+        candidates.push(data_dir.join("MultiMC"));
+    }
+
+    // Windows: check common extraction locations
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(home) = dirs::home_dir() {
+            candidates.push(home.join("MultiMC"));
+            candidates.push(home.join("Desktop").join("MultiMC"));
+            candidates.push(home.join("Downloads").join("MultiMC"));
+        }
+        candidates.push(PathBuf::from("C:\\MultiMC"));
+        if let Some(program_files) =
+            std::env::var_os("ProgramFiles").map(PathBuf::from)
+        {
+            candidates.push(program_files.join("MultiMC"));
+        }
+        if let Some(program_files_x86) =
+            std::env::var_os("ProgramFiles(x86)").map(PathBuf::from)
+        {
+            candidates.push(program_files_x86.join("MultiMC"));
+        }
+    }
+
+    // macOS: MultiMC is a .app bundle with data inside MultiMC.app/Data/
+    #[cfg(target_os = "macos")]
+    {
+        candidates.push(PathBuf::from("/Applications/MultiMC.app/Data"));
+        if let Some(home) = dirs::home_dir() {
+            candidates.push(
+                home.join("Applications").join("MultiMC.app").join("Data"),
+            );
+        }
+    }
+
+    candidates
+        .into_iter()
+        .find(|p| p.join("multimc.cfg").exists())
 }
 
 /// Checks if this PathBuf is a valid instance for the given launcher type

@@ -31,6 +31,8 @@ import {
 	Button,
 	ButtonStyled,
 	commonMessages,
+	ContentInstallModal,
+	CreationFlowModal,
 	defineMessages,
 	I18nDebugPanel,
 	NewsArticleCard,
@@ -38,6 +40,7 @@ import {
 	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
+	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
 	providePageContext,
@@ -65,27 +68,25 @@ import ErrorModal from '@/components/ui/ErrorModal.vue'
 import FriendsList from '@/components/ui/friends/FriendsList.vue'
 import AddServerToInstanceModal from '@/components/ui/install_flow/AddServerToInstanceModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
-import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
-import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import MinecraftAuthErrorModal from '@/components/ui/minecraft-auth-error-modal/MinecraftAuthErrorModal.vue'
 import AppSettingsModal from '@/components/ui/modal/AppSettingsModal.vue'
 import AuthGrantFlowWaitModal from '@/components/ui/modal/AuthGrantFlowWaitModal.vue'
 import InstallToPlayModal from '@/components/ui/modal/InstallToPlayModal.vue'
+import ModpackAlreadyInstalledModal from '@/components/ui/modal/ModpackAlreadyInstalledModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
 import NavButton from '@/components/ui/NavButton.vue'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
-import { get_user } from '@/helpers/cache.js'
+import { get_user, get_version } from '@/helpers/cache.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { cancelLogin, get as getCreds, login, logout } from '@/helpers/mr_auth.ts'
+import { create_profile_and_install_from_file } from '@/helpers/pack'
 import { list } from '@/helpers/profile.js'
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
 import { get_opening_command, initialize_state } from '@/helpers/state'
@@ -98,15 +99,16 @@ import {
 	isNetworkMetered,
 } from '@/helpers/utils.js'
 import i18n from '@/i18n.config'
+import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
 	provideAppUpdateDownloadProgress,
 	subscribeToDownloadProgress,
 } from '@/providers/download-progress.ts'
+import { createServerInstall, provideServerInstall } from '@/providers/server-install'
+import { setupProviders } from '@/providers/setup'
 import { useError } from '@/store/error.js'
-import { playServerProject, useInstall } from '@/store/install.js'
 import { useLoading, useTheming } from '@/store/state'
 
-import { create_profile_and_install_from_file } from './helpers/pack'
 import { generateSkinPreviews } from './helpers/rendering/batch-skin-renderer'
 import { get_available_capes, get_available_skins } from './helpers/skins'
 import { AppNotificationManager } from './providers/app-notifications'
@@ -136,10 +138,26 @@ providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
 })
+provideModalBehavior({
+	noblur: computed(() => !themeStore.advancedRendering),
+	onShow: () => hide_ads_window(),
+	onHide: () => show_ads_window(),
+})
+
+const {
+	installationModal,
+	fetchExistingInstanceNames,
+	handleCreate,
+	handleBrowseModpacks,
+	searchModpacks,
+	getProjectVersions,
+	setModpackAlreadyInstalledModal,
+	handleModpackDuplicateCreateAnyway,
+	handleModpackDuplicateGoToInstance,
+} = setupProviders(notificationManager)
+
 const news = ref([])
 const availableSurvey = ref(false)
-
-const urlModal = ref(null)
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -392,10 +410,42 @@ const error = useError()
 const errorModal = ref()
 const minecraftAuthErrorModal = ref()
 
-const install = useInstall()
+const contentInstall = createContentInstall({ router, handleError })
+provideContentInstall(contentInstall)
+const {
+	instances: contentInstallInstances,
+	compatibleLoaders: contentInstallLoaders,
+	gameVersions: contentInstallGameVersions,
+	loading: contentInstallLoading,
+	defaultTab: contentInstallDefaultTab,
+	preferredLoader: contentInstallPreferredLoader,
+	preferredGameVersion: contentInstallPreferredGameVersion,
+	releaseGameVersions: contentInstallReleaseGameVersions,
+	projectInfo: contentInstallProjectInfo,
+	handleInstallToInstance,
+	handleCreateAndInstall,
+	handleNavigate: handleContentInstallNavigate,
+	handleCancel: handleContentInstallCancel,
+	setContentInstallModal,
+	setModpackAlreadyInstalledModal: setContentInstallModpackAlreadyInstalledModal,
+	handleModpackDuplicateCreateAnyway: handleContentInstallModpackDuplicateCreateAnyway,
+	handleModpackDuplicateGoToInstance: handleContentInstallModpackDuplicateGoToInstance,
+	setIncompatibilityWarningModal: setContentIncompatibilityWarningModal,
+} = contentInstall
+
+const serverInstall = createServerInstall({ router, handleError, popupNotificationManager })
+provideServerInstall(serverInstall)
+const {
+	setInstallToPlayModal: setServerInstallToPlayModal,
+	setUpdateToPlayModal: setServerUpdateToPlayModal,
+	setAddServerToInstanceModal: setServerAddServerToInstanceModal,
+	playServerProject,
+} = serverInstall
+
 const modInstallModal = ref()
+const modpackAlreadyInstalledModal = ref()
+const contentInstallModpackAlreadyInstalledModal = ref()
 const addServerToInstanceModal = ref()
-const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 const installToPlayModal = ref()
 const updateToPlayModal = ref()
@@ -474,13 +524,13 @@ onMounted(() => {
 	error.setErrorModal(errorModal.value)
 	error.setMinecraftAuthErrorModal(minecraftAuthErrorModal.value)
 
-	install.setIncompatibilityWarningModal(incompatibilityWarningModal)
-	install.setInstallConfirmModal(installConfirmModal)
-	install.setModInstallModal(modInstallModal)
-	install.setAddServerToInstanceModal(addServerToInstanceModal)
-	install.setInstallToPlayModal(installToPlayModal)
-	install.setUpdateToPlayModal(updateToPlayModal)
-	install.setPopupNotificationManager(popupNotificationManager)
+	setContentIncompatibilityWarningModal(incompatibilityWarningModal.value)
+	setContentInstallModal(modInstallModal.value)
+	setContentInstallModpackAlreadyInstalledModal(contentInstallModpackAlreadyInstalledModal.value)
+	setModpackAlreadyInstalledModal(modpackAlreadyInstalledModal.value)
+	setServerAddServerToInstanceModal(addServerToInstanceModal.value)
+	setServerInstallToPlayModal(installToPlayModal.value)
+	setServerUpdateToPlayModal(updateToPlayModal.value)
 })
 
 const accounts = ref(null)
@@ -501,9 +551,19 @@ async function handleCommand(e) {
 	} else if (e.event === 'InstallServer') {
 		await router.push(`/project/${e.id}`)
 		await playServerProject(e.id).catch(handleError)
+	} else if (e.event === 'InstallVersion') {
+		const version = await get_version(e.id, 'must_revalidate').catch(handleError)
+		if (version) {
+			await contentInstall
+				.install(version.project_id, version.id, null, 'URLConfirmModal', undefined, undefined, {
+					showProjectInfo: true,
+				})
+				.catch(handleError)
+		}
 	} else {
-		// Other commands are URL-based (deep linking)
-		urlModal.value.show(e)
+		await contentInstall
+			.install(e.id, null, null, 'URLConfirmModal', undefined, undefined, { showProjectInfo: true })
+			.catch(handleError)
 	}
 }
 
@@ -898,9 +958,16 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		<Suspense>
 			<AuthGrantFlowWaitModal ref="modrinthLoginFlowWaitModal" @flow-cancel="cancelLogin" />
 		</Suspense>
-		<Suspense>
-			<InstanceCreationModal ref="installationModal" />
-		</Suspense>
+		<CreationFlowModal
+			ref="installationModal"
+			type="instance"
+			show-snapshot-toggle
+			:fetch-existing-instance-names="fetchExistingInstanceNames"
+			:search-modpacks="searchModpacks"
+			:get-project-versions="getProjectVersions"
+			@create="handleCreate"
+			@browse-modpacks="handleBrowseModpacks"
+		/>
 		<div
 			class="app-grid-navbar bg-bg-raised flex flex-col p-[0.5rem] pt-0 gap-[0.5rem] w-[--left-bar-width]"
 		>
@@ -946,7 +1013,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</suspense>
 			<NavButton
 				v-tooltip.right="'Create new instance'"
-				:to="() => $refs.installationModal.show()"
+				:to="() => installationModal?.show()"
 				:disabled="offline"
 			>
 				<PlusIcon />
@@ -1021,9 +1088,9 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 		</div>
 		<div data-tauri-drag-region class="app-grid-statusbar bg-bg-raised h-[--top-bar-height] flex">
-			<div data-tauri-drag-region class="flex p-3">
-				<ModrinthAppLogo class="h-full w-auto text-contrast pointer-events-none" />
-				<div data-tauri-drag-region class="flex items-center gap-1 ml-3">
+			<div data-tauri-drag-region class="flex min-w-0 flex-1 overflow-hidden p-3">
+				<ModrinthAppLogo class="h-full w-auto shrink-0 text-contrast pointer-events-none" />
+				<div data-tauri-drag-region class="flex shrink-0 items-center gap-1 ml-3">
 					<button
 						class="cursor-pointer p-0 m-0 text-contrast border-none outline-none bg-button-bg rounded-full flex items-center justify-center w-6 h-6 hover:brightness-75 transition-all"
 						@click="router.back()"
@@ -1039,7 +1106,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</div>
 				<Breadcrumbs class="pt-[2px]" />
 			</div>
-			<section data-tauri-drag-region class="flex ml-auto items-center">
+			<section data-tauri-drag-region class="flex shrink-0 ml-auto items-center">
 				<ButtonStyled
 					v-if="!forceSidebar && themeStore.toggleSidebar"
 					:type="sidebarToggled ? 'standard' : 'transparent'"
@@ -1214,16 +1281,39 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</template>
 		</div>
 	</div>
-	<URLConfirmModal ref="urlModal" />
 	<I18nDebugPanel />
 	<NotificationPanel has-sidebar />
 	<PopupNotificationPanel has-sidebar />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
-	<ModInstallModal ref="modInstallModal" />
+	<ContentInstallModal
+		ref="modInstallModal"
+		:instances="contentInstallInstances"
+		:compatible-loaders="contentInstallLoaders"
+		:game-versions="contentInstallGameVersions"
+		:loading="contentInstallLoading"
+		:default-tab="contentInstallDefaultTab"
+		:preferred-loader="contentInstallPreferredLoader"
+		:preferred-game-version="contentInstallPreferredGameVersion"
+		:release-game-versions="contentInstallReleaseGameVersions"
+		:project-info="contentInstallProjectInfo"
+		@install="handleInstallToInstance"
+		@create-and-install="handleCreateAndInstall"
+		@navigate="handleContentInstallNavigate"
+		@cancel="handleContentInstallCancel"
+	/>
+	<ModpackAlreadyInstalledModal
+		ref="modpackAlreadyInstalledModal"
+		@create-anyway="handleModpackDuplicateCreateAnyway"
+		@go-to-instance="handleModpackDuplicateGoToInstance"
+	/>
 	<AddServerToInstanceModal ref="addServerToInstanceModal" />
 	<IncompatibilityWarningModal ref="incompatibilityWarningModal" />
-	<InstallConfirmModal ref="installConfirmModal" />
+	<ModpackAlreadyInstalledModal
+		ref="contentInstallModpackAlreadyInstalledModal"
+		@create-anyway="handleContentInstallModpackDuplicateCreateAnyway"
+		@go-to-instance="handleContentInstallModpackDuplicateGoToInstance"
+	/>
 	<InstallToPlayModal ref="installToPlayModal" />
 	<UpdateToPlayModal ref="updateToPlayModal" />
 </template>
@@ -1534,4 +1624,3 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 	}
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>

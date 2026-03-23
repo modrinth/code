@@ -2,15 +2,15 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { fn } from 'storybook/test'
 import { ref } from 'vue'
 
-import ContentCardItem from '../../components/instances/ContentCardItem.vue'
-import ContentModpackCard from '../../components/instances/ContentModpackCard.vue'
+import NewModal from '../../components/modal/NewModal.vue'
+import ContentCardItem from '../../layouts/shared/content-tab/components/ContentCardItem.vue'
+import ContentModpackCard from '../../layouts/shared/content-tab/components/ContentModpackCard.vue'
 import type {
 	ContentModpackCardCategory,
 	ContentModpackCardProject,
 	ContentModpackCardVersion,
 	ContentOwner,
-} from '../../components/instances/types'
-import NewModal from '../../components/modal/NewModal.vue'
+} from '../../layouts/shared/content-tab/types'
 
 // Real project data from Modrinth API
 const fabulouslyOptimizedProject: ContentModpackCardProject = {

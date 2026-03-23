@@ -46,7 +46,10 @@
 						}
 					"
 				>
-					<template v-if="!$slots[option.id]">{{ option.id }}</template>
+					<template v-if="!$slots[option.id]">
+						<component :is="option.icon" v-if="option.icon" class="size-5" />
+						{{ option.id }}
+					</template>
 					<slot :name="option.id"></slot>
 				</Button>
 			</template>
@@ -55,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref } from 'vue'
+import { type Component, type Ref, ref } from 'vue'
 
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
@@ -70,6 +73,7 @@ interface Divider extends BaseOption {
 
 interface Item extends BaseOption {
 	id: string
+	icon?: Component
 	action?: (event?: MouseEvent) => void
 	link?: string
 	external?: boolean

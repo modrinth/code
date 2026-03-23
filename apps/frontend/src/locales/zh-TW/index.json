@@ -39,7 +39,7 @@
     "message": "下載選項"
   },
   "app-marketing.download.terms": {
-    "message": "下載 Modrinth App 即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
+    "message": "下載 Modrinth App，即表示您同意我們的《<terms-link>使用條款</terms-link>》及《<privacy-link>隱私權政策</privacy-link>》。"
   },
   "app-marketing.download.title": {
     "message": "下載 Modrinth App（Beta 版）"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App 的效能優於許多主流模組管理程式，僅佔用 150MB 的記憶體！"
+    "message": "Modrinth App 的效能優於許多主流的模組管理員，且僅使用 150 MB 記憶體！"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -213,7 +213,7 @@
     "message": "拒絕"
   },
   "auth.authorize.app-info": {
-    "message": "<strong>{appName}</strong> 由 <creator-link>{creator}</creator-link> 開發，將能夠："
+    "message": "由 <creator-link>{creator}</creator-link> 開發的「<strong>{appName}</strong>」將可執行下列操作："
   },
   "auth.authorize.authorize-app-name": {
     "message": "授權「{appName}」"
@@ -393,7 +393,7 @@
     "message": "收藏中暫無專案"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {暫無專案} one {<stat>{count}</stat> 個專案} other {<stat>{count}</stat> 個{type}}}"
+    "message": "{count, plural, =0 {還沒有專案} other {<stat>{count}</stat> 個{type}}}"
   },
   "collection.label.updated-at": {
     "message": "更新時間：{ago}"
@@ -420,7 +420,7 @@
     "message": "名稱"
   },
   "create.collection.name-placeholder": {
-    "message": "輸入收藏名稱……"
+    "message": "輸入收藏名稱..."
   },
   "create.collection.summary-description": {
     "message": "用一兩句話描述你的收藏。"
@@ -578,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "新增"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "建立你的第一個收藏，立即開始！"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "你還沒有任何收藏"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "沒有收藏符合你的搜尋字詞"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "試試調整篩選器或搜尋字詞。"
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} 個專案}}"
+    "message": "{count} 個專案"
   },
   "dashboard.collections.label.search-input": {
     "message": "搜尋收藏"
@@ -1131,7 +1143,7 @@
     "message": "Modrinth Hosting 伺服器有 DDoS 防護嗎？"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "有的。所有 Modrinth Hosting 伺服器都具備 DDoS 防護，部分地區的防禦容量最高可達 17Tbps。"
+    "message": "有的。所有 Modrinth Hosting 伺服器都具備 DDoS 防護，部分地區的防禦容量最高可達 17 Tbps。"
   },
   "hosting-marketing.faq.heading": {
     "message": "常見問題"
@@ -1194,7 +1206,7 @@
     "message": "內建備份服務"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "每台伺服器均包含 15 份安全儲存於異地的備份。"
+    "message": "每臺伺服器均包含 15 份安全儲存於異地的備份。"
   },
   "hosting-marketing.included.custom-url": {
     "message": "自訂網址"
@@ -1203,7 +1215,7 @@
     "message": "使用自訂的 <contrast>modrinth.gg</contrast> 網址分享你的伺服器。"
   },
   "hosting-marketing.included.description": {
-    "message": "每台伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
+    "message": "每臺伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
   },
   "hosting-marketing.included.file-manager": {
     "message": "直覺好用的檔案管理員"
@@ -1221,7 +1233,7 @@
     "message": "隨時聯絡 Modrinth 團隊來取得伺服器相關協助。"
   },
   "hosting-marketing.included.powerful-console": {
-    "message": "強大的控制台、伺服器設定檔管理員，以及更多功能"
+    "message": "強大的主控臺、伺服器設定檔管理員，以及更多功能"
   },
   "hosting-marketing.included.powerful-console.description": {
     "message": "Modrinth Hosting 配備了多樣強大工具，讓你輕鬆管理你的伺服器。"
@@ -1291,6 +1303,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "自由選擇原版、Fabric、Forge、Quilt 或 NeoForge。只要在 Modrinth 上找得到的，都能在你的伺服器上執行。"
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "無法變更模組包版本"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "無法載入版本"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "無法重新安裝模組包"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "無法修復伺服器"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "無法儲存安裝設定"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "無法取消連結模組包"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {載入器} other {{loader}}} 版本"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "你的伺服器安裝已修復。"
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "修復完成"
+  },
+  "hosting.loader.reset-server": {
+    "message": "重設伺服器"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1425,7 +1470,7 @@
     "message": "玩家專區"
   },
   "landing.section.for-players.tagline": {
-    "message": "探索超過 {count} 個創作"
+    "message": "探索超過 {count, number} 個創作"
   },
   "landing.subheading": {
     "message": "透過我們為社群打造的開源平臺，探索、遊玩並分享 Minecraft 內容。"
@@ -2771,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "與伺服器同步"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "正在建立備份"
+  },
+  "servers.busy.backup-restoring": {
     "message": "正在還原備份"
+  },
+  "servers.busy.installing": {
+    "message": "正在安裝伺服器"
+  },
+  "servers.busy.syncing-content": {
+    "message": "正在同步內容"
   },
   "servers.notice.actions": {
     "message": "動作"
@@ -3051,7 +3105,7 @@
     "message": "建立個人存取權杖"
   },
   "settings.pats.description": {
-    "message": "個人存取權杖可以用來存取 Modrinth 的 API。如需更多資訊，請參閱 <doc-link>Modrinth 的 API 文件</doc-link>。你隨時可以建立及撤銷這些權杖。"
+    "message": "可用於存取 Modrinth 的 API。你可以隨時建立或撤銷。欲了解更多資訊，請參閱 <doc-link>Modrinth API 文件</doc-link>。"
   },
   "settings.pats.modal.create.action": {
     "message": "建立個人存取權杖"

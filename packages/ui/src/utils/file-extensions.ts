@@ -1,5 +1,5 @@
 // File extension constants
-export const CODE_EXTENSIONS = [
+export const FILE_CODE_EXTENSIONS = [
 	'json',
 	'json5',
 	'jsonc',
@@ -26,7 +26,7 @@ export const CODE_EXTENSIONS = [
 	'go',
 ] as const
 
-export const TEXT_EXTENSIONS = [
+export const FILE_TEXT_EXTENSIONS = [
 	'txt',
 	'md',
 	'log',
@@ -37,15 +37,15 @@ export const TEXT_EXTENSIONS = [
 	'sk',
 ] as const
 
-export const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
+export const FILE_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'] as const
 
-export const ARCHIVE_EXTENSIONS = ['zip'] as const
+export const FILE_ARCHIVE_EXTENSIONS = ['zip', 'jar', 'tar', 'gz', 'rar', '7z'] as const
 
 // Type for extension strings
-export type CodeExtension = (typeof CODE_EXTENSIONS)[number]
-export type TextExtension = (typeof TEXT_EXTENSIONS)[number]
-export type ImageExtension = (typeof IMAGE_EXTENSIONS)[number]
-export type ArchiveExtension = (typeof ARCHIVE_EXTENSIONS)[number]
+export type CodeExtension = (typeof FILE_CODE_EXTENSIONS)[number]
+export type TextExtension = (typeof FILE_TEXT_EXTENSIONS)[number]
+export type ImageExtension = (typeof FILE_IMAGE_EXTENSIONS)[number]
+export type ArchiveExtension = (typeof FILE_ARCHIVE_EXTENSIONS)[number]
 
 /**
  * Extract file extension from filename (lowercase)
@@ -58,28 +58,28 @@ export function getFileExtension(filename: string): string {
  * Check if extension is a code file
  */
 export function isCodeFile(ext: string): boolean {
-	return (CODE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+	return (FILE_CODE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
 /**
  * Check if extension is a text file
  */
 export function isTextFile(ext: string): boolean {
-	return (TEXT_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+	return (FILE_TEXT_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
 /**
  * Check if extension is an image file
  */
 export function isImageFile(ext: string): boolean {
-	return (IMAGE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+	return (FILE_IMAGE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
 /**
  * Check if extension is an archive file
  */
 export function isArchiveFile(ext: string): boolean {
-	return (ARCHIVE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
+	return (FILE_ARCHIVE_EXTENSIONS as readonly string[]).includes(ext.toLowerCase())
 }
 
 /**
