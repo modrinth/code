@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CheckIcon,
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
@@ -34,7 +35,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type Instance from '@/components/ui/Instance.vue'
@@ -51,12 +52,12 @@ import {
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { getServerLatency } from '@/helpers/worlds'
+import { add_server_to_profile, getServerLatency } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 
-const { handleError } = injectNotificationManager()
+const { handleError, addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
@@ -108,12 +109,20 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
+const isFromWorlds = route.query.from === 'worlds'
+
+if (isFromWorlds && route.params.projectType !== 'server') {
+	router.replace({
+		path: '/browse/server',
+		query: route.query,
+	})
+}
 
 const allInstalledIds = computed(
 	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
 )
 
-const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
+const PERSISTENT_QUERY_PARAMS = ['i', 'ai', 'from']
 
 await initInstanceContext()
 
@@ -281,11 +290,21 @@ async function handlePlayServerProject(projectId: string) {
 	checkServerRunningStates(serverHits.value)
 }
 
-function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
+async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
 	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
 	const address = getServerAddress(project.minecraft_java_server)
 	if (!address) return
-	showAddServerToInstanceModal(project.name, address)
+
+	if (instance.value) {
+		try {
+			await add_server_to_profile(instance.value.path, project.name, address, 'prompt')
+			newlyInstalled.value.push(project.project_id)
+		} catch (err) {
+			handleError(err as Error)
+		}
+	} else {
+		showAddServerToInstanceModal(project.name, address)
+	}
 }
 
 const unlistenProcesses = await process_listener(
@@ -317,6 +336,16 @@ const {
 	createServerPageParams,
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
+if (instance.value?.game_version) {
+	const gv = instance.value.game_version
+	const alreadyHasGv = serverCurrentFilters.value.some(
+		(f) => f.type === 'server_game_version' && f.option === gv,
+	)
+	if (!alreadyHasGv) {
+		serverCurrentFilters.value.push({ type: 'server_game_version', option: gv })
+	}
+}
+
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 	debugLog('pingServerHits', { hitCount: hits.length })
 	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
@@ -347,7 +376,25 @@ window.addEventListener('online', () => {
 })
 
 const breadcrumbs = useBreadcrumbs()
-breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
+const browseTitle = isFromWorlds ? 'Discover servers' : 'Discover content'
+breadcrumbs.setName('BrowseTitle', browseTitle)
+if (instance.value) {
+	const instanceLink = `/instance/${encodeURIComponent(instance.value.path)}`
+	breadcrumbs.setContext({
+		name: instance.value.name,
+		link: isFromWorlds ? `${instanceLink}/worlds` : instanceLink,
+	})
+} else {
+	breadcrumbs.setContext(null)
+}
+
+onBeforeRouteLeave(() => {
+	breadcrumbs.setContext({
+		name: browseTitle,
+		link: `/browse/${projectType.value}`,
+		query: route.query,
+	})
+})
 
 const loading = ref(true)
 
@@ -484,11 +531,6 @@ async function refreshSearch() {
 			...(isServer ? createServerPageParams() : createPageParams()),
 		}
 
-		breadcrumbs.setContext({
-			name: 'Discover content',
-			link: `/browse/${projectType.value}`,
-			query: params,
-		})
 		debugLog('updating URL', params)
 		router.replace({ path: route.path, query: params })
 
@@ -569,29 +611,25 @@ const selectableProjectTypes = computed(() => {
 	if (route.query.ai) {
 		params.ai = route.query.ai
 	}
-
-	const links = [
-		{ label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
-		{ label: 'Mods', href: `/browse/mod`, shown: mods },
-		{ label: 'Resource Packs', href: `/browse/resourcepack` },
-		{ label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks },
-		{ label: 'Shaders', href: `/browse/shader` },
-		{ label: 'Servers', href: `/browse/server`, shown: !instance.value },
-	]
-
-	if (params) {
-		return links.map((link) => {
-			return {
-				...link,
-				href: {
-					path: link.href,
-					query: params,
-				},
-			}
-		})
+	if (route.query.from) {
+		params.from = route.query.from
 	}
 
-	return links
+	const queryString = new URLSearchParams(params as Record<string, string>).toString()
+	const suffix = queryString ? `?${queryString}` : ''
+
+	if (isFromWorlds) {
+		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
+	}
+
+	return [
+		{ label: 'Modpacks', href: `/browse/modpack${suffix}`, shown: modpacks },
+		{ label: 'Mods', href: `/browse/mod${suffix}`, shown: mods },
+		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
+		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
+		{ label: 'Shaders', href: `/browse/shader${suffix}` },
+		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
+	]
 })
 
 const messages = defineMessages({
@@ -776,8 +814,8 @@ previousFilterState.value = JSON.stringify({
 	</Teleport>
 	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
 		<template v-if="instance">
-			<InstanceIndicator :instance="instance" />
-			<h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
+			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
+			<h1 class="m-0 mb-1 text-xl">{{ isFromWorlds ? 'Add servers to your instance' : 'Install content to instance' }}</h1>
 			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
 				be lost when you update the server instance content.
@@ -889,10 +927,12 @@ previousFilterState.value = JSON.stringify({
 							<div class="flex gap-2">
 								<ButtonStyled circular>
 									<button
-										v-tooltip="'Add server to instance'"
+										v-tooltip="allInstalledIds.has(project.project_id) ? 'Already added' : instance ? `Add to ${instance.name}` : 'Add server to instance'"
+										:disabled="allInstalledIds.has(project.project_id)"
 										@click.stop="() => handleAddServerToInstance(project)"
 									>
-										<PlusIcon />
+										<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
+										<PlusIcon v-else />
 									</button>
 								</ButtonStyled>
 								<ButtonStyled

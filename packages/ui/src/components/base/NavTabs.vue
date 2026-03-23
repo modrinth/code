@@ -1,6 +1,6 @@
 <template>
 	<nav
-		v-if="filteredLinks.length > 1"
+		v-if="filteredLinks.length > 0"
 		ref="scrollContainer"
 		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'shadow-sm': mode === 'navigation' }"
@@ -166,7 +166,7 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 	for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
 		const link = filteredLinks.value[i]
 		const decodedPath = decodeURIComponent(route.path)
-		const decodedHref = decodeURIComponent(link.href)
+		const decodedHref = decodeURIComponent(link.href.split('?')[0])
 
 		if (props.query) {
 			const queryValue = route.query[props.query]
@@ -181,7 +181,9 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 		}
 
 		const isSubpageMatch =
-			decodedPath.includes(decodedHref) ||
+			(decodedPath.startsWith(decodedHref) &&
+				(decodedPath.length === decodedHref.length ||
+					decodedPath[decodedHref.length] === '/')) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
 		if (isSubpageMatch) {

@@ -92,51 +92,42 @@
 			/>
 		</div>
 	</div>
-	<div v-else class="w-full max-w-[48rem] mx-auto flex flex-col mt-6">
-		<RadialHeader class="">
-			<div class="flex items-center gap-6 w-[32rem] mx-auto">
-				<img src="@/assets/sad-modrinth-bot.webp" alt="" aria-hidden="true" class="h-24" />
-				<span class="text-contrast font-bold text-xl"> You don't have any worlds yet. </span>
-			</div>
-		</RadialHeader>
-		<div class="flex gap-2 mt-4 mx-auto">
-			<ButtonStyled>
-				<button @click="addServerModal?.show()">
-					<PlusIcon aria-hidden="true" />
+	<EmptyState v-else type="empty-inbox" heading="You don't have any worlds yet.">
+		<template #actions>
+			<ButtonStyled type="outlined">
+				<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
+					<PlusIcon class="size-5" />
 					Add a server
 				</button>
 			</ButtonStyled>
-			<ButtonStyled>
-				<button :disabled="refreshingAll" @click="refreshAllWorlds">
-					<template v-if="refreshingAll">
-						<SpinnerIcon aria-hidden="true" class="animate-spin" />
-						Refreshing...
-					</template>
-					<template v-else>
-						<UpdatedIcon aria-hidden="true" />
-						Refresh
-					</template>
+			<ButtonStyled color="brand">
+				<button
+					class="!h-10 flex items-center gap-2"
+					@click="router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })"
+				>
+					<CompassIcon class="size-5" />
+					<span>Browse servers</span>
 				</button>
 			</ButtonStyled>
-		</div>
-	</div>
+		</template>
+	</EmptyState>
 </template>
 <script setup lang="ts">
-import { PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
+import { CompassIcon, PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	defineMessages,
+	EmptyState,
 	FilterBar,
 	type FilterBarOption,
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
-	RadialHeader,
 	StyledInput,
 } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
@@ -181,6 +172,7 @@ import { ensureManagedServerWorldExists, getServerAddress } from '@/store/instal
 const { handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const route = useRoute()
+const router = useRouter()
 
 const addServerModal = ref<InstanceType<typeof AddServerModal>>()
 const editServerModal = ref<InstanceType<typeof EditServerModal>>()

@@ -869,7 +869,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project.title).join(', ')"
+			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal

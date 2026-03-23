@@ -41,7 +41,8 @@ export default new createRouter({
 			name: 'Discover content',
 			component: Pages.Browse,
 			meta: {
-				breadcrumb: [{ name: 'Discover content' }],
+				useContext: true,
+				breadcrumb: [{ name: '?BrowseTitle' }],
 			},
 		},
 		{
