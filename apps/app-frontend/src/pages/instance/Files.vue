@@ -311,20 +311,24 @@ async function handleExtractFile(path: string, override: boolean, dry: boolean) 
 	}
 }
 
-debug('setup: registering profile_listener')
-const unlistenProfiles = await profile_listener(
-	async (event: { event: string; profile_path_id: string }) => {
-		debug('profile_listener: event =', event.event, 'path =', event.profile_path_id)
-		if (event.profile_path_id === props.instance.path && event.event === 'synced') {
-			debug('profile_listener: synced event matched, calling refresh')
-			await refresh()
-		}
-	},
-)
-debug('setup: profile_listener registered')
+let unlistenProfiles: (() => void) | undefined
+
+onMounted(async () => {
+	debug('setup: registering profile_listener')
+	unlistenProfiles = await profile_listener(
+		async (event: { event: string; profile_path_id: string }) => {
+			debug('profile_listener: event =', event.event, 'path =', event.profile_path_id)
+			if (event.profile_path_id === props.instance.path && event.event === 'synced') {
+				debug('profile_listener: synced event matched, calling refresh')
+				await refresh()
+			}
+		},
+	)
+	debug('setup: profile_listener registered')
+})
 
 onUnmounted(() => {
-	unlistenProfiles()
+	unlistenProfiles?.()
 })
 
 watch(
