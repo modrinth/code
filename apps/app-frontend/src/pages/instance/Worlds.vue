@@ -247,6 +247,13 @@ function toggleFilter(id: string) {
 		selectedFilters.value.splice(idx, 1)
 	} else {
 		selectedFilters.value.push(id)
+		if (id === 'singleplayer') {
+			selectedFilters.value = selectedFilters.value.filter(
+				(f) => f !== 'online' && f !== 'offline',
+			)
+		} else if (id === 'online' || id === 'offline') {
+			selectedFilters.value = selectedFilters.value.filter((f) => f !== 'singleplayer')
+		}
 	}
 }
 
@@ -535,13 +542,23 @@ const dedupedWorlds = computed(() => {
 
 const filterOptions = computed(() => {
 	const options: { id: string; label: string }[] = []
+	const hasSingleplayer = dedupedWorlds.value.some((x) => x.type === 'singleplayer')
 	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
+
+	const hasStatusFilter =
+		selectedFilters.value.includes('online') || selectedFilters.value.includes('offline')
+
+	if (hasSingleplayer && hasServer && !hasStatusFilter) {
+		options.push({ id: 'singleplayer', label: 'Singleplayer' })
+	}
 
 	if (hasServer) {
 		options.push({ id: 'vanilla', label: 'Vanilla' })
 		options.push({ id: 'modded', label: 'Modded' })
-		options.push({ id: 'online', label: 'Online' })
-		options.push({ id: 'offline', label: 'Offline' })
+		if (!selectedFilters.value.includes('singleplayer')) {
+			options.push({ id: 'online', label: 'Online' })
+			options.push({ id: 'offline', label: 'Offline' })
+		}
 	}
 
 	return options
@@ -555,11 +572,16 @@ const filteredWorlds = computed(() =>
 
 		if (selectedFilters.value.length === 0) return true
 
+		const hasSingleplayerFilter = selectedFilters.value.includes('singleplayer')
 		const typeFilters = selectedFilters.value.filter((f) => f === 'vanilla' || f === 'modded')
 		const statusFilters = selectedFilters.value.filter((f) => f === 'online' || f === 'offline')
 
 		if (x.type === 'singleplayer') {
-			return typeFilters.length === 0 && statusFilters.length === 0
+			return hasSingleplayerFilter || (typeFilters.length === 0 && statusFilters.length === 0)
+		}
+
+		if (hasSingleplayerFilter && typeFilters.length === 0 && statusFilters.length === 0) {
+			return false
 		}
 
 		let passesType = true
