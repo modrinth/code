@@ -456,14 +456,14 @@ const tabs = computed(() => [
 		icon: BoxesIcon,
 	},
 	{
-		label: 'Worlds',
-		href: `${basePath.value}/worlds`,
-		icon: GlobeIcon,
-	},
-	{
 		label: 'Files',
 		href: `${basePath.value}/files`,
 		icon: FolderOpenIcon,
+	},
+	{
+		label: 'Worlds',
+		href: `${basePath.value}/worlds`,
+		icon: GlobeIcon,
 	},
 	{
 		label: 'Logs',
