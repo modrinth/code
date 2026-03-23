@@ -57,7 +57,7 @@ import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 
-const { handleError, addNotification } = injectNotificationManager()
+const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
@@ -822,7 +822,9 @@ previousFilterState.value = JSON.stringify({
 	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
 		<template v-if="instance">
 			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
-			<h1 class="m-0 mb-1 text-xl">{{ isFromWorlds ? 'Add servers to your instance' : 'Install content to instance' }}</h1>
+			<h1 class="m-0 mb-1 text-xl">
+				{{ isFromWorlds ? 'Add servers to your instance' : 'Install content to instance' }}
+			</h1>
 			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
 				be lost when you update the server instance content.
@@ -934,7 +936,13 @@ previousFilterState.value = JSON.stringify({
 							<div class="flex gap-2">
 								<ButtonStyled circular>
 									<button
-										v-tooltip="allInstalledIds.has(project.project_id) ? 'Already added' : instance ? `Add to ${instance.name}` : 'Add server to instance'"
+										v-tooltip="
+											allInstalledIds.has(project.project_id)
+												? 'Already added'
+												: instance
+													? `Add to ${instance.name}`
+													: 'Add server to instance'
+										"
 										:disabled="allInstalledIds.has(project.project_id)"
 										@click.stop="() => handleAddServerToInstance(project)"
 									>

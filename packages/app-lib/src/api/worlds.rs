@@ -880,8 +880,6 @@ mod servers_data {
     }
 }
 
-
-
 pub async fn get_profile_protocol_version(
     profile: &str,
 ) -> Result<Option<ProtocolVersion>> {

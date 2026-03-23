@@ -155,18 +155,16 @@ pub async fn add_server_to_profile(
     content_kind: Option<String>,
 ) -> Result<usize> {
     let full_path = get_full_path(path).await?;
-    Ok(
-        worlds::add_server_to_profile(
-            &full_path,
-            path,
-            name,
-            address,
-            pack_status,
-            project_id,
-            content_kind,
-        )
-        .await?,
+    Ok(worlds::add_server_to_profile(
+        &full_path,
+        path,
+        name,
+        address,
+        pack_status,
+        project_id,
+        content_kind,
     )
+    .await?)
 }
 
 #[tauri::command]

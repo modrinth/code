@@ -491,9 +491,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Don't show on Home"
   },
-  "instance.worlds.filter.available": {
-    "message": "Available"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instance is already open"
   },
@@ -517,12 +514,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Play instance"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Singleplayer"
   },
   "instance.worlds.view_instance": {
     "message": "View instance"

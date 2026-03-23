@@ -566,18 +566,6 @@
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
   },
-  "files.layout.leave-editor-body": {
-    "defaultMessage": "You have unsaved changes that will be lost if you leave the editor."
-  },
-  "files.layout.leave-editor-leave": {
-    "defaultMessage": "Leave editor"
-  },
-  "files.layout.leave-editor-stay": {
-    "defaultMessage": "Stay in editor"
-  },
-  "files.layout.leave-editor-title": {
-    "defaultMessage": "Leave editor?"
-  },
   "files.layout.loading": {
     "defaultMessage": "Loading files..."
   },
@@ -712,6 +700,18 @@
   },
   "files.table-header.size": {
     "defaultMessage": "Size"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "You have unsaved changes that will be lost if you leave. Would you like to save before leaving?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Discard"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Unsaved changes"
+  },
+  "files.unsaved-changes-modal.save": {
+    "defaultMessage": "Save"
   },
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Cancelled"
@@ -1201,6 +1201,9 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
+  },
+  "instances.modpack-content-modal.switch-version": {
+    "defaultMessage": "Switch version"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"

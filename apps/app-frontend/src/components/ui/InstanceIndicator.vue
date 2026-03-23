@@ -29,11 +29,7 @@ const instanceLink = computed(() => {
 
 <template>
 	<div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
-		<router-link
-			:to="instanceLink"
-			tabindex="-1"
-			class="flex flex-col gap-4 text-primary"
-		>
+		<router-link :to="instanceLink" tabindex="-1" class="flex flex-col gap-4 text-primary">
 			<span class="flex items-center gap-2">
 				<Avatar
 					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
@@ -53,9 +49,7 @@ const instanceLink = computed(() => {
 			</span>
 		</router-link>
 		<ButtonStyled>
-			<router-link :to="instanceLink">
-				<LeftArrowIcon /> Back to instance
-			</router-link>
+			<router-link :to="instanceLink"> <LeftArrowIcon /> Back to instance </router-link>
 		</ButtonStyled>
 	</div>
 </template>

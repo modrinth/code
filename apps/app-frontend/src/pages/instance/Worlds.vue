@@ -41,10 +41,7 @@
 			/>
 			<div class="flex gap-2">
 				<ButtonStyled type="outlined">
-					<button
-						class="!h-10 !border-button-bg !border-[1px]"
-						@click="addServerModal?.show()"
-					>
+					<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
 						Add server
 					</button>
@@ -52,7 +49,9 @@
 				<ButtonStyled color="brand">
 					<button
 						class="!h-10 flex items-center gap-2"
-						@click="router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })"
+						@click="
+							router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
+						"
 					>
 						<CompassIcon class="size-5" />
 						<span>Browse servers</span>
@@ -141,7 +140,9 @@
 			<ButtonStyled color="brand">
 				<button
 					class="!h-10 flex items-center gap-2"
-					@click="router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })"
+					@click="
+						router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })
+					"
 				>
 					<CompassIcon class="size-5" />
 					<span>Browse servers</span>
@@ -248,9 +249,7 @@ function toggleFilter(id: string) {
 	} else {
 		selectedFilters.value.push(id)
 		if (id === 'singleplayer') {
-			selectedFilters.value = selectedFilters.value.filter(
-				(f) => f !== 'online' && f !== 'offline',
-			)
+			selectedFilters.value = selectedFilters.value.filter((f) => f !== 'online' && f !== 'offline')
 		} else if (id === 'online' || id === 'offline') {
 			selectedFilters.value = selectedFilters.value.filter((f) => f !== 'singleplayer')
 		}
@@ -662,5 +661,4 @@ async function proceedDeleteWorld() {
 onUnmounted(() => {
 	unlistenProfile()
 })
-
 </script>
