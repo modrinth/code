@@ -239,7 +239,9 @@
 			<div>
 				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
 					pendingChange.planSize
-				}}" plan on {{ formatDate(pendingChange.date) }}.
+				}}" plan on
+				<span class="font-medium text-contrast">{{ formatDate(pendingChange.date) }}</span
+				>.
 			</div>
 			<ServersSpecs
 				class="!font-normal !text-primary"

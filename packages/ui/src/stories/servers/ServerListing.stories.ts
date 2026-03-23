@@ -61,11 +61,18 @@ export const ConfiguringNewServer: Story = {
 	},
 }
 
-export const WithPendingChange: Story = {
+export const WithPendingDowngrade: Story = {
 	args: {
 		...baseServer,
 		name: 'Competitive UHC',
-		pendingChange,
+		pendingChange: {
+			...pendingChange,
+			planSize: 'Small',
+			ramGb: 4,
+			storageGb: 40,
+			cpuBurst: 4,
+			verb: 'Downgrade',
+		},
 	},
 }
 
