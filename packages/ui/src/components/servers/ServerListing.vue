@@ -5,18 +5,18 @@
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
 					'!rounded-b-none border-b-0': hasNotice,
-					'opacity-50 bg-surface-2': isDisabled,
+					'opacity-70 bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
 			>
 				<div
-					v-if="isProvisioning"
+					v-if="isProvisioning || isUpgrading"
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
 					<ServerIcon :image="image ?? undefined" />
-					<LoaderCircleIcon class="size-10 animate-spin text-constrast brightness-200 absolute" />
+					<SpinnerIcon class="size-8 animate-spin text-constrast brightness-200 absolute" />
 				</div>
 				<div
 					v-else-if="status === 'suspended'"
@@ -84,7 +84,6 @@
 			class="server-listing-notice"
 		>
 			<div class="flex gap-2">
-				<LoaderCircleIcon class="size-5 animate-spin" />
 				Your server's hardware is currently being upgraded and will be back online shortly.
 			</div>
 		</div>
@@ -106,8 +105,8 @@
 			<div class="flex gap-2">
 				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
 					<button
-						class="!border-surface-5"
 						v-tooltip="'Download latest backup'"
+						class="!border-surface-5"
 						@click="onDownloadBackup"
 					>
 						<DownloadIcon />
@@ -115,8 +114,8 @@
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button
-						class="!border-surface-5"
 						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
@@ -142,8 +141,8 @@
 			<div class="flex gap-2">
 				<ButtonStyled type="outlined">
 					<button
-						class="!border-surface-5"
 						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
@@ -170,8 +169,8 @@
 			<div class="flex gap-2">
 				<ButtonStyled type="outlined">
 					<button
-						class="!border-surface-5 w-28"
 						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5 w-28"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
@@ -208,8 +207,8 @@
 			<div class="flex gap-2">
 				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
 					<button
-						class="!border-surface-5"
 						v-tooltip="'Download latest backup'"
+						class="!border-surface-5"
 						@click="onDownloadBackup"
 					>
 						<DownloadIcon />
@@ -217,8 +216,8 @@
 				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button
-						class="!border-surface-5 w-28"
 						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5 w-28"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied"> Copied <CheckIcon class="text-green" /></template>
@@ -230,7 +229,7 @@
 						><MessagesSquareIcon /> Support
 					</a>
 				</ButtonStyled>
-				<ButtonStyled color="brand" v-if="onResubscribe">
+				<ButtonStyled v-if="onResubscribe" color="brand">
 					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
 				</ButtonStyled>
 			</div>
@@ -256,15 +255,15 @@
 import type { Archon } from '@modrinth/api-client'
 import {
 	DownloadIcon,
-	LoaderCircleIcon,
 	LockIcon,
 	MessagesSquareIcon,
 	SparklesIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
+import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 
-import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import {
 	CardIcon,
 	CheckIcon,
@@ -321,6 +320,9 @@ const { kyros, labrinth } = injectModrinthClient()
 
 const isConfiguring = computed(() => props.flows?.intro)
 const isProvisioning = computed(() => props.status === 'installing' && !isConfiguring.value)
+const isUpgrading = computed(
+	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
+)
 const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
 const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
 const isFilesExpired = computed(() => {
