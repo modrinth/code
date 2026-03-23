@@ -1,24 +1,18 @@
 <script setup lang="ts">
+import { getChangelog, type Product } from '@modrinth/blog'
 import { ChangelogEntry } from '@modrinth/ui'
 import Timeline from '@modrinth/ui/src/components/base/Timeline.vue'
-import { getChangelog, type Product } from '@modrinth/utils'
 
 import NavTabs from '~/components/ui/NavTabs.vue'
 
 const route = useRoute()
-const router = useRouter()
 
 const filter = ref<Product | undefined>(undefined)
 const allChangelogEntries = ref(getChangelog())
 
 function updateFilter() {
 	if (route.query.filter) {
-		let value = route.query.filter
-		if (route.query.filter === 'servers') {
-			router.push({ query: { ...route.query, filter: 'hosting' } })
-			value = 'hosting'
-		}
-		filter.value = value as Product
+		filter.value = route.query.filter as Product
 	} else {
 		filter.value = undefined
 	}
@@ -44,7 +38,7 @@ const changelogEntries = computed(() =>
 				href: '',
 			},
 			{
-				label: 'Website',
+				label: 'Platform',
 				href: 'web',
 			},
 			{

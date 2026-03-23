@@ -182,9 +182,6 @@
   "changelog.justNow": {
     "defaultMessage": "Just now"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -192,7 +189,7 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Website"
+    "defaultMessage": "Platform"
   },
   "collections.label.private": {
     "defaultMessage": "Private"
