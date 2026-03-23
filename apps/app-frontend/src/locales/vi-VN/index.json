@@ -36,10 +36,25 @@
     "message": "Hành động này sẽ không thể huỷ bỏ"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Hoá hồ sơ"
+    "message": "Xoá hồ sơ"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Xoá hồ xe"
+    "message": "Xoá hồ sơ"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Modpack này đã được cài đặt trong phiên chơi \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Nhân bản modpack"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Vẫn tiếp tục tạo"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Đi đến phiên chơi"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack đã được cài đặt"
   },
   "app.instance.mods.content-type-project": {
     "message": "Dự án"
@@ -204,7 +219,7 @@
     "message": "Tên người dùng Modrinth của bạn của bạn là gì?"
   },
   "friends.add-friends-to-share": {
-    "message": "Hãy <link>Thêm bạn bè</link> để biết họ đang chơi gì!"
+    "message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
   },
   "friends.friend.cancel-request": {
     "message": "Huỷ yêu cầu"
@@ -216,7 +231,7 @@
     "message": "Đã gửi yêu cầu kết bạn"
   },
   "friends.friend.view-profile": {
-    "message": "Xem hồ sơ"
+    "message": "Xem thông tin"
   },
   "friends.heading": {
     "message": "Bạn bè"
@@ -279,7 +294,7 @@
     "message": "Đặt lại biểu tượng"
   },
   "instance.edit-world.title": {
-    "message": "Sửa thể giới"
+    "message": "Chỉnh sửa thế giới"
   },
   "instance.server-modal.address": {
     "message": "Địa chỉ"
@@ -318,7 +333,7 @@
     "message": "Nhân bản hồ sơ"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tạo ra một bản sao của hiện thể này, bao gồm các thế giới, cấu hình, mod, v.v.."
+    "message": "Tạo ra một bản sao của hồ sơ này, bao gồm các thế giới, cấu hình, mod, v.v."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Sửa biểu tượng"
@@ -495,7 +510,7 @@
     "message": "Được cung cấp bởi phiên bản"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Phiên bản trò chơi được cung cấp bởi instance này"
+    "message": "Phiên bản trò chơi được cung cấp bởi hồ sơ này"
   },
   "search.filter.locked.instance-loader.title": {
     "message": "Loader được cung cấp bởi hồ sơ"

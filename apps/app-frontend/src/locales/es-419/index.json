@@ -5,8 +5,86 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede acceder a los servidores de autenticación"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Cambiar versión"
+  "app.export-modal.description-placeholder": {
+    "message": "Escribe la descripción del modpack..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportar"
+  },
+  "app.export-modal.header": {
+    "message": "Exportar modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Seleccione archivos y carpetas para incluir en el paquete"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Número de versión"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Todos los datos de su instancia se eliminarán permanentemente, incluidos sus mundos, configuraciones y todo el contenido instalado."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Esta acción no se puede deshacer"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Este modpack ya está instalado en la instancia \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Modpack duplicado"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Crea de todos modos"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Ir a la instancia"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack ya está instalado"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyecto"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Copiar enlace"
+  },
+  "app.instance.mods.installing": {
+    "message": "Instalando..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Se ha añadido \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "Se han añadido {count} proyectos"
+  },
+  "app.instance.mods.share-text": {
+    "message": "¡Echa un vistazo a los proyectos que utilizo en mi modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Compartir contenido del modpack"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Mostrar archivo"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Se ha subido correctamente"
   },
   "app.instance.mods.unknown-version": {
     "message": "Desconocido"

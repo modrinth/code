@@ -93,7 +93,7 @@
     "defaultMessage": "フォロー"
   },
   "button.hide-snapshots": {
-    "defaultMessage": "スナップショットを表示"
+    "defaultMessage": "スナップショットを非表示"
   },
   "button.max": {
     "defaultMessage": "最大"
@@ -108,7 +108,7 @@
     "defaultMessage": "フォルダーを開く"
   },
   "button.play": {
-    "defaultMessage": "起動"
+    "defaultMessage": "プレイ"
   },
   "button.refresh": {
     "defaultMessage": "更新"
@@ -126,10 +126,10 @@
     "defaultMessage": "修復"
   },
   "button.repairing": {
-    "defaultMessage": "修復中..."
+    "defaultMessage": "修復中…"
   },
   "button.report": {
-    "defaultMessage": "報告する"
+    "defaultMessage": "報告"
   },
   "button.reset": {
     "defaultMessage": "リセット"
@@ -147,16 +147,16 @@
     "defaultMessage": "保存して更新"
   },
   "button.saving": {
-    "defaultMessage": "節約"
+    "defaultMessage": "保存中"
   },
   "button.show-all-versions": {
     "defaultMessage": "すべてのバージョンを表示"
   },
   "button.sign-in": {
-    "defaultMessage": "サインイン"
+    "defaultMessage": "ログイン"
   },
   "button.sign-out": {
-    "defaultMessage": "サインアウト"
+    "defaultMessage": "ログアウト"
   },
   "button.sign-up": {
     "defaultMessage": "サインアップ"
@@ -186,7 +186,7 @@
     "defaultMessage": "API"
   },
   "changelog.product.app": {
-    "defaultMessage": "App"
+    "defaultMessage": "アプリ"
   },
   "changelog.product.hosting": {
     "defaultMessage": "ホスティング"
@@ -198,7 +198,7 @@
     "defaultMessage": "非公開"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "{count, plural, one {# プロジェクト} other {# これらプロジェクト}}を互換性のある最新バージョンにアップデートしてもよろしいですか？ 1 つずつアップデートすることをおすすめします。"
+    "defaultMessage": "プロジェクトを互換性のある最新バージョンにアップデートしてもよろしいですか？ 1つずつアップデートすることをおすすめします。"
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "アップデート前にご確認ください"
@@ -207,7 +207,7 @@
     "defaultMessage": "プロジェクトをアップデート"
   },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "{count, plural, one {# プロジェクト} other {# これらのプロジェクト}}をアップデート"
+    "defaultMessage": "プロジェクトをアップデート"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Modを削除すると、ワールドに永続的な影響を与え、再読み込み時にコンテンツの欠落や予期せぬ問題が発生する可能性があります。"
@@ -216,10 +216,10 @@
     "defaultMessage": "削除する前にご確認ください"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "{count} 件の {itemType}{count, plural, one {} other {}} を削除"
+    "defaultMessage": "{count}件の{itemType}を削除"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "{count, plural, one {} other {これらの}}{itemType}を削除"
+    "defaultMessage": "{itemType}を削除"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Modパックに追加したModやコンテンツはすべて削除されます。"
@@ -262,9 +262,6 @@
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "サーバー上のコンテンツの一部は分析できず、この変更の影響を受ける可能性があります。"
-  },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "不明なコンテンツ"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} 件更新されました"
@@ -369,7 +366,7 @@
     "defaultMessage": "{mode}"
   },
   "content.page-layout.update-all": {
-    "defaultMessage": "全て更新"
+    "defaultMessage": "すべて更新"
   },
   "content.page-layout.upload-files": {
     "defaultMessage": "ファイルをアップロード"
@@ -514,6 +511,9 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "解像度"
+  },
+  "hosting.content.copy-link": {
+    "defaultMessage": "リンクをコピー"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "コンテンツの削除に失敗しました"
@@ -669,7 +669,7 @@
     "defaultMessage": "承認中…"
   },
   "instance.confirm-reinstall.admonition-body": {
-    "defaultMessage": "再インストールすると全てのインストールされたり変更されたコンテンツがModパックによって提供されたものにリセットされ、元のインストールに追加されたModやコンテンツが削除されます。"
+    "defaultMessage": "再インストールするとすべてのインストールされたり変更されたりしたコンテンツがModパックによって提供されたものにリセットされ、元のインストールに追加されたModやコンテンツが削除されます。"
   },
   "instance.confirm-reinstall.admonition-header": {
     "defaultMessage": "再インストールの警告"
@@ -774,10 +774,7 @@
     "defaultMessage": "アイコンを選択"
   },
   "instances.content-install.show-all-versions": {
-    "defaultMessage": "全てのバージョンを表示"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "戻る"
+    "defaultMessage": "すべてのバージョンを表示"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "リンクをコピー"
@@ -818,6 +815,9 @@
   "instances.updater-modal.header-modpack": {
     "defaultMessage": "Modパックバージョンに切り替える"
   },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "バージョンを切り替える"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "非互換を非表示"
   },
@@ -841,6 +841,9 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "非互換を表示"
+  },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "{version}に切り替える"
   },
   "instances.updater-modal.update-to": {
     "defaultMessage": "{version}に更新"
@@ -990,7 +993,7 @@
     "defaultMessage": "シングルプレイ"
   },
   "label.sort-by": {
-    "defaultMessage": "並び替え"
+    "defaultMessage": "並び替え: "
   },
   "label.success": {
     "defaultMessage": "成功"
@@ -1014,7 +1017,7 @@
     "defaultMessage": "バージョン"
   },
   "label.visibility": {
-    "defaultMessage": "公開"
+    "defaultMessage": "公開範囲"
   },
   "label.visit-your-profile": {
     "defaultMessage": "プロフィールを開く"
@@ -1122,7 +1125,7 @@
     "defaultMessage": "支払い方法を追加する"
   },
   "modal.add-payment-method.title": {
-    "defaultMessage": "支払い方法を追加"
+    "defaultMessage": "支払い方法を追加中"
   },
   "modal.open-in-app.benefit.install": {
     "defaultMessage": "必要なコンテンツを自動でインストールする"
@@ -1132,9 +1135,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "サーバーが変更したときにファイルを更新し続ける"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "閉じる"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Modrinth Appを入手する"
@@ -1484,12 +1484,6 @@
   "project.about.server.copied": {
     "defaultMessage": "コピーしました！"
   },
-  "project.about.server.copiedText": {
-    "defaultMessage": "IPアドレスをクリップボードにコピーしました"
-  },
-  "project.about.server.latency": {
-    "defaultMessage": "遅延"
-  },
   "project.about.server.title": {
     "defaultMessage": "サーバーの詳細"
   },
@@ -1791,7 +1785,7 @@
     "defaultMessage": "ゲームバージョン"
   },
   "search.filter_type.game_version.all_versions": {
-    "defaultMessage": "全てのバージョンを表示"
+    "defaultMessage": "すべてのバージョンを表示"
   },
   "search.filter_type.license": {
     "defaultMessage": "ライセンス"
@@ -1834,9 +1828,6 @@
   },
   "servers.backups.admonition.creating-backup.title": {
     "defaultMessage": "バックアップを作成中"
-  },
-  "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "バックアップ"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}からの復元中に問題が発生しました。問題が継続する場合は再試行するかサポートに連絡してください。"
@@ -1920,7 +1911,7 @@
     "defaultMessage": "支払い方法"
   },
   "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval, select, month {1か月ごとに請求} quarterly {3か月ごとに請求}}"
+    "defaultMessage": "{interval}ごとに請求"
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
@@ -2225,9 +2216,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "総合"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
-  },
   "tag.category.library": {
     "defaultMessage": "前提Mod"
   },
@@ -2268,7 +2256,7 @@
     "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
-    "defaultMessage": "モブ"
+    "defaultMessage": "Mob"
   },
   "tag.category.modded": {
     "defaultMessage": "Mod向け"
@@ -2309,20 +2297,11 @@
   "tag.category.plots": {
     "defaultMessage": "プロット"
   },
-  "tag.category.pokemon": {
-    "defaultMessage": "ポケモン"
-  },
   "tag.category.potato": {
     "defaultMessage": "低負荷"
   },
   "tag.category.prison": {
     "defaultMessage": "刑務所"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PVE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PVP"
   },
   "tag.category.questing": {
     "defaultMessage": "クエスト"

@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "インスタンスを削除"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "このModパックは「{instanceName}」インスタンスにすでにインストールされています。"
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "重複したModパック"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "とにかく作成する"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "インスタンスに移動"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modパックはすでにインストール済み"
+  },
   "app.instance.mods.content-type-project": {
     "message": "プロジェクト"
   },
@@ -303,7 +318,7 @@
     "message": "インスタンスを削除"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定などの全てのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
+    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定などのすべてのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "削除中…"

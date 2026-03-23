@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Utwórz projekt"
   },
-  "create.project.create-server-project": {
-    "message": "Utwórz serwer"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Brakujące pola: {fields}"
   },
@@ -2813,20 +2810,29 @@
   "servers.plan.large.description": {
     "message": "Idealny dla 15–25 graczy, paczek modów lub dużej ilości modów."
   },
-  "servers.plan.large.name": {
-    "message": "Duży"
-  },
   "servers.plan.medium.description": {
     "message": "Świetny wybór dla 6–15 graczy i wielu modów."
-  },
-  "servers.plan.medium.name": {
-    "message": "Średni"
   },
   "servers.plan.small.description": {
     "message": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
   },
-  "servers.plan.small.name": {
-    "message": "Mały"
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Potwierdź hasło"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Potwierdź hasło"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Potwierdź nowe hasło"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Potwierdź nowe hasło"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nowe hasło"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nowe hasło"
   },
   "settings.applications.about": {
     "message": "O nas"
@@ -2911,9 +2917,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Informacje o aplikacje"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Wystąpił błąd"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikona twej aplikacji została zaktualizowana."

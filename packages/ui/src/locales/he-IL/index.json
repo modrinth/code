@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "ביטול"
   },
+  "button.change-version": {
+    "defaultMessage": "שנה גרסה"
+  },
   "button.clear": {
     "defaultMessage": "נקה"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "עקוב"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "הסתר סנאפשוטים"
+  },
   "button.max": {
     "defaultMessage": "מקסימום"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "רענן"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "התקן מחדש חבילת מודים"
+  },
   "button.remove": {
     "defaultMessage": "מחק"
   },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
   },
+  "button.repair": {
+    "defaultMessage": "תקן"
+  },
+  "button.repairing": {
+    "defaultMessage": "מתקן..."
+  },
   "button.report": {
     "defaultMessage": "דיווח"
   },
   "button.reset": {
     "defaultMessage": "איפוס"
+  },
+  "button.reset-server": {
+    "defaultMessage": "אפס שרת"
   },
   "button.retry": {
     "defaultMessage": "נסה שוב"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "שומר"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "הצג את כל הגרסאות"
+  },
   "button.sign-in": {
     "defaultMessage": "התחבר"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "עצור"
   },
+  "button.switch-version": {
+    "defaultMessage": "החלף גרסה"
+  },
   "button.unfollow": {
     "defaultMessage": "הסר מעקב"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "בטל קישור חבילת מודים"
   },
   "button.update": {
     "defaultMessage": "עדכן"
@@ -169,6 +196,45 @@
   },
   "collections.label.private": {
     "defaultMessage": "פרטי"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "אתה בטוח שאתה רוצה לעדכן {count, plural, one {# פרויקט} other {# פרויקטים}} לגרסה המתאימה האחרונה שלהם? מומלץ לעדכן תוכן אחד־אחד."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "אזהרת עדכון"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "עדכן פרויקטים"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "עדכן {count, plural, one {# פרויקט} other {# פרויקטים}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "מחיקת מוד יכולה להשפיע לתמיד על העולם שלך ויכולה לגרום לתוכן חסר או בעיות לא צפויות כשהעולם נטען שוב."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "אזהרת מחיקה"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "מחק {count} {itemType}{count, plural, one {} other {ים}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "כל מוד או תוכן שהוספת לחבילת המודים שלך ימחק."
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} נוספו"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "נוסף (תלות)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "הוסר"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "עודכן"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"
@@ -418,9 +484,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "שחקן יחיד"
-  },
-  "label.sort-by": {
-    "defaultMessage": "מיין לפי"
   },
   "label.success": {
     "defaultMessage": "הצלחה"

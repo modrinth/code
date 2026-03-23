@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "프로젝트 만들기"
   },
-  "create.project.create-server-project": {
-    "message": "서버 생성"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "누락된 필드: {fields}"
   },
@@ -2813,20 +2810,11 @@
   "servers.plan.large.description": {
     "message": "15–25명의 플레이어, 모드팩 또는 무거운 모드에 적합합니다."
   },
-  "servers.plan.large.name": {
-    "message": "대형"
-  },
   "servers.plan.medium.description": {
     "message": "6–15명의 플레이어와 여러 개의 모드에 적합합니다."
   },
-  "servers.plan.medium.name": {
-    "message": "중형"
-  },
   "servers.plan.small.description": {
     "message": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
-  },
-  "servers.plan.small.name": {
-    "message": "소형"
   },
   "settings.applications.about": {
     "message": "앱 정보"
@@ -2911,9 +2899,6 @@
   },
   "settings.applications.modal.header": {
     "message": "신청정보"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "오류가 발생했습니다"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "앱 아이콘이 업데이트되었습니다."

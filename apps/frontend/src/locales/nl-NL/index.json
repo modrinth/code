@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Project aanmaken"
   },
-  "create.project.create-server-project": {
-    "message": "Maak server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Missende velden: {fields}"
   },
@@ -2816,20 +2813,50 @@
   "servers.plan.large.description": {
     "message": "Ideaal voor 15-25 spelers, modpacks of zwaar modificeren"
   },
-  "servers.plan.large.name": {
-    "message": "Groot"
-  },
   "servers.plan.medium.description": {
     "message": "Goed voor 6-15 spelers en meerdere mods"
-  },
-  "servers.plan.medium.name": {
-    "message": "Medium"
   },
   "servers.plan.small.description": {
     "message": "Perfect voor 1-5 vrienden en een paar lichte mods"
   },
-  "servers.plan.small.name": {
-    "message": "Klein"
+  "settings.account.password.action.remove": {
+    "message": "Wachtwoord verwijderen"
+  },
+  "settings.account.password.action.save": {
+    "message": "Wachtwoord opslaan"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nieuw wachtwoord"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nieww wachtwoord"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Oud wachtwoord"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Oud wachtwoord"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Wachtwoord toevoegen"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Wachtwoord veranderen"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Wachtwoord verwijderen"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Toevoegen"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Acties"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Wachtwoord toevoegen"
+  },
+  "settings.account.security.password.title": {
+    "message": "Wachtwoord"
   },
   "settings.applications.about": {
     "message": "Over"
@@ -2914,9 +2941,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Project informatie"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Er is een fout opgetreden"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Het icoon van jouw project is bijgewerkt."

@@ -258,10 +258,10 @@
     "message": "Jelszavad visszaállítása"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Kérlek ad meg a két-faktoros kódot hogy tovább menj."
+    "message": "Kérjük írja be a kétlépcsős hitelesítés kódját a folytatáshoz."
   },
   "auth.sign-in.2fa.label": {
-    "message": "Két-faktoros kód megadása"
+    "message": "Írja be a kétlépcsős hitelesítés kódját"
   },
   "auth.sign-in.2fa.placeholder": {
     "message": "Kód beírása..."
@@ -456,13 +456,13 @@
     "message": "szervezet"
   },
   "create.limit-alert.type-plural-collection": {
-    "message": "gyűjtemények"
+    "message": "gyűjtemény"
   },
   "create.limit-alert.type-plural-organization": {
-    "message": "szervezetek"
+    "message": "szervezet"
   },
   "create.limit-alert.type-plural-project": {
-    "message": "projektek"
+    "message": "projekt"
   },
   "create.limit-alert.type-project": {
     "message": "projekt"
@@ -496,9 +496,6 @@
   },
   "create.project.create-project": {
     "message": "Projekt létrehozása"
-  },
-  "create.project.create-server-project": {
-    "message": "Szerver létrehozása"
   },
   "create.project.missing-fields-tooltip": {
     "message": "Hiányzó mezők: {fields}"
@@ -540,7 +537,7 @@
     "message": "Szerver"
   },
   "create.project.url-label": {
-    "message": "URL"
+    "message": "Link"
   },
   "create.project.visibility-description": {
     "message": "A projekt láthatósága jóváhagyása után."
@@ -578,6 +575,18 @@
   "dashboard.collections.button.create-new": {
     "message": "Új létrehozása"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Készítsd el az első gyűjteményedet, és kezdj neki!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Még nincs gyűjteményed"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Egy gyűjtemény sem egyezik a kereséssel"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Próbáld meg módosítani a szűrőket vagy a keresési kifejezéseket."
+  },
   "dashboard.collections.label.projects-count": {
     "message": "{count} {countPlural, plural, one {projekt} other {projektek}}"
   },
@@ -603,7 +612,7 @@
     "message": "A külföldi jogi személy olyan üzleti egységet jelent, amelyet az Egyesült Államokon kívül hoztak létre (például nem amerikai részvénytársaság, társulás vagy korlátolt felelősségű társaság – LLC)."
   },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
-    "message": "Idegen entitáns"
+    "message": "Külföldi szervezet"
   },
   "dashboard.creator-tax-form-modal.entity.private-individual": {
     "message": "Magánszemély"
@@ -788,6 +797,9 @@
   "dashboard.creator-withdraw-modal.tremendous-details.available-denominations-label": {
     "message": "Elérhető címletek"
   },
+  "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
+    "message": "Keress Ajándékkártyákat ez az ár körül."
+  },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-denomination-placeholder": {
     "message": "Összeg megadása"
   },
@@ -922,6 +934,9 @@
   },
   "dashboard.withdraw.error.email-verification.title": {
     "message": "E-mail hítelesítés szükséges"
+  },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Nincs elég vagyonod"
   },
   "dashboard.withdraw.error.invalid-address.title": {
     "message": "Cím megerősítése sikertelen"
@@ -1131,7 +1146,7 @@
     "message": "Egyéni link"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "Ossza meg szerverét egy egyedi <contrast>modrinth.gg</contrast> linkkel."
+    "message": "Oszd meg a szerveredet egy egyedi <contrast>modrinth.gg</contrast> linkkel."
   },
   "hosting-marketing.included.description": {
     "message": "Minden szerverhez tartozik egy sor olyan funkció, amelynek célja, hogy olyan tárhelyszolgáltatást nyújtson, amelyet csak a Modrinth tud nyújtani."
@@ -1396,6 +1411,9 @@
   },
   "layout.banner.add-email.description": {
     "message": "Biztonsági okok miatt a Modrinthon kell egy e-mail cím a fiókodhoz."
+  },
+  "layout.banner.build-fail.description": {
+    "message": "A Modrinth felhasználói felületének jelenlegi telepítése nem tudta az API-ból lekérni az állapotadatokat. Ennek oka lehet egy szolgáltatáskimaradás vagy konfigurációs hiba. Kérünk, próbáld meg újra, amikor az API újra elérhetővé válik. Hibakódok: {errors}; Az API jelenlegi linkje: {url}"
   },
   "layout.banner.staging.title": {
     "message": "A Modrinth színreviteli környezetét nézed"
@@ -1980,61 +1998,61 @@
     "message": "Figyelmeztetés"
   },
   "project-type.collection.plural": {
-    "message": "Gyűjtemények"
+    "message": "Gyűjtemény"
   },
   "project-type.collection.singular": {
     "message": "Gyűjtemény"
   },
   "project-type.datapack.plural": {
-    "message": "Adatcsomagok"
+    "message": "Adatcsomag"
   },
   "project-type.datapack.singular": {
     "message": "Adatcsomag"
   },
   "project-type.minecraft_java_server.plural": {
-    "message": "Szerverek"
+    "message": "Szerver"
   },
   "project-type.minecraft_java_server.singular": {
     "message": "Szerver"
   },
   "project-type.mod.plural": {
-    "message": "Modok"
+    "message": "Mod"
   },
   "project-type.mod.singular": {
     "message": "Mod"
   },
   "project-type.modpack.plural": {
-    "message": "Modcsomagok"
+    "message": "Modcsomag"
   },
   "project-type.modpack.singular": {
     "message": "Modpack"
   },
   "project-type.plugin.plural": {
-    "message": "Bővítmények"
+    "message": "Bővítmény"
   },
   "project-type.plugin.singular": {
     "message": "Bővítmény"
   },
   "project-type.project.plural": {
-    "message": "Projektek"
+    "message": "Projekt"
   },
   "project-type.project.singular": {
     "message": "Projekt"
   },
   "project-type.resourcepack.plural": {
-    "message": "Forráscsomagok"
+    "message": "Forráscsomag"
   },
   "project-type.resourcepack.singular": {
     "message": "Forráscsomag"
   },
   "project-type.server.plural": {
-    "message": "Szerverek"
+    "message": "Szerver"
   },
   "project-type.server.singular": {
     "message": "Szerver"
   },
   "project-type.shader.plural": {
-    "message": "Shaderek"
+    "message": "Shader"
   },
   "project-type.shader.singular": {
     "message": "Shader"
@@ -2531,20 +2549,98 @@
   "servers.plan.large.description": {
     "message": "Ideális 15–25 játékos számára, modcsomagokhoz vagy intenzív moddoláshoz."
   },
-  "servers.plan.large.name": {
-    "message": "Nagy"
-  },
   "servers.plan.medium.description": {
     "message": "Nagyszerű 6–15 játékos számára, többféle moddal."
-  },
-  "servers.plan.medium.name": {
-    "message": "Közepes"
   },
   "servers.plan.small.description": {
     "message": "Tökéletes 1–5 barát számára, néhány kisebb moddal."
   },
-  "servers.plan.small.name": {
-    "message": "Kicsi"
+  "settings.account.delete.confirm.proceed": {
+    "message": "Fiók törlése"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Biztosan törölni szeretnéd a fiókodat?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Fiók törlése"
+  },
+  "settings.account.delete.section.title": {
+    "message": "Fiók törlése"
+  },
+  "settings.account.email.action.save": {
+    "message": "E-mail mentése"
+  },
+  "settings.account.email.field.label": {
+    "message": "E-mail-cím"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Írd ide az e-mail címedet..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "E-mail hozzáadása"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "E-mail megváltoztatása"
+  },
+  "settings.account.password.action.save": {
+    "message": "Jelszó mentése"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "A megadott jelszavak nem egyeznek!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Írd be a jelszavadat a folytatáshoz."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Jelszó megerősítése"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Jelszó megerősítése"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Új jelszó megerősítése"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Új jelszó megerősítése"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Új jelszó"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Új jelszó"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Régi jelszó"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Régi jelszó"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Jelszó létrehozása"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Jelszó módosítása"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Hozzáadás"
+  },
+  "settings.account.security.email.title": {
+    "message": "E-mail"
+  },
+  "settings.account.security.password.title": {
+    "message": "Jelszó"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "A kétlépcsős hitelesítés kikapcsolása "
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "A kétlépcsős hitelesítés beállítása"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Töltse le ezeket a biztonsági kódokat, és őrizze meg őket biztonságos helyen. Ha valaha is elveszítené a hozzáférését az eszközéhez, ezeket a kódokat használhatja a kétlépcsős hitelesítés kódja helyett! Ezeket a kódokat ugyanúgy óvnia kell, mint a jelszavát."
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Olvassa be a QR-kódot az <authy-link>Authy</authy-link>, a <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> vagy bármely más kétlépcsős hitelesítési alkalmazás segítségével a folyamat megkezdéséhez."
   },
   "settings.applications.about": {
     "message": "Rólunk"
@@ -2616,16 +2712,13 @@
     "message": "Hatáskörök"
   },
   "settings.applications.field.url": {
-    "message": "URL"
+    "message": "Link"
   },
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
   "settings.applications.modal.header": {
     "message": "Alkamazás információ"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Hiba történt"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Az alkamazásod ikonja frissítve lett."
