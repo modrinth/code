@@ -297,7 +297,14 @@ async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearc
 
 	if (instance.value) {
 		try {
-			await add_server_to_profile(instance.value.path, project.name, address, 'prompt')
+			await add_server_to_profile(
+				instance.value.path,
+				project.name,
+				address,
+				'prompt',
+				project.project_id,
+				project.minecraft_java_server?.content?.kind,
+			)
 			newlyInstalled.value.push(project.project_id)
 		} catch (err) {
 			handleError(err as Error)

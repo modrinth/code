@@ -414,6 +414,12 @@ async function editServer(server: ServerWorld) {
 async function removeServer(server: ServerWorld) {
 	await remove_server_from_profile(instance.value.path, server.index).catch(handleError)
 	worlds.value = worlds.value.filter((w) => w.type !== 'server' || w.index !== server.index)
+	let serverIdx = 0
+	for (const w of worlds.value) {
+		if (w.type === 'server') {
+			w.index = serverIdx++
+		}
+	}
 }
 
 async function editWorld(path: string, name: string, removeIcon: boolean) {
@@ -553,15 +559,32 @@ const filterOptions = computed(() => {
 	}
 
 	if (hasServer) {
-		options.push({ id: 'vanilla', label: 'Vanilla' })
-		options.push({ id: 'modded', label: 'Modded' })
+		const servers = dedupedWorlds.value.filter((x) => x.type === 'server')
+		const hasVanilla = servers.some((x) => x.content_kind !== 'modpack')
+		const hasModded = servers.some((x) => x.content_kind === 'modpack')
+		if (hasVanilla && hasModded) {
+			options.push({ id: 'vanilla', label: 'Vanilla' })
+			options.push({ id: 'modded', label: 'Modded' })
+		}
 		if (!selectedFilters.value.includes('singleplayer')) {
-			options.push({ id: 'online', label: 'Online' })
-			options.push({ id: 'offline', label: 'Offline' })
+			const hasOnline = servers.some((x) => !!serverData.value[x.address]?.status)
+			const hasOffline = servers.some((x) => !serverData.value[x.address]?.status)
+			if (hasOnline && hasOffline) {
+				options.push({ id: 'online', label: 'Online' })
+				options.push({ id: 'offline', label: 'Offline' })
+			}
 		}
 	}
 
 	return options
+})
+
+watch(filterOptions, (options) => {
+	const validIds = new Set(options.map((opt) => opt.id))
+	const cleaned = selectedFilters.value.filter((f) => validIds.has(f))
+	if (cleaned.length !== selectedFilters.value.length) {
+		selectedFilters.value = cleaned
+	}
 })
 
 const filteredWorlds = computed(() =>
@@ -586,7 +609,7 @@ const filteredWorlds = computed(() =>
 
 		let passesType = true
 		if (typeFilters.length > 0) {
-			const isModded = isManagedServerWorld(x)
+			const isModded = x.content_kind === 'modpack'
 			passesType =
 				(typeFilters.includes('modded') && isModded) ||
 				(typeFilters.includes('vanilla') && !isModded)

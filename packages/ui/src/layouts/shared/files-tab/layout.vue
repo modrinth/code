@@ -1,12 +1,6 @@
 <template>
 	<slot name="modals" />
-	<ConfirmLeaveModal
-		ref="confirmLeaveModal"
-		:title="formatMessage(messages.leaveEditorTitle)"
-		:body="formatMessage(messages.leaveEditorBody)"
-		:stay-label="formatMessage(messages.leaveEditorStay)"
-		:leave-label="formatMessage(messages.leaveEditorLeave)"
-	/>
+	<FileUnsavedChangesModal ref="unsavedChangesModal" />
 	<FileCreateItemModal ref="createItemModal" :type="newItemType" @create="handleCreateNewItem" />
 	<FileUploadConflictModal ref="uploadConflictModal" @proceed="handleExtractConfirm" />
 	<FileUploadZipUrlModal v-if="ctx.showInstallFromUrl" ref="uploadZipUrlModal" />
@@ -229,9 +223,7 @@ import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import FloatingActionBar from '#ui/components/base/FloatingActionBar.vue'
-import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { usePageLeaveSafety } from '#ui/composables/page-leave-safety'
 import { useStickyObserver } from '#ui/composables/sticky-observer'
 import { useVirtualScroll } from '#ui/composables/virtual-scroll'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -250,6 +242,7 @@ import FileDeleteItemModal from './components/modals/FileDeleteItemModal.vue'
 import FileMoveItemModal from './components/modals/FileMoveItemModal.vue'
 import FileRenameItemModal from './components/modals/FileRenameItemModal.vue'
 import FileUploadConflictModal from './components/modals/FileUploadConflictModal.vue'
+import FileUnsavedChangesModal from './components/modals/FileUnsavedChangesModal.vue'
 import FileUploadZipUrlModal from './components/modals/FileUploadZipUrlModal.vue'
 import FileUploadDragAndDrop from './components/upload/FileUploadDragAndDrop.vue'
 import { useFileSearch } from './composables/file-search'
@@ -325,22 +318,6 @@ const messages = defineMessages({
 	saveButton: {
 		id: 'files.layout.save',
 		defaultMessage: 'Save',
-	},
-	leaveEditorTitle: {
-		id: 'files.layout.leave-editor-title',
-		defaultMessage: 'Leave editor?',
-	},
-	leaveEditorBody: {
-		id: 'files.layout.leave-editor-body',
-		defaultMessage: 'You have unsaved changes that will be lost if you leave the editor.',
-	},
-	leaveEditorStay: {
-		id: 'files.layout.leave-editor-stay',
-		defaultMessage: 'Stay in editor',
-	},
-	leaveEditorLeave: {
-		id: 'files.layout.leave-editor-leave',
-		defaultMessage: 'Leave editor',
 	},
 })
 
@@ -429,13 +406,18 @@ const contextMenuRef = ref<InstanceType<typeof FileContextMenu>>()
 const newItemType = ref<'file' | 'directory'>('file')
 const selectedItem = ref<FileItem | null>(null)
 
-const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
+const unsavedChangesModal = ref<InstanceType<typeof FileUnsavedChangesModal>>()
 
-const { confirmLeaveModal } = usePageLeaveSafety(hasUnsavedChanges)
+const hasUnsavedChanges = computed(() => fileEditorRef.value?.hasUnsavedChanges ?? false)
 
 async function confirmDiscardChanges(): Promise<boolean> {
 	if (!hasUnsavedChanges.value) return true
-	return (await confirmLeaveModal.value?.prompt()) ?? false
+	const result = await unsavedChangesModal.value?.prompt()
+	if (result === 'save') {
+		await fileEditorRef.value?.saveFileContent(false)
+		return true
+	}
+	return result === 'discard'
 }
 
 // Navigation
