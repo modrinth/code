@@ -766,7 +766,7 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
 	const groups: string[][] = []
 	if (client && server) {
-		groups.push(['client_side:required'], ['server_side:required'])
+		groups.push(['client_side:required', 'client_side:optional'], ['server_side:required', 'server_side:optional'])
 	} else if (client) {
 		groups.push(
 			['client_side:optional', 'client_side:required'],
