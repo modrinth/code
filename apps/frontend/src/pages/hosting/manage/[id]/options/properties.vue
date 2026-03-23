@@ -2,7 +2,7 @@
 	<div class="relative h-full w-full select-none overflow-y-auto">
 		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4 overflow-y-auto">
 			<Admonition
-				v-if="missingKnownProperties.length > 0"
+				v-if="hasNoProperties"
 				type="warning"
 				body="Some expected properties are missing from your server.properties - this usually means the server hasn't completed its first startup yet."
 			/>
@@ -199,10 +199,18 @@ function syncFormFromData() {
 	originalProperties.value = { ...flat }
 }
 
+const hasNoProperties = computed(() => Object.keys(liveProperties.value).length === 0)
+
+const hasUnsavedChanges = computed(() =>
+	Object.keys(liveProperties.value).some(
+		(key) => liveProperties.value[key] !== originalProperties.value[key],
+	),
+)
+
 watch(
 	propsData,
-	(newData, oldData) => {
-		if (newData && !oldData) {
+	(newData) => {
+		if (newData && !hasUnsavedChanges.value) {
 			syncFormFromData()
 		}
 	},
@@ -212,16 +220,6 @@ watch(
 watch(powerState, () => {
 	queryClient.invalidateQueries({ queryKey: queryKey.value })
 })
-
-const missingKnownProperties = computed(() =>
-	Object.keys(KNOWN_PROPERTIES).filter((key) => !(key in liveProperties.value)),
-)
-
-const hasUnsavedChanges = computed(() =>
-	Object.keys(liveProperties.value).some(
-		(key) => liveProperties.value[key] !== originalProperties.value[key],
-	),
-)
 
 function buildPatch(): Archon.Content.v1.PatchPropertiesFields {
 	const known: Record<string, string> = {}
