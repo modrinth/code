@@ -18,170 +18,178 @@
 			/>
 		</div>
 		<div class="flex items-center justify-between gap-2">
-		<nav
-			:aria-label="formatMessage(messages.breadcrumbNavigation)"
-			class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
-		>
-			<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
-				<li class="mr-4 flex-shrink-0">
-					<ButtonStyled circular>
-						<button
-							v-tooltip="formatMessage(messages.backToHome)"
-							type="button"
-							class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-							@click="$emit('navigateHome')"
-							@mouseenter="$emit('prefetchHome')"
-						>
-							<HomeIcon />
-							<span class="sr-only">{{ formatMessage(messages.home) }}</span>
-						</button>
-					</ButtonStyled>
-				</li>
-				<li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
-					<ol
-						ref="breadcrumbOuter"
-						class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
-						:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
-						:style="isBreadcrumbOverflowing ? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` } : undefined"
-						@mouseenter="onBreadcrumbMouseEnter"
-						@mouseleave="onBreadcrumbMouseLeave"
-					>
-						<TransitionGroup
-							name="breadcrumb"
-							tag="span"
-							ref="breadcrumbInner"
-							class="relative flex w-fit items-center"
-							:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
-							@animationiteration="onBreadcrumbAnimationIteration"
-						>
-							<li
-								v-for="(segment, index) in breadcrumbs"
-								:key="`${segment || index}-group`"
-								class="relative flex shrink-0 items-center text-sm"
-							>
-								<div class="flex shrink-0 items-center">
-									<ButtonStyled type="transparent">
-										<button
-											class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-											:aria-current="
-												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
-											"
-											:class="{
-												'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
-											}"
-											@click="$emit('navigate', index)"
-										>
-											{{ segment || '' }}
-										</button>
-									</ButtonStyled>
-									<ChevronRightIcon
-										v-if="index < breadcrumbs.length - 1 || isEditing"
-										class="size-4 flex-shrink-0 text-secondary"
-										aria-hidden="true"
-									/>
-								</div>
-							</li>
-						</TransitionGroup>
-						<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
-							<span class="font-semibold !text-contrast" aria-current="location">
-								{{ editingFileName }}
-							</span>
-						</li>
-					</ol>
-				</li>
-			</ol>
-		</nav>
-
-		<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
-			<StyledInput
-				id="search-folder"
-				:model-value="searchQuery"
-				:icon="SearchIcon"
-				type="search"
-				name="search"
-				autocomplete="off"
-				:placeholder="formatMessage(messages.searchFiles)"
-				class="!h-10 hidden @[800px]:block"
-				input-class="!h-10"
-				wrapper-class="w-full sm:w-[280px]"
-				@update:model-value="$emit('update:searchQuery', $event)"
-			/>
-
-			<ButtonStyled v-if="showRefreshButton" type="outlined">
-				<button
-					type="button"
-					class="flex !h-10 items-center gap-2 !border-[1px] !border-surface-5"
-					:disabled="refreshing"
-					@click="handleRefresh"
-				>
-					<RefreshCwIcon aria-hidden="true" class="h-5 w-5 transition-transform" :class="refreshing ? 'animate-spin' : ''" />
-					{{ formatMessage(commonMessages.refreshButton) }}
-				</button>
-			</ButtonStyled>
-
-			<ButtonStyled type="outlined">
-				<OverflowMenu
-					:dropdown-id="`create-new-${baseId}`"
-					position="bottom"
-					direction="left"
-					:aria-label="formatMessage(messages.createNew)"
-					:disabled="disabled"
-					:tooltip="disabled ? disabledTooltip : undefined"
-					class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
-					:options="[
-						{ id: 'file', action: () => $emit('create', 'file') },
-						{ id: 'directory', action: () => $emit('create', 'directory') },
-						{ id: 'upload', action: () => $emit('upload') },
-						{ divider: true, shown: showInstallFromUrl ?? false },
-						{ id: 'upload-zip', shown: false, action: () => $emit('uploadZip') },
-						{
-							id: 'install-from-url',
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', false),
-						},
-						{
-							id: 'install-cf-pack',
-							shown: showInstallFromUrl ?? false,
-							action: () => $emit('unzipFromUrl', true),
-						},
-					]"
-				>
-					<PlusIcon aria-hidden="true" class="h-5 w-5" />
-					<DropdownIcon aria-hidden="true" class="h-5 w-5" />
-					<template #file>
-						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
-					</template>
-					<template #directory>
-						<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
-					</template>
-					<template #upload>
-						<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
-					</template>
-					<template #upload-zip>
-						<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
-					</template>
-					<template #install-from-url>
-						<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
-					</template>
-					<template #install-cf-pack>
-						<CurseForgeIcon aria-hidden="true" />
-						{{ formatMessage(messages.installCurseForgePack) }}
-					</template>
-				</OverflowMenu>
-			</ButtonStyled>
-		</div>
-
-		<div v-else-if="!isEditingImage && isLogFile" class="flex gap-2">
-			<Button
-				v-tooltip="formatMessage(messages.shareToMclogs)"
-				icon-only
-				transparent
-				:aria-label="formatMessage(messages.shareToMclogs)"
-				@click="$emit('share')"
+			<nav
+				:aria-label="formatMessage(messages.breadcrumbNavigation)"
+				class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
 			>
-				<ShareIcon />
-			</Button>
-		</div>
+				<ol class="m-0 flex min-w-0 flex-shrink list-none items-center p-0">
+					<li class="mr-4 flex-shrink-0">
+						<ButtonStyled circular>
+							<button
+								v-tooltip="formatMessage(messages.backToHome)"
+								type="button"
+								class="!size-10 bg-surface-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+								@click="$emit('navigateHome')"
+								@mouseenter="$emit('prefetchHome')"
+							>
+								<HomeIcon />
+								<span class="sr-only">{{ formatMessage(messages.home) }}</span>
+							</button>
+						</ButtonStyled>
+					</li>
+					<li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
+						<ol
+							ref="breadcrumbOuter"
+							class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
+							:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
+							:style="
+								isBreadcrumbOverflowing
+									? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` }
+									: undefined
+							"
+							@mouseenter="onBreadcrumbMouseEnter"
+							@mouseleave="onBreadcrumbMouseLeave"
+						>
+							<TransitionGroup
+								ref="breadcrumbInner"
+								name="breadcrumb"
+								tag="span"
+								class="relative flex w-fit items-center"
+								:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
+								@animationiteration="onBreadcrumbAnimationIteration"
+							>
+								<li
+									v-for="(segment, index) in breadcrumbs"
+									:key="`${segment || index}-group`"
+									class="relative flex shrink-0 items-center text-sm"
+								>
+									<div class="flex shrink-0 items-center">
+										<ButtonStyled type="transparent">
+											<button
+												class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+												:aria-current="
+													!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
+												"
+												:class="{
+													'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
+												}"
+												@click="$emit('navigate', index)"
+											>
+												{{ segment || '' }}
+											</button>
+										</ButtonStyled>
+										<ChevronRightIcon
+											v-if="index < breadcrumbs.length - 1 || isEditing"
+											class="size-4 flex-shrink-0 text-secondary"
+											aria-hidden="true"
+										/>
+									</div>
+								</li>
+							</TransitionGroup>
+							<li v-if="isEditing && editingFileName" class="flex items-center px-3 text-base">
+								<span class="font-semibold !text-contrast" aria-current="location">
+									{{ editingFileName }}
+								</span>
+							</li>
+						</ol>
+					</li>
+				</ol>
+			</nav>
+
+			<div v-if="!isEditing" class="flex flex-shrink-0 items-center gap-2">
+				<StyledInput
+					id="search-folder"
+					:model-value="searchQuery"
+					:icon="SearchIcon"
+					type="search"
+					name="search"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.searchFiles)"
+					class="!h-10 hidden @[800px]:block"
+					input-class="!h-10"
+					wrapper-class="w-full sm:w-[280px]"
+					@update:model-value="$emit('update:searchQuery', $event)"
+				/>
+
+				<ButtonStyled v-if="showRefreshButton" type="outlined">
+					<button
+						type="button"
+						class="flex !h-10 items-center gap-2 !border-[1px] !border-surface-5"
+						:disabled="refreshing"
+						@click="handleRefresh"
+					>
+						<RefreshCwIcon
+							aria-hidden="true"
+							class="h-5 w-5 transition-transform"
+							:class="refreshing ? 'animate-spin' : ''"
+						/>
+						{{ formatMessage(commonMessages.refreshButton) }}
+					</button>
+				</ButtonStyled>
+
+				<ButtonStyled type="outlined">
+					<OverflowMenu
+						:dropdown-id="`create-new-${baseId}`"
+						position="bottom"
+						direction="left"
+						:aria-label="formatMessage(messages.createNew)"
+						:disabled="disabled"
+						:tooltip="disabled ? disabledTooltip : undefined"
+						class="!h-10 justify-center gap-2 !border-[1px] !border-surface-5"
+						:options="[
+							{ id: 'file', action: () => $emit('create', 'file') },
+							{ id: 'directory', action: () => $emit('create', 'directory') },
+							{ id: 'upload', action: () => $emit('upload') },
+							{ divider: true, shown: showInstallFromUrl ?? false },
+							{ id: 'upload-zip', shown: false, action: () => $emit('uploadZip') },
+							{
+								id: 'install-from-url',
+								shown: showInstallFromUrl ?? false,
+								action: () => $emit('unzipFromUrl', false),
+							},
+							{
+								id: 'install-cf-pack',
+								shown: showInstallFromUrl ?? false,
+								action: () => $emit('unzipFromUrl', true),
+							},
+						]"
+					>
+						<PlusIcon aria-hidden="true" class="h-5 w-5" />
+						<DropdownIcon aria-hidden="true" class="h-5 w-5" />
+						<template #file>
+							<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.newFile) }}
+						</template>
+						<template #directory>
+							<FolderOpenIcon aria-hidden="true" /> {{ formatMessage(messages.newFolder) }}
+						</template>
+						<template #upload>
+							<UploadIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFile) }}
+						</template>
+						<template #upload-zip>
+							<FileArchiveIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZip) }}
+						</template>
+						<template #install-from-url>
+							<LinkIcon aria-hidden="true" /> {{ formatMessage(messages.uploadFromZipUrl) }}
+						</template>
+						<template #install-cf-pack>
+							<CurseForgeIcon aria-hidden="true" />
+							{{ formatMessage(messages.installCurseForgePack) }}
+						</template>
+					</OverflowMenu>
+				</ButtonStyled>
+			</div>
+
+			<div v-else-if="!isEditingImage && isLogFile" class="flex gap-2">
+				<Button
+					v-tooltip="formatMessage(messages.shareToMclogs)"
+					icon-only
+					transparent
+					:aria-label="formatMessage(messages.shareToMclogs)"
+					@click="$emit('share')"
+				>
+					<ShareIcon />
+				</Button>
+			</div>
 		</div>
 	</header>
 </template>
@@ -358,9 +366,12 @@ onBeforeUnmount(() => {
 	bcResizeObserver?.disconnect()
 })
 
-watch(() => props.breadcrumbs, () => {
-	requestAnimationFrame(checkBreadcrumbOverflow)
-})
+watch(
+	() => props.breadcrumbs,
+	() => {
+		requestAnimationFrame(checkBreadcrumbOverflow)
+	},
+)
 
 const isLogFile = computed(() => {
 	return (

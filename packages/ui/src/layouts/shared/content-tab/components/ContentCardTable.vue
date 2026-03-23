@@ -192,9 +192,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				role="row"
 				class="flex min-w-0 items-center gap-4"
 				:class="
-					hasAnyActions
-						? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
-						: 'flex-1'
+					hasAnyActions ? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none' : 'flex-1'
 				"
 			>
 				<Checkbox

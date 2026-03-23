@@ -3,10 +3,7 @@ import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
-import {
-	commonProjectTypeCategoryMessages,
-	normalizeProjectType,
-} from '#ui/utils/common-messages'
+import { commonProjectTypeCategoryMessages, normalizeProjectType } from '#ui/utils/common-messages'
 
 import type { ContentItem } from '../types'
 
@@ -48,9 +45,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
 			for (const type of types) {
 				const msg =
-					commonProjectTypeCategoryMessages[
-						type as keyof typeof commonProjectTypeCategoryMessages
-					]
+					commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
 				const label = msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's'
 				options.push({ id: type, label })
 			}
@@ -101,7 +96,10 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		const activeAttributes = selectedFilters.value.filter((f) => attributeFilters.has(f))
 
 		return source.filter((item) => {
-			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type))) {
+			if (
+				typeFilters.length > 0 &&
+				!typeFilters.includes(normalizeProjectType(item.project_type))
+			) {
 				return false
 			}
 

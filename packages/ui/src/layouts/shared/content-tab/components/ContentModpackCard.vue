@@ -5,7 +5,7 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	SettingsIcon,
+	Settings2Icon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -268,7 +268,7 @@ onUnmounted(() => {
 									}
 								"
 							>
-								<SettingsIcon />
+								<Settings2Icon />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -305,7 +305,7 @@ onUnmounted(() => {
 									{{ formatMessage(commonMessages.contentLabel) }}
 								</template>
 								<template #settings>
-									<SettingsIcon class="size-5" />
+									<Settings2Icon class="size-5" />
 									{{ formatMessage(commonMessages.settingsLabel) }}
 								</template>
 							</TeleportOverflowMenu></ButtonStyled

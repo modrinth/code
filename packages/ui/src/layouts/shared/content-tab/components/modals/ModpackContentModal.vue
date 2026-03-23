@@ -7,11 +7,6 @@ import {
 	SearchIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import {
-	commonProjectTypeCategoryMessages,
-	commonProjectTypeTitleMessages,
-	normalizeProjectType,
-} from '#ui/utils/common-messages'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
@@ -22,7 +17,12 @@ import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowM
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import {
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	commonProjectTypeTitleMessages,
+	normalizeProjectType,
+} from '#ui/utils/common-messages'
 
 import { isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
@@ -148,9 +148,7 @@ const filterOptions = computed(() => {
 		.sort(([, a], [, b]) => b - a)
 		.map(([type]) => {
 			const msg =
-				commonProjectTypeCategoryMessages[
-					type as keyof typeof commonProjectTypeCategoryMessages
-				]
+				commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
 			return {
 				id: type,
 				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's',
@@ -178,7 +176,9 @@ function toggleFilter(filterId: string) {
 
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
-	return items.value.filter((item) => selectedFilters.value.includes(normalizeProjectType(item.project_type))).length
+	return items.value.filter((item) =>
+		selectedFilters.value.includes(normalizeProjectType(item.project_type)),
+	).length
 })
 
 const filteredItems = computed(() => {
@@ -197,7 +197,9 @@ const filteredItems = computed(() => {
 
 	// Apply type filters
 	if (selectedFilters.value.length > 0) {
-		result = result.filter((item) => selectedFilters.value.includes(normalizeProjectType(item.project_type)))
+		result = result.filter((item) =>
+			selectedFilters.value.includes(normalizeProjectType(item.project_type)),
+		)
 	}
 
 	return result
@@ -486,7 +488,17 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 						<div class="flex items-center gap-1.5">
 							<component :is="getTypeIcon(type as string)" class="size-5 text-secondary" />
 							<span class="font-medium text-primary">
-								{{ count }} {{ formatMessage(commonProjectTypeTitleMessages[normalizeProjectType(type as string) as keyof typeof commonProjectTypeTitleMessages] ?? commonProjectTypeTitleMessages.project, { count }) }}
+								{{ count }}
+								{{
+									formatMessage(
+										commonProjectTypeTitleMessages[
+											normalizeProjectType(
+												type as string,
+											) as keyof typeof commonProjectTypeTitleMessages
+										] ?? commonProjectTypeTitleMessages.project,
+										{ count },
+									)
+								}}
 							</span>
 						</div>
 					</template>

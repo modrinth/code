@@ -182,8 +182,7 @@ function computeActiveIndex(): { index: number; isSubpage: boolean } {
 
 		const isSubpageMatch =
 			(decodedPath.startsWith(decodedHref) &&
-				(decodedPath.length === decodedHref.length ||
-					decodedPath[decodedHref.length] === '/')) ||
+				(decodedPath.length === decodedHref.length || decodedPath[decodedHref.length] === '/')) ||
 			link.subpages?.some((subpage) => decodedPath.includes(subpage))
 
 		if (isSubpageMatch) {
