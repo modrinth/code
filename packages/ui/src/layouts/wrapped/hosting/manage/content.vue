@@ -926,6 +926,7 @@ provideContentManager({
 				:modpack-name="modpack?.project.title"
 				:modpack-icon-url="modpack?.project.icon_url"
 				enable-toggle
+				:switch-version="handleSwitchVersion"
 				@update:enabled="handleModpackContentToggle"
 				@bulk:enable="handleModpackBulkToggle($event, true)"
 				@bulk:disable="handleModpackBulkToggle($event, false)"

@@ -297,7 +297,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
-					@switch-version="emit('switchVersion', item.id)"
+					v-on="hasSwitchVersionListener ? { 'switch-version': () => emit('switchVersion', item.id) } : {}"
 				>
 					<template #additionalButtonsLeft>
 						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />

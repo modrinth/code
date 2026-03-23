@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ArrowLeftRightIcon,
 	BoxIcon,
 	FilterIcon,
 	GlassesIcon,
@@ -36,6 +37,7 @@ interface Props {
 	modpackIconUrl?: string
 	enableToggle?: boolean
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
+	switchVersion?: (item: ContentItem) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -43,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 	modpackIconUrl: undefined,
 	enableToggle: false,
 	getOverflowOptions: undefined,
+	switchVersion: undefined,
 })
 
 const emit = defineEmits<{
@@ -83,6 +86,10 @@ const messages = defineMessages({
 	copyLink: {
 		id: 'instances.modpack-content-modal.copy-link',
 		defaultMessage: 'Copy link',
+	},
+	switchVersion: {
+		id: 'instances.modpack-content-modal.switch-version',
+		defaultMessage: 'Switch version',
 	},
 })
 
@@ -229,7 +236,18 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
 		isClientOnly: isClientOnlyEnvironment(item.environment),
 		disabled: disabledIds.value.has(item.file_name),
-		overflowOptions: props.getOverflowOptions?.(item),
+		overflowOptions: [
+			...(props.switchVersion
+				? [
+						{
+							id: formatMessage(messages.switchVersion),
+							icon: ArrowLeftRightIcon,
+							action: () => props.switchVersion!(item),
+						},
+					]
+				: []),
+			...(props.getOverflowOptions?.(item) ?? []),
+		],
 	})),
 )
 

@@ -13,6 +13,7 @@
 				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
 				:enable-toggle="!props.isServerInstance"
 				:get-overflow-options="getOverflowOptions"
+				:switch-version="handleSwitchVersion"
 				@update:enabled="handleModpackContentToggle"
 				@bulk:enable="handleModpackContentBulkToggle"
 				@bulk:disable="handleModpackContentBulkToggle"
