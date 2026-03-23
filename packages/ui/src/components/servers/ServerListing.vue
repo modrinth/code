@@ -12,18 +12,12 @@
 				:data-pyro-server-listing-id="server_id"
 			>
 				<div
-					v-if="isProvisioning || isUpgrading"
+					v-if="hasIconOverlay"
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
 					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
-					<SpinnerIcon class="size-8 animate-spin absolute" />
-				</div>
-				<div
-					v-else-if="status === 'suspended'"
-					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-				>
-					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
-					<LockIcon class="size-8 absolute" />
+					<SpinnerIcon v-if="isProvisioning || isUpgrading" class="size-8 animate-spin absolute" />
+					<LockIcon v-else class="size-8 absolute" />
 				</div>
 				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
 				<div class="ml-4 flex flex-col gap-2.5" :class="{ 'grayscale opacity-75': isDisabled }">
@@ -75,162 +69,28 @@
 				</div>
 			</div>
 		</NuxtLink>
-		<div v-if="isProvisioning" class="server-listing-notice">
-			<div class="flex gap-2">
+
+		<div v-if="noticeType" class="server-listing-notice">
+			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
 				Please wait while we set up your server. This should only take a minute.
 			</div>
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason === 'upgrading'"
-			class="server-listing-notice"
-		>
-			<div class="flex gap-2">
+			<div v-else-if="noticeType === 'upgrading'" class="flex gap-2">
 				Your server's hardware is currently being upgraded and will be back online shortly.
 			</div>
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="server-listing-notice"
-		>
-			<div>
+			<div v-else-if="noticeType === 'cancelled' || noticeType === 'paymentfailed'">
 				Your subscription was cancelled<template v-if="cancellationDate">
 					on
 					<span class="font-medium text-contrast">
 						{{ formatDate(cancellationDate) }}
 					</span></template
+				><template v-if="noticeType === 'paymentfailed'"> due to payment failure</template
 				>.<template v-if="!isFilesExpired">
-					Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
-					downloaded below before they're deleted.</template
+					Your files will be kept for
+					<span class="font-medium text-red">30 days</span> and can be downloaded below before
+					they're deleted.</template
 				>
 			</div>
-			<div class="flex gap-2">
-				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
-					<button
-						v-tooltip="'Download latest backup'"
-						class="!border-surface-5"
-						@click="onDownloadBackup"
-					>
-						<DownloadIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button
-						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5"
-						@click="copyToClipboard(server_id)"
-					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
-						<template v-else> Copy ID <CopyIcon /> </template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a href="https://support.modrinth.com/en/" target="_blank"
-						><MessagesSquareIcon /> Support
-					</a>
-				</ButtonStyled>
-				<ButtonStyled v-if="onResubscribe" color="brand">
-					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
-				</ButtonStyled>
-			</div>
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason === 'paymentfailed'"
-			class="server-listing-notice"
-		>
-			<div>
-				Your subscription was cancelled<template v-if="cancellationDate">
-					on
-					<span class="font-medium text-contrast">
-						{{ formatDate(cancellationDate) }}
-					</span></template
-				>
-				due to payment failure.<template v-if="!isFilesExpired">
-					Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
-					downloaded below before they're deleted.</template
-				>
-			</div>
-			<div class="flex gap-2">
-				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
-					<button
-						v-tooltip="'Download latest backup'"
-						class="!border-surface-5"
-						@click="onDownloadBackup"
-					>
-						<DownloadIcon />
-					</button>
-				</ButtonStyled>
-				<ButtonStyled type="outlined">
-					<button
-						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5"
-						@click="copyToClipboard(server_id)"
-					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
-						<template v-else> Copy ID <CopyIcon /> </template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a href="https://support.modrinth.com/en/" target="_blank"
-						><MessagesSquareIcon /> Support
-					</a>
-				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<AutoLink :to="`/settings/billing#server-${server_id}`">
-						<CardIcon /> Manage billing
-					</AutoLink>
-				</ButtonStyled>
-			</div>
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason === 'moderated'"
-			class="server-listing-notice"
-		>
-			<div>Your server has been suspended due to a moderation action.</div>
-			<div class="flex gap-2">
-				<ButtonStyled type="outlined">
-					<button
-						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5"
-						@click="copyToClipboard(server_id)"
-					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
-						<template v-else> Copy ID <CopyIcon /> </template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a href="https://support.modrinth.com/en/" target="_blank"
-						><MessagesSquareIcon /> Support
-					</a>
-				</ButtonStyled>
-			</div>
-		</div>
-		<div v-else-if="status === 'suspended'" class="server-listing-notice">
-			<div>
-				Your server has been suspended. Please contact Modrinth Support for more information.
-			</div>
-			<div class="flex gap-2">
-				<ButtonStyled type="outlined">
-					<button
-						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5"
-						@click="copyToClipboard(server_id)"
-					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
-						<template v-else> Copy ID <CopyIcon /> </template>
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<a href="https://support.modrinth.com/en/" target="_blank"
-						><MessagesSquareIcon /> Support
-					</a>
-				</ButtonStyled>
-			</div>
-		</div>
-		<div
-			v-if="isSetToCancel && status !== 'suspended' && !isProvisioning"
-			class="server-listing-notice"
-		>
-			<div>
+			<div v-else-if="noticeType === 'setToCancel'">
 				Your subscription is set to cancel<template v-if="cancellationDate">
 					on
 					<span class="font-medium text-contrast">
@@ -241,8 +101,20 @@
 					<span class="font-medium text-red">30 days</span> after cancellation.</template
 				>
 			</div>
-			<div class="flex gap-2">
-				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
+			<div v-else-if="noticeType === 'moderated'">
+				Your server has been suspended due to a moderation action. Please contact Modrinth Support
+				for more information.
+			</div>
+			<div v-else>
+				Your server has been suspended. Please contact Modrinth Support for more information.
+			</div>
+
+			<div v-if="noticeButtons" class="flex gap-2">
+				<ButtonStyled
+					v-if="noticeButtons.downloadBackup && onDownloadBackup"
+					type="outlined"
+					circular
+				>
 					<button
 						v-tooltip="'Download latest backup'"
 						class="!border-surface-5"
@@ -251,26 +123,32 @@
 						<DownloadIcon />
 					</button>
 				</ButtonStyled>
-				<ButtonStyled type="outlined">
+				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
 					<button
 						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5 w-28"
+						class="!border-surface-5"
 						@click="copyToClipboard(server_id)"
 					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /></template>
-						<template v-else> Copy ID <CopyIcon /></template>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
 					</button>
 				</ButtonStyled>
-				<ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.support">
 					<a href="https://support.modrinth.com/en/" target="_blank"
 						><MessagesSquareIcon /> Support
 					</a>
 				</ButtonStyled>
-				<ButtonStyled v-if="onResubscribe" color="brand">
+				<ButtonStyled v-if="noticeButtons.manageBilling" color="brand">
+					<AutoLink :to="`/settings/billing#server-${server_id}`">
+						<CardIcon /> Manage billing
+					</AutoLink>
+				</ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.resubscribe && onResubscribe" color="brand">
 					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
 				</ButtonStyled>
 			</div>
 		</div>
+
 		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
 				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
@@ -370,13 +248,64 @@ const isFilesExpired = computed(() => {
 	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
 	return new Date() > thirtyDaysLater
 })
-const hasNotice = computed(
-	() =>
-		isProvisioning.value ||
-		props.status === 'suspended' ||
-		isSetToCancel.value ||
-		!!props.pendingChange,
+
+const hasIconOverlay = computed(
+	() => isProvisioning.value || isUpgrading.value || props.status === 'suspended',
 )
+
+type NoticeType =
+	| 'provisioning'
+	| 'upgrading'
+	| 'cancelled'
+	| 'paymentfailed'
+	| 'moderated'
+	| 'suspended'
+	| 'setToCancel'
+
+const noticeType = computed<NoticeType | null>(() => {
+	if (isProvisioning.value) return 'provisioning'
+	if (props.status === 'suspended') {
+		switch (props.suspension_reason) {
+			case 'upgrading':
+				return 'upgrading'
+			case 'cancelled':
+				return 'cancelled'
+			case 'paymentfailed':
+				return 'paymentfailed'
+			case 'moderated':
+				return 'moderated'
+			default:
+				return 'suspended'
+		}
+	}
+	if (isSetToCancel.value) return 'setToCancel'
+	return null
+})
+
+type NoticeButtons = {
+	downloadBackup?: boolean
+	copyId?: boolean
+	support?: boolean
+	manageBilling?: boolean
+	resubscribe?: boolean
+}
+
+const noticeButtons = computed<NoticeButtons | null>(() => {
+	switch (noticeType.value) {
+		case 'cancelled':
+		case 'setToCancel':
+			return { downloadBackup: true, copyId: true, support: true, resubscribe: true }
+		case 'paymentfailed':
+			return { downloadBackup: true, copyId: true, support: true, manageBilling: true }
+		case 'moderated':
+		case 'suspended':
+			return { copyId: true, support: true }
+		default:
+			return null
+	}
+})
+
+const hasNotice = computed(() => !!noticeType.value || !!props.pendingChange)
 
 const showGameLabel = computed(() => !!props.game && !isConfiguring.value)
 const showLoaderLabel = computed(() => !!props.loader && !isConfiguring.value)
