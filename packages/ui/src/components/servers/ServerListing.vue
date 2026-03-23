@@ -20,9 +20,14 @@
 					<LockIcon v-else class="size-8 absolute" />
 				</div>
 				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
-				<div class="ml-4 flex flex-col gap-2.5" :class="{ 'grayscale opacity-75': isDisabled }">
+				<div class="ml-4 flex flex-col gap-2.5">
 					<div class="flex flex-row items-center gap-2">
-						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
+						<h2
+							class="m-0 text-xl font-bold"
+							:class="{ 'text-contrast': !isDisabled, 'text-primary': isDisabled }"
+						>
+							{{ name }}
+						</h2>
 						<div
 							v-if="isConfiguring"
 							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
@@ -33,7 +38,8 @@
 
 					<div
 						v-if="projectData?.title"
-						class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
+						class="m-0 flex flex-row items-center gap-2 text-sm font-medium"
+						:class="{ 'text-secondary': isDisabled }"
 					>
 						<Avatar
 							:src="iconUrl"
@@ -63,6 +69,7 @@
 						:show-game-label="showGameLabel"
 						:show-loader-label="showLoaderLabel"
 						:show-player-count="showPlayerCount"
+						:class="{ 'text-secondary': isDisabled }"
 						:linked="false"
 						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
