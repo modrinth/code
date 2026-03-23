@@ -133,13 +133,32 @@
 				</ButtonStyled>
 			</div>
 		</div>
-		<div v-else-if="status === 'suspended' && suspension_reason" class="server-listing-notice">
-			<div class="flex flex-row gap-2">
-				Your server has been suspended:
-				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
-				for more information.
+		<div
+			v-else-if="status === 'suspended' && suspension_reason === 'paymentfailed'"
+			class="server-listing-notice"
+		>
+			<div>
+				Your subscription was cancelled<template v-if="cancellationDate">
+					on
+					<span class="font-medium text-contrast">
+						{{ formatDate(cancellationDate) }}
+					</span></template
+				>
+				due to payment failure.<template v-if="!isFilesExpired">
+					Your files will be kept for <span class="font-medium text-red">30 days</span> and can be
+					downloaded below before they're deleted.</template
+				>
 			</div>
 			<div class="flex gap-2">
+				<ButtonStyled v-if="onDownloadBackup" type="outlined" circular>
+					<button
+						v-tooltip="'Download latest backup'"
+						class="!border-surface-5"
+						@click="onDownloadBackup"
+					>
+						<DownloadIcon />
+					</button>
+				</ButtonStyled>
 				<ButtonStyled type="outlined">
 					<button
 						v-tooltip="'Copy code to clipboard'"
@@ -162,16 +181,16 @@
 				</ButtonStyled>
 			</div>
 		</div>
-		<div v-else-if="status === 'suspended'" class="server-listing-notice">
-			<div class="flex flex-row gap-2">
-				Your server has been suspended. Please update your billing information or contact Modrinth
-				Support for more information.
-			</div>
+		<div
+			v-else-if="status === 'suspended' && suspension_reason === 'moderated'"
+			class="server-listing-notice"
+		>
+			<div>Your server has been suspended due to a moderation action.</div>
 			<div class="flex gap-2">
 				<ButtonStyled type="outlined">
 					<button
 						v-tooltip="'Copy code to clipboard'"
-						class="!border-surface-5 w-28"
+						class="!border-surface-5"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
@@ -183,10 +202,27 @@
 						><MessagesSquareIcon /> Support
 					</a>
 				</ButtonStyled>
-				<ButtonStyled color="brand">
-					<AutoLink :to="`/settings/billing#server-${server_id}`">
-						<CardIcon /> Manage billing
-					</AutoLink>
+			</div>
+		</div>
+		<div v-else-if="status === 'suspended'" class="server-listing-notice">
+			<div>
+				Your server has been suspended. Please contact Modrinth Support for more information.
+			</div>
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined">
+					<button
+						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
 				</ButtonStyled>
 			</div>
 		</div>

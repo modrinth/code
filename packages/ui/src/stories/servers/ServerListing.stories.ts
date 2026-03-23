@@ -135,19 +135,41 @@ export const SuspendedCancelledFilesExpired: Story = {
 	},
 }
 
-export const SuspendedWithReason: Story = {
+export const SuspendedPaymentFailed: Story = {
 	args: {
 		...baseServer,
 		name: 'Minigames Network',
 		status: 'suspended',
 		suspension_reason: 'paymentfailed',
+		cancellationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+		onDownloadBackup: () => alert('Download backup clicked'),
+	},
+}
+
+export const SuspendedPaymentFailedFilesExpired: Story = {
+	args: {
+		...baseServer,
+		name: 'Minigames Network',
+		status: 'suspended',
+		suspension_reason: 'paymentfailed',
+		cancellationDate: new Date(2025, 1, 17).toISOString(),
+		onDownloadBackup: null,
+	},
+}
+
+export const SuspendedModerated: Story = {
+	args: {
+		...baseServer,
+		name: 'Banned Server',
+		status: 'suspended',
+		suspension_reason: 'moderated',
 	},
 }
 
 export const SuspendedGeneric: Story = {
 	args: {
 		...baseServer,
-		name: 'Archive Server',
+		name: 'Server with other suspension reason',
 		status: 'suspended',
 	},
 }
