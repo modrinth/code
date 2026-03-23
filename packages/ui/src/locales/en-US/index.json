@@ -959,9 +959,6 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
   },
-  "hosting.content.switch-version": {
-    "defaultMessage": "Switch version"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },

@@ -4,8 +4,10 @@ use eyre::Result;
 use futures::TryStreamExt;
 use heck::ToKebabCase;
 use itertools::Itertools;
+use regex::Regex;
 use std::collections::HashMap;
-use tracing::info;
+use std::sync::LazyLock;
+use tracing::{info, warn};
 
 use crate::database::PgPool;
 use crate::database::models::loader_fields::{
@@ -24,6 +26,13 @@ use crate::models::v2::projects::LegacyProject;
 use crate::routes::v2_reroute;
 use crate::search::UploadSearchProject;
 use crate::util::error::Context;
+
+fn normalize_for_search(s: &str) -> String {
+    static SPECIAL_CHARS_RE: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"[^a-zA-Z0-9-.\s]").expect("valid regex"));
+
+    SPECIAL_CHARS_RE.replace_all(s, "").to_kebab_case()
+}
 
 pub async fn index_local(
     pool: &PgPool,
@@ -262,7 +271,7 @@ pub async fn index_local(
             {
                 team_owner
             } else {
-                println!(
+                warn!(
                     "org owner not found for project {} id: {}!",
                     project.name, project.id.0
                 );
@@ -427,7 +436,7 @@ pub async fn index_local(
                     project_id: crate::models::ids::ProjectId::from(project.id)
                         .to_string(),
                     name: project.name.clone(),
-                    indexed_title: project.name.to_kebab_case(),
+                    indexed_name: normalize_for_search(&project.name),
                     summary: project.summary.clone(),
                     categories: categories.clone(),
                     display_categories: display_categories.clone(),
@@ -436,7 +445,7 @@ pub async fn index_local(
                     log_downloads: (project.downloads.max(1) as f64).ln(),
                     icon_url: project.icon_url.clone(),
                     author: owner.clone(),
-                    indexed_author: owner.to_kebab_case(),
+                    indexed_author: normalize_for_search(&owner),
                     date_created: project.approved,
                     created_timestamp: project.approved.timestamp(),
                     date_modified: project.updated,
@@ -613,4 +622,32 @@ async fn index_versions(
     }
 
     Ok(res_versions)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_normalize_for_search_removes_special_chars() {
+        assert_eq!(normalize_for_search("Xaero's Minimap"), "xaeros-minimap");
+        assert_eq!(normalize_for_search("JourneyMap"), "journey-map");
+        assert_eq!(normalize_for_search("journey-map"), "journey-map");
+        assert_eq!(normalize_for_search("SomeUserName"), "some-user-name");
+    }
+
+    #[test]
+    fn test_normalize_for_search_handles_whitespace() {
+        assert_eq!(
+            normalize_for_search("Some  Project  Name"),
+            "some-project-name"
+        );
+        assert_eq!(normalize_for_search("  padded  "), "padded");
+    }
+
+    #[test]
+    fn test_normalize_for_search_handles_numbers() {
+        assert_eq!(normalize_for_search("Project 123"), "project-123");
+        assert_eq!(normalize_for_search("Test 1.0"), "test-1-0");
+    }
 }

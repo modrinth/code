@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ArrowLeftRightIcon, ClipboardCopyIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -77,10 +77,6 @@ const messages = defineMessages({
 	failedToBulkUpdate: {
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
-	},
-	switchVersion: {
-		id: 'hosting.content.switch-version',
-		defaultMessage: 'Switch version',
 	},
 	copyLink: {
 		id: 'hosting.content.copy-link',
@@ -835,15 +831,7 @@ function handleModpackUpdateCancel() {
 }
 
 function getOverflowOptions(item: ContentItem) {
-	const options: { id: string; icon?: typeof ArrowLeftRightIcon; action: () => void }[] = []
-
-	if (item.project?.id && item.version?.id && !item.has_update) {
-		options.push({
-			id: formatMessage(messages.switchVersion),
-			icon: ArrowLeftRightIcon,
-			action: () => handleSwitchVersion(item),
-		})
-	}
+	const options: { id: string; icon?: typeof ClipboardCopyIcon; action: () => void }[] = []
 
 	if (item.project?.slug) {
 		options.push({
@@ -906,6 +894,7 @@ provideContentManager({
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
 	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
