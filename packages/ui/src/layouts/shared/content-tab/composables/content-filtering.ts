@@ -2,6 +2,12 @@ import { useSessionStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
 import { computed, ref, watch } from 'vue'
 
+import { useVIntl } from '#ui/composables/i18n'
+import {
+	commonProjectTypeCategoryMessages,
+	normalizeProjectType,
+} from '#ui/utils/common-messages'
+
 import type { ContentItem } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
@@ -20,11 +26,12 @@ export interface ContentFilterConfig {
 	showUpdateFilter?: boolean
 	showClientOnlyFilter?: boolean
 	isPackLocked?: Ref<boolean>
-	formatProjectType?: (type: string) => string
 	persistKey?: string
 }
 
 export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFilterConfig) {
+	const { formatMessage } = useVIntl()
+
 	const selectedFilters = config?.persistKey
 		? useSessionStorage<string[]>(`content-filters:${config.persistKey}`, [])
 		: ref<string[]>([])
@@ -34,12 +41,17 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 
 		if (config?.showTypeFilters) {
 			const frequency = items.value.reduce((map: Record<string, number>, item) => {
-				map[item.project_type] = (map[item.project_type] || 0) + 1
+				const normalized = normalizeProjectType(item.project_type)
+				map[normalized] = (map[normalized] || 0) + 1
 				return map
 			}, {})
 			const types = Object.keys(frequency).sort((a, b) => frequency[b] - frequency[a])
 			for (const type of types) {
-				const label = config.formatProjectType ? config.formatProjectType(type) + 's' : type + 's'
+				const msg =
+					commonProjectTypeCategoryMessages[
+						type as keyof typeof commonProjectTypeCategoryMessages
+					]
+				const label = msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's'
 				options.push({ id: type, label })
 			}
 		}
@@ -89,7 +101,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 		const activeAttributes = selectedFilters.value.filter((f) => attributeFilters.has(f))
 
 		return source.filter((item) => {
-			if (typeFilters.length > 0 && !typeFilters.includes(item.project_type)) {
+			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type))) {
 				return false
 			}
 

@@ -638,6 +638,14 @@ export const financialMessages = defineMessages({
 	},
 })
 
+const PROJECT_TYPE_ALIASES: Record<string, string> = {
+	shaderpack: 'shader',
+}
+
+export function normalizeProjectType(type: string): string {
+	return PROJECT_TYPE_ALIASES[type] ?? type
+}
+
 export const commonProjectTypeCategoryMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.category',

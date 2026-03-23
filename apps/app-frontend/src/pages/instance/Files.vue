@@ -20,7 +20,7 @@ import {
 	writeFile as writeFileBytes,
 	writeTextFile,
 } from '@tauri-apps/plugin-fs'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 
 import { profile_listener } from '@/helpers/events'
 import { get_full_path } from '@/helpers/profile'
@@ -84,13 +84,10 @@ const editingFile = ref<EditingFile | null>(null)
 
 debug('setup: start, instance.path =', props.instance.path)
 
-onMounted(async () => {
-	debug('onMounted: fired')
-	instanceRoot.value = await get_full_path(props.instance.path)
-	debug('onMounted: instanceRoot =', instanceRoot.value)
-	await refresh()
-	debug('onMounted: refresh complete, items =', items.value.length, 'error =', error.value)
-})
+instanceRoot.value = await get_full_path(props.instance.path)
+debug('setup: instanceRoot =', instanceRoot.value)
+await refresh()
+debug('setup: refresh complete, items =', items.value.length, 'error =', error.value)
 
 function resolvePath(relativePath: string): string {
 	return relativePath ? `${instanceRoot.value}/${relativePath}` : instanceRoot.value
