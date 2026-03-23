@@ -27,36 +27,74 @@
 		@proceed="proceedDeleteWorld"
 	/>
 	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
-		<div class="flex flex-wrap gap-2 items-center">
+		<div class="flex flex-wrap items-center gap-2">
 			<StyledInput
 				v-model="searchFilter"
 				:icon="SearchIcon"
 				type="text"
-				placeholder="Search worlds..."
 				autocomplete="off"
+				:spellcheck="false"
+				input-class="!h-10"
+				wrapper-class="flex-1 min-w-0"
 				clearable
-				wrapper-class="flex-grow"
+				:placeholder="`Search ${dedupedWorlds.length} worlds...`"
 			/>
-			<ButtonStyled>
-				<button :disabled="refreshingAll" @click="refreshAllWorlds">
-					<template v-if="refreshingAll">
-						<SpinnerIcon class="animate-spin" />
-						Refreshing...
-					</template>
-					<template v-else>
-						<UpdatedIcon />
-						Refresh
-					</template>
+			<div class="flex gap-2">
+				<ButtonStyled type="outlined">
+					<button
+						class="!h-10 !border-button-bg !border-[1px]"
+						@click="addServerModal?.show()"
+					>
+						<PlusIcon class="size-5" />
+						Add server
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="brand">
+					<button
+						class="!h-10 flex items-center gap-2"
+						@click="router.push({ path: '/browse/server', query: { i: instance.path, from: 'worlds' } })"
+					>
+						<CompassIcon class="size-5" />
+						<span>Browse servers</span>
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
+		<div class="flex flex-wrap items-center justify-between gap-2">
+			<div class="flex flex-wrap items-center gap-1.5">
+				<FilterIcon class="size-5 text-secondary" />
+				<button
+					class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+					:class="
+						selectedFilters.length === 0
+							? 'border-green bg-brand-highlight text-brand'
+							: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+					"
+					@click="selectedFilters = []"
+				>
+					All
 				</button>
-			</ButtonStyled>
-			<ButtonStyled>
-				<button @click="addServerModal?.show()">
-					<PlusIcon />
-					Add a server
+				<button
+					v-for="option in filterOptions"
+					:key="option.id"
+					class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
+					:class="
+						selectedFilters.includes(option.id)
+							? 'border-green bg-brand-highlight text-brand'
+							: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
+					"
+					@click="toggleFilter(option.id)"
+				>
+					{{ option.label }}
+				</button>
+			</div>
+			<ButtonStyled type="transparent" hover-color-fill="none">
+				<button :disabled="refreshingAll" @click="refreshAllWorlds">
+					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
+					Refresh
 				</button>
 			</ButtonStyled>
 		</div>
-		<FilterBar v-model="filters" :options="filterOptions" show-all-options />
 		<div class="flex flex-col w-full gap-2">
 			<WorldItem
 				v-for="world in filteredWorlds"
@@ -113,13 +151,10 @@
 	</EmptyState>
 </template>
 <script setup lang="ts">
-import { CompassIcon, PlusIcon, SearchIcon, SpinnerIcon, UpdatedIcon } from '@modrinth/assets'
+import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	defineMessages,
 	EmptyState,
-	FilterBar,
-	type FilterBarOption,
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
@@ -203,8 +238,17 @@ function play(world: World) {
 	emit('play', world)
 }
 
-const filters = ref<string[]>([])
+const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
+
+function toggleFilter(id: string) {
+	const idx = selectedFilters.value.indexOf(id)
+	if (idx >= 0) {
+		selectedFilters.value.splice(idx, 1)
+	} else {
+		selectedFilters.value.push(id)
+	}
+}
 
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)
@@ -490,43 +534,14 @@ const dedupedWorlds = computed(() => {
 })
 
 const filterOptions = computed(() => {
-	const options: FilterBarOption[] = []
-
+	const options: { id: string; label: string }[] = []
 	const hasServer = dedupedWorlds.value.some((x) => x.type === 'server')
 
-	if (dedupedWorlds.value.some((x) => x.type === 'singleplayer') && hasServer) {
-		options.push({
-			id: 'singleplayer',
-			message: messages.singleplayer,
-		})
-		options.push({
-			id: 'server',
-			message: messages.server,
-		})
-	}
-
 	if (hasServer) {
-		// add available filter if there's any offline ("unavailable") servers AND there's any singleplayer worlds or available servers
-		if (
-			dedupedWorlds.value.some(
-				(x) =>
-					x.type === 'server' &&
-					!serverData.value[x.address]?.status &&
-					!serverData.value[x.address]?.refreshing,
-			) &&
-			dedupedWorlds.value.some(
-				(x) =>
-					x.type === 'singleplayer' ||
-					(x.type === 'server' &&
-						serverData.value[x.address]?.status &&
-						!serverData.value[x.address]?.refreshing),
-			)
-		) {
-			options.push({
-				id: 'available',
-				message: messages.available,
-			})
-		}
+		options.push({ id: 'vanilla', label: 'Vanilla' })
+		options.push({ id: 'modded', label: 'Modded' })
+		options.push({ id: 'online', label: 'Online' })
+		options.push({ id: 'offline', label: 'Offline' })
 	}
 
 	return options
@@ -534,14 +549,36 @@ const filterOptions = computed(() => {
 
 const filteredWorlds = computed(() =>
 	dedupedWorlds.value.filter((x) => {
-		const availableFilter = filters.value.includes('available')
-		const typeFilter = filters.value.includes('server') || filters.value.includes('singleplayer')
+		if (searchFilter.value && !x.name.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+			return false
+		}
 
-		return (
-			(!typeFilter || filters.value.includes(x.type)) &&
-			(!availableFilter || x.type !== 'server' || serverData.value[x.address]?.status) &&
-			(!searchFilter.value || x.name.toLowerCase().includes(searchFilter.value.toLowerCase()))
-		)
+		if (selectedFilters.value.length === 0) return true
+
+		const typeFilters = selectedFilters.value.filter((f) => f === 'vanilla' || f === 'modded')
+		const statusFilters = selectedFilters.value.filter((f) => f === 'online' || f === 'offline')
+
+		if (x.type === 'singleplayer') {
+			return typeFilters.length === 0 && statusFilters.length === 0
+		}
+
+		let passesType = true
+		if (typeFilters.length > 0) {
+			const isModded = isManagedServerWorld(x)
+			passesType =
+				(typeFilters.includes('modded') && isModded) ||
+				(typeFilters.includes('vanilla') && !isModded)
+		}
+
+		let passesStatus = true
+		if (statusFilters.length > 0) {
+			const isOnline = !!serverData.value[x.address]?.status
+			passesStatus =
+				(statusFilters.includes('online') && isOnline) ||
+				(statusFilters.includes('offline') && !isOnline)
+		}
+
+		return passesType && passesStatus
 	}),
 )
 
@@ -581,18 +618,4 @@ onUnmounted(() => {
 	unlistenProfile()
 })
 
-const messages = defineMessages({
-	singleplayer: {
-		id: 'instance.worlds.type.singleplayer',
-		defaultMessage: 'Singleplayer',
-	},
-	server: {
-		id: 'instance.worlds.type.server',
-		defaultMessage: 'Server',
-	},
-	available: {
-		id: 'instance.worlds.filter.available',
-		defaultMessage: 'Available',
-	},
-})
 </script>
