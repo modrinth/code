@@ -14,13 +14,14 @@
 	<FileDeleteItemModal ref="deleteItemModal" :item="selectedItem" @delete="handleDeleteItem" />
 	<FileContextMenu ref="contextMenuRef">
 		<template #extract
-			><PackageOpenIcon class="size-5" /> {{ formatMessage(messages.extractLabel) }}</template
+			><PackageOpenIcon class="size-5" />
+			{{ formatMessage(commonMessages.extractButton) }}</template
 		>
 		<template #rename
-			><EditIcon class="size-5" /> {{ formatMessage(messages.renameLabel) }}</template
+			><EditIcon class="size-5" /> {{ formatMessage(commonMessages.renameButton) }}</template
 		>
 		<template #move
-			><RightArrowIcon class="size-5" /> {{ formatMessage(messages.moveLabel) }}</template
+			><RightArrowIcon class="size-5" /> {{ formatMessage(commonMessages.moveButton) }}</template
 		>
 		<template #download
 			><DownloadIcon class="size-5" />
@@ -169,7 +170,7 @@
 					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button @click="fileEditorRef?.saveFileContent(false)">
-							<SaveIcon /> {{ formatMessage(messages.saveButton) }}
+							<SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
 						</button>
 					</ButtonStyled>
 				</div>
@@ -283,18 +284,6 @@ const messages = defineMessages({
 		id: 'files.layout.selected-count',
 		defaultMessage: '{count} selected',
 	},
-	extractLabel: {
-		id: 'files.action.extract',
-		defaultMessage: 'Extract',
-	},
-	renameLabel: {
-		id: 'files.action.rename',
-		defaultMessage: 'Rename',
-	},
-	moveLabel: {
-		id: 'files.action.move',
-		defaultMessage: 'Move',
-	},
 	dryRunFailedTitle: {
 		id: 'files.layout.dry-run-failed-title',
 		defaultMessage: 'Dry run failed',
@@ -303,10 +292,6 @@ const messages = defineMessages({
 		id: 'files.layout.dry-run-failed-text',
 		defaultMessage: 'Error running dry run',
 	},
-	extractFailedTitle: {
-		id: 'files.layout.extract-failed-title',
-		defaultMessage: 'Extract failed',
-	},
 	extractionStartedTitle: {
 		id: 'files.layout.extraction-started-title',
 		defaultMessage: 'Extraction started',
@@ -314,10 +299,6 @@ const messages = defineMessages({
 	unsavedChanges: {
 		id: 'files.layout.unsaved-changes',
 		defaultMessage: 'You have unsaved changes.',
-	},
-	saveButton: {
-		id: 'files.layout.save',
-		defaultMessage: 'Save',
 	},
 })
 
@@ -549,7 +530,7 @@ async function handleExtractItem(item: { name: string; type: string; path: strin
 		}
 	} catch (error) {
 		addNotification({
-			title: formatMessage(messages.extractFailedTitle),
+			title: formatMessage(commonMessages.extractFailedLabel),
 			text: error instanceof Error ? error.message : '',
 			type: 'error',
 		})
@@ -563,7 +544,7 @@ async function handleExtractConfirm(path: string) {
 		addNotification({ title: formatMessage(messages.extractionStartedTitle), type: 'success' })
 	} catch (error) {
 		addNotification({
-			title: formatMessage(messages.extractFailedTitle),
+			title: formatMessage(commonMessages.extractFailedLabel),
 			text: error instanceof Error ? error.message : '',
 			type: 'error',
 		})

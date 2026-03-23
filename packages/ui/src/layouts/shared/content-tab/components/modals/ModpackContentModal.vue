@@ -79,18 +79,6 @@ const messages = defineMessages({
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
 	},
-	allFilter: {
-		id: 'instances.modpack-content-modal.filter-all',
-		defaultMessage: 'All',
-	},
-	copyLink: {
-		id: 'instances.modpack-content-modal.copy-link',
-		defaultMessage: 'Copy link',
-	},
-	switchVersion: {
-		id: 'instances.modpack-content-modal.switch-version',
-		defaultMessage: 'Switch version',
-	},
 })
 
 export interface ModpackContentModalState {
@@ -240,7 +228,7 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 			...(props.switchVersion
 				? [
 						{
-							id: formatMessage(messages.switchVersion),
+							id: formatMessage(commonMessages.switchVersionButton),
 							icon: ArrowLeftRightIcon,
 							action: () => props.switchVersion!(item),
 						},
@@ -388,7 +376,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 							"
 							@click="selectedFilters = []"
 						>
-							{{ formatMessage(messages.allFilter) }}
+							{{ formatMessage(commonMessages.allProjectType) }}
 						</button>
 						<button
 							v-for="option in filterOptions"

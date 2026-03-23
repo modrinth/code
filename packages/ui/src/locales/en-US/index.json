@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Continue"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Copy filename"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Copy full path"
+  },
   "button.copy-id": {
     "defaultMessage": "Copy ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Copy link"
   },
   "button.copy-permalink": {
     "defaultMessage": "Copy permanent link"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Decline"
   },
+  "button.disable": {
+    "defaultMessage": "Disable"
+  },
   "button.download": {
     "defaultMessage": "Download"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.enable": {
+    "defaultMessage": "Enable"
+  },
+  "button.extract": {
+    "defaultMessage": "Extract"
   },
   "button.follow": {
     "defaultMessage": "Follow"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "More options"
   },
+  "button.move": {
+    "defaultMessage": "Move"
+  },
   "button.next": {
     "defaultMessage": "Next"
   },
   "button.open-folder": {
     "defaultMessage": "Open folder"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Open in folder"
   },
   "button.play": {
     "defaultMessage": "Play"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
+  },
+  "button.rename": {
+    "defaultMessage": "Rename"
   },
   "button.repair": {
     "defaultMessage": "Repair"
@@ -151,6 +178,9 @@
   },
   "button.show-all-versions": {
     "defaultMessage": "Show all versions"
+  },
+  "button.show-file": {
+    "defaultMessage": "Show file"
   },
   "button.sign-in": {
     "defaultMessage": "Sign in"
@@ -299,9 +329,6 @@
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Don't show again"
   },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Updating..."
-  },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
   },
@@ -404,26 +431,11 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Updating {contentType}..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Disable"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Enable"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} selected"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
-  },
-  "files.action.extract": {
-    "defaultMessage": "Extract"
-  },
-  "files.action.move": {
-    "defaultMessage": "Move"
-  },
-  "files.action.rename": {
-    "defaultMessage": "Rename"
   },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
@@ -445,21 +457,6 @@
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Files will be overwritten"
-  },
-  "files.context-menu.copied-filename": {
-    "defaultMessage": "Copied filename"
-  },
-  "files.context-menu.copied-path": {
-    "defaultMessage": "Copied path"
-  },
-  "files.context-menu.copy-filename": {
-    "defaultMessage": "Copy filename"
-  },
-  "files.context-menu.copy-full-path": {
-    "defaultMessage": "Copy full path"
-  },
-  "files.context-menu.open-in-folder": {
-    "defaultMessage": "Open in folder"
   },
   "files.create-modal.create-button": {
     "defaultMessage": "Create {type, select, directory {folder} other {file}}"
@@ -560,17 +557,11 @@
   "files.layout.error-title": {
     "defaultMessage": "Unable to load files"
   },
-  "files.layout.extract-failed-title": {
-    "defaultMessage": "Extract failed"
-  },
   "files.layout.extraction-started-title": {
     "defaultMessage": "Extraction started"
   },
   "files.layout.loading": {
     "defaultMessage": "Loading files..."
-  },
-  "files.layout.save": {
-    "defaultMessage": "Save"
   },
   "files.layout.selected-count": {
     "defaultMessage": "{count} selected"
@@ -589,9 +580,6 @@
   },
   "files.move-modal.header": {
     "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
-  },
-  "files.move-modal.move-button": {
-    "defaultMessage": "Move"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Back to home"
@@ -632,9 +620,6 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Upload from .zip URL"
   },
-  "files.operations.done": {
-    "defaultMessage": "Done"
-  },
   "files.operations.extracted": {
     "defaultMessage": "{size} extracted"
   },
@@ -659,35 +644,8 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "New name"
   },
-  "files.rename-modal.rename-button": {
-    "defaultMessage": "Rename"
-  },
-  "files.row.copied-filename": {
-    "defaultMessage": "Copied filename"
-  },
-  "files.row.copied-path": {
-    "defaultMessage": "Copied path"
-  },
-  "files.row.copy-filename": {
-    "defaultMessage": "Copy filename"
-  },
-  "files.row.copy-full-path": {
-    "defaultMessage": "Copy full path"
-  },
-  "files.row.extract": {
-    "defaultMessage": "Extract"
-  },
   "files.row.item-count": {
     "defaultMessage": "{count, plural, one {# item} other {# items}}"
-  },
-  "files.row.move": {
-    "defaultMessage": "Move"
-  },
-  "files.row.open-in-folder": {
-    "defaultMessage": "Open in folder"
-  },
-  "files.row.rename": {
-    "defaultMessage": "Rename"
   },
   "files.table-header.created": {
     "defaultMessage": "Created"
@@ -710,14 +668,8 @@
   "files.unsaved-changes-modal.header": {
     "defaultMessage": "Unsaved changes"
   },
-  "files.unsaved-changes-modal.save": {
-    "defaultMessage": "Save"
-  },
   "files.upload-dropdown.cancelled": {
     "defaultMessage": "Cancelled"
-  },
-  "files.upload-dropdown.done": {
-    "defaultMessage": "Done"
   },
   "files.upload-dropdown.failed-file-exists": {
     "defaultMessage": "Failed - File already exists"
@@ -742,9 +694,6 @@
   },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "An unexpected error occurred."
-  },
-  "files.upload-dropdown.upload-failed": {
-    "defaultMessage": "Upload failed"
   },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} left"
@@ -922,9 +871,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
-  },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Copy link"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
@@ -1127,26 +1073,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Existing instance"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Game version"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Select game version"
   },
   "instances.content-install.header": {
     "defaultMessage": "Install project"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Hide snapshots"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Install"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Installed"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Installing..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Instance type"
@@ -1175,20 +1112,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Select icon"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Show all versions"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Copy link"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "All"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpack content"
@@ -1201,9 +1129,6 @@
   },
   "instances.modpack-content-modal.search-placeholder": {
     "defaultMessage": "Search {count, number} {count, plural, one {project} other {projects}}"
-  },
-  "instances.modpack-content-modal.switch-version": {
-    "defaultMessage": "Switch version"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Current"
@@ -1283,6 +1208,15 @@
   "label.content": {
     "defaultMessage": "Content"
   },
+  "label.copied-filename": {
+    "defaultMessage": "Copied filename"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Copied path"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Create failed"
+  },
   "label.created-ago": {
     "defaultMessage": "Created {ago}"
   },
@@ -1291,6 +1225,9 @@
   },
   "label.delete": {
     "defaultMessage": "Delete"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "Delete failed"
   },
   "label.delete-immediately": {
     "defaultMessage": "Delete immediately"
@@ -1301,6 +1238,12 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.done": {
+    "defaultMessage": "Done"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Download failed"
+  },
   "label.email": {
     "defaultMessage": "Email"
   },
@@ -1309,6 +1252,9 @@
   },
   "label.error": {
     "defaultMessage": "Error"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "Extract failed"
   },
   "label.filter-by": {
     "defaultMessage": "Filter by"
@@ -1336,6 +1282,9 @@
   },
   "label.modpack": {
     "defaultMessage": "Modpack"
+  },
+  "label.move-failed": {
+    "defaultMessage": "Move failed"
   },
   "label.no": {
     "defaultMessage": "No"
@@ -1381,6 +1330,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejected"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Rename failed"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
@@ -1429,6 +1381,12 @@
   },
   "label.update-available": {
     "defaultMessage": "Update available"
+  },
+  "label.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Upload failed"
   },
   "label.username": {
     "defaultMessage": "Username"

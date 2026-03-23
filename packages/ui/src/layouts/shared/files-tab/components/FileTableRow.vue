@@ -47,19 +47,25 @@
 					<TeleportOverflowMenu :options="menuOptions">
 						<MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
 						<template #copy-filename
-							><ClipboardCopyIcon /> {{ formatMessage(messages.copyFilename) }}</template
+							><ClipboardCopyIcon />
+							{{ formatMessage(commonMessages.copyFilenameButton) }}</template
 						>
 						<template #copy-full-path
-							><ClipboardCopyIcon /> {{ formatMessage(messages.copyFullPath) }}</template
+							><ClipboardCopyIcon />
+							{{ formatMessage(commonMessages.copyFullPathButton) }}</template
 						>
 						<template #open-in-folder
-							><FolderOpenIcon /> {{ formatMessage(messages.openInFolder) }}</template
+							><FolderOpenIcon /> {{ formatMessage(commonMessages.openInFolderButton) }}</template
 						>
 						<template #extract
-							><PackageOpenIcon /> {{ formatMessage(messages.extractLabel) }}</template
+							><PackageOpenIcon /> {{ formatMessage(commonMessages.extractButton) }}</template
 						>
-						<template #rename><EditIcon /> {{ formatMessage(messages.renameLabel) }}</template>
-						<template #move><RightArrowIcon /> {{ formatMessage(messages.moveLabel) }}</template>
+						<template #rename
+							><EditIcon /> {{ formatMessage(commonMessages.renameButton) }}</template
+						>
+						<template #move
+							><RightArrowIcon /> {{ formatMessage(commonMessages.moveButton) }}</template
+						>
 						<template #download
 							><DownloadIcon />
 							{{
@@ -124,38 +130,6 @@ const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
 
 const messages = defineMessages({
-	extractLabel: {
-		id: 'files.row.extract',
-		defaultMessage: 'Extract',
-	},
-	renameLabel: {
-		id: 'files.row.rename',
-		defaultMessage: 'Rename',
-	},
-	moveLabel: {
-		id: 'files.row.move',
-		defaultMessage: 'Move',
-	},
-	copyFilename: {
-		id: 'files.row.copy-filename',
-		defaultMessage: 'Copy filename',
-	},
-	copyFullPath: {
-		id: 'files.row.copy-full-path',
-		defaultMessage: 'Copy full path',
-	},
-	copiedFilename: {
-		id: 'files.row.copied-filename',
-		defaultMessage: 'Copied filename',
-	},
-	copiedPath: {
-		id: 'files.row.copied-path',
-		defaultMessage: 'Copied path',
-	},
-	openInFolder: {
-		id: 'files.row.open-in-folder',
-		defaultMessage: 'Open in folder',
-	},
 	itemCount: {
 		id: 'files.row.item-count',
 		defaultMessage: '{count, plural, one {# item} other {# items}}',
@@ -236,7 +210,10 @@ const menuOptions = computed(() => {
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(props.name)
-				addNotification({ title: formatMessage(messages.copiedFilename), type: 'success' })
+				addNotification({
+					title: formatMessage(commonMessages.copiedFilenameLabel),
+					type: 'success',
+				})
 			},
 		},
 		{
@@ -244,7 +221,7 @@ const menuOptions = computed(() => {
 			icon: ClipboardCopyIcon,
 			action: () => {
 				navigator.clipboard.writeText(getFullPath())
-				addNotification({ title: formatMessage(messages.copiedPath), type: 'success' })
+				addNotification({ title: formatMessage(commonMessages.copiedPathLabel), type: 'success' })
 			},
 		},
 		{
@@ -373,7 +350,7 @@ function handlePointerDown(e: PointerEvent) {
 		(source, destination) => {
 			emit('moveDirectTo', {
 				name: source.name,
-				type: source.type,
+				type: source.type as FileItem['type'],
 				path: source.path,
 				destination,
 			})

@@ -129,7 +129,7 @@ await initInstanceContext()
 async function initInstanceContext() {
 	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
 	if (route.query.i) {
-		instance.value = await getInstance(route.query.i).catch(handleError)
+		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
 		debugLog('instance loaded', {
 			name: instance.value?.name,
 			loader: instance.value?.loader,
@@ -139,7 +139,7 @@ async function initInstanceContext() {
 		// Load installed project IDs in background — the page and initial search render immediately.
 		// When this resolves, instanceFilters recomputes and triggers a search refresh
 		// that applies the "hide installed" negative filters and marks installed badges.
-		getInstalledProjectIds(route.query.i)
+		getInstalledProjectIds(route.query.i as string)
 			.then((ids) => {
 				debugLog('installedProjectIds loaded', { count: ids?.length })
 				installedProjectIds.value = ids

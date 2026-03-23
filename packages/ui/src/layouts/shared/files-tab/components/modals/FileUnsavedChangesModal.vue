@@ -20,7 +20,7 @@
 				<ButtonStyled color="green">
 					<button @click="handleSave">
 						<SaveIcon />
-						{{ formatMessage(messages.save) }}
+						{{ formatMessage(commonMessages.saveButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -52,10 +52,6 @@ const messages = defineMessages({
 	discard: {
 		id: 'files.unsaved-changes-modal.discard',
 		defaultMessage: 'Discard',
-	},
-	save: {
-		id: 'files.unsaved-changes-modal.save',
-		defaultMessage: 'Save',
 	},
 })
 

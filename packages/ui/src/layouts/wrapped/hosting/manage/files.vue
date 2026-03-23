@@ -10,6 +10,7 @@ import {
 	injectModrinthServerContext,
 	injectNotificationManager,
 } from '#ui/providers'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
@@ -171,7 +172,11 @@ const deleteMutation = useMutation({
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
-		addNotification({ title: 'Delete failed', text: err.message, type: 'error' })
+		addNotification({
+			title: formatMessage(commonMessages.deleteFailedLabel),
+			text: err.message,
+			type: 'error',
+		})
 	},
 	onSuccess: () => {
 		addNotification({
@@ -211,7 +216,11 @@ const renameMutation = useMutation({
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
-		addNotification({ title: 'Rename failed', text: err.message, type: 'error' })
+		addNotification({
+			title: formatMessage(commonMessages.renameFailedLabel),
+			text: err.message,
+			type: 'error',
+		})
 	},
 	onSuccess: (_, { newName }) => {
 		addNotification({ title: 'Renamed', text: `Renamed to ${newName}`, type: 'success' })
@@ -236,7 +245,11 @@ const moveMutation = useMutation({
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
-		addNotification({ title: 'Move failed', text: err.message, type: 'error' })
+		addNotification({
+			title: formatMessage(commonMessages.moveFailedLabel),
+			text: err.message,
+			type: 'error',
+		})
 	},
 	onSuccess: (_, { destination }) => {
 		addNotification({ title: 'Moved', text: `Moved to ${destination}`, type: 'success' })
@@ -271,7 +284,11 @@ const createMutation = useMutation({
 	},
 	onError: (err: Error, _vars, context) => {
 		queryClient.setQueryData(getQueryKey(), context?.previous)
-		addNotification({ title: 'Create failed', text: err.message, type: 'error' })
+		addNotification({
+			title: formatMessage(commonMessages.createFailedLabel),
+			text: err.message,
+			type: 'error',
+		})
 	},
 	onSuccess: (_, { path, type }) => {
 		const name = path.split('/').pop()
@@ -326,7 +343,7 @@ async function downloadFile(path: string, fileName: string): Promise<void> {
 		}
 	} catch {
 		addNotification({
-			title: 'Download failed',
+			title: formatMessage(commonMessages.downloadFailedLabel),
 			text: 'Could not download the file.',
 			type: 'error',
 		})
@@ -439,7 +456,7 @@ async function uploadFiles(files: File[]) {
 		} catch (err) {
 			if (err instanceof Error && err.message === 'Upload cancelled') break
 			addNotification({
-				title: 'Upload failed',
+				title: formatMessage(commonMessages.uploadFailedLabel),
 				text: `Failed to upload ${file.name}`,
 				type: 'error',
 			})

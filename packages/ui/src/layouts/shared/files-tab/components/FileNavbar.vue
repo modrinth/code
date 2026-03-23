@@ -105,7 +105,7 @@
 					name="search"
 					autocomplete="off"
 					:placeholder="formatMessage(messages.searchFiles)"
-					class="!h-10 hidden @[800px]:block"
+					class="!h-10 hidden @[800px]:inline-flex"
 					input-class="!h-10"
 					wrapper-class="w-full sm:w-[280px]"
 					@update:model-value="$emit('update:searchQuery', $event)"

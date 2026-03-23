@@ -24,7 +24,7 @@
 						@click="handleCopyFilename"
 					>
 						<ClipboardCopyIcon class="size-5" />
-						{{ formatMessage(messages.copyFilename) }}
+						{{ formatMessage(commonMessages.copyFilenameButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled type="transparent">
@@ -34,7 +34,7 @@
 						@click="handleCopyPath"
 					>
 						<ClipboardCopyIcon class="size-5" />
-						{{ formatMessage(messages.copyFullPath) }}
+						{{ formatMessage(commonMessages.copyFullPathButton) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="ctx.openInFolder" type="transparent">
@@ -44,7 +44,7 @@
 						@click="handleOpenInFolder"
 					>
 						<FolderOpenIcon class="size-5" />
-						{{ formatMessage(messages.openInFolder) }}
+						{{ formatMessage(commonMessages.openInFolderButton) }}
 					</button>
 				</ButtonStyled>
 				<div class="h-px w-full bg-surface-5" />
@@ -79,8 +79,9 @@ import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { injectFileManager } from '../providers/file-manager'
 import type { FileContextMenuOption, FileItem } from '../types'
@@ -88,29 +89,6 @@ import type { FileContextMenuOption, FileItem } from '../types'
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
-
-const messages = defineMessages({
-	copyFilename: {
-		id: 'files.context-menu.copy-filename',
-		defaultMessage: 'Copy filename',
-	},
-	copyFullPath: {
-		id: 'files.context-menu.copy-full-path',
-		defaultMessage: 'Copy full path',
-	},
-	copiedFilename: {
-		id: 'files.context-menu.copied-filename',
-		defaultMessage: 'Copied filename',
-	},
-	copiedPath: {
-		id: 'files.context-menu.copied-path',
-		defaultMessage: 'Copied path',
-	},
-	openInFolder: {
-		id: 'files.context-menu.open-in-folder',
-		defaultMessage: 'Open in folder',
-	},
-})
 
 const visible = ref(false)
 const menuRef = ref<HTMLElement>()
@@ -145,7 +123,7 @@ function hide() {
 function handleCopyFilename() {
 	if (!currentItem.value) return
 	navigator.clipboard.writeText(currentItem.value.name)
-	addNotification({ title: formatMessage(messages.copiedFilename), type: 'success' })
+	addNotification({ title: formatMessage(commonMessages.copiedFilenameLabel), type: 'success' })
 	hide()
 }
 
@@ -159,7 +137,7 @@ function getFullPath() {
 function handleCopyPath() {
 	if (!currentItem.value) return
 	navigator.clipboard.writeText(getFullPath())
-	addNotification({ title: formatMessage(messages.copiedPath), type: 'success' })
+	addNotification({ title: formatMessage(commonMessages.copiedPathLabel), type: 'success' })
 	hide()
 }
 

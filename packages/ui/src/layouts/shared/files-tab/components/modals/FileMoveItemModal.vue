@@ -34,7 +34,7 @@
 				<ButtonStyled color="brand">
 					<button @click="handleSubmit">
 						<RightArrowIcon class="h-5 w-5" />
-						{{ formatMessage(messages.moveButton) }}
+						{{ formatMessage(commonMessages.moveButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -68,10 +68,6 @@ const messages = defineMessages({
 	destinationPath: {
 		id: 'files.move-modal.destination-path',
 		defaultMessage: 'Destination path',
-	},
-	moveButton: {
-		id: 'files.move-modal.move-button',
-		defaultMessage: 'Move',
 	},
 	destinationPlaceholder: {
 		id: 'files.move-modal.destination-placeholder',

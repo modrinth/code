@@ -59,15 +59,6 @@
   "app.instance.mods.content-type-project": {
     "message": "project"
   },
-  "app.instance.mods.copy-link": {
-    "message": "Copy link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installing..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
-  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was added"
   },
@@ -80,17 +71,50 @@
   "app.instance.mods.share-title": {
     "message": "Sharing modpack content"
   },
-  "app.instance.mods.show-file": {
-    "message": "Show file"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Successfully uploaded"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Unknown"
+  "app.instance.worlds.add-server": {
+    "message": "Add server"
   },
-  "app.instance.mods.updating": {
-    "message": "Updating..."
+  "app.instance.worlds.browse-servers": {
+    "message": "Browse servers"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' will be **permanently deleted**, and there will be no way to recover it."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Are you sure you want to permanently delete this world?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modded"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "You don't have any worlds yet."
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' will be removed from your list, including in-game, and there will be no way to recover it."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Are you sure you want to remove {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Search {count} worlds..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "this server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content required"
@@ -197,6 +221,24 @@
   "app.update.reload-to-update": {
     "message": "Reload to install update"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Select an option"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Incompatible version {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Not played yet"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
+  },
   "friends.action.add-friend": {
     "message": "Add a friend"
   },
@@ -299,26 +341,8 @@
   "instance.files.adding-files": {
     "message": "Adding files ({completed}/{total})"
   },
-  "instance.files.create-failed": {
-    "message": "Create failed"
-  },
-  "instance.files.delete-failed": {
-    "message": "Delete failed"
-  },
-  "instance.files.extract-failed": {
-    "message": "Extract failed"
-  },
-  "instance.files.move-failed": {
-    "message": "Move failed"
-  },
-  "instance.files.rename-failed": {
-    "message": "Rename failed"
-  },
   "instance.files.save-as": {
     "message": "Save as..."
-  },
-  "instance.files.upload-failed": {
-    "message": "Upload failed"
   },
   "instance.server-modal.address": {
     "message": "Address"

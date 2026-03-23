@@ -189,6 +189,22 @@ const messages = defineMessages({
 		id: 'instance.worlds.linked_server',
 		defaultMessage: 'Managed by server project',
 	},
+	incompatibleVersion: {
+		id: 'app.world.world-item.incompatible-version',
+		defaultMessage: 'Incompatible version {version}',
+	},
+	playersOnline: {
+		id: 'app.world.world-item.players-online',
+		defaultMessage: '{count} online',
+	},
+	offline: {
+		id: 'app.world.world-item.offline',
+		defaultMessage: 'Offline',
+	},
+	notPlayedYet: {
+		id: 'app.world.world-item.not-played-yet',
+		defaultMessage: 'Not played yet',
+	},
 })
 </script>
 <template>
@@ -243,13 +259,17 @@ const messages = defineMessages({
 					>
 						<template v-if="refreshing">
 							<SpinnerIcon aria-hidden="true" class="animate-spin shrink-0" />
-							Loading...
+							{{ formatMessage(commonMessages.loadingLabel) }}
 						</template>
 						<template v-else-if="serverStatus">
 							<template v-if="serverIncompatible">
 								<IssuesIcon class="shrink-0 text-orange" aria-hidden="true" />
 								<span class="text-orange">
-									Incompatible version {{ serverStatus.version?.name }}
+									{{
+										formatMessage(messages.incompatibleVersion, {
+											version: serverStatus.version?.name,
+										})
+									}}
 								</span>
 							</template>
 							<template v-else>
@@ -265,8 +285,11 @@ const messages = defineMessages({
 								/>
 								<Tooltip :disabled="!hasPlayersTooltip">
 									<span :class="{ 'cursor-help': hasPlayersTooltip }">
-										{{ formatNumber(serverStatus.players?.online) }}
-										online
+										{{
+											formatMessage(messages.playersOnline, {
+												count: formatNumber(serverStatus.players?.online ?? 0),
+											})
+										}}
 									</span>
 									<template #popper>
 										<div class="flex flex-col gap-1">
@@ -280,7 +303,7 @@ const messages = defineMessages({
 						</template>
 						<template v-else>
 							<NoSignalIcon aria-hidden="true" stroke-width="3px" class="shrink-0" />
-							Offline
+							{{ formatMessage(messages.offline) }}
 						</template>
 					</div>
 				</div>
@@ -299,7 +322,7 @@ const messages = defineMessages({
 								})
 							}}
 						</template>
-						<template v-else> Not played yet </template>
+						<template v-else> {{ formatMessage(messages.notPlayedYet) }} </template>
 					</div>
 					<template v-if="instancePath">
 						•

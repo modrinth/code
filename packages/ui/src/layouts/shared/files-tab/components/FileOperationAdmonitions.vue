@@ -73,7 +73,7 @@
 					})
 				}}
 				<span v-if="op.state === 'done'" class="font-normal text-green">
-					— {{ formatMessage(messages.done) }}</span
+					— {{ formatMessage(commonMessages.doneLabel) }}</span
 				>
 				<span v-else-if="op.state?.startsWith('fail')" class="font-normal text-red">
 					— {{ formatMessage(messages.failed) }}</span
@@ -155,10 +155,6 @@ const messages = defineMessages({
 	modpackFromUrl: {
 		id: 'files.operations.modpack-from-url',
 		defaultMessage: 'modpack from URL',
-	},
-	done: {
-		id: 'files.operations.done',
-		defaultMessage: 'Done',
 	},
 	failed: {
 		id: 'files.operations.failed',

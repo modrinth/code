@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { EditingFile, FileItem, UploadState } from '@modrinth/ui'
 import {
+	commonMessages,
 	defineMessages,
 	FilePageLayout,
 	injectNotificationManager,
@@ -48,30 +49,6 @@ const messages = defineMessages({
 	addingFiles: {
 		id: 'instance.files.adding-files',
 		defaultMessage: 'Adding files ({completed}/{total})',
-	},
-	deleteFailed: {
-		id: 'instance.files.delete-failed',
-		defaultMessage: 'Delete failed',
-	},
-	renameFailed: {
-		id: 'instance.files.rename-failed',
-		defaultMessage: 'Rename failed',
-	},
-	moveFailed: {
-		id: 'instance.files.move-failed',
-		defaultMessage: 'Move failed',
-	},
-	createFailed: {
-		id: 'instance.files.create-failed',
-		defaultMessage: 'Create failed',
-	},
-	uploadFailed: {
-		id: 'instance.files.upload-failed',
-		defaultMessage: 'Upload failed',
-	},
-	extractFailed: {
-		id: 'instance.files.extract-failed',
-		defaultMessage: 'Extract failed',
 	},
 })
 
@@ -175,7 +152,7 @@ async function handleCreateItem(name: string, type: 'file' | 'directory') {
 		await refresh()
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.createFailed),
+			title: formatMessage(commonMessages.createFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})
@@ -192,7 +169,7 @@ async function handleRenameItem(path: string, newName: string) {
 		await refresh()
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.renameFailed),
+			title: formatMessage(commonMessages.renameFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})
@@ -205,7 +182,7 @@ async function handleMoveItem(source: string, destination: string) {
 		await refresh()
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.moveFailed),
+			title: formatMessage(commonMessages.moveFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})
@@ -218,7 +195,7 @@ async function handleDeleteItem(path: string, recursive: boolean) {
 		await refresh()
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.deleteFailed),
+			title: formatMessage(commonMessages.deleteFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})
@@ -281,7 +258,7 @@ async function handleUploadFiles(files: File[]) {
 		}
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.uploadFailed),
+			title: formatMessage(commonMessages.uploadFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})
@@ -301,7 +278,7 @@ async function handleExtractFile(path: string, override: boolean, dry: boolean) 
 		})
 	} catch (e) {
 		addNotification({
-			title: formatMessage(messages.extractFailed),
+			title: formatMessage(commonMessages.extractFailedLabel),
 			text: e instanceof Error ? e.message : '',
 			type: 'error',
 		})

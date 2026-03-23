@@ -48,7 +48,7 @@
 				"
 				:project-name="
 					updatingModpack
-						? (linkedModpackProject?.title ?? formatMessage(messages.modpackFallback))
+						? (linkedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
 						: (updatingProject?.project?.title ?? updatingProject?.file_name)
 				"
 				:loading="loadingVersions"
@@ -66,6 +66,7 @@
 import type { Labrinth } from '@modrinth/api-client'
 import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	ConfirmModpackUpdateModal,
 	type ContentItem,
 	type ContentModpackCardCategory,
@@ -126,10 +127,6 @@ const messages = defineMessages({
 		id: 'app.instance.mods.share-text',
 		defaultMessage: "Check out the projects I'm using in my modpack!",
 	},
-	modpackFallback: {
-		id: 'app.instance.mods.modpack-fallback',
-		defaultMessage: 'Modpack',
-	},
 	successfullyUploaded: {
 		id: 'app.instance.mods.successfully-uploaded',
 		defaultMessage: 'Successfully uploaded',
@@ -142,29 +139,9 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
-	updating: {
-		id: 'app.instance.mods.updating',
-		defaultMessage: 'Updating...',
-	},
-	installing: {
-		id: 'app.instance.mods.installing',
-		defaultMessage: 'Installing...',
-	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
-	},
-	unknownVersion: {
-		id: 'app.instance.mods.unknown-version',
-		defaultMessage: 'Unknown',
-	},
-	showFile: {
-		id: 'app.instance.mods.show-file',
-		defaultMessage: 'Show file',
-	},
-	copyLink: {
-		id: 'app.instance.mods.copy-link',
-		defaultMessage: 'Copy link',
 	},
 })
 
@@ -661,14 +638,14 @@ function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = []
 
 	options.push({
-		id: formatMessage(messages.showFile),
+		id: formatMessage(commonMessages.showFileButton),
 		icon: FolderOpenIcon,
 		action: () => highlightModInProfile(props.instance.path, item.file_path),
 	})
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(messages.copyLink),
+			id: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(
@@ -800,8 +777,8 @@ provideContentManager({
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
 					disabledText: isModpackUpdating.value
-						? formatMessage(messages.updating)
-						: formatMessage(messages.installing),
+						? formatMessage(commonMessages.updatingLabel)
+						: formatMessage(commonMessages.installingLabel),
 				}
 			: null,
 	),
@@ -844,7 +821,7 @@ provideContentManager({
 			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
-			version_number: formatMessage(messages.unknownVersion),
+			version_number: formatMessage(commonMessages.unknownLabel),
 			file_name: item.file_name,
 		},
 		versionLink:

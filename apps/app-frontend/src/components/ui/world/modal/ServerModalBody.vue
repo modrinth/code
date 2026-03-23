@@ -49,6 +49,14 @@ const messages = defineMessages({
 		id: 'instance.server-modal.placeholder-name',
 		defaultMessage: 'Minecraft Server',
 	},
+	placeholderAddress: {
+		id: 'app.world.server-modal.placeholder-address',
+		defaultMessage: 'example.modrinth.gg',
+	},
+	selectAnOption: {
+		id: 'app.world.server-modal.select-an-option',
+		defaultMessage: 'Select an option',
+	},
 })
 
 defineExpose({ resourcePackOptions })
@@ -69,7 +77,7 @@ defineExpose({ resourcePackOptions })
 		</h2>
 		<StyledInput
 			v-model="address"
-			placeholder="example.modrinth.gg"
+			:placeholder="formatMessage(messages.placeholderAddress)"
 			autocomplete="off"
 			wrapper-class="w-full"
 		/>
@@ -89,7 +97,7 @@ defineExpose({ resourcePackOptions })
 				:display-value="
 					resourcePack
 						? formatMessage(resourcePackOptionMessages[resourcePack])
-						: 'Select an option'
+						: formatMessage(messages.selectAnOption)
 				"
 			/>
 		</div>

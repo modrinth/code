@@ -36,10 +36,6 @@ import type {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	updating: {
-		id: 'content.modpack-card.updating',
-		defaultMessage: 'Updating...',
-	},
 	contentHintTitle: {
 		id: 'content.modpack-card.content-hint-title',
 		defaultMessage: 'Modpack content moved',
@@ -195,7 +191,7 @@ onUnmounted(() => {
 					<div class="flex items-center gap-2 text-secondary">
 						<SpinnerIcon class="animate-spin" />
 						<span class="font-semibold">{{
-							disabledText ?? formatMessage(messages.updating)
+							disabledText ?? formatMessage(commonMessages.updatingLabel)
 						}}</span>
 					</div>
 				</template>

@@ -22,7 +22,7 @@
 				<ButtonStyled color="brand">
 					<button :disabled="!!error && submitted" @click="handleSubmit">
 						<EditIcon class="h-5 w-5" />
-						{{ formatMessage(messages.renameButton) }}
+						{{ formatMessage(commonMessages.renameButton) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -53,10 +53,6 @@ const messages = defineMessages({
 	newNameLabel: {
 		id: 'files.rename-modal.new-name-label',
 		defaultMessage: 'New name',
-	},
-	renameButton: {
-		id: 'files.rename-modal.rename-button',
-		defaultMessage: 'Rename',
 	},
 })
 

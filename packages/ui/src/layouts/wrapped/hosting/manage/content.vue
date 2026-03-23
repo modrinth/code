@@ -78,10 +78,6 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
 	},
-	copyLink: {
-		id: 'hosting.content.copy-link',
-		defaultMessage: 'Copy link',
-	},
 })
 
 const leaveMessages = defineMessages({
@@ -179,7 +175,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 							: `/user/${mp.owner.id}`,
 				}
 			: undefined,
-		categories: (project?.display_categories ?? []).map((name) => ({
+		categories: (project?.categories ?? []).map((name) => ({
 			name,
 			icon: name,
 			project_type: 'modpack',
@@ -835,7 +831,7 @@ function getOverflowOptions(item: ContentItem) {
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(messages.copyLink),
+			id: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(

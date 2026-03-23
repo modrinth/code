@@ -60,7 +60,7 @@
 							</div>
 							<div class="flex min-w-[80px] items-center justify-end gap-2">
 								<template v-if="item.status === 'completed'">
-									<span>{{ formatMessage(messages.done) }}</span>
+									<span>{{ formatMessage(commonMessages.doneLabel) }}</span>
 								</template>
 								<template v-else-if="item.status === 'error-file-exists'">
 									<span class="text-red">{{ formatMessage(messages.failedFileExists) }}</span>
@@ -137,10 +137,6 @@ const messages = defineMessages({
 		id: 'files.upload-dropdown.uploads-left',
 		defaultMessage: ' - {count} left',
 	},
-	done: {
-		id: 'files.upload-dropdown.done',
-		defaultMessage: 'Done',
-	},
 	failedFileExists: {
 		id: 'files.upload-dropdown.failed-file-exists',
 		defaultMessage: 'Failed - File already exists',
@@ -164,10 +160,6 @@ const messages = defineMessages({
 	incorrectFileType: {
 		id: 'files.upload-dropdown.incorrect-file-type',
 		defaultMessage: 'Upload had incorrect file type',
-	},
-	uploadFailed: {
-		id: 'files.upload-dropdown.upload-failed',
-		defaultMessage: 'Upload failed',
 	},
 	failedToUpload: {
 		id: 'files.upload-dropdown.failed-to-upload',
@@ -350,7 +342,7 @@ const uploadFile = async (file: File) => {
 
 		if (error instanceof Error && error.message !== 'Upload cancelled') {
 			addNotification({
-				title: formatMessage(messages.uploadFailed),
+				title: formatMessage(commonMessages.uploadFailedLabel),
 				text: formatMessage(messages.failedToUpload, { fileName: file.name }),
 				type: 'error',
 			})

@@ -15,15 +15,26 @@
 	<EditWorldModal ref="editWorldModal" :instance="instance" @submit="editWorld" />
 	<ConfirmModalWrapper
 		ref="removeServerModal"
-		:title="`Are you sure you want to remove ${serverToRemove?.name ?? 'this server'}?`"
-		:description="`'${serverToRemove?.name}'${serverToRemove?.address === serverToRemove?.name ? ' ' : ` (${serverToRemove?.address})`} will be removed from your list, including in-game, and there will be no way to recover it.`"
+		:title="
+			formatMessage(messages.removeServerTitle, {
+				name: serverToRemove?.name ?? formatMessage(messages.thisServer),
+			})
+		"
+		:description="
+			serverToRemove?.address === serverToRemove?.name
+				? formatMessage(messages.removeServerDescription, { name: serverToRemove?.name })
+				: formatMessage(messages.removeServerDescriptionWithAddress, {
+						name: serverToRemove?.name,
+						address: serverToRemove?.address,
+					})
+		"
 		:markdown="false"
 		@proceed="proceedRemoveServer"
 	/>
 	<ConfirmModalWrapper
 		ref="deleteWorldModal"
-		:title="`Are you sure you want to permanently delete this world?`"
-		:description="`'${worldToDelete?.name}' will be **permanently deleted**, and there will be no way to recover it.`"
+		:title="formatMessage(messages.deleteWorldTitle)"
+		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
 		@proceed="proceedDeleteWorld"
 	/>
 	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
@@ -37,13 +48,15 @@
 				input-class="!h-10"
 				wrapper-class="flex-1 min-w-0"
 				clearable
-				:placeholder="`Search ${dedupedWorlds.length} worlds...`"
+				:placeholder="
+					formatMessage(messages.searchWorldsPlaceholder, { count: dedupedWorlds.length })
+				"
 			/>
 			<div class="flex gap-2">
 				<ButtonStyled type="outlined">
 					<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
 						<PlusIcon class="size-5" />
-						Add server
+						{{ formatMessage(messages.addServer) }}
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="brand">
@@ -54,7 +67,7 @@
 						"
 					>
 						<CompassIcon class="size-5" />
-						<span>Browse servers</span>
+						<span>{{ formatMessage(messages.browseServers) }}</span>
 					</button>
 				</ButtonStyled>
 			</div>
@@ -71,7 +84,7 @@
 					"
 					@click="selectedFilters = []"
 				>
-					All
+					{{ formatMessage(commonMessages.allProjectType) }}
 				</button>
 				<button
 					v-for="option in filterOptions"
@@ -90,7 +103,7 @@
 			<ButtonStyled type="transparent" hover-color-fill="none">
 				<button :disabled="refreshingAll" @click="refreshAllWorlds">
 					<RefreshCwIcon :class="refreshingAll ? 'animate-spin' : ''" />
-					Refresh
+					{{ formatMessage(commonMessages.refreshButton) }}
 				</button>
 			</ButtonStyled>
 		</div>
@@ -129,12 +142,12 @@
 			/>
 		</div>
 	</div>
-	<EmptyState v-else type="empty-inbox" heading="You don't have any worlds yet.">
+	<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noWorldsHeading)">
 		<template #actions>
 			<ButtonStyled type="outlined">
 				<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
 					<PlusIcon class="size-5" />
-					Add a server
+					{{ formatMessage(messages.addServer) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
@@ -145,7 +158,7 @@
 					"
 				>
 					<CompassIcon class="size-5" />
-					<span>Browse servers</span>
+					<span>{{ formatMessage(messages.browseServers) }}</span>
 				</button>
 			</ButtonStyled>
 		</template>
@@ -155,11 +168,14 @@
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
+	commonMessages,
+	defineMessages,
 	EmptyState,
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
 	StyledInput,
+	useVIntl,
 } from '@modrinth/ui'
 import { platform } from '@tauri-apps/plugin-os'
 import { computed, onUnmounted, ref, watch } from 'vue'
@@ -205,6 +221,69 @@ import {
 import { injectServerInstall } from '@/providers/server-install'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
+const messages = defineMessages({
+	removeServerTitle: {
+		id: 'app.instance.worlds.remove-server-title',
+		defaultMessage: 'Are you sure you want to remove {name}?',
+	},
+	removeServerDescription: {
+		id: 'app.instance.worlds.remove-server-description',
+		defaultMessage:
+			"'{name}' will be removed from your list, including in-game, and there will be no way to recover it.",
+	},
+	removeServerDescriptionWithAddress: {
+		id: 'app.instance.worlds.remove-server-description-with-address',
+		defaultMessage:
+			"'{name}' ({address}) will be removed from your list, including in-game, and there will be no way to recover it.",
+	},
+	deleteWorldTitle: {
+		id: 'app.instance.worlds.delete-world-title',
+		defaultMessage: 'Are you sure you want to permanently delete this world?',
+	},
+	deleteWorldDescription: {
+		id: 'app.instance.worlds.delete-world-description',
+		defaultMessage:
+			"'{name}' will be **permanently deleted**, and there will be no way to recover it.",
+	},
+	searchWorldsPlaceholder: {
+		id: 'app.instance.worlds.search-worlds-placeholder',
+		defaultMessage: 'Search {count} worlds...',
+	},
+	addServer: {
+		id: 'app.instance.worlds.add-server',
+		defaultMessage: 'Add server',
+	},
+	browseServers: {
+		id: 'app.instance.worlds.browse-servers',
+		defaultMessage: 'Browse servers',
+	},
+	noWorldsHeading: {
+		id: 'app.instance.worlds.no-worlds-heading',
+		defaultMessage: "You don't have any worlds yet.",
+	},
+	thisServer: {
+		id: 'app.instance.worlds.this-server',
+		defaultMessage: 'this server',
+	},
+	vanillaFilter: {
+		id: 'app.instance.worlds.filter-vanilla',
+		defaultMessage: 'Vanilla',
+	},
+	moddedFilter: {
+		id: 'app.instance.worlds.filter-modded',
+		defaultMessage: 'Modded',
+	},
+	onlineFilter: {
+		id: 'app.instance.worlds.filter-online',
+		defaultMessage: 'Online',
+	},
+	offlineFilter: {
+		id: 'app.instance.worlds.filter-offline',
+		defaultMessage: 'Offline',
+	},
+})
+
+const { formatMessage } = useVIntl()
 const { handleError } = injectNotificationManager()
 const { playServerProject } = injectServerInstall()
 const route = useRoute()
@@ -554,7 +633,7 @@ const filterOptions = computed(() => {
 		selectedFilters.value.includes('online') || selectedFilters.value.includes('offline')
 
 	if (hasSingleplayer && hasServer && !hasStatusFilter) {
-		options.push({ id: 'singleplayer', label: 'Singleplayer' })
+		options.push({ id: 'singleplayer', label: formatMessage(commonMessages.singleplayerLabel) })
 	}
 
 	if (hasServer) {
@@ -562,15 +641,15 @@ const filterOptions = computed(() => {
 		const hasVanilla = servers.some((x) => x.content_kind !== 'modpack')
 		const hasModded = servers.some((x) => x.content_kind === 'modpack')
 		if (hasVanilla && hasModded) {
-			options.push({ id: 'vanilla', label: 'Vanilla' })
-			options.push({ id: 'modded', label: 'Modded' })
+			options.push({ id: 'vanilla', label: formatMessage(messages.vanillaFilter) })
+			options.push({ id: 'modded', label: formatMessage(messages.moddedFilter) })
 		}
 		if (!selectedFilters.value.includes('singleplayer')) {
 			const hasOnline = servers.some((x) => !!serverData.value[x.address]?.status)
 			const hasOffline = servers.some((x) => !serverData.value[x.address]?.status)
 			if (hasOnline && hasOffline) {
-				options.push({ id: 'online', label: 'Online' })
-				options.push({ id: 'offline', label: 'Offline' })
+				options.push({ id: 'online', label: formatMessage(messages.onlineFilter) })
+				options.push({ id: 'offline', label: formatMessage(messages.offlineFilter) })
 			}
 		}
 	}
