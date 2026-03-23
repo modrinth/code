@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Skapa projekt"
   },
-  "create.project.create-server-project": {
-    "message": "Skapa server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Saknade fält: {fields}"
   },
@@ -578,6 +575,21 @@
   "dashboard.collections.button.create-new": {
     "message": "Skapa ny"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Skapa din första samling för att komma igång!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du har inga samlingar än"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Inga samlingar matchar din sökning"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Prova att ändra dina filter eller sökord."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
+  },
   "dashboard.collections.label.search-input": {
     "message": "Sök i dina samlingar"
   },
@@ -652,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En affärsenhet är en registrerad organisation såsom ett aktiebolag, ett handelsbolag eller ett LLC-bolag."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Tar du ut pengar som en privatperson eller företag?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
@@ -881,8 +896,32 @@
   "dashboard.withdraw.completion.wallet": {
     "message": "Saldo"
   },
+  "dashboard.withdraw.error.insufficient-balance.title": {
+    "message": "Otillräcklig saldo"
+  },
+  "dashboard.withdraw.error.invalid-address.text": {
+    "message": "Adressen som du angett kunde inte verifieras. Kontrollera dina adressdetaljer."
+  },
+  "dashboard.withdraw.error.invalid-address.title": {
+    "message": "Adressverifiering misslyckades"
+  },
+  "dashboard.withdraw.error.invalid-bank.text": {
+    "message": "Bankkonto-detaljerna som du angett är ogiltiga. Vänligen verifiera din information."
+  },
   "dashboard.withdraw.error.invalid-bank.title": {
     "message": "Ogiltiga bankuppgifter"
+  },
+  "dashboard.withdraw.error.invalid-wallet.text": {
+    "message": "Kryptoplånboks-adressen som du angett är ogiltig. Dubbelkolla och försök igen."
+  },
+  "dashboard.withdraw.error.invalid-wallet.title": {
+    "message": "Ogiltig plånboksadress"
+  },
+  "dashboard.withdraw.error.minimum-not-met.text": {
+    "message": "Utdragningsbeloppet (efter avgifterna) möter inte minimikravet. Vänligen höj utdragningsbeloppet."
+  },
+  "dashboard.withdraw.error.minimum-not-met.title": {
+    "message": "Belopp för lågt"
   },
   "error.collection.404.list_item.1": {
     "message": "Du kan ha skrivit fel på samlingens URL."
@@ -904,6 +943,12 @@
   },
   "error.generic.404.title": {
     "message": "Sidan hittades inte"
+  },
+  "error.generic.451.subtitle": {
+    "message": "Sidan har blockerats av juridiska skäl, såsom statlig censur eller pågående rättsliga förfaranden."
+  },
+  "error.generic.451.title": {
+    "message": "Innehåll otillgängligt av juridiska skäl"
   },
   "error.generic.default.list_item.1": {
     "message": "Se om Modrinth är nere på vår <status-link>statussida</status-link>."
@@ -1010,6 +1055,9 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hostings servrar DDoS-skydd?"
   },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alla Modrinth Hosting servrar medföljer DDoS-skydd, med upp till 17 Tbps kapacitet på vissa ställen."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Vanliga frågor"
   },
@@ -1018,6 +1066,9 @@
   },
   "hosting-marketing.faq.how-fast.answer.one": {
     "message": "Modrinth Hostings servrar bygger på väldigt modern högpresterande hårdvara, men att säga exakt hur det kommer påverka hur din server kör är svårt, då det finns många olika faktorer som påverkar det, som moddarna, datapaketen, pluginsen som du kör på din server och även beteendet av dina spelare."
+  },
+  "hosting-marketing.faq.how-fast.answer.two": {
+    "message": "Flesta prestandaproblem som kommer upp är ofta på grund av en ej-optimerad modpack, mod, datapack, eller plugin som får servern att lagga. Eftersom våra servrar är av väldigt hög kvalitet, så borde du inte inträffa många problem om du väljer en lämplig plan för innehållet som du har på servern."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Kan jag öka mängden lagring på min server?"
@@ -1073,6 +1124,9 @@
   "hosting-marketing.included.custom-url.description": {
     "message": "Dela din server med en anpassad <contrast>modrinth.gg</contrast> URL."
   },
+  "hosting-marketing.included.file-manager": {
+    "message": "Filhanterare som är lätt att använda"
+  },
   "hosting-marketing.included.file-manager.description": {
     "message": "Sök, hantera, redigera och ladda upp filer direkt till din server med lätthet."
   },
@@ -1102,6 +1156,9 @@
   },
   "hosting-marketing.know-what-you-need": {
     "message": "Vet du exakt vad du behöver?"
+  },
+  "hosting-marketing.medal.info": {
+    "message": "Prova på en gratis <orange>3 GB server</orange> i 5 dagar drivet av <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Läs mer"
@@ -1143,7 +1200,7 @@
     "message": "Spela där dina moddar finns"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting integrerar mod- och modpack-installationsprocessen sömlöst i din server."
+    "message": "Modrinth Hosting integrerar mod- och modpaket-installationsprocessen sömlöst i din server."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
     "message": "Varför Modrinth Hosting?"
@@ -1153,6 +1210,9 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Välja mellan Vanilla, Fabric, Forge; Quilt och NeoForge. Om det finns på Modrinth så kan din server köra det."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Misslyckades med att ändra version på modpaketet"
   },
   "hosting.plan.out-of-stock": {
     "message": "Ej i lager"
@@ -2366,17 +2426,11 @@
   "servers.plan.large.description": {
     "message": "Ideal för 15–25 spelare, modpaket, eller tungt moddande."
   },
-  "servers.plan.large.name": {
-    "message": "Stor"
-  },
   "servers.plan.medium.description": {
     "message": "Bra för 6–15 spelare och flera moddar."
   },
   "servers.plan.small.description": {
     "message": "Perfekt för 1–5 vänner med några få lätta moddar."
-  },
-  "servers.plan.small.name": {
-    "message": "Liten"
   },
   "settings.applications.about": {
     "message": "Om"
@@ -2431,9 +2485,6 @@
   },
   "settings.applications.field.url.placeholder": {
     "message": "https://exempel.se"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Ett fel inträffade"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ditt applikations ikon har blivit uppdaterad."

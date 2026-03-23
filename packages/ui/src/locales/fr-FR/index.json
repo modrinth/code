@@ -219,7 +219,7 @@
     "defaultMessage": "Supprimer {count} {itemType}{count, plural, one {} other {s}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Supprimer {itemType} {count, plural, one {} other {s}}"
+    "defaultMessage": "Supprimer {count, plural, one {un } other {des }}{itemType}{count,  plural, one {} other {s}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Tous les mods ou contenus que vous avez ajoutés en haut du modpack seront supprimés."
@@ -262,9 +262,6 @@
   },
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Certains contenus de votre serveur n’ont pas pu être analysés et peuvent être affectés par ce changement."
-  },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "Contenu inconnu"
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} mis à jour"
@@ -376,6 +373,12 @@
   },
   "content.page-layout.uploading-files": {
     "defaultMessage": "Importation des fichiers ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Tout le contenu sélectionné est déjà désactivé"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Tout le contenu sélectionné est déjà activé"
   },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Suppression de {progress}/{total} {contentType} en cours..."
@@ -550,9 +553,6 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Impossible d'importer le fichier"
-  },
-  "hosting.content.switch-version": {
-    "defaultMessage": "Changer de version"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Jusqu'à {cpus} processeurs"
@@ -782,9 +782,6 @@
   "instances.content-install.show-all-versions": {
     "defaultMessage": "Afficher toutes les versions"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Retour"
-  },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copier le lien"
   },
@@ -956,6 +953,21 @@
   "label.password": {
     "defaultMessage": "Mot de passe"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Personnalisé"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Large"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Moyen"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Petit"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Inconnu"
+  },
   "label.platform": {
     "defaultMessage": "Plateforme"
   },
@@ -1002,7 +1014,7 @@
     "defaultMessage": "Solo"
   },
   "label.sort-by": {
-    "defaultMessage": "Trier par"
+    "defaultMessage": "Trier par: "
   },
   "label.success": {
     "defaultMessage": "Succès"
@@ -1144,9 +1156,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Garder les fichiers à jour quand le serveur change"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Fermer"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Obtenir l'application Modrinth"
@@ -1433,6 +1442,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibilité"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organisation"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Propriétaire du projet"
   },
@@ -1493,17 +1505,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "Visiter le wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Copier l'adresse du serveur Java"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Copié !"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "Adresse IP copié dans le presse-papier"
+    "defaultMessage": "Adresse du serveur copiée vers le presse-papier"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Latence"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Télécharger le modpack"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Langues"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Recommandé)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Région"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Contenu requis"
   },
   "project.about.server.title": {
     "defaultMessage": "Détails du serveur"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Tags"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {téléchargement} other {téléchargements}}"
@@ -1589,8 +1619,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, one {partie récente} other {parties récentes}} de Modrinth au cours des 2 dernières semaines"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Ce projet utilise un modpack personnalisé"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amharique"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabe"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbaïdjanais"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Biélorusse"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgare"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengali"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosnien"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Catalan"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Tchèque"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Danois"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Allemand"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Grec"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Anglais"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Espéranto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Espagnol"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonien"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Basque"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Persan"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finnois"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Français"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Irlandais"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galicien"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Hébreu"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Croate"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Hongrois"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Arménien"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonésien"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Islandais"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italien"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Japonais"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Géorgien"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazakh"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Khmer"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Coréen"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Lao"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Lituanien"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Letton"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Macédonien"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongolien"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathi"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Malais"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Birmans"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepali"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Néerlandais"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norvégien"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polonais"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portugais"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Roumain"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Russe"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Sinhala"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovak"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Slovène"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albanian"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbe"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Suédois"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thaïlandais"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Philippin"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turc"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukrainien"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Uzbek"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamien"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Chinois"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "en Asie"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "en Australie"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "en Europe"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "au Moyen-Orient"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "en Russie"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "en Amérique du Sud"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Serveur hébergé {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "aux États-Unis Est"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "aux États-Unis Ouest"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Hors ligne"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Le serveur est hors ligne"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "En ligne"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analyses"
@@ -1826,8 +2114,26 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID de projet"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Type"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Langue"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Région"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Statut"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Chargeur"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Moddé"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanilla"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Une erreur s'est produite durant la création de {backupName}. Ressayez ou contactez le support si le problème persiste."
@@ -1848,7 +2154,7 @@
     "defaultMessage": "Création de la sauvegarde"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "votre sauvegarde"
+    "defaultMessage": "Votre sauvegarde"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Une erreur s'est produite lors de la restauration de {backupName}. Veuillez ressayer ou contacter le support si le problème persiste."
@@ -1935,7 +2241,7 @@
     "defaultMessage": "prélevé {interval}"
   },
   "servers.purchase.step.plan.custom.desc": {
-    "defaultMessage": "Choisissez un plan personnalisé avec uniquement les spécifications dont vous avez besoin."
+    "defaultMessage": "Choisissez un forfait personnalisé avec uniquement les spécifications dont vous avez besoin."
   },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Commencer"
@@ -1950,10 +2256,10 @@
     "defaultMessage": "Le plus populaire"
   },
   "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Choisissez un plan"
+    "defaultMessage": "Choisissez un forfait"
   },
   "servers.purchase.step.plan.select": {
-    "defaultMessage": "Sélectionnez un plan"
+    "defaultMessage": "Sélectionner le forfait"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Parfait pour 1–5 amis et quelques mods légers."
@@ -1962,7 +2268,7 @@
     "defaultMessage": "Choisissez la quantité de RAM et les spécifications qui correspondent à vos besoins."
   },
   "servers.purchase.step.plan.title": {
-    "defaultMessage": "Plan"
+    "defaultMessage": "Forfait"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Région"
@@ -2238,7 +2544,7 @@
     "defaultMessage": "Fourre-tout"
   },
   "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
+    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Bibliothèque"

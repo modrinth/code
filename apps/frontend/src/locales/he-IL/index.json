@@ -485,9 +485,6 @@
   "create.project.create-project": {
     "message": "צור פרויקט"
   },
-  "create.project.create-server-project": {
-    "message": "צור שרת"
-  },
   "create.project.name-label": {
     "message": "שם"
   },

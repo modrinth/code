@@ -35,6 +35,9 @@
   "app-marketing.download.options-title": {
     "message": "Lataus vaihtoehdot"
   },
+  "app-marketing.download.terms": {
+    "message": "Lataamalla Modrint sovelluksen, sinä hyväksyt meidän <terms-link>Ehdot</terms-link> Ja <privacy-link>Tietosuojakäytännöt</privacy-link>."
+  },
   "app-marketing.download.title": {
     "message": "Lataa Modrinth App (Beta)"
   },
@@ -100,6 +103,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App toimii paremmin kuin monet johtavat modinhallintaohjelmat ja käyttää vain 150 MT RAM-muistia!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -335,6 +341,9 @@
   "collection.title": {
     "message": "{name} - kokoelma"
   },
+  "create.collection.collection-info": {
+    "message": "Sinun uusi kokoelma luodaan julkiseksi kokoelmaksi {count, plural, =0 {no projects} one {# project} other {# projects}}:lla. "
+  },
   "dashboard.collections.button.create-new": {
     "message": "Luo uusi"
   },
@@ -346,6 +355,15 @@
   },
   "dashboard.creator-tax-form-modal.header": {
     "message": "Vero lomake"
+  },
+  "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
+    "message": "Vahvista lompakkosi osoite"
+  },
+  "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
+    "message": "Matalammat maksut saatavilla"
+  },
+  "dashboard.revenue.processing": {
+    "message": "Prosessoidaan"
   },
   "error.collection.404.list_item.1": {
     "message": "Saatoit kirjoittaa kokoelman URL osoitteen väärin."
@@ -706,15 +724,6 @@
   },
   "servers.notices.no-notices": {
     "message": "Ei ilmoituksia"
-  },
-  "servers.plan.large.name": {
-    "message": "Suuri"
-  },
-  "servers.plan.medium.name": {
-    "message": "Keskikokoinen"
-  },
-  "servers.plan.small.name": {
-    "message": "Pieni"
   },
   "settings.billing.payment_method.action.primary": {
     "message": "Tee ensisijaiseksi"

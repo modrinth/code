@@ -5,6 +5,78 @@
   "app.auth-servers.unreachable.header": {
     "message": "Kan ikke nå autentificeringsservere"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Indtast modpack beskrivelse..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Eksporter"
+  },
+  "app.export-modal.header": {
+    "message": "Eksporter modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Navn"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack navn"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Vælg filer og mapper til at inkludere i pakken"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Versionsnummer"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Al' data for din instance vil blive permanent slettet, dette inkludere dine verdener, konfigurationer, og alt installeret indhold."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Denne handling kan ikke fortrydes"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Slet instance"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Slet instance"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Kopier link"
+  },
+  "app.instance.mods.installing": {
+    "message": "Installer..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" blev tilføjet"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projekter blev tilføjet"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Tjek ud disse projekter jeg bruger i min modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Deler modpack indhold"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Vis filer"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Uploadet"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Ukendt"
+  },
+  "app.instance.mods.updating": {
+    "message": "Opdatere..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Indhold krævet"
   },
@@ -392,6 +464,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Serveren er uforenelig"
   },
+  "instance.worlds.linked_server": {
+    "message": "Styret af server projektet"
+  },
   "instance.worlds.no_contact": {
     "message": "Serveren kunne ikke blive kontaktet"
   },
@@ -427,6 +502,12 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Synkroniser med instance"
+  },
+  "search.filter.locked.server": {
+    "message": "Givet af serveren"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Kun klient-sided mods kan blive tilføjet til denne server instance"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "Spille version er givet af serveren"

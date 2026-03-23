@@ -260,9 +260,6 @@
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "Sunucundaki bazı içerikler analiz edilemedi ve bu değişiklikten etkilenebilir."
   },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "Bilinmeyen içerik"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count} güncellendi"
   },
@@ -298,6 +295,9 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Bir daha gösterme"
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Güncelleniyor..."
   },
   "content.page-layout.empty.modpack-hint": {
     "defaultMessage": "Bu mod paketinin üzerine ek içerik ekle"
@@ -413,6 +413,9 @@
   "header.category.performance-impact": {
     "defaultMessage": "Performansa etkisi"
   },
+  "header.category.resolutions": {
+    "defaultMessage": "Çözünürlük"
+  },
   "hosting.content.copy-link": {
     "defaultMessage": "Bağlantıyı kopyala"
   },
@@ -428,8 +431,11 @@
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "İçeriği güncelleme başarısız"
   },
-  "hosting.content.switch-version": {
-    "defaultMessage": "Sürüm değiştir"
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Sürümler yüklenemedi"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Güncellenemedi"
   },
   "hosting.specs.burst": {
     "defaultMessage": "{cpus} CPUya kadar çıkar"
@@ -461,6 +467,9 @@
   "input.search.placeholder": {
     "defaultMessage": "Ara..."
   },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Sürüm seç"
+  },
   "input.view.gallery": {
     "defaultMessage": "Galeri görünümü"
   },
@@ -469,6 +478,18 @@
   },
   "input.view.list": {
     "defaultMessage": "Satır görünümü"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Oyun sürümü seç"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "{loader} sürümü seç"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Platform seç"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Onayla"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} sürümü"
@@ -607,9 +628,6 @@
   },
   "instances.content-install.show-all-versions": {
     "defaultMessage": "Bütün sürümleri göster"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Geri"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Bağlantıyı kopyala"
@@ -779,6 +797,15 @@
   "label.password": {
     "defaultMessage": "Parola"
   },
+  "label.plan-medium": {
+    "defaultMessage": "Orta"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Küçük"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Bilinmiyor"
+  },
   "label.platform": {
     "defaultMessage": "Platform"
   },
@@ -820,9 +847,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Tek Oyunculu"
-  },
-  "label.sort-by": {
-    "defaultMessage": "Sırala"
   },
   "label.success": {
     "defaultMessage": "Başarılı"
@@ -964,9 +988,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Sunucu değiştiğinde dosyaları güncel tut"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Kapat"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Modrinth Uygulaması Edin"
@@ -1247,6 +1268,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Uyumluluk"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organizasyon"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Projenin sahibi"
   },
@@ -1310,11 +1334,11 @@
   "project.about.server.copied": {
     "defaultMessage": "Kopyalandı!"
   },
-  "project.about.server.copiedText": {
-    "defaultMessage": "IP adresi panoya kopyalandı"
+  "project.about.server.languages": {
+    "defaultMessage": "Diller"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Gecikme"
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Önerilen)"
   },
   "project.about.server.title": {
     "defaultMessage": "Sunucu detayları"
@@ -1387,6 +1411,111 @@
   },
   "project.recent-plays.tooltip": {
     "defaultMessage": "Modrinth'den son 2 haftada {count} oynama"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgarca"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Boşnakça"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Katalanca"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Çekçe"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Danca"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Almanca"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Yunanca"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "İngilizce"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "İspanyolca"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonca"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Farsça"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Fince"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Fransızca"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hintçe"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Hırvatça"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Macarca"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Ermenice"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Endonezce"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "İtalyanca"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Japonca"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazakça"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Korece"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Litvanyaca"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Letonca"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Makedonca"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Moğolca"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Flemenkçe"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norveçce"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Lehçe"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portekizce"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Romanca"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Rusça"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Türkçe"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukraynaca"
   },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
@@ -1647,7 +1776,7 @@
     "defaultMessage": "Yedek oluşturuluyor"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "yedeğiniz"
+    "defaultMessage": "Yedeğiniz"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "{backupName}'den geri yüklerken bir hata yaşandı. Lütfen tekrar deneyin veya sorun devam ederse desteğe ulaşın."
@@ -2036,9 +2165,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Çok Türlü"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
-  },
   "tag.category.library": {
     "defaultMessage": "Kütüphane"
   },
@@ -2121,19 +2247,13 @@
     "defaultMessage": "Arsalar"
   },
   "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Patates"
   },
   "tag.category.prison": {
     "defaultMessage": "Prison"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PVE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PVP"
   },
   "tag.category.questing": {
     "defaultMessage": "Görev yapmak"

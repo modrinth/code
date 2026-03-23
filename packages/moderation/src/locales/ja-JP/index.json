@@ -30,7 +30,7 @@
     "defaultMessage": "外部リンクを追加する"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}全てを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
+    "defaultMessage": "利用できる{totalAvailableTags, plural, other {#個のタグ}}のすべてを選択しています。これでは、関連したプロジェクトをユーザーが見つけやすくするというタグ本来の目的を果たせなくなってしまいます。このプロジェクトに関連するタグのみを選択してください。"
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "プロジェクトと関係のあるタグを選択する"

@@ -1997,20 +1997,11 @@
   "servers.plan.large.description": {
     "message": "Ideal pentru 15–25 de jucători, pachete de moduri sau moduri complexe."
   },
-  "servers.plan.large.name": {
-    "message": "Larg"
-  },
   "servers.plan.medium.description": {
     "message": "Bun pentru 6–15 jucători și multiple moduri."
   },
-  "servers.plan.medium.name": {
-    "message": "Mediu"
-  },
   "servers.plan.small.description": {
     "message": "Perfect pentru 1–5 prieteni cu câteva moduri ușoare."
-  },
-  "servers.plan.small.name": {
-    "message": "Mic"
   },
   "settings.applications.about": {
     "message": "Despre"

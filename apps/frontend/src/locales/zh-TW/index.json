@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "建立專案"
   },
-  "create.project.create-server-project": {
-    "message": "建立伺服器"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "缺少欄位：{fields}"
   },
@@ -2858,20 +2855,167 @@
   "servers.plan.large.description": {
     "message": "適合 15 到 25 位玩家、大型模組包或重度模組環境。"
   },
-  "servers.plan.large.name": {
-    "message": "大型"
-  },
   "servers.plan.medium.description": {
     "message": "適合 6 到 15 位玩家及多個模組。"
-  },
-  "servers.plan.medium.name": {
-    "message": "中型"
   },
   "servers.plan.small.description": {
     "message": "適合 1 到 5 位好友及少量輕量模組。"
   },
-  "servers.plan.small.name": {
-    "message": "小型"
+  "settings.account.button.complete-setup": {
+    "message": "完成設定"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "下載匯出"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "生成匯出"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "正在生成匯出..."
+  },
+  "settings.account.data-export.title": {
+    "message": "資料匯出"
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "刪除這個帳號"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "你確定要刪除你的帳號嗎？"
+  },
+  "settings.account.delete.section.action": {
+    "message": "刪除帳號"
+  },
+  "settings.account.delete.section.title": {
+    "message": "刪除帳號"
+  },
+  "settings.account.email.action.save": {
+    "message": "儲存電子郵件"
+  },
+  "settings.account.email.field.label": {
+    "message": "電子郵件地址"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "輸入你的電子郵件地址..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "新增電子郵件"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "變更電子郵件"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "你的帳號資訊不會公開顯示。"
+  },
+  "settings.account.password.action.remove": {
+    "message": "移除密碼"
+  },
+  "settings.account.password.action.save": {
+    "message": "儲存"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "輸入的密碼不相符！"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "請輸入你的密碼以繼續。"
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "確認密碼"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "確認密碼"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "確認新密碼"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "確認新密碼"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "新密碼"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "新密碼"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "舊密碼"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "舊密碼"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "新增密碼"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "變更密碼"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "移除密碼"
+  },
+  "settings.account.providers.action.add": {
+    "message": "新增"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "驗證提供商"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "動作"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "提供商"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "新增電子郵件"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "變更電子郵件"
+  },
+  "settings.account.security.email.description": {
+    "message": "變更與你帳號相關聯的電子郵件。"
+  },
+  "settings.account.security.email.title": {
+    "message": "電子郵件"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "新增密碼"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "變更密碼"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "變更用於登入你帳號的密碼。"
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "變更或移除用於登入你帳號的密碼。"
+  },
+  "settings.account.security.password.description.set": {
+    "message": "請設定永久密碼，以便登入你的帳號。"
+  },
+  "settings.account.security.password.title": {
+    "message": "密碼"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "管理登入提供商"
+  },
+  "settings.account.security.providers.description": {
+    "message": "從你的帳號新增或移除登入方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 以及 Google。"
+  },
+  "settings.account.security.providers.title": {
+    "message": "管理驗證提供商"
+  },
+  "settings.account.security.title": {
+    "message": "帳號安全性"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "移除 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "設定 2FA"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "雙重驗證"
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "雙重驗證要求必須使用第二部裝置才能登入，藉此確保你的帳號安全性。"
   },
   "settings.applications.about": {
     "message": "關於"
@@ -2957,9 +3101,6 @@
   "settings.applications.modal.header": {
     "message": "應用程式資訊"
   },
-  "settings.applications.notification.error.title": {
-    "message": "發生錯誤"
-  },
   "settings.applications.notification.icon-updated.description": {
     "message": "你的應用程式的圖示已更新。"
   },
@@ -2968,6 +3109,12 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "請立即儲存你的密碼，離開這個頁面後將不再顯示！"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
   },
   "settings.billing.modal.cancel.action": {
     "message": "取消訂閱"
@@ -3008,6 +3155,18 @@
   "settings.billing.payment_method.title": {
     "message": "付款方式"
   },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB 記憶體"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "重新訂閱你的 Modrinth 伺服器時發生錯誤。"
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "重新訂閱時發生錯誤"
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "管理你的 Modrinth 伺服器訂閱。"
   },
@@ -3040,6 +3199,9 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模組頁面"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "圖庫"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "模組包頁面"
@@ -3191,11 +3353,26 @@
   "settings.sessions.unknown-platform": {
     "message": "未知的平臺"
   },
+  "settings.sidebar.label.account": {
+    "message": "帳號"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "開發人員"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
   },
   "ui.latest-news-row.view-all": {
     "message": "查看所有新聞"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "訂閱"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "已訂閱！"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "訂閱 Modrinth 的最新消息"
   },
   "version.environment.none.description": {
     "message": "此版本的執行環境尚未指定。"

@@ -36,25 +36,25 @@
     "message": "Mac"
   },
   "app-marketing.download.options-title": {
-    "message": "Opzioni download"
+    "message": "Opzioni di download"
   },
   "app-marketing.download.terms": {
     "message": "Scaricando Modrinth App, accetti i nostri <terms-link>termini d''uso</terms-link> e l''<privacy-link>informativa sulla privacy</privacy-link>."
   },
   "app-marketing.download.title": {
-    "message": "Scarica Modrinth App (Beta)"
+    "message": "Scarica Modrinth App (beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "Memorizza i contenuti che ami e ricevi aggiornamenti con un clic."
+    "message": "Memorizza i contenuti che ami e rimani aggiornato con un clic."
   },
   "app-marketing.features.follow.title": {
     "message": "Segui i progetti che ami"
   },
   "app-marketing.features.importing.description": {
-    "message": "Importa i tuoi profili preferiti dal launcher che usavi prima e parti con Modrinth App in pochi secondi!"
+    "message": "Importa i tuoi profili dal launcher che usavi prima e sarai pronto a usare Modrinth App in pochi secondi!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -63,7 +63,7 @@
     "message": "MultiMC"
   },
   "app-marketing.features.importing.title": {
-    "message": "Importa profili"
+    "message": "Importa i tuoi profili"
   },
   "app-marketing.features.mod-management.actions": {
     "message": "Azioni"
@@ -72,7 +72,7 @@
     "message": "di {author}"
   },
   "app-marketing.features.mod-management.description": {
-    "message": "Modrinth facilita la gestione di tutte le tue mod in un posto solo. Puoi installarle, disinstallarle e aggiornarle con un solo clic."
+    "message": "Modrinth App facilita la gestione di tutte le mod che hai scaricato in un unico posto. Puoi installarle, disinstallarle e aggiornarle con un solo clic."
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "Mod installate"
@@ -84,7 +84,7 @@
     "message": "Cerca mod"
   },
   "app-marketing.features.mod-management.title": {
-    "message": "Gestisci mod"
+    "message": "Gestisci le mod scaricate"
   },
   "app-marketing.features.mod-management.version": {
     "message": "Versione"
@@ -93,7 +93,7 @@
     "message": "Gioca con le tue mod, con o senza connessione a Internet."
   },
   "app-marketing.features.offline.title": {
-    "message": "Modalità offline"
+    "message": "Usala anche offline"
   },
   "app-marketing.features.open-source.description": {
     "message": "Modrinth App è del tutto open source. Leggi il codice sorgente sul nostro <github-link>GitHub</github-link>!"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App ha prestazioni migliori di molti dei principali gestori mod, utilizzando appena 150 MB di RAM!"
+    "message": "Modrinth App offre prestazioni migliori rispetto a molti dei principali gestori di mod, utilizzando appena 150 MB di RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,31 +147,31 @@
     "message": "Performante"
   },
   "app-marketing.features.play.description": {
-    "message": "Usa Modrinth App per scaricare e giocare con le tue mod e i tuoi pacchetti di mod preferiti."
+    "message": "Usa Modrinth App per scaricare e giocare con le tue mod e pacchetti preferiti."
   },
   "app-marketing.features.play.title": {
     "message": "Gioca con le tue mod preferite"
   },
   "app-marketing.features.sharing.description": {
-    "message": "Trova e scegli tra le migliaia di mod e pacchetti presenti qui su Modrinth."
+    "message": "Cerca e scegli tra le migliaia di mod e pacchetti presenti qui su Modrinth."
   },
   "app-marketing.features.sharing.modpack": {
-    "message": "Pacchetto di mod"
+    "message": "Pacchetto"
   },
   "app-marketing.features.sharing.share-button": {
     "message": "Condividi"
   },
   "app-marketing.features.sharing.title": {
-    "message": "Trova, crea e condividi"
+    "message": "Esplora, crea e condividi"
   },
   "app-marketing.features.unlike-any-launcher": {
     "message": "Distinta dagli altri launcher"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti dall'app!"
+    "message": "Modrinth App è integrata completamente con il sito, così puoi accedere a tutti i tuoi progetti preferiti direttamente dall'app!"
   },
   "app-marketing.features.website.title": {
-    "message": "Integrata col sito"
+    "message": "Integrata con il sito"
   },
   "app-marketing.features.youve-used-before": {
     "message": "che tu abbia mai usato prima"
@@ -258,7 +258,7 @@
     "message": "Reimposta la password"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Inserisci un codice di autenticazione a due fattori per procedere."
+    "message": "Inserisci il codice 2FA per continuare."
   },
   "auth.sign-in.2fa.label": {
     "message": "Inserisci un codice 2FA"
@@ -336,7 +336,7 @@
     "message": "Ricevi novità riguardanti Modrinth"
   },
   "auth.welcome.description": {
-    "message": "Fai ora parte della grandiosa community di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
+    "message": "Fai ora parte della grandiosa comunità di creatori ed esploratori che già costruiscono, aggiornano e stanno sul pezzo con le fantastiche mod."
   },
   "auth.welcome.label.tos": {
     "message": "Creando un''account, hai accettato i <terms-link>termini d''utilizzo</terms-link> e l''<privacy-policy-link>informativa sulla privacy</privacy-policy-link> di Modrinth."
@@ -496,9 +496,6 @@
   },
   "create.project.create-project": {
     "message": "Crea progetto"
-  },
-  "create.project.create-server-project": {
-    "message": "Crea server"
   },
   "create.project.missing-fields-tooltip": {
     "message": "Campi mancanti: {fields}"
@@ -864,7 +861,7 @@
     "message": "Clicca per sapere come Modrinth gestisce i tuoi guadagni."
   },
   "dashboard.revenue.estimated-with-date": {
-    "message": "Previsti per {date}"
+    "message": "Previsti per il {date}"
   },
   "dashboard.revenue.processing": {
     "message": "In elaborazione"
@@ -1191,7 +1188,7 @@
     "message": "Avvia il tuo server"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "Affidati a Modrinth Hosting per il tuo prossimo server"
+    "message": "Affida il tuo prossimo server a Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
     "message": "Modrinth Hosting è il modo più facile per gestire il tuo server personale per Minecraft: Java Edition. Installa e gioca alle tue mod e pacchetti preferiti, tutto tramite la piattaforma Modrinth."
@@ -1473,7 +1470,7 @@
     "message": "Scopri oltre {count, number} creazioni"
   },
   "landing.subheading": {
-    "message": "Scopri, gioca e condividi contenuti per Minecraft attraverso la nostra piattaforma open source creata per la community."
+    "message": "Scopri, gioca e condividi contenuti per Minecraft attraverso la nostra piattaforma open source creata per la comunità."
   },
   "layout.action.change-theme": {
     "message": "Cambia tema"
@@ -1689,7 +1686,7 @@
     "message": "Esplora"
   },
   "layout.nav.discover-content": {
-    "message": "Esplora contenuti"
+    "message": "Esplora i contenuti"
   },
   "layout.nav.feature-flags": {
     "message": "Flag delle funzionalità"
@@ -2817,16 +2814,16 @@
     "message": "Sincronizza col server"
   },
   "servers.busy.backup-creating": {
-    "message": "Creando il backup..."
+    "message": "È in corso la creazione di un backup"
   },
   "servers.busy.backup-restoring": {
-    "message": "Ripristinando il backup..."
+    "message": "È in corso il ripristino da un backup"
   },
   "servers.busy.installing": {
-    "message": "Installando il server..."
+    "message": "È in corso l'installazione del server"
   },
   "servers.busy.syncing-content": {
-    "message": "Sincronizzando i contenuti..."
+    "message": "È in corso la sincronizzazione dei contenuti"
   },
   "servers.notice.actions": {
     "message": "Azioni"
@@ -2858,20 +2855,209 @@
   "servers.plan.large.description": {
     "message": "Ideale per 15–25 giocatori, pacchetti di mod o modding intenso."
   },
-  "servers.plan.large.name": {
-    "message": "Grande"
-  },
   "servers.plan.medium.description": {
     "message": "Ottimo per 6–15 giocatori e più mod."
-  },
-  "servers.plan.medium.name": {
-    "message": "Medio"
   },
   "servers.plan.small.description": {
     "message": "Perfetto per 1–5 giocatori e qualche mod leggera."
   },
-  "servers.plan.small.name": {
-    "message": "Piccolo"
+  "settings.account.button.complete-setup": {
+    "message": "Completa la configurazione"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Scarica copia"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Genera copia"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Generando la copia..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Richiedi una copia dei tuoi dati personali che hai caricato su Modrinth. L'operazione richiederà alcuni minuti."
+  },
+  "settings.account.data-export.title": {
+    "message": "Esporta i dati"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Questo **eliminerà immediatamente tutti i tuoi dati utente**, ma non i tuoi progetti. Questa azione non può essere annullata.<br><br>Se hai bisogno di assistenza col tuo account, puoi ottenere supporto sul [server Discord di Modrinth](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Elimina questo account"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Vuoi davvero eliminare il tuo account?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Elimina account"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Una volta eliminato l'account, non si torna indietro. Proseguendo tutti i dati associati a esso, esclusi i progetti, verranno rimossi dai nostri server."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Elimina account"
+  },
+  "settings.account.email.action.save": {
+    "message": "Salva email"
+  },
+  "settings.account.email.field.label": {
+    "message": "Indirizzo email"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Inserisci il tuo indirizzo email..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Aggiungi email"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Cambia email"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "I dati del tuo account non sono visibili pubblicamente."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Rimuovi password"
+  },
+  "settings.account.password.action.save": {
+    "message": "Salva password"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Le password inserite non corrispondono!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Inserisci la tua password per continuare."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Conferma password"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Conferma password"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Conferma nuova password"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Conferma nuova password"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nuova password"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nuova password"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Vecchia password"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Vecchia password"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Aggiungi password"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Cambia password"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Rimuovi password"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Aggiungi"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Fornitori per l'autenticazione"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Azioni"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Fornitore"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Aggiungi email"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Cambia email"
+  },
+  "settings.account.security.email.description": {
+    "message": "Cambia la email associata col tuo account."
+  },
+  "settings.account.security.email.title": {
+    "message": "Email"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Aggiungi password"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Cambia password"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Cambia la password usata per accedere al tuo account."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Cambia o rimuovi la password usata per accedere al tuo account."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Imposta una password permanente per accedere al tuo account."
+  },
+  "settings.account.security.password.title": {
+    "message": "Password"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Gestisci fornitori"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Aggiungi o rimuovi metodi di accesso al tuo account, inclusi GitHub, GitLab, Microsoft, Discord, Steam e Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Gestisci fornitori per l'autenticazione"
+  },
+  "settings.account.security.title": {
+    "message": "Sicurezza dell'account"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Rimuovi 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Configura 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Aggiungi un livello di sicurezza aggiuntivo nell'accesso al tuo account."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Autenticazione a due fattori"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Scarica e salva questi codici di recupero in un posto sicuro. Puoi usarli al posto del codice 2FA se perdi l'accesso al tuo dispositivo! Dovresti proteggere questi codici come la tua password."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Ogni codice di recupero è utilizzabile solo una volta."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Il codice inserito è sbagliato!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Inserisci il codice 2FA per continuare."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Inserisci codice 2FA"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Inserisci codice..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "L'autenticazione a due fattori (2FA) protegge il tuo account richiedendo un dispositivo secondario per effettuare l'accesso."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Se il codice QR non funziona, inserisci manualmente questa chiave:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Inizia scansionando il codice QR con <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> o qualsiasi altra app per il 2FA."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Inserisci il codice generato dall'app di autenticazione per confermare l'accesso."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Codice di verifica"
   },
   "settings.applications.about": {
     "message": "Info"
@@ -2954,11 +3140,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Applicazioni"
+  },
   "settings.applications.modal.header": {
     "message": "Info sull'applicazione"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Si è verificato un errore"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "L'icona della tua applicazione è stata aggiornata."
@@ -2969,11 +3155,95 @@
   "settings.applications.secret.disclaimer": {
     "message": "Segnati il secret ora, perché sarà nascosto appena lasci questa pagina!"
   },
+  "settings.authorizations.about-this-app": {
+    "message": "Info sull'app"
+  },
+  "settings.authorizations.by": {
+    "message": "da"
+  },
+  "settings.authorizations.description": {
+    "message": "Quando autorizzi un'applicazione, le concedi l'accesso al tuo account Modrinth. Qui puoi gestirne e controllarne l'accesso in qualsiasi momento."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Al momento non riusciamo a mostrare le tue app autorizzate, stiamo lavorando per risolvere il problema. Ritorna più tardi!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Autorizzazioni"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Revoca"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Questo revocherà l'accesso dell'app al tuo account. Potrai riautorizzarla in seguito."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Vuoi davvero revocare questa applicazione?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Tutti gli addebiti passati del tuo account Modrinth saranno mostrati qui:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Prova del server Medal"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "Scade: {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "mese"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "mensile"
+  },
+  "settings.billing.interval.year": {
+    "message": "anno"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "annuale"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Niente pubblicità su modrinth.com e nella Modrinth App"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Distintivo Modrinth+ sul tuo profilo"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Supporta Modrinth e i creatori direttamente"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Benefici"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Risparmia {amount}/anno passando al piano annuale!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Hai annullato l'abbonamento."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "I vantaggi rimarranno attivi fino alla fine di questo ciclo di fatturazione."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "La transazione non è andata a buon fine. Aggiorna il tuo metodo di pagamento."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Abbonamento attuale:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "La transazione è in fase di elaborazione. I vantaggi si attiveranno a fine operazione."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Abbonati a Modrinth Plus!"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Annulla abbonamento"
   },
   "settings.billing.modal.cancel.description": {
-    "message": "Questo annullerà il tuo abbonamento. Manterrai i tuoi vantaggi fino alla fine del ciclo di fatturazione in corso."
+    "message": "Questo annullerà il tuo abbonamento. I vantaggi rimarranno attivi fino alla fine di questo ciclo di fatturazione."
   },
   "settings.billing.modal.cancel.title": {
     "message": "Vuoi davvero annullare il tuo abbonamento?"
@@ -2987,11 +3257,17 @@
   "settings.billing.modal.delete.title": {
     "message": "Vuoi davvero rimuovere questo metodo di pagamento?"
   },
+  "settings.billing.next": {
+    "message": "Poi:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "O {price} / anno (risparmi il {percent}%!)"
+  },
   "settings.billing.payment_method.action.add": {
     "message": "Aggiungi un metodo di pagamento"
   },
   "settings.billing.payment_method.action.history": {
-    "message": "Vedi accrediti precedenti"
+    "message": "Vedi addebiti precedenti"
   },
   "settings.billing.payment_method.action.primary": {
     "message": "Rendi primario"
@@ -3008,17 +3284,98 @@
   "settings.billing.payment_method.title": {
     "message": "Metodi di pagamento"
   },
+  "settings.billing.plan.title": {
+    "message": "Piano: {size}"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} CPU condivise (Supercarica fino a {bursts} CPU)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Non è stato trovato un server collegato a questo abbonamento. Ci sono alcune possibili spiegazioni: se lo hai appena acquistato, è normale, potrebbe volerci fino a un'ora prima che sia pronto all'uso. Altrimenti, il server potrebbe essere stato sospeso. Se questo non è ciò che ti aspettavi, contatta il supporto di Modrinth fornendo le seguenti informazioni:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID server: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "ID Stripe: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB di RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Si è verificato un errore nel riabbonamento del tuo server Modrinth."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Errore nel riabbonamento"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Se il server è in sospensione, un nuovo tentativo di addebito potrebbe richiedere fino a 10 minuti."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Richiesta di riabbonamento inviata"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Riabbonamento al server effettuato con successo"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "La transazione non è andata a buon fine. Aggiorna il tuo metodo di pagamento, poi riprova."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "La transazione è in fase di elaborazione. Il tuo server si attiverà a fine operazione."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB di SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB di swap"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Gestisci i tuoi abbonamenti legati a Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Abbonamenti Modrinth Servers"
   },
+  "settings.billing.renews": {
+    "message": "Rinnovo: {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Riabbonati"
+  },
+  "settings.billing.since": {
+    "message": "Dal: {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Abbonati"
+  },
   "settings.billing.subscription.description": {
     "message": "Gestisci i tuoi abbonamenti Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Abbonamenti"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Passando al piano {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Passa al piano {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Il piano mensile costerà {amount} in più all'anno"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Passerà al piano {interval} il {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Aggiorna metodo"
+  },
+  "settings.billing.upgrade": {
+    "message": "Aggiorna"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Disattiva modalità sviluppatore"
@@ -3032,6 +3389,12 @@
   "settings.display.flags.title": {
     "message": "Altre funzionalità"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "La modalità sviluppatore è stata disabilitata"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Modalità sviluppatore disattivata"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Pagina dei pacchetti di dati"
   },
@@ -3040,6 +3403,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Pagina delle mod"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galleria"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Griglia"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Righe"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Pagina dei pacchetti di mod"
@@ -3101,6 +3473,9 @@
   "settings.display.theme.title": {
     "message": "Tema"
   },
+  "settings.head-title": {
+    "message": "Impostazioni di visualizzazione"
+  },
   "settings.pats.action.create": {
     "message": "Crea un token"
   },
@@ -3150,7 +3525,7 @@
     "message": "Ultimo utilizzo {ago}"
   },
   "settings.pats.token.never-used": {
-    "message": "Mai utilizzato"
+    "message": "Mai usato"
   },
   "settings.profile.bio.description": {
     "message": "Una breve descrizione per raccontare a tutti qualcosa di te."
@@ -3160,6 +3535,9 @@
   },
   "settings.profile.description": {
     "message": "Le informazioni del tuo profilo sono visibili pubblicamente su Modrinth e tramite l''<docs-link>API di Modrinth</docs-link>."
+  },
+  "settings.profile.head-title": {
+    "message": "Impostazioni del profilo"
   },
   "settings.profile.profile-info": {
     "message": "Informazioni del profilo"
@@ -3191,11 +3569,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Piattaforma sconosciuta"
   },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Sviluppo"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Visualizzazione"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Novità da Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Leggi tutte le novità"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Iscriviti"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Iscritto!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Iscriviti alla newsletter di Modrinth"
   },
   "version.environment.none.description": {
     "message": "L'ambiente per questa versione non è stato specificato."

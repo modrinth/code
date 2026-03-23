@@ -5,6 +5,93 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat terhubung ke server autentikasi"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Masukkan deskripsi paket mod..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Ekspor"
+  },
+  "app.export-modal.header": {
+    "message": "Ekspor paket mod"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nama Paket Mod"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nama paket mod"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Pilih berkas dan folder yang ingin dimasukkan ke paket"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Nomor versi"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Semua data dari instans Anda akan dihapus secara permanen, termasuk dunia, konfigurasi, dan konten terpasang Anda."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tindakan ini tidak dapat dibatalkan"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Hapus instans"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Hapus instans"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Paket mod ini telah terpasang pada instans \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Gandakan paket mod"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Tetap buat"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Pergi ke instans"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Paket mod telah terpasang"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyek"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Salin tautan"
+  },
+  "app.instance.mods.installing": {
+    "message": "Memasang..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Paket Mod"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" telah ditambahkan"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} proyek telah ditambahkan"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Lihat proyek-proyek yang saya pakai di paket mod saya!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Membagi konten paket mod"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Tampilkan berkas"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Berhasil diunggah"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Tidak diketahui"
+  },
+  "app.instance.mods.updating": {
+    "message": "Memperbarui..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Konten diperlukan"
   },

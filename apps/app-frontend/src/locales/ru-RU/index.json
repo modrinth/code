@@ -6,22 +6,22 @@
     "message": "Нет связи с серверами аутентификации"
   },
   "app.export-modal.description-placeholder": {
-    "message": "Введите описание сборки модов..."
+    "message": "Введите описание сборки..."
   },
   "app.export-modal.export-button": {
     "message": "Экспортировать"
   },
   "app.export-modal.header": {
-    "message": "Экспортировать сборку модов"
+    "message": "Экспорт модпака"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Название сборки модов"
+    "message": "Название сборки"
   },
   "app.export-modal.modpack-name-placeholder": {
-    "message": "Название сборки модов"
+    "message": "Название сборки"
   },
   "app.export-modal.select-files-label": {
-    "message": "Выберите файлы и папки для добавления в пак"
+    "message": "Выберите элементы экспорта в модпак"
   },
   "app.export-modal.version-number-label": {
     "message": "Номер версии"
@@ -30,22 +30,37 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Все данные вашей установки будут окончательно удалены, включая ваши миры, настройки и весь установленный контент."
+    "message": "Все данные вашей инстанции будут окончательно удалены, включая ваши миры, настройки и весь установленный контент."
   },
   "app.instance.confirm-delete.admonition-header": {
-    "message": "Это действие не может быть возвращено"
+    "message": "Это действие нельзя обратить"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Удалить установку"
+    "message": "Удалить сборку"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Удалить установку"
+    "message": "Удаление сборки"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Этот модпак уже установлен в инстанции \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Дублировать модпак"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Всё равно создать"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "К инстанции"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Модпак уже установлен"
   },
   "app.instance.mods.content-type-project": {
     "message": "проект"
   },
   "app.instance.mods.copy-link": {
-    "message": "Скопировать ссылку"
+    "message": "Копировать ссылку"
   },
   "app.instance.mods.installing": {
     "message": "Установка..."
@@ -57,25 +72,22 @@
     "message": "\"{name}\" был добавлен"
   },
   "app.instance.mods.projects-were-added": {
-    "message": "{count} проектов были добавлены"
+    "message": "Проектов добавлено: {count}"
   },
   "app.instance.mods.share-text": {
-    "message": "Посмотрите проекты, которые я использую в моей сборке модов!"
+    "message": "Посмотрите проекты, в моём модпаке!"
   },
   "app.instance.mods.share-title": {
-    "message": "Поделится контентом сборки модов"
+    "message": "Содержимое сборки"
   },
   "app.instance.mods.show-file": {
-    "message": "Показать файл"
+    "message": "Показать в папке"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успешно загружено"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Сменить версию"
-  },
   "app.instance.mods.unknown-version": {
-    "message": "Неизвестная"
+    "message": "Неизвестно"
   },
   "app.instance.mods.updating": {
     "message": "Обновление..."
@@ -105,7 +117,7 @@
     "message": "Общая сборка сервера"
   },
   "app.modal.install-to-play.view-contents": {
-    "message": "Посмотреть содержимое"
+    "message": "Посмотреть"
   },
   "app.modal.update-to-play.header": {
     "message": "Обновление перед запуском"
@@ -246,7 +258,7 @@
     "message": "{title} — {count}"
   },
   "friends.sign-in-to-add-friends": {
-    "message": "<link>Войдите в аккаунт Modrinth</link>, чтобы добавлять друзей и видеть, во что они играют!"
+    "message": "<link>Войдите в аккаунт Modrinth</link>, вы сможете добавлять друзей и видеть их статус!"
   },
   "instance.add-server.add-and-play": {
     "message": "Добавить и играть"

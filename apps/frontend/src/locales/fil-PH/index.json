@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Lumikha ng proyekto"
   },
-  "create.project.create-server-project": {
-    "message": "Lumikha ng server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Nakukulang na field: {fields}"
   },
@@ -1303,6 +1300,9 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Modrinth, gagana ito sa server mo."
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Bigong ma-unlink ang modpack"
   },
   "hosting.plan.out-of-stock": {
     "message": "Wala nang stock"
@@ -2813,20 +2813,11 @@
   "servers.plan.large.description": {
     "message": "Nakaaangkop sa 15–25 manlalaro, modpack, o mabibigat na modding."
   },
-  "servers.plan.large.name": {
-    "message": "Large"
-  },
   "servers.plan.medium.description": {
     "message": "Nakaaangkop sa 6–15 manlalaro at may karamihang mod."
   },
-  "servers.plan.medium.name": {
-    "message": "Medium"
-  },
   "servers.plan.small.description": {
     "message": "Nakaaangkop sa 1–5 manlalaro na may iilang mod."
-  },
-  "servers.plan.small.name": {
-    "message": "Small"
   },
   "settings.applications.about": {
     "message": "Tungkol"
@@ -2911,9 +2902,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Impormasyon ng aplikasyon"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Isang kamaliang naganap"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ang ikono ng iyong aplikasyon ay na-update."
@@ -3151,6 +3139,15 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Tingnan ang lahat ng balita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Mag-subscribe"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Naka-subscribe!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Mag-subscribe sa Modrinth newsletter"
   },
   "version.environment.none.description": {
     "message": "Wala pang itinakdang environment para sa bersiyong ito."

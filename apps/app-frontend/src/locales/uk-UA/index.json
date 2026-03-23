@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Видалити профіль"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Цю збірку вже встановлено в профілі «{instanceName}»."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Дублікат збірки"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Все одно створити"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Перейти до профілю"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Збірку вже встановлено"
+  },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
   },
@@ -48,13 +63,13 @@
     "message": "Копіювати посилання"
   },
   "app.instance.mods.installing": {
-    "message": "Встановлення..."
+    "message": "Установлення…"
   },
   "app.instance.mods.modpack-fallback": {
-    "message": "Збірка модів"
+    "message": "Збірка"
   },
   "app.instance.mods.project-was-added": {
-    "message": "\"{name}\" був доданий"
+    "message": "«{name}» було додано"
   },
   "app.instance.mods.projects-were-added": {
     "message": "{count} проєктів було додано"
@@ -70,9 +85,6 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успішно вивантажено"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "Змінити версію"
   },
   "app.instance.mods.unknown-version": {
     "message": "Невідомо"
@@ -183,7 +195,7 @@
     "message": "Завантаження оновлення ({percent}%)"
   },
   "app.update.reload-to-update": {
-    "message": "Перезапустіть, аби встановити оновлення"
+    "message": "Перезавантажте, щоб установити оновлення"
   },
   "friends.action.add-friend": {
     "message": "Додати друга"

@@ -258,7 +258,7 @@
     "message": "Сброс пароля"
   },
   "auth.sign-in.2fa.description": {
-    "message": "Введите код двухфакторной аутентификации."
+    "message": "Введите код подтверждения из приложения."
   },
   "auth.sign-in.2fa.label": {
     "message": "Двухфакторная аутентификация"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Создать проект"
   },
-  "create.project.create-server-project": {
-    "message": "Создать сервер"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Не заполнены поля: {fields}"
   },
@@ -660,7 +657,7 @@
     "message": "Чистая сумма"
   },
   "dashboard.creator-withdraw-modal.fee-breakdown-usd-equivalent": {
-    "message": "Доллар США"
+    "message": "Долларов США"
   },
   "dashboard.creator-withdraw-modal.kyc.business-entity": {
     "message": "Юридическое лицо"
@@ -1322,11 +1319,20 @@
   "hosting.loader.failed-to-unlink": {
     "message": "Не удалось отвязать набор модов"
   },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Версия загрузчика} other {Версия {loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Установка вашего сервера была восстановлена."
+  },
   "hosting.loader.repair-started-title": {
     "message": "Восстановление завершено"
   },
   "hosting.loader.reset-server": {
     "message": "Сбросить сервер"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Удаляет все данные сервера, включая миры, моды и файлы настроек. Резервные копии останутся и их можно будет восстановить."
   },
   "hosting.plan.out-of-stock": {
     "message": "Нет в наличии"
@@ -2241,7 +2247,7 @@
     "message": "Создать сервер"
   },
   "project.actions.dont-show-again": {
-    "message": "Больше не показывать"
+    "message": "Больше не показывать"
   },
   "project.actions.review-project": {
     "message": "Проверить проект"
@@ -2849,20 +2855,209 @@
   "servers.plan.large.description": {
     "message": "Подходит для 15–25 игроков, сборок, либо требовательных модов."
   },
-  "servers.plan.large.name": {
-    "message": "Большой"
-  },
   "servers.plan.medium.description": {
     "message": "Подходит для 6–15 игроков и нескольких модов."
-  },
-  "servers.plan.medium.name": {
-    "message": "Средний"
   },
   "servers.plan.small.description": {
     "message": "Подходит для 1–5 игроков и нескольких лёгких модов."
   },
-  "servers.plan.small.name": {
-    "message": "Малый"
+  "settings.account.button.complete-setup": {
+    "message": "Завершить настройку"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Скачать экспорт"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Сгенерировать экспорт"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Генерация экспорта..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Запросите закодировать ваших персональных данных, загузине в Modrinth. Этот процесс может отнять несколько минут."
+  },
+  "settings.account.data-export.title": {
+    "message": "Экспортирование данных"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Этот процесс **немедленно удалит все ваши пользовательские данные и следования**. Ваши проекты не будут удалённы.<br><br>. Если вам нужна помощь с вашей учетной записью, обратитесь за поддержкой в ​​[Discord сервер Modrinth-а](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Удалить этот аккаунт"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Вы уверены, что вы хотите удалить ваш аккаунт?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Удалить аккаунт"
+  },
+  "settings.account.delete.section.description": {
+    "message": "После удаления аккаунта пути назад нет. Удаление ваших аккаунта приведет к удалению всех связанных с ней данных, за исключением проектов, с наших серверов."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Удалить аккаунт"
+  },
+  "settings.account.email.action.save": {
+    "message": "Сохранить электронную почту"
+  },
+  "settings.account.email.field.label": {
+    "message": "Адрес электронной почты"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Введите ваш адрес электронной почты..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Добавить электронную почту"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Сменить электронную почту"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Информация о вашем аккаунте не показывается публично."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Удалить пароль"
+  },
+  "settings.account.password.action.save": {
+    "message": "Сохранить пароль"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Введённые пароли не совпадают!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Пожалуйста, введите ваш пароль, чтобы продолжить."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Подтвердить пароль"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Подтвердить пароль"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Подтвердить новый пароль"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Подтвердить новый пароль"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Новый пароль"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Новый пароль"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Прошлый пароль"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Прошлый пароль"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Добавить пароль"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Сменить пароль"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Удалить пароль"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Добавить"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Сервисы входа"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Действия"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Сервис"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Добавить электронную почту"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Сменить электронную почту"
+  },
+  "settings.account.security.email.description": {
+    "message": "Изменяет электронную почту связанную с вашим аккаунтом."
+  },
+  "settings.account.security.email.title": {
+    "message": "Электронная почта"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Добавить пароль"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Сменить пароль"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Смените пароль, использовавшийся для входа в ваш аккаунт."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Смените пароль или удалите, использовавшийся для входа в ваш аккаунт."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Поставьте постоянный пароль, чтобы войти в ваш аккаунт."
+  },
+  "settings.account.security.password.title": {
+    "message": "Пароль"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Настроить сервисы"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Привяжите или отвяжите сторонние сервисы входа: GitHub, GitLab, Microsoft, Discord, Steam и Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Вход через сторонние сервисы"
+  },
+  "settings.account.security.title": {
+    "message": "Безопасность аккаунта"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Отвязать аутентификатор"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Привязать аутентификатор"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Добавьте ещё один уровень безопасности аккаунта при входе."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Двухфакторная аутентификация"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Сохраните резервные коды в надёжном месте. Используйте любой из них как код подтверждения, если потеряете доступ к устройству. Берегите их как свой пароль."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Резервные коды одноразовые."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Введённый код неверный!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Введите код подтверждения из приложения."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Код подтверждения"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Введите код..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "Двухфакторная аутентификация защищает аккаунт, требуя доступ ко второму устройству при входе в систему."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Если код не сканируется, введите ключ вручную:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Отсканируйте QR‑код через <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> или любое другое приложение для генерации кодов, чтобы начать настройку."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Введите одноразовый код подтверждения из приложения."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Код подтверждения"
   },
   "settings.applications.about": {
     "message": "Сведения"
@@ -2945,11 +3140,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Приложения"
+  },
   "settings.applications.modal.header": {
     "message": "Информация о приложении"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Произошла ошибка"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Иконка приложения обновлена."
@@ -2959,6 +3154,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "Сохраните секретный ключ. Он исчезнет после выхода со страницы!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Об этом приложении"
+  },
+  "settings.authorizations.by": {
+    "message": "от"
+  },
+  "settings.authorizations.description": {
+    "message": "Когда вы авторизуете приложение с помощью своего Modrinth аккаунта, вы предоставляете ему доступ для действий от вашего имени. Вы можете управлять доступом своего аккаунта и просматривать его здесь в любое время."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Извините, в данный момент мы не можем отобразить ваши авторизованные приложения. Мы работаем над устранением этой проблемы. Пожалуйста, посетите эту страницу позже!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Авторизации"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Отменить"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Это операция отменить доступ приложения к вашему аккаунту. Вы всегда сможете авторизовать его позже."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Вы уверены, что хотите изменить доступ?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Здесь будут перечислены все ваши прошлые платежи в аккаунте Modrinth:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Пробный период Medal Server"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "Истечёт через {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "месяц"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "ежемесячный"
+  },
+  "settings.billing.interval.year": {
+    "message": "год"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "годовой"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Поиск на modrinth.com и Modrinth App без рекламы"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Значок Modrinth+ в вашем профиле"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Поддержать Modrinth и создателей напрямую"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Преимущества"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Сэкономьте {amount} / год, перейдя на годовую оплату!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Вы отменили вашу подписку."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Ваши привилегии сохранятся до конца текущего расчетного периода."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "Оплата подписки не удалась. Пожалуйста, обновите способ оплаты."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "На данный момент вы подписаны на:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "Ваш платеж обрабатывается. Привилегии будут активированы после завершения платежа."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Станьте подписчиком Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Отменить подписку"
@@ -2977,6 +3256,12 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "Вы действительно хотите удалить этот способ оплаты?"
+  },
+  "settings.billing.next": {
+    "message": "Далее:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Или {price} / год (скидка {percent}%)!"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Добавить способ оплаты"
@@ -2999,17 +3284,98 @@
   "settings.billing.payment_method.title": {
     "message": "Способы оплаты"
   },
+  "settings.billing.plan.title": {
+    "message": "{size} план"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} общих ЦП (увеличение до {bursts} ЦП)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Для этой подписки не удалось найти связанный сервер. Этому есть несколько возможных объяснений. Если вы только что приобрели сервер, это нормально. Подготовка сервера может занять до часа. В противном случае, если вы приобрели этот сервер некоторое время назад, он, вероятно, уже приостановлен. Если это не то, чего вы ожидали, пожалуйста, свяжитесь со службой поддержки Modrinth, предоставив следующую информацию:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID сервера: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe ID: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} ГБ RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Произошла ошибка при повторной подписке Modrinth server."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Ошибка при повторной подписке"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Если сервер в данный момент приостановлен, повторная попытка списания средств может занять до 10 минут."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Запрос на повторную подписку отправлен"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Подписка на сервер успешно продлена"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Оплата подписки не удалась. Пожалуйста, обновите способ оплаты."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Ваш платеж обрабатывается. Ваш сервер будет активирован после завершения платежа."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} ГБ SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} ГБ файла подкачки"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Управляйте своими подписками на Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Подписки на Modrinth Servers"
   },
+  "settings.billing.renews": {
+    "message": "Продлевает {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Переподписаться"
+  },
+  "settings.billing.since": {
+    "message": "С {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Подписаться"
+  },
   "settings.billing.subscription.description": {
     "message": "Управляйте своими подписками на Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Подписки"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Переключение на {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Переключите на {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Ежемесячная оплата обойдется вам дополнительно {amount} на год"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Переход на оплату по {interval} на {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Обновить способ"
+  },
+  "settings.billing.upgrade": {
+    "message": "Обновиться"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Отключить режим разработчика"
@@ -3023,6 +3389,12 @@
   "settings.display.flags.title": {
     "message": "Переключение функций"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Режим разработчика отключен"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Режим разработчика отключен"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Страница наборов данных"
   },
@@ -3031,6 +3403,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Страница модов"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Галерея"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Сетка"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Список"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Страница сборок"
@@ -3092,6 +3473,9 @@
   "settings.display.theme.title": {
     "message": "Тема"
   },
+  "settings.head-title": {
+    "message": "Настройки отображения"
+  },
   "settings.pats.action.create": {
     "message": "Создать токен доступа"
   },
@@ -3152,6 +3536,9 @@
   "settings.profile.description": {
     "message": "Информация в вашем профиле доступна публично на Modrinth и через <docs-link>API Modrinth</docs-link>."
   },
+  "settings.profile.head-title": {
+    "message": "Настройки профиля"
+  },
   "settings.profile.profile-info": {
     "message": "Информация в профиле"
   },
@@ -3182,11 +3569,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Неизвестная платформа"
   },
+  "settings.sidebar.label.account": {
+    "message": "Аккаунт"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Разработка"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Отображение"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Последние новости от Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Посмотреть все новости"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Подписаться"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Вы подписаны!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Подписаться на рассылку от Modrinth"
   },
   "version.environment.none.description": {
     "message": "Среда для этой версии не указана."

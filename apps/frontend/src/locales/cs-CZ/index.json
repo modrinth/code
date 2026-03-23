@@ -1331,15 +1331,6 @@
   "servers.notice.id": {
     "message": "ID"
   },
-  "servers.plan.large.name": {
-    "message": "Velký"
-  },
-  "servers.plan.medium.name": {
-    "message": "Střední"
-  },
-  "servers.plan.small.name": {
-    "message": "Malý"
-  },
   "settings.billing.payment_method.primary": {
     "message": "Hlavní"
   },

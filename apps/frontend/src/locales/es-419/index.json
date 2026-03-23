@@ -38,6 +38,9 @@
   "app-marketing.download.options-title": {
     "message": "Opciones de descarga"
   },
+  "app-marketing.download.terms": {
+    "message": "Al descargar Modrinth App, tú aceptas nuestros <terms-link>Términos</terms-link> y <privacy-link>Política de privacidad</privacy-link>."
+  },
   "app-marketing.download.title": {
     "message": "Descargar la Modrinth App (Beta)"
   },
@@ -103,6 +106,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "La aplicación Modrinth funciona mejor que muchos de los principales gestores de mods, ¡usando solo 150 MB de RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -386,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "Aún no hay proyectos en la colección"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Aún no hay proyectos} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Actualizado {ago}"
   },
@@ -488,9 +497,6 @@
   "create.project.create-project": {
     "message": "Crear proyecto"
   },
-  "create.project.create-server-project": {
-    "message": "Crear servidor"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Campos faltantes: {fields}"
   },
@@ -569,6 +575,21 @@
   "dashboard.collections.button.create-new": {
     "message": "Crear nuevo"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "¡Crea tu primera colección para comenzar!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Aún no tienes ninguna colección"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Ninguna colección coincide con tu búsqueda"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Intente ajustar sus filtros o términos de búsqueda."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {proyecto} other {proyectos}}"
+  },
   "dashboard.collections.label.search-input": {
     "message": "Busca en tus colecciones"
   },
@@ -643,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "Una entidad comercial se refiere a una organización registrada, como una sociedad anónima, una sociedad colectiva o una sociedad de responsabilidad limitada."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "¿Vas a realizar la retirada como particular o como empresa?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Particular"
@@ -1115,6 +1139,9 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "¿Los servidores de Modrinth Hosting tendrán protección contra DDoS?"
   },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Sí. Todos los servidores de Modrinth Hosting vienen con protección DDoS, con hasta 17 Tbps de capacidad en algunas ubicaciones."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Preguntas Frecuentes (FAQ)"
   },
@@ -1220,6 +1247,9 @@
   "hosting-marketing.know-what-you-need": {
     "message": "¿Sabes exactamente lo que necesitas?"
   },
+  "hosting-marketing.medal.info": {
+    "message": "Pruebe un <orange>servidor de 3 GB</orange> gratuito durante 5 días con <orange>Medal</orange>"
+  },
   "hosting-marketing.medal.learn-more": {
     "message": "Aprender más"
   },
@@ -1270,6 +1300,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Elige entre Vanilla, Fabric, Forge, Quilt y NeoForge. Si está en Modrinth, puede ejecutarse en tu servidor."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "No se pudo cambiar la versión del modpack"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "No se pudieron cargar las versiones"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "No se pudo reinstalar el modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "No se pudo reparar el servidor"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "No se pudo guardar la configuración de instalación"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "No se pudo desvincular el modpack"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Cargador} other {{loader}}} versión"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "La instalación de su servidor ha sido reparada."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparación completada"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Reiniciar servidor"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Elimina todos los datos de su servidor, incluidos sus mundos, mods y archivos de configuración. Las copias de seguridad permanecerán y podrán restaurarse."
   },
   "hosting.plan.out-of-stock": {
     "message": "Agotado"
@@ -1402,6 +1465,9 @@
   },
   "landing.section.for-players.label": {
     "message": "Para jugadores"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Descubra más de {count, number} creaciones"
   },
   "landing.subheading": {
     "message": "Descubre, juega y comparte contenido de Minecraft a través de nuestra plataforma de código abierto creada para la comunidad."
@@ -2003,6 +2069,9 @@
   "profile.label.collection": {
     "message": "Colección"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {descarga} other {descargas}}"
+  },
   "profile.label.joined": {
     "message": "Se unió"
   },
@@ -2020,6 +2089,9 @@
   },
   "profile.label.organizations": {
     "message": "Organizaciones"
+  },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {proyecto} other {proyectos}}"
   },
   "profile.label.saving": {
     "message": "Guardando..."
@@ -2741,6 +2813,18 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar con el servidor"
   },
+  "servers.busy.backup-creating": {
+    "message": "Creación de copia de seguridad en curso"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Restauración de copia de seguridad en curso"
+  },
+  "servers.busy.installing": {
+    "message": "El servidor se está instalando"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Sincronización de contenido en progreso"
+  },
   "servers.notice.actions": {
     "message": "Acciones"
   },
@@ -2771,20 +2855,209 @@
   "servers.plan.large.description": {
     "message": "Ideal para 15–25 jugadores, modpacks o uso intensivo de mods."
   },
-  "servers.plan.large.name": {
-    "message": "Grande"
-  },
   "servers.plan.medium.description": {
     "message": "Ideal para 6–15 jugadores y múltiples mods."
-  },
-  "servers.plan.medium.name": {
-    "message": "Mediano"
   },
   "servers.plan.small.description": {
     "message": "Perfecto para 1–5 amigos con algunos mods ligeros."
   },
-  "servers.plan.small.name": {
-    "message": "Pequeño"
+  "settings.account.button.complete-setup": {
+    "message": "Configuración completa"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Descargar exportación"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Generar exportación"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Generando exportación..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Solicita una copia de todos los datos personales que hayas subido a Modrinth. El proceso puede tardar varios minutos en completarse."
+  },
+  "settings.account.data-export.title": {
+    "message": "Exportación de datos"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Esto **eliminará inmediatamente todos tus datos de usuario y tus seguidores**. No se eliminarán tus proyectos. La eliminación de tu cuenta es irreversible.<br><br>Si necesitas ayuda con tu cuenta, solicita asistencia en el [Discord de Modrinth](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Eliminar esta cuenta"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "¿Estás seguro de que quieres eliminar tu cuenta?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Eliminar cuenta"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Una vez que elimines tu cuenta, no habrá vuelta atrás. Al eliminar tu cuenta, se borrarán de nuestros servidores todos los datos asociados, excepto los proyectos."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Eliminar cuenta"
+  },
+  "settings.account.email.action.save": {
+    "message": "Guardar correo electrónico"
+  },
+  "settings.account.email.field.label": {
+    "message": "Correo electrónico"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Introduce tu correo electrónico..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Añadir correo electrónico"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Cambiar correo electrónico"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "La información de tu cuenta no se muestra públicamente."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Eliminar contraseña"
+  },
+  "settings.account.password.action.save": {
+    "message": "Guardar contraseña"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "¡Las contraseñas no coinciden!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Introduzca su contraseña para continuar."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Confirmar contraseña"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Confirmar contraseña"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Confirmar nueva contraseña"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Confirmar nueva contraseña"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nueva contraseña"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nueva contraseña"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Antigua contraseña"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Antigua contraseña"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Añadir contraseña"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Cambiar contraseña"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Eliminar contraseña"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Añadir"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Proveedores de autenticación"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Acciones"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Proveedor"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Añadir correo electrónico"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Cambiar correo electrónico"
+  },
+  "settings.account.security.email.description": {
+    "message": "Cambia la dirección de correo electrónico asociada a tu cuenta."
+  },
+  "settings.account.security.email.title": {
+    "message": "Correo electrónico"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Añadir contraseña"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Cambiar contraseña"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Cambia la contraseña que utilizas para iniciar sesión en tu cuenta."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Cambia o elimina la contraseña que utilizas para iniciar sesión en tu cuenta."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Establece una contraseña permanente para iniciar sesión en tu cuenta."
+  },
+  "settings.account.security.password.title": {
+    "message": "Contraseña"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Gestionar proveedores"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Añade o elimina métodos de inicio de sesión de tu cuenta, como GitHub, GitLab, Microsoft, Discord, Steam y Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Gestionar proveedores de autenticación"
+  },
+  "settings.account.security.title": {
+    "message": "Seguridad de la cuenta"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Desactivar la autenticación de dos factores"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Configurar la autenticación de dos factores"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Añade una capa adicional de seguridad a tu cuenta al iniciar sesión."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Autenticación de dos factores"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Descarga y guarda estos códigos de seguridad en un lugar seguro. ¡Puedes utilizarlos en lugar de un código de autenticación de dos factores si alguna vez pierdes el acceso a tu dispositivo! Debes proteger estos códigos igual que tu contraseña."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Los códigos de seguridad solo se pueden usar una vez."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "¡El código introducido es incorrecto!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Introduce el código de autenticación de dos factores para continuar."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Introduce el código de dos factores"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Introduce el código..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "La autenticación de dos factores protege tu cuenta, ya que exige el acceso a un segundo dispositivo para iniciar sesión."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Si no se puede escanear el código QR, puedes introducir el secreto manualmente:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Escanea el código QR con <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> o cualquier otra aplicación de autenticación de dos factores para empezar."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Introduce el código de un solo uso de la aplicación de autenticación para verificar el acceso."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Verificar código"
   },
   "settings.applications.about": {
     "message": "Acerca de"
@@ -2867,11 +3140,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Aplicaciones"
+  },
   "settings.applications.modal.header": {
     "message": "Información de la aplicación"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Ha ocurrido un error"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "El ícono de tu aplicación se ha actualizado."
@@ -2881,6 +3154,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "¡Guarda tu secreto ahora, se ocultará después de salir de esta página!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Acerca de esta aplicación"
+  },
+  "settings.authorizations.by": {
+    "message": "por"
+  },
+  "settings.authorizations.description": {
+    "message": "Cuando autorizas una aplicación con tu cuenta de Modrinth, le concedes acceso a tu cuenta. Puedes gestionar y revisar el acceso a tu cuenta aquí en cualquier momento."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Por el momento no podemos mostrar tus aplicaciones autorizadas, pero estamos trabajando para solucionar el problema. ¡Vuelve a visitar esta página más adelante!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Autorizaciones"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Revocar"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Esto revocará el acceso de la aplicación a tu cuenta. Siempre podrás volver a autorizarla más adelante."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "¿Estás seguro de que quieres revocar esta solicitud?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Aquí aparecerán todos los cargos anteriores de tu cuenta de Modrinth:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Versión de prueba de Medal Server"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "Caduca el {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "mes"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "mensual"
+  },
+  "settings.billing.interval.year": {
+    "message": "año"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "anual"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Navegación sin anuncios en modrinth.com y Modrinth App"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Insignia de Modrinth+ en tu perfil"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Apoya directamente a Modrinth y a los creadores"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Beneficios"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "¡Ahorra {amount} al año cambiando a la facturación anual!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Has cancelado tu suscripción."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Conservarás tus ventajas hasta el final del ciclo de facturación actual."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "El pago de tu suscripción no se ha realizado correctamente. Actualiza tu método de pago."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Actualmente estás suscrito a:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "Se está procesando tu pago. Las ventajas se activarán una vez que se haya completado el pago."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "¡Suscríbete a Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Cancelar subscripción"
@@ -2899,6 +3256,12 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "¿Estás seguro de que quieres eliminar este método de pago?"
+  },
+  "settings.billing.next": {
+    "message": "Siguiente:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "O {price} al año (¡ahorra un {percent}%!)"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Agregar método de pago"
@@ -2921,17 +3284,98 @@
   "settings.billing.payment_method.title": {
     "message": "Métodos de pago"
   },
+  "settings.billing.plan.title": {
+    "message": "{size} Plan"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} CPU compartidas (Picos de hasta {bursts} CPUs)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "No se ha encontrado ningún servidor vinculado para esta suscripción. Hay varias explicaciones posibles para ello. Si acaba de adquirir su servidor, esto es normal. La configuración del servidor puede tardar hasta una hora. Por el contrario, si adquirió este servidor hace tiempo, es probable que haya sido suspendido desde entonces. Si esto no es lo que esperaba, póngase en contacto con el servicio de asistencia de Modrinth con la siguiente información:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID del servidor: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "ID de Stripe: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB de RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Se ha producido un error al volver a suscribirse a su servidor Modrinth."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Error al volver a suscribirse"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Si el servidor está actualmente suspendido, pueden pasar hasta 10 minutos antes de que se realice otro intento de cobro."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Solicitud de renovación enviada"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "La suscripción al servidor se ha renovado correctamente"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "El pago de tu suscripción no se ha realizado correctamente. Actualiza tu método de pago y vuelve a suscribirte."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Se está procesando tu pago. Tu servidor se activará una vez que se haya completado el pago."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB de SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB de intercambio"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Gestiona tus suscripciones de Modrinth Servers."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Suscripciones de Modrinth Servers"
   },
+  "settings.billing.renews": {
+    "message": "Se renueva el {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Volver a suscribirse"
+  },
+  "settings.billing.since": {
+    "message": "Desde el {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Suscríbete"
+  },
   "settings.billing.subscription.description": {
     "message": "Gestiona tus suscripciones de servidores Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Suscripciones"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Cambiando a {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Cambiar a {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "La facturación mensual te supondrá un coste adicional de {amount} al año"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Pasará a la facturación por {interval} a partir del {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Actualizar método"
+  },
+  "settings.billing.upgrade": {
+    "message": "Mejorar"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Desactivar modo desarrollador"
@@ -2945,6 +3389,12 @@
   "settings.display.flags.title": {
     "message": "Activar/desactivar funciones"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "El modo de desarrollador se ha desactivado"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Modo de desarrollador desactivado"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Página de Data Packs"
   },
@@ -2953,6 +3403,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Página de Mods"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galería"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Cuadrícula"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Filas"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Página de Modpacks"
@@ -3014,6 +3473,9 @@
   "settings.display.theme.title": {
     "message": "Color de la interfaz"
   },
+  "settings.head-title": {
+    "message": "Configuración de pantalla"
+  },
   "settings.pats.action.create": {
     "message": "Crear un PAT"
   },
@@ -3074,6 +3536,9 @@
   "settings.profile.description": {
     "message": "La información de tu perfil es visible públicamente en Modrinth y mediante la <docs-link>API de Modrinth</docs-link>."
   },
+  "settings.profile.head-title": {
+    "message": "Configuración del perfil"
+  },
   "settings.profile.profile-info": {
     "message": "Información del perfil"
   },
@@ -3104,11 +3569,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Plataforma desconocida"
   },
+  "settings.sidebar.label.account": {
+    "message": "Cuenta"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Desarrollador"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Pantalla"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Últimas noticias de Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Ver todas las noticias"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Suscribir"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "¡Suscrito!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Suscríbete al boletín de noticias de Modrinth"
   },
   "version.environment.none.description": {
     "message": "No se ha especificado el entorno para esta versión."

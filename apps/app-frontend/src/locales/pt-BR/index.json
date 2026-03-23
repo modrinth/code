@@ -1,6 +1,6 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Cheque sua conexão com a internet e tente novamente mais tarde."
+    "message": "Os servidores de autenticação do Minecraft podem estar indisponíveis no momento. Verifique sua conexão com a internet e tente novamente mais tarde."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível acessar os servidores de autenticação"
@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Excluir instância"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Este pacote de mods já está instalado na instância \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Pacote de mods duplicado"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Criar mesmo assim"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Ir para a instância"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "O pacote de mods já está instalado"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projeto"
   },
@@ -71,9 +86,6 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "Enviado com sucesso"
   },
-  "app.instance.mods.switch-version": {
-    "message": "Trocar versão"
-  },
   "app.instance.mods.unknown-version": {
     "message": "Desconhecido"
   },
@@ -90,7 +102,7 @@
     "message": "Instalar"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}\n"
+    "message": "{count, plural, =0 {Nenhum mod} one {# mod} other {# mods}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "Pacote de mods necessário"

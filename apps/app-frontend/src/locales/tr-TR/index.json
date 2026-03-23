@@ -5,6 +5,69 @@
   "app.auth-servers.unreachable.header": {
     "message": "Doğrulama sunucularına erişilemedi"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Mod paketi açıklaması yazın..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Çıkart"
+  },
+  "app.export-modal.header": {
+    "message": "Modpaketi çıkart"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpaketi adı"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpaketi adı"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Sürüm numarası"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Bu eylem geri alınamaz"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Yinede oluştur"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpaketi zaten kurulu"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proje"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Bağlantıyı kopyala"
+  },
+  "app.instance.mods.installing": {
+    "message": "Kuruluyor..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpaketi"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" eklendi"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projeler eklendi"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Modpaketimde kullandığım projelere göz at!"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Dosya göster"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Başarı ile yüklendi"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Bilinmeyen"
+  },
+  "app.instance.mods.updating": {
+    "message": "Güncelleniyor..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "İçerik gerekli"
   },

@@ -263,9 +263,6 @@
   "content.diff-modal.unknown-content-body": {
     "defaultMessage": "你伺服器上的部分內容無法進行分析，且可能會受到這項變更的影響。"
   },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "未知的內容"
-  },
   "content.diff-modal.updated-count": {
     "defaultMessage": "已更新 {count} 個"
   },
@@ -376,6 +373,12 @@
   },
   "content.page-layout.uploading-files": {
     "defaultMessage": "正在上傳檔案 ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "所有已選擇的內容已經停用"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "所有已選擇的內容已經啟用"
   },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "正在刪除 {progress}/{total} {contentType}..."
@@ -551,9 +554,6 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "無法更新檔案"
   },
-  "hosting.content.switch-version": {
-    "defaultMessage": "切換版本"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "最高可爆發至 {cpus} 個 CPU"
   },
@@ -647,8 +647,53 @@
   "installation-settings.removed-incompatible": {
     "defaultMessage": "已移除（不相容）"
   },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "重新安裝 Minecraft 的必要元件並檢查檔案是否損毀。這或許能修復你的遊戲因啟動器出錯而打不開的問題。"
+  },
   "installation-settings.repair.instance-title": {
     "defaultMessage": "修復實例"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "在保留遊戲內容的情況下，重新安裝載入器與 Minecraft 的必要元件。這或許能修復你伺服器無法正常啟動的問題。"
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "修復伺服器"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "儲存中..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "搜尋遊戲版本..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "取消連結"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "取消連結將永久切斷此{type, select, server {伺服器} other {實例}}與{projectType, select, server {伺服器} other {模組包}}專案的連結。這讓你可以更改載入器與 Minecraft 版本，但你將無法收到未來的更新。"
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "驗證中..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "重新安裝將會把所有已安裝或修改過的內容，重設回模組包原始的狀態。這將會移除所有你在原始安裝上額外添加的模組或內容。"
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "重新安裝警告"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "重新安裝模組包"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "重新安裝模組包"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "修復實例會在保留遊戲內容的情況下，重新安裝載入器與 Minecraft 的必要元件。這或許能修復你{type, select, server {伺服器無法正常啟動的問題} other {的遊戲因啟動器出錯而打不開的問題}}。"
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "修復{type, select, server {伺服器} other {實例}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "修復"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "冒險模式"
@@ -665,8 +710,77 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "未知的遊戲模式"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "返回"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "檔案還在上傳中，離開此頁面將取消上傳，並且你所做的變更可能會遺失。"
+  },
+  "instances.confirm-leave-modal.leave": {
+    "defaultMessage": "離開頁面"
+  },
+  "instances.confirm-leave-modal.stay": {
+    "defaultMessage": "留在本頁"
+  },
+  "instances.confirm-leave-modal.title": {
+    "defaultMessage": "是否要離開頁面？"
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "正在執行上傳作業"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} 個相容實例"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "已有實例"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "遊戲版本"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "選擇遊戲版本"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "安裝專案"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "隱藏快照版本"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "安裝"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "已安裝"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "安裝中..."
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "實例類型"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "載入器"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "名稱"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "輸入實例名稱"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "新的實例"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "找不到相容的實例"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "移除圖示"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "搜尋實例"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "選擇圖示"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "顯示所有版本"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "複製連結"
@@ -698,14 +812,26 @@
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "不相容"
   },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "降級到 {version}"
+  },
   "instances.updater-modal.header": {
     "defaultMessage": "更新版本"
+  },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "切換模組包版本"
   },
   "instances.updater-modal.header-switch": {
     "defaultMessage": "切換版本"
   },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "隱藏不相容項目"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "正在載入更新日誌..."
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "正在載入版本..."
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "這個版本沒有提供更新日誌。"
@@ -725,6 +851,15 @@
   "instances.updater-modal.switch-to": {
     "defaultMessage": "切換到 {version}"
   },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "更新到 {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "更新可能會導致實例損壞。請先查看版本更新日誌並備份。"
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "更新可能會導致世界損壞。請先查看版本更新日誌並備份。"
+  },
   "label.actions": {
     "defaultMessage": "動作"
   },
@@ -736,6 +871,9 @@
   },
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "這是一個用戶端模組，可能會導致問題。我們仍保持啟用狀態，是因為部分作者會誤標執行環境，且載入器應能自行解決衝突。"
   },
   "label.collections": {
     "defaultMessage": "收藏"
@@ -754,6 +892,9 @@
   },
   "label.delete": {
     "defaultMessage": "刪除"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "立即刪除"
   },
   "label.description": {
     "defaultMessage": "描述"
@@ -776,11 +917,26 @@
   "label.followed-projects": {
     "defaultMessage": "追蹤的專案"
   },
+  "label.game-version": {
+    "defaultMessage": "遊戲版本"
+  },
+  "label.installation-info": {
+    "defaultMessage": "安裝資訊"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "已安裝模組包"
+  },
+  "label.installing": {
+    "defaultMessage": "安裝中..."
+  },
   "label.loading": {
     "defaultMessage": "載入中..."
   },
   "label.moderation": {
     "defaultMessage": "管理"
+  },
+  "label.modpack": {
+    "defaultMessage": "模組包"
   },
   "label.no": {
     "defaultMessage": "否"
@@ -796,6 +952,24 @@
   },
   "label.password": {
     "defaultMessage": "密碼"
+  },
+  "label.plan-custom": {
+    "defaultMessage": "自訂"
+  },
+  "label.plan-large": {
+    "defaultMessage": "大型"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "中型"
+  },
+  "label.plan-small": {
+    "defaultMessage": "小型"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "未知"
+  },
+  "label.platform": {
+    "defaultMessage": "平臺"
   },
   "label.played": {
     "defaultMessage": "遊玩時長：{ago}"
@@ -821,6 +995,12 @@
   "label.search": {
     "defaultMessage": "搜尋"
   },
+  "label.select-all": {
+    "defaultMessage": "選擇全部"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "選擇動作"
+  },
   "label.server": {
     "defaultMessage": "伺服器"
   },
@@ -834,13 +1014,16 @@
     "defaultMessage": "單人遊戲"
   },
   "label.sort-by": {
-    "defaultMessage": "排序依據"
+    "defaultMessage": "排序依據："
   },
   "label.success": {
     "defaultMessage": "成功"
   },
   "label.title": {
     "defaultMessage": "標題"
+  },
+  "label.unknown": {
+    "defaultMessage": "未知"
   },
   "label.unlisted": {
     "defaultMessage": "不公開"
@@ -973,9 +1156,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "當伺服器變動時，維持檔案為最新狀態"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "關閉"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "取得 Modrinth App"
@@ -1262,6 +1442,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "相容性"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "組織"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "專案擁有者"
   },
@@ -1322,17 +1505,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "前往 wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "複製 Java 伺服器位址"
+  },
   "project.about.server.copied": {
     "defaultMessage": "已複製！"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "已將 IP 位址複製到剪貼簿"
+    "defaultMessage": "已將伺服器 IP 位址複製到剪貼簿"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "延遲"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "下載模組包"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "語言"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "（推薦）"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "地區"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "必需內容"
   },
   "project.about.server.title": {
     "defaultMessage": "伺服器詳細資訊"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "標籤"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "下載次數：{count, number}"
@@ -1418,8 +1619,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "過去 2 週內來自 Modrinth 的 {count} 次最近遊玩次數"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "這個專案用了一個自定義模組包"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "南非文"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "阿姆哈拉文"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "阿拉伯文"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "亞塞拜然文"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "白俄羅斯文"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "保加利亞文"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "孟加拉文"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "波士尼亞文"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "加泰隆尼亞文"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "捷克文"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "丹麥文"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "德文"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "希臘文"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "英文"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "世界語"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "西班牙文"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "愛沙尼亞文"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "巴斯克文"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "波斯文"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "芬蘭文"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "法文"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "愛爾蘭文"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "加利西亞文"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "希伯來文"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "印地文"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "克羅埃西亞文"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "匈牙利文"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "亞美尼亞文"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "印尼文"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "冰島文"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "義大利文"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "日文"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "喬治亞文"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "哈薩克文"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "高棉文"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "坎那達文"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "韓文"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "寮文"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "立陶宛文"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "拉脫維亞文"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "馬其頓文"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "馬來亞拉姆文"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "蒙古文"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "馬拉提文"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "馬來文"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "緬甸文"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "尼泊爾文"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "荷蘭文"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "挪威文"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "旁遮普文"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "波蘭文"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "葡萄牙文"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "羅馬尼亞文"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "俄文"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "僧伽羅文"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "斯洛伐克文"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "斯洛維尼亞文"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "阿爾巴尼亞文"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "塞爾維亞文"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "瑞典文"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "斯瓦希里文"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "泰米爾文"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "泰盧固文"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "泰文"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "菲律賓文"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "土耳其文"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "烏克蘭文"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "烏爾都文"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "烏茲別克文"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "越南文"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "約魯巴文"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "中文"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "祖魯文"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} 毫秒"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "亞洲"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "澳洲"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "歐洲"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "中東"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "俄羅斯"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "南美洲"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "伺服器位於{regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "美國東部"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "美國西部"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "離線"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "伺服器已離線"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "線上"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "數據分析"
@@ -1655,8 +2114,71 @@
   "search.filter_type.project_id": {
     "defaultMessage": "專案 ID"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "類型"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "語言"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "地區"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "狀態"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "載入器"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "模組版"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "原版"
+  },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "建立「{backupName}」時發生錯誤。請再試一次，若問題持續發生，請聯絡支援團隊。"
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "無法備份"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} 已加入佇列，即將開始。"
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "備份作業已加入佇列"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "正在為 {backupName} 保存世界資料和伺服器配置。這可能需要幾分鐘。"
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "正在建立備份"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "你的備份"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "還原「{backupName}」時發生錯誤。請再試一次，若問題持續發生，請聯絡支援團隊。"
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "無法從備份還原"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "從 {backupName} 還原已加入佇列，即將開始。"
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "備份還原作業已加入佇列"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "你的伺服器以還原至 {backupName} ，可以啟動了。"
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "成功從備份還原"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "正在從 {backupName} 還原你的伺服器。這可能需要幾分鐘。"
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "從備份還原"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "自動備份"
@@ -1774,6 +2296,24 @@
   },
   "servers.region.western-europe": {
     "defaultMessage": "西歐"
+  },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "你的操作過於頻繁。請稍後再試。"
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "無法重新安裝伺服器"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "重新安裝時發生非預期的錯誤。請稍後再試。"
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "重新安裝失敗"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "上傳時請勿關閉此頁面。"
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "正在上傳模組包"
   },
   "settings.account.title": {
     "defaultMessage": "帳號和安全性"

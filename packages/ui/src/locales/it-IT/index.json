@@ -216,10 +216,10 @@
     "defaultMessage": "Avviso di rimozione"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Elimina {count} {itemType}"
+    "defaultMessage": "Elimina {count} {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {progetto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {progetti}}}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Elimina {itemType}"
+    "defaultMessage": "Elimina {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {progetto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {progetti}}}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà rimosso."
@@ -261,10 +261,7 @@
     "defaultMessage": "{count, plural, one {# rimozione} other {# rimozioni}}"
   },
   "content.diff-modal.unknown-content-body": {
-    "defaultMessage": "Alcuni contenuti sul tuo server non sono stati analizzati e potrebbero essere affetti da questa modifica."
-  },
-  "content.diff-modal.unknown-content-header": {
-    "defaultMessage": "Contenuto sconosciuto"
+    "defaultMessage": "Non è stato possibile analizzare alcuni contenuti sul tuo server, pertanto potrebbero essere affetti da questa modifica."
   },
   "content.diff-modal.updated-count": {
     "defaultMessage": "{count, plural, one {# aggiornamento} other {# aggiornamenti}}"
@@ -288,7 +285,7 @@
     "defaultMessage": "Crea backup"
   },
   "content.inline-backup.shift-click-hint": {
-    "defaultMessage": "Tieni premuto Maiusc mentre clicchi per evitare la conferma."
+    "defaultMessage": "Salta la conferma tenendo premuto Shift."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Si consiglia di creare un backup prima di procedere, così da poterlo ripristinare nel caso qualcosa {type, select, server {nel tuo mondo} other {nella tua istanza}} vada storto."
@@ -318,7 +315,7 @@
     "defaultMessage": "Inizia esplorando o caricando {contentType}"
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Aggiungi contenuto aggiuntivo a questo pacchetto"
+    "defaultMessage": "Aggiungi del contenuto aggiuntivo a questo pacchetto"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Nessun contenuto installato"
@@ -357,7 +354,7 @@
     "defaultMessage": "Nomi dei progetti"
   },
   "content.page-layout.sort.alphabetical": {
-    "defaultMessage": "ordine alfabetico"
+    "defaultMessage": "Alfabetico"
   },
   "content.page-layout.sort.date-added-newest": {
     "defaultMessage": "Più recenti prima"
@@ -376,6 +373,12 @@
   },
   "content.page-layout.uploading-files": {
     "defaultMessage": "Caricando i file ({completed}/{total})..."
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Tutti i contenuti selezionati sono già disattivati"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Tutti i contenuti selezionati sono già attivati"
   },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Rimuovendo {contentType} ({progress}/{total})..."
@@ -408,7 +411,7 @@
     "defaultMessage": "Abilita"
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType} {count, plural, one {selezionato} other {selezionati}}"
+    "defaultMessage": "{count} {contentType, select, mod {mod selezionata} mods {mod selezionate} plugin {plugin selezionato} plugins {plugin selezionati} datapack {pacchetto selezionato} datapacks {pacchetti selezionati} other {{count, plural, one {progetto selezionato} other {progetti selezionati}}}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} {count, plural, one {selezionato} other {selezionati}}"
@@ -551,9 +554,6 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Errore nel caricamento del file"
   },
-  "hosting.content.switch-version": {
-    "defaultMessage": "Cambia versione"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
   },
@@ -642,10 +642,10 @@
     "defaultMessage": "Reinstalla pacchetto di mod"
   },
   "installation-settings.reinstalling-modpack": {
-    "defaultMessage": "Reinstallando pacchetto di mod..."
+    "defaultMessage": "Reinstallando il pacchetto..."
   },
   "installation-settings.removed-incompatible": {
-    "defaultMessage": "Rimozione (incompatibile)"
+    "defaultMessage": "Rimosso (incompatibile)"
   },
   "installation-settings.repair.instance-description": {
     "defaultMessage": "Reinstalla le dipendenze di Minecraft e controlla eventuali corruzioni. Se il tuo gioco non si avvia per colpa del launcher, prova questa opzione."
@@ -723,7 +723,7 @@
     "defaultMessage": "Abbandonare la pagina?"
   },
   "instances.confirm-leave-modal.upload-in-progress": {
-    "defaultMessage": "Caricando..."
+    "defaultMessage": "È in corso un caricamento"
   },
   "instances.content-install.compatible-count": {
     "defaultMessage": "{count} {count, plural, one {istanza compatibile} other {istanze compatibili}}"
@@ -781,9 +781,6 @@
   },
   "instances.content-install.show-all-versions": {
     "defaultMessage": "Mostra tutte le versioni"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Indietro"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copia link"
@@ -870,7 +867,7 @@
     "defaultMessage": "{amount} disponibile."
   },
   "label.changelog": {
-    "defaultMessage": "Cronologia"
+    "defaultMessage": "Novità"
   },
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
@@ -956,6 +953,21 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Ad hoc"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Grande"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Medio"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Piccolo"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Sconosciuto"
+  },
   "label.platform": {
     "defaultMessage": "Piattaforma"
   },
@@ -1002,7 +1014,7 @@
     "defaultMessage": "Giocatore singolo"
   },
   "label.sort-by": {
-    "defaultMessage": "Ordina per"
+    "defaultMessage": "Ordine: "
   },
   "label.success": {
     "defaultMessage": "Successo"
@@ -1144,9 +1156,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Mantieni i file aggiornati coi server"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Chiudi"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Scarica Modrinth App"
@@ -1433,6 +1442,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Compatibilità"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organizzazione"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Proprietario"
   },
@@ -1493,17 +1505,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "Consulta la wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Copia indirizzo server Java"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Copiato!"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "Indirizzo IP copiato negli appunti"
+    "defaultMessage": "Indirizzo copiato negli appunti"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Latenza"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Scarica pacchetto"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Lingue"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(consigliata)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Regione"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Contenuto richiesto"
   },
   "project.about.server.title": {
     "defaultMessage": "Dettagli sul server"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Tag"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} download"
@@ -1589,8 +1619,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, one {avvio recente} other {avvii recenti}} da Modrinth nelle ultime 2 settimane"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Questo progetto usa un pacchetto di mod personalizzato"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amarico"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabo"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbaigiano"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Bielorusso"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgaro"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengalese"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosniaco"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Catalano"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Ceco"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Danese"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Tedesco"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Greco"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Inglese"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Spagnolo"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estone"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Basco"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Persiano"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finlandese"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Francese"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Irlandese"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galiziano"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Ebraico"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Croato"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Ungherese"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Armeno"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonesiano"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Islandese"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italiano"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Giapponese"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Georgiano"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazako"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Khmer"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Coreano"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Lao"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Lituano"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Lettone"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Macedone"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongolo"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathi"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Malese"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Birmano"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepalese"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Olandese"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norvegese"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polacco"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portoghese"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Rumeno"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Russo"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Singalese"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovacco"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Sloveno"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albanese"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbo"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Svedese"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thailandese"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filippino"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turco"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ucraino"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Uzbeco"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamita"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Cinese"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australia"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Medio Oriente"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Russia"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "America meridionale"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Server situato in {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "USA orientale"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "USA occidentale"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Il server è offline"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitiche"
@@ -1826,53 +2114,71 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID progetto"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Tipo"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Lingua"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Regione"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Stato"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Moddato"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanilla"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Qualcosa è andato storto nella creazione di \"{backupName}\". Riprova più tardi o contatta l'assistenza se il problema persiste."
   },
   "servers.backups.admonition.backup-failed.title": {
-    "defaultMessage": "Impossibile creare il backup"
+    "defaultMessage": "Errore nella creazione del backup"
   },
   "servers.backups.admonition.backup-queued.description": {
-    "defaultMessage": "\"{backupName}\" è in attesa e inizierà a momenti."
+    "defaultMessage": "La creazione di \"{backupName}\" è in coda e inizierà a momenti."
   },
   "servers.backups.admonition.backup-queued.title": {
-    "defaultMessage": "Backup in attesa"
+    "defaultMessage": "Backup in attesa..."
   },
   "servers.backups.admonition.creating-backup.description": {
-    "defaultMessage": "Salvando i dati del mondo e le configurazioni del server per \"{backupName}\". Ciò potrà richiedere alcuni minuti."
+    "defaultMessage": "Salvando i dati e le configurazioni per \"{backupName}\". L'operazione richiederà alcuni minuti."
   },
   "servers.backups.admonition.creating-backup.title": {
-    "defaultMessage": "Creazione del backup"
+    "defaultMessage": "Creando il backup..."
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "il mio backup"
+    "defaultMessage": "Backup senza nome"
   },
   "servers.backups.admonition.restore-failed.description": {
-    "defaultMessage": "Qualcosa è andato storto nel ripristino di \"{backupName}\". Riprova più tardi o contatta l'assistenza se il problema persiste."
+    "defaultMessage": "Qualcosa è andato storto nel ripristino da \"{backupName}\". Riprova più tardi o contatta l'assistenza se il problema persiste."
   },
   "servers.backups.admonition.restore-failed.title": {
-    "defaultMessage": "Errore nel ripristino del backup"
+    "defaultMessage": "Errore nel ripristino dal backup"
   },
   "servers.backups.admonition.restore-queued.description": {
-    "defaultMessage": "Il ripristino da \"{backupName}\" è in attesa e inizierà a momenti."
+    "defaultMessage": "Il ripristino da \"{backupName}\" è in coda e inizierà a momenti."
   },
   "servers.backups.admonition.restore-queued.title": {
-    "defaultMessage": "Ripristino del backup in attesa"
+    "defaultMessage": "Ripristino dal backup in attesa..."
   },
   "servers.backups.admonition.restore-successful.description": {
-    "defaultMessage": "\"{backupName}\" è stato ripristinato e ora il server è pronto a essere avviato."
+    "defaultMessage": "\"{backupName}\" è stato ripristinato e ora il server è pronto per essere avviato."
   },
   "servers.backups.admonition.restore-successful.title": {
     "defaultMessage": "Backup ripristinato con successo"
   },
   "servers.backups.admonition.restoring-backup.description": {
-    "defaultMessage": "Ripristinando il server da \"{backupName}\". Ciò potrà richiedere alcuni minuti."
+    "defaultMessage": "Ripristinando da \"{backupName}\". L'operazione richiederà alcuni minuti."
   },
   "servers.backups.admonition.restoring-backup.title": {
-    "defaultMessage": "Ripristino dal backup"
+    "defaultMessage": "Ripristinando dal backup..."
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Automatico"
@@ -2169,16 +2475,16 @@
     "defaultMessage": "Modalità creativa"
   },
   "tag.category.creator-community": {
-    "defaultMessage": "Creatività"
+    "defaultMessage": "Salotto creativo"
   },
   "tag.category.crossplay": {
     "defaultMessage": "Multipiattaforma"
   },
   "tag.category.cursed": {
-    "defaultMessage": "Grottesca"
+    "defaultMessage": "Grottesco"
   },
   "tag.category.custom-content": {
-    "defaultMessage": "Contenuti personalizzati"
+    "defaultMessage": "Contenuti extra"
   },
   "tag.category.decoration": {
     "defaultMessage": "Decorazione"

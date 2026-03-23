@@ -197,6 +197,12 @@
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Peringatan penghapusan"
   },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Mohon tunggu"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Tautan Markdown"
+  },
   "form.label.address-line": {
     "defaultMessage": "Baris alamat"
   },
@@ -352,9 +358,6 @@
   },
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Kembali"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Salin tautan"
@@ -515,9 +518,6 @@
   "label.singleplayer": {
     "defaultMessage": "Bermain sendiri"
   },
-  "label.sort-by": {
-    "defaultMessage": "Urutkan berdasarkan"
-  },
   "label.success": {
     "defaultMessage": "Berhasil"
   },
@@ -655,9 +655,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Berkas-berkas selalu diperbarui ketika server berubah"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Tutup"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Dapatkan Modrinth App"
@@ -1007,11 +1004,8 @@
   "project.about.server.copied": {
     "defaultMessage": "Disalin!"
   },
-  "project.about.server.copiedText": {
-    "defaultMessage": "Alamat IP telah disalin ke papan klip"
-  },
-  "project.about.server.latency": {
-    "defaultMessage": "Latensi"
+  "project.about.server.languages": {
+    "defaultMessage": "Bahasa"
   },
   "project.about.server.title": {
     "defaultMessage": "Perincian server"
@@ -1078,6 +1072,225 @@
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} orang daring"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amharik"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arab"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbaijan"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Belarusia"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgaria"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengali"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosnia"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Katalan"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Ceko"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Denmark"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Jerman"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Yunani"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Inggris"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Spanyol"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonia"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Bask"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Persia"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finlandia"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Prancis"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Irlandia"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galisia"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Ibrani"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Kroasia"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Hungaria"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Armenia"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indonesia"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Islandia"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italia"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Jepang"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Georgia"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kazak"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Khmer"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Korea"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Lao"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Lituania"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Latvia"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Makedonia"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongol"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marati"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Melayu"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Burma"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepali"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Belanda"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norwegia"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polandia"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portugis"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Rumania"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Rusia"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Sinhala"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slowakia"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Slovenia"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albania"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbia"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Swedia"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thai"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipino"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turki"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukraina"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Uzbek"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnam"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "China"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
   },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
@@ -1315,6 +1528,9 @@
   },
   "search.filter_type.project_id": {
     "defaultMessage": "Pengenal proyek"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Bahasa"
   },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Pemuat"
@@ -1664,9 +1880,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Aneka Macam"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "KitPvP"
-  },
   "tag.category.library": {
     "defaultMessage": "Pustaka"
   },
@@ -1748,20 +1961,11 @@
   "tag.category.plots": {
     "defaultMessage": "Petak"
   },
-  "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
-  },
   "tag.category.potato": {
     "defaultMessage": "Kentang"
   },
   "tag.category.prison": {
     "defaultMessage": "Penjara"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PvE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PvP"
   },
   "tag.category.questing": {
     "defaultMessage": "Misi-misian"

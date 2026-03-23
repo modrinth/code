@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Zrušit"
   },
+  "button.change-version": {
+    "defaultMessage": "Změnit verzi"
+  },
   "button.clear": {
     "defaultMessage": "Vymazať"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Sledovat"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Skrýt snapshoty"
+  },
   "button.max": {
     "defaultMessage": "Max"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "Obnovit"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Znovunainstalovat modpack"
+  },
   "button.remove": {
     "defaultMessage": "Odstranit"
   },
   "button.remove-image": {
     "defaultMessage": "Odstranit obrázek"
   },
+  "button.repair": {
+    "defaultMessage": "Opravit"
+  },
+  "button.repairing": {
+    "defaultMessage": "Opravování..."
+  },
   "button.report": {
     "defaultMessage": "Nahlásit"
   },
   "button.reset": {
     "defaultMessage": "Obnovit"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Resetovat server"
   },
   "button.retry": {
     "defaultMessage": "Znovu zkusit"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Ukládání"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Zobrazit všechny verze"
+  },
   "button.sign-in": {
     "defaultMessage": "Přihlásit se"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "Stop"
   },
+  "button.switch-version": {
+    "defaultMessage": "Změnit verzi"
+  },
   "button.unfollow": {
     "defaultMessage": "Přestat sledovat"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Odpojit modpack"
   },
   "button.update": {
     "defaultMessage": "Aktualizace"
@@ -169,6 +196,171 @@
   },
   "collections.label.private": {
     "defaultMessage": "Soukromé"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Skutečně chceš aktualizovat {count, plural, one {# projekt} other {# projektů}} na jejich poslední kompatibilní verzi? Doporučujeme aktualizovat obsah jeden po jednom."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Upozornění na aktualizaci"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Aktualizovat projekty"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Aktualizovat {count, plural, one {# projekt} other {# projektů}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Smazáním modu může poškodit tvůj svět, způsobit chybějící věci nebo neočekávatelné chyby."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Upozornění při smazání"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Smazat {count} {itemType}{count, plural, one {} other {}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Smazat {itemType}{count, plural, one {} other {}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Jakékoli mody, které jste přidali, budou smazány."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "Upozornění na {action, select, downgrade {zhoršení} other {vylepšení}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "Upozornění na {action, select, downgrade {zhoršení} other {vylepšení}} modpacku"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Zhoršit} other {Vylepšit}} modpack"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mody a obsah budou sloučeny s tím, co jste přidali k modpacku, modpack ale přestane dostávat aktualizace."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Odpojit modpack"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Odpojit modpack"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Odpojit"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "Přidáno {count}"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Přidáno (závislost)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Odstraněno"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Aktualizováno"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "Odstraněno {count}"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Některý obsah na vašem serveru nebylo možné analyzovat a tato změna se ho může týkat."
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "Aktualizováno {count}"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Vytvářim zálohu..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Záloha úspěšně vytvořena"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Vytvoření zálohy se nezdařilo. Můžeš přesto pokračovat."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Probíhá zálohování. Doporučujeme počkat na jeho dokončení, než tuto akci provedeš."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Vytvoření zálohy může trvat několik minut dle velikosti tvého serveru."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Vytvořit zálohu"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Podrž Shift a klikni, jestli chceš přeskočit potvrzení"
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Doporučujeme vytvoření zálohy před pokračováním dále. V případě nějaké chyby můžeš obnovit {type, select, server {svět} other {instanci}}."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Obsah tvého modpacku nyní najdeš zde!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Obsah modpacku byl přesunut"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Znovu nezobrazovat"
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Aktualizace"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Dodatečný obsah"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Prozkoumat"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Před úpravou obsahu prosím počkej, až se operace dokončí."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Pro začátek prozkoumej nebo nahraj {contentType}"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Přidejte další obsah k tomuto modpacku"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Není nainstalován žádný obsah"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Není nainstalován žádný další obsah"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Nepodařilo se načíst obsah"
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Nebyl nalezen obsah."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Prosím, počkej"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Vyhledat {count} {contentType}..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Název souboru"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Název projektů"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Abecedně"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Nejnovější"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Nejstarší"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Seřadit {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Aktualizovat vše"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Nahrát soubory"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Nahrávnání souborů ({completed}/{total})"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresa"
@@ -442,9 +634,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Hra pro jednoho hráče"
-  },
-  "label.sort-by": {
-    "defaultMessage": "Třídit podle"
   },
   "label.success": {
     "defaultMessage": "Úspěch"
@@ -720,10 +909,10 @@
     "defaultMessage": "Podporovaná prostředí"
   },
   "project.about.compatibility.environments.client-and-server": {
-    "defaultMessage": "Client i server"
+    "defaultMessage": "Klient i server"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Client-side"
+    "defaultMessage": "Klient"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Pouze dedikované servery"
@@ -801,16 +990,16 @@
     "defaultMessage": "Navštivte wiki"
   },
   "project.environment.client-and-server.title": {
-    "defaultMessage": "Client i server, nutný na obou"
+    "defaultMessage": "Klient i server, nutný na obou"
   },
   "project.environment.client-only-server-optional.title": {
-    "defaultMessage": "Client i server, volitelý na serveru"
+    "defaultMessage": "Klient i server, volitelý na serveru"
   },
   "project.environment.client-only.description": {
     "defaultMessage": "Veškerá funkcionalita je udělána na straně klienta a je kompatibilní s vanilla servery."
   },
   "project.environment.client-only.title": {
-    "defaultMessage": "Pouze client-side"
+    "defaultMessage": "Pouze klient"
   },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient a server, nejlépe na obojím"

@@ -1,9 +1,90 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Pelayan pengesahan Minecraft mungkin sedang tergendala sekarang. Periksa sambungan internet anda dan cuba lagi nanti."
+    "message": "Pelayan pengesahan Minecraft mungkin sedang tergendala sekarang. Periksa sambungan internet anda dan cuba lagi kemudian."
   },
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat mencapai pelayan pengesahan"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Masukkan keterangan pek mod..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Eksport"
+  },
+  "app.export-modal.header": {
+    "message": "Eksport pek mod"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nama Pek Mod"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nama pek mod"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Pilih fail dan folder untuk disertakan dalam pek mod"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Nombor versi"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Semua data untuk pemasangan anda akan dipadamkan secara kekal, termasuk dunia, konfigurasi dan semua kandungan yang dipasang."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tindakan ini tidak boleh dibatalkan"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Padam pemasangan"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Padam pemasangan"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Pek mod ini sudah pun dipasang di dalam pemasangan \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Pergi ke pemasangan"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Pek mod sudah dipasang"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projek"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Salin pautan"
+  },
+  "app.instance.mods.installing": {
+    "message": "Sedang memasang..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Pek Mod"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" telah ditambahkan"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projek telah ditambahkan"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Lihat projek-projek yang saya gunakan dalam pek mod saya!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Berkongsi kandungan pek mod"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Tunjukkan fail"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Berjaya dimuat naik"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Tidak Diketahui"
+  },
+  "app.instance.mods.updating": {
+    "message": "Sedang mengemas kini..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "Kandungan yang diperlukan"

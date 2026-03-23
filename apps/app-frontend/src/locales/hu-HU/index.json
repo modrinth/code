@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Profil törlése"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Ez a modcsomag már telepítve van a „{instanceName}” profilban."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Modcsomag duplikálása"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Létrehozás mindenképpen"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Profil megnyitása"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "A modcsomag már telepítve van"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -61,6 +76,9 @@
   },
   "app.instance.mods.share-text": {
     "message": "Nézd meg, milyen projekteket használok a modcsomagomban!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Modcsomag-tartalmak megosztása"
   },
   "app.instance.mods.show-file": {
     "message": "Fájl megjelenítése"
@@ -99,7 +117,7 @@
     "message": "Megosztott szerverprofil"
   },
   "app.modal.install-to-play.view-contents": {
-    "message": "Tartalom megjelenítése"
+    "message": "Tartalom megtekintése"
   },
   "app.modal.update-to-play.header": {
     "message": "Frissítsd a játékhoz"

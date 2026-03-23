@@ -11,6 +11,12 @@
   "nags.add-icon.title": {
     "defaultMessage": "Adj hozzá egy ikont"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Add hozzá az IP címet és Portot, amit a Java Edition Játékosok használhatnak, hogy fellépjenek a szerveredre."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Adj hozzá egy Java Címet"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
@@ -121,6 +127,12 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Kompatibilitás kiválasztása"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Hagyd a játékosokat tudni, melyik régióban vam a szervered."
   },
   "nags.select-country.title": {
     "defaultMessage": "Régió választása"

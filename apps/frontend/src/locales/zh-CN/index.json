@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "创建项目"
   },
-  "create.project.create-server-project": {
-    "message": "创建服务器"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "缺少字段：{fields}"
   },
@@ -2346,7 +2343,7 @@
     "message": "请复核运行环境元数据"
   },
   "project.error.loading": {
-    "message": "加载项目数据时出错{message}"
+    "message": "加载项目数据时出错 {message}"
   },
   "project.error.page-not-found": {
     "message": "未找到该页面"
@@ -2463,10 +2460,10 @@
     "message": "请提供关于你所举报情况的更多上下文信息"
   },
   "report.checking": {
-    "message": "正在检查{item, select, project {项目} version {版本} user {用户} other {内容}}..."
+    "message": "正在检查 {item, select, project {项目} version {版本} user {用户} other {内容}}..."
   },
   "report.could-not-find": {
-    "message": "找不到{item, select, project {项目} version {版本} user {用户} other {内容}}"
+    "message": "找不到 {item, select, project {项目} version {版本} user {用户} other {内容}}"
   },
   "report.for.violation": {
     "message": "违反 Modrinth <rules-link>规则</rules-link> 或 <terms-link>使用条款</terms-link>"
@@ -2484,7 +2481,7 @@
     "message": "报告漏洞"
   },
   "report.not-for.bug-reports.description": {
-    "message": "你可以在<issues-link>问题追踪器</issues-link>向他们报告漏洞。"
+    "message": "你可以在 <issues-link>问题追踪器</issues-link> 向他们报告漏洞。"
   },
   "report.not-for.dmca": {
     "message": "由于DMCA下架"
@@ -2858,20 +2855,209 @@
   "servers.plan.large.description": {
     "message": "适合 15–25 名玩家使用，加模组包或重度添加模组。"
   },
-  "servers.plan.large.name": {
-    "message": "大型"
-  },
   "servers.plan.medium.description": {
     "message": "适合 6–15 名玩家使用，加多个模组。"
-  },
-  "servers.plan.medium.name": {
-    "message": "中型"
   },
   "servers.plan.small.description": {
     "message": "适合 1–5 位朋友使用，加少量轻量模组。"
   },
-  "servers.plan.small.name": {
-    "message": "小型"
+  "settings.account.button.complete-setup": {
+    "message": "完成设置"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "下载导出"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "生成导出"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "正在导出……"
+  },
+  "settings.account.data-export.description": {
+    "message": "申请获取你在 Modrinth 上传的所有个人数据副本。此操作可能需要几分钟才能完成。"
+  },
+  "settings.account.data-export.title": {
+    "message": "数据导出"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "这将**立即删除你的所有用户数据和关注**。此操作不会删除你的项目。删除账户操作不可撤销。<br><br>若你的账户需要帮助，请在 [Modrinth Discord](https://discord.modrinth.com) 获取支持。"
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "删除该账户"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "你确定要删除你的账户吗？"
+  },
+  "settings.account.delete.section.action": {
+    "message": "注销账户"
+  },
+  "settings.account.delete.section.description": {
+    "message": "一旦删除账户，将无法复原，请谨慎度量。删除你的账户将从我们的服务器上删除所有附加的数据，但项目除外。"
+  },
+  "settings.account.delete.section.title": {
+    "message": "删除账户"
+  },
+  "settings.account.email.action.save": {
+    "message": "保存电子邮箱"
+  },
+  "settings.account.email.field.label": {
+    "message": "电子邮箱地址"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "输入您的电子邮件地址……"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "添加电子邮箱"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "更改电子邮箱"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "你的账户信息不会被公开显示。"
+  },
+  "settings.account.password.action.remove": {
+    "message": "删除密码"
+  },
+  "settings.account.password.action.save": {
+    "message": "保存密码"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "输入的密码不一致！"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "请输入你的密码以继续。"
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "确认密码"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "确认密码"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "确认新的密码"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "确认新的密码"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "新密码"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "新密码"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "旧密码"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "旧密码"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "添加密码"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "更改密码"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "删除密码"
+  },
+  "settings.account.providers.action.add": {
+    "message": "添加"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "身份验证提供程序"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "行动"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "供应商"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "添加电子邮箱"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "更改电子邮箱"
+  },
+  "settings.account.security.email.description": {
+    "message": "更改与你账户关联的电子邮箱。"
+  },
+  "settings.account.security.email.title": {
+    "message": "电子邮箱"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "添加密码"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "更改密码"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "更改用于登录你账户的密码。"
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "更改或删除用于登录你账户的密码。"
+  },
+  "settings.account.security.password.description.set": {
+    "message": "设置一个永久密码以登录您的账户。"
+  },
+  "settings.account.security.password.title": {
+    "message": "密码"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "管理供应商"
+  },
+  "settings.account.security.providers.description": {
+    "message": "向您的账户添加或移除登录方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 和 Google。"
+  },
+  "settings.account.security.providers.title": {
+    "message": "管理身份验证提供程序"
+  },
+  "settings.account.security.title": {
+    "message": "账户安全"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "移除 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "设置 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "在登录时为您的账户增加一层额外的安全保障。"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "双因素认证"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "下载并将这些备用代码保存在安全的地方。如果您无法访问设备，可以使用这些代码代替双重认证代码！您应该像保护密码一样保护这些代码。"
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "备份代码只能使用一次。"
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "代码错误！"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "请输入双重验证码以继续操作。"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "输入两步验证代码"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "输入代码……"
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "双因素认证通过要求访问第二个设备来登录，从而保护您的账户安全。"
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "如果二维码无法扫描，您可以手动输入密码："
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 或任何其他双重身份验证应用程序扫描二维码即可开始。"
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "输入认证器提供的一次性验证码以验证访问权限。"
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "验证码"
   },
   "settings.applications.about": {
     "message": "关于"
@@ -2954,11 +3140,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "应用程序"
+  },
   "settings.applications.modal.header": {
     "message": "应用程序信息"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "发生错误"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "你的应用程序图标已更新。"
@@ -2968,6 +3154,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "请立即保存你的密钥，离开当前页面后将不再显示！"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "关于此应用"
+  },
+  "settings.authorizations.by": {
+    "message": "by"
+  },
+  "settings.authorizations.description": {
+    "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
+  },
+  "settings.authorizations.empty-state": {
+    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
+  },
+  "settings.authorizations.head-title": {
+    "message": "授权"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "撤销"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "这将撤销该应用程序对您账户的访问权限。您随时可以之后重新授权。"
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "你确定要撤销此申请吗？"
+  },
+  "settings.billing.charges.description": {
+    "message": "您过去所有支付给Modrinth账户的款项都将列在这里："
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "服务器试用版"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth托管服务"
+  },
+  "settings.billing.expires": {
+    "message": "有效期至{date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "月"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "每月"
+  },
+  "settings.billing.interval.year": {
+    "message": "年"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "每年"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "在 modrinth.com 和 Modrinth 应用上无广告浏览"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "个人资料上显示Modrinth+徽章"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "直接支持Modrinth及其创作者"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "福利"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "切换为年费支付，每年可节省{amount}！"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "您已取消订阅。"
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "您将保留现有福利直至当前计费周期结束。"
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "您的订阅支付失败了。请换一个您的支付方式。"
+  },
+  "settings.billing.midas.status.open": {
+    "message": "您当前订阅了："
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "您的付款正在处理中。付款完成后福利将立即生效。"
+  },
+  "settings.billing.midas.upsell": {
+    "message": "成为Modrinth Plus的订阅者吧！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "取消订阅"
@@ -2986,6 +3256,12 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "确定要删除这个支付方式吗？"
+  },
+  "settings.billing.next": {
+    "message": "下一项："
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "或者{price}/年（节省{percent}%）！"
   },
   "settings.billing.payment_method.action.add": {
     "message": "添加支付方式"
@@ -3008,17 +3284,98 @@
   "settings.billing.payment_method.title": {
     "message": "支付方式"
   },
+  "settings.billing.plan.title": {
+    "message": "{size}计划"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} 共享 CPU（突发高达 {bursts} 个 CPU）"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "我们未能找到与此订阅关联的服务器。可能存在以下几种情况：若你刚刚购买服务器，此为正常现象，服务器配置可能需要一小时左右；若你已购买一段时间，服务器可能已被暂停使用。如有不符预期的情况，请提供以下信息联系 Modrinth 支持团队："
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "服务器ID：{id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe ID: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB 内存"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "在重新订阅你的 Modrinth 服务器时发生了错误。"
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "重新订阅时出错"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "如果服务器当前已暂停，再次尝试扣费可能最多需要10分钟。"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "重新订阅请求已提交"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "服务器订阅已成功重新订阅"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "你的订阅支付失败了。请你换一个支付方式，然后重新订阅。"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "你的付款正在处理中。支付完成后，你的服务器将立即激活。"
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB 存储"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB 虚拟内存"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "管理你的 Modrinth Servers 订阅。"
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Servers 订阅"
   },
+  "settings.billing.renews": {
+    "message": "下次续订 {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "重新订阅"
+  },
+  "settings.billing.since": {
+    "message": "开通于 {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "订阅"
+  },
   "settings.billing.subscription.description": {
     "message": "管理你的 Modrinth 订阅。"
   },
   "settings.billing.subscription.title": {
     "message": "订阅"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "正在切换至 {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "切换至 {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "每月账单将为你每年额外增加 {amount}"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "在 {date} 转换为 {interval} 账单"
+  },
+  "settings.billing.update-method": {
+    "message": "更新付款方式"
+  },
+  "settings.billing.upgrade": {
+    "message": "升级"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "停用开发者模式"
@@ -3032,6 +3389,12 @@
   "settings.display.flags.title": {
     "message": "功能开关"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "开发者模式已被禁用"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "开发者模式已关闭"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "数据包页面"
   },
@@ -3040,6 +3403,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "模组页面"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "图库"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "网格"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "行"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "整合包页面"
@@ -3101,6 +3473,9 @@
   "settings.display.theme.title": {
     "message": "色彩主题"
   },
+  "settings.head-title": {
+    "message": "显示设置"
+  },
   "settings.pats.action.create": {
     "message": "创建个人访问令牌"
   },
@@ -3161,6 +3536,9 @@
   "settings.profile.description": {
     "message": "你的个人资料信息在 Modrinth 网站及<docs-link>其 API </docs-link>上均公开可见。"
   },
+  "settings.profile.head-title": {
+    "message": "个人资料设置"
+  },
   "settings.profile.profile-info": {
     "message": "个人资料信息"
   },
@@ -3191,11 +3569,29 @@
   "settings.sessions.unknown-platform": {
     "message": "未知平台"
   },
+  "settings.sidebar.label.account": {
+    "message": "账户选项"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "开发者选项"
+  },
+  "settings.sidebar.label.display": {
+    "message": "显示选项"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"
   },
   "ui.latest-news-row.view-all": {
     "message": "查看所有新闻"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "订阅"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "已订阅！"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "订阅 Modrinth 新闻"
   },
   "version.environment.none.description": {
     "message": "此版本的运行环境尚未指定。"

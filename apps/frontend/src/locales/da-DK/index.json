@@ -107,6 +107,9 @@
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
   },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150 MB RAM!"
+  },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
   },
@@ -482,11 +485,23 @@
   "create.project.create-project": {
     "message": "Opret projekt"
   },
+  "create.project.missing-fields-tooltip": {
+    "message": "Mangler informationer: {fields}"
+  },
   "create.project.name-label": {
     "message": "Navn"
   },
   "create.project.name-placeholder": {
     "message": "Indtast projekt navn..."
+  },
+  "create.project.owner-description": {
+    "message": "Det projekt ejeren som dig selv eller en organisation du medlem af."
+  },
+  "create.project.owner-label": {
+    "message": "Ejer"
+  },
+  "create.project.server-project-title": {
+    "message": "Opretter et server projekt"
   },
   "create.project.summary-description": {
     "message": "En sætning eller to som beskriver dit projekt."
@@ -499,6 +514,15 @@
   },
   "create.project.title": {
     "message": "Opretter et projekt"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -538,6 +562,15 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Opret ny"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Opret din første samling for at komme i gang!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du har ikke nogle samlinger endnu"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Ingen samlinger passer din søgning"
   },
   "dashboard.collections.label.search-input": {
     "message": "Søg dine samlinger"
@@ -956,6 +989,9 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hosting servere DDoS beskyttelse?"
   },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle Modrinth servere kommer med DDoS beskyttelse, med op til 17 Tbps kapacitet i nogle lokationer."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Ofte Spurgt Spørgsmål"
   },
@@ -1061,6 +1097,9 @@
   "hosting-marketing.know-what-you-need": {
     "message": "Hvad har du præcis brug for?"
   },
+  "hosting-marketing.medal.info": {
+    "message": "Prøv en gratis <orange>3 GB server</orange> i 5 dage drevet af <orange>Medal</orange>"
+  },
   "hosting-marketing.medal.learn-more": {
     "message": "Lær mere"
   },
@@ -1111,6 +1150,24 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vælg imellem Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, det kan køre på din server."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Fejlede i at ændre modpack version"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Fejlede i at indlæse versioner"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Fejlede i at geninstallere modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Fejlede i at reparere server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Fejlede i at gemme installation indstillinger"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Fejlede i at unlink modpack"
   },
   "hosting.plan.out-of-stock": {
     "message": "Ikke på lager"
@@ -2056,6 +2113,12 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Ukendt platform"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Konto"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Udvikler"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Seneste nyheder fra Modrinth"

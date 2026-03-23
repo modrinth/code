@@ -5,8 +5,17 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Ilagay ang paglalarawan ng modpack..."
+  },
   "app.export-modal.export-button": {
     "message": "Iluwas"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Pangalan ng Modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Pangalan ng modpack"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
@@ -16,6 +25,9 @@
   },
   "app.instance.mods.content-type-project": {
     "message": "proyekto"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Kopyahin ang link"
   },
   "app.instance.mods.modpack-fallback": {
     "message": "Modpack"

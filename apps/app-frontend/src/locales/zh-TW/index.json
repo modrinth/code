@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "刪除實例"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "這個模組包已經安裝在「{instanceName}」實例中了。"
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "複製模組包"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "仍要建立"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "前往實例"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "模組包已經安裝"
+  },
   "app.instance.mods.content-type-project": {
     "message": "專案"
   },
@@ -70,9 +85,6 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "上傳成功"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "切換版本"
   },
   "app.instance.mods.unknown-version": {
     "message": "未知"

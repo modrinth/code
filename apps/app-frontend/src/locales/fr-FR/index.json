@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Supprimer l'instance"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Ce modpack est déjà installé dans l’instance « {instanceName} »."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Dupliquer le modpack"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Créer quand même"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Aller à l’instance"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack déjà installé"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projet"
   },
@@ -70,9 +85,6 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Mis en ligne avec succès"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "Changer de version"
   },
   "app.instance.mods.unknown-version": {
     "message": "Inconnu"
@@ -477,7 +489,7 @@
     "message": "Vous pouvez seulement entrer directement dans les serveurs sur Minecraft Alpha 1.0.5+"
   },
   "instance.worlds.no_singleplayer_quick_play": {
-    "message": "Vous pouvez seulement entrer directement dans les mondes solo sur Minecraft Alpha 1.20+"
+    "message": "Vous pouvez seulement entrer directement dans les mondes solo sur Minecraft 1.20+"
   },
   "instance.worlds.play_instance": {
     "message": "Jouer à l'instance"
@@ -516,6 +528,6 @@
     "message": "Version du jeu est procurée par le serveur"
   },
   "search.filter.locked.server-loader.title": {
-    "message": "Loader est procuré par le serveur"
+    "message": "Le loader est procuré par le serveur"
   }
 }
