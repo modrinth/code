@@ -3,6 +3,7 @@ import type { Labrinth } from '@modrinth/api-client'
 import { injectModrinthClient, ServersManagePageIndex } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
+
 import { config } from '../config'
 
 const stripePublishableKey = (config.stripePublishableKey as string) || ''

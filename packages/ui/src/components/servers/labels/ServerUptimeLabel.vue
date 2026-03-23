@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
+
 import Separator from './Separator.vue'
 
 const props = defineProps<{

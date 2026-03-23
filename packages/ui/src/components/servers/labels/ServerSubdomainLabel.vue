@@ -25,6 +25,7 @@ import { injectNotificationManager } from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+
 import Separator from './Separator.vue'
 
 const { addNotification } = injectNotificationManager()
