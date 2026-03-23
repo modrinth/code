@@ -1,7 +1,6 @@
 <script setup>
 import { DownloadIcon, HeartIcon, TagIcon } from '@modrinth/assets'
-import { Avatar, FormattedTag, TagItem } from '@modrinth/ui'
-import { formatNumber } from '@modrinth/utils'
+import { Avatar, FormattedTag, TagItem, useCompactNumber } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { computed } from 'vue'
@@ -10,6 +9,8 @@ import { useRouter } from 'vue-router'
 dayjs.extend(relativeTime)
 
 const router = useRouter()
+
+const { formatCompactNumber } = useCompactNumber()
 
 const props = defineProps({
 	project: {
@@ -96,13 +97,13 @@ const toTransparent = computed(() => {
 					class="flex items-center gap-1 pr-2 border-0 border-r-[1px] border-solid border-button-border"
 				>
 					<DownloadIcon />
-					{{ formatNumber(project.downloads) }}
+					{{ formatCompactNumber(project.downloads) }}
 				</div>
 				<div
 					class="flex items-center gap-1 pr-2 border-0 border-r-[1px] border-solid border-button-border"
 				>
 					<HeartIcon />
-					{{ formatNumber(project.follows) }}
+					{{ formatCompactNumber(project.follows) }}
 				</div>
 				<div class="flex items-center gap-1 pr-2">
 					<TagIcon />

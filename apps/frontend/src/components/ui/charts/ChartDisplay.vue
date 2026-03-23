@@ -8,7 +8,7 @@
 				{{ analytics.error.value }}
 			</div>
 		</div>
-		<div v-else-if="!isInitialized || analytics.loading.value" class="universal-card">
+		<div v-else-if="analytics.loading.value" class="universal-card">
 			<h2>
 				<span class="label__title">Loading analytics...</span>
 			</h2>
@@ -21,7 +21,7 @@
 						ref="tinyDownloadChart"
 						:title="`Downloads`"
 						color="var(--color-brand)"
-						:value="formatNumber(analytics.formattedData.value.downloads.sum, false)"
+						:value="formatNumber(analytics.formattedData.value.downloads.sum)"
 						:data="analytics.formattedData.value.downloads.chart.sumData"
 						:labels="analytics.formattedData.value.downloads.chart.labels"
 						suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
@@ -40,7 +40,7 @@
 						ref="tinyViewChart"
 						:title="`Views`"
 						color="var(--color-blue)"
-						:value="formatNumber(analytics.formattedData.value.views.sum, false)"
+						:value="formatNumber(analytics.formattedData.value.views.sum)"
 						:data="analytics.formattedData.value.views.chart.sumData"
 						:labels="analytics.formattedData.value.views.chart.labels"
 						suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
@@ -57,7 +57,7 @@
 						ref="tinyRevenueChart"
 						:title="`Revenue`"
 						color="var(--color-purple)"
-						:value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
+						:value="formatMoney(analytics.formattedData.value.revenue.sum)"
 						:data="analytics.formattedData.value.revenue.chart.sumData"
 						:labels="analytics.formattedData.value.revenue.chart.labels"
 						is-money
@@ -221,7 +221,7 @@
 										><template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
 										<template v-else>{{ countryCodeToName(name) }}</template>
 									</strong>
-									<span class="data-point">{{ formatNumber(count) }}</span>
+									<span class="data-point">{{ formatCompactNumber(count) }}</span>
 								</div>
 								<div
 									v-tooltip="
@@ -280,7 +280,7 @@
 										<template v-if="name.toLowerCase() === 'xx' || !name">Other</template>
 										<template v-else>{{ countryCodeToName(name) }}</template>
 									</strong>
-									<span class="data-point">{{ formatNumber(count) }}</span>
+									<span class="data-point">{{ formatCompactNumber(count) }}</span>
 								</div>
 								<div
 									v-tooltip="
@@ -310,8 +310,16 @@
 
 <script setup lang="ts">
 import { DownloadIcon, PaletteIcon, UpdatedIcon } from '@modrinth/assets'
-import { Button, Card, DropdownSelect } from '@modrinth/ui'
-import { capitalizeString, formatMoney, formatNumber } from '@modrinth/utils'
+import {
+	Button,
+	Card,
+	DropdownSelect,
+	useCompactNumber,
+	useDebugLogger,
+	useFormatMoney,
+	useFormatNumber,
+} from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
@@ -325,8 +333,15 @@ import {
 	intToRgba,
 } from '~/utils/analytics.js'
 
+const debug = useDebugLogger('ChartDisplay')
+const formatNumber = useFormatNumber()
+const { formatCompactNumber } = useCompactNumber()
+const formatMoney = useFormatMoney()
+
 const router = useNativeRouter()
 const theme = useTheme()
+
+debug('setup start', { server: import.meta.server, client: import.meta.client })
 
 const props = withDefaults(
 	defineProps<{
@@ -346,7 +361,12 @@ const props = withDefaults(
 	},
 )
 
-const projects = ref(props.projects || [])
+const projects = computed(() => props.projects || [])
+
+debug('projects from props', {
+	count: projects.value.length,
+	ids: projects.value.map((p: any) => p.id),
+})
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
@@ -377,6 +397,13 @@ const tinyViewChart = ref()
 const tinyRevenueChart = ref()
 
 const selectedDisplayProjects = ref(props.projects || [])
+
+watch(
+	() => props.projects,
+	(newProjects) => {
+		selectedDisplayProjects.value = newProjects || []
+	},
+)
 
 const removeProjectFromDisplay = (id: string) => {
 	selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id)
@@ -420,45 +447,46 @@ const isUsingProjectColors = computed({
 	},
 })
 
-const startDate = ref(dayjs().startOf('day'))
-const endDate = ref(dayjs().endOf('day'))
-const timeResolution = ref(30)
-const isInitialized = ref(false)
+const defaultRange = props.ranges.find(
+	(r) => r.getLabel([dayjs(), dayjs()]) === 'Previous 30 days',
+)!
+const initialDates = defaultRange.getDates(dayjs())
+
+const internalRange: Ref<RangeObject> = ref(defaultRange)
+const startDate = ref(initialDates.startDate)
+const endDate = ref(initialDates.endDate)
+const timeResolution = ref(defaultRange.timeResolution)
+
+debug('default range initialized', {
+	range: defaultRange.getLabel([dayjs(), dayjs()]),
+	startDate: startDate.value.toISOString(),
+	endDate: endDate.value.toISOString(),
+	timeResolution: timeResolution.value,
+})
 
 onBeforeMount(() => {
-	// Load cached data and range from localStorage - cache.
+	debug('onBeforeMount')
 	if (import.meta.client) {
 		const rangeLabel = localStorage.getItem('analyticsSelectedRange')
+		debug('localStorage range', { rangeLabel })
 		if (rangeLabel) {
-			const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)!
+			const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)
 
-			if (range !== undefined) {
+			if (range) {
 				internalRange.value = range
-				const ranges = range.getDates(dayjs())
+				const dates = range.getDates(dayjs())
 				timeResolution.value = range.timeResolution
-				startDate.value = ranges.startDate
-				endDate.value = ranges.endDate
+				startDate.value = dates.startDate
+				endDate.value = dates.endDate
+				debug('range overridden from localStorage', {
+					startDate: dates.startDate.toISOString(),
+					endDate: dates.endDate.toISOString(),
+					timeResolution: range.timeResolution,
+				})
 			}
 		}
 	}
 })
-
-onMounted(() => {
-	if (internalRange.value === null) {
-		internalRange.value = props.ranges.find(
-			(r) => r.getLabel([dayjs(), dayjs()]) === 'Previous 30 days',
-		)!
-	}
-
-	const ranges = selectedRange.value.getDates(dayjs())
-	startDate.value = ranges.startDate
-	endDate.value = ranges.endDate
-	timeResolution.value = selectedRange.value.timeResolution
-
-	isInitialized.value = true
-})
-
-const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject)
 
 const selectedRange = computed({
 	get: () => {
@@ -481,6 +509,7 @@ const selectedRange = computed({
 	},
 })
 
+debug('calling useFetchAllAnalytics')
 const analytics = useFetchAllAnalytics(
 	resetCharts,
 	projects,
@@ -489,8 +518,14 @@ const analytics = useFetchAllAnalytics(
 	startDate,
 	endDate,
 	timeResolution,
-	isInitialized,
 )
+
+debug('awaiting analytics.fetch()')
+await analytics.fetch()
+debug('analytics.fetch() resolved', {
+	loading: analytics.loading.value,
+	error: analytics.error.value,
+})
 
 const formattedCategorySubtitle = computed(() => {
 	return (

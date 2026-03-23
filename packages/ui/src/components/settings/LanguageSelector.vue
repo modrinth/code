@@ -3,7 +3,13 @@ import { RadioButtonCheckedIcon, RadioButtonIcon, SearchIcon } from '@modrinth/a
 import Fuse from 'fuse.js/dist/fuse.basic'
 import { computed, ref, watchSyncEffect } from 'vue'
 
-import { defineMessages, type LocaleDefinition, useVIntl } from '../../composables/i18n'
+import {
+	buildLocaleMessages,
+	defineMessages,
+	type LocaleDefinition,
+	useVIntl,
+} from '../../composables/i18n'
+import { metaLocaleModules } from '../../locales.ts'
 import { isModifierKeyDown } from '../../utils/events'
 import StyledInput from '../base/StyledInput.vue'
 
@@ -40,34 +46,34 @@ const messages = defineMessages({
 	},
 })
 
+const localeMetas = buildLocaleMessages(metaLocaleModules)
+
 type Category = 'default' | 'searchResult'
 
 type LocaleInfo = {
 	category: Category
 	tag: string
 	displayName: string
-	nativeName: string
+	translatedName: string
 	searchTerms?: string[]
 }
-
-const displayNames = new Intl.DisplayNames(['en'], { type: 'language' })
 
 const $locales = computed(() => {
 	const result: LocaleInfo[] = []
 
 	for (const loc of props.locales) {
 		const tag = loc.code
-		const name = loc.name || displayNames.of(tag) || tag
-
-		const nativeDisplayNames = new Intl.DisplayNames([tag], { type: 'language' })
-		const nativeName = nativeDisplayNames.of(tag) || tag
+		const meta = localeMetas[tag] ?? null
+		const displayName = meta?.displayName ?? loc.name
+		const translatedName = formatMessage(loc.translatedName)
+		const searchTerms = meta?.searchTerms === '-' ? undefined : meta?.searchTerms?.split('\n')
 
 		result.push({
 			tag,
 			category: 'default',
-			displayName: name,
-			nativeName,
-			searchTerms: [tag, name, nativeName],
+			displayName,
+			translatedName,
+			searchTerms,
 		})
 	}
 
@@ -156,7 +162,7 @@ function onItemClick(e: MouseEvent, loc: LocaleInfo) {
 }
 
 function getItemLabel(loc: LocaleInfo) {
-	return `${loc.nativeName}. ${loc.displayName}`
+	return `${loc.translatedName}. ${loc.displayName}`
 }
 
 function getCategoryName(category: Category): string {
@@ -227,13 +233,13 @@ function getCategoryName(category: Category): string {
 						<RadioButtonCheckedIcon v-if="$activeLocale === loc.tag" class="size-6" />
 						<RadioButtonIcon v-else class="size-6" />
 
-						<div class="flex flex-1 flex-wrap justify-between">
+						<div class="flex flex-1 flex-wrap justify-between gap-x-6">
 							<div class="font-bold">
 								{{ loc.displayName }}
 							</div>
 
 							<div>
-								{{ loc.nativeName }}
+								{{ loc.translatedName }}
 							</div>
 						</div>
 					</div>

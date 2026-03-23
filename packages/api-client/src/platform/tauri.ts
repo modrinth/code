@@ -69,8 +69,16 @@ export class TauriModrinthClient extends XHRUploadClient {
 
 			let fullUrl = url
 			if (options.params) {
-				const queryParams = new URLSearchParams(options.params as Record<string, string>).toString()
-				fullUrl = `${url}?${queryParams}`
+				const filteredParams: Record<string, string> = {}
+				for (const [key, value] of Object.entries(options.params)) {
+					if (value !== undefined && value !== null) {
+						filteredParams[key] = String(value)
+					}
+				}
+				const queryString = new URLSearchParams(filteredParams).toString()
+				if (queryString) {
+					fullUrl = `${url}?${queryString}`
+				}
 			}
 
 			const response = await tauriFetch(fullUrl, {

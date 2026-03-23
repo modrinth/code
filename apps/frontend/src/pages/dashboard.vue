@@ -20,7 +20,7 @@
 						link: '/dashboard/affiliate-links',
 						label: formatMessage(commonMessages.affiliateLinksButton),
 						icon: AffiliateIcon,
-						shown: isAffiliate,
+						shown: !!isAffiliate,
 					},
 					{ link: '/dashboard/revenue', label: 'Revenue', icon: CurrencyIcon, matchNested: true },
 				]"

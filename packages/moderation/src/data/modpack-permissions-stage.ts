@@ -11,7 +11,8 @@ export default {
 	// Replace me please.
 	guidance_url:
 		'https://www.notion.so/Content-Moderation-Cheat-Sheets-22d5ee711bf081a4920ef08879fe6bf5?source=copy_link#22d5ee711bf08116bd8bc1186f357062',
-	shouldShow: (project: Labrinth.Projects.v2.Project) => project.project_type === 'modpack',
+	shouldShow: (project: Labrinth.Projects.v2.Project, projectV3) =>
+		project.project_type === 'modpack' && !projectV3?.minecraft_server,
 	actions: [
 		{
 			id: 'button',

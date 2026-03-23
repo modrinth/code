@@ -1,8 +1,8 @@
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::models::ids::PayoutId;
 use crate::routes::ApiError;
 use crate::routes::internal::gotenberg::{GotenbergDocument, GotenbergError};
-use crate::util::env::env_var;
 use crate::util::error::Context;
 use actix_web::http::header::HeaderName;
 use chrono::{DateTime, Datelike, Utc};
@@ -71,15 +71,14 @@ impl GotenbergClient {
             .build()
             .wrap_err("failed to build reqwest client")?;
 
-        let gotenberg_url = env_var("GOTENBERG_URL")?;
-        let site_url = env_var("SITE_URL")?;
-        let callback_base = env_var("GOTENBERG_CALLBACK_BASE")?;
-
         Ok(Self {
             client,
-            gotenberg_url: gotenberg_url.trim_end_matches('/').to_owned(),
-            site_url: site_url.trim_end_matches('/').to_owned(),
-            callback_base: callback_base.trim_end_matches('/').to_owned(),
+            gotenberg_url: ENV.GOTENBERG_URL.trim_end_matches('/').to_owned(),
+            site_url: ENV.SITE_URL.trim_end_matches('/').to_owned(),
+            callback_base: ENV
+                .GOTENBERG_CALLBACK_BASE
+                .trim_end_matches('/')
+                .to_owned(),
             redis,
         })
     }
@@ -189,12 +188,7 @@ impl GotenbergClient {
 
         self.generate_payment_statement(statement).await?;
 
-        let timeout_ms = env_var("GOTENBERG_TIMEOUT")
-            .map_err(ApiError::Internal)?
-            .parse::<u64>()
-            .wrap_internal_err(
-                "`GOTENBERG_TIMEOUT` is not a valid number of milliseconds",
-            )?;
+        let timeout_ms = ENV.GOTENBERG_TIMEOUT;
 
         let [_key, document] = tokio::time::timeout(
             Duration::from_millis(timeout_ms),

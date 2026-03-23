@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "アイコンを追加する"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Java Editionプレイヤーがサーバーに参加するために使用できるIPアドレスとポートを追加してください。"
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Javaアドレスを追加する"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Modrinth以外の関連リンク (ウェブサイト、ストア、Discord招待など) を追加してください。"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "外部リンクを追加する"
+  },
   "nags.add-links.description": {
     "defaultMessage": "ソースコードやバグの報告場所、Discordの招待などの外部リンクを追加してください。"
   },
@@ -54,10 +66,16 @@
     "defaultMessage": "ギャラリーのページを閲覧する"
   },
   "nags.gpl-license-source-required.description": {
-    "defaultMessage": "この{type, select, mod {MOD} plugin {プラグイン} other {プロジェクト}}はソースコードの公開が必要なライセンスを使用しています。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
+    "defaultMessage": "この{type, select, mod {Mod} plugin {プラグイン} other {プロジェクト}}はソースコードの公開が必要なライセンスを使用しています。ソースコードへのリンクを追加するか、バージョン毎にソースファイルを添付してください。もしくは他のライセンスへの変更を検討してください。"
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "ソースコードのリンクの追加"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "まったく同じ外部リンクが複数あるようです。各リンクは適切なリンク形式で一度だけ入力してください。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "リンクの重複"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "視覚障害のある方やインターネット回線速度の遅い方への配慮のため、十分で分かりやすい説明または画像の代替テキストが必要です。"
@@ -122,8 +140,26 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "正しい解像度を選択"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "サーバーがサポートするバージョンのModpackを選択するか、または独自のModpackをアップロードしてください。"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "互換性を選択する"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "プレイヤーに、サーバーがどの地域にあるかをお知らせください。"
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "地域を選択"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "サーバーが対応している言語をリストアップしてください。"
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "言語を選択"
+  },
   "nags.select-license.description": {
-    "defaultMessage": "この{type, select, mod {MOD} modpack {MODパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
+    "defaultMessage": "この{type, select, mod {Mod} modpack {Modパック} resourcepack {リソースパック} shader {シェーダー} plugin {プラグイン} datapack {データパック} other {プロジェクト}}に適用させるライセンスを選択してください。"
   },
   "nags.select-license.title": {
     "defaultMessage": "ライセンスを選択"
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "タグ選択"
+  },
+  "nags.server.title": {
+    "defaultMessage": "サーバー設定を表示する"
   },
   "nags.settings.description.title": {
     "defaultMessage": "訪問設定の表示"
@@ -172,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "名前を整理"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount, plural, one {# tag} other {# tags}} を選択しました。サーバーが関連する検索結果に表示されるように、{maxTagCount} 以下に減らしてください。"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "適切なタグを選択する"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "{tagCount, plural, other {#個}}のタグを選択しました。関連する検索結果に表示されるように、{maxTagCount}個以下に減らすことを検討してください。"

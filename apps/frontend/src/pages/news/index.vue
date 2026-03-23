@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ChevronRightIcon, GitGraphIcon, RssIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonStyled, NewsArticleCard } from '@modrinth/ui'
-import dayjs from 'dayjs'
+import { ButtonStyled, NewsArticleCard, useFormatDateTime } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 
 import NewsletterButton from '~/components/ui/NewsletterButton.vue'
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 const articles = ref(
 	rawArticles
@@ -83,7 +84,7 @@ useSeoMeta({
 							</h3>
 							<p class="m-0 text-lg leading-tight">{{ featuredArticle?.summary }}</p>
 							<div class="mt-auto text-secondary">
-								{{ dayjs(featuredArticle?.date).format('MMMM D, YYYY') }}
+								{{ formatDate(featuredArticle?.date) }}
 							</div>
 						</div>
 					</article>

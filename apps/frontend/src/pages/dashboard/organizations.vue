@@ -50,7 +50,8 @@
 
 <script setup>
 import { PlusIcon, UsersIcon } from '@modrinth/assets'
-import { Avatar } from '@modrinth/ui'
+import { Avatar, injectModrinthClient } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import { useAuth } from '~/composables/auth.js'
@@ -58,14 +59,13 @@ import { useAuth } from '~/composables/auth.js'
 const createOrgModal = ref(null)
 
 const auth = await useAuth()
+const client = injectModrinthClient()
 const uid = computed(() => auth.value.user?.id || null)
 
-const { data: orgs, error } = useAsyncData('organizations', () => {
-	if (!uid.value) return Promise.resolve(null)
-
-	return useBaseFetch('user/' + uid.value + '/organizations', {
-		apiVersion: 3,
-	})
+const { data: orgs, error } = useQuery({
+	queryKey: computed(() => ['user', uid.value, 'organizations']),
+	queryFn: () => client.labrinth.users_v2.getOrganizations(uid.value),
+	enabled: computed(() => !!uid.value),
 })
 
 const sortedOrgs = computed(() =>

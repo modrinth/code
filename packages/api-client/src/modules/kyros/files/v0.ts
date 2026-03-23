@@ -22,7 +22,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	): Promise<Kyros.Files.v0.DirectoryResponse> {
 		return this.client.request<Kyros.Files.v0.DirectoryResponse>('/fs/list', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'GET',
 			params: { path, page, page_size: pageSize },
 			useNodeAuth: true,
@@ -38,7 +38,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	public async createFileOrFolder(path: string, type: 'file' | 'directory'): Promise<void> {
 		return this.client.request<void>('/fs/create', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'POST',
 			params: { path, type },
 			headers: { 'Content-Type': 'application/octet-stream' },
@@ -55,7 +55,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	public async downloadFile(path: string): Promise<Blob> {
 		return this.client.request<Blob>('/fs/download', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'GET',
 			params: { path },
 			useNodeAuth: true,
@@ -80,7 +80,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	): UploadHandle<void> {
 		return this.client.upload<void>('/fs/create', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			file,
 			params: { path, type: 'file' },
 			onProgress: options?.onProgress,
@@ -100,7 +100,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 
 		return this.client.request<void>('/fs/update', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'PUT',
 			params: { path },
 			body: blob,
@@ -118,7 +118,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	public async moveFileOrFolder(sourcePath: string, destPath: string): Promise<void> {
 		return this.client.request<void>('/fs/move', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'POST',
 			body: { source: sourcePath, destination: destPath },
 			useNodeAuth: true,
@@ -145,7 +145,7 @@ export class KyrosFilesV0Module extends AbstractModule {
 	public async deleteFileOrFolder(path: string, recursive: boolean): Promise<void> {
 		return this.client.request<void>('/fs/delete', {
 			api: '',
-			version: 'v0',
+			version: 'modrinth/v0',
 			method: 'DELETE',
 			params: { path, recursive },
 			useNodeAuth: true,

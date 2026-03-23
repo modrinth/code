@@ -75,7 +75,7 @@
 				<div class="section-header">
 					<div class="section-label green">{{ formatMessage(messages.forPlayersLabel) }}</div>
 					<h2 class="section-tagline">
-						{{ formatMessage(messages.discoverCreationsTagline, { count: formattedProjectCount }) }}
+						{{ formatMessage(messages.discoverCreationsTagline, { count: PROJECT_COUNT }) }}
 					</h2>
 					<p class="section-description">
 						{{ formatMessage(messages.playersDescription) }}
@@ -106,19 +106,22 @@
 									@input="updateSearchProjects"
 								/>
 								<div class="sort-by">
-									<span class="label">{{ formatMessage(commonMessages.sortByLabel) }}</span>
-									<Multiselect
+									<DropdownSelect
+										v-slot="{ selected }"
 										v-model="sortType"
-										placeholder="Select one"
-										class="selector"
-										:custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-										:options="['relevance', 'downloads', 'follows', 'updated', 'newest']"
-										:searchable="false"
-										:close-on-select="true"
-										:show-labels="false"
-										:allow-empty="false"
-										@update:model-value="updateSearchProjects"
-									/>
+										class="!h-9 !w-max flex-grow"
+										name="Sort by"
+										:options="sortOptions"
+										:display-name="(value) => value?.charAt(0).toUpperCase() + value?.slice(1)"
+										@change="updateSearchProjects()"
+									>
+										<div>
+											<span class="font-semibold text-primary"
+												>{{ formatMessage(commonMessages.sortByLabel) }}:
+											</span>
+											<span class="font-semibold text-secondary">{{ selected }}</span>
+										</div>
+									</DropdownSelect>
 								</div>
 							</div>
 							<div class="results display-mode--list">
@@ -444,6 +447,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	defineMessages,
+	DropdownSelect,
 	IntlFormatted,
 	ProjectCard,
 	StyledInput,
@@ -451,7 +455,6 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { ref } from 'vue'
-import { Multiselect } from 'vue-multiselect'
 
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
 import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
@@ -464,10 +467,9 @@ const { formatMessage } = useVIntl()
 
 const searchQuery = ref('leave')
 const sortType = ref('relevance')
+const sortOptions = ['relevance', 'downloads', 'follows', 'updated', 'newest']
 
 const PROJECT_COUNT = 100000
-const formatNumber = new Intl.NumberFormat().format
-const formattedProjectCount = computed(() => formatNumber(PROJECT_COUNT))
 
 const auth = await useAuth()
 
@@ -526,7 +528,7 @@ const messages = defineMessages({
 	},
 	discoverCreationsTagline: {
 		id: 'landing.section.for-players.tagline',
-		defaultMessage: 'Discover over {count} creations',
+		defaultMessage: 'Discover over {count, number} creations',
 	},
 	shareContentTagline: {
 		id: 'landing.section.for-creators.tagline',
@@ -957,7 +959,7 @@ const creatorFeatureMessages = defineMessages({
 						display: flex;
 						justify-content: space-between;
 						margin-bottom: 1rem;
-						gap: 1rem;
+						gap: 0.5rem;
 
 						.iconified-input {
 							width: 100%;
@@ -979,19 +981,6 @@ const creatorFeatureMessages = defineMessages({
 							display: flex;
 							gap: 0.75rem;
 							align-items: center;
-
-							.label {
-								white-space: nowrap;
-							}
-
-							.selector {
-								min-width: 8rem;
-								white-space: nowrap;
-							}
-
-							@media screen and (max-width: 500px) {
-								display: none;
-							}
 						}
 					}
 

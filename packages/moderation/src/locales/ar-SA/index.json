@@ -22,6 +22,39 @@
   },
   "nags.all-tags-selected.title": {
     "defaultMessage": "اختر علامة دقيقة"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "وصفك هو {length, plural, one {# readable character} other {# readable characters}}. يُوصى بأن يكون على الأقل {minChars, plural, one {# character} other {# characters}} لإنشاء وصف واضح وغني بالمعلومات.\n"
+  },
+  "nags.description-too-short.title": {
+    "defaultMessage": "قم بتوسيع الوصف"
+  },
+  "nags.edit-description.title": {
+    "defaultMessage": "تعديل الوصف"
+  },
+  "nags.edit-license.title": {
+    "defaultMessage": "تعديل الرخصة"
+  },
+  "nags.edit-summary.title": {
+    "defaultMessage": "تعديل الملخص"
+  },
+  "nags.edit-tags.title": {
+    "defaultMessage": "تعديل العلامات"
+  },
+  "nags.edit-title.title": {
+    "defaultMessage": "تعديل العنوان"
+  },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "غالباً ما تكون صورة المعرض الرئيسية هي الطريقة التي يترك بها مشروعك انطباعه الأول."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": ""
+  },
+  "nags.gpl-license-source-required.description": {
+    "defaultMessage": "الـ {type, select, mod {mod} plugin {plugin} other {project}} الخاص بك يستخدم ترخيصًا يتطلب إتاحة الشيفرة المصدرية. يُرجى توفير رابط الشيفرة المصدرية أو ملف المصادر لكل إصدار إضافي، أو التفكير في استخدام ترخيص مختلف.\n"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}. يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام، وليست جملًا كاملة.\n"
   }
 }
 

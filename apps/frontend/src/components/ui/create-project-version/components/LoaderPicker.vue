@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-2.5">
-		<span class="font-semibold text-contrast">Loaders <span class="text-red">*</span></span>
+		<span class="font-semibold text-contrast">Loaders</span>
 
 		<Chips
 			v-model="loaderGroup"
@@ -45,9 +45,10 @@ import { Chips, FormattedTag, TagItem } from '@modrinth/ui'
 
 const selectedLoaders = defineModel<string[]>({ default: [] })
 
-const { loaders } = defineProps<{
+const { loaders, includeGeyser } = defineProps<{
 	loaders: Labrinth.Tags.v2.Loader[]
 	toggleLoader: (loader: string) => void
+	includeGeyser?: boolean
 }>()
 
 const loaderGroup = ref<GroupLabels>('mods')
@@ -92,7 +93,7 @@ function groupLoaders(loaders: Labrinth.Tags.v2.Loader[]) {
 		'bungeecord',
 		'velocity',
 		'waterfall',
-		'geyser',
+		...(includeGeyser ? ['geyser'] : []),
 	]
 
 	const SHADER_SORT = ['optifine', 'iris', 'canvas', 'vanilla']

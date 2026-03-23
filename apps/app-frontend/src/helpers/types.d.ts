@@ -1,6 +1,6 @@
 import type { ModrinthId } from '@modrinth/utils'
 
-type GameInstance = {
+export type GameInstance = {
 	path: string
 	install_stage: InstallStage
 
@@ -46,20 +46,13 @@ type LinkedData = {
 	locked: boolean
 }
 
-type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
+export type InstanceLoader = 'vanilla' | 'forge' | 'fabric' | 'quilt' | 'neoforge'
 
 type ContentFile = {
-	hash: string
-	file_name: string
-	size: number
-	metadata?: FileMetadata
-	update_version_id?: string
-	project_type: ContentFileProjectType
-}
-
-type FileMetadata = {
-	project_id: string
-	version_id: string
+	metadata?: {
+		project_id: string
+		version_id: string
+	}
 }
 
 type ContentFileProjectType = 'mod' | 'datapack' | 'resourcepack' | 'shaderpack'
@@ -134,9 +127,4 @@ type AppSettings = {
 	custom_dir?: string
 	prev_custom_dir?: string
 	migrated: boolean
-}
-
-export type InstanceSettingsTabProps = {
-	instance: GameInstance
-	offline?: boolean
 }

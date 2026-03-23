@@ -122,15 +122,17 @@ import {
 	TriangleAlertIcon,
 } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
+import { useFormatDateTime } from '../../composables'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
 import CopyCode from '../base/CopyCode.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
+
+const formatDate = useFormatDateTime({ dateStyle: 'long' })
 
 export type PendingChange = {
 	planSize: string
@@ -201,8 +203,8 @@ async function dataURLToBlob(dataURL: string): Promise<Blob> {
 
 const { data: image } = useQuery({
 	queryKey: ['server-icon', props.server_id] as const,
-	queryFn: async (): Promise<string | undefined> => {
-		if (!props.server_id || props.status !== 'available') return undefined
+	queryFn: async (): Promise<string | null> => {
+		if (!props.server_id || props.status !== 'available') return null
 
 		try {
 			const auth = await archon.servers_v0.getFilesystemAuth(props.server_id)
@@ -242,19 +244,13 @@ const { data: image } = useQuery({
 			}
 		} catch (error) {
 			console.debug('Icon processing failed:', error)
-			return undefined
+			return null
 		}
+
+		return null
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
 
 const isConfiguring = computed(() => props.flows?.intro)
-
-const formatDate = (d: unknown) => {
-	try {
-		return dayjs(d as string).format('MMMM D, YYYY')
-	} catch {
-		return ''
-	}
-}
 </script>

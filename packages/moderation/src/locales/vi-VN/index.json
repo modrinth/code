@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Thêm một biểu tượng"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Thêm địa chỉ IP và cổng mà người chơi phiên bản Java có thể sử dụng để tham gia máy chủ của bạn."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Thêm địa chỉ Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như trang web, cửa hàng hoặc lời mời tham gia Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Thêm liên kết ngoài"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Thêm bất kỳ liên kết nào có liên quan đến các trang web bên ngoài Modrinth, chẳng hạn như mã nguồn, trình theo dõi lỗi hoặc lời mời tham gia Discord."
   },
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Cung cấp mã nguồn"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Một số liên kết ngoài của bạn có vẻ giống hệt nhau. Mỗi liên kết chỉ nên được nhập một lần và với loại liên kết phù hợp."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Liên kết giống nhau"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Phần mô tả của bạn nên chứa đủ văn bản thuần hoặc văn bản thay thế cho hình ảnh (alt-text), nhằm đảm bảo khả năng truy cập cho người dùng trình đọc màn hình hoặc có kết nối internet chậm."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Chọn độ phân giải đúng"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Chọn các phiên bản mà máy chủ của bạn hỗ trợ, chọn một Modpack hoặc tải lên Modpack của riêng bạn."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Chọn khả năng tương thích"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Hãy cho người chơi biết máy chủ của bạn đặt ở khu vực nào."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Chọn khu vực"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Liệt kê ngôn ngữ hoặc các ngôn ngữ được máy chủ của bạn hỗ trợ."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Lựa chọn ngôn ngữ"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Chọn giấy phép mà {type, select, mod {mod} modpack {modpack} resourcepack {gói tài nguyên} shader {shader} plugin {plugin} datapack {gói dữ liệu} other {dự án}} của bạn được phát hành theo."
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Chọn thẻ"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Truy cập cài đặt máy chủ"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Truy cập cài đặt mô tả"
@@ -172,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Làm gọn tên dự án"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# tag} other {# tags}}. vui lòng giảm {maxTagCount} hoặc ít hơn để đảm bảo máy chủ của bạn xuất hiện trong kết quả tìm kiếm có liên quan."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Chọn thẻ"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Bạn đã chọn {tagCount, plural, one {# thẻ} other {# thẻ}}. Hãy cân nhắc giảm xuống còn {maxTagCount} thẻ hoặc ít hơn để đảm bảo dự án của bạn xuất hiện trong các kết quả tìm kiếm phù hợp."

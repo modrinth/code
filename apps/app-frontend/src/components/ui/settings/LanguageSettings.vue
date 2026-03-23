@@ -8,14 +8,14 @@ import {
 	LOCALES,
 	useVIntl,
 } from '@modrinth/ui'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { get, set } from '@/helpers/settings.ts'
 import i18n from '@/i18n.config'
 
 const { formatMessage } = useVIntl()
 
-const platform = formatMessage(languageSelectorMessages.platformApp)
+const platform = computed(() => formatMessage(languageSelectorMessages.platformApp))
 
 const settings = ref(await get())
 

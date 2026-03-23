@@ -7,6 +7,9 @@ use serde_with::{DisplayFromStr, serde_as};
 use thiserror::Error;
 use tracing::trace;
 
+use crate::env::ENV;
+use crate::routes::ApiError;
+
 pub fn transaction_id_stripe_pi(pi: &stripe::PaymentIntentId) -> String {
     format!("stripe:charge:{pi}")
 }
@@ -154,19 +157,14 @@ pub struct Client {
 }
 
 impl Client {
-    pub fn from_env() -> Result<Self, dotenvy::Error> {
-        let api_key = dotenvy::var("ANROK_API_KEY")?;
-        let api_url = dotenvy::var("ANROK_API_URL")?
-            .trim_start_matches('/')
-            .to_owned();
-
+    pub fn from_env() -> Result<Self, ApiError> {
         Ok(Self {
             client: reqwest::Client::builder()
                 .user_agent("Modrinth")
                 .build()
                 .expect("AnrokClient to build"),
-            api_key,
-            api_url,
+            api_key: ENV.ANROK_API_KEY.clone(),
+            api_url: ENV.ANROK_API_URL.trim_start_matches('/').to_owned(),
         })
     }
 

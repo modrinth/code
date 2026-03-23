@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "新增圖示"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "新增 Java 版玩家加入你的伺服器時使用的 IP 位址與連接埠。"
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "新增 Java 位址"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "新增 Modrinth 以外的任何相關連結，例如網站、商店或 Discord 邀請連結。"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "新增外部連結"
+  },
   "nags.add-links.description": {
     "defaultMessage": "新增任何與專案相關且指向 Modrinth 以外的連結，例如原始碼、問題追蹤器或 Discord 邀請連結。"
   },
@@ -18,13 +30,13 @@
     "defaultMessage": "新增外部連結"
   },
   "nags.all-tags-selected.description": {
-    "defaultMessage": "你已選取了全部 {totalAvailableTags} 個可用標籤。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
+    "defaultMessage": "你選擇了全部 {totalAvailableTags} 個可用標籤。這違背了標籤的初衷，標籤旨在幫助使用者找到相關專案。請僅選取與你的專案相關的標籤。"
   },
   "nags.all-tags-selected.title": {
-    "defaultMessage": "選取準確的標籤"
+    "defaultMessage": "選擇精確的標籤"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "你的描述目前只有 {length} 個字元。建議至少達到 {minChars} 個字元，才能寫出一段既實用又吸引人的摘要。"
+    "defaultMessage": "您的描述目前長度為 {length, plural, one {# 個可閱讀字元} other {# 個可閱讀字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立清晰且資訊完整的描述。"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "擴展描述"
@@ -59,6 +71,12 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "提供原始碼"
   },
+  "nags.identical-links.description": {
+    "defaultMessage": "你輸入的部分外部連結似乎完全相同。每個連結僅應輸入一次，並選擇正確的連結類型。"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "連結內容重複"
+  },
   "nags.image-heavy-description.description": {
     "defaultMessage": "請在描述中提供充足的純文字或圖片替代文字，讓螢幕閱讀器使用者與網路速度較慢的使用者也能順利閱讀。"
   },
@@ -84,7 +102,7 @@
     "defaultMessage": "請勿使用短網址"
   },
   "nags.long-headers.description": {
-    "defaultMessage": "你的描述中有 {count} 個標題字數過多。標題的作用是作為區塊標題，應保持簡潔，避免使用完整的長句子。"
+    "defaultMessage": "{count, plural, one {# 個標題} other {# 個標題}} 在您的描述中長度過長。標題應簡潔扼要，作為章節的標題即可，不應使用完整句子。"
   },
   "nags.long-headers.title": {
     "defaultMessage": "標題請簡短扼要"
@@ -96,7 +114,7 @@
     "defaultMessage": "避免品牌侵權"
   },
   "nags.missing-alt-text.description": {
-    "defaultMessage": "你的部分圖片缺少替代文字，這對協助工具（尤其是視障使用者）來說非常重要。"
+    "defaultMessage": "您的部分圖片缺少替代文字，這對於無障礙存取至關重要，特別是對視障用戶而言。"
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "新增圖片替代文字"
@@ -117,10 +135,28 @@
     "defaultMessage": "檢查回饋"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "你已選取了 {count} 個解析度標籤 ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
+    "defaultMessage": "你選擇了 {count} 個解析度標籤 ({tags})。資源包通常應該只有一個與其主要解析度相符的解析度標籤。"
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "選擇正確的解析度"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "選擇你的伺服器支援的版本、挑選一個模組包，或是上傳你自己的檔案。"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "選擇相容性"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "讓玩家知道你的伺服器所在地。"
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "選擇地區"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "列出你的伺服器支援的一種或多種語言。"
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "選擇語言"
   },
   "nags.select-license.description": {
     "defaultMessage": "選擇你的{type, select, mod {模組} modpack {模組包} resourcepack {資源包} shader {光影包} plugin {插件} datapack {資料包} other {專案}}所採用的授權條款。"
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "選擇標籤"
+  },
+  "nags.server.title": {
+    "defaultMessage": "前往伺服器設定"
   },
   "nags.settings.description.title": {
     "defaultMessage": "前往描述設定"
@@ -162,7 +201,7 @@
     "defaultMessage": "清理摘要"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "你的摘要目前只有 {length} 個字元。建議至少達到 {minChars} 個字元，才能寫出一段既實用又吸引人的摘要。"
+    "defaultMessage": "您的摘要長度為 {length, plural, one {# 個字元} other {# 個字元}}。建議至少輸入 {minChars, plural, one {# 個字元} other {# 個字元}}，以建立資訊完整且吸引人的摘要。"
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "擴展摘要"
@@ -173,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "清理名稱"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "你選擇了 {tagCount} 個標籤。請減少到 {maxTagCount} 個或更少，以確保你的伺服器出現在相關的搜尋結果中。"
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "選擇精確的標籤"
+  },
   "nags.too-many-tags.description": {
-    "defaultMessage": "你已選取了 {tagCount} 個標籤。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
+    "defaultMessage": "你選擇了 {tagCount} 個標籤。請考慮減少到 {maxTagCount} 個或更少，以確保你的專案出現在相關的搜尋結果中。"
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "選擇精確的標籤"

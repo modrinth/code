@@ -8,6 +8,7 @@ use serde_json::json;
 
 use crate::{
     database::models::payout_item::DBPayout,
+    env::ENV,
     models::payouts::{
         PayoutMethod, PayoutMethodFee, PayoutMethodType, PayoutStatus,
         TremendousCurrency, TremendousDetails, TremendousForexResponse,
@@ -210,7 +211,7 @@ pub(super) async fn execute(
             "products": [
                 method_id,
             ],
-            "campaign_id": dotenvy::var("TREMENDOUS_CAMPAIGN_ID")?,
+            "campaign_id": ENV.TREMENDOUS_CAMPAIGN_ID.as_str(),
         }]
     });
 

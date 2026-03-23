@@ -64,7 +64,8 @@ generated
 app-playground-data/*
 
 .astro
-.claude
+.claude/*
+!.claude/skills/
 .letta
 
 # labrinth demo fixtures

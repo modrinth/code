@@ -50,7 +50,7 @@
 									</span>
 									<span>
 										on
-										{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
+										{{ formatDate(version.date_published) }}</span
 									>
 								</div>
 								<a
@@ -86,11 +86,22 @@
 </template>
 <script setup>
 import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
-import { injectModrinthClient, injectProjectPageContext, Pagination } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectProjectPageContext,
+	Pagination,
+	useFormatDateTime,
+} from '@modrinth/ui'
 import VersionFilterControl from '@modrinth/ui/src/components/version/VersionFilterControl.vue'
 import { renderHighlightedString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import { onMounted } from 'vue'
+
+const formatDate = useFormatDateTime({
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric',
+})
 
 const { projectV2, versions, versionsLoading, loadVersions } = injectProjectPageContext()
 

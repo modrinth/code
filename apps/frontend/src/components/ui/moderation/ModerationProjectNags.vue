@@ -100,6 +100,7 @@ interface Tags {
 
 interface Props {
 	project: Labrinth.Projects.v2.Project
+	projectV3: Labrinth.Projects.v3.Project
 	versions?: Labrinth.Versions.v2.Version[]
 	currentMember?: Labrinth.Projects.v3.TeamMember | null
 	collapsed?: boolean
@@ -172,6 +173,7 @@ const emit = defineEmits<{
 
 const nagContext = computed<NagContext>(() => ({
 	project: props.project,
+	projectV3: props.projectV3,
 	versions: props.versions,
 	currentMember: props.currentMember?.user as Labrinth.Users.v2.User,
 	currentRoute: props.routeName,

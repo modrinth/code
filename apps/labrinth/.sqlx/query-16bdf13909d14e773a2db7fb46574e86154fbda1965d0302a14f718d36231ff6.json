@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tDELETE FROM user_limits\n\t\t\t\tWHERE user_id = $1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "16bdf13909d14e773a2db7fb46574e86154fbda1965d0302a14f718d36231ff6"
+}

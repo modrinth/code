@@ -345,7 +345,7 @@ watch(
 const messages = defineMessages({
 	entityQuestion: {
 		id: 'dashboard.creator-withdraw-modal.kyc.entity-question',
-		defaultMessage: 'Are you a withdrawing as an individual or business?',
+		defaultMessage: 'Are you withdrawing as an individual or a business?',
 	},
 	entityDescription: {
 		id: 'dashboard.creator-withdraw-modal.kyc.entity-description',

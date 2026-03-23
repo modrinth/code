@@ -11,6 +11,12 @@
   "nags.add-icon.title": {
     "defaultMessage": "Simge ekle"
   },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Java adresleri ekle"
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Dış bağlantı ekle"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Modrinth'in dışına gönderen herhangi ilgili bağlantı ekle. Mesela kaynak kodu, hata takipçisi veya Discord daveti."
   },
@@ -58,6 +64,9 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Aynı linkler"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Açıklaman yeterli düz yazı veya resim açıklamalı içermeli ki ekran okuyucu veya patates internet kullananlar için erişilebilir olsun."
@@ -122,6 +131,21 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
   },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Uyumluluk seçiniz"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Sunucunuzun hangi bölgede bulunduğunu oyunculara belirtin."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Bölge seç"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Sunucunuz tarafından desteklenen dil veya dilleri seçiniz."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Dil seç"
+  },
   "nags.select-license.description": {
     "defaultMessage": "{type, select, mod {Modunun} modpack {Mod paketinin} resourcepack {Kaynak paketinin} shader {Shaderının} plugin {Plugininin} datapack {Veri paketinin} other {Projenin}} hangi lisans altında dağıtıldığını seç."
   },
@@ -133,6 +157,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Etiketleri seç"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Sunucu ayarlara göz at"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Açıklama ayarlarına göz at"
@@ -172,6 +199,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "İsmi düzenle"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "{tagCount,plural,one {#etiket}other {#etiketler}} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Uygun etiketleri seç"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "{tagCount} etiket seçtiniz. Projenizin ilgili arama sonuçlarında görünmesini sağlamak için {maxTagCount} veya daha az etikete indirmeyi düşünün."

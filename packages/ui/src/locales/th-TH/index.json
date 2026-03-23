@@ -263,9 +263,6 @@
   "label.password": {
     "defaultMessage": "รหัสผ่าน"
   },
-  "label.played": {
-    "defaultMessage": "เล่นไป {time}"
-  },
   "label.public": {
     "defaultMessage": "สาธารณะ"
   },

@@ -99,15 +99,15 @@ import {
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-useHead({
-	title: 'Profile settings - Modrinth',
-})
-
 definePageMeta({
 	middleware: 'auth',
 })
 
 const messages = defineMessages({
+	headTitle: {
+		id: 'settings.profile.head-title',
+		defaultMessage: 'Profile settings',
+	},
 	title: {
 		id: 'settings.profile.profile-info',
 		defaultMessage: 'Profile information',
@@ -133,6 +133,10 @@ const messages = defineMessages({
 		id: 'settings.profile.bio.description',
 		defaultMessage: 'A short description to tell everyone a little bit about you.',
 	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const auth = await useAuth()
@@ -231,7 +235,7 @@ async function save() {
 		avatarUrl.value = auth.value.user.avatar_url
 	} catch (err) {
 		addNotification({
-			title: 'An error occurred',
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err
 				? err.data
 					? err.data.description

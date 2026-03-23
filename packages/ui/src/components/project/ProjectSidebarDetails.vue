@@ -2,7 +2,7 @@
 	<div class="flex flex-col gap-3">
 		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
 		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
-			<div>
+			<div v-if="!hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>
 					<IntlFormatted :message-id="messages.licensed">
@@ -30,10 +30,13 @@
 					</IntlFormatted>
 				</div>
 			</div>
-			<div
-				v-if="project.approved"
-				v-tooltip="dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
-			>
+			<div v-if="showFollowers">
+				<HeartIcon aria-hidden="true" />
+				<div>
+					{{ formatMessage(commonMessages.projectFollowers, { count: project.followers }) }}
+				</div>
+			</div>
+			<div v-if="project.approved" v-tooltip="formatDateTime(project.approved)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -43,7 +46,7 @@
 					}}
 				</div>
 			</div>
-			<div v-else v-tooltip="dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')">
+			<div v-else v-tooltip="formatDateTime(project.published)">
 				<CalendarIcon aria-hidden="true" />
 				<div>
 					{{
@@ -53,7 +56,7 @@
 			</div>
 			<div
 				v-if="project.status === 'processing' && project.queued"
-				v-tooltip="dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+				v-tooltip="formatDateTime(project.queued)"
 			>
 				<ScaleIcon aria-hidden="true" />
 				<div>
@@ -64,10 +67,7 @@
 					}}
 				</div>
 			</div>
-			<div
-				v-if="hasVersions && project.updated"
-				v-tooltip="dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
-			>
+			<div v-if="hasVersions && project.updated" v-tooltip="formatDateTime(project.updated)">
 				<VersionIcon aria-hidden="true" />
 				<div>
 					{{
@@ -79,34 +79,36 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { BookTextIcon, CalendarIcon, ExternalIcon, ScaleIcon, VersionIcon } from '@modrinth/assets'
+import type { Labrinth } from '@modrinth/api-client'
+import {
+	BookTextIcon,
+	CalendarIcon,
+	ExternalIcon,
+	HeartIcon,
+	ScaleIcon,
+	VersionIcon,
+} from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { useRelativeTime } from '../../composables'
+import { useFormatDateTime, useRelativeTime } from '../../composables'
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import { commonMessages } from '../../utils/common-messages'
 import { IntlFormatted } from '../base'
 
 const { formatMessage } = useVIntl()
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const props = defineProps<{
-	project: {
-		id: string
-		published: string
-		updated: string
-		approved: string
-		queued: string
-		status: string
-		license: {
-			id: string
-			url: string
-		}
-	}
+	project: Labrinth.Projects.v2.Project
 	linkTarget: string
 	hasVersions: boolean
+	hideLicense?: boolean
+	showFollowers?: boolean
 }>()
 
 const createdDate = computed(() =>

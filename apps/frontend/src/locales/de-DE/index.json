@@ -96,7 +96,7 @@
     "message": "Offline-Modus"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Der Modrinth-Launcher ist vollständig quelloffen. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
+    "message": "Der Launcher von Modrinth ist vollständig Open Source. Den Quellcode kannst du auf unserem <github-link>GitHub</github-link> einsehen!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Open Source"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Die Modrinth App läuft besser als viele führende Mod-Manager und benötigt dabei nur 150 MB RAM!"
+    "message": "Die Modrinth App läuft besser als viele der führenden Mod-Manager und benötigt dabei nur 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Noch keine Projekte in der Kollektion"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Noch keine Projekte} one {<stat>{count}</stat> Projekt} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Noch keine Projekte} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Aktualisiert {ago}"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Projekt erstellen"
   },
+  "create.project.create-server-project": {
+    "message": "Server erstellen"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Fehlende Felder: {fields}"
+  },
   "create.project.name-label": {
     "message": "Name"
   },
   "create.project.name-placeholder": {
     "message": "Projektnamen eingeben..."
+  },
+  "create.project.owner-description": {
+    "message": "Setze dich oder eine Organisation, bei der du Mitglied bist, als Projektbesitzer."
+  },
+  "create.project.owner-label": {
+    "message": "Besitzer"
+  },
+  "create.project.server-project-title": {
+    "message": "Ein Serverprojekt erstellen"
   },
   "create.project.summary-description": {
     "message": "Ein bis zwei Sätze, die dein Projekt beschreiben."
@@ -514,6 +529,15 @@
   },
   "create.project.title": {
     "message": "Ein Projekt erstellen"
+  },
+  "create.project.type-label": {
+    "message": "Art"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Erstellen"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Erstelle deine erste Kollektion, um loszulegen!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du hast noch keine Kollektionen"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Keine Kollektion entspricht deiner Suche"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Versuch deine Filter oder Suchbegriffe anzupassen."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} Projekt} other {{count} Projekte}}"
+    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Durchsuche deine Kollektionen"
@@ -699,7 +735,7 @@
     "message": "RUC-Nummer"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc-placeholder": {
-    "message": "RUC-Nummer eingeben"
+    "message": "RUC Nummer eingeben"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-tax-id": {
     "message": "Steueridentifikationsnummer"
@@ -1268,6 +1304,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Wähle zwischen Vanilla, Fabric, Forge, Quilt und NeoForge. Was auf Modrinth ist, kann auf deinem Server laufen."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Änderung der Modpack-Version ist fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Versionen konnten nicht geladen werden"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Neuinstallation des Modpacks ist fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Reparatur des Servers fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Speichern der Installationseinstellungen ist fehlgeschlagen"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Das Trennen vom Modpack ist fehlgeschlagen"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Loader} other {{loader}}}version"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Deine Server-Installation wurde repariert."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparatur abgeschlossen"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Server zurücksetzen"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Entfernt alle Daten auf deinem Server, einschließlich deiner Welten, Mods und Konfigurationsdateien. Die Sicherungen bleiben erhalten und können wiederhergestellt werden."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Nicht verfügbar"
   },
@@ -1401,7 +1470,7 @@
     "message": "Für Spieler"
   },
   "landing.section.for-players.tagline": {
-    "message": "Entdecke über {count} Kreationen"
+    "message": "Entdecke über {count, number} Kreationen"
   },
   "landing.subheading": {
     "message": "Entdecke, spiele und teile Minecraft-Inhalte über unsere Open-Source-Plattform, die für die Community entwickelt wurde."
@@ -1433,6 +1502,12 @@
   "layout.action.new-project": {
     "message": "Neues Projekt"
   },
+  "layout.action.new-server-project": {
+    "message": "Neuer Server"
+  },
+  "layout.action.publish": {
+    "message": "Veröffentlichen"
+  },
   "layout.action.reports": {
     "message": "Meldungen einsehen"
   },
@@ -1446,7 +1521,7 @@
     "message": "Dein Avatar"
   },
   "layout.banner.account-action": {
-    "message": "Konto-Aktion benötigt"
+    "message": "Kontoaktion erforderlich"
   },
   "layout.banner.add-email.button": {
     "message": "Kontoeinstellungen besuchen"
@@ -1713,7 +1788,7 @@
     "message": "Litauen"
   },
   "muralpay.country.lu": {
-    "message": "Luxenburg"
+    "message": "Luxemburg"
   },
   "muralpay.country.lv": {
     "message": "Lettland"
@@ -1763,9 +1838,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Kontonummer"
   },
-  "muralpay.field.branch-code": {
-    "message": "Filialcode"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1867,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX-Telefon"
+  },
+  "muralpay.field.random-key": {
+    "message": "Zufälliger Schlüssel"
   },
   "muralpay.field.routing-number": {
     "message": "Bankleitzahl"
@@ -1856,9 +1931,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "Kontonummer eingeben"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Filialcode eingeben"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "18-stelligen CLABE eingeben"
   },
@@ -1870,6 +1942,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "PIX-E-Mail eingeben"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Zufälligen Schlüssel eingeben"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "9-stellige Bankleitzahl eingeben"
@@ -1998,7 +2073,7 @@
     "message": "Kollektion"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {Download} other {Downloads}}"
+    "message": "{count} {countPlural, plural, one {Download} other {Downloads}}"
   },
   "profile.label.joined": {
     "message": "Beigetreten"
@@ -2019,7 +2094,7 @@
     "message": "Organisationen"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {Projekt} other {Projekte}}"
+    "message": "{count} {countPlural, plural, one {Projekt} other {Projekte}}"
   },
   "profile.label.saving": {
     "message": "Speichert..."
@@ -2102,6 +2177,12 @@
   "project-type.datapack.singular": {
     "message": "Datenpaket"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Server "
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2131,6 +2212,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Ressourcenpaket"
+  },
+  "project-type.server.plural": {
+    "message": "Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shader"
@@ -2631,7 +2718,7 @@
     "message": "Meldungen schreiben"
   },
   "scopes.sessionAccess.description": {
-    "message": "Zugriff auf Modrinth-ausgestellte Sitzungen"
+    "message": "Auf von Modrinth erstellte Sitzungen zugreifen"
   },
   "scopes.sessionAccess.label": {
     "message": "Zugriff auf Sitzungen"
@@ -2729,8 +2816,17 @@
   "search.filter.locked.server.sync": {
     "message": "Mit Server synchronisieren"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Sicherung wird wiederhergestellt"
+  "servers.busy.backup-creating": {
+    "message": "Sicherung wird erstellt"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Wiederherstellung aus Sicherung läuft"
+  },
+  "servers.busy.installing": {
+    "message": "Server wird installiert"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Inhalt wird synchronisiert"
   },
   "servers.notice.actions": {
     "message": "Aktionen"
@@ -2847,7 +2943,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Umleitungs-URIs"
+    "message": "Weiterleitungs-URIs"
   },
   "settings.applications.field.scopes": {
     "message": "Berechtigungen"
@@ -2954,6 +3050,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Ressourcenpakete-Seite"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "Server-Seite"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "Shader-Seite"
   },
@@ -3006,7 +3105,7 @@
     "message": "Erstelle ein PAT"
   },
   "settings.pats.description": {
-    "message": "Mit PATs kannst du auf die API von Modrinth zugreifen. Weitere Informationen findest du in der <doc-link>Dokumentation zur Modrinth-API</doc-link>. Sie können jederzeit erstellt und widerrufen werden."
+    "message": "Mit PATs kannst du auf die API von Modrinth zugreifen. Sie können jederzeit erstellt und widerrufen werden. Weitere Informationen findest du in der <doc-link>Dokumentation zur Modrinth-API</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT erstellen"

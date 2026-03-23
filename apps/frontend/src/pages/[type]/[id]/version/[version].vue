@@ -25,17 +25,14 @@
 						The mod loaders you would like to package your data pack for.
 					</span>
 				</label>
-				<multiselect
+				<MultiSelect
 					id="package-mod-loaders"
 					v-model="packageLoaders"
-					:options="['fabric', 'forge', 'quilt', 'neoforge']"
-					:custom-label="(value: string) => value.charAt(0).toUpperCase() + value.slice(1)"
-					:multiple="true"
+					class="package-loader-select"
+					:options="packageLoaderOptions"
 					:searchable="false"
-					:show-no-results="false"
-					:show-labels="false"
 					placeholder="Choose loaders..."
-					open-direction="top"
+					force-direction="up"
 				/>
 				<div class="button-group">
 					<ButtonStyled>
@@ -368,7 +365,7 @@
 				<div v-if="!isEditing">
 					<h4>Publication date</h4>
 					<span>
-						{{ $dayjs(version.date_published).format('MMMM D, YYYY [at] h:mm A') }}
+						{{ formatDateTime(version.date_published) }}
 					</span>
 				</div>
 				<div v-if="!isEditing && version.author">
@@ -436,10 +433,11 @@ import {
 	ENVIRONMENTS_COPY,
 	injectNotificationManager,
 	injectProjectPageContext,
+	MultiSelect,
 	StyledInput,
+	useFormatDateTime,
 } from '@modrinth/ui'
 import { formatBytes, renderHighlightedString } from '@modrinth/utils'
-import { Multiselect } from 'vue-multiselect'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
@@ -460,6 +458,11 @@ const auth = await useAuth()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const { addNotification } = injectNotificationManager()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+const formatDate = useFormatDateTime({ dateStyle: 'medium' })
 
 // Helper for accessing nuxt app $formatVersion
 const formatVersionDisplay = (versions: string[]) => (data as any).$formatVersion(versions)
@@ -498,6 +501,12 @@ const newFiles = ref<File[]>([])
 const deleteFiles = ref<string[]>([])
 const newFileTypes = ref<Array<{ display: string; value: string } | null>>([])
 const packageLoaders = ref(['forge', 'fabric', 'quilt', 'neoforge'])
+const packageLoaderOptions = [
+	{ value: 'fabric', label: 'Fabric' },
+	{ value: 'forge', label: 'Forge' },
+	{ value: 'quilt', label: 'Quilt' },
+	{ value: 'neoforge', label: 'Neoforge' },
+]
 const showKnownErrors = ref(false)
 const shouldPreventActions = ref(false)
 const uploadedImageIds = ref<string[]>([])
@@ -697,9 +706,9 @@ const description = computed(
 			version.value.loaders ?? []
 		)
 			.map((x: string) => x.charAt(0).toUpperCase() + x.slice(1))
-			.join(' & ')}. Published on ${data
-			.$dayjs(version.value.date_published)
-			.format('MMM D, YYYY')}. ${version.value.downloads} downloads.`,
+			.join(
+				' & ',
+			)}. Published on ${formatDate(version.value.date_published)}. ${version.value.downloads} downloads.`,
 )
 
 const usesFeaturedVersions = computed(() =>
@@ -1209,11 +1218,6 @@ async function resetProjectVersions() {
 					margin-bottom: var(--spacing-card-sm);
 				}
 
-				.multiselect {
-					width: 8rem;
-					flex-grow: 1;
-				}
-
 				input {
 					flex-grow: 2;
 				}
@@ -1264,14 +1268,6 @@ async function resetProjectVersions() {
 				font-weight: 300;
 			}
 
-			.raised-multiselect {
-				display: none;
-				margin: 0 0.5rem;
-				height: 40px;
-				max-height: 40px;
-				min-width: 235px;
-			}
-
 			.raised-button {
 				margin-left: auto;
 				background-color: var(--color-raised-bg);
@@ -1279,13 +1275,6 @@ async function resetProjectVersions() {
 
 			&:not(:nth-child(2)) {
 				margin-top: 0.5rem;
-			}
-
-			// TODO: Make file type editing  work on mobile
-			@media (min-width: 600px) {
-				.raised-multiselect {
-					display: block;
-				}
 			}
 		}
 
@@ -1351,7 +1340,7 @@ async function resetProjectVersions() {
 		margin-bottom: 1rem;
 	}
 
-	.multiselect {
+	.package-loader-select {
 		max-width: 20rem;
 	}
 }

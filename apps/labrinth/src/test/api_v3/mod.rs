@@ -3,6 +3,7 @@ use super::{
     environment::LocalService,
 };
 use crate::LabrinthConfig;
+use crate::env::ENV;
 use actix_web::{App, dev::ServiceResponse, test};
 use async_trait::async_trait;
 use std::rc::Rc;
@@ -51,10 +52,7 @@ impl Api for ApiV3 {
     async fn reset_search_index(&self) -> ServiceResponse {
         let req = actix_web::test::TestRequest::post()
             .uri("/_internal/admin/_force_reindex")
-            .append_header((
-                "Modrinth-Admin",
-                dotenvy::var("LABRINTH_ADMIN_KEY").unwrap(),
-            ))
+            .append_header(("Modrinth-Admin", ENV.LABRINTH_ADMIN_KEY.clone()))
             .to_request();
         self.call(req).await
     }

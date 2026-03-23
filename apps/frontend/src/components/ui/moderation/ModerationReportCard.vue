@@ -32,7 +32,7 @@
 
 				<div class="flex flex-row items-center gap-2 self-end sm:self-auto">
 					<span
-						v-tooltip="formatExactDate(report.created)"
+						v-tooltip="formatDateTime(report.created)"
 						class="cursor-help whitespace-nowrap text-sm text-secondary"
 					>
 						{{ formatRelativeTime(report.created) }}
@@ -80,7 +80,7 @@
 
 						<span
 							v-if="report.user?.created"
-							v-tooltip="formatExactDate(report.user.created)"
+							v-tooltip="formatDateTime(report.user.created)"
 							class="cursor-help text-sm text-secondary"
 						>
 							Joined {{ formatRelativeTime(report.user.created) }}
@@ -190,7 +190,7 @@ import {
 	LinkIcon,
 } from '@modrinth/assets'
 import { type ExtendedReport, reportQuickReplies } from '@modrinth/moderation'
-import type { OverflowMenuOption } from '@modrinth/ui'
+import { type OverflowMenuOption, useFormatDateTime } from '@modrinth/ui'
 import {
 	Avatar,
 	ButtonStyled,
@@ -201,7 +201,6 @@ import {
 	useRelativeTime,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { isStaff } from '~/helpers/users.js'
@@ -305,10 +304,10 @@ async function reopenReport() {
 }
 
 const formatRelativeTime = useRelativeTime()
-
-function formatExactDate(date: string): string {
-	return dayjs(date).format('MMMM D, YYYY [at] h:mm A')
-}
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 function updateThread(newThread: any) {
 	if (props.report.thread) {

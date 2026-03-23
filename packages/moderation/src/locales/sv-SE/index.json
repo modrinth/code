@@ -1,12 +1,21 @@
 {
+  "nags.add-description.description": {
+    "defaultMessage": "En beskrivning som tydligt beskriver projektets syfte och funktion krävs."
+  },
   "nags.add-description.title": {
     "defaultMessage": "Lägg till en beskrivning"
+  },
+  "nags.add-icon.description": {
+    "defaultMessage": "Att lägga till en unik, relevant och engagerande ikon gör ditt projekt identifierbart och hjälper den sticka ut."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Lägg till en ikon"
   },
   "nags.add-links.title": {
     "defaultMessage": "Lägg till externa länkar"
+  },
+  "nags.all-tags-selected.title": {
+    "defaultMessage": "Välj korrekta taggar"
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expandera beskrivning"
@@ -65,11 +74,20 @@
   "nags.moderator-feedback.title": {
     "defaultMessage": "Granska feedback"
   },
+  "nags.multiple-resolution-tags.description": {
+    "defaultMessage": "Du har valt {count, plural, one {# upplösningstagg} other {# upplösningstaggar}} ({tags}). Resurspaket bör normalt endast ha en upplösningstagg som matchar dess primära upplösning."
+  },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
   },
+  "nags.select-license.description": {
+    "defaultMessage": "Välj vilken licens {type, select, mod {din mod} modpack {ditt modpaket} resourcepack {ditt resurspaket} shader {din shader} plugin {ditt plugin} datapack {ditt datapaket} other {ditt projekt}} distribueras under."
+  },
   "nags.select-license.title": {
     "defaultMessage": "Välj en licens"
+  },
+  "nags.select-tags.description": {
+    "defaultMessage": "Välj de taggar som passar ditt projekt så att rätt användare kan hitta det."
   },
   "nags.select-tags.title": {
     "defaultMessage": "Välj taggar"
@@ -89,8 +107,32 @@
   "nags.settings.title": {
     "defaultMessage": "Besök allmänna inställningar"
   },
+  "nags.summary-same-as-title.description": {
+    "defaultMessage": "Din sammanfattning kan inte vara samma som ditt projekts namn. Det är viktigt att du skriver en sammanfattning som är informativ och lockande."
+  },
+  "nags.summary-same-as-title.title": {
+    "defaultMessage": "Gör sammanfattningen unik"
+  },
+  "nags.summary-special-formatting.description": {
+    "defaultMessage": "Din sammanfattning bör inte innehålla formatering, radbrytningar, specialtecken eller länkar. Den visas endast som oformaterad text."
+  },
+  "nags.summary-special-formatting.title": {
+    "defaultMessage": "Rensa upp sammanfattningen"
+  },
+  "nags.summary-too-short.description": {
+    "defaultMessage": "Din sammanfattning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en informativ och lockande sammanfattning."
+  },
+  "nags.summary-too-short.title": {
+    "defaultMessage": "Expandera sammanfattningen"
+  },
+  "nags.title-contains-technical-info.description": {
+    "defaultMessage": "Om du håller projektets namn rent blir det lättare att komma ihåg och hitta. Versions- och laddarinformation visas automatiskt tillsammans med ditt projekt."
+  },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rensa upp namnet"
+  },
+  "nags.too-many-tags.description": {
+    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Försök minska till {maxTagCount} eller färre för att säkerställa att ditt projekt visas i relevanta sökresultat."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Välj korrekta taggar"

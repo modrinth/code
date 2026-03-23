@@ -75,38 +75,58 @@
 				autocomplete="off"
 				clearable
 				size="small"
+				input-class="!bg-button-bg"
 				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 			/>
 
 			<ScrollablePanel :class="{ 'h-[16rem]': scrollable }" :disable-scrolling="!scrollable">
 				<div :class="innerPanelClass ? innerPanelClass : ''" class="flex flex-col gap-1">
-					<SearchFilterOption
-						v-for="option in visibleOptions"
-						:key="`${filterType.id}-${option}`"
-						:option="option"
-						:included="isIncluded(option)"
-						:excluded="isExcluded(option)"
-						:supports-negative-filter="filterType.supports_negative_filter"
-						:class="{
-							'mr-3': scrollable,
-						}"
-						@toggle="toggleFilter"
-						@toggle-exclude="toggleNegativeFilter"
-					>
-						<slot name="option" :filter="filterType" :option="option">
-							<span
-								v-if="option.icon"
-								class="inline-flex items-center justify-center shrink-0 h-4 w-4"
-								:style="iconStyle(option)"
-							>
-								<div v-if="typeof option.icon === 'string'" class="h-4 w-4" v-html="option.icon" />
-								<component :is="option.icon" v-else class="h-4 w-4" />
-							</span>
-							<span class="truncate text-sm" :style="iconStyle(option)">
-								{{ option.formatted_name ?? option.id }}
-							</span>
-						</slot>
-					</SearchFilterOption>
+					<template v-if="groupedOptions">
+						<SearchFilterGroup
+							v-for="[groupName, options] in groupedOptions"
+							:key="`${filterType.id}-group-${groupName}`"
+							:group-name="groupName"
+							:options="options"
+							:supports-negative-filter="filterType.supports_negative_filter"
+							:included="isIncluded"
+							:excluded="isExcluded"
+							@toggle="toggleFilter"
+							@toggle-exclude="toggleNegativeFilter"
+						/>
+					</template>
+					<template v-else>
+						<SearchFilterOption
+							v-for="option in visibleOptions"
+							:key="`${filterType.id}-${option}`"
+							:option="option"
+							:included="isIncluded(option)"
+							:excluded="isExcluded(option)"
+							:supports-negative-filter="filterType.supports_negative_filter"
+							:class="{
+								'mr-3': scrollable,
+							}"
+							@toggle="toggleFilter"
+							@toggle-exclude="toggleNegativeFilter"
+						>
+							<slot name="option" :filter="filterType" :option="option">
+								<span
+									v-if="option.icon"
+									class="inline-flex items-center justify-center shrink-0 h-4 w-4"
+									:style="iconStyle(option)"
+								>
+									<div
+										v-if="typeof option.icon === 'string'"
+										class="h-4 w-4"
+										v-html="option.icon"
+									/>
+									<component :is="option.icon" v-else class="h-4 w-4" />
+								</span>
+								<span class="truncate text-sm" :style="iconStyle(option)">
+									{{ option.formatted_name ?? option.id }}
+								</span>
+							</slot>
+						</SearchFilterOption>
+					</template>
 					<button
 						v-if="filterType.display === 'expandable'"
 						class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
@@ -166,6 +186,7 @@ import type { FilterOption, FilterType, FilterValue } from '../../utils/search'
 import Accordion from '../base/Accordion.vue'
 import ButtonStyled from '../base/ButtonStyled.vue'
 import { Checkbox, ScrollablePanel, StyledInput } from '../index'
+import SearchFilterGroup from './SearchFilterGroup.vue'
 import SearchFilterOption from './SearchFilterOption.vue'
 
 const { formatMessage } = useVIntl()
@@ -223,6 +244,20 @@ const visibleOptions = computed(() =>
 			return 0
 		}),
 )
+
+const hasGroups = computed(() => visibleOptions.value.some((o) => o.group))
+const groupedOptions = computed(() => {
+	if (!hasGroups.value) return null
+	const groups = new Map<string, FilterOption[]>()
+	for (const option of visibleOptions.value) {
+		const groupName = option.group ?? ''
+		if (!groups.has(groupName)) {
+			groups.set(groupName, [])
+		}
+		groups.get(groupName)!.push(option)
+	}
+	return groups
+})
 
 const hasProvidedFilter = computed(() =>
 	props.providedFilters.some((filter) => filter.type === props.filterType.id),

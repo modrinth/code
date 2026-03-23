@@ -17,6 +17,7 @@ const gallery: Stage = {
 			weight: 900,
 			suggestedStatus: 'flagged',
 			severity: 'low',
+			shouldShow: (project, projectV3) => !projectV3?.minecraft_server,
 			message: async () => (await import('../messages/gallery/insufficient.md?raw')).default,
 		} as ButtonAction,
 		{

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { InfoIcon } from '@modrinth/assets'
-import { formatPrice } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, inject, type Ref } from 'vue'
 
+import { useFormatPrice } from '../../composables'
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { getPriceForInterval, monthsInInterval } from '../../utils/product-utils'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
@@ -30,7 +30,8 @@ const emit = defineEmits<{
 	(e: 'select', plan: Labrinth.Billing.Internal.Product): void
 }>()
 
-const { formatMessage, locale } = useVIntl()
+const { formatMessage } = useVIntl()
+const formatPrice = useFormatPrice()
 
 // TODO: Use DI framework when merged.
 const selectedInterval = inject<Ref<ServerBillingInterval>>('selectedInterval')
@@ -101,7 +102,7 @@ const mostPopularStyle = computed(() => {
 					</div>
 				</div>
 				<span class="m-0 text-lg font-bold text-contrast">
-					{{ formatPrice(locale, perMonth, currency, true) }}
+					{{ formatPrice(perMonth, currency, true) }}
 					<span class="text-sm font-semibold text-secondary">
 						/ month{{ selectedInterval !== 'monthly' ? `, billed ${selectedInterval}` : '' }}
 					</span>

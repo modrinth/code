@@ -42,6 +42,10 @@ app.use(FloatingVue, {
 			instantMove: true,
 			distance: 8,
 		},
+		'dismissable-prompt': {
+			$extend: 'dropdown',
+			placement: 'bottom-start',
+		},
 	},
 })
 app.use(i18nPlugin)

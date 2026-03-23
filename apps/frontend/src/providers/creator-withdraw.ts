@@ -1,3 +1,4 @@
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	BadgeDollarSignIcon,
 	GiftIcon,
@@ -43,29 +44,7 @@ export type PaymentProvider = 'tremendous' | 'muralpay' | 'paypal' | 'venmo'
  **/
 export type PaymentMethod = 'gift_card' | 'paypal' | 'venmo' | 'bank' | 'crypto'
 
-export interface PayoutMethod {
-	id: string
-	type: string
-	name: string
-	category?: string
-	image_url: string | null
-	image_logo_url: string | null
-	interval: {
-		standard: {
-			min: number
-			max: number
-		}
-		fixed?: {
-			values: number[]
-		}
-	}
-	config?: {
-		fiat?: string | null
-		blockchain?: string[]
-	}
-	currency_code?: string | null
-	exchange_rate?: number | null
-}
+export type PayoutMethod = Labrinth.Payout.v3.PayoutMethod
 
 export interface PaymentOption {
 	value: string
@@ -429,11 +408,11 @@ export function createWithdrawContext(
 	const stages = computed<WithdrawStage[]>(() => {
 		const dynamicStages: WithdrawStage[] = []
 
-		const usedLimit = balance?.withdrawn_ytd ?? 0
-		const available = balance?.available ?? 0
+		const usedLimit = balanceRef.value?.withdrawn_ytd ?? 0
+		const available = balanceRef.value?.available ?? 0
 
 		const needsTaxForm =
-			balance?.form_completion_status !== 'complete' &&
+			balanceRef.value?.form_completion_status !== 'complete' &&
 			usedLimit + available >= getTaxThreshold(taxComplianceThresholds)
 
 		const threshold = getTaxThreshold(taxComplianceThresholds)
@@ -441,7 +420,7 @@ export function createWithdrawContext(
 			usedLimit,
 			available,
 			total: usedLimit + available,
-			status: balance?.form_completion_status,
+			status: balanceRef.value?.form_completion_status,
 			needsTaxForm,
 			taxThreshold: threshold,
 			taxComplianceFilled: `${((usedLimit / threshold) * 100).toFixed(1)}%`,
@@ -469,14 +448,14 @@ export function createWithdrawContext(
 	})
 
 	const maxWithdrawAmount = computed(() => {
-		const availableBalance = balance?.available ?? 0
-		const formCompleted = balance?.form_completion_status === 'complete'
+		const availableBalance = balanceRef.value?.available ?? 0
+		const formCompleted = balanceRef.value?.form_completion_status === 'complete'
 
 		if (formCompleted) {
 			return Math.max(0, availableBalance)
 		}
 
-		const usedLimit = balance?.withdrawn_ytd ?? 0
+		const usedLimit = balanceRef.value?.withdrawn_ytd ?? 0
 		const remainingLimit = Math.max(0, getTaxThresholdActual(taxComplianceThresholds) - usedLimit)
 		return Math.max(0, Math.min(remainingLimit, availableBalance))
 	})

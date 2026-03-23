@@ -12,6 +12,7 @@ use crate::database::models::{
 };
 use crate::database::redis::RedisPool;
 use crate::database::{PgPool, PgTransaction};
+use crate::env::ENV;
 use crate::models::billing::{
     Charge, ChargeStatus, ChargeType, PaymentPlatform, Price, PriceDuration,
     Product, ProductMetadata, ProductPrice, SubscriptionMetadata,
@@ -1437,7 +1438,7 @@ pub async fn active_servers(
     pool: web::Data<PgPool>,
     query: web::Query<ActiveServersQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let master_key = dotenvy::var("PYRO_API_KEY")?;
+    let master_key = &ENV.PYRO_API_KEY;
 
     if req
         .head()
@@ -1626,7 +1627,7 @@ pub async fn stripe_webhook(
     if let Ok(event) = Webhook::construct_event(
         &payload,
         stripe_signature,
-        &dotenvy::var("STRIPE_WEBHOOK_SECRET")?,
+        &ENV.STRIPE_WEBHOOK_SECRET,
     ) {
         struct PaymentIntentMetadata {
             pub user_item: crate::database::models::user_item::DBUser,
@@ -2036,23 +2037,23 @@ pub async fn stripe_webhook(
                                     client
                                         .post(format!(
                                             "{}/modrinth/v0/servers/{}/unsuspend",
-                                            dotenvy::var("ARCHON_URL")?,
+                                            ENV.ARCHON_URL,
                                             id
                                         ))
-                                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                        .header("X-Master-Key", &ENV.PYRO_API_KEY)
                                         .send()
                                         .await?
                                         .error_for_status()?;
 
                                     client
                                         .post(format!(
-                                        "{}/modrinth/v0/servers/{}/reallocate",
-                                        dotenvy::var("ARCHON_URL")?,
-                                        id
-                                    ))
+                                            "{}/modrinth/v0/servers/{}/reallocate",
+                                            ENV.ARCHON_URL,
+                                            id
+                                        ))
                                         .header(
                                             "X-Master-Key",
-                                            dotenvy::var("PYRO_API_KEY")?,
+                                            &ENV.PYRO_API_KEY,
                                         )
                                         .json(&body)
                                         .send()
@@ -2114,9 +2115,9 @@ pub async fn stripe_webhook(
                                     let res = client
                                         .post(format!(
                                             "{}/modrinth/v0/servers/create",
-                                            dotenvy::var("ARCHON_URL")?,
+                                            ENV.ARCHON_URL,
                                         ))
-                                        .header("X-Master-Key", dotenvy::var("PYRO_API_KEY")?)
+                                        .header("X-Master-Key", &ENV.PYRO_API_KEY)
                                         .json(&serde_json::json!({
                                             "user_id": to_base62(metadata.user_item.id.0 as u64),
                                             "name": server_name,

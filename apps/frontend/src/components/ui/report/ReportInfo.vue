@@ -1,7 +1,8 @@
 <template>
-	<div class="report">
+	<div v-if="report" class="report">
 		<div v-if="report.item_type === 'project'" class="item-info">
 			<nuxt-link
+				v-if="report.project"
 				:to="`/${$getProjectTypeForUrl(report.project.project_type, report.project.loaders)}/${
 					report.project.slug
 				}`"
@@ -38,27 +39,29 @@
 			</div>
 		</div>
 		<div v-else-if="report.item_type === 'version'" class="item-info">
-			<nuxt-link
-				:to="`/project/${report.project.slug}/version/${report.version.id}`"
-				class="iconified-link"
-			>
-				<div class="backed-svg" :class="{ raised: raised }">
-					<VersionIcon />
-				</div>
-				<span class="title">{{ report.version.name }}</span>
-			</nuxt-link>
-			of
-			<nuxt-link :to="`/project/${report.project.slug}`" class="iconified-stacked-link">
-				<Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
-				<div class="stacked">
-					<span class="title">{{ report.project.title }}</span>
-					<span>{{
-						formatProjectType(
-							getProjectTypeForUrl(report.project.project_type, report.project.loaders),
-						)
-					}}</span>
-				</div>
-			</nuxt-link>
+			<template v-if="report.version && report.project">
+				<nuxt-link
+					:to="`/project/${report.project.slug}/version/${report.version.id}`"
+					class="iconified-link"
+				>
+					<div class="backed-svg" :class="{ raised: raised }">
+						<VersionIcon />
+					</div>
+					<span class="title">{{ report.version.name }}</span>
+				</nuxt-link>
+				of
+				<nuxt-link :to="`/project/${report.project.slug}`" class="iconified-stacked-link">
+					<Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
+					<div class="stacked">
+						<span class="title">{{ report.project.title }}</span>
+						<span>{{
+							formatProjectType(
+								getProjectTypeForUrl(report.project.project_type, report.project.loaders),
+							)
+						}}</span>
+					</div>
+				</nuxt-link>
+			</template>
 		</div>
 		<div v-else class="item-info">
 			<div class="backed-svg" :class="{ raised: raised }">
@@ -79,7 +82,7 @@
 			:link="`/${moderation ? 'moderation' : 'dashboard'}/report/${report.id}`"
 			:auth="auth"
 		/>
-		<div class="reporter-info">
+		<div v-if="report.reporterUser" class="reporter-info">
 			<ReportIcon class="inline-svg" />
 			Reported by
 			<span v-if="auth.user.id === report.reporterUser.id">you</span>
@@ -94,7 +97,7 @@
 				<span>{{ report.reporterUser.username }}</span>
 			</nuxt-link>
 			<span>&nbsp;</span>
-			<span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
+			<span v-tooltip="formatDateTime(report.created)">{{
 				formatRelativeTime(report.created)
 			}}</span>
 			<CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
@@ -104,13 +107,17 @@
 
 <script setup>
 import { ReportIcon, UnknownIcon, VersionIcon } from '@modrinth/assets'
-import { Avatar, Badge, CopyCode, useRelativeTime } from '@modrinth/ui'
+import { Avatar, Badge, CopyCode, useFormatDateTime, useRelativeTime } from '@modrinth/ui'
 import { formatProjectType, renderHighlightedString } from '@modrinth/utils'
 
 import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 defineProps({
 	report: {

@@ -32,8 +32,8 @@
 						:src="
 							previewImage
 								? previewImage
-								: project.gallery?.[editIndex]?.url
-									? project.gallery[editIndex].url
+								: filteredGallery[editIndex]?.url
+									? filteredGallery[editIndex].url
 									: 'https://cdn.modrinth.com/placeholder-banner.svg'
 						"
 						alt="gallery-preview"
@@ -175,14 +175,14 @@
 								<ContractIcon v-else aria-hidden="true" />
 							</button>
 							<button
-								v-if="(project?.gallery?.length ?? 0) > 1"
+								v-if="filteredGallery.length > 1"
 								class="previous circle-button"
 								@click="previousImage()"
 							>
 								<LeftArrowIcon aria-hidden="true" />
 							</button>
 							<button
-								v-if="(project?.gallery?.length ?? 0) > 1"
+								v-if="filteredGallery.length > 1"
 								class="next circle-button"
 								@click="nextImage()"
 							>
@@ -193,36 +193,8 @@
 				</div>
 			</div>
 		</div>
-		<Admonition v-if="!hideGalleryAdmonition && currentMember" type="info" class="mb-4">
-			Creating and editing gallery images can now be done directly from the
-			<NuxtLink to="settings/gallery" class="font-medium text-blue hover:underline"
-				>project settings</NuxtLink
-			>.
-			<template #actions>
-				<div class="flex gap-2">
-					<ButtonStyled color="blue">
-						<button
-							aria-label="Project Settings"
-							class="!shadow-none"
-							@click="() => router.push('settings/gallery')"
-						>
-							<SettingsIcon />
-							Edit gallery
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="transparent">
-						<button
-							aria-label="Dismiss"
-							class="!shadow-none"
-							@click="() => (hideGalleryAdmonition = true)"
-						>
-							Dismiss
-						</button>
-					</ButtonStyled>
-				</div>
-			</template>
-		</Admonition>
-		<div v-if="currentMember && project?.gallery?.length" class="card header-buttons">
+
+		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
 			<FileInput
 				:max-size="5242880"
 				:accept="acceptFileTypes"
@@ -243,8 +215,8 @@
 				@change="handleFiles"
 			/>
 		</div>
-		<div v-if="project?.gallery?.length" class="items">
-			<div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
+		<div v-if="filteredGallery.length" class="items">
+			<div v-for="(item, index) in filteredGallery" :key="index" class="card gallery-item">
 				<a class="gallery-thumbnail" @click="expandImage(item as GalleryItem, index)">
 					<img
 						:src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
@@ -264,7 +236,7 @@
 				<div class="gallery-bottom">
 					<div class="gallery-created">
 						<CalendarIcon aria-hidden="true" aria-label="Date created" />
-						{{ $dayjs(item.created).format('MMMM D, YYYY') }}
+						{{ formatDate(item.created) }}
 					</div>
 					<div v-if="currentMember" class="gallery-buttons input-group">
 						<button
@@ -325,7 +297,6 @@ import {
 	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SettingsIcon,
 	StarIcon,
 	TransferIcon,
 	TrashIcon,
@@ -333,21 +304,23 @@ import {
 	XIcon,
 } from '@modrinth/assets'
 import {
-	Admonition,
-	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
 	injectProjectPageContext,
 	NewModal as Modal,
 	StyledInput,
+	useFormatDateTime,
 } from '@modrinth/ui'
-import { useEventListener, useLocalStorage } from '@vueuse/core'
+import { useEventListener } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
 
-// Router
-const router = useRouter()
+const formatDate = useFormatDateTime({
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+})
 
 // Single DI injection
 const {
@@ -374,12 +347,6 @@ useSeoMeta({
 	ogTitle: title,
 	ogDescription: description,
 })
-
-// Local storage state
-const hideGalleryAdmonition = useLocalStorage(
-	'hideGalleryHasMovedAdmonition',
-	!project.value.gallery?.length,
-)
 
 // Gallery item type matching actual v2 API response (LegacyGalleryItem in labrinth)
 // raw_url is optional in TS types but present in API response
@@ -414,7 +381,12 @@ const previewImage = ref<string | null>(null)
 const shouldPreventActions = ref(false)
 
 // Constant for accepted file types
+const MC_SERVER_BANNER_NAME = '__mc_server_banner__'
 const acceptFileTypes = 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+
+const filteredGallery = computed(
+	() => project.value.gallery?.filter((img) => img.title !== MC_SERVER_BANNER_NAME) ?? [],
+)
 
 // Keyboard navigation for expanded image modal
 useEventListener(document, 'keydown', (e) => {
@@ -435,18 +407,18 @@ useEventListener(document, 'keydown', (e) => {
 // Navigation functions
 function nextImage() {
 	expandedGalleryIndex.value++
-	if (expandedGalleryIndex.value >= project.value.gallery!.length) {
+	if (expandedGalleryIndex.value >= filteredGallery.value.length) {
 		expandedGalleryIndex.value = 0
 	}
-	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
 }
 
 function previousImage() {
 	expandedGalleryIndex.value--
 	if (expandedGalleryIndex.value < 0) {
-		expandedGalleryIndex.value = project.value.gallery!.length - 1
+		expandedGalleryIndex.value = filteredGallery.value.length - 1
 	}
-	expandedGalleryItem.value = project.value.gallery![expandedGalleryIndex.value] as GalleryItem
+	expandedGalleryItem.value = filteredGallery.value[expandedGalleryIndex.value] as GalleryItem
 }
 
 function expandImage(item: GalleryItem, index: number) {
@@ -509,11 +481,11 @@ async function editGalleryItem() {
 	shouldPreventActions.value = true
 	startLoading()
 
-	const imageUrl = project.value!.gallery![editIndex.value].url
+	const imageUrl = filteredGallery.value[editIndex.value].url
 	const success = await contextEditGalleryItem(
 		imageUrl,
-		editTitle.value || undefined,
-		editDescription.value || undefined,
+		editTitle.value,
+		editDescription.value,
 		editFeatured.value,
 		editOrder.value ? Number(editOrder.value) : undefined,
 	)
@@ -529,7 +501,7 @@ async function editGalleryItem() {
 async function deleteGalleryImage() {
 	startLoading()
 
-	const imageUrl = project.value!.gallery![deleteIndex.value].url!
+	const imageUrl = filteredGallery.value[deleteIndex.value].url!
 	await contextDeleteGalleryItem(imageUrl)
 
 	stopLoading()
@@ -711,7 +683,7 @@ async function deleteGalleryImage() {
 		margin-bottom: 0;
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
-		min-height: 10rem;
+		aspect-ratio: 16 / 9;
 		object-fit: cover;
 	}
 

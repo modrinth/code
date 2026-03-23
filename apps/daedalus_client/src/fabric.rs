@@ -1,17 +1,17 @@
 use crate::util::{download_file, fetch_json, format_url};
-use crate::{Error, MirrorArtifact, UploadFile, insert_mirrored_artifact};
+use crate::{
+    Error, FetchResult, MirrorArtifact, UploadFile, insert_mirrored_artifact,
+};
 use daedalus::modded::{DUMMY_REPLACE_STRING, Manifest, PartialVersionInfo};
 use dashmap::DashMap;
 use serde::Deserialize;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
-#[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
+#[tracing::instrument(skip(semaphore))]
 pub async fn fetch_fabric(
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
     fetch(
         daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
         "fabric",
@@ -19,18 +19,14 @@ pub async fn fetch_fabric(
         "https://maven.fabricmc.net/",
         &[],
         semaphore,
-        upload_files,
-        mirror_artifacts,
     )
     .await
 }
 
-#[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
+#[tracing::instrument(skip(semaphore))]
 pub async fn fetch_quilt(
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
     fetch(
         daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
         "quilt",
@@ -41,14 +37,12 @@ pub async fn fetch_quilt(
             "0.17.5-beta.4",
         ],
         semaphore,
-        upload_files,
-        mirror_artifacts,
     )
     .await
 }
 
 #[allow(clippy::too_many_arguments)]
-#[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
+#[tracing::instrument(skip(semaphore))]
 async fn fetch(
     format_version: usize,
     mod_loader: &str,
@@ -56,9 +50,9 @@ async fn fetch(
     maven_url: &str,
     skip_versions: &[&str],
     semaphore: Arc<Semaphore>,
-    upload_files: &DashMap<String, UploadFile>,
-    mirror_artifacts: &DashMap<String, MirrorArtifact>,
-) -> Result<(), Error> {
+) -> Result<FetchResult, Error> {
+    let upload_files = DashMap::new();
+    let mirror_artifacts = DashMap::<String, MirrorArtifact>::new();
     let modrinth_manifest = fetch_json::<Manifest>(
         &format_url(&format!("{mod_loader}/v{format_version}/manifest.json",)),
         &semaphore,
@@ -124,7 +118,7 @@ async fn fetch(
                 None,
                 vec![maven_url.to_string()],
                 false,
-                mirror_artifacts,
+                &mirror_artifacts,
             )?;
         }
     }
@@ -175,7 +169,7 @@ async fn fetch(
                                     .unwrap_or_else(|| maven_url.to_string()),
                             ],
                             false,
-                            mirror_artifacts,
+                            &mirror_artifacts,
                         )?;
                     } else {
                         lib.name = new_name;
@@ -268,7 +262,10 @@ async fn fetch(
         );
     }
 
-    Ok(())
+    Ok(FetchResult {
+        upload_files,
+        mirror_artifacts,
+    })
 }
 
 #[derive(Deserialize, Debug, Clone)]

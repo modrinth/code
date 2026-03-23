@@ -71,6 +71,7 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			params: {
 				...params,
 				facets: params.facets ? JSON.stringify(params.facets) : undefined,
+				new_filters: params.new_filters ?? undefined,
 			},
 		})
 	}
@@ -133,6 +134,153 @@ export class LabrinthProjectsV2Module extends AbstractModule {
 			api: 'labrinth',
 			version: 2,
 			method: 'GET',
+		})
+	}
+
+	/**
+	 * Create a gallery image for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param file - Image file to upload
+	 * @param options - Gallery image options
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.createGalleryImage('sodium', imageFile, {
+	 *   featured: true,
+	 *   title: 'Screenshot 1',
+	 *   description: 'Main menu with Sodium enabled'
+	 * })
+	 * ```
+	 */
+	public async createGalleryImage(
+		id: string,
+		file: Blob,
+		options: {
+			ext: string
+			featured: boolean
+			title?: string
+			description?: string
+			ordering?: number
+		},
+	): Promise<void> {
+		const params: Record<string, string> = {
+			ext: options.ext,
+			featured: String(options.featured),
+		}
+		if (options.title) params.title = options.title
+		if (options.description) params.description = options.description
+		if (options.ordering !== undefined) params.ordering = String(options.ordering)
+
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			params,
+			body: file,
+		})
+	}
+
+	/**
+	 * Edit a gallery image for a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param url - URL of the existing gallery image to edit
+	 * @param options - Gallery image options to update
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.editGalleryImage('sodium', 'https://cdn.modrinth.com/...', {
+	 *   featured: false,
+	 *   title: 'Updated title'
+	 * })
+	 * ```
+	 */
+	public async editGalleryImage(
+		id: string,
+		url: string,
+		options: {
+			featured: boolean
+			title?: string
+			description?: string
+			ordering?: number
+		},
+	): Promise<void> {
+		const params: Record<string, string> = {
+			url,
+			featured: String(options.featured),
+		}
+		if (options.title) params.title = options.title
+		if (options.description) params.description = options.description
+		if (options.ordering !== undefined) params.ordering = String(options.ordering)
+
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			params,
+		})
+	}
+
+	/**
+	 * Delete a gallery image from a project
+	 *
+	 * @param id - Project ID or slug
+	 * @param url - URL of the gallery image to delete
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.deleteGalleryImage('sodium', 'https://cdn.modrinth.com/...')
+	 * ```
+	 */
+	public async deleteGalleryImage(id: string, url: string): Promise<void> {
+		return this.client.request(`/project/${id}/gallery`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'DELETE',
+			params: { url },
+		})
+	}
+
+	/**
+	 * Get random projects
+	 *
+	 * @param count - Number of random projects to return
+	 * @returns Promise resolving to an array of random projects
+	 */
+	public async getRandom(count: number): Promise<Labrinth.Projects.v2.Project[]> {
+		return this.client.request<Labrinth.Projects.v2.Project[]>('/projects_random', {
+			api: 'labrinth',
+			version: 2,
+			method: 'GET',
+			params: { count: String(count) },
+		})
+	}
+
+	/**
+	 * Bulk edit multiple projects at once
+	 *
+	 * @param ids - Array of project IDs to edit
+	 * @param data - Fields to update across all specified projects
+	 *
+	 * @example
+	 * ```typescript
+	 * await client.labrinth.projects_v2.bulkEdit(['id1', 'id2'], {
+	 *   issues_url: 'https://github.com/issues',
+	 *   source_url: null,
+	 * })
+	 * ```
+	 */
+	public async bulkEdit(
+		ids: string[],
+		data: Labrinth.Projects.v2.BulkEditProjectRequest,
+	): Promise<void> {
+		return this.client.request(`/projects`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'PATCH',
+			params: { ids: JSON.stringify(ids) },
+			body: data,
 		})
 	}
 }

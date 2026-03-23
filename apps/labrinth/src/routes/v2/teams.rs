@@ -39,7 +39,7 @@ pub async fn team_members_get_project(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::teams::team_members_get_project(
+    let response = v3::teams::team_members_get_project_internal(
         req,
         info,
         pool,

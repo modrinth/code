@@ -11,7 +11,9 @@ use crate::database::models::version_item::{
 };
 use crate::database::models::{self, DBOrganization, image_item};
 use crate::database::redis::RedisPool;
+use crate::env::ENV;
 use crate::file_hosting::{FileHost, FileHostPublicity};
+use crate::models::exp;
 use crate::models::ids::{ImageId, ProjectId, VersionId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::notifications::NotificationBody;
@@ -25,6 +27,7 @@ use crate::models::projects::{DependencyType, ProjectStatus, skip_nulls};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
+use crate::util::http::HttpClient;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{ValidationResult, validate_file};
@@ -110,6 +113,7 @@ pub async fn version_create(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
     moderation_queue: web::Data<AutomatedModerationQueue>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -124,6 +128,7 @@ pub async fn version_create(
         &client,
         &session_queue,
         &moderation_queue,
+        &http,
     )
     .await;
 
@@ -157,6 +162,7 @@ async fn version_create_inner(
     pool: &PgPool,
     session_queue: &AuthQueue,
     moderation_queue: &AutomatedModerationQueue,
+    http: &reqwest::Client,
 ) -> Result<HttpResponse, CreateError> {
     let mut initial_version_data = None;
     let mut version_builder = None;
@@ -324,6 +330,7 @@ async fn version_create_inner(
                     status: version_create_data.status,
                     requested_status: None,
                     ordering: version_create_data.ordering,
+                    components: exp::VersionSerial::default(),
                 });
 
                 return Ok(());
@@ -473,10 +480,11 @@ async fn version_create_inner(
         dependencies: version_data.dependencies,
         loaders: version_data.loaders,
         fields: version_data.fields,
+        components: exp::VersionQuery::default(),
     };
 
     let project_id = builder.project_id;
-    builder.insert(transaction).await?;
+    builder.insert(transaction, http).await?;
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
@@ -538,6 +546,7 @@ pub async fn upload_file_to_version(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
+    http: web::Data<HttpClient>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -554,6 +563,7 @@ pub async fn upload_file_to_version(
         &mut uploaded_files,
         version_id,
         &session_queue,
+        &http,
     )
     .await;
 
@@ -587,6 +597,7 @@ async fn upload_file_to_version_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::DBVersionId,
     session_queue: &AuthQueue,
+    http: &reqwest::Client,
 ) -> Result<HttpResponse, CreateError> {
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
@@ -770,7 +781,7 @@ async fn upload_file_to_version_inner(
         ));
     } else {
         for file in file_builders {
-            file.insert(version_id, &mut *transaction).await?;
+            file.insert(version_id, &mut *transaction, http).await?;
         }
     }
 
@@ -974,7 +985,7 @@ pub async fn upload_file(
 
     version_files.push(VersionFileBuilder {
         filename: file_name.to_string(),
-        url: format!("{}/{file_path_encode}", dotenvy::var("CDN_URL")?),
+        url: format!("{}/{file_path_encode}", ENV.CDN_URL),
         hashes: vec![
             models::version_item::HashBuilder {
                 algorithm: "sha1".to_string(),

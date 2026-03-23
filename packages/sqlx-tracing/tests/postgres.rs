@@ -46,13 +46,21 @@ impl PostgresContainer {
 
 #[tokio::test]
 async fn execute() {
-    let observability = opentelemetry_testing::ObservabilityContainer::create().await;
+    let observability =
+        opentelemetry_testing::ObservabilityContainer::create().await;
     let provider = observability.install().await;
 
     let container = PostgresContainer::create().await;
     let pool = container.client().await;
 
-    common::should_trace("trace_pool", "postgresql", &observability, &provider, &pool).await;
+    common::should_trace(
+        "trace_pool",
+        "postgresql",
+        &observability,
+        &provider,
+        &pool,
+    )
+    .await;
 
     {
         let mut conn = pool.acquire().await.unwrap();
@@ -67,7 +75,8 @@ async fn execute() {
     }
 
     {
-        let mut tx: sqlx_tracing::Transaction<'_, Postgres> = pool.begin().await.unwrap();
+        let mut tx: sqlx_tracing::Transaction<'_, Postgres> =
+            pool.begin().await.unwrap();
         common::should_trace(
             "trace_tx",
             "postgresql",

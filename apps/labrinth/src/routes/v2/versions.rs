@@ -11,7 +11,7 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use crate::search::SearchConfig;
+use crate::search::SearchBackend;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -104,7 +104,7 @@ pub async fn version_list(
         include_changelog: filters.include_changelog,
     };
 
-    let response = v3::versions::version_list(
+    let response = v3::versions::version_list_internal(
         req,
         info,
         web::Query(filters),
@@ -211,6 +211,7 @@ pub async fn version_get(
     let response =
         v3::versions::version_get_helper(req, id, pool, redis, session_queue)
             .await
+            .map(|b| HttpResponse::Ok().json(b))
             .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -277,7 +278,7 @@ pub async fn version_edit(
     }
 
     // Get the older version to get info from
-    let old_version = v3::versions::version_get_helper(
+    let old_version = match v3::versions::version_get_helper(
         req.clone(),
         (*info).0,
         pool.clone(),
@@ -285,12 +286,19 @@ pub async fn version_edit(
         session_queue.clone(),
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)?;
-    let old_version =
-        match v2_reroute::extract_ok_json::<Version>(old_version).await {
-            Ok(version) => version,
-            Err(response) => return Ok(response),
-        };
+    {
+        Ok(resp) => resp,
+        Err(ApiError::NotFound) => return Ok(HttpResponse::NotFound().body("")),
+        Err(err) => return Err(err),
+    };
+    let old_version = match v2_reroute::extract_ok_json::<Version>(
+        HttpResponse::Ok().json(old_version.0),
+    )
+    .await
+    {
+        Ok(version) => version,
+        Err(response) => return Ok(response),
+    };
 
     // If this has 'mrpack_loaders' as a loader field previously, this is a modpack.
     // Therefore, if we are modifying the 'loader' field in this case,
@@ -349,7 +357,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
-    search_config: web::Data<SearchConfig>,
+    search_backend: web::Data<dyn SearchBackend>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(
@@ -358,7 +366,7 @@ pub async fn version_delete(
         pool,
         redis,
         session_queue,
-        search_config,
+        search_backend,
     )
     .await
     .or_else(v2_reroute::flatten_404_error)

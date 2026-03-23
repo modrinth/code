@@ -209,6 +209,9 @@ pub enum CommandPayload {
     InstallModpack {
         id: String,
     },
+    InstallServer {
+        id: String,
+    },
     RunMRPack {
         // run or install .mrpack
         path: PathBuf,

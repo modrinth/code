@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150mb ng RAM!"
+    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Wala pang proyekto sa koleksiyon"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat>proyekto} other {<stat>{count}</stat> na {type}}}"
+    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat> {type}} other {<stat>{count}</stat> na {type}}}"
   },
   "collection.label.updated-at": {
     "message": "In-update {ago}"
@@ -429,7 +429,7 @@
     "message": "Buod"
   },
   "create.collection.summary-placeholder": {
-    "message": "Itong koleksiyon na ito ay..."
+    "message": "This is a collection of..."
   },
   "create.collection.title": {
     "message": "Naglilikha ng koleksiyon"
@@ -486,7 +486,7 @@
     "message": "Buod"
   },
   "create.organization.summary-placeholder": {
-    "message": "Isang organisasyon naglalayong..."
+    "message": "An organization for..."
   },
   "create.organization.title": {
     "message": "Naglilikha ng organisasyon"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "Lumikha ng proyekto"
   },
+  "create.project.create-server-project": {
+    "message": "Lumikha ng server"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "Nakukulang na field: {fields}"
+  },
   "create.project.name-label": {
     "message": "Pangalan"
   },
   "create.project.name-placeholder": {
     "message": "Ilagay ang pangalan ng proyekto..."
+  },
+  "create.project.owner-description": {
+    "message": "Itatakda kang may-ari ng proyekto o ng organisasyong sinalihan mo."
+  },
+  "create.project.owner-label": {
+    "message": "May-ari"
+  },
+  "create.project.server-project-title": {
+    "message": "Naglilikha ng proyektong server"
   },
   "create.project.summary-description": {
     "message": "Maisa o dalawang pangungusap na maglalarawan sa iyong proyekto."
@@ -510,10 +525,19 @@
     "message": "Buod"
   },
   "create.project.summary-placeholder": {
-    "message": "Magdaragdag ang proyektong ito ng..."
+    "message": "This project adds..."
   },
   "create.project.title": {
     "message": "Naglilikha ng proyekto"
+  },
+  "create.project.type-label": {
+    "message": "Uri"
+  },
+  "create.project.type-project": {
+    "message": "Proyekto"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Lumikha ng bago"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Likhain ang iyong pinakaunang koleksiyon upang makapagsimula!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Wala ka pang koleksiyon"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Walang koleksiyong tumugma sa iyong paghanap"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Subukang ayusin ang mga pansala at ang mga paghahanapang termino."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proyekto} other {{count} na proyekto}}"
+    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Hanapin ang iyong mga koleksiyon"
@@ -576,7 +612,7 @@
     "message": "Handa ka na! 🎉"
   },
   "dashboard.creator-tax-form-modal.entity.description": {
-    "message": "Ang banyagang entidad ay isang kalakalang entidad na nakaayos sa labas ng Estados Unidos (tulod ng di-US na korporasyon, partnership, o LLC)."
+    "message": "Ang banyagang entidad ay isang kalakalang entidad na nakaayos sa labas ng Estados Unidos (tulad ng di-US na korporasyon, partnership, o LLC)."
   },
   "dashboard.creator-tax-form-modal.entity.foreign-entity": {
     "message": "Banyagang entidad"
@@ -1068,7 +1104,7 @@
     "message": "Palaka"
   },
   "hosting-marketing.available-locations": {
-    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para malawakang abot."
+    "message": "Magagamit sa Hilagang Amerika, Yuropa, at Timog-Silangang Asya para sa malawakang abot."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Buwanang pagbayad"
@@ -1077,7 +1113,7 @@
     "message": "Tatluhang-buwanang pagbayad"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "Makatipid nang 16% sa tatluhang-buwanang pagbabayad!"
+    "message": "Makatitipid nang 16% sa tatluhang-buwanang pagbabayad!"
   },
   "hosting-marketing.billing.starting-at": {
     "message": "Nagsisimula sa {price} / buwan"
@@ -1107,7 +1143,7 @@
     "message": "Protekdado ba nang proteksiyong DDos ang Modrinth Hosting?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17Tbps sa iilang lokasyon."
+    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17 Tbps sa iilang lokasyon."
   },
   "hosting-marketing.faq.heading": {
     "message": "Kadalasang Tinatanong"
@@ -1155,10 +1191,10 @@
     "message": "Simulan ang iyong server"
   },
   "hosting-marketing.hero.host-with-modrinth": {
-    "message": "I-host ang susunid na server mo sa Modrinth Hosting"
+    "message": "I-host ang susunod na server mo sa Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Ang Modrinth Hosting ang pinakamadaling daan na makaho-host ka nang sarili mong Minecraft: Java Edition na server. Walang hadlang nang sarili makapag-install at makapaglaro nang mga paboritong mod at modpack, lahat sa loob ng plataporma ng Modrinth."
+    "message": "Ang Modrinth Hosting ang iyong pinakamadaling daan na makaho-host nang sarili mong Minecraft: Java Edition na server. Walang hadlangang pag-install at paglaro nang iyong mga paboritong mod at modpack, lahat sa loob ng plataporma ng Modrinth."
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "Dalubhasang pamamahala ng network"
@@ -1170,7 +1206,7 @@
     "message": "Kasama ang pag-backup"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "Lahat ng servers and may 15 backup na ligtas na nakaimbak sa off-site."
+    "message": "Lahat ng server ay may 15 backup na ligtas na nakaimbak sa off-site."
   },
   "hosting-marketing.included.custom-url": {
     "message": "Pasadyang URL"
@@ -1197,10 +1233,10 @@
     "message": "Abutin ang Modrinth team para sa tulong sa iyong server sa kahit na anong oras."
   },
   "hosting-marketing.included.powerful-console": {
-    "message": "Isang makapangyarihan na konsol, server properties manager, at higit pa"
+    "message": "Isang makapangyarihang konsol, server properties manager, at higit pa"
   },
   "hosting-marketing.included.powerful-console.description": {
-    "message": "Ang Modrinth Hosting ay nandito na may makapangyarihan na kagamitan sa pagpamahala ng iyong server."
+    "message": "Dala ng Modrinth Hosting ang makakapangyarihang kagamitan sa pamahala ng iyong server."
   },
   "hosting-marketing.included.sftp-access": {
     "message": "SFTP access"
@@ -1215,7 +1251,7 @@
     "message": "Alam mo bang ninanais mo?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Subukan ang isang libreng <orange>3GB server</orange> nang 5 araw na pinapagana ni <orange>Medal</orange>"
+    "message": "Subukan ang isang libreng <orange>3 GB server</orange> nang 5 araw na pinapagana ni <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Matuto pa"
@@ -1251,7 +1287,7 @@
     "message": "Dumanas ng modernong, maaasahang hosting"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa <contrast>mga high-performance AMD CUP kasama ng DDR5 RAM</contrast>, pinatatakbo sa pasadyang gawa na software upang masiguro na tuloy-tuloy ang takbo ng server mo."
+    "message": "Ang mga server ng Modrinth Hosting ay naka-host sa <contrast>mga high-performance AMD CPU kasama ng DDR5 RAM</contrast>, pinatatakbo sa pasadyang gawa na software upang masiguro na tuloy-tuloy ang takbo ng server mo."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Maglaro kung saan ang mod mo"
@@ -1293,22 +1329,22 @@
     "message": "Data and Statistics"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Gawing madaling matuklas sa libo-libong tagagamit ang iyong proyekto gamit ang panghanap, sa aming home page, sa Discord server, at sa iba pang paraan para sa darating na panahon!"
+    "message": "Gawing madaling matuklas sa libo-libong tagagamit ang iyong proyekto gamit ang panghanap, sa aming home page, sa Discord server, at sa iiba pang paraan sa darating na panahon!"
   },
   "landing.creator.feature.discovery.title": {
-    "message": "Discovery"
+    "message": "Pagtutuklas"
   },
   "landing.creator.feature.diverse-ecosystem.description": {
     "message": "Pagsamahin sa iyong build tools gamit ang Minotaur para sa awtomatikong pag-upload sa tuwing maglalathala ka ng bagong bersiyon"
   },
   "landing.creator.feature.diverse-ecosystem.title": {
-    "message": "Diverse Ecosystem"
+    "message": "Mayamang Ekosistema"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Tumanggap ng ad revenue galing sa mga pahina ng iyong proyekto at mag-withdraw sa iyong pundo sa kahit anong panahon"
+    "message": "Tumanggap ng kita sa advertising galing sa mga pahina ng iyong proyekto at mag-withdraw sa iyong pundo sa kahit anong panahon"
   },
   "landing.creator.feature.monetization.title": {
-    "message": "Monetization"
+    "message": "Monetisasyon"
   },
   "landing.creator.feature.team-management.description": {
     "message": "Anyayahin ang iyong mga kasing kakoponan at pamahalaan ang mga tungkulin at pahintulot ng madalian"
@@ -1335,7 +1371,7 @@
     "message": "Ang malakitdlating-bilis na panghanap ng Modrinth at mahuhusay na pansala ay bibigyan ka ng daang mahanap ang lahat ng iyong gusto sa bawat mong pagtipa."
   },
   "landing.feature.search.heading": {
-    "message": "Hanapin ang guato mo, mabilisan at madalian"
+    "message": "Hanapin ang gusto mo, mabilisan at madalian"
   },
   "landing.heading.the-place-for-minecraft": {
     "message": "Ang lugar para sa Minecraft na {content}"
@@ -1386,13 +1422,13 @@
     "message": "Ang bersiyong {version} ay ni-release para sa {gameVersion}"
   },
   "landing.section.for-creators.description": {
-    "message": "Bigyan ng online home ang iyong mga kalikhaan at abutin ang mga malalaking madla ng mga dedikadong manlalaro."
+    "message": "Bigyan ng tahanang-online ang iyong mga kalikhaan at abutin ang mga malalaking madla ng mga dedikadong manlalaro."
   },
   "landing.section.for-creators.label": {
     "message": "Para sa mga Tagagawa"
   },
   "landing.section.for-creators.tagline": {
-    "message": "Magbahagi ka ng mga kontento mo sa mundo"
+    "message": "Ibahagi ang kontento mo sa mundo"
   },
   "landing.section.for-players.description": {
     "message": "Sa mga mahihiwagang hayligiran patungo sa mga sinumpaang piitan, tiyak na mayroon kang mahahanap na kontentong makapapadadala sa iyong paglalaro sa mataas pang lebel."
@@ -1401,7 +1437,7 @@
     "message": "Para sa mga Manlalaro"
   },
   "landing.section.for-players.tagline": {
-    "message": "Tumuklas ng humigit {count} kalikhaan"
+    "message": "Tumuklas ng humigit {count, number} kalikhaan"
   },
   "landing.subheading": {
     "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming open-source na platapormang ginawa para sa komunidad."
@@ -1432,6 +1468,12 @@
   },
   "layout.action.new-project": {
     "message": "Bagong proyekto"
+  },
+  "layout.action.new-server-project": {
+    "message": "Bagong server"
+  },
+  "layout.action.publish": {
+    "message": "Ilathala"
   },
   "layout.action.reports": {
     "message": "Suriin ang mga sumbong"
@@ -1484,6 +1526,9 @@
   "layout.banner.tax.action": {
     "message": "Kinumpletong pormularyo sa buwis"
   },
+  "layout.banner.tax.description": {
+    "message": "Ikaw ay naka-withdraw ng humigit {threshold} galing sa Modrinth ngayong taon. Upang makasunod sa regulasyon sa buwis, kinakailangang mong kumumpleto ng pormularyo sa buwis. Pinahinto muna ang iyong pag-withdraw hanggang ikaw ay nakapagsumite sa naturang pormularyo."
+  },
   "layout.banner.tax.title": {
     "message": "Nangangailangan ng pormularyo sa buwis"
   },
@@ -1518,7 +1563,7 @@
     "message": "Programa ng Gantimpala"
   },
   "layout.footer.about.status": {
-    "message": "Istado"
+    "message": "Estado"
   },
   "layout.footer.legal": {
     "message": "Legal"
@@ -1760,9 +1805,6 @@
   "muralpay.field.bank-account-number": {
     "message": "Numero ng account"
   },
-  "muralpay.field.branch-code": {
-    "message": "Branch code"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1792,6 +1834,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX phone"
+  },
+  "muralpay.field.random-key": {
+    "message": "Random key"
   },
   "muralpay.field.routing-number": {
     "message": "Routing number"
@@ -1836,7 +1881,7 @@
     "message": "Phone number"
   },
   "muralpay.placeholder.account-number": {
-    "message": "Ilagay ang numero sa account"
+    "message": "Ilagay ang account number"
   },
   "muralpay.placeholder.cbu-cvu": {
     "message": "Ilagay ang CBU o CVU"
@@ -1851,10 +1896,7 @@
     "message": "Ilagay ang CUIT o CUIL"
   },
   "muralpay.placeholder.enter-account-number": {
-    "message": "Ilagay ang numero sa account"
-  },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "Ilagay ang branch code"
+    "message": "Ilagay ang account number"
   },
   "muralpay.placeholder.enter-clabe": {
     "message": "Ilagay ang 18-digit CLABE"
@@ -1867,6 +1909,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Ilagay ang PIX email"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Maglagay ng random key"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Ilagay ang 9-digit routing number"
@@ -1995,7 +2040,7 @@
     "message": "Koleksiyon"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {na download}}"
+    "message": "{count} {countPlural, plural, one {download} other {na download}}"
   },
   "profile.label.joined": {
     "message": "Sumali"
@@ -2004,19 +2049,19 @@
     "message": "Walang mga koleksiyon ang tagagamit na ito!"
   },
   "profile.label.no-collections-auth": {
-    "message": "Wala ka pang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
+    "message": "Wala kang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.no-projects": {
     "message": "Walang mga proyekto ang tagagmit na ito!"
   },
   "profile.label.no-projects-auth": {
-    "message": "Wala ka pang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
+    "message": "Wala kang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.organizations": {
     "message": "Mga organisasyon"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {proyekto} other {na proyekto}}"
+    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "profile.label.saving": {
     "message": "Sine-save..."
@@ -2099,6 +2144,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Mga Server"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mga Mod"
   },
@@ -2128,6 +2179,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Resource Pack"
+  },
+  "project-type.server.plural": {
+    "message": "Mga Server"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Mga Shader"
@@ -2343,7 +2400,7 @@
     "message": "Mga Setting"
   },
   "project.settings.visit-dashboard": {
-    "message": "Bisitahin ang dashbord ng mga proyekto"
+    "message": "Bisitahin ang dashboard ng mga proyekto"
   },
   "project.stats.downloads-label": {
     "message": "download {count, plural, one {} other {}}"
@@ -2358,7 +2415,7 @@
     "message": "Mga bersiyon"
   },
   "report.already-reported": {
-    "message": "Nasumbong mo na man ang {title}"
+    "message": "Nasumbong mo na ang {title}"
   },
   "report.already-reported-description": {
     "message": "Ikaw ay mayroon nang bukas na sumbong para sa {item, select, project {proyektong} version {bersiyong} user {tagagamit na} other {kontentong}} ito. Ikaw ay maaaring magdagdag ng detalye sa iyong sumbong kapag mayroong impormasyong kang maisasama pa."
@@ -2403,7 +2460,7 @@
     "message": "Tingnan ang aming <policy-link>Patakaran sa Copyright</policy-link>."
   },
   "report.note.copyright.1": {
-    "message": "Mangyaring paunawaan na *hindi* DMCA takedown request ang iyong isusumite, ngunit ito ay isang sumbong sa kontentong na-reupload."
+    "message": "Mangyaring paunawaan na *hindi* DMCA takedown request ang iyong isusumite, ngunit ito ay isang sumbong sa kontentong muling-upload."
   },
   "report.note.copyright.2": {
     "message": "Kung sa halip ang ibig mong gawin ay mag-file ng DMCA takedown request (na isang legal na aksiyon), mangyaring tingan ang aming <copyright-policy-link>Patakaran sa Copyright</copyright-policy-link>."
@@ -2433,7 +2490,7 @@
     "message": "Isumbong ang {title} sa mga moderator"
   },
   "report.submit": {
-    "message": "Sumumite ng sumbong"
+    "message": "Magsumite ng sumbong"
   },
   "scopes.analytics.description": {
     "message": "Pag-akses sa iyong datos sa analitika"
@@ -2475,7 +2532,7 @@
     "message": "Account ng tagagamit"
   },
   "scopes.category.versions": {
-    "message": "Bersiyon"
+    "message": "Mga bersiyon"
   },
   "scopes.collectionCreate.description": {
     "message": "Paglikha ng mga koleksiyon"
@@ -2628,7 +2685,7 @@
     "message": "Pagsulat sa sumbong"
   },
   "scopes.sessionAccess.description": {
-    "message": "Pag-akses sa mga sesyong inisyu ng modrinth"
+    "message": "Pag-akses sa mga sesyong inisyu ng Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Pag-akses ng sesyon"
@@ -2726,9 +2783,6 @@
   "search.filter.locked.server.sync": {
     "message": "I-sync sa server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Isinasagawa ang backup restore"
-  },
   "servers.notice.actions": {
     "message": "Mga Aksiyon"
   },
@@ -2781,7 +2835,7 @@
     "message": "Magdagdag pa"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Magdagdag ng redirect uri"
+    "message": "Magdagdag ng redirect URI"
   },
   "settings.applications.button.cancel": {
     "message": "Kanselahin"
@@ -2844,10 +2898,10 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Mga redirect uri"
+    "message": "Mga redirect URI"
   },
   "settings.applications.field.scopes": {
-    "message": "Mga Sakop"
+    "message": "Mga sakop"
   },
   "settings.applications.field.url": {
     "message": "URL"
@@ -2931,7 +2985,7 @@
     "message": "Magpagana at magpatay ng mga piniling tampok sa iyong device."
   },
   "settings.display.flags.title": {
-    "message": "Mag-toggle ang mga tampok"
+    "message": "Pagtatakda ng tampok"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Pahina ng Mga Data Pack"
@@ -2940,19 +2994,22 @@
     "message": "Pumili ng iyong gugustohing ayos ng bawat pahinang magpapakita sa mga listahan ng proyekto sa iyong device."
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Pahina ng Mga Mod"
+    "message": "Pahina ng mga mod"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Pahina ng Mga Modpack"
+    "message": "Pahina ng mga modpack"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Pahina ng Mga Plugin"
+    "message": "Pahina ng mga plugin"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Pahina ng Mga Resource Pack"
+    "message": "Pahina ng mga resource pack"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Pahina ng mga server"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Pahina ng Mga Shader"
+    "message": "Pahina ng mga shader"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Mga ayos ng listahan ng proyekto"
@@ -2964,16 +3021,16 @@
     "message": "Koleksiyon"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Ma-enable ang advanced rendering katulad ng paglalabo na maaaring sumanhi ng isyu sa performance sa mga walang hardware-accelerated rendering."
+    "message": "Patatakbuhin ang masalimuot na pagrerender o advanced rendering katulad ng paglalabo na maaaring sumanhi ng isyu sa performance sa mga walang hardware-accelerated rendering."
   },
   "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Advanced rendering"
+    "message": "Masalimuot na pagrerender"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Gagawa ng mga link na pupunta sa labas ng Modrinth na magbubukas ng bagong tab. Kahit ano pang lagay, ang mga link sa magkatulad na domain at nasa paglalarawang Markdown ay bubukas sa iisang tab, at ang mga link sa ads at edit page ay magbubukas sa bagong tab."
+    "message": "Gawin na magbukas ng bagong tab ang mga link na papunta sa labas ng Modrinth. Kahit na sa setting na ito, ang mga link sa magkatulad na domain at nasa paglalarawang Markdown ay bubukas sa iisang tab, at ang mga link sa ads at edit page ay magbubukas sa bagong tab."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Buksan ang pabasang link sa bagong tab"
+    "message": "Buksan ang link palabas sa bagong tab"
   },
   "settings.display.sidebar.hide-app-promos.description": {
     "message": "Itatago ang \"Kunin ang Modrinth App\" na mga pindutan sa pangunahing navigation. Ang pahina ng Modrinth App ay maaari pa ring mahanap sa landing page o kaya sa footer."
@@ -3000,10 +3057,10 @@
     "message": "Paksang kulay"
   },
   "settings.pats.action.create": {
-    "message": "Gumawa ng PAT"
+    "message": "Lumikha ng PAT"
   },
   "settings.pats.description": {
-    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Para sa mga karagdagang impormasyon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>. Maaari silang malikha at mabawi sa kahit anong panahon."
+    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Maaari silang malikha at mabawi sa kahit anong panahon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Lumikha ng PAT"

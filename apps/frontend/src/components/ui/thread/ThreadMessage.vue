@@ -99,7 +99,7 @@
 			</span>
 		</div>
 		<span class="message__date">
-			<span v-tooltip="$dayjs(message.created).format('MMMM D, YYYY [at] h:mm A')">
+			<span v-tooltip="formatDateTime(message.created)">
 				{{ timeSincePosted }}
 			</span>
 		</span>
@@ -131,7 +131,14 @@ import {
 	ScaleIcon,
 	TrashIcon,
 } from '@modrinth/assets'
-import { AutoLink, Avatar, Badge, OverflowMenu, useRelativeTime } from '@modrinth/ui'
+import {
+	AutoLink,
+	Avatar,
+	Badge,
+	OverflowMenu,
+	useFormatDateTime,
+	useRelativeTime,
+} from '@modrinth/ui'
 import { renderString } from '@modrinth/utils'
 
 import { isStaff } from '~/helpers/users.js'
@@ -186,6 +193,11 @@ const formattedMessage = computed(() => {
 })
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
+
 const timeSincePosted = ref(formatRelativeTime(props.message.created))
 
 const isPrivateMessage = computed(() => {

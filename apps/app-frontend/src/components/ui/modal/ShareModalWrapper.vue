@@ -1,11 +1,7 @@
+<!-- @deprecated Use ShareModal from @modrinth/ui directly. Ads/noblur now handled by injectModalBehavior. -->
 <script setup lang="ts">
 import { ShareModal } from '@modrinth/ui'
 import { ref } from 'vue'
-
-import { hide_ads_window, show_ads_window } from '@/helpers/ads.js'
-import { useTheming } from '@/store/theme.ts'
-
-const themeStore = useTheming()
 
 defineProps({
 	header: {
@@ -34,18 +30,12 @@ const modal = ref(null)
 
 defineExpose({
 	show: (passedContent) => {
-		hide_ads_window()
 		modal.value.show(passedContent)
 	},
 	hide: () => {
-		onModalHide()
 		modal.value.hide()
 	},
 })
-
-function onModalHide() {
-	show_ads_window()
-}
 </script>
 
 <template>
@@ -56,7 +46,5 @@ function onModalHide() {
 		:share-text="shareText"
 		:link="link"
 		:open-in-new-tab="openInNewTab"
-		:on-hide="onModalHide"
-		:noblur="!themeStore.advancedRendering"
 	/>
 </template>

@@ -49,7 +49,7 @@ const messages = defineMessages({
 	info: {
 		id: 'hosting-marketing.medal.info',
 		defaultMessage:
-			'Try a free <orange>3GB server</orange> for 5 days powered by <orange>Medal</orange>',
+			'Try a free <orange>3 GB server</orange> for 5 days powered by <orange>Medal</orange>',
 	},
 	textSecondary: {
 		id: 'hosting-marketing.medal.text-secondary',

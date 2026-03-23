@@ -48,7 +48,7 @@
     "message": "Windows"
   },
   "app-marketing.features.follow.description": {
-    "message": "마음에 드는 콘텐츠를 저장하고, 한 번의 클릭으로 업데이트를 받아보세요."
+    "message": "마음에 드는 콘텐츠를 저장하고 한 번의 클릭으로 업데이트를 받아보세요."
   },
   "app-marketing.features.follow.title": {
     "message": "프로젝트 팔로우"
@@ -66,7 +66,7 @@
     "message": "프로필 가져오기"
   },
   "app-marketing.features.mod-management.actions": {
-    "message": "활동"
+    "message": "작업"
   },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "{author} 제공"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App은 단 150MB의 램을 사용하여 많은 주요 모드 관리자들보다 뛰어난 성능을 제공합니다!"
+    "message": "Modrinth App은 대다수 모드 매니저들보다 빠릅니다, 150 MB의 메모리만 사용하죠!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -147,7 +147,7 @@
     "message": "고성능"
   },
   "app-marketing.features.play.description": {
-    "message": "Modrinth App을 사용하여 좋아하는 모드와 모드팩을 다운로드하고 플레이하세요."
+    "message": "Modrinth App을 통해 여러분이 좋아하는 모드와 모드팩을 다운로드하고 바로 플레이하세요."
   },
   "app-marketing.features.play.title": {
     "message": "좋아하는 모드를 플레이하세요"
@@ -165,7 +165,7 @@
     "message": "모드팩 공유"
   },
   "app-marketing.features.unlike-any-launcher": {
-    "message": "다른 런처와 달리"
+    "message": "한 번도 경험하지 못했던,"
   },
   "app-marketing.features.website.description": {
     "message": "Modrinth App은 웹사이트와 완전히 통합되어 있어, 앱에서 좋아하는 프로젝트에 접근할 수 있습니다!"
@@ -174,10 +174,10 @@
     "message": "웹사이트 통합"
   },
   "app-marketing.features.youve-used-before": {
-    "message": "당신이 이전에 사용했던"
+    "message": "차원이 다른 런처"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Cobblemon 인스턴스가 ‘콘텐츠’ 페이지에 열려 있는 Modrinth App의 스크린샷"
+    "message": "Cobblemon 인스턴스가 ‘콘텐츠’ 페이지에 열려 있는 Modrinth App의 스크린샷."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App은 독특한 오픈 소스 런처로, 좋아하는 모드를 플레이하고 최신 상태로 유지하는 모든 기능이 이 깔끔한 패키지 하나에 모두 담겨 있습니다."
@@ -189,7 +189,7 @@
     "message": "Modrinth App 다운로드"
   },
   "app-marketing.hero.download-modrinth-app-for-os": {
-    "message": "{os} 용 Modrinth App 다운로드"
+    "message": "{os}용 Modrinth App 다운로드"
   },
   "app-marketing.hero.minecraft-screenshot-alt": {
     "message": "Cobblemon 인스턴스의 메인 메뉴 스크린샷"
@@ -201,10 +201,10 @@
     "message": "다른 패키지 숨기기"
   },
   "app-marketing.not-recommended": {
-    "message": "뭘 하고 있는지 모르시다면 이걸 사용하는걸 권장하지 않습니다."
+    "message": "뭘 하고 있는지 모르시다면 사용을 권장하지 않습니다."
   },
   "app-marketing.show-other-packages": {
-    "message": "다른 패키지 보이기"
+    "message": "다른 패키지 보기"
   },
   "auth.authorize.action.authorize": {
     "message": "승인"
@@ -315,7 +315,7 @@
     "message": "인증 이메일 재전송"
   },
   "auth.verify-email.failed-verification.description": {
-    "message": "이메일을 인증할 수 없었습니다. 로그인 한 뒤 대시보드를 통해 인증 이메일을 다시 보내주세요."
+    "message": "이메일을 인증할 수 없습니다. 로그인 한 뒤 대시보드를 통해 인증 이메일 재전송을 시도해 보세요."
   },
   "auth.verify-email.failed-verification.description.logged-in": {
     "message": "이메일을 인증할 수 없습니다. 아래 버튼을 통해 인증 이메일을 다시 보내주세요."
@@ -372,7 +372,7 @@
     "message": "이 컬렉션을 삭제하시겠습니까?"
   },
   "collection.description": {
-    "message": "{description} - Modrinth에서 {username}이(가) 만든 컬렉션 {name} 보기"
+    "message": "{description} - Modrinth에서 {username}님이 만든 컬렉션 {name} 보기"
   },
   "collection.description.following": {
     "message": "팔로우하는 모든 프로젝트로 자동 생성된 컬렉션입니다."
@@ -393,7 +393,7 @@
     "message": "아직 프로젝트에 컬렉션이 없습니다"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {프로젝트 없음} one {<stat>{count}</stat> 프로젝트} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {프로젝트 없음} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} 전에 업데이트됨"
@@ -408,10 +408,10 @@
     "message": "{name} - 컬렉션"
   },
   "create-project-version.create-modal.stage.add-files.admonition": {
-    "message": "보조 파일은 소스 코드와 같은 지원 자료용이며, 대체 버전이나 변형을 위한 것이 아닙니다."
+    "message": "보조 파일은 소스 코드와 같은 지원용 리소스를 위한 것이며, 대체 버전이나 변형을 위한 것이 아닙니다."
   },
   "create.collection.collection-info": {
-    "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} one {#개의 프로젝트} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
+    "message": "새 컬렉션은 {count, plural, =0 {프로젝트 없음} other {#개의 프로젝트}}를 포함한 공개 컬렉션으로 생성됩니다."
   },
   "create.collection.create-collection": {
     "message": "컬렉션 생성"
@@ -423,7 +423,7 @@
     "message": "컬렉션 이름 입력..."
   },
   "create.collection.summary-description": {
-    "message": "당신의 컬렉션을 짧은 문장으로 설명해 주세요."
+    "message": "내 컬렉션에 대해 짧게 설명해 보세요."
   },
   "create.collection.summary-label": {
     "message": "개요"
@@ -477,10 +477,10 @@
     "message": "조직 이름 입력..."
   },
   "create.organization.ownership-info": {
-    "message": "당신은 이 조직의 소유자이며, 필요시 다른 멤버를 초대하거나 권한을 이전할 수 있습니다."
+    "message": "여러분은 이 조직의 소유자이며, 필요시 다른 멤버를 초대하거나 권한을 이전할 수 있습니다."
   },
   "create.organization.summary-description": {
-    "message": "당신의 조직을 짧은 문장으로 설명해 주세요."
+    "message": "여러분의 조직에 대해 짧게 설명해 보세요."
   },
   "create.organization.summary-label": {
     "message": "개요"
@@ -497,11 +497,26 @@
   "create.project.create-project": {
     "message": "프로젝트 만들기"
   },
+  "create.project.create-server-project": {
+    "message": "서버 생성"
+  },
+  "create.project.missing-fields-tooltip": {
+    "message": "누락된 필드: {fields}"
+  },
   "create.project.name-label": {
     "message": "이름"
   },
   "create.project.name-placeholder": {
     "message": "프로젝트 이름 입력..."
+  },
+  "create.project.owner-description": {
+    "message": "프로젝트 소유자를 자신 또는 소속된 조직으로 설정하세요."
+  },
+  "create.project.owner-label": {
+    "message": "소유자"
+  },
+  "create.project.server-project-title": {
+    "message": "서버 프로젝트 생성"
   },
   "create.project.summary-description": {
     "message": "당신의 프로젝트를 짧은 문장으로 설명해 주세요."
@@ -510,16 +525,25 @@
     "message": "개요"
   },
   "create.project.summary-placeholder": {
-    "message": "이 프로젝트는 ...을 추가합니다"
+    "message": "이 프로젝트에 추가할 건..."
   },
   "create.project.title": {
     "message": "프로젝트 생성"
+  },
+  "create.project.type-label": {
+    "message": "유형"
+  },
+  "create.project.type-project": {
+    "message": "프로젝트"
+  },
+  "create.project.type-server": {
+    "message": "서버"
   },
   "create.project.url-label": {
     "message": "URL"
   },
   "create.project.visibility-description": {
-    "message": "승인 후 프로젝트의 공개 범위"
+    "message": "승인 후 프로젝트의 공개 범위."
   },
   "create.project.visibility-private": {
     "message": "비공개"
@@ -554,8 +578,20 @@
   "dashboard.collections.button.create-new": {
     "message": "새로 만들기"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "첫 컬렉션을 만들어 시작하세요!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "아직 컬렉션이 없습니다"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "검색어와 일치하는 컬렉션이 없습니다"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "검색 필터 또는 검색어를 변경 해보세요."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} 프로젝트}}"
+    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "컬렉션 검색"
@@ -633,7 +669,7 @@
     "message": "사업체란 법인, 파트너십 또는 유한책임회사(LLC)와 같이 등록된 조직을 의미합니다."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "개인으로 출금하시나요, 아니면 사업체로 출금하시나요?"
+    "message": "개인으로 출금하시나요, 아니면 사업자로 출금하시나요?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "개인"
@@ -672,7 +708,7 @@
     "message": "사업체를 대신하여 이 은행 계좌를 운영할 수 있는 권한을 가진 사람의 이름을 입력하세요."
   },
   "dashboard.creator-withdraw-modal.muralpay-details.coin": {
-    "message": "코인"
+    "message": "암호화폐"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.crypto-warning-header": {
     "message": "지갑 주소 확인"
@@ -690,10 +726,10 @@
     "message": "여권 번호 입력"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id": {
-    "message": "주민 ID 번호"
+    "message": "주민등록번호"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-resident-id-placeholder": {
-    "message": "주민 ID 번호 입력"
+    "message": "주민등록번호 입력"
   },
   "dashboard.creator-withdraw-modal.muralpay-details.document-number-ruc": {
     "message": "RUC 번호"
@@ -747,7 +783,7 @@
     "message": "완료"
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
-    "message": "수단"
+    "message": "결제수단"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "세금 신고서"
@@ -765,7 +801,7 @@
     "message": "사용 가능한 금액 단위"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.balance-worth-hint": {
-    "message": "현재 잔액 {usdBalance}은(는) {localBalance}의 가치입니다."
+    "message": "현재 잔액 {usdBalance}는 {localBalance}만큼의 가치입니다."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.enter-amount-hint": {
     "message": "이 가격대 근처의 기프트 카드를 찾으세요."
@@ -795,13 +831,13 @@
     "message": "진행하기 위해 지정 금액을 선택해 주세요"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-header": {
-    "message": "검증되지 않은 이메일"
+    "message": "인증되지 않은 이메일"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.unverified-email-message": {
     "message": "입력하신 배송 이메일은 귀하의 Modrinth 계정과 연결되어 있지 않습니다. Modrinth는 잘못된 이메일 주소로 발송된 보상을 복구할 수 없습니다."
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-header": {
-    "message": "할인된 수수료 이용 가능"
+    "message": "수수료 절감 가능"
   },
   "dashboard.creator-withdraw-modal.tremendous-details.usd-paypal-warning-message": {
     "message": "PayPal 국제 결제를 위해 USD를 선택하셨습니다. <direct-paypal-link>직접 PayPal 결제</direct-paypal-link>로 전환하시면 수수료가 더 저렴합니다(약 6% 대신 약 2%)."
@@ -1107,7 +1143,7 @@
     "message": "Modrinth Hosting 서버는 DDoS 공격 방어 기능을 갖추고 있나요?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "네. 모든 Modrinth Hosting 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17Tbps의 용량을 제공합니다."
+    "message": "네. 모든 Modrinth 호스팅 서버에는 DDoS 공격 방지 기능이 탑재되어 있으며, 일부 지역에서는 최대 17 Tbps의 용량을 제공합니다."
   },
   "hosting-marketing.faq.heading": {
     "message": "자주 묻는 질문"
@@ -1215,7 +1251,7 @@
     "message": "정확히 필요한 것이 있나요?"
   },
   "hosting-marketing.medal.info": {
-    "message": "<orange>Medal</orange>에서 제공하는 <orange>3GB</orange> 서버를 5일 동안 무료로 사용해 보세요."
+    "message": "<orange>Medal</orange>에서 제공하는 <orange>3 GB</orange> 서버를 5일 동안 무료로 사용해 보세요"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "자세히 보기"
@@ -1401,7 +1437,7 @@
     "message": "플레이어를 위해"
   },
   "landing.section.for-players.tagline": {
-    "message": "{count}개 이상의 창작물을 찾으세요"
+    "message": "{count, number} 개 이상의 프로젝트를 만나보세요"
   },
   "landing.subheading": {
     "message": "커뮤니티를 위해 구축된 오픈소스 플랫폼을 통해 마인크래프트 콘텐츠를 찾고, 즐기고, 공유하세요."
@@ -1432,6 +1468,12 @@
   },
   "layout.action.new-project": {
     "message": "새 프로젝트"
+  },
+  "layout.action.new-server-project": {
+    "message": "새 서버"
+  },
+  "layout.action.publish": {
+    "message": "게시"
   },
   "layout.action.reports": {
     "message": "보고서 검토"
@@ -1763,9 +1805,6 @@
   "muralpay.field.bank-account-number": {
     "message": "계좌 번호"
   },
-  "muralpay.field.branch-code": {
-    "message": "은행 코드"
-  },
   "muralpay.field.clabe": {
     "message": "CLABE"
   },
@@ -1795,6 +1834,9 @@
   },
   "muralpay.field.pix-phone": {
     "message": "PIX 전화"
+  },
+  "muralpay.field.random-key": {
+    "message": "임의 키"
   },
   "muralpay.field.routing-number": {
     "message": "라우팅 번호"
@@ -1856,9 +1898,6 @@
   "muralpay.placeholder.enter-account-number": {
     "message": "계좌 번호 입력"
   },
-  "muralpay.placeholder.enter-branch-code": {
-    "message": "은행 코드 입력"
-  },
   "muralpay.placeholder.enter-clabe": {
     "message": "18자리 CLABE 입력"
   },
@@ -1870,6 +1909,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "PIX 이메일 입력"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "임의 키 입력"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "9자리 라우팅 번호 입력"
@@ -1998,7 +2040,7 @@
     "message": "컬렉션"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {다운로드}}"
+    "message": "{count} {countPlural, plural, one {다운로드} other {다운로드}}"
   },
   "profile.label.joined": {
     "message": "가입"
@@ -2019,7 +2061,7 @@
     "message": "조직"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {프로젝트}}"
+    "message": "{count} {countPlural, plural, one {프로젝트} other {프로젝트}}"
   },
   "profile.label.saving": {
     "message": "저장..."
@@ -2102,6 +2144,12 @@
   "project-type.datapack.singular": {
     "message": "데이터 팩"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "서버"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "서버"
+  },
   "project-type.mod.plural": {
     "message": "모드"
   },
@@ -2131,6 +2179,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "리소스 팩"
+  },
+  "project-type.server.plural": {
+    "message": "서버"
+  },
+  "project-type.server.singular": {
+    "message": "서버"
   },
   "project-type.shader.plural": {
     "message": "셰이더"
@@ -2631,7 +2685,7 @@
     "message": "신고 쓰기"
   },
   "scopes.sessionAccess.description": {
-    "message": "Modrinth 발급 세션에 접근하기"
+    "message": "Modrinth에서 발급한 세션 찾기"
   },
   "scopes.sessionAccess.label": {
     "message": "세션 접근"
@@ -2729,9 +2783,6 @@
   "search.filter.locked.server.sync": {
     "message": "서버와 동기화"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "백업 복원이 진행 중입니다"
-  },
   "servers.notice.actions": {
     "message": "활동"
   },
@@ -2784,7 +2835,7 @@
     "message": "추가하기"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "리디렉션 Uri를 추가하세요"
+    "message": "리디렉션 URI 를 추가하세요"
   },
   "settings.applications.button.cancel": {
     "message": "취소"
@@ -2847,7 +2898,7 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "리다이렉트 URIs"
+    "message": "URI 리다이렉트 하기"
   },
   "settings.applications.field.scopes": {
     "message": "범위"
@@ -2954,6 +3005,9 @@
   "settings.display.project-list-layouts.resourcepack": {
     "message": "리소스 팩 페이지"
   },
+  "settings.display.project-list-layouts.server": {
+    "message": "서버 페이지"
+  },
   "settings.display.project-list-layouts.shader": {
     "message": "셰이더 페이지"
   },
@@ -3006,7 +3060,7 @@
     "message": "PAT 생성"
   },
   "settings.pats.description": {
-    "message": "PAT는 Modrinth API 접근에 사용됩니다. 자세한 내용 <doc-link>Modrinth API 문서</doc-link>를 확인하세요. 언제든지 생성 및 해지가 가능합니다."
+    "message": "개인 접속 토큰으로 Modrinth API에 접근 할 수 있습니다. 생성 및 해지가 언제든 가능합니다. <doc-link>Modrinth's API 문서</doc-link>를 확인해보세요."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT 생성"

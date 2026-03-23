@@ -56,15 +56,17 @@ const search = async (query: string) => {
 		options.value = [...resultsByProjectId.hits, ...results.hits].map((hit) => ({
 			label: hit.title,
 			value: hit.project_id,
-			icon: defineAsyncComponent(() =>
-				Promise.resolve({
-					setup: () => () =>
-						h('img', {
-							src: hit.icon_url,
-							alt: hit.title,
-							class: 'h-5 w-5 rounded',
-						}),
-				}),
+			icon: markRaw(
+				defineAsyncComponent(() =>
+					Promise.resolve({
+						setup: () => () =>
+							h('img', {
+								src: hit.icon_url,
+								alt: hit.title,
+								class: 'h-5 w-5 rounded',
+							}),
+					}),
+				),
 			),
 		}))
 	} catch (error: any) {

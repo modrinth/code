@@ -1,3 +1,4 @@
+import containerQueries from '@tailwindcss/container-queries'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -8,6 +9,7 @@ const config: Config = {
 					1: 'var(--surface-1)',
 					1.5: 'var(--surface-1-5)',
 					2: 'var(--surface-2)',
+					2.5: 'var(--surface-2-5)',
 					3: 'var(--surface-3)',
 					4: 'var(--surface-4)',
 					5: 'var(--surface-5)',
@@ -253,7 +255,7 @@ const config: Config = {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [containerQueries],
 	corePlugins: {
 		preflight: false,
 	},

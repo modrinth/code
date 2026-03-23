@@ -175,10 +175,17 @@ function refreshServer(address: string, instancePath: string) {
 	refreshServerData(serverData.value[address], protocolVersions.value[instancePath], address)
 }
 
-async function joinWorld(world: WorldWithProfile) {
+async function joinWorld(world: WorldWithProfile, instance?: GameInstance) {
 	console.log(`Joining world ${getWorldIdentifier(world)}`)
 	if (world.type === 'server') {
 		await start_join_server(world.profile, world.address).catch(handleError)
+		if (instance) {
+			trackEvent('InstanceStart', {
+				loader: instance.loader,
+				game_version: instance.game_version,
+				source: 'WorldItem',
+			})
+		}
 	} else if (world.type === 'singleplayer') {
 		await start_join_singleplayer_world(world.profile, world.path).catch(handleError)
 	}
@@ -188,7 +195,7 @@ async function playInstance(instance: GameInstance) {
 	await run(instance.path)
 		.catch((err) => handleSevereError(err, { profilePath: instance.path }))
 		.finally(() => {
-			trackEvent('InstancePlay', {
+			trackEvent('InstanceStart', {
 				loader: instance.loader,
 				game_version: instance.game_version,
 				source: 'WorldItem',
@@ -317,7 +324,7 @@ onUnmounted(() => {
 						() => {
 							currentProfile = item.instance.path
 							currentWorld = getWorldIdentifier(item.world)
-							joinWorld(item.world)
+							joinWorld(item.world, item.instance)
 						}
 					"
 					@play-instance="

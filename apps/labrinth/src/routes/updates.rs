@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::database::PgPool;
+use crate::env::ENV;
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::{Deserialize, Serialize};
 
@@ -94,11 +95,7 @@ pub async fn forge_updates(
     }
 
     let mut response = ForgeUpdates {
-        homepage: format!(
-            "{}/mod/{}",
-            dotenvy::var("SITE_URL").unwrap_or_default(),
-            id
-        ),
+        homepage: format!("{}/mod/{}", ENV.SITE_URL, id),
         promos: HashMap::new(),
     };
 

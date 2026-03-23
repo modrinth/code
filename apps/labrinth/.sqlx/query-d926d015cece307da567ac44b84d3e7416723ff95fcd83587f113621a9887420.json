@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n\t\t\t\tDELETE FROM shared_instance_users\n\t\t\t\tWHERE user_id = $1\n\t\t\t\t",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d926d015cece307da567ac44b84d3e7416723ff95fcd83587f113621a9887420"
+}

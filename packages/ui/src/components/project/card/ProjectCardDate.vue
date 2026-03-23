@@ -1,36 +1,39 @@
 <script setup lang="ts">
 import { CalendarIcon, HistoryIcon } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
-import dayjs from 'dayjs'
 import { computed } from 'vue'
 
-import { useRelativeTime, useVIntl } from '../../../composables'
+import { defineMessage, useFormatDateTime, useRelativeTime, useVIntl } from '../../../composables'
 
 const { formatMessage } = useVIntl()
 
 const formatRelativeTime = useRelativeTime()
+const formatDateTime = useFormatDateTime({
+	timeStyle: 'short',
+	dateStyle: 'long',
+})
 
 const props = defineProps<{
 	date: Date
 	type: 'updated' | 'published'
 }>()
 
-const formattedDate = computed(() => dayjs(props.date).format('MMMM D, YYYY [at] h:mm A'))
+const formattedDate = computed(() => formatDateTime(props.date))
 
 const types = {
 	updated: {
 		icon: HistoryIcon,
-		tooltip: {
+		tooltip: defineMessage({
 			id: 'project-card.date.updated.tooltip',
 			defaultMessage: 'Updated {date}',
-		},
+		}),
 	},
 	published: {
 		icon: CalendarIcon,
-		tooltip: {
+		tooltip: defineMessage({
 			id: 'project-card.date.published.tooltip',
 			defaultMessage: 'Published {date}',
-		},
+		}),
 	},
 }
 

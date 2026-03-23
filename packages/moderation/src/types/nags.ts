@@ -22,6 +22,10 @@ export interface NagContext {
 	 */
 	project: Labrinth.Projects.v2.Project
 	/**
+	 * The project V3 associated with the nag.
+	 */
+	projectV3: Labrinth.Projects.v3.Project
+	/**
 	 * The versions associated with the project.
 	 */
 	versions: Labrinth.Versions.v2.Version[]

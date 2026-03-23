@@ -22,7 +22,7 @@ export function useDebugLogger(namespace: string) {
 	// eslint-disable-next-line
 	return (...args: any[]) => {
 		const location = getCallerLocation()
-		const prefix = location ? `[${namespace}] [${location}]` : `[${namespace}]`
+		const prefix = location ? `[${namespace}] ${location}` : `[${namespace}]`
 		console.debug(prefix, ...args)
 	}
 }

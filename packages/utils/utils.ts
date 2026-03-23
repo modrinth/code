@@ -60,10 +60,23 @@ export const computeVersions = (versions, members) => {
 		.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
 
+const SERVER_HEADER_ORDER = [
+	'minecraft_server_features',
+	'minecraft_server_gameplay',
+	'minecraft_server_meta',
+	'minecraft_server_community',
+]
+
 export const sortedCategories = (tags, formatCategoryName, locale) => {
 	return tags.categories.slice().sort((a, b) => {
 		const headerCompare = a.header.localeCompare(b.header)
 		if (headerCompare !== 0) {
+			const aServerIdx = SERVER_HEADER_ORDER.indexOf(a.header)
+			const bServerIdx = SERVER_HEADER_ORDER.indexOf(b.header)
+			if (aServerIdx !== -1 && bServerIdx !== -1) {
+				return aServerIdx - bServerIdx
+			}
+
 			return headerCompare
 		}
 
@@ -72,44 +85,13 @@ export const sortedCategories = (tags, formatCategoryName, locale) => {
 			return x.indexOf(a.name) - x.indexOf(b.name)
 		}
 
+		if (a.name === 'pokemon') return -1
+		if (b.name === 'pokemon') return 1
+
 		const aFormatted = formatCategoryName(a.name)
 		const bFormatted = formatCategoryName(b.name)
 		return aFormatted.localeCompare(bFormatted, locale, { numeric: true })
 	})
-}
-
-export const formatNumber = (number, abbreviate = true) => {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `${(x / 1000).toFixed(1).toString()}k`
-	}
-	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
-export function formatDate(
-	date: dayjs.Dayjs,
-	options: Intl.DateTimeFormatOptions = {
-		month: 'long',
-		day: 'numeric',
-		year: 'numeric',
-	},
-): string {
-	return date.toDate().toLocaleDateString(undefined, options)
-}
-
-export function formatMoney(number, abbreviate = false) {
-	const x = Number(number)
-	if (x >= 1000000 && abbreviate) {
-		return `$${(x / 1000000).toFixed(2).toString()}M`
-	} else if (x >= 10000 && abbreviate) {
-		return `$${(x / 1000).toFixed(2).toString()}k`
-	}
-	return `$${x
-		.toFixed(2)
-		.toString()
-		.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
 export const formatBytes = (bytes, decimals = 2) => {
@@ -158,6 +140,8 @@ export const formatProjectType = (name, short = false) => {
 		return 'Data Pack'
 	} else if (name === 'modpack') {
 		return 'Modpack'
+	} else if (name === 'minecraft_java_server') {
+		return 'Server'
 	}
 
 	return capitalizeString(name)

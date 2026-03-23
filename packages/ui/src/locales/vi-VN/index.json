@@ -41,6 +41,9 @@
   "badge.new": {
     "defaultMessage": "Mới"
   },
+  "button.accept": {
+    "defaultMessage": "Chấp nhận"
+  },
   "button.affiliate-links": {
     "defaultMessage": "Liên kết affiliate"
   },
@@ -52,6 +55,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Huỷ"
+  },
+  "button.change-version": {
+    "defaultMessage": "Thay đổi phiên bản"
   },
   "button.clear": {
     "defaultMessage": "Xoá"
@@ -71,6 +77,9 @@
   "button.create-a-project": {
     "defaultMessage": "Tạo dự án"
   },
+  "button.decline": {
+    "defaultMessage": "Huỷ bỏ"
+  },
   "button.download": {
     "defaultMessage": "Tải xuống"
   },
@@ -82,6 +91,9 @@
   },
   "button.follow": {
     "defaultMessage": "Theo dõi"
+  },
+  "button.hide-snapshots": {
+    "defaultMessage": ""
   },
   "button.max": {
     "defaultMessage": "Tối đa"
@@ -113,6 +125,9 @@
   "button.reset": {
     "defaultMessage": "Đặt lại"
   },
+  "button.retry": {
+    "defaultMessage": "Thử lại"
+  },
   "button.save": {
     "defaultMessage": "Lưu"
   },
@@ -137,6 +152,9 @@
   "button.unfollow": {
     "defaultMessage": "Bỏ theo dõi"
   },
+  "button.update": {
+    "defaultMessage": "Cập nhật"
+  },
   "button.upload-image": {
     "defaultMessage": "Tải ảnh lên"
   },
@@ -154,6 +172,9 @@
   },
   "changelog.product.web": {
     "defaultMessage": "Trang web"
+  },
+  "collections.label.private": {
+    "defaultMessage": "Riêng tư"
   },
   "form.label.address-line": {
     "defaultMessage": "Dòng địa chỉ"
@@ -233,6 +254,30 @@
   "form.placeholder.state": {
     "defaultMessage": "Nhập bang/tỉnh"
   },
+  "header.category.category": {
+    "defaultMessage": "Loại"
+  },
+  "header.category.feature": {
+    "defaultMessage": "Tính năng"
+  },
+  "header.category.minecraft-server-community": {
+    "defaultMessage": "Cộng đồng"
+  },
+  "header.category.minecraft-server-features": {
+    "defaultMessage": "Nhiều tính năng"
+  },
+  "header.category.minecraft-server-gameplay": {
+    "defaultMessage": "Lối chơi"
+  },
+  "header.category.performance-impact": {
+    "defaultMessage": "Ảnh hưởng hiệu suất"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Tăng tốc tối đa lên {cpus} CPU"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "Tính năng tăng tốc CPU cho phép máy chủ của bạn tạm thời sử dụng thêm các luồng để giúp giảm thiểu hiện tượng tăng đột biến TPS (số giao dịch mỗi giây). Nhấp vào đây để biết thêm thông tin."
+  },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
   },
@@ -281,6 +326,33 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Chế độ chơi không xác định"
   },
+  "instances.modpack-content-modal.back-button": {
+    "defaultMessage": "Quay lại"
+  },
+  "instances.modpack-content-modal.copy-link": {
+    "defaultMessage": "Sao chép liên kết"
+  },
+  "instances.modpack-content-modal.empty-description": {
+    "defaultMessage": "Gói modpack này không bao gồm các nội dung bổ sung nào."
+  },
+  "instances.modpack-content-modal.empty-title": {
+    "defaultMessage": "Không có nội dung nào được tìm thấy"
+  },
+  "instances.modpack-content-modal.filter-all": {
+    "defaultMessage": "Tất cả"
+  },
+  "instances.modpack-content-modal.header": {
+    "defaultMessage": "Nội dung modpack"
+  },
+  "instances.modpack-content-modal.loading": {
+    "defaultMessage": "Đang tải nội dung..."
+  },
+  "instances.modpack-content-modal.no-results": {
+    "defaultMessage": "Không có dự án nào phù hợp với kết quả tìm kiếm."
+  },
+  "instances.modpack-content-modal.search-placeholder": {
+    "defaultMessage": "Tìm {count, number} {count, plural, one {project} other {projects}}"
+  },
   "label.available": {
     "defaultMessage": "{amount} khả dụng."
   },
@@ -322,9 +394,6 @@
   },
   "label.password": {
     "defaultMessage": "Mật khẩu"
-  },
-  "label.played": {
-    "defaultMessage": "Đã chơi {time}"
   },
   "label.public": {
     "defaultMessage": "Công khai"
@@ -635,14 +704,8 @@
   "project.about.links.wiki": {
     "defaultMessage": "Xem wiki"
   },
-  "project.environment.client-and-server.description": {
-    "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
-  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Máy khách và máy chủ, yêu cầu ở cả hai bên"
-  },
-  "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Máy khách và máy chủ, tùy chọn trên máy chủ"
@@ -653,26 +716,14 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Chỉ phía client"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Máy khách và máy chủ, hoạt động tốt nhất khi được cài trên cả hai bên"
   },
   "project.environment.client-or-server.description": {
     "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "Mọi chức năng đều chạy phía server và tương thích với client vanilla."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Chỉ phía máy chủ"
-  },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Có một số chức năng hoạt động trên cả client và server, dù chỉ ở mức độ một phần."
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "Mọi chức năng đều chạy phía server và tương thích với client vanilla."
   },
   "project.environment.singleplayer-only.description": {
     "defaultMessage": "Chức năng này chỉ hoạt động trong chế độ chơi đơn hoặc khi không kết nối với máy chủ nhiều người chơi."
@@ -872,9 +923,6 @@
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Lịch sao lưu"
   },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Đang tạo sao lưu"
-  },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Tạo sao lưu thất bại"
   },
@@ -1042,9 +1090,6 @@
   },
   "settings.profile.title": {
     "defaultMessage": "Hồ sơ công khai"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} vào lúc {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Bạn có những thay đổi chưa được lưu"

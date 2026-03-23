@@ -106,6 +106,8 @@ import {
 } from '../../composables/i18n'
 
 const { formatMessage } = useVIntl()
+// TODO: anything in this component that uses the router will not work in the app. and this component is used in the app.
+// fix is to replace any router stuff with click handlers and pass in the handlers as props from the parent component
 const router = useRouter()
 
 type EnvironmentValue = 'optional' | 'required' | 'unsupported' | 'unknown'

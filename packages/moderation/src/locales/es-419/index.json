@@ -3,13 +3,25 @@
     "defaultMessage": "Se requiere una descripción que indique claramente el propósito y la función del proyecto."
   },
   "nags.add-description.title": {
-    "defaultMessage": "Añadirr descripcion"
+    "defaultMessage": "Agrega una descripción"
   },
   "nags.add-icon.description": {
     "defaultMessage": "Agrega un ícono único, relevante y atractivo hace que tu proyecto sea fácilmente identificable y destaque."
   },
   "nags.add-icon.title": {
     "defaultMessage": "Agrega un ícono"
+  },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Agrega la dirección IP y el puerto que los jugadores de Java Edition pueden usar para unirse a tu servidor."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Agrega una dirección de Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Agrega cualquier enlace relevante que esté fuera de Modrinth, cómo un sitio web, tienda, o una invitación de Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Agrega enlaces externos"
   },
   "nags.add-links.description": {
     "defaultMessage": "Agrega cualquier enlace relevante fuera de Modrinth, como el código fuente, un rastreador de incidencias o una invitación de Discord."
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Proporciona el código fuente"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Algunos de tus enlaces externos parecen ser idénticos. Cada enlace debe introducirse solo una vez y con el tipo de enlace adecuado."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Enlaces idénticos"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Tu descripción debe incluir suficiente texto plano o texto alternativo para imágenes, de modo que sea accesible para quienes usan lectores de pantalla o tienen conexiones lentas a Internet."
@@ -108,7 +126,7 @@
     "defaultMessage": "Mover invitación de Discord"
   },
   "nags.moderation.title": {
-    "defaultMessage": "Visitar hilo de moderación"
+    "defaultMessage": "Ver hilo de moderación"
   },
   "nags.moderator-feedback.description": {
     "defaultMessage": "Revisa y atiende todas las inquietudes del equipo de moderación antes de volver a enviar."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Elige la resolución correcta"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Selecciona las versiones que soporta tu servidor, elige un modpack o sube el tuyo."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Selecciona compatibilidad"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Informe a los jugadores en qué región se encuentra su servidor."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Selecciona una región"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Indica el idioma o los idiomas que soporta tu servidor."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Selecciona un idioma"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Selecciona la licencia bajo la cual se distribuye tu {type, select, mod {mod} modpack {modpack} resourcepack {paquete de recursos} shader {shader} plugin {plugin} datapack {paquete de datos} other {proyecto}}."
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Selecciona etiquetas"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Ver configuración del servidor"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Ver configuración de la descripción"
@@ -172,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Hacer el nombre más claro"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Por favor, redúcelas a {maxTagCount} o menos para asegurarte de que tu servidor aparezca en resultados de búsqueda relevantes."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Selecciona etiquetas adecuadas"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Has seleccionado {tagCount, plural, one {# etiqueta} other {# etiquetas}}. Considera reducirlas a {maxTagCount} o menos para asegurarte de que tu proyecto aparezca en resultados de búsqueda relevantes."

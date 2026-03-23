@@ -1,6 +1,7 @@
 use std::{collections::HashMap, net::Ipv4Addr, sync::Arc};
 
 use crate::database::PgPool;
+use crate::env::ENV;
 use crate::{
     auth::get_user_from_headers,
     database::{
@@ -13,10 +14,7 @@ use crate::{
     },
     queue::{analytics::AnalyticsQueue, session::AuthQueue},
     routes::analytics::FILTERED_HEADERS,
-    util::{
-        date::get_current_tenths_of_ms, env::parse_strings_from_var,
-        error::Context,
-    },
+    util::{date::get_current_tenths_of_ms, error::Context},
 };
 use actix_web::{HttpRequest, delete, get, patch, post, put, web};
 use ariadne::ids::UserId;
@@ -70,11 +68,10 @@ async fn ingest_click(
     })?;
     let url_origin = url.origin().ascii_serialization();
 
-    let is_valid_url_origin =
-        parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS")
-            .unwrap_or_default()
-            .iter()
-            .any(|origin| origin == "*" || url_origin == *origin);
+    let is_valid_url_origin = ENV
+        .ANALYTICS_ALLOWED_ORIGINS
+        .iter()
+        .any(|origin| origin == "*" || url_origin == *origin);
 
     if !is_valid_url_origin {
         return Err(ApiError::InvalidInput(

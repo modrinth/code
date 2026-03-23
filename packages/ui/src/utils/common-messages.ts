@@ -77,10 +77,6 @@ export const commonMessages = defineMessages({
 		id: 'label.dashboard',
 		defaultMessage: 'Dashboard',
 	},
-	dateAtTimeTooltip: {
-		id: 'tooltip.date-at-time',
-		defaultMessage: '{date, date, long} at {time, time, short}',
-	},
 	declineButton: {
 		id: 'button.decline',
 		defaultMessage: 'Decline',
@@ -88,6 +84,10 @@ export const commonMessages = defineMessages({
 	deleteLabel: {
 		id: 'label.delete',
 		defaultMessage: 'Delete',
+	},
+	deleteImmediatelyLabel: {
+		id: 'label.delete-immediately',
+		defaultMessage: 'Delete immediately',
 	},
 	descriptionLabel: {
 		id: 'label.description',
@@ -199,7 +199,7 @@ export const commonMessages = defineMessages({
 	},
 	playedLabel: {
 		id: 'label.played',
-		defaultMessage: 'Played {time}',
+		defaultMessage: 'Played {ago}',
 	},
 	privateLabel: {
 		id: 'collections.label.private',
@@ -295,7 +295,7 @@ export const commonMessages = defineMessages({
 	},
 	sortByLabel: {
 		id: 'label.sort-by',
-		defaultMessage: 'Sort by',
+		defaultMessage: 'Sort by: ',
 	},
 	stopButton: {
 		id: 'button.stop',
@@ -337,9 +337,90 @@ export const commonMessages = defineMessages({
 		id: 'label.yes',
 		defaultMessage: 'Yes',
 	},
+	platformLabel: {
+		id: 'label.platform',
+		defaultMessage: 'Platform',
+	},
+	gameVersionLabel: {
+		id: 'label.game-version',
+		defaultMessage: 'Game version',
+	},
+	selectVersionPlaceholder: {
+		id: 'input.select-version.placeholder',
+		defaultMessage: 'Select version',
+	},
+	searchVersionPlaceholder: {
+		id: 'input.search-version.placeholder',
+		defaultMessage: 'Search version...',
+	},
+	unknownLabel: {
+		id: 'label.unknown',
+		defaultMessage: 'Unknown',
+	},
+	modpackLabel: {
+		id: 'label.modpack',
+		defaultMessage: 'Modpack',
+	},
+	repairButton: {
+		id: 'button.repair',
+		defaultMessage: 'Repair',
+	},
+	repairingButton: {
+		id: 'button.repairing',
+		defaultMessage: 'Repairing...',
+	},
+	showAllVersionsButton: {
+		id: 'button.show-all-versions',
+		defaultMessage: 'Show all versions',
+	},
+	hideSnapshotsButton: {
+		id: 'button.hide-snapshots',
+		defaultMessage: 'Hide snapshots',
+	},
+	installationInfoTitle: {
+		id: 'label.installation-info',
+		defaultMessage: 'Installation info',
+	},
+	installedModpackTitle: {
+		id: 'label.installed-modpack',
+		defaultMessage: 'Installed modpack',
+	},
+	changeVersionButton: {
+		id: 'button.change-version',
+		defaultMessage: 'Change version',
+	},
+	unlinkModpackButton: {
+		id: 'button.unlink-modpack',
+		defaultMessage: 'Unlink modpack',
+	},
+	reinstallModpackButton: {
+		id: 'button.reinstall-modpack',
+		defaultMessage: 'Re-install modpack',
+	},
+	resetServerButton: {
+		id: 'button.reset-server',
+		defaultMessage: 'Reset server',
+	},
+	clientOnlyWarning: {
+		id: 'label.client-only-warning',
+		defaultMessage:
+			"This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict.",
+	},
+	selectAllLabel: {
+		id: 'label.select-all',
+		defaultMessage: 'Select all',
+	},
+	selectionActionsLabel: {
+		id: 'label.selection-actions',
+		defaultMessage: 'Selection actions',
+	},
 	updateAvailableLabel: {
 		id: 'label.update-available',
 		defaultMessage: 'Update available',
+	},
+	installingLabel: {
+		id: 'label.installing',
+		defaultMessage: 'Installing...',
 	},
 	changelogLabel: {
 		id: 'label.changelog',
@@ -369,6 +450,30 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	planUnknownLabel: {
+		id: 'label.plan-unknown',
+		defaultMessage: 'Unknown',
+	},
+	planSmallLabel: {
+		id: 'label.plan-small',
+		defaultMessage: 'Small',
+	},
+	planMediumLabel: {
+		id: 'label.plan-medium',
+		defaultMessage: 'Medium',
+	},
+	planLargeLabel: {
+		id: 'label.plan-large',
+		defaultMessage: 'Large',
+	},
+	planCustomLabel: {
+		id: 'label.plan-custom',
+		defaultMessage: 'Custom',
+	},
+	switchVersionButton: {
+		id: 'button.switch-version',
+		defaultMessage: 'Switch version',
+	},
 	projectCreated: {
 		id: 'project.about.details.created',
 		defaultMessage: 'Created {date}',
@@ -387,11 +492,28 @@ export const commonMessages = defineMessages({
 	},
 	projectDownloads: {
 		id: 'project.download-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {download} other {downloads}}',
+		defaultMessage: '{count, number} {count, plural, one {download} other {downloads}}',
 	},
 	projectFollowers: {
 		id: 'project.follower-count-tooltip',
-		defaultMessage: '{count} {count, plural, one {followers} other {followers}}',
+		defaultMessage: '{count, number} {count, plural, one {follower} other {followers}}',
+	},
+	projectOnlinePlayerCount: {
+		id: 'project.online-player-count',
+		defaultMessage: '{count, number} online',
+	},
+	projectOnlinePlayerCountTooltip: {
+		id: 'project.online-player-count.tooltip',
+		defaultMessage: '{count} {countPlural, plural, one {player} other {players}} online',
+	},
+	projectRecentPlays: {
+		id: 'project.recent-plays',
+		defaultMessage: '{count} {countPlural, plural, one {recent play} other {recent plays}}',
+	},
+	projectRecentPlaysTooltip: {
+		id: 'project.recent-plays.tooltip',
+		defaultMessage:
+			'{count} {countPlural, plural, one {recent play} other {recent plays}} from Modrinth in the past 2 weeks',
 	},
 })
 
@@ -665,6 +787,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.analytics.title',
 		defaultMessage: 'Analytics',
 	},
+	content: {
+		id: 'project.settings.content.title',
+		defaultMessage: 'Content',
+	},
 	description: {
 		id: 'project.settings.description.title',
 		defaultMessage: 'Description',
@@ -708,6 +834,10 @@ export const commonProjectSettingsMessages = defineMessages({
 	upload: {
 		id: 'project.settings.upload.title',
 		defaultMessage: 'Upload',
+	},
+	server: {
+		id: 'project.settings.server.title',
+		defaultMessage: 'Server',
 	},
 	versions: {
 		id: 'project.settings.versions.title',

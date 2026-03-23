@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "Dodaj ikonę"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Dodaj adres IP i port, którego gracze Java Edition mogą użyć, by połączyć się z Twoim serwerem."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Dodaj adres Java"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak strona, sklep lub zaproszenie Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Dodaj zewnętrzne linki"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Dodaj wszelkie odpowiednie linki skierowane poza Modrinth, takie jak kod źródłowy, śledzenie problemu lub zaproszenie Discord."
   },
@@ -58,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Podaj kod źródłowy"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Niektóre z Twoich linków zewnętrznych wydają się być identyczne. Każdy link powinien być wprowadzony tylko raz i z odpowiednim typem linku."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Takie same linki"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "Twój opis powinien zawierać wystarczająco zwykłego tekstu lub tekstu alternatywnego obrazów, aby był przystępny dla osób korzystających z czytników ekranu lub mających wolne połączenie z internetem."
@@ -122,6 +140,24 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Wybierz poprawną rozdzielczość"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Wybierz wersje gry, które wspiera Twój serwer, wybierz istniejącą paczkę modów lub prześlij własną."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Ustal kompatybilność"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Poinformuj graczy, w jakim regionie znajduje się Twój serwer."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Wybierz region"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Podaj język bądź języki, które wspiera Twój serwer."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Wybierz język"
+  },
   "nags.select-license.description": {
     "defaultMessage": "Wybierz licencję, pod którą {type, select, mod {udostępniony jest Twój mod} modpack {udostępniona jest Twoja paczka modów} resourcepack {udostępniona jest Twoja paczka zasobów} shader {udostępnione są Twoje shadery} plugin {udostępniony jest Twój plugin} datapack {udostępniona jest Twoja paczka danych} other {udostępniony jest Twój projekt}}."
   },
@@ -133,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Wybierz etykiety"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Odwiedź ustawienia serwera"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Odwiedź ustawienia opisu"
@@ -173,8 +212,14 @@
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Oczyść nazwę"
   },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój serwer był łatwiejszy do znalezienia."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Wybierz odpowiednie tagi"
+  },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój projekt był łatwiejszy to znalezienia."
+    "defaultMessage": "Wybrano {tagCount, plural, one {# tag} few {# tagi} other {# tagów}}. Spróbuj użyć {maxTagCount} lub mniej tagów, by Twój projekt był łatwiejszy do znalezienia."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Wybierz odpowiednie tagi"

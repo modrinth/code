@@ -622,7 +622,7 @@ impl From<LegacyModrinthVersion> for Version {
             featured: value.featured,
             name: value.name,
             version_number: value.version_number,
-            changelog: value.changelog,
+            changelog: Some(value.changelog),
             changelog_url: value.changelog_url,
             date_published: value.date_published,
             downloads: value.downloads,

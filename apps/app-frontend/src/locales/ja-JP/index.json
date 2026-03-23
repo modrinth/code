@@ -1,9 +1,84 @@
 {
   "app.auth-servers.unreachable.body": {
-    "message": "Minecraft の認証サーバーは現在停止している可能性があります。インターネット接続を確認し、しばらくしてからもう一度お試しください。"
+    "message": "Minecraftの認証サーバーは現在停止している可能性があります。インターネット接続を確認し、しばらくしてからもう一度お試しください。"
   },
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Modパックの説明を入力…"
+  },
+  "app.export-modal.export-button": {
+    "message": "書き出し"
+  },
+  "app.export-modal.header": {
+    "message": "Modパックを書き出す"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modパック名"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modパック名"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "パックに含めるファイルとフォルダーを選択"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "バージョン番号"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "インスタンス内のすべてのデータは、ワールド、設定、インストール済みのコンテンツを含め、完全に削除されます。"
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "この操作は取り消せません"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "インスタンスを削除"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "インスタンスを削除"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "プロジェクト"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "リンクをコピー"
+  },
+  "app.instance.mods.installing": {
+    "message": "インストール中…"
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modパック"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "「{name}」が追加されました"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count}件のプロジェクトが追加されました"
+  },
+  "app.instance.mods.share-text": {
+    "message": "私のModパックで使われているプロジェクトをチェック！"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Modパックのコンテンツを共有"
+  },
+  "app.instance.mods.show-file": {
+    "message": "ファイルを表示"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "アップロードに成功しました"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "不明"
+  },
+  "app.instance.mods.updating": {
+    "message": "アップデート中…"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "必須コンテンツ"
   },
   "app.modal.install-to-play.header": {
     "message": "インストールしてプレイ"
@@ -14,11 +89,11 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, other {#個のMod}}"
   },
-  "app.modal.install-to-play.server-requires-mods": {
-    "message": "このサーバーをプレイするにはMODが必要です。インストールをクリックしてModrinthから必要なファイルを設定してください。"
+  "app.modal.install-to-play.required-modpack": {
+    "message": "必須のModパック"
   },
-  "app.modal.install-to-play.shared-by-today": {
-    "message": "{name} が本日この事例を共有しました。"
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "このサーバーをプレイするにはModが必要です。インストールをクリックしてModrinthから必要なファイルを設定し、サーバーに接続してください。"
   },
   "app.modal.install-to-play.shared-instance": {
     "message": "共有インスタンス"
@@ -26,35 +101,17 @@
   "app.modal.install-to-play.shared-server-instance": {
     "message": "共有サーバーインスタンス"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count}追加"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "追加"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "削除済み"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "更新済み"
+  "app.modal.install-to-play.view-contents": {
+    "message": "コンテンツを見る"
   },
   "app.modal.update-to-play.header": {
     "message": "更新してプレイ"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count}件削除されました"
   },
   "app.modal.update-to-play.update-required": {
     "message": "更新が必要です"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}をプレイするには更新が必要です。ゲームを起動するには最新版に更新してください。"
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} 更新されました"
   },
   "app.settings.developer-mode-enabled": {
     "message": "開発者モードがオンになっています。"
@@ -83,38 +140,32 @@
   "app.settings.tabs.resource-management": {
     "message": "リソース管理"
   },
-  "app.update-toast.body": {
-    "message": "Modrinth App v{version}のインストールの準備ができました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} のインストール準備が整いました！今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
   },
-  "app.update-toast.body.download-complete": {
-    "message": "Modrinth App v{version}のダウンロードが完了しました。再起動して今すぐ更新するか、アプリを閉じた際に自動で更新されます。"
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} のダウンロードが完了しました。今すぐ更新するには再読み込みするか、Modrinth Appを閉じる際に自動更新されます。"
   },
-  "app.update-toast.body.linux": {
+  "app.update-popup.body.linux": {
     "message": "Modrinth App v{version} が利用可能です。最新の機能と修正プログラムを入手するには、パッケージマネージャーを使用して更新してください！"
   },
-  "app.update-toast.body.metered": {
-    "message": "Modrinth App v{version}は今すぐダウンロードできます。従量課金制ネットワークを使用しているため自動ダウンロードはされていません。"
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} が利用可能になりました！お使いのネットワークが従量制のため、自動ダウンロードは行っておりません。"
   },
-  "app.update-toast.changelog": {
+  "app.update-popup.changelog": {
     "message": "更新履歴"
   },
-  "app.update-toast.download": {
+  "app.update-popup.download": {
     "message": "ダウンロード ({size})"
   },
-  "app.update-toast.download-page": {
-    "message": "ダウンロード"
-  },
-  "app.update-toast.downloading": {
-    "message": "ダウンロード中..."
-  },
-  "app.update-toast.reload": {
-    "message": "再起動"
-  },
-  "app.update-toast.title": {
-    "message": "アップデートが利用可能です"
-  },
-  "app.update-toast.title.download-complete": {
+  "app.update-popup.download-complete": {
     "message": "ダウンロード完了"
+  },
+  "app.update-popup.reload": {
+    "message": "再読み込み"
+  },
+  "app.update-popup.title": {
+    "message": "アップデートが利用可能です"
   },
   "app.update.complete-toast.text": {
     "message": "クリックすると更新履歴を表示できます。"
@@ -183,7 +234,7 @@
     "message": "保留中"
   },
   "friends.no-friends-match": {
-    "message": "フレンド\"{query}\"は見つかりませんでした"
+    "message": "フレンド「{query}」は見つかりませんでした"
   },
   "friends.search-friends-placeholder": {
     "message": "フレンドを検索…"
@@ -222,19 +273,13 @@
     "message": "名前"
   },
   "instance.edit-world.placeholder-name": {
-    "message": "Mincraft ワールド"
+    "message": "Mincraftワールド"
   },
   "instance.edit-world.reset-icon": {
     "message": "アイコンをリセット"
   },
   "instance.edit-world.title": {
     "message": "ワールドを編集"
-  },
-  "instance.filter.disabled": {
-    "message": "無効なプロジェクト"
-  },
-  "instance.filter.updates-available": {
-    "message": "アップデートが可能"
   },
   "instance.server-modal.address": {
     "message": "アドレス"
@@ -258,7 +303,7 @@
     "message": "インスタンスを削除"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定、他、全てのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
+    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定などの全てのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "削除中…"
@@ -318,7 +363,7 @@
     "message": "ゲームが閉じられた後に実行されます。"
   },
   "instance.settings.tabs.hooks.post-exit.enter": {
-    "message": "終了後のコマンドを入力"
+    "message": "終了後のコマンドを入力…"
   },
   "instance.settings.tabs.hooks.pre-launch": {
     "message": "起動前"
@@ -327,7 +372,7 @@
     "message": "ゲームが起動する前に実行されます。"
   },
   "instance.settings.tabs.hooks.pre-launch.enter": {
-    "message": "起動前のコマンドを入力"
+    "message": "起動前のコマンドを入力…"
   },
   "instance.settings.tabs.hooks.title": {
     "message": "ゲーム起動フック"
@@ -336,7 +381,7 @@
     "message": "ラッパー"
   },
   "instance.settings.tabs.hooks.wrapper.description": {
-    "message": "Minecraftを起動用のラッパーコマンド。"
+    "message": "Minecraftを起動するためのラッパーコマンド。"
   },
   "instance.settings.tabs.hooks.wrapper.enter": {
     "message": "ラッパーのコマンドを入力…"
@@ -344,140 +389,8 @@
   "instance.settings.tabs.installation": {
     "message": "インストール"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Minecraft {game_version} の {platform} {version} はすでにインストールされています"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "Vanilla {game_version} はすでにインストールされています"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "バージョンを変更"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "インストール"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "インストール中"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "ModPackのバージョンを取得しています"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "新しいバージョンをインストール中"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "インストール済"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "デバッグ情報："
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "ModPackの情報を取得しています"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "ゲームバージョン"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "インストール"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "インストール中"
-  },
   "instance.settings.tabs.installation.loader-version": {
-    "message": "{loader} バージョン"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "リンクされたModpackの情報が取得できませんでした。インターネット接続を確認してください。"
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader}はMinecraft {version}で使用できません。別のローダーを選択してください。"
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "このインスタンスはModpackにリンクされていますが、ModrinthではModpackが見つかりません。"
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "プラットフォーム"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "Modpackを再インストール"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "Modpackを再インストール中"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "再インストールすると、全てのコンテンツがModpackで提供される内容にリセットされ、元のコンテンツに追加されたMod等やコンテンツは全て削除されます。インスタンスに変更を加えていた場合、予期せぬ動作が修正がされる場合がありますが、ワールドが追加でインストールされたコンテンツに依存している場合、既存のワールドで動かなくなる可能性があります。"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "本当にインスタンスを再インストールしますか？"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "インスタンスの状態をもとの状態にリセットし、元のModpackに追加されたModやコンテンツ等を削除します。"
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "Modpackを再インストール"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "修復"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "修復中"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "修復を行うと、Minecraftの依存関係が再インストールされ、破損がないかのチェックが行われます。ランチャー関連の問題の場合は、修復によって解決する可能性がありますが、インストール済みのModに関する問題は解決されません。"
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "インスタンスを修復しますか？"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "修復中"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "現在の状態にリセット"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "全てのバージョンを表示"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "バージョンを変更"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "インストール"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "再インストール"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "修復"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "インストール中に{action}することはできません"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "オフラインの時に{action}することはできません"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "修復中に{action}することはできません"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(不明なバージョン)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "インスタンスのリンク解除"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "この操作を行うと、新しいインスタンスを作らなければ再びリンクすることはできなくなります。通常のインスタンスになるので、modpackのバージョンアップは利用できなくなります。"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "本当にインスタンスのリンクを解除しますか？"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "このインスタンスはmodpackにリンクされているので、modやmodローダー、Minecraftのバージョンを変更することはできません。リンクを解除するとこのインスタンスとmodpackは永久に分離されます。"
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "modpackとのリンクを解除する"
+    "message": "{loader}のバージョン"
   },
   "instance.settings.tabs.java": {
     "message": "Javaとメモリ"
@@ -489,13 +402,13 @@
     "message": "フック"
   },
   "instance.settings.tabs.java.java-arguments": {
-    "message": "Java コマンドライン引数"
+    "message": "Javaコマンドライン引数"
   },
   "instance.settings.tabs.java.java-installation": {
     "message": "Javaのインストール"
   },
   "instance.settings.tabs.java.java-memory": {
-    "message": "メモリ割り当て量"
+    "message": "メモリ割り当て"
   },
   "instance.settings.tabs.window": {
     "message": "ウィンドウ"
@@ -551,6 +464,9 @@
   "instance.worlds.incompatible_server": {
     "message": "サーバーに互換性がありません"
   },
+  "instance.worlds.linked_server": {
+    "message": "サーバープロジェクトによる管理"
+  },
   "instance.worlds.no_contact": {
     "message": "サーバーに接続できませんでした"
   },
@@ -576,15 +492,27 @@
     "message": "ワールドは使用中"
   },
   "search.filter.locked.instance": {
-    "message": "インスタンスより提供"
+    "message": "インスタンスによる条件"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "ゲームバージョンはインスタンスより提供"
+    "message": "ゲームバージョンはインスタンスによる条件です"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "ローダーはインスタンスにより提供"
+    "message": "ローダーはインスタンスによる条件です"
   },
   "search.filter.locked.instance.sync": {
     "message": "インスタンスと同期"
+  },
+  "search.filter.locked.server": {
+    "message": "サーバーによる条件"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "サーバーインスタンスにはクライアント側Modのみ追加可能"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "ゲームバージョンはサーバーによる条件です"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "ローダーはサーバーによる条件です"
   }
 }

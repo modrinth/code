@@ -38,7 +38,7 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled>
-					<button @click="modal.hide()">
+					<button @click="hide()">
 						<XIcon />
 						Cancel
 					</button>
@@ -124,6 +124,9 @@ function proceed() {
 function show() {
 	modal.value.show()
 }
+function hide() {
+	modal.value.hide()
+}
 
-defineExpose({ show })
+defineExpose({ show, hide })
 </script>

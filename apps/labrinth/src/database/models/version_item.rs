@@ -6,6 +6,7 @@ use crate::database::models::loader_fields::{
     QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
 };
 use crate::database::redis::RedisPool;
+use crate::models::exp;
 use crate::models::projects::{FileType, VersionStatus};
 use crate::routes::internal::delphi::DelphiRunParameters;
 use chrono::{DateTime, Utc};
@@ -37,6 +38,7 @@ pub struct VersionBuilder {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
+    pub components: exp::VersionSerial,
 }
 
 #[derive(Clone)]
@@ -133,6 +135,7 @@ impl VersionFileBuilder {
         self,
         version_id: DBVersionId,
         transaction: &mut PgTransaction<'_>,
+        http: &reqwest::Client,
     ) -> Result<DBFileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
@@ -171,6 +174,7 @@ impl VersionFileBuilder {
             DelphiRunParameters {
                 file_id: file_id.into(),
             },
+            http,
         )
         .await
         {
@@ -191,6 +195,7 @@ impl VersionBuilder {
     pub async fn insert(
         self,
         transaction: &mut PgTransaction<'_>,
+        http: &reqwest::Client,
     ) -> Result<DBVersionId, DatabaseError> {
         let version = DBVersion {
             id: self.version_id,
@@ -206,6 +211,7 @@ impl VersionBuilder {
             status: self.status,
             requested_status: self.requested_status,
             ordering: self.ordering,
+            components: self.components,
         };
 
         version.insert(transaction).await?;
@@ -230,7 +236,7 @@ impl VersionBuilder {
         } = self;
 
         for file in files {
-            file.insert(version_id, transaction).await?;
+            file.insert(version_id, transaction, http).await?;
         }
 
         DependencyBuilder::insert_many(
@@ -285,7 +291,7 @@ impl DBLoaderVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct DBVersion {
     pub id: DBVersionId,
     pub project_id: DBProjectId,
@@ -300,7 +306,16 @@ pub struct DBVersion {
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
     pub ordering: Option<i32>,
+    pub components: exp::VersionSerial,
 }
+
+impl PartialEq for DBVersion {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for DBVersion {}
 
 impl DBVersion {
     pub async fn insert(
@@ -312,12 +327,14 @@ impl DBVersion {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, date_published, downloads,
-                version_type, featured, status, ordering
+                version_type, featured, status, ordering,
+                components
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8,
-                $9, $10, $11, $12
+                $9, $10, $11, $12,
+                $13
             )
             ",
             self.id as DBVersionId,
@@ -331,7 +348,9 @@ impl DBVersion {
             &self.version_type,
             self.featured,
             self.status.as_str(),
-            self.ordering
+            self.ordering,
+            serde_json::to_value(&self.components)
+                .expect("serialization shouldn't fail"),
         )
         .execute(&mut *transaction)
         .await?;
@@ -719,13 +738,14 @@ impl DBVersion {
                     ).await?;
 
                 let res = sqlx::query!(
-                    "
+                    r#"
                     SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                     v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering
+                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
+                    v.components AS "components: sqlx::types::Json<exp::VersionSerial>"
                     FROM versions v
                     WHERE v.id = ANY($1);
-                    ",
+                    "#,
                     &version_ids
                 )
                     .fetch(&mut exec)
@@ -746,6 +766,7 @@ impl DBVersion {
                             .filter(|x| loader_loader_field_ids.contains(&x.id))
                             .collect::<Vec<_>>();
 
+                        let components_serial = v.components.0;
                         let query_version = VersionQueryResult {
                             inner: DBVersion {
                                 id: DBVersionId(v.id),
@@ -762,6 +783,7 @@ impl DBVersion {
                                 requested_status: v.requested_status
                                     .map(|x| VersionStatus::from_string(&x)),
                                 ordering: v.ordering,
+                                components: components_serial,
                             },
                             files: {
                                 let mut files = files.into_iter().map(|x| {
@@ -804,6 +826,8 @@ impl DBVersion {
                             project_types,
                             games,
                             dependencies,
+                            // TODO populate
+                            components: exp::VersionQuery::default(),
                         };
 
                         acc.insert(v.id, query_version);
@@ -937,7 +961,7 @@ impl DBVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct VersionQueryResult {
     pub inner: DBVersion,
 
@@ -947,6 +971,8 @@ pub struct VersionQueryResult {
     pub project_types: Vec<String>,
     pub games: Vec<String>,
     pub dependencies: Vec<DependencyQueryResult>,
+    #[serde(flatten)]
+    pub components: exp::VersionQuery,
 }
 
 #[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
@@ -992,6 +1018,14 @@ impl std::cmp::PartialOrd for VersionQueryResult {
         Some(self.cmp(other))
     }
 }
+
+impl std::cmp::PartialEq for VersionQueryResult {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
+impl std::cmp::Eq for VersionQueryResult {}
 
 impl std::cmp::Ord for DBVersion {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -1061,6 +1095,7 @@ mod tests {
             featured: false,
             status: VersionStatus::Listed,
             requested_status: None,
+            components: exp::VersionSerial::default(),
         }
     }
 }

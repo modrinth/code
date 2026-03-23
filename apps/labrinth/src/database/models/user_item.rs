@@ -573,9 +573,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM notifications_actions
-                 WHERE notification_id = ANY($1)
-                ",
+				DELETE FROM notifications_actions
+				 WHERE notification_id = ANY($1)
+				",
                 &notifications
             )
             .execute(&mut *transaction)
@@ -584,9 +584,20 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM notifications_deliveries
-                WHERE user_id = $1
-                ",
+				DELETE FROM notifications_deliveries
+				WHERE notification_id = ANY($1)
+				",
+                &notifications
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to delete notifications_deliveries")?;
+
+            sqlx::query!(
+                "
+				DELETE FROM notifications_deliveries
+				WHERE user_id = $1
+				",
                 id as DBUserId
             )
             .execute(&mut *transaction)
@@ -785,15 +796,27 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                UPDATE payouts_values
-                SET user_id = $1
-                WHERE user_id = $2",
+				UPDATE payouts_values
+				SET user_id = $1
+				WHERE user_id = $2",
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to update payouts_values user_id")?;
+
+            sqlx::query!(
+                "
+				UPDATE payouts
+				SET user_id = $1
+				WHERE user_id = $2",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update payouts user_id")?;
 
             sqlx::query!(
                 "
@@ -866,9 +889,22 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM users
-                WHERE id = $1
-                ",
+				UPDATE oauth_clients
+				SET created_by = $1
+				WHERE created_by = $2
+				",
+                deleted_user as DBUserId,
+                id as DBUserId,
+            )
+            .execute(&mut *transaction)
+            .await
+            .wrap_err("failed to update oauth_clients created_by")?;
+
+            sqlx::query!(
+                "
+				DELETE FROM users
+				WHERE id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -877,9 +913,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM oauth_client_authorizations
-                WHERE user_id = $1
-                ",
+				DELETE FROM oauth_client_authorizations
+				WHERE user_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -888,9 +924,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM shared_instance_users
-                WHERE user_id = $1
-                ",
+				DELETE FROM shared_instance_users
+				WHERE user_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -899,9 +935,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM shared_instance_invited_users
-                WHERE invited_user_id = $1
-                ",
+				DELETE FROM shared_instance_invited_users
+				WHERE invited_user_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -910,10 +946,10 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                UPDATE users_redeemals
-                SET user_id = $1
-                WHERE user_id = $2
-                ",
+				UPDATE users_redeemals
+				SET user_id = $1
+				WHERE user_id = $2
+				",
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
@@ -923,10 +959,10 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                UPDATE users_compliance
-                SET user_id = $1
-                WHERE user_id = $2
-                ",
+				UPDATE users_compliance
+				SET user_id = $1
+				WHERE user_id = $2
+				",
                 deleted_user as DBUserId,
                 id as DBUserId,
             )
@@ -936,9 +972,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM user_limits
-                WHERE user_id = $1
-                ",
+				DELETE FROM user_limits
+				WHERE user_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -947,9 +983,9 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM users_notifications_preferences
-                WHERE user_id = $1
-                ",
+				DELETE FROM users_notifications_preferences
+				WHERE user_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
@@ -958,27 +994,14 @@ impl DBUser {
 
             sqlx::query!(
                 "
-                DELETE FROM moderation_locks
-                WHERE moderator_id = $1
-                ",
+				DELETE FROM moderation_locks
+				WHERE moderator_id = $1
+				",
                 id as DBUserId,
             )
             .execute(&mut *transaction)
             .await
             .wrap_err("failed to delete moderation_locks")?;
-
-            sqlx::query!(
-                "
-                UPDATE oauth_clients
-                SET created_by = $1
-                WHERE created_by = $2
-                ",
-                deleted_user as DBUserId,
-                id as DBUserId,
-            )
-            .execute(&mut *transaction)
-            .await
-            .wrap_err("failed to update oauth_clients created_by")?;
 
             Ok(Some(()))
         } else {
