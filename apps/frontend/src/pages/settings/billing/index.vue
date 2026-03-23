@@ -800,13 +800,27 @@ const pyroSubscriptions = computed(() => {
 	const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === 'pyro') || []
 	const servers = serversData.value?.servers || []
 
-	return pyroSubs.map((subscription) => {
-		const server = servers.find((s) => s.server_id === subscription.metadata.id)
-		return {
-			...subscription,
-			serverInfo: server,
-		}
-	})
+	return pyroSubs
+		.map((subscription) => {
+			const server = servers.find((s) => s.server_id === subscription.metadata.id)
+			return {
+				...subscription,
+				serverInfo: server,
+			}
+		})
+		.filter((subscription) => {
+			// files expire 30 days after cancellation
+			const cancellationDate = getCancellationDate(subscription)
+			if (
+				!cancellationDate ||
+				subscription.serverInfo?.status !== 'suspended' ||
+				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			)
+				return true
+			const cancellation = new Date(cancellationDate)
+			const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+			return new Date() <= thirtyDaysLater
+		})
 })
 
 const midasPurchaseModal = ref()
@@ -919,14 +933,14 @@ const getProductFromPriceId = (priceId) => {
 	return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId))
 }
 
-const getPyroCharge = (subscription) => {
+function getPyroCharge(subscription) {
 	if (!subscription || !charges.value) return null
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
 }
 
-const getCancellationDate = (subscription) => {
+function getCancellationDate(subscription) {
 	const charge = getPyroCharge(subscription)
 	if (!charge) return null
 	if (charge.status === 'cancelled') return charge.due

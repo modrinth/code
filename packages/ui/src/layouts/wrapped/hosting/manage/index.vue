@@ -453,13 +453,23 @@ function introToTop(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server
 	})
 }
 
+// files expire 30 days after cancellation
+function filesExpired(server: Archon.Servers.v0.Server): boolean {
+	if (server.status !== 'suspended' || server.suspension_reason !== 'cancelled') return false
+	const cancellationDate = serverBillingMap.value.get(server.server_id)?.cancellationDate
+	if (!cancellationDate) return false
+	const cancellation = new Date(cancellationDate)
+	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+	return new Date() > thirtyDaysLater
+}
+
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	if (!searchInput.value.trim()) {
-		return introToTop(serverList.value)
-	}
-	return fuse.value
-		? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
-		: []
+	const base = !searchInput.value.trim()
+		? introToTop(serverList.value)
+		: fuse.value
+			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			: []
+	return base.filter((server) => !filesExpired(server))
 })
 
 // Start polling only after initial data is available so the baseline is correct
