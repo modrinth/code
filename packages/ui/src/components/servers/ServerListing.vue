@@ -15,18 +15,18 @@
 					v-if="isProvisioning || isUpgrading"
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
-					<ServerIcon class="opacity-70" :image="image ?? undefined" />
+					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
 					<SpinnerIcon class="size-8 animate-spin absolute" />
 				</div>
 				<div
 					v-else-if="status === 'suspended'"
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
-					<ServerIcon class="opacity-70" :image="image ?? undefined" />
+					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
 					<LockIcon class="size-8 absolute" />
 				</div>
-				<ServerIcon v-else :image="image ?? undefined" />
-				<div class="ml-4 flex flex-col gap-2.5" :class="{ 'opacity-70': isDisabled }">
+				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
+				<div class="ml-4 flex flex-col gap-2.5" :class="{ 'grayscale opacity-75': isDisabled }">
 					<div class="flex flex-row items-center gap-2">
 						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
 						<div
