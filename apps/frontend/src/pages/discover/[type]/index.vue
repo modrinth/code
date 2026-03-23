@@ -255,16 +255,10 @@ const serverFilters = computed(() => {
 		}
 
 		if (projectType.value?.id === 'mod') {
-			filters.push(
-				{
-					type: 'environment',
-					option: 'client',
-				},
-				{
-					type: 'environment',
-					option: 'server',
-				},
-			)
+			filters.push({
+				type: 'environment',
+				option: 'server',
+			})
 		}
 
 		if (serverHideInstalled.value && serverContentData.value) {
