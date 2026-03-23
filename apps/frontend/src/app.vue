@@ -16,3 +16,4 @@ import { setupProviders } from '~/providers/setup.ts'
 const auth = await useAuth()
 setupProviders(auth)
 </script>
+<!-- check -->
