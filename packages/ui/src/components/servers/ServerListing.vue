@@ -5,7 +5,7 @@
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
 					'!rounded-b-none border-b-0': hasNotice,
-					'opacity-70 bg-surface-2': isDisabled,
+					'bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
 				}"
 				data-pyro-server-listing
@@ -15,17 +15,18 @@
 					v-if="isProvisioning || isUpgrading"
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
-					<ServerIcon :image="image ?? undefined" />
-					<SpinnerIcon class="size-8 animate-spin text-constrast brightness-200 absolute" />
+					<ServerIcon class="opacity-70" :image="image ?? undefined" />
+					<SpinnerIcon class="size-8 animate-spin absolute" />
 				</div>
 				<div
 					v-else-if="status === 'suspended'"
-					class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
-					<LockIcon class="size-12 text-secondary" />
+					<ServerIcon class="opacity-70" :image="image ?? undefined" />
+					<LockIcon class="size-8 absolute" />
 				</div>
 				<ServerIcon v-else :image="image ?? undefined" />
-				<div class="ml-4 flex flex-col gap-2.5">
+				<div class="ml-4 flex flex-col gap-2.5" :class="{ 'opacity-70': isDisabled }">
 					<div class="flex flex-row items-center gap-2">
 						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
 						<div
