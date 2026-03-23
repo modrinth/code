@@ -1,8 +1,23 @@
 <template>
 	<header
-		class="flex select-none flex-col justify-between gap-2 sm:flex-row sm:items-center"
+		class="@container flex select-none flex-col gap-4"
 		:aria-label="formatMessage(messages.fileNavigation)"
 	>
+		<div v-if="!isEditing" class="flex items-center gap-2 @[800px]:hidden">
+			<StyledInput
+				:model-value="searchQuery"
+				:icon="SearchIcon"
+				type="search"
+				name="search"
+				autocomplete="off"
+				:placeholder="formatMessage(messages.searchFiles)"
+				class="!h-10"
+				input-class="!h-10"
+				wrapper-class="flex-1 min-w-0"
+				@update:model-value="$emit('update:searchQuery', $event)"
+			/>
+		</div>
+		<div class="flex items-center justify-between gap-2">
 		<nav
 			:aria-label="formatMessage(messages.breadcrumbNavigation)"
 			class="m-0 flex min-w-0 flex-shrink items-center p-0 text-contrast"
@@ -23,21 +38,31 @@
 					</ButtonStyled>
 				</li>
 				<li class="m-0 -ml-2 min-w-0 flex-shrink p-0">
-					<ol class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0">
+					<ol
+						ref="breadcrumbOuter"
+						class="m-0 flex min-w-0 flex-shrink items-center overflow-hidden p-0"
+						:class="{ 'breadcrumb-fade-mask': isBreadcrumbOverflowing }"
+						:style="isBreadcrumbOverflowing ? { '--scroll-distance': `-${breadcrumbOverflowAmount}px` } : undefined"
+						@mouseenter="onBreadcrumbMouseEnter"
+						@mouseleave="onBreadcrumbMouseLeave"
+					>
 						<TransitionGroup
 							name="breadcrumb"
 							tag="span"
-							class="relative flex min-w-0 flex-shrink items-center"
+							ref="breadcrumbInner"
+							class="relative flex w-fit items-center"
+							:class="{ 'breadcrumbs-scroll': isBreadcrumbAnimating }"
+							@animationiteration="onBreadcrumbAnimationIteration"
 						>
 							<li
 								v-for="(segment, index) in breadcrumbs"
 								:key="`${segment || index}-group`"
-								class="relative flex min-w-0 flex-shrink items-center text-sm"
+								class="relative flex shrink-0 items-center text-sm"
 							>
-								<div class="flex min-w-0 flex-shrink items-center">
+								<div class="flex shrink-0 items-center">
 									<ButtonStyled type="transparent">
 										<button
-											class="cursor-pointer truncate focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+											class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
 											:aria-current="
 												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
 											"
@@ -76,7 +101,7 @@
 				name="search"
 				autocomplete="off"
 				:placeholder="formatMessage(messages.searchFiles)"
-				class="!h-10"
+				class="!h-10 hidden @[800px]:block"
 				input-class="!h-10"
 				wrapper-class="w-full sm:w-[280px]"
 				@update:model-value="$emit('update:searchQuery', $event)"
@@ -86,9 +111,10 @@
 				<button
 					type="button"
 					class="flex !h-10 items-center gap-2 !border-[1px] !border-surface-5"
-					@click="$emit('refresh')"
+					:disabled="refreshing"
+					@click="handleRefresh"
 				>
-					<RefreshCwIcon aria-hidden="true" class="h-5 w-5" />
+					<RefreshCwIcon aria-hidden="true" class="h-5 w-5 transition-transform" :class="refreshing ? 'animate-spin' : ''" />
 					{{ formatMessage(commonMessages.refreshButton) }}
 				</button>
 			</ButtonStyled>
@@ -156,6 +182,7 @@
 				<ShareIcon />
 			</Button>
 		</div>
+		</div>
 	</header>
 </template>
 
@@ -175,7 +202,7 @@ import {
 	ShareIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import Button from '#ui/components/base/Button.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -255,7 +282,7 @@ const props = defineProps<{
 	disabledTooltip?: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
 	navigate: [index: number]
 	navigateHome: []
 	prefetchHome: []
@@ -267,6 +294,73 @@ defineEmits<{
 	refresh: []
 	share: []
 }>()
+
+const refreshing = ref(false)
+
+function handleRefresh() {
+	emit('refresh')
+	refreshing.value = true
+	setTimeout(() => {
+		refreshing.value = false
+	}, 1000)
+}
+
+const breadcrumbOuter = ref<HTMLElement | null>(null)
+const breadcrumbInner = ref<{ $el: HTMLElement } | null>(null)
+const isBreadcrumbOverflowing = ref(false)
+const isBreadcrumbAnimating = ref(false)
+const breadcrumbOverflowAmount = ref(0)
+
+let bcHovered = false
+let bcStopping = false
+
+function checkBreadcrumbOverflow() {
+	const inner = breadcrumbInner.value?.$el
+	if (!breadcrumbOuter.value || !inner) return
+	const overflow = inner.scrollWidth - breadcrumbOuter.value.clientWidth
+	isBreadcrumbOverflowing.value = overflow > 0
+	breadcrumbOverflowAmount.value = overflow + 12
+}
+
+function onBreadcrumbMouseEnter() {
+	bcHovered = true
+	bcStopping = false
+	if (isBreadcrumbOverflowing.value) {
+		isBreadcrumbAnimating.value = true
+	}
+}
+
+function onBreadcrumbMouseLeave() {
+	bcHovered = false
+	if (isBreadcrumbAnimating.value) {
+		bcStopping = true
+	}
+}
+
+function onBreadcrumbAnimationIteration() {
+	if (bcStopping && !bcHovered) {
+		isBreadcrumbAnimating.value = false
+		bcStopping = false
+	}
+}
+
+let bcResizeObserver: ResizeObserver | null = null
+
+onMounted(() => {
+	checkBreadcrumbOverflow()
+	bcResizeObserver = new ResizeObserver(checkBreadcrumbOverflow)
+	if (breadcrumbOuter.value) bcResizeObserver.observe(breadcrumbOuter.value)
+	const innerEl = breadcrumbInner.value?.$el
+	if (innerEl) bcResizeObserver.observe(innerEl)
+})
+
+onBeforeUnmount(() => {
+	bcResizeObserver?.disconnect()
+})
+
+watch(() => props.breadcrumbs, () => {
+	requestAnimationFrame(checkBreadcrumbOverflow)
+})
 
 const isLogFile = computed(() => {
 	return (
@@ -302,5 +396,32 @@ const isLogFile = computed(() => {
 
 .breadcrumb-move {
 	z-index: 1;
+}
+
+.breadcrumb-fade-mask {
+	mask-image: linear-gradient(
+		to right,
+		transparent,
+		black 12px,
+		black calc(100% - 12px),
+		transparent
+	);
+}
+
+.breadcrumbs-scroll {
+	animation: breadcrumb-scroll 10s ease-in-out infinite;
+}
+
+@keyframes breadcrumb-scroll {
+	0% {
+		transform: translateX(0);
+	}
+	35%,
+	65% {
+		transform: translateX(var(--scroll-distance));
+	}
+	100% {
+		transform: translateX(0);
+	}
 }
 </style>
