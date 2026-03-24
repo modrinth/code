@@ -30,6 +30,16 @@ pub async fn file_extract_zip(
 ) -> Result<Option<ExtractDryRunResult>> {
     let base = get_full_path(instance_path).await?;
     let zip_path = base.join(file_path);
+    let canonical_zip = tokio::fs::canonicalize(&zip_path).await?;
+    let canonical_base = tokio::fs::canonicalize(&base).await?;
+    if !canonical_zip.starts_with(&canonical_base) {
+        return Err(theseus::Error::from(
+            theseus::ErrorKind::OtherError(
+                "file_path escapes the instance directory".to_string(),
+            ),
+        )
+        .into());
+    }
     let extract_dir = zip_path
         .parent()
         .map(|p| p.to_path_buf())
@@ -61,8 +71,18 @@ pub async fn file_extract_zip(
 
     if dry_run {
         let mut conflicting_files = Vec::new();
+        let canonical_extract =
+            tokio::fs::canonicalize(&extract_dir).await?;
         for (_, name) in &entries {
             let target = extract_dir.join(name);
+            if let Some(parent) = target.parent() {
+                let normalized = parent
+                    .canonicalize()
+                    .unwrap_or_else(|_| extract_dir.join(parent));
+                if !normalized.starts_with(&canonical_extract) {
+                    continue;
+                }
+            }
             if target.exists() {
                 conflicting_files.push(name.clone());
             }
@@ -73,6 +93,8 @@ pub async fn file_extract_zip(
         }));
     }
 
+    let canonical_extract_dir =
+        tokio::fs::canonicalize(&extract_dir).await?;
     let mut zip_reader = zip_reader;
     for (index, name) in &entries {
         let target = extract_dir.join(name);
@@ -83,6 +105,11 @@ pub async fn file_extract_zip(
 
         if let Some(parent) = target.parent() {
             tokio::fs::create_dir_all(parent).await?;
+            let canonical_parent =
+                tokio::fs::canonicalize(parent).await?;
+            if !canonical_parent.starts_with(&canonical_extract_dir) {
+                continue;
+            }
         }
 
         let mut file_bytes = Vec::new();
