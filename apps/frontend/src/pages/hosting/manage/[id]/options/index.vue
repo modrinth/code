@@ -2,62 +2,62 @@
 	<div class="relative h-full w-full overflow-y-auto">
 		<div v-if="data" class="flex h-full w-full flex-col">
 			<div class="card flex flex-col gap-6">
-				<!-- Server name -->
-				<div class="flex flex-col gap-2">
-					<label for="server-name-field" class="flex flex-col gap-2">
-						<span class="text-lg font-bold text-contrast">Server name</span>
-						<span> This name is only visible on Modrinth.</span>
-					</label>
-					<div class="flex flex-col gap-2">
-						<StyledInput
-							id="server-name-field"
-							v-model="serverName"
-							wrapper-class="w-full md:w-[50%]"
-							:maxlength="48"
-							@keyup.enter="!serverName && saveGeneral"
-						/>
-						<span v-if="!serverName" class="text-sm text-rose-400">
-							Server name must be at least 1 character long.
-						</span>
-						<span v-if="!isValidServerName" class="text-sm text-rose-400">
-							Server name can contain any character.
-						</span>
-					</div>
-				</div>
+				<div class="flex justify-between gap-6">
+					<div class="flex grow flex-col gap-6">
+						<!-- Server name -->
+						<div class="flex max-w-[500px] flex-col gap-2.5">
+							<label for="server-name-field" class="flex flex-col gap-2">
+								<span class="text-md font-semibold text-contrast">Server name</span>
+							</label>
+							<div class="flex flex-col gap-2.5">
+								<StyledInput
+									id="server-name-field"
+									v-model="serverName"
+									wrapper-class="w-full"
+									:maxlength="48"
+									@keyup.enter="!serverName && saveGeneral"
+								/>
+								<span v-if="!serverName" class="text-sm text-rose-400">
+									Server name must be at least 1 character long.
+								</span>
+								<span v-if="!isValidServerName" class="text-sm text-rose-400">
+									Server name can contain any character.
+								</span>
+							</div>
+							<span> This name is only visible on Modrinth.</span>
+						</div>
 
-				<!-- Hostname -->
-				<div class="flex flex-col gap-2">
-					<label for="server-subdomain" class="flex flex-col gap-2">
-						<span class="text-lg font-bold text-contrast">Hostname</span>
-						<span> Your friends can connect to your server using this URL. </span>
-					</label>
-					<div class="flex w-full items-center gap-2 md:w-[60%]">
-						<StyledInput
-							id="server-subdomain"
-							v-model="serverSubdomain"
-							wrapper-class="h-[50%] w-[63%]"
-							:maxlength="32"
-							@keyup.enter="saveGeneral"
-						/>
-						.modrinth.gg
+						<!-- Hostname -->
+						<div class="flex flex-col gap-2.5">
+							<label for="server-subdomain" class="flex flex-col gap-2">
+								<span class="text-md font-semibold text-contrast">Hostname</span>
+							</label>
+							<div class="flex w-full items-center gap-2">
+								<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-rose-400">
+									<span v-if="!isValidLengthSubdomain">
+										Subdomain must be at least 5 characters long.
+									</span>
+									<span v-if="!isValidCharsSubdomain">
+										Subdomain can only contain alphanumeric characters and dashes.
+									</span>
+								</div>
+								<StyledInput
+									id="server-subdomain"
+									v-model="serverSubdomain"
+									:maxlength="32"
+									@keyup.enter="saveGeneral"
+								/>
+								.modrinth.gg
+							</div>
+							<span> Your friends can connect to your server using this URL. </span>
+						</div>
 					</div>
-					<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-rose-400">
-						<span v-if="!isValidLengthSubdomain">
-							Subdomain must be at least 5 characters long.
-						</span>
-						<span v-if="!isValidCharsSubdomain">
-							Subdomain can only contain alphanumeric characters and dashes.
-						</span>
-					</div>
-				</div>
 
-				<!-- Server icon -->
-				<div v-if="!data.is_medal" class="flex flex-col gap-2">
-					<label for="server-icon-field" class="flex flex-col gap-2">
-						<span class="text-lg font-bold text-contrast">Server icon</span>
-						<span> This icon will be visible on the Minecraft server list and on Modrinth. </span>
-					</label>
-					<div class="flex gap-4">
+					<!-- Server icon -->
+					<div v-if="!data.is_medal" class="flex flex-col gap-2.5">
+						<label for="server-icon-field" class="flex flex-col gap-2">
+							<span class="text-md font-semibold text-contrast">Icon</span>
+						</label>
 						<div
 							v-tooltip="'Upload a custom Icon'"
 							class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-surface-2"
@@ -81,51 +81,44 @@
 							</div>
 							<ServerIcon class="size-24" :image="icon" />
 						</div>
-						<ButtonStyled>
-							<button
-								v-tooltip="'Synchronize icon with installed modpack'"
-								class="my-auto"
-								@click="resetIcon"
-							>
+						<ButtonStyled size="small">
+							<button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
 								<TransferIcon /> Sync icon
 							</button>
 						</ButtonStyled>
 					</div>
 				</div>
 
-				<!-- Preferences -->
-				<div class="flex flex-col gap-4">
-					<h2 class="m-0 text-lg font-bold text-contrast">Preferences</h2>
-					<div
-						v-for="(prefConfig, key) in preferences"
-						:key="key"
-						class="flex items-center justify-between gap-2"
-					>
-						<label :for="`pref-${key}`" class="flex flex-col gap-2">
-							<div class="flex flex-row gap-2">
-								<span class="text-lg font-bold text-contrast">{{ prefConfig.displayName }}</span>
-								<div
-									v-if="prefConfig.implemented === false"
-									class="hidden items-center gap-1 rounded-full bg-surface-2 p-1 px-1.5 text-xs font-semibold sm:flex"
-								>
-									Coming Soon
-								</div>
+				<!-- preferences -->
+				<div
+					v-for="(prefConfig, key) in preferences"
+					:key="key"
+					class="flex items-center justify-between gap-2"
+				>
+					<label :for="`pref-${key}`" class="flex flex-col gap-2">
+						<div class="flex flex-row items-center gap-2">
+							<span class="text-md font-semibold text-contrast">{{ prefConfig.displayName }}</span>
+							<div
+								v-if="prefConfig.implemented === false"
+								class="hidden items-center gap-1 rounded-full bg-surface-2 p-1 px-1.5 text-xs font-semibold sm:flex"
+							>
+								Coming Soon
 							</div>
-							<span>{{ prefConfig.description }}</span>
-						</label>
-						<Toggle
-							:id="`pref-${key}`"
-							v-model="newUserPreferences[key]"
-							class="flex-none"
-							:disabled="prefConfig.implemented === false"
-						/>
-					</div>
+						</div>
+						<span>{{ prefConfig.description }}</span>
+					</label>
+					<Toggle
+						:id="`pref-${key}`"
+						v-model="newUserPreferences[key]"
+						class="flex-none"
+						:disabled="prefConfig.implemented === false"
+					/>
 				</div>
 
 				<!-- Info -->
-				<div class="flex flex-col gap-2">
-					<h2 class="m-0 text-lg font-bold text-contrast">Info</h2>
-					<div class="flex flex-col gap-2 rounded-xl bg-surface-2 p-4">
+				<div class="flex flex-col gap-2.5">
+					<div class="text-md m-0 font-semibold text-contrast">Info</div>
+					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
 							v-for="property in infoProperties"
 							:key="property.name"
