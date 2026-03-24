@@ -62,7 +62,7 @@ const messages = defineMessages({
 	},
 	placeholderDirectory: {
 		id: 'files.create-modal.placeholder-directory',
-		defaultMessage: 'e.g. plugins',
+		defaultMessage: 'e.g. my-folder',
 	},
 	createButton: {
 		id: 'files.create-modal.create-button',

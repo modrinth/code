@@ -71,7 +71,7 @@ const messages = defineMessages({
 	},
 	destinationPlaceholder: {
 		id: 'files.move-modal.destination-placeholder',
-		defaultMessage: 'e.g. /mods',
+		defaultMessage: 'e.g. /my-folder',
 	},
 })
 
