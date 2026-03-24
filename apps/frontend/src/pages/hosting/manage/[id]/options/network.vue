@@ -67,9 +67,9 @@
 							<div class="grid place-content-center rounded-full bg-bg-orange p-4">
 								<IssuesIcon class="size-12 text-orange" />
 							</div>
-							<h1 class="m-0 mb-2 w-fit text-4xl font-bold">Failed to load network settings</h1>
+							<h1 class="m-0 mb-2 w-fit text-4xl font-semibold">Failed to load network settings</h1>
 						</div>
-						<p class="text-lg text-secondary">
+						<p class="text-md text-secondary">
 							We couldn't load your server's network settings. Here's what we know:
 							<span class="break-all font-mono">{{
 								allocationsError?.message ?? 'Unknown error'
@@ -84,96 +84,74 @@
 			<div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
 				<div class="card flex h-full flex-col gap-6">
 					<!-- Allocations section -->
-					<div class="flex flex-col gap-4">
-						<div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-							<div class="flex flex-col gap-2">
-								<span class="text-lg font-bold text-contrast">Allocations</span>
-								<span>
-									Configure additional ports for internet-facing features like map viewers or voice
-									chat mods.
-								</span>
-							</div>
+					<div class="flex flex-col gap-2">
+						<span class="text-md font-semibold text-contrast">Allocations</span>
 
-							<ButtonStyled type="standard" @click="showNewAllocationModal">
-								<button class="!w-full sm:!w-auto">
+						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
+							<StyledInput
+								v-model="allocationSearch"
+								wrapper-class="grow max-w-[400px]"
+								:maxlength="64"
+								placeholder="Search allocations..."
+							/>
+
+							<ButtonStyled color="brand" @click="showNewAllocationModal">
+								<button class="!w-full max-w-20">
 									<PlusIcon />
-									<span>New allocation</span>
+									<span>Add</span>
 								</button>
 							</ButtonStyled>
 						</div>
 
-						<div class="flex w-full flex-col overflow-hidden rounded-xl bg-table-alternateRow p-4">
-							<!-- Primary allocation -->
-							<div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-								<span class="text-md font-bold tracking-wide text-contrast">
-									Primary allocation
-								</span>
-
-								<CopyCode :text="`${serverIP}:${serverPrimaryPort}`" />
-							</div>
-						</div>
-
-						<div
-							v-if="allocations?.[0]"
-							class="flex w-full flex-col gap-4 overflow-hidden rounded-xl bg-table-alternateRow p-4"
-						>
-							<div
-								v-for="allocation in allocations"
-								:key="allocation.port"
-								class="border-border flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
-							>
-								<div class="flex flex-row items-center gap-4">
-									<VersionIcon class="h-7 w-7 flex-none rotate-90" />
-									<div class="flex w-[20rem] flex-col justify-between sm:flex-row sm:items-center">
-										<div class="flex flex-col gap-1">
-											<span class="text-md font-bold tracking-wide text-contrast">
-												{{ allocation.name }}
-											</span>
-											<span class="hidden text-xs text-secondary sm:block">Name</span>
-										</div>
-										<div class="flex flex-col gap-1">
-											<span
-												class="text-md w-10 tracking-wide text-secondary sm:font-bold sm:text-contrast"
-											>
-												{{ allocation.port }}
-											</span>
-											<span class="hidden text-xs text-secondary sm:block">Port</span>
-										</div>
-									</div>
-								</div>
-
-								<div class="flex w-full flex-row items-center gap-2 sm:w-auto">
-									<CopyCode :text="`${serverIP}:${allocation.port}`" />
-									<ButtonStyled icon-only>
-										<button
-											class="!w-full sm:!w-auto"
-											@click="showEditAllocationModal(allocation.port)"
-										>
-											<EditIcon />
+						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
+							<template #cell-name="{ row }">
+								<TagItem v-if="row.primary" class="!font-medium">Primary</TagItem>
+								<span v-else class="font-semibold text-contrast">{{ row.name }}</span>
+							</template>
+							<template #cell-port="{ row }">
+								<span class="font-medium text-contrast">{{ row.port }}</span>
+							</template>
+							<template #cell-actions="{ row }">
+								<div class="flex items-center justify-end gap-2">
+									<ButtonStyled icon-only type="transparent" circular>
+										<button @click="copyText(`${serverIP}:${row.port}`)">
+											<CopyIcon />
 										</button>
 									</ButtonStyled>
-									<ButtonStyled icon-only color="red">
-										<button
-											class="!w-full sm:!w-auto"
-											@click="showConfirmDeleteModal(allocation.port)"
-										>
-											<TrashIcon />
-										</button>
-									</ButtonStyled>
+									<template v-if="!row.primary">
+										<ButtonStyled icon-only type="transparent" circular>
+											<button @click="showEditAllocationModal(row.port)">
+												<PencilIcon />
+											</button>
+										</ButtonStyled>
+										<ButtonStyled icon-only type="outlined" circular color="red">
+											<button @click="showConfirmDeleteModal(row.port)">
+												<TrashIcon />
+											</button>
+										</ButtonStyled>
+									</template>
 								</div>
-							</div>
-						</div>
+							</template>
+						</Table>
+						<span>
+							Create additional ports for internet-facing features like map viewers or voice chat
+							mods.
+						</span>
 					</div>
 
 					<!-- DNS records section -->
-					<div class="flex flex-col gap-4">
-						<div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-							<label for="user-domain" class="flex flex-col gap-2">
-								<span class="text-lg font-bold text-contrast">Generated DNS records</span>
-								<span>
-									Set up your personal domain to connect to your server via custom DNS records.
-								</span>
-							</label>
+					<div class="flex flex-col gap-2">
+						<label for="user-domain" class="flex flex-col gap-2">
+							<span class="text-md font-semibold text-contrast">Generated DNS records</span>
+						</label>
+						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
+							<StyledInput
+								id="user-domain"
+								v-model="userDomain"
+								wrapper-class="grow max-w-[400px]"
+								:maxlength="64"
+								:placeholder="exampleDomain"
+							/>
 
 							<ButtonStyled>
 								<button
@@ -182,68 +160,41 @@
 									@click="exportDnsRecords"
 								>
 									<UploadIcon />
-									<span>Export DNS records</span>
+									<span>Export</span>
 								</button>
 							</ButtonStyled>
 						</div>
 
-						<StyledInput
-							id="user-domain"
-							v-model="userDomain"
-							wrapper-class="w-full md:w-[50%]"
-							:maxlength="64"
-							:placeholder="exampleDomain"
-						/>
+						<Table :columns="dnsColumns" :data="dnsRecords">
+							<template #cell-type="{ row }">
+								<span
+									class="cursor-pointer pr-8 font-semibold text-contrast"
+									@click="copyText(row.type)"
+								>
+									{{ row.type }}
+								</span>
+							</template>
+							<template #cell-name="{ row }">
+								<span
+									class="block cursor-pointer truncate pr-8 font-semibold text-contrast"
+									@click="copyText(row.name)"
+								>
+									{{ row.name }}
+								</span>
+							</template>
+							<template #cell-content="{ row }">
+								<span
+									class="block cursor-pointer truncate pr-8 font-semibold text-contrast"
+									@click="copyText(row.content)"
+								>
+									{{ row.content }}
+								</span>
+							</template>
+						</Table>
 
-						<div
-							class="flex max-w-full flex-none overflow-auto rounded-xl bg-table-alternateRow px-4 py-2"
-						>
-							<table
-								class="w-full flex-none border-collapse truncate rounded-lg border-2 border-gray-300"
-							>
-								<tbody class="w-full">
-									<tr v-for="record in dnsRecords" :key="record.content" class="w-full">
-										<td class="w-1/6 py-3 pr-4 md:w-1/5 md:pr-8 lg:w-1/4 lg:pr-12">
-											<div class="flex flex-col gap-1" @click="copyText(record.type)">
-												<span
-													class="text-md font-bold tracking-wide text-contrast hover:cursor-pointer"
-												>
-													{{ record.type }}
-												</span>
-												<span class="text-xs text-secondary">Type</span>
-											</div>
-										</td>
-										<td class="w-2/6 py-3 md:w-1/3">
-											<div class="flex flex-col gap-1" @click="copyText(record.name)">
-												<span
-													class="text-md truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
-												>
-													{{ record.name }}
-												</span>
-												<span class="text-xs text-secondary">Name</span>
-											</div>
-										</td>
-										<td class="w-3/6 py-3 pl-4 md:w-5/12 lg:w-5/12">
-											<div class="flex flex-col gap-1" @click="copyText(record.content)">
-												<span
-													class="text-md w-fit truncate font-bold tracking-wide text-contrast hover:cursor-pointer"
-												>
-													{{ record.content }}
-												</span>
-												<span class="text-xs text-secondary">Content</span>
-											</div>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-
-						<div class="flex items-center gap-2">
-							<InfoIcon class="hidden sm:block" />
-							<span class="text-sm text-secondary">
-								You must own your own domain to use this feature.
-							</span>
-						</div>
+						<span>
+							Set up your personal domain to connect to your server via custom DNS records. 
+						</span>
 					</div>
 				</div>
 			</div>
@@ -253,24 +204,25 @@
 
 <script setup lang="ts">
 import {
-	EditIcon,
-	InfoIcon,
+	CopyIcon,
 	IssuesIcon,
+	PencilIcon,
 	PlusIcon,
 	SaveIcon,
 	TrashIcon,
 	UploadIcon,
-	VersionIcon,
 } from '@modrinth/assets'
+import type { TableColumn } from '@modrinth/ui'
 import {
 	ButtonStyled,
 	ConfirmModal,
-	CopyCode,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	NewModal,
 	StyledInput,
+	Table,
+	TagItem,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { nextTick, ref } from 'vue'
@@ -296,6 +248,39 @@ const {
 	queryFn: () => client.archon.servers_v0.getAllocations(serverId),
 })
 const allocations = allocationsData
+
+const allocationColumns: TableColumn[] = [
+	{ key: 'name', label: 'Name' },
+	{ key: 'port', label: 'Port' },
+	{ key: 'actions', label: 'Actions', width: '33%', align: 'right' },
+]
+
+const allocationSearch = ref('')
+
+const allocationRows = computed(() => {
+	const primary = {
+		name: 'Primary allocation',
+		port: serverPrimaryPort.value,
+		primary: true,
+	}
+	const extra = (allocations.value ?? []).map((a) => ({
+		name: a.name,
+		port: a.port,
+		primary: false,
+	}))
+	const all = [primary, ...extra]
+	const query = allocationSearch.value.toLowerCase().trim()
+	if (!query) return all
+	return all.filter(
+		(row) => row.name.toLowerCase().includes(query) || String(row.port).includes(query),
+	)
+})
+
+const dnsColumns: TableColumn[] = [
+	{ key: 'type', label: 'Type', width: '15%' },
+	{ key: 'name', label: 'Name', width: '35%' },
+	{ key: 'content', label: 'Content' },
+]
 
 const newAllocationModal = ref<typeof NewModal>()
 const editAllocationModal = ref<typeof NewModal>()

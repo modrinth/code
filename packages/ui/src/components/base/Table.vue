@@ -1,6 +1,6 @@
 <template>
-	<div class="overflow-hidden rounded-2xl border border-solid border-surface-3">
-		<table class="w-full border-separate border-spacing-0">
+	<div class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+		<table class="w-full table-fixed border-separate border-spacing-0">
 			<thead>
 				<tr class="bg-surface-3">
 					<th v-if="showSelection" class="w-10 pl-4">
@@ -60,7 +60,7 @@
 					<td
 						v-for="column in columns"
 						:key="column.key"
-						class="text-secondary h-14 first:pl-4 last:pr-4"
+						class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4"
 						:class="`text-${column.align ?? 'left'}`"
 						:style="column.width ? { width: column.width } : undefined"
 					>
