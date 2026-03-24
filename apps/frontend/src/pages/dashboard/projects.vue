@@ -167,7 +167,7 @@
 					</button>
 					<div class="push-right">
 						<div class="labeled-control-row">
-							{{ formatMessage(messages.sortByLabel) }}
+							{{ formatMessage(commonMessages.sortByLabel) }}
 							<Combobox
 								v-model="sortBy"
 								:searchable="false"
@@ -416,10 +416,6 @@ const messages = defineMessages({
 	bulkEditHint: {
 		id: 'dashboard.projects.bulk-edit-hint',
 		defaultMessage: 'You can edit multiple projects at once by selecting them below.',
-	},
-	sortByLabel: {
-		id: 'dashboard.projects.sort.label',
-		defaultMessage: 'Sort by',
 	},
 	ascending: {
 		id: 'dashboard.projects.sort.ascending',

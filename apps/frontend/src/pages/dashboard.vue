@@ -5,8 +5,16 @@
 				:items="[
 					{ type: 'heading', label: formatMessage(messages.dashboard) },
 					{ link: '/dashboard', label: formatMessage(messages.overview), icon: DashboardIcon },
-					{ link: '/dashboard/notifications', label: formatMessage(messages.notifications), icon: NotificationsIcon },
-					{ link: '/dashboard/reports', label: formatMessage(messages.activeReports), icon: ReportIcon },
+					{
+						link: '/dashboard/notifications',
+						label: formatMessage(messages.notifications),
+						icon: NotificationsIcon,
+					},
+					{
+						link: '/dashboard/reports',
+						label: formatMessage(messages.activeReports),
+						icon: ReportIcon,
+					},
 					{
 						link: '/dashboard/collections',
 						label: formatMessage(commonMessages.collectionsLabel),
@@ -14,15 +22,28 @@
 					},
 					{ type: 'heading', label: formatMessage(messages.creators) },
 					{ link: '/dashboard/projects', label: formatMessage(messages.projects), icon: ListIcon },
-					{ link: '/dashboard/organizations', label: formatMessage(messages.organizations), icon: OrganizationIcon },
-					{ link: '/dashboard/analytics', label: formatMessage(messages.analytics), icon: ChartIcon },
+					{
+						link: '/dashboard/organizations',
+						label: formatMessage(messages.organizations),
+						icon: OrganizationIcon,
+					},
+					{
+						link: '/dashboard/analytics',
+						label: formatMessage(messages.analytics),
+						icon: ChartIcon,
+					},
 					{
 						link: '/dashboard/affiliate-links',
 						label: formatMessage(commonMessages.affiliateLinksButton),
 						icon: AffiliateIcon,
 						shown: !!isAffiliate,
 					},
-					{ link: '/dashboard/revenue', label: formatMessage(messages.revenue), icon: CurrencyIcon, matchNested: true },
+					{
+						link: '/dashboard/revenue',
+						label: formatMessage(messages.revenue),
+						icon: CurrencyIcon,
+						matchNested: true,
+					},
 				]"
 			/>
 		</div>
@@ -43,7 +64,7 @@ import {
 	OrganizationIcon,
 	ReportIcon,
 } from '@modrinth/assets'
-import { defineMessages, commonMessages, useVIntl } from '@modrinth/ui'
+import { commonMessages, defineMessages, useVIntl } from '@modrinth/ui'
 import { type User, UserBadge } from '@modrinth/utils'
 
 import NavStack from '~/components/ui/NavStack.vue'

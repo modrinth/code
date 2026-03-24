@@ -20,7 +20,7 @@
 					v-slot="{ selected }"
 					v-model="sortBy"
 					class="!w-auto flex-grow md:flex-grow-0"
-					:name="formatMessage(messages.sortByControlName)"
+					:name="formatMessage(commonMessages.sortByLabel)"
 					:options="['updated', 'created', 'name']"
 					:display-name="formatCollectionSortOption"
 				>
@@ -186,10 +186,6 @@ const messages = defineMessages({
 	searchCollectionsPlaceholder: {
 		id: 'dashboard.collections.placeholder.search',
 		defaultMessage: 'Search collections...',
-	},
-	sortByControlName: {
-		id: 'dashboard.collections.sort.control-name',
-		defaultMessage: 'Sort by',
 	},
 	sortRecentlyUpdated: {
 		id: 'dashboard.collections.sort.recently-updated',

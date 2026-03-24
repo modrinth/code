@@ -611,9 +611,6 @@
   "dashboard.collections.placeholder.search": {
     "message": "Search collections..."
   },
-  "dashboard.collections.sort.control-name": {
-    "message": "Sort by"
-  },
   "dashboard.collections.sort.name-ascending": {
     "message": "Name (A-Z)"
   },
@@ -1022,9 +1019,6 @@
   "dashboard.projects.sort.descending": {
     "message": "Descending"
   },
-  "dashboard.projects.sort.label": {
-    "message": "Sort by"
-  },
   "dashboard.projects.sort.option.name": {
     "message": "Name"
   },
@@ -1159,6 +1153,33 @@
   },
   "dashboard.revenue.withdraw.header": {
     "message": "Withdraw"
+  },
+  "dashboard.sidebar.label.activeReports": {
+    "message": "Active reports"
+  },
+  "dashboard.sidebar.label.analytics": {
+    "message": "Analytics"
+  },
+  "dashboard.sidebar.label.creators": {
+    "message": "Creators"
+  },
+  "dashboard.sidebar.label.dashboard": {
+    "message": "Dashboard"
+  },
+  "dashboard.sidebar.label.notifications": {
+    "message": "Notifications"
+  },
+  "dashboard.sidebar.label.organizations": {
+    "message": "Organizations"
+  },
+  "dashboard.sidebar.label.overview": {
+    "message": "Overview"
+  },
+  "dashboard.sidebar.label.projects": {
+    "message": "Projects"
+  },
+  "dashboard.sidebar.label.revenue": {
+    "message": "Revenue"
   },
   "dashboard.withdraw.completion.account": {
     "message": "Account"
