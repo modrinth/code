@@ -671,10 +671,7 @@ async function confirmResetToOnboarding() {
 	} catch (err) {
 		addNotification({
 			type: 'error',
-			text:
-				err instanceof Error
-					? err.message
-					: formatMessage(messages.failedToResetToOnboarding),
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
 		})
 	} finally {
 		isResettingToOnboarding.value = false
