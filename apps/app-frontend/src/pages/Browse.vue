@@ -15,6 +15,7 @@ import {
 	Admonition,
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
@@ -399,7 +400,9 @@ window.addEventListener('online', () => {
 })
 
 const breadcrumbs = useBreadcrumbs()
-const browseTitle = computed(() => (isFromWorlds.value ? 'Discover servers' : 'Discover content'))
+const browseTitle = computed(() =>
+	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
+)
 breadcrumbs.setName('BrowseTitle', browseTitle.value)
 if (instance.value) {
 	const instanceLink = `/instance/${encodeURIComponent(instance.value.path)}`
@@ -605,7 +608,7 @@ watch(
 			instanceHideInstalled.value = false
 			newlyInstalled.value = []
 			isServerInstance.value = false
-			breadcrumbs.setName('BrowseTitle', 'Discover content')
+			breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
 			breadcrumbs.setContext(null)
 		}
 
@@ -668,6 +671,42 @@ const selectableProjectTypes = computed(() => {
 })
 
 const messages = defineMessages({
+	addServerToInstance: {
+		id: 'app.browse.add-server-to-instance',
+		defaultMessage: 'Add server to instance',
+	},
+	addServersToInstance: {
+		id: 'app.browse.add-servers-to-instance',
+		defaultMessage: 'Add servers to your instance',
+	},
+	addToInstance: {
+		id: 'app.browse.add-to-instance',
+		defaultMessage: 'Add to instance',
+	},
+	addToInstanceName: {
+		id: 'app.browse.add-to-instance-name',
+		defaultMessage: 'Add to {instanceName}',
+	},
+	added: {
+		id: 'app.browse.added',
+		defaultMessage: 'Added',
+	},
+	alreadyAdded: {
+		id: 'app.browse.already-added',
+		defaultMessage: 'Already added',
+	},
+	discoverContent: {
+		id: 'app.browse.discover-content',
+		defaultMessage: 'Discover content',
+	},
+	discoverServers: {
+		id: 'app.browse.discover-servers',
+		defaultMessage: 'Discover servers',
+	},
+	environmentProvidedByServer: {
+		id: 'search.filter.locked.server-environment.title',
+		defaultMessage: 'Only client-side mods can be added to the server instance',
+	},
 	gameVersionProvidedByInstance: {
 		id: 'search.filter.locked.instance-game-version.title',
 		defaultMessage: 'Game version is provided by the instance',
@@ -676,6 +715,18 @@ const messages = defineMessages({
 		id: 'search.filter.locked.server-game-version.title',
 		defaultMessage: 'Game version is provided by the server',
 	},
+	hideAddedServers: {
+		id: 'app.browse.hide-added-servers',
+		defaultMessage: 'Hide added servers',
+	},
+	hideInstalledContent: {
+		id: 'app.browse.hide-installed-content',
+		defaultMessage: 'Hide installed content',
+	},
+	installContentToInstance: {
+		id: 'app.browse.install-content-to-instance',
+		defaultMessage: 'Install content to instance',
+	},
 	modLoaderProvidedByInstance: {
 		id: 'search.filter.locked.instance-loader.title',
 		defaultMessage: 'Loader is provided by the instance',
@@ -683,10 +734,6 @@ const messages = defineMessages({
 	modLoaderProvidedByServer: {
 		id: 'search.filter.locked.server-loader.title',
 		defaultMessage: 'Loader is provided by the server',
-	},
-	environmentProvidedByServer: {
-		id: 'search.filter.locked.server-environment.title',
-		defaultMessage: 'Only client-side mods can be added to the server instance',
 	},
 	providedByInstance: {
 		id: 'search.filter.locked.instance',
@@ -770,7 +817,7 @@ previousFilterState.value = JSON.stringify({
 		>
 			<Checkbox
 				v-model="instanceHideInstalled"
-				:label="isFromWorlds ? 'Hide added servers' : 'Hide installed content'"
+				:label="formatMessage(isFromWorlds ? messages.hideAddedServers : messages.hideInstalledContent)"
 				class="filter-checkbox"
 				@update:model-value="onSearchChangeToTop()"
 				@click.prevent.stop
@@ -851,7 +898,7 @@ previousFilterState.value = JSON.stringify({
 		<template v-if="instance">
 			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
 			<h1 class="m-0 mb-1 text-xl">
-				{{ isFromWorlds ? 'Add servers to your instance' : 'Install content to instance' }}
+				{{ formatMessage(isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance) }}
 			</h1>
 			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
@@ -970,7 +1017,7 @@ previousFilterState.value = JSON.stringify({
 										>
 											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
 											<PlusIcon v-else />
-											{{ allInstalledIds.has(project.project_id) ? 'Added' : 'Add to instance' }}
+											{{ formatMessage(allInstalledIds.has(project.project_id) ? messages.added : messages.addToInstance) }}
 										</button>
 									</ButtonStyled>
 								</template>
@@ -979,10 +1026,10 @@ previousFilterState.value = JSON.stringify({
 										<button
 											v-tooltip="
 												allInstalledIds.has(project.project_id)
-													? 'Already added'
+													? formatMessage(messages.alreadyAdded)
 													: instance
-														? `Add to ${instance.name}`
-														: 'Add server to instance'
+														? formatMessage(messages.addToInstanceName, { instanceName: instance.name })
+														: formatMessage(messages.addServerToInstance)
 											"
 											:disabled="allInstalledIds.has(project.project_id)"
 											@click.stop="() => handleAddServerToInstance(project)"
@@ -998,7 +1045,7 @@ previousFilterState.value = JSON.stringify({
 									>
 										<button @click="() => handleStopServerProject(project.project_id)">
 											<StopCircleIcon />
-											Stop
+											{{ formatMessage(commonMessages.stopButton) }}
 										</button>
 									</ButtonStyled>
 									<ButtonStyled v-else color="brand" type="outlined">
@@ -1010,9 +1057,11 @@ previousFilterState.value = JSON.stringify({
 										>
 											<PlayIcon />
 											{{
-												(installingServerProjects as string[]).includes(project.project_id)
-													? 'Installing...'
-													: 'Play'
+												formatMessage(
+													(installingServerProjects as string[]).includes(project.project_id)
+														? commonMessages.installingLabel
+														: commonMessages.playButton,
+												)
 											}}
 										</button>
 									</ButtonStyled>

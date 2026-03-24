@@ -76,12 +76,7 @@
 			<div class="flex flex-wrap items-center gap-1.5">
 				<FilterIcon class="size-5 text-secondary" />
 				<button
-					class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-					:class="
-						selectedFilters.length === 0
-							? 'border-green bg-brand-highlight text-brand'
-							: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-					"
+					:class="filterPillClass(selectedFilters.length === 0)"
 					@click="selectedFilters = []"
 				>
 					{{ formatMessage(commonMessages.allProjectType) }}
@@ -89,12 +84,7 @@
 				<button
 					v-for="option in filterOptions"
 					:key="option.id"
-					class="cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]"
-					:class="
-						selectedFilters.includes(option.id)
-							? 'border-green bg-brand-highlight text-brand'
-							: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5'
-					"
+					:class="filterPillClass(selectedFilters.includes(option.id))"
 					@click="toggleFilter(option.id)"
 				>
 					{{ option.label }}
@@ -330,6 +320,15 @@ function play(world: World) {
 
 const selectedFilters = ref<string[]>([])
 const searchFilter = ref('')
+
+function filterPillClass(isActive: boolean) {
+	return [
+		'cursor-pointer rounded-full border border-solid px-3 py-1.5 text-base font-semibold leading-5 transition-all duration-100 active:scale-[0.97]',
+		isActive
+			? 'border-green bg-brand-highlight text-brand'
+			: 'border-surface-5 bg-surface-4 text-primary hover:bg-surface-5',
+	]
+}
 
 function toggleFilter(id: string) {
 	const idx = selectedFilters.value.indexOf(id)

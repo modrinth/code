@@ -148,13 +148,15 @@ pub async fn file_save_as<R: Runtime>(
         .to_string_lossy()
         .to_string();
 
-    let dest = app
-        .dialog()
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    app.dialog()
         .file()
         .set_file_name(&file_name)
-        .blocking_save_file();
+        .save_file(|path| {
+            let _ = tx.send(path);
+        });
 
-    if let Some(dest) = dest {
+    if let Some(dest) = rx.await.unwrap_or(None) {
         let dest_path = std::path::PathBuf::try_from(dest).map_err(|e| {
             theseus::Error::from(theseus::ErrorKind::OtherError(format!(
                 "Invalid save path: {e}"

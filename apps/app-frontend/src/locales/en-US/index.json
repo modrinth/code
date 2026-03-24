@@ -1,4 +1,37 @@
 {
+  "app.browse.add-server-to-instance": {
+    "message": "Add server to instance"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Add servers to your instance"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Add to instance"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Add to {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Added"
+  },
+  "app.browse.already-added": {
+    "message": "Already added"
+  },
+  "app.browse.discover-content": {
+    "message": "Discover content"
+  },
+  "app.browse.discover-servers": {
+    "message": "Discover servers"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Hide added servers"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Hide installed content"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Install content to instance"
+  },
   "app.auth-servers.unreachable.body": {
     "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
   },
