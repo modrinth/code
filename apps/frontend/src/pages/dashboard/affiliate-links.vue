@@ -94,15 +94,12 @@ const {
 
 const filterQuery = ref('')
 const creatingLink = ref(false)
-const currentUserId = computed(() =>
-	auth.value?.user ? (auth.value.user as { id: string }).id : null,
-)
 
 const filteredAffiliates = computed(
 	() =>
 		affiliateLinks.value?.filter(
 			(link: Labrinth.Affiliate.Internal.AffiliateCode) =>
-				link.affiliate === currentUserId.value &&
+				link.affiliate === auth.value?.user?.id &&
 				(filterQuery.value.trim()
 					? link.source_name.trim().toLowerCase().includes(filterQuery.value.trim().toLowerCase())
 					: true),
