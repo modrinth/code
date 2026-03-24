@@ -407,6 +407,13 @@ function handleUpdateById(id: string) {
 	ctx.updateItem?.(id)
 }
 
+function handleSwitchVersionById(id: string) {
+	const item = ctx.items.value.find((i) => i.id === id)
+	if (item) {
+		ctx.switchVersion?.(item)
+	}
+}
+
 // Bulk updating
 const confirmBulkUpdateModal = ref<InstanceType<typeof ConfirmBulkUpdateModal>>()
 const pendingBulkUpdateItems = ref<ContentItem[]>([])
@@ -705,6 +712,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						@update:enabled="handleToggleEnabledById"
 						@delete="handleDeleteById"
 						@update="handleUpdateById"
+						@switch-version="handleSwitchVersionById"
 					>
 						<template #empty>
 							<span>{{ formatMessage(messages.noContentFound) }}</span>

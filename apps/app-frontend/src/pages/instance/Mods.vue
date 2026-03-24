@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftRightIcon, ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	ConfirmModpackUpdateModal,
 	type ContentItem,
@@ -164,10 +164,6 @@ const messages = defineMessages({
 	copyLink: {
 		id: 'app.instance.mods.copy-link',
 		defaultMessage: 'Copy link',
-	},
-	switchVersion: {
-		id: 'app.instance.mods.switch-version',
-		defaultMessage: 'Switch version',
 	},
 })
 
@@ -386,7 +382,7 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 }
 
 async function handleUpdate(id: string) {
-	const item = projects.value.find((p) => p.file_name === id)
+	const item = projects.value.find((p) => p.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	debug('handleUpdate triggered', {
@@ -663,14 +659,6 @@ async function handleShareItems(
 function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = []
 
-	if (item.project?.id && item.version?.id && !item.has_update) {
-		options.push({
-			id: formatMessage(messages.switchVersion),
-			icon: ArrowLeftRightIcon,
-			action: () => handleSwitchVersion(item),
-		})
-	}
-
 	options.push({
 		id: formatMessage(messages.showFile),
 		icon: FolderOpenIcon,
@@ -837,6 +825,7 @@ provideContentManager({
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairProfile,
 	openSettings: props.openSettings,
+	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	showContentHint,
 	dismissContentHint,

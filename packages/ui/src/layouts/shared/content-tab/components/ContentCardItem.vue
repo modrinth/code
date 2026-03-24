@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ArrowLeftRightIcon,
 	DownloadIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
@@ -67,11 +68,15 @@ const emit = defineEmits<{
 	'update:enabled': [value: boolean]
 	delete: [event: MouseEvent]
 	update: []
+	switchVersion: []
 }>()
 
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasSwitchVersionListener = computed(
+	() => typeof instance?.vnode.props?.onSwitchVersion === 'function',
+)
 
 const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
@@ -232,8 +237,11 @@ const deleteHovered = ref(false)
 		>
 			<slot name="additionalButtonsLeft" />
 
-			<!-- Fixed width container to reserve space for update button -->
-			<div v-if="hasUpdateListener" class="flex w-8 items-center justify-center">
+			<!-- Fixed width container to reserve space for update/switch version button -->
+			<div
+				v-if="hasUpdateListener || hasSwitchVersionListener"
+				class="flex w-8 items-center justify-center"
+			>
 				<ButtonStyled
 					v-if="hasUpdate"
 					circular
@@ -248,6 +256,15 @@ const deleteHovered = ref(false)
 						@click="emit('update')"
 					>
 						<DownloadIcon class="size-5" />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-else-if="hasSwitchVersionListener && version" circular type="transparent">
+					<button
+						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
+						:disabled="disabled"
+						@click="emit('switchVersion')"
+					>
+						<ArrowLeftRightIcon class="size-5" />
 					</button>
 				</ButtonStyled>
 			</div>

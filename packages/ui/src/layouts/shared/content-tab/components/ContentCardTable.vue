@@ -49,6 +49,7 @@ const emit = defineEmits<{
 	'update:enabled': [id: string, value: boolean]
 	delete: [id: string, event: MouseEvent]
 	update: [id: string]
+	switchVersion: [id: string]
 	sort: [column: ContentCardTableSortColumn, direction: ContentCardTableSortDirection]
 }>()
 
@@ -56,6 +57,9 @@ const emit = defineEmits<{
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasSwitchVersionListener = computed(
+	() => typeof instance?.vnode.props?.onSwitchVersion === 'function',
+)
 const hasEnabledListener = computed(
 	() => typeof instance?.vnode.props?.['onUpdate:enabled'] === 'function',
 )
@@ -65,6 +69,7 @@ const hasAnyActions = computed(() => {
 	const hasListeners =
 		(hasDeleteListener.value && !props.hideDelete) ||
 		hasUpdateListener.value ||
+		hasSwitchVersionListener.value ||
 		hasEnabledListener.value
 
 	// Check if any items have overflow options or updates
@@ -294,6 +299,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
+					@switch-version="emit('switchVersion', item.id)"
 				>
 					<template #additionalButtonsLeft>
 						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />
@@ -342,6 +348,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				@update:enabled="(val) => emit('update:enabled', item.id, val)"
 				@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 				@update="emit('update', item.id)"
+				@switch-version="emit('switchVersion', item.id)"
 			>
 				<template #additionalButtonsLeft>
 					<slot name="itemButtonsLeft" :item="item" :index="index" />
