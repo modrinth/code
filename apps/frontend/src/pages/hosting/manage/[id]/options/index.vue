@@ -2,10 +2,10 @@
 	<div class="relative h-full w-full overflow-y-auto">
 		<div v-if="data" class="flex h-full w-full flex-col">
 			<div class="card flex flex-col gap-6">
-				<div class="flex justify-between gap-6">
-					<div class="flex grow flex-col gap-6">
+				<div class="flex justify-start gap-16">
+					<div class="flex max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->
-						<div class="flex max-w-[500px] flex-col gap-2.5">
+						<div class="flex flex-col gap-2.5">
 							<label for="server-name-field" class="flex flex-col gap-2">
 								<span class="text-md font-semibold text-contrast">Server name</span>
 							</label>
@@ -29,27 +29,36 @@
 
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
-							<label for="server-subdomain" class="flex flex-col gap-2">
+							<label for="server-subdomain" class="flex flex-col gap-2.5">
 								<span class="text-md font-semibold text-contrast">Hostname</span>
-							</label>
-							<div class="flex w-full items-center gap-2">
-								<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-rose-400">
-									<span v-if="!isValidLengthSubdomain">
-										Subdomain must be at least 5 characters long.
-									</span>
-									<span v-if="!isValidCharsSubdomain">
-										Subdomain can only contain alphanumeric characters and dashes.
-									</span>
+								<div class="text-input-wrapper !w-full px-3">
+									<div class="relative inline-flex min-h-9 min-w-[5ch] items-center">
+										<span
+											class="pointer-events-none invisible whitespace-pre text-base font-medium"
+											aria-hidden="true"
+										>{{ serverSubdomain || 'subdomain' }}</span>
+										<input
+											id="server-subdomain"
+											:value="serverSubdomain"
+											placeholder="subdomain"
+											:maxlength="32"
+											class="absolute inset-0 !p-0 bg-transparent text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
+											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
+											@keyup.enter="saveGeneral"
+										/>
+									</div>
+									<div class="text-input-wrapper__after">.modrinth.gg</div>
 								</div>
-								<StyledInput
-									id="server-subdomain"
-									v-model="serverSubdomain"
-									:maxlength="32"
-									@keyup.enter="saveGeneral"
-								/>
-								.modrinth.gg
-							</div>
+							</label>
 							<span> Your friends can connect to your server using this URL. </span>
+							<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-red">
+								<span v-if="!isValidLengthSubdomain">
+									Subdomain must be at least 5 characters long.
+								</span>
+								<span v-if="!isValidCharsSubdomain">
+									Subdomain can only contain alphanumeric characters and dashes.
+								</span>
+							</div>
 						</div>
 					</div>
 
