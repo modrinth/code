@@ -36,13 +36,14 @@
 										<span
 											class="pointer-events-none invisible whitespace-pre text-base font-medium"
 											aria-hidden="true"
-										>{{ serverSubdomain || 'subdomain' }}</span>
+											>{{ serverSubdomain || 'subdomain' }}</span
+										>
 										<input
 											id="server-subdomain"
 											:value="serverSubdomain"
 											placeholder="subdomain"
 											:maxlength="32"
-											class="absolute inset-0 !p-0 bg-transparent text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
+											class="absolute inset-0 bg-transparent !p-0 text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
 											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
 											@keyup.enter="saveGeneral"
 										/>

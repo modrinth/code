@@ -201,7 +201,7 @@
 						</Table>
 
 						<span>
-							Set up your personal domain to connect to your server via custom DNS records. 
+							Set up your personal domain to connect to your server via custom DNS records.
 						</span>
 					</div>
 				</div>
