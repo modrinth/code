@@ -3,6 +3,7 @@
 		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
+				:key="instance.path"
 				ref="settingsModal"
 				:instance="instance"
 				:offline="offline"

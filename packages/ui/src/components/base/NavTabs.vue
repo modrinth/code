@@ -1,6 +1,6 @@
 <template>
 	<nav
-		v-if="filteredLinks.length > 0"
+		v-if="filteredLinks.length > 1"
 		ref="scrollContainer"
 		class="relative flex w-fit overflow-x-auto rounded-full bg-bg-raised p-1 text-sm font-bold"
 		:class="{ 'shadow-sm': mode === 'navigation' }"

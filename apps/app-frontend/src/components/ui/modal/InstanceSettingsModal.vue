@@ -44,8 +44,10 @@ const emit = defineEmits<{
 const isMinecraftServer = ref(false)
 const handleUnlinked = () => emit('unlinked')
 
+const instanceRef = computed(() => props.instance)
+
 provideInstanceSettings({
-	instance: props.instance,
+	instance: instanceRef,
 	offline: props.offline,
 	isMinecraftServer,
 	onUnlinked: handleUnlinked,

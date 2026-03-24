@@ -299,7 +299,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 					@update="emit('update', item.id)"
 					v-on="
 						hasSwitchVersionListener
-							? { 'switch-version': () => emit('switchVersion', item.id) }
+							? { switchVersion: () => emit('switchVersion', item.id) }
 							: {}
 					"
 				>

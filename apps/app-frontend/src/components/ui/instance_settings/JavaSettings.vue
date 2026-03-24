@@ -25,20 +25,20 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
-const overrideJavaInstall = ref(!!instance.java_path)
-const optimalJava = readonly(await get_optimal_jre_key(instance.path).catch(handleError))
-const javaInstall = ref({ path: optimalJava.path ?? instance.java_path })
+const overrideJavaInstall = ref(!!instance.value.java_path)
+const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catch(handleError))
+const javaInstall = ref({ path: optimalJava.path ?? instance.value.java_path })
 
-const overrideJavaArgs = ref((instance.extra_launch_args?.length ?? 0) > 0)
-const javaArgs = ref((instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '))
+const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
+const javaArgs = ref((instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '))
 
-const overrideEnvVars = ref((instance.custom_env_vars?.length ?? 0) > 0)
+const overrideEnvVars = ref((instance.value.custom_env_vars?.length ?? 0) > 0)
 const envVars = ref(
-	(instance.custom_env_vars ?? globalSettings.custom_env_vars).map((x) => x.join('=')).join(' '),
+	(instance.value.custom_env_vars ?? globalSettings.custom_env_vars).map((x) => x.join('=')).join(' '),
 )
 
-const overrideMemorySettings = ref(!!instance.memory)
-const memory = ref(instance.memory ?? globalSettings.memory)
+const overrideMemorySettings = ref(!!instance.value.memory)
+const memory = ref(instance.value.memory ?? globalSettings.memory)
 const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) as unknown as {
 	maxMemory: number
 	snapPoints: number[]
@@ -76,7 +76,7 @@ watch(
 		memory,
 	],
 	async () => {
-		await edit(instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )

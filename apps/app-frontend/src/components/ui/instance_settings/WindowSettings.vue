@@ -22,12 +22,12 @@ const { instance } = injectInstanceSettings()
 
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
-const overrideWindowSettings = ref(!!instance.game_resolution || !!instance.force_fullscreen)
+const overrideWindowSettings = ref(!!instance.value.game_resolution || !!instance.value.force_fullscreen)
 const resolution: Ref<[number, number]> = ref(
-	instance.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
+	instance.value.game_resolution ?? (globalSettings.game_resolution.slice() as [number, number]),
 )
 const fullscreenSetting: Ref<boolean> = ref(
-	instance.force_fullscreen ?? globalSettings.force_fullscreen,
+	instance.value.force_fullscreen ?? globalSettings.force_fullscreen,
 )
 
 const editProfileObject = computed(() => {
@@ -46,7 +46,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideWindowSettings, resolution, fullscreenSetting],
 	async () => {
-		await edit(instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )

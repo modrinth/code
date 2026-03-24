@@ -142,7 +142,12 @@
 			/>
 		</div>
 	</div>
-	<EmptyState v-else type="empty-inbox" :heading="formatMessage(messages.noWorldsHeading)">
+	<EmptyState
+		v-else
+		type="empty-inbox"
+		:heading="formatMessage(messages.noWorldsHeading)"
+		:description="formatMessage(messages.noWorldsDescription)"
+	>
 		<template #actions>
 			<ButtonStyled type="outlined">
 				<button class="!h-10 !border-button-bg !border-[1px]" @click="addServerModal?.show()">
@@ -219,6 +224,7 @@ import {
 	type World,
 } from '@/helpers/worlds.ts'
 import { injectServerInstall } from '@/providers/server-install'
+import { handleSevereError } from '@/store/error.js'
 import { ensureManagedServerWorldExists, getServerAddress } from '@/store/install'
 
 const messages = defineMessages({
@@ -259,7 +265,11 @@ const messages = defineMessages({
 	},
 	noWorldsHeading: {
 		id: 'app.instance.worlds.no-worlds-heading',
-		defaultMessage: "You don't have any worlds yet.",
+		defaultMessage: 'No servers or worlds added',
+	},
+	noWorldsDescription: {
+		id: 'app.instance.worlds.no-worlds-description',
+		defaultMessage: 'Add a server or browse to get started',
 	},
 	thisServer: {
 		id: 'app.instance.worlds.this-server',
@@ -520,7 +530,7 @@ async function deleteWorld(world: SingleplayerWorld) {
 }
 
 function handleJoinError(err: Error) {
-	handleError(err)
+	handleSevereError(err, { profilePath: instance.value.path })
 	startingInstance.value = false
 	worldPlaying.value = undefined
 }

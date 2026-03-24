@@ -30,19 +30,19 @@ const deleteConfirmModal = ref()
 
 const { instance } = injectInstanceSettings()
 
-const title = ref(instance.name)
-const icon: Ref<string | undefined> = ref(instance.icon_path)
-const groups = ref(instance.groups)
+const title = ref(instance.value.name)
+const icon: Ref<string | undefined> = ref(instance.value.icon_path)
+const groups = ref([...instance.value.groups])
 
 const newCategoryInput = ref('')
 
-const installing = computed(() => instance.install_stage !== 'installed')
+const installing = computed(() => instance.value.install_stage !== 'installed')
 
 async function duplicateProfile() {
-	await duplicate(instance.path).catch(handleError)
+	await duplicate(instance.value.path).catch(handleError)
 	trackEvent('InstanceDuplicate', {
-		loader: instance.loader,
-		game_version: instance.game_version,
+		loader: instance.value.loader,
+		game_version: instance.value.game_version,
 	})
 }
 
@@ -53,7 +53,7 @@ const availableGroups = computed(() => [
 
 async function resetIcon() {
 	icon.value = undefined
-	await edit_icon(instance.path, null).catch(handleError)
+	await edit_icon(instance.value.path, null).catch(handleError)
 	trackEvent('InstanceRemoveIcon')
 }
 
@@ -71,7 +71,7 @@ async function setIcon() {
 	if (!value) return
 
 	icon.value = value
-	await edit_icon(instance.path, icon.value).catch(handleError)
+	await edit_icon(instance.value.path, icon.value).catch(handleError)
 
 	trackEvent('InstanceSetIcon')
 }
@@ -102,7 +102,7 @@ watch(
 	[title, groups, groups],
 	async () => {
 		if (removing.value) return
-		await edit(instance.path, editProfileObject.value).catch(handleError)
+		await edit(instance.value.path, editProfileObject.value).catch(handleError)
 	},
 	{ deep: true },
 )
@@ -110,11 +110,11 @@ watch(
 const removing = ref(false)
 async function removeProfile() {
 	removing.value = true
-	const path = instance.path
+	const path = instance.value.path
 
 	trackEvent('InstanceRemove', {
-		loader: instance.loader,
-		game_version: instance.game_version,
+		loader: instance.value.loader,
+		game_version: instance.value.game_version,
 	})
 
 	await router.push({ path: '/' })
