@@ -94,8 +94,10 @@
 				><template v-if="noticeType === 'paymentfailed'"> due to payment failure</template
 				>.<template v-if="!isFilesExpired">
 					Your files will be kept for
-					<span class="font-medium text-red">30 days</span> and can be downloaded below before
-					they're deleted.</template
+					<span class="font-medium text-red"
+						>{{ filesRemainingDays }} more {{ filesRemainingDays === 1 ? 'day' : 'days' }}</span
+					>
+					and can be downloaded below before they're deleted.</template
 				>
 			</div>
 			<div v-else-if="noticeType === 'setToCancel'">
@@ -248,12 +250,14 @@ const isUpgrading = computed(
 )
 const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
 const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
-const isFilesExpired = computed(() => {
-	if (!props.cancellationDate) return false
+const filesRemainingDays = computed(() => {
+	if (!props.cancellationDate) return 0
 	const cancellation = new Date(props.cancellationDate)
-	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
-	return new Date() > thirtyDaysLater
+	const expiresAt = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000) // expires 30 days after cancellation
+	const remaining = Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+	return Math.max(0, remaining)
 })
+const isFilesExpired = computed(() => filesRemainingDays.value <= 0)
 
 const hasIconOverlay = computed(
 	() => isProvisioning.value || isUpgrading.value || props.status === 'suspended',
