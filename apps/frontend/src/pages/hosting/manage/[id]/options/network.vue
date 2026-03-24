@@ -106,10 +106,10 @@
 						<Table :columns="allocationColumns" :data="allocationRows" row-key="port">
 							<template #cell-name="{ row }">
 								<TagItem v-if="row.primary" class="!font-medium">Primary</TagItem>
-								<span v-else class="font-semibold text-contrast">{{ row.name }}</span>
+								<span v-else class="font-semibold">{{ row.name }}</span>
 							</template>
 							<template #cell-port="{ row }">
-								<span class="font-medium text-contrast">{{ row.port }}</span>
+								<span class="font-medium">{{ row.port }}</span>
 							</template>
 							<template #cell-actions="{ row }">
 								<div class="flex items-center justify-end gap-2">
@@ -142,7 +142,7 @@
 					<!-- DNS records section -->
 					<div class="flex flex-col gap-2">
 						<label for="user-domain" class="flex flex-col gap-2">
-							<span class="text-md font-semibold text-contrast">Generated DNS records</span>
+							<span class="text-md font-semibold text-contrast">DNS records</span>
 						</label>
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
@@ -167,16 +167,24 @@
 
 						<Table :columns="dnsColumns" :data="dnsRecords">
 							<template #cell-type="{ row }">
-								<span
-									class="cursor-pointer pr-8 font-semibold text-contrast"
-									@click="copyText(row.type)"
+								<TagItem
+									v-if="row.type === 'SRV'"
+									class="border !border-solid border-purple bg-highlight-purple !font-medium"
+									:style="`--_color: var(--color-purple)`"
 								>
 									{{ row.type }}
-								</span>
+								</TagItem>
+								<TagItem
+									v-else
+									class="border !border-solid border-blue bg-highlight-blue !font-medium"
+									:style="`--_color: var(--color-blue)`"
+								>
+									{{ row.type }}
+								</TagItem>
 							</template>
 							<template #cell-name="{ row }">
 								<span
-									class="block cursor-pointer truncate pr-8 font-semibold text-contrast"
+									class="block cursor-pointer truncate pr-8 font-semibold"
 									@click="copyText(row.name)"
 								>
 									{{ row.name }}
@@ -184,7 +192,7 @@
 							</template>
 							<template #cell-content="{ row }">
 								<span
-									class="block cursor-pointer truncate pr-8 font-semibold text-contrast"
+									class="block cursor-pointer truncate pr-8 font-semibold"
 									@click="copyText(row.content)"
 								>
 									{{ row.content }}
