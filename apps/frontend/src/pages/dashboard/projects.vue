@@ -485,11 +485,11 @@ const user = await useUser()
 const projects = ref([])
 const projectsWithMigrationWarning = ref([])
 const selectedProjects = ref([])
-const sortBy = ref('name')
+const sortBy = ref('Name')
 const sortOptions = computed(() => [
-	{ value: 'name', label: formatMessage(messages.sortOptionName) },
-	{ value: 'status', label: formatMessage(messages.sortOptionStatus) },
-	{ value: 'type', label: formatMessage(messages.sortOptionType) },
+	{ value: 'Name', label: formatMessage(messages.sortOptionName) },
+	{ value: 'Status', label: formatMessage(messages.sortOptionStatus) },
+	{ value: 'Type', label: formatMessage(messages.sortOptionType) },
 ])
 const descending = ref(false)
 const editLinks = reactive({
@@ -571,17 +571,17 @@ function getBulkEditDisabledTooltip(project) {
 function updateSort(list, sort, desc) {
 	let sortedArray = list
 	switch (sort) {
-		case 'name':
+		case 'Name':
 			sortedArray = list.slice().sort((a, b) => a.title.localeCompare(b.title))
 			break
-		case 'status':
+		case 'Status':
 			sortedArray = list.slice().sort((a, b) => {
 				if (a.status < b.status) return -1
 				if (a.status > b.status) return 1
 				return 0
 			})
 			break
-		case 'type':
+		case 'Type':
 			sortedArray = list.slice().sort((a, b) => {
 				if (a.project_type < b.project_type) return -1
 				if (a.project_type > b.project_type) return 1
@@ -646,7 +646,7 @@ async function bulkEditLinks() {
 
 await initUserProjects()
 if (user.value?.projects) {
-	projects.value = updateSort(user.value.projects, 'name', false)
+	projects.value = updateSort(user.value.projects, 'Name', false)
 
 	// minecraft_java_server type determined from component on projectV3
 	projects.value = projects.value.map((project) => {
