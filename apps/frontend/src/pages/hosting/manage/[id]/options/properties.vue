@@ -39,7 +39,10 @@
 
 				<div class="flex flex-col gap-6">
 					<!-- Basic Properties -->
-					<div class="rounded-2xl border border-solid border-surface-5 p-4 empty:hidden">
+					<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
+					<div
+						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
+					>
 						<div class="flex max-w-[600px] flex-col gap-6">
 							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2">
 								<span class="font-semibold text-contrast">Gamemode</span>
@@ -85,6 +88,30 @@
 							</div>
 
 							<div
+								v-if="isPropertyVisible('allow_flight')"
+								class="flex flex-row items-center justify-between gap-4"
+							>
+								<span class="font-semibold text-contrast">Allow flight</span>
+								<Toggle
+									id="server-property-allow-flight"
+									:model-value="liveProperties.allow_flight === 'true'"
+									@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
+								/>
+							</div>
+
+							<div
+								v-if="isPropertyVisible('allow_cheats')"
+								class="flex flex-row items-center justify-between gap-4"
+							>
+								<span class="font-semibold text-contrast">Allow cheats</span>
+								<Toggle
+									id="server-property-allow-cheats"
+									:model-value="liveProperties.allow_cheats === 'true'"
+									@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
+								/>
+							</div>
+
+							<div
 								v-if="isPropertyVisible('white_list')"
 								class="flex flex-row items-center justify-between gap-4"
 							>
@@ -103,7 +130,10 @@
 								/>
 							</div>
 
-							<div v-if="spawnProtectionEnabled" class="flex items-center justify-between">
+							<div
+								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
+								class="flex items-center justify-between"
+							>
 								<span class="text-md font-semibold text-contrast">Protection radius</span>
 								<StyledInput
 									id="server-property-spawn-protection-radius"
@@ -116,7 +146,7 @@
 						</div>
 					</div>
 					<!-- Advanced Properties -->
-					<Accordion overflow-visible>
+					<Accordion v-if="hasVisibleAdvancedProperties" overflow-visible>
 						<template #title>
 							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
 						</template>
@@ -199,6 +229,15 @@
 							</div>
 						</div>
 					</Accordion>
+
+					<div
+						v-if="hasNoResults"
+						class="flex flex-col items-center gap-2 py-8 text-center text-secondary"
+					>
+						<SearchIcon class="size-10" />
+						<span class="text-lg font-semibold text-contrast">No properties found</span>
+						<span>No properties match "{{ searchInput }}".</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -296,8 +335,6 @@ const ADVANCED_GROUPS = [
 	{
 		label: 'Other',
 		keys: [
-			'allow_cheats',
-			'allow_flight',
 			'force_gamemode',
 			'generate_structures',
 			'generator_settings',
@@ -499,6 +536,9 @@ const filteredProperties = computed(() => {
 })
 
 const isSearchActive = computed(() => !!searchInput.value?.trim())
+const hasNoResults = computed(
+	() => isSearchActive.value && Object.keys(filteredProperties.value).length === 0,
+)
 
 function isPropertyVisible(key: string): boolean {
 	if (!isSearchActive.value) return true
@@ -513,6 +553,12 @@ const visibleCustomProperties = computed(() => {
 	if (!isSearchActive.value) return customProperties.value
 	return customProperties.value.filter((key) => isPropertyVisible(key))
 })
+
+const hasVisibleAdvancedProperties = computed(
+	() =>
+		advancedGroupedProperties.value.some((group) => hasVisibleProperties(group)) ||
+		visibleCustomProperties.value.length > 0,
+)
 
 function formatPropertyName(name: string): string {
 	return name
