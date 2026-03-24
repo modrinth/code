@@ -9,7 +9,6 @@
 
 			<div class="card flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
-					<h2 class="m-0 text-lg font-bold text-contrast">Server properties</h2>
 					<div class="m-0">
 						Edit the Minecraft server properties file. If you're unsure about a specific property,
 						the
@@ -93,31 +92,33 @@
 								<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
 							</div>
 
-							<div v-if="isPropertyVisible('spawn_protection')" class="flex flex-col gap-2">
-								<div class="flex flex-row items-center justify-between gap-4">
-									<span class="font-semibold text-contrast">Enable spawn protection</span>
-									<Toggle
-										id="server-property-spawn-protection-toggle"
-										v-model="spawnProtectionEnabled"
-									/>
-								</div>
-								<div v-if="spawnProtectionEnabled" class="mt-1">
-									<span class="text-sm text-secondary">Protection radius</span>
-									<StyledInput
-										id="server-property-spawn-protection-radius"
-										:model-value="liveProperties.spawn_protection"
-										type="number"
-										wrapper-class="w-full sm:w-[320px]"
-										@update:model-value="liveProperties.spawn_protection = String($event)"
-									/>
-								</div>
+							<div
+								v-if="isPropertyVisible('spawn_protection')"
+								class="flex flex-row items-center justify-between gap-4"
+							>
+								<span class="font-semibold text-contrast">Enable spawn protection</span>
+								<Toggle
+									id="server-property-spawn-protection-toggle"
+									v-model="spawnProtectionEnabled"
+								/>
+							</div>
+
+							<div v-if="spawnProtectionEnabled" class="flex items-center justify-between">
+								<span class="text-md font-semibold text-contrast">Protection radius</span>
+								<StyledInput
+									id="server-property-spawn-protection-radius"
+									:model-value="liveProperties.spawn_protection"
+									type="number"
+									wrapper-class="w-full sm:w-[320px]"
+									@update:model-value="liveProperties.spawn_protection = String($event)"
+								/>
 							</div>
 						</div>
 					</div>
 					<!-- Advanced Properties -->
 					<Accordion overflow-visible>
 						<template #title>
-							<span class="text-lg font-bold text-contrast">Advanced properties</span>
+							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
 						</template>
 
 						<div class="flex flex-col gap-6 pt-4">
@@ -152,6 +153,7 @@
 														:id="`server-property-${key}`"
 														:model-value="liveProperties[key]"
 														type="number"
+														placeholder="Type here..."
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
 														@update:model-value="liveProperties[key] = String($event)"
@@ -161,6 +163,7 @@
 													<StyledInput
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
+														placeholder="Type here..."
 														wrapper-class="w-full"
 														:aria-labelledby="`property-label-${key}`"
 													/>
@@ -187,6 +190,7 @@
 												:id="`server-property-${key}`"
 												v-model="liveProperties[key]"
 												wrapper-class="w-full"
+												placeholder="Type here..."
 												:aria-labelledby="`property-label-${key}`"
 											/>
 										</div>
