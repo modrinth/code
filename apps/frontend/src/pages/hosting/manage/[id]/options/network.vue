@@ -84,7 +84,7 @@
 			<div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
 				<div class="card flex h-full flex-col gap-6">
 					<!-- Allocations section -->
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-2.5">
 						<span class="text-md font-semibold text-contrast">Allocations</span>
 
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
@@ -140,7 +140,7 @@
 					</div>
 
 					<!-- DNS records section -->
-					<div class="flex flex-col gap-2">
+					<div class="flex flex-col gap-2.5">
 						<label for="user-domain" class="flex flex-col gap-2">
 							<span class="text-md font-semibold text-contrast">DNS records</span>
 						</label>
