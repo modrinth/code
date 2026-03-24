@@ -38,26 +38,6 @@
 								<template v-else> Never played </template>
 							</div>
 
-							<div v-if="linkedProjectV3" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
-							</div>
 						</template>
 
 						<template v-else>

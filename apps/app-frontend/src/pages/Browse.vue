@@ -45,14 +45,14 @@ import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
+	get as getInstance,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { add_server_to_profile, getServerLatency } from '@/helpers/worlds'
+import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
@@ -109,9 +109,9 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
-const isFromWorlds = route.query.from === 'worlds'
+const isFromWorlds = computed(() => route.query.from === 'worlds')
 
-if (isFromWorlds && route.params.projectType !== 'server') {
+if (isFromWorlds.value && route.params.projectType !== 'server') {
 	router.replace({
 		path: '/browse/server',
 		query: route.query,
@@ -139,12 +139,24 @@ async function initInstanceContext() {
 		// Load installed project IDs in background — the page and initial search render immediately.
 		// When this resolves, instanceFilters recomputes and triggers a search refresh
 		// that applies the "hide installed" negative filters and marks installed badges.
-		getInstalledProjectIds(route.query.i as string)
-			.then((ids) => {
-				debugLog('installedProjectIds loaded', { count: ids?.length })
-				installedProjectIds.value = ids
-			})
-			.catch(handleError)
+		if (route.query.from === 'worlds') {
+			get_profile_worlds(route.query.i as string)
+				.then((worlds) => {
+					const serverProjectIds = worlds
+						.filter((w) => w.type === 'server' && 'project_id' in w && w.project_id)
+						.map((w) => (w as { project_id: string }).project_id)
+					debugLog('installedServerProjectIds loaded', { count: serverProjectIds.length })
+					installedProjectIds.value = serverProjectIds
+				})
+				.catch(handleError)
+		} else {
+			getInstalledProjectIds(route.query.i as string)
+				.then((ids) => {
+					debugLog('installedProjectIds loaded', { count: ids?.length })
+					installedProjectIds.value = ids
+				})
+				.catch(handleError)
+		}
 
 		if (instance.value?.linked_data?.project_id) {
 			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
@@ -255,6 +267,10 @@ const activeGameVersion = computed(() => {
 })
 
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
+const filteredServerHits = computed(() => {
+	if (!instanceHideInstalled.value || allInstalledIds.value.size === 0) return serverHits.value
+	return serverHits.value.filter((hit) => !allInstalledIds.value.has(hit.project_id))
+})
 const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
@@ -383,13 +399,13 @@ window.addEventListener('online', () => {
 })
 
 const breadcrumbs = useBreadcrumbs()
-const browseTitle = isFromWorlds ? 'Discover servers' : 'Discover content'
-breadcrumbs.setName('BrowseTitle', browseTitle)
+const browseTitle = computed(() => (isFromWorlds.value ? 'Discover servers' : 'Discover content'))
+breadcrumbs.setName('BrowseTitle', browseTitle.value)
 if (instance.value) {
 	const instanceLink = `/instance/${encodeURIComponent(instance.value.path)}`
 	breadcrumbs.setContext({
 		name: instance.value.name,
-		link: isFromWorlds ? `${instanceLink}/worlds` : instanceLink,
+		link: isFromWorlds.value ? `${instanceLink}/worlds` : instanceLink,
 	})
 } else {
 	breadcrumbs.setContext(null)
@@ -397,7 +413,7 @@ if (instance.value) {
 
 onBeforeRouteLeave(() => {
 	breadcrumbs.setContext({
-		name: browseTitle,
+		name: browseTitle.value,
 		link: `/browse/${projectType.value}`,
 		query: route.query,
 	})
@@ -581,6 +597,18 @@ watch(
 		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
+		// If instance context was removed (e.g. sidebar browse navigation), reset state
+		if (!route.query.i && instance.value) {
+			debugLog('instance context removed, resetting')
+			instance.value = null
+			installedProjectIds.value = null
+			instanceHideInstalled.value = false
+			newlyInstalled.value = []
+			isServerInstance.value = false
+			breadcrumbs.setName('BrowseTitle', 'Discover content')
+			breadcrumbs.setContext(null)
+		}
+
 		currentSortType.value = { display: 'Relevance', name: 'relevance' }
 		query.value = ''
 	},
@@ -625,7 +653,7 @@ const selectableProjectTypes = computed(() => {
 	const queryString = new URLSearchParams(params as Record<string, string>).toString()
 	const suffix = queryString ? `?${queryString}` : ''
 
-	if (isFromWorlds) {
+	if (isFromWorlds.value) {
 		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
 	}
 
@@ -742,7 +770,7 @@ previousFilterState.value = JSON.stringify({
 		>
 			<Checkbox
 				v-model="instanceHideInstalled"
-				label="Hide installed content"
+				:label="isFromWorlds ? 'Hide added servers' : 'Hide installed content'"
 				class="filter-checkbox"
 				@update:model-value="onSearchChangeToTop()"
 				@click.prevent.stop
@@ -897,7 +925,7 @@ previousFilterState.value = JSON.stringify({
 			<section
 				v-else-if="
 					projectType === 'server'
-						? serverHits.length === 0
+						? filteredServerHits.length === 0
 						: results && results.hits && results.hits.length === 0
 				"
 				class="offline"
@@ -908,7 +936,7 @@ previousFilterState.value = JSON.stringify({
 			<ProjectCardList v-else :layout="'list'">
 				<template v-if="projectType === 'server'">
 					<ProjectCard
-						v-for="project in serverHits"
+						v-for="project in filteredServerHits"
 						:key="`server-card-${project.project_id}`"
 						:title="project.name"
 						:icon-url="project.icon_url || undefined"
@@ -934,45 +962,61 @@ previousFilterState.value = JSON.stringify({
 					>
 						<template #actions>
 							<div class="flex gap-2">
-								<ButtonStyled circular>
-									<button
-										v-tooltip="
-											allInstalledIds.has(project.project_id)
-												? 'Already added'
-												: instance
-													? `Add to ${instance.name}`
-													: 'Add server to instance'
-										"
-										:disabled="allInstalledIds.has(project.project_id)"
-										@click.stop="() => handleAddServerToInstance(project)"
+								<template v-if="isFromWorlds && instance">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											:disabled="allInstalledIds.has(project.project_id)"
+											@click.stop="() => handleAddServerToInstance(project)"
+										>
+											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
+											<PlusIcon v-else />
+											{{ allInstalledIds.has(project.project_id) ? 'Added' : 'Add to instance' }}
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else>
+									<ButtonStyled circular>
+										<button
+											v-tooltip="
+												allInstalledIds.has(project.project_id)
+													? 'Already added'
+													: instance
+														? `Add to ${instance.name}`
+														: 'Add server to instance'
+											"
+											:disabled="allInstalledIds.has(project.project_id)"
+											@click.stop="() => handleAddServerToInstance(project)"
+										>
+											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
+											<PlusIcon v-else />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled
+										v-if="runningServerProjects[project.project_id]"
+										color="red"
+										type="outlined"
 									>
-										<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
-										<PlusIcon v-else />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-if="runningServerProjects[project.project_id]"
-									color="red"
-									type="outlined"
-								>
-									<button @click="() => handleStopServerProject(project.project_id)">
-										<StopCircleIcon />
-										Stop
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-else color="brand" type="outlined">
-									<button
-										:disabled="(installingServerProjects as string[]).includes(project.project_id)"
-										@click="() => handlePlayServerProject(project.project_id)"
-									>
-										<PlayIcon />
-										{{
-											(installingServerProjects as string[]).includes(project.project_id)
-												? 'Installing...'
-												: 'Play'
-										}}
-									</button>
-								</ButtonStyled>
+										<button @click="() => handleStopServerProject(project.project_id)">
+											<StopCircleIcon />
+											Stop
+										</button>
+									</ButtonStyled>
+									<ButtonStyled v-else color="brand" type="outlined">
+										<button
+											:disabled="
+												(installingServerProjects as string[]).includes(project.project_id)
+											"
+											@click="() => handlePlayServerProject(project.project_id)"
+										>
+											<PlayIcon />
+											{{
+												(installingServerProjects as string[]).includes(project.project_id)
+													? 'Installing...'
+													: 'Play'
+											}}
+										</button>
+									</ButtonStyled>
+								</template>
 							</div>
 						</template>
 					</ProjectCard>
