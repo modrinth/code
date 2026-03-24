@@ -462,7 +462,7 @@
     "defaultMessage": "Create a {type, select, directory {folder} other {file}}"
   },
   "files.create-modal.placeholder-directory": {
-    "defaultMessage": "e.g. plugins"
+    "defaultMessage": "e.g. my-folder"
   },
   "files.create-modal.placeholder-file": {
     "defaultMessage": "e.g. config.yml"
@@ -573,7 +573,7 @@
     "defaultMessage": "Destination path"
   },
   "files.move-modal.destination-placeholder": {
-    "defaultMessage": "e.g. /mods"
+    "defaultMessage": "e.g. /my-folder"
   },
   "files.move-modal.header": {
     "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"

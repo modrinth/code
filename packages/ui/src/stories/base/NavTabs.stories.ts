@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { getCurrentInstance, ref } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
+
 import NavTabs from '../../components/base/NavTabs.vue'
 
 const router = createRouter({

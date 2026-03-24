@@ -1,4 +1,10 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
+  },
+  "app.auth-servers.unreachable.header": {
+    "message": "Cannot reach authentication servers"
+  },
   "app.browse.add-server-to-instance": {
     "message": "Add server to instance"
   },
@@ -31,12 +37,6 @@
   },
   "app.browse.install-content-to-instance": {
     "message": "Install content to instance"
-  },
-  "app.auth-servers.unreachable.body": {
-    "message": "Minecraft authentication servers may be down right now. Check your internet connection and try again later."
-  },
-  "app.auth-servers.unreachable.header": {
-    "message": "Cannot reach authentication servers"
   },
   "app.export-modal.description-placeholder": {
     "message": "Enter modpack description..."
@@ -74,20 +74,17 @@
   "app.instance.confirm-delete.header": {
     "message": "Delete instance"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "This modpack is already installed in the \"{instanceName}\" instance."
+  "app.instance.modpack-already-installed.body": {
+    "message": "This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?"
   },
-  "app.instance.modpack-already-installed.admonition-header": {
-    "message": "Duplicate modpack"
-  },
-  "app.instance.modpack-already-installed.create-anyway": {
-    "message": "Create anyway"
-  },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "Go to instance"
+  "app.instance.modpack-already-installed.create": {
+    "message": "Create"
   },
   "app.instance.modpack-already-installed.header": {
     "message": "Modpack already installed"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instance"
   },
   "app.instance.mods.content-type-project": {
     "message": "project"
@@ -131,8 +128,11 @@
   "app.instance.worlds.filter-vanilla": {
     "message": "Vanilla"
   },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Add a server or browse to get started"
+  },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "You don't have any worlds yet."
+    "message": "No servers or worlds added"
   },
   "app.instance.worlds.remove-server-description": {
     "message": "'{name}' will be removed from your list, including in-game, and there will be no way to recover it."

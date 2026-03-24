@@ -35,7 +35,14 @@
 
 <script setup lang="ts">
 import { PlusIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
-import { ButtonStyled, commonMessages, defineMessages, IntlFormatted, NewModal, useVIntl } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref } from 'vue'
 
 const { formatMessage } = useVIntl()

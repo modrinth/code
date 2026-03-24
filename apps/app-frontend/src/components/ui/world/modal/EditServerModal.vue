@@ -9,6 +9,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { computed, ref } from 'vue'
+
 import HideFromHomeOption from '@/components/ui/world/modal/HideFromHomeOption.vue'
 import ServerModalBody from '@/components/ui/world/modal/ServerModalBody.vue'
 import type { GameInstance } from '@/helpers/types'

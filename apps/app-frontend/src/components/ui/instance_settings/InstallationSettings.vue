@@ -138,7 +138,10 @@ provideInstallationSettings({
 	isLinked: computed(() => !!instance.value.linked_data?.locked),
 	isBusy: computed(
 		() =>
-			instance.value.install_stage !== 'installed' || repairing.value || reinstalling.value || !!offline,
+			instance.value.install_stage !== 'installed' ||
+			repairing.value ||
+			reinstalling.value ||
+			!!offline,
 	),
 	modpack: computed(() => {
 		if (!modpackInfo.value) return null

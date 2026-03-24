@@ -37,7 +37,6 @@
 								</template>
 								<template v-else> Never played </template>
 							</div>
-
 						</template>
 
 						<template v-else>

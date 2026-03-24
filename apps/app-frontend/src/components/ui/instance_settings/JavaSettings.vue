@@ -30,11 +30,15 @@ const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catc
 const javaInstall = ref({ path: optimalJava.path ?? instance.value.java_path })
 
 const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
-const javaArgs = ref((instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '))
+const javaArgs = ref(
+	(instance.value.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
+)
 
 const overrideEnvVars = ref((instance.value.custom_env_vars?.length ?? 0) > 0)
 const envVars = ref(
-	(instance.value.custom_env_vars ?? globalSettings.custom_env_vars).map((x) => x.join('=')).join(' '),
+	(instance.value.custom_env_vars ?? globalSettings.custom_env_vars)
+		.map((x) => x.join('='))
+		.join(' '),
 )
 
 const overrideMemorySettings = ref(!!instance.value.memory)

@@ -46,8 +46,8 @@ import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get_installed_project_ids as getInstalledProjectIds,
 	get as getInstance,
+	get_installed_project_ids as getInstalledProjectIds,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
@@ -817,7 +817,9 @@ previousFilterState.value = JSON.stringify({
 		>
 			<Checkbox
 				v-model="instanceHideInstalled"
-				:label="formatMessage(isFromWorlds ? messages.hideAddedServers : messages.hideInstalledContent)"
+				:label="
+					formatMessage(isFromWorlds ? messages.hideAddedServers : messages.hideInstalledContent)
+				"
 				class="filter-checkbox"
 				@update:model-value="onSearchChangeToTop()"
 				@click.prevent.stop
@@ -898,7 +900,11 @@ previousFilterState.value = JSON.stringify({
 		<template v-if="instance">
 			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
 			<h1 class="m-0 mb-1 text-xl">
-				{{ formatMessage(isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance) }}
+				{{
+					formatMessage(
+						isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance,
+					)
+				}}
 			</h1>
 			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
@@ -1017,7 +1023,13 @@ previousFilterState.value = JSON.stringify({
 										>
 											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
 											<PlusIcon v-else />
-											{{ formatMessage(allInstalledIds.has(project.project_id) ? messages.added : messages.addToInstance) }}
+											{{
+												formatMessage(
+													allInstalledIds.has(project.project_id)
+														? messages.added
+														: messages.addToInstance,
+												)
+											}}
 										</button>
 									</ButtonStyled>
 								</template>
@@ -1028,7 +1040,9 @@ previousFilterState.value = JSON.stringify({
 												allInstalledIds.has(project.project_id)
 													? formatMessage(messages.alreadyAdded)
 													: instance
-														? formatMessage(messages.addToInstanceName, { instanceName: instance.name })
+														? formatMessage(messages.addToInstanceName, {
+																instanceName: instance.name,
+															})
 														: formatMessage(messages.addServerToInstance)
 											"
 											:disabled="allInstalledIds.has(project.project_id)"
