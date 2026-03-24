@@ -11,6 +11,12 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-24T12:00:00-04:00`,
+		product: 'hosting',
+		body: `## Improvements
+- Added Java 25 to hosting panel`,
+	},
+	{
 		date: `2026-03-17T19:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements
