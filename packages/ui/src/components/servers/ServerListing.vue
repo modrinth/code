@@ -107,13 +107,11 @@
 						{{ formatDate(cancellationDate) }}
 					</span></template
 				>.<template v-if="!isFilesExpired">
-					Your files will be preserved for
-					<span class="font-medium text-red">30 days</span> after cancellation.</template
-				>
+					Your files will be preserved for 30 days after cancellation.
+				</template>
 			</div>
 			<div v-else-if="noticeType === 'moderated'">
-				Your server has been suspended due to a moderation action. Please contact Modrinth Support
-				for more information.
+				Your server has been suspended by moderation action.
 			</div>
 			<div v-else>
 				Your server has been suspended. Please contact Modrinth Support for more information.

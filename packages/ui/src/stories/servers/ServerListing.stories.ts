@@ -103,14 +103,6 @@ export const SetToCancel: Story = {
 	},
 }
 
-export const SetToCancelFilesExpired: Story = {
-	args: {
-		...baseServer,
-		name: 'Survival SMP',
-		cancellationDate: new Date(2025, 1, 17).toISOString(),
-	},
-}
-
 export const SuspendedCancelled: Story = {
 	args: {
 		...baseServer,
@@ -143,17 +135,6 @@ export const SuspendedPaymentFailed: Story = {
 		suspension_reason: 'paymentfailed',
 		cancellationDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
 		onDownloadBackup: () => alert('Download backup clicked'),
-	},
-}
-
-export const SuspendedPaymentFailedFilesExpired: Story = {
-	args: {
-		...baseServer,
-		name: 'Minigames Network',
-		status: 'suspended',
-		suspension_reason: 'paymentfailed',
-		cancellationDate: new Date(2025, 1, 17).toISOString(),
-		onDownloadBackup: null,
 	},
 }
 
