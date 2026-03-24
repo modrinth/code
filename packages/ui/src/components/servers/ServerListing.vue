@@ -16,7 +16,10 @@
 					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
 					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
-					<SpinnerIcon v-if="isProvisioning || isUpgrading" class="size-8 animate-spin absolute" />
+					<SpinnerIcon
+						v-if="isProvisioning || isUpgrading"
+						class="size-8 animate-spin absolute text-contrast"
+					/>
 					<LockIcon v-else class="size-8 absolute" />
 				</div>
 				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
