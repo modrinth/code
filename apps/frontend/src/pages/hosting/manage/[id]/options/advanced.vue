@@ -1,14 +1,11 @@
 <template>
 	<div class="relative h-full w-full">
 		<div class="flex h-full w-full flex-col gap-4">
-			<div class="card flex flex-col gap-8">
+			<div class="card flex flex-col gap-6">
 				<!-- SFTP section -->
-				<div class="flex flex-col gap-4">
-					<div class="flex flex-col justify-between gap-4 sm:flex-row">
-						<label class="flex flex-col gap-2">
-							<span class="text-lg font-bold text-contrast">SFTP</span>
-							<span> SFTP allows you to access your server's files from outside of Modrinth. </span>
-						</label>
+				<div class="flex flex-col gap-2">
+					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
+						<span class="text-md font-semibold text-contrast">SFTP</span>
 						<ButtonStyled>
 							<a
 								v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
@@ -96,15 +93,15 @@
 				</div>
 
 				<!-- Startup command section -->
-				<div class="flex flex-col gap-2">
-					<div class="flex h-9 flex-col items-center justify-between gap-4 sm:flex-row">
-						<label for="startup-command-field" class="flex flex-col gap-2">
-							<span class="text-lg font-bold text-contrast">Startup command</span>
+				<div class="flex flex-col gap-2.5">
+					<div class="flex h-9 flex-col items-end justify-between gap-4 sm:flex-row">
+						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
+							<span class="text-md font-semibold text-contrast">Startup command</span>
 						</label>
 						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
 							<button
 								:disabled="isStartupLoading || startupCommand === defaultStartupCommand"
-								class="!w-full sm:!w-auto"
+								class="relative !w-full sm:!w-auto"
 								@click="resetToDefault"
 							>
 								<UpdatedIcon class="h-5 w-5" />
@@ -132,14 +129,9 @@
 				</div>
 
 				<!-- Java version section -->
-				<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-lg font-bold text-contrast">Java version</span>
-						<span>
-							The version of Java that your server will run on. By default, only the Java versions
-							compatible with this version of Minecraft are shown. Some mods may require a different
-							Java version to work properly.
-						</span>
+						<span class="text-md font-semibold text-contrast">Java version</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
@@ -169,13 +161,16 @@
 							<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 						</div>
 					</div>
+					<span>
+						The Java version your server runs on. By default, only versions compatible with your
+						Minecraft version are shown.
+					</span>
 				</div>
 
 				<!-- Java runtime section -->
-				<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-lg font-bold text-contrast">Runtime</span>
-						<span> The Java runtime your server will use. </span>
+						<span class="text-md font-semibold text-contrast">Java runtime</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
@@ -193,6 +188,7 @@
 							<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 						</div>
 					</div>
+					<span> The Java runtime your server will use. </span>
 				</div>
 			</div>
 		</div>
