@@ -10,8 +10,8 @@
 			<div class="card flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
-						Edit the Minecraft server properties file. If you're unsure about a specific property,
-						the
+						Edit the Minecraft server properties file here, or use the Files tab to edit the full
+						file. If you're unsure about a setting, the
 						<NuxtLink
 							class="goto-link !inline-block"
 							to="https://minecraft.wiki/w/Server.properties"
@@ -19,7 +19,7 @@
 						>
 							Minecraft Wiki
 						</NuxtLink>
-						has more detailed information.
+						has more details.
 					</div>
 				</div>
 

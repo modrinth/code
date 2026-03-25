@@ -24,7 +24,7 @@
 									Server name can contain any character.
 								</span>
 							</div>
-							<span> This name is only visible on Modrinth.</span>
+							<span>This name is only visible on Modrinth.</span>
 						</div>
 
 						<!-- Hostname -->
@@ -51,7 +51,7 @@
 									<div class="text-input-wrapper__after">.modrinth.gg</div>
 								</div>
 							</label>
-							<span> Your friends can connect to your server using this URL. </span>
+							<span>Your friends can connect to your server using this address.</span>
 							<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-red">
 								<span v-if="!isValidLengthSubdomain">
 									Subdomain must be at least 5 characters long.
@@ -201,19 +201,18 @@ const preferences = {
 		implemented: true,
 	},
 	autoRestart: {
-		displayName: 'Auto restart',
-		description: 'When enabled, your server will automatically restart if it crashes.',
+		displayName: 'Auto restarts',
+		description: 'Automatically restart the server if it crashes.',
 		implemented: false,
 	},
 	ramAsNumber: {
 		displayName: 'RAM as bytes',
-		description:
-			"When enabled, RAM will be displayed as bytes instead of a percentage in your server's Overview.",
+		description: 'Show RAM usage in bytes instead of a percentage.',
 		implemented: true,
 	},
 	powerDontAskAgain: {
-		displayName: 'Power actions confirmation',
-		description: 'When enabled, you will be prompted before stopping and restarting your server.',
+		displayName: 'Power action confirmation',
+		description: 'Ask for confirmation before stopping or restarting the server.',
 		implemented: true,
 	},
 } as const
