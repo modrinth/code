@@ -6,9 +6,6 @@
 					<span class="text-lg font-semibold text-contrast">{{
 						formatMessage(messages.resetServerTitle)
 					}}</span>
-					<span class="text-primary">
-						{{ formatMessage(messages.resetServerDescription) }}
-					</span>
 					<div>
 						<ButtonStyled color="red">
 							<button class="!shadow-none" :disabled="isInstalling" @click="setupModal?.show()">
@@ -17,6 +14,9 @@
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{ formatMessage(messages.resetServerDescription) }}
+					</span>
 				</div>
 			</template>
 
