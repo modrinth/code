@@ -146,7 +146,7 @@
 						</div>
 					</div>
 					<!-- Advanced Properties -->
-					<Accordion v-if="hasVisibleAdvancedProperties" overflow-visible>
+					<Accordion v-if="hasVisibleAdvancedProperties" overflow-visible :force-open="isSearchActive">
 						<template #title>
 							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
 						</template>
