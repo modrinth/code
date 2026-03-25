@@ -114,12 +114,12 @@ pub async fn fetch_neo(
     }
 
     let forge_versions = fetch_xml::<Metadata>(
-        "https://maven.neoforged.net/net/neoforged/forge/maven-metadata.xml",
+        "https://maven.neoforged.net/releases/net/neoforged/forge/maven-metadata.xml",
         &semaphore,
     )
     .await?;
     let neo_versions = fetch_xml::<Metadata>(
-        "https://maven.neoforged.net/net/neoforged/neoforge/maven-metadata.xml",
+        "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml",
         &semaphore,
     )
     .await?;
@@ -133,7 +133,7 @@ pub async fn fetch_neo(
 
         Ok(ForgeVersion {
             format_version: 2,
-            installer_url: format!("https://maven.neoforged.net/net/neoforged/forge/{loader_version}/forge-{loader_version}-installer.jar"),
+            installer_url: format!("https://maven.neoforged.net/releases/net/neoforged/forge/{loader_version}/forge-{loader_version}-installer.jar"),
             raw: loader_version,
             loader_version: version_split,
             game_version: "1.20.1".to_string(), // All NeoForge Forge versions are for 1.20.1
@@ -159,7 +159,7 @@ pub async fn fetch_neo(
 
         Ok(ForgeVersion {
             format_version: 2,
-            installer_url: format!("https://maven.neoforged.net/net/neoforged/neoforge/{loader_version}/neoforge-{loader_version}-installer.jar"),
+            installer_url: format!("https://maven.neoforged.net/releases/net/neoforged/neoforge/{loader_version}/neoforge-{loader_version}-installer.jar"),
             loader_version: loader_version.clone(),
             raw: loader_version,
             game_version,
