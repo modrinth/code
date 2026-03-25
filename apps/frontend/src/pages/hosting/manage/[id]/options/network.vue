@@ -92,7 +92,7 @@
 								v-model="allocationSearch"
 								wrapper-class="grow max-w-[400px]"
 								:maxlength="64"
-								placeholder="Search allocations..."
+								placeholder="Port name (e.g., Dynmap)"
 							/>
 
 							<ButtonStyled color="brand" @click="showNewAllocationModal">
