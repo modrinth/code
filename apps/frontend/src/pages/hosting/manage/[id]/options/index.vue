@@ -32,23 +32,29 @@
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
 								<span class="text-md font-semibold text-contrast">Hostname</span>
 								<div class="text-input-wrapper !w-full px-3">
-									<div class="relative inline-flex min-h-9 min-w-[5ch] items-center">
+									<div class="relative inline-flex min-h-9 items-center">
 										<span
 											class="pointer-events-none invisible whitespace-pre text-base font-medium"
 											aria-hidden="true"
-											>{{ serverSubdomain || 'subdomain' }}</span
+											>{{ serverSubdomain || 'Enter subdomain...' }}</span
 										>
 										<input
 											id="server-subdomain"
 											:value="serverSubdomain"
-											placeholder="subdomain"
+											placeholder="Enter subdomain..."
 											:maxlength="32"
 											class="absolute inset-0 bg-transparent !p-0 text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
 											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
 											@keyup.enter="saveGeneral"
+											autocomplete="off"
 										/>
 									</div>
-									<div class="text-input-wrapper__after">.modrinth.gg</div>
+									<div
+										class="text-input-wrapper__after"
+										:class="!serverSubdomain ? '!ml-auto' : ''"
+									>
+										.modrinth.gg
+									</div>
 								</div>
 							</label>
 							<span>Your friends can connect to your server using this address.</span>
