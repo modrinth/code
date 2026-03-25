@@ -5,11 +5,11 @@
 				<h1>{{ formatMessage(commonMessages.errorLabel) }}</h1>
 			</div>
 			<p>
-				<span>{{ error.data.error }}: </span>
-				{{ error.data.description }}
+				<span>{{ error.data?.error }}: </span>
+				{{ error.data?.description }}
 			</p>
 		</div>
-		<div v-else class="oauth-items">
+		<div v-else-if="app && createdBy && authorizationData" class="oauth-items">
 			<div class="connected-items">
 				<div class="profile-pics">
 					<Avatar size="md" :src="app.icon_url" />
@@ -164,22 +164,29 @@ const {
 	data: authorizationData,
 	isPending: pending,
 	error,
+	suspense: authSusp,
 } = useQuery({
 	queryKey: computed(() => ['authorization', clientId, redirectUri, scope, state]),
 	queryFn: getFlowIdAuthorization,
 	enabled: computed(() => !!clientId && !!redirectUri && !!scope),
 })
 
-const { data: app } = useQuery({
+const { data: app, suspense: appSusp } = useQuery({
 	queryKey: computed(() => ['oauth/app', clientId]),
 	queryFn: () => client.labrinth.oauth_internal.getApp(clientId),
 	enabled: computed(() => !!clientId),
 })
 
-const { data: createdBy } = useQuery({
+const { data: createdBy, suspense: userSusp } = useQuery({
 	queryKey: computed(() => ['user', app.value?.created_by]),
 	queryFn: () => client.labrinth.users_v2.get(app.value.created_by),
 	enabled: computed(() => !!app.value?.created_by),
+})
+
+onServerPrefetch(async () => {
+	await authSusp()
+	await appSusp()
+	await userSusp()
 })
 
 const scopeDefinitions = computed(() =>
