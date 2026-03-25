@@ -8,12 +8,12 @@ useSeoMeta({
 })
 </script>
 <template>
-	<NuxtPage class="auth-container universal-card" />
+	<NuxtPage class="auth-container universal-card border border-solid border-surface-5" />
 </template>
 
 <style>
 .auth-container {
-	width: 26rem;
+	width: 28rem;
 	max-width: calc(100% - 2rem);
 	margin: 1rem auto;
 	display: flex;
@@ -45,24 +45,6 @@ useSeoMeta({
 	margin: 0 0 0 0.5rem;
 }
 
-.third-party {
-	display: grid;
-	gap: var(--gap-md);
-	grid-template-columns: repeat(2, 1fr);
-	width: 100%;
-}
-
-.third-party .btn {
-	width: 100%;
-	vertical-align: middle;
-}
-
-.third-party .btn svg {
-	margin-right: var(--gap-sm);
-	width: 1.25rem;
-	height: 1.25rem;
-}
-
 @media screen and (max-width: 25.5rem) {
 	.third-party .btn {
 		grid-column: 1 / 3;
@@ -84,7 +66,7 @@ useSeoMeta({
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	gap: var(--gap-md);
+	gap: var(--gap-xs);
 	flex-wrap: wrap;
 }
 

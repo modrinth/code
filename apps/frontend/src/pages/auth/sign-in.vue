@@ -5,7 +5,7 @@
 			class="fixed left-0 top-0 z-[9999] m-0 h-full w-full border-0 p-0"
 		></iframe>
 	</div>
-	<div v-else>
+	<div v-else c>
 		<template v-if="flow && !subtleLauncherRedirectUri">
 			<label for="two-factor-code">
 				<span class="label__title">{{ formatMessage(messages.twoFactorCodeLabel) }}</span>
@@ -28,98 +28,120 @@
 			</button>
 		</template>
 		<template v-else>
-			<h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
-
-			<section class="third-party">
-				<a class="btn" :href="getAuthUrl('discord', redirectTarget)">
-					<DiscordColorIcon />
-					<span>Discord</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-					<GitHubColorIcon />
-					<span>GitHub</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-					<MicrosoftColorIcon />
-					<span>Microsoft</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-					<GoogleColorIcon />
-					<span>Google</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-					<SteamColorIcon />
-					<span>Steam</span>
-				</a>
-				<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-					<GitLabColorIcon />
-					<span>GitLab</span>
-				</a>
-			</section>
-
-			<h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
-
-			<section class="auth-form">
-				<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
-				<StyledInput
-					id="email"
-					v-model="email"
-					:icon="MailIcon"
-					type="text"
-					inputmode="email"
-					autocomplete="username"
-					:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
-					wrapper-class="w-full"
-				/>
-
-				<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-				<StyledInput
-					id="password"
-					v-model="password"
-					:icon="KeyIcon"
-					type="password"
-					autocomplete="current-password"
-					:placeholder="formatMessage(commonMessages.passwordLabel)"
-					wrapper-class="w-full"
-				/>
-
-				<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
-
-				<button
-					class="btn btn-primary continue-btn centered-btn"
-					:disabled="globals?.captcha_enabled ? !token : false"
-					@click="beginPasswordSignIn()"
-				>
-					{{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
-				</button>
-
-				<div class="auth-form__additional-options">
-					<IntlFormatted :message-id="messages.additionalOptionsLabel">
-						<template #forgot-password-link="{ children }">
-							<NuxtLink
-								class="text-link"
-								:to="{
-									path: '/auth/reset-password',
-									query: route.query,
-								}"
-							>
-								<component :is="() => children" />
-							</NuxtLink>
-						</template>
-						<template #create-account-link="{ children }">
-							<NuxtLink
-								class="text-link"
-								:to="{
-									path: '/auth/sign-up',
-									query: route.query,
-								}"
-							>
-								<component :is="() => children" />
-							</NuxtLink>
-						</template>
-					</IntlFormatted>
+			<div class="flex flex-col gap-6">
+				<div class="text-center text-2xl font-semibold text-contrast">
+					{{ formatMessage(messages.signInWithLabel) }}
 				</div>
-			</section>
+
+				<section class="flex flex-col gap-2.5">
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('google', redirectTarget)">
+							<GoogleColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('microsoft', redirectTarget)">
+							<MicrosoftColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('discord', redirectTarget)">
+							<DiscordColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('github', redirectTarget)">
+							<GitHubColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('gitlab', redirectTarget)">
+							<GitLabColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
+						</a>
+					</ButtonStyled>
+					<ButtonStyled>
+						<a class="!shadow-none" :href="getAuthUrl('steam', redirectTarget)">
+							<SteamColorIcon />
+							<span class="ml-1">{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
+						</a>
+					</ButtonStyled>
+				</section>
+
+				<div class="h-px w-full bg-surface-5"></div>
+
+				<section class="auth-form">
+					<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
+					<StyledInput
+						id="email"
+						v-model="email"
+						:icon="MailIcon"
+						type="text"
+						inputmode="email"
+						autocomplete="username"
+						:placeholder="formatMessage(commonMessages.emailUsernameLabel)"
+						wrapper-class="w-full"
+					/>
+
+					<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
+					<StyledInput
+						id="password"
+						v-model="password"
+						:icon="KeyIcon"
+						type="password"
+						autocomplete="current-password"
+						:placeholder="formatMessage(commonMessages.passwordLabel)"
+						wrapper-class="w-full"
+					/>
+
+					<HCaptcha
+						v-if="globals?.captcha_enabled && email && password"
+						ref="captcha"
+						v-model="token"
+					/>
+
+					<ButtonStyled color="brand">
+						<button
+							class="!w-full"
+							:disabled="globals?.captcha_enabled ? !token : false"
+							@click="beginPasswordSignIn()"
+						>
+							{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+						</button>
+					</ButtonStyled>
+
+					<div class="auth-form__additional-options !text-base">
+						<IntlFormatted :message-id="messages.additionalOptionsLabel">
+							<template #forgot-password-link="{ children }">
+								<NuxtLink
+									class="text-link"
+									:to="{
+										path: '/auth/reset-password',
+										query: route.query,
+									}"
+								>
+									<component :is="() => children" />
+								</NuxtLink>
+							</template>
+							<template #create-account-link="{ children }">
+								<NuxtLink
+									class="inline text-link"
+									:to="{
+										path: '/auth/sign-up',
+										query: route.query,
+									}"
+								>
+									<component :is="() => children" />
+								</NuxtLink>
+							</template>
+						</IntlFormatted>
+					</div>
+				</section>
+			</div>
 		</template>
 	</div>
 </template>
@@ -137,6 +159,7 @@ import {
 	SteamColorIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
@@ -159,11 +182,11 @@ const messages = defineMessages({
 	additionalOptionsLabel: {
 		id: 'auth.sign-in.additional-options',
 		defaultMessage:
-			'<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>',
+			"<forgot-password-link>Forgot password</forgot-password-link> • Don't have an account? <create-account-link>Sign up</create-account-link>",
 	},
 	signInWithLabel: {
 		id: 'auth.sign-in.sign-in-with',
-		defaultMessage: 'Sign in with',
+		defaultMessage: 'Sign into Modrinth',
 	},
 	signInTitle: {
 		id: 'auth.sign-in.title',
@@ -184,6 +207,14 @@ const messages = defineMessages({
 	usePasswordLabel: {
 		id: 'auth.sign-in.use-password',
 		defaultMessage: 'Or use a password',
+	},
+	continueWithProvider: {
+		id: 'auth.continue-with-provider',
+		defaultMessage: 'Continue with {provider}',
+	},
+	continueWithEmail: {
+		id: 'auth.sign-in.continue-with-email',
+		defaultMessage: 'Continue with Email',
 	},
 })
 

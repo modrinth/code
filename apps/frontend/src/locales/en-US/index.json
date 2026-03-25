@@ -267,10 +267,10 @@
     "message": "Enter code..."
   },
   "auth.sign-in.additional-options": {
-    "message": "<forgot-password-link>Forgot password?</forgot-password-link> • <create-account-link>Create an account</create-account-link>"
+    "message": "<forgot-password-link>Forgot password</forgot-password-link> • Don't have an account? <create-account-link>Sign up</create-account-link>"
   },
   "auth.sign-in.sign-in-with": {
-    "message": "Sign in with"
+    "message": "Sign into Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Sign In"

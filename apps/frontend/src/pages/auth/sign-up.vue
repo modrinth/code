@@ -1,37 +1,56 @@
 <template>
-	<div>
-		<h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
-
-		<section class="third-party">
-			<a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-				<DiscordColorIcon />
-				<span>Discord</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-				<GitHubColorIcon />
-				<span>GitHub</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-				<MicrosoftColorIcon />
-				<span>Microsoft</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-				<GoogleColorIcon />
-				<span>Google</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-				<SteamColorIcon />
-				<span>Steam</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-				<GitLabColorIcon />
-				<span>GitLab</span>
-			</a>
+	<div class="flex flex-col gap-6">
+		<div class="text-center text-2xl font-semibold text-contrast">{{ formatMessage(messages.signUpWithTitle) }}</div>
+		<section class="flex flex-col gap-2.5">
+			<ButtonStyled>
+				<a class="!shadow-none" :href="getAuthUrl('google', redirectTarget)">
+					<GoogleColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Google' }) }}</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a class="!shadow-none" :href="getAuthUrl('microsoft', redirectTarget)">
+					<MicrosoftColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Microsoft' }) }}</span>
+				</a>
+			</ButtonStyled>
+			<ButtonStyled>
+				<a class="!shadow-none" :href="getAuthUrl('discord', redirectTarget)">
+					<DiscordColorIcon />
+					<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Discord' }) }}</span>
+				</a>
+			</ButtonStyled>
+			<template v-if="showOtherOptions">
+				<ButtonStyled>
+					<a class="!shadow-none" :href="getAuthUrl('github', redirectTarget)">
+						<GitHubColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitHub' }) }}</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a class="!shadow-none" :href="getAuthUrl('gitlab', redirectTarget)">
+						<GitLabColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'GitLab' }) }}</span>
+					</a>
+				</ButtonStyled>
+				<ButtonStyled>
+					<a class="!shadow-none" :href="getAuthUrl('steam', redirectTarget)">
+						<SteamColorIcon />
+						<span>{{ formatMessage(messages.continueWithProvider, { provider: 'Steam' }) }}</span>
+					</a>
+				</ButtonStyled>
+			</template>
+			<button
+				class="mx-auto -mb-3 bg-transparent pt-1 text-center text-base font-semibold text-secondary transition-all hover:text-primary"
+				@click="showOtherOptions = !showOtherOptions"
+			>
+				{{ showOtherOptions ? formatMessage(messages.showFewerOptions) : formatMessage(messages.showOtherOptions) }}
+			</button>
 		</section>
 
-		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
+		<div class="h-px w-full bg-surface-5"></div>
 
-		<section class="auth-form">
+		<section class="flex flex-col gap-2.5">
 			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
 			<StyledInput
 				id="email"
@@ -98,15 +117,21 @@
 				</IntlFormatted>
 			</p>
 
-			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
+			<HCaptcha
+				v-if="globals?.captcha_enabled && email && password && confirmPassword && username"
+				ref="captcha"
+				v-model="token"
+			/>
 
-			<button
-				class="btn btn-primary continue-btn centered-btn"
-				:disabled="globals?.captcha_enabled ? !token : false"
-				@click="createAccount"
-			>
-				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
-			</button>
+			<ButtonStyled color="brand">
+				<button
+					class="!w-full"
+					:disabled="globals?.captcha_enabled ? !token : false"
+					@click="createAccount"
+				>
+					{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
+				</button>
+			</ButtonStyled>
 
 			<div class="auth-form__additional-options">
 				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
@@ -138,6 +163,7 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	Checkbox,
 	commonMessages,
 	defineMessages,
@@ -163,11 +189,7 @@ const messages = defineMessages({
 	},
 	signUpWithTitle: {
 		id: 'auth.sign-up.title.sign-up-with',
-		defaultMessage: 'Sign up with',
-	},
-	createAccountTitle: {
-		id: 'auth.sign-up.title.create-account',
-		defaultMessage: 'Or create an account yourself',
+		defaultMessage: 'Create an Account',
 	},
 	subscribeLabel: {
 		id: 'auth.sign-up.subscribe.label',
@@ -186,6 +208,22 @@ const messages = defineMessages({
 		id: 'auth.sign-up.sign-in-option.title',
 		defaultMessage: 'Already have an account?',
 	},
+	continueWithProvider: {
+		id: 'auth.continue-with-provider',
+		defaultMessage: 'Continue with {provider}',
+	},
+	continueWithEmail: {
+		id: 'auth.sign-up.continue-with-email',
+		defaultMessage: 'Continue with Email',
+	},
+	showFewerOptions: {
+		id: 'auth.sign-up.show-fewer-options',
+		defaultMessage: 'Show fewer options',
+	},
+	showOtherOptions: {
+		id: 'auth.sign-up.show-other-options',
+		defaultMessage: 'Show other options',
+	},
 })
 
 useHead({
@@ -196,6 +234,7 @@ const auth = await useAuth()
 const route = useNativeRoute()
 
 const redirectTarget = route.query.redirect
+const showOtherOptions = ref(false)
 
 if (auth.value.user) {
 	await navigateTo('/dashboard')
