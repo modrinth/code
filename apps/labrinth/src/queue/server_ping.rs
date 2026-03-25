@@ -140,33 +140,14 @@ impl ServerPingQueue {
                     // ping failed; if it's failed too many times, mark it as offline in redis
                     // otherwise, just add to the fail counter
 
-                    let mut failure_count: u32 = redis
-                        .get(REDIS_FAILURE_NAMESPACE, &project_id.to_string())
+                    let failure_count = redis
+                        .incr(REDIS_FAILURE_NAMESPACE, &project_id.to_string())
                         .await
-                        .inspect_err(|err| {
-                            warn!("failed to get failure count: {err:#}")
-                        })
-                        .ok()
-                        .flatten()
-                        .and_then(|s| s.parse().ok())
-                        .unwrap_or(0);
+                        .wrap_err("failed to increment failure count")?;
 
-                    failure_count = failure_count.saturating_add(1);
-
-                    redis
-                        .set(
-                            REDIS_FAILURE_NAMESPACE,
-                            &project_id.to_string(),
-                            &failure_count.to_string(),
-                            None,
-                        )
-                        .await
-                        .inspect_err(|err| {
-                            warn!("failed to set failure count: {err:#}")
-                        })
-                        .ok();
-
-                    if failure_count >= ENV.SERVER_PING_MAX_FAIL_COUNT {
+                    if let Some(count) = failure_count
+                        && count >= ENV.SERVER_PING_MAX_FAIL_COUNT
+                    {
                         redis
                             .set_serialized_to_json(
                                 REDIS_NAMESPACE,
@@ -175,10 +156,9 @@ impl ServerPingQueue {
                                 None,
                             )
                             .await
-                            .inspect_err(|err| {
-                                warn!("failed to set failed ping record in redis: {err:#}")
-                            })
-                            .ok();
+                            .wrap_err(
+                                "failed to set failed ping record in redis",
+                            )?;
                     }
                 }
 

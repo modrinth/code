@@ -788,6 +788,20 @@ impl RedisConnection {
             .await?;
         Ok(values)
     }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn incr(
+        &mut self,
+        namespace: &str,
+        id: &str,
+    ) -> Result<Option<u64>, DatabaseError> {
+        let key = format!("{}_{namespace}:{id}", self.meta_namespace);
+        let value = cmd("INCR")
+            .arg(key)
+            .query_async(&mut self.connection)
+            .await?;
+        Ok(value)
+    }
 }
 
 #[derive(Serialize, Deserialize)]
