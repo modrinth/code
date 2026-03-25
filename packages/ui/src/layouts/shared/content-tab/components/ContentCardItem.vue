@@ -212,8 +212,7 @@ const deleteHovered = ref(false)
 				>
 					<span ref="versionNumberRef" class="truncate">{{
 						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
-					}}</span>
-					<span class="shrink-0">{{
+					}}</span><span class="shrink-0">{{
 						version.version_number.slice(Math.ceil(version.version_number.length / 2))
 					}}</span>
 				</AutoLink>
@@ -223,8 +222,7 @@ const deleteHovered = ref(false)
 				>
 					<span ref="fileNameRef" class="truncate">{{
 						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
-					}}</span>
-					<span class="shrink-0">{{
+					}}</span><span class="shrink-0">{{
 						version.file_name.slice(Math.ceil(version.file_name.length / 2))
 					}}</span>
 				</span>
