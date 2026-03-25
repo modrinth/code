@@ -1,7 +1,7 @@
 <template>
 	<div class="contents">
-		<NewModal ref="newAllocationModal" header="New allocation">
-			<form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="addNewAllocation">
+		<NewModal ref="newAllocationModal" header="New allocation" width="550px">
+			<form class="flex w-full flex-col gap-2" @submit.prevent="addNewAllocation">
 				<label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
 				<StyledInput
 					id="new-allocation-name"
@@ -11,21 +11,21 @@
 					:maxlength="32"
 					placeholder="e.g. Secondary allocation"
 				/>
-				<div class="mb-1 mt-4 flex justify-start gap-4">
+				<div class="mb-1 mt-4 flex justify-end gap-2.5">
+					<ButtonStyled>
+						<button @click="newAllocationModal?.hide()">Cancel</button>
+					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button :disabled="!newAllocationName" type="submit">
 							<PlusIcon /> Create allocation
 						</button>
 					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="newAllocationModal?.hide()">Cancel</button>
-					</ButtonStyled>
 				</div>
 			</form>
 		</NewModal>
 
-		<NewModal ref="editAllocationModal" header="Edit allocation">
-			<form class="flex flex-col gap-2 md:w-[600px]" @submit.prevent="editAllocation">
+		<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
+			<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
 				<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
 				<StyledInput
 					id="edit-allocation-name"
@@ -35,14 +35,14 @@
 					:maxlength="32"
 					placeholder="e.g. Secondary allocation"
 				/>
-				<div class="mb-1 mt-4 flex justify-start gap-4">
+				<div class="mb-1 mt-4 flex justify-end gap-2.5">
+					<ButtonStyled>
+						<button @click="editAllocationModal?.hide()">Cancel</button>
+					</ButtonStyled>
 					<ButtonStyled color="brand">
 						<button :disabled="!newAllocationName" type="submit">
 							<SaveIcon /> Update allocation
 						</button>
-					</ButtonStyled>
-					<ButtonStyled>
-						<button @click="editAllocationModal?.hide()">Cancel</button>
 					</ButtonStyled>
 				</div>
 			</form>
