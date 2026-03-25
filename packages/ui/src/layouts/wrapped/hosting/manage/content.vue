@@ -115,6 +115,7 @@ const contentQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 0,
 })
 
 const modpackProjectId = computed(() => contentQuery.data.value?.modpack?.spec.project_id ?? null)
@@ -483,7 +484,7 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
-		id: addon.id,
+		id: addon.id ?? addon.filename,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,

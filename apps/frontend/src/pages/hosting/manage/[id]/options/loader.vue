@@ -398,11 +398,17 @@ provideInstallationSettings({
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
 
+		let resolvedLoaderVersion = loaderVersionId
+		if (!resolvedLoaderVersion && platform !== 'vanilla') {
+			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
+			resolvedLoaderVersion = versions[0]?.id ?? null
+		}
+
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
 			platformChanged
-				? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
+				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
@@ -410,7 +416,7 @@ provideInstallationSettings({
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
-					version: loaderVersionId ?? '',
+					version: resolvedLoaderVersion ?? '',
 					game_version: gameVersion || undefined,
 					soft_override: true,
 				}
