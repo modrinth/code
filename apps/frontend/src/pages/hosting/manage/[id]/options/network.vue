@@ -85,7 +85,7 @@
 				<div class="card flex h-full flex-col gap-6">
 					<!-- Allocations section -->
 					<div class="flex flex-col gap-2.5">
-						<span class="text-md font-semibold text-contrast">Allocations</span>
+						<span class="text-lg font-semibold text-contrast">Allocations</span>
 
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
@@ -142,7 +142,7 @@
 					<!-- DNS records section -->
 					<div class="flex flex-col gap-2.5">
 						<label for="user-domain" class="flex flex-col gap-2">
-							<span class="text-md font-semibold text-contrast">DNS records</span>
+							<span class="text-lg font-semibold text-contrast">DNS records</span>
 						</label>
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput

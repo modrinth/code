@@ -7,7 +7,7 @@
 						<!-- Server name -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-name-field" class="flex flex-col gap-2">
-								<span class="text-md font-semibold text-contrast">Server name</span>
+								<span class="text-lg font-semibold text-contrast">Server name</span>
 							</label>
 							<div class="flex flex-col gap-2.5">
 								<StyledInput
@@ -30,7 +30,7 @@
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
-								<span class="text-md font-semibold text-contrast">Hostname</span>
+								<span class="text-lg font-semibold text-contrast">Hostname</span>
 								<div class="text-input-wrapper !w-full px-3">
 									<div class="relative inline-flex min-h-9 items-center">
 										<span
@@ -72,7 +72,7 @@
 					<!-- Server icon -->
 					<div v-if="!data.is_medal" class="flex flex-col gap-2.5">
 						<label for="server-icon-field" class="flex flex-col gap-2">
-							<span class="text-md font-semibold text-contrast">Icon</span>
+							<span class="text-lg font-semibold text-contrast">Icon</span>
 						</label>
 						<div
 							v-tooltip="'Upload a custom Icon'"
@@ -113,9 +113,9 @@
 				>
 					<label :for="`pref-${key}`" class="flex flex-col gap-2">
 						<div class="flex flex-row items-center gap-2">
-							<span class="text-md font-semibold text-contrast">{{ prefConfig.displayName }}</span>
+							<span class="text-lg font-semibold text-contrast">{{ prefConfig.displayName }}</span>
 							<div
-								v-if="prefConfig.implemented === false"
+								v-if="!prefConfig.implemented"
 								class="hidden items-center gap-1 rounded-full bg-surface-2 p-1 px-1.5 text-xs font-semibold sm:flex"
 							>
 								Coming Soon
@@ -127,7 +127,7 @@
 						:id="`pref-${key}`"
 						v-model="newUserPreferences[key]"
 						class="flex-none"
-						:disabled="prefConfig.implemented === false"
+						:disabled="!prefConfig.implemented"
 					/>
 				</div>
 
@@ -206,11 +206,11 @@ const preferences = {
 		description: 'When enabled, the subdomain label will be hidden from the server header.',
 		implemented: true,
 	},
-	autoRestart: {
-		displayName: 'Auto restarts',
-		description: 'Automatically restart the server if it crashes.',
-		implemented: false,
-	},
+	// autoRestart: {
+	// 	displayName: 'Auto restarts',
+	// 	description: 'Automatically restart the server if it crashes.',
+	// 	implemented: false,
+	// },
 	ramAsNumber: {
 		displayName: 'RAM as bytes',
 		description: 'Show RAM usage in bytes instead of a percentage.',

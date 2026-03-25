@@ -134,7 +134,7 @@
 								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
 								class="flex items-center justify-between"
 							>
-								<span class="text-md font-semibold text-contrast">Protection radius</span>
+								<span class="text-lg font-semibold text-contrast">Protection radius</span>
 								<StyledInput
 									id="server-property-spawn-protection-radius"
 									:model-value="liveProperties.spawn_protection"

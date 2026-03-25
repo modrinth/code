@@ -5,7 +5,7 @@
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">
-						<span class="text-md font-semibold text-contrast">SFTP</span>
+						<span class="text-lg font-semibold text-contrast">SFTP</span>
 						<ButtonStyled>
 							<a
 								v-tooltip="'This button only works with compatible SFTP clients (e.g. WinSCP)'"
@@ -20,7 +20,7 @@
 					</div>
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
-						<span class="text-md font-semibold text-contrast">Server Address</span>
+						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<div class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2">
 							<div class="flex flex-col gap-2">
 								<span class="cursor-pointer font-semibold text-primary">
@@ -38,7 +38,7 @@
 						</div>
 						<div class="flex flex-col gap-2 sm:mt-0 sm:flex-row">
 							<div class="flex w-full flex-col justify-center gap-2">
-								<span class="text-md font-semibold text-contrast">Username</span>
+								<span class="text-lg font-semibold text-contrast">Username</span>
 								<div
 									class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2"
 								>
@@ -56,7 +56,7 @@
 								</div>
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
-								<span class="text-md font-semibold text-contrast">Password</span>
+								<span class="text-lg font-semibold text-contrast">Password</span>
 								<div
 									class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2"
 								>
@@ -96,7 +96,7 @@
 				<div class="flex flex-col gap-2.5">
 					<div class="flex h-9 flex-col items-end justify-between gap-4 sm:flex-row">
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
-							<span class="text-md font-semibold text-contrast">Startup command</span>
+							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
 						<ButtonStyled v-if="startupCommand !== defaultStartupCommand" type="transparent">
 							<button
@@ -131,7 +131,7 @@
 				<!-- Java version section -->
 				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-md font-semibold text-contrast">Java version</span>
+						<span class="text-lg font-semibold text-contrast">Java version</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
@@ -170,7 +170,7 @@
 				<!-- Java runtime section -->
 				<div class="flex flex-col gap-2.5">
 					<div class="flex flex-col gap-2">
-						<span class="text-md font-semibold text-contrast">Java runtime</span>
+						<span class="text-lg font-semibold text-contrast">Java runtime</span>
 					</div>
 					<div class="relative max-w-xs">
 						<Combobox
