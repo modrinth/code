@@ -68,10 +68,24 @@ pub async fn get_importable_instances(
         .await
         .unwrap_or_else(|| "instances".to_string()),
         ImportLauncherType::Unknown => {
-            return Err(crate::ErrorKind::InputError(
-                "Launcher type Unknown".to_string(),
-            )
-            .into());
+            let types = [
+                ImportLauncherType::MultiMC,
+                ImportLauncherType::PrismLauncher,
+                ImportLauncherType::ATLauncher,
+                ImportLauncherType::GDLauncher,
+                ImportLauncherType::Curseforge,
+            ];
+            for lt in types {
+                if let Ok(instances) =
+                    Box::pin(get_importable_instances(lt, base_path.clone()))
+                        .await
+                {
+                    if !instances.is_empty() {
+                        return Ok(instances);
+                    }
+                }
+            }
+            return Ok(Vec::new());
         }
     };
 
@@ -144,10 +158,40 @@ pub async fn import_instance(
             .await
         }
         ImportLauncherType::Unknown => {
-            return Err(crate::ErrorKind::InputError(
-                "Launcher type Unknown".to_string(),
-            )
-            .into());
+            let types = [
+                ImportLauncherType::MultiMC,
+                ImportLauncherType::PrismLauncher,
+                ImportLauncherType::ATLauncher,
+                ImportLauncherType::GDLauncher,
+                ImportLauncherType::Curseforge,
+            ];
+            let mut matched = false;
+            for lt in types {
+                if let Ok(instances) =
+                    Box::pin(get_importable_instances(lt, base_path.clone()))
+                        .await
+                {
+                    if instances.contains(&instance_folder) {
+                        matched = true;
+                        Box::pin(import_instance(
+                            profile_path,
+                            lt,
+                            base_path,
+                            instance_folder,
+                        ))
+                        .await?;
+                        break;
+                    }
+                }
+            }
+            if !matched {
+                return Err(crate::ErrorKind::InputError(
+                    "Could not determine launcher type for the given path"
+                        .to_string(),
+                )
+                .into());
+            }
+            return Ok(());
         }
     };
 
