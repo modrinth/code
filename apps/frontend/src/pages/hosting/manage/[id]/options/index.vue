@@ -71,37 +71,35 @@
 
 					<!-- Server icon -->
 					<div v-if="!data.is_medal" class="flex flex-col gap-2.5">
-						<label for="server-icon-field" class="flex flex-col gap-2">
-							<span class="text-lg font-semibold text-contrast">Icon</span>
-						</label>
-						<div
-							v-tooltip="'Upload a custom Icon'"
-							class="group relative flex w-fit cursor-pointer items-center gap-2 rounded-xl bg-surface-2"
-							@dragover.prevent="onDragOver"
-							@dragleave.prevent="onDragLeave"
-							@drop.prevent="onDrop"
-							@click="triggerFileInput"
-						>
-							<input
-								v-if="icon"
-								id="server-icon-field"
-								type="file"
-								accept="image/png,image/jpeg,image/gif,image/webp"
-								hidden
-								@change="uploadFile"
-							/>
-							<div
-								class="absolute top-0 hidden size-24 flex-col items-center justify-center rounded-xl bg-button-bg p-2 opacity-80 group-hover:flex"
+						<span class="text-lg font-semibold text-contrast">Icon</span>
+						<div class="group relative w-fit">
+							<OverflowMenu
+								v-tooltip="'Edit icon'"
+								class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
+								:options="[
+									{
+										id: 'upload',
+										action: () => triggerFileInput(),
+									},
+									{
+										id: 'sync',
+										action: () => resetIcon(),
+									},
+								]"
 							>
-								<EditIcon class="h-8 w-8 text-contrast" />
-							</div>
-							<ServerIcon class="size-24" :image="icon" />
+								<ServerIcon
+									class="size-24 transition-[filter] group-hover:brightness-75"
+									:image="icon"
+								/>
+								<div class="absolute right-0 top-0 m-1">
+									<div class="flex items-center justify-center rounded-full bg-button-bg p-1.5">
+										<EditIcon aria-hidden="true" class="h-4 w-4 text-contrast" />
+									</div>
+								</div>
+								<template #upload> <UploadIcon /> Upload icon </template>
+								<template #sync> <TransferIcon /> Sync icon </template>
+							</OverflowMenu>
 						</div>
-						<ButtonStyled size="small">
-							<button v-tooltip="'Synchronize icon with installed modpack'" @click="resetIcon">
-								<TransferIcon /> Sync icon
-							</button>
-						</ButtonStyled>
 					</div>
 				</div>
 
@@ -161,17 +159,17 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, TransferIcon } from '@modrinth/assets'
+import { EditIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import {
 	CopyCode,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	OverflowMenu,
 	ServerIcon,
 	StyledInput,
 	Toggle,
 } from '@modrinth/ui'
-import ButtonStyled from '@modrinth/ui/src/components/base/ButtonStyled.vue'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 
@@ -417,19 +415,6 @@ const resetIcon = async () => {
 			})
 		}
 	}
-}
-
-const onDragOver = (e: DragEvent) => {
-	e.preventDefault()
-}
-
-const onDragLeave = (e: DragEvent) => {
-	e.preventDefault()
-}
-
-const onDrop = (e: DragEvent) => {
-	e.preventDefault()
-	uploadFile(e)
 }
 
 const triggerFileInput = () => {
