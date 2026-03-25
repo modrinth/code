@@ -906,7 +906,7 @@ previousFilterState.value = JSON.stringify({
 					)
 				}}
 			</h1>
-			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
+			<Admonition v-if="isServerInstance && !isFromWorlds" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
 				be lost when you update the server instance content.
 			</Admonition>
