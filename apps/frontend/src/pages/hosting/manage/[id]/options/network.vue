@@ -258,7 +258,7 @@ const {
 const allocations = allocationsData
 
 const allocationColumns: TableColumn[] = [
-	{ key: 'name', label: 'Name' },
+	{ key: 'name', label: 'Name', width: '40%' },
 	{ key: 'port', label: 'Port' },
 	{ key: 'actions', label: 'Actions', width: '33%', align: 'right' },
 ]
@@ -285,7 +285,7 @@ const allocationRows = computed(() => {
 })
 
 const dnsColumns: TableColumn[] = [
-	{ key: 'type', label: 'Type', width: '15%' },
+	{ key: 'type', label: 'Type', width: '20%' },
 	{ key: 'name', label: 'Name', width: '35%' },
 	{ key: 'content', label: 'Content' },
 ]
