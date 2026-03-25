@@ -399,6 +399,85 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
+const messages = defineMessages({
+	addServerToInstance: {
+		id: 'app.browse.add-server-to-instance',
+		defaultMessage: 'Add server to instance',
+	},
+	addServersToInstance: {
+		id: 'app.browse.add-servers-to-instance',
+		defaultMessage: 'Add servers to your instance',
+	},
+	addToInstance: {
+		id: 'app.browse.add-to-instance',
+		defaultMessage: 'Add to instance',
+	},
+	addToInstanceName: {
+		id: 'app.browse.add-to-instance-name',
+		defaultMessage: 'Add to {instanceName}',
+	},
+	added: {
+		id: 'app.browse.added',
+		defaultMessage: 'Added',
+	},
+	alreadyAdded: {
+		id: 'app.browse.already-added',
+		defaultMessage: 'Already added',
+	},
+	discoverContent: {
+		id: 'app.browse.discover-content',
+		defaultMessage: 'Discover content',
+	},
+	discoverServers: {
+		id: 'app.browse.discover-servers',
+		defaultMessage: 'Discover servers',
+	},
+	environmentProvidedByServer: {
+		id: 'search.filter.locked.server-environment.title',
+		defaultMessage: 'Only client-side mods can be added to the server instance',
+	},
+	gameVersionProvidedByInstance: {
+		id: 'search.filter.locked.instance-game-version.title',
+		defaultMessage: 'Game version is provided by the instance',
+	},
+	gameVersionProvidedByServer: {
+		id: 'search.filter.locked.server-game-version.title',
+		defaultMessage: 'Game version is provided by the server',
+	},
+	hideAddedServers: {
+		id: 'app.browse.hide-added-servers',
+		defaultMessage: 'Hide added servers',
+	},
+	hideInstalledContent: {
+		id: 'app.browse.hide-installed-content',
+		defaultMessage: 'Hide installed content',
+	},
+	installContentToInstance: {
+		id: 'app.browse.install-content-to-instance',
+		defaultMessage: 'Install content to instance',
+	},
+	modLoaderProvidedByInstance: {
+		id: 'search.filter.locked.instance-loader.title',
+		defaultMessage: 'Loader is provided by the instance',
+	},
+	modLoaderProvidedByServer: {
+		id: 'search.filter.locked.server-loader.title',
+		defaultMessage: 'Loader is provided by the server',
+	},
+	providedByInstance: {
+		id: 'search.filter.locked.instance',
+		defaultMessage: 'Provided by the instance',
+	},
+	providedByServer: {
+		id: 'search.filter.locked.server',
+		defaultMessage: 'Provided by the server',
+	},
+	syncFilterButton: {
+		id: 'search.filter.locked.instance.sync',
+		defaultMessage: 'Sync with instance',
+	},
+})
+
 const breadcrumbs = useBreadcrumbs()
 const browseTitle = computed(() =>
 	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
@@ -668,85 +747,6 @@ const selectableProjectTypes = computed(() => {
 		{ label: 'Shaders', href: `/browse/shader${suffix}` },
 		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
 	]
-})
-
-const messages = defineMessages({
-	addServerToInstance: {
-		id: 'app.browse.add-server-to-instance',
-		defaultMessage: 'Add server to instance',
-	},
-	addServersToInstance: {
-		id: 'app.browse.add-servers-to-instance',
-		defaultMessage: 'Add servers to your instance',
-	},
-	addToInstance: {
-		id: 'app.browse.add-to-instance',
-		defaultMessage: 'Add to instance',
-	},
-	addToInstanceName: {
-		id: 'app.browse.add-to-instance-name',
-		defaultMessage: 'Add to {instanceName}',
-	},
-	added: {
-		id: 'app.browse.added',
-		defaultMessage: 'Added',
-	},
-	alreadyAdded: {
-		id: 'app.browse.already-added',
-		defaultMessage: 'Already added',
-	},
-	discoverContent: {
-		id: 'app.browse.discover-content',
-		defaultMessage: 'Discover content',
-	},
-	discoverServers: {
-		id: 'app.browse.discover-servers',
-		defaultMessage: 'Discover servers',
-	},
-	environmentProvidedByServer: {
-		id: 'search.filter.locked.server-environment.title',
-		defaultMessage: 'Only client-side mods can be added to the server instance',
-	},
-	gameVersionProvidedByInstance: {
-		id: 'search.filter.locked.instance-game-version.title',
-		defaultMessage: 'Game version is provided by the instance',
-	},
-	gameVersionProvidedByServer: {
-		id: 'search.filter.locked.server-game-version.title',
-		defaultMessage: 'Game version is provided by the server',
-	},
-	hideAddedServers: {
-		id: 'app.browse.hide-added-servers',
-		defaultMessage: 'Hide added servers',
-	},
-	hideInstalledContent: {
-		id: 'app.browse.hide-installed-content',
-		defaultMessage: 'Hide installed content',
-	},
-	installContentToInstance: {
-		id: 'app.browse.install-content-to-instance',
-		defaultMessage: 'Install content to instance',
-	},
-	modLoaderProvidedByInstance: {
-		id: 'search.filter.locked.instance-loader.title',
-		defaultMessage: 'Loader is provided by the instance',
-	},
-	modLoaderProvidedByServer: {
-		id: 'search.filter.locked.server-loader.title',
-		defaultMessage: 'Loader is provided by the server',
-	},
-	providedByInstance: {
-		id: 'search.filter.locked.instance',
-		defaultMessage: 'Provided by the instance',
-	},
-	providedByServer: {
-		id: 'search.filter.locked.server',
-		defaultMessage: 'Provided by the server',
-	},
-	syncFilterButton: {
-		id: 'search.filter.locked.instance.sync',
-		defaultMessage: 'Sync with instance',
-	},
 })
 
 const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
