@@ -24,6 +24,7 @@ pub struct ServerPingQueue {
 }
 
 pub const REDIS_NAMESPACE: &str = "minecraft_java_server_ping";
+pub const REDIS_FAILURE_NAMESPACE: &str = "minecraft_java_server_ping_failures";
 pub const CLICKHOUSE_TABLE: &str = "minecraft_java_server_pings";
 
 impl ServerPingQueue {
@@ -118,27 +119,82 @@ impl ServerPingQueue {
                     .await
                     .wrap_err("failed to write ping record")?;
 
-                redis
-                    .set_serialized_to_json(
-                        REDIS_NAMESPACE,
-                        project_id,
-                        ping,
+                if data.is_some() {
+                    // ping succeeded; immediately update its online status in redis
+
+                    redis
+                        .set_serialized_to_json(
+                            REDIS_NAMESPACE,
+                            project_id,
+                            ping,
+                            None,
+                        )
+                        .await
+                        .wrap_err("failed to set redis key")?;
+
+                    redis
+                        .delete(REDIS_FAILURE_NAMESPACE, project_id)
+                        .await
+                        .wrap_err("failed to delete failure count")?;
+                } else {
+                    // ping failed; if it's failed too many times, mark it as offline in redis
+                    // otherwise, just add to the fail counter
+
+                    let mut failure_count: u32 = redis
+                        .get(REDIS_FAILURE_NAMESPACE, &project_id.to_string())
+                        .await
+                        .inspect_err(|err| {
+                            warn!("failed to get failure count: {err:#}")
+                        })
+                        .ok()
+                        .flatten()
+                        .and_then(|s| s.parse().ok())
+                        .unwrap_or(0);
+
+                    failure_count = failure_count.saturating_add(1);
+
+                    redis
+                        .set(
+                            REDIS_FAILURE_NAMESPACE,
+                            &project_id.to_string(),
+                            &failure_count.to_string(),
+                            None,
+                        )
+                        .await
+                        .inspect_err(|err| {
+                            warn!("failed to set failure count: {err:#}")
+                        })
+                        .ok();
+
+                    if failure_count >= ENV.SERVER_PING_MAX_FAIL_COUNT {
+                        redis
+                            .set_serialized_to_json(
+                                REDIS_NAMESPACE,
+                                project_id,
+                                ping,
+                                None,
+                            )
+                            .await
+                            .inspect_err(|err| {
+                                warn!("failed to set failed ping record in redis: {err:#}")
+                            })
+                            .ok();
+                    }
+                }
+
+                if data.is_some() {
+                    DBProject::clear_cache(
+                        (*project_id).into(),
                         None,
+                        None,
+                        &self.redis,
                     )
                     .await
-                    .wrap_err("failed to set redis key")?;
-
-                DBProject::clear_cache(
-                    (*project_id).into(),
-                    None,
-                    None,
-                    &self.redis,
-                )
-                .await
-                .inspect_err(|err| {
-                    warn!("failed to clear project cache: {err:#}")
-                })
-                .ok();
+                    .inspect_err(|err| {
+                        warn!("failed to clear project cache: {err:#}")
+                    })
+                    .ok();
+                }
             }
 
             ch.end()
