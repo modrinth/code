@@ -146,7 +146,11 @@
 						</div>
 					</div>
 					<!-- Advanced Properties -->
-					<Accordion v-if="hasVisibleAdvancedProperties" overflow-visible :force-open="isSearchActive">
+					<Accordion
+						v-if="hasVisibleAdvancedProperties"
+						overflow-visible
+						:force-open="isSearchActive"
+					>
 						<template #title>
 							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
 						</template>
@@ -157,7 +161,9 @@
 									<h3 class="m-0 text-base font-semibold text-contrast">
 										{{ group.label }}
 									</h3>
-									<div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
+									<div
+										class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4"
+									>
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
@@ -203,30 +209,6 @@
 									</div>
 								</div>
 							</template>
-
-							<div v-if="visibleCustomProperties.length > 0" class="flex flex-col gap-4">
-								<h3 class="m-0 text-base font-semibold text-contrast">Custom properties</h3>
-								<div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
-									<div
-										v-for="key in visibleCustomProperties"
-										:key="key"
-										class="flex flex-row flex-wrap items-center justify-between py-2"
-									>
-										<span :id="`property-label-${key}`">
-											{{ formatPropertyName(key) }}
-										</span>
-										<div class="mt-2 flex w-full justify-end sm:w-[320px]">
-											<StyledInput
-												:id="`server-property-${key}`"
-												v-model="liveProperties[key]"
-												wrapper-class="w-full"
-												placeholder="Type here..."
-												:aria-labelledby="`property-label-${key}`"
-											/>
-										</div>
-									</div>
-								</div>
-							</div>
 						</div>
 					</Accordion>
 
@@ -331,16 +313,6 @@ const ADVANCED_GROUPS = [
 	{
 		label: 'Resource Pack',
 		keys: ['resource_pack', 'resource_pack_id', 'resource_pack_sha1', 'require_resource_pack'],
-	},
-	{
-		label: 'Other',
-		keys: [
-			'force_gamemode',
-			'generate_structures',
-			'generator_settings',
-			'level_seed',
-			'level_type',
-		],
 	},
 ]
 
@@ -516,11 +488,6 @@ const advancedGroupedProperties = computed(() =>
 	})).filter((g) => g.properties.length > 0),
 )
 
-const customProperties = computed(() => {
-	const knownKeys = new Set(Object.keys(KNOWN_PROPERTIES))
-	return Object.keys(liveProperties.value).filter((key) => !knownKeys.has(key))
-})
-
 const fuse = computed(() => {
 	const entries = Object.entries(liveProperties.value).map(([key, value]) => ({
 		key,
@@ -549,15 +516,8 @@ function hasVisibleProperties(group: { properties: string[] }): boolean {
 	return group.properties.some((key) => isPropertyVisible(key))
 }
 
-const visibleCustomProperties = computed(() => {
-	if (!isSearchActive.value) return customProperties.value
-	return customProperties.value.filter((key) => isPropertyVisible(key))
-})
-
-const hasVisibleAdvancedProperties = computed(
-	() =>
-		advancedGroupedProperties.value.some((group) => hasVisibleProperties(group)) ||
-		visibleCustomProperties.value.length > 0,
+const hasVisibleAdvancedProperties = computed(() =>
+	advancedGroupedProperties.value.some((group) => hasVisibleProperties(group)),
 )
 
 function formatPropertyName(name: string): string {
