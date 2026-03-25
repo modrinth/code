@@ -119,6 +119,7 @@ impl ServerPingQueue {
                     .await
                     .wrap_err("failed to write ping record")?;
 
+                let mut updated_project = false;
                 if data.is_some() {
                     // ping succeeded; immediately update its online status in redis
 
@@ -131,6 +132,7 @@ impl ServerPingQueue {
                         )
                         .await
                         .wrap_err("failed to set redis key")?;
+                    updated_project = true;
 
                     redis
                         .delete(REDIS_FAILURE_NAMESPACE, project_id)
@@ -159,10 +161,11 @@ impl ServerPingQueue {
                             .wrap_err(
                                 "failed to set failed ping record in redis",
                             )?;
+                        updated_project = true;
                     }
                 }
 
-                if data.is_some() {
+                if updated_project {
                     DBProject::clear_cache(
                         (*project_id).into(),
                         None,
