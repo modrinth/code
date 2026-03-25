@@ -231,7 +231,7 @@ type UserPreferences = {
 
 const defaultPreferences: UserPreferences = {
 	hideSubdomainLabel: false,
-	autoRestart: false,
+	// autoRestart: false,
 	ramAsNumber: false,
 	powerDontAskAgain: false,
 }
