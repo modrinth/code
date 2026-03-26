@@ -201,7 +201,7 @@ const diffTypeMessages = defineMessages({
 	},
 	removed: {
 		id: 'content.diff-modal.diff-type.removed',
-		defaultMessage: 'Removed',
+		defaultMessage: 'Disabled',
 	},
 	updated: {
 		id: 'content.diff-modal.diff-type.updated',

@@ -5,12 +5,19 @@ import { computed, ref, watch } from 'vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonProjectTypeCategoryMessages, normalizeProjectType } from '#ui/utils/common-messages'
 
-import type { ContentItem } from '../types'
+import type { ClientWarningType, ContentItem } from '../types'
 
 const CLIENT_ONLY_ENVIRONMENTS = new Set(['client_only', 'singleplayer_only'])
 
 export function isClientOnlyEnvironment(env?: string | null): boolean {
 	return !!env && CLIENT_ONLY_ENVIRONMENTS.has(env)
+}
+
+export function getClientWarningType(item: ContentItem): ClientWarningType | null {
+	if (item.pack_client_retained) return 'retained'
+	if (item.pack_client_depends) return 'depends'
+	if (isClientOnlyEnvironment(item.environment)) return 'environment'
+	return null
 }
 
 export interface ContentFilterOption {
@@ -55,10 +62,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'updates', label: 'Updates' })
 		}
 
-		if (
-			config?.showClientOnlyFilter &&
-			items.value.some((m) => isClientOnlyEnvironment(m.environment))
-		) {
+		if (config?.showClientOnlyFilter && items.value.some((m) => getClientWarningType(m) !== null)) {
 			options.push({ id: 'client-only', label: 'Client-only' })
 		}
 
@@ -102,7 +106,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			for (const filter of activeAttributes) {
 				if (filter === 'updates' && !item.has_update) return false
 				if (filter === 'disabled' && item.enabled) return false
-				if (filter === 'client-only' && !isClientOnlyEnvironment(item.environment)) return false
+				if (filter === 'client-only' && getClientWarningType(item) === null) return false
 			}
 
 			return true

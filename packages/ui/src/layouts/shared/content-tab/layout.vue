@@ -40,6 +40,7 @@ import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.v
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import {
+	getClientWarningType,
 	isClientOnlyEnvironment,
 	useBulkOperation,
 	useChangingItems,
@@ -279,7 +280,12 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				item.installing === true,
 			installing: item.installing === true,
 			hasUpdate: item.has_update,
-			isClientOnly: isClientOnlyEnvironment(item.environment),
+			isClientOnly:
+				isClientOnlyEnvironment(item.environment) ||
+				!!item.pack_client_retained ||
+				!!item.pack_client_depends,
+			clientWarning: getClientWarningType(item),
+			hideSwitchVersion: !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})

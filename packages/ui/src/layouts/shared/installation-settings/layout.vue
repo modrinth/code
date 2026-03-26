@@ -86,7 +86,11 @@ const disabledPlatforms = computed(() => {
 	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
 })
 
-const showModpackVersionActions = ctx.showModpackVersionActions ?? true
+const showModpackVersionActions = computed(() => {
+	const val = ctx.showModpackVersionActions
+	if (val == null) return true
+	return typeof val === 'boolean' ? val : val.value
+})
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
@@ -284,26 +288,31 @@ const messages = defineMessages({
 						class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
 					>
 						<AutoLink :to="ctx.modpack.value.link" class="shrink-0">
-							<div
-								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
-							>
-								<Avatar
-									v-if="ctx.modpack.value.iconUrl"
-									:src="ctx.modpack.value.iconUrl"
-									:alt="ctx.modpack.value.title"
-									size="100%"
-									no-shadow
-								/>
-							</div>
+							<Avatar
+								:src="ctx.modpack.value.iconUrl"
+								:alt="ctx.modpack.value.title"
+								size="3.5rem"
+								no-shadow
+								raised
+							/>
 						</AutoLink>
-						<div class="flex flex-col gap-1">
-							<AutoLink
-								:to="ctx.modpack.value.link"
-								class="font-semibold text-contrast hover:underline"
+						<div class="flex min-w-0 flex-col gap-1">
+							<div class="flex min-w-0 flex-col">
+								<AutoLink
+									:to="ctx.modpack.value.link"
+									class="truncate font-semibold text-contrast"
+									:class="ctx.modpack.value.link ? 'hover:underline' : ''"
+								>
+									{{ ctx.modpack.value.title }}
+								</AutoLink>
+								<span v-if="ctx.modpack.value.filename" class="truncate text-sm text-secondary">
+									{{ ctx.modpack.value.filename }}
+								</span>
+							</div>
+							<div
+								v-if="ctx.modpack.value.owner || ctx.modpack.value.versionNumber"
+								class="flex items-center gap-2 text-sm text-secondary"
 							>
-								{{ ctx.modpack.value.title }}
-							</AutoLink>
-							<div class="flex items-center gap-2 text-sm text-secondary">
 								<AutoLink
 									v-if="ctx.modpack.value.owner"
 									:to="

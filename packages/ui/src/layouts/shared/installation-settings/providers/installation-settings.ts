@@ -52,7 +52,7 @@ export interface InstallationSettingsContext {
 	isApp: boolean
 
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
-	showModpackVersionActions?: boolean
+	showModpackVersionActions?: boolean | ComputedRef<boolean>
 
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>

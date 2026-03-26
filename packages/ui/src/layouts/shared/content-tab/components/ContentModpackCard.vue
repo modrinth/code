@@ -138,19 +138,28 @@ onUnmounted(() => {
 		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<div class="flex flex-wrap items-start justify-between gap-4">
-			<div class="flex min-w-0 flex-1 items-start gap-4">
+		<div class="flex flex-wrap items-center justify-between gap-4">
+			<div class="flex min-w-0 flex-1 items-center gap-4">
 				<AutoLink :to="projectLink" class="shrink-0">
 					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow raised />
 				</AutoLink>
-				<div class="flex flex-col gap-1.5">
-					<AutoLink
-						:to="projectLink"
-						class="text-xl font-semibold leading-8 text-contrast hover:underline"
+				<div class="flex min-w-0 flex-col gap-1.5">
+					<div class="flex min-w-0 flex-col">
+						<AutoLink
+							:to="projectLink"
+							class="truncate text-xl font-semibold text-contrast"
+							:class="projectLink ? 'hover:underline' : ''"
+						>
+							{{ project.title }}
+						</AutoLink>
+						<span v-if="project.filename" class="truncate text-secondary mb-2">
+							{{ project.filename }}
+						</span>
+					</div>
+					<div
+						v-if="owner || version"
+						class="flex flex-nowrap items-center gap-2 overflow-hidden text-secondary"
 					>
-						{{ project.title }}
-					</AutoLink>
-					<div class="flex flex-nowrap items-center gap-2 overflow-hidden text-secondary">
 						<AutoLink
 							v-if="owner"
 							:to="owner.link"
@@ -346,13 +355,16 @@ onUnmounted(() => {
 			{{ project.description }}
 		</span>
 
-		<div class="flex flex-wrap items-center gap-3">
-			<div v-if="project.downloads !== undefined" class="flex items-center gap-2 text-secondary">
+		<div
+			v-if="project.downloads != null || project.followers != null || categories?.length"
+			class="flex flex-wrap items-center gap-3"
+		>
+			<div v-if="project.downloads != null" class="flex items-center gap-2 text-secondary">
 				<DownloadIcon class="size-5" />
 				<span class="font-medium">{{ formatCompact(project.downloads) }}</span>
 			</div>
 
-			<div v-if="project.followers !== undefined" class="flex items-center gap-2 text-secondary">
+			<div v-if="project.followers != null" class="flex items-center gap-2 text-secondary">
 				<HeartIcon class="size-5" />
 				<span class="font-medium">{{ formatCompact(project.followers) }}</span>
 			</div>

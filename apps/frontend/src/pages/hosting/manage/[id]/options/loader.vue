@@ -203,13 +203,18 @@ const addonsQuery = useQuery({
 
 const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 
+const modpackProjectId = computed(() => {
+	const spec = modpack.value?.spec
+	return spec?.platform === 'modrinth' ? spec.project_id : null
+})
+
 const modpackVersionsQuery = useQuery({
-	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpack.value?.spec.project_id]),
+	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
 	queryFn: () =>
-		client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+		client.labrinth.versions_v2.getProjectVersions(modpackProjectId.value!, {
 			include_changelog: false,
 		}),
-	enabled: computed(() => !!modpack.value?.spec.project_id),
+	enabled: computed(() => !!modpackProjectId.value),
 })
 
 const auth = await useAuth()
@@ -321,17 +326,20 @@ provideInstallationSettings({
 	}),
 	isLinked: computed(() => {
 		const val = !!modpack.value
-		debug('isLinked:', val, 'modpack:', modpack.value?.spec?.project_id)
+		debug('isLinked:', val, 'modpack:', modpackProjectId.value)
 		return val
 	}),
 	isBusy: isInstalling,
 	modpack: computed(() => {
 		if (!modpack.value) return null
+		const isLocal = modpack.value.spec.platform === 'local_file'
 		return {
 			iconUrl: modpack.value.icon_url,
-			title: modpack.value.title ?? modpack.value.spec.project_id,
-			link: `/project/${modpack.value.spec.project_id}`,
+			title:
+				modpack.value.title ?? (isLocal ? modpack.value.spec.name : modpack.value.spec.project_id),
+			link: modpackProjectId.value ? `/project/${modpackProjectId.value}` : undefined,
 			versionNumber: modpack.value.version_number,
+			filename: isLocal ? modpack.value.spec.filename : undefined,
 			owner: modpack.value.owner
 				? {
 						id: modpack.value.owner.id,
@@ -460,7 +468,7 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
-		if (!modpack.value) return
+		if (!modpack.value || modpack.value.spec.platform !== 'modrinth') return
 		debug(
 			'reinstallModpack: called, project:',
 			modpack.value.spec.project_id,
@@ -531,10 +539,11 @@ provideInstallationSettings({
 	getCachedModpackVersions: () => modpackVersionsQuery.data.value ?? null,
 
 	async fetchModpackVersions() {
-		debug('fetchModpackVersions: called, project:', modpack.value?.spec.project_id)
+		debug('fetchModpackVersions: called, project:', modpackProjectId.value)
+		if (!modpackProjectId.value) throw new Error('No modpack project ID')
 		try {
 			const versions = await client.labrinth.versions_v2.getProjectVersions(
-				modpack.value!.spec.project_id,
+				modpackProjectId.value,
 				{
 					include_changelog: false,
 				},
@@ -562,7 +571,7 @@ provideInstallationSettings({
 	},
 
 	async onModpackVersionConfirm(version) {
-		if (!modpack.value) return
+		if (!modpackProjectId.value) return
 		debug('onModpackVersionConfirm: called, version:', version.id)
 		debug('onModpackVersionConfirm: emitting reinstall before API call')
 		emit('reinstall')
@@ -571,7 +580,7 @@ provideInstallationSettings({
 				content_variant: 'modpack',
 				spec: {
 					platform: 'modrinth',
-					project_id: modpack.value.spec.project_id,
+					project_id: modpackProjectId.value,
 					version_id: version.id,
 				},
 				soft_override: true,
@@ -590,18 +599,18 @@ provideInstallationSettings({
 
 	updaterModalProps: computed(() => ({
 		isApp: false,
-		currentVersionId: modpack.value?.spec.version_id ?? '',
+		currentVersionId:
+			modpack.value?.spec.platform === 'modrinth' ? modpack.value.spec.version_id : '',
 		projectIconUrl: modpack.value?.icon_url ?? undefined,
 		projectName:
-			modpack.value?.title ??
-			modpack.value?.spec.project_id ??
-			formatMessage(commonMessages.modpackLabel),
+			modpack.value?.title ?? modpackProjectId.value ?? formatMessage(commonMessages.modpackLabel),
 		currentGameVersion: addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
 		currentLoader: addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
 	})),
 
 	isServer: true,
 	isApp: false,
+	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 
 	lockPlatform: true,
 	hideLoaderVersion: true,

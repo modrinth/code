@@ -406,6 +406,16 @@ export const commonMessages = defineMessages({
 		defaultMessage:
 			"This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict.",
 	},
+	clientRetainedWarning: {
+		id: 'label.client-retained-warning',
+		defaultMessage:
+			'This is a client-side mod that was installed as a dependency and may cause issues when starting your server',
+	},
+	clientDependsWarning: {
+		id: 'label.client-depends-warning',
+		defaultMessage:
+			'This mod depends on a client-side mod and may cause issues when starting your server',
+	},
 	selectAllLabel: {
 		id: 'label.select-all',
 		defaultMessage: 'Select all',
