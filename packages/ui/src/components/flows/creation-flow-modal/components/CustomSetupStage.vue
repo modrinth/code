@@ -254,7 +254,14 @@ async function fetchLoaderManifest(loader: string) {
 	let apiLoader = loader
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
-	debug('fetchLoaderManifest:', loader, 'apiLoader:', apiLoader, 'cached:', !!loaderVersionsCache.value[apiLoader])
+	debug(
+		'fetchLoaderManifest:',
+		loader,
+		'apiLoader:',
+		apiLoader,
+		'cached:',
+		!!loaderVersionsCache.value[apiLoader],
+	)
 	if (loaderVersionsCache.value[apiLoader]) return
 
 	try {
@@ -322,18 +329,32 @@ function getLoaderVersionsForGameVersion(
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
 	const manifest = loaderVersionsCache.value[apiLoader]
-	debug('getLoaderVersionsForGameVersion:', { loader, apiLoader, gameVersion, hasManifest: !!manifest, manifestLength: manifest?.length })
+	debug('getLoaderVersionsForGameVersion:', {
+		loader,
+		apiLoader,
+		gameVersion,
+		hasManifest: !!manifest,
+		manifestLength: manifest?.length,
+	})
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
 	if (placeholder) {
-		debug('getLoaderVersionsForGameVersion: using placeholder, loaders:', placeholder.loaders.length)
+		debug(
+			'getLoaderVersionsForGameVersion: using placeholder, loaders:',
+			placeholder.loaders.length,
+		)
 		return placeholder.loaders
 	}
 
 	const entry = manifest.find((x) => x.id === gameVersion)
-	debug('getLoaderVersionsForGameVersion: entry for', gameVersion, ':', entry ? entry.loaders.length + ' loaders' : 'NOT FOUND')
+	debug(
+		'getLoaderVersionsForGameVersion: entry for',
+		gameVersion,
+		':',
+		entry ? entry.loaders.length + ' loaders' : 'NOT FOUND',
+	)
 	return entry?.loaders ?? []
 }
 
@@ -393,11 +414,17 @@ watch(
 
 		await fetchLoaderManifest(loader)
 		if (watchId !== loaderVersionWatchId) {
-			debug('watch [loader, gameVersion]: stale execution, skipping', { watchId, current: loaderVersionWatchId })
+			debug('watch [loader, gameVersion]: stale execution, skipping', {
+				watchId,
+				current: loaderVersionWatchId,
+			})
 			return
 		}
 		loaderVersionsData.value = getLoaderVersionsForGameVersion(loader, gameVersion)
-		debug('watch [loader, gameVersion]: loaderVersionsData set, count:', loaderVersionsData.value.length)
+		debug(
+			'watch [loader, gameVersion]: loaderVersionsData set, count:',
+			loaderVersionsData.value.length,
+		)
 		loaderVersionsLoading.value = false
 
 		// Auto-select based on loaderVersionType
@@ -411,7 +438,16 @@ watch(
 )
 
 function autoSelectLoaderVersion() {
-	debug('autoSelectLoaderVersion: type:', loaderVersionType.value, 'dataCount:', loaderVersionsData.value.length, 'stableCount:', loaderVersionsData.value.filter((v) => v.stable).length, 'first:', loaderVersionsData.value[0]?.id)
+	debug(
+		'autoSelectLoaderVersion: type:',
+		loaderVersionType.value,
+		'dataCount:',
+		loaderVersionsData.value.length,
+		'stableCount:',
+		loaderVersionsData.value.filter((v) => v.stable).length,
+		'first:',
+		loaderVersionsData.value[0]?.id,
+	)
 	if (loaderVersionType.value === 'stable') {
 		const stable = loaderVersionsData.value.find((v) => v.stable)
 		selectedLoaderVersion.value = stable?.id ?? loaderVersionsData.value[0]?.id ?? null
