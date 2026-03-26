@@ -352,14 +352,22 @@ pub async fn install(path: &str, force: bool) -> crate::Result<()> {
     if let Some(profile) = get(path).await? {
         let result =
             crate::launcher::install_minecraft(&profile, None, force).await;
-        if result.is_err()
-            && profile.install_stage != ProfileInstallStage::Installed
-        {
-            edit(path, |prof| {
-                prof.install_stage = ProfileInstallStage::NotInstalled;
-                async { Ok(()) }
-            })
-            .await?;
+        if result.is_err() {
+            // Re-read the profile to get the current install_stage, as
+            // install_minecraft may have changed it (e.g. to MinecraftInstalling)
+            let current_stage = get(path)
+                .await
+                .ok()
+                .flatten()
+                .map(|p| p.install_stage)
+                .unwrap_or(ProfileInstallStage::NotInstalled);
+            if current_stage != ProfileInstallStage::Installed {
+                edit(path, |prof| {
+                    prof.install_stage = ProfileInstallStage::NotInstalled;
+                    async { Ok(()) }
+                })
+                .await?;
+            }
         }
         result?;
     } else {
