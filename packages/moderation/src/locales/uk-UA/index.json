@@ -12,7 +12,7 @@
     "defaultMessage": "Додайте значок"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "Додайте IP-адресу та порт Java Edition, аби гравці могли приєднатися до сервера."
+    "defaultMessage": "Додайте IP-адресу та порт Java Edition, щоб гравці могли приєднатися до сервера."
   },
   "nags.add-java-address.title": {
     "defaultMessage": "Додайте адресу Java"
@@ -24,7 +24,7 @@
     "defaultMessage": "Додайте зовнішні посилання"
   },
   "nags.add-links.description": {
-    "defaultMessage": "Додайте будь-які необхідні посилання на вебсайти поза Modrinth, як-от, на вихідний код, систему відстеження проблем чи запрошення до Discord."
+    "defaultMessage": "Додайте будь-які доречні посилання, націлені за межі Modrinth, наприклад на вихідний код, систему відстеження проблем чи запрошення Discord."
   },
   "nags.add-links.title": {
     "defaultMessage": "Додайте зовнішні посилання"
@@ -141,7 +141,7 @@
     "defaultMessage": "Виберіть правильну роздільність"
   },
   "nags.select-compatibility.description": {
-    "defaultMessage": "Виберіть, які версії підтримує ваш сервер, виберіть збірку або завантажте власний."
+    "defaultMessage": "Виберіть, які версії підтримує ваш сервер, виберіть збірку або завантажте власну."
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "Виберіть сумісність"

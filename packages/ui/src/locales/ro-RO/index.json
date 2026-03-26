@@ -326,9 +326,6 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mod de joc necunoscut"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Înapoi"
-  },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copiați linkul"
   },
@@ -488,9 +485,6 @@
   "label.singleplayer": {
     "defaultMessage": "Un singur jucător"
   },
-  "label.sort-by": {
-    "defaultMessage": "Filtrează după"
-  },
   "label.success": {
     "defaultMessage": "Succes"
   },
@@ -628,9 +622,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Mențineți fișierele actualizate atunci când serverul se modifică"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Închide"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Descărcați aplicația Modrinth"
@@ -979,12 +970,6 @@
   },
   "project.about.server.copied": {
     "defaultMessage": "Copiată!"
-  },
-  "project.about.server.copiedText": {
-    "defaultMessage": "Adresa IP copiată în clipboard"
-  },
-  "project.about.server.latency": {
-    "defaultMessage": "Latență"
   },
   "project.about.server.title": {
     "defaultMessage": "Detalii server"
@@ -1658,9 +1643,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Cu de toate"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
-  },
   "tag.category.library": {
     "defaultMessage": "Librărie"
   },
@@ -1742,20 +1724,11 @@
   "tag.category.plots": {
     "defaultMessage": "Loturi"
   },
-  "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
-  },
   "tag.category.potato": {
     "defaultMessage": "Cartof"
   },
   "tag.category.prison": {
     "defaultMessage": "Închisoare"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PVE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PVP"
   },
   "tag.category.questing": {
     "defaultMessage": "Căutare"

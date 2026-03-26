@@ -150,6 +150,7 @@ const JAVA_VERSIONS = [
 	{ value: 11, label: 'Java 11' },
 	{ value: 17, label: 'Java 17' },
 	{ value: 21, label: 'Java 21' },
+	{ value: 25, label: 'Java 25' },
 ]
 
 const JRE_VENDORS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
@@ -203,19 +204,50 @@ const hasUnsavedChanges = computed(
 // Java version filtering
 const showAllVersions = ref(false)
 
+type MinecraftReleaseVersion = {
+	major: number
+	minor: number
+}
+
+function parseMinecraftReleaseVersion(version: string): MinecraftReleaseVersion | null {
+	const [majorPart, minorPart] = version.split('.')
+
+	if (!majorPart || !minorPart) return null
+
+	const major = Number(majorPart)
+	const minor = Number(minorPart)
+
+	if (!Number.isInteger(major) || !Number.isInteger(minor)) return null
+
+	return { major, minor }
+}
+
+function filterJavaVersions(compatibleVersions: number[]) {
+	return JAVA_VERSIONS.filter((version) => compatibleVersions.includes(version.value))
+}
+
 const displayedJavaVersions = computed(() => {
 	if (showAllVersions.value) return JAVA_VERSIONS
 
 	const mcVersion = server.value?.mc_version ?? ''
 	if (!mcVersion) return JAVA_VERSIONS
 
-	const [, minor] = mcVersion.split('.').map(Number)
+	const releaseVersion = parseMinecraftReleaseVersion(mcVersion)
+	if (!releaseVersion) return JAVA_VERSIONS
 
-	if (minor >= 20) return JAVA_VERSIONS.filter((v) => v.value === 21)
-	if (minor >= 17) return JAVA_VERSIONS.filter((v) => [17, 21].includes(v.value))
-	if (minor >= 12) return JAVA_VERSIONS
-	if (minor >= 6) return JAVA_VERSIONS.filter((v) => [8, 11].includes(v.value))
-	return JAVA_VERSIONS.filter((v) => v.value === 8)
+	if (releaseVersion.major > 1) {
+		if (releaseVersion.major >= 26) {
+			return filterJavaVersions([25])
+		}
+
+		return JAVA_VERSIONS
+	}
+
+	if (releaseVersion.minor >= 20) return filterJavaVersions([21])
+	if (releaseVersion.minor >= 17) return filterJavaVersions([17, 21])
+	if (releaseVersion.minor >= 12) return filterJavaVersions([8, 11, 17, 21])
+	if (releaseVersion.minor >= 6) return filterJavaVersions([8, 11])
+	return filterJavaVersions([8])
 })
 
 // Save mutation

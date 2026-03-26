@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Buat proyek"
   },
-  "create.project.create-server-project": {
-    "message": "Buat server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Bidang hilang: {fields}"
   },
@@ -1303,6 +1300,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Pilih antara Vanila, Fabric, Forge, Quilt, dan NeoForge. Bila ia ada di Modrinth, ia dapat dijalankan di server Anda."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Gagal mengubah versi paket mod"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Gagal memuat versi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Gagal memasang ulang paket mod"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Gagal memperbaiki server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Gagal menyinpan pengaturan pemasangan"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Gagal melepas tautan paket mod"
+  },
+  "hosting.loader.loader-version": {
+    "message": "Versi {loader, select, null {pemuat} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Pemasangan server Anda telah diperbaiki."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Perbaikan selesai"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Atur ulang server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Menghapus semua data pada server Anda, termasuk dunia, mod, dan berkas konfigurasi Anda. Cadangan akan tetap ada dan dapat dipulihkan."
   },
   "hosting.plan.out-of-stock": {
     "message": "Habis"
@@ -2783,6 +2813,18 @@
   "search.filter.locked.server.sync": {
     "message": "Sinkronkan dengan server"
   },
+  "servers.busy.backup-creating": {
+    "message": "Sedang membuat cadangan"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Sedang memulihkan cadangan"
+  },
+  "servers.busy.installing": {
+    "message": "Server sedang dipasang"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Sedang menyingkronkan konten"
+  },
   "servers.notice.actions": {
     "message": "Tindakan"
   },
@@ -2813,20 +2855,11 @@
   "servers.plan.large.description": {
     "message": "Cocok untuk 15—25 pemain, paket mod, atau yang penggunakan mod berat."
   },
-  "servers.plan.large.name": {
-    "message": "Besar"
-  },
   "servers.plan.medium.description": {
     "message": "Cocok untuk 6—15 orang pemain dan yang menggunakan beberapa mod."
   },
-  "servers.plan.medium.name": {
-    "message": "Sedang"
-  },
   "servers.plan.small.description": {
     "message": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
-  },
-  "servers.plan.small.name": {
-    "message": "Kecil"
   },
   "settings.applications.about": {
     "message": "Tentang"
@@ -2911,9 +2944,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Informasi aplikasi"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Terjadi kesalahan"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikon aplikasi Anda telah diperbarui."
@@ -3151,6 +3181,12 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Berlangganan"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Sudah berlangganan!"
   },
   "version.environment.none.description": {
     "message": "Lingkungan untuk versi ini belum ditentukan."

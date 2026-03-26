@@ -1,5 +1,13 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
+		<ConfirmModal
+			ref="resetToOnboardingModal"
+			:title="formatMessage(messages.resetToOnboardingModalTitle)"
+			:description="formatMessage(messages.resetToOnboardingModalDescription)"
+			:proceed-label="formatMessage(messages.resetToOnboardingButton)"
+			@proceed="confirmResetToOnboarding"
+		/>
+
 		<InstallationSettingsLayout ref="installationSettingsLayout">
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
@@ -28,6 +36,24 @@
 				/>
 			</template>
 		</InstallationSettingsLayout>
+
+		<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
+			<span class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.supportOptionsTitle) }}
+			</span>
+			<div>
+				<ButtonStyled color="red">
+					<button
+						class="!shadow-none"
+						:disabled="!worldId || isResettingToOnboarding"
+						@click="resetToOnboardingModal?.show()"
+					>
+						<RotateCounterClockwiseIcon class="size-5" />
+						{{ formatMessage(messages.resetToOnboardingButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -37,6 +63,7 @@ import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,
+	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
 	injectModrinthClient,
@@ -106,6 +133,35 @@ const messages = defineMessages({
 		id: 'hosting.loader.failed-to-unlink',
 		defaultMessage: 'Failed to unlink modpack',
 	},
+	supportOptionsTitle: {
+		id: 'hosting.loader.support-options-title',
+		defaultMessage: 'Support options',
+	},
+	resetToOnboardingButton: {
+		id: 'hosting.loader.reset-to-onboarding-button',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingModalTitle: {
+		id: 'hosting.loader.reset-to-onboarding-modal-title',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingModalDescription: {
+		id: 'hosting.loader.reset-to-onboarding-modal-description',
+		defaultMessage:
+			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
+	},
+	resetToOnboardingSuccessTitle: {
+		id: 'hosting.loader.reset-to-onboarding-success-title',
+		defaultMessage: 'Server reset to onboarding',
+	},
+	resetToOnboardingSuccessDescription: {
+		id: 'hosting.loader.reset-to-onboarding-success-description',
+		defaultMessage: 'The server has been returned to the onboarding flow.',
+	},
+	failedToResetToOnboarding: {
+		id: 'hosting.loader.failed-to-reset-to-onboarding',
+		defaultMessage: 'Failed to reset server to onboarding',
+	},
 })
 
 const emit = defineEmits<{
@@ -156,8 +212,13 @@ const modpackVersionsQuery = useQuery({
 	enabled: computed(() => !!modpack.value?.spec.project_id),
 })
 
+const auth = await useAuth()
+const isSiteAdmin = computed(() => auth.value?.user?.role === 'admin')
+
 const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
 const editingGameVersion = ref(server.value?.mc_version ?? '')
+const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
+const isResettingToOnboarding = ref(false)
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
@@ -337,11 +398,17 @@ provideInstallationSettings({
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
 
+		let resolvedLoaderVersion = loaderVersionId
+		if (!resolvedLoaderVersion && platform !== 'vanilla') {
+			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
+			resolvedLoaderVersion = versions[0]?.id ?? null
+		}
+
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
 			platformChanged
-				? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
+				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
@@ -349,7 +416,7 @@ provideInstallationSettings({
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
-					version: loaderVersionId ?? '',
+					version: resolvedLoaderVersion ?? '',
 					game_version: gameVersion || undefined,
 					soft_override: true,
 				}
@@ -589,5 +656,31 @@ function onBrowseModpacks() {
 		path: '/discover/modpacks',
 		query: { sid: serverId, from: 'reset-server', wid: worldId.value },
 	})
+}
+
+async function confirmResetToOnboarding() {
+	if (!worldId.value) return
+
+	try {
+		isResettingToOnboarding.value = true
+		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
+		server.value.flows = { intro: true }
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		])
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.resetToOnboardingSuccessTitle),
+			text: formatMessage(messages.resetToOnboardingSuccessDescription),
+		})
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
+		})
+	} finally {
+		isResettingToOnboarding.value = false
+	}
 }
 </script>

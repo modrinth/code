@@ -149,6 +149,9 @@
   "button.unfollow": {
     "defaultMessage": "Mag-unfollow"
   },
+  "button.unlink-modpack": {
+    "defaultMessage": "I-unlink ang modpack"
+  },
   "button.update": {
     "defaultMessage": "Mag-update"
   },
@@ -175,6 +178,12 @@
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Ang kahit anong mod o kontentong dinagdag sa itaas ng modpack ay matatanggal."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Ina-unlink ang modpack"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "I-unlink ang modpack"
   },
   "content.confirm-unlink.unlink-button": {
     "defaultMessage": "I-unlink"
@@ -211,6 +220,12 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "Ibahagi"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Mga markdown link"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Mga link ng proyekto"
   },
   "content.page-layout.sort.alphabetical": {
     "defaultMessage": "Alpabetiko"
@@ -329,6 +344,12 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
   },
+  "hosting.content.copy-link": {
+    "defaultMessage": "Kopyahin ang link"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Bigong ma-unlink ang modpack"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Mag-burst ng hanggang sa {cpus} CPU"
   },
@@ -371,8 +392,14 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Kumpirmahin"
   },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Naka-link na {projectType, select, server {server project} other {modpack}}"
+  },
   "installation-settings.unlink": {
     "defaultMessage": "Mag-unlink"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Sa pag-a-unlink ay habambuhay na madidiskonekta ang {type, select, server {server na} other {instansiyang}} ito sa proyektong {projectType, select, server {server} other {modpack}}, na mahahayaan kang makapagpalit ng loader at ng bersiyon ng Minecraft, ngunit hindi ka na makatatanggap ng mga susunod na update."
   },
   "instance.confirm-repair.repair-button": {
     "defaultMessage": "Ayusin"
@@ -400,9 +427,6 @@
   },
   "instances.content-install.name-label": {
     "defaultMessage": "Pangalan"
-  },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Bumalik"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Kopyahin ang link"
@@ -437,6 +461,9 @@
   "instances.updater-modal.header": {
     "defaultMessage": "I-update ang bersiyon"
   },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Palitan ng bersiyon"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Hindi magkatugma"
   },
@@ -454,6 +481,9 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Ipakita ang hindi magkatugma"
+  },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Papalitan ng {version}"
   },
   "label.actions": {
     "defaultMessage": "Mga Aksiyon"
@@ -570,7 +600,7 @@
     "defaultMessage": "Pang-isahang laro"
   },
   "label.sort-by": {
-    "defaultMessage": "I-sort ayon sa"
+    "defaultMessage": "I-ayon sa: "
   },
   "label.success": {
     "defaultMessage": "Tagumpay"
@@ -709,9 +739,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Panatilihing naisapanahon ang mga file kapag nagbago ang server"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Isara"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Kunin ang Modrinth App"
@@ -1061,11 +1088,11 @@
   "project.about.server.copied": {
     "defaultMessage": "Nakopya na!"
   },
-  "project.about.server.copiedText": {
-    "defaultMessage": "Nakopya ang IP address na nasa clipboard na"
+  "project.about.server.languages": {
+    "defaultMessage": "Mga wika"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Latency"
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Iminumungkahi)"
   },
   "project.about.server.title": {
     "defaultMessage": "Detalye ng server"
@@ -1153,6 +1180,96 @@
   },
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, one {kamakailang paglaro} other {na kamakailang paglaro}} galing sa Modrinth sa nakalipas na 2 linggo"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amhariko"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabo"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azeri"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Biyeloruso"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgaro"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Benggali"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosniyo"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Katalan"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Tseko"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Danes"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Jerman"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Griyego"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Ingles"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Esperanto"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Espanyol"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Estonyo"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Euskarya"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Persa"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Finlandes"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Pranses"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Irlandes"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Galyego"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Hebreo"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Hindi"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Kroato"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Ungaro"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Armenyo"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Indones"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albanes"
   },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
@@ -1757,9 +1874,6 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Samot-sari't Labis"
   },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PVP"
-  },
   "tag.category.library": {
     "defaultMessage": "Librarya"
   },
@@ -1841,20 +1955,11 @@
   "tag.category.plots": {
     "defaultMessage": "Plots"
   },
-  "tag.category.pokemon": {
-    "defaultMessage": "Pokemon"
-  },
   "tag.category.potato": {
     "defaultMessage": "Kamote"
   },
   "tag.category.prison": {
     "defaultMessage": "Bilanggo"
-  },
-  "tag.category.pve": {
-    "defaultMessage": "PVE"
-  },
-  "tag.category.pvp": {
-    "defaultMessage": "PVP"
   },
   "tag.category.questing": {
     "defaultMessage": "Paggawa ng gawain"

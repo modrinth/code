@@ -42,9 +42,11 @@ interface CommentInfo {
 function parseArgs(argv: string[]): {
 	version?: string
 	dryRun: boolean
+	pr?: number
 } {
 	let version: string | undefined
 	let dryRun = false
+	let pr: number | undefined
 
 	let i = 0
 	while (i < argv.length) {
@@ -63,13 +65,25 @@ function parseArgs(argv: string[]): {
 		} else if (argv[i] === '--dry-run') {
 			dryRun = true
 			i++
+		} else if (argv[i] === '--pr') {
+			i++
+			if (i >= argv.length || argv[i].startsWith('--')) {
+				console.error(chalk.red('--pr requires a value'))
+				process.exit(1)
+			}
+			pr = parseInt(argv[i], 10)
+			if (isNaN(pr)) {
+				console.error(chalk.red('--pr must be a number'))
+				process.exit(1)
+			}
+			i++
 		} else {
 			console.error(chalk.red(`Unknown argument: ${argv[i]}`))
 			process.exit(1)
 		}
 	}
 
-	return { version, dryRun }
+	return { version, dryRun, pr }
 }
 
 async function getParser() {
@@ -141,7 +155,7 @@ function buildBody(sections: Map<string, string[]>): string {
 		parts.push(`${SECTION_HEADERS[type]}\n${lines.join('\n')}`)
 	}
 
-	return parts.join('\n\n')
+	return parts.join('\n\n').replace(/`/g, '\\`').replace(/\$/g, '\\$')
 }
 
 function mergeSections(
@@ -196,18 +210,17 @@ async function fetchMergedPRs(token: string, sinceDate: string): Promise<PRInfo[
 
 		if (data.length === 0) break
 
-		let foundOlder = false
+		let allTooOld = true
 		for (const pr of data) {
+			if (new Date(pr.updated_at) < new Date(sinceDate)) continue
+			allTooOld = false
 			if (!pr.merged_at) continue
-
 			if (new Date(pr.merged_at) > new Date(sinceDate)) {
 				prs.push({ number: pr.number, mergedAt: pr.merged_at })
-			} else {
-				foundOlder = true
 			}
 		}
 
-		if (foundOlder || data.length < 100) break
+		if (allTooOld || data.length < 100) break
 		page++
 	}
 
@@ -239,47 +252,12 @@ async function markCommentBaked(token: string, commentId: number, currentBody: s
 	})
 }
 
-function getCurrentPacificISO(): string {
-	const now = new Date()
-
-	const formatter = new Intl.DateTimeFormat('en-US', {
-		timeZone: 'America/Los_Angeles',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-		hour12: false,
-	})
-
-	const parts = formatter.formatToParts(now)
-	const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '00'
-
-	const year = get('year')
-	const month = get('month')
-	const day = get('day')
-	const hour = get('hour')
-	const minute = get('minute')
-	const second = get('second')
-
-	const jan = new Date(now.getFullYear(), 0, 1)
-	const jul = new Date(now.getFullYear(), 6, 1)
-	const stdOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset())
-	const pacificNow = new Date(
-		now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
-	)
-	const utcNow = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }))
-	const offsetMinutes = (utcNow.getTime() - pacificNow.getTime()) / 60000
-	const isDST = offsetMinutes !== stdOffset
-
-	const offsetStr = isDST ? '-07:00' : '-08:00'
-
-	return `${year}-${month}-${day}T${hour}:${minute}:${second}${offsetStr}`
+function getCurrentUTCISO(): string {
+	return new Date().toISOString().replace(/\.\d{3}Z$/, '+00:00')
 }
 
 function generateEntry(product: string, body: string, version?: string): string {
-	const dateStr = getCurrentPacificISO()
+	const dateStr = getCurrentUTCISO()
 	const versionLine = version ? `\n\t\tversion: '${version}',` : ''
 
 	return `\t{
@@ -324,15 +302,22 @@ async function main() {
 	const rootDir = path.resolve(__dirname, '..')
 	const changelogPath = path.join(rootDir, 'packages', 'blog', 'changelog.ts')
 
-	const prodDate = execSync('git log -1 --format=%aI origin/prod', { encoding: 'utf-8' }).trim()
-	console.log(chalk.gray(`Last prod commit: ${prodDate}`))
+	let prs: PRInfo[]
 
-	const prs = await fetchMergedPRs(token, prodDate)
-	console.log(chalk.gray(`Found ${prs.length} merged PR(s) since last prod deploy`))
+	if (args.pr) {
+		console.log(chalk.gray(`Targeting single PR #${args.pr}`))
+		prs = [{ number: args.pr, mergedAt: '' }]
+	} else {
+		const prodDate = execSync('git log -1 --format=%aI origin/prod', { encoding: 'utf-8' }).trim()
+		console.log(chalk.gray(`Last prod commit: ${prodDate}`))
 
-	if (prs.length === 0) {
-		console.log(chalk.yellow('No merged PRs found since last prod deploy'))
-		return
+		prs = await fetchMergedPRs(token, prodDate)
+		console.log(chalk.gray(`Found ${prs.length} merged PR(s) since last prod deploy`))
+
+		if (prs.length === 0) {
+			console.log(chalk.yellow('No merged PRs found since last prod deploy'))
+			return
+		}
 	}
 
 	const allEntries = new Map<Product, { sections: Map<string, string[]>; prNumber: number }[]>()
@@ -386,14 +371,6 @@ async function main() {
 		const productEntries = allEntries.get(product)!
 		const mergedSections = mergeSections(productEntries)
 		const body = buildBody(mergedSections)
-
-		if (body.includes('`')) {
-			console.error(
-				chalk.yellow(
-					`Warning: Changelog body for ${product} contains backticks — this may break the template literal in changelog.ts`,
-				),
-			)
-		}
 
 		const version = product === 'app' ? args.version : undefined
 		const entryString = generateEntry(product, body, version)

@@ -488,9 +488,6 @@
   "create.project.create-project": {
     "message": "Proje oluştur"
   },
-  "create.project.create-server-project": {
-    "message": "Sunucu oluştur"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Eksik alanlar:{fields}"
   },
@@ -568,6 +565,12 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Başlamak için ilk koleksiyonunu oluştur!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Henüz koleksiyonun yok"
   },
   "dashboard.collections.label.search-input": {
     "message": "Koleksiyonlarında ara"
@@ -1270,6 +1273,21 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Modrinth'de varsa sunucunuzda çalışır."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Modpaketi sürümü değiştirilemedi"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Sürümler yüklenemedi"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Sunucu tamiri başarısız oldu"
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Tamir tamamlandı"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Sunucuyu sıfırla"
   },
   "hosting.plan.out-of-stock": {
     "message": "Stokta yok"
@@ -2271,7 +2289,7 @@
     "message": "Lütfen ortam meta verisini inceleyin"
   },
   "project.error.loading": {
-    "message": "Proje verisi yüklenemedi{message}"
+    "message": "Proje verisi yüklenirken hata{message}"
   },
   "project.error.page-not-found": {
     "message": "Sayfa bulunamadı"
@@ -2771,20 +2789,95 @@
   "servers.plan.large.description": {
     "message": "15–25 oyuncu, mod paketleri veya ağır modlu sunucu için ideal."
   },
-  "servers.plan.large.name": {
-    "message": "Büyük"
-  },
   "servers.plan.medium.description": {
     "message": "6–15 oyuncu ve birden fazla mod için iyi."
-  },
-  "servers.plan.medium.name": {
-    "message": "Orta"
   },
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
-  "servers.plan.small.name": {
-    "message": "Küçük"
+  "settings.account.password.error.mismatch": {
+    "message": "Parolalar uyuşmuyor!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Devam etmek için lütfen şifrenizi girin."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Parolayı onayla"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Parolayı onayla"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Yeni parolayı onayla"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Yeni parolayı onayla"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Yeni parola"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Yeni parola"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Eski parola"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Eski parola"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Parola ekle"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Parolayı değiştir"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Parolayı kaldır"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Ekle"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Sağlayıcı"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Eposta ekle"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Eposta değiştir"
+  },
+  "settings.account.security.email.title": {
+    "message": "Eposta"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Parola ekle"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Parolayı değiştir"
+  },
+  "settings.account.security.password.title": {
+    "message": "Parola"
+  },
+  "settings.account.security.title": {
+    "message": "Hesap güvenliği"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "İki aşamalı doğrulamayı kaldır"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "İki aşamalı doğrulama kur"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "İki aşamalı doğrulama"
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Girilen kod yanlış!"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Kodu girin..."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Kodu onayla"
   },
   "settings.applications.about": {
     "message": "Hakkında"
@@ -2870,9 +2963,6 @@
   "settings.applications.modal.header": {
     "message": "Proje bilgileri"
   },
-  "settings.applications.notification.error.title": {
-    "message": "Bir hata oluştu"
-  },
   "settings.applications.notification.icon-updated.description": {
     "message": "Uygulamanızın simgesi güncellendi."
   },
@@ -2881,6 +2971,12 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "Gizli anahtar sadece bir kez gösterilir. Pencereyi kapadığınızda kaybolacaktır. Güvenliğiniz için paylaşmayın!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Bu uygulama hakkında"
+  },
+  "settings.authorizations.by": {
+    "message": "tarafından"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
@@ -2921,17 +3017,35 @@
   "settings.billing.payment_method.title": {
     "message": "Ödeme yöntemleri"
   },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "Sunucu Kimliği:{id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Ödemeniz işleniyor. Sunucunuz ödeme tamamlandığında aktifleşecektir."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB RAM"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Sunucu aboneliklerini yönet."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Sunucu Abonelikleri"
   },
+  "settings.billing.subscribe": {
+    "message": "Abone ol"
+  },
   "settings.billing.subscription.description": {
     "message": "Modrinth aboneliklerinizi yönetin."
   },
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
+  },
+  "settings.billing.upgrade": {
+    "message": "Güncelle"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Geliştiri modunu devre dışı bırak"
@@ -2953,6 +3067,9 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Modlar sayfası"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galeri"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Mod paketleri sayfası"
@@ -3014,6 +3131,9 @@
   "settings.display.theme.title": {
     "message": "Renk teması"
   },
+  "settings.head-title": {
+    "message": "Görüntü Ayarları"
+  },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
   },
@@ -3071,6 +3191,9 @@
   "settings.profile.description": {
     "message": "Profil bilgin Modrinth'te ve <docs-link>Modrinth API</docs-link> herkese açık görüntülenebilir."
   },
+  "settings.profile.head-title": {
+    "message": "Profil Ayarları"
+  },
   "settings.profile.profile-info": {
     "message": "Profil bilgisi"
   },
@@ -3101,11 +3224,23 @@
   "settings.sessions.unknown-platform": {
     "message": "Bilinmeyen platform"
   },
+  "settings.sidebar.label.account": {
+    "message": "Hesap"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Geliştirici"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth'ten haberler"
   },
   "ui.latest-news-row.view-all": {
     "message": "Bütün haberleri gör"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Abone ol"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Abone Olundu!"
   },
   "version.environment.none.description": {
     "message": "Bu sürüm için ortam belirtilmemiş."

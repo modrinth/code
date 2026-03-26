@@ -12,7 +12,7 @@
     "message": "Esporta"
   },
   "app.export-modal.header": {
-    "message": "Esporta un pacchetto di mod"
+    "message": "Esporta pacchetto"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Nome del pacchetto"
@@ -40,6 +40,21 @@
   },
   "app.instance.confirm-delete.header": {
     "message": "Elimina istanza"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Questo pacchetto è già stato installato nell'istanza \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Pacchetto duplicato"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Crea comunque"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Vai all'istanza"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Pacchetto già installato"
   },
   "app.instance.mods.content-type-project": {
     "message": "progetto"
@@ -70,9 +85,6 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Caricato con successo"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "Cambia versione"
   },
   "app.instance.mods.unknown-version": {
     "message": "Sconosciuta"
@@ -234,7 +246,7 @@
     "message": "Online"
   },
   "friends.heading.pending": {
-    "message": "In sospeso"
+    "message": "In attesa"
   },
   "friends.no-friends-match": {
     "message": "Nessuna amicizia corrisponde a ''{query}''"
@@ -369,7 +381,7 @@
     "message": "Inserisci comando post-uscita..."
   },
   "instance.settings.tabs.hooks.pre-launch": {
-    "message": "Pre-lancio"
+    "message": "Pre-avvio"
   },
   "instance.settings.tabs.hooks.pre-launch.description": {
     "message": "Eseguito prima dell'avvio dell'istanza."

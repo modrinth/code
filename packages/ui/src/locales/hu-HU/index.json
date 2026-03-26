@@ -188,6 +188,12 @@
   "collections.label.private": {
     "defaultMessage": "Privát"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Biztosan frissíteni szeretnél {count} projektet a legújabb kompatibilis verziójára? Javasoljuk, hogy a tartalmakat egyenként frissítsd."
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "{count} projekt frissítése"
+  },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Modpack leválasztása folyamatban"
   },
@@ -208,6 +214,63 @@
   },
   "content.diff-modal.removed-count": {
     "defaultMessage": "{count} eltávolítva"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "További tartalom"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Tartalom böngészése"
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Böngésszen vagy töltsön fel projekteket a kezdéshez"
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Kérjük, várjon"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "{count} {contentType} keresése..."
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Fájlnevek"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Megosztás"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Markdown-linkek"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Projektlinkek"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Projektnevek"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Ábécé sorrendben"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Legújabbak elöl"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Legrégebbiek elöl"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Rendezés {mode} szerint"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Összes frissítése"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Fájlok feltöltése"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Fájlok feltöltése... ({completed}/{total})"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "{contentType} frissítése..."
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "{count} {contentType} kiválasztva"
   },
   "form.label.address-line": {
     "defaultMessage": "Cím"
@@ -344,8 +407,8 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ismeretlen játékmód"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Vissza"
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} kompatiblis profil"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Link másolása"
@@ -369,7 +432,7 @@
     "defaultMessage": "Nincsen olyan projekt ami keresnél."
   },
   "instances.modpack-content-modal.search-placeholder": {
-    "defaultMessage": "Keresés {count, number} {count, plural,one {projekt} other {projektek}} között"
+    "defaultMessage": "Keresés {count} projekt között"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Jelenlegi"
@@ -502,9 +565,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Egyjátékos"
-  },
-  "label.sort-by": {
-    "defaultMessage": "Rendezés"
   },
   "label.success": {
     "defaultMessage": "Sikeres"
@@ -761,6 +821,12 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Közzététel: {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Frissítve: {date}"
+  },
   "project-card.environment.client": {
     "defaultMessage": "Kliens"
   },
@@ -783,7 +849,7 @@
     "defaultMessage": "Adatcsomagok"
   },
   "project-type.datapack.lowercase": {
-    "defaultMessage": "{count} adatcsomag"
+    "defaultMessage": "adatcsomag"
   },
   "project-type.mod.capital": {
     "defaultMessage": "{count, plural,one {Mod} other {Modok}}"
@@ -792,7 +858,7 @@
     "defaultMessage": "Modok"
   },
   "project-type.mod.lowercase": {
-    "defaultMessage": "{count, plural,one {mod} other {modok}}"
+    "defaultMessage": "mod"
   },
   "project-type.modpack.capital": {
     "defaultMessage": "{count, plural, one {Modcsomag} other {Modcsomagok}}"
@@ -801,7 +867,7 @@
     "defaultMessage": "Modcsomagok"
   },
   "project-type.modpack.lowercase": {
-    "defaultMessage": "{count, plural,one {modcsomag} other {modcsomagok}}"
+    "defaultMessage": "modcsomag"
   },
   "project-type.plugin.capital": {
     "defaultMessage": "{count, plural,one {Bővítmény} other {Bővítmények}}"
@@ -810,7 +876,7 @@
     "defaultMessage": "Bővítmények"
   },
   "project-type.plugin.lowercase": {
-    "defaultMessage": "{count, plural,one {bővítmény} other {bővítmények}}"
+    "defaultMessage": "bővítmény"
   },
   "project-type.project.capital": {
     "defaultMessage": "{count, plural, one {Projekt} other {Projektek}}"
@@ -819,7 +885,7 @@
     "defaultMessage": "Projektek"
   },
   "project-type.project.lowercase": {
-    "defaultMessage": "{count, plural, one {projekt} other {projektek}}"
+    "defaultMessage": "projekt"
   },
   "project-type.resourcepack.capital": {
     "defaultMessage": "{count, plural,one {Forráscsomag} other {Forráscsomagok}}"
@@ -828,7 +894,7 @@
     "defaultMessage": "Forráscsomagok"
   },
   "project-type.resourcepack.lowercase": {
-    "defaultMessage": "{count, plural, one {forráscsomag} other {forráscsomagok}}"
+    "defaultMessage": "forráscsomag"
   },
   "project-type.server.capital": {
     "defaultMessage": "{count, plural,one {Szerver} other {Szerverek}}"
@@ -837,7 +903,7 @@
     "defaultMessage": "Szerverek"
   },
   "project-type.server.lowercase": {
-    "defaultMessage": "{count, plural,one {szerver} other {szerverek}}"
+    "defaultMessage": "szerver"
   },
   "project-type.shader.capital": {
     "defaultMessage": "{count, plural,one {Shader} other {Shaderek}}"
@@ -846,7 +912,7 @@
     "defaultMessage": "Shaderek"
   },
   "project-type.shader.lowercase": {
-    "defaultMessage": "{count, plural,one {shader} other {shaderek}}"
+    "defaultMessage": "shader"
   },
   "project.about.compatibility.environments": {
     "defaultMessage": "Támogatott környezettek"
@@ -875,6 +941,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Kompatibilitás"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Szervezet"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Projekttulajdonos"
   },
@@ -900,13 +969,13 @@
     "defaultMessage": "Csatlakozz a Discord szerverhez"
   },
   "project.about.links.donate.bmac": {
-    "defaultMessage": "Buy Me a Coffee"
+    "defaultMessage": "Vegyél nekem egy kávét"
   },
   "project.about.links.donate.generic": {
-    "defaultMessage": "Donate"
+    "defaultMessage": "Adományozz"
   },
   "project.about.links.donate.github": {
-    "defaultMessage": "Sponzoráció GitHubon"
+    "defaultMessage": "Támogass GitHubon"
   },
   "project.about.links.donate.kofi": {
     "defaultMessage": "Támogass Ko-fin"
@@ -920,14 +989,23 @@
   "project.about.links.issues": {
     "defaultMessage": "Hibák jelentése"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Weboldal megtekintése"
+  },
   "project.about.links.source": {
     "defaultMessage": "Forráskód megtekintése"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Bolt oldal megtekintése"
   },
   "project.about.links.title": {
     "defaultMessage": "Linkek"
   },
   "project.about.links.wiki": {
     "defaultMessage": "Wiki megtekintése"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Címkék"
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Kliens és szerver, mindkettőn kötelező"
@@ -1367,6 +1445,9 @@
   "settings.language.title": {
     "defaultMessage": "Nyelv"
   },
+  "settings.language.warning": {
+    "defaultMessage": "Az {platform} nyelvének megváltoztatása esetén előfordulhat, hogy egyes tartalmak angolul jelennek meg, ha azokhoz nincs elérhető fordítás. Az {platform} még nem teljesen lefordított, ezért bizonyos nyelvek esetében egyes tartalmak angolul maradhatnak."
+  },
   "settings.pats.title": {
     "defaultMessage": "Személyes hozzáférési tokenek"
   },
@@ -1454,14 +1535,26 @@
   "tag.category.gui": {
     "defaultMessage": "GUI"
   },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Hardcore Mód"
+  },
   "tag.category.high": {
     "defaultMessage": "Magas"
   },
   "tag.category.items": {
     "defaultMessage": "Tárgyak"
   },
+  "tag.category.keep-inventory": {
+    "defaultMessage": "Inventory megtartása"
+  },
+  "tag.category.kitchen-sink": {
+    "defaultMessage": "Konyhai csap"
+  },
   "tag.category.library": {
     "defaultMessage": "Könyvtár"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "LifeSteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Könnyű"
@@ -1499,14 +1592,59 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Többjátékos"
   },
+  "tag.category.network": {
+    "defaultMessage": "Hálózat"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Offline Mód"
+  },
+  "tag.category.oneblock": {
+    "defaultMessage": "Egy Blokk"
+  },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimalizálás"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkúr"
+  },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Saját Világok"
+  },
+  "tag.category.potato": {
+    "defaultMessage": "Krumpli"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Börtön"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
   },
   "tag.category.quests": {
     "defaultMessage": "Kalandok"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Versenyzés"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Valósághű"
+  },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Felvevős SMP"
+  },
+  "tag.category.reflections": {
+    "defaultMessage": "Fényvisszaverődések"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Szerepjáték"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Képernyőkép"
@@ -1520,14 +1658,29 @@
   "tag.category.simplistic": {
     "defaultMessage": "Egyszerűsítő"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "SkyBlock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Szociális"
   },
   "tag.category.storage": {
     "defaultMessage": "Tárhely"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Túlélő Mód"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Csapatok"
+  },
   "tag.category.technology": {
     "defaultMessage": "Technológia"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Városok"
   },
   "tag.category.transportation": {
     "defaultMessage": "Közlekedés"
@@ -1540,6 +1693,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Vanilla-szerű"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Fehérlistázott"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Világ-Visszaállítások"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Világgenerálás"
@@ -1576,6 +1735,9 @@
   },
   "tag.loader.iris": {
     "defaultMessage": "Iris"
+  },
+  "tag.loader.legacy-fabric": {
+    "defaultMessage": "Legacy Fabric"
   },
   "tag.loader.liteloader": {
     "defaultMessage": "LiteLoader"

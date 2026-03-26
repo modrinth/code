@@ -11,6 +11,28 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-03-26T07:22:22+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error on settings page.
+- Fixed the "500 Server Error" error on the "Authorized apps" settings page.`,
+	},
+	{
+		date: `2026-03-26T07:22:22+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed wrong mod being disabled on hosted servers - Disabling a non-Modrinth mod could incorrectly disable a different mod instead
+- Fixed content list not refreshing after installing mods - Navigating back to the content tab after installing something from Browse would show stale data for up to 10 seconds
+- Fixed copying mod filenames inserting a newline - Copying a filename or version number from the content tab no longer includes a line break in the middle
+- Fixed NeoForge installs sending an empty loader version - Changing to NeoForge on a hosted server could send a blank loader version, resulting in a broken installation`,
+	},
+	{
+		date: `2026-03-24T21:14:30-08:00`,
+		product: 'hosting',
+		body: `## Added
+- Added support for Java 25.`,
+	},
+	{
 		date: `2026-03-17T19:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements

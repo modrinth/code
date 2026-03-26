@@ -1,4 +1,16 @@
 {
+  "affiliate.create.title.placeholder": {
+    "defaultMessage": "esim. YouTube"
+  },
+  "affiliate.create.user.placeholder": {
+    "defaultMessage": "Anna käyttäjänimi..."
+  },
+  "affiliate.createdBy": {
+    "defaultMessage": "Luonut {user}"
+  },
+  "affiliate.viewAnalytics": {
+    "defaultMessage": "Näytä analytiikat"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -19,6 +31,9 @@
   },
   "button.cancel": {
     "defaultMessage": "Peruuta"
+  },
+  "button.change-version": {
+    "defaultMessage": "Vaihda versiota"
   },
   "button.clear": {
     "defaultMessage": "Tyhjennä"
@@ -53,6 +68,9 @@
   "button.follow": {
     "defaultMessage": "Seuraa"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Piilota snapshotit"
+  },
   "button.max": {
     "defaultMessage": "Maksimi"
   },
@@ -82,6 +100,9 @@
   },
   "button.reset": {
     "defaultMessage": "Nollaa"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Resettaa serveri"
   },
   "button.retry": {
     "defaultMessage": "Yritä uudelleen"
@@ -130,6 +151,12 @@
   },
   "collections.label.private": {
     "defaultMessage": "Yksityinen"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} lisätty"
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} päivitetty"
   },
   "form.label.first-name": {
     "defaultMessage": "Etunimi"
@@ -301,9 +328,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Yksinpeli"
-  },
-  "label.sort-by": {
-    "defaultMessage": "Järjestä"
   },
   "label.success": {
     "defaultMessage": "Onnistui"

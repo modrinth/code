@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Failed to repair server"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Failed to reset server to onboarding"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Failed to save installation settings"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Reset to onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Reset to onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "The server has been returned to the onboarding flow."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Server reset to onboarding"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Support options"
   },
   "hosting.plan.out-of-stock": {
     "message": "Out of stock"

@@ -6,7 +6,7 @@
     "message": "无法连接到身份验证服务器"
   },
   "app.export-modal.description-placeholder": {
-    "message": "输入整合包描述内容..."
+    "message": "输入整合包描述……"
   },
   "app.export-modal.export-button": {
     "message": "导出"
@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "删除实例"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "这个整合包已经安装在\"{instanceName}\"实例中了。"
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "重复的整合包"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "在任何地方创建"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "前往实例"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "整合包已安装"
+  },
   "app.instance.mods.content-type-project": {
     "message": "项目"
   },
@@ -71,14 +86,11 @@
   "app.instance.mods.successfully-uploaded": {
     "message": "上传成功"
   },
-  "app.instance.mods.switch-version": {
-    "message": "切换版本"
-  },
   "app.instance.mods.unknown-version": {
     "message": "未知"
   },
   "app.instance.mods.updating": {
-    "message": "正在更新……"
+    "message": "更新中……"
   },
   "app.modal.install-to-play.content-required": {
     "message": "内容需求"
