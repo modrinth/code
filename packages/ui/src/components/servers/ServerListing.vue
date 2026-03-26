@@ -1,32 +1,46 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
+		<NuxtLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
+				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
-					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
-					'opacity-75': status === 'suspended',
-					'active:scale-95': status !== 'suspended' && !pendingChange,
+					'!rounded-b-none border-b-0': hasNotice,
+					'bg-surface-2': isDisabled,
+					'active:scale-95': !isDisabled && !hasNotice,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
 			>
-				<ServerIcon v-if="status !== 'suspended'" :image="image" />
 				<div
-					v-else
-					class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+					v-if="hasIconOverlay"
+					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
-					<LockIcon class="size-12 text-secondary" />
+					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
+					<SpinnerIcon
+						v-if="isProvisioning || isUpgrading"
+						class="size-8 animate-spin absolute text-contrast"
+						:class="{ 'opacity-50': isDisabled }"
+					/>
+					<LockIcon v-else class="size-8 absolute" :class="{ 'opacity-50': isDisabled }" />
 				</div>
+				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
 				<div class="ml-4 flex flex-col gap-2.5">
 					<div class="flex flex-row items-center gap-2">
-						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
-						<ChevronRightIcon />
+						<h2 class="m-0 text-xl font-bold text-contrast" :class="{ 'opacity-50': isDisabled }">
+							{{ name }}
+						</h2>
+						<div
+							v-if="isConfiguring"
+							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
+						>
+							<SparklesIcon class="size-5 shrink-0 font-semibold" /> New
+						</div>
 					</div>
 
 					<div
 						v-if="projectData?.title"
-						class="m-0 flex flex-row items-center gap-2 text-sm font-medium text-secondary"
+						class="m-0 flex flex-row items-center gap-2 text-sm font-medium"
+						:class="{ 'opacity-50': isDisabled }"
 					>
 						<Avatar
 							:src="iconUrl"
@@ -37,72 +51,122 @@
 						Using {{ projectData?.title || 'Unknown' }}
 					</div>
 
-					<div
-						v-if="isConfiguring"
-						class="flex min-w-0 items-center gap-2 truncate text-sm font-semibold text-brand"
-					>
-						<SparklesIcon class="size-5 shrink-0" /> New server
-					</div>
 					<ServerInfoLabels
-						v-else
-						:server-data="{ game, mc_version, loader, loader_version, net }"
+						:server-data="
+							isConfiguring
+								? { net }
+								: {
+										game,
+										mc_version,
+										loader,
+										loader_version,
+										net,
+										online,
+										players: playerCount
+											? { current: playerCount.current, max: playerCount.max }
+											: undefined,
+									}
+						"
 						:show-game-label="showGameLabel"
 						:show-loader-label="showLoaderLabel"
+						:show-player-count="showPlayerCount"
+						:class="{ 'opacity-50': isDisabled }"
 						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-secondary *:hidden sm:flex-row sm:*:flex"
+						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</div>
 		</NuxtLink>
-		<div
-			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
-		>
-			<LoaderCircleIcon class="size-5 animate-spin" />
-			Your server's hardware is currently being upgraded and will be back online shortly.
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
-		>
-			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been cancelled. Please update your
-				billing information or contact Modrinth Support for more information.
+
+		<div v-if="noticeType" class="server-listing-notice">
+			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
+				Please wait while we set up your server. This should only take a minute.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
-		</div>
-		<div
-			v-else-if="status === 'suspended' && suspension_reason"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
-		>
-			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
-				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
-				for more information.
+			<div v-else-if="noticeType === 'upgrading'" class="flex gap-2">
+				Your server's hardware is currently being upgraded and will be back online shortly.
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
-		</div>
-		<div
-			v-else-if="status === 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
-		>
-			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
-				billing information or contact Modrinth Support for more information.
+			<div v-else-if="noticeType === 'cancelled' || noticeType === 'paymentfailed'">
+				Your subscription was cancelled<template v-if="cancellationDate">
+					on
+					<span class="font-medium text-contrast">
+						{{ formatDate(cancellationDate) }}
+					</span></template
+				><template v-if="noticeType === 'paymentfailed'"> due to payment failure</template
+				>.<template v-if="!isFilesExpired">
+					Your files will be kept for
+					<span class="font-medium text-red"
+						>{{ filesRemainingDays }} more {{ filesRemainingDays === 1 ? 'day' : 'days' }}</span
+					>
+					and can be downloaded below before they're deleted.</template
+				>
 			</div>
-			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
+			<div v-else-if="noticeType === 'setToCancel'">
+				Your subscription is set to cancel<template v-if="cancellationDate">
+					on
+					<span class="font-medium text-contrast">
+						{{ formatDate(cancellationDate) }}
+					</span></template
+				>.<template v-if="!isFilesExpired">
+					Your files will be preserved for 30 days after cancellation.
+				</template>
+			</div>
+			<div v-else-if="noticeType === 'moderated'">
+				Your server has been suspended by moderation action.
+			</div>
+			<div v-else>
+				Your server has been suspended. Please contact Modrinth Support for more information.
+			</div>
+
+			<div v-if="noticeButtons" class="flex gap-2">
+				<ButtonStyled
+					v-if="noticeButtons.downloadBackup && onDownloadBackup"
+					type="outlined"
+					circular
+				>
+					<button
+						v-tooltip="'Download latest backup'"
+						class="!border-surface-5"
+						@click="onDownloadBackup"
+					>
+						<DownloadIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
+					<button
+						v-tooltip="'Copy code to clipboard'"
+						class="!border-surface-5"
+						@click="copyToClipboard(server_id)"
+					>
+						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
+						<template v-else> Copy ID <CopyIcon /> </template>
+					</button>
+				</ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.support">
+					<a href="https://support.modrinth.com/en/" target="_blank"
+						><MessagesSquareIcon /> Support
+					</a>
+				</ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.manageBilling" color="brand">
+					<AutoLink :to="`/settings/billing#server-${server_id}`">
+						<CardIcon /> Manage billing
+					</AutoLink>
+				</ButtonStyled>
+				<ButtonStyled v-if="noticeButtons.resubscribe && onResubscribe" color="brand">
+					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
+				</ButtonStyled>
+			</div>
 		</div>
-		<div
-			v-if="pendingChange && status !== 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
-		>
+
+		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
 				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
 					pendingChange.planSize
-				}}" plan on {{ formatDate(pendingChange.date) }}.
+				}}" plan on
+				<span class="font-medium text-contrast">{{ formatDate(pendingChange.date) }}</span
+				>.
 			</div>
 			<ServersSpecs
-				class="!font-normal !text-contrast"
+				class="!font-normal !text-primary"
 				:ram="Math.round((pendingChange.ramGb ?? 0) * 1024)"
 				:storage="Math.round((pendingChange.storageGb ?? 0) * 1024)"
 				:cpus="pendingChange.cpuBurst"
@@ -115,19 +179,25 @@
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
 import {
-	ChevronRightIcon,
-	LoaderCircleIcon,
+	DownloadIcon,
 	LockIcon,
+	MessagesSquareIcon,
 	SparklesIcon,
-	TriangleAlertIcon,
+	SpinnerIcon,
 } from '@modrinth/assets'
+import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
+import {
+	CardIcon,
+	CheckIcon,
+	CopyIcon,
+	RotateCounterClockwiseIcon,
+} from '../../../../assets/generated-icons'
 import { useFormatDateTime } from '../../composables'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
-import CopyCode from '../base/CopyCode.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
@@ -159,14 +229,97 @@ type ServerListingProps = {
 	upstream?: Archon.Servers.v0.Upstream | null
 	flows?: Archon.Servers.v0.Flows
 	pendingChange?: PendingChange
+	online?: boolean
+	playerCount?: {
+		current?: number
+		max?: number
+	}
+	cancellationDate?: string | Date | null
+	onResubscribe?: (() => void) | null
+	onDownloadBackup?: (() => void) | null
 }
 
 const props = defineProps<ServerListingProps>()
 
-const { archon, kyros, labrinth } = injectModrinthClient()
+const { kyros, labrinth } = injectModrinthClient()
 
-const showGameLabel = computed(() => !!props.game)
-const showLoaderLabel = computed(() => !!props.loader)
+const isConfiguring = computed(() => props.flows?.intro)
+const isProvisioning = computed(() => props.status === 'installing' && !isConfiguring.value)
+const isUpgrading = computed(
+	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
+)
+const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
+const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
+const filesRemainingDays = computed(() => {
+	if (!props.cancellationDate) return 0
+	const cancellation = new Date(props.cancellationDate)
+	const expiresAt = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000) // expires 30 days after cancellation
+	const remaining = Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+	return Math.max(0, remaining)
+})
+const isFilesExpired = computed(() => filesRemainingDays.value <= 0)
+
+const hasIconOverlay = computed(
+	() => isProvisioning.value || isUpgrading.value || props.status === 'suspended',
+)
+
+type NoticeType =
+	| 'provisioning'
+	| 'upgrading'
+	| 'cancelled'
+	| 'paymentfailed'
+	| 'moderated'
+	| 'suspended'
+	| 'setToCancel'
+
+const noticeType = computed<NoticeType | null>(() => {
+	if (isProvisioning.value) return 'provisioning'
+	if (props.status === 'suspended') {
+		switch (props.suspension_reason) {
+			case 'upgrading':
+				return 'upgrading'
+			case 'cancelled':
+				return 'cancelled'
+			case 'paymentfailed':
+				return 'paymentfailed'
+			case 'moderated':
+				return 'moderated'
+			default:
+				return 'suspended'
+		}
+	}
+	if (isSetToCancel.value) return 'setToCancel'
+	return null
+})
+
+type NoticeButtons = {
+	downloadBackup?: boolean
+	copyId?: boolean
+	support?: boolean
+	manageBilling?: boolean
+	resubscribe?: boolean
+}
+
+const noticeButtons = computed<NoticeButtons | null>(() => {
+	switch (noticeType.value) {
+		case 'cancelled':
+		case 'setToCancel':
+			return { downloadBackup: true, copyId: true, support: true, resubscribe: true }
+		case 'paymentfailed':
+			return { downloadBackup: true, copyId: true, support: true, manageBilling: true }
+		case 'moderated':
+		case 'suspended':
+			return { copyId: true, support: true }
+		default:
+			return null
+	}
+})
+
+const hasNotice = computed(() => !!noticeType.value || !!props.pendingChange)
+
+const showGameLabel = computed(() => !!props.game && !isConfiguring.value)
+const showLoaderLabel = computed(() => !!props.loader && !isConfiguring.value)
+const showPlayerCount = computed(() => !!props.playerCount && !isConfiguring.value)
 
 const { data: projectData } = useQuery({
 	queryKey: ['project', props.upstream?.project_id] as const,
@@ -207,14 +360,8 @@ const { data: image } = useQuery({
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			const auth = await archon.servers_v0.getFilesystemAuth(props.server_id)
-
 			try {
-				const blob = await kyros.files_v0.downloadFile(
-					auth.url,
-					auth.token,
-					'/server-icon-original.png',
-				)
+				const blob = await kyros.files_v0.downloadFile('/server-icon-original.png')
 
 				return await processImageBlob(blob, 512)
 			} catch {
@@ -227,17 +374,12 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					await kyros.files_v0.uploadFile(auth.url, auth.token, '/server-icon.png', scaledFile)
+					kyros.files_v0.uploadFile('/server-icon.png', scaledFile)
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					await kyros.files_v0.uploadFile(
-						auth.url,
-						auth.token,
-						'/server-icon-original.png',
-						originalFile,
-					)
+					kyros.files_v0.uploadFile('/server-icon-original.png', originalFile)
 
 					return scaledDataUrl
 				}
@@ -252,5 +394,19 @@ const { data: image } = useQuery({
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
 
-const isConfiguring = computed(() => props.flows?.intro)
+const copied = ref(false)
+
+async function copyToClipboard(text: string) {
+	await navigator.clipboard.writeText(text)
+	copied.value = true
+	setTimeout(() => {
+		copied.value = false
+	}, 3000)
+}
 </script>
+
+<style scoped>
+.server-listing-notice {
+	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
+}
+</style>

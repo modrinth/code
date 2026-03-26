@@ -284,6 +284,8 @@
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
+								:cancellation-date="getCancellationDate(subscription)"
+								:on-download-backup="getLatestBackupDownload(subscription.serverInfo)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -1053,6 +1055,11 @@ const { data: serversData } = useQuery({
 	queryFn: () => client.archon.servers_v0.list(),
 })
 
+const { data: serverFullList } = useQuery({
+	queryKey: ['servers', 'v1'],
+	queryFn: () => client.archon.servers_v1.list(),
+})
+
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
 const midasSubscription = computed(() =>
 	subscriptions.value?.find(
@@ -1082,13 +1089,27 @@ const pyroSubscriptions = computed(() => {
 	const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === 'pyro') || []
 	const servers = serversData.value?.servers || []
 
-	return pyroSubs.map((subscription) => {
-		const server = servers.find((s) => s.server_id === subscription.metadata.id)
-		return {
-			...subscription,
-			serverInfo: server,
-		}
-	})
+	return pyroSubs
+		.map((subscription) => {
+			const server = servers.find((s) => s.server_id === subscription.metadata.id)
+			return {
+				...subscription,
+				serverInfo: server,
+			}
+		})
+		.filter((subscription) => {
+			// files expire 30 days after cancellation
+			const cancellationDate = getCancellationDate(subscription)
+			if (
+				!cancellationDate ||
+				subscription.serverInfo?.status !== 'suspended' ||
+				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			)
+				return true
+			const cancellation = new Date(cancellationDate)
+			const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+			return new Date() <= thirtyDaysLater
+		})
 })
 
 const midasPurchaseModal = ref()
@@ -1201,11 +1222,18 @@ const getProductFromPriceId = (priceId) => {
 	return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId))
 }
 
-const getPyroCharge = (subscription) => {
+function getPyroCharge(subscription) {
 	if (!subscription || !charges.value) return null
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
+}
+
+function getCancellationDate(subscription) {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return null
+	if (charge.status === 'cancelled') return charge.due
+	return null
 }
 
 const getProductSize = (product) => {
@@ -1268,6 +1296,46 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 			text: formatMessage(messages.pyroResubscribeErrorText),
 			type: 'error',
 		})
+	}
+}
+
+function getLatestBackupDownload(serverInfo) {
+	const serverFull = serverFullList.value?.find((s) => s.id === serverInfo.server_id)
+	if (!serverFull) return null
+
+	const activeWorld = serverFull.worlds.find((w) => w.is_active) ?? serverFull.worlds[0]
+	if (!activeWorld?.backups?.length) return null
+
+	const latestBackup = activeWorld.backups
+		.filter((b) => b.status === 'done')
+		.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+	if (!latestBackup) return null
+
+	return async () => {
+		try {
+			const server = await client.archon.servers_v0.get(serverInfo.server_id)
+			const kyrosUrl = server.node?.instance
+			const jwt = server.node?.token
+			if (!kyrosUrl || !jwt) {
+				addNotification({
+					title: 'Download unavailable',
+					text: 'Server connection info is not available. Please contact support.',
+					type: 'error',
+				})
+				return
+			}
+
+			window.open(
+				`https://${kyrosUrl}/modrinth/v0/backups/${latestBackup.id}/download?auth=${jwt}`,
+				'_blank',
+			)
+		} catch {
+			addNotification({
+				title: 'Download failed',
+				text: 'An error occurred while trying to download the backup.',
+				type: 'error',
+			})
+		}
 	}
 }
 

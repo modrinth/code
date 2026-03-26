@@ -374,7 +374,7 @@ function goToBreadcrumbStep(id: string) {
 				:ping="currentPing"
 				:loading="paymentMethodLoading"
 				:selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
-				:has-payment-method="hasPaymentMethod"
+				:has-payment-method="!!hasPaymentMethod"
 				:tax="tax"
 				:total="total"
 				:no-payment-required="noPaymentRequired"
