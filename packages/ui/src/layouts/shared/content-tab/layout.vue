@@ -285,6 +285,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				!!item.pack_client_retained ||
 				!!item.pack_client_depends,
 			clientWarning: getClientWarningType(item),
+			hideSwitchVersion: !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})

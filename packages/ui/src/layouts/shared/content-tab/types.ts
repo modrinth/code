@@ -36,6 +36,7 @@ export interface ContentCardTableItem {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 }
 
@@ -63,8 +64,12 @@ export interface ContentItem extends Omit<
 
 export type ContentModpackCardProject = Pick<
 	Labrinth.Projects.v2.Project,
-	'id' | 'slug' | 'title' | 'icon_url' | 'description' | 'downloads' | 'followers'
->
+	'id' | 'slug' | 'title' | 'icon_url' | 'description'
+> & {
+	downloads?: number | null
+	followers?: number | null
+	filename?: string | null
+}
 
 export type ContentModpackCardVersion = Pick<
 	Labrinth.Versions.v2.Version,

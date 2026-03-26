@@ -45,6 +45,7 @@ interface Props {
 	hasUpdate?: boolean
 	isClientOnly?: boolean
 	clientWarning?: ClientWarningType | null
+	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
@@ -62,6 +63,7 @@ const props = withDefaults(defineProps<Props>(), {
 	hasUpdate: false,
 	isClientOnly: false,
 	clientWarning: null,
+	hideSwitchVersion: false,
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
@@ -278,7 +280,11 @@ const deleteHovered = ref(false)
 						<DownloadIcon class="size-5" />
 					</button>
 				</ButtonStyled>
-				<ButtonStyled v-else-if="hasSwitchVersionListener && version" circular type="transparent">
+				<ButtonStyled
+					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
+					circular
+					type="transparent"
+				>
 					<button
 						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
 						:disabled="isDisabled"
