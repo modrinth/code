@@ -5,7 +5,7 @@
 				v-if="!isServerProject"
 				:project="data"
 				:tags="{ loaders: allLoaders, gameVersions: allGameVersions }"
-				:v3-metadata="projectV3"
+				:project-v3="projectV3"
 				class="project-sidebar-section"
 			/>
 			<ProjectSidebarServerInfo
