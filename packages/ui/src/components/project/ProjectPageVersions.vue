@@ -110,13 +110,18 @@
 							</div>
 						</div>
 						<div
-							class="pointer-events-none relative z-[1] flex flex-col justify-center"
+							class="pointer-events-none relative z-[1] flex flex-col justify-center overflow-hidden min-w-32"
 							:class="{
 								'group-hover:underline': !!versionLink,
 							}"
+							title="`${version.version_number} - ${version.name}`"
 						>
-							<div class="font-bold text-contrast">{{ version.version_number }}</div>
-							<div class="text-xs font-medium">{{ version.name }}</div>
+							<div class="font-bold text-contrast text-ellipsis overflow-hidden">
+								{{ version.version_number }}
+							</div>
+							<div class="text-xs font-medium text-ellipsis overflow-hidden">
+								{{ version.name }}
+							</div>
 						</div>
 					</div>
 					<div class="flex flex-col justify-center gap-2 sm:contents">
@@ -127,7 +132,7 @@
 										v-for="gameVersion in formatVersionsForDisplay(
 											version.game_versions,
 											gameVersions,
-										)"
+										).slice(0, maxGameVersionTags)"
 										:key="`version-tag-${gameVersion}`"
 										v-tooltip="`Toggle filter for ${gameVersion}`"
 										class="z-[1]"
@@ -137,6 +142,39 @@
 									>
 										{{ gameVersion }}
 									</TagItem>
+									<Menu
+										v-if="
+											formatVersionsForDisplay(version.game_versions, gameVersions).length >
+											maxGameVersionTags
+										"
+										:delay="{ hide: 50, show: 0 }"
+										no-auto-focus
+										class="z-[1] cursor-default"
+									>
+										<TagItem tabindex="0">
+											+{{
+												formatVersionsForDisplay(version.game_versions, gameVersions).length -
+												maxGameVersionTags
+											}}
+										</TagItem>
+										<template #popper>
+											<div class="flex gap-1 flex-wrap max-w-[20rem]">
+												<TagItem
+													v-for="gameVersion in formatVersionsForDisplay(
+														version.game_versions,
+														gameVersions,
+													).slice(maxGameVersionTags)"
+													:key="`overflow-version-tag-${gameVersion}`"
+													:action="
+														() =>
+															versionFilters?.toggleFilters('gameVersion', version.game_versions)
+													"
+												>
+													{{ gameVersion }}
+												</TagItem>
+											</div>
+										</template>
+									</Menu>
 								</div>
 							</div>
 							<div class="flex items-center">
@@ -169,7 +207,7 @@
 										class="z-[1] text-center"
 									>
 										<component :is="tag.icon" />
-										{{ formatMessage(tag.label) }}
+										{{ formatMessage(tag.label).replace('and', '&') }}
 									</TagItem>
 								</div>
 							</div>
@@ -240,6 +278,7 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
+import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -320,6 +359,8 @@ const normalizedVersions = computed<DisplayVersion[]>(() =>
 		}
 	}),
 )
+
+const maxGameVersionTags = 6
 
 const currentPage: Ref<number> = ref(1)
 const pageSize: Ref<number> = ref(20)
