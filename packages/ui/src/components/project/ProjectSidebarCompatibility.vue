@@ -15,15 +15,22 @@
 		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.platforms) }}</h3>
 			<div class="flex flex-wrap gap-1">
-				<TagItem
-					v-for="platform in project.loaders"
-					:key="`platform-tag-${platform}`"
-					:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
-					:style="`--_color: var(--color-platform-${platform})`"
-				>
-					<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-					<FormattedTag :tag="platform" enforce-type="loader" />
-				</TagItem>
+				<template v-if="noModpackLoader">
+					<TagItem class="border !border-solid border-surface-5 hover:no-underline">
+						No mod loader
+					</TagItem>
+				</template>
+				<template v-else>
+					<TagItem
+						v-for="platform in project.loaders"
+						:key="`platform-tag-${platform}`"
+						:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
+						:style="`--_color: var(--color-platform-${platform})`"
+					>
+						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+						<FormattedTag :tag="platform" enforce-type="loader" />
+					</TagItem>
+				</template>
 			</div>
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
@@ -93,11 +100,12 @@ import {
 	UserIcon,
 } from '@modrinth/assets'
 import { FormattedTag, TagItem } from '@modrinth/ui'
-import type { EnvironmentV3, GameVersionTag, PlatformTag, ProjectV3Partial } from '@modrinth/utils'
+import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	defineMessage,
 	defineMessages,
@@ -128,17 +136,24 @@ const props = defineProps<{
 		gameVersions: GameVersionTag[]
 		loaders: PlatformTag[]
 	}
-	v3Metadata?: ProjectV3Partial
+	projectV3?: Labrinth.Projects.v3.Project
 }>()
+
+const noModpackLoader = computed(
+	() =>
+		props.projectV3?.project_types.includes('modpack') &&
+		props.projectV3?.mrpack_loaders.length === 1 &&
+		props.projectV3?.mrpack_loaders[0] === 'minecraft',
+)
 
 const showEnvironments = computed(
 	() =>
-		TYPES_WITH_ENVS.some((x) => props.v3Metadata?.project_types.includes(x)) &&
+		TYPES_WITH_ENVS.some((x) => props.projectV3?.project_types.includes(x)) &&
 		primaryEnvironment.value,
 )
 
 const primaryEnvironment = computed<EnvironmentV3 | undefined>(() =>
-	props.v3Metadata?.environment?.find((x) => x !== 'unknown'),
+	props.projectV3?.environment?.find((x) => x !== 'unknown'),
 )
 
 type EnvironmentTag = {
