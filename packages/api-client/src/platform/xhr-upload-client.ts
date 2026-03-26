@@ -46,6 +46,7 @@ export abstract class XHRUploadClient extends AbstractModrinthClient {
 				...options.headers,
 			},
 		}
+		this.attachArchonSentryCaptureHeader(mergedOptions)
 
 		const context = this.buildUploadContext(url, path, mergedOptions)
 
