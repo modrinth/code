@@ -279,7 +279,7 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				isBulkOperating.value ||
 				item.installing === true,
 			installing: item.installing === true,
-			hasUpdate: !ctx.isPackLocked.value && item.has_update,
+			hasUpdate: item.has_update,
 			isClientOnly:
 				isClientOnlyEnvironment(item.environment) ||
 				!!item.pack_client_retained ||
@@ -717,7 +717,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</div>
 
 							<ButtonStyled
-								v-if="hasBulkUpdateSupport && !ctx.isPackLocked.value && hasOutdatedProjects"
+								v-if="hasBulkUpdateSupport && hasOutdatedProjects"
 								color="green"
 								type="transparent"
 								color-fill="text"
@@ -820,11 +820,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		>
 			<template #actions>
 				<ButtonStyled
-					v-if="
-						hasBulkUpdateSupport &&
-						!ctx.isPackLocked.value &&
-						selectedItems.some((m) => m.has_update)
-					"
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
 					type="transparent"
 					color="green"
 					color-fill="text"
