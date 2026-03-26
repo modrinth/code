@@ -473,7 +473,8 @@
 						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
 					</template>
 					<template #flags>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.featureFlags) }}
+						<ToggleRightIcon aria-hidden="true" />
+						{{ formatMessage(commonSettingsMessages.featureFlags) }}
 					</template>
 					<template #projects>
 						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
@@ -585,9 +586,9 @@
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
 						</NuxtLink>
-						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(messages.featureFlags) }}
+						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/settings/flags">
+							<ToggleRightIcon aria-hidden="true" />
+							{{ formatMessage(commonSettingsMessages.featureFlags) }}
 						</NuxtLink>
 					</template>
 					<NuxtLink class="iconified-button" to="/settings">
@@ -724,6 +725,7 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
@@ -734,6 +736,7 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
+	commonSettingsMessages,
 	defineMessages,
 	injectModrinthClient,
 	OverflowMenu,
@@ -918,10 +921,6 @@ const messages = defineMessages({
 		id: 'layout.nav.upgrade-to-modrinth-plus',
 		defaultMessage: 'Upgrade to Modrinth+',
 	},
-	featureFlags: {
-		id: 'layout.nav.feature-flags',
-		defaultMessage: 'Feature flags',
-	},
 	projects: {
 		id: 'layout.nav.projects',
 		defaultMessage: 'Projects',
@@ -1045,7 +1044,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'flags',
-			link: '/flags',
+			link: '/settings/flags',
 			shown: flags.value.developerMode,
 		},
 		{

@@ -856,6 +856,10 @@ export const commonSettingsMessages = defineMessages({
 		id: 'settings.billing.title',
 		defaultMessage: 'Billing and subscriptions',
 	},
+	featureFlags: {
+		id: 'settings.feature-flags.title',
+		defaultMessage: 'Feature flags',
+	},
 	language: {
 		id: 'settings.language.title',
 		defaultMessage: 'Language',

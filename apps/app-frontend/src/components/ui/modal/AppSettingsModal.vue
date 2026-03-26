@@ -6,12 +6,13 @@ import {
 	LanguagesIcon,
 	ModrinthIcon,
 	PaintbrushIcon,
-	ReportIcon,
 	SettingsIcon,
 	ShieldIcon,
+	ToggleRightIcon,
 } from '@modrinth/assets'
 import {
 	commonMessages,
+	commonSettingsMessages,
 	defineMessage,
 	defineMessages,
 	ProgressBar,
@@ -95,11 +96,8 @@ const tabs = [
 		content: ResourceManagementSettings,
 	},
 	{
-		name: defineMessage({
-			id: 'app.settings.tabs.feature-flags',
-			defaultMessage: 'Feature flags',
-		}),
-		icon: ReportIcon,
+		name: commonSettingsMessages.featureFlags,
+		icon: ToggleRightIcon,
 		content: FeatureFlagSettings,
 		developerOnly: true,
 	},
