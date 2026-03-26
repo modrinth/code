@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO attached_world_data (profile_path, world_type, world_id, content_kind)\nVALUES ($1, $2, $3, $4)\nON CONFLICT (profile_path, world_type, world_id) DO UPDATE\n    SET content_kind = $4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "dcf7340800c1d6ca82de2092b477a41a9622ce891732300f029f34545954128e"
+}

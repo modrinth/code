@@ -192,9 +192,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 				role="row"
 				class="flex min-w-0 items-center gap-4"
 				:class="
-					hasAnyActions
-						? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
-						: 'flex-1'
+					hasAnyActions ? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none' : 'flex-1'
 				"
 			>
 				<Checkbox
@@ -299,7 +297,9 @@ function handleSort(column: ContentCardTableSortColumn) {
 					@update:enabled="(val) => emit('update:enabled', item.id, val)"
 					@delete="(e: MouseEvent) => emit('delete', item.id, e)"
 					@update="emit('update', item.id)"
-					@switch-version="emit('switchVersion', item.id)"
+					v-on="
+						hasSwitchVersionListener ? { switchVersion: () => emit('switchVersion', item.id) } : {}
+					"
 				>
 					<template #additionalButtonsLeft>
 						<slot name="itemButtonsLeft" :item="item" :index="visibleRange.start + idx" />

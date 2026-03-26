@@ -19,8 +19,8 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
-import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { truncatedTooltip } from '#ui/utils/truncate'
@@ -81,6 +81,8 @@ const hasSwitchVersionListener = computed(
 const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
+const isDisabled = computed(() => props.disabled || props.installing)
+
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
 </script>
@@ -94,7 +96,7 @@ const deleteHovered = ref(false)
 		<div
 			class="flex min-w-0 items-center gap-4"
 			:class="
-				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
@@ -252,7 +254,7 @@ const deleteHovered = ref(false)
 				>
 					<button
 						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
-						:disabled="disabled"
+						:disabled="isDisabled"
 						@click="emit('update')"
 					>
 						<DownloadIcon class="size-5" />
@@ -261,7 +263,7 @@ const deleteHovered = ref(false)
 				<ButtonStyled v-else-if="hasSwitchVersionListener && version" circular type="transparent">
 					<button
 						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
-						:disabled="disabled"
+						:disabled="isDisabled"
 						@click="emit('switchVersion')"
 					>
 						<ArrowLeftRightIcon class="size-5" />
@@ -272,7 +274,7 @@ const deleteHovered = ref(false)
 			<Toggle
 				v-if="enabled !== undefined"
 				:model-value="enabled"
-				:disabled="disabled"
+				:disabled="isDisabled"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
@@ -287,7 +289,7 @@ const deleteHovered = ref(false)
 								: commonMessages.deleteLabel,
 						)
 					"
-					:disabled="disabled"
+					:disabled="isDisabled"
 					@click="emit('delete', $event)"
 					@mouseenter="deleteHovered = true"
 					@mouseleave="deleteHovered = false"
@@ -311,7 +313,7 @@ const deleteHovered = ref(false)
 				<TeleportOverflowMenu
 					v-if="overflowOptions?.length"
 					:options="overflowOptions"
-					:disabled="disabled"
+					:disabled="isDisabled"
 				>
 					<MoreVerticalIcon class="size-5" />
 				</TeleportOverflowMenu>

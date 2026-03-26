@@ -170,10 +170,7 @@
 						},
 						{
 							label: 'Versions',
-							href: {
-								path: `/project/${$route.params.id}/versions`,
-								query: instanceFilters,
-							},
+							href: versionsHref,
 							subpages: ['version'],
 							shown: projectV3?.minecraft_server == null,
 						},
@@ -224,6 +221,7 @@ import {
 import {
 	ButtonStyled,
 	injectNotificationManager,
+	NavTabs,
 	OverflowMenu,
 	ProjectBackgroundGradient,
 	ProjectHeader,
@@ -242,7 +240,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
 import {
 	get_organization,
 	get_project,
@@ -316,6 +313,21 @@ const instanceFilters = computed(() => {
 	}
 
 	return { l: loaders, g: instance.value.game_version }
+})
+
+const versionsHref = computed(() => {
+	const base = `/project/${route.params.id}/versions`
+	const filters = instanceFilters.value
+	const params = new URLSearchParams()
+	for (const [key, val] of Object.entries(filters)) {
+		if (Array.isArray(val)) {
+			for (const v of val) params.append(key, v)
+		} else if (val) {
+			params.append(key, String(val))
+		}
+	}
+	const qs = params.toString()
+	return qs ? `${base}?${qs}` : base
 })
 
 const [allLoaders, allGameVersions] = await Promise.all([

@@ -142,6 +142,10 @@ pub enum WorldDetails {
         index: usize,
         address: String,
         pack_status: ServerPackStatus,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        project_id: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        content_kind: Option<String>,
     },
 }
 
@@ -426,6 +430,8 @@ async fn get_server_worlds_in_profile(
                 index,
                 address: server.ip,
                 pack_status: server.accept_textures.into(),
+                project_id: None,
+                content_kind: None,
             },
         };
         worlds.push(world);
@@ -460,6 +466,15 @@ async fn get_server_worlds_in_profile(
 
 fn attach_world_data_to_world(world: &mut World, data: &AttachedWorldData) {
     world.display_status = data.display_status;
+    if let WorldDetails::Server {
+        project_id,
+        content_kind,
+        ..
+    } = &mut world.details
+    {
+        *project_id = data.project_id.clone();
+        *content_kind = data.content_kind.clone();
+    }
 }
 
 pub async fn set_world_display_status(
@@ -712,9 +727,12 @@ async fn try_get_world_session_lock(
 
 pub async fn add_server_to_profile(
     profile_path: &Path,
+    profile_path_id: &str,
     name: String,
     address: String,
     pack_status: ServerPackStatus,
+    project_id: Option<String>,
+    content_kind: Option<String>,
 ) -> Result<usize> {
     let mut servers = servers_data::read(profile_path).await?;
     let insert_index = servers
@@ -725,13 +743,38 @@ pub async fn add_server_to_profile(
         insert_index,
         servers_data::ServerData {
             name,
-            ip: address,
+            ip: address.clone(),
             accept_textures: pack_status.into(),
             hidden: false,
             icon: None,
         },
     );
     servers_data::write(profile_path, &servers).await?;
+
+    if project_id.is_some() || content_kind.is_some() {
+        let state = State::get().await?;
+        if let Some(project_id) = &project_id {
+            attached_world_data::set_project_id(
+                profile_path_id,
+                WorldType::Server,
+                &address,
+                project_id,
+                &state.pool,
+            )
+            .await?;
+        }
+        if let Some(content_kind) = &content_kind {
+            attached_world_data::set_content_kind(
+                profile_path_id,
+                WorldType::Server,
+                &address,
+                content_kind,
+                &state.pool,
+            )
+            .await?;
+        }
+    }
+
     Ok(insert_index)
 }
 

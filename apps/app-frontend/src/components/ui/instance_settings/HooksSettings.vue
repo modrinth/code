@@ -22,9 +22,11 @@ const { instance } = injectInstanceSettings()
 const globalSettings = (await get().catch(handleError)) as AppSettings
 
 const overrideHooks = ref(
-	!!instance.hooks.pre_launch || !!instance.hooks.wrapper || !!instance.hooks.post_exit,
+	!!instance.value.hooks.pre_launch ||
+		!!instance.value.hooks.wrapper ||
+		!!instance.value.hooks.post_exit,
 )
-const hooks = ref(instance.hooks ?? globalSettings.hooks)
+const hooks = ref(instance.value.hooks ?? globalSettings.hooks)
 
 const editProfileObject = computed(() => {
 	const editProfile: {
@@ -40,7 +42,7 @@ const editProfileObject = computed(() => {
 watch(
 	[overrideHooks, hooks],
 	async () => {
-		await edit(instance.path, editProfileObject.value)
+		await edit(instance.value.path, editProfileObject.value)
 	},
 	{ deep: true },
 )

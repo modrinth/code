@@ -49,34 +49,40 @@ const messages = defineMessages({
 		id: 'instance.server-modal.placeholder-name',
 		defaultMessage: 'Minecraft Server',
 	},
+	placeholderAddress: {
+		id: 'app.world.server-modal.placeholder-address',
+		defaultMessage: 'example.modrinth.gg',
+	},
+	selectAnOption: {
+		id: 'app.world.server-modal.select-an-option',
+		defaultMessage: 'Select an option',
+	},
 })
 
 defineExpose({ resourcePackOptions })
 </script>
 <template>
-	<div class="w-[450px]">
-		<h2 class="text-lg font-extrabold text-contrast mt-0 mb-1">
-			{{ formatMessage(messages.name) }}
-		</h2>
-		<StyledInput
-			v-model="name"
-			:placeholder="formatMessage(messages.placeholderName)"
-			autocomplete="off"
-			wrapper-class="w-full"
-		/>
-		<h2 class="text-lg font-extrabold text-contrast mt-3 mb-1">
-			{{ formatMessage(messages.address) }}
-		</h2>
-		<StyledInput
-			v-model="address"
-			placeholder="example.modrinth.gg"
-			autocomplete="off"
-			wrapper-class="w-full"
-		/>
-		<h2 class="text-lg font-extrabold text-contrast mt-3 mb-1">
-			{{ formatMessage(messages.resourcePack) }}
-		</h2>
-		<div>
+	<div class="space-y-4 w-full">
+		<label class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">{{ formatMessage(messages.name) }}</span>
+			<StyledInput
+				v-model="name"
+				:placeholder="formatMessage(messages.placeholderName)"
+				autocomplete="off"
+				wrapper-class="w-full"
+			/>
+		</label>
+		<label class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">{{ formatMessage(messages.address) }}</span>
+			<StyledInput
+				v-model="address"
+				:placeholder="formatMessage(messages.placeholderAddress)"
+				autocomplete="off"
+				wrapper-class="w-full"
+			/>
+		</label>
+		<label class="flex flex-col gap-2">
+			<span class="font-semibold text-contrast">{{ formatMessage(messages.resourcePack) }}</span>
 			<Combobox
 				v-model="resourcePack"
 				:options="
@@ -89,9 +95,9 @@ defineExpose({ resourcePackOptions })
 				:display-value="
 					resourcePack
 						? formatMessage(resourcePackOptionMessages[resourcePack])
-						: 'Select an option'
+						: formatMessage(messages.selectAnOption)
 				"
 			/>
-		</div>
+		</label>
 	</div>
 </template>

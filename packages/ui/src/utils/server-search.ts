@@ -112,7 +112,7 @@ export const SERVER_SORT_TYPES: SortType[] = [
 
 const FILTER_FIELD_MAP: Record<string, string> = {
 	server_content_type: 'minecraft_java_server.content.kind',
-	server_game_version: 'minecraft_java_server.content.supported_game_versions',
+	server_game_version: 'game_versions',
 	server_status: 'minecraft_java_server.ping.data',
 	server_region: 'minecraft_server.region',
 	server_language: 'minecraft_server.languages',

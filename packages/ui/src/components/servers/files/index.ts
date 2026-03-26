@@ -1,5 +1,0 @@
-export * from './editor'
-export * from './explorer'
-export { default as FileNavbar } from './FileNavbar.vue'
-export * from './modals'
-export * from './upload'
