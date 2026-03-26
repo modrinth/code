@@ -79,11 +79,9 @@ pub async fn get_importable_instances(
                 if let Ok(instances) =
                     Box::pin(get_importable_instances(lt, base_path.clone()))
                         .await
-                {
-                    if !instances.is_empty() {
+                    && !instances.is_empty() {
                         return Ok(instances);
                     }
-                }
             }
             return Ok(Vec::new());
         }
@@ -170,8 +168,7 @@ pub async fn import_instance(
                 if let Ok(instances) =
                     Box::pin(get_importable_instances(lt, base_path.clone()))
                         .await
-                {
-                    if instances.contains(&instance_folder) {
+                    && instances.contains(&instance_folder) {
                         matched = true;
                         Box::pin(import_instance(
                             profile_path,
@@ -182,7 +179,6 @@ pub async fn import_instance(
                         .await?;
                         break;
                     }
-                }
             }
             if !matched {
                 return Err(crate::ErrorKind::InputError(

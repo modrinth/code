@@ -10,7 +10,7 @@
 			<span class="text-lg font-extrabold text-contrast">{{
 				header ??
 				formatMessage(
-					isModpack.value
+					isModpack
 						? messages.switchModpackVersionHeader
 						: switchMode
 							? messages.switchVersionHeader

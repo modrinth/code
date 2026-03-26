@@ -81,6 +81,8 @@ const hasSwitchVersionListener = computed(
 const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
+const isDisabled = computed(() => props.disabled || props.installing)
+
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
 </script>
@@ -252,7 +254,7 @@ const deleteHovered = ref(false)
 				>
 					<button
 						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
-						:disabled="disabled"
+						:disabled="isDisabled"
 						@click="emit('update')"
 					>
 						<DownloadIcon class="size-5" />
@@ -261,7 +263,7 @@ const deleteHovered = ref(false)
 				<ButtonStyled v-else-if="hasSwitchVersionListener && version" circular type="transparent">
 					<button
 						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
-						:disabled="disabled"
+						:disabled="isDisabled"
 						@click="emit('switchVersion')"
 					>
 						<ArrowLeftRightIcon class="size-5" />
@@ -272,7 +274,7 @@ const deleteHovered = ref(false)
 			<Toggle
 				v-if="enabled !== undefined"
 				:model-value="enabled"
-				:disabled="disabled"
+				:disabled="isDisabled"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
@@ -287,7 +289,7 @@ const deleteHovered = ref(false)
 								: commonMessages.deleteLabel,
 						)
 					"
-					:disabled="disabled"
+					:disabled="isDisabled"
 					@click="emit('delete', $event)"
 					@mouseenter="deleteHovered = true"
 					@mouseleave="deleteHovered = false"
@@ -311,7 +313,7 @@ const deleteHovered = ref(false)
 				<TeleportOverflowMenu
 					v-if="overflowOptions?.length"
 					:options="overflowOptions"
-					:disabled="disabled"
+					:disabled="isDisabled"
 				>
 					<MoreVerticalIcon class="size-5" />
 				</TeleportOverflowMenu>

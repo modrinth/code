@@ -308,49 +308,52 @@ pub async fn get_content_items(
         .get_projects(cache_behaviour, pool, fetch_semaphore)
         .await?;
 
-    let modpack_hashes: HashSet<String> = if let Some(ref linked_data) =
-        profile.linked_data
-    {
+    let modpack_ids = if let Some(ref linked_data) = profile.linked_data {
         if linked_data.version_id.is_empty() {
-            HashSet::new()
+            None
         } else {
             tracing::info!(
-                "Fetching modpack file hashes for version_id={}, project_id={}",
+                "Fetching modpack identifiers for version_id={}, project_id={}",
                 linked_data.version_id,
                 linked_data.project_id
             );
-            match get_modpack_file_hashes(
+            match get_modpack_identifiers(
                 &linked_data.version_id,
                 pool,
                 fetch_semaphore,
             )
             .await
             {
-                Ok(hashes) => {
+                Ok(ids) => {
                     tracing::info!(
-                        "Got {} modpack file hashes for version {}",
-                        hashes.len(),
+                        "Got {} modpack file hashes, {} project IDs for version {}",
+                        ids.hashes.len(),
+                        ids.project_ids.len(),
                         linked_data.version_id
                     );
-                    hashes
+                    Some(ids)
                 }
                 Err(e) => {
                     tracing::error!(
-                        "Failed to fetch modpack file hashes for version {}: {}",
+                        "Failed to fetch modpack identifiers for version {}: {}",
                         linked_data.version_id,
                         e
                     );
-                    HashSet::new()
+                    None
                 }
             }
         }
     } else {
-        HashSet::new()
+        None
     };
 
     let user_files: Vec<(String, ProfileFile)> = all_files
         .into_iter()
-        .filter(|(_, file)| !modpack_hashes.contains(&file.hash))
+        .filter(|(_, file)| {
+            modpack_ids
+                .as_ref()
+                .is_none_or(|ids| !ids.is_modpack_file(file))
+        })
         .collect();
 
     profile_files_to_content_items(
@@ -633,16 +636,16 @@ pub async fn get_linked_modpack_content(
         .get_projects(cache_behaviour, pool, fetch_semaphore)
         .await?;
 
-    let modpack_hashes: HashSet<String> = match get_modpack_file_hashes(
+    let modpack_ids = match get_modpack_identifiers(
         &linked_data.version_id,
         pool,
         fetch_semaphore,
     )
     .await
     {
-        Ok(hashes) => hashes,
+        Ok(ids) => ids,
         Err(e) => {
-            tracing::warn!("Failed to fetch modpack file hashes: {}", e);
+            tracing::warn!("Failed to fetch modpack identifiers: {}", e);
             return Ok(Vec::new());
         }
     };
@@ -650,7 +653,7 @@ pub async fn get_linked_modpack_content(
     // Inverse of get_content_items: keep only modpack-bundled files
     let modpack_files: Vec<(String, ProfileFile)> = all_files
         .into_iter()
-        .filter(|(_, file)| modpack_hashes.contains(&file.hash))
+        .filter(|(_, file)| modpack_ids.is_modpack_file(file))
         .collect();
 
     profile_files_to_content_items(
@@ -778,23 +781,78 @@ pub async fn dependencies_to_content_items(
     Ok(items)
 }
 
-/// Gets SHA1 hashes of all files in a modpack version.
+/// Modpack file identifiers: hashes for exact matching and project IDs for
+/// matching files whose version was switched by the user.
+struct ModpackIdentifiers {
+    hashes: HashSet<String>,
+    project_ids: HashSet<String>,
+}
+
+impl ModpackIdentifiers {
+    fn is_modpack_file(&self, file: &ProfileFile) -> bool {
+        self.hashes.contains(&file.hash)
+            || file
+                .metadata
+                .as_ref()
+                .is_some_and(|m| self.project_ids.contains(&m.project_id))
+    }
+}
+
+/// Gets SHA1 hashes and project IDs of all files in a modpack version.
 /// Checks cache first, falls back to downloading mrpack if not cached.
-async fn get_modpack_file_hashes(
+async fn get_modpack_identifiers(
     version_id: &str,
     pool: &SqlitePool,
     fetch_semaphore: &FetchSemaphore,
-) -> crate::Result<HashSet<String>> {
+) -> crate::Result<ModpackIdentifiers> {
     if let Some(cached) =
         CachedEntry::get_modpack_files(version_id, pool, fetch_semaphore)
             .await?
     {
+        if !cached.project_ids.is_empty() {
+            tracing::info!(
+                "Cache hit: {} modpack file hashes, {} project IDs for version {}",
+                cached.file_hashes.len(),
+                cached.project_ids.len(),
+                version_id
+            );
+            return Ok(ModpackIdentifiers {
+                hashes: cached.file_hashes.into_iter().collect(),
+                project_ids: cached.project_ids.into_iter().collect(),
+            });
+        }
+
+        // Legacy cache entry without project_ids — resolve via hash lookup API
         tracing::info!(
-            "Cache hit: {} modpack file hashes for version {}",
-            cached.file_hashes.len(),
+            "Legacy cache entry without project IDs, resolving via API for version {}",
             version_id
         );
-        return Ok(cached.file_hashes.into_iter().collect());
+        let hash_refs: Vec<&str> =
+            cached.file_hashes.iter().map(|s| s.as_str()).collect();
+        let files =
+            CachedEntry::get_file_many(&hash_refs, None, pool, fetch_semaphore)
+                .await?;
+
+        let project_ids: Vec<String> = files
+            .iter()
+            .map(|f| f.project_id.clone())
+            .collect::<HashSet<_>>()
+            .into_iter()
+            .collect();
+
+        // Update cache with project_ids for next time
+        CachedEntry::cache_modpack_files(
+            version_id,
+            cached.file_hashes.clone(),
+            project_ids.clone(),
+            pool,
+        )
+        .await?;
+
+        return Ok(ModpackIdentifiers {
+            hashes: cached.file_hashes.into_iter().collect(),
+            project_ids: project_ids.into_iter().collect(),
+        });
     }
 
     tracing::warn!(
@@ -863,6 +921,20 @@ async fn get_modpack_file_hashes(
         .filter_map(|f| f.hashes.get(&PackFileHash::Sha1).cloned())
         .collect();
 
+    let project_ids: Vec<String> = pack
+        .files
+        .iter()
+        .filter_map(|f| {
+            f.downloads.iter().find_map(|url| {
+                let parts: Vec<&str> = url.split('/').collect();
+                let data_idx = parts.iter().position(|&p| p == "data")?;
+                parts.get(data_idx + 1).map(|s| s.to_string())
+            })
+        })
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
+
     // Also hash files from overrides folders (these aren't in modrinth.index.json)
     let override_entries: Vec<usize> = zip_reader
         .file()
@@ -888,7 +960,16 @@ async fn get_modpack_file_hashes(
         hashes.push(hash);
     }
 
-    CachedEntry::cache_modpack_files(version_id, hashes.clone(), pool).await?;
+    CachedEntry::cache_modpack_files(
+        version_id,
+        hashes.clone(),
+        project_ids.clone(),
+        pool,
+    )
+    .await?;
 
-    Ok(hashes.into_iter().collect())
+    Ok(ModpackIdentifiers {
+        hashes: hashes.into_iter().collect(),
+        project_ids: project_ids.into_iter().collect(),
+    })
 }

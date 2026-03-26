@@ -68,6 +68,7 @@ import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
 	commonMessages,
 	ConfirmModpackUpdateModal,
+	ContentCardLayout as ContentPageLayout,
 	type ContentItem,
 	type ContentModpackCardCategory,
 	type ContentModpackCardProject,
@@ -84,7 +85,6 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -261,7 +261,7 @@ async function handleUploadFiles() {
 	}
 }
 
-async function _toggleDisableMod(mod: ContentItem) {
+async function toggleDisableMod(mod: ContentItem) {
 	try {
 		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
 		mod.enabled = !mod.enabled
@@ -279,7 +279,7 @@ async function _toggleDisableMod(mod: ContentItem) {
 	}
 }
 
-const toggleDisableMod = useDebounceFn(_toggleDisableMod, 20)
+const toggleDisableDebounced = useDebounceFn(toggleDisableMod, 20)
 
 async function removeMod(mod: ContentItem) {
 	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
@@ -332,6 +332,12 @@ async function updateProject(mod: ContentItem) {
 }
 
 async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
+	isBulkOperating.value = true
+	mod.installing = true
+	if (mod.version) {
+		mod.version.id = version.id
+		mod.version.version_number = version.version_number
+	}
 	try {
 		await remove_project(props.instance.path, mod.file_path!)
 		const newPath = await add_project_from_version(props.instance.path, version.id)
@@ -342,20 +348,12 @@ async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions
 		}
 
 		mod.file_path = newPath
-		if (mod.version) {
-			mod.version.id = version.id
-			mod.version.version_number = version.version_number
-		}
-
-		trackEvent('InstanceProjectSwitchVersion', {
-			loader: props.instance.loader,
-			game_version: props.instance.game_version,
-			id: mod.project?.id,
-			name: mod.project?.title ?? mod.file_name,
-			project_type: mod.project_type,
-		})
 	} catch (err) {
 		handleError(err as Error)
+	} finally {
+		mod.installing = false
+		isBulkOperating.value = false
+		await initProjects()
 	}
 }
 
@@ -446,11 +444,11 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackContentToggle(item: ContentItem) {
-	await toggleDisableMod(item)
+	await toggleDisableDebounced(item)
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[]) {
-	await Promise.all(items.map((item) => _toggleDisableMod(item)))
+	await Promise.all(items.map((item) => toggleDisableMod(item)))
 }
 
 async function handleModpackContent() {
@@ -517,7 +515,7 @@ async function fetchAndSpliceVersion(
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog != null) return
 	loadingChangelog.value = true
-	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError)
+	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError as (err: unknown) => void)
 	loadingChangelog.value = false
 }
 
@@ -696,18 +694,13 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 
 		if (allCategories && modpackInfo.project.categories) {
 			const seen = new Set<string>()
-			linkedModpackCategories.value = allCategories
-				.filter((cat: { name: string }) => {
-					if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
-						seen.add(cat.name)
-						return true
-					}
-					return false
-				})
-				.map((cat: { name: string }) => ({
-					...cat,
-					name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
-				}))
+			linkedModpackCategories.value = allCategories.filter((cat: { name: string }) => {
+				if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
+					seen.add(cat.name)
+					return true
+				}
+				return false
+			})
 		} else {
 			linkedModpackCategories.value = []
 		}
@@ -786,13 +779,18 @@ provideContentManager({
 	isBusy: isInstanceBusy,
 	isBulkOperating,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
-	toggleEnabled: toggleDisableMod,
-	bulkEnableItems: (items) =>
-		Promise.all(items.map((item) => _toggleDisableMod(item))).then(() => {}),
-	bulkDisableItems: (items) =>
-		Promise.all(items.map((item) => _toggleDisableMod(item))).then(() => {}),
+	toggleEnabled: toggleDisableDebounced,
+	bulkEnableItems: (items: ContentItem[]) =>
+		Promise.all(items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item))).then(
+			() => {},
+		),
+	bulkDisableItems: (items: ContentItem[]) =>
+		Promise.all(items.filter((item) => item.enabled).map((item) => toggleDisableMod(item))).then(
+			() => {},
+		),
 	deleteItem: removeMod,
-	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	bulkDeleteItems: (items: ContentItem[]) =>
+		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
@@ -808,7 +806,7 @@ provideContentManager({
 	showContentHint,
 	dismissContentHint,
 	shareItems: handleShareItems,
-	mapToTableItem: (item) => ({
+	mapToTableItem: (item: ContentItem) => ({
 		id: item.id,
 		project: item.project ?? {
 			id: item.file_name,
@@ -838,6 +836,7 @@ provideContentManager({
 				}
 			: undefined,
 		enabled: item.enabled,
+		installing: item.installing,
 	}),
 	filterPersistKey: props.instance.path,
 })

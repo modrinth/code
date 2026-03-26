@@ -139,7 +139,7 @@ const filterOptions = computed(() => {
 		{} as Record<string, number>,
 	)
 
-	return Object.entries(frequency)
+	const options = Object.entries(frequency)
 		.sort(([, a], [, b]) => b - a)
 		.map(([type]) => {
 			const msg =
@@ -149,6 +149,12 @@ const filterOptions = computed(() => {
 				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's',
 			}
 		})
+
+	if (items.value.some((item) => !item.enabled)) {
+		options.push({ id: 'disabled', label: 'Disabled' })
+	}
+
+	return options
 })
 
 const stats = computed(() => {
@@ -169,11 +175,18 @@ function toggleFilter(filterId: string) {
 	}
 }
 
+const attributeFilterIds = new Set(['disabled'])
+
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
-	return items.value.filter((item) =>
-		selectedFilters.value.includes(normalizeProjectType(item.project_type)),
-	).length
+	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	return items.value.filter((item) => {
+		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
+			return false
+		if (hasDisabledFilter && item.enabled) return false
+		return true
+	}).length
 })
 
 const filteredItems = computed(() => {
@@ -190,11 +203,15 @@ const filteredItems = computed(() => {
 		})
 	}
 
-	// Apply type filters
 	if (selectedFilters.value.length > 0) {
-		result = result.filter((item) =>
-			selectedFilters.value.includes(normalizeProjectType(item.project_type)),
-		)
+		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		result = result.filter((item) => {
+			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
+				return false
+			if (hasDisabledFilter && item.enabled) return false
+			return true
+		})
 	}
 
 	return result
@@ -363,7 +380,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 				/>
 
 				<!-- Filters -->
-				<div v-if="filterOptions.length > 1" class="flex items-center gap-2">
+				<div v-if="filterOptions.length > 0" class="flex items-center gap-2">
 					<FilterIcon class="size-5 text-secondary shrink-0" />
 					<div class="flex flex-wrap items-center gap-1.5">
 						<button
@@ -435,7 +452,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 							class="flex min-w-0 items-center gap-4"
 							:class="
 								props.enableToggle
-									? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
 						>
@@ -453,7 +470,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 						</div>
 						<div
 							class="hidden @[800px]:flex"
-							:class="props.enableToggle ? 'w-[335px] min-w-0' : 'flex-1'"
+							:class="props.enableToggle ? 'flex-1 min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)

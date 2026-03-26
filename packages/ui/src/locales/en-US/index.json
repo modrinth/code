@@ -251,6 +251,9 @@
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Any mods or content you added on top of the modpack will be deleted."
   },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Any mods or content you added on top of the modpack will be preserved."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} warning"
   },

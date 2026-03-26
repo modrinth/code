@@ -20,7 +20,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu, {
 	type Option as OverflowMenuOption,
 } from '#ui/components/base/OverflowMenu.vue'
-import TagItem from '#ui/components/base/TagItem.vue'
+import TagTagItem from '#ui/components/base/TagTagItem.vue'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -358,9 +358,13 @@ onUnmounted(() => {
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap items-center gap-1">
-				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
-					{{ cat.name }}
-				</TagItem>
+				<TagTagItem
+					v-for="cat in categories"
+					:key="cat.name"
+					:tag="cat.name"
+					:action="cat.action"
+					hide-non-loader-icon
+				/>
 			</div>
 		</div>
 	</div>
