@@ -126,6 +126,7 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 				...options.headers,
 			},
 		}
+		this.attachArchonSentryCaptureHeader(mergedOptions)
 
 		const headers = mergedOptions.headers
 		if (headers && 'Content-Type' in headers && headers['Content-Type'] === '') {
@@ -307,6 +308,21 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 		}
 
 		return headers
+	}
+
+	protected attachArchonSentryCaptureHeader(options: RequestOptions): void {
+		if (options.api !== 'archon' || !options.headers || !this.shouldCaptureArchonRequests()) {
+			return
+		}
+
+		options.headers['modrinth-sentry-capture'] = '1'
+	}
+
+	private shouldCaptureArchonRequests(): boolean {
+		const archonSentryCapture = this.config.archonSentryCapture
+		return typeof archonSentryCapture === 'function'
+			? archonSentryCapture()
+			: archonSentryCapture === true
 	}
 
 	/**

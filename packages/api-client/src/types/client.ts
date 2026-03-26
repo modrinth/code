@@ -56,6 +56,14 @@ export interface ClientConfig {
 	headers?: Record<string, string>
 
 	/**
+	 * Whether to attach `modrinth-sentry-capture: 1` to Archon requests.
+	 * Can be a callback so apps can drive this from runtime feature flags.
+	 *
+	 * @default false
+	 */
+	archonSentryCapture?: boolean | (() => boolean)
+
+	/**
 	 * Features to enable for this client
 	 * Features are applied in the order they appear in this array
 	 */
