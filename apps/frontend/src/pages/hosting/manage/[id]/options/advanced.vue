@@ -138,22 +138,10 @@
 							:id="'java-version-field'"
 							v-model="javaVersion"
 							name="java-version"
-							:options="displayedJavaVersions"
+							:options="JAVA_VERSIONS"
 							:display-value="javaVersionLabel ?? 'Java Version'"
 							:disabled="isStartupLoading"
-						>
-							<template #dropdown-footer>
-								<button
-									class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
-									@mousedown.prevent
-									@click="showAllVersions = !showAllVersions"
-								>
-									<EyeOffIcon v-if="showAllVersions" class="size-4" />
-									<EyeIcon v-else class="size-4" />
-									{{ showAllVersions ? 'Hide extra versions' : 'Show all versions' }}
-								</button>
-							</template>
-						</Combobox>
+						/>
 						<div
 							v-if="isStartupLoading"
 							class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
@@ -161,10 +149,7 @@
 							<SpinnerIcon class="h-5 w-5 animate-spin text-secondary" />
 						</div>
 					</div>
-					<span>
-						The Java version your server runs on. By default, only versions compatible with your
-						Minecraft version are shown.
-					</span>
+					<span> The Java version your server runs on. </span>
 				</div>
 
 				<!-- Java runtime section -->
@@ -301,23 +286,6 @@ const hasUnsavedChanges = computed(
 		javaVersion.value !== savedJavaVersion.value ||
 		jreVendor.value !== savedJreVendor.value,
 )
-
-const showAllVersions = ref(false)
-
-const displayedJavaVersions = computed(() => {
-	if (showAllVersions.value) return JAVA_VERSIONS
-
-	const mcVersion = server.value?.mc_version ?? ''
-	if (!mcVersion) return JAVA_VERSIONS
-
-	const [, minor] = mcVersion.split('.').map(Number)
-
-	if (minor >= 20) return JAVA_VERSIONS.filter((v) => v.value === 21)
-	if (minor >= 17) return JAVA_VERSIONS.filter((v) => [17, 21].includes(v.value))
-	if (minor >= 12) return JAVA_VERSIONS
-	if (minor >= 6) return JAVA_VERSIONS.filter((v) => [8, 11].includes(v.value))
-	return JAVA_VERSIONS.filter((v) => v.value === 8)
-})
 
 const { mutate: saveStartup, isPending } = useMutation({
 	mutationFn: () =>
