@@ -2354,6 +2354,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "Color theme"
   },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Feature flags"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Standard languages"
   },

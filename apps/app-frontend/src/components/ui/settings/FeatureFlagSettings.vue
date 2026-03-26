@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Toggle } from '@modrinth/ui'
+import { Button, Toggle } from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import { get as getSettings, set as setSettings } from '@/helpers/settings.ts'
@@ -31,11 +31,18 @@ watch(
 				{{ option.replaceAll('_', ' ') }}
 			</h2>
 		</div>
-
-		<Toggle
-			id="advanced-rendering"
-			:model-value="themeStore.getFeatureFlag(option)"
-			@update:model-value="() => setFeatureFlag(option, !themeStore.getFeatureFlag(option))"
-		/>
+		<div class="flex items-center gap-2">
+			<Toggle
+				id="advanced-rendering"
+				:model-value="themeStore.getFeatureFlag(option)"
+				@update:model-value="() => setFeatureFlag(option, !themeStore.getFeatureFlag(option))"
+			/>
+			<Button
+				:disabled="themeStore.getFeatureFlag(option) === DEFAULT_FEATURE_FLAGS[option]"
+				@click="setFeatureFlag(option, DEFAULT_FEATURE_FLAGS[option])"
+			>
+				Reset to default
+			</Button>
+		</div>
 	</div>
 </template>

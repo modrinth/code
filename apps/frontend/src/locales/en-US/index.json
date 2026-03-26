@@ -1709,9 +1709,6 @@
   "layout.nav.discover-content": {
     "message": "Discover content"
   },
-  "layout.nav.feature-flags": {
-    "message": "Feature flags"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Get Modrinth App"
   },
