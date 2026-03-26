@@ -814,10 +814,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		>
 			<template #actions>
 				<ButtonStyled
-					v-if="
-						hasBulkUpdateSupport &&
-						selectedItems.some((m) => m.has_update)
-					"
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
 					type="transparent"
 					color="green"
 					color-fill="text"

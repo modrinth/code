@@ -51,10 +51,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			}
 		}
 
-		if (
-			config?.showUpdateFilter &&
-			items.value.some((m) => m.has_update)
-		) {
+		if (config?.showUpdateFilter && items.value.some((m) => m.has_update)) {
 			options.push({ id: 'updates', label: 'Updates' })
 		}
 
