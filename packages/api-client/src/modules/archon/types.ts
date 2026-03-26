@@ -27,6 +27,8 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
+				pack_client_retained: boolean
+				pack_client_depends: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null

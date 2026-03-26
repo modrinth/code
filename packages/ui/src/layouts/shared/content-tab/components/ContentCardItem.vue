@@ -25,7 +25,12 @@ import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
-import type { ContentCardProject, ContentCardVersion, ContentOwner } from '../types'
+import type {
+	ClientWarningType,
+	ContentCardProject,
+	ContentCardVersion,
+	ContentOwner,
+} from '../types'
 
 const { formatMessage } = useVIntl()
 
@@ -39,6 +44,7 @@ interface Props {
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
+	clientWarning?: ClientWarningType | null
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
@@ -55,6 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
 	installing: false,
 	hasUpdate: false,
 	isClientOnly: false,
+	clientWarning: null,
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
@@ -82,6 +89,17 @@ const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
 
 const isDisabled = computed(() => props.disabled || props.installing)
+
+const clientWarningMessage = computed(() => {
+	switch (props.clientWarning) {
+		case 'retained':
+			return commonMessages.clientRetainedWarning
+		case 'depends':
+			return commonMessages.clientDependsWarning
+		default:
+			return commonMessages.clientOnlyWarning
+	}
+})
 
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
@@ -147,7 +165,7 @@ const deleteHovered = ref(false)
 							<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
 							<template #popper>
 								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(commonMessages.clientOnlyWarning) }}
+									{{ formatMessage(clientWarningMessage) }}
 								</div>
 							</template>
 						</Tooltip>

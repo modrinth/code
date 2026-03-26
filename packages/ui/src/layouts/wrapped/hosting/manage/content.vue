@@ -499,6 +499,8 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,
 		environment: addon.version?.environment ?? undefined,
+		pack_client_retained: addon.pack_client_retained,
+		pack_client_depends: addon.pack_client_depends,
 	}
 }
 

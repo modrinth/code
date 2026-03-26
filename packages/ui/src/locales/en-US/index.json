@@ -282,7 +282,7 @@
     "defaultMessage": "Added (dependency)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Removed"
+    "defaultMessage": "Disabled"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
@@ -1196,8 +1196,14 @@
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "This mod depends on a client-side mod and may cause issues when starting your server"
+  },
   "label.client-only-warning": {
     "defaultMessage": "This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict."
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
   },
   "label.collections": {
     "defaultMessage": "Collections"

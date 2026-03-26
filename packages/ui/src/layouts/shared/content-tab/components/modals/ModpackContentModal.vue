@@ -25,7 +25,7 @@ import {
 	normalizeProjectType,
 } from '#ui/utils/common-messages'
 
-import { isClientOnlyEnvironment } from '../../composables/content-filtering'
+import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
@@ -239,7 +239,11 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
-		isClientOnly: isClientOnlyEnvironment(item.environment),
+		isClientOnly:
+			isClientOnlyEnvironment(item.environment) ||
+			!!item.pack_client_retained ||
+			!!item.pack_client_depends,
+		clientWarning: getClientWarningType(item),
 		disabled: disabledIds.value.has(item.file_name),
 		overflowOptions: [
 			...(props.switchVersion
