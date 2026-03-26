@@ -92,6 +92,7 @@
 	</div>
 </template>
 <script setup lang="ts">
+import type { Labrinth } from '@modrinth/api-client'
 import {
 	ClientIcon,
 	getLoaderIcon,
@@ -105,7 +106,6 @@ import { getVersionsToDisplay } from '@modrinth/utils'
 import { type Component, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-import type { Labrinth } from '@modrinth/api-client'
 import {
 	defineMessage,
 	defineMessages,

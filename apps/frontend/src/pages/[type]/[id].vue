@@ -877,7 +877,7 @@
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
-						:projectV3="projectV3"
+						:project-v3="projectV3"
 						class="card flex-card experimental-styles-within"
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
