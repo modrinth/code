@@ -901,15 +901,13 @@ pub async fn get_profile_protocol_version(
         return Ok(Some(*protocol_version));
     }
 
-    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-    let version_index = minecraft
-        .versions
-        .iter()
-        .position(|it| it.id == profile.game_version)
-        .ok_or(ErrorKind::LauncherError(format!(
-            "Invalid game version: {}",
-            profile.game_version
-        )))?;
+    let state = State::get().await?;
+    let (minecraft, version_index) =
+        crate::launcher::resolve_minecraft_manifest(
+            &profile.game_version,
+            &state,
+        )
+        .await?;
     let version = &minecraft.versions[version_index];
 
     let loader_version = get_loader_version_from_profile(
