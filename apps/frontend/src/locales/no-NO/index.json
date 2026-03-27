@@ -2720,20 +2720,11 @@
   "servers.plan.large.description": {
     "message": "Ideelt for 15 - 25 spillere, modpacks eller tung modding."
   },
-  "servers.plan.large.name": {
-    "message": "Stor"
-  },
   "servers.plan.medium.description": {
     "message": "Flott for 6 - 15 spillere og flere mods."
   },
-  "servers.plan.medium.name": {
-    "message": "Medium"
-  },
   "servers.plan.small.description": {
     "message": "Perfekt for 1 - 5 venner med noen få lette mods."
-  },
-  "servers.plan.small.name": {
-    "message": "Lite"
   },
   "settings.applications.about": {
     "message": "Om"
@@ -2812,9 +2803,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Applikasjonsinformasjon"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Det har oppstått en feil"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Applikasjonsikonet ditt har blitt oppdatert."

@@ -41,6 +41,9 @@
   "app.instance.confirm-delete.header": {
     "message": "Radera instans"
   },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Skapa ändå"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
@@ -51,7 +54,7 @@
     "message": "Installerar..."
   },
   "app.instance.mods.modpack-fallback": {
-    "message": "Modd-paket"
+    "message": "Modpaket"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" lades till"
@@ -60,19 +63,16 @@
     "message": "{count} projekt lades till"
   },
   "app.instance.mods.share-text": {
-    "message": "Kolla in projekten jag använder i mitt modd-paket!"
+    "message": "Kolla in projekten jag använder i mitt modpaket!"
   },
   "app.instance.mods.share-title": {
-    "message": "Delar innehåll från modd-paket"
+    "message": "Delar innehåll från modpaket"
   },
   "app.instance.mods.show-file": {
     "message": "Visa fil"
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uppladdning lyckades"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "Byt version"
   },
   "app.instance.mods.unknown-version": {
     "message": "Okänt"
@@ -165,7 +165,7 @@
     "message": "Nedladdning slutförd"
   },
   "app.update-popup.reload": {
-    "message": "Ladda om"
+    "message": "Kolla efter uppdateringar"
   },
   "app.update-popup.title": {
     "message": "Uppdatering tillgänglig"

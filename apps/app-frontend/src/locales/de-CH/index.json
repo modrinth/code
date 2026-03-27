@@ -41,6 +41,21 @@
   "app.instance.confirm-delete.header": {
     "message": "Instanz löschen"
   },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Dieses Modpack ist bereits in der Instanz „{instanceName}“ installiert."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Modpack duplizieren"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Trotzdem erstellen"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Gehe zu Instanz"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack bereits installiert"
+  },
   "app.instance.mods.content-type-project": {
     "message": "Projekt"
   },
@@ -70,9 +85,6 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Erfolgreich hochgeladen"
-  },
-  "app.instance.mods.switch-version": {
-    "message": "Version wechseln"
   },
   "app.instance.mods.unknown-version": {
     "message": "Unbekannt"

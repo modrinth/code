@@ -17,6 +17,66 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Nazwa paczki modów"
   },
+  "app.export-modal.select-files-label": {
+    "message": "Wybierz pliki i foldery, które mają znaleźć się w paczce"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Numer wersji"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Wszystkie dane z Twojej instancji zostaną trwale usunięte, w tym Twoje światy, pliki konfiguracji i wszystkie zainstalowane treści."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Tej akcji nie można odwrócić"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Usuń instancję"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Usuń instancję"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Ta paczka modów jest już zainstalowana w instancji \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Duplikat paczki modów"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Utwórz mimo to"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Przejdź do instancji"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Paczka modów jest już zainstalowana"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projekt"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Kopiuj łącze"
+  },
+  "app.instance.mods.installing": {
+    "message": "Instalowanie..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Paczka modów"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Dodano \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "Dodano {count} {count, plural, one {projekt} few {projekty} other {projektów}}"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Pokaż plik"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Przesyłanie powiodło się"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Wymagane treści"
   },

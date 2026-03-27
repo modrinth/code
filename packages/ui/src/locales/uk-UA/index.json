@@ -111,7 +111,7 @@
     "defaultMessage": "Грати"
   },
   "button.refresh": {
-    "defaultMessage": "Оновити"
+    "defaultMessage": "Перезавантажити"
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Перевстановити збірку"
@@ -260,6 +260,162 @@
   "content.diff-modal.removed-count": {
     "defaultMessage": "Видалено {count}"
   },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Деякий уміст на вашому сервері не вдалося проаналізувати, тож ця зміна може вплинути на нього."
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} оновлено"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Створення резервної копії…"
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Резервну копію успішно створено"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Не вдалося створити резервну копію. Ви все одно можете продовжити."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Триває процес створення резервної копії. Рекомендовано дочекатися завершення, а лише тоді виконувати цю дію."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Створення резервної копії може зайняти кілька хвилин, залежно від розміру вашого сервера."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Створити резервну копію"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Утримуйте клавішу Shift під час натискання, щоб пропустити підтвердження."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Ми рекомендуємо створити резервну копію перш ніж продовжувати, щоб ви могли відновити свій {type, select, server {світ} other {профіль}}, якщо щось піде не так."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Уміст вашої збірки тепер можна знайти тут!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Уміст збірки перемістився"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Не показувати знову"
+  },
+  "content.modpack-card.updating": {
+    "defaultMessage": "Оновлення…"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Додатковий уміст"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Шукати вміст"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Будь ласка, дочекайтеся завершення операції, перш ніж редагувати вміст."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Знайдіть або вивантажте проєкти, щоб розпочати"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Додайте додатковий уміст до цієї збірки"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "Немає встановленого вмісту"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "Немає додаткового вмісту"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "Не вдалося завантажити вміст"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "Завантаження вмісту…"
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "Умісту не знайдено."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "Будь ласка, зачекайте"
+  },
+  "content.page-layout.search-placeholder": {
+    "defaultMessage": "Пошук серед проєктів ({count})…"
+  },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Назва файлу"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Поділитися"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Посилання Markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Посилання на проєкт"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Назва проєкту"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "За алфавітом"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Спочатку новіші"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Спочатку старіші"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Сортування: {mode}"
+  },
+  "content.page-layout.update-all": {
+    "defaultMessage": "Оновити все"
+  },
+  "content.page-layout.upload-files": {
+    "defaultMessage": "Вивантажити файли"
+  },
+  "content.page-layout.uploading-files": {
+    "defaultMessage": "Вивантаження файлів ({completed}/{total})"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Увесь вибраний уміст уже вимкнено"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Увесь вибраний уміст уже ввімкнено"
+  },
+  "content.selection-bar.bulk.deleting": {
+    "defaultMessage": "Видалення {progress}/{total} {contentType}…"
+  },
+  "content.selection-bar.bulk.deleting-waiting": {
+    "defaultMessage": "Видалення {contentType}…"
+  },
+  "content.selection-bar.bulk.disabling": {
+    "defaultMessage": "Вимкнення {progress}/{total} {contentType}…"
+  },
+  "content.selection-bar.bulk.disabling-waiting": {
+    "defaultMessage": "Вимкнення {contentType}…"
+  },
+  "content.selection-bar.bulk.enabling": {
+    "defaultMessage": "Увімкнення {progress}/{total} {contentType}…"
+  },
+  "content.selection-bar.bulk.enabling-waiting": {
+    "defaultMessage": "Увімкнення {contentType}…"
+  },
+  "content.selection-bar.bulk.updating": {
+    "defaultMessage": "Оновлення {progress}/{total} {contentType}…"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "Оновлення {contentType}…"
+  },
+  "content.selection-bar.disable": {
+    "defaultMessage": "Вимкнути"
+  },
+  "content.selection-bar.enable": {
+    "defaultMessage": "Увімкнути"
+  },
+  "content.selection-bar.selected-count": {
+    "defaultMessage": "Проєктів вибрано: {count}"
+  },
+  "content.selection-bar.selected-count-simple": {
+    "defaultMessage": "Вибрано {count, number}"
+  },
   "form.label.address-line": {
     "defaultMessage": "Рядок адреси"
   },
@@ -357,10 +513,13 @@
     "defaultMessage": "Властивості"
   },
   "header.category.performance-impact": {
-    "defaultMessage": "Вплив на продуктивність"
+    "defaultMessage": "Навантаження"
   },
   "header.category.resolutions": {
     "defaultMessage": "Роздільність"
+  },
+  "hosting.content.copy-link": {
+    "defaultMessage": "Скопіювати посилання"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Не вдалося видалити вміст"
@@ -373,6 +532,27 @@
   },
   "hosting.content.failed-to-bulk-update": {
     "defaultMessage": "Не вдалося оновити вміст"
+  },
+  "hosting.content.failed-to-load-modpack-content": {
+    "defaultMessage": "Не вдалося завантажити вміст збірки"
+  },
+  "hosting.content.failed-to-load-versions": {
+    "defaultMessage": "Не вдалося завантажити версії"
+  },
+  "hosting.content.failed-to-remove": {
+    "defaultMessage": "Не вдалося видалити вміст"
+  },
+  "hosting.content.failed-to-toggle": {
+    "defaultMessage": "Не вдалося перемкнути {name}"
+  },
+  "hosting.content.failed-to-unlink": {
+    "defaultMessage": "Не вдалося відв’язати збірку"
+  },
+  "hosting.content.failed-to-update": {
+    "defaultMessage": "Не вдалося оновити"
+  },
+  "hosting.content.failed-to-upload": {
+    "defaultMessage": "Не вдалося оновити файл"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
@@ -401,8 +581,14 @@
   "icon-select.select": {
     "defaultMessage": "Вибрати значок"
   },
+  "input.search-version.placeholder": {
+    "defaultMessage": "Знайти версію…"
+  },
   "input.search.placeholder": {
     "defaultMessage": "Пошук…"
+  },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Вибрати версію"
   },
   "input.view.gallery": {
     "defaultMessage": "У вигляді галереї"
@@ -412,6 +598,102 @@
   },
   "input.view.list": {
     "defaultMessage": "У вигляді рядків"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Вибрати версію гри"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Вибрати версію {loader}"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Вибрати платформу"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Підтвердити"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Зміна версії на {gameVersion} призведе таких змін умісту на вашому сервері."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Перегляд змін умісту"
+  },
+  "installation-settings.edit-installation.title": {
+    "defaultMessage": "Редагувати інсталяцію"
+  },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, будьте обережні, оскільки це може спричинити проблеми."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, скиньте ваш сервер."
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "{projectType, select, server {Пов’заний проєкт сервера} other {Пов’зана збірка}}"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "Версія {loader}"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Щоб змінювати завантажувач потрібно скинути сервер."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Перевстановлення зібрки скине вміст {type, select, server {сервера} other {профіля}} до початкового стану, видаливши всі моди та вміст, які ви додавали."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Перевстановити збірку"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Перевстановлення збірки"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Видалено (несумісно)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Перевстановлює залежності Minecraft та перевіряє їх на наявність пошкоджень. Це може розв’язати проблеми, якщо ваша гра не запускається через помилки запускача."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Відновити профіль"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Перевстановлює завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо ваш сервер не запускається належним чином."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Лагодження сервера"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Збереження…"
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Пошук версій гри…"
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Відв’язати"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Відв’яжіть {type, select, server {сервер} other {профіль}} від проєкту {projectType, select, server {сервера} other {збірки}}. Це дозволить змінити завантажувач і версію Minecraft, але ви не будете отримувати майбутні оновлення."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Перевірка…"
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Перевстановлення скине ввесь доданий або модифікований уміст до наданого збіркою, прибираючи будь-які додатково встановлені вами моди чи вміст."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Попередження про перевстановлення"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Перевстановити збірку"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Перевстановити збірку"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Лагодження перевстановить завантажувач та залежності Minecraft без видалення вашого вмісту. Це може розв’язати проблеми, якщо {type, select, server {ваш сервер не запускається належним чином} other {ваша гра не запускається через помилки запускача}}."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Полагодити {type, select, server {сервер} other {профіль}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Полагодити"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Режим пригод"
@@ -428,8 +710,77 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Невідомий режим"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Назад"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Файли все ще вивантажуються. Якщо ви покинете цю сторінку, вивантаження буде скасовано, і ваші зміни можуть бути втрачені."
+  },
+  "instances.confirm-leave-modal.leave": {
+    "defaultMessage": "Покинути сторінку"
+  },
+  "instances.confirm-leave-modal.stay": {
+    "defaultMessage": "Залишитися на сторінці"
+  },
+  "instances.confirm-leave-modal.title": {
+    "defaultMessage": "Покинути сторінку?"
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Вивантаження триває"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} {count, plural, one {сумісний профіль} few {сумісні профілі} other {сумісних профілів}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Наявний профіль"
+  },
+  "instances.content-install.game-version-label": {
+    "defaultMessage": "Версія гри"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Вибрати версію гри"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Установити проєкт"
+  },
+  "instances.content-install.hide-snapshots": {
+    "defaultMessage": "Приховати знімки"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Установити"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Установлено"
+  },
+  "instances.content-install.installing-label": {
+    "defaultMessage": "Установлення…"
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Тип профіля"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Завантажувач"
+  },
+  "instances.content-install.name-label": {
+    "defaultMessage": "Назва"
+  },
+  "instances.content-install.name-placeholder": {
+    "defaultMessage": "Укажіть назву профілю"
+  },
+  "instances.content-install.new-tab": {
+    "defaultMessage": "Новий профіль"
+  },
+  "instances.content-install.no-instances": {
+    "defaultMessage": "Не знайдено сумісних профілів"
+  },
+  "instances.content-install.remove-icon": {
+    "defaultMessage": "Прибрати значок"
+  },
+  "instances.content-install.search-placeholder": {
+    "defaultMessage": "Пошук профілів"
+  },
+  "instances.content-install.select-icon": {
+    "defaultMessage": "Вибрати значок"
+  },
+  "instances.content-install.show-all-versions": {
+    "defaultMessage": "Показати всі версії"
   },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Копіювати посилання"
@@ -461,11 +812,26 @@
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Несумісна"
   },
+  "instances.updater-modal.downgrade-to": {
+    "defaultMessage": "Відкотити до {version}"
+  },
   "instances.updater-modal.header": {
     "defaultMessage": "Оновити версію"
   },
+  "instances.updater-modal.header-modpack": {
+    "defaultMessage": "Змінити версію збірки"
+  },
+  "instances.updater-modal.header-switch": {
+    "defaultMessage": "Змінити версію"
+  },
   "instances.updater-modal.hide-incompatible": {
     "defaultMessage": "Приховати несумісні"
+  },
+  "instances.updater-modal.loading-changelog": {
+    "defaultMessage": "Завантаження журналу змін…"
+  },
+  "instances.updater-modal.loading-versions": {
+    "defaultMessage": "Завантаження версій…"
   },
   "instances.updater-modal.no-changelog": {
     "defaultMessage": "Для цієї версії не надано журнал змін."
@@ -482,6 +848,18 @@
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Показати несумісні"
   },
+  "instances.updater-modal.switch-to": {
+    "defaultMessage": "Змінити на {version}"
+  },
+  "instances.updater-modal.update-to": {
+    "defaultMessage": "Оновити до {version}"
+  },
+  "instances.updater-modal.warning-app": {
+    "defaultMessage": "Оновлення може зламати ваш профіль. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
+  },
+  "instances.updater-modal.warning-web": {
+    "defaultMessage": "Оновлення може зламати ваш світ. Спочатку ознайомтеся із журналом змін у версії й створіть резервну копію."
+  },
   "label.actions": {
     "defaultMessage": "Дії"
   },
@@ -493,6 +871,9 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Зміни збережено"
+  },
+  "label.client-only-warning": {
+    "defaultMessage": "Це мод для клієнтської сторони, який може спричинити проблеми. Ми залишили його увімкненим, оскільки деякі автори неправильно позначають середовища, а завантажувач повинен вирішити цей конфлікт."
   },
   "label.collections": {
     "defaultMessage": "Добірки"
@@ -511,6 +892,9 @@
   },
   "label.delete": {
     "defaultMessage": "Видалити"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Видалити негайно"
   },
   "label.description": {
     "defaultMessage": "Опис"
@@ -533,6 +917,15 @@
   "label.followed-projects": {
     "defaultMessage": "Відстежуванні проєкти"
   },
+  "label.game-version": {
+    "defaultMessage": "Версія гри"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Інформація про інсталяцію"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Установлена збірка"
+  },
   "label.installing": {
     "defaultMessage": "Установлення…"
   },
@@ -541,6 +934,9 @@
   },
   "label.moderation": {
     "defaultMessage": "Модерація"
+  },
+  "label.modpack": {
+    "defaultMessage": "Збірка"
   },
   "label.no": {
     "defaultMessage": "Ні"
@@ -556,6 +952,24 @@
   },
   "label.password": {
     "defaultMessage": "Пароль"
+  },
+  "label.plan-custom": {
+    "defaultMessage": "Власний"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Великий"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Середній"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Малий"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Невідомий"
+  },
+  "label.platform": {
+    "defaultMessage": "Платформа"
   },
   "label.played": {
     "defaultMessage": "Зіграно {ago}"
@@ -581,6 +995,12 @@
   "label.search": {
     "defaultMessage": "Пошук"
   },
+  "label.select-all": {
+    "defaultMessage": "Вибрати все"
+  },
+  "label.selection-actions": {
+    "defaultMessage": "Дії з вибраним"
+  },
   "label.server": {
     "defaultMessage": "Сервер"
   },
@@ -594,13 +1014,16 @@
     "defaultMessage": "Гра наодинці"
   },
   "label.sort-by": {
-    "defaultMessage": "Сортувати за"
+    "defaultMessage": "Сортувати за: "
   },
   "label.success": {
     "defaultMessage": "Успіх"
   },
   "label.title": {
     "defaultMessage": "Заголовок"
+  },
+  "label.unknown": {
+    "defaultMessage": "Невідомо"
   },
   "label.unlisted": {
     "defaultMessage": "Прихований"
@@ -693,7 +1116,7 @@
     "defaultMessage": "Румунська"
   },
   "locale.ru-RU": {
-    "defaultMessage": "російська"
+    "defaultMessage": "Російська"
   },
   "locale.sr-CS": {
     "defaultMessage": "Сербська (латиниця)"
@@ -733,9 +1156,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Зберігання файлів оновленими, попри зміни сервера"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Закрити"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Отримати Modrinth App"
@@ -1022,6 +1442,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Сумісність"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Організація"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Власник проєкту"
   },
@@ -1082,17 +1505,35 @@
   "project.about.links.wiki": {
     "defaultMessage": "Відвідати вікі"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Скопіювати посилання на сервер Java"
+  },
   "project.about.server.copied": {
     "defaultMessage": "Скопійовано!"
   },
   "project.about.server.copiedText": {
-    "defaultMessage": "IP-адресу скопійовано до буфера обміну"
+    "defaultMessage": "Посилання на сервер скопійовано до буфера обміну"
   },
-  "project.about.server.latency": {
-    "defaultMessage": "Затримка"
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Завантажити збірку"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Мови"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(рекомендовано)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Регіон"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Обов’язковий вміст"
   },
   "project.about.server.title": {
     "defaultMessage": "Подробиці сервера"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Теґи"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {завантаження} few {завантаження} other {завантажень}}"
@@ -1164,7 +1605,7 @@
     "defaultMessage": "Невідоме середовище"
   },
   "project.follower-count-tooltip": {
-    "defaultMessage": "{count, number} {count, plural, one {відстужує} few {відстужують} many {відстужують} other {відстужують}}"
+    "defaultMessage": "{count, number} {count, plural, one {відстежує} few {відстежують} other {відстежують}}"
   },
   "project.online-player-count": {
     "defaultMessage": "{count, number} у мережі"
@@ -1178,8 +1619,266 @@
   "project.recent-plays.tooltip": {
     "defaultMessage": "{count} {countPlural, plural, one {нещодавно грав} other {нещодавно грали}} з Modrinth за останні 2 тижні"
   },
+  "project.server.customModpackTooltip": {
+    "defaultMessage": "Цей проєкт використовує власну збірку"
+  },
+  "project.server.language.af": {
+    "defaultMessage": "Африкаанс"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Амхарська"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Арабська"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Азербайджанська"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Білоруська"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Болгарська"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Бенгальська"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Боснійська"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Каталонська"
+  },
+  "project.server.language.cs": {
+    "defaultMessage": "Чеська"
+  },
+  "project.server.language.da": {
+    "defaultMessage": "Данська"
+  },
+  "project.server.language.de": {
+    "defaultMessage": "Німецька"
+  },
+  "project.server.language.el": {
+    "defaultMessage": "Грецька"
+  },
+  "project.server.language.en": {
+    "defaultMessage": "Англійська"
+  },
+  "project.server.language.eo": {
+    "defaultMessage": "Есперанто"
+  },
+  "project.server.language.es": {
+    "defaultMessage": "Іспанська"
+  },
+  "project.server.language.et": {
+    "defaultMessage": "Естонська"
+  },
+  "project.server.language.eu": {
+    "defaultMessage": "Баскська"
+  },
+  "project.server.language.fa": {
+    "defaultMessage": "Перська"
+  },
+  "project.server.language.fi": {
+    "defaultMessage": "Фінська"
+  },
+  "project.server.language.fr": {
+    "defaultMessage": "Французька"
+  },
+  "project.server.language.ga": {
+    "defaultMessage": "Ірландська"
+  },
+  "project.server.language.gl": {
+    "defaultMessage": "Галісійська"
+  },
+  "project.server.language.he": {
+    "defaultMessage": "Іврит"
+  },
+  "project.server.language.hi": {
+    "defaultMessage": "Гінді"
+  },
+  "project.server.language.hr": {
+    "defaultMessage": "Хорватська"
+  },
+  "project.server.language.hu": {
+    "defaultMessage": "Угорська"
+  },
+  "project.server.language.hy": {
+    "defaultMessage": "Вірменська"
+  },
+  "project.server.language.id": {
+    "defaultMessage": "Індонезійська"
+  },
+  "project.server.language.is": {
+    "defaultMessage": "Ісландська"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Італійська"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Японська"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Картлійська"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Казахська"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Кхмерська"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Каннада"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Корейська"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Лаоська"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Литовська"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Латвійська"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Македонська"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Малаялам"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Монгольська"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Маратхі"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Малайська"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Бірманська"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Непальська"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Нідерландська"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Норвезька"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Пенджабська"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Польська"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Португальська"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Румунська"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Російська"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Сингальська"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Словацька"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Словенська"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Албанська"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Сербська"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Шведська"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Суахілі"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Тамільська"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Телугу"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Тайська"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Філіппінська"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Турецька"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Українська"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Урду"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Узбецька"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Вʼєтнамська"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Йоруба"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Китайська"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Зулу"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} мс"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Азія"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Австралія"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Європа"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Близький Схід"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "росія"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Південна Америка"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Локація сервера: {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "США (схід)"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "США (захід)"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Поза мережею"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Сервер поза мережею"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "У мережі"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Аналітика"
@@ -1200,7 +1899,7 @@
     "defaultMessage": "Опціонально для обох, краще працює коли встановлено на обох сторонах"
   },
   "project.settings.environment.client_and_server.optional_client.title": {
-    "defaultMessage": "Опціонально для клієнта"
+    "defaultMessage": "Необов’язково на клієнті"
   },
   "project.settings.environment.client_and_server.optional_server.title": {
     "defaultMessage": "Опціонально для сервера"
@@ -1415,8 +2114,71 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID проєкту"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Тип"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Мова"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Регіон"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Статус"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Завантажувач"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Модифікований"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Ванільний"
+  },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Під час створення «{backupName}» сталася помилка. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникає."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Не вдалося створити резервну копію"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "«{backupName}» наразі в черзі й розпочнеться незабаром."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Резервне копіювання в черзі"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "Збереження даних світу й конфігурації сервера для «{backupName}». Це може зайняти кілька хвилин."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Створення резервної копії"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "Ваша резервна копія"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Під час відновлення з «{backupName}» сталася помилка. Спробуйте ще раз або зверніться до служби підтримки, якщо проблема не зникає."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Не вдалося відновити з резервної копії"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Відновлення з «{backupName}» наразі в черзі й розпочнеться незабаром."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Відновлення з резервної копії наразі в черзі"
+  },
+  "servers.backups.admonition.restore-successful.description": {
+    "defaultMessage": "Ваш сервер було відновлено до «{backupName}» і готовий до запуску."
+  },
+  "servers.backups.admonition.restore-successful.title": {
+    "defaultMessage": "Успішне відновлення з резервної копії"
+  },
+  "servers.backups.admonition.restoring-backup.description": {
+    "defaultMessage": "Відновлення вашого сервера з «{backupName}». Це може зайняти кілька хвилин."
+  },
+  "servers.backups.admonition.restoring-backup.title": {
+    "defaultMessage": "Відновлення з резервної копії"
   },
   "servers.backups.item.auto": {
     "defaultMessage": "Автоматично"
@@ -1535,8 +2297,26 @@
   "servers.region.western-europe": {
     "defaultMessage": "Західна Європа"
   },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "На вас накладено обмеження через кількість запитів. Спробуйте ще раз пізніше."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Не вдалося перевстановити сервер"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Під час перевстановлення сталася несподівана помилка. Спробуйте ще раз пізніше."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Не вдалося перевстановити"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Будь ласка, не закривайте цю сторінку поки триває вивантаження."
+  },
+  "servers.setup.uploading-modpack.header": {
+    "defaultMessage": "Вивантаження збірки"
+  },
   "settings.account.title": {
-    "defaultMessage": "Обліковий запис і безпека"
+    "defaultMessage": "Обліковий запис, безпека"
   },
   "settings.appearance.title": {
     "defaultMessage": "Вигляд"
@@ -1752,7 +2532,7 @@
     "defaultMessage": "Режим гардкору"
   },
   "tag.category.high": {
-    "defaultMessage": "Високий"
+    "defaultMessage": "Високе"
   },
   "tag.category.items": {
     "defaultMessage": "Предмети"
@@ -1779,7 +2559,7 @@
     "defaultMessage": "Локалізація"
   },
   "tag.category.low": {
-    "defaultMessage": "Низький"
+    "defaultMessage": "Низьке"
   },
   "tag.category.magic": {
     "defaultMessage": "Магія"
@@ -1791,7 +2571,7 @@
     "defaultMessage": "Медіа"
   },
   "tag.category.medium": {
-    "defaultMessage": "Середній"
+    "defaultMessage": "Середнє"
   },
   "tag.category.microgames": {
     "defaultMessage": "Мікроігри"
@@ -1848,13 +2628,13 @@
     "defaultMessage": "Ділянки"
   },
   "tag.category.pokemon": {
-    "defaultMessage": "Покемон"
+    "defaultMessage": "Pokémon"
   },
   "tag.category.potato": {
     "defaultMessage": "Картопля"
   },
   "tag.category.prison": {
-    "defaultMessage": "В'язниця"
+    "defaultMessage": "В’язниця"
   },
   "tag.category.pve": {
     "defaultMessage": "PvE"
@@ -1875,7 +2655,7 @@
     "defaultMessage": "Реалізм"
   },
   "tag.category.recording-smp": {
-    "defaultMessage": "Запис SMP"
+    "defaultMessage": "SMP під запис"
   },
   "tag.category.reflections": {
     "defaultMessage": "Відбиття"
@@ -1887,7 +2667,7 @@
     "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
-    "defaultMessage": "Для знімка екрана"
+    "defaultMessage": "Лише для фото"
   },
   "tag.category.semi-realistic": {
     "defaultMessage": "Напівреалізм"
@@ -1938,7 +2718,7 @@
     "defaultMessage": "Приладдя"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Як стандартна гра"
+    "defaultMessage": "Як ванільна гра"
   },
   "tag.category.whitelisted": {
     "defaultMessage": "Білий список"

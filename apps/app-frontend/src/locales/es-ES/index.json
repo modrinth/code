@@ -5,8 +5,95 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede conectar con los servidores de autenticación"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Escribe la descripción del modpack..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportar"
+  },
+  "app.export-modal.header": {
+    "message": "Exportar modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Seleccione archivos y carpetas para incluir en el paquete"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Número de versión"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Todos los datos de su instancia se eliminarán permanentemente, incluidos sus mundos, configuraciones y todo el contenido instalado."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Esta acción no se puede deshacer"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Este modpack ya está instalado en la instancia \"{instanceName}\"."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Modpack duplicado"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Crea de todos modos"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Ir a la instancia"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack ya está instalado"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyecto"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "Copiar enlace"
+  },
+  "app.instance.mods.installing": {
+    "message": "Instalando..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "Modpack"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Se ha añadido \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "Se han añadido {count} proyectos"
+  },
+  "app.instance.mods.share-text": {
+    "message": "¡Echa un vistazo a los proyectos que utilizo en mi modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Compartir contenido del modpack"
+  },
+  "app.instance.mods.show-file": {
+    "message": "Mostrar archivo"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Se ha subido correctamente"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "Desconocido"
+  },
+  "app.instance.mods.updating": {
+    "message": "Actualizando..."
+  },
   "app.modal.install-to-play.content-required": {
-    "message": "Contenido requerido"
+    "message": "Contenido obligatorio"
   },
   "app.modal.install-to-play.header": {
     "message": "Instala para jugar"
@@ -71,6 +158,15 @@
   "app.update-popup.body": {
     "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
   },
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Modrinth App."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Ya está disponible Modrinth App v{version}. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "¡Modrinth App v{version} ya está disponible! Como estás conectado a una red con tarifa por datos, no la hemos descargado automáticamente."
+  },
   "app.update-popup.changelog": {
     "message": "Registro de cambios"
   },
@@ -79,6 +175,9 @@
   },
   "app.update-popup.download-complete": {
     "message": "Descarga completada"
+  },
+  "app.update-popup.reload": {
+    "message": "Recargar"
   },
   "app.update-popup.title": {
     "message": "Actualización disponible"
@@ -380,6 +479,9 @@
   "instance.worlds.incompatible_server": {
     "message": "Servidor es incompatible"
   },
+  "instance.worlds.linked_server": {
+    "message": "Gestionado por el proyecto del servidor"
+  },
   "instance.worlds.no_contact": {
     "message": "No se pudo contactar con el servidor"
   },
@@ -416,7 +518,16 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
   },
+  "search.filter.locked.server": {
+    "message": "Proporcionado por el servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Solo se pueden añadir a la instancia del servidor modificaciones del lado del cliente"
+  },
   "search.filter.locked.server-game-version.title": {
     "message": "La versión del juego es proporcionada por el servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "El cargador lo proporciona el servidor"
   }
 }

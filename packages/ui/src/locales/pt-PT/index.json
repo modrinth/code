@@ -320,9 +320,6 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Modo de jogo desconhecido"
   },
-  "instances.modpack-content-modal.back-button": {
-    "defaultMessage": "Voltar"
-  },
   "instances.modpack-content-modal.copy-link": {
     "defaultMessage": "Copiar link"
   },
@@ -476,9 +473,6 @@
   "label.singleplayer": {
     "defaultMessage": "Um jogador"
   },
-  "label.sort-by": {
-    "defaultMessage": "Ordenar por"
-  },
   "label.success": {
     "defaultMessage": "Sucesso"
   },
@@ -520,9 +514,6 @@
   },
   "modal.open-in-app.benefit.update": {
     "defaultMessage": "Mantém ficheiros atualizados quando o servidor muda"
-  },
-  "modal.open-in-app.close": {
-    "defaultMessage": "Fechar"
   },
   "modal.open-in-app.get-app": {
     "defaultMessage": "Obter a Modrinth App"
@@ -865,12 +856,6 @@
   },
   "project.about.server.copied": {
     "defaultMessage": "Copiado!"
-  },
-  "project.about.server.copiedText": {
-    "defaultMessage": "Endereço IP copiado para a área de transferência"
-  },
-  "project.about.server.latency": {
-    "defaultMessage": "Latência"
   },
   "project.about.server.title": {
     "defaultMessage": "Detalhes do servidor"
@@ -1486,9 +1471,6 @@
   },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Salada Russa"
-  },
-  "tag.category.kitpvp": {
-    "defaultMessage": "Kit PvP"
   },
   "tag.category.library": {
     "defaultMessage": "Biblioteca"

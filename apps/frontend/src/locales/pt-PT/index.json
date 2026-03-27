@@ -506,6 +506,15 @@
   "create.project.title": {
     "message": "Criar um projeto"
   },
+  "create.project.type-label": {
+    "message": "Tipo"
+  },
+  "create.project.type-project": {
+    "message": "Projeto"
+  },
+  "create.project.type-server": {
+    "message": "Servidor"
+  },
   "create.project.url-label": {
     "message": "URL"
   },
@@ -2720,20 +2729,11 @@
   "servers.plan.large.description": {
     "message": "Ideal para 15 a 25 jogadores, modpacks ou muitos mods."
   },
-  "servers.plan.large.name": {
-    "message": "Grande"
-  },
   "servers.plan.medium.description": {
     "message": "Ótimo para 6 a 15 jogadores e vários mods."
   },
-  "servers.plan.medium.name": {
-    "message": "Médio"
-  },
   "servers.plan.small.description": {
     "message": "Perfeito para 1 a 5 amigos com alguns mods leves."
-  },
-  "servers.plan.small.name": {
-    "message": "Pequeno"
   },
   "settings.applications.about": {
     "message": "Sobre"
@@ -2812,9 +2812,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Informação da Aplicação"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Ocorreu um erro"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "O ícone da tua aplicação foi atualizado."

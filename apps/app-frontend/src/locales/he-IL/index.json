@@ -5,6 +5,78 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "הזן את תיאור חבילת המודים..."
+  },
+  "app.export-modal.export-button": {
+    "message": "יצוא"
+  },
+  "app.export-modal.header": {
+    "message": "יצוא חבילת מודים"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "שם חבילת המודים"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "שם חבילת המודים"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "בחר קבצים ותיקיות להכללה בחבילה הזו"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "מספר גרסה"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "כל הנתונים של ההתקנה שלך ימחקו לתמיד, זה כולל את העולמות שלך, ההגדרות וכל התוכן שהתקנת."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "הפעולה הזו לא ניתנת לביטול"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "מחק התקנה"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "מחיקת התקנה"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "פרויקט"
+  },
+  "app.instance.mods.copy-link": {
+    "message": "העתק קישור"
+  },
+  "app.instance.mods.installing": {
+    "message": "מתקין..."
+  },
+  "app.instance.mods.modpack-fallback": {
+    "message": "חבילת מודים"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" נוסף"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} פרויקטים נוספו"
+  },
+  "app.instance.mods.share-text": {
+    "message": "בדוק את הפרויקטים שאני משתמש בהם בחבילת המודים שלי!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "משתף את התוכן של חבילת המודים"
+  },
+  "app.instance.mods.show-file": {
+    "message": "מצא קובץ"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "הועלה בהצלחה"
+  },
+  "app.instance.mods.unknown-version": {
+    "message": "לא ידוע"
+  },
+  "app.instance.mods.updating": {
+    "message": "מעדכן..."
+  },
   "app.modal.install-to-play.content-required": {
     "message": "תוכן נדרש"
   },

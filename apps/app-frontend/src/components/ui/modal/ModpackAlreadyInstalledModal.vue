@@ -1,21 +1,31 @@
 <template>
 	<NewModal ref="modal" :header="formatMessage(messages.header)" fade="warning" max-width="500px">
-		<Admonition type="warning" :header="formatMessage(messages.admonitionHeader)">
-			{{ formatMessage(messages.admonitionBody, { instanceName }) }}
-		</Admonition>
+		<p class="m-0 text-secondary">
+			<IntlFormatted :message-id="messages.body" :values="{ instanceName }">
+				<template #bold="{ children }">
+					<span class="font-medium text-contrast"><component :is="() => children" /></span>
+				</template>
+			</IntlFormatted>
+		</p>
 
 		<template #actions>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled type="outlined">
-					<button class="!border !border-surface-4" @click="handleGoToInstance">
-						<ExternalIcon />
-						{{ formatMessage(messages.goToInstance) }}
+					<button class="!border !border-surface-4" @click="handleCancel">
+						<XIcon />
+						{{ formatMessage(commonMessages.cancelButton) }}
+					</button>
+				</ButtonStyled>
+				<ButtonStyled>
+					<button @click="handleGoToInstance">
+						{{ formatMessage(messages.instance) }}
+						<RightArrowIcon />
 					</button>
 				</ButtonStyled>
 				<ButtonStyled color="orange">
 					<button @click="handleCreateAnyway">
 						<PlusIcon />
-						{{ formatMessage(messages.createAnyway) }}
+						{{ formatMessage(messages.create) }}
 					</button>
 				</ButtonStyled>
 			</div>
@@ -24,8 +34,15 @@
 </template>
 
 <script setup lang="ts">
-import { ExternalIcon, PlusIcon } from '@modrinth/assets'
-import { Admonition, ButtonStyled, defineMessages, NewModal, useVIntl } from '@modrinth/ui'
+import { PlusIcon, RightArrowIcon, XIcon } from '@modrinth/assets'
+import {
+	ButtonStyled,
+	commonMessages,
+	defineMessages,
+	IntlFormatted,
+	NewModal,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref } from 'vue'
 
 const { formatMessage } = useVIntl()
@@ -35,21 +52,18 @@ const messages = defineMessages({
 		id: 'app.instance.modpack-already-installed.header',
 		defaultMessage: 'Modpack already installed',
 	},
-	admonitionHeader: {
-		id: 'app.instance.modpack-already-installed.admonition-header',
-		defaultMessage: 'Duplicate modpack',
+	body: {
+		id: 'app.instance.modpack-already-installed.body',
+		defaultMessage:
+			'This modpack is already installed in the <bold>{instanceName}</bold> instance. Are you sure you want to duplicate it?',
 	},
-	admonitionBody: {
-		id: 'app.instance.modpack-already-installed.admonition-body',
-		defaultMessage: 'This modpack is already installed in the "{instanceName}" instance.',
+	instance: {
+		id: 'app.instance.modpack-already-installed.instance',
+		defaultMessage: 'Instance',
 	},
-	goToInstance: {
-		id: 'app.instance.modpack-already-installed.go-to-instance',
-		defaultMessage: 'Go to instance',
-	},
-	createAnyway: {
-		id: 'app.instance.modpack-already-installed.create-anyway',
-		defaultMessage: 'Create anyway',
+	create: {
+		id: 'app.instance.modpack-already-installed.create',
+		defaultMessage: 'Create',
 	},
 })
 
@@ -66,6 +80,10 @@ function show(name: string, path: string) {
 	instanceName.value = name
 	instancePath.value = path
 	modal.value?.show()
+}
+
+function handleCancel() {
+	modal.value?.hide()
 }
 
 function handleGoToInstance() {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ArrowLeftRightIcon,
 	BoxIcon,
 	FilterIcon,
 	GlassesIcon,
@@ -7,7 +8,6 @@ import {
 	SearchIcon,
 	SpinnerIcon,
 } from '@modrinth/assets'
-import { formatProjectType } from '@modrinth/utils'
 import Fuse from 'fuse.js'
 import { computed, nextTick, ref, watchSyncEffect } from 'vue'
 
@@ -18,9 +18,14 @@ import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowM
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import NewModal from '#ui/components/modal/NewModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
-import { commonMessages } from '#ui/utils/common-messages'
+import {
+	commonMessages,
+	commonProjectTypeCategoryMessages,
+	commonProjectTypeTitleMessages,
+	normalizeProjectType,
+} from '#ui/utils/common-messages'
 
-import { isClientOnlyEnvironment } from '../../composables/content-filtering'
+import { getClientWarningType, isClientOnlyEnvironment } from '../../composables/content-filtering'
 import type { ContentCardTableItem, ContentItem } from '../../types'
 import ContentCardTable from '../ContentCardTable.vue'
 import ContentSelectionBar from '../ContentSelectionBar.vue'
@@ -32,6 +37,7 @@ interface Props {
 	modpackIconUrl?: string
 	enableToggle?: boolean
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
+	switchVersion?: (item: ContentItem) => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 	modpackIconUrl: undefined,
 	enableToggle: false,
 	getOverflowOptions: undefined,
+	switchVersion: undefined,
 })
 
 const emit = defineEmits<{
@@ -71,14 +78,6 @@ const messages = defineMessages({
 	noResults: {
 		id: 'instances.modpack-content-modal.no-results',
 		defaultMessage: 'No projects match your search.',
-	},
-	allFilter: {
-		id: 'instances.modpack-content-modal.filter-all',
-		defaultMessage: 'All',
-	},
-	copyLink: {
-		id: 'instances.modpack-content-modal.copy-link',
-		defaultMessage: 'Copy link',
 	},
 })
 
@@ -133,25 +132,36 @@ watchSyncEffect(() => fuse.setCollection(items.value))
 const filterOptions = computed(() => {
 	const frequency = items.value.reduce(
 		(map, item) => {
-			map[item.project_type] = (map[item.project_type] || 0) + 1
+			const normalized = normalizeProjectType(item.project_type)
+			map[normalized] = (map[normalized] || 0) + 1
 			return map
 		},
 		{} as Record<string, number>,
 	)
 
-	// Sort by frequency (most common first)
-	return Object.entries(frequency)
+	const options = Object.entries(frequency)
 		.sort(([, a], [, b]) => b - a)
-		.map(([type]) => ({
-			id: type,
-			label: formatProjectType(type) + 's',
-		}))
+		.map(([type]) => {
+			const msg =
+				commonProjectTypeCategoryMessages[type as keyof typeof commonProjectTypeCategoryMessages]
+			return {
+				id: type,
+				label: msg ? formatMessage(msg) : type.charAt(0).toUpperCase() + type.slice(1) + 's',
+			}
+		})
+
+	if (items.value.some((item) => !item.enabled)) {
+		options.push({ id: 'disabled', label: 'Disabled' })
+	}
+
+	return options
 })
 
 const stats = computed(() => {
 	const counts: Record<string, number> = {}
 	for (const item of items.value) {
-		counts[item.project_type] = (counts[item.project_type] || 0) + 1
+		const normalized = normalizeProjectType(item.project_type)
+		counts[normalized] = (counts[normalized] || 0) + 1
 	}
 	return counts
 })
@@ -165,9 +175,18 @@ function toggleFilter(filterId: string) {
 	}
 }
 
+const attributeFilterIds = new Set(['disabled'])
+
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
-	return items.value.filter((item) => selectedFilters.value.includes(item.project_type)).length
+	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	return items.value.filter((item) => {
+		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
+			return false
+		if (hasDisabledFilter && item.enabled) return false
+		return true
+	}).length
 })
 
 const filteredItems = computed(() => {
@@ -184,9 +203,15 @@ const filteredItems = computed(() => {
 		})
 	}
 
-	// Apply type filters
 	if (selectedFilters.value.length > 0) {
-		result = result.filter((item) => selectedFilters.value.includes(item.project_type))
+		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
+		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		result = result.filter((item) => {
+			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
+				return false
+			if (hasDisabledFilter && item.enabled) return false
+			return true
+		})
 	}
 
 	return result
@@ -214,9 +239,24 @@ const tableItems = computed<ContentCardTableItem[]>(() =>
 				}
 			: undefined,
 		...(props.enableToggle ? { enabled: item.enabled } : {}),
-		isClientOnly: isClientOnlyEnvironment(item.environment),
+		isClientOnly:
+			isClientOnlyEnvironment(item.environment) ||
+			!!item.pack_client_retained ||
+			!!item.pack_client_depends,
+		clientWarning: getClientWarningType(item),
 		disabled: disabledIds.value.has(item.file_name),
-		overflowOptions: props.getOverflowOptions?.(item),
+		overflowOptions: [
+			...(props.switchVersion
+				? [
+						{
+							id: formatMessage(commonMessages.switchVersionButton),
+							icon: ArrowLeftRightIcon,
+							action: () => props.switchVersion!(item),
+						},
+					]
+				: []),
+			...(props.getOverflowOptions?.(item) ?? []),
+		],
 	})),
 )
 
@@ -344,7 +384,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 				/>
 
 				<!-- Filters -->
-				<div v-if="filterOptions.length > 1" class="flex items-center gap-2">
+				<div v-if="filterOptions.length > 0" class="flex items-center gap-2">
 					<FilterIcon class="size-5 text-secondary shrink-0" />
 					<div class="flex flex-wrap items-center gap-1.5">
 						<button
@@ -357,7 +397,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 							"
 							@click="selectedFilters = []"
 						>
-							{{ formatMessage(messages.allFilter) }}
+							{{ formatMessage(commonMessages.allProjectType) }}
 						</button>
 						<button
 							v-for="option in filterOptions"
@@ -416,7 +456,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 							class="flex min-w-0 items-center gap-4"
 							:class="
 								props.enableToggle
-									? 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+									? 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 									: 'flex-1'
 							"
 						>
@@ -434,7 +474,7 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 						</div>
 						<div
 							class="hidden @[800px]:flex"
-							:class="props.enableToggle ? 'w-[335px] min-w-0' : 'flex-1'"
+							:class="props.enableToggle ? 'flex-1 min-w-0' : 'flex-1'"
 						>
 							<span class="font-semibold text-secondary">{{
 								formatMessage(commonMessages.versionLabel)
@@ -475,7 +515,17 @@ defineExpose({ show, showLoading, hide, getState, restore, updateItem })
 						<div class="flex items-center gap-1.5">
 							<component :is="getTypeIcon(type as string)" class="size-5 text-secondary" />
 							<span class="font-medium text-primary">
-								{{ count }} {{ formatProjectType(type as string) }}{{ count !== 1 ? 's' : '' }}
+								{{ count }}
+								{{
+									formatMessage(
+										commonProjectTypeTitleMessages[
+											normalizeProjectType(
+												type as string,
+											) as keyof typeof commonProjectTypeTitleMessages
+										] ?? commonProjectTypeTitleMessages.project,
+										{ count },
+									)
+								}}
 							</span>
 						</div>
 					</template>

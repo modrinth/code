@@ -68,6 +68,10 @@ CSS custom properties are defined in `packages/assets/styles/variables.scss` wit
 
 **Color palette** (each with shades 50–950): red, orange, green, blue, purple, gray. Platform-specific colors also exist (fabric, forge, quilt, neoforge, etc.).
 
+## Storybook
+
+When modifying a component in `src/components/`, you must also update its corresponding Storybook story in `src/stories/` to reflect the changes. If a story file doesn't exist yet, create one. Stories should cover the component's key states and variants.
+
 ## Dependency Injection
 
 This package defines the DI layer using `createContext` from `src/providers/index.ts`. See the `dependency-injection` skill (`.claude/skills/dependency-injection/SKILL.md`) for full documentation.

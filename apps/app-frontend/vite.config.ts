@@ -70,14 +70,17 @@ export default defineConfig({
 	// https://v2.tauri.app/reference/environment-variables/#tauri-cli-hook-commands
 	envPrefix: ['VITE_', 'TAURI_'],
 	build: {
+		rolldownOptions: {
+			onwarn(warning, defaultHandler) {
+				if (warning.code === 'INEFFECTIVE_DYNAMIC_IMPORT') return
+				defaultHandler(warning)
+			},
+		},
 		// Tauri supports es2021
 		target: process.env.TAURI_ENV_PLATFORM == 'windows' ? 'chrome105' : 'safari13', // eslint-disable-line turbo/no-undeclared-env-vars
 		// don't minify for debug builds
-		minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false, // eslint-disable-line turbo/no-undeclared-env-vars
+		minify: !process.env.TAURI_ENV_DEBUG, // eslint-disable-line turbo/no-undeclared-env-vars
 		// produce sourcemaps for debug builds
 		sourcemap: !!process.env.TAURI_ENV_DEBUG, // eslint-disable-line turbo/no-undeclared-env-vars
-		commonjsOptions: {
-			esmExternals: true,
-		},
 	},
 })

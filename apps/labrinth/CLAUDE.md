@@ -8,7 +8,7 @@ When the user refers to "perform[ing] pre-PR checks", do the following:
 
 - Run `cargo clippy -p labrinth --all-targets` — there must be ZERO warnings, otherwise CI will fail
 - DO NOT run tests unless explicitly requested (they take a long time)
-- Prepare the sqlx cache: cd into `apps/labrinth` and run `cargo sqlx prepare`
+- Prepare the sqlx cache: cd into `apps/labrinth` and run `cargo sqlx prepare -- --tests`
 	- NEVER run `cargo sqlx prepare --workspace`
 
 ## Testing

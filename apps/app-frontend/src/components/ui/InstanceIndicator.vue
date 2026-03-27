@@ -2,6 +2,7 @@
 import { GameIcon, LeftArrowIcon } from '@modrinth/assets'
 import { Avatar, ButtonStyled, FormattedTag } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { computed } from 'vue'
 
 type Instance = {
 	game_version: string
@@ -12,18 +13,23 @@ type Instance = {
 	name: string
 }
 
-defineProps<{
-	instance: Instance
-}>()
+const props = withDefaults(
+	defineProps<{
+		instance: Instance
+		backTab?: string
+	}>(),
+	{ backTab: undefined },
+)
+
+const instanceLink = computed(() => {
+	const base = `/instance/${encodeURIComponent(props.instance.path)}`
+	return props.backTab ? `${base}/${props.backTab}` : base
+})
 </script>
 
 <template>
 	<div class="flex justify-between items-center border-0 border-b border-solid border-divider pb-4">
-		<router-link
-			:to="`/instance/${encodeURIComponent(instance.path)}`"
-			tabindex="-1"
-			class="flex flex-col gap-4 text-primary"
-		>
+		<router-link :to="instanceLink" tabindex="-1" class="flex flex-col gap-4 text-primary">
 			<span class="flex items-center gap-2">
 				<Avatar
 					:src="instance.icon_path ? convertFileSrc(instance.icon_path) : undefined"
@@ -43,9 +49,7 @@ defineProps<{
 			</span>
 		</router-link>
 		<ButtonStyled>
-			<router-link :to="`/instance/${encodeURIComponent(instance.path)}`">
-				<LeftArrowIcon /> Back to instance
-			</router-link>
+			<router-link :to="instanceLink"> <LeftArrowIcon /> Back to instance </router-link>
 		</ButtonStyled>
 	</div>
 </template>

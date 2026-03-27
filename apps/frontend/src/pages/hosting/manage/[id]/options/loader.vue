@@ -1,5 +1,13 @@
 <template>
 	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
+		<ConfirmModal
+			ref="resetToOnboardingModal"
+			:title="formatMessage(messages.resetToOnboardingModalTitle)"
+			:description="formatMessage(messages.resetToOnboardingModalDescription)"
+			:proceed-label="formatMessage(messages.resetToOnboardingButton)"
+			@proceed="confirmResetToOnboarding"
+		/>
+
 		<InstallationSettingsLayout ref="installationSettingsLayout">
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
@@ -28,6 +36,24 @@
 				/>
 			</template>
 		</InstallationSettingsLayout>
+
+		<div v-if="isSiteAdmin" class="flex flex-col gap-2.5">
+			<span class="text-lg font-semibold text-contrast">
+				{{ formatMessage(messages.supportOptionsTitle) }}
+			</span>
+			<div>
+				<ButtonStyled color="red">
+					<button
+						class="!shadow-none"
+						:disabled="!worldId || isResettingToOnboarding"
+						@click="resetToOnboardingModal?.show()"
+					>
+						<RotateCounterClockwiseIcon class="size-5" />
+						{{ formatMessage(messages.resetToOnboardingButton) }}
+					</button>
+				</ButtonStyled>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -37,6 +63,7 @@ import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	commonMessages,
+	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
 	injectModrinthClient,
@@ -106,6 +133,35 @@ const messages = defineMessages({
 		id: 'hosting.loader.failed-to-unlink',
 		defaultMessage: 'Failed to unlink modpack',
 	},
+	supportOptionsTitle: {
+		id: 'hosting.loader.support-options-title',
+		defaultMessage: 'Support options',
+	},
+	resetToOnboardingButton: {
+		id: 'hosting.loader.reset-to-onboarding-button',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingModalTitle: {
+		id: 'hosting.loader.reset-to-onboarding-modal-title',
+		defaultMessage: 'Reset to onboarding',
+	},
+	resetToOnboardingModalDescription: {
+		id: 'hosting.loader.reset-to-onboarding-modal-description',
+		defaultMessage:
+			'This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?',
+	},
+	resetToOnboardingSuccessTitle: {
+		id: 'hosting.loader.reset-to-onboarding-success-title',
+		defaultMessage: 'Server reset to onboarding',
+	},
+	resetToOnboardingSuccessDescription: {
+		id: 'hosting.loader.reset-to-onboarding-success-description',
+		defaultMessage: 'The server has been returned to the onboarding flow.',
+	},
+	failedToResetToOnboarding: {
+		id: 'hosting.loader.failed-to-reset-to-onboarding',
+		defaultMessage: 'Failed to reset server to onboarding',
+	},
 })
 
 const emit = defineEmits<{
@@ -147,17 +203,27 @@ const addonsQuery = useQuery({
 
 const modpack = computed(() => addonsQuery.data.value?.modpack ?? null)
 
+const modpackProjectId = computed(() => {
+	const spec = modpack.value?.spec
+	return spec?.platform === 'modrinth' ? spec.project_id : null
+})
+
 const modpackVersionsQuery = useQuery({
-	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpack.value?.spec.project_id]),
+	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
 	queryFn: () =>
-		client.labrinth.versions_v2.getProjectVersions(modpack.value!.spec.project_id, {
+		client.labrinth.versions_v2.getProjectVersions(modpackProjectId.value!, {
 			include_changelog: false,
 		}),
-	enabled: computed(() => !!modpack.value?.spec.project_id),
+	enabled: computed(() => !!modpackProjectId.value),
 })
+
+const auth = await useAuth()
+const isSiteAdmin = computed(() => auth.value?.user?.role === 'admin')
 
 const editingPlatform = ref(server.value?.loader?.toLowerCase() ?? 'vanilla')
 const editingGameVersion = ref(server.value?.mc_version ?? '')
+const resetToOnboardingModal = ref<InstanceType<typeof ConfirmModal>>()
+const isResettingToOnboarding = ref(false)
 
 const modLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
@@ -260,17 +326,20 @@ provideInstallationSettings({
 	}),
 	isLinked: computed(() => {
 		const val = !!modpack.value
-		debug('isLinked:', val, 'modpack:', modpack.value?.spec?.project_id)
+		debug('isLinked:', val, 'modpack:', modpackProjectId.value)
 		return val
 	}),
 	isBusy: isInstalling,
 	modpack: computed(() => {
 		if (!modpack.value) return null
+		const isLocal = modpack.value.spec.platform === 'local_file'
 		return {
 			iconUrl: modpack.value.icon_url,
-			title: modpack.value.title ?? modpack.value.spec.project_id,
-			link: `/project/${modpack.value.spec.project_id}`,
+			title:
+				modpack.value.title ?? (isLocal ? modpack.value.spec.name : modpack.value.spec.project_id),
+			link: modpackProjectId.value ? `/project/${modpackProjectId.value}` : undefined,
 			versionNumber: modpack.value.version_number,
+			filename: isLocal ? modpack.value.spec.filename : undefined,
 			owner: modpack.value.owner
 				? {
 						id: modpack.value.owner.id,
@@ -337,11 +406,17 @@ provideInstallationSettings({
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
 
+		let resolvedLoaderVersion = loaderVersionId
+		if (!resolvedLoaderVersion && platform !== 'vanilla') {
+			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
+			resolvedLoaderVersion = versions[0]?.id ?? null
+		}
+
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
 			platformChanged
-				? { loader: platform, lVersion: loaderVersionId, mVersion: gameVersion }
+				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
@@ -349,7 +424,7 @@ provideInstallationSettings({
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
-					version: loaderVersionId ?? '',
+					version: resolvedLoaderVersion ?? '',
 					game_version: gameVersion || undefined,
 					soft_override: true,
 				}
@@ -393,7 +468,7 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
-		if (!modpack.value) return
+		if (!modpack.value || modpack.value.spec.platform !== 'modrinth') return
 		debug(
 			'reinstallModpack: called, project:',
 			modpack.value.spec.project_id,
@@ -464,10 +539,11 @@ provideInstallationSettings({
 	getCachedModpackVersions: () => modpackVersionsQuery.data.value ?? null,
 
 	async fetchModpackVersions() {
-		debug('fetchModpackVersions: called, project:', modpack.value?.spec.project_id)
+		debug('fetchModpackVersions: called, project:', modpackProjectId.value)
+		if (!modpackProjectId.value) throw new Error('No modpack project ID')
 		try {
 			const versions = await client.labrinth.versions_v2.getProjectVersions(
-				modpack.value!.spec.project_id,
+				modpackProjectId.value,
 				{
 					include_changelog: false,
 				},
@@ -495,7 +571,7 @@ provideInstallationSettings({
 	},
 
 	async onModpackVersionConfirm(version) {
-		if (!modpack.value) return
+		if (!modpackProjectId.value) return
 		debug('onModpackVersionConfirm: called, version:', version.id)
 		debug('onModpackVersionConfirm: emitting reinstall before API call')
 		emit('reinstall')
@@ -504,7 +580,7 @@ provideInstallationSettings({
 				content_variant: 'modpack',
 				spec: {
 					platform: 'modrinth',
-					project_id: modpack.value.spec.project_id,
+					project_id: modpackProjectId.value,
 					version_id: version.id,
 				},
 				soft_override: true,
@@ -523,18 +599,18 @@ provideInstallationSettings({
 
 	updaterModalProps: computed(() => ({
 		isApp: false,
-		currentVersionId: modpack.value?.spec.version_id ?? '',
+		currentVersionId:
+			modpack.value?.spec.platform === 'modrinth' ? modpack.value.spec.version_id : '',
 		projectIconUrl: modpack.value?.icon_url ?? undefined,
 		projectName:
-			modpack.value?.title ??
-			modpack.value?.spec.project_id ??
-			formatMessage(commonMessages.modpackLabel),
+			modpack.value?.title ?? modpackProjectId.value ?? formatMessage(commonMessages.modpackLabel),
 		currentGameVersion: addonsQuery.data.value?.game_version ?? server.value?.mc_version ?? '',
 		currentLoader: addonsQuery.data.value?.modloader ?? server.value?.loader ?? '',
 	})),
 
 	isServer: true,
 	isApp: false,
+	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 
 	lockPlatform: true,
 	hideLoaderVersion: true,
@@ -589,5 +665,31 @@ function onBrowseModpacks() {
 		path: '/discover/modpacks',
 		query: { sid: serverId, from: 'reset-server', wid: worldId.value },
 	})
+}
+
+async function confirmResetToOnboarding() {
+	if (!worldId.value) return
+
+	try {
+		isResettingToOnboarding.value = true
+		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
+		server.value.flows = { intro: true }
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
+			queryClient.invalidateQueries({ queryKey: ['servers', 'v1', 'detail', serverId] }),
+		])
+		addNotification({
+			type: 'success',
+			title: formatMessage(messages.resetToOnboardingSuccessTitle),
+			text: formatMessage(messages.resetToOnboardingSuccessDescription),
+		})
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : formatMessage(messages.failedToResetToOnboarding),
+		})
+	} finally {
+		isResettingToOnboarding.value = false
+	}
 }
 </script>

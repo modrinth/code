@@ -13,7 +13,7 @@
 					formatMessage(messages.admonitionHeader, { action: downgrade ? 'downgrade' : 'update' })
 				"
 			>
-				{{ formatMessage(messages.admonitionBody) }}
+				{{ formatMessage(server ? messages.admonitionBody : messages.admonitionBodyApp) }}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -82,6 +82,10 @@ const messages = defineMessages({
 	admonitionBody: {
 		id: 'content.confirm-modpack-update.admonition-body',
 		defaultMessage: 'Any mods or content you added on top of the modpack will be deleted.',
+	},
+	admonitionBodyApp: {
+		id: 'content.confirm-modpack-update.admonition-body-app',
+		defaultMessage: 'Any mods or content you added on top of the modpack will be preserved.',
 	},
 	confirmButton: {
 		id: 'content.confirm-modpack-update.confirm-button',

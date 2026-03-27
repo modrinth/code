@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -13,7 +14,6 @@ import {
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
-import ConfirmLeaveModal from '../../../shared/content-tab/components/modals/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../../../shared/content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmUnlinkModal from '../../../shared/content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../../../shared/content-tab/components/modals/ContentUpdaterModal.vue'
@@ -78,9 +78,17 @@ const messages = defineMessages({
 		id: 'hosting.content.failed-to-bulk-update',
 		defaultMessage: 'Failed to update content',
 	},
-	copyLink: {
-		id: 'hosting.content.copy-link',
-		defaultMessage: 'Copy link',
+})
+
+const leaveMessages = defineMessages({
+	uploadInProgress: {
+		id: 'instances.confirm-leave-modal.upload-in-progress',
+		defaultMessage: 'Upload in progress',
+	},
+	leavePageBody: {
+		id: 'instances.confirm-leave-modal.body',
+		defaultMessage:
+			'Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost.',
 	},
 })
 
@@ -115,9 +123,13 @@ const contentQuery = useQuery({
 	queryFn: () =>
 		client.archon.content_v1.getAddons(serverId, worldId.value!, { from_modpack: false }),
 	enabled: computed(() => worldId.value !== null),
+	staleTime: 0,
 })
 
-const modpackProjectId = computed(() => contentQuery.data.value?.modpack?.spec.project_id ?? null)
+const modpackProjectId = computed(() => {
+	const spec = contentQuery.data.value?.modpack?.spec
+	return spec?.platform === 'modrinth' ? spec.project_id : null
+})
 
 const modpackVersionsQuery = useQuery({
 	queryKey: computed(() => ['labrinth', 'versions', 'v2', modpackProjectId.value]),
@@ -137,24 +149,32 @@ const projectQuery = useQuery({
 const modpack = computed<ContentModpackData | null>(() => {
 	const mp = contentQuery.data.value?.modpack
 	if (!mp) return null
+	const isLocal = mp.spec.platform === 'local_file'
 	const project = projectQuery.data.value
+	const projectId = isLocal ? null : mp.spec.project_id
 	return {
 		project: {
-			id: mp.spec.project_id,
-			slug: project?.slug ?? mp.spec.project_id,
-			title: mp.title ?? mp.spec.project_id,
+			id: projectId ?? mp.title ?? '',
+			slug: project?.slug ?? projectId ?? '',
+			title: mp.title ?? (isLocal ? mp.spec.name : projectId) ?? '',
 			icon_url: mp.icon_url ?? undefined,
 			description: mp.description ?? '',
-			downloads: mp.downloads ?? 0,
-			followers: mp.followers ?? 0,
+			downloads: mp.downloads,
+			followers: mp.followers,
+			filename: isLocal ? mp.spec.filename : undefined,
 		} as ContentModpackCardProject,
-		projectLink: `/project/${project?.slug ?? mp.spec.project_id}`,
-		version: {
-			id: mp.spec.version_id,
-			version_number: mp.version_number ?? '',
-			date_published: mp.date_published ?? '',
-		} as ContentModpackCardVersion,
-		versionLink: `/project/${project?.slug ?? mp.spec.project_id}/version/${mp.spec.version_id}`,
+		projectLink: projectId ? `/project/${project?.slug ?? projectId}` : undefined,
+		version: isLocal
+			? undefined
+			: ({
+					id: mp.spec.version_id,
+					version_number: mp.version_number ?? '',
+					date_published: mp.date_published ?? '',
+				} as ContentModpackCardVersion),
+		versionLink:
+			projectId && !isLocal
+				? `/project/${project?.slug ?? projectId}/version/${mp.spec.version_id}`
+				: undefined,
 		owner: mp.owner
 			? {
 					id: mp.owner.id,
@@ -167,7 +187,7 @@ const modpack = computed<ContentModpackData | null>(() => {
 							: `/user/${mp.owner.id}`,
 				}
 			: undefined,
-		categories: (project?.display_categories ?? []).map((name) => ({
+		categories: (project?.categories ?? []).map((name) => ({
 			name,
 			icon: name,
 			project_type: 'modpack',
@@ -483,13 +503,15 @@ function addonToContentItem(addon: Archon.Content.v1.Addon): ContentItem {
 					link: `/${addon.owner.type}/${addon.owner.id}`,
 				}
 			: undefined,
-		id: addon.id,
+		id: addon.id ?? addon.filename,
 		enabled: !addon.disabled,
 		file_name: addon.filename,
 		project_type: addon.kind,
 		has_update: !!addon.has_update,
 		update_version_id: addon.has_update,
 		environment: addon.version?.environment ?? undefined,
+		pack_client_retained: addon.pack_client_retained,
+		pack_client_depends: addon.pack_client_depends,
 	}
 }
 
@@ -668,7 +690,7 @@ async function handleSwitchVersion(item: ContentItem) {
 
 async function handleModpackUpdate() {
 	const mp = contentQuery.data.value?.modpack
-	if (!mp?.spec.project_id) return
+	if (!mp || mp.spec.platform !== 'modrinth') return
 
 	updatingModpack.value = true
 	updatingProject.value = null
@@ -758,7 +780,8 @@ function handleModalUpdate(selectedVersion: Labrinth.Versions.v2.Version, event?
 			pendingModpackUpdateVersion.value = selectedVersion
 			handleModpackUpdateConfirm()
 		} else {
-			const currentVersionId = contentQuery.data.value?.modpack?.spec.version_id
+			const mpSpec = contentQuery.data.value?.modpack?.spec
+			const currentVersionId = mpSpec?.platform === 'modrinth' ? mpSpec.version_id : undefined
 			const currentVersion = updatingProjectVersions.value.find((v) => v.id === currentVersionId)
 			isModpackUpdateDowngrade.value = currentVersion
 				? new Date(selectedVersion.date_published) < new Date(currentVersion.date_published)
@@ -776,7 +799,7 @@ async function performUpdate(selectedVersion: Labrinth.Versions.v2.Version) {
 	try {
 		if (updatingModpack.value) {
 			const mp = contentQuery.data.value?.modpack
-			if (!mp) return
+			if (!mp || mp.spec.platform !== 'modrinth') return
 			await client.archon.content_v1.installContent(serverId, worldId.value!, {
 				content_variant: 'modpack',
 				spec: {
@@ -823,7 +846,7 @@ function getOverflowOptions(item: ContentItem) {
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(messages.copyLink),
+			id: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(
@@ -886,13 +909,15 @@ provideContentManager({
 	getOverflowOptions,
 	mapToTableItem: (item) => {
 		const projectType = item.project_type ?? type.value
+		const addon = addonLookup.value.get(item.file_name)
+		const hasModrinthProject = !!addon?.project_id
 		return {
 			id: item.id,
 			project: item.project,
-			projectLink: item.project?.id ? `/${projectType}/${item.project.id}` : undefined,
+			projectLink: hasModrinthProject ? `/${projectType}/${item.project.id}` : undefined,
 			version: item.version,
 			versionLink:
-				item.project?.id && item.version?.id
+				hasModrinthProject && item.version?.id
 					? `/${projectType}/${item.project.id}/version/${item.version.id}`
 					: undefined,
 			owner: item.owner
@@ -926,7 +951,9 @@ provideContentManager({
 				:current-loader="currentLoader"
 				:current-version-id="
 					updatingModpack
-						? (contentQuery.data.value?.modpack?.spec.version_id ?? '')
+						? contentQuery.data.value?.modpack?.spec.platform === 'modrinth'
+							? contentQuery.data.value.modpack.spec.version_id
+							: ''
 						: (updatingProject?.version?.id ?? '')
 				"
 				:is-app="false"
@@ -960,5 +987,10 @@ provideContentManager({
 		@confirm="handleModpackUpdateConfirm"
 		@cancel="handleModpackUpdateCancel"
 	/>
-	<ConfirmLeaveModal ref="confirmLeaveModal" />
+	<ConfirmLeaveModal
+		ref="confirmLeaveModal"
+		:header="formatMessage(leaveMessages.uploadInProgress)"
+		:body="formatMessage(leaveMessages.leavePageBody)"
+		admonition-type="critical"
+	/>
 </template>

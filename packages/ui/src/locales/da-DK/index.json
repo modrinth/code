@@ -350,6 +350,9 @@
   "label.confirm-password": {
     "defaultMessage": "Bekræft adgangskode"
   },
+  "label.content": {
+    "defaultMessage": "Indhold"
+  },
   "label.created-ago": {
     "defaultMessage": "Oprettet {ago}"
   },
@@ -358,6 +361,9 @@
   },
   "label.delete": {
     "defaultMessage": "Slet"
+  },
+  "label.delete-immediately": {
+    "defaultMessage": "Slet med det samme"
   },
   "label.description": {
     "defaultMessage": "Beskrivelse"
@@ -380,11 +386,26 @@
   "label.followed-projects": {
     "defaultMessage": "Fulgte projekter"
   },
+  "label.game-version": {
+    "defaultMessage": "Spil version"
+  },
+  "label.installation-info": {
+    "defaultMessage": "Installation information"
+  },
+  "label.installed-modpack": {
+    "defaultMessage": "Installeret modpack"
+  },
+  "label.installing": {
+    "defaultMessage": "Installere..."
+  },
   "label.loading": {
     "defaultMessage": "Indlæser..."
   },
   "label.moderation": {
     "defaultMessage": "Moderation"
+  },
+  "label.modpack": {
+    "defaultMessage": "Modpack"
   },
   "label.no": {
     "defaultMessage": "Nej"
@@ -400,6 +421,27 @@
   },
   "label.password": {
     "defaultMessage": "Adgangskode"
+  },
+  "label.plan-custom": {
+    "defaultMessage": "Brugerdefineret"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Stor"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Mellem"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Lille"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Ukendt"
+  },
+  "label.platform": {
+    "defaultMessage": "Platform"
+  },
+  "label.played": {
+    "defaultMessage": "Spillet {ago}"
   },
   "label.project": {
     "defaultMessage": "Projekt"
@@ -422,6 +464,9 @@
   "label.search": {
     "defaultMessage": "Søg"
   },
+  "label.select-all": {
+    "defaultMessage": "Vælg alle"
+  },
   "label.server": {
     "defaultMessage": "Server"
   },
@@ -433,9 +478,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "Singleplayer"
-  },
-  "label.sort-by": {
-    "defaultMessage": "Sorter efter"
   },
   "label.success": {
     "defaultMessage": "Succes"

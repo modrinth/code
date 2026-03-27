@@ -366,7 +366,7 @@
     "message": "Nyahikut projek"
   },
   "collection.delete-modal.description": {
-    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibuat asal."
+    "message": "Ini akan memadamkan koleksi ini selama-lamanya. Tindakan ini tidak boleh dibatalkan."
   },
   "collection.delete-modal.title": {
     "message": "Adakah anda pasti mahu memadamkan koleksi ini?"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Cipta projek"
   },
-  "create.project.create-server-project": {
-    "message": "Cipta sebuah pelayan"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Medan yang hilang: {fields}"
   },
@@ -558,7 +555,7 @@
     "message": "Cipta pautan afiliasi"
   },
   "dashboard.affiliate-links.error.title": {
-    "message": "Ralat semasa memuatkan pautan afiliasi"
+    "message": "Ralat semasa memuat pautan afiliasi"
   },
   "dashboard.affiliate-links.header": {
     "message": "Pautan afiliasi anda"
@@ -684,7 +681,7 @@
     "message": "Tidak dapat mengambil kaedah pembayaran yang tersedia. Sila cuba lagi kemudian."
   },
   "dashboard.creator-withdraw-modal.method-selection.error-title": {
-    "message": "Gagal memuatkan kaedah pembayaran"
+    "message": "Gagal memuat kaedah pembayaran"
   },
   "dashboard.creator-withdraw-modal.method-selection.region": {
     "message": "Rantau"
@@ -1386,7 +1383,7 @@
     "message": "Pengurusan Pasukan"
   },
   "landing.error.failedToLoadRandomProjects": {
-    "message": "Gagal memuatkan projek-projek rawak :("
+    "message": "Gagal memuat projek-projek rawak :("
   },
   "landing.feature.follow.description": {
     "message": "Dapatkan makluman setiap kali projek kegemaran anda dikemas kini dan elakkan daripada ketinggalan."
@@ -2346,7 +2343,7 @@
     "message": "Sila semak metadata persekitaran"
   },
   "project.error.loading": {
-    "message": "Ralat memuatkan data projek{message}"
+    "message": "Ralat semasa memuat data projek{message}"
   },
   "project.error.page-not-found": {
     "message": "Halaman tidak dapat dijumpai"
@@ -2361,7 +2358,7 @@
     "message": "Teks lesen tidak dapat diambil."
   },
   "project.license.loading": {
-    "message": "Sedang memuatkan teks lesen..."
+    "message": "Sedang memuat teks lesen..."
   },
   "project.license.title": {
     "message": "Lesen"
@@ -2858,20 +2855,209 @@
   "servers.plan.large.description": {
     "message": "Sesuai untuk 15–25 pemain, pek mod atau pengubahsuaian yang berat."
   },
-  "servers.plan.large.name": {
-    "message": "Besar"
-  },
   "servers.plan.medium.description": {
     "message": "Bagus untuk 6–15 pemain dan berbilang mod."
-  },
-  "servers.plan.medium.name": {
-    "message": "Sederhana"
   },
   "servers.plan.small.description": {
     "message": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
   },
-  "servers.plan.small.name": {
-    "message": "Kecil"
+  "settings.account.button.complete-setup": {
+    "message": "Lengkapkan persediaan"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Muat turun eksport"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Jana eksport"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Sedang menjana eksport..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Minta salinan semua data peribadi anda yang telah dimuat naik ke Modrinth. Ini mungkin mengambil masa beberapa minit untuk diselesaikan."
+  },
+  "settings.account.data-export.title": {
+    "message": "Pengeksportan data"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Ini akan **dengan segera memadamkan semua projek** dan ikutan anda. Ini tidak akan memadamkan projek anda. Pemadaman akaun anda tidak boleh dibatalkan.<br><br>Jika anda memerlukan bantuan dengan akaun anda, dapatkan sokongan di [Discord Modrinth](https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Padam akaun ini"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Adakah anda pasti mahu memadamkan akaun anda?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Padam akaun"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Setelah anda memadamkan akaun anda, tidak ada jalan untuk kembali. Pemadaman akaun anda akan menghapuskan semua data yang dilampirkan, kecuali projek, daripada pelayan kami."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Padam akaun"
+  },
+  "settings.account.email.action.save": {
+    "message": "Simpan e-mel"
+  },
+  "settings.account.email.field.label": {
+    "message": "Alamat e-mel"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Masukkan alamat e-mel anda..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Tambah e-mel"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Tukar e-mel"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Maklumat akaun anda tidak dipaparkan secara terbuka."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Alih keluar kata laluan"
+  },
+  "settings.account.password.action.save": {
+    "message": "Simpan kata laluan"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Kata laluan input tidak sepadan!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Sila masukkan kata laluan anda untuk meneruskan."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Sahkan kata laluan"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Sahkan kata laluan"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Sahkan kata laluan baharu"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Sahkan kata laluan baharu"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Kata laluan baharu"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Kata laluan baharu"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Kata laluan lama"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Kata laluan lama"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Tambah kata laluan"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Tukar kata laluan"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Alih keluar kata laluan"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Tambah"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Penyedia pengesahan"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Tindakan"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Penyedia"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Tambah e-mel"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Tukar e-mel"
+  },
+  "settings.account.security.email.description": {
+    "message": "Tukar e-mel yang dikaitkan dengan akaun anda."
+  },
+  "settings.account.security.email.title": {
+    "message": "E-mel"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Tambah kata laluan"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Tukar kata laluan"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Tukar kata laluan yang digunakan untuk log masuk ke akaun anda."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Tukar atau alih keluar kata laluan yang digunakan untuk log masuk ke akaun anda."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Tetapkan kata laluan kekal untuk log masuk ke akaun anda."
+  },
+  "settings.account.security.password.title": {
+    "message": "Kata laluan"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Urus penyedia"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Tambah atau alih keluar kaedah daftar masuk daripada akaun anda, termasuk GitHub, GitLab, Microsoft, Discord, Steam dan Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Urus penyedia pengesahan"
+  },
+  "settings.account.security.title": {
+    "message": "Keselamatan akaun"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Alih keluar 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Sediakan 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Tambahkan lapisan keselamatan tambahan pada akaun anda semasa log masuk."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Pengesahan dua faktor (2FA)"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Muat turun dan simpan kod sandaran ini di tempat yang selamat. Anda boleh menggunakannya sebagai ganti kod 2FA jika anda kehilangan akses kepada peranti anda! Anda harus melindungi kod ini seperti kata laluan anda."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Kod sandaran hanya boleh digunakan sekali sahaja."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Kod yang dimasukkan salah!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Sila masukkan kod dua faktor untuk meneruskan."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Masukkan kod dua faktor"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Masukkan kod..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "Pengesahan dua faktor memastikan akaun anda selamat dengan memerlukan akses kepada peranti kedua untuk log masuk."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Jika kod QR tidak dapat diimbas, anda boleh memasukkan rahsia secara manual:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Imbas kod QR dengan <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> atau mana-mana aplikasi 2FA lain untuk mulakan."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Masukkan kod sekali pakai daripada pengesah untuk mengesahkan akses."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Sahkan kod"
   },
   "settings.applications.about": {
     "message": "Tentang"
@@ -2954,11 +3140,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Aplikasi"
+  },
   "settings.applications.modal.header": {
     "message": "Maklumat aplikasi"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Sebuah ralat telah berlaku"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikon aplikasi anda telah dikemas kini."
@@ -2968,6 +3154,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "Simpan secret anda sekarang, ia akan disembunyikan selepas anda meninggalkan laman ini!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Mengenai aplikasi ini"
+  },
+  "settings.authorizations.by": {
+    "message": "oleh"
+  },
+  "settings.authorizations.description": {
+    "message": "Apabila anda membenarkan aplikasi ini dengan akaun Modrinth anda, anda memberikannya akses kepada akaun anda. Anda boleh mengurus dan menyemak akses kepada akaun anda di sini pada bila-bila masa."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi halaman ini pada tarikh yang akan datang!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Kebenaran"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Batalkan"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Ini akan membatalkan akses aplikasi ini ke akaun anda. Anda sentiasa boleh membenarkannya semula kemudian."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Adakah anda pasti mahu membatalkan aplikasi ini?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Semua caj anda ke akaun Modrinth anda yang lepas akan disenaraikan di sini:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Percubaan Pelayan Medal"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "Akan tamat tempoh {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "bulan"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "bulanan"
+  },
+  "settings.billing.interval.year": {
+    "message": "tahun"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "tahunan"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Pelayaran bebas iklan di modrinth.com dan Modrinth App"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Lencana Modrinth+ pada profil anda"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Sokong Modrinth dan pencipta secara langsung"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Faedah"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Jimat {amount}/tahun dengan bertukar kepada pengebilan tahunan!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Anda telah membatalkan langganan anda."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Anda akan mengekalkan faedah anda sehingga akhir kitaran pengebilan semasa."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "Pembayaran langganan anda gagal. Sila kemas kini kaedah pembayaran anda."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Anda sedang melanggan:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "Pembayaran anda sedang diproses. Manfaat akan diaktifkan setelah pembayaran selesai."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Jadilah pelanggan Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Batalkan langganan"
@@ -2987,6 +3257,12 @@
   "settings.billing.modal.delete.title": {
     "message": "Adakah anda pasti mahu mengalih keluar kaedah pembayaran ini?"
   },
+  "settings.billing.next": {
+    "message": "Seterusnya:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Atau {price} / tahun (jimat {percent}%)!"
+  },
   "settings.billing.payment_method.action.add": {
     "message": "Tambah kaedah pembayaran"
   },
@@ -2997,7 +3273,7 @@
     "message": "Jadikan utama"
   },
   "settings.billing.payment_method.card_expiry": {
-    "message": "Luput {month}/{year}"
+    "message": "Tamat tempoh {month}/{year}"
   },
   "settings.billing.payment_method.none": {
     "message": "Anda belum menambah sebarang kaedah pembayaran."
@@ -3008,17 +3284,98 @@
   "settings.billing.payment_method.title": {
     "message": "Kaedah pembayaran"
   },
+  "settings.billing.plan.title": {
+    "message": "Pelan {size}"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} CPU Kongsi (Boleh memecut sehingga {bursts} CPU)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Pelayan yang dipautkan tidak dapat ditemui untuk langganan ini. Terdapat beberapa kemungkinan untuk menjelaskan perkara ini. Jika anda baru sahaja membeli pelayan anda, ini adalah perkara biasa. Ia mungkin mengambil masa sehingga sejam untuk pelayan anda disediakan. Jika tidak, jika anda membeli pelayan ini beberapa ketika dahulu, ia mungkin telah digantung. Jika ini bukan yang anda jangkakan, sila hubungi Sokongan Modrinth dengan maklumat berikut:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "ID Pelayan: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "ID Stripe: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "RAM {gb} GB"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Sebuah ralat telah berlaku semasa melanggan semula pelayan Modrinth anda."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Ralat semasa melanggan semula"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Jika pelayan sedang digantung, percubaan pengecasan lain mungkin mengambil masa sehingga 10 minit."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Permintaan langganan semula telah dihantar"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Langganan pelayan berjaya dilanggan semula"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Pembayaran langganan anda gagal. Sila kemas kini kaedah pembayaran anda, kemudian langgan semula."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Pembayaran anda sedang diproses. Pelayan anda akan diaktifkan setelah pembayaran selesai."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "SSD {gb} GB"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "Swap {gb} GB"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Urus langganan Modrinth Servers anda."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Langganan Modrinth Servers"
   },
+  "settings.billing.renews": {
+    "message": "Diperbaharui {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Langgan semula"
+  },
+  "settings.billing.since": {
+    "message": "Sejak {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Langgan"
+  },
   "settings.billing.subscription.description": {
     "message": "Urus langganan Modrinth anda."
   },
   "settings.billing.subscription.title": {
     "message": "Langganan"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Bertukar ke {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Tukar ke {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Bil bulanan akan dikenakan bayaran tambahan sebanyak {amount} setahun"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Akan beralih kepada pengebilan {interval} pada {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Kaedah kemas kini"
+  },
+  "settings.billing.upgrade": {
+    "message": "Naik Taraf"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Nyahaktifkan mod pembangun"
@@ -3032,6 +3389,12 @@
   "settings.display.flags.title": {
     "message": "Togol ciri-ciri"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Mod pembangun telah dinyahdayakan"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Mod pembangun dinyahaktifkan"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Halaman Pek Data"
   },
@@ -3040,6 +3403,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Halaman Mod"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galeri"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Grid"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Barisan"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Halaman Pek Mod"
@@ -3101,6 +3473,9 @@
   "settings.display.theme.title": {
     "message": "Tema warna"
   },
+  "settings.head-title": {
+    "message": "Tetapan paparan"
+  },
   "settings.pats.action.create": {
     "message": "Cipta PAT"
   },
@@ -3111,7 +3486,7 @@
     "message": "Cipta PAT"
   },
   "settings.pats.modal.create.expires.label": {
-    "message": "Luput"
+    "message": "Tamat tempoh"
   },
   "settings.pats.modal.create.name.label": {
     "message": "Nama"
@@ -3141,10 +3516,10 @@
     "message": "Batalkan token"
   },
   "settings.pats.token.expired-ago": {
-    "message": "Telah luput {ago}"
+    "message": "Telah tamat tempoh {ago}"
   },
   "settings.pats.token.expires-in": {
-    "message": "Akan luput dalam {inTime}"
+    "message": "Akan tamat tempoh {inTime}"
   },
   "settings.pats.token.last-used": {
     "message": "Kali terakhir digunakan {ago}"
@@ -3160,6 +3535,9 @@
   },
   "settings.profile.description": {
     "message": "Maklumat profil anda boleh dilihat secara terbuka pada Modrinth dan melalui <docs-link>API Modrinth</docs-link>."
+  },
+  "settings.profile.head-title": {
+    "message": "Tetapan profil"
   },
   "settings.profile.profile-info": {
     "message": "Maklumat profil"
@@ -3191,11 +3569,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Platform tidak diketahui"
   },
+  "settings.sidebar.label.account": {
+    "message": "Akaun"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Pembangun"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Paparan"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Berita terkini dari Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Langgan"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Sudah melanggan!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Langgan surat berita Modrinth"
   },
   "version.environment.none.description": {
     "message": "Persekitaran untuk versi ini belum dinyatakan."

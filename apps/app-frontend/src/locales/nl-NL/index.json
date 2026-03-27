@@ -5,14 +5,56 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Voeg modpack beschrijving in..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exporteer"
+  },
+  "app.export-modal.header": {
+    "message": "Exporteer modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Naam"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack naam"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Selecteer bestanden en mappen om toe te voegen aan pack"
+  },
   "app.export-modal.version-number-label": {
     "message": "Versie nummer"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Alle data van je instantie zal permanent verwijderd worden, inclusief al je werelden, voorkeuren, en alle geïnstalleerde content."
+  },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.modpack-already-installed.admonition-body": {
+    "message": "Deze modpack is al geïnstalleerd in de \"{instanceName}\" instantie."
+  },
+  "app.instance.modpack-already-installed.admonition-header": {
+    "message": "Dupliceer modpack"
+  },
+  "app.instance.modpack-already-installed.create-anyway": {
+    "message": "Maak toch"
+  },
+  "app.instance.modpack-already-installed.go-to-instance": {
+    "message": "Ga naar instantie"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack is al geïnstalleerd"
   },
   "app.instance.mods.content-type-project": {
     "message": "project"

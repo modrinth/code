@@ -877,7 +877,7 @@
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
-						:v3-metadata="projectV3"
+						:project-v3="projectV3"
 						class="card flex-card experimental-styles-within"
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
@@ -1076,6 +1076,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NavTabs,
 	NewModal,
 	OpenInAppModal,
 	OverflowMenu,
@@ -1115,7 +1116,6 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
