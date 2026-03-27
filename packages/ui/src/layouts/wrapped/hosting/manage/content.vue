@@ -92,15 +92,6 @@ const leaveMessages = defineMessages({
 	},
 })
 
-const props = withDefaults(
-	defineProps<{
-		showClientOnlyFilter?: boolean
-	}>(),
-	{
-		showClientOnlyFilter: false,
-	},
-)
-
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
@@ -896,7 +887,6 @@ provideContentManager({
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
 	uploadState,
-	showClientOnlyFilter: props.showClientOnlyFilter,
 	deletionContext: 'server',
 	hasUpdateSupport: true,
 	updateItem: handleUpdateItem,
