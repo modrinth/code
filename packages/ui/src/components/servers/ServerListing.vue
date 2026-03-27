@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
+		<RouterLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
@@ -19,8 +19,8 @@
 					<LockIcon class="size-12 text-secondary" />
 				</div>
 				<div class="ml-4 flex flex-col gap-2.5">
-					<div class="flex flex-row items-center gap-2">
-						<h2 class="m-0 text-xl font-bold text-contrast">{{ name }}</h2>
+					<div class="flex flex-row items-center gap-2 text-contrast">
+						<h2 class="m-0 text-xl font-bold">{{ name }}</h2>
 						<ChevronRightIcon />
 					</div>
 
@@ -53,7 +53,7 @@
 					/>
 				</div>
 			</div>
-		</NuxtLink>
+		</RouterLink>
 		<div
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
 			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
