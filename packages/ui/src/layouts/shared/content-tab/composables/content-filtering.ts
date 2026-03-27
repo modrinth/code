@@ -28,7 +28,6 @@ export interface ContentFilterOption {
 export interface ContentFilterConfig {
 	showTypeFilters?: boolean
 	showUpdateFilter?: boolean
-	showClientOnlyFilter?: boolean
 	showWarningsFilter?: boolean
 	isPackLocked?: Ref<boolean>
 	persistKey?: string
@@ -63,10 +62,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			options.push({ id: 'updates', label: 'Updates' })
 		}
 
-		if (config?.showClientOnlyFilter && items.value.some((m) => getClientWarningType(m) !== null)) {
-			options.push({ id: 'client-only', label: 'Client-only' })
-		}
-
 		if (config?.showWarningsFilter && items.value.some((m) => getClientWarningType(m) !== null)) {
 			options.push({ id: 'warnings', label: 'Warnings' })
 		}
@@ -96,7 +91,7 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 	function applyFilters(source: ContentItem[]): ContentItem[] {
 		if (selectedFilters.value.length === 0) return source
 
-		const attributeFilters = new Set(['updates', 'disabled', 'client-only', 'warnings'])
+		const attributeFilters = new Set(['updates', 'disabled', 'warnings'])
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilters.has(f))
 		const activeAttributes = selectedFilters.value.filter((f) => attributeFilters.has(f))
 
@@ -111,7 +106,6 @@ export function useContentFilters(items: Ref<ContentItem[]>, config?: ContentFil
 			for (const filter of activeAttributes) {
 				if (filter === 'updates' && !item.has_update) return false
 				if (filter === 'disabled' && item.enabled) return false
-				if (filter === 'client-only' && getClientWarningType(item) === null) return false
 				if (filter === 'warnings' && getClientWarningType(item) === null) return false
 			}
 
