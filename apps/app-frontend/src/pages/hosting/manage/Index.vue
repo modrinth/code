@@ -69,6 +69,13 @@
 						</div>
 					</div>
 				</template>
+				<template #actions>
+					<ButtonStyled circular>
+						<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
+							<SettingsIcon />
+						</button>
+					</ButtonStyled>
+				</template>
 			</ContentPageHeader>
 
 			<div class="mb-4">
@@ -76,6 +83,9 @@
 			</div>
 
 			<div class="pt-2">
+				<Suspense>
+					<ServerSettingsModal ref="serverSettingsModal" />
+				</Suspense>
 				<RouterView v-slot="{ Component }">
 					<template v-if="Component">
 						<Suspense>
@@ -104,6 +114,7 @@ import {
 import {
 	Avatar,
 	type BusyReason,
+	ButtonStyled,
 	ContentPageHeader,
 	defineMessage,
 	injectModrinthClient,
@@ -117,6 +128,8 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+
+import ServerSettingsModal from '@/components/ui/modal/ServerSettingsModal.vue'
 
 const route = useRoute()
 const client = injectModrinthClient()
@@ -132,6 +145,7 @@ const basePath = computed(() => `/hosting/manage/${encodeURIComponent(serverId.v
 
 const server = ref<Archon.Servers.v0.Server>({} as Archon.Servers.v0.Server)
 const worldId = ref<string | null>(null)
+const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 
 const serverQuery = useQuery({
 	queryKey: computed(() => ['servers', 'detail', serverId.value]),
@@ -273,6 +287,11 @@ function copyServerAddress() {
 		text: "Your server's address has been copied to your clipboard.",
 		type: 'success',
 	})
+}
+
+function openServerSettingsModal() {
+	if (!serverId.value) return
+	serverSettingsModal.value?.show({ serverId: serverId.value })
 }
 
 watch(
