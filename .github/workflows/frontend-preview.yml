@@ -49,6 +49,10 @@ jobs:
         working-directory: ./packages/ui
         run: pnpm run build-storybook
 
+      - name: Configure short SHA
+        id: meta
+        run: echo "sha_short=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
       - name: Deploy Storybook preview
         uses: cloudflare/wrangler-action@v3
         with:
@@ -57,7 +61,7 @@ jobs:
           workingDirectory: ./packages/ui
           packageManager: pnpm
           wranglerVersion: '4.54.0'
-          command: versions upload --preview-alias git-${{ github.sha }}
+          command: versions upload --preview-alias git-${{ steps.meta.outputs.sha_short }}
 
   comment:
     if: github.repository_owner == 'modrinth' && github.event.pull_request.head.repo.full_name == github.repository
@@ -107,5 +111,5 @@ jobs:
             |-------------|-----|
             | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
             | production  | ${{ steps.urls.outputs.production-preview-url }} |
-            | storybook   | https://git-${{ github.sha }}-storybook.modrinth.workers.dev |
+            | storybook   | https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev |
           edit-mode: replace
