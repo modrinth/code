@@ -138,10 +138,22 @@
 							:id="'java-version-field'"
 							v-model="javaVersion"
 							name="java-version"
-							:options="JAVA_VERSIONS"
+							:options="displayedJavaVersions"
 							:display-value="javaVersionLabel ?? 'Java Version'"
 							:disabled="isStartupLoading"
-						/>
+						>
+							<template #dropdown-footer>
+								<button
+									class="flex w-full cursor-pointer items-center justify-center gap-1.5 border-0 border-t border-solid border-surface-5 bg-transparent py-3 text-center text-sm font-semibold text-secondary transition-colors hover:text-contrast"
+									@mousedown.prevent
+									@click="showAllVersions = !showAllVersions"
+								>
+									<EyeOffIcon v-if="showAllVersions" class="size-4" />
+									<EyeIcon v-else class="size-4" />
+									{{ showAllVersions ? 'Hide extra versions' : 'Show all versions' }}
+								</button>
+							</template>
+						</Combobox>
 						<div
 							v-if="isStartupLoading"
 							class="bg-bg/50 absolute inset-0 flex items-center justify-center rounded-xl"
@@ -240,7 +252,56 @@ const JAVA_VERSIONS = [
 	{ value: 11, label: 'Java 11' },
 	{ value: 17, label: 'Java 17' },
 	{ value: 21, label: 'Java 21' },
+	{ value: 25, label: 'Java 25' },
 ]
+
+const showAllVersions = ref(false)
+
+type MinecraftReleaseVersion = {
+	major: number
+	minor: number
+}
+
+function parseMinecraftReleaseVersion(version: string): MinecraftReleaseVersion | null {
+	const [majorPart, minorPart] = version.split('.')
+
+	if (!majorPart || !minorPart) return null
+
+	const major = Number(majorPart)
+	const minor = Number(minorPart)
+
+	if (!Number.isInteger(major) || !Number.isInteger(minor)) return null
+
+	return { major, minor }
+}
+
+function filterJavaVersions(compatibleVersions: number[]) {
+	return JAVA_VERSIONS.filter((version) => compatibleVersions.includes(version.value))
+}
+
+const displayedJavaVersions = computed(() => {
+	if (showAllVersions.value) return JAVA_VERSIONS
+
+	const mcVersion = server.value?.mc_version ?? ''
+	if (!mcVersion) return JAVA_VERSIONS
+
+	const releaseVersion = parseMinecraftReleaseVersion(mcVersion)
+	if (!releaseVersion) return JAVA_VERSIONS
+
+	if (releaseVersion.major > 1) {
+		if (releaseVersion.major >= 26) {
+			return filterJavaVersions([25])
+		}
+
+		return JAVA_VERSIONS
+	}
+
+	if (releaseVersion.minor >= 20) return filterJavaVersions([21])
+	if (releaseVersion.minor >= 17) return filterJavaVersions([17, 21])
+	if (releaseVersion.minor >= 12) return filterJavaVersions([8, 11, 17, 21])
+	if (releaseVersion.minor >= 6) return filterJavaVersions([8, 11])
+	return filterJavaVersions([8])
+})
 
 const JRE_VENDORS: { value: Archon.Content.v1.JreVendor; label: string }[] = [
 	{ value: 'corretto', label: 'Corretto' },
