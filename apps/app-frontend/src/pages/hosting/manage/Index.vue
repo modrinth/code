@@ -70,7 +70,7 @@
 					</div>
 				</template>
 				<template #actions>
-					<ButtonStyled circular>
+					<ButtonStyled circular size="large">
 						<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
 							<SettingsIcon />
 						</button>
