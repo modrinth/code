@@ -256,6 +256,26 @@ const purpurBuildsQuery = useQuery({
 	staleTime: 5 * 60 * 1000,
 })
 
+const paperSupportedVersionsQuery = useQuery({
+	queryKey: ['paper-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.paper.versions_v3.getProject()
+		return new Set(Object.values(project.versions).flat())
+	},
+	enabled: computed(() => editingPlatform.value === 'paper'),
+	staleTime: 5 * 60 * 1000,
+})
+
+const purpurSupportedVersionsQuery = useQuery({
+	queryKey: ['purpur-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.purpur.versions_v2.getProject()
+		return new Set(project.versions)
+	},
+	enabled: computed(() => editingPlatform.value === 'purpur'),
+	staleTime: 5 * 60 * 1000,
+})
+
 type LoaderVersionEntry = LauncherMeta.Manifest.v0.LoaderVersion
 
 function getLoaderVersionsForGameVersion(
@@ -363,17 +383,33 @@ provideInstallationSettings({
 			? tags.gameVersions.value
 			: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
-		if (loader && loader !== 'vanilla' && !['paper', 'purpur'].includes(loader)) {
-			const manifest = manifestQuery.data.value?.gameVersions
-			if (manifest) {
-				const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-				if (!hasPlaceholder) {
-					const supportedVersions = new Set(
-						manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
-					)
+		if (loader && loader !== 'vanilla') {
+			if (loader === 'paper') {
+				const supported = paperSupportedVersionsQuery.data.value
+				if (supported) {
 					return versions
-						.filter((v) => supportedVersions.has(v.version))
+						.filter((v) => supported.has(v.version))
 						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else if (loader === 'purpur') {
+				const supported = purpurSupportedVersionsQuery.data.value
+				if (supported) {
+					return versions
+						.filter((v) => supported.has(v.version))
+						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else {
+				const manifest = manifestQuery.data.value?.gameVersions
+				if (manifest) {
+					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+					if (!hasPlaceholder) {
+						const supportedVersions = new Set(
+							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+						)
+						return versions
+							.filter((v) => supportedVersions.has(v.version))
+							.map((v) => ({ value: v.version, label: v.version }))
+					}
 				}
 			}
 		}
@@ -387,8 +423,22 @@ provideInstallationSettings({
 	},
 
 	resolveHasSnapshots(loader) {
-		if (loader === 'vanilla' || ['paper', 'purpur'].includes(loader)) {
+		if (loader === 'vanilla') {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
+		}
+		if (loader === 'paper') {
+			const supported = paperSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
+		}
+		if (loader === 'purpur') {
+			const supported = purpurSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
 		}
 		const manifest = manifestQuery.data.value?.gameVersions
 		if (!manifest) return false
