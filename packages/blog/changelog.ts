@@ -11,7 +11,7 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
-		date: `2026-03-27T01:04:01+00:00`,
+		date: `2026-03-26T18:45:00-07:00`,
 		product: 'hosting',
 		body: `## Added
 - Mods that are client-side dependencies now show a more specific warning: "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
@@ -22,7 +22,7 @@ const VERSIONS: VersionEntry[] = [
 ## Changed
 - When updating your game version in the platform settings, incompatible mods are now disabled instead of removed.
 - Better UI for installed custom modpack files.
-- Redesigned the server panel header - loader, game version, server address, uptime, and linked project are now shown as clean inline stats with the project icon and a link to the project page, matching instances in the Modrinth App.
+- Redesigned the server panel header — loader, game version, server address, uptime, and linked project are now shown as clean inline stats with the project icon and a link to the project page, matching instances in the Modrinth App.
 - Rebuilt the Files tab with right-click context menus, keyboard shortcuts, drag-and-drop, improved modals for moving items and extracting archives, undo/redo for file moves and renames, and smoother scrolling for large directories, now aligned with the Content tab design.
 - Cleaned up backup progress indicators to be more compact.
 
@@ -34,11 +34,11 @@ const VERSIONS: VersionEntry[] = [
 - Fixed a bug with server onboarding/reset flow not passing the correct NeoForge loader version for the selected game version.`,
 	},
 	{
-		date: `2026-03-27T01:04:01+00:00`,
+		date: `2026-03-26T18:45:00-07:00`,
 		product: 'app',
 		version: '0.12.5',
 		body: `## Added
-- Added a Files tab for instances, matching the Modrinth Hosting experience - browse, edit, and manage all files in your instance folder without leaving the app, ideal for editing config files, viewing crash reports, and more.
+- Added a Files tab for instances, matching the Modrinth Hosting experience — browse, edit, and manage all files in your instance folder without leaving the app, ideal for editing config files, viewing crash reports, and more.
 - Added new filters to the Worlds tab: Online, Offline, Singleplayer, Modded, and Vanilla, replacing the previous set.
 - Added a "Browse servers" option to the Worlds tab, allowing you to search for compatible servers and quickly play or save them for later.
 - Added an empty state to the Worlds tab aligned with the Content tabs, with options to add or browse for servers.
@@ -46,35 +46,32 @@ const VERSIONS: VersionEntry[] = [
 
 ## Changed
 - Redesigned the Worlds tab to align with the Content tab - searching and filtering for worlds and servers is now cleaner and more consistent.
-- Breadcrumbs in the app header now fade at the edges when overflowing instead of clipping abruptly.
-- The modpack already installed modal has been redesigned.
-- The add server and edit server modals in the worlds tab have been polished.
+- The modpack "Already installed" pop-up has been redesigned.
+- The "Add server" and "Edit server" pop-ups in the worlds tab have been polished.
+- Moved the "switch version" button outside of the overflow menu on the instance Content tab.
 
 ## Fixed
-- Fixed instance getting stuck at "Installing" after a failed version change - When changing the game version of an already-installed instance and the install failed the instance would get permanently stuck in the "Installing" state with no way to recover. The install stage is now properly reset on failure.
-- Fixed [#5671](https://github.com/modrinth/code/issues/5671) - "Invalid game version" error when updating to newly-released Minecraft versions - If a new Minecraft version (e.g. 26.1) was selected but the app's cached version manifest hadn't been refreshed yet, the install would fail with "Invalid game version". The launcher now automatically retries with a fresh manifest when the version isn't found in cache.
 - Navigating back from the browse page within an instance now returns you to the tab you came from (e.g. Worlds) instead of always defaulting to Content.
 - Content cards no longer sometimes display inconsistent column widths.
 - Deleting content that isn't linked to a project no longer causes a crash.
-- Mod updates are now detected correctly in all cases.
+- Fixed mod updates not being detected correctly in some cases.
 - Deleting servers from the Worlds tab no longer causes an "out of index" error to occur.
-- Server game version filter now correctly includes modded servers on the Browse page.`,
+- Server game version filter now correctly includes modded servers on the Browse page.
+- Breadcrumbs in the app header now fade at the edges when overflowing instead of clipping abruptly.
+- Fixed instance getting stuck at "Installing" after a failed version change.
+- Fixed "Invalid game version" error when updating to newly-released Minecraft versions.`,
 	},
 	{
-		date: `2026-03-27T01:04:01+00:00`,
+		date: `2026-03-26T18:45:00-07:00`,
 		product: 'web',
 		body: `## Added
 - Added unsaved changes warnings to project settings pages (general, description, tags, license, and server).
 
-## Changed
-- Developer mode feature flags are now available at \`/settings/flags\` rather than \`/flags\`.
-
 ## Fixed
-- Removed a global style that forced all buttons to use a pointer cursor and no border, which caused unexpected styling issues in some areas.
 - Server game version filter now correctly includes modded servers on the Discover servers page.
-- Modpacks with no loader showing as resource pack loader in project page. See https://modrinth.com/project/IswAxbxA
-https://modrinth.com/project/WBmeJun7 for examples.
-- Project versions table overflows outside of table. Fixed by truncating name column and adding "+ {num}" overflow menu on game version tags. See \`/mod/endermannospawniron/versions\` for overflow fix.`,
+- Fixed Modpack projects with no mod loader displaying as Resource Packs in project page.
+- Fixed project versions table overflowing outside of table. Version tags will now truncate.
+- Fixed an unexpected styling issue with some buttons.`,
 	},
 	{
 		date: `2026-03-26T07:22:22+00:00`,
