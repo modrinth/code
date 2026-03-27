@@ -1,15 +1,81 @@
 <template>
-	<div class="p-6">
+	<div class="mx-auto w-full max-w-[1280px] px-6 pb-6">
 		<div v-if="isLoading" class="py-8">
 			<LoadingIndicator />
 		</div>
 		<div v-else-if="hasError" class="py-8 text-secondary">Failed to load server.</div>
 		<template v-else>
+			<!-- TODO-SERVERS: make a shared server header component for website and app to share -->
+			<RouterLink
+				to="/hosting/manage"
+				class="breadcrumb goto-link mt-6 mb-4 flex w-fit items-center"
+			>
+				<LeftArrowIcon />
+				All servers
+			</RouterLink>
+			<ContentPageHeader class="mb-4">
+				<template #icon>
+					<ServerIcon
+						:image="
+							server.is_medal
+								? 'https://cdn-raw.modrinth.com/medal_icon.webp'
+								: (serverImage ?? undefined)
+						"
+					/>
+				</template>
+				<template #title>
+					{{ server.name || 'Server' }}
+				</template>
+				<template #stats>
+					<div
+						v-if="server.flows?.intro"
+						class="flex items-center gap-2 font-semibold text-secondary"
+					>
+						<SettingsIcon />
+						Configuring server...
+					</div>
+					<div v-else class="flex flex-wrap items-center gap-2">
+						<div v-if="server.loader" class="flex items-center gap-2 font-medium capitalize">
+							<LoaderIcon :loader="server.loader" class="flex shrink-0 [&&]:size-5" />
+							{{ server.loader }} {{ server.mc_version }}
+						</div>
+
+						<div
+							v-if="server.loader && server.net?.domain"
+							class="h-1.5 w-1.5 rounded-full bg-surface-5"
+						/>
+
+						<div
+							v-if="server.net?.domain"
+							v-tooltip="'Copy server address'"
+							class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
+							@click="copyServerAddress"
+						>
+							<LinkIcon class="flex size-5 shrink-0" />
+							{{ server.net.domain }}.modrinth.gg
+						</div>
+
+						<div
+							v-if="serverProject && (server.loader || server.net?.domain)"
+							class="h-1.5 w-1.5 rounded-full bg-surface-5"
+						/>
+
+						<div v-if="serverProject" class="flex items-center gap-1.5 font-medium text-primary">
+							Linked to
+							<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
+							<RouterLink :to="serverProjectLink" class="truncate text-primary hover:underline">
+								{{ serverProject.title }}
+							</RouterLink>
+						</div>
+					</div>
+				</template>
+			</ContentPageHeader>
+
 			<div class="mb-4">
-				<h1 class="m-0 text-3xl font-bold text-contrast">{{ server.name || 'Server' }}</h1>
+				<NavTabs :links="tabs" />
 			</div>
-			<NavTabs :links="tabs" />
-			<div class="pt-4">
+
+			<div class="pt-2">
 				<RouterView v-slot="{ Component }">
 					<template v-if="Component">
 						<Suspense>
@@ -27,22 +93,35 @@
 
 <script setup lang="ts">
 import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
-import { BoxesIcon, DatabaseBackupIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
+	BoxesIcon,
+	DatabaseBackupIcon,
+	FolderOpenIcon,
+	LeftArrowIcon,
+	LinkIcon,
+	SettingsIcon,
+} from '@modrinth/assets'
+import {
+	Avatar,
 	type BusyReason,
+	ContentPageHeader,
 	defineMessage,
 	injectModrinthClient,
+	injectNotificationManager,
+	LoaderIcon,
 	LoadingIndicator,
 	NavTabs,
 	provideModrinthServerContext,
+	ServerIcon,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 
 const route = useRoute()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const { addNotification } = injectNotificationManager()
 
 const serverId = computed(() => {
 	const rawId = route.params.id
@@ -89,6 +168,20 @@ watch(
 const isLoading = computed(() => serverQuery.isPending.value || serverV1Query.isPending.value)
 const hasError = computed(() => !!serverQuery.error.value || !!serverV1Query.error.value)
 
+const { data: serverProject } = useQuery({
+	queryKey: computed(() => ['server-project', server.value.upstream?.project_id]),
+	queryFn: async () => {
+		if (!server.value.upstream?.project_id) return null
+		return await client.labrinth.projects_v2.get(server.value.upstream.project_id)
+	},
+	enabled: computed(() => !!server.value.upstream?.project_id),
+})
+
+const serverProjectLink = computed(() => {
+	if (!serverProject.value) return ''
+	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
+})
+
 const isConnected = ref(true)
 const powerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const isServerRunning = computed(() => powerState.value === 'running')
@@ -120,6 +213,43 @@ const fsAuth = ref<{ url: string; token: string } | null>(null)
 const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
 const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
 
+async function processImageBlob(blob: Blob, size: number): Promise<string> {
+	return new Promise((resolve) => {
+		const canvas = document.createElement('canvas')
+		const ctx = canvas.getContext('2d')!
+		const img = new Image()
+		img.onload = () => {
+			canvas.width = size
+			canvas.height = size
+			ctx.drawImage(img, 0, 0, size, size)
+			const dataURL = canvas.toDataURL('image/png')
+			URL.revokeObjectURL(img.src)
+			resolve(dataURL)
+		}
+		img.src = URL.createObjectURL(blob)
+	})
+}
+
+const { data: serverImage } = useQuery({
+	queryKey: computed(() => ['server-icon', serverId.value, serverProject.value?.icon_url ?? null]),
+	queryFn: async (): Promise<string | null> => {
+		if (!serverId.value || server.value.status !== 'available') return null
+
+		const auth = await client.archon.servers_v0.getFilesystemAuth(serverId.value)
+
+		try {
+			const blob = await client.kyros.files_v0.downloadFile('/server-icon-original.png')
+			return await processImageBlob(blob, 512)
+		} catch {
+			if (serverProject.value?.icon_url) {
+				return serverProject.value.icon_url
+			}
+			return null
+		}
+	},
+	enabled: computed(() => !!serverId.value && server.value.status === 'available'),
+})
+
 async function refreshFsAuth() {
 	if (!serverId.value) {
 		fsAuth.value = null
@@ -133,6 +263,16 @@ async function refreshFsAuth() {
 
 function markBackupCancelled(backupId: string) {
 	backupsState.delete(backupId)
+}
+
+function copyServerAddress() {
+	if (!server.value?.net?.domain) return
+	navigator.clipboard.writeText(server.value.net.domain + '.modrinth.gg')
+	addNotification({
+		title: 'Server address copied',
+		text: "Your server's address has been copied to your clipboard.",
+		type: 'success',
+	})
 }
 
 watch(
