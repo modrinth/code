@@ -259,9 +259,8 @@ const purpurBuildsQuery = useQuery({
 const paperSupportedVersionsQuery = useQuery({
 	queryKey: ['paper-supported-versions'] as const,
 	queryFn: async () => {
-		const res = await fetch('https://api.papermc.io/v2/projects/paper')
-		const data = (await res.json()) as { versions: string[] }
-		return new Set(data.versions)
+		const project = await client.paper.versions_v3.getProject()
+		return new Set(Object.values(project.versions).flat())
 	},
 	enabled: computed(() => editingPlatform.value === 'paper'),
 	staleTime: 5 * 60 * 1000,
@@ -270,9 +269,8 @@ const paperSupportedVersionsQuery = useQuery({
 const purpurSupportedVersionsQuery = useQuery({
 	queryKey: ['purpur-supported-versions'] as const,
 	queryFn: async () => {
-		const res = await fetch('https://api.purpurmc.org/v2/purpur')
-		const data = (await res.json()) as { versions: string[] }
-		return new Set(data.versions)
+		const project = await client.purpur.versions_v2.getProject()
+		return new Set(project.versions)
 	},
 	enabled: computed(() => editingPlatform.value === 'purpur'),
 	staleTime: 5 * 60 * 1000,
