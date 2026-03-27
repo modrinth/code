@@ -1,0 +1,7 @@
+export { default as ServerSettingsAdminBillingPage } from './admin-billing.vue'
+export { default as ServerSettingsAdvancedPage } from './advanced.vue'
+export { default as ServerSettingsBillingPage } from './billing.vue'
+export { default as ServerSettingsGeneralPage } from './general.vue'
+export { default as ServerSettingsInstallationPage } from './installation.vue'
+export { default as ServerSettingsNetworkPage } from './network.vue'
+export { default as ServerSettingsPropertiesPage } from './properties.vue'

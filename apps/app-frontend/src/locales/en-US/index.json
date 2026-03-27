@@ -185,6 +185,9 @@
   "app.modal.update-to-play.update-required-description": {
     "message": "An update is required to play {name}. Please update to the latest version to launch the game."
   },
+  "app.server-settings.failed-to-load-server": {
+    "message": "Failed to load server settings"
+  },
   "app.settings.developer-mode-enabled": {
     "message": "Developer mode enabled."
   },
@@ -598,5 +601,11 @@
   },
   "search.filter.locked.server-loader.title": {
     "message": "Loader is provided by the server"
+  },
+  "servers.busy.installing": {
+    "message": "Server is installing"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Content sync in progress"
   }
 }

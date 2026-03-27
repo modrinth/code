@@ -5,16 +5,13 @@
 </template>
 <script setup lang="ts">
 import {
-	CardIcon,
-	ListIcon,
-	ModrinthIcon,
-	SettingsIcon,
-	TextQuoteIcon,
-	VersionIcon,
-	WrenchIcon,
-} from '@modrinth/assets'
-import { injectModrinthServerContext } from '@modrinth/ui'
+	getServerSettingsNavLinks,
+	injectModrinthServerContext,
+	provideServerSettings,
+	type ServerSettingsBrowseModpacksArgs,
+} from '@modrinth/ui'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
+import { computed, ref } from 'vue'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
 
@@ -32,30 +29,28 @@ const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => (auth.value?.user as User | null)?.id === ownerId.value)
 const isAdmin = computed(() => isUserAdmin(auth.value?.user))
 
-const navLinks = computed(() => [
-	{ icon: SettingsIcon, label: 'General', href: `/hosting/manage/${serverId}/options` },
-	{ icon: WrenchIcon, label: 'Installation', href: `/hosting/manage/${serverId}/options/loader` },
-	{ icon: VersionIcon, label: 'Network', href: `/hosting/manage/${serverId}/options/network` },
-	{
-		icon: ListIcon,
-		label: 'Properties',
-		href: `/hosting/manage/${serverId}/options/properties`,
-		shown: server.value?.status !== 'installing',
+const currentUserId = computed(() => (auth.value?.user as User | null)?.id ?? null)
+const currentUserRole = computed(() => auth.value?.user?.role ?? null)
+
+provideServerSettings({
+	isApp: ref(false),
+	currentUserId,
+	currentUserRole,
+	browseModpacks: ({ serverId, worldId, from }: ServerSettingsBrowseModpacksArgs) => {
+		navigateTo({
+			path: '/discover/modpacks',
+			query: { sid: serverId, from, wid: worldId ?? undefined },
+		})
 	},
-	{ icon: TextQuoteIcon, label: 'Advanced', href: `/hosting/manage/${serverId}/options/advanced` },
-	{
-		icon: CardIcon,
-		label: 'Billing',
-		href: `/settings/billing#server-${serverId}`,
-		external: true,
-		shown: isOwner.value,
-	},
-	{
-		icon: ModrinthIcon,
-		label: 'Admin Billing',
-		href: `/admin/billing/${ownerId.value}`,
-		external: true,
-		shown: isAdmin.value,
-	},
-])
+})
+
+const navLinks = computed(() =>
+	getServerSettingsNavLinks({
+		serverId,
+		ownerId: ownerId.value,
+		serverStatus: server.value?.status,
+		isOwner: isOwner.value,
+		isAdmin: isAdmin.value,
+	}),
+)
 </script>
