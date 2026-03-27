@@ -24,6 +24,7 @@
 			:affiliate-code="affiliateCode"
 			plan-stage
 		/>
+		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
 		<div
 			v-if="hasError || fetchError"
@@ -202,6 +203,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
+	ResubscribeModal,
 	StyledInput,
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
@@ -236,6 +238,7 @@ const pollingState = ref({
 })
 
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
+const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
 const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
 const regionPings = ref<
@@ -547,6 +550,11 @@ type ServerBillingInfo = {
 	onDownloadBackup?: (() => void) | null
 }
 
+type ResubscribeRequest = {
+	subscriptionId: string
+	wasSuspended: boolean
+}
+
 function getLatestBackupDownload(serverId: string): (() => void) | null {
 	const serverFull = serverFullList.value?.find((s) => s.id === serverId)
 	if (!serverFull) return null
@@ -587,6 +595,127 @@ function getLatestBackupDownload(serverId: string): (() => void) | null {
 	}
 }
 
+function getProductFromPriceId(priceId: string | null | undefined) {
+	if (!priceId) return null
+
+	return pyroProducts.value.find((product) => product.prices.some((price) => price.id === priceId)) ?? null
+}
+
+function getPlanName(product: Labrinth.Billing.Internal.Product | null): string {
+	if (!product) return 'Medium plan'
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return 'Medium plan'
+
+	switch (product.metadata.ram) {
+		case 4096:
+			return 'Small plan'
+		case 6144:
+			return 'Medium plan'
+		case 8192:
+			return 'Large plan'
+		default:
+			return 'Custom plan'
+	}
+}
+
+function getRamGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.ram / 1024
+}
+
+function getStorageGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.storage / 1024
+}
+
+function getSharedCpus(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.cpu / 2
+}
+
+function getRecurringPrice(
+	product: Labrinth.Billing.Internal.Product | null,
+	interval: Labrinth.Billing.Internal.PriceDuration,
+	preferredCurrency?: string,
+): { amount: number; currencyCode: string } | null {
+	if (!product) return null
+
+	const recurringPrices = product.prices.filter((price) => price.prices.type === 'recurring')
+	const preferredPrice = preferredCurrency
+		? recurringPrices.find((price) => price.currency_code === preferredCurrency)
+		: undefined
+	const usdPrice = recurringPrices.find((price) => price.currency_code === 'USD')
+	const selectedPrice = preferredPrice ?? usdPrice ?? recurringPrices[0]
+
+	if (!selectedPrice || selectedPrice.prices.type !== 'recurring') return null
+
+	return {
+		amount: selectedPrice.prices.intervals[interval],
+		currencyCode: selectedPrice.currency_code,
+	}
+}
+
+function openResubscribeModal(
+	serverId: string,
+	subscription: Labrinth.Billing.Internal.UserSubscription,
+	charge?: Labrinth.Billing.Internal.Charge | null,
+) {
+	const displayInterval = charge?.subscription_interval ?? subscription.interval
+	const displayPriceId = charge?.price_id ?? subscription.price_id
+	const product = getProductFromPriceId(displayPriceId)
+	const fallbackPrice = getRecurringPrice(product, displayInterval, charge?.currency_code)
+
+	resubscribeModal.value?.show({
+		subscriptionId: subscription.id,
+		wasSuspended: !!charge?.due && dayjs(charge.due).isBefore(dayjs()),
+		serverName: serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
+		planName: getPlanName(product),
+		ramGb: getRamGb(product),
+		storageGb: getStorageGb(product),
+		sharedCpus: getSharedCpus(product),
+		priceCents: charge?.amount ?? fallbackPrice?.amount,
+		currencyCode: charge?.currency_code ?? fallbackPrice?.currencyCode,
+		interval: displayInterval,
+		nextChargeDate: charge?.due,
+	})
+}
+
+async function handleResubscribeConfirm({ subscriptionId, wasSuspended }: ResubscribeRequest) {
+	try {
+		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
+			cancelled: false,
+		})
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['billing'] }),
+			queryClient.invalidateQueries({ queryKey: ['servers'] }),
+		])
+		if (wasSuspended) {
+			addNotification({
+				title: 'Resubscription request submitted',
+				text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+				type: 'success',
+			})
+		} else {
+			addNotification({
+				title: 'Success',
+				text: 'Server subscription resubscribed successfully',
+				type: 'success',
+			})
+		}
+	} catch {
+		addNotification({
+			title: 'Error resubscribing',
+			text: 'An error occurred while resubscribing to your Modrinth server.',
+			type: 'error',
+		})
+	}
+}
+
 const serverBillingMap = computed(() => {
 	const map = new Map<string, ServerBillingInfo>()
 	if (!subscriptions.value || !charges.value) return map
@@ -607,38 +736,7 @@ const serverBillingMap = computed(() => {
 		if (charge?.status === 'cancelled') {
 			info.cancellationDate = charge.due
 
-			const subId = sub.id
-			const wasSuspended = dayjs(charge.due).isBefore(dayjs())
-			info.onResubscribe = async () => {
-				try {
-					await client.labrinth.billing_internal.editSubscription(subId, {
-						cancelled: false,
-					})
-					await Promise.all([
-						queryClient.invalidateQueries({ queryKey: ['billing'] }),
-						queryClient.invalidateQueries({ queryKey: ['servers'] }),
-					])
-					if (wasSuspended) {
-						addNotification({
-							title: 'Resubscription request submitted',
-							text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
-							type: 'success',
-						})
-					} else {
-						addNotification({
-							title: 'Success',
-							text: 'Server subscription resubscribed successfully',
-							type: 'success',
-						})
-					}
-				} catch {
-					addNotification({
-						title: 'Error resubscribing',
-						text: 'An error occurred while resubscribing to your Modrinth server.',
-						type: 'error',
-					})
-				}
-			}
+			info.onResubscribe = () => openResubscribeModal(serverId, sub, charge)
 		}
 
 		map.set(serverId, info)
