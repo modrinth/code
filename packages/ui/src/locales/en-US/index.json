@@ -905,6 +905,60 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Failed to change modpack version"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Failed to load versions"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Failed to reinstall modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Failed to repair server"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Failed to reset server to onboarding"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Failed to save installation settings"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Failed to unlink modpack"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "{loader, select, null {Loader} other {{loader}}} version"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Your server installation has been repaired."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Repair completed"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Reset server"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Reset to onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Reset to onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "The server has been returned to the onboarding flow."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Server reset to onboarding"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Support options"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
   },

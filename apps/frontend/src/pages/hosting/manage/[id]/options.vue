@@ -5,18 +5,13 @@
 </template>
 <script setup lang="ts">
 import {
-	CardIcon,
-	InfoIcon,
-	ListIcon,
-	ModrinthIcon,
-	SettingsIcon,
-	TextQuoteIcon,
-	UserIcon,
-	VersionIcon,
-	WrenchIcon,
-} from '@modrinth/assets'
-import { injectModrinthServerContext } from '@modrinth/ui'
+	getServerSettingsNavLinks,
+	injectModrinthServerContext,
+	provideServerSettings,
+	type ServerSettingsBrowseModpacksArgs,
+} from '@modrinth/ui'
 import { isAdmin as isUserAdmin, type User } from '@modrinth/utils'
+import { computed, ref } from 'vue'
 
 import ServerSidebar from '~/components/ui/servers/ServerSidebar.vue'
 
@@ -34,36 +29,28 @@ const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => (auth.value?.user as User | null)?.id === ownerId.value)
 const isAdmin = computed(() => isUserAdmin(auth.value?.user))
 
-const navLinks = computed(() => [
-	{ icon: SettingsIcon, label: 'General', href: `/hosting/manage/${serverId}/options` },
-	{ icon: WrenchIcon, label: 'Platform', href: `/hosting/manage/${serverId}/options/loader` },
-	{ icon: TextQuoteIcon, label: 'Startup', href: `/hosting/manage/${serverId}/options/startup` },
-	{ icon: VersionIcon, label: 'Network', href: `/hosting/manage/${serverId}/options/network` },
-	{
-		icon: ListIcon,
-		label: 'Properties',
-		href: `/hosting/manage/${serverId}/options/properties`,
-		shown: server.value?.status !== 'installing',
+const currentUserId = computed(() => (auth.value?.user as User | null)?.id ?? null)
+const currentUserRole = computed(() => auth.value?.user?.role ?? null)
+
+provideServerSettings({
+	isApp: ref(false),
+	currentUserId,
+	currentUserRole,
+	browseModpacks: ({ serverId, worldId, from }: ServerSettingsBrowseModpacksArgs) => {
+		navigateTo({
+			path: '/discover/modpacks',
+			query: { sid: serverId, from, wid: worldId ?? undefined },
+		})
 	},
-	{
-		icon: UserIcon,
-		label: 'Preferences',
-		href: `/hosting/manage/${serverId}/options/preferences`,
-	},
-	{
-		icon: CardIcon,
-		label: 'Billing',
-		href: `/settings/billing#server-${serverId}`,
-		external: true,
-		shown: isOwner.value,
-	},
-	{
-		icon: ModrinthIcon,
-		label: 'Admin Billing',
-		href: `/admin/billing/${ownerId.value}`,
-		external: true,
-		shown: isAdmin.value,
-	},
-	{ icon: InfoIcon, label: 'Info', href: `/hosting/manage/${serverId}/options/info` },
-])
+})
+
+const navLinks = computed(() =>
+	getServerSettingsNavLinks({
+		serverId,
+		ownerId: ownerId.value,
+		serverStatus: server.value?.status,
+		isOwner: isOwner.value,
+		isAdmin: isAdmin.value,
+	}),
+)
 </script>
