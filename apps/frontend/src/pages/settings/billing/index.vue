@@ -1,9 +1,6 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
-	<ResubscribeModal
-		ref="pyroResubscribeModal"
-		@resubscribe="handlePyroResubscribeConfirm"
-	/>
+	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
 	<section class="universal-card experimental-styles-within">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -428,9 +425,7 @@
 											"
 											color="green"
 										>
-											<button
-												@click="openPyroResubscribeModal(subscription)"
-											>
+											<button @click="openPyroResubscribeModal(subscription)">
 												Resubscribe <RightArrowIcon />
 											</button>
 										</ButtonStyled>
@@ -626,7 +621,8 @@ import {
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
@@ -803,9 +799,16 @@ const pyroSubscriptions = computed(() => {
 	return pyroSubs
 		.map((subscription) => {
 			const server = servers.find((s) => s.server_id === subscription.metadata.id)
+			const charge = getPyroCharge(subscription)
+
 			return {
 				...subscription,
-				serverInfo: server,
+				serverInfo: {
+					...server,
+					isProvisioning:
+						subscription.status === 'unprovisioned' &&
+						(charge?.status === 'processing' || charge?.status === 'open'),
+				},
 			}
 		})
 		.filter((subscription) => {
@@ -983,16 +986,42 @@ const showPyroUpgradeModal = (subscription) => {
 	upgradeModal.value?.open(subscription?.metadata?.id)
 }
 
+const CHARGE_POLL_INTERVAL_MS = 20_000
+
+const hasProvisioningSubscription = computed(() =>
+	pyroSubscriptions.value?.some((s) => s.serverInfo?.isProvisioning),
+)
+
+const { pause: pauseChargePoll, resume: resumeChargePoll } = useIntervalFn(
+	() => {
+		queryClient.invalidateQueries({ queryKey: ['billing', 'payments'] })
+		queryClient.invalidateQueries({ queryKey: ['billing', 'subscriptions'] })
+	},
+	CHARGE_POLL_INTERVAL_MS,
+	{ immediate: false },
+)
+
+watch(
+	hasProvisioningSubscription,
+	(isProvisioning) => {
+		if (isProvisioning) {
+			resumeChargePoll()
+		} else {
+			pauseChargePoll()
+		}
+	},
+	{ immediate: true },
+)
+
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
 	try {
 		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
 			cancelled: false,
 		})
-		await refresh()
 		if (wasSuspended) {
 			addNotification({
 				title: 'Resubscription request submitted',
-				text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+				text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
 				type: 'success',
 			})
 		} else {

@@ -181,6 +181,7 @@
 						:key="server.server_id"
 						v-bind="server"
 						:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+						:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
 						:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
 						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
@@ -208,6 +209,7 @@ import {
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
 import type Stripe from 'stripe'
@@ -539,6 +541,41 @@ const { data: charges } = useQuery({
 	queryFn: () => client.labrinth.billing_internal.getPayments(),
 })
 
+const CHARGE_POLL_INTERVAL_MS = 20_000
+
+const hasProvisioningSubscription = computed(() => {
+	if (!subscriptions.value || !charges.value) return false
+	return subscriptions.value
+		.filter((s) => s?.metadata?.type === 'pyro')
+		.some((sub) => {
+			if (sub.status !== 'unprovisioned') return false
+			const charge = charges.value?.find((c) => c.subscription_id === sub.id)
+			return charge?.status === 'processing' || charge?.status === 'open'
+		})
+})
+
+const { pause: pauseChargePoll, resume: resumeChargePoll } = useIntervalFn(
+	() => {
+		queryClient.invalidateQueries({ queryKey: ['billing', 'payments'] })
+		queryClient.invalidateQueries({ queryKey: ['billing', 'subscriptions'] })
+		queryClient.invalidateQueries({ queryKey: ['servers'] })
+	},
+	CHARGE_POLL_INTERVAL_MS,
+	{ immediate: false },
+)
+
+watch(
+	hasProvisioningSubscription,
+	(isProvisioning) => {
+		if (isProvisioning) {
+			resumeChargePoll()
+		} else {
+			pauseChargePoll()
+		}
+	},
+	{ immediate: true },
+)
+
 const { data: serverFullList } = useQuery({
 	queryKey: ['servers', 'v1'],
 	queryFn: () => client.archon.servers_v1.list(),
@@ -546,6 +583,7 @@ const { data: serverFullList } = useQuery({
 
 type ServerBillingInfo = {
 	cancellationDate?: string | null
+	isProvisioning?: boolean
 	onResubscribe?: () => void
 	onDownloadBackup?: (() => void) | null
 }
@@ -598,7 +636,10 @@ function getLatestBackupDownload(serverId: string): (() => void) | null {
 function getProductFromPriceId(priceId: string | null | undefined) {
 	if (!priceId) return null
 
-	return pyroProducts.value.find((product) => product.prices.some((price) => price.id === priceId)) ?? null
+	return (
+		pyroProducts.value.find((product) => product.prices.some((price) => price.id === priceId)) ??
+		null
+	)
 }
 
 function getPlanName(product: Labrinth.Billing.Internal.Product | null): string {
@@ -673,7 +714,8 @@ function openResubscribeModal(
 	resubscribeModal.value?.show({
 		subscriptionId: subscription.id,
 		wasSuspended: !!charge?.due && dayjs(charge.due).isBefore(dayjs()),
-		serverName: serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
+		serverName:
+			serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
 		planName: getPlanName(product),
 		ramGb: getRamGb(product),
 		storageGb: getStorageGb(product),
@@ -697,7 +739,7 @@ async function handleResubscribeConfirm({ subscriptionId, wasSuspended }: Resubs
 		if (wasSuspended) {
 			addNotification({
 				title: 'Resubscription request submitted',
-				text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+				text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
 				type: 'success',
 			})
 		} else {
@@ -729,7 +771,11 @@ const serverBillingMap = computed(() => {
 			(c) => c.subscription_id === sub.id && c.status !== 'succeeded',
 		)
 
-		const info: ServerBillingInfo = {}
+		const info: ServerBillingInfo = {
+			isProvisioning:
+				sub.status === 'unprovisioned' &&
+				(charge?.status === 'processing' || charge?.status === 'open'),
+		}
 
 		info.onDownloadBackup = getLatestBackupDownload(serverId)
 

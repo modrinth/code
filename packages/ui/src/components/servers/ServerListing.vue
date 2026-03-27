@@ -80,7 +80,7 @@
 
 		<div v-if="noticeType" class="server-listing-notice">
 			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
-				Please wait while we set up your server. This should only take a minute.
+				Please wait while we set up your server. This can take up to 10 minutes.
 			</div>
 			<div v-else-if="noticeType === 'upgrading'" class="flex gap-2">
 				Your server's hardware is currently being upgraded and will be back online shortly.
@@ -234,6 +234,7 @@ type ServerListingProps = {
 		current?: number
 		max?: number
 	}
+	isProvisioning?: boolean
 	cancellationDate?: string | Date | null
 	onResubscribe?: (() => void) | null
 	onDownloadBackup?: (() => void) | null
@@ -244,11 +245,10 @@ const props = defineProps<ServerListingProps>()
 const { kyros, labrinth } = injectModrinthClient()
 
 const isConfiguring = computed(() => props.flows?.intro)
-const isProvisioning = computed(() => props.status === 'installing' && !isConfiguring.value)
 const isUpgrading = computed(
 	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
 )
-const isDisabled = computed(() => props.status === 'suspended' || isProvisioning.value)
+const isDisabled = computed(() => props.status === 'suspended' || props.isProvisioning)
 const isSetToCancel = computed(() => !!props.cancellationDate && props.status !== 'suspended')
 const filesRemainingDays = computed(() => {
 	if (!props.cancellationDate) return 0
@@ -260,7 +260,7 @@ const filesRemainingDays = computed(() => {
 const isFilesExpired = computed(() => filesRemainingDays.value <= 0)
 
 const hasIconOverlay = computed(
-	() => isProvisioning.value || isUpgrading.value || props.status === 'suspended',
+	() => props.isProvisioning || isUpgrading.value || props.status === 'suspended',
 )
 
 type NoticeType =
@@ -273,7 +273,7 @@ type NoticeType =
 	| 'setToCancel'
 
 const noticeType = computed<NoticeType | null>(() => {
-	if (isProvisioning.value) return 'provisioning'
+	if (props.isProvisioning) return 'provisioning'
 	if (props.status === 'suspended') {
 		switch (props.suspension_reason) {
 			case 'upgrading':
