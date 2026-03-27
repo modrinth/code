@@ -85,6 +85,7 @@ jobs:
 
           echo "staging-preview-url=$STAGING_PREVIEW_URL" >> $GITHUB_OUTPUT
           echo "production-preview-url=$PRODUCTION_PREVIEW_URL" >> $GITHUB_OUTPUT
+          echo "storybook-preview-url=https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev" >> $GITHUB_OUTPUT
 
       - name: Find comment
         if: github.event_name == 'pull_request'
@@ -111,5 +112,5 @@ jobs:
             |-------------|-----|
             | staging     | ${{ steps.urls.outputs.staging-preview-url }} |
             | production  | ${{ steps.urls.outputs.production-preview-url }} |
-            | storybook   | https://git-${GITHUB_SHA::8}-storybook.modrinth.workers.dev |
+            | storybook   | ${{ steps.urls.outputs.storybook-preview-url }} |
           edit-mode: replace
