@@ -12,6 +12,7 @@ useHead({
 <template>
 	<ServersManageBackupsPage
 		:is-server-running="isServerRunning"
+		:show-copy-id-action="flags.developerMode"
 		:show-debug-info="flags.advancedDebugInfo"
 	/>
 </template>

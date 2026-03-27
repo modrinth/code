@@ -100,6 +100,7 @@
 										:restore-disabled="backupRestoreDisabled"
 										:kyros-url="server.node?.instance"
 										:jwt="server.node?.token"
+										:show-copy-id-action="showCopyIdAction"
 										:show-debug-info="showDebugInfo"
 										@download="() => triggerDownloadAnimation()"
 										@rename="() => renameBackupModal?.show(backup)"
@@ -171,6 +172,7 @@ const { server, worldId, backupsState, markBackupCancelled, busyReasons } =
 
 const props = defineProps<{
 	isServerRunning: boolean
+	showCopyIdAction?: boolean
 	showDebugInfo?: boolean
 }>()
 
