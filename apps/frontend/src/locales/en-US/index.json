@@ -1694,8 +1694,53 @@
   "layout.nav.upgrade-to-modrinth-plus": {
     "message": "Upgrade to Modrinth+"
   },
+  "moderation.external-projects.empty-description": {
+    "message": "Type at least 3 characters of a project’s title to begin browsing."
+  },
+  "moderation.external-projects.empty-flame-id-description": {
+    "message": "Type the numeric project ID, then use lookup for an exact match."
+  },
+  "moderation.external-projects.empty-flame-id-title": {
+    "message": "Enter a CurseForge project ID"
+  },
+  "moderation.external-projects.empty-sha1-description": {
+    "message": "Paste the full 40-character hex hash, then use lookup for an exact match."
+  },
+  "moderation.external-projects.empty-sha1-title": {
+    "message": "Enter a SHA-1 hash"
+  },
+  "moderation.external-projects.empty-title": {
+    "message": "Enter a search term to get started"
+  },
+  "moderation.external-projects.lookup-curseforge-id": {
+    "message": "Lookup CurseForge ID"
+  },
+  "moderation.external-projects.lookup-sha1-hash": {
+    "message": "Lookup SHA-1"
+  },
+  "moderation.external-projects.no-results-by-flame-id": {
+    "message": "No external project has that CurseForge ID"
+  },
+  "moderation.external-projects.no-results-by-sha1": {
+    "message": "No external file has that SHA-1 hash"
+  },
+  "moderation.external-projects.no-results-by-title": {
+    "message": "No projects matched that title search"
+  },
+  "moderation.external-projects.page-title": {
+    "message": "External projects - Modrinth"
+  },
+  "moderation.external-projects.search-by-title": {
+    "message": "Search by title"
+  },
+  "moderation.external-projects.search-placeholder": {
+    "message": "Search external projects..."
+  },
   "moderation.moderate": {
     "message": "Moderate"
+  },
+  "moderation.page.external-projects": {
+    "message": "External projects"
   },
   "moderation.page.projects": {
     "message": "Projects"
@@ -1704,7 +1749,7 @@
     "message": "Reports"
   },
   "moderation.page.technicalReview": {
-    "message": "Technical Review"
+    "message": "Tech review"
   },
   "muralpay.account-type.checking": {
     "message": "Checking"

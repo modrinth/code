@@ -491,6 +491,57 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
   },
+  "external-files.lookup-card.allowed-label": {
+    "defaultMessage": "Allowed:"
+  },
+  "external-files.lookup-card.curseforge-project": {
+    "defaultMessage": "CurseForge project"
+  },
+  "external-files.lookup-card.files-heading": {
+    "defaultMessage": "Files"
+  },
+  "external-files.lookup-card.first-identified-name": {
+    "defaultMessage": "First identified name:"
+  },
+  "external-files.lookup-card.last-edited": {
+    "defaultMessage": "Last edited on {date} by {user}"
+  },
+  "external-files.lookup-card.no-files": {
+    "defaultMessage": "No files available for external project."
+  },
+  "external-files.lookup-card.notes-label": {
+    "defaultMessage": "Notes:"
+  },
+  "external-files.lookup-card.project-link": {
+    "defaultMessage": "Project link"
+  },
+  "external-files.lookup-card.proof-label": {
+    "defaultMessage": "Proof:"
+  },
+  "external-files.lookup-card.sha1-label": {
+    "defaultMessage": "SHA-1:"
+  },
+  "external-files.lookup-card.status.no": {
+    "defaultMessage": "No"
+  },
+  "external-files.lookup-card.status.permanent-no": {
+    "defaultMessage": "Permanent no"
+  },
+  "external-files.lookup-card.status.unidentified": {
+    "defaultMessage": "Unidentified"
+  },
+  "external-files.lookup-card.status.with-attribution": {
+    "defaultMessage": "With attribution"
+  },
+  "external-files.lookup-card.status.with-attribution-and-source": {
+    "defaultMessage": "With attribution and source"
+  },
+  "external-files.lookup-card.status.yes": {
+    "defaultMessage": "Yes"
+  },
+  "external-files.lookup-card.unknown-file-name": {
+    "defaultMessage": "Unknown"
+  },
   "files.conflict-modal.header": {
     "defaultMessage": "Extract summary"
   },
