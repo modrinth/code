@@ -1275,4 +1275,46 @@ impl Profile {
 
         Ok(())
     }
+
+    /// Rename existing project-related files, such as shader config,
+    /// to match the new project path. It does not overwrite anything.
+    ///
+    /// Accepts relative paths (e.g. `shaderpacks/myshader_old.zip`
+    /// and `shaderpacks/myshader_new.zip`)
+    #[tracing::instrument]
+    pub async fn rename_project_companion_files(
+        profile_path: &str,
+        old_project_path: &str,
+        new_project_path: &str,
+    ) -> crate::Result<()> {
+        if let Ok(path) = crate::api::profile::get_full_path(profile_path).await
+        {
+            let project_type =
+                ProjectType::get_from_parent_folder(new_project_path)
+                    .ok_or_else(|| {
+                        crate::ErrorKind::InputError(
+                            "Unable to determine project type.".to_string(),
+                        )
+                        .as_error()
+                    })?;
+
+            if project_type == ProjectType::ShaderPack {
+                let old_settings_path = path.join(format!(
+                    "{}.txt",
+                    old_project_path.trim_end_matches(".disabled")
+                ));
+                let new_settings_path = path.join(format!(
+                    "{}.txt",
+                    new_project_path.trim_end_matches(".disabled")
+                ));
+
+                if old_settings_path.exists() && !new_settings_path.exists() {
+                    io::rename_or_move(&old_settings_path, &new_settings_path)
+                        .await?;
+                }
+            }
+        }
+
+        Ok(())
+    }
 }
