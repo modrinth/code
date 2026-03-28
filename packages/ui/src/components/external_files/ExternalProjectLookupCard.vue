@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { CurseForgeIcon, FileIcon, LinkIcon, UnknownIcon } from '@modrinth/assets'
+import {
+	ClipboardCopyIcon,
+	CurseForgeIcon,
+	FileIcon,
+	LinkIcon,
+	UnknownIcon,
+} from '@modrinth/assets'
 import { Menu } from 'floating-vue'
 import { computed } from 'vue'
 
-import { CopyCode, TagItem } from '#ui/components'
+import { ButtonStyled, CopyCode, TagItem } from '#ui/components'
+import { commonMessages } from '#ui/utils/common-messages'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { ExternalLicenseStatus } from './types.ts'
@@ -108,27 +115,36 @@ const lastEditedText = computed(() =>
 			})
 		: '',
 )
+
+async function copyProjectLink() {
+	if (!props.link) return
+	await navigator.clipboard.writeText(props.link)
+}
 </script>
 
 <template>
 	<div class="bg-surface-3 p-4 rounded-2xl flex flex-col gap-3">
 		<span class="text-contrast font-semibold">{{ title }}</span>
-		<a
-			v-if="link?.includes('curseforge.com')"
-			class="flex items-center gap-2 font-medium hover:underline focus:underline w-fit text-blue"
-			:href="link"
-			target="_blank"
-		>
-			<CurseForgeIcon class="size-5 shrink-0" /> {{ formatMessage(messages.curseforgeProject) }}
-		</a>
-		<a
-			v-else-if="!!link"
-			class="flex items-center gap-2 font-medium hover:underline focus:underline w-fit text-blue"
-			:href="link"
-			target="_blank"
-		>
-			<LinkIcon class="size-5 shrink-0" /> {{ formatMessage(messages.projectLink) }}
-		</a>
+		<div v-if="!!link" class="flex gap-2 items-center">
+			<a
+				class="flex items-center gap-2 font-medium hover:underline focus:underline w-fit text-blue"
+				:href="link"
+				target="_blank"
+			>
+				<template v-if="link?.includes('curseforge.com')">
+					<CurseForgeIcon class="size-5 shrink-0" /> {{ formatMessage(messages.curseforgeProject) }}
+				</template>
+				<template v-else>
+					<LinkIcon class="size-5 shrink-0" /> {{ formatMessage(messages.projectLink) }}
+				</template>
+			</a>
+			<ButtonStyled circular type="transparent" size="small">
+				<button v-tooltip="formatMessage(commonMessages.copyLinkButton)" @click="copyProjectLink">
+					<ClipboardCopyIcon />
+				</button>
+			</ButtonStyled>
+		</div>
+
 		<div class="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2">
 			<div class="font-medium">{{ formatMessage(messages.allowedLabel) }}</div>
 			<div>
