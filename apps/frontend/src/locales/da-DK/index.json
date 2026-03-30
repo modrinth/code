@@ -1460,9 +1460,6 @@
   "layout.nav.discover-content": {
     "message": "Opdag indhold"
   },
-  "layout.nav.feature-flags": {
-    "message": "Funktionsflags"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Hent Modrinth-app"
   },

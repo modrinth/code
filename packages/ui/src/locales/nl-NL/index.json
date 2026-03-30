@@ -182,17 +182,11 @@
   "changelog.justNow": {
     "defaultMessage": "Zojuist"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
     "defaultMessage": "Hosten"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "Website"
   },
   "collections.label.private": {
     "defaultMessage": "Prive"
@@ -242,9 +236,6 @@
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Toegevoegd (afhankelijkheid)"
   },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Verwijderd"
-  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Geüpdate"
   },
@@ -289,9 +280,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Niet opnieuw tonen"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Aan het bijwerken..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Extra inhoud"
@@ -394,12 +382,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "{contentType} aan het updaten..."
-  },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Schakel uit"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Schakel in"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} geselecteerd"
@@ -506,9 +488,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolutie"
   },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Kopieer link"
-  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Het verwijderen van content is mislukt"
   },
@@ -611,32 +590,20 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Onbekende spelmodus"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Spelversie"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Kies de spelversie"
   },
   "instances.content-install.install-button": {
     "defaultMessage": "Installeren"
   },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Aan het installeren..."
-  },
   "instances.content-install.name-label": {
     "defaultMessage": "Naam"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Kopieer link"
   },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Deze modpack bevat geen extra inhoud."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Geen inhoud gevonden"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Alles"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpack inhoud"

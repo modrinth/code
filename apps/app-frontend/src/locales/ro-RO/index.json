@@ -5,9 +5,6 @@
   "app.auth-servers.unreachable.header": {
     "message": "Nu se pot accesa serverele de autentificare"
   },
-  "app.instance.mods.copy-link": {
-    "message": "Copiază linkul"
-  },
   "app.modal.install-to-play.content-required": {
     "message": "Conținut necesar"
   },
@@ -55,9 +52,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Opțiuni implicite instanță"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Controale funcționalitate"
   },
   "app.settings.tabs.java-installations": {
     "message": "Instalări Java"
@@ -383,9 +377,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Nu afișa în pagina principală"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponibil"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instanța este deja deschisă"
   },
@@ -409,12 +400,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Joacă pe instanța"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Un singur jucător"
   },
   "instance.worlds.view_instance": {
     "message": "Afișează instanța"
