@@ -37,7 +37,7 @@
 					/>
 				</div>
 
-				<div class="flex flex-col gap-6">
+				<div class="flex flex-col gap-6 pb-10">
 					<!-- Basic Properties -->
 					<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
 					<div
