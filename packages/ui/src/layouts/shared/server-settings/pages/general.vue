@@ -17,14 +17,11 @@
 									:maxlength="48"
 									@keyup.enter="!serverName && saveGeneral"
 								/>
-								<span v-if="!serverName" class="text-sm text-rose-400">
-									Server name must be at least 1 character long.
-								</span>
-								<span v-if="!isValidServerName" class="text-sm text-rose-400">
-									Server name can contain any character.
-								</span>
+								<span>This name is only visible on Modrinth.</span>
+								<div class="text-red font-medium">
+									<span v-if="!isValidServerName"> Server name cannot be empty. </span>
+								</div>
 							</div>
-							<span>This name is only visible on Modrinth.</span>
 						</div>
 
 						<!-- Hostname -->
@@ -60,7 +57,7 @@
 								</div>
 							</label>
 							<span>Your friends can connect to your server using this address.</span>
-							<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-red">
+							<div v-if="!isValidSubdomain" class="text-red font-medium">
 								<span v-if="!isValidLengthSubdomain">
 									Subdomain must be at least 5 characters long.
 								</span>
@@ -111,7 +108,7 @@
 					:key="key"
 					class="flex items-center justify-between gap-2"
 				>
-					<label :for="`pref-${key}`" class="flex flex-col gap-2">
+					<label :for="`pref-${key}`" class="flex flex-col gap-1">
 						<div class="flex flex-row items-center gap-2">
 							<span class="text-lg font-semibold text-contrast">{{ prefConfig.displayName }}</span>
 							<div
@@ -183,7 +180,9 @@ const data = server
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
 const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5)
-const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value))
+const isValidCharsSubdomain = computed(
+	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
+)
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
 const icon = ref<string | undefined>(undefined)
 
