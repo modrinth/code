@@ -43,7 +43,7 @@
 					<div
 						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
 					>
-						<div class="flex max-w-[600px] flex-col gap-4">
+						<div class="flex w-full flex-col gap-4 min-[1100px]:max-w-[600px]">
 							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2">
 								<span class="font-semibold text-contrast">Gamemode</span>
 								<Chips
@@ -134,12 +134,13 @@
 								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
 								class="flex items-center justify-between"
 							>
-								<span class="text-lg font-semibold text-contrast">Protection radius</span>
+								<span class="font-semibold text-contrast">Protection radius</span>
 								<StyledInput
 									id="server-property-spawn-protection-radius"
 									:model-value="liveProperties.spawn_protection"
 									type="number"
-									wrapper-class="w-full sm:w-[320px]"
+									wrapper-class="w-full sm:w-[100px]"
+									input-class="text-right"
 									@update:model-value="liveProperties.spawn_protection = String($event)"
 								/>
 							</div>
@@ -157,7 +158,7 @@
 
 						<div class="flex flex-col gap-6 pt-4">
 							<template v-for="group in advancedGroupedProperties" :key="group.label">
-								<div v-if="hasVisibleProperties(group)" class="flex flex-col gap-4">
+								<div v-if="hasVisibleProperties(group)" class="flex flex-col gap-2.5">
 									<h3 class="m-0 text-base font-semibold text-contrast">
 										{{ group.label }}
 									</h3>
@@ -167,9 +168,9 @@
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
-												class="flex flex-row flex-wrap items-center justify-between"
+												class="flex flex-row flex-wrap items-center justify-between h-10"
 											>
-												<span :id="`property-label-${key}`">
+												<span :id="`property-label-${key}`" class="font-semibold">
 													{{ formatPropertyName(key) }}
 												</span>
 
@@ -183,7 +184,7 @@
 												</div>
 												<div
 													v-else-if="getPropertyDef(key).type === 'number'"
-													class="mt-2 w-full sm:w-[320px]"
+													class="w-full sm:w-[320px]"
 												>
 													<StyledInput
 														:id="`server-property-${key}`"
