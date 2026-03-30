@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Tiếp tục"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Sao chép tên tài liệu"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Sao chép đường dẫn"
+  },
   "button.copy-id": {
     "defaultMessage": "Sao chép ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Sao chép liên kết"
   },
   "button.copy-permalink": {
     "defaultMessage": "Sao chép liên kết vĩnh viễn"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Huỷ bỏ"
   },
+  "button.disable": {
+    "defaultMessage": "Vô hiệu hoá"
+  },
   "button.download": {
     "defaultMessage": "Tải xuống"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Chỉnh sửa"
+  },
+  "button.enable": {
+    "defaultMessage": "Kích hoạt"
+  },
+  "button.extract": {
+    "defaultMessage": "Giải nén"
   },
   "button.follow": {
     "defaultMessage": "Theo dõi"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "Thêm tùy chọn"
   },
+  "button.move": {
+    "defaultMessage": "Di chuyển"
+  },
   "button.next": {
     "defaultMessage": "Tiếp theo"
   },
   "button.open-folder": {
     "defaultMessage": "Mở thư mục"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Mở nó trong thư mục"
   },
   "button.play": {
     "defaultMessage": "Chơi"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Xóa ảnh"
+  },
+  "button.rename": {
+    "defaultMessage": "Đổi tên"
   },
   "button.repair": {
     "defaultMessage": "Sửa chửa"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Hiển thị tất cả các phiên bản"
   },
+  "button.show-file": {
+    "defaultMessage": "Hiện tệp"
+  },
   "button.sign-in": {
     "defaultMessage": "Đăng nhập"
   },
@@ -182,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "Vừa xong"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Ứng dụng"
   },
@@ -192,7 +219,7 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Trang web"
+    "defaultMessage": "Nền tảng"
   },
   "collections.label.private": {
     "defaultMessage": "Riêng tư"
@@ -224,6 +251,9 @@
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Mọi bản mod hoặc nội dung bạn đã thêm vào modpack sẽ bị xóa."
   },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Mọi bản mod hoặc nội dung bạn thêm vào modpack này sẽ được giữ nguyên."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Cảnh báo {action, select, downgrade {hạ cấp} other {cập nhật}}"
   },
@@ -250,9 +280,6 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Đã thêm (phụ thuộc)"
-  },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Đã xoá"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Đã cập nhật"
@@ -298,9 +325,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Không hiển thị lại"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Đang cập nhật..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Mod bổ sung"
@@ -403,12 +427,6 @@
   },
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Đang cập nhật {contentType}..."
-  },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Tắt"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Bật"
   },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} đã được chọn"
@@ -517,9 +535,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Độ phân giải"
-  },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Sao chép liên kết"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Không thể xóa nội dung"
@@ -713,15 +728,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "Các file đang trong quá trình upload. Rời khỏi trang này sẽ hủy upload và mất các thay đổi của bạn."
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Rời khỏi trang"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Ở lại trang này"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Rời khỏi trang sao?"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "Đang trong quá trình upload"
   },
@@ -731,26 +737,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Phiên chơi có sẵn"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Phiên bản game"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Chọn phiên bản game"
   },
   "instances.content-install.header": {
     "defaultMessage": "Cài đặt dự án"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Ẩn các bản snapshot"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Cài đặt"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Đã cài đặt"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Đang cài đặt..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Loại phiên chơi"
@@ -779,20 +776,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Chọn biểu tượng"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Hiển thị tất cả các phiên bản"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Sao chép liên kết"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Gói modpack này không bao gồm các nội dung bổ sung nào."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Không có nội dung nào được tìm thấy"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Tất cả"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Nội dung modpack"

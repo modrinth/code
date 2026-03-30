@@ -104,12 +104,6 @@
   "changelog.justNow": {
     "defaultMessage": "ตอนนี้"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "เว็ปไซต์"
-  },
   "form.label.address-line-2": {
     "defaultMessage": "ที่อยู่บรรทัดที่ 2 (ไม่จำเป็น)"
   },

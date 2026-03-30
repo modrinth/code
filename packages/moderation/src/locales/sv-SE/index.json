@@ -11,11 +11,32 @@
   "nags.add-icon.title": {
     "defaultMessage": "Lägg till en ikon"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Lägg till IP-adressen och porten Java Edition-spelare kan använda för att gå med i din server."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Lägg till Java-adress"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Lägg till andra relevanta länkar utanför Modrinth, som till exempel en webbsida, butik eller en Discord-inbjudning."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Lägg till externa länkar"
+  },
+  "nags.add-links.description": {
+    "defaultMessage": "Lägg till andra relevanta länkar utanför Modrinth, som till exempel källkoden, en buggspårare eller en Discord-inbjudning."
+  },
   "nags.add-links.title": {
     "defaultMessage": "Lägg till externa länkar"
   },
+  "nags.all-tags-selected.description": {
+    "defaultMessage": "Du har valt alla {totalAvailableTags} taggar. Detta motverkar syftet med taggar, som ska hjälpa användare att hitta projekten de letar efter. Vänligen välj bara taggar som är relevanta till ditt projekt."
+  },
   "nags.all-tags-selected.title": {
     "defaultMessage": "Välj korrekta taggar"
+  },
+  "nags.description-too-short.description": {
+    "defaultMessage": "Din beskrivning är {length, plural, one {# tecken} other {# tecken}} lång. Minst {minChars, plural, one {# tecken} other {# tecken}} rekommenderas för en klar och informativ beskrivning."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Expandera beskrivning"
@@ -35,6 +56,12 @@
   "nags.edit-title.title": {
     "defaultMessage": "Redigera titel"
   },
+  "nags.feature-gallery-image.description": {
+    "defaultMessage": "Den utvalda galleribilden är ofta hur ditt projekt gör sitt första intryck."
+  },
+  "nags.feature-gallery-image.title": {
+    "defaultMessage": "Välj ut en galleribild"
+  },
   "nags.gallery.title": {
     "defaultMessage": "Besök gallerisida"
   },
@@ -44,20 +71,50 @@
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Tillförse källkod"
   },
+  "nags.identical-links.description": {
+    "defaultMessage": "Några av dina externa länkar ser ut att vara likadana. Varje länk ska bara anges en gång och med den passande länktypen."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Likadana länkar"
+  },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "Din beskrivning ska ha tillräckligt med vanlig text eller bild-alternativtext, för att hålla det tillgängligt till de som använder skärmavläsare eller de med långsamma internetkopplingar."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "Se till att det är tillgängligt"
+  },
   "nags.invalid-license-url.description.default": {
     "defaultMessage": "Licens-URL är ogiltig."
+  },
+  "nags.invalid-license-url.description.domain": {
+    "defaultMessage": "Din licens-URL pekar till {domain}, vilket inte är lämpligt för licensinformation. Licens-URL:er ska bara länka direkt till din licensfil, inte sociala medier, gaming-plattformar, osv."
+  },
+  "nags.invalid-license-url.description.malformed": {
+    "defaultMessage": "Din licens-URL ser ut att vara söndrig. Vänligen ange en URL till din licenstext."
   },
   "nags.invalid-license-url.title": {
     "defaultMessage": "Lägg till en giltig licenslänk"
   },
+  "nags.link-shortener-usage.description": {
+    "defaultMessage": "Att använda en länkförkortare eller andra metoder för att gömma vart en länk leder i dina externa länkar eller licenslänkar är förbjudet, vänligen använd lämpliga länkar i full längd."
+  },
   "nags.link-shortener-usage.title": {
     "defaultMessage": "Använd inte länkförkortare"
+  },
+  "nags.long-headers.description": {
+    "defaultMessage": "{count, plural, one {# rubrik} other {# rubriker}} i din beskrivning är för {count, plural, one {lång} other {långa}}. Rubriker ska vara korta och fungera som titlar till olika delar, inte hela meningar."
   },
   "nags.long-headers.title": {
     "defaultMessage": "Korta ner rubriker"
   },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "Projekt får inte använda Minecrafts varumärke eller ha \"Minecraft\" som en viktig del av namnet."
+  },
   "nags.minecraft-title-clause.title": {
     "defaultMessage": "Undvik varumärkesintrång"
+  },
+  "nags.missing-alt-text.description": {
+    "defaultMessage": "Några av dina bilder saknar alternativtext, vilket är viktigt för tillgänglighet, speciellt för synskadade användare."
   },
   "nags.missing-alt-text.title": {
     "defaultMessage": "Lägg till alternativ bildtext"
@@ -71,6 +128,9 @@
   "nags.moderation.title": {
     "defaultMessage": "Visa moderationstråd"
   },
+  "nags.moderator-feedback.description": {
+    "defaultMessage": "Kolla igenom och ta upp problemen från moderationsteamet innan du skickar in det igen."
+  },
   "nags.moderator-feedback.title": {
     "defaultMessage": "Granska feedback"
   },
@@ -79,6 +139,24 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Välj korrekt upplösning"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Välj vilka versioner din server stödjer, välj ett modpaket, eller ladda upp ditt egna."
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Välj kompatibilitet"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Berätta för dina spelare vilken region din server ligger i."
+  },
+  "nags.select-country.title": {
+    "defaultMessage": "Välj en region"
+  },
+  "nags.select-language.description": {
+    "defaultMessage": "Lista vilka språk som stöds av din server."
+  },
+  "nags.select-language.title": {
+    "defaultMessage": "Välj språk"
   },
   "nags.select-license.description": {
     "defaultMessage": "Välj vilken licens {type, select, mod {din mod} modpack {ditt modpaket} resourcepack {ditt resurspaket} shader {din shader} plugin {ditt plugin} datapack {ditt datapaket} other {ditt projekt}} distribueras under."
@@ -91,6 +169,9 @@
   },
   "nags.select-tags.title": {
     "defaultMessage": "Välj taggar"
+  },
+  "nags.server.title": {
+    "defaultMessage": "Besök serverinställningar"
   },
   "nags.settings.description.title": {
     "defaultMessage": "Besök beskrivningsinställningar"
@@ -130,6 +211,12 @@
   },
   "nags.title-contains-technical-info.title": {
     "defaultMessage": "Rensa upp namnet"
+  },
+  "nags.too-many-tags-server.description": {
+    "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Vänligen tänk på att minska till {maxTagCount} eller färre för att säkerställa att din server visas i relevanta sökresultat."
+  },
+  "nags.too-many-tags-server.title": {
+    "defaultMessage": "Välj korrekta taggar"
   },
   "nags.too-many-tags.description": {
     "defaultMessage": "Du har valt {tagCount, plural, one {# tagg} other {# taggar}}. Försök minska till {maxTagCount} eller färre för att säkerställa att ditt projekt visas i relevanta sökresultat."

@@ -1,33 +1,141 @@
 {
+  "app.auth-servers.unreachable.body": {
+    "message": "เซิร์ฟเวอร์ตรวจสอบสิทธิ์ของ Minecraft อาจใช้งานไม่ได้ในขณะนี้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณและลองใหม่อีกครั้งในภายหลัง"
+  },
+  "app.browse.add-server-to-instance": {
+    "message": "เพิ่มเซิร์ฟเวอร์ลงในอินสแตนซ์"
+  },
+  "app.browse.added": {
+    "message": "เพิ่ม"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "กรอกคำอธิบายมอดแพ็ก.."
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "ชื่อมอดแพ็ก"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "ข้อมูลทั้งหมดในอินสแตนซ์ของคุณจะถูกลบอย่างถาวร รวมถึงโลก การตั้งค่า และเนื้อหาที่ติดตั้งไว้ทั้งหมด"
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "การดำเนินการนี้ไม่สามารถย้อนคืนได้"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "ลบอินสแตนซ์"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "มอดแพ็กนี้ถูกติดตั้งไว้ในอินสแตนซ์ <bold>{instanceName}</bold> อยู่แล้ว คุณแน่ใจหรือไม่ว่าต้องการสร้างสำเนาซ้ำ?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "สร้าง"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "ติดตั้งมอดแพ็กนี้อยู่แล้ว"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "อินสแตนซ์"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "โปรเจกต์"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "เพิ่ม \"{name}\" เรียบร้อยแล้ว"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "เพิ่ม {count} โปรเจกต์เรียบร้อยแล้ว"
+  },
+  "app.instance.mods.share-text": {
+    "message": "มาตรวจดูโปรเจกต์ต่าง ๆ ที่ฉันใช้ในมอดแพ็กนี้กัน!"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "อัปโหลดสำเร็จ"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "ค้นหาเซิฟเวอร์"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' จะถูกลบอย่างถาวร** และจะไม่สามารถกู้คืนได้**"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "คุณแน่ใจหรือไม่ว่าต้องการลบโลกนี้อย่างถาวร?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "แบบมีมอด"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "ออฟไลน์"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "ออนไลน์"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "ต้นฉบับ"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "เพิ่มเซิร์ฟเวอร์หรือสำรวจเพื่อเริ่มต้น"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "ไม่มีเซิร์ฟเวอร์หรือโลกที่เพิ่มไว้"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' จะถูกลบออกจากรายชื่อของคุณ รวมถึงในเกมด้วย และจะไม่สามารถกู้คืนได้"
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) จะถูกลบออกจากรายชื่อของคุณ รวมถึงในเกมด้วย และจะไม่สามารถกู้คืนได้"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "คุณแน่ใจหรือไม่ว่าต้องการลบ {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "ค้นหา {count} โลก"
+  },
+  "app.instance.worlds.this-server": {
+    "message": "เซิร์ฟเวอร์อันนี้"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "จำเป็นต้องมีเนื้อหา"
+  },
   "app.modal.install-to-play.header": {
     "message": "ติดตั้งเพื่อเล่น"
   },
   "app.modal.install-to-play.install-button": {
     "message": "ติดตั้ง"
   },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "มอดแพ็กที่จำเป็น"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "เซิร์ฟเวอร์นี้จำเป็นต้องใช้มอดเพื่อเข้าเล่น คลิกติดตั้ง เพื่อตั้งค่าไฟล์ที่จำเป็นจาก Modrinth จากนั้นจึงจะเข้าสู่เซิร์ฟเวอร์โดยตรงได้"
+  },
+  "app.modal.install-to-play.shared-instance": {
+    "message": "อินสแตนซ์ที่ใช้ร่วมกัน"
+  },
+  "app.modal.install-to-play.shared-server-instance": {
+    "message": "อินสแตนซ์เซิร์ฟเวอร์ที่ใช้ร่วมกัน"
+  },
   "app.modal.update-to-play.header": {
     "message": "อัปเดตเพื่อเล่น"
   },
   "app.modal.update-to-play.update-required": {
-    "message": "ต้องมีการอัปเดต"
+    "message": "จำเป็นต้องอัปเดต"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "ต้องอัปเดตอย่างหนึ่งเพื่อเล่น {name}. โปรดอัปเดตให้เป็นเวอร์ชั่นล่าสุดเพื่อเปิดเกมใ"
+    "message": "จำเป็นต้องอัปเดตเพื่อเล่น {name} กรุณาอัปเดตเป็นเวอร์ชันล่าสุดเพื่อเปิดเกม"
   },
   "app.settings.developer-mode-enabled": {
-    "message": "กำลังอยู่ในโหมดผู้พัฒนา"
+    "message": "โหมดนักพัฒนาเปิดอยู่"
   },
   "app.settings.downloading": {
     "message": "ดาวน์โหลด เวอร์ชั่น{version}"
   },
   "app.settings.tabs.appearance": {
-    "message": "รูปลักษณ์"
+    "message": "หน้าตา"
   },
   "app.settings.tabs.default-instance-options": {
     "message": "ตัวเลือกอินสแตนซ์เริ่มต้น"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "ระบบควบคุมการเปิดใช้งานฟีเจอร์"
   },
   "app.settings.tabs.java-installations": {
     "message": "การจัดการ Java ที่ติดตั้ง"
@@ -40,6 +148,15 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "การจัดการทรัพยากร"
+  },
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} พร้อมให้อัปเดตแล้ว โปรดใช้ตัวจัดการแพ็กเกจ ของคุณเพื่ออัปเดตฟีเจอร์ใหม่และตัวแก้ไขล่าสุด!"
+  },
+  "app.update-popup.download-complete": {
+    "message": "ดาวน์โหลดเสร็จสมบูรณ์"
+  },
+  "app.update-popup.title": {
+    "message": "มีการอัปเดตใหม่"
   },
   "app.update.complete-toast.text": {
     "message": "คลิกที่นี่เพื่อดูบันทึกการเปลี่ยนแปลง"
@@ -55,6 +172,18 @@
   },
   "app.update.reload-to-update": {
     "message": "รีโหลดเพื่อติดตั้งอัพเดต"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "เวอร์ชัน {version} ไม่รองรับ"
+  },
+  "app.world.world-item.offline": {
+    "message": "ออฟไลน์"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} ออนไลน์"
   },
   "friends.action.add-friend": {
     "message": "เพิ่มเพื่อน"
@@ -100,6 +229,9 @@
   },
   "friends.heading.online": {
     "message": "ออฟไลน์"
+  },
+  "friends.heading.pending": {
+    "message": "กําลังดำเนินการ"
   },
   "friends.no-friends-match": {
     "message": "ไม่มีเพื่อนชื่อว่า \"{query}\""
@@ -148,6 +280,12 @@
   },
   "instance.edit-world.title": {
     "message": "แก้ไขโลก"
+  },
+  "instance.files.adding-files": {
+    "message": "กำลังเพิ่มไฟล์ ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "บันทึกเป็น..."
   },
   "instance.server-modal.address": {
     "message": "ที่อยู่เซิร์ฟเวอร์"
@@ -215,13 +353,130 @@
   "instance.settings.tabs.general.name": {
     "message": "ชื่อ"
   },
+  "instance.settings.tabs.hooks": {
+    "message": "ตัวดักการปล่อย"
+  },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "กำหนดเอง"
+  },
+  "instance.settings.tabs.hooks.description": {
+    "message": "ตัวดักจับช่วยให้ผู้ใช้ระดับสูงสามารถรันคำสั่งระบบบางอย่างได้ ทั้งก่อนและหลังการเปิดเกม"
+  },
+  "instance.settings.tabs.hooks.post-exit.enter": {
+    "message": "ป้อนคำสั่งหลังจบการทำงาน..."
+  },
+  "instance.settings.tabs.hooks.pre-launch": {
+    "message": "ก่อนรัน"
+  },
+  "instance.settings.tabs.hooks.title": {
+    "message": "ฮุกการเปิดเกม"
+  },
+  "instance.settings.tabs.hooks.wrapper": {
+    "message": "ตัวห่อหุ้ม"
+  },
+  "instance.settings.tabs.hooks.wrapper.description": {
+    "message": "คำสั่งตัวห่อหุ้มสำหรับเปิด ไมน์คราฟต์"
+  },
+  "instance.settings.tabs.hooks.wrapper.enter": {
+    "message": "ป้อนตัวห่อหุ้มคำสั่ง..."
   },
   "instance.settings.tabs.installation": {
     "message": "การติดตั้ง"
   },
   "instance.settings.tabs.installation.loader-version": {
     "message": "เวอร์ชั่น {loader}"
+  },
+  "instance.settings.tabs.java": {
+    "message": "Java และ หน่วยความจำ"
+  },
+  "instance.settings.tabs.java.hooks": {
+    "message": "ฮุก"
+  },
+  "instance.settings.tabs.java.java-arguments": {
+    "message": "อาร์กิวเมนต์ Java"
+  },
+  "instance.settings.tabs.java.java-installation": {
+    "message": "การติดตั้ง Java"
+  },
+  "instance.settings.tabs.java.java-memory": {
+    "message": "หน่วยความจำที่จัดสรร"
+  },
+  "instance.settings.tabs.window": {
+    "message": "หน้าต่าง"
+  },
+  "instance.settings.tabs.window.fullscreen": {
+    "message": "เต็มหน้าจอ"
+  },
+  "instance.settings.tabs.window.fullscreen.description": {
+    "message": "ทำให้เกมเปิดในโหมดเต็มหน้าจอเมื่อเริ่มเกม (โดยใช้ไฟล์ options.txt)"
+  },
+  "instance.settings.tabs.window.height": {
+    "message": "ความสูง"
+  },
+  "instance.settings.tabs.window.height.description": {
+    "message": "ความสูงของหน้าต่างเมื่อรันเกม"
+  },
+  "instance.settings.tabs.window.height.enter": {
+    "message": "ป้อนความสูง..."
+  },
+  "instance.settings.tabs.window.width": {
+    "message": "ความกว้าง"
+  },
+  "instance.settings.tabs.window.width.description": {
+    "message": "ความกว้างของหน้าต่างเมื่อรันเกม"
+  },
+  "instance.settings.tabs.window.width.enter": {
+    "message": "ป้อนความกว้าง..."
+  },
+  "instance.worlds.a_minecraft_server": {
+    "message": "เซิร์ฟเวอร์ ไมน์คราฟต์"
+  },
+  "instance.worlds.cant_connect": {
+    "message": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
+  },
+  "instance.worlds.copy_address": {
+    "message": "คัดลอกที่อยู่"
+  },
+  "instance.worlds.dont_show_on_home": {
+    "message": "ไม่ต้องแสดงในหน้าแรก"
+  },
+  "instance.worlds.game_already_open": {
+    "message": "อินสแตนซ์ถูกเปิดอยู่แล้ว"
+  },
+  "instance.worlds.hardcore": {
+    "message": "โหมดฮาร์ดคอร์"
+  },
+  "instance.worlds.incompatible_server": {
+    "message": "เซิร์ฟเวอร์ไม่รองรับ"
+  },
+  "instance.worlds.linked_server": {
+    "message": "จัดการโดยโปรเจกต์เซิร์ฟเวอร์"
+  },
+  "instance.worlds.no_contact": {
+    "message": "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้"
+  },
+  "instance.worlds.no_server_quick_play": {
+    "message": "คุณสามารถเข้าสู่เซิร์ฟเวอร์ได้โดยตรงบน Minecraft Alpha 1.0.5 ขึ้นไปเท่านั้น"
+  },
+  "instance.worlds.no_singleplayer_quick_play": {
+    "message": "คุณสามารถเข้าสู่โลกผู้เล่นคนเดียวได้โดยตรงบน Minecraft 1.20 ขึ้นไปเท่านั้น"
+  },
+  "instance.worlds.play_instance": {
+    "message": "เริ่มเล่นอินสแตนซ์"
+  },
+  "instance.worlds.view_instance": {
+    "message": "ดูอินสแตนซ์"
+  },
+  "instance.worlds.world_in_use": {
+    "message": "โลกนี้กำลังถูกใช้งานอยู่"
+  },
+  "search.filter.locked.instance": {
+    "message": "อินสแตนซ์เป็นผู้จัดเตรียม"
+  },
+  "search.filter.locked.server": {
+    "message": "เซิร์ฟเวอร์เป็นผู้จัดเตรียม"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "เซิร์ฟเวอร์เป็นผู้จัดเตรียมเวอร์ชันเกม"
   }
 }

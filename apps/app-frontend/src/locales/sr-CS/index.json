@@ -8,23 +8,8 @@
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
-  "app.instance.mods.copy-link": {
-    "message": "Kopiraj link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Instaliranje..."
-  },
-  "app.instance.mods.show-file": {
-    "message": "Prikaži datoteku"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uspešno otpremljeno"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "Nepoznato"
-  },
-  "app.instance.mods.updating": {
-    "message": "Ažuriranje..."
   },
   "app.settings.tabs.appearance": {
     "message": "Izgled"

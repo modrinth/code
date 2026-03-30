@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Impossible de réparer le serveur"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Impossible de réinitialiser le serveur à l'intégration"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Impossible de sauvegarder les paramètres d'installation"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Supprime définitivement toutes les données de votre serveur, y compris vos mondes, vos mods, et vos fichiers paramètres. Les sauvegardes resteront et pourront être restaurées."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Réinitialiser à l'intégration"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr de vouloir continuer ?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Réinitialiser à l'intégration"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Le serveur a été renvoyé au flux d'intégration."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Serveur réinitialisé à l'intégration"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Options de prise en charge"
   },
   "hosting.plan.out-of-stock": {
     "message": "En rupture de stock"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Découvrir du contenu"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Fonctionnalités expérimentales"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Obtenir Modrinth App"

@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Lanjutkan"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Salin nama berkas"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Salin jalur lengkap"
+  },
   "button.copy-id": {
     "defaultMessage": "Salin pengenal"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Salin tautan"
   },
   "button.copy-permalink": {
     "defaultMessage": "Salin tautan permanen"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Tolak"
   },
+  "button.disable": {
+    "defaultMessage": "Matikan"
+  },
   "button.download": {
     "defaultMessage": "Unduh"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Sunting"
+  },
+  "button.enable": {
+    "defaultMessage": "Hidupkan"
+  },
+  "button.extract": {
+    "defaultMessage": "Ekstrak"
   },
   "button.follow": {
     "defaultMessage": "Ikuti"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "Pilihan lainnya"
   },
+  "button.move": {
+    "defaultMessage": "Pindahkan"
+  },
   "button.next": {
     "defaultMessage": "Berikutnya"
   },
   "button.open-folder": {
-    "defaultMessage": "Buka map"
+    "defaultMessage": "Buka folder"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Buka di folder"
   },
   "button.play": {
     "defaultMessage": "Mainkan"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Hapus gambar"
+  },
+  "button.rename": {
+    "defaultMessage": "Ganti nama"
   },
   "button.repair": {
     "defaultMessage": "Perbaiki"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Tampilkan semua versi"
   },
+  "button.show-file": {
+    "defaultMessage": "Tampilkan berkas"
+  },
   "button.sign-in": {
     "defaultMessage": "Masuk"
   },
@@ -164,8 +194,14 @@
   "button.stop": {
     "defaultMessage": "Hentikan"
   },
+  "button.switch-version": {
+    "defaultMessage": "Beralih versi"
+  },
   "button.unfollow": {
     "defaultMessage": "Batal Ikuti"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Lepas tautan paket mod"
   },
   "button.update": {
     "defaultMessage": "Perbarui"
@@ -176,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "Baru saja"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Aplikasi"
   },
@@ -186,16 +219,76 @@
     "defaultMessage": "Pengehosan"
   },
   "changelog.product.web": {
-    "defaultMessage": "Situs web"
+    "defaultMessage": "Platform"
   },
   "collections.label.private": {
     "defaultMessage": "Pribadi"
   },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Apakah Anda yakin ingin memperbarui  {count, plural, one {# project} other {# projects}} ke versi terbaru yang kompatibel? Disarankan untuk memperbarui konten satu per satu."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Peringatan pembaruan"
+  },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Perbarui proyek"
   },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Perbarui {count, plural, other {# proyek}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Menghapus mod bisa berdampak pada dunia Anda dan mungkin menyebabkan konten hilang atau masalah tak terduga saat dunia dimuat kembali."
+  },
   "content.confirm-deletion.admonition-header": {
     "defaultMessage": "Peringatan penghapusan"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Haous {count} {itemType}{count, plural, other {}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Hapus {itemType}{count, plural, other {}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Semua mod atau konten yang Anda tambahkan ke dalam paket mod akan dihapus."
+  },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Semua mod atau konten yang Anda tambahkan ke dalam paket mod tersebut akan tetap tersimpan."
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mod dan konten akan digabungkan dengan apa yang Anda tambahkan di atas paket mod dan ia tidak akan lagi menerima pembaruan."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Melepas tautan paket mod"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Lepas tautan paket mod"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Lepas tautan"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} ditambahkan"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "Ditambahkan (depedensi)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Dimatikan"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Membuat cadangan..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Berhasil membuat cadangan"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Gagal membuat cadangan. Anda tetap dapat melanjutkan."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Proses pencadangan sedang berlangsung; disarankan untuk menunggu hingga proses tersebut selesai sebelum melakukan tindakan ini."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Pembuatan cadangan mungkin memerlukan waktu beberapa menit, tergantung pada ukuran server Anda."
   },
   "content.page-layout.please-wait": {
     "defaultMessage": "Mohon tunggu"
@@ -359,17 +452,11 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Mode permainan tak dikenal"
   },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Salin tautan"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Paket mod ini tidak termasuk konten tambahan."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Konten tidak ditemukan"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Semua"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Konten paket mod"
