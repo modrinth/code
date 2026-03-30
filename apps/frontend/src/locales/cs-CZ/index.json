@@ -536,6 +536,9 @@
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Odvolat"
   },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Jste si jistý, že chcete zrušit svůj affiliate odkaz „{title}“?"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
   },
@@ -1330,15 +1333,6 @@
   },
   "servers.notice.id": {
     "message": "ID"
-  },
-  "servers.plan.large.name": {
-    "message": "Velký"
-  },
-  "servers.plan.medium.name": {
-    "message": "Střední"
-  },
-  "servers.plan.small.name": {
-    "message": "Malý"
   },
   "settings.billing.payment_method.primary": {
     "message": "Hlavní"

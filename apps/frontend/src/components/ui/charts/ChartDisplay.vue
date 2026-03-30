@@ -8,7 +8,7 @@
 				{{ analytics.error.value }}
 			</div>
 		</div>
-		<div v-else-if="!isInitialized || analytics.loading.value" class="universal-card">
+		<div v-else-if="analytics.loading.value" class="universal-card">
 			<h2>
 				<span class="label__title">Loading analytics...</span>
 			</h2>
@@ -315,6 +315,7 @@ import {
 	Card,
 	DropdownSelect,
 	useCompactNumber,
+	useDebugLogger,
 	useFormatMoney,
 	useFormatNumber,
 } from '@modrinth/ui'
@@ -332,12 +333,15 @@ import {
 	intToRgba,
 } from '~/utils/analytics.js'
 
+const debug = useDebugLogger('ChartDisplay')
 const formatNumber = useFormatNumber()
 const { formatCompactNumber } = useCompactNumber()
 const formatMoney = useFormatMoney()
 
 const router = useNativeRouter()
 const theme = useTheme()
+
+debug('setup start', { server: import.meta.server, client: import.meta.client })
 
 const props = withDefaults(
 	defineProps<{
@@ -358,6 +362,11 @@ const props = withDefaults(
 )
 
 const projects = computed(() => props.projects || [])
+
+debug('projects from props', {
+	count: projects.value.length,
+	ids: projects.value.map((p: any) => p.id),
+})
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
@@ -438,45 +447,46 @@ const isUsingProjectColors = computed({
 	},
 })
 
-const startDate = ref(dayjs().startOf('day'))
-const endDate = ref(dayjs().endOf('day'))
-const timeResolution = ref(30)
-const isInitialized = ref(false)
+const defaultRange = props.ranges.find(
+	(r) => r.getLabel([dayjs(), dayjs()]) === 'Previous 30 days',
+)!
+const initialDates = defaultRange.getDates(dayjs())
+
+const internalRange: Ref<RangeObject> = ref(defaultRange)
+const startDate = ref(initialDates.startDate)
+const endDate = ref(initialDates.endDate)
+const timeResolution = ref(defaultRange.timeResolution)
+
+debug('default range initialized', {
+	range: defaultRange.getLabel([dayjs(), dayjs()]),
+	startDate: startDate.value.toISOString(),
+	endDate: endDate.value.toISOString(),
+	timeResolution: timeResolution.value,
+})
 
 onBeforeMount(() => {
-	// Load cached data and range from localStorage - cache.
+	debug('onBeforeMount')
 	if (import.meta.client) {
 		const rangeLabel = localStorage.getItem('analyticsSelectedRange')
+		debug('localStorage range', { rangeLabel })
 		if (rangeLabel) {
-			const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)!
+			const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)
 
-			if (range !== undefined) {
+			if (range) {
 				internalRange.value = range
-				const ranges = range.getDates(dayjs())
+				const dates = range.getDates(dayjs())
 				timeResolution.value = range.timeResolution
-				startDate.value = ranges.startDate
-				endDate.value = ranges.endDate
+				startDate.value = dates.startDate
+				endDate.value = dates.endDate
+				debug('range overridden from localStorage', {
+					startDate: dates.startDate.toISOString(),
+					endDate: dates.endDate.toISOString(),
+					timeResolution: range.timeResolution,
+				})
 			}
 		}
 	}
 })
-
-onMounted(() => {
-	if (internalRange.value === null) {
-		internalRange.value = props.ranges.find(
-			(r) => r.getLabel([dayjs(), dayjs()]) === 'Previous 30 days',
-		)!
-	}
-
-	const ranges = selectedRange.value.getDates(dayjs())
-	startDate.value = ranges.startDate
-	endDate.value = ranges.endDate
-	timeResolution.value = selectedRange.value.timeResolution
-
-	isInitialized.value = true
-})
-
-const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject)
 
 const selectedRange = computed({
 	get: () => {
@@ -499,6 +509,7 @@ const selectedRange = computed({
 	},
 })
 
+debug('calling useFetchAllAnalytics')
 const analytics = useFetchAllAnalytics(
 	resetCharts,
 	projects,
@@ -507,8 +518,14 @@ const analytics = useFetchAllAnalytics(
 	startDate,
 	endDate,
 	timeResolution,
-	isInitialized,
 )
+
+debug('awaiting analytics.fetch()')
+await analytics.fetch()
+debug('analytics.fetch() resolved', {
+	loading: analytics.loading.value,
+	error: analytics.error.value,
+})
 
 const formattedCategorySubtitle = computed(() => {
 	return (

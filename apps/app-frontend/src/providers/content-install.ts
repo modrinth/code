@@ -26,6 +26,7 @@ import {
 	remove_project,
 } from '@/helpers/profile.js'
 import { get_game_versions } from '@/helpers/tags'
+import type { GameInstance, InstanceLoader } from '@/helpers/types'
 import {
 	findPreferredVersion,
 	installVersionDependencies,
@@ -37,13 +38,8 @@ interface ModalRef {
 	hide: () => void
 }
 
-interface InstallConfirmModalRef {
-	show: (
-		project: Labrinth.Projects.v2.Project,
-		version: string,
-		callback: (versionId?: string) => void,
-		createInstanceCallback: (profile: string) => void,
-	) => void
+interface ModpackAlreadyInstalledModalRef {
+	show: (instanceName: string, instancePath: string) => void
 }
 
 interface IncompatibilityWarningModalRef {
@@ -92,7 +88,9 @@ export interface ContentInstallContext {
 	handleNavigate: (instance: ContentInstallInstance) => void
 	handleCancel: () => void
 	setContentInstallModal: (ref: ModalRef) => void
-	setInstallConfirmModal: (ref: InstallConfirmModalRef) => void
+	setModpackAlreadyInstalledModal: (ref: ModpackAlreadyInstalledModalRef) => void
+	handleModpackDuplicateCreateAnyway: () => Promise<void>
+	handleModpackDuplicateGoToInstance: (instancePath: string) => void
 	setIncompatibilityWarningModal: (ref: IncompatibilityWarningModalRef) => void
 	install: (
 		projectId: string,
@@ -135,17 +133,20 @@ export function createContentInstall(opts: {
 			title: string
 			icon_url?: string | null
 			project_type?: string
+			organization?: string | null
+			team?: string
 		},
 		version?: Labrinth.Versions.v2.Version,
 	) {
 		const primaryFile = version?.files?.find((f) => f.primary) ?? version?.files?.[0]
 		const placeholder: ContentItem = {
+			id: `__installing_${project.id}`,
 			file_name: `__installing_${project.id}`,
 			project: {
 				id: project.id,
-				slug: project.slug ?? null,
+				slug: project.slug ?? '',
 				title: project.title,
-				icon_url: project.icon_url ?? null,
+				icon_url: project.icon_url ?? undefined,
 			},
 			version: version
 				? {
@@ -165,6 +166,60 @@ export function createContentInstall(opts: {
 		if (items.some((i) => i.file_name === placeholder.file_name)) return
 		next.set(instancePath, [...items, placeholder])
 		installingItems.value = next
+
+		if (project.organization) {
+			get_organization(project.organization)
+				.then((org: { id: string; slug: string; name: string; icon_url?: string }) => {
+					updateInstallingItem(instancePath, placeholder.file_name, {
+						owner: {
+							id: org.id,
+							name: org.name,
+							avatar_url: org.icon_url,
+							type: 'organization',
+						},
+					})
+				})
+				.catch(() => {})
+		} else if (project.team) {
+			get_team(project.team)
+				.then(
+					(
+						members: {
+							user: { id: string; username: string; avatar_url?: string }
+							is_owner: boolean
+						}[],
+					) => {
+						const owner = members.find((m) => m.is_owner)
+						if (owner) {
+							updateInstallingItem(instancePath, placeholder.file_name, {
+								owner: {
+									id: owner.user.id,
+									name: owner.user.username,
+									avatar_url: owner.user.avatar_url,
+									type: 'user',
+								},
+							})
+						}
+					},
+				)
+				.catch(() => {})
+		}
+	}
+
+	function updateInstallingItem(
+		instancePath: string,
+		fileName: string,
+		updates: Partial<ContentItem>,
+	) {
+		const next = new Map(installingItems.value)
+		const items = next.get(instancePath)
+		if (!items) return
+		const index = items.findIndex((i) => i.file_name === fileName)
+		if (index === -1) return
+		const updated = [...items]
+		updated[index] = { ...updated[index], ...updates }
+		next.set(instancePath, updated)
+		installingItems.value = next
 	}
 
 	function removeInstallingItems(instancePath: string, projectIds: string[]) {
@@ -183,18 +238,26 @@ export function createContentInstall(opts: {
 	}
 
 	let modalRef: ModalRef | null = null
-	let installConfirmModalRef: InstallConfirmModalRef | null = null
+	let modpackAlreadyInstalledModalRef: ModpackAlreadyInstalledModalRef | null = null
 	let incompatibilityWarningModalRef: IncompatibilityWarningModalRef | null = null
 	let currentProject: Labrinth.Projects.v2.Project | null = null
 	let currentVersions: Labrinth.Versions.v2.Version[] = []
 	let currentCallback: (versionId?: string) => void = () => {}
 	let profileMap: Record<string, GameInstance> = {}
 
+	let pendingModpackInstall: {
+		project: Labrinth.Projects.v2.Project
+		version: string
+		source: string
+		callback: (versionId?: string) => void
+		createInstanceCallback: (profile: string) => void
+	} | null = null
+
 	async function showModInstallModal(
 		project: Labrinth.Projects.v2.Project,
 		versions: Labrinth.Versions.v2.Version[],
 		onInstall: (versionId?: string) => void,
-		hints?: { preferredLoader?: string; preferredGameVersion?: string },
+		hints?: { preferredLoader?: string; preferredGameVersion?: string; showProjectInfo?: boolean },
 	) {
 		currentProject = project
 		currentVersions = versions
@@ -379,10 +442,10 @@ export function createContentInstall(opts: {
 			trackEvent('ProjectInstall', {
 				loader: profile.loader,
 				game_version: profile.game_version,
-				id: currentProject.id,
+				id: currentProject!.id,
 				version_id: version.id,
-				project_type: currentProject.project_type,
-				title: currentProject.title,
+				project_type: currentProject!.project_type,
+				title: currentProject!.title,
 				source: 'ProjectInstallModal',
 			})
 			currentCallback(version.id)
@@ -433,10 +496,10 @@ export function createContentInstall(opts: {
 			trackEvent('ProjectInstall', {
 				loader: data.loader,
 				game_version: data.gameVersion,
-				id: currentProject.id,
+				id: currentProject!.id,
 				version_id: version.id,
-				project_type: currentProject.project_type,
-				title: currentProject.title,
+				project_type: currentProject!.project_type,
+				title: currentProject!.title,
 				source: 'ProjectInstallModal',
 			})
 
@@ -470,28 +533,28 @@ export function createContentInstall(opts: {
 		if (project.project_type === 'modpack') {
 			const version = versionId ?? project.versions[project.versions.length - 1]
 			const packs = await list()
+			const existingPack = packs.find((pack) => pack.linked_data?.project_id === project.id)
 
-			if (
-				packs.length === 0 ||
-				!packs.find((pack) => pack.linked_data?.project_id === project.id)
-			) {
-				await packInstall(
-					project.id,
-					version,
-					project.title,
-					project.icon_url,
-					createInstanceCallback,
-				)
-				trackEvent('PackInstall', {
-					id: project.id,
-					version_id: version,
-					title: project.title,
-					source,
-				})
-				callback(version)
-			} else {
-				installConfirmModalRef?.show(project, version, callback, createInstanceCallback)
+			if (existingPack) {
+				pendingModpackInstall = { project, version, source, callback, createInstanceCallback }
+				modpackAlreadyInstalledModalRef?.show(existingPack.name, existingPack.path)
+				return
 			}
+
+			await packInstall(
+				project.id,
+				version,
+				project.title,
+				project.icon_url,
+				createInstanceCallback,
+			)
+			trackEvent('PackInstall', {
+				id: project.id,
+				version_id: version,
+				title: project.title,
+				source,
+			})
+			callback(version)
 		} else if (instancePath) {
 			const [instanceOrNull, instanceProjects, versions] = await Promise.all([
 				get(instancePath),
@@ -577,8 +640,31 @@ export function createContentInstall(opts: {
 		setContentInstallModal(ref: ModalRef) {
 			modalRef = ref
 		},
-		setInstallConfirmModal(ref: InstallConfirmModalRef) {
-			installConfirmModalRef = ref
+		setModpackAlreadyInstalledModal(ref: ModpackAlreadyInstalledModalRef) {
+			modpackAlreadyInstalledModalRef = ref
+		},
+		async handleModpackDuplicateCreateAnyway() {
+			if (!pendingModpackInstall) return
+			const { project, version, source, callback, createInstanceCallback } = pendingModpackInstall
+			pendingModpackInstall = null
+			await packInstall(
+				project.id,
+				version,
+				project.title,
+				project.icon_url,
+				createInstanceCallback,
+			)
+			trackEvent('PackInstall', {
+				id: project.id,
+				version_id: version,
+				title: project.title,
+				source,
+			})
+			callback(version)
+		},
+		handleModpackDuplicateGoToInstance(instancePath: string) {
+			pendingModpackInstall = null
+			opts.router.push(`/instance/${encodeURIComponent(instancePath)}/`)
 		},
 		setIncompatibilityWarningModal(ref: IncompatibilityWarningModalRef) {
 			incompatibilityWarningModalRef = ref

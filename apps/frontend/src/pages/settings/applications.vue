@@ -248,6 +248,7 @@ import {
 	Avatar,
 	Button,
 	Checkbox,
+	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,
 	CopyCode,
@@ -282,11 +283,11 @@ definePageMeta({
 	middleware: 'auth',
 })
 
-useHead({
-	title: 'Applications - Modrinth',
-})
-
 const messages = defineMessages({
+	headTitle: {
+		id: 'settings.applications.head-title',
+		defaultMessage: 'Applications',
+	},
 	modalHeader: {
 		id: 'settings.applications.modal.header',
 		defaultMessage: 'Application information',
@@ -413,10 +414,10 @@ const messages = defineMessages({
 		id: 'settings.applications.notification.icon-updated.description',
 		defaultMessage: 'Your application icon has been updated.',
 	},
-	errorTitle: {
-		id: 'settings.applications.notification.error.title',
-		defaultMessage: 'An error occurred',
-	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const { scopesToLabels } = useScopes()
@@ -585,7 +586,7 @@ async function createApp() {
 		await refresh()
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -649,7 +650,7 @@ async function editApp() {
 		appModal.value.hide()
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})
@@ -669,7 +670,7 @@ async function removeApp() {
 		editingId.value = null
 	} catch (err) {
 		addNotification({
-			title: formatMessage(messages.errorTitle),
+			title: formatMessage(commonMessages.errorNotificationTitle),
 			text: err.data ? err.data.description : err,
 			type: 'error',
 		})

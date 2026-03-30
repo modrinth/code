@@ -148,6 +148,8 @@ impl CacheValueType {
 pub struct CachedModpackFiles {
     pub version_id: String,
     pub file_hashes: Vec<String>,
+    #[serde(default)]
+    pub project_ids: Vec<String>,
 }
 
 /// Cached list of versions for a project (without changelogs for fast loading)
@@ -1831,11 +1833,13 @@ impl CachedEntry {
     pub async fn cache_modpack_files(
         version_id: &str,
         file_hashes: Vec<String>,
+        project_ids: Vec<String>,
         pool: &SqlitePool,
     ) -> crate::Result<()> {
         let data = CachedModpackFiles {
             version_id: version_id.to_string(),
             file_hashes,
+            project_ids,
         };
 
         let entry = CachedEntry {

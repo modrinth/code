@@ -5,6 +5,75 @@
   "app.auth-servers.unreachable.header": {
     "message": "לא ניתן לגשת לשרתי האימות"
   },
+  "app.browse.hide-installed-content": {
+    "message": "הסתר תוכן מותקן"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "הזן את תיאור חבילת המודים..."
+  },
+  "app.export-modal.export-button": {
+    "message": "יצוא"
+  },
+  "app.export-modal.header": {
+    "message": "יצוא חבילת מודים"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "שם חבילת המודים"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "שם חבילת המודים"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "בחר קבצים ותיקיות להכללה בחבילה הזו"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "מספר גרסה"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "כל הנתונים של ההתקנה שלך ימחקו לתמיד, זה כולל את העולמות שלך, ההגדרות וכל התוכן שהתקנת."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "הפעולה הזו לא ניתנת לביטול"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "מחק התקנה"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "מחיקת התקנה"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "צור"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "פרויקט"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" נוסף"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} פרויקטים נוספו"
+  },
+  "app.instance.mods.share-text": {
+    "message": "בדוק את הפרויקטים שאני משתמש בהם בחבילת המודים שלי!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "משתף את התוכן של חבילת המודים"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "הועלה בהצלחה"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "הוסף שרת"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "האם אתה בטוח שברצונך למחוק לצמיתות את העולם הזה?"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "אין שרתים אן עולמות שנוספו"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "תוכן נדרש"
   },
@@ -52,9 +121,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "אפשרויות ברירת מחדל של התקנה"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "הגדרות ניסיוניות"
   },
   "app.settings.tabs.java-installations": {
     "message": "התקנות ג'אווה"
@@ -208,6 +274,9 @@
   },
   "instance.edit-world.title": {
     "message": "ערוך עולם"
+  },
+  "instance.files.save-as": {
+    "message": "שמור כ..."
   },
   "instance.server-modal.address": {
     "message": "כתובת"
@@ -380,9 +449,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "אל תציג בדף הבית"
   },
-  "instance.worlds.filter.available": {
-    "message": "זמין"
-  },
   "instance.worlds.game_already_open": {
     "message": "התקנה כבר פתוחה"
   },
@@ -406,12 +472,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "שחק בהתקנה"
-  },
-  "instance.worlds.type.server": {
-    "message": "שרת"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "שחקן יחיד"
   },
   "instance.worlds.view_instance": {
     "message": "הצג התקנה"

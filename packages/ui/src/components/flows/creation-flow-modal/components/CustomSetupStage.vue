@@ -104,7 +104,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker, injectTags } from '../../../../providers'
+import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
@@ -116,6 +116,7 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize, formatLoaderLabel } from '../shared'
 
 const debug = useDebugLogger('CustomSetupStage')
+const client = injectModrinthClient()
 const ctx = injectCreationFlowContext()
 const {
 	selectedLoader,
@@ -254,6 +255,14 @@ async function fetchLoaderManifest(loader: string) {
 	let apiLoader = loader
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
+	debug(
+		'fetchLoaderManifest:',
+		loader,
+		'apiLoader:',
+		apiLoader,
+		'cached:',
+		!!loaderVersionsCache.value[apiLoader],
+	)
 	if (loaderVersionsCache.value[apiLoader]) return
 
 	try {
@@ -262,7 +271,9 @@ async function fetchLoaderManifest(loader: string) {
 			gameVersions: { id: string; loaders: LoaderVersionEntry[] }[]
 		}
 		loaderVersionsCache.value[apiLoader] = data.gameVersions
-	} catch {
+		debug('fetchLoaderManifest: loaded', apiLoader, 'gameVersions:', data.gameVersions.length)
+	} catch (e) {
+		debug('fetchLoaderManifest: FAILED', apiLoader, e)
 		loaderVersionsCache.value[apiLoader] = []
 	}
 }
@@ -270,9 +281,8 @@ async function fetchLoaderManifest(loader: string) {
 async function fetchPaperSupportedVersions() {
 	if (paperSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.papermc.io/v2/projects/paper')
-		const data = (await res.json()) as { versions: string[] }
-		paperSupportedVersions.value = new Set(data.versions)
+		const project = await client.paper.versions_v3.getProject()
+		paperSupportedVersions.value = new Set(Object.values(project.versions).flat())
 	} catch {
 		paperSupportedVersions.value = new Set()
 	}
@@ -281,9 +291,8 @@ async function fetchPaperSupportedVersions() {
 async function fetchPurpurSupportedVersions() {
 	if (purpurSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.purpurmc.org/v2/purpur')
-		const data = (await res.json()) as { versions: string[] }
-		purpurSupportedVersions.value = new Set(data.versions)
+		const project = await client.purpur.versions_v2.getProject()
+		purpurSupportedVersions.value = new Set(project.versions)
 	} catch {
 		purpurSupportedVersions.value = new Set()
 	}
@@ -292,8 +301,7 @@ async function fetchPurpurSupportedVersions() {
 async function fetchPaperVersions(mcVersion: string) {
 	if (paperVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
-		const data = (await res.json()) as { builds: number[] }
+		const data = await client.paper.versions_v3.getBuilds(mcVersion)
 		paperVersions.value[mcVersion] = data.builds.sort((a, b) => b - a)
 	} catch {
 		paperVersions.value[mcVersion] = []
@@ -303,8 +311,7 @@ async function fetchPaperVersions(mcVersion: string) {
 async function fetchPurpurVersions(mcVersion: string) {
 	if (purpurVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
-		const data = (await res.json()) as { builds: { all: string[] } }
+		const data = await client.purpur.versions_v2.getBuilds(mcVersion)
 		purpurVersions.value[mcVersion] = data.builds.all.sort((a, b) => parseInt(b) - parseInt(a))
 	} catch {
 		purpurVersions.value[mcVersion] = []
@@ -319,13 +326,32 @@ function getLoaderVersionsForGameVersion(
 	if (apiLoader === 'neoforge') apiLoader = 'neo'
 
 	const manifest = loaderVersionsCache.value[apiLoader]
+	debug('getLoaderVersionsForGameVersion:', {
+		loader,
+		apiLoader,
+		gameVersion,
+		hasManifest: !!manifest,
+		manifestLength: manifest?.length,
+	})
 	if (!manifest) return []
 
 	// Some loaders (e.g. Fabric) list all versions under a placeholder entry
 	const placeholder = manifest.find((x) => x.id === '${modrinth.gameVersion}')
-	if (placeholder) return placeholder.loaders
+	if (placeholder) {
+		debug(
+			'getLoaderVersionsForGameVersion: using placeholder, loaders:',
+			placeholder.loaders.length,
+		)
+		return placeholder.loaders
+	}
 
 	const entry = manifest.find((x) => x.id === gameVersion)
+	debug(
+		'getLoaderVersionsForGameVersion: entry for',
+		gameVersion,
+		':',
+		entry ? entry.loaders.length + ' loaders' : 'NOT FOUND',
+	)
 	return entry?.loaders ?? []
 }
 
@@ -348,9 +374,12 @@ watch(
 )
 
 // Watch loader + game version to resolve loader versions
+let loaderVersionWatchId = 0
 watch(
 	[() => selectedLoader.value, () => selectedGameVersion.value],
 	async ([loader, gameVersion]) => {
+		const watchId = ++loaderVersionWatchId
+		debug('watch [loader, gameVersion] fired:', { loader, gameVersion, watchId })
 		loaderVersionsData.value = []
 		selectedLoaderVersion.value = null
 
@@ -360,8 +389,8 @@ watch(
 
 		if (loader === 'paper') {
 			await fetchPaperVersions(gameVersion)
+			if (watchId !== loaderVersionWatchId) return
 			loaderVersionsLoading.value = false
-			// Auto-select latest build
 			const builds = paperVersions.value[gameVersion]
 			if (builds?.length) {
 				selectedLoaderVersion.value = `${builds[0]}`
@@ -371,8 +400,8 @@ watch(
 
 		if (loader === 'purpur') {
 			await fetchPurpurVersions(gameVersion)
+			if (watchId !== loaderVersionWatchId) return
 			loaderVersionsLoading.value = false
-			// Auto-select latest build
 			const builds = purpurVersions.value[gameVersion]
 			if (builds?.length) {
 				selectedLoaderVersion.value = builds[0]
@@ -381,7 +410,18 @@ watch(
 		}
 
 		await fetchLoaderManifest(loader)
+		if (watchId !== loaderVersionWatchId) {
+			debug('watch [loader, gameVersion]: stale execution, skipping', {
+				watchId,
+				current: loaderVersionWatchId,
+			})
+			return
+		}
 		loaderVersionsData.value = getLoaderVersionsForGameVersion(loader, gameVersion)
+		debug(
+			'watch [loader, gameVersion]: loaderVersionsData set, count:',
+			loaderVersionsData.value.length,
+		)
 		loaderVersionsLoading.value = false
 
 		// Auto-select based on loaderVersionType
@@ -395,6 +435,16 @@ watch(
 )
 
 function autoSelectLoaderVersion() {
+	debug(
+		'autoSelectLoaderVersion: type:',
+		loaderVersionType.value,
+		'dataCount:',
+		loaderVersionsData.value.length,
+		'stableCount:',
+		loaderVersionsData.value.filter((v) => v.stable).length,
+		'first:',
+		loaderVersionsData.value[0]?.id,
+	)
 	if (loaderVersionType.value === 'stable') {
 		const stable = loaderVersionsData.value.find((v) => v.stable)
 		selectedLoaderVersion.value = stable?.id ?? loaderVersionsData.value[0]?.id ?? null
@@ -403,7 +453,7 @@ function autoSelectLoaderVersion() {
 	} else if (loaderVersionType.value === 'other' && !selectedLoaderVersion.value) {
 		selectedLoaderVersion.value = loaderVersionsData.value[0]?.id ?? null
 	}
-	debug('autoSelectLoaderVersion:', selectedLoaderVersion.value, 'type:', loaderVersionType.value)
+	debug('autoSelectLoaderVersion: result:', selectedLoaderVersion.value)
 }
 
 const loaderVersionOptions = computed<ComboboxOption<string>[]>(() => {

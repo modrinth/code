@@ -9,7 +9,7 @@
     "message": "ユーザーが見つかりませんでした"
   },
   "app-marketing.download.description": {
-    "message": "我々のデスクトップアプリは全てのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
+    "message": "我々のデスクトップアプリはすべてのプラットフォームでご利用いただけますので、ご希望のバージョンをお選びください。"
   },
   "app-marketing.download.download-appimage": {
     "message": "AppImageをダウンロードする"
@@ -141,7 +141,7 @@
     "message": "RAM"
   },
   "app-marketing.features.performance.small": {
-    "message": "少"
+    "message": "小さい"
   },
   "app-marketing.features.performance.title": {
     "message": "効率的"
@@ -168,7 +168,7 @@
     "message": "他のランチャーと異なる点"
   },
   "app-marketing.features.website.description": {
-    "message": "Modrinth Appはウェブサイトと完全に統合されているため、あなたはお気に入りのプロジェクトにアプリからアクセスできます！"
+    "message": "Modrinth Appはウェブサイトと完全に統合されているため、あなたはすべてのお気に入りのプロジェクトにアプリからアクセスできます！"
   },
   "app-marketing.features.website.title": {
     "message": "ウェブサイトとの統合"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "プロジェクトを作成"
   },
-  "create.project.create-server-project": {
-    "message": "サーバーを作成"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "不足している項目: {fields}"
   },
@@ -591,7 +588,7 @@
     "message": "フィルターや検索語句を調整してみてください。"
   },
   "dashboard.collections.label.projects-count": {
-    "message": "{count}件のプロジェクト"
+    "message": "{count} {countPlural, plural, one {プロジェクト} other {プロジェクト}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "コレクションを検索"
@@ -1194,7 +1191,7 @@
     "message": "Modrinth Hostingで次のサーバーをホストしよう"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hostingは、Minecraft: Java Editionサーバーを最も簡単にホストする方法です。お気に入りのModやModパックをModrinthプラットフォーム内で、シームレスにインストールしてプレイできます。"
+    "message": "Modrinth Hostingは、Minecraft: Java Editionサーバーを最も簡単にホストする方法です。お気に入りのModやModパックをすべてModrinthプラットフォーム内で、シームレスにインストールしてプレイできます。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "高度なネットワーク管理"
@@ -1212,7 +1209,7 @@
     "message": "カスタムURL"
   },
   "hosting-marketing.included.custom-url.description": {
-    "message": "カスタム<contrast>modrinth.gg</contrast>URLでサーバーを共有できます。"
+    "message": "カスタム <contrast>modrinth.gg</contrast> URLでサーバーを共有できます。"
   },
   "hosting-marketing.included.description": {
     "message": "全てのサーバーにはModrinthだけが提供できるホスティング体験を提供するために設計された一連の機能が含まれています。"
@@ -1316,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "サーバーの修復に失敗しました"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "サーバー設定の初期化に失敗しました"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "インストール設定の保存に失敗しました"
   },
@@ -1336,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "サーバー上のワールド、Mod、設定ファイルを含むすべてのデータを削除します。 バックアップは残り、復元できます。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "初期状態に戻す"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "これを行うことでサーバーが初期状態に戻されるためセットアップをもう一度行う必要があります。本当に続行しますか？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "初期化"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "サーバーが初期状態に戻されました。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "サーバー初期化"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "サポート項目"
   },
   "hosting.plan.out-of-stock": {
     "message": "品切れ"
@@ -1691,9 +1709,6 @@
   "layout.nav.discover-content": {
     "message": "コンテンツを探索"
   },
-  "layout.nav.feature-flags": {
-    "message": "機能フラグ"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth Appを入手"
   },
@@ -1725,7 +1740,7 @@
     "message": "収益"
   },
   "layout.nav.saved-projects": {
-    "message": "プロジェクトを保存"
+    "message": "保存されたプロジェクト"
   },
   "layout.nav.search": {
     "message": "検索"
@@ -2076,7 +2091,7 @@
     "message": "{count}件のダウンロード"
   },
   "profile.label.joined": {
-    "message": "参加しました"
+    "message": "参加: "
   },
   "profile.label.no-collections": {
     "message": "このユーザーのコレクションはありません！"
@@ -2310,10 +2325,10 @@
     "message": "{title}は{gameVersion}の{platform}に対応していません"
   },
   "project.download.search-game-versions": {
-    "message": "ゲームバージョンを検索..."
+    "message": "ゲームバージョンを検索…"
   },
   "project.download.search-game-versions-label": {
-    "message": "ゲームバージョンを検索..."
+    "message": "ゲームバージョンを検索…"
   },
   "project.download.select-game-version": {
     "message": "ゲームバージョンを選択"
@@ -2361,7 +2376,7 @@
     "message": "ライセンステキストを取得できませんでした。"
   },
   "project.license.loading": {
-    "message": "ライセンスの文を読み込み中"
+    "message": "ライセンステキストを読み込み中…"
   },
   "project.license.title": {
     "message": "ライセンス"
@@ -2409,7 +2424,7 @@
     "message": "。"
   },
   "project.settings.general.tagline.placeholder.1": {
-    "message": "。"
+    "message": "例: ゲームの進行システムをネザーを中心に据えるように大幅に変更する。"
   },
   "project.settings.general.tagline.placeholder.2": {
     "message": "例: 着用可能な建設作業着を追加する。"
@@ -2421,7 +2436,7 @@
     "message": "例：ネザーポータル同士の接続方法を改善する。"
   },
   "project.settings.general.tagline.placeholder.5": {
-    "message": "例：夜間に遭遇する通常のモブに、強力なボスバージョンを追加する。"
+    "message": "例：夜間に遭遇する通常のMobに、強力なボスバージョンを追加する。"
   },
   "project.settings.general.tagline.title": {
     "message": "キャッチフレーズ"
@@ -2436,10 +2451,10 @@
     "message": "プロジェクトダッシュボードを見る"
   },
   "project.stats.downloads-label": {
-    "message": "件のダウンロード{count, plural, one {} other {}}"
+    "message": "件のダウンロード"
   },
   "project.stats.followers-label": {
-    "message": "人のフォロワー{count, plural, one {} other {}}"
+    "message": "人のフォロワー"
   },
   "project.status.archived.message": {
     "message": "{title} はアーカイブされました。作者がプロジェクトのアーカイブを解除しない限り、今後 {title} に更新はありません。"
@@ -2454,7 +2469,7 @@
     "message": "この{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}に関するあなたの報告はすでに投稿されています。追記がある場合は、報告に詳細を追加できます。"
   },
   "report.back-to-item": {
-    "message": "{item, select, project {project} version {version} user {user} other {content}} に戻る"
+    "message": "{item, select, project {プロジェクト} version {バージョン} user {ユーザー} other {コンテンツ}}に戻る"
   },
   "report.body.description": {
     "message": "可能で関連性がある場合は、リンクと画像を追加してください。空または不十分な報告は閉じられ、無視されます。"
@@ -2652,7 +2667,7 @@
     "message": "PATの書き込み"
   },
   "scopes.payoutsRead.description": {
-    "message": "支払い額を確認する"
+    "message": "支払いデータを確認する"
   },
   "scopes.payoutsRead.label": {
     "message": "支払い額の確認"
@@ -2727,7 +2742,7 @@
     "message": "セッションを削除する"
   },
   "scopes.sessionDelete.label": {
-    "message": "セッションを削除する"
+    "message": "セッションを削除"
   },
   "scopes.sessionRead.description": {
     "message": "有効なセッションを読み取る"
@@ -2856,22 +2871,211 @@
     "message": "お知らせはありません"
   },
   "servers.plan.large.description": {
-    "message": "15〜25人、Modパックや重いModを導入するのに最適です。"
-  },
-  "servers.plan.large.name": {
-    "message": "大"
+    "message": "15〜25人、Modパックや重いModを導入するのに最適。"
   },
   "servers.plan.medium.description": {
     "message": "6〜15人のプレイヤーと複数のModに最適。"
   },
-  "servers.plan.medium.name": {
-    "message": "標準"
-  },
   "servers.plan.small.description": {
     "message": "いくつかの軽量なModで1〜5人に最適。"
   },
-  "servers.plan.small.name": {
-    "message": "少"
+  "settings.account.button.complete-setup": {
+    "message": "セットアップを完了"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "エクスポートをダウンロード"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "エクスポートを生成"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "エクスポートを生成中…"
+  },
+  "settings.account.data-export.description": {
+    "message": "Modrinthにアップロードされたあなたのすべての個人データのコピーをリクエストします。これには数分かかることがあります。"
+  },
+  "settings.account.data-export.title": {
+    "message": "データのエクスポート"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "これにより**即座にあなたのすべてのユーザーデータとフォローが削除されます**。プロジェクトは削除されません。アカウントの削除は取り消せません。<br><br>アカウントについてサポートが必要な場合は、[Modrinth Discord](https://discord.modrinth.com)にてご連絡ください。"
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "このアカウントを削除"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "本当にアカウントを削除しますか？"
+  },
+  "settings.account.delete.section.action": {
+    "message": "アカウントを削除"
+  },
+  "settings.account.delete.section.description": {
+    "message": "一度アカウントを削除すると元に戻せません。アカウントを削除すると、プロジェクトを除くすべてのデータがModrinthのサーバーから削除されます。"
+  },
+  "settings.account.delete.section.title": {
+    "message": "アカウントを削除"
+  },
+  "settings.account.email.action.save": {
+    "message": "メールアドレスを保存"
+  },
+  "settings.account.email.field.label": {
+    "message": "メールアドレス"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "メールアドレスを入力…"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "メールアドレスを追加"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "メールアドレスを変更"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "アカウントの情報は公開されません。"
+  },
+  "settings.account.password.action.remove": {
+    "message": "パスワードを削除"
+  },
+  "settings.account.password.action.save": {
+    "message": "パスワードを保存"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "入力されたパスワードが一致しません！"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "続けるにはパスワードを入力してください。"
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "パスワードの確認"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "パスワードの確認"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "新しいパスワードの確認"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "新しいパスワードの確認"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "新しいパスワード"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "新しいパスワード"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "古いパスワード"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "古いパスワード"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "パスワードを追加"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "パスワードを変更"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "パスワードを削除"
+  },
+  "settings.account.providers.action.add": {
+    "message": "追加"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "認証プロバイダ"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "アクション"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "プロバイダ"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "メールアドレスを追加"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "メールアドレスを変更"
+  },
+  "settings.account.security.email.description": {
+    "message": "アカウントに関連づけられたメールアドレスを変更します。"
+  },
+  "settings.account.security.email.title": {
+    "message": "メールドレス"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "パスワードを追加"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "パスワードを変更"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "アカウントにログインするにはパスワードを変更してください。"
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "アカウントにログインするにはパスワードを変更または削除してください。"
+  },
+  "settings.account.security.password.description.set": {
+    "message": "アカウントにログインするためのパスワードを設定してください。"
+  },
+  "settings.account.security.password.title": {
+    "message": "パスワード"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "プロバイダを管理"
+  },
+  "settings.account.security.providers.description": {
+    "message": "GitHub、GitLab、Microsoft、Discord、Steam、Googleなどのログイン方法をアカウントに追加、または削除できます。"
+  },
+  "settings.account.security.providers.title": {
+    "message": "認証プロバイダを管理"
+  },
+  "settings.account.security.title": {
+    "message": "アカウントのセキュリティ"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "2FAを削除"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "2FAを設定"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "ログイン時のアカウントのセキュリティをさらに強化します。"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "2段階認証"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "バックアップコードをダウンロードし、安全な場所に保存してください。デバイスにアクセスできなくなった場合、2段階認証コードの代わりにこれらのコードを使用できます。パスワードと同様に、厳重に管理してください。"
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "バックアップコードは1回のみ使用可能です。"
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "入力されたコードが正しくありません。"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "続行するには二要素認証コードを入力してください。"
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "二要素認証コードを入力"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "コードを入力…"
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "2段階認証では、サインイン時にあなたの別のデバイスへのアクセスを求めることで、アカウントの安全性を高めます。"
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "QRコードが読み取れない場合は、コードを手動で入力してください："
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "以下のQRコードを　<authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link>, またはその他の2FA(二要素認証)アプリで読み取って設定しましょう。"
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "認証アプリに表示されたワンタイムコードを入力してアクセスを認証します。"
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "コードを認証"
   },
   "settings.applications.about": {
     "message": "概要"
@@ -2954,11 +3158,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "アプリケーション"
+  },
   "settings.applications.modal.header": {
     "message": "アプリケーション情報"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "エラーが発生しました"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "アプリケーションのアイコンが更新されました。"
@@ -2968,6 +3172,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "今すぐ秘密情報を保存しましょう。このページを離れると非表示になります！"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "このアプリについて"
+  },
+  "settings.authorizations.by": {
+    "message": "作成者"
+  },
+  "settings.authorizations.description": {
+    "message": "Modrinthアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
+  },
+  "settings.authorizations.empty-state": {
+    "message": "現在承認済みアプリを表示することができません。現在修正中のため、また後ほど確認ください！"
+  },
+  "settings.authorizations.head-title": {
+    "message": "承認"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "取り消す"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "アプリケーションによるアカウントのアクセス権を取り消します。アプリケーションはいつでも再承認可能です。"
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "アプリケーションのアクセス権を取り消してもよろしいですか？"
+  },
+  "settings.billing.charges.description": {
+    "message": "Modrinthアカウントでの過去の支払い履歴は、こちらに表示されます："
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Medal Server トライアル"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "有効期限: {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "月"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "月間"
+  },
+  "settings.billing.interval.year": {
+    "message": "年"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "年間"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "modrinth.comとModrinth Appを広告なしでブラウジング"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+バッジをプロフィールに表示"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Modrinthとクリエイターを直接支援"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "特典"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "年間プランなら {amount}/年 お得！"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "サブスクリプションをキャンセルしました。"
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "特典は現在のお支払いサイクル終了日まで継続します。"
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "サブスクリプションの決済に失敗しました。 お支払い方法を変更してください。"
+  },
+  "settings.billing.midas.status.open": {
+    "message": "現在加入中のサブスクリプション："
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "決済を処理中です。 特典は決済の完了後に有効になります。"
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Modrinth Plusに加入しよう！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "サブスクリプションを解除する"
@@ -2987,6 +3275,12 @@
   "settings.billing.modal.delete.title": {
     "message": "このお支払い方法を削除してもよろしいですか？"
   },
+  "settings.billing.next": {
+    "message": "次："
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "または{price} / 年 ({percent}%お得)！"
+  },
   "settings.billing.payment_method.action.add": {
     "message": "支払い方法を追加する"
   },
@@ -3003,10 +3297,61 @@
     "message": "お支払い方法が設定されていません。"
   },
   "settings.billing.payment_method.primary": {
-    "message": "プライマリ"
+    "message": "メイン"
   },
   "settings.billing.payment_method.title": {
     "message": "支払い方法"
+  },
+  "settings.billing.plan.title": {
+    "message": "{size}プラン"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared}個の共有されたCPU ({bursts}個のCPUに増加)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "このサブスクリプションに対応するサーバーが見つかりませんでした。これにはいくつか説明があります。あなたがサーバーを購入してすぐの場合、これは通常であり、サーバーが提供されるまで長くて1時間かかります。しばらく前にサーバーを購入していた場合はおそらくそれ以来サーバーが停止されています。これが期待したものではない場合は、以下の情報と共にModrinth Supportにお問い合わせください。"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "サーバーID: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe ID: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb}GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "Modrinthサーバーの再登録中にエラーが発生しました。"
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "再登録エラー"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "サーバーが一時停止中の場合、再請求の試行まで最大10分かかることがあります。"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "再加入申請を受け付けました"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "サーバーのサブスクリプションに再加入しました"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "サブスクリプションの決済に失敗しました。 お支払い方法を変更して、もう一度再加入してください。"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "決済を処理中です。 サーバーは決済の完了後に有効になります。"
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB スワップ領域"
   },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Server のサブスクリプションを管理する。"
@@ -3014,11 +3359,41 @@
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Server のサブスクリプション"
   },
+  "settings.billing.renews": {
+    "message": "次の更新日: {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "再加入"
+  },
+  "settings.billing.since": {
+    "message": "加入日: {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "加入"
+  },
   "settings.billing.subscription.description": {
     "message": "Modrinth のサブスクリプションを管理する。"
   },
   "settings.billing.subscription.title": {
     "message": "サブスクリプション"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "{interval} に変更中"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "{interval} に変更"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "月払いの場合年間で {amount} 高くなります"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "{date}に {interval} 払いに変更されます"
+  },
+  "settings.billing.update-method": {
+    "message": "支払い方法を更新"
+  },
+  "settings.billing.upgrade": {
+    "message": "アップグレード"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "開発者モードを無効にする"
@@ -3032,6 +3407,12 @@
   "settings.display.flags.title": {
     "message": "機能の切り替え"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "開発者モードが無効になりました"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "開発者モード無効"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "データパックページ"
   },
@@ -3039,16 +3420,25 @@
     "message": "このデバイスでプロジェクト一覧を表示する各ページのレイアウトをお選びください。"
   },
   "settings.display.project-list-layouts.mod": {
-    "message": ""
+    "message": "Modページ"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "ギャラリー"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "グリッド表示"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "行表示"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Modpacks"
+    "message": "Modパックページ"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins"
+    "message": "プラグインページ"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resource Packs"
+    "message": "リソースパックページ"
   },
   "settings.display.project-list-layouts.server": {
     "message": "サーバーページ"
@@ -3060,13 +3450,13 @@
     "message": "プロジェクト一覧のレイアウト"
   },
   "settings.display.project-list-layouts.user": {
-    "message": "ユーザープロフィール"
+    "message": "ユーザープロフィールページ"
   },
   "settings.display.project-list.layouts.collection": {
     "message": "コレクション"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィック アクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
+    "message": "ぼかし効果などの高度なレンダリングを有効にします。グラフィックアクセラレーションが使用できない場合は、パフォーマンスが低下する可能性があります。"
   },
   "settings.display.sidebar.advanced-rendering.title": {
     "message": "高度なレンダリング"
@@ -3101,6 +3491,9 @@
   "settings.display.theme.title": {
     "message": "テーマ"
   },
+  "settings.head-title": {
+    "message": "表示設定"
+  },
   "settings.pats.action.create": {
     "message": "PATを作成"
   },
@@ -3117,7 +3510,7 @@
     "message": "名前"
   },
   "settings.pats.modal.create.name.placeholder": {
-    "message": "PATの名前を入力..."
+    "message": "PATの名前を入力…"
   },
   "settings.pats.modal.create.title": {
     "message": "個人用アクセストークンを作成"
@@ -3161,6 +3554,9 @@
   "settings.profile.description": {
     "message": "あなたのプロフィール情報は、Modrinth上および<docs-link>Modrinth API</docs-link>を通じて一般公開されます。"
   },
+  "settings.profile.head-title": {
+    "message": "プロフィール設定"
+  },
   "settings.profile.profile-info": {
     "message": "プロフィール情報"
   },
@@ -3191,11 +3587,29 @@
   "settings.sessions.unknown-platform": {
     "message": "不明なプラットフォーム"
   },
+  "settings.sidebar.label.account": {
+    "message": "アカウント"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "開発者"
+  },
+  "settings.sidebar.label.display": {
+    "message": "表示"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinthの最新ニュース"
   },
   "ui.latest-news-row.view-all": {
     "message": "すべてのニュースを見る"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "登録"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "登録しました！"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Modrinthのニュースレターに登録する"
   },
   "version.environment.none.description": {
     "message": "このバージョンの環境設定は未指定です。"
@@ -3204,7 +3618,7 @@
     "message": "環境設定が指定されていません"
   },
   "version.environment.unknown.description": {
-    "message": "環境: {environment} が認識されていません。"
+    "message": "環境: 「{environment}」が認識されていません。"
   },
   "version.environment.unknown.title": {
     "message": "不明な環境"

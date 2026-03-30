@@ -40,7 +40,8 @@ export default new createRouter({
 			name: 'Discover content',
 			component: Pages.Browse,
 			meta: {
-				breadcrumb: [{ name: 'Discover content' }],
+				useContext: true,
+				breadcrumb: [{ name: '?BrowseTitle' }],
 			},
 		},
 		{
@@ -175,6 +176,15 @@ export default new createRouter({
 					meta: {
 						useRootContext: true,
 						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Content' }],
+					},
+				},
+				{
+					path: 'files',
+					name: 'Files',
+					component: Instance.Files,
+					meta: {
+						useRootContext: true,
+						breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Files' }],
 					},
 				},
 				{

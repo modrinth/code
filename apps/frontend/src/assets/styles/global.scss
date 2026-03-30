@@ -446,13 +446,6 @@ textarea {
 	}
 }
 
-button,
-input[type='button'] {
-	cursor: pointer;
-	border: none;
-	outline: 2px solid transparent;
-}
-
 kbd {
 	background-color: var(--color-code-bg);
 	color: var(--color-code-text);

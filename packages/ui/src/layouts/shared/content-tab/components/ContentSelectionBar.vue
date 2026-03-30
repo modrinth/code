@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PowerIcon, PowerOffIcon } from '@modrinth/assets'
+import { PowerIcon, PowerOffIcon, XIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -20,14 +20,6 @@ const messages = defineMessages({
 	selectedCountSimple: {
 		id: 'content.selection-bar.selected-count-simple',
 		defaultMessage: '{count, number} selected',
-	},
-	enable: {
-		id: 'content.selection-bar.enable',
-		defaultMessage: 'Enable',
-	},
-	disable: {
-		id: 'content.selection-bar.disable',
-		defaultMessage: 'Disable',
 	},
 	bulkEnabling: {
 		id: 'content.selection-bar.bulk.enabling',
@@ -60,6 +52,14 @@ const messages = defineMessages({
 	bulkDeletingWaiting: {
 		id: 'content.selection-bar.bulk.deleting-waiting',
 		defaultMessage: 'Deleting {contentType}...',
+	},
+	allAlreadyEnabled: {
+		id: 'content.selection-bar.all-already-enabled',
+		defaultMessage: 'All selected content is already enabled',
+	},
+	allAlreadyDisabled: {
+		id: 'content.selection-bar.all-already-disabled',
+		defaultMessage: 'All selected content is already disabled',
 	},
 })
 
@@ -95,6 +95,7 @@ const emit = defineEmits<{
 const shown = computed(() => props.selectedItems.length > 0 || props.isBulkOperating)
 
 const allDisabled = computed(() => props.selectedItems.every((m) => !m.enabled))
+const allEnabled = computed(() => props.selectedItems.every((m) => m.enabled))
 
 const selectedCountText = computed(() => {
 	const count = props.selectedItems.length || props.bulkTotal
@@ -135,12 +136,14 @@ const bulkProgressMessage = computed(() => {
 			<div class="mx-1 h-6 w-px bg-surface-5" />
 			<ButtonStyled type="transparent">
 				<button
+					v-tooltip="formatMessage(commonMessages.clearButton)"
 					class="!text-primary"
 					:disabled="isBulkOperating"
 					:class="{ 'opacity-60 pointer-events-none': isBulkOperating }"
 					@click="emit('clear')"
 				>
-					{{ formatMessage(commonMessages.clearButton) }}
+					<XIcon class="hidden cq-show-icon" />
+					<span class="bar-label">{{ formatMessage(commonMessages.clearButton) }}</span>
 				</button>
 			</ButtonStyled>
 		</div>
@@ -148,16 +151,32 @@ const bulkProgressMessage = computed(() => {
 		<div v-if="!isBulkOperating" class="ml-auto flex items-center gap-0.5">
 			<slot name="actions" />
 
-			<ButtonStyled v-if="allDisabled" type="transparent">
-				<button :disabled="isBusy" @click="emit('enable')">
+			<ButtonStyled type="transparent">
+				<button
+					v-tooltip="
+						allEnabled
+							? formatMessage(messages.allAlreadyEnabled)
+							: formatMessage(commonMessages.enableButton)
+					"
+					:disabled="isBusy || allEnabled"
+					@click="emit('enable')"
+				>
 					<PowerIcon />
-					{{ formatMessage(messages.enable) }}
+					<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
 				</button>
 			</ButtonStyled>
-			<ButtonStyled v-else type="transparent">
-				<button :disabled="isBusy" @click="emit('disable')">
+			<ButtonStyled type="transparent">
+				<button
+					v-tooltip="
+						allDisabled
+							? formatMessage(messages.allAlreadyDisabled)
+							: formatMessage(commonMessages.disableButton)
+					"
+					:disabled="isBusy || allDisabled"
+					@click="emit('disable')"
+				>
 					<PowerOffIcon />
-					{{ formatMessage(messages.disable) }}
+					<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
 				</button>
 			</ButtonStyled>
 

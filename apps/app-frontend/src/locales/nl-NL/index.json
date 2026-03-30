@@ -5,26 +5,47 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Voeg modpack beschrijving in..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exporteer"
+  },
+  "app.export-modal.header": {
+    "message": "Exporteer modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Modpack Naam"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack naam"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Selecteer bestanden en mappen om toe te voegen aan pack"
+  },
   "app.export-modal.version-number-label": {
     "message": "Versie nummer"
   },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Alle data van je instantie zal permanent verwijderd worden, inclusief al je werelden, voorkeuren, en alle geïnstalleerde content."
+  },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Deze actie kan niet ongedaan gemaakt worden"
   },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Verwijder instantie"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack is al geïnstalleerd"
+  },
   "app.instance.mods.content-type-project": {
     "message": "project"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Kopieer link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Aan het installeren..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" was toegevoegd"
@@ -38,17 +59,8 @@
   "app.instance.mods.share-title": {
     "message": "Modpack-inhoud delen"
   },
-  "app.instance.mods.show-file": {
-    "message": "Bestand weergeven"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Succesvol geüpload"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "Onbekend"
-  },
-  "app.instance.mods.updating": {
-    "message": "Aan het updaten..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"
@@ -97,9 +109,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standaardopties voor instantie"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Feature flags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java installaties"
@@ -425,9 +434,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Niet tonen op de startpagina"
   },
-  "instance.worlds.filter.available": {
-    "message": "Beschikbaar"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instantie is al open"
   },
@@ -451,12 +457,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Speel instantie"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Alleen spelen"
   },
   "instance.worlds.view_instance": {
     "message": "Bekijk instantie"

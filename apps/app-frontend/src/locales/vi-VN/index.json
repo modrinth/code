@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Không thể kết nối đến máy chủ xác thực"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Thêm máy chủ vào hồ sơ"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Thêm máy chủ vào hồ sơ của bạn"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Thêm vào hồ sơ"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Thêm vào {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Đã thêm"
+  },
+  "app.browse.already-added": {
+    "message": "Đã được thêm"
+  },
+  "app.browse.discover-content": {
+    "message": "Khám phá nội dung"
+  },
+  "app.browse.discover-servers": {
+    "message": "Khám phá máy chủ"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ẩn các máy chủ đã thêm"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Ẩn các nội dung đã được tải xuống"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Tải nội dung này vào hồ sơ"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Thêm miêu tả cho gói modpack..."
   },
@@ -36,22 +69,25 @@
     "message": "Hành động này sẽ không thể huỷ bỏ"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "Hoá hồ sơ"
+    "message": "Xoá hồ sơ"
   },
   "app.instance.confirm-delete.header": {
-    "message": "Xoá hồ xe"
+    "message": "Xoá hồ sơ"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Gói modpack này đã được cài đặt trong hồ sơ <bold>{instanceName}</bold> rồi. Bạn có chắc chắn muốn sao chép nó không?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Khởi tạo"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack đã được cài đặt"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Hồ sơ"
   },
   "app.instance.mods.content-type-project": {
     "message": "Dự án"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Sao chép liên kết"
-  },
-  "app.instance.mods.installing": {
-    "message": "Đang tải xuống..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" đã được thêm"
@@ -65,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Chia sẻ hồ sơ modpack"
   },
-  "app.instance.mods.show-file": {
-    "message": "Hiện tệp"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Tải lên thành công"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Không rõ"
+  "app.instance.worlds.add-server": {
+    "message": "Thêm máy chủ"
   },
-  "app.instance.mods.updating": {
-    "message": "Đang cập nhật..."
+  "app.instance.worlds.browse-servers": {
+    "message": "Tìm kiếm máy chủ"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' sẽ bị **xóa vĩnh viễn** và không có cách nào khôi phục lại."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Bạn có chắc cắn rằng bạn muốn xoá vĩnh viễn thế giới này không?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modded"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Ngoại tuyến"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Trực tuyến"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Thêm một máy chủ hoặc tìm kiếm để bắt đầu"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Không có máy chủ hay thế giới nào đã được thêm"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) sẽ bị xóa khỏi danh sách của bạn, kể cả trong game, và bạn sẽ không có cách nào để khôi phục lại."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Bạn có chắc chắn rằng bạn muốn xoá {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Tìm kiếm {count} world..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "Máy chủ này"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nội dung bắt buộc"
@@ -124,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Tuỳ chọn hồ sơ khởi chạy mặc định"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Các cờ tính năng"
   },
   "app.settings.tabs.java-installations": {
     "message": "Các bản cài Java"
@@ -182,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "Hãy khởi động lại để cài đặt bản cập nhật"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Chọn một tuỳ chọn"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Không phù hợp với phiên bản {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Chưa từng được chơi"
+  },
+  "app.world.world-item.offline": {
+    "message": "Ngoại tuyến"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} đang trực tuyến"
+  },
   "friends.action.add-friend": {
     "message": "Thêm một người bạn"
   },
@@ -204,7 +291,7 @@
     "message": "Tên người dùng Modrinth của bạn của bạn là gì?"
   },
   "friends.add-friends-to-share": {
-    "message": "Hãy <link>Thêm bạn bè</link> để biết họ đang chơi gì!"
+    "message": "Hãy <link>thêm bạn bè</link> để biết họ đang chơi gì!"
   },
   "friends.friend.cancel-request": {
     "message": "Huỷ yêu cầu"
@@ -216,7 +303,7 @@
     "message": "Đã gửi yêu cầu kết bạn"
   },
   "friends.friend.view-profile": {
-    "message": "Xem hồ sơ"
+    "message": "Xem thông tin"
   },
   "friends.heading": {
     "message": "Bạn bè"
@@ -279,7 +366,13 @@
     "message": "Đặt lại biểu tượng"
   },
   "instance.edit-world.title": {
-    "message": "Sửa thể giới"
+    "message": "Chỉnh sửa thế giới"
+  },
+  "instance.files.adding-files": {
+    "message": "Đang thêm dữ liệu ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Lưu như..."
   },
   "instance.server-modal.address": {
     "message": "Địa chỉ"
@@ -318,7 +411,7 @@
     "message": "Nhân bản hồ sơ"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "Tạo ra một bản sao của hiện thể này, bao gồm các thế giới, cấu hình, mod, v.v.."
+    "message": "Tạo ra một bản sao của hồ sơ này, bao gồm các thế giới, cấu hình, mod, v.v."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "Sửa biểu tượng"
@@ -452,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Không hiện ở Trang chủ"
   },
-  "instance.worlds.filter.available": {
-    "message": "Có sẵn"
-  },
   "instance.worlds.game_already_open": {
     "message": "Bản này đã mở sẵn"
   },
@@ -479,12 +569,6 @@
   "instance.worlds.play_instance": {
     "message": "Chơi phiên bản này"
   },
-  "instance.worlds.type.server": {
-    "message": "Máy chủ"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Chế độ một người chơi"
-  },
   "instance.worlds.view_instance": {
     "message": "Xem phiên bản"
   },
@@ -495,7 +579,7 @@
     "message": "Được cung cấp bởi phiên bản"
   },
   "search.filter.locked.instance-game-version.title": {
-    "message": "Phiên bản trò chơi được cung cấp bởi instance này"
+    "message": "Phiên bản trò chơi được cung cấp bởi hồ sơ này"
   },
   "search.filter.locked.instance-loader.title": {
     "message": "Loader được cung cấp bởi hồ sơ"

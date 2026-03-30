@@ -5,6 +5,24 @@
   "app.auth-servers.unreachable.header": {
     "message": "Todennuspalvelimiin ei saada yhteyttä"
   },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Modpack nimi"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Valitse tiedostot ja kansiot pakettiin"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Versio numero"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" lisättiin"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projektia lisättiin"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "Sisältö vaaditaan"
   },
@@ -52,9 +70,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Oletusinstanssin asetukset"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Ominaisuuskytkimet"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java asennukset"
@@ -380,9 +395,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Älä näytä koti näkymässä"
   },
-  "instance.worlds.filter.available": {
-    "message": "Saatavilla"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instanssi on jo avattu"
   },
@@ -407,12 +419,6 @@
   "instance.worlds.play_instance": {
     "message": "Pelaa instanssia"
   },
-  "instance.worlds.type.server": {
-    "message": "Palvelin"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Yksinpeli"
-  },
   "instance.worlds.view_instance": {
     "message": "Näytä instanssi"
   },
@@ -429,7 +435,7 @@
     "message": "Lataajan antaa instanssi"
   },
   "search.filter.locked.instance.sync": {
-    "message": "Synkkaa instanssin kanssa"
+    "message": "Synkronoi instanssin kanssa"
   },
   "search.filter.locked.server": {
     "message": "Palvelimen tarjoama"

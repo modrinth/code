@@ -5,8 +5,152 @@
   "app.auth-servers.unreachable.header": {
     "message": "No se puede conectar con los servidores de autenticación"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Añadir servidor a la instancia"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Añadir servidor a tu instancia"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Añadir a la instancia"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Añadir a {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Añadido"
+  },
+  "app.browse.already-added": {
+    "message": "Ya está añadido"
+  },
+  "app.browse.discover-content": {
+    "message": "Descubrir contenido"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descubrir servidores"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Ocultar servidores añadidos"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Ocultar contenido instalado"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Instalar contenido a una instancia"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Escribe la descripción del modpack..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportar"
+  },
+  "app.export-modal.header": {
+    "message": "Exportar modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nombre del modpack"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Seleccione archivos y carpetas para incluir en el paquete"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Número de versión"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Todos los datos de su instancia se eliminarán permanentemente, incluidos sus mundos, configuraciones y todo el contenido instalado."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Esta acción no se puede deshacer"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Eliminar instancia"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Este modpack ya está instalado en la instancia <bold>{instanceName}</bold>. ¿Estás seguro qué quieres duplicarlo?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Crear"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack ya está instalado"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instancia"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "proyecto"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "Se ha añadido \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "Se han añadido {count} proyectos"
+  },
+  "app.instance.mods.share-text": {
+    "message": "¡Echa un vistazo a los proyectos que utilizo en mi modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Compartir contenido del modpack"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Se ha subido correctamente"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Añadir servidor"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Explorar servidores"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' será **permanentemente eliminado**, y habrá forma de recuperarlo."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "¿Estás seguro de qué quieres eliminar permanentemente este mundo?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modeado"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Sin conexión"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "En línea"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Añadir un servidor o explora para comenzar"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "No hay servidores o mundos añadidos"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) será eliminado de tu lista, incluyendo dentro del juego, y no habrá forma de recuperarlo."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "¿Estás seguro de qué quieres eliminar {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Buscar {count} mundos..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "este servidor"
+  },
   "app.modal.install-to-play.content-required": {
-    "message": "Contenido requerido"
+    "message": "Contenido obligatorio"
   },
   "app.modal.install-to-play.header": {
     "message": "Instala para jugar"
@@ -53,9 +197,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Opciones predeterminadas de la instancia"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Funciones experimentales"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalaciones de Java"
   },
@@ -71,6 +212,15 @@
   "app.update-popup.body": {
     "message": "¡La versión v{version} de Modrinth está lista para instalarse! Actualiza ahora o automáticamente al cerrar la aplicación."
   },
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} se ha descargado. Actualiza la página ahora o espera a que se actualice automáticamente al cerrar Modrinth App."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Ya está disponible Modrinth App v{version}. ¡Utiliza tu gestor de paquetes para actualizarla y disfrutar de las últimas funciones y correcciones!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "¡Modrinth App v{version} ya está disponible! Como estás conectado a una red con tarifa por datos, no la hemos descargado automáticamente."
+  },
   "app.update-popup.changelog": {
     "message": "Registro de cambios"
   },
@@ -79,6 +229,9 @@
   },
   "app.update-popup.download-complete": {
     "message": "Descarga completada"
+  },
+  "app.update-popup.reload": {
+    "message": "Recargar"
   },
   "app.update-popup.title": {
     "message": "Actualización disponible"
@@ -97,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Recarga para instalar la actualización"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "ejemplo.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Selecciona una opción"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versión {version} incompatible"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "No se ha jugado aún"
+  },
+  "app.world.world-item.offline": {
+    "message": "Desconectado"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} en línea"
   },
   "friends.action.add-friend": {
     "message": "Agrega a un amigo"
@@ -196,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Editar mundo"
+  },
+  "instance.files.adding-files": {
+    "message": "Añadiendo archivos ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Guardar como..."
   },
   "instance.server-modal.address": {
     "message": "Dirección IP"
@@ -368,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "No mostrar en Inicio"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponible"
-  },
   "instance.worlds.game_already_open": {
     "message": "La instancia ya está abierta"
   },
@@ -379,6 +553,9 @@
   },
   "instance.worlds.incompatible_server": {
     "message": "Servidor es incompatible"
+  },
+  "instance.worlds.linked_server": {
+    "message": "Gestionado por el proyecto del servidor"
   },
   "instance.worlds.no_contact": {
     "message": "No se pudo contactar con el servidor"
@@ -391,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Jugar instancia"
-  },
-  "instance.worlds.type.server": {
-    "message": "Servidor"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Un jugador"
   },
   "instance.worlds.view_instance": {
     "message": "Ver instancia"
@@ -416,7 +587,16 @@
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar con la instancia"
   },
+  "search.filter.locked.server": {
+    "message": "Proporcionado por el servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Solo se pueden añadir a la instancia del servidor modificaciones del lado del cliente"
+  },
   "search.filter.locked.server-game-version.title": {
     "message": "La versión del juego es proporcionada por el servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "El cargador lo proporciona el servidor"
   }
 }

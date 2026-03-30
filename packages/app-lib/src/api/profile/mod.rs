@@ -294,19 +294,13 @@ pub async fn get_optimal_jre_key(
     let state = State::get().await?;
 
     if let Some(profile) = get(path).await? {
-        let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-
-        // Fetch version info from stored profile game_version
-        let version = minecraft
-            .versions
-            .iter()
-            .find(|it| it.id == profile.game_version)
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Invalid or unknown Minecraft version: {}",
-                    profile.game_version
-                ))
-            })?;
+        let (minecraft, version_index) =
+            crate::launcher::resolve_minecraft_manifest(
+                &profile.game_version,
+                &state,
+            )
+            .await?;
+        let version = &minecraft.versions[version_index];
 
         let loader_version = crate::launcher::get_loader_version_from_profile(
             &profile.game_version,
@@ -352,14 +346,22 @@ pub async fn install(path: &str, force: bool) -> crate::Result<()> {
     if let Some(profile) = get(path).await? {
         let result =
             crate::launcher::install_minecraft(&profile, None, force).await;
-        if result.is_err()
-            && profile.install_stage != ProfileInstallStage::Installed
-        {
-            edit(path, |prof| {
-                prof.install_stage = ProfileInstallStage::NotInstalled;
-                async { Ok(()) }
-            })
-            .await?;
+        if result.is_err() {
+            // Re-read the profile to get the current install_stage, as
+            // install_minecraft may have changed it (e.g. to MinecraftInstalling)
+            let current_stage = get(path)
+                .await
+                .ok()
+                .flatten()
+                .map(|p| p.install_stage)
+                .unwrap_or(ProfileInstallStage::NotInstalled);
+            if current_stage != ProfileInstallStage::Installed {
+                edit(path, |prof| {
+                    prof.install_stage = ProfileInstallStage::NotInstalled;
+                    async { Ok(()) }
+                })
+                .await?;
+            }
         }
         result?;
     } else {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ConfirmLeaveModal,
 	defineMessages,
 	IconSelect,
 	injectProjectPageContext,
@@ -7,6 +8,7 @@ import {
 	SettingsLabel,
 	StyledInput,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 	useSavable,
 	useVIntl,
 } from '@modrinth/ui'
@@ -15,7 +17,7 @@ const { formatMessage } = useVIntl()
 
 const { projectV2: project, patchProject } = injectProjectPageContext()
 
-const { saved, current, saving, reset, save } = useSavable(
+const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({
 		title: project.value.title,
 		tagline: project.value.description,
@@ -30,6 +32,8 @@ const { saved, current, saving, reset, save } = useSavable(
 		})
 	},
 )
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const messages = defineMessages({
 	nameTitle: {
@@ -117,6 +121,7 @@ const placeholder = computed(() => placeholders[placeholderIndex.value] ?? place
 </script>
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<UnsavedChangesPopup
 			:original="saved"
 			:modified="current"

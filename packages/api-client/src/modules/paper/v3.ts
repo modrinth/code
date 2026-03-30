@@ -13,6 +13,13 @@ export class PaperVersionsV3Module extends AbstractModule {
 	}
 
 	/**
+	 * Get the Paper project info including all supported Minecraft versions.
+	 */
+	public async getProject(): Promise<Paper.Versions.v3.Project> {
+		return $fetch<Paper.Versions.v3.Project>(`${BASE_URL}/projects/paper`)
+	}
+
+	/**
 	 * Get available Paper builds for a Minecraft version.
 	 *
 	 * @param mcVersion - Minecraft version (e.g. "1.21.4")

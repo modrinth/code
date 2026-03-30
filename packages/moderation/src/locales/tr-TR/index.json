@@ -11,8 +11,14 @@
   "nags.add-icon.title": {
     "defaultMessage": "Simge ekle"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Java Sürümü oyuncuların sunucunuza girebileceği IP adresi ve portu girin."
+  },
   "nags.add-java-address.title": {
     "defaultMessage": "Java adresleri ekle"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Modrinth'in dışında herhangi ilgili bağlantı ekleyin, website, mağaza veya Discord daveti gibi."
   },
   "nags.add-links-server.title": {
     "defaultMessage": "Dış bağlantı ekle"
@@ -64,6 +70,9 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Kaynak kodu sun"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Bazı dış bağlantılarınız aynı. Her bağlantı sadece bir kere doğru bağlantı türüyle girilmelidir."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Aynı linkler"
@@ -130,6 +139,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Doğru boyutu seç"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Sunucunuzun desteklediği sürümleri seçin ve bir Mod Paketi seçin ya da kendinizinkini yükleyin."
   },
   "nags.select-compatibility.title": {
     "defaultMessage": "Uyumluluk seçiniz"

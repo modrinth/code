@@ -19,6 +19,7 @@ import _ArrowLeftRightIcon from './icons/arrow-left-right.svg?component'
 import _ArrowUpIcon from './icons/arrow-up.svg?component'
 import _ArrowUpDownIcon from './icons/arrow-up-down.svg?component'
 import _ArrowUpRightIcon from './icons/arrow-up-right.svg?component'
+import _ArrowUpZAIcon from './icons/arrow-up-z-a.svg?component'
 import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BadgeCheckIcon from './icons/badge-check.svg?component'
 import _BadgeDollarSignIcon from './icons/badge-dollar-sign.svg?component'
@@ -202,6 +203,7 @@ import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
+import _Settings2Icon from './icons/settings-2.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
@@ -404,6 +406,7 @@ export const ArrowLeftRightIcon = _ArrowLeftRightIcon
 export const ArrowUpIcon = _ArrowUpIcon
 export const ArrowUpDownIcon = _ArrowUpDownIcon
 export const ArrowUpRightIcon = _ArrowUpRightIcon
+export const ArrowUpZAIcon = _ArrowUpZAIcon
 export const AsteriskIcon = _AsteriskIcon
 export const BadgeCheckIcon = _BadgeCheckIcon
 export const BadgeDollarSignIcon = _BadgeDollarSignIcon
@@ -587,6 +590,7 @@ export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const ServerPlusIcon = _ServerPlusIcon
 export const SettingsIcon = _SettingsIcon
+export const Settings2Icon = _Settings2Icon
 export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon

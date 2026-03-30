@@ -5,6 +5,12 @@
   "app.auth-servers.unreachable.header": {
     "message": "Připojení k autorizačním serverům se nezdařilo"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "Přidej popis modpacku..."
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Všechna data z instance budou navždy smazána, včetně světů, nastavení a všeho ostatního."
+  },
   "app.modal.install-to-play.header": {
     "message": "Nainstaluj ke hraní"
   },
@@ -41,9 +47,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Výchozí možnosti instance"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Vlajky funkcí"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalace Javy"
   },
@@ -55,6 +58,9 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Správa zdrojů"
+  },
+  "app.update-popup.download": {
+    "message": "Stáhnout ({size})"
   },
   "app.update.complete-toast.text": {
     "message": "Kliknutím sem zobrazíte seznam změn."
@@ -341,9 +347,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Nezobrazuje na domovské stránce"
   },
-  "instance.worlds.filter.available": {
-    "message": "Dostupné"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instance je již otevřená"
   },
@@ -365,12 +368,6 @@
   "instance.worlds.play_instance": {
     "message": "Hrát instanci"
   },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Hra pro jednoho hráče"
-  },
   "instance.worlds.view_instance": {
     "message": "Zobrazit instanci"
   },
@@ -384,9 +381,18 @@
     "message": "Verze hry je poskytnut instanci"
   },
   "search.filter.locked.instance-loader.title": {
-    "message": "Spouštěč je poskytnut instanci"
+    "message": "Spouštěč je poskytnut instancí"
   },
   "search.filter.locked.instance.sync": {
     "message": "Synchronizováno z instancí"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Jen klientské mody mohou být přidány na server"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Verzi hry poskytuje server"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Loader zprostředkovává server"
   }
 }

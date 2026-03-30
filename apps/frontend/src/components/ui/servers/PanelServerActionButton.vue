@@ -51,14 +51,14 @@
 		</NewModal>
 
 		<div class="flex flex-row items-center gap-2 rounded-lg">
-			<ButtonStyled v-if="isInstalling" type="standard" color="brand">
+			<ButtonStyled v-if="isInstalling" type="standard" color="brand" size="large">
 				<button disabled class="flex-shrink-0">
 					<PanelSpinner class="size-5" /> Installing...
 				</button>
 			</ButtonStyled>
 
 			<template v-else>
-				<ButtonStyled v-if="showStopButton" type="transparent">
+				<ButtonStyled v-if="showStopButton" type="transparent" size="large">
 					<button :disabled="!canTakeAction" @click="initiateAction('Stop')">
 						<div class="flex gap-1">
 							<StopCircleIcon class="h-5 w-5" />
@@ -67,7 +67,7 @@
 					</button>
 				</ButtonStyled>
 
-				<ButtonStyled type="standard" color="brand">
+				<ButtonStyled type="standard" color="brand" size="large">
 					<button v-tooltip="busyReason" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<div v-if="isTransitionState" class="grid place-content-center">
 							<LoadingIcon />
@@ -77,7 +77,7 @@
 					</button>
 				</ButtonStyled>
 
-				<ButtonStyled circular type="transparent">
+				<ButtonStyled circular type="transparent" size="large">
 					<TeleportOverflowMenu :options="[...menuOptions]">
 						<MoreVerticalIcon aria-hidden="true" />
 						<template #kill>

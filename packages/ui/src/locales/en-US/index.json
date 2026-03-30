@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Continue"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Copy filename"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Copy full path"
+  },
   "button.copy-id": {
     "defaultMessage": "Copy ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Copy link"
   },
   "button.copy-permalink": {
     "defaultMessage": "Copy permanent link"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Decline"
   },
+  "button.disable": {
+    "defaultMessage": "Disable"
+  },
   "button.download": {
     "defaultMessage": "Download"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Edit"
+  },
+  "button.enable": {
+    "defaultMessage": "Enable"
+  },
+  "button.extract": {
+    "defaultMessage": "Extract"
   },
   "button.follow": {
     "defaultMessage": "Follow"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "More options"
   },
+  "button.move": {
+    "defaultMessage": "Move"
+  },
   "button.next": {
     "defaultMessage": "Next"
   },
   "button.open-folder": {
     "defaultMessage": "Open folder"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Open in folder"
   },
   "button.play": {
     "defaultMessage": "Play"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Remove image"
+  },
+  "button.rename": {
+    "defaultMessage": "Rename"
   },
   "button.repair": {
     "defaultMessage": "Repair"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Show all versions"
   },
+  "button.show-file": {
+    "defaultMessage": "Show file"
+  },
   "button.sign-in": {
     "defaultMessage": "Sign in"
   },
@@ -182,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "Just now"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -192,7 +219,7 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Website"
+    "defaultMessage": "Platform"
   },
   "collections.label.private": {
     "defaultMessage": "Private"
@@ -224,6 +251,9 @@
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Any mods or content you added on top of the modpack will be deleted."
   },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Any mods or content you added on top of the modpack will be preserved."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} warning"
   },
@@ -252,7 +282,7 @@
     "defaultMessage": "Added (dependency)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Removed"
+    "defaultMessage": "Disabled"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Updated"
@@ -298,9 +328,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Don't show again"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Updating..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Additional content"
@@ -374,6 +401,12 @@
   "content.page-layout.uploading-files": {
     "defaultMessage": "Uploading files ({completed}/{total})"
   },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "All selected content is already disabled"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "All selected content is already enabled"
+  },
   "content.selection-bar.bulk.deleting": {
     "defaultMessage": "Deleting {progress}/{total} {contentType}..."
   },
@@ -398,17 +431,344 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Updating {contentType}..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Disable"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Enable"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} selected"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} selected"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Extract summary"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Overwrite"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Over 100 files will be overwritten if you proceed with extraction; here are some of them."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "The following {count} files already exist on your server, and will be overwritten if you proceed with extraction."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} overwritten"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Overwritten"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Files will be overwritten"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Create {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Create a {type, select, directory {folder} other {file}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "e.g. my-folder"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "e.g. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Deleting \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Delete file"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {This folder and all its contents will be permanently deleted. This action cannot be undone.} other {This file will be permanently deleted. This action cannot be undone.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Could not load file contents."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Failed to open file"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Could not upload to mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Failed to share file"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Your file has been saved."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "File saved"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "Your log file URL has been copied to your clipboard."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "Log URL copied"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Could not save the file."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Save failed"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Go to home folder"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Try again"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Image too large to view (max {maxDimension}x{maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Invalid or empty image file."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Failed to load image"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Reset zoom"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Viewed image"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Zoom in"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Zoom out"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "File operations are disabled while the operation is in progress."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Error running dry run"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Dry run failed"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "There are no files or folders."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "This folder is empty"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "The folder may not exist."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Unable to load files"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Extraction started"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Loading files..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} selected"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "You have unsaved changes."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Current location"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Destination path"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "e.g. /my-folder"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Move folder} other {Move file}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Back to home"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Breadcrumb navigation"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Create new..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "File navigation"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Home"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Install CurseForge pack"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "New file"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "New folder"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Search files"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Share to mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Upload file"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Upload from .zip file"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Upload from .zip URL"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} extracted"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Extracting {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Failed"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpack from URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent}%)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Uploading files ({completed}/{total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Rename {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "New name"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# item} other {# items}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Created"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modified"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Name"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Size"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "You have unsaved changes that will be lost if you leave. Would you like to save before leaving?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Discard"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Unsaved changes"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Failed - File already exists"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Failed - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Failed - Incorrect file type"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Failed to upload {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "File"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "{fileType} uploads"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Upload had incorrect file type"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "An unexpected error occurred."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} left"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Drop {type, select, undefined {files} other {{type}s}} here to upload"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Name must contain only alphanumeric characters, dashes, underscores, or spaces."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Name must contain only alphanumeric characters, dashes, underscores, dots, or spaces."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Name"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Name is required."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "CurseForge modpack install"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Install a CurseForge modpack"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Could not find CurseForge modpack at that URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "CurseForge modpack not found"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Enter link"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "URL must be a CurseForge modpack version URL."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "URL must be valid."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URL is required."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Install"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Installation failed"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Copy the version page URL and paste it below."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Copy the URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Browse CurseForge and locate the modpack you want."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Find the modpack"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Go to the \"Files\" tab and pick the version to install."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Select a version"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "An unknown error occurred"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Copy and paste the direct download URL of a .zip file."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Uploading .zip contents from URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -512,9 +872,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolution"
   },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Copy link"
-  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Failed to delete content"
   },
@@ -547,9 +904,6 @@
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Failed to upload file"
-  },
-  "hosting.content.switch-version": {
-    "defaultMessage": "Switch version"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Bursts up to {cpus} CPUs"
@@ -710,15 +1064,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "Files are still being uploaded. Leaving this page will cancel the upload and your changes may be lost."
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Leave page"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Stay on page"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Leave page?"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "Upload in progress"
   },
@@ -728,26 +1073,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Existing instance"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Game version"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Select game version"
   },
   "instances.content-install.header": {
     "defaultMessage": "Install project"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Hide snapshots"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Install"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Installed"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Installing..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Instance type"
@@ -776,20 +1112,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Select icon"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Show all versions"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Copy link"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "This modpack does not include any additional content."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "No content found"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "All"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpack content"
@@ -869,8 +1196,14 @@
   "label.changes-saved": {
     "defaultMessage": "Changes saved"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "This mod depends on a client-side mod and may cause issues when starting your server"
+  },
   "label.client-only-warning": {
     "defaultMessage": "This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict."
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
   },
   "label.collections": {
     "defaultMessage": "Collections"
@@ -881,6 +1214,15 @@
   "label.content": {
     "defaultMessage": "Content"
   },
+  "label.copied-filename": {
+    "defaultMessage": "Copied filename"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Copied path"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Create failed"
+  },
   "label.created-ago": {
     "defaultMessage": "Created {ago}"
   },
@@ -889,6 +1231,9 @@
   },
   "label.delete": {
     "defaultMessage": "Delete"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "Delete failed"
   },
   "label.delete-immediately": {
     "defaultMessage": "Delete immediately"
@@ -899,6 +1244,12 @@
   "label.details": {
     "defaultMessage": "Details"
   },
+  "label.done": {
+    "defaultMessage": "Done"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Download failed"
+  },
   "label.email": {
     "defaultMessage": "Email"
   },
@@ -907,6 +1258,9 @@
   },
   "label.error": {
     "defaultMessage": "Error"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "Extract failed"
   },
   "label.filter-by": {
     "defaultMessage": "Filter by"
@@ -935,6 +1289,9 @@
   "label.modpack": {
     "defaultMessage": "Modpack"
   },
+  "label.move-failed": {
+    "defaultMessage": "Move failed"
+  },
   "label.no": {
     "defaultMessage": "No"
   },
@@ -950,6 +1307,21 @@
   "label.password": {
     "defaultMessage": "Password"
   },
+  "label.plan-custom": {
+    "defaultMessage": "Custom"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Large"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Medium"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Small"
+  },
+  "label.plan-unknown": {
+    "defaultMessage": "Unknown"
+  },
   "label.platform": {
     "defaultMessage": "Platform"
   },
@@ -964,6 +1336,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejected"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Rename failed"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "I agree to the <terms-link>Rewards Program Terms</terms-link>"
@@ -1012,6 +1387,12 @@
   },
   "label.update-available": {
     "defaultMessage": "Update available"
+  },
+  "label.updating": {
+    "defaultMessage": "Updating..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Upload failed"
   },
   "label.username": {
     "defaultMessage": "Username"
@@ -2136,7 +2517,7 @@
     "defaultMessage": "Creating backup"
   },
   "servers.backups.admonition.fallback-name": {
-    "defaultMessage": "your backup"
+    "defaultMessage": "Your backup"
   },
   "servers.backups.admonition.restore-failed.description": {
     "defaultMessage": "Something went wrong while restoring from {backupName}. Please try again or contact support if the issue continues."
@@ -2338,6 +2719,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "Color theme"
+  },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Feature flags"
   },
   "settings.language.categories.default": {
     "defaultMessage": "Standard languages"
@@ -2803,5 +3187,20 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "You have unsaved changes."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "You have unsaved changes that will be lost if you leave this page."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "You have unsaved changes"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Leave page"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Stay on page"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Leave page?"
   }
 }
