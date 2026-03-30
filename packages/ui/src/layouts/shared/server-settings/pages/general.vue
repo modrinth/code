@@ -1,7 +1,7 @@
 <template>
-	<div class="relative h-full w-full overflow-y-auto">
+	<div class="relative h-full w-full">
 		<div v-if="data" class="flex h-full w-full flex-col">
-			<div class="card flex flex-col gap-6">
+			<div class="flex flex-col gap-6">
 				<div class="flex justify-start gap-16">
 					<div class="flex max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->

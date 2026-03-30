@@ -1,13 +1,13 @@
 <template>
-	<div class="relative h-full w-full select-none overflow-y-auto">
-		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4 overflow-y-auto">
+	<div class="relative h-full w-full select-none">
+		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4">
 			<Admonition
 				v-if="hasNoProperties"
 				type="warning"
 				body="Some expected properties are missing from your server.properties - this usually means the server hasn't completed its first startup yet."
 			/>
 
-			<div class="card flex flex-col gap-4">
+			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
 						Edit the Minecraft server properties file here, or use the Files tab to edit the full

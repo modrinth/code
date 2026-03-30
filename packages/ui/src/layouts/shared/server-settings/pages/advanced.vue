@@ -1,7 +1,7 @@
 <template>
 	<div class="relative h-full w-full">
 		<div class="flex h-full w-full flex-col gap-4">
-			<div class="card flex flex-col gap-6">
+			<div class="flex flex-col gap-6">
 				<!-- SFTP section -->
 				<div class="flex flex-col gap-2">
 					<div class="flex flex-col items-center justify-between gap-0.5 sm:flex-row">

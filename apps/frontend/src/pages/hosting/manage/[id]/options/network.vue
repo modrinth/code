@@ -3,5 +3,5 @@ import { ServerSettingsNetworkPage } from '@modrinth/ui'
 </script>
 
 <template>
-	<ServerSettingsNetworkPage />
+	<ServerSettingsNetworkPage class="card" />
 </template>

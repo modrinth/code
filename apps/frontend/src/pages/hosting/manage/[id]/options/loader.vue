@@ -11,5 +11,6 @@ const emit = defineEmits<{
 	<ServerSettingsInstallationPage
 		@reinstall="(event: unknown) => emit('reinstall', event)"
 		@reinstall-failed="emit('reinstall-failed')"
+		class="card"
 	/>
 </template>
