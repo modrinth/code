@@ -22,9 +22,9 @@
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
 						<div
-							v-tooltip="'Copy SFTP username'"
-							class="copy-field"
-							@click="copyToClipboard('Username', server?.sftp_username)"
+							v-tooltip="'Copy SFTP server address'"
+							class="copy-field hover:bg-button-bg-hover"
+							@click="copyToClipboard('Server address', server?.sftp_host)"
 						>
 							<span class="cursor-pointer font-semibold text-primary">
 								{{ server?.sftp_host }}
@@ -38,7 +38,7 @@
 								<span class="text-lg font-semibold text-contrast">Username</span>
 								<div
 									v-tooltip="'Copy SFTP username'"
-									class="copy-field"
+									class="copy-field hover:bg-button-bg-hover"
 									@click="copyToClipboard('Username', server?.sftp_username)"
 								>
 									<div class="truncate font-semibold">
@@ -52,10 +52,10 @@
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Password</span>
 								<div
-									class="copy-field-has-button"
+									class="copy-field-has-button [&:hover:not(:has(button:hover))]:bg-button-bg-hover"
 									@click="copyToClipboard('Password', server?.sftp_password)"
 								>
-									<div class="flex items-center gap-1 h-full w-full">
+									<div class="flex items-center gap-1.5 h-full w-full">
 										<div
 											class="h-full flex justify-between grow items-center"
 											v-tooltip="'Copy SFTP Password'"
@@ -381,11 +381,11 @@ function resetToDefault() {
 <style scoped>
 .copy-field {
 	@apply flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all;
-	@apply hover:bg-button-bg-hover hover:brightness-125 active:scale-95;
+	@apply hover:brightness-125 active:scale-95;
 }
 
 .copy-field-has-button {
 	@apply flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all;
-	@apply [&:hover:not(:has(button:hover))]:bg-button-bg-hover [&:hover:not(:has(button:hover))]:brightness-125 [&:active:not(:has(button:active))]:scale-95;
+	@apply [&:hover:not(:has(button:hover))]:brightness-125 [&:active:not(:has(button:active))]:scale-95;
 }
 </style>
