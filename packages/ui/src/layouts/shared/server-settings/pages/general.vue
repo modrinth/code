@@ -31,10 +31,12 @@
 						<div class="flex flex-col gap-2.5">
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
 								<span class="text-lg font-semibold text-contrast">Hostname</span>
-								<div class="text-input-wrapper !w-full px-3">
+								<div
+									class="flex w-full overflow-hidden rounded-xl bg-button-bg px-3 [box-shadow:var(--shadow-inset-sm)] transition-[box-shadow] duration-100 ease-in-out focus-within:[box-shadow:0_0_0_0.25rem_var(--color-brand-shadow)]"
+								>
 									<div class="relative inline-flex min-h-9 items-center">
 										<span
-											class="pointer-events-none invisible whitespace-pre text-base font-medium"
+											class="pointer-events-none invisible whitespace-pre px-px text-base font-medium"
 											aria-hidden="true"
 											>{{ serverSubdomain || 'Enter subdomain...' }}</span
 										>
@@ -43,14 +45,14 @@
 											:value="serverSubdomain"
 											placeholder="Enter subdomain..."
 											:maxlength="32"
-											class="absolute inset-0 bg-transparent !p-0 text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
+											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
 											autocomplete="off"
 											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
 											@keyup.enter="saveGeneral"
 										/>
 									</div>
 									<div
-										class="text-input-wrapper__after"
+										class="flex min-h-9 shrink-0 select-none items-center py-2 pr-4 font-medium opacity-50 [filter:grayscale(50%)]"
 										:class="!serverSubdomain ? '!ml-auto' : ''"
 									>
 										.modrinth.gg
