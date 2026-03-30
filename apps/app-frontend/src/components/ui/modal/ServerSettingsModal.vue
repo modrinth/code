@@ -15,9 +15,7 @@ import {
 	injectNotificationManager,
 	provideModrinthServerContext,
 	provideServerSettings,
-	ServerSettingsAdminBillingPage,
 	ServerSettingsAdvancedPage,
-	ServerSettingsBillingPage,
 	ServerSettingsGeneralPage,
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
@@ -115,8 +113,6 @@ const serverSettingsTabComponentMap = {
 	network: ServerSettingsNetworkPage,
 	properties: ServerSettingsPropertiesPage,
 	advanced: ServerSettingsAdvancedPage,
-	billing: ServerSettingsBillingPage,
-	'admin-billing': ServerSettingsAdminBillingPage,
 } as const
 
 provideServerSettings({
@@ -150,23 +146,36 @@ const isOwner = computed(() => currentUserId.value != null && currentUserId.valu
 const isAdmin = computed(() => currentUserRole.value === 'admin')
 
 const tabs = computed<TabbedModalTab[]>(() =>
-	serverSettingsTabDefinitions.map((tab) => ({
-		name: defineMessage({
+	serverSettingsTabDefinitions.map((tab) => {
+		const ctx = {
+			serverId: currentServerId.value,
+			ownerId: ownerId.value,
+			serverStatus: server.value?.status,
+			isOwner: isOwner.value,
+			isAdmin: isAdmin.value,
+		}
+		const name = defineMessage({
 			id: `server.settings.tabs.${tab.id}`,
 			defaultMessage: tab.label,
-		}),
-		icon: tab.icon,
-		content: serverSettingsTabComponentMap[tab.id],
-		shown: tab.shown
-			? tab.shown({
-					serverId: currentServerId.value,
-					ownerId: ownerId.value,
-					serverStatus: server.value?.status,
-					isOwner: isOwner.value,
-					isAdmin: isAdmin.value,
-				})
-			: true,
-	})),
+		})
+		const shown = tab.shown ? tab.shown(ctx) : true
+
+		if (tab.external) {
+			return {
+				name,
+				icon: tab.icon,
+				href: `https://modrinth.com${tab.href(ctx)}`,
+				shown,
+			}
+		}
+
+		return {
+			name,
+			icon: tab.icon,
+			content: serverSettingsTabComponentMap[tab.id as keyof typeof serverSettingsTabComponentMap],
+			shown,
+		}
+	}),
 )
 
 async function resolveViewer() {

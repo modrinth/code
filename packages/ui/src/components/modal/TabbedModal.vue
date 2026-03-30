@@ -1,6 +1,7 @@
 <script lang="ts"></script>
 
 <script setup lang="ts">
+import { RightArrowIcon } from '@modrinth/assets'
 import { type Component, computed, nextTick, ref } from 'vue'
 
 import { type MessageDescriptor, useVIntl } from '../../composables/i18n'
@@ -9,7 +10,8 @@ import NewModal from './NewModal.vue'
 export interface Tab {
 	name: MessageDescriptor
 	icon: Component
-	content: Component
+	content?: Component
+	href?: string
 	badge?: MessageDescriptor
 	shown?: boolean
 }
@@ -79,11 +81,15 @@ defineExpose({ show, hide, selectedTab, setTab })
 			<div
 				class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
 			>
-				<button
+				<component
+					:is="tab.href ? 'a' : 'button'"
 					v-for="(tab, index) in visibleTabs"
 					:key="index"
-					:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all ${selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
-					@click="() => setTab(index)"
+					:href="tab.href ?? undefined"
+					:target="tab.href ? '_blank' : undefined"
+					:rel="tab.href ? 'noopener noreferrer' : undefined"
+					:class="`flex gap-2 items-center text-left rounded-xl px-4 py-2 border-none text-nowrap font-semibold cursor-pointer active:scale-[0.97] transition-all no-underline ${!tab.href && selectedTab === index ? 'bg-button-bgSelected text-button-textSelected' : 'bg-transparent text-button-text hover:bg-button-bg hover:text-contrast'}`"
+					@click="!tab.href && setTab(index)"
 				>
 					<component :is="tab.icon" class="w-4 h-4 flex-shrink-0" />
 					<span>{{ formatMessage(tab.name) }}</span>
@@ -93,7 +99,8 @@ defineExpose({ show, hide, selectedTab, setTab })
 					>
 						{{ formatMessage(tab.badge) }}
 					</span>
-				</button>
+					<RightArrowIcon v-if="tab.href" class="size-4 ml-auto" />
+				</component>
 
 				<slot name="footer" />
 			</div>
@@ -118,7 +125,10 @@ defineExpose({ show, hide, selectedTab, setTab })
 					@scroll="checkScrollState"
 				>
 					<Suspense>
-						<component :is="visibleTabs[selectedTab].content" />
+						<component
+							:is="visibleTabs[selectedTab]?.content"
+							v-if="visibleTabs[selectedTab]?.content"
+						/>
 					</Suspense>
 				</div>
 
