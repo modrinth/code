@@ -21,68 +21,64 @@
 
 					<div class="flex flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
 						<span class="text-lg font-semibold text-contrast">Server Address</span>
-						<div class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2">
-							<div class="flex flex-col gap-2">
-								<span class="cursor-pointer font-semibold text-primary">
-									{{ server?.sftp_host }}
-								</span>
+						<div
+							v-tooltip="'Copy SFTP username'"
+							class="hover:bg-button-bg-hover flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all hover:brightness-125 active:scale-95"
+							@click="copyToClipboard('Username', server?.sftp_username)"
+						>
+							<span class="cursor-pointer font-semibold text-primary">
+								{{ server?.sftp_host }}
+							</span>
+							<div class="grid h-10 w-10 place-content-center">
+								<CopyIcon class="h-5 w-5" />
 							</div>
-							<ButtonStyled type="transparent" circular>
-								<button
-									v-tooltip="'Copy SFTP server address'"
-									@click="copyToClipboard('Server address', server?.sftp_host)"
-								>
-									<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
-								</button>
-							</ButtonStyled>
 						</div>
 						<div class="flex flex-col gap-2 sm:mt-0 sm:flex-row">
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Username</span>
 								<div
-									class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2"
+									v-tooltip="'Copy SFTP username'"
+									class="hover:bg-button-bg-hover flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all hover:brightness-125 active:scale-95"
+									@click="copyToClipboard('Username', server?.sftp_username)"
 								>
-									<span class="font-semibold text-primary">
+									<div class="truncate font-semibold">
 										{{ server?.sftp_username }}
-									</span>
-									<ButtonStyled type="transparent" circular>
-										<button
-											v-tooltip="'Copy SFTP username'"
-											@click="copyToClipboard('Username', server?.sftp_username)"
-										>
-											<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
-										</button>
-									</ButtonStyled>
+									</div>
+									<div class="grid h-10 w-9 place-content-center">
+										<CopyIcon class="h-5 w-5" />
+									</div>
 								</div>
 							</div>
 							<div class="flex w-full flex-col justify-center gap-2">
 								<span class="text-lg font-semibold text-contrast">Password</span>
 								<div
-									class="flex h-10 items-center justify-between rounded-xl bg-surface-3 px-3 py-2"
+									class="[&:hover:not(:has(button:hover))]:bg-button-bg-hover flex h-10 cursor-pointer items-center justify-between gap-2 rounded-lg bg-button-bg px-3 pr-1.5 transition-all [&:active:not(:has(button:active))]:scale-95 [&:hover:not(:has(button:hover))]:brightness-125"
+									@click="copyToClipboard('Password', server?.sftp_password)"
 								>
-									<span class="font-semibold text-primary">
-										{{
-											showPassword
-												? server?.sftp_password
-												: '*'.repeat(server?.sftp_password?.length ?? 0)
-										}}
-									</span>
-									<div class="flex flex-row items-center gap-1">
-										<ButtonStyled type="transparent" circular>
-											<button
-												v-tooltip="'Copy SFTP password'"
-												@click="copyToClipboard('Password', server?.sftp_password)"
-											>
-												<CopyIcon class="h-5 w-5 hover:cursor-pointer" />
-											</button>
-										</ButtonStyled>
+									<div class="flex items-center gap-1 h-full w-full">
+										<div
+											class="h-full flex justify-between grow items-center"
+											v-tooltip="'Copy SFTP Password'"
+										>
+											<div class="truncate font-semibold">
+												{{
+													showPassword
+														? server?.sftp_password
+														: '*'.repeat(server?.sftp_password?.length ?? 0)
+												}}
+											</div>
+											<CopyIcon class="h-5 w-5" />
+										</div>
+
 										<ButtonStyled type="transparent" circular>
 											<button
 												v-tooltip="showPassword ? 'Hide password' : 'Show password'"
-												@click="showPassword = !showPassword"
+												class="hover:bg-button-bg-hover grid h-10 w-10 place-content-center rounded-lg"
+												@click.stop="showPassword = !showPassword"
 											>
-												<EyeIcon v-if="showPassword" class="h-5 w-5 hover:cursor-pointer" />
-												<EyeOffIcon v-else class="h-5 w-5 hover:cursor-pointer" />
+												<!-- look into doing stop propagation here -->
+												<EyeIcon v-if="showPassword" class="h-5 w-5" />
+												<EyeOffIcon v-else class="h-5 w-5" />
 											</button>
 										</ButtonStyled>
 									</div>
@@ -94,7 +90,7 @@
 
 				<!-- Startup command section -->
 				<div class="flex flex-col gap-2.5">
-					<div class="flex h-9 flex-col items-end justify-between gap-4 sm:flex-row">
+					<div class="flex h-10 flex-col items-end justify-between gap-4 sm:flex-row">
 						<label for="startup-command-field" class="mb-0.5 flex flex-col gap-2">
 							<span class="text-lg font-semibold text-contrast">Startup command</span>
 						</label>
