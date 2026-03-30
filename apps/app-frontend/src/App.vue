@@ -1248,7 +1248,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 							<FriendsList
 								:credentials="credentials"
 								:sign-in="() => signIn()"
-								:refresh-credentials="fetchCredentials"
 							/>
 						</suspense>
 					</div>
