@@ -37,13 +37,13 @@
 					/>
 				</div>
 
-				<div class="flex flex-col gap-6 pb-10">
+				<div class="flex flex-col gap-6 pb-2">
 					<!-- Basic Properties -->
 					<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
 					<div
 						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
 					>
-						<div class="flex max-w-[600px] flex-col gap-6">
+						<div class="flex max-w-[600px] flex-col gap-4">
 							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2">
 								<span class="font-semibold text-contrast">Gamemode</span>
 								<Chips
@@ -167,7 +167,7 @@
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
-												class="flex flex-row flex-wrap items-center justify-between py-2"
+												class="flex flex-row flex-wrap items-center justify-between"
 											>
 												<span :id="`property-label-${key}`">
 													{{ formatPropertyName(key) }}
