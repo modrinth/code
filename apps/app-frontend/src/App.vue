@@ -1,5 +1,11 @@
 <script setup>
-import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
+import {
+	AuthFeature,
+	NodeAuthFeature,
+	nodeAuthState,
+	PanelVersionFeature,
+	TauriModrinthClient,
+} from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -127,6 +133,14 @@ const { addPopupNotification } = popupNotificationManager
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
 	features: [
+		new NodeAuthFeature({
+			getAuth: () => nodeAuthState.getAuth?.() ?? null,
+			refreshAuth: async () => {
+				if (nodeAuthState.refreshAuth) {
+					await nodeAuthState.refreshAuth()
+				}
+			},
+		}),
 		new AuthFeature({
 			token: async () => (await getCreds()).session,
 		}),
