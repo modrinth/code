@@ -3,7 +3,6 @@
 		v-if="uptimeSeconds || uptimeSeconds !== 0"
 		v-tooltip="`Online for ${verboseUptime}`"
 		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-2"
-		class="server-action-buttons-anim flex min-w-0 flex-row items-center gap-2"
 		data-pyro-uptime
 	>
 		<Separator v-if="!noSeparator" />

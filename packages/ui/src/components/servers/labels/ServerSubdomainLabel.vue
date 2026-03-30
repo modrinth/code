@@ -3,7 +3,6 @@
 		v-if="subdomain && !isHidden"
 		v-tooltip="'Copy custom URL'"
 		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
-		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
 	>
 		<Separator v-if="!noSeparator" />
 
