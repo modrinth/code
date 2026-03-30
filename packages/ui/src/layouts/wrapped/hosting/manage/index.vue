@@ -186,9 +186,11 @@
 						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
 				</TransitionGroup>
-				<div v-else class="flex h-full items-center justify-center">
+				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
 					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
+				<div v-else-if="searchInput">No servers found.</div>
+				<div v-else><ServerListEmpty /></div>
 			</div>
 		</Transition>
 	</div>
@@ -205,6 +207,7 @@ import {
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
+	ServerListEmpty,
 	StyledInput,
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
@@ -469,12 +472,14 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 }
 
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	const base = !searchInput.value.trim()
-		? introToTop(serverList.value)
-		: fuse.value
-			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
-			: []
-	return base.filter((server) => !filesExpired(server))
+	return []
+
+	// const base = !searchInput.value.trim()
+	// 	? introToTop(serverList.value)
+	// 	: fuse.value
+	// 		? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+	// 		: []
+	// return base.filter((server) => !filesExpired(server))
 })
 
 // Start polling only after initial data is available so the baseline is correct
