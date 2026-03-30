@@ -100,24 +100,9 @@
 			<div
 				v-else-if="serverList.length === 0 && !isPollingForNewServers"
 				key="empty"
-				class="flex h-full flex-col items-center justify-center gap-8"
+				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
-				<img
-					src="https://cdn.modrinth.com/servers/excitement.webp"
-					alt=""
-					class="max-w-[360px]"
-					style="
-						mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%);
-					"
-				/>
-				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
-				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
-				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink v-if="isNuxt" to="/servers#plan">Create a server</AutoLink>
-					<button v-else :disabled="!canOpenPurchaseModal" @click="openPurchaseModal">
-						Create a server
-					</button>
-				</ButtonStyled>
+				<ServerListEmpty @click-new-server="openPurchaseModal" @click-sign-in="handleSignIn" />
 			</div>
 
 			<div v-else key="list">
@@ -189,8 +174,7 @@
 				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
 					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
-				<div v-else-if="searchInput">No servers found.</div>
-				<div v-else><ServerListEmpty /></div>
+				<div v-else>No servers found.</div>
 			</div>
 		</Transition>
 	</div>
@@ -440,8 +424,10 @@ watch([fetchError, serverResponse], ([error, response]) => {
 })
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
-	if (!serverResponse.value) return []
-	return serverResponse.value.servers
+	return []
+
+	// if (!serverResponse.value) return []
+	// return serverResponse.value.servers
 })
 
 const searchInput = ref('')
@@ -472,14 +458,12 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 }
 
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	return []
-
-	// const base = !searchInput.value.trim()
-	// 	? introToTop(serverList.value)
-	// 	: fuse.value
-	// 		? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
-	// 		: []
-	// return base.filter((server) => !filesExpired(server))
+	const base = !searchInput.value.trim()
+		? introToTop(serverList.value)
+		: fuse.value
+			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			: []
+	return base.filter((server) => !filesExpired(server))
 })
 
 // Start polling only after initial data is available so the baseline is correct
@@ -534,6 +518,10 @@ function openPurchaseModal() {
 	}
 
 	purchaseModal.value.show('quarterly')
+}
+
+function handleSignIn() {
+	router.push({ name: 'login', query: { redirect: '/hosting/manage' } })
 }
 
 const { data: subscriptions } = useQuery({

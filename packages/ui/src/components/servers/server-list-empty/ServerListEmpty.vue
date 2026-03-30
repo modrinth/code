@@ -1,5 +1,5 @@
 <template>
-	<div class="flex gap-8 items-center justify-center">
+	<div class="flex gap-8 items-center justify-center py-10">
 		<!-- Left column -->
 		<div class="flex flex-col gap-8 items-start pr-8 shrink-0 w-[380px]">
 			<!-- Heading -->
@@ -100,7 +100,7 @@
 						v-for="row in GRID_ROWS"
 						:key="row"
 						class="flex gap-4 items-center shrink-0"
-						:class="row % 2 === 1 ? 'drift-left' : 'drift-right relative left-14'"
+						:class="animated ? (row % 2 === 1 ? 'drift-left' : 'drift-right relative left-14') : ''"
 					>
 						<div class="hidden drift-right drift-left"></div>
 						<div
@@ -170,10 +170,14 @@ import imgYum2 from './grid-images/yum2.png'
 import imgYum3 from './grid-images/yum3.png'
 import imgYung from './grid-images/yung.png'
 
-defineProps<{
-	onClickNewServer?: () => void
-	onClickSignIn?: () => void
-}>()
+withDefaults(
+	defineProps<{
+		animated?: boolean
+		onClickNewServer?: () => void
+		onClickSignIn?: () => void
+	}>(),
+	{ animated: false },
+)
 
 const GRID_ROWS = 6
 const GRID_COLS = 5
@@ -218,7 +222,7 @@ p {
 		transform: translateX(-33%);
 	}
 	to {
-		transform: translateX(66%);
+		transform: translateX(33%);
 	}
 }
 
@@ -227,7 +231,7 @@ p {
 		transform: translateX(33%);
 	}
 	to {
-		transform: translateX(-66%);
+		transform: translateX(-33%);
 	}
 }
 
