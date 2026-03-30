@@ -126,7 +126,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		if (!fa || !term) return
 		const dims = fa.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 	}
 
@@ -183,7 +183,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		await nextTick()
 		const dims = fit.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 
 		term.options.disableStdin = true
