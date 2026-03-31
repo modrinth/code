@@ -173,15 +173,8 @@
 			<template #actions>
 				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
 					<PanelServerActionButton
-						:is-online="isServerRunning"
-						:is-actioning="isActioning"
-						:is-installing="serverData.status === 'installing'"
-						:disabled="isActioning || !!error"
-						:server-name="serverData.name"
-						:server-data="serverData"
+						:disabled="!!error"
 						:uptime-seconds="uptimeSeconds"
-						:busy-reason="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
-						@action="sendPowerAction"
 					/>
 				</div>
 			</template>
@@ -402,7 +395,7 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import type { PowerAction, Stats } from '@modrinth/utils'
+import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -507,7 +500,6 @@ const modrinthServersConsole = useModrinthServersConsole()
 const queryClient = useQueryClient()
 const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
-const isActioning = ref(false)
 const isServerRunning = computed(() => serverPowerState.value === 'running')
 const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
@@ -1236,42 +1228,6 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 	return updated
 }
 
-const toAdverb = (word: string) => {
-	if (word.endsWith('p')) {
-		return word + 'ping'
-	}
-	if (word.endsWith('e')) {
-		return word.slice(0, -1) + 'ing'
-	}
-	if (word.endsWith('ie')) {
-		return word.slice(0, -2) + 'ying'
-	}
-	return word + 'ing'
-}
-
-const sendPowerAction = async (action: PowerAction) => {
-	const actionName = action.charAt(0).toUpperCase() + action.slice(1)
-	try {
-		isActioning.value = true
-		await client.archon.servers_v0.power(serverId, action)
-	} catch (error) {
-		console.error(`Error ${toAdverb(actionName)} server:`, error)
-		notifyError(
-			`Error ${toAdverb(actionName)} server`,
-			'An error occurred while performing this action.',
-		)
-	} finally {
-		isActioning.value = false
-	}
-}
-
-const notifyError = (title: string, text: string) => {
-	addNotification({
-		title,
-		text,
-		type: 'error',
-	})
-}
 
 const nodeUnavailableDetails = computed(() => [
 	{
