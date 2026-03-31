@@ -27,7 +27,7 @@
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
 		<div
-			v-if="hasError || fetchError"
+			v-if="hasError"
 			class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
 		>
 			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -100,24 +100,13 @@
 			<div
 				v-else-if="serverList.length === 0 && !isPollingForNewServers"
 				key="empty"
-				class="flex h-full flex-col items-center justify-center gap-8"
+				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
-				<img
-					src="https://cdn.modrinth.com/servers/excitement.webp"
-					alt=""
-					class="max-w-[360px]"
-					style="
-						mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%);
-					"
+				<ServerListEmpty
+					:logged-in="loggedIn"
+					@click-new-server="openPurchaseModal"
+					@click-sign-in="handleSignIn"
 				/>
-				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
-				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
-				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink v-if="isNuxt" to="/servers#plan">Create a server</AutoLink>
-					<button v-else :disabled="!canOpenPurchaseModal" @click="openPurchaseModal">
-						Create a server
-					</button>
-				</ButtonStyled>
 			</div>
 
 			<div v-else key="list">
@@ -186,9 +175,10 @@
 						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
 				</TransitionGroup>
-				<div v-else class="flex h-full items-center justify-center">
+				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
 					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
+				<div v-else>No servers found.</div>
 			</div>
 		</Transition>
 	</div>
@@ -201,10 +191,12 @@ import {
 	AutoLink,
 	ButtonStyled,
 	CopyCode,
+	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
+	ServerListEmpty,
 	StyledInput,
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
@@ -227,11 +219,12 @@ const props = defineProps<{
 
 const router = useRouter()
 const route = useRoute()
+const auth = injectAuth()
 const client = injectModrinthClient()
+const loggedIn = computed(() => !!auth.user.value)
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
-const hasError = ref(false)
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
 	enabled: false,
@@ -269,6 +262,7 @@ const {
 } = useQuery({
 	queryKey: ['billing', 'customer'],
 	queryFn: () => client.labrinth.billing_internal.getCustomer() as Promise<Stripe.Customer>,
+	enabled: loggedIn,
 })
 
 const {
@@ -279,11 +273,13 @@ const {
 	queryKey: ['billing', 'payment-methods'],
 	queryFn: () =>
 		client.labrinth.billing_internal.getPaymentMethods() as Promise<Stripe.PaymentMethod[]>,
+	enabled: loggedIn,
 })
 
 const { data: regions, isLoading: regionsLoading } = useQuery({
 	queryKey: ['servers', 'regions'],
 	queryFn: () => client.archon.servers_v1.getRegions(),
+	enabled: loggedIn,
 })
 
 watch(
@@ -430,11 +426,10 @@ const {
 		return response
 	},
 	refetchInterval: computed(() => (pollingState.value.enabled ? 5000 : false)),
+	enabled: loggedIn,
 })
 
-watch([fetchError, serverResponse], ([error, response]) => {
-	hasError.value = !!error || !response
-})
+const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 	if (!serverResponse.value) return []
@@ -531,14 +526,20 @@ function openPurchaseModal() {
 	purchaseModal.value.show('quarterly')
 }
 
+function handleSignIn() {
+	void auth.requestSignIn('/hosting/manage')
+}
+
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
 	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+	enabled: loggedIn,
 })
 
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],
 	queryFn: () => client.labrinth.billing_internal.getPayments(),
+	enabled: loggedIn,
 })
 
 const CHARGE_POLL_INTERVAL_MS = 20_000
@@ -579,6 +580,7 @@ watch(
 const { data: serverFullList } = useQuery({
 	queryKey: ['servers', 'v1'],
 	queryFn: () => client.archon.servers_v1.list(),
+	enabled: loggedIn,
 })
 
 type ServerBillingInfo = {

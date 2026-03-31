@@ -283,6 +283,10 @@ function handleChooseCustom() {
 	selectedPlan.value = undefined
 }
 
+function handleProceed() {
+	setStep(nextStep.value)
+}
+
 // When the user explicitly wants to change or add a payment method from Review
 // we must disable the auto-skip behavior, clear any selected method, and
 // navigate to the Payment step so Stripe Elements can mount.
@@ -328,7 +332,7 @@ function goToBreadcrumbStep(id: string) {
 				</template>
 			</div>
 		</template>
-		<div class="w-[40rem] max-w-full">
+		<div :class="currentStep === 'plan' ? 'w-[56rem] max-w-full' : 'w-[40rem] max-w-full'">
 			<PlanSelector
 				v-if="currentStep === 'plan'"
 				v-model:plan="selectedPlan"
@@ -337,6 +341,7 @@ function goToBreadcrumbStep(id: string) {
 				:available-products="availableProducts"
 				:currency="currency"
 				@choose-custom="handleChooseCustom"
+				@proceed="handleProceed"
 			/>
 			<RegionSelector
 				v-else-if="currentStep === 'region'"
@@ -415,7 +420,7 @@ function goToBreadcrumbStep(id: string) {
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled color="brand">
+			<ButtonStyled v-if="currentStep !== 'plan'" color="brand">
 				<button
 					v-tooltip="
 						currentStep === 'review' && !acceptedEula && !noPaymentRequired
