@@ -138,7 +138,6 @@
 </template>
 
 <script setup lang="ts">
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import {
 	GlobeIcon,
 	LogInIcon,
@@ -148,6 +147,8 @@ import {
 	UsersIcon,
 } from '@modrinth/assets'
 import { AutoLink } from '@modrinth/ui'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 import imgAircraft from './grid-images/aircraft.png'
 import imgAlexs from "./grid-images/alex's.png"

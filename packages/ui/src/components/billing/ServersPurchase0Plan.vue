@@ -25,8 +25,7 @@ const availableBillingIntervals = ['monthly', 'quarterly']
 const selectedPlan = defineModel<Labrinth.Billing.Internal.Product>('plan')
 const selectedInterval = defineModel<ServerBillingInterval>('interval')
 const emit = defineEmits<{
-	(e: 'choose-custom'): void
-	(e: 'proceed'): void
+	(e: 'choose-custom' | 'proceed'): void
 }>()
 
 const messages = defineMessages({
