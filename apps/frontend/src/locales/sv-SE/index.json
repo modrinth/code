@@ -1068,7 +1068,7 @@
     "message": "Modrinth Hostings servrar bygger på väldigt modern högpresterande hårdvara, men att säga exakt hur det kommer påverka hur din server kör är svårt, då det finns många olika faktorer som påverkar det, som moddarna, datapaketen, pluginsen som du kör på din server och även beteendet av dina spelare."
   },
   "hosting-marketing.faq.how-fast.answer.two": {
-    "message": "Flesta prestandaproblem som kommer upp är ofta på grund av en ej-optimerad modpack, mod, datapack, eller plugin som får servern att lagga. Eftersom våra servrar är av väldigt hög kvalitet, så borde du inte inträffa många problem om du väljer en lämplig plan för innehållet som du har på servern."
+    "message": "De flesta prestandaproblem som kommer upp är ofta på grund av ett ej-optimerad modpaket, mod, datapaket, eller plugin som får servern att lagga. Eftersom våra servrar är av väldigt hög kvalitet, så borde du inte inträffa många problem om du väljer en lämplig plan för innehållet som du har på servern."
   },
   "hosting-marketing.faq.increase-storage": {
     "message": "Kan jag öka mängden lagring på min server?"
@@ -1212,7 +1212,16 @@
     "message": "Välja mellan Vanilla, Fabric, Forge; Quilt och NeoForge. Om det finns på Modrinth så kan din server köra det."
   },
   "hosting.loader.failed-to-change-version": {
-    "message": "Misslyckades med att ändra version på modpaketet"
+    "message": "Misslyckades med att ändra modpaketets version"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Kunde inte ominstallera modpaket"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Kunde inte avlänka modpaketet"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Återställ server"
   },
   "hosting.plan.out-of-stock": {
     "message": "Ej i lager"
@@ -1347,7 +1356,7 @@
     "message": "För spelare"
   },
   "landing.subheading": {
-    "message": "Upptäck, spela och dela Minecraftinnehåll via vår plattform med öppen källkod som skapades för communityn."
+    "message": "Upptäck, spela och dela Minecraft-innehåll via vår plattform med öppen källkod som skapades för communityn."
   },
   "layout.action.change-theme": {
     "message": "Ändra tema"
@@ -1546,9 +1555,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Utforska innehåll"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Funktionsflaggor"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Installera Modrinth App"
@@ -2424,7 +2430,7 @@
     "message": "Nivå"
   },
   "servers.plan.large.description": {
-    "message": "Ideal för 15–25 spelare, modpaket, eller tungt moddande."
+    "message": "Perfekt för 15–25 spelare, modpaket, eller tungt moddande."
   },
   "servers.plan.medium.description": {
     "message": "Bra för 6–15 spelare och flera moddar."
@@ -2532,22 +2538,40 @@
     "message": "Växla funktioner"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Datapaketssida"
+    "message": "Sidan för datapaket"
   },
   "settings.display.project-list-layouts.description": {
     "message": "Välj en önskad layout för varje sida som visar projektlistor på denna enhet."
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Mod-sida"
+    "message": "Sidan för moddar"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galleri"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Rutnät"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Rader"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Modpaketssida"
+    "message": "Sidan för modpaket"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Plugins-sida"
+    "message": "Sidan för plugins"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Resurspaket-sida"
+    "message": "Sidan för resurspaket"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Sidan för servrar"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Sidan för shaders"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Projektlistans layouter"
   },
   "settings.display.project-list-layouts.user": {
     "message": "Användarprofil-sidor"

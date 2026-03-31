@@ -47,9 +47,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Výchozí možnosti instance"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Vlajky funkcí"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalace Javy"
   },
@@ -350,9 +347,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Nezobrazuje na domovské stránce"
   },
-  "instance.worlds.filter.available": {
-    "message": "Dostupné"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instance je již otevřená"
   },
@@ -373,12 +367,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Hrát instanci"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Hra pro jednoho hráče"
   },
   "instance.worlds.view_instance": {
     "message": "Zobrazit instanci"

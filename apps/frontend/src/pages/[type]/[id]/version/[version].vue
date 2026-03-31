@@ -714,8 +714,8 @@ const modpackLoaders = computed<string[]>(() => {
 const noModpackLoader = computed(
 	() =>
 		project.value.project_type === 'modpack' &&
-		modpackLoaders.value.length === 1 &&
-		modpackLoaders.value[0] === 'minecraft',
+		((modpackLoaders.value.length === 1 && modpackLoaders.value[0] === 'minecraft') ||
+			modpackLoaders.value.length === 0),
 )
 
 const description = computed(

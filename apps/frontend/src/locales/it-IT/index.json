@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Errore nella riparazione del server"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Errore nella reinizializzazione"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Errore nel salvataggio delle impostazioni"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Reinizializza"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Reinizializza"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Il server è stato ripristinato alla configurazione iniziale."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Server reinizializzato"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Opzioni di assistenza"
   },
   "hosting.plan.out-of-stock": {
     "message": "Non disponibile"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Esplora i contenuti"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Flag delle funzionalità"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Scarica Modrinth App"

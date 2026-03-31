@@ -5,6 +5,153 @@
   "app.auth-servers.unreachable.header": {
     "message": "Não foi possível alcançar os servidores de autenticação"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Adicionar servidor à instância"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Adicionar servidores à tua instância"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Adicionar à instância"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Adicionar a {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Adicionado"
+  },
+  "app.browse.already-added": {
+    "message": "Já adicionado"
+  },
+  "app.browse.discover-content": {
+    "message": "Descobrir conteúdo"
+  },
+  "app.browse.discover-servers": {
+    "message": "Descobrir servidores"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Esconder servidores adicionados"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Esconder conteúdo instalado"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Instalar conteúdo à instância"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "Insere a descrição do modpack..."
+  },
+  "app.export-modal.export-button": {
+    "message": "Exportar"
+  },
+  "app.export-modal.header": {
+    "message": "Exportar modpack"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "Nome do Modpack"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "Nome do Modpack"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "Seleciona as pastas e ficheiros a incluir no pack"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Número da versão"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "Todos os dados da tua instância vão ser permanentemente apagados, incluídos os teus mundos, definições, e todos os conteúdos instalados."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Esta ação não pode ser desfeita"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Apagar instância"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Apagar instância"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Este modpack já está instalado na instância <bold>{instanceName}</bold>. Tens a certeza que o queres duplicar?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Criar"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modpack já instalado"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instância"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "projeto"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" foi adicionado"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} projetos foram adicionados"
+  },
+  "app.instance.mods.share-text": {
+    "message": "Vê os projetos que estou a usar no meu modpack!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Partilhar conteúdo do modpack"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Carregado com sucesso"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Adicionar servidor"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Procurar servidores"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "\"{name}\" vai ser **apagado permanentemente**, e não haverá maneira de o recuperar."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Tens a certeza que queres apagar permanentemente este mundo?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Com Mods"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Sem mods"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Adiciona um servidor ou procura um para começar"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Sem servidores ou mundos adicionados"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "\"{name}\" vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "\"{name}\" ({address}) vai ser removido da tua lista, incluindo dentro do jogo, e não haverá maneira de o recuperar."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Tens a certeza que queres remover {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Pesquisar {count} mundos..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "este servidor"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "Conteúdo necessário"
+  },
   "app.modal.install-to-play.header": {
     "message": "Instala para jogar"
   },
@@ -14,11 +161,20 @@
   "app.modal.install-to-play.mod-count": {
     "message": "{count, plural, one {mod} other {mods}}"
   },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "Modpack requerido"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "Este servidor requer mods para jogares. Clica Instalar para transferir os ficheiros necessários do Modrinth, e então entrar diretamente no servidor."
+  },
   "app.modal.install-to-play.shared-instance": {
     "message": "Instância partilhada"
   },
   "app.modal.install-to-play.shared-server-instance": {
     "message": "Instância de servidor partilhada"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "Ver conteúdo"
   },
   "app.modal.update-to-play.header": {
     "message": "Atualiza para jogar"
@@ -41,9 +197,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Opções padrão de instância"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Flags de funcionalidades"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Instalações Java"
   },
@@ -55,6 +208,33 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "Gestão de recursos"
+  },
+  "app.update-popup.body": {
+    "message": "Modrinth App v{version} está pronta para ser instalada! Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "Modrinth App v{version} acabou de ser transferida. Recarrega para atualizar agora, ou automaticamente quando fechares a Modrinth App."
+  },
+  "app.update-popup.body.linux": {
+    "message": "Modrinth App v{version} está disponível. Usa o teu gestor de pacotes para atualizar e receber as correções e recursos mais recentes!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "Modrinth App v{version} está disponível! Como estás numa rede com tráfego limitado, não a transferimos automaticamente."
+  },
+  "app.update-popup.changelog": {
+    "message": "Lista de alterações"
+  },
+  "app.update-popup.download": {
+    "message": "Transferir ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "Transferência concluída"
+  },
+  "app.update-popup.reload": {
+    "message": "Recarregar"
+  },
+  "app.update-popup.title": {
+    "message": "Atualização disponível"
   },
   "app.update.complete-toast.text": {
     "message": "Clica aqui para ver a lista de alterações."
@@ -70,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Recarrega para instalar a atualização"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "exemplo.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Seleciona uma opção"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versão incompatível {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ainda não jogado"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Adicionar um amigo"
@@ -169,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Editar mundo"
+  },
+  "instance.files.adding-files": {
+    "message": "Adicionando ficheiros ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Guardar como..."
   },
   "instance.server-modal.address": {
     "message": "Endereço"
@@ -341,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Não mostrar na página Inicial"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponível"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instância já está aberta"
   },
@@ -352,6 +553,9 @@
   },
   "instance.worlds.incompatible_server": {
     "message": "Servidor é incompatível"
+  },
+  "instance.worlds.linked_server": {
+    "message": "Gerido pelo projeto do servidor"
   },
   "instance.worlds.no_contact": {
     "message": "Servidor não conseguiu ser contactado"
@@ -364,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Jogar instância"
-  },
-  "instance.worlds.type.server": {
-    "message": "Servidor"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Um jogador"
   },
   "instance.worlds.view_instance": {
     "message": "Ver instância"
@@ -388,5 +586,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "Sincronizar com a instância"
+  },
+  "search.filter.locked.server": {
+    "message": "Fornecido pelo servidor"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "Apenas mods no cliente podem ser adicionados à instância de servidor"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "Versão do jogo é fornecida pelo servidor"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "Carregador é fornecido pelo servidor"
   }
 }

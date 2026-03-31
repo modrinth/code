@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Continua"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Copia nome del file"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Copia percorso completo"
+  },
   "button.copy-id": {
     "defaultMessage": "Copia ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Copia link"
   },
   "button.copy-permalink": {
     "defaultMessage": "Copia link permanente"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Rifiuta"
   },
+  "button.disable": {
+    "defaultMessage": "Disabilita"
+  },
   "button.download": {
     "defaultMessage": "Scarica"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Modifica"
+  },
+  "button.enable": {
+    "defaultMessage": "Abilita"
+  },
+  "button.extract": {
+    "defaultMessage": "Estrai"
   },
   "button.follow": {
     "defaultMessage": "Segui"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "Altre opzioni"
   },
+  "button.move": {
+    "defaultMessage": "Sposta"
+  },
   "button.next": {
     "defaultMessage": "Avanti"
   },
   "button.open-folder": {
     "defaultMessage": "Apri cartella"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Apri nella cartella"
   },
   "button.play": {
     "defaultMessage": "Avvia"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Rimuovi immagine"
+  },
+  "button.rename": {
+    "defaultMessage": "Rinomina"
   },
   "button.repair": {
     "defaultMessage": "Ripara"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Mostra tutte le versioni"
   },
+  "button.show-file": {
+    "defaultMessage": "Mostra file"
+  },
   "button.sign-in": {
     "defaultMessage": "Accedi"
   },
@@ -182,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "Ora"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -192,7 +219,7 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Sito web"
+    "defaultMessage": "Piattaforma"
   },
   "collections.label.private": {
     "defaultMessage": "Privata"
@@ -216,13 +243,16 @@
     "defaultMessage": "Avviso di rimozione"
   },
   "content.confirm-deletion.delete-button": {
-    "defaultMessage": "Elimina {count} {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {progetto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {progetti}}}}"
+    "defaultMessage": "Elimina {count} {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {contenuto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {contenuti}}}}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "Elimina {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {progetto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {progetti}}}}"
+    "defaultMessage": "Elimina {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {contenuto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {contenuti}}}}"
   },
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà rimosso."
+  },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà preservato."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Avviso di {action, select, downgrade {retrocessione} other {aggiornamento}}"
@@ -252,7 +282,7 @@
     "defaultMessage": "Aggiunto (dipendenza)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Rimosso"
+    "defaultMessage": "Disabilitato"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aggiornato"
@@ -298,9 +328,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Non mostrare più"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Aggiornando..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenuto aggiuntivo"
@@ -404,17 +431,344 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Aggiornando {contentType}..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Disabilita"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Abilita"
-  },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType, select, mod {mod selezionata} mods {mod selezionate} plugin {plugin selezionato} plugins {plugin selezionati} datapack {pacchetto selezionato} datapacks {pacchetti selezionati} other {{count, plural, one {progetto selezionato} other {progetti selezionati}}}}"
+    "defaultMessage": "{count} {contentType, select, mod {mod selezionata} mods {mod selezionate} plugin {plugin selezionato} plugins {plugin selezionati} datapack {pacchetto selezionato} datapacks {pacchetti selezionati} project {progetto selezionato} projects {progetti selezionati} other {{count, plural, one {contenuto selezionato} other {contenuti selezionati}}}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} {count, plural, one {selezionato} other {selezionati}}"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Sommario dell'estrazione"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Sovrascrivi"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Oltre 100 file verranno sovrascritti proseguendo con l'estrazione; eccone alcuni."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "I seguenti {count} file esistono già sul tuo server e verranno sovrascritti se procedi con l'estrazione."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} sovrascritti"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Sovrascritto"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "I file verranno sovrascritti"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Crea {type, select, directory {cartella} other {file}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Crea {type, select, directory {una cartella} other {un file}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "es. la-mia-cartella"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "es. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Eliminando \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Elimina file"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Questa cartella e tutti i suoi contenuti verranno eliminati permanentemente} other {Questo file verrà eliminato permanentemente}}. Questa azione non può essere annullata."
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Impossibile caricare i contenuti del file."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Errore nell'apertura del file"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Impossibile caricare su mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Errore nella condivisione del file"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Il file è stato salvato."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "File salvato"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "L'URL dei tuoi log è stato copiato negli appunti."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL dei log copiato"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Impossibile salvare il file."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Errore nel salvataggio"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Vai alla cartella home"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Riprova"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "L'immagine è troppo grande per essere visualizzata (massimo {maxDimension}x{maxDimension} pixel)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "File immagine vuoto o non valido."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Errore nel caricamento dell'immagine"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Resetta zoom"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Immagine mostrata"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Ingrandisci"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Rimpicciolisci"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "L'operazione sui file è disabilitata quando è in corso l'operazione."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Errore nell'esecuzione del test"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Errore nel test"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Non ci sono file o cartelle."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Questa cartella è vuota"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "La cartella potrebbe non esistere."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Impossibile caricare i file"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "Estrazione iniziata"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Caricamento dei file..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count, plural, one {# selezionato} other {# selezionati}}"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Hai modifiche non salvate."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Percorso attuale"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Percorso di destinazione"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "es. /la-mia-cartella"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Sposta cartella} other {Sposta file}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Torna alla home"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Breadcrumb"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Crea..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Navigazione file"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Home"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Installa da CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Nuovo file"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Nuova cartella"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Cerca file"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Condividi su mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Carica file"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Carica .zip da file"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Carica .zip da URL"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "estratti {size}"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Estraendo {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Errore"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "pacchetto di mod da URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent}%)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Caricando i file ({completed}/{total})..."
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Rinomina {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nuovo nome"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Creato"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modificato"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Nome"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Dimensione"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Le modifiche non salvate andranno perse. Vorresti salvare prima di uscire?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Scarta"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Modifiche non salvate"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Annullato"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Errore - Il file esiste già"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Errore - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Errore - Tipo di file errato"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Errore nel caricamento di \"{fileName}\""
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "File"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "Caricamento {fileType}"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Tipo di file caricato errato"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Si è verificato un errore imprevisto."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count, select, one {# rimanente} other {# rimanenti}}"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Rilascia i file qui per caricarli"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Il nome può contenere solo lettere, numeri, trattini o spazi."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Il nome può contenere solo lettere, numeri, trattini, punti o spazi."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nome"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Nome richiesto."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "Installazione pacchetto CurseForge"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Installa pacchetto da CurseForge"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Non è stato trovato su CurseForge un pacchetto di mod a quell'URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Pacchetto da CurseForge non trovato"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Inserisci link"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "L'URL deve essere di una versione del pacchetto."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "URL non valido."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URL richiesto."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installa"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Errore nell'installazione"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Copia l'URL della pagina della versione e incollala sotto."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Copia l'URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Esplora su CurseForge e trova il pacchetto di mod che desideri."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Trova il pacchetto di mod"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Vai nella scheda \"File\" e seleziona la versione da installare."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Seleziona una versione"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Errore sconosciuto"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Copia e incolla un URL di download diretto del file .zip."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Caricando i contenuti del .zip dall'URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Riga indirizzo"
@@ -517,9 +871,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Risoluzione"
-  },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Copia link"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Errore nella rimozione dei contenuti"
@@ -713,15 +1064,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "I file sono ancora in fase di caricamento. Lasciare questa pagina annullerà questa operazione e le tue modifiche andranno perse."
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Abbandona"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Rimani"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Abbandonare la pagina?"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "È in corso un caricamento"
   },
@@ -731,26 +1073,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Istanza esistente"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Versione del gioco"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Seleziona versione del gioco"
   },
   "instances.content-install.header": {
     "defaultMessage": "Installa progetto"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Nascondi versioni snapshot"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Installa"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Installata"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Installando..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Tipo di istanza"
@@ -779,20 +1112,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Seleziona icona"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Mostra tutte le versioni"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Copia link"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Questo pacchetto di mod non include alcun contenuto aggiuntivo."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Nessun contenuto trovato"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Tutto"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Contenuto del pacchetto"
@@ -872,8 +1196,14 @@
   "label.changes-saved": {
     "defaultMessage": "Modifiche salvate"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "Questa mod dipende da una mod lato client e potrebbe causare problemi con l'avvio del server"
+  },
   "label.client-only-warning": {
     "defaultMessage": "Questa è una mod lato client e potrebbe causare problemi. L'abbiamo lasciata abilitata in quando alcuni autori sbagliano a selezionare l'ambiente, e il loader dovrebbe risolvere il conflitto."
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "Questa è una mod lato client che è stata installata come dipendenza e potrebbe causare problemi con l'avvio del server"
   },
   "label.collections": {
     "defaultMessage": "Raccolte"
@@ -884,6 +1214,15 @@
   "label.content": {
     "defaultMessage": "Contenuto"
   },
+  "label.copied-filename": {
+    "defaultMessage": "Nome del file copiato"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Percorso copiato"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Errore nella creazione"
+  },
   "label.created-ago": {
     "defaultMessage": "Creato {ago}"
   },
@@ -892,6 +1231,9 @@
   },
   "label.delete": {
     "defaultMessage": "Elimina"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "Errore nell'eliminazione"
   },
   "label.delete-immediately": {
     "defaultMessage": "Elimina subito"
@@ -902,6 +1244,12 @@
   "label.details": {
     "defaultMessage": "Dettagli"
   },
+  "label.done": {
+    "defaultMessage": "Finito"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Errore nel download"
+  },
   "label.email": {
     "defaultMessage": "Email"
   },
@@ -910,6 +1258,9 @@
   },
   "label.error": {
     "defaultMessage": "Errore"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "Errore nell'estrazione"
   },
   "label.filter-by": {
     "defaultMessage": "Filtra per"
@@ -938,6 +1289,9 @@
   "label.modpack": {
     "defaultMessage": "Pacchetto di mod"
   },
+  "label.move-failed": {
+    "defaultMessage": "Errore nello spostare"
+  },
   "label.no": {
     "defaultMessage": "No"
   },
@@ -948,7 +1302,7 @@
     "defaultMessage": "Notifiche"
   },
   "label.or": {
-    "defaultMessage": "o"
+    "defaultMessage": "oppure"
   },
   "label.password": {
     "defaultMessage": "Password"
@@ -982,6 +1336,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rifiutato"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Errore nella rinomina"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Accetto i <terms-link>termini del Programma Premi</terms-link>"
@@ -1030,6 +1387,12 @@
   },
   "label.update-available": {
     "defaultMessage": "Aggiornamento disponibile"
+  },
+  "label.updating": {
+    "defaultMessage": "Aggiornando..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "Errore nel caricamento"
   },
   "label.username": {
     "defaultMessage": "Nome utente"
@@ -2357,6 +2720,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "Tema"
   },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Flag di funzionalità"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Lingue standard"
   },
@@ -2821,6 +3187,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Hai modifiche non salvate."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Le modifiche non salvate andranno perse se abbandoni questa pagina."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Hai modifiche non salvate"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Abbandona"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Rimani"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Abbandonare la pagina?"
   }
 }
 

@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Tidak dapat mencapai pelayan pengesahan"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Tambahkan pelayan ke dalam pemasangan"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Tambahkan pelayan ke dalam pemasangan anda"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Tambahkan ke dalam pemasangan"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Tambahkan ke {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Ditambah"
+  },
+  "app.browse.already-added": {
+    "message": "Sudah ditambah"
+  },
+  "app.browse.discover-content": {
+    "message": "Temui kandungan"
+  },
+  "app.browse.discover-servers": {
+    "message": "Temui pelayan"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Sembunyikan pelayan yang ditambah"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Sembunyikan kandungan yang dipasang"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Pasang kandungan ke dalam pemasangan"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Masukkan keterangan pek mod..."
   },
@@ -41,26 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Padam pemasangan"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "Pek mod ini sudah pun dipasang di dalam pemasangan \"{instanceName}\"."
+  "app.instance.modpack-already-installed.body": {
+    "message": "Pek mod ini telah dipasang dalam pemasangan <bold>{instanceName}</bold>. Adakah anda pasti mahu menduakannya?"
   },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "Pergi ke pemasangan"
+  "app.instance.modpack-already-installed.create": {
+    "message": "Cipta"
   },
   "app.instance.modpack-already-installed.header": {
     "message": "Pek mod sudah dipasang"
   },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Pemasangan"
+  },
   "app.instance.mods.content-type-project": {
     "message": "projek"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Salin pautan"
-  },
-  "app.instance.mods.installing": {
-    "message": "Sedang memasang..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Pek Mod"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" telah ditambahkan"
@@ -74,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Berkongsi kandungan pek mod"
   },
-  "app.instance.mods.show-file": {
-    "message": "Tunjukkan fail"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Berjaya dimuat naik"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Tidak Diketahui"
+  "app.instance.worlds.add-server": {
+    "message": "Tambah pelayan"
   },
-  "app.instance.mods.updating": {
-    "message": "Sedang mengemas kini..."
+  "app.instance.worlds.browse-servers": {
+    "message": "Layari pelayan"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' akan **dipadamkan secara kekal**, dan tiada cara untuk memulihkannya."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Adakah anda pasti mahu memadamkan dunia ini secara kekal?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Diubah Suai"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Luar Talian"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Dalam Talian"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanila"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Tambah sebuah pelayan atau layari untuk bermula"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Tiada pelayan atau dunia ditambah"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' akan dialih keluar daripada senarai anda, termasuk dalam permainan, dan tiada cara untuk memulihkannya."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) akan dialih keluar daripada senarai anda, termasuk dalam permainan, dan tiada cara untuk memulihkannya."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Adakah anda pasti mahu mengalih keluar {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Cari {count} dunia..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "pelayan ini"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Kandungan yang diperlukan"
@@ -133,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Tetapan lalai pemasangan"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Penetapan ciri"
   },
   "app.settings.tabs.java-installations": {
     "message": "Pemasangan Java"
@@ -190,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Muat semula untuk memasang kemas kini"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Pilih pilihan anda"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versi tidak serasi: {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Belum dimainkan"
+  },
+  "app.world.world-item.offline": {
+    "message": "Luar Talian"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} dalam talian"
   },
   "friends.action.add-friend": {
     "message": "Tambah rakan"
@@ -289,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Sunting dunia"
+  },
+  "instance.files.adding-files": {
+    "message": "Sedang menambah fail ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Simpan sebagai..."
   },
   "instance.server-modal.address": {
     "message": "Alamat"
@@ -461,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Jangan tunjukkan pada Laman Utama"
   },
-  "instance.worlds.filter.available": {
-    "message": "Tersedia"
-  },
   "instance.worlds.game_already_open": {
     "message": "Pemasangan sudah pun dibuka"
   },
@@ -487,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Mainkan pemasangan"
-  },
-  "instance.worlds.type.server": {
-    "message": "Pelayan"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Ekapemain"
   },
   "instance.worlds.view_instance": {
     "message": "Lihat pemasangan"

@@ -6,7 +6,7 @@
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
   "app.export-modal.description-placeholder": {
-    "message": "ادخل وصف التعديل..."
+    "message": "أدخل وصف التعديل..."
   },
   "app.export-modal.export-button": {
     "message": "تصدير"
@@ -41,35 +41,14 @@
   "app.instance.confirm-delete.header": {
     "message": "حذف المثيل"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "تم تثبيت حزمة التعديل هذه بالفعل في مثيل \"{instanceName}\"."
-  },
-  "app.instance.modpack-already-installed.admonition-header": {
-    "message": "حزمة تعديل مكررة"
-  },
-  "app.instance.modpack-already-installed.create-anyway": {
-    "message": "إنشاء على أي حال"
-  },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "انتقل إلى المثال"
-  },
   "app.instance.modpack-already-installed.header": {
     "message": "تم تثبيت حزمة التعديل بالفعل"
   },
   "app.instance.mods.content-type-project": {
     "message": "مشروع"
   },
-  "app.instance.mods.copy-link": {
-    "message": "نسخ الرابط"
-  },
-  "app.instance.mods.installing": {
-    "message": "جاري التثبيت..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "حزمة التعديل"
-  },
   "app.instance.mods.project-was-added": {
-    "message": "تمت إضافة \"{name}\"."
+    "message": "تمت إضافة \"{name}\""
   },
   "app.instance.mods.projects-were-added": {
     "message": "تمت إضافة {count} من المشاريع"
@@ -80,17 +59,8 @@
   "app.instance.mods.share-title": {
     "message": "مشاركة محتوى حزمة التعديل"
   },
-  "app.instance.mods.show-file": {
-    "message": "عرض الملف"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "تم الرفع بنجاح"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "غير معروف"
-  },
-  "app.instance.mods.updating": {
-    "message": "جارٍ التحديث..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "المحتوى مطلوب"
@@ -102,7 +72,7 @@
     "message": "تثبيت"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": ""
+    "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
   },
   "app.modal.install-to-play.required-modpack": {
     "message": "حزمة التعديل مطلوبة"
@@ -111,10 +81,10 @@
     "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "حُزْمَة مشاركة"
+    "message": "حزمة مشتركة"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "حُزْمَة خادم مشاركة"
+    "message": "حزمة خادم مشتركة"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "عرض المحتويات"
@@ -139,9 +109,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "خيارات النسخة الافتراضية"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "أعلام الميزات"
   },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
@@ -467,9 +434,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "عدم العرض في الصفحة الرئيسية"
   },
-  "instance.worlds.filter.available": {
-    "message": "متاح"
-  },
   "instance.worlds.game_already_open": {
     "message": "النسخة مفتوحة بالفعل"
   },
@@ -493,12 +457,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "تشغيل النسخة"
-  },
-  "instance.worlds.type.server": {
-    "message": "الخادم"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "لعب فردي"
   },
   "instance.worlds.view_instance": {
     "message": "عرض النسخة"
