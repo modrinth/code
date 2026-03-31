@@ -729,6 +729,7 @@ const messages = defineMessages({
 			v-if="form.incompatibleContentVariant.value"
 			ref="incompatibleContentModal"
 			:variant="form.incompatibleContentVariant.value"
+			:loading="form.isVerifying.value || form.isSaving.value"
 			@confirm-loader-change="form.confirmLoaderChange()"
 			@auto-fix="form.confirmAutoFix()"
 			@disable-conflicts="form.confirmDisableConflicts()"

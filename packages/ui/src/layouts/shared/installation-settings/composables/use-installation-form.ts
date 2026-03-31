@@ -87,6 +87,7 @@ export function useInstallationForm(
 			const gameVersionChanged = selectedGameVersion.value !== ctx.currentGameVersion.value
 
 			if (platformChanged && ctx.disableAllContent) {
+				isSaving.value = false
 				incompatibleContentVariant.value = 'loader-change'
 				await nextTick()
 				incompatibleContentModalRef?.value?.show()
@@ -94,6 +95,7 @@ export function useInstallationForm(
 			}
 
 			if (isModded && gameVersionChanged && ctx.disableIncompatibleContent) {
+				isSaving.value = false
 				incompatibleContentVariant.value = 'game-version-change'
 				await nextTick()
 				incompatibleContentModalRef?.value?.show()
@@ -150,19 +152,19 @@ export function useInstallationForm(
 	}
 
 	async function confirmLoaderChange() {
-		incompatibleContentVariant.value = null
 		try {
 			if (ctx.disableAllContent) {
 				await ctx.disableAllContent()
 			}
+			incompatibleContentVariant.value = null
 			await performSave()
 		} catch {
+			incompatibleContentVariant.value = null
 			isSaving.value = false
 		}
 	}
 
 	async function confirmAutoFix() {
-		incompatibleContentVariant.value = null
 		try {
 			if (ctx.previewSave) {
 				isVerifying.value = true
@@ -187,20 +189,23 @@ export function useInstallationForm(
 
 				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
 					pendingPreview.value = preview
+					incompatibleContentVariant.value = null
+					await nextTick()
 					await nextTick()
 					contentDiffModalRef?.value?.show()
 					return
 				}
 			}
 
+			incompatibleContentVariant.value = null
 			await performSave()
 		} catch {
+			incompatibleContentVariant.value = null
 			isSaving.value = false
 		}
 	}
 
 	async function confirmDisableConflicts() {
-		incompatibleContentVariant.value = null
 		try {
 			if (ctx.disableIncompatibleContent && ctx.previewSave) {
 				isVerifying.value = true
@@ -228,6 +233,7 @@ export function useInstallationForm(
 				}
 			}
 
+			incompatibleContentVariant.value = null
 			if (ctx.saveWithoutAutoFix) {
 				const loaderVersionId =
 					selectedPlatform.value !== 'vanilla'
@@ -245,6 +251,7 @@ export function useInstallationForm(
 				await performSave()
 			}
 		} catch {
+			incompatibleContentVariant.value = null
 			isSaving.value = false
 		}
 	}

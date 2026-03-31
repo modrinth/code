@@ -1,5 +1,5 @@
 <template>
-	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="true" no-padding>
+	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="!loading" no-padding>
 		<div class="flex max-w-[500px] flex-col gap-6 p-6">
 			<Admonition
 				:type="variant === 'loader-change' ? 'critical' : 'warning'"
@@ -19,7 +19,7 @@
 					</span>
 					<div v-if="variant === 'loader-change'">
 						<ButtonStyled color="red">
-							<button @click="handleResetServer">
+							<button :disabled="loading" @click="handleResetServer">
 								<TrashIcon class="size-5" />
 								{{ formatMessage(commonMessages.resetServerButton) }}
 							</button>
@@ -41,29 +41,38 @@
 		<template #actions>
 			<div class="flex justify-end gap-2">
 				<ButtonStyled>
-					<button @click="handleCancel">
+					<button :disabled="loading" @click="handleCancel">
 						<XIcon />
 						{{ formatMessage(commonMessages.cancelButton) }}
 					</button>
 				</ButtonStyled>
 				<template v-if="variant === 'game-version-change'">
 					<ButtonStyled>
-						<button :disabled="buttonsDisabled" @click="handleDisableConflicts">
-							<PowerOffIcon class="size-5" />
+						<button :disabled="buttonsDisabled || loading" @click="handleDisableConflicts">
+							<SpinnerIcon
+								v-if="loading && loadingAction === 'disable-conflicts'"
+								class="size-5 animate-spin"
+							/>
+							<PowerOffIcon v-else class="size-5" />
 							{{ formatMessage(messages.disableConflictsButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="orange">
-						<button :disabled="buttonsDisabled" @click="handleAutoFix">
-							<HammerIcon class="size-5" />
+						<button :disabled="buttonsDisabled || loading" @click="handleAutoFix">
+							<SpinnerIcon
+								v-if="loading && loadingAction === 'auto-fix'"
+								class="size-5 animate-spin"
+							/>
+							<HammerIcon v-else class="size-5" />
 							{{ formatMessage(messages.autoFixButton) }}
 						</button>
 					</ButtonStyled>
 				</template>
 				<template v-else>
 					<ButtonStyled color="red">
-						<button :disabled="buttonsDisabled" @click="handleConfirmLoaderChange">
-							<CircleAlertIcon class="size-5" />
+						<button :disabled="buttonsDisabled || loading" @click="handleConfirmLoaderChange">
+							<SpinnerIcon v-if="loading" class="size-5 animate-spin" />
+							<CircleAlertIcon v-else class="size-5" />
 							{{ formatMessage(messages.changeLoaderButton) }}
 						</button>
 					</ButtonStyled>
@@ -74,7 +83,14 @@
 </template>
 
 <script setup lang="ts">
-import { CircleAlertIcon, HammerIcon, PowerOffIcon, TrashIcon, XIcon } from '@modrinth/assets'
+import {
+	CircleAlertIcon,
+	HammerIcon,
+	PowerOffIcon,
+	SpinnerIcon,
+	TrashIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { ref } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -87,6 +103,7 @@ import InlineBackupCreator from '../../content-tab/components/modals/InlineBacku
 
 defineProps<{
 	variant: 'loader-change' | 'game-version-change'
+	loading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -101,8 +118,10 @@ const { formatMessage } = useVIntl()
 
 const modal = ref<InstanceType<typeof NewModal>>()
 const buttonsDisabled = ref(false)
+const loadingAction = ref<'auto-fix' | 'disable-conflicts' | null>(null)
 
 function show(e?: MouseEvent) {
+	loadingAction.value = null
 	modal.value?.show(e)
 }
 
@@ -116,17 +135,16 @@ function handleCancel() {
 }
 
 function handleConfirmLoaderChange() {
-	hide()
 	emit('confirm-loader-change')
 }
 
 function handleAutoFix() {
-	hide()
+	loadingAction.value = 'auto-fix'
 	emit('auto-fix')
 }
 
 function handleDisableConflicts() {
-	hide()
+	loadingAction.value = 'disable-conflicts'
 	emit('disable-conflicts')
 }
 
