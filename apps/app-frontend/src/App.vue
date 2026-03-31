@@ -129,7 +129,7 @@ const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
 	features: [
 		new AuthFeature({
-			token: async () => (await getCreds()).session,
+			token: async () => (await getCreds())?.session,
 		}),
 		new PanelVersionFeature(),
 	],
