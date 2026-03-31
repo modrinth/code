@@ -320,12 +320,14 @@
 				>
 					<InstallingBanner
 						v-if="
-							(serverData.status === 'installing' || isSyncingContent) &&
+							(serverData.status === 'installing' || isSyncingContent || contentError) &&
 							syncProgress?.phase !== 'Analyzing'
 						"
 						data-pyro-server-installing
 						class="mb-4"
 						:progress="syncProgress"
+						:content-error="contentError"
+						@retry="handleContentRetry"
 					>
 						<template #icon>
 							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
@@ -518,6 +520,7 @@ const markBackupCancelled = (backupId: string) => {
 
 // Parthenon state event
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
+const contentError = ref<Archon.Websocket.v0.SyncContentError | null>(null)
 const syncProgressActive = ref(false)
 const isAwaitingPostInstallRefresh = ref(false)
 const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
@@ -845,6 +848,7 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 		serverStatus: serverData.value?.status,
 	})
 	syncProgress.value = data.progress
+	contentError.value = data.content_error
 
 	// Sync power state from the state event
 	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
@@ -878,6 +882,7 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			hasSeenInstallProgress = true
 		} else if (
 			data.progress == null &&
+			data.content_error == null &&
 			serverData.value.status === 'installing' &&
 			hasSeenInstallProgress
 		) {
@@ -886,6 +891,18 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			applyOptimisticCompletion()
 			invalidateAfterInstall()
 		}
+	}
+}
+
+async function handleContentRetry() {
+	if (!worldId.value) return
+	try {
+		await client.archon.content_v1.repair(serverId, worldId.value)
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : 'Failed to retry installation',
+		})
 	}
 }
 
