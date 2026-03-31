@@ -1,10 +1,11 @@
 import type { Labrinth } from '@modrinth/api-client/src/modules/labrinth/types'
+import type { Ref } from 'vue'
 
 import { createContext } from './create-context'
 
 export interface AuthProvider {
-	session_token: string | null
-	user: Labrinth.Users.v2.User | null
+	session_token: Ref<string | null>
+	user: Ref<Labrinth.Users.v2.User | null>
 	requestSignIn: (redirectPath: string) => void | Promise<void>
 }
 

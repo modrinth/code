@@ -1,6 +1,6 @@
 export * from './api-client'
-export * from './auth'
 export * from './app-backup'
+export * from './auth'
 export * from './content-manager'
 export { createContext } from './create-context'
 export * from './file-picker'
