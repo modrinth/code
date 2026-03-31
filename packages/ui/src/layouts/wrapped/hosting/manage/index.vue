@@ -442,8 +442,6 @@ const {
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
-	return []
-
 	if (!serverResponse.value) return []
 	return serverResponse.value.servers
 })
