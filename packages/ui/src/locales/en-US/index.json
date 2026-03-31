@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Update projects"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Hold Shift while clicking \"Update all\" to skip this confirmation in the future."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
   },
