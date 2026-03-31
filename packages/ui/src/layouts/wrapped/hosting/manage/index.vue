@@ -221,7 +221,7 @@ const router = useRouter()
 const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
-const loggedIn = computed(() => !!auth.user)
+const loggedIn = computed(() => !!auth.user.value)
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
@@ -262,7 +262,7 @@ const {
 } = useQuery({
 	queryKey: ['billing', 'customer'],
 	queryFn: () => client.labrinth.billing_internal.getCustomer() as Promise<Stripe.Customer>,
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 const {
@@ -273,13 +273,13 @@ const {
 	queryKey: ['billing', 'payment-methods'],
 	queryFn: () =>
 		client.labrinth.billing_internal.getPaymentMethods() as Promise<Stripe.PaymentMethod[]>,
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 const { data: regions, isLoading: regionsLoading } = useQuery({
 	queryKey: ['servers', 'regions'],
 	queryFn: () => client.archon.servers_v1.getRegions(),
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 watch(
@@ -426,7 +426,7 @@ const {
 		return response
 	},
 	refetchInterval: computed(() => (pollingState.value.enabled ? 5000 : false)),
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
@@ -527,19 +527,19 @@ function openPurchaseModal() {
 }
 
 function handleSignIn() {
-	auth.requestSignIn('/hosting/manage')
+	void auth.requestSignIn('/hosting/manage')
 }
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
 	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],
 	queryFn: () => client.labrinth.billing_internal.getPayments(),
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 const CHARGE_POLL_INTERVAL_MS = 20_000
@@ -580,7 +580,7 @@ watch(
 const { data: serverFullList } = useQuery({
 	queryKey: ['servers', 'v1'],
 	queryFn: () => client.archon.servers_v1.list(),
-	enabled: loggedIn.value,
+	enabled: loggedIn,
 })
 
 type ServerBillingInfo = {
