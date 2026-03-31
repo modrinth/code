@@ -94,7 +94,7 @@
 
 		<!-- Right column - mod icon grid -->
 		<div
-			class="relative flex h-[617px] w-[380px] shrink-0 items-center justify-center overflow-hidden rounded-[40px] pointer-events-none select-none"
+			class="relative flex h-[617px] w-[380px] shrink-0 items-center justify-center overflow-hidden rounded-[40px] pointer-events-none select-none [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)]"
 		>
 			<div class="rotate-[15deg]">
 				<div class="flex flex-col gap-4">
@@ -129,10 +129,6 @@
 					</div>
 				</div>
 			</div>
-			<!-- Gradient overlay fading to page background -->
-			<div
-				class="absolute rounded-[40px] inset-0 pointer-events-none bg-gradient-to-b from-transparent to-[var(--color-bg)]"
-			/>
 		</div>
 	</div>
 </template>
