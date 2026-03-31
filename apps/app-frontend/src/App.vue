@@ -40,7 +40,6 @@ import {
 	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
-	provideAuth,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
@@ -58,7 +57,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -107,6 +106,7 @@ import {
 } from '@/providers/download-progress.ts'
 import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
+import { setupAuthProvider } from '@/providers/setup/auth'
 import { useError } from '@/store/error.js'
 import { useLoading, useTheming } from '@/store/state'
 
@@ -455,23 +455,9 @@ const credentials = ref()
 
 const modrinthLoginFlowWaitModal = ref()
 
-const authSessionToken = ref(null)
-const authUser = ref(null)
-
-const authProvider = {
-	session_token: authSessionToken,
-	user: authUser,
-	requestSignIn: async (_redirectPath) => {
-		await signIn()
-	},
-}
-
-watchEffect(() => {
-	authSessionToken.value = credentials.value?.session ?? null
-	authUser.value = credentials.value?.user ?? null
+setupAuthProvider(credentials, async (_redirectPath) => {
+	await signIn()
 })
-
-provideAuth(authProvider)
 
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
