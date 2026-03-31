@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
+import { ChevronRightIcon } from '@modrinth/assets'
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { ChevronRightIcon } from '@modrinth/assets'
 import NewModal from '../modal/NewModal.vue'
 import type { ServerBillingInterval } from './ModrinthServersPurchaseModal.vue'
 import PlanSelector from './ServersPurchase0Plan.vue'

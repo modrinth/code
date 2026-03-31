@@ -217,6 +217,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
+import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
 
 const props = defineProps<{
 	stripePublishableKey: string
@@ -231,17 +232,6 @@ const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
-const PURCHASE_INTENT_STORAGE_KEY = 'modrinth:servers-purchase-intent'
-const PURCHASE_INTENT_SOURCE = 'hosting-manage'
-
-type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
-
-type PendingPurchaseIntent = {
-	interval: ServerBillingInterval
-	planId: string | null
-	source: string
-	ts: number
-}
 
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
@@ -255,9 +245,6 @@ const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | nu
 const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
 const affiliateCode = ref<string | null>(null)
 const selectedCurrency = ref<string>('USD')
-const lastSelectedInterval = ref<ServerBillingInterval>('quarterly')
-const lastSelectedPlanId = ref<string | null | undefined>(undefined)
-const pendingResumeIntent = ref<PendingPurchaseIntent | null>(null)
 const regionPings = ref<
 	{
 		region: string
@@ -276,40 +263,6 @@ const pyroProducts = computed(() => {
 			return aRam - bRam
 		})
 })
-
-function readPendingPurchaseIntent(): PendingPurchaseIntent | null {
-	if (typeof window === 'undefined') return null
-	const rawIntent = window.sessionStorage.getItem(PURCHASE_INTENT_STORAGE_KEY)
-	if (!rawIntent) return null
-
-	try {
-		const parsedIntent = JSON.parse(rawIntent) as Partial<PendingPurchaseIntent>
-		if (
-			(parsedIntent.interval === 'monthly' ||
-				parsedIntent.interval === 'quarterly' ||
-				parsedIntent.interval === 'yearly') &&
-			(parsedIntent.planId === null || typeof parsedIntent.planId === 'string') &&
-			typeof parsedIntent.source === 'string' &&
-			typeof parsedIntent.ts === 'number'
-		) {
-			return parsedIntent as PendingPurchaseIntent
-		}
-	} catch {
-		return null
-	}
-
-	return null
-}
-
-function writePendingPurchaseIntent(intent: PendingPurchaseIntent) {
-	if (typeof window === 'undefined') return
-	window.sessionStorage.setItem(PURCHASE_INTENT_STORAGE_KEY, JSON.stringify(intent))
-}
-
-function clearPendingPurchaseIntent() {
-	if (typeof window === 'undefined') return
-	window.sessionStorage.removeItem(PURCHASE_INTENT_STORAGE_KEY)
-}
 
 const {
 	data: customer,
@@ -488,6 +441,8 @@ const {
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
+	return []
+
 	if (!serverResponse.value) return []
 	return serverResponse.value.servers
 })
@@ -560,25 +515,6 @@ const canOpenPurchaseModal = computed(() => {
 	)
 })
 
-function openCheckoutFromIntent(intent: PendingPurchaseIntent): boolean {
-	console.log('Attempting to open checkout from intent', intent)
-	if (!purchaseModal.value || !canOpenPurchaseModal.value) return false
-
-	lastSelectedInterval.value = intent.interval
-	lastSelectedPlanId.value = intent.planId
-	const defaultPlan =
-		pyroProducts.value.find((p) => p?.metadata?.type === 'pyro' && p.metadata.ram === 6144) ??
-		pyroProducts.value.find((p) => p?.metadata?.type === 'pyro') ??
-		pyroProducts.value[0]
-	const selectedPlan =
-		intent.planId === null
-			? null
-			: (pyroProducts.value.find((product) => product.id === intent.planId) ?? defaultPlan)
-
-	purchaseModal.value.show(intent.interval, selectedPlan)
-	return true
-}
-
 function handleError(err: unknown) {
 	const error = err as Error & { data?: { description?: string } }
 	addNotification({
@@ -588,78 +524,30 @@ function handleError(err: unknown) {
 	})
 }
 
-function openPurchaseModal() {
-	guestPlanModal.value?.show(lastSelectedInterval.value, lastSelectedPlanId.value)
+function handleSignIn() {
+	void auth.requestSignIn('/hosting/manage')
 }
 
-function handleGuestPlanContinue(payload: {
-	interval: ServerBillingInterval
-	planId: string | null
-}) {
-	const intent: PendingPurchaseIntent = {
-		interval: payload.interval,
-		planId: payload.planId,
-		source: PURCHASE_INTENT_SOURCE,
-		ts: Date.now(),
-	}
-
-	lastSelectedInterval.value = payload.interval
-	lastSelectedPlanId.value = payload.planId
-
-	if (!loggedIn.value) {
-		writePendingPurchaseIntent(intent)
-		void auth.requestSignIn('/hosting/manage')
-		return
-	}
-
-	pendingResumeIntent.value = intent
-	if (openCheckoutFromIntent(intent)) {
-		pendingResumeIntent.value = null
-	} else {
+const hostingPurchaseIntent = createHostingPurchaseIntentContext({
+	authRequestSignIn: auth.requestSignIn,
+	signInRedirectPath: '/hosting/manage',
+	intentSource: 'hosting-manage',
+	loggedIn,
+	availableProducts: pyroProducts,
+	canOpenCheckout: canOpenPurchaseModal,
+	guestPlanModal,
+	checkoutModal: purchaseModal,
+	onCheckoutPending: () => {
 		addNotification({
 			title: 'Purchase unavailable',
 			text: 'Payment information is still loading. Opening checkout as soon as it is ready.',
 			type: 'info',
 		})
-	}
-}
-
-function handleSignIn() {
-	void auth.requestSignIn('/hosting/manage')
-}
-
-watch(
-	loggedIn,
-	(isLoggedIn) => {
-		if (!isLoggedIn) return
-
-		const pendingIntent = readPendingPurchaseIntent()
-		if (!pendingIntent || pendingIntent.source !== PURCHASE_INTENT_SOURCE) return
-
-		clearPendingPurchaseIntent()
-		pendingResumeIntent.value = pendingIntent
-		lastSelectedInterval.value = pendingIntent.interval
-		lastSelectedPlanId.value = pendingIntent.planId
 	},
-	{ immediate: true },
-)
+})
+provideHostingPurchaseIntent(hostingPurchaseIntent)
 
-watch(
-	() =>
-		[
-			loggedIn.value,
-			canOpenPurchaseModal.value,
-			pendingResumeIntent.value,
-			purchaseModal.value,
-		] as const,
-	([isLoggedIn, canOpen, pendingIntent]) => {
-		if (!isLoggedIn || !canOpen || !pendingIntent) return
-		if (openCheckoutFromIntent(pendingIntent)) {
-			pendingResumeIntent.value = null
-		}
-	},
-	{ immediate: true },
-)
+const { openPurchaseModal, handleGuestPlanContinue } = hostingPurchaseIntent
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
