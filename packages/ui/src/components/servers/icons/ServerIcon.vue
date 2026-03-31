@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="experimental-styles-within flex size-16 shrink-0 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+		class="experimental-styles-within relative flex size-16 shrink-0 overflow-hidden rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 	>
 		<client-only>
 			<img
@@ -16,6 +16,7 @@
 				:src="MinecraftServerIcon"
 			/>
 		</client-only>
+		<div v-if="disabled" class="absolute inset-0 bg-surface-1 opacity-50" />
 	</div>
 </template>
 
@@ -24,5 +25,6 @@ import { MinecraftServerIcon } from '@modrinth/assets'
 
 defineProps<{
 	image: string | undefined
+	disabled?: boolean
 }>()
 </script>

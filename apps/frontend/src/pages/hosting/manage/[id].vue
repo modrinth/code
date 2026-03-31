@@ -1181,7 +1181,8 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 }
 
 const updateStats = (currentStats: Stats['current']) => {
-	isConnected.value = true
+	if (!isMounted.value) return
+	if (!isConnected.value) isConnected.value = true
 	stats.value = {
 		current: currentStats,
 		past: { ...stats.value.current },

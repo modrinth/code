@@ -1,18 +1,40 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+		class="experimental-styles-within relative mx-auto mb-6 flex w-full max-w-[1280px] flex-col px-6"
+		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
 	>
-		<ServersUpgradeModalWrapper
-			v-if="isNuxt"
-			ref="upgradeModal"
-			:stripe-publishable-key
-			:site-url
-			:products
+		<ServersGuestPlanModal
+			ref="guestPlanModal"
+			:available-products="pyroProducts"
+			:currency="selectedCurrency"
+			:logged-in="loggedIn"
+			@continue="handleGuestPlanContinue"
 		/>
+		<ModrinthServersPurchaseModal
+			v-if="customer && paymentMethods && regions"
+			ref="purchaseModal"
+			:publishable-key="props.stripePublishableKey"
+			:initiate-payment="
+				async (body) => await client.labrinth.billing_internal.initiatePayment(body)
+			"
+			:available-products="pyroProducts"
+			:on-error="handleError"
+			:customer="customer"
+			:payment-methods="paymentMethods"
+			:currency="selectedCurrency"
+			:return-url="`${props.siteUrl}/hosting/manage`"
+			:pings="regionPings"
+			:regions="regions"
+			:refresh-payment-methods="fetchPaymentData"
+			:fetch-stock="fetchStock"
+			:affiliate-code="affiliateCode"
+			plan-stage
+		/>
+		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
 		<div
-			v-if="hasError || fetchError"
+			v-if="hasError"
 			class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
 		>
 			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -85,21 +107,13 @@
 			<div
 				v-else-if="serverList.length === 0 && !isPollingForNewServers"
 				key="empty"
-				class="flex h-full flex-col items-center justify-center gap-8"
+				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
-				<img
-					src="https://cdn.modrinth.com/servers/excitement.webp"
-					alt=""
-					class="max-w-[360px]"
-					style="
-						mask-image: radial-gradient(97% 77% at 50% 25%, #d9d9d9 0, hsla(0, 0%, 45%, 0) 100%);
-					"
+				<ServerListEmpty
+					:logged-in="loggedIn"
+					@click-new-server="openPurchaseModal"
+					@click-sign-in="handleSignIn"
 				/>
-				<h1 class="m-0 text-contrast">You don't have any servers yet!</h1>
-				<p class="m-0">Modrinth Hosting is a new way to play modded Minecraft with your friends.</p>
-				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink to="/servers#plan">Create a server</AutoLink>
-				</ButtonStyled>
 			</div>
 
 			<div v-else key="list">
@@ -116,11 +130,15 @@
 							placeholder="Search servers..."
 							wrapper-class="w-full md:w-72"
 						/>
-						<ButtonStyled v-if="isNuxt" type="standard">
-							<AutoLink :to="{ path: '/servers', hash: '#plan' }">
+						<ButtonStyled type="standard">
+							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
 								New server
 							</AutoLink>
+							<button v-else @click="openPurchaseModal">
+								<PlusIcon />
+								New server
+							</button>
 						</ButtonStyled>
 					</div>
 				</div>
@@ -152,17 +170,22 @@
 						v-for="server in filteredData.filter((s) => s.is_medal)"
 						:key="server.server_id"
 						v-bind="server"
-						@upgrade="openUpgradeModal(server.server_id)"
+						@upgrade="openPurchaseModal"
 					/>
 					<ServerListing
 						v-for="server in filteredData.filter((s) => !s.is_medal)"
 						:key="server.server_id"
 						v-bind="server"
+						:cancellation-date="serverBillingMap.get(server.server_id)?.cancellationDate"
+						:is-provisioning="serverBillingMap.get(server.server_id)?.isProvisioning"
+						:on-resubscribe="serverBillingMap.get(server.server_id)?.onResubscribe"
+						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
 				</TransitionGroup>
-				<div v-else class="flex h-full items-center justify-center">
+				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
 					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
+				<div v-else>No servers found.</div>
 			</div>
 		</Transition>
 	</div>
@@ -171,38 +194,206 @@
 <script setup lang="ts">
 import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
-import { AutoLink, ButtonStyled, CopyCode, injectModrinthClient, StyledInput } from '@modrinth/ui'
+import {
+	AutoLink,
+	ButtonStyled,
+	CopyCode,
+	injectAuth,
+	injectModrinthClient,
+	injectNotificationManager,
+	ModrinthServersPurchaseModal,
+	ResubscribeModal,
+	ServerListEmpty,
+	ServersGuestPlanModal,
+	StyledInput,
+} from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useIntervalFn } from '@vueuse/core'
 import dayjs from 'dayjs'
 import Fuse from 'fuse.js'
-import type { ComponentPublicInstance } from 'vue'
+import type Stripe from 'stripe'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import ServersUpgradeModalWrapper from '#ui/components/billing/ServersUpgradeModalWrapper.vue'
 import MedalServerListing from '#ui/components/servers/marketing/MedalServerListing.vue'
 import ServerListing from '#ui/components/servers/ServerListing.vue'
+import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from '#ui/providers'
 
-defineProps<{
-	stripePublishableKey?: string
-	siteUrl?: string
-	products?: Labrinth.Billing.Internal.Product[]
+const props = defineProps<{
+	stripePublishableKey: string
+	siteUrl: string
+	products: Labrinth.Billing.Internal.Product[]
 }>()
 
 const router = useRouter()
 const route = useRoute()
+const auth = injectAuth()
 const client = injectModrinthClient()
+const loggedIn = computed(() => !!auth.user.value)
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
-const hasError = ref(false)
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
 	enabled: false,
 	count: 0,
 	initialServers: [] as Archon.Servers.v0.Server[],
 })
+
+const guestPlanModal = ref<InstanceType<typeof ServersGuestPlanModal> | null>(null)
+const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
+const resubscribeModal = ref<InstanceType<typeof ResubscribeModal> | null>(null)
+const affiliateCode = ref<string | null>(null)
+const selectedCurrency = ref<string>('USD')
+const regionPings = ref<
+	{
+		region: string
+		ping: number
+	}[]
+>([])
+
+const pyroProducts = computed(() => {
+	return [...props.products]
+		.filter((p) => p?.metadata?.type === 'pyro' || p?.metadata?.type === 'medal')
+		.sort((a, b) => {
+			const aRam =
+				a?.metadata?.type === 'pyro' || a?.metadata?.type === 'medal' ? a.metadata.ram : 0
+			const bRam =
+				b?.metadata?.type === 'pyro' || b?.metadata?.type === 'medal' ? b.metadata.ram : 0
+			return aRam - bRam
+		})
+})
+
+const {
+	data: customer,
+	refetch: refetchCustomer,
+	isLoading: customerLoading,
+} = useQuery({
+	queryKey: ['billing', 'customer'],
+	queryFn: () => client.labrinth.billing_internal.getCustomer() as Promise<Stripe.Customer>,
+	enabled: loggedIn,
+})
+
+const {
+	data: paymentMethods,
+	refetch: refetchPaymentMethods,
+	isLoading: paymentMethodsLoading,
+} = useQuery({
+	queryKey: ['billing', 'payment-methods'],
+	queryFn: () =>
+		client.labrinth.billing_internal.getPaymentMethods() as Promise<Stripe.PaymentMethod[]>,
+	enabled: loggedIn,
+})
+
+const { data: regions, isLoading: regionsLoading } = useQuery({
+	queryKey: ['servers', 'regions'],
+	queryFn: () => client.archon.servers_v1.getRegions(),
+	enabled: loggedIn,
+})
+
+watch(
+	regions,
+	(newRegions) => {
+		regionPings.value = []
+		if (newRegions) {
+			newRegions.forEach((region) => {
+				runPingTest(region)
+			})
+		}
+	},
+	{ immediate: true },
+)
+
+async function fetchPaymentData() {
+	await Promise.all([refetchCustomer(), refetchPaymentMethods()])
+}
+
+async function fetchStock(
+	region: Archon.Servers.v1.Region,
+	request: Archon.Servers.v0.StockRequest,
+): Promise<number> {
+	const result = await client.archon.servers_v0.checkStock(region.shortcode, request)
+	return result.available
+}
+
+const PING_COUNT = 20
+const PING_INTERVAL = 200
+const MAX_PING_TIME = 1000
+
+function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
+	if (index > 10) {
+		regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
+		regionPings.value.push({
+			region: region.shortcode,
+			ping: -1,
+		})
+		return
+	}
+
+	const wsUrl = `wss://${region.shortcode}${index}.${region.zone}/pingtest`
+	try {
+		const socket = new WebSocket(wsUrl)
+		const pings: number[] = []
+		let finalized = false
+
+		const finalize = (ping: number) => {
+			if (finalized) return
+			finalized = true
+			clearTimeout(connectTimeout)
+			regionPings.value = regionPings.value.filter((entry) => entry.region !== region.shortcode)
+			regionPings.value.push({
+				region: region.shortcode,
+				ping,
+			})
+			socket.close()
+		}
+
+		const retryNext = () => {
+			if (finalized) return
+			finalized = true
+			clearTimeout(connectTimeout)
+			socket.close()
+			runPingTest(region, index + 1)
+		}
+
+		// Prevent hangs where the socket never opens or errors.
+		const connectTimeout = setTimeout(() => {
+			retryNext()
+		}, 3000)
+
+		socket.onopen = () => {
+			clearTimeout(connectTimeout)
+
+			for (let i = 0; i < PING_COUNT; i++) {
+				setTimeout(() => {
+					socket.send(String(performance.now()))
+				}, i * PING_INTERVAL)
+			}
+			setTimeout(
+				() => {
+					const median =
+						pings.length > 0
+							? Math.round([...pings].sort((a, b) => a - b)[Math.floor(pings.length / 2)])
+							: -1
+					finalize(median)
+				},
+				PING_COUNT * PING_INTERVAL + MAX_PING_TIME,
+			)
+		}
+
+		socket.onmessage = (event) => {
+			const start = Number(event.data)
+			pings.push(performance.now() - start)
+		}
+
+		socket.onerror = () => {
+			retryNext()
+		}
+	} catch {
+		runPingTest(region, index + 1)
+	}
+}
 
 const {
 	data: serverResponse,
@@ -245,13 +436,14 @@ const {
 		return response
 	},
 	refetchInterval: computed(() => (pollingState.value.enabled ? 5000 : false)),
+	enabled: loggedIn,
 })
 
-watch([fetchError, serverResponse], ([error, response]) => {
-	hasError.value = !!error || !response
-})
+const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
+	return []
+
 	if (!serverResponse.value) return []
 	return serverResponse.value.servers
 })
@@ -273,13 +465,23 @@ function introToTop(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server
 	})
 }
 
+// files expire 30 days after cancellation
+function filesExpired(server: Archon.Servers.v0.Server): boolean {
+	if (server.status !== 'suspended' || server.suspension_reason !== 'cancelled') return false
+	const cancellationDate = serverBillingMap.value.get(server.server_id)?.cancellationDate
+	if (!cancellationDate) return false
+	const cancellation = new Date(cancellationDate)
+	const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+	return new Date() > thirtyDaysLater
+}
+
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
-	if (!searchInput.value.trim()) {
-		return introToTop(serverList.value)
-	}
-	return fuse.value
-		? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
-		: []
+	const base = !searchInput.value.trim()
+		? introToTop(serverList.value)
+		: fuse.value
+			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			: []
+	return base.filter((server) => !filesExpired(server))
 })
 
 // Start polling only after initial data is available so the baseline is correct
@@ -299,14 +501,317 @@ watch(serverResponse, (response) => {
 	}
 })
 
-type ServersUpgradeModalWrapperRef = ComponentPublicInstance<{
-	open: (id: string) => void | Promise<void>
-}>
+const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 
-const upgradeModal = ref<ServersUpgradeModalWrapperRef | null>(null)
-function openUpgradeModal(serverId: string) {
-	upgradeModal.value?.open(serverId)
+const canOpenPurchaseModal = computed(() => {
+	return (
+		Boolean(props.stripePublishableKey) &&
+		Boolean(customer.value) &&
+		paymentMethods.value !== undefined &&
+		Boolean(regions.value) &&
+		!customerLoading.value &&
+		!paymentMethodsLoading.value &&
+		!regionsLoading.value
+	)
+})
+
+function handleError(err: unknown) {
+	const error = err as Error & { data?: { description?: string } }
+	addNotification({
+		title: 'An error occurred',
+		type: 'error',
+		text: error?.message ?? error?.data?.description ?? String(err),
+	})
 }
+
+function handleSignIn() {
+	void auth.requestSignIn('/hosting/manage')
+}
+
+const hostingPurchaseIntent = createHostingPurchaseIntentContext({
+	authRequestSignIn: auth.requestSignIn,
+	signInRedirectPath: '/hosting/manage',
+	intentSource: 'hosting-manage',
+	loggedIn,
+	availableProducts: pyroProducts,
+	canOpenCheckout: canOpenPurchaseModal,
+	guestPlanModal,
+	checkoutModal: purchaseModal,
+	onCheckoutPending: () => {
+		addNotification({
+			title: 'Purchase unavailable',
+			text: 'Payment information is still loading. Opening checkout as soon as it is ready.',
+			type: 'info',
+		})
+	},
+})
+provideHostingPurchaseIntent(hostingPurchaseIntent)
+
+const { openPurchaseModal, handleGuestPlanContinue } = hostingPurchaseIntent
+
+const { data: subscriptions } = useQuery({
+	queryKey: ['billing', 'subscriptions'],
+	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+	enabled: loggedIn,
+})
+
+const { data: charges } = useQuery({
+	queryKey: ['billing', 'payments'],
+	queryFn: () => client.labrinth.billing_internal.getPayments(),
+	enabled: loggedIn,
+})
+
+const CHARGE_POLL_INTERVAL_MS = 20_000
+
+const hasProvisioningSubscription = computed(() => {
+	if (!subscriptions.value || !charges.value) return false
+	return subscriptions.value
+		.filter((s) => s?.metadata?.type === 'pyro')
+		.some((sub) => {
+			if (sub.status !== 'unprovisioned') return false
+			const charge = charges.value?.find((c) => c.subscription_id === sub.id)
+			return charge?.status === 'processing' || charge?.status === 'open'
+		})
+})
+
+const { pause: pauseChargePoll, resume: resumeChargePoll } = useIntervalFn(
+	() => {
+		queryClient.invalidateQueries({ queryKey: ['billing', 'payments'] })
+		queryClient.invalidateQueries({ queryKey: ['billing', 'subscriptions'] })
+		queryClient.invalidateQueries({ queryKey: ['servers'] })
+	},
+	CHARGE_POLL_INTERVAL_MS,
+	{ immediate: false },
+)
+
+watch(
+	hasProvisioningSubscription,
+	(isProvisioning) => {
+		if (isProvisioning) {
+			resumeChargePoll()
+		} else {
+			pauseChargePoll()
+		}
+	},
+	{ immediate: true },
+)
+
+const { data: serverFullList } = useQuery({
+	queryKey: ['servers', 'v1'],
+	queryFn: () => client.archon.servers_v1.list(),
+	enabled: loggedIn,
+})
+
+type ServerBillingInfo = {
+	cancellationDate?: string | null
+	isProvisioning?: boolean
+	onResubscribe?: () => void
+	onDownloadBackup?: (() => void) | null
+}
+
+type ResubscribeRequest = {
+	subscriptionId: string
+	wasSuspended: boolean
+}
+
+function getLatestBackupDownload(serverId: string): (() => void) | null {
+	const serverFull = serverFullList.value?.find((s) => s.id === serverId)
+	if (!serverFull) return null
+
+	const activeWorld = serverFull.worlds.find((w) => w.is_active) ?? serverFull.worlds[0]
+	if (!activeWorld?.backups?.length) return null
+
+	const latestBackup = activeWorld.backups
+		.filter((b) => b.status === 'done')
+		.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+	if (!latestBackup) return null
+
+	return async () => {
+		try {
+			const server = await client.archon.servers_v0.get(serverId)
+			const kyrosUrl = server.node?.instance
+			const jwt = server.node?.token
+			if (!kyrosUrl || !jwt) {
+				addNotification({
+					title: 'Download unavailable',
+					text: 'Server connection info is not available. Please contact support.',
+					type: 'error',
+				})
+				return
+			}
+
+			window.open(
+				`https://${kyrosUrl}/modrinth/v0/backups/${latestBackup.id}/download?auth=${jwt}`,
+				'_blank',
+			)
+		} catch {
+			addNotification({
+				title: 'Download failed',
+				text: 'An error occurred while trying to download the backup.',
+				type: 'error',
+			})
+		}
+	}
+}
+
+function getProductFromPriceId(priceId: string | null | undefined) {
+	if (!priceId) return null
+
+	return (
+		pyroProducts.value.find((product) => product.prices.some((price) => price.id === priceId)) ??
+		null
+	)
+}
+
+function getPlanName(product: Labrinth.Billing.Internal.Product | null): string {
+	if (!product) return 'Medium plan'
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return 'Medium plan'
+
+	switch (product.metadata.ram) {
+		case 4096:
+			return 'Small plan'
+		case 6144:
+			return 'Medium plan'
+		case 8192:
+			return 'Large plan'
+		default:
+			return 'Custom plan'
+	}
+}
+
+function getRamGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.ram / 1024
+}
+
+function getStorageGb(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.storage / 1024
+}
+
+function getSharedCpus(product: Labrinth.Billing.Internal.Product | null): number | undefined {
+	if (!product) return undefined
+	if (product.metadata.type !== 'pyro' && product.metadata.type !== 'medal') return undefined
+
+	return product.metadata.cpu / 2
+}
+
+function getRecurringPrice(
+	product: Labrinth.Billing.Internal.Product | null,
+	interval: Labrinth.Billing.Internal.PriceDuration,
+	preferredCurrency?: string,
+): { amount: number; currencyCode: string } | null {
+	if (!product) return null
+
+	const recurringPrices = product.prices.filter((price) => price.prices.type === 'recurring')
+	const preferredPrice = preferredCurrency
+		? recurringPrices.find((price) => price.currency_code === preferredCurrency)
+		: undefined
+	const usdPrice = recurringPrices.find((price) => price.currency_code === 'USD')
+	const selectedPrice = preferredPrice ?? usdPrice ?? recurringPrices[0]
+
+	if (!selectedPrice || selectedPrice.prices.type !== 'recurring') return null
+
+	return {
+		amount: selectedPrice.prices.intervals[interval],
+		currencyCode: selectedPrice.currency_code,
+	}
+}
+
+function openResubscribeModal(
+	serverId: string,
+	subscription: Labrinth.Billing.Internal.UserSubscription,
+	charge?: Labrinth.Billing.Internal.Charge | null,
+) {
+	const displayInterval = charge?.subscription_interval ?? subscription.interval
+	const displayPriceId = charge?.price_id ?? subscription.price_id
+	const product = getProductFromPriceId(displayPriceId)
+	const fallbackPrice = getRecurringPrice(product, displayInterval, charge?.currency_code)
+
+	resubscribeModal.value?.show({
+		subscriptionId: subscription.id,
+		wasSuspended: !!charge?.due && dayjs(charge.due).isBefore(dayjs()),
+		serverName:
+			serverList.value.find((server) => server.server_id === serverId)?.name ?? 'this server',
+		planName: getPlanName(product),
+		ramGb: getRamGb(product),
+		storageGb: getStorageGb(product),
+		sharedCpus: getSharedCpus(product),
+		priceCents: charge?.amount ?? fallbackPrice?.amount,
+		currencyCode: charge?.currency_code ?? fallbackPrice?.currencyCode,
+		interval: displayInterval,
+		nextChargeDate: charge?.due,
+	})
+}
+
+async function handleResubscribeConfirm({ subscriptionId, wasSuspended }: ResubscribeRequest) {
+	try {
+		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
+			cancelled: false,
+		})
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: ['billing'] }),
+			queryClient.invalidateQueries({ queryKey: ['servers'] }),
+		])
+		if (wasSuspended) {
+			addNotification({
+				title: 'Resubscription request submitted',
+				text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
+				type: 'success',
+			})
+		} else {
+			addNotification({
+				title: 'Success',
+				text: 'Server subscription resubscribed successfully',
+				type: 'success',
+			})
+		}
+	} catch {
+		addNotification({
+			title: 'Error resubscribing',
+			text: 'An error occurred while resubscribing to your Modrinth server.',
+			type: 'error',
+		})
+	}
+}
+
+const serverBillingMap = computed(() => {
+	const map = new Map<string, ServerBillingInfo>()
+	if (!subscriptions.value || !charges.value) return map
+
+	const pyroSubs = subscriptions.value.filter((s) => s?.metadata?.type === 'pyro')
+	for (const sub of pyroSubs) {
+		const serverId = (sub.metadata as { id?: string })?.id
+		if (!serverId) continue
+
+		const charge = charges.value.find(
+			(c) => c.subscription_id === sub.id && c.status !== 'succeeded',
+		)
+
+		const info: ServerBillingInfo = {
+			isProvisioning:
+				sub.status === 'unprovisioned' &&
+				(charge?.status === 'processing' || charge?.status === 'open'),
+		}
+
+		info.onDownloadBackup = getLatestBackupDownload(serverId)
+
+		if (charge?.status === 'cancelled') {
+			info.cancellationDate = charge.due
+
+			info.onResubscribe = () => openResubscribeModal(serverId, sub, charge)
+		}
+
+		map.set(serverId, info)
+	}
+
+	return map
+})
 </script>
 
 <style scoped>

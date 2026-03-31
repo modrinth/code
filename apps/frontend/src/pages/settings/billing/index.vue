@@ -1,5 +1,6 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
+	<ResubscribeModal ref="pyroResubscribeModal" @resubscribe="handlePyroResubscribeConfirm" />
 	<section class="universal-card experimental-styles-within">
 		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
 		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
@@ -284,6 +285,8 @@
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
+								:cancellation-date="getCancellationDate(subscription)"
+								:on-download-backup="getLatestBackupDownload(subscription.serverInfo)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -514,15 +517,9 @@
 											"
 											color="green"
 										>
-											<button
-												@click="
-													resubscribePyro(
-														subscription.id,
-														$dayjs(getPyroCharge(subscription).due).isBefore($dayjs()),
-													)
-												"
-											>
-												{{ formatMessage(messages.resubscribe) }} <RightArrowIcon />
+											<button @click="openPyroResubscribeModal(subscription)">
+												{{ formatMessage(messages.resubscribe) }}
+												<RightArrowIcon />
 											</button>
 										</ButtonStyled>
 									</div>
@@ -709,6 +706,7 @@ import {
 	OverflowMenu,
 	paymentMethodMessages,
 	PurchaseModal,
+	ResubscribeModal,
 	ServerListing,
 	useFormatDateTime,
 	useFormatPrice,
@@ -716,7 +714,8 @@ import {
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { useIntervalFn } from '@vueuse/core'
+import { computed, ref, watch } from 'vue'
 
 import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
@@ -998,7 +997,7 @@ const messages = defineMessages({
 	pyroResubscribeRequestSubmittedText: {
 		id: 'settings.billing.pyro.resubscribe.request-submitted.text',
 		defaultMessage:
-			'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+			'If the server is currently cancelled, it may take 10-15 minutes to set up the server.',
 	},
 	pyroResubscribeSuccessText: {
 		id: 'settings.billing.pyro.resubscribe.success.text',
@@ -1053,6 +1052,11 @@ const { data: serversData } = useQuery({
 	queryFn: () => client.archon.servers_v0.list(),
 })
 
+const { data: serverFullList } = useQuery({
+	queryKey: ['servers', 'v1'],
+	queryFn: () => client.archon.servers_v1.list(),
+})
+
 const midasProduct = ref(products.find((x) => x.metadata?.type === 'midas'))
 const midasSubscription = computed(() =>
 	subscriptions.value?.find(
@@ -1082,16 +1086,38 @@ const pyroSubscriptions = computed(() => {
 	const pyroSubs = subscriptions.value?.filter((s) => s?.metadata?.type === 'pyro') || []
 	const servers = serversData.value?.servers || []
 
-	return pyroSubs.map((subscription) => {
-		const server = servers.find((s) => s.server_id === subscription.metadata.id)
-		return {
-			...subscription,
-			serverInfo: server,
-		}
-	})
+	return pyroSubs
+		.map((subscription) => {
+			const server = servers.find((s) => s.server_id === subscription.metadata.id)
+			const charge = getPyroCharge(subscription)
+
+			return {
+				...subscription,
+				serverInfo: {
+					...server,
+					isProvisioning:
+						subscription.status === 'unprovisioned' &&
+						(charge?.status === 'processing' || charge?.status === 'open'),
+				},
+			}
+		})
+		.filter((subscription) => {
+			// files expire 30 days after cancellation
+			const cancellationDate = getCancellationDate(subscription)
+			if (
+				!cancellationDate ||
+				subscription.serverInfo?.status !== 'suspended' ||
+				subscription.serverInfo?.suspension_reason !== 'cancelled'
+			)
+				return true
+			const cancellation = new Date(cancellationDate)
+			const thirtyDaysLater = new Date(cancellation.getTime() + 30 * 24 * 60 * 60 * 1000)
+			return new Date() <= thirtyDaysLater
+		})
 })
 
 const midasPurchaseModal = ref()
+const pyroResubscribeModal = ref()
 const country = useUserCountry()
 const price = computed(() =>
 	midasProduct.value?.prices?.find((x) => x.currency_code === getCurrency(country.value)),
@@ -1201,11 +1227,18 @@ const getProductFromPriceId = (priceId) => {
 	return productsData.value.find((p) => p.prices?.some((x) => x.id === priceId))
 }
 
-const getPyroCharge = (subscription) => {
+function getPyroCharge(subscription) {
 	if (!subscription || !charges.value) return null
 	return charges.value.find(
 		(charge) => charge.subscription_id === subscription.id && charge.status !== 'succeeded',
 	)
+}
+
+function getCancellationDate(subscription) {
+	const charge = getPyroCharge(subscription)
+	if (!charge) return null
+	if (charge.status === 'cancelled') return charge.due
+	return null
 }
 
 const getProductSize = (product) => {
@@ -1243,12 +1276,38 @@ const showPyroUpgradeModal = (subscription) => {
 	upgradeModal.value?.open(subscription?.metadata?.id)
 }
 
+const CHARGE_POLL_INTERVAL_MS = 20_000
+
+const hasProvisioningSubscription = computed(() =>
+	pyroSubscriptions.value?.some((s) => s.serverInfo?.isProvisioning),
+)
+
+const { pause: pauseChargePoll, resume: resumeChargePoll } = useIntervalFn(
+	() => {
+		queryClient.invalidateQueries({ queryKey: ['billing', 'payments'] })
+		queryClient.invalidateQueries({ queryKey: ['billing', 'subscriptions'] })
+	},
+	CHARGE_POLL_INTERVAL_MS,
+	{ immediate: false },
+)
+
+watch(
+	hasProvisioningSubscription,
+	(isProvisioning) => {
+		if (isProvisioning) {
+			resumeChargePoll()
+		} else {
+			pauseChargePoll()
+		}
+	},
+	{ immediate: true },
+)
+
 const resubscribePyro = async (subscriptionId, wasSuspended) => {
 	try {
 		await client.labrinth.billing_internal.editSubscription(subscriptionId, {
 			cancelled: false,
 		})
-		await refresh()
 		if (wasSuspended) {
 			addNotification({
 				title: formatMessage(messages.pyroResubscribeRequestSubmittedTitle),
@@ -1268,6 +1327,71 @@ const resubscribePyro = async (subscriptionId, wasSuspended) => {
 			text: formatMessage(messages.pyroResubscribeErrorText),
 			type: 'error',
 		})
+	}
+}
+
+function openPyroResubscribeModal(subscription) {
+	const charge = getPyroCharge(subscription)
+	const product = getPyroProduct(subscription)
+	const interval = charge?.subscription_interval || subscription?.interval
+	const productPrice = getProductPrice(product, interval)
+
+	pyroResubscribeModal.value?.show({
+		subscriptionId: subscription?.id ?? '',
+		wasSuspended: charge?.due ? new Date(charge.due).getTime() < Date.now() : false,
+		serverName: subscription?.serverInfo?.name ?? 'this server',
+		planName: `${getProductSize(product)} plan`,
+		ramGb: product?.metadata?.ram ? product.metadata.ram / 1024 : undefined,
+		storageGb: product?.metadata?.storage ? product.metadata.storage / 1024 : undefined,
+		sharedCpus: product?.metadata?.cpu ? product.metadata.cpu / 2 : undefined,
+		priceCents: charge?.amount ?? productPrice?.prices?.intervals?.[interval],
+		currencyCode: charge?.currency_code ?? productPrice?.currency_code,
+		interval,
+		nextChargeDate: charge?.due,
+	})
+}
+
+function handlePyroResubscribeConfirm({ subscriptionId, wasSuspended }) {
+	return resubscribePyro(subscriptionId, wasSuspended)
+}
+
+function getLatestBackupDownload(serverInfo) {
+	const serverFull = serverFullList.value?.find((s) => s.id === serverInfo.server_id)
+	if (!serverFull) return null
+
+	const activeWorld = serverFull.worlds.find((w) => w.is_active) ?? serverFull.worlds[0]
+	if (!activeWorld?.backups?.length) return null
+
+	const latestBackup = activeWorld.backups
+		.filter((b) => b.status === 'done')
+		.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+	if (!latestBackup) return null
+
+	return async () => {
+		try {
+			const server = await client.archon.servers_v0.get(serverInfo.server_id)
+			const kyrosUrl = server.node?.instance
+			const jwt = server.node?.token
+			if (!kyrosUrl || !jwt) {
+				addNotification({
+					title: 'Download unavailable',
+					text: 'Server connection info is not available. Please contact support.',
+					type: 'error',
+				})
+				return
+			}
+
+			window.open(
+				`https://${kyrosUrl}/modrinth/v0/backups/${latestBackup.id}/download?auth=${jwt}`,
+				'_blank',
+			)
+		} catch {
+			addNotification({
+				title: 'Download failed',
+				text: 'An error occurred while trying to download the backup.',
+				type: 'error',
+			})
+		}
 	}
 }
 
