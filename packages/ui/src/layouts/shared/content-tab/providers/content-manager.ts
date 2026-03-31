@@ -82,9 +82,6 @@ export interface ContentManagerContext {
 	// Upload progress (optional)
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
 
-	// Show client-only environment filter pill
-	showClientOnlyFilter?: boolean
-
 	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
 	isBulkOperating?: Ref<boolean>
 

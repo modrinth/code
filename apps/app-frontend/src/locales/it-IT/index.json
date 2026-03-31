@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Impossibile raggiungere i server di autenticazione"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Aggiungi server all'istanza"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Aggiungi server alla tua istanza"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Aggiungi all'istanza"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Aggiungi a {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Aggiunto"
+  },
+  "app.browse.already-added": {
+    "message": "Già aggiunto"
+  },
+  "app.browse.discover-content": {
+    "message": "Esplora contenuti"
+  },
+  "app.browse.discover-servers": {
+    "message": "Esplora i server"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Nascondi server aggiunti"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Nascondi contenuti installati"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installa nella istanza"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Inserisci descrizione del pacchetto..."
   },
@@ -41,32 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Elimina istanza"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "Questo pacchetto è già stato installato nell'istanza \"{instanceName}\"."
+  "app.instance.modpack-already-installed.body": {
+    "message": "Questo pacchetto di mod è già installato nell'istanza <bold>{instanceName}</bold>. Vuoi davvero duplicarlo?"
   },
-  "app.instance.modpack-already-installed.admonition-header": {
-    "message": "Pacchetto duplicato"
-  },
-  "app.instance.modpack-already-installed.create-anyway": {
-    "message": "Crea comunque"
-  },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "Vai all'istanza"
+  "app.instance.modpack-already-installed.create": {
+    "message": "Crea"
   },
   "app.instance.modpack-already-installed.header": {
     "message": "Pacchetto già installato"
   },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Istanza"
+  },
   "app.instance.mods.content-type-project": {
     "message": "progetto"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Copia link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installando..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Pacchetto di mod"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" è stato aggiunto"
@@ -80,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Condivisione del pacchetto"
   },
-  "app.instance.mods.show-file": {
-    "message": "Mostra file"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Caricato con successo"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Sconosciuta"
+  "app.instance.worlds.add-server": {
+    "message": "Aggiungi server"
   },
-  "app.instance.mods.updating": {
-    "message": "Aggiornando..."
+  "app.instance.worlds.browse-servers": {
+    "message": "Esplora i server"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "\"{name}\" verrà eliminato permanentemente e non ci sarà modo di recuperarlo."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Vuoi davvero eliminare permanentemente questo mondo?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Moddato"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Inizia esplorando o aggiungendo un server"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Nessun server o mondi aggiunti"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "\"{name}\" sarà rimosso dalla tua lista, inclusa quella in-gioco, e non ci sarà modo di recuperarlo."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "\"{name}\" ({address}) sarà rimosso dalla tua lista, inclusa quella in-gioco, e non ci sarà modo di recuperarlo."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Vuoi davvero rimuovere {name}?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Cerca tra {count} mondi..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "questo server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Contenuto richiesto"
@@ -139,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Opzioni d'istanza predefinite"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Flag di funzionalità"
   },
   "app.settings.tabs.java-installations": {
     "message": "Installazioni Java"
@@ -196,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Ricarica per installare l'aggiornamento"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Seleziona un'opzione"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Versione {version} incompatibile"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Mai avviato"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
   },
   "friends.action.add-friend": {
     "message": "Stringi un'amicizia"
@@ -295,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Modifica mondo"
+  },
+  "instance.files.adding-files": {
+    "message": "Aggiungendo i file ({completed}/{total})..."
+  },
+  "instance.files.save-as": {
+    "message": "Salva come..."
   },
   "instance.server-modal.address": {
     "message": "Indirizzo"
@@ -467,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Non mostrare nella home"
   },
-  "instance.worlds.filter.available": {
-    "message": "Disponibile"
-  },
   "instance.worlds.game_already_open": {
     "message": "Istanza già aperta"
   },
@@ -493,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Avvia istanza"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Giocatore singolo"
   },
   "instance.worlds.view_instance": {
     "message": "Mostra istanza"

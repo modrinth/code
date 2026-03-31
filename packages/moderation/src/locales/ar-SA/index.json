@@ -11,6 +11,18 @@
   "nags.add-icon.title": {
     "defaultMessage": "أضف أيقونة"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "أضف عنوان IP و منفذ يمكن للاعبي جافا استخدامه لدخول خادمك."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "أضف عنوان جافا"
+  },
+  "nags.add-links-server.description": {
+    "defaultMessage": "أضف أي روابط ذات صلة خارج Modrinth، مثل موقع إلكتروني، متجر، أو دعوة Discord."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "إضافة روابط خارجية"
+  },
   "nags.add-links.description": {
     "defaultMessage": "أضف أي روابط ذات صلة تستهدف خارج Modrinth، مثل كود المصدر، أو متعقب المشكلات، أو دعوة Discord."
   },
@@ -50,8 +62,20 @@
   "nags.feature-gallery-image.title": {
     "defaultMessage": ""
   },
+  "nags.gallery.title": {
+    "defaultMessage": "زيارة مَعْرِض الصور"
+  },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "الـ {type, select, mod {mod} plugin {plugin} other {project}} الخاص بك يستخدم ترخيصًا يتطلب إتاحة الشيفرة المصدرية. يُرجى توفير رابط الشيفرة المصدرية أو ملف المصادر لكل إصدار إضافي، أو التفكير في استخدام ترخيص مختلف.\n"
+  },
+  "nags.gpl-license-source-required.title": {
+    "defaultMessage": "توفير كود مصدري"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "بعض روابطك الإضافية تبدو متطابقة. كل رابط يجب أن يكون فريدا بنوع رابط مناسب."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "روابط متطابقة"
   },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}. يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام، وليست جملًا كاملة.\n"

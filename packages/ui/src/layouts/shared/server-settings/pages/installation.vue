@@ -60,26 +60,25 @@
 <script setup lang="ts">
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
-
-import { ButtonStyled, ConfirmModal, ServerSetupModal } from '#ui/components'
-import { useDebugLogger } from '#ui/composables/debug-logger'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	InstallationSettingsLayout,
-	provideInstallationSettings,
-} from '#ui/layouts/shared/installation-settings'
-import {
+	ButtonStyled,
+	commonMessages,
+	ConfirmModal,
+	defineMessages,
+	formatLoaderLabel,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettings,
 	injectTags,
-} from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
-import { formatLoaderLabel } from '#ui/utils/loaders'
-
-import { injectServerSettings } from '../providers'
+	InstallationSettingsLayout,
+	provideInstallationSettings,
+	ServerSetupModal,
+	useDebugLogger,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
@@ -168,7 +167,7 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	reinstall: [unknown?]
+	reinstall: [any?]
 	'reinstall-failed': []
 }>()
 
@@ -255,6 +254,26 @@ const purpurBuildsQuery = useQuery({
 	queryKey: computed(() => ['purpur-builds', editingGameVersion.value] as const),
 	queryFn: () => client.purpur.versions_v2.getBuilds(editingGameVersion.value),
 	enabled: computed(() => editingPlatform.value === 'purpur' && !!editingGameVersion.value),
+	staleTime: 5 * 60 * 1000,
+})
+
+const paperSupportedVersionsQuery = useQuery({
+	queryKey: ['paper-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.paper.versions_v3.getProject()
+		return new Set(Object.values(project.versions).flat())
+	},
+	enabled: computed(() => editingPlatform.value === 'paper'),
+	staleTime: 5 * 60 * 1000,
+})
+
+const purpurSupportedVersionsQuery = useQuery({
+	queryKey: ['purpur-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.purpur.versions_v2.getProject()
+		return new Set(project.versions)
+	},
+	enabled: computed(() => editingPlatform.value === 'purpur'),
 	staleTime: 5 * 60 * 1000,
 })
 
@@ -365,17 +384,33 @@ provideInstallationSettings({
 			? tags.gameVersions.value
 			: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
-		if (loader && loader !== 'vanilla' && !['paper', 'purpur'].includes(loader)) {
-			const manifest = manifestQuery.data.value?.gameVersions
-			if (manifest) {
-				const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-				if (!hasPlaceholder) {
-					const supportedVersions = new Set(
-						manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
-					)
+		if (loader && loader !== 'vanilla') {
+			if (loader === 'paper') {
+				const supported = paperSupportedVersionsQuery.data.value
+				if (supported) {
 					return versions
-						.filter((v) => supportedVersions.has(v.version))
+						.filter((v) => supported.has(v.version))
 						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else if (loader === 'purpur') {
+				const supported = purpurSupportedVersionsQuery.data.value
+				if (supported) {
+					return versions
+						.filter((v) => supported.has(v.version))
+						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else {
+				const manifest = manifestQuery.data.value?.gameVersions
+				if (manifest) {
+					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+					if (!hasPlaceholder) {
+						const supportedVersions = new Set(
+							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+						)
+						return versions
+							.filter((v) => supportedVersions.has(v.version))
+							.map((v) => ({ value: v.version, label: v.version }))
+					}
 				}
 			}
 		}
@@ -389,8 +424,22 @@ provideInstallationSettings({
 	},
 
 	resolveHasSnapshots(loader) {
-		if (loader === 'vanilla' || ['paper', 'purpur'].includes(loader)) {
+		if (loader === 'vanilla') {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
+		}
+		if (loader === 'paper') {
+			const supported = paperSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
+		}
+		if (loader === 'purpur') {
+			const supported = purpurSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
 		}
 		const manifest = manifestQuery.data.value?.gameVersions
 		if (!manifest) return false
@@ -656,7 +705,7 @@ watch(
 	},
 )
 
-function onReinstall(event?: unknown) {
+function onReinstall(event?: any) {
 	installationSettingsLayout.value?.cancelEditing()
 	emit('reinstall', event)
 }

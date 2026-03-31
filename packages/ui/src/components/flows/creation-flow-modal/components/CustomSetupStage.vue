@@ -104,7 +104,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import { injectFilePicker, injectTags } from '../../../../providers'
+import { injectFilePicker, injectModrinthClient, injectTags } from '../../../../providers'
 import Avatar from '../../../base/Avatar.vue'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Chips from '../../../base/Chips.vue'
@@ -116,6 +116,7 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 import { capitalize, formatLoaderLabel } from '../shared'
 
 const debug = useDebugLogger('CustomSetupStage')
+const client = injectModrinthClient()
 const ctx = injectCreationFlowContext()
 const {
 	selectedLoader,
@@ -280,9 +281,8 @@ async function fetchLoaderManifest(loader: string) {
 async function fetchPaperSupportedVersions() {
 	if (paperSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.papermc.io/v2/projects/paper')
-		const data = (await res.json()) as { versions: string[] }
-		paperSupportedVersions.value = new Set(data.versions)
+		const project = await client.paper.versions_v3.getProject()
+		paperSupportedVersions.value = new Set(Object.values(project.versions).flat())
 	} catch {
 		paperSupportedVersions.value = new Set()
 	}
@@ -291,9 +291,8 @@ async function fetchPaperSupportedVersions() {
 async function fetchPurpurSupportedVersions() {
 	if (purpurSupportedVersions.value) return
 	try {
-		const res = await fetch('https://api.purpurmc.org/v2/purpur')
-		const data = (await res.json()) as { versions: string[] }
-		purpurSupportedVersions.value = new Set(data.versions)
+		const project = await client.purpur.versions_v2.getProject()
+		purpurSupportedVersions.value = new Set(project.versions)
 	} catch {
 		purpurSupportedVersions.value = new Set()
 	}
@@ -302,8 +301,7 @@ async function fetchPurpurSupportedVersions() {
 async function fetchPaperVersions(mcVersion: string) {
 	if (paperVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${mcVersion}`)
-		const data = (await res.json()) as { builds: number[] }
+		const data = await client.paper.versions_v3.getBuilds(mcVersion)
 		paperVersions.value[mcVersion] = data.builds.sort((a, b) => b - a)
 	} catch {
 		paperVersions.value[mcVersion] = []
@@ -313,8 +311,7 @@ async function fetchPaperVersions(mcVersion: string) {
 async function fetchPurpurVersions(mcVersion: string) {
 	if (purpurVersions.value[mcVersion]) return
 	try {
-		const res = await fetch(`https://api.purpurmc.org/v2/purpur/${mcVersion}`)
-		const data = (await res.json()) as { builds: { all: string[] } }
+		const data = await client.purpur.versions_v2.getBuilds(mcVersion)
 		purpurVersions.value[mcVersion] = data.builds.all.sort((a, b) => parseInt(b) - parseInt(a))
 	} catch {
 		purpurVersions.value[mcVersion] = []

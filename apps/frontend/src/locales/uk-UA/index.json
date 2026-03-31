@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Не вдалося полагодити сервер"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Не вдалося скинути до початкового стану"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Не вдалося зберегти налаштування інсталяції"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Скинути до початкового стану"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Це призведе до повернення сервера в початковий стан, щоб можна було повторно виконати процес налаштування. Ви впевнені, що хочете продовжити?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Скинути до початкового стану"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Сервер повернуто до початкового стану для налаштування."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Сервер скинуто до початкового стану"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Налаштування підтримки"
   },
   "hosting.plan.out-of-stock": {
     "message": "Немає в наявності"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Дослідити вміст"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Спеціальні функції"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Установити Modrinth App"

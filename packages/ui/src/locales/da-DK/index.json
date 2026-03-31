@@ -155,17 +155,11 @@
   "changelog.justNow": {
     "defaultMessage": "Lige nu"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "Hjemmeside"
   },
   "collections.label.private": {
     "defaultMessage": "Privat"

@@ -44,15 +44,6 @@
   "app.instance.mods.content-type-project": {
     "message": "projekt"
   },
-  "app.instance.mods.copy-link": {
-    "message": "Kopier link"
-  },
-  "app.instance.mods.installing": {
-    "message": "Installer..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
-  },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" blev tilføjet"
   },
@@ -65,17 +56,8 @@
   "app.instance.mods.share-title": {
     "message": "Deler modpack indhold"
   },
-  "app.instance.mods.show-file": {
-    "message": "Vis filer"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Uploadet"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "Ukendt"
-  },
-  "app.instance.mods.updating": {
-    "message": "Opdatere..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "Indhold krævet"
@@ -124,9 +106,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Standardindstillinger for instans"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Funktionsflags"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javainstallationer"
@@ -452,9 +431,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Vis ikke på forsiden"
   },
-  "instance.worlds.filter.available": {
-    "message": "Tilgængelig"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instance allerede åben"
   },
@@ -478,12 +454,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Spil instance"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Singleplayer"
   },
   "instance.worlds.view_instance": {
     "message": "Se instance"

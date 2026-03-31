@@ -38,6 +38,9 @@
   "app-marketing.download.options-title": {
     "message": "خيارات التنزيل"
   },
+  "app-marketing.download.terms": {
+    "message": "بتنزيلك Modrinth App فإنك توافق على <terms-link>الشروط</terms-link> و <privacy-link>سياسة الخصوصية</privacy-link>."
+  },
   "app-marketing.download.title": {
     "message": "تنزيل Modrinth App (النسخة التجريبية)"
   },
@@ -103,6 +106,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "يعمل Modrinth App بكفاءة أفضل من العديد من مديري المودات الرائدين، باستخدام 150 ميغابايت فقط من الذاكرة العشوائية!"
   },
   "app-marketing.features.performance.discord": {
     "message": "ديسكورد"
@@ -386,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "لا توجد مشروعات في هذه المجموعة حتي الآن"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {لا مشاريع حتى الاۤن} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "تم التحديث منذ {ago}"
   },
@@ -488,11 +497,23 @@
   "create.project.create-project": {
     "message": "إنشاء مشروع"
   },
+  "create.project.missing-fields-tooltip": {
+    "message": "حقل مفقود: {fields}"
+  },
   "create.project.name-label": {
     "message": "الإسم"
   },
   "create.project.name-placeholder": {
     "message": "أدخل اسم المشروع..."
+  },
+  "create.project.owner-description": {
+    "message": "عين مالك المشروع كنفسك أو كمنظمة أنت عضو منها."
+  },
+  "create.project.owner-label": {
+    "message": "المالك"
+  },
+  "create.project.server-project-title": {
+    "message": "إنشاء مشروع الخادم"
   },
   "create.project.summary-description": {
     "message": "جملة أو جملتان تصف مجموعتك."
@@ -505,6 +526,15 @@
   },
   "create.project.title": {
     "message": "إنشاء مشروع"
+  },
+  "create.project.type-label": {
+    "message": "نوع"
+  },
+  "create.project.type-project": {
+    "message": "مشروع"
+  },
+  "create.project.type-server": {
+    "message": "خادم"
   },
   "create.project.url-label": {
     "message": "عنوان URL"
@@ -544,6 +574,21 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "إنشاء جديد"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "أنشئ مجموعتك الأولى للبدء!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "ليس لديك مجموعات بعد"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "لا توجد مجموعات تطابق بحثك"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "جرب تعديل فلاترك أو شروط البحث."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {مشروع} other {مشروع}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "ابحث في مجموعاتك"
@@ -619,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "تشير الكيان التجاري إلى منظمة مسجلة مثل شركة مساهمة أو شراكة أو شركة ذات مسؤولية محدودة."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "هل تسحب كفرد أم كشركة؟"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "فرد خاص"
@@ -1046,14 +1094,56 @@
   "frog": {
     "message": "لقد تم ضفدعتك! 🐸"
   },
+  "frog.altText": {
+    "message": "لوحة فنية واقعية فوتوغرافية لمتاهة ضفادع"
+  },
+  "frog.title": {
+    "message": "ضفدع"
+  },
+  "hosting-marketing.available-locations": {
+    "message": "متاح في أمريكا الشمالية، أوروبا، و جنوب شرق اۤسيا لتغطية أوسع."
+  },
+  "hosting-marketing.billing.monthly": {
+    "message": "ادفع شهريا"
+  },
+  "hosting-marketing.billing.quarterly": {
+    "message": "ادفع أرباعا سنوية"
+  },
   "hosting-marketing.billing.save-with-quarterly": {
     "message": "وفر 16% مع الدفع ربع السنوي!"
+  },
+  "hosting-marketing.billing.starting-at": {
+    "message": "يبدأ من {price} / للشهر"
+  },
+  "hosting-marketing.billing.yearly": {
+    "message": "ادفع سنويا"
+  },
+  "hosting-marketing.faq.burst-threads": {
+    "message": "كيف تعمل مسارات المعالجة في وحدة المعالجة المركزية؟"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
     "message": "تعمل استضافة خوادم مودرينث على AMD Ryzen 7900 و 7950X3D و وحدات معالجة مركزية مماثلة بسرعة 5+ غيغاهيرتز مقترنة بذاكرة وصول عشوائي من نوع DDR5"
   },
   "hosting-marketing.faq.location": {
     "message": "أين تقع استضافة خوادم Modrinth؟ هل يمكنني اختيار منطقة؟"
+  },
+  "hosting-marketing.get-started": {
+    "message": "ابدأ"
+  },
+  "hosting-marketing.hero.button.manage-your-servers": {
+    "message": "ٳدارة خوادمك"
+  },
+  "hosting-marketing.hero.button.start-a-new-server": {
+    "message": "أنشئ خادما جديدا"
+  },
+  "hosting-marketing.hero.button.start-your-server": {
+    "message": "أنشئ خادمك"
+  },
+  "hosting-marketing.hero.host-with-modrinth": {
+    "message": "أدر خادمك التالي مع Modrinth Hosting"
+  },
+  "hosting-marketing.included.backups-included": {
+    "message": "النسخ الاحتياطية مضمنة"
   },
   "hosting-marketing.included.description": {
     "message": "."
