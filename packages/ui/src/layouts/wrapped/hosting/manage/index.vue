@@ -1,7 +1,8 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="experimental-styles-within relative mx-auto mb-6 flex min-h-screen w-full max-w-[1280px] flex-col px-6"
+		class="experimental-styles-within relative mx-auto mb-6 flex w-full max-w-[1280px] flex-col px-6"
+		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
 	>
 		<ModrinthServersPurchaseModal
 			v-if="customer && regions"
