@@ -79,7 +79,7 @@ export function useVirtualScroll<T>(items: Ref<T[]>, options: VirtualScrollOptio
 		const rangeEnd = Math.min(items.value.length, start + visibleCount + bufferSize * 2)
 
 		return {
-			start: Math.min(rangeStart, rangeEnd),
+			start: rangeStart,
 			end: rangeEnd,
 		}
 	})
