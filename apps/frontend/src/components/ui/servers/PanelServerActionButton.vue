@@ -68,11 +68,7 @@
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand" size="large">
-					<button
-						v-tooltip="busyTooltip"
-						:disabled="!canTakeAction"
-						@click="handlePrimaryAction"
-					>
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<div v-if="isTransitioning" class="grid place-content-center">
 							<LoadingIcon />
 						</div>

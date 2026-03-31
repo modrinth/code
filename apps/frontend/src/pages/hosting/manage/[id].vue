@@ -172,10 +172,7 @@
 			</template>
 			<template #actions>
 				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
-					<PanelServerActionButton
-						:disabled="!!error"
-						:uptime-seconds="uptimeSeconds"
-					/>
+					<PanelServerActionButton :disabled="!!error" :uptime-seconds="uptimeSeconds" />
 				</div>
 			</template>
 		</ContentPageHeader>
@@ -393,7 +390,6 @@ import {
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
-	useVIntl,
 } from '@modrinth/ui'
 import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -411,7 +407,6 @@ import { useServerProject } from '~/composables/servers/use-server-project.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 
 const isReconnecting = ref(false)
@@ -1227,7 +1222,6 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 	if (updated.length > 10) updated.shift()
 	return updated
 }
-
 
 const nodeUnavailableDetails = computed(() => [
 	{

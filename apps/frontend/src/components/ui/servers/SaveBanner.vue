@@ -45,9 +45,7 @@ const props = defineProps<{
 const client = injectModrinthClient()
 const { powerState } = injectModrinthServerContext()
 
-const isStopped = computed(
-	() => powerState.value === 'stopped' || powerState.value === 'crashed',
-)
+const isStopped = computed(() => powerState.value === 'stopped' || powerState.value === 'crashed')
 
 const isTransitioning = computed(
 	() => powerState.value === 'starting' || powerState.value === 'stopping',
