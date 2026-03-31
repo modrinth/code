@@ -264,7 +264,8 @@ function begin(
 	selectedInterval.value = interval
 	customServer.value = !selectedPlan.value
 	selectedPaymentMethod.value = undefined
-	currentStep.value = steps[0]
+	const skipPlanStep = props.planStage && plan !== undefined
+	currentStep.value = skipPlanStep ? (steps[1] ?? steps[0]) : steps[0]
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
