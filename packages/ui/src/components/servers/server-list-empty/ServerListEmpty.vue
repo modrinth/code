@@ -76,17 +76,19 @@
 					</AutoLink>
 				</div>
 
-				<div class="h-px w-full bg-surface-5" />
+				<template v-if="!loggedIn">
+					<div class="h-px w-full bg-surface-5" />
 
-				<div class="flex gap-3 items-center flex-wrap">
-					<p class="text-base font-normal text-primary">Already have a server?</p>
-					<ButtonStyled>
-						<button @click="onClickSignIn?.()">
-							<LogInIcon aria-hidden="true" />
-							Sign in
-						</button>
-					</ButtonStyled>
-				</div>
+					<div class="flex gap-3 items-center flex-wrap">
+						<p class="text-base font-normal text-primary">Already have a server?</p>
+						<ButtonStyled>
+							<button @click="onClickSignIn?.()">
+								<LogInIcon aria-hidden="true" />
+								Sign in
+							</button>
+						</ButtonStyled>
+					</div>
+				</template>
 			</div>
 		</div>
 
@@ -175,6 +177,7 @@ withDefaults(
 		animated?: boolean
 		onClickNewServer?: () => void
 		onClickSignIn?: () => void
+		loggedIn?: boolean
 	}>(),
 	{ animated: false },
 )

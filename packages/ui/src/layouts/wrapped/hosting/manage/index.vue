@@ -27,7 +27,7 @@
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
 		<div
-			v-if="hasError || fetchError"
+			v-if="hasError"
 			class="mx-auto flex h-full min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-left"
 		>
 			<div class="flex max-w-lg flex-col items-center rounded-3xl bg-bg-raised p-6 shadow-xl">
@@ -102,7 +102,11 @@
 				key="empty"
 				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
-				<ServerListEmpty @click-new-server="openPurchaseModal" @click-sign-in="handleSignIn" />
+				<ServerListEmpty
+					:logged-in="loggedIn"
+					@click-new-server="openPurchaseModal"
+					@click-sign-in="handleSignIn"
+				/>
 			</div>
 
 			<div v-else key="list">
@@ -187,6 +191,7 @@ import {
 	AutoLink,
 	ButtonStyled,
 	CopyCode,
+	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
 	ModrinthServersPurchaseModal,
@@ -214,11 +219,12 @@ const props = defineProps<{
 
 const router = useRouter()
 const route = useRoute()
+const auth = injectAuth()
 const client = injectModrinthClient()
+const loggedIn = computed(() => !!auth.user)
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
-const hasError = ref(false)
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
 	enabled: false,
@@ -256,6 +262,7 @@ const {
 } = useQuery({
 	queryKey: ['billing', 'customer'],
 	queryFn: () => client.labrinth.billing_internal.getCustomer() as Promise<Stripe.Customer>,
+	enabled: loggedIn.value,
 })
 
 const {
@@ -266,11 +273,13 @@ const {
 	queryKey: ['billing', 'payment-methods'],
 	queryFn: () =>
 		client.labrinth.billing_internal.getPaymentMethods() as Promise<Stripe.PaymentMethod[]>,
+	enabled: loggedIn.value,
 })
 
 const { data: regions, isLoading: regionsLoading } = useQuery({
 	queryKey: ['servers', 'regions'],
 	queryFn: () => client.archon.servers_v1.getRegions(),
+	enabled: loggedIn.value,
 })
 
 watch(
@@ -417,17 +426,14 @@ const {
 		return response
 	},
 	refetchInterval: computed(() => (pollingState.value.enabled ? 5000 : false)),
+	enabled: loggedIn.value,
 })
 
-watch([fetchError, serverResponse], ([error, response]) => {
-	hasError.value = !!error || !response
-})
+const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
-	return []
-
-	// if (!serverResponse.value) return []
-	// return serverResponse.value.servers
+	if (!serverResponse.value) return []
+	return serverResponse.value.servers
 })
 
 const searchInput = ref('')
@@ -521,17 +527,19 @@ function openPurchaseModal() {
 }
 
 function handleSignIn() {
-	router.push({ name: 'login', query: { redirect: '/hosting/manage' } })
+	auth.requestSignIn('/hosting/manage')
 }
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
 	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+	enabled: loggedIn.value,
 })
 
 const { data: charges } = useQuery({
 	queryKey: ['billing', 'payments'],
 	queryFn: () => client.labrinth.billing_internal.getPayments(),
+	enabled: loggedIn.value,
 })
 
 const CHARGE_POLL_INTERVAL_MS = 20_000
@@ -572,6 +580,7 @@ watch(
 const { data: serverFullList } = useQuery({
 	queryKey: ['servers', 'v1'],
 	queryFn: () => client.archon.servers_v1.list(),
+	enabled: loggedIn.value,
 })
 
 type ServerBillingInfo = {
