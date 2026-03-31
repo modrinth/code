@@ -8,6 +8,7 @@
 			ref="guestPlanModal"
 			:available-products="pyroProducts"
 			:currency="selectedCurrency"
+			:logged-in="loggedIn"
 			@continue="handleGuestPlanContinue"
 		/>
 		<ModrinthServersPurchaseModal
