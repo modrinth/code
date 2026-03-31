@@ -40,6 +40,7 @@ import {
 	OverflowMenu,
 	PopupNotificationPanel,
 	ProgressSpinner,
+	provideAuth,
 	provideModalBehavior,
 	provideModrinthClient,
 	provideNotificationManager,
@@ -57,7 +58,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { $fetch } from 'ofetch'
-import { computed, onMounted, onUnmounted, provide, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, provide, reactive, ref, watch, watchEffect } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import ModrinthAppLogo from '@/assets/modrinth_app.svg?component'
@@ -453,6 +454,21 @@ const updateToPlayModal = ref()
 const credentials = ref()
 
 const modrinthLoginFlowWaitModal = ref()
+
+const authProvider = reactive({
+	session_token: null,
+	user: null,
+	requestSignIn: async (_redirectPath) => {
+		await signIn()
+	},
+})
+
+watchEffect(() => {
+	authProvider.session_token = credentials.value?.session ?? null
+	authProvider.user = credentials.value?.user ?? null
+})
+
+provideAuth(authProvider)
 
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
