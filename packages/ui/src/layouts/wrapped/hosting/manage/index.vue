@@ -442,7 +442,7 @@ const {
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
-	if (!serverResponse.value) return []
+	if (!loggedIn.value || !serverResponse.value) return []
 	return serverResponse.value.servers
 })
 
@@ -501,6 +501,23 @@ watch(serverResponse, (response) => {
 
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
+
+watch(
+	() => auth.user.value,
+	(user, previousUser) => {
+		if (user || !previousUser) return
+		isPollingForNewServers.value = false
+		pollingState.value = {
+			enabled: false,
+			count: 0,
+			initialServers: [],
+		}
+		void Promise.all([
+			queryClient.resetQueries({ queryKey: ['billing'] }),
+			queryClient.resetQueries({ queryKey: ['servers'] }),
+		])
+	},
+)
 
 const canOpenPurchaseModal = computed(() => {
 	return (
