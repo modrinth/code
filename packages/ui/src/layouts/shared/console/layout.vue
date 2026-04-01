@@ -37,7 +37,6 @@
 				<ConsoleActionButtons
 					:share-disabled="resolvedShareDisabled"
 					@clear="handleClear"
-					@copy="handleCopy"
 					@share="handleShare"
 				/>
 			</div>
@@ -170,7 +169,9 @@ watch(searchQuery, (query) => {
 		const addon = terminalRef.value?.searchAddon
 		if (!addon) return
 		if (query) {
-			addon.findNext(query, { decorations: { activeMatchColorOverviewRuler: '#ffffff', matchOverviewRuler: '#888888' } })
+			addon.findNext(query, {
+				decorations: { activeMatchColorOverviewRuler: '#ffffff', matchOverviewRuler: '#888888' },
+			})
 		} else {
 			addon.clearDecorations()
 		}
@@ -182,7 +183,7 @@ function handleCommand(cmd: string) {
 }
 
 function handleClear() {
-	terminalRef.value?.clear()
+	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
 }
