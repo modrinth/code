@@ -1,5 +1,5 @@
 <template>
-	<div v-if="project.versions.length > 0" class="flex flex-col gap-3">
+	<div v-if="project.versions?.length > 0" class="flex flex-col gap-3">
 		<section class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">Supported Minecraft versions</h3>
 			<div class="flex flex-wrap gap-3">
@@ -133,9 +133,9 @@ const props = defineProps<{
 const noModpackLoader = computed(
 	() =>
 		(props.projectV3?.project_types.includes('modpack') &&
-			props.projectV3?.mrpack_loaders.length === 1 &&
-			props.projectV3?.mrpack_loaders[0] === 'minecraft') ||
-		props.projectV3?.mrpack_loaders.length === 0,
+			props.projectV3?.mrpack_loaders?.length === 1 &&
+			props.projectV3?.mrpack_loaders?.[0] === 'minecraft') ||
+		props.projectV3?.mrpack_loaders?.length === 0,
 )
 
 const showEnvironments = computed(
