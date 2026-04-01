@@ -11,16 +11,16 @@
 			v-for="(metric, index) in metrics"
 			:key="index"
 			:to="metric.link && !loading ? metric.link : undefined"
-			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-bg-raised p-5"
+			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
 			:class="
 				metric.link && !loading
 					? 'cursor-pointer transition-transform duration-100 hover:scale-105 active:scale-100'
 					: ''
 			"
 		>
-			<div class="relative z-10 flex flex-col gap-3">
+			<div class="relative z-10 flex flex-col gap-2">
 				<div class="flex items-center justify-between">
-					<span class="flex items-center gap-2 text-base font-medium text-primary">
+					<span class="flex items-center gap-2 font-medium text-primary">
 						{{ metric.title }}
 						<IssuesIcon
 							v-if="metric.warning && !loading"
@@ -29,11 +29,17 @@
 							:style="{ color: 'var(--color-orange)' }"
 						/>
 					</span>
-					<component :is="metric.icon" class="size-7" />
+					<span class="relative">
+						<component :is="metric.icon" class="relative z-10 size-7" />
+						<div class="absolute -right-4 -top-4 -z-10 size-14 rounded-full bg-surface-3 opacity-50 blur-lg" />
+					</span>
 				</div>
 				<span class="text-4xl font-semibold text-contrast">
 					{{ metric.value }}
 				</span>
+				<div
+					class="absolute -left-8 -top-4 -z-10 h-28 w-56 rounded-full bg-surface-3 opacity-50 blur-lg"
+				/>
 			</div>
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
@@ -194,9 +200,9 @@ const getChartOptions = (hasWarning: string | null, index: number) => ({
 			updated: () => onChartReady(index),
 		},
 	},
-	stroke: { curve: 'smooth', width: 3 },
+	stroke: { curve: 'smooth' as const, width: 3 },
 	fill: {
-		type: 'gradient',
+		type: 'gradient' as const,
 		gradient: {
 			shadeIntensity: 1,
 			opacityFrom: 0.25,
@@ -209,7 +215,7 @@ const getChartOptions = (hasWarning: string | null, index: number) => ({
 	xaxis: {
 		labels: { show: false },
 		axisBorder: { show: false },
-		type: 'numeric',
+		type: 'numeric' as const,
 		tickAmount: 20,
 		range: 20,
 	},
@@ -247,5 +253,8 @@ watch(
 	width: 100% !important;
 	height: 142px !important;
 	transition: opacity 0.3s ease-out;
+	box-shadow:
+		0 1px 2px 0 rgba(0, 0, 0, 0.3),
+		0 1px 3px 0 rgba(0, 0, 0, 0.15);
 }
 </style>

@@ -60,11 +60,8 @@
 				:loading="!isConnected || isWsAuthIncorrect"
 			/>
 
-			<div class="flex h-[700px] flex-col gap-3">
-				<div class="flex items-center gap-4">
-					<h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
-					<PanelServerStatus v-if="isConnected && !isWsAuthIncorrect" :state="serverPowerState" />
-				</div>
+			<div class="flex h-[700px] flex-col gap-4">
+				<span class="text-2xl font-semibold text-contrast">Console</span>
 
 				<ConsolePageLayout />
 			</div>
@@ -94,7 +91,6 @@ import {
 } from '@modrinth/ui'
 import type { ServerState, Stats } from '@modrinth/utils'
 
-import PanelServerStatus from '~/components/ui/servers/PanelServerStatus.vue'
 import ServerStats from '~/components/ui/servers/ServerStats.vue'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
