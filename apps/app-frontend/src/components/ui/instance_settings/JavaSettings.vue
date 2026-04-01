@@ -24,6 +24,7 @@ import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
 import useJavaTest from '@/composables/useJavaTest.js'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
+import type { JavaVersion } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
 import { injectInstanceSettings } from '@/providers/instance-settings'
 
@@ -37,11 +38,11 @@ const { instance } = injectInstanceSettings()
 const globalSettings = (await get().catch(handleError)) as unknown as AppSettings
 
 const overrideJavaInstall = ref(!!instance.value.java_path)
-const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catch(handleError))
-const javaInstall = ref({ path: optimalJava.path ?? instance.value.java_path })
+const optimalJava = readonly(await get_optimal_jre_key(instance.value.path).catch(handleError)) as JavaVersion | null
+const javaInstall = ref({ path: optimalJava?.path ?? instance.value.java_path })
 
 const activePath = computed(() =>
-	overrideJavaInstall.value ? javaInstall.value : (optimalJava?.path ?? ''),
+	overrideJavaInstall.value ? javaInstall.value.path : (optimalJava?.path ?? ''),
 )
 
 watch(overrideJavaInstall, (enabled) => {
@@ -81,7 +82,8 @@ async function handleBrowseJava() {
 }
 
 function handleDetectJava() {
-	javaDetectionModal.value.show(optimalJava?.parsed_version, { path: javaInstall.value.path })
+	if (optimalJava?.parsed_version == null) return
+	javaDetectionModal.value?.show(optimalJava.parsed_version, { path: javaInstall.value.path ?? '' })
 }
 
 const overrideJavaArgs = ref((instance.value.extra_launch_args?.length ?? 0) > 0)
@@ -106,27 +108,27 @@ const { maxMemory, snapPoints } = (await useMemorySlider().catch(handleError)) a
 const editProfileObject = computed(() => {
 	return {
 		java_path:
-			overrideJavaInstall.value && javaPath.value
-				? javaPath.value.replace('java.exe', 'javaw.exe')
-				: null,
+			overrideJavaInstall.value && javaInstall.value.path
+				? javaInstall.value.path.replace('java.exe', 'javaw.exe')
+				: undefined,
 		extra_launch_args: overrideJavaArgs.value
 			? javaArgs.value.trim().split(/\s+/).filter(Boolean)
-			: null,
+			: undefined,
 		custom_env_vars: overrideEnvVars.value
-			? envVars.value
+			? (envVars.value
 					.trim()
 					.split(/\s+/)
 					.filter(Boolean)
-					.map((x) => x.split('=').filter(Boolean))
-			: null,
-		memory: overrideMemorySettings.value ? memory.value : null,
+					.map((x) => x.split('=').filter(Boolean)) as [string, string][])
+			: undefined,
+		memory: overrideMemorySettings.value ? memory.value : undefined,
 	}
 })
 
 watch(
 	[
 		overrideJavaInstall,
-		javaPath,
+		javaInstall,
 		overrideJavaArgs,
 		javaArgs,
 		overrideEnvVars,
@@ -194,7 +196,7 @@ const messages = defineMessages({
 
 <template>
 	<div>
-		<JavaDetectionModal ref="javaDetectionModal" @submit="(val) => (javaPath = val.path)" />
+		<JavaDetectionModal ref="javaDetectionModal" @submit="(val) => (javaInstall = { path: val.path })" />
 		<h2 class="m-0 mb-2 text-lg font-extrabold text-contrast block">
 			{{ formatMessage(messages.javaInstallation) }}
 		</h2>
@@ -221,7 +223,7 @@ const messages = defineMessages({
 							autocomplete="off"
 							:placeholder="formatMessage(messages.javaPathPlaceholder)"
 							wrapper-class="flex-1 min-w-0"
-							@update:model-value="(val) => (javaPath = String(val))"
+							@update:model-value="(val) => (javaInstall = { path: String(val) })"
 						/>
 						<Button
 							:disabled="!overrideJavaInstall || testingJava"
