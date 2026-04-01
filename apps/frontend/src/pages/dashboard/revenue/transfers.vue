@@ -99,6 +99,7 @@ import {
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
+import { capitalizeString } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
@@ -166,7 +167,7 @@ function getPeriodLabel(date) {
 	} else if (txnDate.isSame(now.subtract(1, 'month'), 'month')) {
 		return formatMessage(messages.lastMonth)
 	} else {
-		return formatMonth(txnDate.toDate())
+		return capitalizeString(formatMonth(txnDate.toDate()))
 	}
 }
 
