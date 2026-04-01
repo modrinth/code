@@ -780,7 +780,7 @@
     "message": "完成"
   },
   "dashboard.creator-withdraw-modal.stage.method-selection": {
-    "message": "方式"
+    "message": "领取方式"
   },
   "dashboard.creator-withdraw-modal.stage.tax-form": {
     "message": "税务表格"
@@ -957,7 +957,7 @@
     "message": "需要验证电子邮件"
   },
   "dashboard.withdraw.error.generic.text": {
-    "message": "我们无法提交您的提现请求，请检查您的详细信息或联系支持。\n{error}"
+    "message": "我们无法提交你的提现请求，请检查你的详细信息或联系支持。\n{error}"
   },
   "dashboard.withdraw.error.generic.title": {
     "message": "无法提现"
@@ -1149,7 +1149,7 @@
     "message": "Modrinth Hosting 服务器有多快？"
   },
   "hosting-marketing.faq.how-fast.answer.one": {
-    "message": "Modrinth Hosting 服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
+    "message": "Modrinth 代理服务器搭载了极为现代的高性能硬件，但要具体反映到你的服务器会有多快，还是很难预测的，因为实际性能受诸多因素影响，例如在你的服务器上运行的模组、数据包、插件，甚至用户行为模式都是影响的因素。"
   },
   "hosting-marketing.faq.how-fast.answer.two": {
     "message": "大多数性能问题，往往是未优化的整合包、模组、数据包或插件导致服务器卡顿。由于我们的服务器配置非常高端，只要你针对服务器上运行的内容，选择合适的套餐方案，通常不会遇到太大问题。"
@@ -1161,7 +1161,7 @@
     "message": "可以，你可以给你的服务器增加存储空间，而且无需额外费用。如果需要更多存储空间，请联系 Modrinth 支持团队。"
   },
   "hosting-marketing.faq.location": {
-    "message": "Modrinth Hosting 的服务器位于哪里？我可以选择地区吗？"
+    "message": "Modrinth 代理的服务器位于哪里？我可以选择地区吗？"
   },
   "hosting-marketing.faq.location.answer": {
     "message": "目前我们提供北美、欧洲和东南亚的服务器，供你在购买时选择。未来还会增加更多地区！如需更换服务器地区，请联系技术支持。"
@@ -1191,7 +1191,7 @@
     "message": "你的下一个服务器，就交给 Modrinth Hosting"
   },
   "hosting-marketing.hero.hosting-description": {
-    "message": "Modrinth Hosting 可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
+    "message": "Modrinth 代理可让你以最便捷的方式，托管你专属的 Minecraft Java 版服务器。无缝安装并畅玩你心爱的模组和模组包，全在 Modrinth 平台搞定。"
   },
   "hosting-marketing.included.advanced-networking": {
     "message": "高级网络管理"
@@ -1239,7 +1239,7 @@
     "message": "SFTP 访问"
   },
   "hosting-marketing.included.sftp-access.description": {
-    "message": "通过 Modrinth Hosting 内置的 SFTP 功能，直接访问你的服务器文件。"
+    "message": "通过 Modrinth  代理内置的 SFTP 功能，直接访问你的服务器文件。"
   },
   "hosting-marketing.included.with-your-server": {
     "message": "随服务器一并提供"
@@ -1290,10 +1290,10 @@
     "message": "模组在哪，就在哪玩"
   },
   "hosting-marketing.why.where-mods-are.description": {
-    "message": "Modrinth Hosting 将模组与整合包的安装流程无缝集成到你的服务器中。"
+    "message": "Modrinth 代理将模组与整合包的安装流程无缝集成到你的服务器中。"
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "为什么选择 Modrinth Hosting？"
+    "message": "为什么选择 Modrinth代理？"
   },
   "hosting-marketing.why.your-favorite-mods": {
     "message": "你最喜欢的模组都在这里"
@@ -1312,6 +1312,9 @@
   },
   "hosting.loader.failed-to-repair": {
     "message": "修复服务器失败"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "将服务器重置至引导流程失败"
   },
   "hosting.loader.failed-to-save-settings": {
     "message": "保存安装设置失败"
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "删除服务器上的所有数据，包括你的世界、模组和配置文件。备份将保留并可以恢复。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "重置至引导流程"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "这将使服务器重新进入引导流程，以便再次完成设置。你确定要继续吗？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "重置至引导流程"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "服务器已返回至引导流程。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "服务器已重置至引导流程"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "支持选项"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺货"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "发现内容"
-  },
-  "layout.nav.feature-flags": {
-    "message": "功能开关"
   },
   "layout.nav.get-modrinth-app": {
     "message": "获取 Modrinth App"
@@ -2115,13 +2133,13 @@
     "message": "接受团队邀请时失败"
   },
   "project-member-header.invitation-no-role": {
-    "message": "你被邀请加入这个项目。请接受或拒绝这个邀请。"
+    "message": "你收到了加入此项目的邀请，请接受或拒绝。"
   },
   "project-member-header.invitation-title": {
     "message": "加入项目邀请"
   },
   "project-member-header.invitation-with-role": {
-    "message": "你被邀请以“{role}“身份成为此项目成员。"
+    "message": "你收到了加入此项目的邀请，其中你的身份为“{role}”。"
   },
   "project-member-header.success-decline": {
     "message": "你拒绝了团队邀请"
@@ -2448,7 +2466,7 @@
     "message": "你已举报过 {title}"
   },
   "report.already-reported-description": {
-    "message": "您已经对此{item, select, project {项目} version {版本} user {用户} other {内容}}提交了一份未结举报。如需补充更多信息，您可以添加更多详情。"
+    "message": "你已经对此{item, select, project {项目} version {版本} user {用户} other {内容}}提交了一份未结举报。如需补充更多信息，你可以添加更多详情。"
   },
   "report.back-to-item": {
     "message": "返回到{item, select, project {项目} version {版本} user {用户} other {内容}}"
@@ -2904,7 +2922,7 @@
     "message": "电子邮箱地址"
   },
   "settings.account.email.field.placeholder": {
-    "message": "输入您的电子邮件地址……"
+    "message": "输入你的电子邮件地址……"
   },
   "settings.account.email.modal.header.add": {
     "message": "添加电子邮箱"
@@ -2997,7 +3015,7 @@
     "message": "更改或删除用于登录你账户的密码。"
   },
   "settings.account.security.password.description.set": {
-    "message": "设置一个永久密码以登录您的账户。"
+    "message": "设置一个永久密码以登录你的账户。"
   },
   "settings.account.security.password.title": {
     "message": "密码"
@@ -3006,7 +3024,7 @@
     "message": "管理供应商"
   },
   "settings.account.security.providers.description": {
-    "message": "向您的账户添加或移除登录方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 和 Google。"
+    "message": "向你的账户添加或移除登录方式，包括 GitHub、GitLab、Microsoft、Discord、Steam 和 Google。"
   },
   "settings.account.security.providers.title": {
     "message": "管理身份验证提供程序"
@@ -3021,13 +3039,13 @@
     "message": "设置 2FA"
   },
   "settings.account.security.two-factor.description": {
-    "message": "在登录时为您的账户增加一层额外的安全保障。"
+    "message": "在登录时为你的账户增加一层额外的安全保障。"
   },
   "settings.account.security.two-factor.title": {
     "message": "双因素认证"
   },
   "settings.account.two-factor.backup.intro": {
-    "message": "下载并将这些备用代码保存在安全的地方。如果您无法访问设备，可以使用这些代码代替双重认证代码！您应该像保护密码一样保护这些代码。"
+    "message": "下载并将这些备用代码保存在安全的地方。如果你无法访问设备，可以使用这些代码代替双重认证代码！你应该像保护密码一样保护这些代码。"
   },
   "settings.account.two-factor.backup.single-use": {
     "message": "备份代码只能使用一次。"
@@ -3045,10 +3063,10 @@
     "message": "输入代码……"
   },
   "settings.account.two-factor.setup.intro": {
-    "message": "双因素认证通过要求访问第二个设备来登录，从而保护您的账户安全。"
+    "message": "双因素认证通过要求访问第二个设备来登录，从而保护你的账户安全。"
   },
   "settings.account.two-factor.setup.manual-secret": {
-    "message": "如果二维码无法扫描，您可以手动输入密码："
+    "message": "如果二维码无法扫描，你可以手动输入密码："
   },
   "settings.account.two-factor.setup.scan": {
     "message": "使用 <authy-link>Authy</authy-link>、<microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link> 或任何其他双重身份验证应用程序扫描二维码即可开始。"
@@ -3162,10 +3180,10 @@
     "message": "by"
   },
   "settings.authorizations.description": {
-    "message": "当您使用 Modrinth 账户授权某个应用程序时，即表示您授予其访问您账户的权限。您可以随时在此处管理和审查对您账户的访问权限。"
+    "message": "当你使用 Modrinth 账户授权某个应用程序时，即表示你授予其访问你账户的权限。你可以随时在此处管理和审查对你账户的访问权限。"
   },
   "settings.authorizations.empty-state": {
-    "message": "我们目前无法显示您授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
+    "message": "我们目前无法显示你授权的应用程序，我们正在努力解决这个问题。请稍后再访问此页面！"
   },
   "settings.authorizations.head-title": {
     "message": "授权"
@@ -3174,13 +3192,13 @@
     "message": "撤销"
   },
   "settings.authorizations.revoke.confirm.description": {
-    "message": "这将撤销该应用程序对您账户的访问权限。您随时可以之后重新授权。"
+    "message": "这将撤销该应用程序对你账户的访问权限。你随时可以之后重新授权。"
   },
   "settings.authorizations.revoke.confirm.title": {
     "message": "你确定要撤销此申请吗？"
   },
   "settings.billing.charges.description": {
-    "message": "您过去所有支付给Modrinth账户的款项都将列在这里："
+    "message": "你过去所有支付给Modrinth账户的款项都将列在这里："
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "服务器试用版"
@@ -3222,19 +3240,19 @@
     "message": "切换为年费支付，每年可节省{amount}！"
   },
   "settings.billing.midas.status.cancelled.line1": {
-    "message": "您已取消订阅。"
+    "message": "你已取消订阅。"
   },
   "settings.billing.midas.status.cancelled.line2": {
-    "message": "您将保留现有福利直至当前计费周期结束。"
+    "message": "你将保留现有福利直至当前计费周期结束。"
   },
   "settings.billing.midas.status.failed": {
-    "message": "您的订阅支付失败了。请换一个您的支付方式。"
+    "message": "你的订阅支付失败了。请换一个你的支付方式。"
   },
   "settings.billing.midas.status.open": {
-    "message": "您当前订阅了："
+    "message": "你当前订阅了："
   },
   "settings.billing.midas.status.processing": {
-    "message": "您的付款正在处理中。付款完成后福利将立即生效。"
+    "message": "你的付款正在处理中。付款完成后福利将立即生效。"
   },
   "settings.billing.midas.upsell": {
     "message": "成为Modrinth Plus的订阅者吧！"

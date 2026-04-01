@@ -106,6 +106,7 @@ import {
 } from '@/providers/download-progress.ts'
 import { createServerInstall, provideServerInstall } from '@/providers/server-install'
 import { setupProviders } from '@/providers/setup'
+import { setupAuthProvider } from '@/providers/setup/auth'
 import { useError } from '@/store/error.js'
 import { useLoading, useTheming } from '@/store/state'
 
@@ -453,6 +454,10 @@ const updateToPlayModal = ref()
 const credentials = ref()
 
 const modrinthLoginFlowWaitModal = ref()
+
+setupAuthProvider(credentials, async (_redirectPath) => {
+	await signIn()
+})
 
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)

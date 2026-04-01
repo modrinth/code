@@ -26,17 +26,8 @@
   "app.instance.mods.content-type-project": {
     "message": "proyekto"
   },
-  "app.instance.mods.copy-link": {
-    "message": "Kopyahin ang link"
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modpack"
-  },
   "app.instance.mods.project-was-added": {
     "message": "Ang \"{name}\" ay nadagdag"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "Hindi kilala"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nangangailangan ng kontento"
@@ -85,9 +76,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Mga pagpipilian sa default na instansiya"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Mga hudyat ng tampok"
   },
   "app.settings.tabs.java-installations": {
     "message": "Mga instalasyon ng Java"
@@ -413,9 +401,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Huwag ipakita sa Home"
   },
-  "instance.worlds.filter.available": {
-    "message": "Magagamit"
-  },
   "instance.worlds.game_already_open": {
     "message": "Bukas naman ang instansiya"
   },
@@ -439,12 +424,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Laruin ang instansiya"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Pang-isahang laro"
   },
   "instance.worlds.view_instance": {
     "message": "Tingnan ang instansiya"

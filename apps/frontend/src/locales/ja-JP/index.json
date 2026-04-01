@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "サーバーの修復に失敗しました"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "サーバー設定の初期化に失敗しました"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "インストール設定の保存に失敗しました"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "サーバー上のワールド、Mod、設定ファイルを含むすべてのデータを削除します。 バックアップは残り、復元できます。"
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "初期状態に戻す"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "これを行うことでサーバーが初期状態に戻されるためセットアップをもう一度行う必要があります。本当に続行しますか？"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "初期化"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "サーバーが初期状態に戻されました。"
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "サーバー初期化"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "サポート項目"
   },
   "hosting.plan.out-of-stock": {
     "message": "品切れ"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "コンテンツを探索"
-  },
-  "layout.nav.feature-flags": {
-    "message": "機能フラグ"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth Appを入手"
@@ -3050,6 +3068,15 @@
   "settings.account.two-factor.setup.manual-secret": {
     "message": "QRコードが読み取れない場合は、コードを手動で入力してください："
   },
+  "settings.account.two-factor.setup.scan": {
+    "message": "以下のQRコードを　<authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link>, またはその他の2FA(二要素認証)アプリで読み取って設定しましょう。"
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "認証アプリに表示されたワンタイムコードを入力してアクセスを認証します。"
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "コードを認証"
+  },
   "settings.applications.about": {
     "message": "概要"
   },
@@ -3131,6 +3158,9 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "アプリケーション"
+  },
   "settings.applications.modal.header": {
     "message": "アプリケーション情報"
   },
@@ -3142,6 +3172,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "今すぐ秘密情報を保存しましょう。このページを離れると非表示になります！"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "このアプリについて"
+  },
+  "settings.authorizations.by": {
+    "message": "作成者"
+  },
+  "settings.authorizations.description": {
+    "message": "Modrinthアカウントでアプリケーションを承認することにより、アプリケーションがあなたのアカウントにアクセスできるようになります。 アクセス権はいつでも確認でき、変更可能です。"
+  },
+  "settings.authorizations.empty-state": {
+    "message": "現在承認済みアプリを表示することができません。現在修正中のため、また後ほど確認ください！"
+  },
+  "settings.authorizations.head-title": {
+    "message": "承認"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "取り消す"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "アプリケーションによるアカウントのアクセス権を取り消します。アプリケーションはいつでも再承認可能です。"
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "アプリケーションのアクセス権を取り消してもよろしいですか？"
+  },
+  "settings.billing.charges.description": {
+    "message": "Modrinthアカウントでの過去の支払い履歴は、こちらに表示されます："
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Medal Server トライアル"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "有効期限: {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "月"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "月間"
+  },
+  "settings.billing.interval.year": {
+    "message": "年"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "年間"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "modrinth.comとModrinth Appを広告なしでブラウジング"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+バッジをプロフィールに表示"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Modrinthとクリエイターを直接支援"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "特典"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "年間プランなら {amount}/年 お得！"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "サブスクリプションをキャンセルしました。"
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "特典は現在のお支払いサイクル終了日まで継続します。"
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "サブスクリプションの決済に失敗しました。 お支払い方法を変更してください。"
+  },
+  "settings.billing.midas.status.open": {
+    "message": "現在加入中のサブスクリプション："
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "決済を処理中です。 特典は決済の完了後に有効になります。"
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Modrinth Plusに加入しよう！"
   },
   "settings.billing.modal.cancel.action": {
     "message": "サブスクリプションを解除する"
@@ -3218,17 +3332,68 @@
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "再登録エラー"
   },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "サーバーが一時停止中の場合、再請求の試行まで最大10分かかることがあります。"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "再加入申請を受け付けました"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "サーバーのサブスクリプションに再加入しました"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "サブスクリプションの決済に失敗しました。 お支払い方法を変更して、もう一度再加入してください。"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "決済を処理中です。 サーバーは決済の完了後に有効になります。"
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB スワップ領域"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Server のサブスクリプションを管理する。"
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Server のサブスクリプション"
   },
+  "settings.billing.renews": {
+    "message": "次の更新日: {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "再加入"
+  },
+  "settings.billing.since": {
+    "message": "加入日: {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "加入"
+  },
   "settings.billing.subscription.description": {
     "message": "Modrinth のサブスクリプションを管理する。"
   },
   "settings.billing.subscription.title": {
     "message": "サブスクリプション"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "{interval} に変更中"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "{interval} に変更"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "月払いの場合年間で {amount} 高くなります"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "{date}に {interval} 払いに変更されます"
+  },
+  "settings.billing.update-method": {
+    "message": "支払い方法を更新"
+  },
+  "settings.billing.upgrade": {
+    "message": "アップグレード"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "開発者モードを無効にする"
@@ -3242,6 +3407,12 @@
   "settings.display.flags.title": {
     "message": "機能の切り替え"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "開発者モードが無効になりました"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "開発者モード無効"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "データパックページ"
   },
@@ -3250,6 +3421,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Modページ"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "ギャラリー"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "グリッド表示"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "行表示"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Modパックページ"
@@ -3311,6 +3491,9 @@
   "settings.display.theme.title": {
     "message": "テーマ"
   },
+  "settings.head-title": {
+    "message": "表示設定"
+  },
   "settings.pats.action.create": {
     "message": "PATを作成"
   },
@@ -3371,6 +3554,9 @@
   "settings.profile.description": {
     "message": "あなたのプロフィール情報は、Modrinth上および<docs-link>Modrinth API</docs-link>を通じて一般公開されます。"
   },
+  "settings.profile.head-title": {
+    "message": "プロフィール設定"
+  },
   "settings.profile.profile-info": {
     "message": "プロフィール情報"
   },
@@ -3400,6 +3586,15 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "不明なプラットフォーム"
+  },
+  "settings.sidebar.label.account": {
+    "message": "アカウント"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "開発者"
+  },
+  "settings.sidebar.label.display": {
+    "message": "表示"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinthの最新ニュース"

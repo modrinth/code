@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "繼續"
   },
+  "button.copy-filename": {
+    "defaultMessage": "複製檔案名稱"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "複製完整路徑"
+  },
   "button.copy-id": {
     "defaultMessage": "複製 ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "複製連結"
   },
   "button.copy-permalink": {
     "defaultMessage": "複製永久連結"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "拒絕"
   },
+  "button.disable": {
+    "defaultMessage": "停用"
+  },
   "button.download": {
     "defaultMessage": "下載"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "編輯"
+  },
+  "button.enable": {
+    "defaultMessage": "啟用"
+  },
+  "button.extract": {
+    "defaultMessage": "解壓縮"
   },
   "button.follow": {
     "defaultMessage": "追蹤"
@@ -101,11 +119,17 @@
   "button.more-options": {
     "defaultMessage": "更多選項"
   },
+  "button.move": {
+    "defaultMessage": "移動"
+  },
   "button.next": {
     "defaultMessage": "下一步"
   },
   "button.open-folder": {
     "defaultMessage": "開啟資料夾"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "在資料夾中開啟"
   },
   "button.play": {
     "defaultMessage": "遊玩"
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "移除圖片"
+  },
+  "button.rename": {
+    "defaultMessage": "重新命名"
   },
   "button.repair": {
     "defaultMessage": "修復"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "顯示所有版本"
   },
+  "button.show-file": {
+    "defaultMessage": "顯示檔案"
+  },
   "button.sign-in": {
     "defaultMessage": "登入"
   },
@@ -182,17 +212,11 @@
   "changelog.justNow": {
     "defaultMessage": "現在"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "網站"
   },
   "collections.label.private": {
     "defaultMessage": "私人"
@@ -224,6 +248,9 @@
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "你在該模組包之上額外新增的任何模組或內容都將被刪除。"
   },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "你在該模組包之上額外新增的任何模組或內容都將被保留。"
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}警告"
   },
@@ -250,9 +277,6 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
-  },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "已移除"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
@@ -298,9 +322,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "不再顯示"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "更新中..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "額外內容"
@@ -404,17 +425,110 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "正在上傳{contentType}..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "停用"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "啟用"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "已選取 {count} 個{contentType}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "已選取 {count, number} 個項目"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "解壓縮摘要"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "覆寫"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "若你繼續執行解壓縮，將有超過 100 個檔案被覆寫；以下列出部分檔案。"
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "下列 {count} 個檔案已存在於你的伺服器上，若你繼續執行解壓縮，這些檔案將被覆寫。"
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "將覆寫 {count} 個檔案"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "將覆寫"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "檔案將被覆寫"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "建立{type, select, directory {資料夾} other {檔案}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "建立{type, select, directory {資料夾} other {檔案}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "例如：my-folder"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "例如：config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "正在刪除「{name}」"
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "刪除檔案"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {這個資料夾及其所有內容將被永久刪除。此動作無法復原。} other {這個檔案將被永久刪除。此動作無法復原。}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "無法載入檔案內容。"
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "無法開啟檔案"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "無法上傳至 mclo.gs。"
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "無法分享檔案"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "你的檔案已儲存。"
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "已儲存檔案"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "你的記錄檔網址已複製到剪貼簿。"
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "記錄檔網址已複製"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "無法儲存檔案。"
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "儲存失敗"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "前往家資料夾"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "再試一次"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "圖片檔案無效或內容為空。"
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "無法載入圖片"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "重設縮放"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "已檢視圖片"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "放大"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "縮小"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "作業進行中，已停用檔案操作功能。"
   },
   "form.label.address-line": {
     "defaultMessage": "地址行 1"
@@ -517,9 +631,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "解析度"
-  },
-  "hosting.content.copy-link": {
-    "defaultMessage": "複製連結"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "無法刪除內容"
@@ -713,15 +824,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "檔案還在上傳中，離開此頁面將取消上傳，並且你所做的變更可能會遺失。"
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "離開頁面"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "留在本頁"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "是否要離開頁面？"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "正在執行上傳作業"
   },
@@ -731,26 +833,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "已有實例"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "遊戲版本"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "選擇遊戲版本"
   },
   "instances.content-install.header": {
     "defaultMessage": "安裝專案"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "隱藏快照版本"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "安裝"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "已安裝"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "安裝中..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "實例類型"
@@ -779,20 +872,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "選擇圖示"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "顯示所有版本"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "複製連結"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "這個模組包不包含任何額外內容。"
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "找不到內容"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "全部"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "模組包內容"

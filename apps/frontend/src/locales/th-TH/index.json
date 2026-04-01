@@ -38,14 +38,23 @@
   "app-marketing.download.options-title": {
     "message": "ตัวเลือกการดาวน์โหลด"
   },
+  "app-marketing.download.terms": {
+    "message": "การดาวน์โหลด Modrinth App ถือว่าคุณยอมรับ <terms-link>ข้อกำหนดการใช้งาน</terms-link> และ <privacy-link>นโยบายความเป็นส่วนตัว</privacy-link> ของเรา"
+  },
   "app-marketing.download.title": {
     "message": "ดาวน์โหลดแอปพลิเคชัน Modrinth (Beta)"
   },
   "app-marketing.download.windows": {
     "message": "Windows"
   },
+  "app-marketing.features.follow.description": {
+    "message": "บันทึกคอนเทนต์ที่คุณชอบ และรับการอัปเดตได้ในคลิกเดียว"
+  },
   "app-marketing.features.follow.title": {
     "message": "ติดตามโปรเจค"
+  },
+  "app-marketing.features.importing.description": {
+    "message": "นำเข้าโปรไฟล์โปรดทั้งหมดของคุณจากลอนเชอร์ที่คุณเคยใช้ก่อนหน้านี้ และเริ่มต้นใช้งาน Modrinth App ได้ภายในไม่กี่วินาที!"
   },
   "app-marketing.features.importing.gdlauncher-alt": {
     "message": "GDLauncher"
@@ -56,8 +65,14 @@
   "app-marketing.features.importing.title": {
     "message": "การนำเข้าโปรไฟล์"
   },
+  "app-marketing.features.mod-management.actions": {
+    "message": "การกระทำ"
+  },
   "app-marketing.features.mod-management.byAuthor": {
     "message": "โดย {author}"
+  },
+  "app-marketing.features.mod-management.description": {
+    "message": "Modrinth ช่วยให้การจัดการมอดทั้งหมดของคุณในที่เดียวเป็นเรื่องง่าย คุณสามารถติดตั้ง ถอนการติดตั้ง และอัปเดตมอดได้ด้วยการคลิกเพียงครั้งเดียว!"
   },
   "app-marketing.features.mod-management.installed-mods": {
     "message": "ม็อดที่ติดตั้งแล้ว"
@@ -80,8 +95,14 @@
   "app-marketing.features.offline.title": {
     "message": "โหมดออฟไลน์"
   },
+  "app-marketing.features.open-source.description": {
+    "message": "ลอนเชอร์ของ Modrinth เป็นโอเพนซอร์สแบบเต็มรูปแบบ คุณสามารถดูซอร์สโค้ดได้ที่ <github-link>GitHub</github-link>ของเรา!"
+  },
   "app-marketing.features.open-source.title": {
     "message": "โอเพนซอร์ส"
+  },
+  "app-marketing.features.performance.activity-monitor": {
+    "message": "ตัวตรวจสอบกิจกรรม"
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"

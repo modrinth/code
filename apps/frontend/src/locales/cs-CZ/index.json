@@ -536,6 +536,9 @@
   "dashboard.affiliate-links.revoke-confirm.button": {
     "message": "Odvolat"
   },
+  "dashboard.affiliate-links.revoke-confirm.title": {
+    "message": "Jste si jistý, že chcete zrušit svůj affiliate odkaz „{title}“?"
+  },
   "dashboard.collections.button.create-new": {
     "message": "Vytvořit novou"
   },

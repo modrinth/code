@@ -324,7 +324,10 @@ function getModpackLoaders(version: VersionWithDisplayUrlEnding): string[] {
 
 function hasNoModLoader(loaders: string[]): boolean {
 	return (
-		props.project.project_type === 'modpack' && loaders.length === 1 && loaders[0] === 'minecraft'
+		(props.project.project_type === 'modpack' &&
+			loaders.length === 1 &&
+			loaders[0] === 'minecraft') ||
+		loaders.length === 0
 	)
 }
 

@@ -141,9 +141,16 @@ pub async fn fetch_neo(
     }).chain(neo_versions.versioning.versions.version.into_iter().map(|loader_version| {
         let mut parts = loader_version.split('.');
 
-        // NeoForge Forge versions are in this format: 20.2.29-beta, 20.6.119
-        // Where the first number is the major MC version, the second is the minor MC version, and the third is the NeoForge version
-        let major = parts.next().ok_or_else(
+        // NeoForge Forge versions are in either of these formats:
+		// - 20.2.29-beta, 20.6.119
+		// - 26.1.0.10-beta, 26.1.0.16
+        //
+		// The first format is the "modern" format for Minecraft versions starting with 1, where the first number is the major MC version,
+		// the second is the minor MC version, and the third is the NeoForge version.
+		//
+		// The second format is the "new-modern" format for Minecraft versions in year-based format, where the first three numbers
+		// are the Minecraft version (year.release.hotfix), and the fourth, the NeoForge release version, with an optional "beta" suffix.
+        let major_or_year = parts.next().ok_or_else(
             || crate::ErrorKind::InvalidInput(format!("Unable to find major game version for NeoForge {loader_version}"))
         )?;
 
@@ -151,11 +158,24 @@ pub async fn fetch_neo(
             || crate::ErrorKind::InvalidInput(format!("Unable to find minor game version for NeoForge {loader_version}"))
         )?;
 
-        let game_version = if minor == "0" {
-            format!("1.{major}")
-        } else {
-            format!("1.{major}.{minor}")
-        };
+		let major_or_year = major_or_year.parse::<u32>()?;
+
+		// Year-based MC versions started in 2026
+		let game_version = match major_or_year {
+			26.. => {
+				let hotfix = parts.next().ok_or_else(
+					|| crate::ErrorKind::InvalidInput(format!("Unable to find hotfix version for NeoForge {loader_version}"))
+				)?;
+
+				if hotfix == "0" {
+					format!("{major_or_year}.{minor}")
+				} else {
+					format!("{major_or_year}.{minor}.{hotfix}")
+				}
+			}
+			..26 if minor == "0" => format!("1.{major_or_year}"),
+			..26 => format!("1.{major_or_year}.{minor}"),
+		};
 
         Ok(ForgeVersion {
             format_version: 2,

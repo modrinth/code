@@ -132,9 +132,10 @@ const props = defineProps<{
 
 const noModpackLoader = computed(
 	() =>
-		props.projectV3?.project_types.includes('modpack') &&
-		props.projectV3?.mrpack_loaders.length === 1 &&
-		props.projectV3?.mrpack_loaders[0] === 'minecraft',
+		(props.projectV3?.project_types.includes('modpack') &&
+			props.projectV3?.mrpack_loaders.length === 1 &&
+			props.projectV3?.mrpack_loaders[0] === 'minecraft') ||
+		props.projectV3?.mrpack_loaders.length === 0,
 )
 
 const showEnvironments = computed(
