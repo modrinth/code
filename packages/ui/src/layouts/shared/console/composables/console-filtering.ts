@@ -46,7 +46,7 @@ export function rewriteTerminal(
 	allLines: string[],
 	predicate: FilterPredicate | null,
 ) {
-	terminal.clear()
+	terminal.reset()
 	terminal.write('\x1b[?25l')
 
 	const filtered = predicate ? allLines.filter(predicate) : allLines
