@@ -5,10 +5,10 @@ import { test_jre } from '@/helpers/jre.js'
 
 export default function useJavaTest() {
 	const testingJava = ref(false)
-	const javaTestResult = ref(null)
-	let testDebounceTimer = null
+	const javaTestResult = ref<boolean | null>(null)
+	let testDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-	async function runJavaTest(path, version, track = true) {
+	async function runJavaTest(path: string, version: number, track = true) {
 		if (testDebounceTimer) {
 			clearTimeout(testDebounceTimer)
 			testDebounceTimer = null
@@ -30,13 +30,13 @@ export default function useJavaTest() {
 		}
 	}
 
-	function testJavaInstallationDebounced(path, version, delay = 600) {
+	function testJavaInstallationDebounced(path: string, version: number, delay = 600) {
 		if (!path) return
 		if (testDebounceTimer) clearTimeout(testDebounceTimer)
 		testDebounceTimer = setTimeout(() => runJavaTest(path, version, false), delay)
 	}
 
-	async function testJavaInstallation(path, version, track = false) {
+	async function testJavaInstallation(path: string, version: number, track = false) {
 		if (!path) return
 		if (testDebounceTimer) clearTimeout(testDebounceTimer)
 		await runJavaTest(path, version, track)

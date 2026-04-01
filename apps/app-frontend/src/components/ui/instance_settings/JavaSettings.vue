@@ -21,7 +21,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { computed, readonly, ref, watch } from 'vue'
 
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import useJavaTest from '@/composables/useJavaTest.js'
+import useJavaTest from '@/composables/useJavaTest'
 import useMemorySlider from '@/composables/useMemorySlider'
 import { edit, get_optimal_jre_key } from '@/helpers/profile'
 import { get } from '@/helpers/settings.ts'
