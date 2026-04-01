@@ -31,7 +31,9 @@
 					</span>
 					<span class="relative">
 						<component :is="metric.icon" class="relative z-10 size-7" />
-						<div class="absolute -right-4 -top-4 -z-10 size-14 rounded-full bg-surface-3 opacity-50 blur-lg" />
+						<div
+							class="absolute -right-4 -top-4 -z-10 size-14 rounded-full bg-surface-3 opacity-50 blur-lg"
+						/>
 					</span>
 				</div>
 				<span class="text-4xl font-semibold text-contrast">
@@ -60,11 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import { NuxtLink } from '#components'
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, shallowRef } from 'vue'
+
+import { NuxtLink } from '#components'
 
 const flags = useFeatureFlags()
 const route = useNativeRoute()

@@ -1,8 +1,6 @@
 <template>
 	<FilterPills v-model="selectedFilters" :options="pillOptions">
-		<template #all>
-			All
-		</template>
+		<template #all> All </template>
 	</FilterPills>
 </template>
 

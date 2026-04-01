@@ -6,9 +6,7 @@
 			:aria-pressed="modelValue.length === 0"
 			@click="modelValue = []"
 		>
-			<slot name="all">
-				All
-			</slot>
+			<slot name="all"> All </slot>
 		</button>
 		<button
 			v-for="option in options"

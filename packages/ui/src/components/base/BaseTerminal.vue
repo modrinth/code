@@ -8,7 +8,11 @@
 			<div ref="containerRef" class="size-full pl-2" />
 			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
-					<button class="!shadow-none" aria-label="Exit fullscreen" @click="emit('exit-fullscreen')">
+					<button
+						class="!shadow-none"
+						aria-label="Exit fullscreen"
+						@click="emit('exit-fullscreen')"
+					>
 						<XIcon />
 					</button>
 				</ButtonStyled>
@@ -117,7 +121,6 @@ defineExpose({
 .xterm {
 	height: 100% !important;
 }
-
 
 .xterm .xterm-screen {
 	margin-left: auto !important;

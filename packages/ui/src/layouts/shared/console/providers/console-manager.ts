@@ -1,5 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
+
 import { createContext } from '#ui/providers/create-context'
+
 import type { LogSource } from '../types'
 
 export interface ConsoleManagerContext {
@@ -19,5 +21,7 @@ export interface ConsoleManagerContext {
 	shareDisabled?: Ref<boolean> | ComputedRef<boolean>
 }
 
-export const [injectConsoleManager, provideConsoleManager] =
-	createContext<ConsoleManagerContext>('ConsolePageLayout', 'consoleManagerContext')
+export const [injectConsoleManager, provideConsoleManager] = createContext<ConsoleManagerContext>(
+	'ConsolePageLayout',
+	'consoleManagerContext',
+)

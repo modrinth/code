@@ -23,8 +23,8 @@
 				/>
 				<ButtonStyled circular>
 					<button
-						aria-label="Open fullscreen"
 						v-tooltip="'Open fullscreen'"
+						aria-label="Open fullscreen"
 						@click="enterFullscreen"
 					>
 						<ExpandIcon />
@@ -186,12 +186,6 @@ function handleClear() {
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
-}
-
-async function handleCopy() {
-	const predicate = buildFilterPredicate()
-	const lines = predicate ? ctx.logLines.value.filter(predicate) : ctx.logLines.value
-	await navigator.clipboard.writeText(lines.join('\n'))
 }
 
 async function handleShare() {

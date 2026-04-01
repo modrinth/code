@@ -1,5 +1,6 @@
 import type { Terminal } from '@xterm/xterm'
 import { ref } from 'vue'
+
 import type { LogLevel } from '../types'
 import { detectLogLevel } from './log-level'
 

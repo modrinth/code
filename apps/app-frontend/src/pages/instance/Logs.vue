@@ -5,21 +5,15 @@
 </template>
 
 <script setup>
-import { ConsolePageLayout, provideConsoleManager } from '@modrinth/ui'
+import { ConsolePageLayout, injectNotificationManager, provideConsoleManager } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { injectNotificationManager } from '@modrinth/ui'
 import { process_listener } from '@/helpers/events.js'
-import {
-	delete_logs_by_filename,
-	get_latest_log_cursor,
-	get_logs,
-	get_output_by_filename,
-} from '@/helpers/logs.js'
+import { get_latest_log_cursor, get_logs, get_output_by_filename } from '@/helpers/logs.js'
 import { get_by_profile_path } from '@/helpers/process.js'
 
 dayjs.extend(isToday)
@@ -155,19 +149,6 @@ if (logs.value.length > 1 && !props.playing) {
 	selectedLogIndex.value = 1
 } else {
 	selectedLogIndex.value = 0
-}
-
-const deleteLog = async () => {
-	if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-		const deleteIndex = selectedLogIndex.value
-		selectedLogIndex.value = deleteIndex - 1
-		await delete_logs_by_filename(
-			props.instance.path,
-			logs.value[deleteIndex].log_type,
-			logs.value[deleteIndex].filename,
-		).catch(handleError)
-		await setLogs()
-	}
 }
 
 interval.value = setInterval(async () => {

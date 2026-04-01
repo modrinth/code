@@ -1,2 +1,2 @@
+export { type FilterPredicate, rewriteTerminal, useConsoleFilters } from './console-filtering'
 export { detectLogLevel } from './log-level'
-export { useConsoleFilters, rewriteTerminal, type FilterPredicate } from './console-filtering'
