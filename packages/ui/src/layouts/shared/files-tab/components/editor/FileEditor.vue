@@ -1,8 +1,70 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		class="relative flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
 	>
+		<Transition name="search-bar">
+			<div
+				v-if="isSearchOpen && !isEditingImage"
+				class="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-2xl border-2 border-solid border-surface-5 bg-surface-3 p-1.5 shadow-lg"
+				@keydown.enter.prevent.stop="findNext"
+				@keydown.shift.enter.prevent.stop="findPrevious"
+				@keydown.escape.stop="closeSearch"
+			>
+				<StyledInput
+					ref="searchInputRef"
+					v-model="inFileSearchQuery"
+					:icon="SearchIcon"
+					type="search"
+					size="small"
+					autocomplete="off"
+					:placeholder="formatMessage(messages.searchInFile)"
+					wrapper-class="w-44"
+				/>
+				<span class="min-w-[6rem] px-1 text-right text-sm text-secondary tabular-nums">
+					{{
+						searchMatchCount > 0
+							? formatMessage(messages.matchCount, {
+									current: currentSearchMatch,
+									total: searchMatchCount,
+								})
+							: inFileSearchQuery
+								? formatMessage(messages.noResults)
+								: ''
+					}}
+				</span>
+				<Button
+					v-tooltip="formatMessage(messages.previousMatch)"
+					icon-only
+					transparent
+					:disabled="searchMatchCount === 0"
+					:aria-label="formatMessage(messages.previousMatch)"
+					@click="findPrevious"
+				>
+					<ChevronUpIcon />
+				</Button>
+				<Button
+					v-tooltip="formatMessage(messages.nextMatch)"
+					icon-only
+					transparent
+					:disabled="searchMatchCount === 0"
+					:aria-label="formatMessage(messages.nextMatch)"
+					@click="findNext"
+				>
+					<ChevronDownIcon />
+				</Button>
+				<div class="mx-0.5 h-4 w-px bg-surface-5" />
+				<Button
+					v-tooltip="formatMessage(messages.closeSearch)"
+					icon-only
+					transparent
+					:aria-label="formatMessage(messages.closeSearch)"
+					@click="closeSearch"
+				>
+					<XIcon />
+				</Button>
+			</div>
+		</Transition>
 		<component
 			:is="props.editorComponent"
 			v-if="!isEditingImage && !isLoading && props.editorComponent"
@@ -26,9 +88,11 @@
 </template>
 
 <script setup lang="ts">
-import { SpinnerIcon } from '@modrinth/assets'
+import { ChevronDownIcon, ChevronUpIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import Button from '#ui/components/base/Button.vue'
+import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
@@ -41,6 +105,30 @@ interface MclogsResponse {
 	success: boolean
 	url?: string
 	error?: string
+}
+
+interface AceEditorInstance {
+	commands: {
+		addCommand: (cmd: {
+			name: string
+			bindKey: { win: string; mac: string }
+			exec: () => void
+		}) => void
+	}
+	find: (
+		needle: string,
+		options?: {
+			backwards?: boolean
+			wrap?: boolean
+			caseSensitive?: boolean
+			wholeWord?: boolean
+			regExp?: boolean
+		},
+		animate?: boolean,
+	) => unknown
+	findNext: (options?: object, animate?: boolean) => void
+	findPrevious: (options?: object, animate?: boolean) => void
+	focus: () => void
 }
 
 const props = defineProps<{
@@ -97,6 +185,30 @@ const messages = defineMessages({
 		id: 'files.editor.failed-to-share-text',
 		defaultMessage: 'Could not upload to mclo.gs.',
 	},
+	searchInFile: {
+		id: 'files.editor.search-in-file',
+		defaultMessage: 'Search...',
+	},
+	matchCount: {
+		id: 'files.editor.search-match-count',
+		defaultMessage: '{current} of {total}',
+	},
+	noResults: {
+		id: 'files.editor.search-no-results',
+		defaultMessage: 'No results',
+	},
+	previousMatch: {
+		id: 'files.editor.search-previous-match',
+		defaultMessage: 'Previous match',
+	},
+	nextMatch: {
+		id: 'files.editor.search-next-match',
+		defaultMessage: 'Next match',
+	},
+	closeSearch: {
+		id: 'files.editor.search-close',
+		defaultMessage: 'Close search',
+	},
 })
 
 const fileContent = ref('')
@@ -104,9 +216,17 @@ const originalContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<unknown>(null)
+const editorInstance = ref<AceEditorInstance | null>(null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
+
+const isSearchOpen = ref(false)
+const inFileSearchQuery = ref('')
+const searchMatchCount = ref(0)
+const currentSearchMatch = ref(0)
+const searchInputRef = ref<{ focus: () => void } | null>(null)
+
+watch(inFileSearchQuery, handleSearchInput)
 
 function updateEditorHeight() {
 	if (editorContainer.value) {
@@ -130,6 +250,7 @@ watch(
 	() => props.file,
 	async (newFile) => {
 		if (newFile) {
+			closeSearch()
 			await loadFileContent(newFile)
 			nextTick(updateEditorHeight)
 		} else {
@@ -184,21 +305,19 @@ function resetState() {
 	imagePreview.value = null
 }
 
-function onEditorInit(editor: {
-	commands: {
-		addCommand: (cmd: {
-			name: string
-			bindKey: { win: string; mac: string }
-			exec: () => void
-		}) => void
-	}
-}) {
+function onEditorInit(editor: AceEditorInstance) {
 	editorInstance.value = editor
 
 	editor.commands.addCommand({
 		name: 'save',
 		bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
 		exec: () => saveFileContent(false),
+	})
+
+	editor.commands.addCommand({
+		name: 'find',
+		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
+		exec: () => toggleSearch(),
 	})
 }
 
@@ -265,6 +384,68 @@ async function shareToMclogs() {
 	}
 }
 
+function countOccurrences(content: string, query: string): number {
+	if (!query) return 0
+	const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+	return (content.match(new RegExp(escaped, 'gi')) ?? []).length
+}
+
+function toggleSearch() {
+	if (isSearchOpen.value) {
+		closeSearch()
+	} else {
+		isSearchOpen.value = true
+		nextTick(() => searchInputRef.value?.focus())
+	}
+}
+
+function closeSearch() {
+	isSearchOpen.value = false
+	inFileSearchQuery.value = ''
+	searchMatchCount.value = 0
+	currentSearchMatch.value = 0
+	editorInstance.value?.find('', { wrap: true })
+	editorInstance.value?.focus()
+}
+
+function handleSearchInput() {
+	const editor = editorInstance.value
+	if (!editor) return
+
+	const query = inFileSearchQuery.value
+	if (!query) {
+		searchMatchCount.value = 0
+		currentSearchMatch.value = 0
+		editor.find('', { wrap: true })
+		return
+	}
+
+	const count = countOccurrences(fileContent.value, query)
+	searchMatchCount.value = count
+
+	if (count > 0) {
+		editor.find(query, { wrap: true, caseSensitive: false })
+		currentSearchMatch.value = 1
+	} else {
+		currentSearchMatch.value = 0
+	}
+}
+
+function findNext() {
+	const editor = editorInstance.value
+	if (!editor || searchMatchCount.value === 0) return
+	editor.findNext()
+	currentSearchMatch.value = (currentSearchMatch.value % searchMatchCount.value) + 1
+}
+
+function findPrevious() {
+	const editor = editorInstance.value
+	if (!editor || searchMatchCount.value === 0) return
+	editor.findPrevious()
+	currentSearchMatch.value =
+		((currentSearchMatch.value - 2 + searchMatchCount.value) % searchMatchCount.value) + 1
+}
+
 function close() {
 	resetState()
 	emit('close')
@@ -281,8 +462,25 @@ defineExpose({
 	shareToMclogs,
 	close,
 	isEditingImage,
+	isSearchOpen,
 	fileContent,
 	hasUnsavedChanges,
 	revertChanges,
+	toggleSearch,
 })
 </script>
+
+<style scoped>
+.search-bar-enter-active,
+.search-bar-leave-active {
+	transition:
+		opacity 0.15s ease,
+		transform 0.15s ease;
+}
+
+.search-bar-enter-from,
+.search-bar-leave-to {
+	opacity: 0;
+	transform: translateY(-4px) scale(0.97);
+}
+</style>
