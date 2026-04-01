@@ -31,7 +31,7 @@
 			</ButtonStyled>
 		</template>
 		<template v-else>
-			<h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
+			<h1 class="!text-xl">{{ formatMessage(messages.signInWithLabel) }}</h1>
 
 			<section class="third-party">
 				<ButtonStyled>
@@ -72,7 +72,7 @@
 				</ButtonStyled>
 			</section>
 
-			<h1>{{ formatMessage(messages.usePasswordLabel) }}</h1>
+			<h1 class="!text-xl">{{ formatMessage(messages.usePasswordLabel) }}</h1>
 
 			<section class="auth-form">
 				<label for="email" hidden>{{ formatMessage(commonMessages.emailUsernameLabel) }}</label>
