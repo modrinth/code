@@ -8,30 +8,19 @@ useSeoMeta({
 })
 </script>
 <template>
-	<NuxtPage class="auth-container universal-card" />
+	<div class="px-4 py-6">
+		<NuxtPage
+			class="auth-surface mx-auto flex max-w-lg flex-col gap-4 border border-solid border-[#c3c3c3] bg-[#EFEFEF] p-4 [&_h1]:m-0 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:text-[var(--color-contrast)]"
+		/>
+	</div>
 </template>
 
 <style>
-.auth-container {
-	width: 26rem;
-	max-width: calc(100% - 2rem);
-	margin: 1rem auto;
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-}
-
-.auth-container h1 {
-	font-size: var(--font-size-xl);
-	margin: 0 0 -1rem 0;
-	color: var(--color-contrast);
-}
-
-.auth-container p {
+.auth-surface p {
 	margin: 0;
 }
 
-.auth-container .btn {
+.auth-surface .btn {
 	font-weight: 700;
 	min-height: 2.5rem;
 	text-decoration: none;
