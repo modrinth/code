@@ -97,7 +97,7 @@ import {
 	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,
-	useVIntl
+	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'

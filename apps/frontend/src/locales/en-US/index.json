@@ -905,24 +905,6 @@
   "dashboard.notifications.loading": {
     "message": "Loading notifications..."
   },
-  "dashboard.notifications.type.moderator-messages": {
-    "message": "Moderator messages"
-  },
-  "dashboard.notifications.type.organization-invites": {
-    "message": "Organization invites"
-  },
-  "dashboard.notifications.type.other": {
-    "message": "Other notifications"
-  },
-  "dashboard.notifications.type.project-updates": {
-    "message": "Project updates"
-  },
-  "dashboard.notifications.type.status-changes": {
-    "message": "Status changes"
-  },
-  "dashboard.notifications.type.team-invites": {
-    "message": "Team invites"
-  },
   "dashboard.organizations.button.create": {
     "message": "Create organization"
   },
@@ -1088,33 +1070,6 @@
   "dashboard.revenue.transactions.btn.download-csv": {
     "message": "Download as CSV"
   },
-  "dashboard.revenue.transactions.csv.header.amount": {
-    "message": "Amount"
-  },
-  "dashboard.revenue.transactions.csv.header.date": {
-    "message": "Date"
-  },
-  "dashboard.revenue.transactions.csv.header.fee": {
-    "message": "Fee"
-  },
-  "dashboard.revenue.transactions.csv.header.source": {
-    "message": "Source"
-  },
-  "dashboard.revenue.transactions.csv.header.status": {
-    "message": "Status"
-  },
-  "dashboard.revenue.transactions.csv.header.type": {
-    "message": "Type"
-  },
-  "dashboard.revenue.transactions.csv.source.mural-pay-unknown": {
-    "message": "Mural Pay ({unknown})"
-  },
-  "dashboard.revenue.transactions.csv.type.payout": {
-    "message": "Payout"
-  },
-  "dashboard.revenue.transactions.csv.type.withdrawal": {
-    "message": "Withdrawal"
-  },
   "dashboard.revenue.transactions.head-title": {
     "message": "Transaction history"
   },
@@ -1126,9 +1081,6 @@
   },
   "dashboard.revenue.transactions.none.desc": {
     "message": "Your payouts and withdrawals will appear here."
-  },
-  "dashboard.revenue.transactions.not-applicable": {
-    "message": "N/A"
   },
   "dashboard.revenue.transactions.period.last-month": {
     "message": "Last month"
