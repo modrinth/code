@@ -249,7 +249,7 @@
 						</div>
 
 						<div>
-							{{ formatProjectTypeLabel(project) }}
+							{{ formatProjectType(getProjectTypeForUrl(project.project_type, project.loaders)) }}
 						</div>
 
 						<div>
@@ -308,7 +308,6 @@ import {
 	Checkbox,
 	Combobox,
 	commonMessages,
-	commonProjectTypeTitleMessages,
 	CopyCode,
 	defineMessages,
 	injectNotificationManager,
@@ -318,6 +317,7 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
 import { getProjectTypeForUrl } from '~/helpers/projects.js'
@@ -511,17 +511,6 @@ function getLinkInputPlaceholder(clearLink, isDiscord = false) {
 	return isDiscord
 		? formatMessage(messages.enterValidDiscordInviteUrl)
 		: formatMessage(messages.enterValidUrl)
-}
-
-function getProjectTypeTitleMessage(type) {
-	return commonProjectTypeTitleMessages[type] ?? commonProjectTypeTitleMessages.project
-}
-
-function formatProjectTypeLabel(project) {
-	return formatMessage(
-		getProjectTypeTitleMessage(getProjectTypeForUrl(project.project_type, project.loaders)),
-		{ count: 1 },
-	)
 }
 
 function isProjectBulkEditDisabled(project) {

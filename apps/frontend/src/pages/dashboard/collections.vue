@@ -42,7 +42,7 @@
 		</div>
 		<div class="collections-grid">
 			<nuxt-link
-				v-if="showFollowedProjectsCollection"
+				v-if="'followed projects'.includes(filterQuery.toLowerCase())"
 				:to="`/collection/following`"
 				class="universal-card recessed collection"
 			>
@@ -244,12 +244,6 @@ const route = useNativeRoute()
 const router = useNativeRouter()
 const validSortOptions = ['updated', 'created', 'name']
 const sortBy = ref(validSortOptions.includes(route.query.s) ? route.query.s : 'updated')
-
-const showFollowedProjectsCollection = computed(() =>
-	formatMessage(commonMessages.followedProjectsLabel)
-		.toLowerCase()
-		.includes(filterQuery.value.toLowerCase()),
-)
 
 function formatCollectionSortOption(option) {
 	if (option === 'updated') {

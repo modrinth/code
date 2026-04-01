@@ -35,7 +35,7 @@
 				v-if="notifTypes.length > 1"
 				v-model="selectedType"
 				:items="notifTypes"
-				:format-label="formatNotificationTypeLabel"
+				:format-label="(x) => (x === 'all' ? 'All' : formatProjectType(x).replace('_', ' ') + 's')"
 				:capitalize="false"
 			/>
 			<p v-if="isPending">{{ formatMessage(messages.loadingNotifications) }}</p>
@@ -75,6 +75,7 @@ import {
 	Pagination,
 	useVIntl,
 } from '@modrinth/ui'
+import { formatProjectType } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
@@ -116,30 +117,6 @@ const messages = defineMessages({
 		id: 'dashboard.notifications.empty.no-unread',
 		defaultMessage: "You don't have any unread notifications.",
 	},
-	projectUpdatesType: {
-		id: 'dashboard.notifications.type.project-updates',
-		defaultMessage: 'Project updates',
-	},
-	teamInvitesType: {
-		id: 'dashboard.notifications.type.team-invites',
-		defaultMessage: 'Team invites',
-	},
-	organizationInvitesType: {
-		id: 'dashboard.notifications.type.organization-invites',
-		defaultMessage: 'Organization invites',
-	},
-	statusChangesType: {
-		id: 'dashboard.notifications.type.status-changes',
-		defaultMessage: 'Status changes',
-	},
-	moderatorMessagesType: {
-		id: 'dashboard.notifications.type.moderator-messages',
-		defaultMessage: 'Moderator messages',
-	},
-	otherNotificationsType: {
-		id: 'dashboard.notifications.type.other',
-		defaultMessage: 'Other notifications',
-	},
 })
 
 const client = injectModrinthClient()
@@ -157,22 +134,6 @@ useHead({
 const selectedType = ref('all')
 const page = ref(1)
 const perPage = ref(50)
-
-function formatNotificationTypeLabel(type) {
-	if (type === 'all') {
-		return formatMessage(commonMessages.allProjectType)
-	}
-
-	const notificationTypeMessages = {
-		project_update: messages.projectUpdatesType,
-		team_invite: messages.teamInvitesType,
-		organization_invite: messages.organizationInvitesType,
-		status_change: messages.statusChangesType,
-		moderator_message: messages.moderatorMessagesType,
-	}
-
-	return formatMessage(notificationTypeMessages[type] ?? messages.otherNotificationsType)
-}
 
 const { data, isPending, error, refetch } = useQuery({
 	queryKey: computed(() => [
