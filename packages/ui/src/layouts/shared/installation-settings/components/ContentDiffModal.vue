@@ -73,6 +73,7 @@
 				<InlineBackupCreator
 					ref="backupCreator"
 					backup-name="Before version change"
+					hide-shift-click-hint
 					@update:buttons-disabled="buttonsDisabled = $event"
 				/>
 			</div>

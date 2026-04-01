@@ -8,7 +8,7 @@
 			@proceed="confirmResetToOnboarding"
 		/>
 
-		<InstallationSettingsLayout ref="installationSettingsLayout">
+		<InstallationSettingsLayout ref="installationSettingsLayout" @reset-server="setupModal?.show()">
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
@@ -456,6 +456,9 @@ provideInstallationSettings({
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
+		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
+		const loaderVersionChanged =
+			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -466,12 +469,12 @@ provideInstallationSettings({
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
-			platformChanged
+			platformChanged || loaderVersionChanged
 				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
-			if (platformChanged) {
+			if (platformChanged || loaderVersionChanged) {
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
@@ -479,9 +482,9 @@ provideInstallationSettings({
 					game_version: gameVersion || undefined,
 					soft_override: true,
 				}
-				debug('save: platform changed, calling installContent', request)
+				debug('save: platform/loader version changed, calling installContent', request)
 				await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			} else {
+			} else if (gameVersionChanged) {
 				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
 				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
 			}
@@ -663,8 +666,66 @@ provideInstallationSettings({
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 
-	lockPlatform: true,
-	hideLoaderVersion: true,
+	lockPlatform: false,
+	hideLoaderVersion: false,
+
+	async disableAllContent() {
+		debug('disableAllContent: fetching all addons')
+		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
+		const items = (addons.addons ?? [])
+			.filter((a) => !a.disabled)
+			.map((a) => ({ kind: a.kind, filename: a.filename }))
+		if (items.length > 0) {
+			debug('disableAllContent: disabling', items.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		}
+		debug('disableAllContent: done')
+	},
+
+	async disableIncompatibleContent(diffs) {
+		debug('disableIncompatibleContent: processing', diffs.length, 'diffs')
+		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
+		const removedFiles = new Set(diffs.filter((d) => d.type === 'removed').map((d) => d.fileName))
+		const items = (addons.addons ?? [])
+			.filter((a) => !a.disabled && removedFiles.has(a.filename))
+			.map((a) => ({ kind: a.kind, filename: a.filename }))
+		if (items.length > 0) {
+			debug('disableIncompatibleContent: disabling', items.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		}
+		debug('disableIncompatibleContent: done')
+	},
+
+	async saveWithoutAutoFix(platform, gameVersion, loaderVersionId) {
+		debug('saveWithoutAutoFix: called with', { platform, gameVersion, loaderVersionId })
+		let resolvedLoaderVersion = loaderVersionId
+		if (!resolvedLoaderVersion && platform !== 'vanilla') {
+			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
+			resolvedLoaderVersion = versions[0]?.id ?? null
+		}
+		emit('reinstall', { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion })
+		try {
+			const request: Archon.Content.v1.InstallWorldContent = {
+				content_variant: 'bare',
+				loader: toApiLoader(platform),
+				version: resolvedLoaderVersion ?? '',
+				game_version: gameVersion || undefined,
+				soft_override: true,
+			}
+			debug('saveWithoutAutoFix: calling installContent', request)
+			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
+			debug('saveWithoutAutoFix: succeeded, invalidating')
+			invalidateServerState()
+		} catch (err) {
+			debug('saveWithoutAutoFix: failed', err)
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToSaveSettings),
+			})
+			throw err
+		}
+	},
 
 	async previewSave(_platform, gameVersion, _loaderVersionId, signal) {
 		const result = await client.archon.content_v1.getUpdateGameVersionPreview(
