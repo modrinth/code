@@ -503,11 +503,41 @@
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Log URL copied"
   },
+  "files.editor.replace": {
+    "defaultMessage": "Replace"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Replace All"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Replace..."
+  },
   "files.editor.save-failed-text": {
     "defaultMessage": "Could not save the file."
   },
   "files.editor.save-failed-title": {
     "defaultMessage": "Save failed"
+  },
+  "files.editor.search-close": {
+    "defaultMessage": "Close search"
+  },
+  "files.editor.search-in-file": {
+    "defaultMessage": "Search..."
+  },
+  "files.editor.search-match-count": {
+    "defaultMessage": "{current} of {total}"
+  },
+  "files.editor.search-next-match": {
+    "defaultMessage": "Next match"
+  },
+  "files.editor.search-no-results": {
+    "defaultMessage": "No results"
+  },
+  "files.editor.search-previous-match": {
+    "defaultMessage": "Previous match"
+  },
+  "files.editor.search-toggle-replace": {
+    "defaultMessage": "Toggle replace"
   },
   "files.error.go-to-home": {
     "defaultMessage": "Go to home folder"
@@ -607,6 +637,9 @@
   },
   "files.navbar.search-files": {
     "defaultMessage": "Search files"
+  },
+  "files.navbar.search-in-file": {
+    "defaultMessage": "Search in file"
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Share to mclo.gs"

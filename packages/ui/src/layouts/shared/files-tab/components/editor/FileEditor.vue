@@ -6,63 +6,115 @@
 		<Transition name="search-bar">
 			<div
 				v-if="isSearchOpen && !isEditingImage"
-				class="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-2xl border-2 border-solid border-surface-5 bg-surface-3 p-1.5 shadow-lg"
-				@keydown.enter.prevent.stop="findNext"
-				@keydown.shift.enter.prevent.stop="findPrevious"
+				class="absolute right-3 top-3 z-10 flex flex-col gap-1 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-1.5 shadow-lg"
 				@keydown.escape.stop="closeSearch"
 			>
-				<StyledInput
-					ref="searchInputRef"
-					v-model="inFileSearchQuery"
-					:icon="SearchIcon"
-					type="search"
-					size="small"
-					autocomplete="off"
-					:placeholder="formatMessage(messages.searchInFile)"
-					wrapper-class="w-44"
-				/>
-				<span class="min-w-[6rem] px-1 text-right text-sm text-secondary tabular-nums">
-					{{
-						searchMatchCount > 0
-							? formatMessage(messages.matchCount, {
-									current: currentSearchMatch,
-									total: searchMatchCount,
-								})
-							: inFileSearchQuery
-								? formatMessage(messages.noResults)
-								: ''
-					}}
-				</span>
-				<Button
-					v-tooltip="formatMessage(messages.previousMatch)"
-					icon-only
-					transparent
-					:disabled="searchMatchCount === 0"
-					:aria-label="formatMessage(messages.previousMatch)"
-					@click="findPrevious"
-				>
-					<ChevronUpIcon />
-				</Button>
-				<Button
-					v-tooltip="formatMessage(messages.nextMatch)"
-					icon-only
-					transparent
-					:disabled="searchMatchCount === 0"
-					:aria-label="formatMessage(messages.nextMatch)"
-					@click="findNext"
-				>
-					<ChevronDownIcon />
-				</Button>
-				<div class="mx-0.5 h-4 w-px bg-surface-5" />
-				<Button
-					v-tooltip="formatMessage(messages.closeSearch)"
-					icon-only
-					transparent
-					:aria-label="formatMessage(messages.closeSearch)"
-					@click="closeSearch"
-				>
-					<XIcon />
-				</Button>
+				<!-- Find row -->
+				<div class="flex items-center gap-1">
+					<Button
+						v-tooltip="formatMessage(messages.toggleReplace)"
+						icon-only
+						transparent
+						:aria-label="formatMessage(messages.toggleReplace)"
+						@click="toggleReplace"
+					>
+						<ChevronRightIcon
+							class="transition-transform duration-150"
+							:class="{ 'rotate-90': isReplaceOpen }"
+						/>
+					</Button>
+					<div
+						@keydown.enter.prevent.stop="findNext"
+						@keydown.shift.enter.prevent.stop="findPrevious"
+					>
+						<StyledInput
+							ref="searchInputRef"
+							v-model="inFileSearchQuery"
+							:icon="SearchIcon"
+							type="search"
+							size="small"
+							autocomplete="off"
+							:placeholder="formatMessage(messages.searchInFile)"
+							wrapper-class="w-44"
+						/>
+					</div>
+					<span class="min-w-[6rem] px-1 text-right text-sm text-secondary tabular-nums">
+						{{
+							searchMatchCount > 0
+								? formatMessage(messages.matchCount, {
+										current: currentSearchMatch,
+										total: searchMatchCount,
+									})
+								: inFileSearchQuery
+									? formatMessage(messages.noResults)
+									: ''
+						}}
+					</span>
+					<Button
+						v-tooltip="formatMessage(messages.previousMatch)"
+						icon-only
+						transparent
+						:disabled="searchMatchCount === 0"
+						:aria-label="formatMessage(messages.previousMatch)"
+						@click="findPrevious"
+					>
+						<ChevronUpIcon />
+					</Button>
+					<Button
+						v-tooltip="formatMessage(messages.nextMatch)"
+						icon-only
+						transparent
+						:disabled="searchMatchCount === 0"
+						:aria-label="formatMessage(messages.nextMatch)"
+						@click="findNext"
+					>
+						<ChevronDownIcon />
+					</Button>
+					<div class="mx-0.5 h-4 w-px bg-surface-5" />
+					<Button
+						v-tooltip="formatMessage(messages.closeSearch)"
+						icon-only
+						transparent
+						:aria-label="formatMessage(messages.closeSearch)"
+						@click="closeSearch"
+					>
+						<XIcon />
+					</Button>
+				</div>
+
+				<!-- Replace row -->
+				<div v-if="isReplaceOpen" class="flex items-center gap-1">
+					<div class="w-8 flex-shrink-0" />
+					<div @keydown.enter.prevent.stop="replaceOne">
+						<StyledInput
+							ref="replaceInputRef"
+							v-model="replaceQuery"
+							type="text"
+							size="small"
+							autocomplete="off"
+							:placeholder="formatMessage(messages.replaceInFile)"
+							wrapper-class="w-44"
+						/>
+					</div>
+					<ButtonStyled type="outlined">
+						<button
+							class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
+							:disabled="searchMatchCount === 0"
+							@click="replaceOne"
+						>
+							{{ formatMessage(messages.replace) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="outlined">
+						<button
+							class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
+							:disabled="searchMatchCount === 0"
+							@click="replaceAllOccurrences"
+						>
+							{{ formatMessage(messages.replaceAll) }}
+						</button>
+					</ButtonStyled>
+				</div>
 			</div>
 		</Transition>
 		<component
@@ -88,10 +140,18 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronUpIcon, SearchIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import {
+	ChevronDownIcon,
+	ChevronRightIcon,
+	ChevronUpIcon,
+	SearchIcon,
+	SpinnerIcon,
+	XIcon,
+} from '@modrinth/assets'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import Button from '#ui/components/base/Button.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
@@ -128,6 +188,8 @@ interface AceEditorInstance {
 	) => unknown
 	findNext: (options?: object, animate?: boolean) => void
 	findPrevious: (options?: object, animate?: boolean) => void
+	replace: (replacement: string) => void
+	replaceAll: (replacement: string) => void
 	focus: () => void
 }
 
@@ -209,6 +271,22 @@ const messages = defineMessages({
 		id: 'files.editor.search-close',
 		defaultMessage: 'Close search',
 	},
+	toggleReplace: {
+		id: 'files.editor.search-toggle-replace',
+		defaultMessage: 'Toggle replace',
+	},
+	replaceInFile: {
+		id: 'files.editor.replace-in-file',
+		defaultMessage: 'Replace...',
+	},
+	replace: {
+		id: 'files.editor.replace',
+		defaultMessage: 'Replace',
+	},
+	replaceAll: {
+		id: 'files.editor.replace-all',
+		defaultMessage: 'Replace All',
+	},
 })
 
 const fileContent = ref('')
@@ -221,10 +299,13 @@ const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
 
 const isSearchOpen = ref(false)
+const isReplaceOpen = ref(false)
 const inFileSearchQuery = ref('')
+const replaceQuery = ref('')
 const searchMatchCount = ref(0)
 const currentSearchMatch = ref(0)
 const searchInputRef = ref<{ focus: () => void } | null>(null)
+const replaceInputRef = ref<{ focus: () => void } | null>(null)
 
 watch(inFileSearchQuery, handleSearchInput)
 
@@ -319,6 +400,16 @@ function onEditorInit(editor: AceEditorInstance) {
 		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
 		exec: () => toggleSearch(),
 	})
+
+	editor.commands.addCommand({
+		name: 'replace',
+		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
+		exec: () => {
+			isSearchOpen.value = true
+			isReplaceOpen.value = true
+			nextTick(() => searchInputRef.value?.focus())
+		},
+	})
 }
 
 async function saveFileContent(exit: boolean = false) {
@@ -395,17 +486,52 @@ function toggleSearch() {
 		closeSearch()
 	} else {
 		isSearchOpen.value = true
+		isReplaceOpen.value = false
 		nextTick(() => searchInputRef.value?.focus())
+	}
+}
+
+function toggleReplace() {
+	isReplaceOpen.value = !isReplaceOpen.value
+	if (isReplaceOpen.value) {
+		nextTick(() => replaceInputRef.value?.focus())
 	}
 }
 
 function closeSearch() {
 	isSearchOpen.value = false
+	isReplaceOpen.value = false
 	inFileSearchQuery.value = ''
+	replaceQuery.value = ''
 	searchMatchCount.value = 0
 	currentSearchMatch.value = 0
 	editorInstance.value?.find('', { wrap: true })
 	editorInstance.value?.focus()
+}
+
+function replaceOne() {
+	const editor = editorInstance.value
+	if (!editor || searchMatchCount.value === 0) return
+	editor.replace(replaceQuery.value)
+	nextTick(() => {
+		const count = countOccurrences(fileContent.value, inFileSearchQuery.value)
+		searchMatchCount.value = count
+		currentSearchMatch.value = count > 0 ? Math.min(currentSearchMatch.value, count) : 0
+	})
+}
+
+function replaceAllOccurrences() {
+	const editor = editorInstance.value
+	if (!editor || searchMatchCount.value === 0) return
+	editor.replaceAll(replaceQuery.value)
+	nextTick(() => {
+		const count = countOccurrences(fileContent.value, inFileSearchQuery.value)
+		searchMatchCount.value = count
+		currentSearchMatch.value = count > 0 ? 1 : 0
+		if (count > 0) {
+			editor.find(inFileSearchQuery.value, { wrap: true, caseSensitive: false })
+		}
+	})
 }
 
 function handleSearchInput() {
