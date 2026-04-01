@@ -60,7 +60,7 @@
 				:loading="!isConnected || isWsAuthIncorrect"
 			/>
 
-			<div class="flex h-[720px] flex-col gap-3">
+			<div class="flex h-[700px] flex-col gap-3">
 				<div class="flex items-center gap-4">
 					<h2 class="m-0 text-3xl font-extrabold text-contrast">Console</h2>
 					<PanelServerStatus v-if="isConnected && !isWsAuthIncorrect" :state="serverPowerState" />
@@ -126,9 +126,7 @@ provideConsoleManager({
 			console.error('Error sending command:', error)
 		}
 	},
-	showCommandInput: computed(
-		() => props.isServerRunning && props.isConnected && !props.isWsAuthIncorrect,
-	),
+	showCommandInput: true,
 	loading: computed(() => !props.isConnected || props.isWsAuthIncorrect),
 	onClear: () => {
 		modrinthServersConsole.clear()

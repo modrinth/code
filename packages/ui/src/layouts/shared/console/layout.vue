@@ -1,5 +1,5 @@
 <template>
-	<div class="flex min-h-0 flex-1 flex-col gap-4">
+	<div class="flex min-h-0 flex-col gap-4">
 		<div class="flex items-center gap-2">
 			<StyledInput
 				v-model="searchQuery"
@@ -36,7 +36,7 @@
 
 		<BaseTerminal
 			ref="terminalRef"
-			class="min-h-0 flex-1"
+			class="min-h-0"
 			:show-input="resolvedShowInput"
 			@command="handleCommand"
 			@ready="handleTerminalReady"

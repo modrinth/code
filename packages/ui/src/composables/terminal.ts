@@ -212,7 +212,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		resizeObserver = new ResizeObserver(() => {
 			const d = fit.proposeDimensions()
 			if (d) {
-				term.resize(d.cols, d.rows + 1)
+				term.resize(d.cols, d.rows)
 			}
 		})
 		resizeObserver.observe(container)
