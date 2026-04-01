@@ -244,7 +244,7 @@ function developerModeIncrement() {
 						class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 						@click="developerModeIncrement()"
 					/>
-					<div class="flex flex-wrap justify-center gap-1 sm:-mx-2">
+					<div class="flex flex-wrap justify-center gap-1">
 						<ButtonStyled
 							v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
@@ -261,6 +261,9 @@ function developerModeIncrement() {
 							</a>
 						</ButtonStyled>
 					</div>
+					<a href="https://www.firefox.com/" target="_blank"
+						><img src="/firefox.gif" alt="Get FireFox!!"
+					/></a>
 					<div class="mt-auto flex flex-wrap justify-center gap-3 md:flex-col">
 						<p class="m-0">
 							<IntlFormatted :message-id="messages.openSource">

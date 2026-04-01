@@ -185,6 +185,17 @@ const TAGLINES = [
 	'Not to be confused with CurseForge',
 	'Better than Curse Client!',
 	`It's open source, fix it yourself!`,
+	'Gentlemen, this is democracy manifest!',
+	'Got any grapes?',
+	'Thanks, Obama.',
+	'Is this loss?',
+	'FUUUUUUU',
+	'Move away from the mic to breathe in!',
+	'Spaghetti!',
+	"Lamp oil, rope, bombs? You want it? It's yours, my friend.",
+	"It's over 9000!",
+	'Good guys, bad guys and explosions, as far as the eye can see!',
+	"I'm doing my part!",
 ]
 
 function pickWeightedTagline(taglines: string[]): string {
