@@ -1,10 +1,18 @@
 <template>
 	<div
 		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="componentHeight ? { height: componentHeight + 'px' } : {}"
+		:style="!fullscreen && componentHeight ? { height: componentHeight + 'px' } : {}"
+		:class="{ 'h-full': fullscreen }"
 	>
-		<div class="relative min-h-0 overflow-hidden">
+		<div class="relative min-h-0 flex-1 overflow-hidden">
 			<div ref="containerRef" class="size-full pl-2" />
+			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
+				<ButtonStyled circular type="highlight">
+					<button class="!shadow-none" aria-label="Exit fullscreen" @click="emit('exit-fullscreen')">
+						<XIcon />
+					</button>
+				</ButtonStyled>
+			</div>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4">
 				<ButtonStyled circular type="highlight">
 					<button class="!shadow-none" aria-label="Scroll to bottom" @click="scrollToBottom">
@@ -31,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
+import { ChevronDownIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, ref } from 'vue'
 
@@ -43,16 +51,19 @@ const props = withDefaults(
 	defineProps<{
 		scrollback?: number
 		showInput?: boolean
+		fullscreen?: boolean
 	}>(),
 	{
 		scrollback: 10000,
 		showInput: false,
+		fullscreen: false,
 	},
 )
 
 const emit = defineEmits<{
 	command: [command: string]
 	ready: [terminal: Terminal]
+	'exit-fullscreen': []
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
@@ -106,6 +117,7 @@ defineExpose({
 .xterm {
 	height: 100% !important;
 }
+
 
 .xterm .xterm-screen {
 	margin-left: auto !important;

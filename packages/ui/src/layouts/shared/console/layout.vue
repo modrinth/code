@@ -1,53 +1,65 @@
 <template>
-	<div class="flex min-h-0 flex-col gap-4">
-		<div class="flex items-center gap-2">
-			<StyledInput
-				v-model="searchQuery"
-				:icon="SearchIcon"
-				placeholder="Search logs"
-				wrapper-class="flex-1"
-				input-class="!h-10"
-				clearable
-			/>
-			<DropdownSelect
-				v-if="ctx.logSources?.value && ctx.activeLogSourceIndex"
-				:model-value="ctx.logSources.value[ctx.activeLogSourceIndex.value]?.name"
-				:options="ctx.logSources.value.map((s) => s.name)"
-				name="log-source"
-				class="w-[220px]"
-				@update:model-value="handleLogSourceChange"
-			/>
-			<ButtonStyled circular :type="wrapEnabled ? 'highlight' : 'standard'" color="brand">
-				<button aria-label="Toggle word wrap" @click="wrapEnabled = !wrapEnabled">
-					<WrapTextIcon />
-				</button>
-			</ButtonStyled>
-		</div>
+	<div
+		class="flex min-h-0 flex-col"
+		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6' : 'gap-4'"
+	>
+		<template v-if="!isFullscreen">
+			<div class="flex items-center gap-2">
+				<StyledInput
+					v-model="searchQuery"
+					:icon="SearchIcon"
+					placeholder="Search logs"
+					wrapper-class="flex-1"
+					input-class="!h-10"
+					clearable
+				/>
+				<DropdownSelect
+					v-if="ctx.logSources?.value && ctx.activeLogSourceIndex"
+					:model-value="ctx.logSources.value[ctx.activeLogSourceIndex.value]?.name"
+					:options="ctx.logSources.value.map((s) => s.name)"
+					name="log-source"
+					class="w-[220px]"
+					@update:model-value="handleLogSourceChange"
+				/>
+				<ButtonStyled circular>
+					<button
+						aria-label="Open fullscreen"
+						v-tooltip="'Open fullscreen'"
+						@click="enterFullscreen"
+					>
+						<ExpandIcon />
+					</button>
+				</ButtonStyled>
+			</div>
 
-		<div class="flex items-center justify-between">
-			<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
-			<ConsoleActionButtons
-				:share-disabled="resolvedShareDisabled"
-				@clear="handleClear"
-				@copy="handleCopy"
-				@share="handleShare"
-			/>
-		</div>
+			<div class="flex items-center justify-between">
+				<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
+				<ConsoleActionButtons
+					:share-disabled="resolvedShareDisabled"
+					@clear="handleClear"
+					@copy="handleCopy"
+					@share="handleShare"
+				/>
+			</div>
+		</template>
 
 		<BaseTerminal
 			ref="terminalRef"
 			class="min-h-0"
+			:class="{ 'flex-1': isFullscreen }"
 			:show-input="resolvedShowInput"
+			:fullscreen="isFullscreen"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
+			@exit-fullscreen="exitFullscreen"
 		/>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { SearchIcon, WrapTextIcon } from '@modrinth/assets'
+import { ExpandIcon, SearchIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
-import { computed, isRef, ref, watch } from 'vue'
+import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
@@ -56,7 +68,7 @@ import StyledInput from '#ui/components/base/StyledInput.vue'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { useConsoleFilters, rewriteTerminal } from './composables'
+import { rewriteTerminal, useConsoleFilters } from './composables'
 import { injectConsoleManager } from './providers'
 import type { LogLevel } from './types'
 
@@ -64,8 +76,14 @@ const ctx = injectConsoleManager()
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
-const wrapEnabled = ref(false)
+const isFullscreen = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
+
+onBeforeUnmount(() => {
+	if (isFullscreen.value) {
+		document.body.style.overflow = ''
+	}
+})
 
 let lastWrittenIndex = 0
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
@@ -98,6 +116,22 @@ function rewriteFiltered() {
 	const predicate = buildFilterPredicate()
 	rewriteTerminal(term, ctx.logLines.value, predicate)
 	lastWrittenIndex = ctx.logLines.value.length
+}
+
+function enterFullscreen() {
+	isFullscreen.value = true
+	document.body.style.overflow = 'hidden'
+	nextTick(() => {
+		terminalRef.value?.fit()
+	})
+}
+
+function exitFullscreen() {
+	isFullscreen.value = false
+	document.body.style.overflow = ''
+	nextTick(() => {
+		terminalRef.value?.fit()
+	})
 }
 
 function writeAllLines() {

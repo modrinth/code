@@ -85,6 +85,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 
 	let resizeObserver: ResizeObserver | null = null
 	let themeObserver: MutationObserver | null = null
+	let wheelHandler: ((e: WheelEvent) => void) | null = null
 	let hasWritten = false
 	const pendingWrites: Array<{ data: string; newline: boolean }> = []
 
@@ -189,6 +190,11 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		term.options.disableStdin = true
 		term.write('\x1b[?25l')
 
+		wheelHandler = (e: WheelEvent) => {
+			e.preventDefault()
+		}
+		container.addEventListener('wheel', wheelHandler, { passive: false })
+
 		term.onScroll(() => checkIfAtBottom())
 		term.onWriteParsed(() => {
 			if (isAtBottom.value) {
@@ -229,6 +235,10 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 	})
 
 	onBeforeUnmount(() => {
+		if (wheelHandler && options.container.value) {
+			options.container.value.removeEventListener('wheel', wheelHandler)
+			wheelHandler = null
+		}
 		resizeObserver?.disconnect()
 		resizeObserver = null
 		themeObserver?.disconnect()
