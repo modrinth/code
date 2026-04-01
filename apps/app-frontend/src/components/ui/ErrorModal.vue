@@ -6,6 +6,7 @@ import {
 	HammerIcon,
 	LogInIcon,
 	UpdatedIcon,
+	WrenchIcon,
 	XIcon,
 } from '@modrinth/assets'
 import { ButtonStyled, Collapsible, injectNotificationManager } from '@modrinth/ui'
@@ -155,7 +156,7 @@ async function copyToClipboard(text) {
 
 <template>
 	<ModalWrapper ref="errorModal" :header="title" :closable="closable">
-		<div class="modal-body">
+		<div class="modal-body max-w-[550px]">
 			<div class="markdown-body">
 				<template v-if="errorType === 'minecraft_auth'">
 					<template v-if="metadata.network">
@@ -280,7 +281,7 @@ async function copyToClipboard(text) {
 					{{ debugInfo }}
 				</template>
 				<template v-if="hasDebugInfo">
-					<hr />
+					<div class="w-full h-[1px] bg-surface-5 mb-3"></div>
 					<p>
 						If nothing is working and you need help, visit
 						<a :href="supportLink">our support page</a>
@@ -296,28 +297,47 @@ async function copyToClipboard(text) {
 				<ButtonStyled v-if="closable">
 					<button @click="errorModal.hide()"><XIcon /> Close</button>
 				</ButtonStyled>
-				<ButtonStyled v-if="hasDebugInfo">
-					<button :disabled="copied" @click="copyToClipboard(debugInfo)">
-						<template v-if="copied"> <CheckIcon class="text-green" /> Copied! </template>
-						<template v-else> <CopyIcon /> Copy debug info </template>
-					</button>
-				</ButtonStyled>
 			</div>
 			<template v-if="hasDebugInfo">
-				<div class="bg-button-bg rounded-xl mt-2 overflow-clip">
-					<button
-						class="flex items-center justify-between w-full bg-transparent border-0 px-4 py-3 cursor-pointer"
-						@click="errorCollapsed = !errorCollapsed"
-					>
-						<span class="text-contrast font-extrabold m-0">Debug information:</span>
-						<DropdownIcon
-							class="h-5 w-5 text-secondary transition-transform"
-							:class="{ 'rotate-180': !errorCollapsed }"
-						/>
-					</button>
-					<Collapsible :collapsed="errorCollapsed">
-						<pre class="m-0 px-4 py-3 bg-bg rounded-none">{{ debugInfo }}</pre>
-					</Collapsible>
+				<div class="flex flex-col gap-2">
+					<div class="w-full h-[1px] bg-surface-5"></div>
+
+					<div class="overflow-clip">
+						<button
+							class="flex items-center justify-between w-full bg-transparent border-0 py-4 cursor-pointer"
+							@click="errorCollapsed = !errorCollapsed"
+						>
+							<span class="flex items-center gap-2 text-contrast font-extrabold m-0">
+								<WrenchIcon class="h-4 w-4" />
+								Debug information
+							</span>
+							<DropdownIcon
+								class="h-5 w-5 text-secondary transition-transform"
+								:class="{ 'rotate-180': !errorCollapsed }"
+							/>
+						</button>
+						<Collapsible :collapsed="errorCollapsed">
+							<div
+								class="p-3 bg-surface-2 rounded-2xl text-xs grid grid-cols-[1fr_auto] max-w-full items-start"
+							>
+								<div
+									class="m-0 p-0 rounded-none bg-transparent text-sm font-mono break-words overflow-auto"
+								>
+									{{ debugInfo }}
+								</div>
+								<ButtonStyled circular>
+									<button
+										v-tooltip="'Copy debug info'"
+										:disabled="copied"
+										@click="copyToClipboard(debugInfo)"
+									>
+										<template v-if="copied"> <CheckIcon class="text-green" /> </template>
+										<template v-else> <CopyIcon /> </template>
+									</button>
+								</ButtonStyled>
+							</div>
+						</Collapsible>
+					</div>
 				</div>
 			</template>
 		</div>

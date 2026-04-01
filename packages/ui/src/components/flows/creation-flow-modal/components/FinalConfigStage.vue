@@ -97,15 +97,24 @@
 				</div>
 			</div>
 		</Accordion>
+
+		<InlineBackupCreator
+			v-if="ctx.flowType === 'reset-server'"
+			ref="backupCreator"
+			backup-name="Before reset server"
+			hide-shift-click-hint
+			@update:buttons-disabled="ctx.isBackingUp.value = $event"
+		/>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon, SettingsIcon } from '@modrinth/assets'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
+import InlineBackupCreator from '../../../../layouts/shared/content-tab/components/modals/InlineBackupCreator.vue'
 import { injectTags } from '../../../../providers'
 import Accordion from '../../../base/Accordion.vue'
 import Chips from '../../../base/Chips.vue'
@@ -118,6 +127,11 @@ import { capitalize } from '../shared'
 
 const debug = useDebugLogger('FinalConfigStage')
 const ctx = injectCreationFlowContext()
+
+const backupCreator = ref<InstanceType<typeof InlineBackupCreator> | null>(null)
+watch(backupCreator, (creator) => {
+	ctx.cancelBackup.value = creator?.cancelBackup ?? null
+})
 const {
 	worldName,
 	gamemode,

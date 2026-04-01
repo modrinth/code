@@ -13,6 +13,7 @@
 				:modpack-icon-url="linkedModpackProject?.icon_url ?? undefined"
 				:enable-toggle="!props.isServerInstance"
 				:get-overflow-options="getOverflowOptions"
+				:switch-version="handleSwitchVersion"
 				@update:enabled="handleModpackContentToggle"
 				@bulk:enable="handleModpackContentBulkToggle"
 				@bulk:disable="handleModpackContentBulkToggle"
@@ -20,6 +21,11 @@
 			<ConfirmModpackUpdateModal
 				ref="modpackUpdateConfirmModal"
 				:downgrade="isModpackUpdateDowngrade"
+				:backup-tip="
+					[linkedModpackProject?.title, pendingModpackUpdateVersion?.version_number]
+						.filter(Boolean)
+						.join(' ')
+				"
 				@confirm="handleModpackUpdateConfirm"
 				@cancel="handleModpackUpdateCancel"
 			/>
@@ -42,7 +48,7 @@
 				"
 				:project-name="
 					updatingModpack
-						? (linkedModpackProject?.title ?? formatMessage(messages.modpackFallback))
+						? (linkedModpackProject?.title ?? formatMessage(commonMessages.modpackLabel))
 						: (updatingProject?.project?.title ?? updatingProject?.file_name)
 				"
 				:loading="loadingVersions"
@@ -58,9 +64,11 @@
 
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ArrowLeftRightIcon, ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, FolderOpenIcon } from '@modrinth/assets'
 import {
+	commonMessages,
 	ConfirmModpackUpdateModal,
+	ContentCardLayout as ContentPageLayout,
 	type ContentItem,
 	type ContentModpackCardCategory,
 	type ContentModpackCardProject,
@@ -77,7 +85,6 @@ import {
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
-import { ContentCardLayout as ContentPageLayout } from '@modrinth/ui'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { open } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -92,6 +99,7 @@ import { get_project_versions, get_version } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import {
 	add_project_from_path,
+	add_project_from_version,
 	duplicate,
 	edit,
 	get,
@@ -119,10 +127,6 @@ const messages = defineMessages({
 		id: 'app.instance.mods.share-text',
 		defaultMessage: "Check out the projects I'm using in my modpack!",
 	},
-	modpackFallback: {
-		id: 'app.instance.mods.modpack-fallback',
-		defaultMessage: 'Modpack',
-	},
 	successfullyUploaded: {
 		id: 'app.instance.mods.successfully-uploaded',
 		defaultMessage: 'Successfully uploaded',
@@ -135,33 +139,9 @@ const messages = defineMessages({
 		id: 'app.instance.mods.projects-were-added',
 		defaultMessage: '{count} projects were added',
 	},
-	updating: {
-		id: 'app.instance.mods.updating',
-		defaultMessage: 'Updating...',
-	},
-	installing: {
-		id: 'app.instance.mods.installing',
-		defaultMessage: 'Installing...',
-	},
 	contentTypeProject: {
 		id: 'app.instance.mods.content-type-project',
 		defaultMessage: 'project',
-	},
-	unknownVersion: {
-		id: 'app.instance.mods.unknown-version',
-		defaultMessage: 'Unknown',
-	},
-	showFile: {
-		id: 'app.instance.mods.show-file',
-		defaultMessage: 'Show file',
-	},
-	copyLink: {
-		id: 'app.instance.mods.copy-link',
-		defaultMessage: 'Copy link',
-	},
-	switchVersion: {
-		id: 'app.instance.mods.switch-version',
-		defaultMessage: 'Switch version',
 	},
 })
 
@@ -281,7 +261,7 @@ async function handleUploadFiles() {
 	}
 }
 
-async function _toggleDisableMod(mod: ContentItem) {
+async function toggleDisableMod(mod: ContentItem) {
 	try {
 		mod.file_path = await toggle_disable_project(props.instance.path, mod.file_path!)
 		mod.enabled = !mod.enabled
@@ -299,7 +279,7 @@ async function _toggleDisableMod(mod: ContentItem) {
 	}
 }
 
-const toggleDisableMod = useDebounceFn(_toggleDisableMod, 20)
+const toggleDisableDebounced = useDebounceFn(toggleDisableMod, 20)
 
 async function removeMod(mod: ContentItem) {
 	await remove_project(props.instance.path, mod.file_path!).catch(handleError)
@@ -351,8 +331,34 @@ async function updateProject(mod: ContentItem) {
 	}
 }
 
+async function switchProjectVersion(mod: ContentItem, version: Labrinth.Versions.v2.Version) {
+	isBulkOperating.value = true
+	mod.installing = true
+	if (mod.version) {
+		mod.version.id = version.id
+		mod.version.version_number = version.version_number
+	}
+	try {
+		await remove_project(props.instance.path, mod.file_path!)
+		const newPath = await add_project_from_version(props.instance.path, version.id)
+
+		const profile = await get(props.instance.path).catch(handleError)
+		if (profile) {
+			await installVersionDependencies(profile, version).catch(handleError)
+		}
+
+		mod.file_path = newPath
+	} catch (err) {
+		handleError(err as Error)
+	} finally {
+		mod.installing = false
+		isBulkOperating.value = false
+		await initProjects()
+	}
+}
+
 async function handleUpdate(id: string) {
-	const item = projects.value.find((p) => p.file_name === id)
+	const item = projects.value.find((p) => p.id === id)
 	if (!item?.has_update || !item.project?.id || !item.version?.id) return
 
 	debug('handleUpdate triggered', {
@@ -438,7 +444,7 @@ async function handleSwitchVersion(item: ContentItem) {
 }
 
 async function handleModpackContentToggle(item: ContentItem) {
-	await toggleDisableMod(item)
+	await toggleDisableDebounced(item)
 }
 
 async function handleModpackContentBulkToggle(items: ContentItem[]) {
@@ -509,7 +515,7 @@ async function fetchAndSpliceVersion(
 async function handleVersionSelect(version: Labrinth.Versions.v2.Version) {
 	if (version.changelog != null) return
 	loadingChangelog.value = true
-	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError)
+	await fetchAndSpliceVersion(version.id, 'must_revalidate', handleError as (err: unknown) => void)
 	loadingChangelog.value = false
 }
 
@@ -570,9 +576,11 @@ async function handleModalUpdate(
 	} else if (updatingProject.value) {
 		const mod = updatingProject.value
 
-		mod.update_version_id = selectedVersion.id
-
-		await updateProject(mod)
+		if (mod.has_update && mod.update_version_id === selectedVersion.id) {
+			await updateProject(mod)
+		} else {
+			await switchProjectVersion(mod, selectedVersion)
+		}
 
 		resetUpdateState()
 	}
@@ -627,23 +635,15 @@ async function handleShareItems(
 function getOverflowOptions(item: ContentItem): OverflowMenuOption[] {
 	const options: OverflowMenuOption[] = []
 
-	if (item.project?.id && item.version?.id && !item.has_update) {
-		options.push({
-			id: formatMessage(messages.switchVersion),
-			icon: ArrowLeftRightIcon,
-			action: () => handleSwitchVersion(item),
-		})
-	}
-
 	options.push({
-		id: formatMessage(messages.showFile),
+		id: formatMessage(commonMessages.showFileButton),
 		icon: FolderOpenIcon,
 		action: () => highlightModInProfile(props.instance.path, item.file_path),
 	})
 
 	if (item.project?.slug) {
 		options.push({
-			id: formatMessage(messages.copyLink),
+			id: formatMessage(commonMessages.copyLinkButton),
 			icon: ClipboardCopyIcon,
 			action: async () => {
 				await navigator.clipboard.writeText(
@@ -694,18 +694,13 @@ async function initProjects(cacheBehaviour?: CacheBehaviour) {
 
 		if (allCategories && modpackInfo.project.categories) {
 			const seen = new Set<string>()
-			linkedModpackCategories.value = allCategories
-				.filter((cat: { name: string }) => {
-					if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
-						seen.add(cat.name)
-						return true
-					}
-					return false
-				})
-				.map((cat: { name: string }) => ({
-					...cat,
-					name: cat.name.charAt(0).toUpperCase() + cat.name.slice(1),
-				}))
+			linkedModpackCategories.value = allCategories.filter((cat: { name: string }) => {
+				if (modpackInfo.project.categories.includes(cat.name) && !seen.has(cat.name)) {
+					seen.add(cat.name)
+					return true
+				}
+				return false
+			})
 		} else {
 			linkedModpackCategories.value = []
 		}
@@ -750,11 +745,17 @@ provideContentManager({
 		linkedModpackProject.value
 			? {
 					project: linkedModpackProject.value,
-					projectLink: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
+					projectLink: {
+						path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}`,
+						query: { i: props.instance.path },
+					},
 					version: linkedModpackVersion.value ?? undefined,
 					versionLink:
 						linkedModpackProject.value && linkedModpackVersion.value
-							? `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`
+							? {
+									path: `/project/${linkedModpackProject.value.slug ?? linkedModpackProject.value.id}/version/${linkedModpackVersion.value.id}`,
+									query: { i: props.instance.path },
+								}
 							: undefined,
 					owner: linkedModpackOwner.value
 						? {
@@ -769,23 +770,27 @@ provideContentManager({
 					hasUpdate: linkedModpackHasUpdate.value,
 					disabled: isModpackUpdating.value,
 					disabledText: isModpackUpdating.value
-						? formatMessage(messages.updating)
-						: formatMessage(messages.installing),
+						? formatMessage(commonMessages.updatingLabel)
+						: formatMessage(commonMessages.installingLabel),
 				}
 			: null,
 	),
 	isPackLocked,
 	isBusy: isInstanceBusy,
 	isBulkOperating,
-	getItemId: (item) => item.file_name,
 	contentTypeLabel: ref(formatMessage(messages.contentTypeProject)),
-	toggleEnabled: toggleDisableMod,
-	bulkEnableItems: (items) =>
-		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
-	bulkDisableItems: (items) =>
-		Promise.all(items.map((item) => toggleDisableMod(item))).then(() => {}),
+	toggleEnabled: toggleDisableDebounced,
+	bulkEnableItems: (items: ContentItem[]) =>
+		Promise.all(items.filter((item) => !item.enabled).map((item) => toggleDisableMod(item))).then(
+			() => {},
+		),
+	bulkDisableItems: (items: ContentItem[]) =>
+		Promise.all(items.filter((item) => item.enabled).map((item) => toggleDisableMod(item))).then(
+			() => {},
+		),
 	deleteItem: removeMod,
-	bulkDeleteItems: (items) => Promise.all(items.map((item) => removeMod(item))).then(() => {}),
+	bulkDeleteItems: (items: ContentItem[]) =>
+		Promise.all(items.map((item) => removeMod(item))).then(() => {}),
 	refresh: () => initProjects('must_revalidate'),
 	browse: handleBrowseContent,
 	uploadFiles: handleUploadFiles,
@@ -796,27 +801,33 @@ provideContentManager({
 	viewModpackContent: handleModpackContent,
 	unlinkModpack: unpairProfile,
 	openSettings: props.openSettings,
+	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	showContentHint,
 	dismissContentHint,
 	shareItems: handleShareItems,
-	mapToTableItem: (item) => ({
-		id: item.file_name,
+	mapToTableItem: (item: ContentItem) => ({
+		id: item.id,
 		project: item.project ?? {
 			id: item.file_name,
 			slug: null,
 			title: item.file_name.replace('.disabled', ''),
 			icon_url: null,
 		},
-		projectLink: item.project?.id ? `/project/${item.project.id}` : undefined,
+		projectLink: item.project?.id
+			? { path: `/project/${item.project.id}`, query: { i: props.instance.path } }
+			: undefined,
 		version: item.version ?? {
 			id: item.file_name,
-			version_number: formatMessage(messages.unknownVersion),
+			version_number: formatMessage(commonMessages.unknownLabel),
 			file_name: item.file_name,
 		},
 		versionLink:
 			item.project?.id && item.version?.id
-				? `/project/${item.project.id}/version/${item.version.id}`
+				? {
+						path: `/project/${item.project.id}/version/${item.version.id}`,
+						query: { i: props.instance.path },
+					}
 				: undefined,
 		owner: item.owner
 			? {
@@ -825,7 +836,9 @@ provideContentManager({
 				}
 			: undefined,
 		enabled: item.enabled,
+		installing: item.installing,
 	}),
+	filterPersistKey: props.instance.path,
 })
 
 await initProjects()

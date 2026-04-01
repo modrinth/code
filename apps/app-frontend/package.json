@@ -22,6 +22,7 @@
 		"@tanstack/vue-query": "^5.90.7",
 		"@tauri-apps/api": "^2.5.0",
 		"@tauri-apps/plugin-dialog": "^2.2.1",
+		"@tauri-apps/plugin-fs": "^2.4.5",
 		"@tauri-apps/plugin-http": "~2.5.7",
 		"@tauri-apps/plugin-opener": "^2.2.6",
 		"@tauri-apps/plugin-os": "^2.2.1",
@@ -40,7 +41,6 @@
 		"vite-svg-loader": "^5.1.0",
 		"vue": "^3.5.13",
 		"vue-i18n": "^10.0.0",
-		"vue-multiselect": "3.0.0",
 		"vue-router": "^4.6.0",
 		"vue-virtual-scroller": "v2.0.0-beta.8"
 	},
@@ -59,7 +59,7 @@
 		"sass": "^1.74.1",
 		"tailwindcss": "^3.4.4",
 		"typescript": "^5.5.4",
-		"vite": "^6.0.0",
+		"vite": "^8.0.0",
 		"vue-component-type-helpers": "^3.1.8",
 		"vue-tsc": "^2.1.6"
 	},

@@ -98,7 +98,7 @@
 import { ChevronRightIcon, FolderSearchIcon, SearchIcon } from '@modrinth/assets'
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { injectInstanceImport } from '../../../../providers'
+import { injectInstanceImport, injectNotificationManager } from '../../../../providers'
 import type { ImportableLauncher } from '../../../../providers/instance-import'
 import ButtonStyled from '../../../base/ButtonStyled.vue'
 import Checkbox from '../../../base/Checkbox.vue'
@@ -108,6 +108,7 @@ import { injectCreationFlowContext } from '../creation-flow-context'
 
 const ctx = injectCreationFlowContext()
 const importProvider = injectInstanceImport()
+const { addNotification } = injectNotificationManager()
 
 const loading = ref(false)
 const expandedLaunchers = ref(new Set<string>())
@@ -257,6 +258,14 @@ async function addLauncherPath() {
 
 	try {
 		const instances = await importProvider.getImportableInstances('Custom', path)
+		if (instances.length === 0) {
+			addNotification({
+				type: 'error',
+				title: 'No instances found',
+				text: `No importable instances were found at the specified path.`,
+			})
+			return
+		}
 		const launcher: ImportableLauncher = {
 			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
 			path,
@@ -266,13 +275,12 @@ async function addLauncherPath() {
 		expandedLaunchers.value.add(launcher.name)
 		expandedLaunchers.value = new Set(expandedLaunchers.value)
 	} catch {
-		// Failed to load — still add with empty instances
-		const launcher: ImportableLauncher = {
-			name: `Custom (${path.split(/[\\/]/).pop() || path})`,
-			path,
-			instances: [],
-		}
-		ctx.importLaunchers.value = [...ctx.importLaunchers.value, launcher]
+		addNotification({
+			type: 'error',
+			title: 'No instances found',
+			text: `No importable instances were found at the specified path.`,
+		})
+		return
 	}
 
 	newLauncherPath.value = ''

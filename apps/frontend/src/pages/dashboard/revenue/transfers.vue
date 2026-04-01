@@ -67,7 +67,7 @@
 						v-for="transaction in transactions"
 						:key="transaction.id || transaction.created"
 						:transaction="transaction"
-						@cancelled="refresh"
+						@cancelled="refetch"
 					/>
 				</div>
 			</div>
@@ -92,11 +92,13 @@ import {
 	Combobox,
 	defineMessages,
 	EmptyState,
+	injectModrinthClient,
 	useFormatDateTime,
 	useFormatMoney,
 	useVIntl,
 } from '@modrinth/ui'
 import { capitalizeString } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
 import RevenueTransaction from '~/components/ui/dashboard/RevenueTransaction.vue'
@@ -110,17 +112,17 @@ const formatMonth = useFormatDateTime({
 	month: 'long',
 })
 
+const client = injectModrinthClient()
 const generatedState = useGeneratedState()
 
 useHead({
 	title: 'Transaction history - Modrinth',
 })
 
-const { data: transactions, refresh } = await useAsyncData(`payout-history`, () =>
-	useBaseFetch(`payout/history`, {
-		apiVersion: 3,
-	}),
-)
+const { data: transactions, refetch } = useQuery({
+	queryKey: ['payout', 'history'],
+	queryFn: () => client.labrinth.payout_v3.getHistory(),
+})
 
 const allTransactions = computed(() => {
 	if (!transactions.value) return []

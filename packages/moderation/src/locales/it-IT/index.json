@@ -36,7 +36,7 @@
     "defaultMessage": "Seleziona tag accurati"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "La tua descrizione è lunga {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
+    "defaultMessage": "La tua descrizione è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia chiara e informativa."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Espandi la descrizione"
@@ -72,7 +72,7 @@
     "defaultMessage": "Fornisci codice sorgente"
   },
   "nags.identical-links.description": {
-    "defaultMessage": "Alcuni dei tuoi link esterni sembrano essere identici. I link dovrebbero essere inseriti solo una volta e con un tipo appropriato."
+    "defaultMessage": "Alcuni dei tuoi link esterni sembrano essere identici. I link dovrebbero essere inseriti solo una volta e con il tipo appropriato."
   },
   "nags.identical-links.title": {
     "defaultMessage": "Link identici"
@@ -135,7 +135,7 @@
     "defaultMessage": "Feedback revisione"
   },
   "nags.multiple-resolution-tags.description": {
-    "defaultMessage": "Hai selezionato {count, plural, one {un} other {#}} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
+    "defaultMessage": "Hai selezionato {count} tag di risoluzione ({tags}). I pacchetti di risorse dovrebbero avere un solo tag di risoluzione che corrisponda alla loro risoluzione primaria."
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Seleziona risoluzione corretta"
@@ -201,7 +201,7 @@
     "defaultMessage": "Rivedi la sintesi"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "La tua sintesi è lunga {length, plural, one {un carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia allettante e informativa."
+    "defaultMessage": "La tua sintesi è lunga {length, plural, one {# carattere} other {# caratteri}}. Si consiglia di scriverne almeno {minChars} perché sia allettante e informativa."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Espandi la sintesi"
@@ -219,7 +219,7 @@
     "defaultMessage": "Seleziona tag accurati"
   },
   "nags.too-many-tags.description": {
-    "defaultMessage": "Hai selezionato {tagCount, plural, one {un} other {#}} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
+    "defaultMessage": "Hai selezionato {tagCount} tag. Dovresti tenerne al massimo {maxTagCount} per assicurarti che il tuo progetto appaia solo nelle ricerche più rilevanti."
   },
   "nags.too-many-tags.title": {
     "defaultMessage": "Seleziona tag accurati"

@@ -5,6 +5,66 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "أدخل وصف التعديل..."
+  },
+  "app.export-modal.export-button": {
+    "message": "تصدير"
+  },
+  "app.export-modal.header": {
+    "message": "تصدير حزمة التعديل"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "إسم حزمة التعديل"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "إسم حزمة التعديل"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "حدد الملفات والمجلدات المراد تضمينها في الحزمة"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "رقم الإصدار"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "سيتم حذف جميع البيانات الخاصة بمثيلك نهائيًا، بما في ذلك عوالمك والتكوينات وكل المحتوى المثبت."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "لا يمكن التراجع عن هذا الإجراء"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "حذف المثيل"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "حذف المثيل"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "تم تثبيت حزمة التعديل بالفعل"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "مشروع"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "تمت إضافة \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "تمت إضافة {count} من المشاريع"
+  },
+  "app.instance.mods.share-text": {
+    "message": "تحقق من المشاريع التي أستخدمها في حزمة التعديل الخاص بي!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "مشاركة محتوى حزمة التعديل"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "تم الرفع بنجاح"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "المحتوى مطلوب"
+  },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
   },
@@ -12,43 +72,31 @@
     "message": "تثبيت"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": ""
+    "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "حزمة التعديل مطلوبة"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "حُزْمَة مشاركة"
+    "message": "حزمة مشتركة"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "حُزْمَة خادم مشاركة"
+    "message": "حزمة خادم مشتركة"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} مضاف"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "تمت الإضافة"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "تمت الإزالة"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "تم تحديث"
+  "app.modal.install-to-play.view-contents": {
+    "message": "عرض المحتويات"
   },
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} مزال"
   },
   "app.modal.update-to-play.update-required": {
     "message": "يلزم التحديث"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "هناك تحديث لازم للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} حُدِّث"
   },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
@@ -62,9 +110,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "خيارات النسخة الافتراضية"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "أعلام الميزات"
-  },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
   },
@@ -76,6 +121,33 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
+  },
+  "app.update-popup.body": {
+    "message": "تطبيق Modrinth v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-popup.body.linux": {
+    "message": "تطبيق Modrinth v {version} متاح. استخدم مدير الحزم الخاص بك للتحديث للحصول على أحدث الميزات والإصلاحات!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "تطبيق Modrinth v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
+  },
+  "app.update-popup.changelog": {
+    "message": "سجل التغيير"
+  },
+  "app.update-popup.download": {
+    "message": "تنزيل ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "اكتمل التنزيل"
+  },
+  "app.update-popup.reload": {
+    "message": "إعادة تحميل"
+  },
+  "app.update-popup.title": {
+    "message": "تحديث متاح"
   },
   "app.update.complete-toast.text": {
     "message": "انقر هنا لعرض سجلّ التغييرات."
@@ -191,12 +263,6 @@
   "instance.edit-world.title": {
     "message": "تعديل العالم"
   },
-  "instance.filter.disabled": {
-    "message": "المشاريع المعطَّلة"
-  },
-  "instance.filter.updates-available": {
-    "message": "توجد تحديثات متاحة"
-  },
   "instance.server-modal.address": {
     "message": "العنوان"
   },
@@ -305,140 +371,8 @@
   "instance.settings.tabs.installation": {
     "message": "تثبيت"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "{platform} {version} لـ Minecraft{game_version} مثبت بالفعل"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "فانيلا {game_version} مُثبّتة بالفعل"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "تغيير الإصدار"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "تثبيت"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "جاري التثبيت"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "جاري جلب إصدارات حزمة المودات"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "جاري تثبيت الإصدار الجديد"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "المثبت حاليًا"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "معلومات التصحيح:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "جاري جلب تفاصيل حزمة المودات"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "إصدار اللعبة"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "تثبيت"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "التثبيت قيد التنفيذ"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "إصدار {loader}"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "تعذّر جلب تفاصيل حزمة المودات المرتبطة. يرجى التحقق من اتصالك بالإنترنت."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader} غير متاح لماين كرافت {version}. جرّب محمّل مودات آخر."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "هذه النسخة مرتبطة بحزمة مودات، لكن لم يتم العثور على الحزمة على مودرنث."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "منصّة"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "إعادة تثبيت حزمة المودات"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "جاري إعادة تثبيت حزمة المودات"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "إعادة التثبيت ستُعيد جميع الملفات المثبتة أو المعدلة إلى ما توفره حُزْمة المودات، مع إزالة أي مودات أو محتوى أضفته بعد التثبيت الأصلي. قد يساعد ذلك في حل السلوك غير المتوقع إذا تم تعديل النسخة، لكن إذا كانت عوالمك تعتمد على محتويات إضافية، فقد يتسبب ذلك في تعطلها."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "هل أنت متأكد أنك تريد إعادة تثبيت هذه النسخة؟"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "يعيد محتوى النسخة إلى حالته الأصلية، مع إزالة جميع المودات أو المحتوى الذي أُضيف فوق حزمة المودات الأصلية."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "إعادة تثبيت حزمة المودات"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "إصلاح"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "جاري الإصلاح"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "الإصلاح يعيد تثبيت مكوّنات ماين كرافت ويتحقق من التلف. قد يساعد ذلك في حل المشكلات إذا كانت لعبتك لا تعمل بسبب أخطاء متعلقة ببرنامج التشغيل، لكنه لن يحل المشكلات أو الأعطال الناتجة عن المودات المثبّتة."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "إصلاح النسخة؟"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "الإصلاح قيد التنفيذ"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "إعادة التعيين إلى الحالة الحالية"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "عرض جميع الإصدارات"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "تغيير الإصدار"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "تثبيت"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "إعادة التثبيت"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "إصلاح"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "لا يمكن {action} أثناء التثبيت"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "لا يمكن {action} أثناء عدم الاتصال بالإنترنت"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "لا يمكن {action} أثناء الإصلاح"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(إصدار غير معروف)"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "إلغاء ربط النسخة"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "إذا تابعت، فلن تتمكّن من إعادة ربطها إلا بإنشاء نسخة جديدة بالكامل. لن تتلقى بعد ذلك تحديثات حزمة المودات، وستصبح نسخة عادية."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "هل أنت متأكد أنك تريد إلغاء ربط هذه النسخة؟"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "هذه النسخة مرتبطة بحزمة مودات، مما يعني أنه لا يمكن تحديث المودات أو تغيير محمّل المودات أو إصدار ماين كرافت. سيؤدي إلغاء الربط إلى فصل هذه النسخة نهائيًا عن حزمة المودات."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "إلغاء الربط من حزمة المودات"
   },
   "instance.settings.tabs.java": {
     "message": "جافا والذاكرة"
@@ -500,9 +434,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "عدم العرض في الصفحة الرئيسية"
   },
-  "instance.worlds.filter.available": {
-    "message": "متاح"
-  },
   "instance.worlds.game_already_open": {
     "message": "النسخة مفتوحة بالفعل"
   },
@@ -511,6 +442,9 @@
   },
   "instance.worlds.incompatible_server": {
     "message": "الخادم غير متوافق"
+  },
+  "instance.worlds.linked_server": {
+    "message": "تدار بواسطة مشروع الخادم"
   },
   "instance.worlds.no_contact": {
     "message": "تعذّر الاتصال بالخادم"
@@ -523,12 +457,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "تشغيل النسخة"
-  },
-  "instance.worlds.type.server": {
-    "message": "الخادم"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "لعب فردي"
   },
   "instance.worlds.view_instance": {
     "message": "عرض النسخة"
@@ -547,5 +475,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "مزامنة مع النسخة"
+  },
+  "search.filter.locked.server": {
+    "message": "يقدمها الخادم"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "يمكن إضافة التعديلات من جانب العميل فقط إلى مثيل الخادم"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "يتم توفير نسخة اللعبة من قبل الخادم"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "يتم توفير المحمّل من قبل الخادم"
   }
 }

@@ -295,7 +295,7 @@ export const commonMessages = defineMessages({
 	},
 	sortByLabel: {
 		id: 'label.sort-by',
-		defaultMessage: 'Sort by',
+		defaultMessage: 'Sort by: ',
 	},
 	stopButton: {
 		id: 'button.stop',
@@ -406,6 +406,16 @@ export const commonMessages = defineMessages({
 		defaultMessage:
 			"This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict.",
 	},
+	clientRetainedWarning: {
+		id: 'label.client-retained-warning',
+		defaultMessage:
+			'This is a client-side mod that was installed as a dependency and may cause issues when starting your server',
+	},
+	clientDependsWarning: {
+		id: 'label.client-depends-warning',
+		defaultMessage:
+			'This mod depends on a client-side mod and may cause issues when starting your server',
+	},
 	selectAllLabel: {
 		id: 'label.select-all',
 		defaultMessage: 'Select all',
@@ -450,9 +460,113 @@ export const commonMessages = defineMessages({
 		id: 'label.no-items',
 		defaultMessage: 'No items',
 	},
+	planUnknownLabel: {
+		id: 'label.plan-unknown',
+		defaultMessage: 'Unknown',
+	},
+	planSmallLabel: {
+		id: 'label.plan-small',
+		defaultMessage: 'Small',
+	},
+	planMediumLabel: {
+		id: 'label.plan-medium',
+		defaultMessage: 'Medium',
+	},
+	planLargeLabel: {
+		id: 'label.plan-large',
+		defaultMessage: 'Large',
+	},
+	planCustomLabel: {
+		id: 'label.plan-custom',
+		defaultMessage: 'Custom',
+	},
+	copyLinkButton: {
+		id: 'button.copy-link',
+		defaultMessage: 'Copy link',
+	},
 	switchVersionButton: {
 		id: 'button.switch-version',
 		defaultMessage: 'Switch version',
+	},
+	updatingLabel: {
+		id: 'label.updating',
+		defaultMessage: 'Updating...',
+	},
+	deleteFailedLabel: {
+		id: 'label.delete-failed',
+		defaultMessage: 'Delete failed',
+	},
+	uploadFailedLabel: {
+		id: 'label.upload-failed',
+		defaultMessage: 'Upload failed',
+	},
+	renameFailedLabel: {
+		id: 'label.rename-failed',
+		defaultMessage: 'Rename failed',
+	},
+	moveFailedLabel: {
+		id: 'label.move-failed',
+		defaultMessage: 'Move failed',
+	},
+	createFailedLabel: {
+		id: 'label.create-failed',
+		defaultMessage: 'Create failed',
+	},
+	extractFailedLabel: {
+		id: 'label.extract-failed',
+		defaultMessage: 'Extract failed',
+	},
+	showFileButton: {
+		id: 'button.show-file',
+		defaultMessage: 'Show file',
+	},
+	enableButton: {
+		id: 'button.enable',
+		defaultMessage: 'Enable',
+	},
+	disableButton: {
+		id: 'button.disable',
+		defaultMessage: 'Disable',
+	},
+	renameButton: {
+		id: 'button.rename',
+		defaultMessage: 'Rename',
+	},
+	moveButton: {
+		id: 'button.move',
+		defaultMessage: 'Move',
+	},
+	extractButton: {
+		id: 'button.extract',
+		defaultMessage: 'Extract',
+	},
+	doneLabel: {
+		id: 'label.done',
+		defaultMessage: 'Done',
+	},
+	copyFilenameButton: {
+		id: 'button.copy-filename',
+		defaultMessage: 'Copy filename',
+	},
+	copyFullPathButton: {
+		id: 'button.copy-full-path',
+		defaultMessage: 'Copy full path',
+	},
+	copiedFilenameLabel: {
+		id: 'label.copied-filename',
+		defaultMessage: 'Copied filename',
+	},
+	copiedPathLabel: {
+		id: 'label.copied-path',
+		defaultMessage: 'Copied path',
+	},
+	openInFolderButton: {
+		id: 'button.open-in-folder',
+		defaultMessage: 'Open in folder',
+	},
+	downloadFailedLabel: {
+		id: 'label.download-failed',
+		defaultMessage: 'Download failed',
 	},
 	projectCreated: {
 		id: 'project.about.details.created',
@@ -618,6 +732,14 @@ export const financialMessages = defineMessages({
 	},
 })
 
+const PROJECT_TYPE_ALIASES: Record<string, string> = {
+	shaderpack: 'shader',
+}
+
+export function normalizeProjectType(type: string): string {
+	return PROJECT_TYPE_ALIASES[type] ?? type
+}
+
 export const commonProjectTypeCategoryMessages = defineMessages({
 	datapack: {
 		id: 'project-type.datapack.category',
@@ -743,6 +865,10 @@ export const commonSettingsMessages = defineMessages({
 	billing: {
 		id: 'settings.billing.title',
 		defaultMessage: 'Billing and subscriptions',
+	},
+	featureFlags: {
+		id: 'settings.feature-flags.title',
+		defaultMessage: 'Feature flags',
 	},
 	language: {
 		id: 'settings.language.title',

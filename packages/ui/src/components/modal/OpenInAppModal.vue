@@ -91,7 +91,7 @@
 					<ButtonStyled class="flex-1">
 						<button @click="hide">
 							<XIcon />
-							{{ formatMessage(messages.close) }}
+							{{ formatMessage(commonMessages.closeButton) }}
 						</button>
 					</ButtonStyled>
 					<ButtonStyled color="green" class="flex-1">
@@ -108,6 +108,7 @@
 
 <script setup lang="ts">
 import { CheckIcon, DownloadIcon, XIcon } from '@modrinth/assets'
+import { commonMessages } from '@modrinth/ui'
 import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -141,10 +142,6 @@ const messages = defineMessages({
 	openingAutomatically: {
 		id: 'modal.open-in-app.opening-automatically',
 		defaultMessage: 'The Modrinth App will open automatically...',
-	},
-	close: {
-		id: 'modal.open-in-app.close',
-		defaultMessage: 'Close',
 	},
 	getApp: {
 		id: 'modal.open-in-app.get-app',

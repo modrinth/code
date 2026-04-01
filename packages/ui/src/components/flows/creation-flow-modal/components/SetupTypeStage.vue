@@ -59,7 +59,6 @@
 					@click="setSetupType('vanilla')"
 				/>
 			</div>
-			<InlineBackupCreator v-if="ctx.flowType === 'reset-server'" backup-name="Before reinstall" />
 		</template>
 	</div>
 </template>
@@ -69,7 +68,6 @@ import { BoxesIcon, BoxIcon, BoxImportIcon, PackageIcon } from '@modrinth/assets
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
-import InlineBackupCreator from '../../../../layouts/shared/content-tab/components/modals/InlineBackupCreator.vue'
 import BigOptionButton from '../../../base/BigOptionButton.vue'
 import { injectCreationFlowContext } from '../creation-flow-context'
 

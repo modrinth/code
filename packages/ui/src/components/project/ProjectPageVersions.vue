@@ -3,7 +3,7 @@
 		<div class="flex flex-wrap justify-between gap-2">
 			<VersionFilterControl
 				ref="versionFilters"
-				:versions="versions"
+				:versions="normalizedVersions"
 				:game-versions="gameVersions"
 				:base-id="`${baseId}-filter`"
 				@update:query="updateQuery"
@@ -110,13 +110,18 @@
 							</div>
 						</div>
 						<div
-							class="pointer-events-none relative z-[1] flex flex-col justify-center"
+							class="pointer-events-none relative z-[1] flex flex-col justify-center overflow-hidden min-w-32"
 							:class="{
 								'group-hover:underline': !!versionLink,
 							}"
+							title="`${version.version_number} - ${version.name}`"
 						>
-							<div class="font-bold text-contrast">{{ version.version_number }}</div>
-							<div class="text-xs font-medium">{{ version.name }}</div>
+							<div class="font-bold text-contrast text-ellipsis overflow-hidden">
+								{{ version.version_number }}
+							</div>
+							<div class="text-xs font-medium text-ellipsis overflow-hidden">
+								{{ version.name }}
+							</div>
 						</div>
 					</div>
 					<div class="flex flex-col justify-center gap-2 sm:contents">
@@ -127,7 +132,7 @@
 										v-for="gameVersion in formatVersionsForDisplay(
 											version.game_versions,
 											gameVersions,
-										)"
+										).slice(0, maxGameVersionTags)"
 										:key="`version-tag-${gameVersion}`"
 										v-tooltip="`Toggle filter for ${gameVersion}`"
 										class="z-[1]"
@@ -137,21 +142,61 @@
 									>
 										{{ gameVersion }}
 									</TagItem>
+									<Menu
+										v-if="
+											formatVersionsForDisplay(version.game_versions, gameVersions).length >
+											maxGameVersionTags
+										"
+										:delay="{ hide: 50, show: 0 }"
+										no-auto-focus
+										class="z-[1] cursor-default"
+									>
+										<TagItem tabindex="0">
+											+{{
+												formatVersionsForDisplay(version.game_versions, gameVersions).length -
+												maxGameVersionTags
+											}}
+										</TagItem>
+										<template #popper>
+											<div class="flex gap-1 flex-wrap max-w-[20rem]">
+												<TagItem
+													v-for="gameVersion in formatVersionsForDisplay(
+														version.game_versions,
+														gameVersions,
+													).slice(maxGameVersionTags)"
+													:key="`overflow-version-tag-${gameVersion}`"
+													:action="
+														() =>
+															versionFilters?.toggleFilters('gameVersion', version.game_versions)
+													"
+												>
+													{{ gameVersion }}
+												</TagItem>
+											</div>
+										</template>
+									</Menu>
 								</div>
 							</div>
 							<div class="flex items-center">
 								<div class="flex flex-wrap gap-1">
-									<TagItem
-										v-for="platform in version.loaders"
-										:key="`platform-tag-${platform}`"
-										v-tooltip="`Toggle filter for ${platform}`"
-										class="z-[1]"
-										:style="`--_color: var(--color-platform-${platform})`"
-										:action="() => versionFilters?.toggleFilter('platform', platform)"
-									>
-										<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
-										<FormattedTag :tag="platform" enforce-type="loader" />
-									</TagItem>
+									<template v-if="version.noModLoader">
+										<TagItem class="z-[1] border !border-solid border-surface-5">
+											No mod loader
+										</TagItem>
+									</template>
+									<template v-else>
+										<TagItem
+											v-for="platform in version.loaders"
+											:key="`platform-tag-${platform}`"
+											v-tooltip="`Toggle filter for ${platform}`"
+											class="z-[1]"
+											:style="`--_color: var(--color-platform-${platform})`"
+											:action="() => versionFilters?.toggleFilter('platform', platform)"
+										>
+											<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
+											<FormattedTag :tag="platform" enforce-type="loader" />
+										</TagItem>
+									</template>
 								</div>
 							</div>
 							<div v-if="hasMultipleEnvironments" class="flex items-center">
@@ -162,7 +207,7 @@
 										class="z-[1] text-center"
 									>
 										<component :is="tag.icon" />
-										{{ formatMessage(tag.label) }}
+										{{ formatMessage(tag.label).replace('and', '&') }}
 									</TagItem>
 								</div>
 							</div>
@@ -233,6 +278,7 @@ import {
 	type GameVersionTag,
 	type Version,
 } from '@modrinth/utils'
+import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -251,6 +297,11 @@ const formatDateTime = useFormatDateTime({
 type VersionWithDisplayUrlEnding = Version & {
 	displayUrlEnding: string
 	environment?: Labrinth.Projects.v3.Environment
+	mrpack_loaders?: string[]
+}
+
+type DisplayVersion = VersionWithDisplayUrlEnding & {
+	noModLoader: boolean
 }
 
 const props = withDefaults(
@@ -278,6 +329,42 @@ const props = withDefaults(
 	},
 )
 
+function getModpackLoaders(version: VersionWithDisplayUrlEnding): string[] {
+	if (props.project.project_type !== 'modpack') {
+		return version.loaders
+	}
+
+	if (version.mrpack_loaders?.length) {
+		return version.mrpack_loaders
+	}
+
+	return version.loaders.filter((loader) => loader !== 'mrpack')
+}
+
+function hasNoModLoader(loaders: string[]): boolean {
+	return (
+		(props.project.project_type === 'modpack' &&
+			loaders.length === 1 &&
+			loaders[0] === 'minecraft') ||
+		loaders.length === 0
+	)
+}
+
+const normalizedVersions = computed<DisplayVersion[]>(() =>
+	props.versions.map((version) => {
+		const loaders = getModpackLoaders(version)
+		const noModLoader = hasNoModLoader(loaders)
+
+		return {
+			...version,
+			loaders: noModLoader ? [] : loaders,
+			noModLoader,
+		}
+	}),
+)
+
+const maxGameVersionTags = 6
+
 const currentPage: Ref<number> = ref(1)
 const pageSize: Ref<number> = ref(20)
 const versionFilters: Ref<InstanceType<typeof VersionFilterControl> | null> = ref(null)
@@ -296,7 +383,7 @@ const hasMultipleEnvironments = computed(() => {
 })
 
 const filteredVersions = computed(() => {
-	return props.versions.filter(
+	return normalizedVersions.value.filter(
 		(version) =>
 			hasAnySelected(version.game_versions, selectedGameVersions.value) &&
 			hasAnySelected(version.loaders, selectedPlatforms.value) &&

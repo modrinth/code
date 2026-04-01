@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT display_status, project_id, content_kind\n            FROM attached_world_data\n            WHERE profile_path = $1 and world_type = $2 and world_id = $3\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "display_status",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "project_id",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_kind",
+        "ordinal": 2,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": [
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "613192379e1fb8fd1becf2f6330365bb5bc2a8f0be01f6e4eef708474f38a3d0"
+}

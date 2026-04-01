@@ -27,6 +27,8 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
+				pack_client_retained: boolean
+				pack_client_depends: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -68,11 +70,20 @@ export namespace Archon {
 				| 'purpur'
 				| 'vanilla'
 
-			export type ModpackSpec = {
+			export type ModpackSpecModrinth = {
 				platform: 'modrinth'
 				project_id: string
 				version_id: string
 			}
+
+			export type ModpackSpecLocalFile = {
+				platform: 'local_file'
+				filename: string
+				name: string
+				description: string | null
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
 
 			export type ModpackOwner = {
 				id: string

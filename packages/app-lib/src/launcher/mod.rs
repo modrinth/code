@@ -191,6 +191,46 @@ pub async fn get_loader_version_from_profile(
     }
 }
 
+/// Resolves the Minecraft version manifest and finds the index for the given
+/// game version. If the version isn't found in the cache, forces a manifest
+/// refresh to pick up newly-released versions.
+pub async fn resolve_minecraft_manifest(
+    game_version: &str,
+    state: &State,
+) -> crate::Result<(d::minecraft::VersionManifest, usize)> {
+    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
+
+    if let Some(idx) = minecraft
+        .versions
+        .iter()
+        .position(|it| it.id == game_version)
+    {
+        return Ok((minecraft, idx));
+    }
+
+    // Version not found in cache — force a manifest refresh in case it was
+    // released after the cache was populated.
+    let refreshed = crate::state::CachedEntry::get_minecraft_manifest(
+        Some(crate::state::CacheBehaviour::MustRevalidate),
+        &state.pool,
+        &state.api_semaphore,
+    )
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::NoValueFor("minecraft versions".to_string())
+    })?;
+
+    let idx = refreshed
+        .versions
+        .iter()
+        .position(|it| it.id == game_version)
+        .ok_or(crate::ErrorKind::LauncherError(format!(
+            "Invalid game version: {game_version}"
+        )))?;
+
+    Ok((refreshed, idx))
+}
+
 #[tracing::instrument(skip(profile))]
 
 pub async fn install_minecraft(
@@ -221,16 +261,8 @@ pub async fn install_minecraft(
 
     let instance_path =
         crate::api::profile::get_full_path(&profile.path).await?;
-    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-
-    let version_index = minecraft
-        .versions
-        .iter()
-        .position(|it| it.id == profile.game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
-            "Invalid game version: {}",
-            profile.game_version
-        )))?;
+    let (minecraft, version_index) =
+        resolve_minecraft_manifest(&profile.game_version, &state).await?;
     let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
         <= minecraft
@@ -483,15 +515,8 @@ pub async fn launch_minecraft(
     let instance_path =
         crate::api::profile::get_full_path(&profile.path).await?;
 
-    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
-    let version_index = minecraft
-        .versions
-        .iter()
-        .position(|it| it.id == profile.game_version)
-        .ok_or(crate::ErrorKind::LauncherError(format!(
-            "Invalid game version: {}",
-            profile.game_version
-        )))?;
+    let (minecraft, version_index) =
+        resolve_minecraft_manifest(&profile.game_version, &state).await?;
     let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
         <= minecraft

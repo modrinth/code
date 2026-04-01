@@ -39,6 +39,7 @@ export class ArchonServersV1Module extends AbstractModule {
 			api: 'archon',
 			version: 1,
 			method: 'GET',
+			skipAuth: true,
 		})
 	}
 
@@ -51,6 +52,18 @@ export class ArchonServersV1Module extends AbstractModule {
 			api: 'archon',
 			version: 1,
 			method: 'DELETE',
+		})
+	}
+
+	/**
+	 * Reset a world to onboarding
+	 * POST /v1/servers/:id/worlds/:wid/onboard
+	 */
+	public async resetToOnboarding(serverId: string, worldId: string): Promise<void> {
+		await this.client.request(`/servers/${serverId}/worlds/${worldId}/onboard`, {
+			api: 'archon',
+			version: 1,
+			method: 'POST',
 		})
 	}
 }

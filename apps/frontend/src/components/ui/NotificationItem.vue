@@ -328,6 +328,7 @@ import {
 	Categories,
 	CopyCode,
 	DoubleIcon,
+	injectModrinthClient,
 	injectNotificationManager,
 	ProjectStatusBadge,
 	useFormatDateTime,
@@ -341,6 +342,7 @@ import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams'
 
 import ThreadSummary from './thread/ThreadSummary.vue'
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
 const emit = defineEmits(['update:notifications'])
 const formatRelativeTime = useRelativeTime()
@@ -407,7 +409,7 @@ async function read() {
 				? props.notification.grouped_notifs.map((notif) => notif.id)
 				: []),
 		]
-		const updateNotifs = await markAsRead(ids)
+		const updateNotifs = await markAsRead(client, ids)
 		const newNotifs = updateNotifs(props.notifications)
 		emit('update:notifications', newNotifs)
 	} catch (err) {

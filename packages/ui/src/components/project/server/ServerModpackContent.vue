@@ -1,6 +1,6 @@
 <template>
 	<div
-		v-tooltip="showCustomModpackTooltip ? 'This project uses a custom modpack' : name"
+		v-tooltip="showCustomModpackTooltip ? formatMessage(messages.customModpackTooltip) : name"
 		class="flex gap-1.5 items-center flex-shrink overflow-hidden smart-clickable:allow-pointer-events"
 		:class="[onclick ? 'hover:underline cursor-pointer' : '']"
 		@click="onclick"
@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { defineMessages, useVIntl } from '../../../composables'
 import Avatar from '../../base/Avatar.vue'
 
 defineProps<{
@@ -21,4 +22,13 @@ defineProps<{
 	onclick?: () => void
 	showCustomModpackTooltip?: boolean
 }>()
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	customModpackTooltip: {
+		id: `project.server.customModpackTooltip`,
+		defaultMessage: 'This project uses a custom modpack',
+	},
+})
 </script>

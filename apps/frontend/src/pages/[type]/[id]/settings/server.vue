@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<section class="universal-card">
 			<div class="flex flex-col gap-6">
 				<div class="text-2xl font-semibold text-contrast">Server details</div>
@@ -161,6 +162,7 @@ import { InfoIcon, RefreshCwIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	Combobox,
+	ConfirmLeaveModal,
 	injectModrinthClient,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -169,11 +171,15 @@ import {
 	SERVER_REGIONS,
 	StyledInput,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
+	useVIntl,
 } from '@modrinth/ui'
 
 import CompatibilityCard from '~/components/ui/project-settings/CompatibilityCard.vue'
 
 const PING_TIMEOUT_MS = 5000
+
+const { formatMessage, locale } = useVIntl()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -262,15 +268,31 @@ if (projectV3.value) {
 	)
 }
 
-const regionOptions = SERVER_REGIONS.map((region) => ({
-	value: region.code,
-	label: region.name,
-}))
+const regionOptions = computed(() =>
+	Object.entries(SERVER_REGIONS)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
-const languageOptions = SERVER_LANGUAGES.map((language) => ({
-	value: language.code,
-	label: language.name,
-}))
+const languageOptions = computed(() =>
+	Object.entries(SERVER_LANGUAGES)
+		.sort(([_, a], [__, b]) => {
+			const aFormatted = formatMessage(a)
+			const bFormatted = formatMessage(b)
+			return aFormatted.localeCompare(bFormatted, locale.value)
+		})
+		.map(([code, name]) => ({
+			value: code,
+			label: formatMessage(name),
+		})),
+)
 
 const javaServerPatchData = computed(() => {
 	const addressChanged =
@@ -344,6 +366,19 @@ const modified = computed(() => ({
 	region: region.value,
 	languages: languages.value,
 }))
+
+const hasChanges = computed(() =>
+	Object.keys(original.value).some((key) => {
+		const a = original.value[key]
+		const b = modified.value[key]
+		if (Array.isArray(a) && Array.isArray(b)) {
+			return a.length !== b.length || a.some((v, i) => v !== b[i])
+		}
+		return a !== b
+	}),
+)
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 function resetChanges() {
 	javaAddress.value = projectV3.value?.minecraft_java_server?.address ?? ''

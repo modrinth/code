@@ -1,5 +1,5 @@
 <template>
-	<template v-if="project">
+	<template v-if="project && projectV3Loaded">
 		<Teleport v-if="flags.projectBackground" to="#fixed-background-teleport">
 			<ProjectBackgroundGradient :project="project" />
 		</Teleport>
@@ -704,7 +704,9 @@
 										</div>
 
 										<div v-else class="menu-text">
-											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
+											<p class="popout-text">
+												{{ formatMessage(messages.noCollectionsFound) }}
+											</p>
 										</div>
 										<button
 											class="btn collection-button"
@@ -862,6 +864,13 @@
 				</div>
 
 				<div class="normal-page__sidebar">
+					<div class="mb-4">
+						<OldButtonStyled>
+							<a :href="legacyUrl" class="!gap-3 !text-white">
+								<img src="/beenz.png" alt="beenz icon" class="h-5 w-auto" /> Give beenz
+							</a>
+						</OldButtonStyled>
+					</div>
 					<ProjectSidebarServerInfo
 						v-if="isServerProject && serverDataLoaded"
 						:project-v3="projectV3"
@@ -877,7 +886,7 @@
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
-						:v3-metadata="projectV3"
+						:project-v3="projectV3"
 						class="card flex-card experimental-styles-within"
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
@@ -1076,6 +1085,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	NavTabs,
 	NewModal,
 	OpenInAppModal,
 	OverflowMenu,
@@ -1115,7 +1125,7 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import NavTabs from '~/components/ui/NavTabs.vue'
+import OldButtonStyled from '~/components/ui/OldButtonStyled.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
@@ -1134,6 +1144,8 @@ const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
+
+const legacyUrl = computed(() => `https://legacy.modrinth.com${route.fullPath}`)
 
 const auth = await useAuth()
 const user = await useUser()
@@ -1541,7 +1553,7 @@ async function getLicenseData(event) {
 	modalLicense.value.show(event)
 
 	try {
-		const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
+		const text = await client.labrinth.tags_v2.getLicenseText(project.value.license.id)
 		licenseText.value = text.body || formatMessage(messages.licenseErrorMessage)
 	} catch {
 		licenseText.value = formatMessage(messages.licenseErrorMessage)
@@ -1672,10 +1684,9 @@ const {
 	error: _projectV3Error,
 	isPending: projectV3Pending,
 } = useQuery({
-	queryKey: computed(() => ['project', 'v3', projectId.value]),
-	queryFn: () => client.labrinth.projects_v3.get(projectId.value),
+	queryKey: computed(() => ['project', 'v3', routeProjectId.value]),
+	queryFn: () => client.labrinth.projects_v3.get(routeProjectId.value),
 	staleTime: STALE_TIME,
-	enabled: computed(() => !!projectId.value),
 })
 
 // Server sidebar: modpack version + project for required content
@@ -1811,12 +1822,16 @@ const {
 
 // Organization
 // Only fetch organization if project belongs to one
-const { data: organization } = useQuery({
+const { data: organizationRaw } = useQuery({
 	queryKey: computed(() => ['project', projectId.value, 'organization']),
 	queryFn: () => client.labrinth.projects_v3.getOrganization(projectId.value),
 	staleTime: STALE_TIME,
 	enabled: computed(() => !!projectId.value && !!projectRaw.value?.organization),
 })
+
+// When project is removed from org, enabled becomes false but TanStack keeps stale data.
+// Return null when the project no longer belongs to an organization.
+const organization = computed(() => (projectRaw.value?.organization ? organizationRaw.value : null))
 
 // Transform versionsV3 to be same shape as versionsV2 for compatibility in project pages
 const versionsRaw = computed(() => {
@@ -1892,10 +1907,7 @@ async function invalidateProject() {
 // Mutation for patching project data
 const patchProjectMutation = useMutation({
 	mutationFn: async ({ projectId, data }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: data,
-		})
+		await client.labrinth.projects_v2.edit(projectId, data)
 		return data
 	},
 
@@ -1939,10 +1951,7 @@ const patchProjectMutation = useMutation({
 // Mutation for changing project status (setProcessing)
 const patchStatusMutation = useMutation({
 	mutationFn: async ({ projectId, status }) => {
-		await useBaseFetch(`project/${projectId}`, {
-			method: 'PATCH',
-			body: { status },
-		})
+		await client.labrinth.projects_v2.edit(projectId, { status })
 	},
 
 	onMutate: async ({ projectId, status }) => {
@@ -2035,13 +2044,8 @@ const patchProjectV3Mutation = useMutation({
 // Mutation for patching project icon
 const patchIconMutation = useMutation({
 	mutationFn: async ({ projectId, icon }) => {
-		await useBaseFetch(
-			`project/${projectId}/icon?ext=${icon.type.split('/')[icon.type.split('/').length - 1]}`,
-			{
-				method: 'PATCH',
-				body: icon,
-			},
-		)
+		const ext = icon.type.split('/')[icon.type.split('/').length - 1]
+		await client.labrinth.projects_v3.changeIcon(projectId, icon, ext)
 	},
 
 	onSuccess: () => {
@@ -2067,23 +2071,13 @@ const patchIconMutation = useMutation({
 
 const createGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, file, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?ext=${
-			file.type.split('/')[file.type.split('/').length - 1]
-		}&featured=${featured ?? false}`
-
-		if (title) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'POST',
-			body: file,
+		const ext = file.type.split('/')[file.type.split('/').length - 1]
+		await client.labrinth.projects_v2.createGalleryImage(projectId, file, {
+			ext,
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -2130,20 +2124,11 @@ const createGalleryItemMutation = useMutation({
 
 const editGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl, title, description, featured, ordering }) => {
-		let url = `project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}&featured=${featured ?? false}`
-
-		if (title) {
-			url += `&title=${encodeURIComponent(title)}`
-		}
-		if (description) {
-			url += `&description=${encodeURIComponent(description)}`
-		}
-		if (ordering !== null && ordering !== undefined) {
-			url += `&ordering=${ordering}`
-		}
-
-		await useBaseFetch(url, {
-			method: 'PATCH',
+		await client.labrinth.projects_v2.editGalleryImage(projectId, imageUrl, {
+			featured: featured ?? false,
+			title,
+			description,
+			ordering,
 		})
 	},
 
@@ -2192,9 +2177,7 @@ const editGalleryItemMutation = useMutation({
 
 const deleteGalleryItemMutation = useMutation({
 	mutationFn: async ({ projectId, imageUrl }) => {
-		await useBaseFetch(`project/${projectId}/gallery?url=${encodeURIComponent(imageUrl)}`, {
-			method: 'DELETE',
-		})
+		await client.labrinth.projects_v2.deleteGalleryImage(projectId, imageUrl)
 	},
 
 	onMutate: async ({ imageUrl }) => {
@@ -2559,9 +2542,7 @@ async function deleteVersion(id) {
 
 	startLoading()
 
-	await useBaseFetch(`version/${id}`, {
-		method: 'DELETE',
-	})
+	await client.labrinth.versions_v3.deleteVersion(id)
 
 	await invalidateProject()
 

@@ -39,7 +39,7 @@
     "message": "İndirme seçenekleri"
   },
   "app-marketing.download.terms": {
-    "message": "Modrinth App indirerek <terms-link>Koşullarımızı</terms-link> ve <privacy-link>Gizlilik İlkemizi</privacy-link> kabul etmiş olursunuz."
+    "message": "Modrinth Uygulamasını indirerek <terms-link>Kullanım Şartları</terms-link> ve <privacy-link>Gizlilik Politikamızı</privacy-link> kabul etmiş olursunuz"
   },
   "app-marketing.download.title": {
     "message": "Modrinth App'i İndir (Beta)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App, öne çıkan çoğu mod yöneticisinden daha hafiftir, sadece 150mb RAM kullanır!"
+    "message": "Modrinth Uygulaması, yalnızca 150 MB RAM kullanarak birçok önde gelen mod yöneticisinden daha iyi performans gösterir!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Koleksiyonda henüz proje yok"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Henüz proje yok} one {<stat>{count}</stat> proje} other {<stat>{count}</stat> {type}}}"
+    "message": "{count, plural, =0 {Henüz proje yok} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "{ago} güncellendi"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Proje oluştur"
   },
-  "create.project.create-server-project": {
-    "message": "Sunucu oluştur"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Eksik alanlar:{fields}"
   },
@@ -578,8 +575,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Yeni oluştur"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Başlamak için ilk koleksiyonunu oluştur!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Henüz koleksiyonun yok"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Aramanızla eşleşen koleksiyon yok"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Filtrelerinizi veya arama terimlerinizi değiştirmeyi deneyin."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proje} other {{count} proje}}"
+    "message": "{count} {countPlural, plural, one {proje} other {projeler}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Koleksiyonlarında ara"
@@ -657,7 +666,7 @@
     "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
   },
   "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Bireysel mi yoksa işletme olarak mı para çekiyorsunuz?"
+    "message": "Bireysel olarak mı yoksa işletme olarak mı çekim yapıyorsunuz?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Özel şahıs"
@@ -831,10 +840,10 @@
     "message": "PayPal International için USD seçtiniz. Daha iyi ücretler için <direct-paypal-link>doğrudan PayPal'a geçin</direct-paypal-link> (≈%6 yerine ≈%2)."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
-    "message": "Çekme"
+    "message": "Para Çek"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
-    "message": "Çekme limiti"
+    "message": "Para Çekme limiti"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
@@ -1131,7 +1140,7 @@
     "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Evet. Tüm Modrinth Hosting sunucuları, bazı konumlarda 17 Tbps'ye kadar kapasiteye sahip DDoS koruması ile birlikte gelir."
+    "message": "Evet. Tüm Modrinth Hosting sunucuları DDoS korumasıyla gelir ve bazı konumlarda 17 Tbps’e kadar kapasiteye sahiptir."
   },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
@@ -1239,7 +1248,7 @@
     "message": "İhtiyacınız olan şeyi tam olarak biliyor musunuz?"
   },
   "hosting-marketing.medal.info": {
-    "message": "<orange>Medal</orange> tarafından desteklenen 5 gün boyunca ücretsiz <orange>3 Gb sunucu</orange> deneyin"
+    "message": "5 gün boyunca <orange>Medal</orange> tarafından desteklenen ücretsiz bir <orange>3 GB sunucu</orange>yu deneyin"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Daha fazla öğrenin"
@@ -1291,6 +1300,45 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Modrinth'de varsa sunucunuzda çalışır."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Modpaketi sürümü değiştirilemedi"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Sürümler yüklenemedi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Mod paketi yeniden yüklenemedi"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Sunucu tamiri başarısız oldu"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Sunucu başlangıç ayarlarına sıfırlanamadı"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Kurulum ayarları kaydedilemedi"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Mod paketi bağlantısı kaldırılamadı"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Yükleyici} other {Yükleyici}} sürüm"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Sunucu kurulumunuz başarıyla onarıldı."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Tamir tamamlandı"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Sunucuyu sıfırla"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Kurulum aşamasına sıfırla"
   },
   "hosting.plan.out-of-stock": {
     "message": "Stokta yok"
@@ -1423,9 +1471,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Oyuncular İçin"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "{count}+ içerik keşfedin"
   },
   "landing.subheading": {
     "message": "Topluluk odaklı açık kaynak platformumuzda Minecraft içerikleri keşfedin, oynayın ve paylaşın."
@@ -1645,9 +1690,6 @@
   },
   "layout.nav.discover-content": {
     "message": "İçerik keşfet"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Özellik bayrakları"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App yükle"
@@ -2027,9 +2069,6 @@
   "profile.label.collection": {
     "message": "Koleksiyon"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {indirme} other {indirme}}"
-  },
   "profile.label.joined": {
     "message": "Katılma:"
   },
@@ -2047,9 +2086,6 @@
   },
   "profile.label.organizations": {
     "message": "Organizasyonlar"
-  },
-  "profile.label.projects": {
-    "message": "{count}{count, plural, one { proje} other { proje}}"
   },
   "profile.label.saving": {
     "message": "Kaydediliyor..."
@@ -2301,7 +2337,7 @@
     "message": "Lütfen ortam meta verisini inceleyin"
   },
   "project.error.loading": {
-    "message": "Proje verisi yüklenemedi{message}"
+    "message": "Proje verisi yüklenirken hata{message}"
   },
   "project.error.page-not-found": {
     "message": "Sayfa bulunamadı"
@@ -2771,9 +2807,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sunucuyla eşle"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Yedek geri yükleme devam ediyor"
-  },
   "servers.notice.actions": {
     "message": "Eylemler"
   },
@@ -2804,20 +2837,110 @@
   "servers.plan.large.description": {
     "message": "15–25 oyuncu, mod paketleri veya ağır modlu sunucu için ideal."
   },
-  "servers.plan.large.name": {
-    "message": "Büyük"
-  },
   "servers.plan.medium.description": {
     "message": "6–15 oyuncu ve birden fazla mod için iyi."
-  },
-  "servers.plan.medium.name": {
-    "message": "Orta"
   },
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
   },
-  "servers.plan.small.name": {
-    "message": "Küçük"
+  "settings.account.delete.confirm.proceed": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Hesabınızı silmek istediğinizden emin misiniz?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.delete.section.title": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "E-posta Ekle"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Parolalar uyuşmuyor!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Devam etmek için lütfen şifrenizi girin."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Parolayı onayla"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Parolayı onayla"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Yeni parolayı onayla"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Yeni parolayı onayla"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Yeni parola"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Yeni parola"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Eski parola"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Eski parola"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Parola ekle"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Parolayı değiştir"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Parolayı kaldır"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Ekle"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Sağlayıcı"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Eposta ekle"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Eposta değiştir"
+  },
+  "settings.account.security.email.title": {
+    "message": "Eposta"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Parola ekle"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Parolayı değiştir"
+  },
+  "settings.account.security.password.title": {
+    "message": "Parola"
+  },
+  "settings.account.security.title": {
+    "message": "Hesap güvenliği"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "İki aşamalı doğrulamayı kaldır"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "İki aşamalı doğrulama kur"
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "İki aşamalı doğrulama"
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Girilen kod yanlış!"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Kodu girin..."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Kodu onayla"
   },
   "settings.applications.about": {
     "message": "Hakkında"
@@ -2826,7 +2949,7 @@
     "message": "Daha fazla ekle"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": ""
+    "message": "Yönlendirme URI'ları ekle"
   },
   "settings.applications.button.cancel": {
     "message": "İptal"
@@ -2903,9 +3026,6 @@
   "settings.applications.modal.header": {
     "message": "Proje bilgileri"
   },
-  "settings.applications.notification.error.title": {
-    "message": "Bir hata oluştu"
-  },
   "settings.applications.notification.icon-updated.description": {
     "message": "Uygulamanızın simgesi güncellendi."
   },
@@ -2914,6 +3034,12 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "Gizli anahtar sadece bir kez gösterilir. Pencereyi kapadığınızda kaybolacaktır. Güvenliğiniz için paylaşmayın!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Bu uygulama hakkında"
+  },
+  "settings.authorizations.by": {
+    "message": "tarafından"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Aboneliği iptal et"
@@ -2954,17 +3080,35 @@
   "settings.billing.payment_method.title": {
     "message": "Ödeme yöntemleri"
   },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "Sunucu Kimliği:{id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Ödemeniz işleniyor. Sunucunuz ödeme tamamlandığında aktifleşecektir."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB RAM"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Modrinth Sunucu aboneliklerini yönet."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Sunucu Abonelikleri"
   },
+  "settings.billing.subscribe": {
+    "message": "Abone ol"
+  },
   "settings.billing.subscription.description": {
     "message": "Modrinth aboneliklerinizi yönetin."
   },
   "settings.billing.subscription.title": {
     "message": "Abonelikler"
+  },
+  "settings.billing.upgrade": {
+    "message": "Güncelle"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Geliştiri modunu devre dışı bırak"
@@ -2986,6 +3130,9 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Modlar sayfası"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galeri"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Mod paketleri sayfası"
@@ -3047,11 +3194,11 @@
   "settings.display.theme.title": {
     "message": "Renk teması"
   },
+  "settings.head-title": {
+    "message": "Görüntü Ayarları"
+  },
   "settings.pats.action.create": {
     "message": "Bir PAT yarat"
-  },
-  "settings.pats.description": {
-    "message": "PAT'lar Modrinth'in API'sine erişmekte kullanılabilir. Daha fazla bilgi için, <doc-link>Modrinth API dokümantasyonununa</doc-link>na bakın. Bunlar her zaman oluşturulabilir veya iptal edilebilir."
   },
   "settings.pats.modal.create.action": {
     "message": "PAT oluştur"
@@ -3107,6 +3254,9 @@
   "settings.profile.description": {
     "message": "Profil bilgin Modrinth'te ve <docs-link>Modrinth API</docs-link> herkese açık görüntülenebilir."
   },
+  "settings.profile.head-title": {
+    "message": "Profil Ayarları"
+  },
   "settings.profile.profile-info": {
     "message": "Profil bilgisi"
   },
@@ -3137,11 +3287,23 @@
   "settings.sessions.unknown-platform": {
     "message": "Bilinmeyen platform"
   },
+  "settings.sidebar.label.account": {
+    "message": "Hesap"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Geliştirici"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth'ten haberler"
   },
   "ui.latest-news-row.view-all": {
     "message": "Bütün haberleri gör"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Abone ol"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Abone Olundu!"
   },
   "version.environment.none.description": {
     "message": "Bu sürüm için ortam belirtilmemiş."

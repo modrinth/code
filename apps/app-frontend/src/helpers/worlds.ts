@@ -30,6 +30,8 @@ export type ServerWorld = BaseWorld & {
 	index: number
 	address: string
 	pack_status: ServerPackStatus
+	project_id?: string
+	content_kind?: string
 }
 
 export type World = SingleplayerWorld | ServerWorld
@@ -140,12 +142,16 @@ export async function add_server_to_profile(
 	name: string,
 	address: string,
 	packStatus: ServerPackStatus,
+	projectId?: string,
+	contentKind?: string,
 ): Promise<number> {
 	return await invoke('plugin:worlds|add_server_to_profile', {
 		path,
 		name,
 		address,
 		packStatus,
+		projectId,
+		contentKind,
 	})
 }
 

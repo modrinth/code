@@ -69,7 +69,7 @@
 				</NuxtLink>
 			</div>
 			<div
-				class="col-span-2 row-start-2 flex flex-wrap justify-center lg:col-span-1 lg:row-start-auto"
+				class="col-span-2 row-start-2 flex justify-center lg:col-span-1 lg:row-start-auto"
 				:class="{ 'gap-4': !flags.projectTypesPrimaryNav }"
 			>
 				<template v-if="flags.projectTypesPrimaryNav">
@@ -473,7 +473,8 @@
 						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
 					</template>
 					<template #flags>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.featureFlags) }}
+						<ToggleRightIcon aria-hidden="true" />
+						{{ formatMessage(commonSettingsMessages.featureFlags) }}
 					</template>
 					<template #projects>
 						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
@@ -585,9 +586,9 @@
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
 						</NuxtLink>
-						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(messages.featureFlags) }}
+						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/settings/flags">
+							<ToggleRightIcon aria-hidden="true" />
+							{{ formatMessage(commonSettingsMessages.featureFlags) }}
 						</NuxtLink>
 					</template>
 					<NuxtLink class="iconified-button" to="/settings">
@@ -724,6 +725,7 @@ import {
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
@@ -734,11 +736,14 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
+	commonSettingsMessages,
 	defineMessages,
+	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
+import { useQuery } from '@tanstack/vue-query'
 
 import { getTaxThreshold } from '@/providers/creator-withdraw.ts'
 import TextLogo from '~/components/brand/TextLogo.vue'
@@ -775,10 +780,12 @@ const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const client = injectModrinthClient()
 
-const { data: payoutBalance } = await useAsyncData('payout/balance', () => {
-	if (!auth.value.user) return null
-	return useBaseFetch('payout/balance', { apiVersion: 3 })
+const { data: payoutBalance } = useQuery({
+	queryKey: ['payout', 'balance'],
+	queryFn: () => client.labrinth.payout_v3.getBalance(),
+	enabled: computed(() => !!auth.value.user),
 })
 
 const showTaxComplianceBanner = computed(() => {
@@ -914,10 +921,6 @@ const messages = defineMessages({
 		id: 'layout.nav.upgrade-to-modrinth-plus',
 		defaultMessage: 'Upgrade to Modrinth+',
 	},
-	featureFlags: {
-		id: 'layout.nav.feature-flags',
-		defaultMessage: 'Feature flags',
-	},
 	projects: {
 		id: 'layout.nav.projects',
 		defaultMessage: 'Projects',
@@ -1041,7 +1044,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'flags',
-			link: '/flags',
+			link: '/settings/flags',
 			shown: flags.value.developerMode,
 		},
 		{
@@ -1140,7 +1143,7 @@ async function onKeyDown(event) {
 		rCount.value++
 
 		if (randomProjects.value.length < 3) {
-			randomProjects.value = await useBaseFetch('projects_random?count=50').catch((err) => {
+			randomProjects.value = await client.labrinth.projects_v2.getRandom(50).catch((err) => {
 				console.error(err)
 				return []
 			})
@@ -1279,7 +1282,7 @@ const { cycle: changeTheme } = useTheme()
 		left: 0;
 		background-color: var(--color-raised-bg);
 		z-index: 11; // 20 = modals, 10 = svg icons
-		transform: translateY(100%);
+		transform: translateY(calc(100% + env(safe-area-inset-bottom)));
 		transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
 		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 		box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0);
@@ -1366,6 +1369,17 @@ const { cycle: changeTheme } = useTheme()
 		transition: border-radius 0.3s ease-out;
 		border-top: 2px solid rgba(0, 0, 0, 0);
 		box-sizing: border-box;
+
+		&::after {
+			content: '';
+			position: absolute;
+			bottom: 2px;
+			left: 0;
+			width: 100%;
+			height: 300px;
+			background-color: var(--color-raised-bg);
+			transform: translateY(100%);
+		}
 
 		&.expanded {
 			box-shadow: none;
@@ -1593,4 +1607,3 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 </style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>

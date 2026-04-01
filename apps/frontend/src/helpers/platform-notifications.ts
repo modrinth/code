@@ -1,47 +1,15 @@
-import type { Organization, Project, Report, User, Version } from '@modrinth/utils'
+import type { AbstractModrinthClient, Labrinth } from '@modrinth/api-client'
 
-type Thread = { id: string }
+type Notification = Labrinth.Notifications.v2.Notification
 
-export type PlatformNotificationAction = {
-	title: string
-	action_route: [string, string]
-}
-
-export type PlatformNotificationBody = {
-	project_id?: string
-	version_id?: string
-	report_id?: string
-	thread_id?: string
-	invited_by?: string
-	organization_id?: string
-}
-
-export type PlatformNotification = {
-	id: string
-	user_id: string
-	type: 'project_update' | 'team_invite' | 'status_change' | 'moderator_message'
-	title: string
-	text: string
-	link: string
-	read: boolean
-	created: string
-	actions: PlatformNotificationAction[]
-	body?: PlatformNotificationBody
+export type PlatformNotification = Notification & {
 	extra_data?: Record<string, unknown>
 	grouped_notifs?: PlatformNotification[]
 }
 
-async function getBulk<T extends { id: string }>(
-	type: string,
-	ids: string[],
-	apiVersion = 2,
-): Promise<T[]> {
-	if (!ids || ids.length === 0) {
-		return []
-	}
-	const url = `${type}?ids=${encodeURIComponent(JSON.stringify([...new Set(ids)]))}`
+async function safeBulkFetch<T>(fn: () => Promise<T[]>): Promise<T[]> {
 	try {
-		const res = await useBaseFetch(url, { apiVersion })
+		const res = await fn()
 		return Array.isArray(res) ? res : []
 	} catch {
 		return []
@@ -49,6 +17,7 @@ async function getBulk<T extends { id: string }>(
 }
 
 export async function fetchExtraNotificationData(
+	client: AbstractModrinthClient,
 	notifications: PlatformNotification[],
 ): Promise<PlatformNotification[]> {
 	const bulk = {
@@ -72,7 +41,14 @@ export async function fetchExtraNotificationData(
 		}
 	}
 
-	const reports = (await getBulk<Report>('reports', bulk.reports)).filter(Boolean)
+	const reports = (
+		await safeBulkFetch(() =>
+			bulk.reports.length > 0
+				? client.labrinth.reports_v3.getMultiple([...new Set(bulk.reports)])
+				: Promise.resolve([]),
+		)
+	).filter(Boolean)
+
 	for (const r of reports) {
 		if (!r?.item_type) continue
 		if (r.item_type === 'project') bulk.projects.push(r.item_id)
@@ -80,15 +56,41 @@ export async function fetchExtraNotificationData(
 		else if (r.item_type === 'version') bulk.versions.push(r.item_id)
 	}
 
-	const versions = (await getBulk<Version>('versions', bulk.versions)).filter(Boolean)
+	const versions = (
+		await safeBulkFetch(() =>
+			bulk.versions.length > 0
+				? client.labrinth.versions_v2.getVersions([...new Set(bulk.versions)])
+				: Promise.resolve([]),
+		)
+	).filter(Boolean)
+
 	for (const v of versions) bulk.projects.push(v.project_id)
 
 	const [projects, threads, users, organizations] = await Promise.all([
-		getBulk<Project>('projects', bulk.projects),
-		getBulk<Thread>('threads', bulk.threads),
-		getBulk<User>('users', bulk.users),
-		getBulk<Organization>('organizations', bulk.organizations, 3),
+		safeBulkFetch(() =>
+			bulk.projects.length > 0
+				? client.labrinth.projects_v2.getMultiple([...new Set(bulk.projects)])
+				: Promise.resolve([]),
+		),
+		safeBulkFetch(() =>
+			bulk.threads.length > 0
+				? client.labrinth.threads_v3.getMultiple([...new Set(bulk.threads)])
+				: Promise.resolve([]),
+		),
+		safeBulkFetch(() =>
+			bulk.users.length > 0
+				? client.labrinth.users_v2.getMultiple([...new Set(bulk.users)])
+				: Promise.resolve([]),
+		),
+		safeBulkFetch(() =>
+			bulk.organizations.length > 0
+				? client.labrinth.organizations_v3.getMultiple([...new Set(bulk.organizations)])
+				: Promise.resolve([]),
+		),
 	])
+
+	type Report = Labrinth.Reports.v3.Report
+	type Version = Labrinth.Versions.v2.Version
 
 	for (const n of notifications) {
 		n.extra_data = {}
@@ -133,13 +135,13 @@ export function groupNotifications(notifications: PlatformNotification[]): Platf
 		const current = notifications[i]
 		const next = notifications[i + 1]
 		if (current.body && i < notifications.length - 1 && isSimilar(current, next)) {
-			current.grouped_notifs = [next]
+			const groupedNotif = { ...current, grouped_notifs: [next] }
 			let j = i + 2
 			while (j < notifications.length && isSimilar(current, notifications[j])) {
-				current.grouped_notifs.push(notifications[j])
+				groupedNotif.grouped_notifs.push(notifications[j])
 				j++
 			}
-			grouped.push(current)
+			grouped.push(groupedNotif)
 			i = j - 1
 		} else {
 			grouped.push(current)
@@ -153,11 +155,10 @@ function isSimilar(a: PlatformNotification, b: PlatformNotification | undefined)
 }
 
 export async function markAsRead(
+	client: AbstractModrinthClient,
 	ids: string[],
 ): Promise<(notifications: PlatformNotification[]) => PlatformNotification[]> {
-	await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
-		method: 'PATCH',
-	})
+	await client.labrinth.notifications_v2.markMultipleAsRead(ids)
 	return (notifications: PlatformNotification[]) => {
 		const newNotifs = notifications ?? []
 		newNotifs.forEach((n) => {

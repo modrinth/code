@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	CheckIcon,
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
@@ -14,10 +15,12 @@ import {
 	Admonition,
 	ButtonStyled,
 	Checkbox,
+	commonMessages,
 	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
 	LoadingIndicator,
+	NavTabs,
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
@@ -33,12 +36,11 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
-import { useRoute, useRouter } from 'vue-router'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
@@ -51,7 +53,7 @@ import {
 } from '@/helpers/profile.js'
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
-import { getServerLatency } from '@/helpers/worlds'
+import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
@@ -108,15 +110,27 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
+const isFromWorlds = computed(() => route.query.from === 'worlds')
 
-const PERSISTENT_QUERY_PARAMS = ['i', 'ai']
+if (isFromWorlds.value && route.params.projectType !== 'server') {
+	router.replace({
+		path: '/browse/server',
+		query: route.query,
+	})
+}
+
+const allInstalledIds = computed(
+	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
+)
+
+const PERSISTENT_QUERY_PARAMS = ['i', 'ai', 'from']
 
 await initInstanceContext()
 
 async function initInstanceContext() {
 	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
 	if (route.query.i) {
-		instance.value = await getInstance(route.query.i).catch(handleError)
+		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
 		debugLog('instance loaded', {
 			name: instance.value?.name,
 			loader: instance.value?.loader,
@@ -126,12 +140,24 @@ async function initInstanceContext() {
 		// Load installed project IDs in background — the page and initial search render immediately.
 		// When this resolves, instanceFilters recomputes and triggers a search refresh
 		// that applies the "hide installed" negative filters and marks installed badges.
-		getInstalledProjectIds(route.query.i)
-			.then((ids) => {
-				debugLog('installedProjectIds loaded', { count: ids?.length })
-				installedProjectIds.value = ids
-			})
-			.catch(handleError)
+		if (route.query.from === 'worlds') {
+			get_profile_worlds(route.query.i as string)
+				.then((worlds) => {
+					const serverProjectIds = worlds
+						.filter((w) => w.type === 'server' && 'project_id' in w && w.project_id)
+						.map((w) => (w as { project_id: string }).project_id)
+					debugLog('installedServerProjectIds loaded', { count: serverProjectIds.length })
+					installedProjectIds.value = serverProjectIds
+				})
+				.catch(handleError)
+		} else {
+			getInstalledProjectIds(route.query.i as string)
+				.then((ids) => {
+					debugLog('installedProjectIds loaded', { count: ids?.length })
+					installedProjectIds.value = ids
+				})
+				.catch(handleError)
+		}
 
 		if (instance.value?.linked_data?.project_id) {
 			debugLog('checking linked project for server status', instance.value.linked_data.project_id)
@@ -242,6 +268,10 @@ const activeGameVersion = computed(() => {
 })
 
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
+const filteredServerHits = computed(() => {
+	if (!instanceHideInstalled.value || allInstalledIds.value.size === 0) return serverHits.value
+	return serverHits.value.filter((hit) => !allInstalledIds.value.has(hit.project_id))
+})
 const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
@@ -277,11 +307,28 @@ async function handlePlayServerProject(projectId: string) {
 	checkServerRunningStates(serverHits.value)
 }
 
-function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
+async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
 	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
 	const address = getServerAddress(project.minecraft_java_server)
 	if (!address) return
-	showAddServerToInstanceModal(project.name, address)
+
+	if (instance.value) {
+		try {
+			await add_server_to_profile(
+				instance.value.path,
+				project.name,
+				address,
+				'prompt',
+				project.project_id,
+				project.minecraft_java_server?.content?.kind,
+			)
+			newlyInstalled.value.push(project.project_id)
+		} catch (err) {
+			handleError(err as Error)
+		}
+	} else {
+		showAddServerToInstanceModal(project.name, address)
+	}
 }
 
 const unlistenProcesses = await process_listener(
@@ -313,6 +360,16 @@ const {
 	createServerPageParams,
 } = useServerSearch({ tags, query, maxResults, currentPage })
 
+if (instance.value?.game_version) {
+	const gv = instance.value.game_version
+	const alreadyHasGv = serverCurrentFilters.value.some(
+		(f) => f.type === 'server_game_version' && f.option === gv,
+	)
+	if (!alreadyHasGv) {
+		serverCurrentFilters.value.push({ type: 'server_game_version', option: gv })
+	}
+}
+
 async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
 	debugLog('pingServerHits', { hitCount: hits.length })
 	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
@@ -342,8 +399,107 @@ window.addEventListener('online', () => {
 	offline.value = false
 })
 
+const messages = defineMessages({
+	addServerToInstance: {
+		id: 'app.browse.add-server-to-instance',
+		defaultMessage: 'Add server to instance',
+	},
+	addServersToInstance: {
+		id: 'app.browse.add-servers-to-instance',
+		defaultMessage: 'Add servers to your instance',
+	},
+	addToInstance: {
+		id: 'app.browse.add-to-instance',
+		defaultMessage: 'Add to instance',
+	},
+	addToInstanceName: {
+		id: 'app.browse.add-to-instance-name',
+		defaultMessage: 'Add to {instanceName}',
+	},
+	added: {
+		id: 'app.browse.added',
+		defaultMessage: 'Added',
+	},
+	alreadyAdded: {
+		id: 'app.browse.already-added',
+		defaultMessage: 'Already added',
+	},
+	discoverContent: {
+		id: 'app.browse.discover-content',
+		defaultMessage: 'Discover content',
+	},
+	discoverServers: {
+		id: 'app.browse.discover-servers',
+		defaultMessage: 'Discover servers',
+	},
+	environmentProvidedByServer: {
+		id: 'search.filter.locked.server-environment.title',
+		defaultMessage: 'Only client-side mods can be added to the server instance',
+	},
+	gameVersionProvidedByInstance: {
+		id: 'search.filter.locked.instance-game-version.title',
+		defaultMessage: 'Game version is provided by the instance',
+	},
+	gameVersionProvidedByServer: {
+		id: 'search.filter.locked.server-game-version.title',
+		defaultMessage: 'Game version is provided by the server',
+	},
+	hideAddedServers: {
+		id: 'app.browse.hide-added-servers',
+		defaultMessage: 'Hide added servers',
+	},
+	hideInstalledContent: {
+		id: 'app.browse.hide-installed-content',
+		defaultMessage: 'Hide installed content',
+	},
+	installContentToInstance: {
+		id: 'app.browse.install-content-to-instance',
+		defaultMessage: 'Install content to instance',
+	},
+	modLoaderProvidedByInstance: {
+		id: 'search.filter.locked.instance-loader.title',
+		defaultMessage: 'Loader is provided by the instance',
+	},
+	modLoaderProvidedByServer: {
+		id: 'search.filter.locked.server-loader.title',
+		defaultMessage: 'Loader is provided by the server',
+	},
+	providedByInstance: {
+		id: 'search.filter.locked.instance',
+		defaultMessage: 'Provided by the instance',
+	},
+	providedByServer: {
+		id: 'search.filter.locked.server',
+		defaultMessage: 'Provided by the server',
+	},
+	syncFilterButton: {
+		id: 'search.filter.locked.instance.sync',
+		defaultMessage: 'Sync with instance',
+	},
+})
+
 const breadcrumbs = useBreadcrumbs()
-breadcrumbs.setContext({ name: 'Discover content', link: route.path, query: route.query })
+const browseTitle = computed(() =>
+	formatMessage(isFromWorlds.value ? messages.discoverServers : messages.discoverContent),
+)
+breadcrumbs.setName('BrowseTitle', browseTitle.value)
+if (instance.value) {
+	const instanceLink = `/instance/${encodeURIComponent(instance.value.path)}`
+	breadcrumbs.setContext({
+		name: instance.value.name,
+		link: isFromWorlds.value ? `${instanceLink}/worlds` : instanceLink,
+	})
+} else {
+	breadcrumbs.setContext(null)
+}
+
+onBeforeRouteLeave(() => {
+	breadcrumbs.setContext({
+		name: browseTitle.value,
+		link: `/browse/${projectType.value}`,
+		query: route.query,
+	})
+})
 
 const loading = ref(true)
 
@@ -480,22 +636,8 @@ async function refreshSearch() {
 			...(isServer ? createServerPageParams() : createPageParams()),
 		}
 
-		breadcrumbs.setContext({
-			name: 'Discover content',
-			link: `/browse/${projectType.value}`,
-			query: params,
-		})
-		const queryString = Object.entries(params)
-			.flatMap(([key, value]) => {
-				const values = Array.isArray(value) ? value : [value]
-				return values
-					.filter((v): v is string => v != null)
-					.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
-			})
-			.join('&')
-		const newUrl = `${route.path}${queryString ? '?' + queryString : ''}`
-		debugLog('updating URL', newUrl)
-		window.history.replaceState(window.history.state, '', newUrl)
+		debugLog('updating URL', params)
+		router.replace({ path: route.path, query: params })
 
 		loading.value = false
 		debugLog('refreshSearch complete', { version })
@@ -537,6 +679,18 @@ watch(
 		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
+		// If instance context was removed (e.g. sidebar browse navigation), reset state
+		if (!route.query.i && instance.value) {
+			debugLog('instance context removed, resetting')
+			instance.value = null
+			installedProjectIds.value = null
+			instanceHideInstalled.value = false
+			newlyInstalled.value = []
+			isServerInstance.value = false
+			breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
+			breadcrumbs.setContext(null)
+		}
+
 		currentSortType.value = { display: 'Relevance', name: 'relevance' }
 		query.value = ''
 	},
@@ -574,64 +728,25 @@ const selectableProjectTypes = computed(() => {
 	if (route.query.ai) {
 		params.ai = route.query.ai
 	}
-
-	const links = [
-		{ label: 'Modpacks', href: `/browse/modpack`, shown: modpacks },
-		{ label: 'Mods', href: `/browse/mod`, shown: mods },
-		{ label: 'Resource Packs', href: `/browse/resourcepack` },
-		{ label: 'Data Packs', href: `/browse/datapack`, shown: dataPacks },
-		{ label: 'Shaders', href: `/browse/shader` },
-		{ label: 'Servers', href: `/browse/server`, shown: !instance.value },
-	]
-
-	if (params) {
-		return links.map((link) => {
-			return {
-				...link,
-				href: {
-					path: link.href,
-					query: params,
-				},
-			}
-		})
+	if (route.query.from) {
+		params.from = route.query.from
 	}
 
-	return links
-})
+	const queryString = new URLSearchParams(params as Record<string, string>).toString()
+	const suffix = queryString ? `?${queryString}` : ''
 
-const messages = defineMessages({
-	gameVersionProvidedByInstance: {
-		id: 'search.filter.locked.instance-game-version.title',
-		defaultMessage: 'Game version is provided by the instance',
-	},
-	gameVersionProvidedByServer: {
-		id: 'search.filter.locked.server-game-version.title',
-		defaultMessage: 'Game version is provided by the server',
-	},
-	modLoaderProvidedByInstance: {
-		id: 'search.filter.locked.instance-loader.title',
-		defaultMessage: 'Loader is provided by the instance',
-	},
-	modLoaderProvidedByServer: {
-		id: 'search.filter.locked.server-loader.title',
-		defaultMessage: 'Loader is provided by the server',
-	},
-	environmentProvidedByServer: {
-		id: 'search.filter.locked.server-environment.title',
-		defaultMessage: 'Only client-side mods can be added to the server instance',
-	},
-	providedByInstance: {
-		id: 'search.filter.locked.instance',
-		defaultMessage: 'Provided by the instance',
-	},
-	providedByServer: {
-		id: 'search.filter.locked.server',
-		defaultMessage: 'Provided by the server',
-	},
-	syncFilterButton: {
-		id: 'search.filter.locked.instance.sync',
-		defaultMessage: 'Sync with instance',
-	},
+	if (isFromWorlds.value) {
+		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
+	}
+
+	return [
+		{ label: 'Modpacks', href: `/browse/modpack${suffix}`, shown: modpacks },
+		{ label: 'Mods', href: `/browse/mod${suffix}`, shown: mods },
+		{ label: 'Resource Packs', href: `/browse/resourcepack${suffix}` },
+		{ label: 'Data Packs', href: `/browse/datapack${suffix}`, shown: dataPacks },
+		{ label: 'Shaders', href: `/browse/shader${suffix}` },
+		{ label: 'Servers', href: `/browse/server${suffix}`, shown: !instance.value },
+	]
 })
 
 const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
@@ -702,7 +817,9 @@ previousFilterState.value = JSON.stringify({
 		>
 			<Checkbox
 				v-model="instanceHideInstalled"
-				label="Hide installed content"
+				:label="
+					formatMessage(isFromWorlds ? messages.hideAddedServers : messages.hideInstalledContent)
+				"
 				class="filter-checkbox"
 				@update:model-value="onSearchChangeToTop()"
 				@click.prevent.stop
@@ -781,9 +898,15 @@ previousFilterState.value = JSON.stringify({
 	</Teleport>
 	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
 		<template v-if="instance">
-			<InstanceIndicator :instance="instance" />
-			<h1 class="m-0 mb-1 text-xl">Install content to instance</h1>
-			<Admonition v-if="isServerInstance" type="warning" class="mb-1">
+			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
+			<h1 class="m-0 mb-1 text-xl">
+				{{
+					formatMessage(
+						isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance,
+					)
+				}}
+			</h1>
+			<Admonition v-if="isServerInstance && !isFromWorlds" type="warning" class="mb-1">
 				Adding content can break compatibility when joining the server. Any added content will also
 				be lost when you update the server instance content.
 			</Admonition>
@@ -855,7 +978,7 @@ previousFilterState.value = JSON.stringify({
 			<section
 				v-else-if="
 					projectType === 'server'
-						? serverHits.length === 0
+						? filteredServerHits.length === 0
 						: results && results.hits && results.hits.length === 0
 				"
 				class="offline"
@@ -866,7 +989,7 @@ previousFilterState.value = JSON.stringify({
 			<ProjectCardList v-else :layout="'list'">
 				<template v-if="projectType === 'server'">
 					<ProjectCard
-						v-for="project in serverHits"
+						v-for="project in filteredServerHits"
 						:key="`server-card-${project.project_id}`"
 						:title="project.name"
 						:icon-url="project.icon_url || undefined"
@@ -892,37 +1015,71 @@ previousFilterState.value = JSON.stringify({
 					>
 						<template #actions>
 							<div class="flex gap-2">
-								<ButtonStyled circular>
-									<button
-										v-tooltip="'Add server to instance'"
-										@click.stop="() => handleAddServerToInstance(project)"
+								<template v-if="isFromWorlds && instance">
+									<ButtonStyled color="brand" type="outlined">
+										<button
+											:disabled="allInstalledIds.has(project.project_id)"
+											@click.stop="() => handleAddServerToInstance(project)"
+										>
+											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
+											<PlusIcon v-else />
+											{{
+												formatMessage(
+													allInstalledIds.has(project.project_id)
+														? messages.added
+														: messages.addToInstance,
+												)
+											}}
+										</button>
+									</ButtonStyled>
+								</template>
+								<template v-else>
+									<ButtonStyled circular>
+										<button
+											v-tooltip="
+												allInstalledIds.has(project.project_id)
+													? formatMessage(messages.alreadyAdded)
+													: instance
+														? formatMessage(messages.addToInstanceName, {
+																instanceName: instance.name,
+															})
+														: formatMessage(messages.addServerToInstance)
+											"
+											:disabled="allInstalledIds.has(project.project_id)"
+											@click.stop="() => handleAddServerToInstance(project)"
+										>
+											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
+											<PlusIcon v-else />
+										</button>
+									</ButtonStyled>
+									<ButtonStyled
+										v-if="runningServerProjects[project.project_id]"
+										color="red"
+										type="outlined"
 									>
-										<PlusIcon />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-if="runningServerProjects[project.project_id]"
-									color="red"
-									type="outlined"
-								>
-									<button @click="() => handleStopServerProject(project.project_id)">
-										<StopCircleIcon />
-										Stop
-									</button>
-								</ButtonStyled>
-								<ButtonStyled v-else color="brand" type="outlined">
-									<button
-										:disabled="(installingServerProjects as string[]).includes(project.project_id)"
-										@click="() => handlePlayServerProject(project.project_id)"
-									>
-										<PlayIcon />
-										{{
-											(installingServerProjects as string[]).includes(project.project_id)
-												? 'Installing...'
-												: 'Play'
-										}}
-									</button>
-								</ButtonStyled>
+										<button @click="() => handleStopServerProject(project.project_id)">
+											<StopCircleIcon />
+											{{ formatMessage(commonMessages.stopButton) }}
+										</button>
+									</ButtonStyled>
+									<ButtonStyled v-else color="brand" type="outlined">
+										<button
+											:disabled="
+												(installingServerProjects as string[]).includes(project.project_id)
+											"
+											@click="() => handlePlayServerProject(project.project_id)"
+										>
+											<PlayIcon />
+											{{
+												formatMessage(
+													(installingServerProjects as string[]).includes(project.project_id)
+														? commonMessages.installingLabel
+														: commonMessages.playButton,
+												)
+											}}
+										</button>
+									</ButtonStyled>
+								</template>
 							</div>
 						</template>
 					</ProjectCard>
@@ -947,7 +1104,7 @@ previousFilterState.value = JSON.stringify({
 									loader.supported_project_types?.includes(projectType),
 							),
 						]"
-						:installed="result.installed || newlyInstalled.includes(result.project_id || '')"
+						:installed="result.installed || allInstalledIds.has(result.project_id || '')"
 						@install="
 							(id) => {
 								newlyInstalled.push(id)

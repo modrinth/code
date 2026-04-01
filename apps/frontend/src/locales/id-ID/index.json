@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Buat proyek"
   },
-  "create.project.create-server-project": {
-    "message": "Buat server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Bidang hilang: {fields}"
   },
@@ -578,8 +575,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Buat baru"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Buat koleksi pertama Anda untuk memulai!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Anda belum memiliki koleksi"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Tidak ada koleksi yang cocok dengan pencarian Anda"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Coba sesuaikan kata kunci pencarian atau penyaringan Anda."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, other {{count} proyek}}"
+    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Cari koleksi Anda"
@@ -1292,6 +1301,39 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Pilih antara Vanila, Fabric, Forge, Quilt, dan NeoForge. Bila ia ada di Modrinth, ia dapat dijalankan di server Anda."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Gagal mengubah versi paket mod"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Gagal memuat versi"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Gagal memasang ulang paket mod"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Gagal memperbaiki server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Gagal menyinpan pengaturan pemasangan"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Gagal melepas tautan paket mod"
+  },
+  "hosting.loader.loader-version": {
+    "message": "Versi {loader, select, null {pemuat} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Pemasangan server Anda telah diperbaiki."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Perbaikan selesai"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Atur ulang server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Menghapus semua data pada server Anda, termasuk dunia, mod, dan berkas konfigurasi Anda. Cadangan akan tetap ada dan dapat dipulihkan."
+  },
   "hosting.plan.out-of-stock": {
     "message": "Habis"
   },
@@ -1425,7 +1467,7 @@
     "message": "Untuk Pemain"
   },
   "landing.section.for-players.tagline": {
-    "message": "Temukan lebih dari {count} kreasi"
+    "message": "Temukan lebih dari {count, number} kreasi"
   },
   "landing.subheading": {
     "message": "Temukan, mainkan, dan bagikan konten Minecraft melalui platform sumber terbuka kami yang dibangun untuk komunitas."
@@ -1645,9 +1687,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Temukan konten"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Bendera fitur"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
@@ -2028,7 +2067,7 @@
     "message": "Koleksi"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, other {unduhan}}"
+    "message": "{count} {countPlural, plural, other {pengunduhan}}"
   },
   "profile.label.joined": {
     "message": "Telah bergabung"
@@ -2049,7 +2088,7 @@
     "message": "Organisasi"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, other {proyek}}"
+    "message": "{count} {countPlural, plural, other {proyek}}"
   },
   "profile.label.saving": {
     "message": "Menyimpan..."
@@ -2771,8 +2810,17 @@
   "search.filter.locked.server.sync": {
     "message": "Sinkronkan dengan server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
+  "servers.busy.backup-creating": {
+    "message": "Sedang membuat cadangan"
+  },
+  "servers.busy.backup-restoring": {
     "message": "Sedang memulihkan cadangan"
+  },
+  "servers.busy.installing": {
+    "message": "Server sedang dipasang"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Sedang menyingkronkan konten"
   },
   "servers.notice.actions": {
     "message": "Tindakan"
@@ -2804,20 +2852,11 @@
   "servers.plan.large.description": {
     "message": "Cocok untuk 15—25 pemain, paket mod, atau yang penggunakan mod berat."
   },
-  "servers.plan.large.name": {
-    "message": "Besar"
-  },
   "servers.plan.medium.description": {
     "message": "Cocok untuk 6—15 orang pemain dan yang menggunakan beberapa mod."
   },
-  "servers.plan.medium.name": {
-    "message": "Sedang"
-  },
   "servers.plan.small.description": {
     "message": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
-  },
-  "servers.plan.small.name": {
-    "message": "Kecil"
   },
   "settings.applications.about": {
     "message": "Tentang"
@@ -2826,7 +2865,7 @@
     "message": "Tambah lagi"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Tidak ada URI pengarahan ulang"
+    "message": "Tambah URI pengarahan ulang"
   },
   "settings.applications.button.cancel": {
     "message": "Batal"
@@ -2902,9 +2941,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Informasi aplikasi"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Terjadi kesalahan"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ikon aplikasi Anda telah diperbarui."
@@ -3051,7 +3087,7 @@
     "message": "Buat PAT"
   },
   "settings.pats.description": {
-    "message": "PAT dapat digunakan untuk mengakses API Modrinth. Untuk informasi lebih lanjut, lihat <doc-link>Dokumentasi API Modrinth</doc-link>. Mereka dapat dibuat dan dicabut kapan saja."
+    "message": "PAT dapat digunakan untuk mengakses API Modrinth dan dapat dibuat dan dicabut kapan saja. Untuk informasi lebih lanjut, lihat <doc-link>dokumentasi API Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Buat PAT"
@@ -3142,6 +3178,12 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Lihat semua berita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Berlangganan"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Sudah berlangganan!"
   },
   "version.environment.none.description": {
     "message": "Lingkungan untuk versi ini belum ditentukan."

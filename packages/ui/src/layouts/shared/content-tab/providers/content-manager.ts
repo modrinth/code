@@ -25,15 +25,7 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
-export interface UploadState {
-	isUploading: boolean
-	currentFileName: string | null
-	currentFileProgress: number
-	uploadedBytes: number
-	totalBytes: number
-	completedFiles: number
-	totalFiles: number
-}
+export type { UploadState } from '@modrinth/api-client'
 
 export interface ContentManagerContext {
 	// Data
@@ -51,8 +43,7 @@ export interface ContentManagerContext {
 	disableAddContent?: Ref<boolean> | ComputedRef<boolean>
 	disableAddContentTooltip?: string
 
-	// Identity & labelling
-	getItemId: (item: ContentItem) => string
+	// Labelling
 	contentTypeLabel: Ref<string> | ComputedRef<string>
 
 	// Core actions
@@ -79,6 +70,9 @@ export interface ContentManagerContext {
 	unlinkModpack?: () => void
 	openSettings?: () => void
 
+	// Switch version (optional)
+	switchVersion?: (item: ContentItem) => void
+
 	// Per-item overflow menu (optional)
 	getOverflowOptions?: (item: ContentItem) => OverflowMenuOption[]
 
@@ -87,9 +81,6 @@ export interface ContentManagerContext {
 
 	// Upload progress (optional)
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
-
-	// Show client-only environment filter pill
-	showClientOnlyFilter?: boolean
 
 	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
 	isBulkOperating?: Ref<boolean>
@@ -103,6 +94,9 @@ export interface ContentManagerContext {
 
 	// Table item mapping (link generation differs per platform)
 	mapToTableItem: (item: ContentItem) => ContentCardTableItem
+
+	// Filter persistence key — when set, selected filters are saved/restored via sessionStorage
+	filterPersistKey?: string
 }
 
 export const [injectContentManager, provideContentManager] = createContext<ContentManagerContext>(

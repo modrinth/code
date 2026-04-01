@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "Kanseller"
   },
+  "button.change-version": {
+    "defaultMessage": "Endre versjonen"
+  },
   "button.clear": {
     "defaultMessage": "Tøm"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "Følg"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "Gjøm snapshots"
+  },
   "button.max": {
     "defaultMessage": "Maks"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "Oppdater"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "Re-installer modpakka"
+  },
   "button.remove": {
     "defaultMessage": "Fjern"
   },
   "button.remove-image": {
     "defaultMessage": "Fjern bilde"
   },
+  "button.repair": {
+    "defaultMessage": "Reparer"
+  },
+  "button.repairing": {
+    "defaultMessage": "Reparerer..."
+  },
   "button.report": {
     "defaultMessage": "Rapporter"
   },
   "button.reset": {
     "defaultMessage": "Reset"
+  },
+  "button.reset-server": {
+    "defaultMessage": "Tilbakestill server"
   },
   "button.retry": {
     "defaultMessage": "Prøv igjen"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "Lagrer"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "Vis alle versjonene"
+  },
   "button.sign-in": {
     "defaultMessage": "Logg inn"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "Stopp"
   },
+  "button.switch-version": {
+    "defaultMessage": "Bytt versjonen"
+  },
   "button.unfollow": {
     "defaultMessage": "Slutt å følge"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "Kople fra modpakka"
   },
   "button.update": {
     "defaultMessage": "Oppdater"
@@ -155,9 +182,6 @@
   "changelog.justNow": {
     "defaultMessage": "Akkurat nå"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -165,10 +189,124 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Nettside"
+    "defaultMessage": "Plattform"
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "Er du sikker på at du har lyst å oppdatere {count, plural, one {# prosjekt} other {# prosjekt}} til den siste kompatible versjonen deres? Det er anbefalt at du oppdaterer innhold en-etter-en."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "Oppdateringsadvarsel"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "Oppdater prosjekt"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "Oppdater {count, plural, one {# prosjekt} other {# prosjekt}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "Hvis du sletter en mod, så kan det påvirke verda di for alltid og gjøre at innhold mangler eller det framkommer problem når det blir lasta inn igjen."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "Slettingsadvarsel"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "Slett {count} {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "Slett {itemType}{count, plural, one {} other {s}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "Hvilken som helst mod eller innhold du legger til i toppen av modpakka kommer til å bli sletta."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} advarsel"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} modpakke"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {Nedgrader} other {Oppdatering}} modpakke"
+  },
+  "content.confirm-unlink.admonition-body": {
+    "defaultMessage": "Mod og innhold kommer til å bli sammensatt med det du la til i toppen av modpakka, og kommer ikke til å få flere oppdateringer."
+  },
+  "content.confirm-unlink.admonition-header": {
+    "defaultMessage": "Kopler fra modpakka"
+  },
+  "content.confirm-unlink.header": {
+    "defaultMessage": "Kople fra modpakka"
+  },
+  "content.confirm-unlink.unlink-button": {
+    "defaultMessage": "Kople fra"
+  },
+  "content.diff-modal.added-count": {
+    "defaultMessage": "{count} lagt til"
+  },
+  "content.diff-modal.diff-type.added": {
+    "defaultMessage": "La til (avhengighet)"
+  },
+  "content.diff-modal.diff-type.updated": {
+    "defaultMessage": "Oppdaterte"
+  },
+  "content.diff-modal.removed-count": {
+    "defaultMessage": "{count} fjerna"
+  },
+  "content.diff-modal.unknown-content-body": {
+    "defaultMessage": "Noe innhold til serveren din kunne ikke bli gjennomgått og kan bli påvirka av denne endringa."
+  },
+  "content.diff-modal.updated-count": {
+    "defaultMessage": "{count} oppdatert"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "Oppretter sikkerhetskopiering..."
+  },
+  "content.inline-backup.backup-complete": {
+    "defaultMessage": "Suksessfult oppretta sikkerhetskopiering"
+  },
+  "content.inline-backup.backup-failed": {
+    "defaultMessage": "Oppretting av sikkerhetskopiering feila. Du kan fortsatt gå videre."
+  },
+  "content.inline-backup.backup-in-progress": {
+    "defaultMessage": "Ei sikkerhetskopiering holder på, det er anbefalt at du venter til den er ferdig før du går videre med handlinga."
+  },
+  "content.inline-backup.backup-takes-a-while": {
+    "defaultMessage": "Å lage ei sikkerhetskopiering kan ta flere minutt, angående størrelsen på serveren din."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "Opprett sikkerhetskopiering"
+  },
+  "content.inline-backup.shift-click-hint": {
+    "defaultMessage": "Hold inne Skift mens du klikker for å hoppe over bekreftelse."
+  },
+  "content.inline-backup.warning-body": {
+    "defaultMessage": "Vi anbefaler at du lager ei sikkerhetskopiering før du fortsetter, sånn at du kan få tilbake {type, select, server {verden} other {instansen}}-en din viss noe går i stykker."
+  },
+  "content.modpack-card.content-hint-description": {
+    "defaultMessage": "Modpakkeinnholdet ditt kan nå bli funnet her!"
+  },
+  "content.modpack-card.content-hint-title": {
+    "defaultMessage": "Modpakkeinnhold flytta"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "Ikke vis igjen"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "Yttligere innhold"
+  },
+  "content.page-layout.browse-content": {
+    "defaultMessage": "Gå gjennom innhold"
+  },
+  "content.page-layout.busy-description": {
+    "defaultMessage": "Vær så snill å vent til operasjonen er fullført før du redigerer innhold."
+  },
+  "content.page-layout.empty.hint": {
+    "defaultMessage": "Gå gjennom eller last opp {contentType} for å komme i gang"
+  },
+  "content.page-layout.empty.modpack-hint": {
+    "defaultMessage": "Legg til yttligere innhold på toppen av denne modpakka"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresse"
@@ -257,9 +395,6 @@
   "header.category.performance-impact": {
     "defaultMessage": "Ytelsespåvirkning"
   },
-  "header.category.resolutions": {
-    "defaultMessage": "Oppløysing"
-  },
   "hosting.specs.burst": {
     "defaultMessage": "Burst opp til {cpus} CPU-er"
   },
@@ -287,8 +422,14 @@
   "icon-select.select": {
     "defaultMessage": "Velg ikon"
   },
+  "input.search-version.placeholder": {
+    "defaultMessage": "Søk opp versjon..."
+  },
   "input.search.placeholder": {
     "defaultMessage": "Søk..."
+  },
+  "input.select-version.placeholder": {
+    "defaultMessage": "Velg versjon"
   },
   "input.view.gallery": {
     "defaultMessage": "Gallerivisning"
@@ -298,6 +439,102 @@
   },
   "input.view.list": {
     "defaultMessage": "Radvisning"
+  },
+  "installation-settings.aria.select-game-version": {
+    "defaultMessage": "Velg spillversjon"
+  },
+  "installation-settings.aria.select-loader-version": {
+    "defaultMessage": "Velg {loader}-versjon"
+  },
+  "installation-settings.aria.select-platform": {
+    "defaultMessage": "Velg plattform"
+  },
+  "installation-settings.confirm-version-change": {
+    "defaultMessage": "Bekreft"
+  },
+  "installation-settings.confirm-version-change-description": {
+    "defaultMessage": "Endring til {gameVersion} kommer til å endre følgende innhold i serveren din."
+  },
+  "installation-settings.confirm-version-change-header": {
+    "defaultMessage": "Gå gjennom innholdsendringer"
+  },
+  "installation-settings.edit-installation.title": {
+    "defaultMessage": "Endre installering"
+  },
+  "installation-settings.edit.warning-instance": {
+    "defaultMessage": "Vi anbefaler ikke at du endrer installeringsinstillingene dine etter installering av innhold. Viss du må endre dem, være forsiktig, sia det kan skape problem."
+  },
+  "installation-settings.edit.warning-server": {
+    "defaultMessage": "Vi anbefaler ikke at du endrer installeringsinstillingene dine etter installering av innhold. Viss du må endre dem, gjør omstart av serveren din."
+  },
+  "installation-settings.linked-instance.title": {
+    "defaultMessage": "Kopla til {projectType, select, server {serverprosjekt} other {modpakke}}"
+  },
+  "installation-settings.loader-version": {
+    "defaultMessage": "{loader}-versjon"
+  },
+  "installation-settings.platform-lock-tooltip": {
+    "defaultMessage": "Du kommer til å måtte starte serveren din på nytt att for å bytte loader."
+  },
+  "installation-settings.reinstall-modpack.description": {
+    "defaultMessage": "Re-installering av modpakka tilbakestiller {type, select, server {serverens} other {instanser}}-innholdet til den opprinnelige tilstanden, fjerner modsa/innholda du har lagt til."
+  },
+  "installation-settings.reinstall-modpack.title": {
+    "defaultMessage": "Re-installer modpakke"
+  },
+  "installation-settings.reinstalling-modpack": {
+    "defaultMessage": "Re-installerer modpakke"
+  },
+  "installation-settings.removed-incompatible": {
+    "defaultMessage": "Fjerna (uforenig)"
+  },
+  "installation-settings.repair.instance-description": {
+    "defaultMessage": "Re-installerer Minecraft-avhengigheter for å sjekke for korrupsjoner. Dette kan fikse problem viss spillet ditt ikke åpner seg på grunn av problem knytt til launcher-errorer."
+  },
+  "installation-settings.repair.instance-title": {
+    "defaultMessage": "Reparer instanse"
+  },
+  "installation-settings.repair.server-description": {
+    "defaultMessage": "Re-installerer loader-en og Minecraft-avhengigheter uten å slette innholdet ditt. Dette kan fikse problem viss serveren din ikke starter opp på riktig måte."
+  },
+  "installation-settings.repair.server-title": {
+    "defaultMessage": "Reparerer server"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Lagrer..."
+  },
+  "installation-settings.search-game-version": {
+    "defaultMessage": "Søk opp spillversjon..."
+  },
+  "installation-settings.unlink": {
+    "defaultMessage": "Kople fra"
+  },
+  "installation-settings.unlink.description": {
+    "defaultMessage": "Frakopling kommer til å permanent frakople denne {type, select, server {server} other {instansen}} fra {projectType, select, server {server} other {modpakke}}-prosjektet, som gjør at du kan endre loader-en og Minecraft-versjonen, men du kommer ikke til å få framtidige oppdateringer."
+  },
+  "installation-settings.verifying": {
+    "defaultMessage": "Bekrefter..."
+  },
+  "instance.confirm-reinstall.admonition-body": {
+    "defaultMessage": "Re-installering kommer til å gjøre omstart av alt installert eller modifisert innhold til det som blei utgitt av modpakka, fjerner modsa eller innholdet du la til på toppen av den originale installeringa."
+  },
+  "instance.confirm-reinstall.admonition-header": {
+    "defaultMessage": "Re-installeringsadvarsel"
+  },
+  "instance.confirm-reinstall.header": {
+    "defaultMessage": "Reinstaller modpakke"
+  },
+  "instance.confirm-reinstall.reinstall-button": {
+    "defaultMessage": "Reinstaller modpakke"
+  },
+  "instance.confirm-repair.body": {
+    "defaultMessage": "Reparering installerer loader-en og Minecraft-avhengigheter på nytt att, uten å slette innholdet ditt. Dette kan fikse problem viss {type, select, server {serveren din ikke starter opp riktig} other {spillet ikke starter opp grunna problem relatert til launcher-en}}."
+  },
+  "instance.confirm-repair.header": {
+    "defaultMessage": "Reparer {type, select, server {server} other {instanse}}"
+  },
+  "instance.confirm-repair.repair-button": {
+    "defaultMessage": "Reparer"
   },
   "instance.worlds.game_mode.adventure": {
     "defaultMessage": "Eventyr modus"
@@ -314,17 +551,41 @@
   "instance.worlds.game_mode.unknown": {
     "defaultMessage": "Ukjent spillmodus"
   },
-  "instances.modpack-card.unlink": {
-    "defaultMessage": "Kople fra modpack"
+  "instances.confirm-leave-modal.body": {
+    "defaultMessage": "Filer blir fortsatt oppdatert. Viss du går ut av denne sida, så avbryter du opplastinga og endringene dine kan forsvinne."
+  },
+  "instances.confirm-leave-modal.upload-in-progress": {
+    "defaultMessage": "Opplasting foregår"
+  },
+  "instances.content-install.compatible-count": {
+    "defaultMessage": "{count} kompatable {count, plural, one {instanse} other {instanser}}"
+  },
+  "instances.content-install.existing-tab": {
+    "defaultMessage": "Eksisterende instanse"
+  },
+  "instances.content-install.game-version-placeholder": {
+    "defaultMessage": "Velg spillversjon"
+  },
+  "instances.content-install.header": {
+    "defaultMessage": "Installer prosjekt"
+  },
+  "instances.content-install.install-button": {
+    "defaultMessage": "Installer"
+  },
+  "instances.content-install.installed-badge": {
+    "defaultMessage": "Installert"
+  },
+  "instances.content-install.instance-type": {
+    "defaultMessage": "Instansetype"
+  },
+  "instances.content-install.loader-label": {
+    "defaultMessage": "Laster"
   },
   "instances.updater-modal.badge.current": {
     "defaultMessage": "Nåværende"
   },
   "instances.updater-modal.badge.incompatible": {
     "defaultMessage": "Ikke kompatibel"
-  },
-  "instances.updater-modal.downgrade-to": {
-    "defaultMessage": "Gå ned i versjon til v{version}"
   },
   "instances.updater-modal.header": {
     "defaultMessage": "Oppdater versjon"
@@ -346,15 +607,6 @@
   },
   "instances.updater-modal.show-incompatible": {
     "defaultMessage": "Vis manglende kompatibilitet"
-  },
-  "instances.updater-modal.update-to": {
-    "defaultMessage": "Oppdater til v{version}"
-  },
-  "instances.updater-modal.warning.app": {
-    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for instansen din. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
-  },
-  "instances.updater-modal.warning.web": {
-    "defaultMessage": "Vi kan ikke garantere at oppdateringer er trygge for verda di. Gå gjennom endringsloggen for alle mellomliggende versjoner og tenk på om du vil gjøre ei sikkerhetskopiering."
   },
   "label.actions": {
     "defaultMessage": "Handlinger"
@@ -428,9 +680,6 @@
   "label.password": {
     "defaultMessage": "Passord"
   },
-  "label.played": {
-    "defaultMessage": "Spilt {time}"
-  },
   "label.project": {
     "defaultMessage": "Prosjekt"
   },
@@ -464,9 +713,6 @@
   "label.singleplayer": {
     "defaultMessage": "Enspiller"
   },
-  "label.sort-by": {
-    "defaultMessage": "Sorter etter"
-  },
   "label.success": {
     "defaultMessage": "Suksess"
   },
@@ -494,11 +740,107 @@
   "label.yes": {
     "defaultMessage": "Ja"
   },
+  "locale.fi-FI": {
+    "defaultMessage": "Finsk"
+  },
+  "locale.fil-PH": {
+    "defaultMessage": "Filipinsk"
+  },
+  "locale.fr-FR": {
+    "defaultMessage": "Fransk"
+  },
+  "locale.he-IL": {
+    "defaultMessage": "Hebraisk"
+  },
+  "locale.hu-HU": {
+    "defaultMessage": "Ungarsk"
+  },
+  "locale.id-ID": {
+    "defaultMessage": "Indonesisk"
+  },
+  "locale.it-IT": {
+    "defaultMessage": "Italiensk (Italia)"
+  },
+  "locale.ja-JP": {
+    "defaultMessage": "Japansk"
+  },
+  "locale.ko-KR": {
+    "defaultMessage": "Koreansk"
+  },
+  "locale.ms-MY": {
+    "defaultMessage": "Malaysisk"
+  },
+  "locale.nl-NL": {
+    "defaultMessage": "Nederlansk"
+  },
+  "locale.no-NO": {
+    "defaultMessage": "Norsk Bokmål"
+  },
+  "locale.pl-PL": {
+    "defaultMessage": "Polsk"
+  },
+  "locale.pt-BR": {
+    "defaultMessage": "Portugisisk (Brasil)"
+  },
+  "locale.pt-PT": {
+    "defaultMessage": "Portugisisk (portugal)"
+  },
+  "locale.ro-RO": {
+    "defaultMessage": "Romansk"
+  },
+  "locale.ru-RU": {
+    "defaultMessage": "Russisk"
+  },
+  "locale.sr-CS": {
+    "defaultMessage": "Serbisk (Latinsk)"
+  },
+  "locale.sv-SE": {
+    "defaultMessage": "Svensk"
+  },
+  "locale.th-TH": {
+    "defaultMessage": "Thai"
+  },
+  "locale.tr-TR": {
+    "defaultMessage": "Tyrkisk"
+  },
+  "locale.uk-UA": {
+    "defaultMessage": "Ukranisk"
+  },
+  "locale.vi-VN": {
+    "defaultMessage": "Vietnamesisk"
+  },
+  "locale.zh-CN": {
+    "defaultMessage": "Kinesisk (Forenkla)"
+  },
+  "locale.zh-TW": {
+    "defaultMessage": "Kinesisk (Tradisjonelt)"
+  },
   "modal.add-payment-method.action": {
     "defaultMessage": "Legg til betalingsmetode"
   },
   "modal.add-payment-method.title": {
     "defaultMessage": "Legger til en betalingsmetode"
+  },
+  "modal.open-in-app.benefit.install": {
+    "defaultMessage": "Automatisk installer påkrevd innhold"
+  },
+  "modal.open-in-app.benefit.launch": {
+    "defaultMessage": "Start opp spillet rett inni serveren"
+  },
+  "modal.open-in-app.benefit.update": {
+    "defaultMessage": "Hold filer oppdatert når serveren endres"
+  },
+  "modal.open-in-app.get-app": {
+    "defaultMessage": "Skaff Modrinth App-en"
+  },
+  "modal.open-in-app.opening-automatically": {
+    "defaultMessage": "Modrinth App-en kommer til å åpne seg automatisk..."
+  },
+  "modal.open-in-app.title": {
+    "defaultMessage": "Åpner Modrinth App-en"
+  },
+  "modal.open-in-app.why-use": {
+    "defaultMessage": "Hvorfor bruke modrinth App-en"
   },
   "notification.error.title": {
     "defaultMessage": "En feil oppstod"
@@ -650,6 +992,12 @@
   "payment-method.visa": {
     "defaultMessage": "Visa"
   },
+  "project-card.date.published.tooltip": {
+    "defaultMessage": "Publisert {date}"
+  },
+  "project-card.date.updated.tooltip": {
+    "defaultMessage": "Oppdatert {date}"
+  },
   "project-card.environment.client": {
     "defaultMessage": "Klient"
   },
@@ -767,6 +1115,9 @@
   "project.about.compatibility.title": {
     "defaultMessage": "Kompatibilitet"
   },
+  "project.about.creators.organization": {
+    "defaultMessage": "Organisering"
+  },
   "project.about.creators.owner": {
     "defaultMessage": "Prosjekteier"
   },
@@ -812,8 +1163,14 @@
   "project.about.links.issues": {
     "defaultMessage": "Rapporter feil"
   },
+  "project.about.links.site": {
+    "defaultMessage": "Besøk side"
+  },
   "project.about.links.source": {
     "defaultMessage": "Vis kildekode"
+  },
+  "project.about.links.store": {
+    "defaultMessage": "Besøk butikkside"
   },
   "project.about.links.title": {
     "defaultMessage": "Besøk wiki"
@@ -821,17 +1178,47 @@
   "project.about.links.wiki": {
     "defaultMessage": "Besøk wiki"
   },
+  "project.about.server.address.tooltip": {
+    "defaultMessage": "Kopier Javaserveradressa"
+  },
+  "project.about.server.copied": {
+    "defaultMessage": "Kopiert!"
+  },
+  "project.about.server.copiedText": {
+    "defaultMessage": "Serveradressa kopiert til utklippstavla"
+  },
+  "project.about.server.downloadModpack": {
+    "defaultMessage": "Last ned modpakka"
+  },
+  "project.about.server.languages": {
+    "defaultMessage": "Språk"
+  },
+  "project.about.server.recommendedVersion": {
+    "defaultMessage": "(Anbefalt)"
+  },
+  "project.about.server.region": {
+    "defaultMessage": "Region"
+  },
+  "project.about.server.requiredContent": {
+    "defaultMessage": "Påkrevd innhold"
+  },
+  "project.about.server.title": {
+    "defaultMessage": "Serverdetaljer"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Tagger"
+  },
   "project.download-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {nedlasting} other {nedlastinger}}"
+    "defaultMessage": "{count, number} {count, plural, one {nedlasting} other {nedlastinger}}"
   },
   "project.environment.client-and-server.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
+    "defaultMessage": "Påkrevd på både klienten og serveren."
   },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Både klient og server er påkrevd"
   },
   "project.environment.client-only-server-optional.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
+    "defaultMessage": "Mesteparten av funksjonaliteten er klient-sidig, men funksjonaliteten blir forbedra viss du installerer den på serveren."
   },
   "project.environment.client-only-server-optional.title": {
     "defaultMessage": "Klient og server, valgfritt på server"
@@ -842,9 +1229,6 @@
   "project.environment.client-only.title": {
     "defaultMessage": "Kun klient"
   },
-  "project.environment.client-or-server-prefers-both.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
   "project.environment.client-or-server-prefers-both.title": {
     "defaultMessage": "Klient og server, best når det er installert på begge"
   },
@@ -854,20 +1238,11 @@
   "project.environment.client-or-server.title": {
     "defaultMessage": "Klient og server, valgfritt på begge"
   },
-  "project.environment.dedicated-server-only.description": {
-    "defaultMessage": "All funksjonalitet kjøres på serveren og er kompatibel med vanlige klienter."
-  },
   "project.environment.dedicated-server-only.title": {
     "defaultMessage": "Kun server"
   },
-  "project.environment.server-only-client-optional.description": {
-    "defaultMessage": "Har noe funksjonalitet både på klienten og serveren, selv om det bare er delvis."
-  },
   "project.environment.server-only-client-optional.title": {
     "defaultMessage": "Klient og server, valgfritt på klient"
-  },
-  "project.environment.server-only.description": {
-    "defaultMessage": "All funksjonalitet køyrer på serveren og er kompatibel med vanlege klientar."
   },
   "project.environment.server-only.title": {
     "defaultMessage": "Bare serversidig, fungerer også på enkeltspiller"
@@ -890,11 +1265,149 @@
   "project.environment.unknown.title": {
     "defaultMessage": "Ukjent miljø"
   },
-  "project.follower-count-tooltip": {
-    "defaultMessage": "{count} {count, plural, one {følger} other {følgere}}"
+  "project.server.language.mk": {
+    "defaultMessage": "Makedonsk"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Mongolsk"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathisk"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Malaysisk"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Burmesisk"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepalsk"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Nederlansk"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norsk"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polsk"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portugisisk"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Romansk"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Russisk"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Singalesisk"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Slovakisk"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Slovensk"
+  },
+  "project.server.language.sq": {
+    "defaultMessage": "Albansk"
+  },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbisk"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Svensk"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamilsk"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thai"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipinsk"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Tyrkisk"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukranisk"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Usbekisk"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamesisk"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Kinesisk"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australia"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Midtausten"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Russland"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Sør-Amerika"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Server oppstarta i {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "US-Aust"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "US-Vest"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Frakopla"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "Serveren er frakopla"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Påkopla"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analytics"
+  },
+  "project.settings.content.title": {
+    "defaultMessage": "Innhold"
   },
   "project.settings.description.title": {
     "defaultMessage": "Beskrivelse"
@@ -1003,6 +1516,9 @@
   },
   "project.settings.notice.no-permission.title": {
     "defaultMessage": "Ingen tilgang"
+  },
+  "project.settings.server.title": {
+    "defaultMessage": "Server"
   },
   "project.settings.tags.title": {
     "defaultMessage": "Tagger"
@@ -1121,6 +1637,12 @@
   "search.filter_type.project_id": {
     "defaultMessage": "Prosjekt-ID"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Type"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Språk"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Laster"
   },
@@ -1129,9 +1651,6 @@
   },
   "servers.backups.item.backup-schedule": {
     "defaultMessage": "Sikkerhetskopiplan"
-  },
-  "servers.backups.item.creating-backup": {
-    "defaultMessage": "Oppretter backup…"
   },
   "servers.backups.item.failed-to-create-backup": {
     "defaultMessage": "Kunne ikke gjenopprette fra backup"
@@ -1142,20 +1661,11 @@
   "servers.backups.item.manual-backup": {
     "defaultMessage": "Manuell sikkerhetskopiering"
   },
-  "servers.backups.item.queued-for-backup": {
-    "defaultMessage": "Sikkerhetskopiering i kø"
-  },
-  "servers.backups.item.queued-for-restore": {
-    "defaultMessage": "Gjenopprett i kø"
-  },
   "servers.backups.item.rename": {
     "defaultMessage": "Endre navn"
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Gjenopprett"
-  },
-  "servers.backups.item.restoring-backup": {
-    "defaultMessage": "Gjenoppretter fra sikkerhetskopi..."
   },
   "servers.notice.dismiss": {
     "defaultMessage": "Avskjedige"
@@ -1469,8 +1979,14 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Flerspiller"
   },
+  "tag.category.op": {
+    "defaultMessage": "OP"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimialisering"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Stisporing"
@@ -1478,17 +1994,50 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Personlige verdener"
+  },
+  "tag.category.plots": {
+    "defaultMessage": "Tomter"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Potet"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Fengsel"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
+  },
+  "tag.category.questing": {
+    "defaultMessage": "Oppdrag"
   },
   "tag.category.quests": {
     "defaultMessage": "Oppdrag"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Racing"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistisk"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Filming av SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Refleksjoner"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Rollespill"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Skjermbilde"
@@ -1502,17 +2051,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Enkelt"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Sosialt"
   },
   "tag.category.storage": {
     "defaultMessage": "Lagring"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Overlevelsesmodus"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Lag"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Teknisk"
+  },
   "tag.category.technology": {
     "defaultMessage": "Teknologi"
   },
   "tag.category.themed": {
     "defaultMessage": "Tema"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Byer"
   },
   "tag.category.transportation": {
     "defaultMessage": "Transportering"
@@ -1525,6 +2092,12 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Likt Som Det Vanlige Spillet"
+  },
+  "tag.category.whitelisted": {
+    "defaultMessage": "Kvitlista"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Omstart av Verdener"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Verdensgenerering"
@@ -1618,9 +2191,6 @@
   },
   "tag.loader.waterfall": {
     "defaultMessage": "Waterfall"
-  },
-  "tooltip.date-at-time": {
-    "defaultMessage": "{date, date, long} klokken {time, time, short}"
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Du har ulagrede endringer."

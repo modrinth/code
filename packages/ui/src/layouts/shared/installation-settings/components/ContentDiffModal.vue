@@ -3,15 +3,10 @@
 		<div class="max-w-[500px]">
 			<div class="flex flex-col gap-4 p-4">
 				<Admonition :type="hasUnknownContent ? 'warning' : 'info'" :header="admonitionHeader">
-					{{ description }}
-				</Admonition>
-
-				<Admonition
-					v-if="hasUnknownContent"
-					type="warning"
-					:header="formatMessage(messages.unknownContentHeader)"
-				>
-					{{ formatMessage(messages.unknownContentBody) }}
+					<div class="flex flex-col gap-2">
+						<span>{{ description }}</span>
+						<span v-if="hasUnknownContent">{{ formatMessage(messages.unknownContentBody) }}</span>
+					</div>
 				</Admonition>
 
 				<div v-if="diffs.length" class="flex gap-2">
@@ -192,10 +187,6 @@ const messages = defineMessages({
 		id: 'content.diff-modal.updated-count',
 		defaultMessage: '{count} updated',
 	},
-	unknownContentHeader: {
-		id: 'content.diff-modal.unknown-content-header',
-		defaultMessage: 'Unknown content',
-	},
 	unknownContentBody: {
 		id: 'content.diff-modal.unknown-content-body',
 		defaultMessage:
@@ -210,7 +201,7 @@ const diffTypeMessages = defineMessages({
 	},
 	removed: {
 		id: 'content.diff-modal.diff-type.removed',
-		defaultMessage: 'Removed',
+		defaultMessage: 'Disabled',
 	},
 	updated: {
 		id: 'content.diff-modal.diff-type.updated',

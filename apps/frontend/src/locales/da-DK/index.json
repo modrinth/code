@@ -39,7 +39,7 @@
     "message": "Download muligheder"
   },
   "app-marketing.download.terms": {
-    "message": "Ved at download Modrinth du acceptere vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
+    "message": "Ved at download Modrinth App, acceptere du vores <terms-link>servicevilkår</terms-link> og <privacy-link>privatlivspolitik</privacy-link>."
   },
   "app-marketing.download.title": {
     "message": "Download Modrinth (Beta)"
@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150mb RAM!"
+    "message": "Modrinth App præsterer bedre end mange af de førende mod-håndteringsværktøjer og bruger kun 150 MB RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -392,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "Ingen projekter i samlingen endnu"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Ingen projekter endnu} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Opdateret {ago}"
   },
@@ -482,11 +485,23 @@
   "create.project.create-project": {
     "message": "Opret projekt"
   },
+  "create.project.missing-fields-tooltip": {
+    "message": "Mangler informationer: {fields}"
+  },
   "create.project.name-label": {
     "message": "Navn"
   },
   "create.project.name-placeholder": {
     "message": "Indtast projekt navn..."
+  },
+  "create.project.owner-description": {
+    "message": "Det projekt ejeren som dig selv eller en organisation du medlem af."
+  },
+  "create.project.owner-label": {
+    "message": "Ejer"
+  },
+  "create.project.server-project-title": {
+    "message": "Opretter et server projekt"
   },
   "create.project.summary-description": {
     "message": "En sætning eller to som beskriver dit projekt."
@@ -499,6 +514,15 @@
   },
   "create.project.title": {
     "message": "Opretter et projekt"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Projekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -539,8 +563,14 @@
   "dashboard.collections.button.create-new": {
     "message": "Opret ny"
   },
-  "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} projekt} other {{count} projekter}}"
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Opret din første samling for at komme i gang!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du har ikke nogle samlinger endnu"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Ingen samlinger passer din søgning"
   },
   "dashboard.collections.label.search-input": {
     "message": "Søg dine samlinger"
@@ -607,9 +637,6 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En forretningsenhed refererer til en registreret organisation, såsom et virksomhed, et partnerskab eller et LLC."
-  },
-  "dashboard.creator-withdraw-modal.kyc.entity-question": {
-    "message": "Udbetaler du penge som en privatperson eller en forretning?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privat individ"
@@ -1124,6 +1151,24 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vælg imellem Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, det kan køre på din server."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Fejlede i at ændre modpack version"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Fejlede i at indlæse versioner"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Fejlede i at geninstallere modpack"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Fejlede i at reparere server"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Fejlede i at gemme installation indstillinger"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Fejlede i at unlink modpack"
+  },
   "hosting.plan.out-of-stock": {
     "message": "Ikke på lager"
   },
@@ -1255,9 +1300,6 @@
   },
   "landing.section.for-players.label": {
     "message": "Til Spillere"
-  },
-  "landing.section.for-players.tagline": {
-    "message": "Udforsk over {count} kreationer"
   },
   "landing.subheading": {
     "message": "Udforsk, spil, og del Minecraft indhold gennem vores open souce platform bygget for fællesskabet."
@@ -1417,9 +1459,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Opdag indhold"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Funktionsflags"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Hent Modrinth-app"
@@ -1631,9 +1670,6 @@
   "profile.label.collection": {
     "message": "Samling"
   },
-  "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {downloads}}"
-  },
   "profile.label.joined": {
     "message": "Tilsluttet"
   },
@@ -1651,9 +1687,6 @@
   },
   "profile.label.organizations": {
     "message": "Organisationer"
-  },
-  "profile.label.projects": {
-    "message": "{count} {count, plural, one {projekt} other {projekter}}"
   },
   "profile.label.saving": {
     "message": "Gemmer..."
@@ -2015,6 +2048,9 @@
   "settings.applications.field.description": {
     "message": "Beskrivelse"
   },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Udløber {month}/{year}"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Side til datapakker"
   },
@@ -2039,14 +2075,32 @@
   "settings.pats.token.never-used": {
     "message": "Aldrig brugt"
   },
+  "settings.profile.bio.description": {
+    "message": "En kort beskrivelse, der fortæller alle lidt om dig selv."
+  },
+  "settings.profile.bio.title": {
+    "message": "Om dig"
+  },
+  "settings.profile.description": {
+    "message": "Dine profiloplysninger kan ses offentligt på Modrinth og via <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Profiloplysninger"
+  },
   "settings.profile.profile-picture.title": {
     "message": "Profilbillede"
+  },
+  "settings.profile.username.description": {
+    "message": "Et unikt, ikke-versalfølsomt navn til at identificere din profil."
   },
   "settings.sessions.created-ago": {
     "message": "Oprettet {ago}"
   },
   "settings.sessions.current-session": {
     "message": "Nuværende session"
+  },
+  "settings.sessions.description": {
+    "message": "Her er alle enheder, der i øjeblikket er logget ind med din Modrinth-konto. Du kan logge ud af hver enhed individuelt.\n\nHvis du ser en enhed, du ikke genkender, bør du straks logge ud af den og ændre adgangskoden til din Modrinth-konto."
   },
   "settings.sessions.last-accessed-ago": {
     "message": "Sidst tilgået {ago}"
@@ -2056,6 +2110,12 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Ukendt platform"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Konto"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Udvikler"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Seneste nyheder fra Modrinth"

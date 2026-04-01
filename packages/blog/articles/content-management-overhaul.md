@@ -1,7 +1,7 @@
 ---
 title: Content Management Overhaul
 summary: Overhauled content management for both Modrinth Hosting servers and Modrinth App instances.
-date: 2026-03-13T12:30:00-08:00
+date: 2026-03-17T12:15:00-08:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', 'LnK8MbX7']
 ---
 

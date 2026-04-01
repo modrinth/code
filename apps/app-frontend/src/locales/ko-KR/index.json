@@ -5,6 +5,150 @@
   "app.auth-servers.unreachable.header": {
     "message": "인증 서버에 연결할 수 없습니다"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "인스턴스에 서버 추가"
+  },
+  "app.browse.add-to-instance": {
+    "message": "인스턴스에 추가"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "{instanceName}에 추가"
+  },
+  "app.browse.added": {
+    "message": "추가됨"
+  },
+  "app.browse.already-added": {
+    "message": "이미 추가됨"
+  },
+  "app.browse.discover-content": {
+    "message": "콘텐츠 탐색하기"
+  },
+  "app.browse.discover-servers": {
+    "message": "서버 탐색하기"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "추가된 서버 숨기기"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "설치된 콘텐츠 숨기기"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "인스턴스에 콘텐츠 설치"
+  },
+  "app.export-modal.description-placeholder": {
+    "message": "모드팩 설명 입력..."
+  },
+  "app.export-modal.export-button": {
+    "message": "내보내기"
+  },
+  "app.export-modal.header": {
+    "message": "모드팩 내보내기"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "모드팩 이름"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "모드팩 이름"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "팩에 포함할 파일과 폴더 선택"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "버전 구분"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "인스턴스의 모든 데이터가 삭제됩니다. 세계 폴더, 설정 폴더 등 설치된 모든 컨텐츠가 포함됩니다."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "이 작업은 되돌릴 수 없습니다"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "인스턴스 삭제"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "인스턴스 삭제"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "이 모드팩은 이미 <bold>{instanceName}</bold> 인스턴스에 설치되어 있습니다. 정말로 복제하시겠습니까?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "생성"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "모드팩 이미 설치됨"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "인스턴스"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "프로젝트"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "\"{name}\" 추가됨"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "프로젝트 {count}개 추가됨"
+  },
+  "app.instance.mods.share-text": {
+    "message": "제 모드팩에 사용중인 프로젝트를 확인해 보세요!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "모드팩 콘텐츠 공유"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "업로드 성공"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "서버 추가"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "서버 탐색하기"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}'이(가) **영구적으로 삭제**되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "정말로 이 세계를 영구적으로 삭제하시겠습니까?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "수정됨"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "오프라인"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "온라인"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "바닐라"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "서버를 추가하거나 탐색하여 시작"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "추가된 서버 또는 세계 없음"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}'이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address})이(가) 게임 내를 포함한 모든 목록에서 삭제되며, 복구할 수 없습니다."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "정말로 {name}을(를) 제거하시겠습니까?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "{count}개의 세계 검색..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "이 서버"
+  },
   "app.modal.install-to-play.content-required": {
     "message": "콘텐츠 설치 필요"
   },
@@ -32,35 +176,14 @@
   "app.modal.install-to-play.view-contents": {
     "message": "구성 요소 보기"
   },
-  "app.modal.update-to-play.added-count": {
-    "message": "{count} 추가됨"
-  },
-  "app.modal.update-to-play.diff-type.added": {
-    "message": "추가됨"
-  },
-  "app.modal.update-to-play.diff-type.removed": {
-    "message": "삭제됨"
-  },
-  "app.modal.update-to-play.diff-type.updated": {
-    "message": "업데이트됨"
-  },
   "app.modal.update-to-play.header": {
     "message": "업데이트하고 플레이"
-  },
-  "app.modal.update-to-play.published-date": {
-    "message": "{date, date, long}"
-  },
-  "app.modal.update-to-play.removed-count": {
-    "message": "{count} 삭제됨"
   },
   "app.modal.update-to-play.update-required": {
     "message": "업데이트 필요"
   },
   "app.modal.update-to-play.update-required-description": {
     "message": "{name}을(를) 플레이하려면 업데이트가 필요합니다. 게임을 실행하려면 최신 버전으로 업데이트해 주세요."
-  },
-  "app.modal.update-to-play.updated-count": {
-    "message": "{count} 업데이트됨"
   },
   "app.settings.developer-mode-enabled": {
     "message": "개발자 모드가 활성화되었습니다."
@@ -73,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "기본 인스턴스 옵션"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "기능 플래그"
   },
   "app.settings.tabs.java-installations": {
     "message": "Java 설치"
@@ -96,7 +216,7 @@
     "message": "Modrinth App v{version} 다운로드가 완료되었습니다. 새로고침하거나 Modrinth App을 종료하면 자동으로 업데이트됩니다."
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} 버전을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
+    "message": "Modrinth App v{version}을 사용할 수 있습니다. 최신 기능과 오류 수정을 적용하려면 패키지 관리자를 통해 업데이트하세요!"
   },
   "app.update-popup.body.metered": {
     "message": "Modrinth App v{version}을 지금 사용할 수 있습니다! 데이터 통신 연결을 사용 중이므로, 자동으로 다운로드하지 않았습니다."
@@ -105,7 +225,7 @@
     "message": "변경 내역"
   },
   "app.update-popup.download": {
-    "message": "({size}) 다운로드"
+    "message": "다운로드 ({size})"
   },
   "app.update-popup.download-complete": {
     "message": "다운로드 완료"
@@ -130,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "새로고침하여 업데이트 설치"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "옵션 선택"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "{version} 버전에 호환되지 않음"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "플레이 안 함"
+  },
+  "app.world.world-item.offline": {
+    "message": "오프라인"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count}명 온라인"
   },
   "friends.action.add-friend": {
     "message": "친구 추가"
@@ -183,7 +321,7 @@
     "message": "대기 중"
   },
   "friends.no-friends-match": {
-    "message": "\"{query}\" 이름과 일치하는 친구 없음"
+    "message": "\"{query}\"과(와) 일치하는 친구 없음"
   },
   "friends.search-friends-placeholder": {
     "message": "친구 검색 중..."
@@ -230,11 +368,11 @@
   "instance.edit-world.title": {
     "message": "세계 편집"
   },
-  "instance.filter.disabled": {
-    "message": "비활성화된 프로젝트"
+  "instance.files.adding-files": {
+    "message": "파일 추가 중 ({completed}/{total})"
   },
-  "instance.filter.updates-available": {
-    "message": "업데이트 가능"
+  "instance.files.save-as": {
+    "message": "다른 이름으로 저장..."
   },
   "instance.server-modal.address": {
     "message": "주소"
@@ -282,7 +420,7 @@
     "message": "아이콘 제거"
   },
   "instance.settings.tabs.general.edit-icon.replace": {
-    "message": "아이콘 대체"
+    "message": "아이콘 교체"
   },
   "instance.settings.tabs.general.edit-icon.select": {
     "message": "아이콘 선택"
@@ -344,149 +482,8 @@
   "instance.settings.tabs.installation": {
     "message": "설치"
   },
-  "instance.settings.tabs.installation.change-version.already-installed.modded": {
-    "message": "Minecraft {game_version} {platform} {version} 설치됨"
-  },
-  "instance.settings.tabs.installation.change-version.already-installed.vanilla": {
-    "message": "바닐라 {game_version} 설치됨"
-  },
-  "instance.settings.tabs.installation.change-version.button": {
-    "message": "버전 변경"
-  },
-  "instance.settings.tabs.installation.change-version.button.install": {
-    "message": "설치"
-  },
-  "instance.settings.tabs.installation.change-version.button.installing": {
-    "message": "설치 중"
-  },
-  "instance.settings.tabs.installation.change-version.cannot-while-fetching": {
-    "message": "모드팩 버전을 가져오는 중"
-  },
-  "instance.settings.tabs.installation.change-version.in-progress": {
-    "message": "새 버전을 설치하는 중"
-  },
-  "instance.settings.tabs.installation.currently-installed": {
-    "message": "현재 설치됨"
-  },
-  "instance.settings.tabs.installation.debug-information": {
-    "message": "디버그 정보:"
-  },
-  "instance.settings.tabs.installation.fetching-modpack-details": {
-    "message": "모드팩 세부 정보를 가져오는 중"
-  },
-  "instance.settings.tabs.installation.game-version": {
-    "message": "게임 버전"
-  },
-  "instance.settings.tabs.installation.install": {
-    "message": "설치"
-  },
-  "instance.settings.tabs.installation.install.in-progress": {
-    "message": "설치 진행 중"
-  },
   "instance.settings.tabs.installation.loader-version": {
     "message": "{loader} 버전"
-  },
-  "instance.settings.tabs.installation.minecraft-version": {
-    "message": "Minecraft {version}"
-  },
-  "instance.settings.tabs.installation.no-connection": {
-    "message": "연결된 모드팩의 세부 정보를 가져올 수 없습니다. 인터넷 연결 상태를 확인하세요."
-  },
-  "instance.settings.tabs.installation.no-loader-versions": {
-    "message": "{loader}(은)는 Minecraft {version}에서 사용할 수 없습니다. 다른 모드 로더를 사용하세요."
-  },
-  "instance.settings.tabs.installation.no-modpack-found": {
-    "message": "이 인스턴스는 모드팩과 연결되어 있지만, Modrinth에서 모드팩을 찾을 수 없습니다."
-  },
-  "instance.settings.tabs.installation.platform": {
-    "message": "플랫폼"
-  },
-  "instance.settings.tabs.installation.reinstall.button": {
-    "message": "모드팩 재설치"
-  },
-  "instance.settings.tabs.installation.reinstall.button.reinstalling": {
-    "message": "모드팩 재설치 중"
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.description": {
-    "message": "재설치하면 설치 또는 수정된 모든 콘텐츠가 모드팩에서 제공하는 콘텐츠로 초기화되며, 기존 팩에 추가한 모드나 콘텐츠는 모두 제거됩니다. 인스턴스에 변경 사항이 있는 경우 예상치 못한 동작은 해결할 수 있지만, 현재 세계가 추가로 설치된 콘텐츠에 의존하고 있다면 기존 세계가 손상될 수 있습니다."
-  },
-  "instance.settings.tabs.installation.reinstall.confirm.title": {
-    "message": "정말로 이 인스턴스를 다시 설치하시겠습니까?"
-  },
-  "instance.settings.tabs.installation.reinstall.description": {
-    "message": "인스턴스를 초기 상태로 복원하고, 원본 모드팩에 추가된 모드나 콘텐츠를 모두 제거합니다."
-  },
-  "instance.settings.tabs.installation.reinstall.title": {
-    "message": "모드팩 재설치"
-  },
-  "instance.settings.tabs.installation.repair.button": {
-    "message": "복구"
-  },
-  "instance.settings.tabs.installation.repair.button.repairing": {
-    "message": "복구 중"
-  },
-  "instance.settings.tabs.installation.repair.confirm.description": {
-    "message": "복구 시 Minecraft 의존성을 재설치하고 무결성을 검사합니다. 런처 오류로 인해 게임이 실행되지 않을 경우 문제 해결에 도움이 될 수 있지만, 설치된 모드로 인한 오류나 충돌은 해결되지 않습니다."
-  },
-  "instance.settings.tabs.installation.repair.confirm.title": {
-    "message": "인스턴스를 복구하시겠습니까?"
-  },
-  "instance.settings.tabs.installation.repair.in-progress": {
-    "message": "복구 진행 중"
-  },
-  "instance.settings.tabs.installation.reset-selections": {
-    "message": "현재 상태로 되돌리기"
-  },
-  "instance.settings.tabs.installation.show-all-versions": {
-    "message": "모든 버전 보이기"
-  },
-  "instance.settings.tabs.installation.tooltip.action.change-version": {
-    "message": "버전 변경"
-  },
-  "instance.settings.tabs.installation.tooltip.action.install": {
-    "message": "설치"
-  },
-  "instance.settings.tabs.installation.tooltip.action.reinstall": {
-    "message": "재설치"
-  },
-  "instance.settings.tabs.installation.tooltip.action.repair": {
-    "message": "복구"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-installing": {
-    "message": "설치 중에는 {action} 할 수 없음"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-offline": {
-    "message": "오프라인 상태에서는 {action} 할 수 없음"
-  },
-  "instance.settings.tabs.installation.tooltip.cannot-while-repairing": {
-    "message": "복구 중에는 {action} 할 수 없음"
-  },
-  "instance.settings.tabs.installation.unknown-version": {
-    "message": "(알 수 없는 버전)"
-  },
-  "instance.settings.tabs.installation.unlink-server-vanilla.description": {
-    "message": "이 인스턴스는 서버에 연결되어 있으므로, 마인크래프트 버전을 변경할 수 없습니다. 연결을 해제하면 이 인스턴스가 서버에서 영구적으로 연결이 끊어집니다."
-  },
-  "instance.settings.tabs.installation.unlink-server.description": {
-    "message": "이 인스턴스는 서버에 연결되어 있으므로 모드를 업데이트할 수 없으며 모드 로더나 Minecraft 버전을 변경할 수 없습니다. 연결을 해제하면 이 인스턴스가 서버에서 영구적으로 연결이 끊어집니다."
-  },
-  "instance.settings.tabs.installation.unlink-server.title": {
-    "message": "서버 연결 해제"
-  },
-  "instance.settings.tabs.installation.unlink.button": {
-    "message": "인스턴스 연결 해제"
-  },
-  "instance.settings.tabs.installation.unlink.confirm.description": {
-    "message": "계속 진행하면 새 인스턴스를 만들지 않는 한 다시 연결할 수 없습니다. 또한 모드팩 업데이트를 더 이상 받을 수 없으며, 일반 인스턴스로 전환됩니다."
-  },
-  "instance.settings.tabs.installation.unlink.confirm.title": {
-    "message": "정말로 이 인스턴스의 연결을 해제하시겠습니까?"
-  },
-  "instance.settings.tabs.installation.unlink.description": {
-    "message": "이 인스턴스는 모드팩에 연결되어 있으므로, 모드를 개별적으로 업데이트하거나 모드 로더 및 Minecraft 버전을 변경할 수 없습니다. 연결을 해제하면 이 인스턴스는 모드팩과 영구적으로 분리됩니다."
-  },
-  "instance.settings.tabs.installation.unlink.title": {
-    "message": "모드팩에서 연결 해제"
   },
   "instance.settings.tabs.java": {
     "message": "Java 및 메모리"
@@ -548,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "홈에서 숨기기"
   },
-  "instance.worlds.filter.available": {
-    "message": "이용 가능"
-  },
   "instance.worlds.game_already_open": {
     "message": "이미 실행된 인스턴스"
   },
@@ -574,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "인스턴스 플레이"
-  },
-  "instance.worlds.type.server": {
-    "message": "서버"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "싱글 플레이"
   },
   "instance.worlds.view_instance": {
     "message": "인스턴스 보기"

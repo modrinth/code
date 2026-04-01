@@ -6,6 +6,45 @@
 			</span>
 		</template>
 
+		<div
+			v-if="projectInfo"
+			class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 mx-6 mt-6 p-3"
+		>
+			<AutoLink :to="projectInfo.link" class="shrink-0">
+				<div
+					class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+				>
+					<Avatar
+						v-if="projectInfo.iconUrl"
+						:src="projectInfo.iconUrl"
+						:alt="projectInfo.title"
+						size="100%"
+						no-shadow
+					/>
+				</div>
+			</AutoLink>
+			<div class="flex flex-col gap-1">
+				<AutoLink :to="projectInfo.link" class="font-semibold text-contrast hover:underline">
+					{{ projectInfo.title }}
+				</AutoLink>
+				<div v-if="projectInfo.owner" class="flex items-center gap-2 text-sm text-secondary">
+					<AutoLink
+						:to="projectInfo.owner.link"
+						class="flex items-center gap-1.5 text-inherit no-underline hover:underline"
+					>
+						<Avatar
+							:src="projectInfo.owner.iconUrl"
+							:alt="projectInfo.owner.name"
+							size="1.25rem"
+							:circle="projectInfo.owner.circle"
+							no-shadow
+						/>
+						<span class="font-medium">{{ projectInfo.owner.name }}</span>
+					</AutoLink>
+				</div>
+			</div>
+		</div>
+
 		<div class="flex flex-col gap-2.5 p-6">
 			<span class="font-semibold text-contrast">
 				{{ formatMessage(messages.instanceType) }}
@@ -34,8 +73,8 @@
 						class="!border-surface-4 !border"
 						@click="hideUninstallable = !hideUninstallable"
 					>
-						<EyeIcon v-if="hideUninstallable" />
-						<EyeOffIcon v-else />
+						<EyeOffIcon v-if="hideUninstallable" />
+						<EyeIcon v-else />
 					</button>
 				</ButtonStyled>
 			</div>
@@ -80,7 +119,7 @@
 						<button @click="emit('install', inst)">
 							{{
 								inst.installing
-									? formatMessage(messages.installingLabel)
+									? formatMessage(commonMessages.installingLabel)
 									: formatMessage(messages.installButton)
 							}}
 						</button>
@@ -137,7 +176,7 @@
 
 			<div class="flex flex-col gap-2.5">
 				<span class="font-semibold text-contrast">
-					{{ formatMessage(messages.gameVersionLabel) }}
+					{{ formatMessage(commonMessages.gameVersionLabel) }}
 				</span>
 				<Combobox
 					v-model="selectedGameVersion"
@@ -156,8 +195,8 @@
 							<EyeIcon v-else class="size-4" />
 							{{
 								showSnapshots
-									? formatMessage(messages.hideSnapshots)
-									: formatMessage(messages.showAllVersions)
+									? formatMessage(commonMessages.hideSnapshotsButton)
+									: formatMessage(commonMessages.showAllVersionsButton)
 							}}
 						</button>
 					</template>
@@ -212,6 +251,7 @@ import {
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
+import AutoLink from '#ui/components/base/AutoLink.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
@@ -251,10 +291,6 @@ const messages = defineMessages({
 		id: 'instances.content-install.installed-badge',
 		defaultMessage: 'Installed',
 	},
-	installingLabel: {
-		id: 'instances.content-install.installing-label',
-		defaultMessage: 'Installing...',
-	},
 	installButton: {
 		id: 'instances.content-install.install-button',
 		defaultMessage: 'Install',
@@ -279,10 +315,6 @@ const messages = defineMessages({
 		id: 'instances.content-install.loader-label',
 		defaultMessage: 'Loader',
 	},
-	gameVersionLabel: {
-		id: 'instances.content-install.game-version-label',
-		defaultMessage: 'Game version',
-	},
 	gameVersionPlaceholder: {
 		id: 'instances.content-install.game-version-placeholder',
 		defaultMessage: 'Select game version',
@@ -295,14 +327,6 @@ const messages = defineMessages({
 		id: 'instances.content-install.no-instances',
 		defaultMessage: 'No compatible instances found',
 	},
-	showAllVersions: {
-		id: 'instances.content-install.show-all-versions',
-		defaultMessage: 'Show all versions',
-	},
-	hideSnapshots: {
-		id: 'instances.content-install.hide-snapshots',
-		defaultMessage: 'Hide snapshots',
-	},
 })
 
 export interface ContentInstallInstance {
@@ -314,6 +338,20 @@ export interface ContentInstallInstance {
 	installing?: boolean
 }
 
+export interface ContentInstallProjectOwner {
+	name: string
+	iconUrl?: string
+	circle?: boolean
+	link: string | (() => void)
+}
+
+export interface ContentInstallProjectInfo {
+	title: string
+	iconUrl?: string | null
+	link: string
+	owner?: ContentInstallProjectOwner | null
+}
+
 const props = defineProps<{
 	instances: ContentInstallInstance[]
 	compatibleLoaders: string[]
@@ -323,6 +361,7 @@ const props = defineProps<{
 	defaultTab?: 'existing' | 'new'
 	preferredLoader?: string | null
 	preferredGameVersion?: string | null
+	projectInfo?: ContentInstallProjectInfo | null
 }>()
 
 const emit = defineEmits<{

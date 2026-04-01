@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<ConfirmLeaveModal ref="confirmLeaveModal" />
 		<div class="universal-card">
 			<div class="markdown-disclaimer">
 				<h2>Description</h2>
@@ -41,9 +42,11 @@
 import { TriangleAlertIcon } from '@modrinth/assets'
 import { countText, MIN_DESCRIPTION_CHARS } from '@modrinth/moderation'
 import {
+	ConfirmLeaveModal,
 	injectProjectPageContext,
 	MarkdownEditor,
 	UnsavedChangesPopup,
+	usePageLeaveSafety,
 	useSavable,
 } from '@modrinth/ui'
 import { TeamMemberPermission } from '@modrinth/utils'
@@ -53,12 +56,14 @@ import { useImageUpload } from '~/composables/image-upload.ts'
 
 const { projectV2: project, currentMember, patchProject } = injectProjectPageContext()
 
-const { saved, current, saving, reset, save } = useSavable(
+const { saved, current, saving, hasChanges, reset, save } = useSavable(
 	() => ({ description: project.value.body }),
 	async ({ description }) => {
 		await patchProject({ body: description })
 	},
 )
+
+const { confirmLeaveModal } = usePageLeaveSafety(hasChanges)
 
 const descriptionWarning = computed(() => {
 	const text = current.value.description?.trim() || ''

@@ -108,7 +108,7 @@
     "message": "% CPU"
   },
   "app-marketing.features.performance.description": {
-    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150mb ng RAM!"
+    "message": "Ang Modrinth App ay mas mahusay mag-perform kaysa sa maraming nangungunang mod manager, gumagamit lamang ng 150 MB ng RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -393,7 +393,7 @@
     "message": "Wala pang proyekto sa koleksiyon"
   },
   "collection.label.projects-count": {
-    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat>proyekto} other {<stat>{count}</stat> na {type}}}"
+    "message": "{count, plural, =0 {Wala pang proyekto} one {<stat>{count}</stat> {type}} other {<stat>{count}</stat> na {type}}}"
   },
   "collection.label.updated-at": {
     "message": "In-update {ago}"
@@ -497,9 +497,6 @@
   "create.project.create-project": {
     "message": "Lumikha ng proyekto"
   },
-  "create.project.create-server-project": {
-    "message": "Lumikha ng server"
-  },
   "create.project.missing-fields-tooltip": {
     "message": "Nakukulang na field: {fields}"
   },
@@ -578,8 +575,20 @@
   "dashboard.collections.button.create-new": {
     "message": "Lumikha ng bago"
   },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Likhain ang iyong pinakaunang koleksiyon upang makapagsimula!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Wala ka pang koleksiyon"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Walang koleksiyong tumugma sa iyong paghanap"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Subukang ayusin ang mga pansala at ang mga paghahanapang termino."
+  },
   "dashboard.collections.label.projects-count": {
-    "message": "{count, plural, one {{count} proyekto} other {{count} na proyekto}}"
+    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Hanapin ang iyong mga koleksiyon"
@@ -1131,7 +1140,7 @@
     "message": "Protekdado ba nang proteksiyong DDos ang Modrinth Hosting?"
   },
   "hosting-marketing.faq.ddos-protection.answer": {
-    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17Tbps sa iilang lokasyon."
+    "message": "Oo. Lahat ng server ng Modrinth Hosting ay may proteksiyong DDoS, umaabot ang kapasidad nang hanggang 17 Tbps sa iilang lokasyon."
   },
   "hosting-marketing.faq.heading": {
     "message": "Kadalasang Tinatanong"
@@ -1239,7 +1248,7 @@
     "message": "Alam mo bang ninanais mo?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Subukan ang isang libreng <orange>3GB server</orange> nang 5 araw na pinapagana ni <orange>Medal</orange>"
+    "message": "Subukan ang isang libreng <orange>3 GB server</orange> nang 5 araw na pinapagana ni <orange>Medal</orange>"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "Matuto pa"
@@ -1291,6 +1300,9 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Modrinth, gagana ito sa server mo."
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Bigong ma-unlink ang modpack"
   },
   "hosting.plan.out-of-stock": {
     "message": "Wala nang stock"
@@ -1425,7 +1437,7 @@
     "message": "Para sa mga Manlalaro"
   },
   "landing.section.for-players.tagline": {
-    "message": "Tumuklas ng humigit {count} kalikhaan"
+    "message": "Tumuklas ng humigit {count, number} kalikhaan"
   },
   "landing.subheading": {
     "message": "Magtuklas, maglaro, at magbahagi ng mga kontentong Minecraft sa aming open-source na platapormang ginawa para sa komunidad."
@@ -1645,9 +1657,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Tumuklas ng kontento"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Mga hudyat ng tampok"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Kunin ang Modrinth App"
@@ -2028,7 +2037,7 @@
     "message": "Koleksiyon"
   },
   "profile.label.downloads": {
-    "message": "{count} {count, plural, one {download} other {na download}}"
+    "message": "{count} {countPlural, plural, one {download} other {na download}}"
   },
   "profile.label.joined": {
     "message": "Sumali"
@@ -2037,19 +2046,19 @@
     "message": "Walang mga koleksiyon ang tagagamit na ito!"
   },
   "profile.label.no-collections-auth": {
-    "message": "Wala ka pang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
+    "message": "Wala kang koleksiyon.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.no-projects": {
     "message": "Walang mga proyekto ang tagagmit na ito!"
   },
   "profile.label.no-projects-auth": {
-    "message": "Wala ka pang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
+    "message": "Wala kang proyekto.\nNais mo bang <create-link>lumikha ng isa</create-link>?"
   },
   "profile.label.organizations": {
     "message": "Mga organisasyon"
   },
   "profile.label.projects": {
-    "message": "{count} {count, plural, one {proyekto} other {na proyekto}}"
+    "message": "{count} {countPlural, plural, one {proyekto} other {na proyekto}}"
   },
   "profile.label.saving": {
     "message": "Sine-save..."
@@ -2673,7 +2682,7 @@
     "message": "Pagsulat sa sumbong"
   },
   "scopes.sessionAccess.description": {
-    "message": "Pag-akses sa mga sesyong inisyu ng modrinth"
+    "message": "Pag-akses sa mga sesyong inisyu ng Modrinth"
   },
   "scopes.sessionAccess.label": {
     "message": "Pag-akses ng sesyon"
@@ -2771,9 +2780,6 @@
   "search.filter.locked.server.sync": {
     "message": "I-sync sa server"
   },
-  "servers.backup.restore.in-progress.tooltip": {
-    "message": "Isinasagawa ang backup restore"
-  },
   "servers.notice.actions": {
     "message": "Mga Aksiyon"
   },
@@ -2804,20 +2810,11 @@
   "servers.plan.large.description": {
     "message": "Nakaaangkop sa 15–25 manlalaro, modpack, o mabibigat na modding."
   },
-  "servers.plan.large.name": {
-    "message": "Large"
-  },
   "servers.plan.medium.description": {
     "message": "Nakaaangkop sa 6–15 manlalaro at may karamihang mod."
   },
-  "servers.plan.medium.name": {
-    "message": "Medium"
-  },
   "servers.plan.small.description": {
     "message": "Nakaaangkop sa 1–5 manlalaro na may iilang mod."
-  },
-  "servers.plan.small.name": {
-    "message": "Small"
   },
   "settings.applications.about": {
     "message": "Tungkol"
@@ -2826,7 +2823,7 @@
     "message": "Magdagdag pa"
   },
   "settings.applications.button.add-redirect-uri": {
-    "message": "Magdagdag ng redirect uri"
+    "message": "Magdagdag ng redirect URI"
   },
   "settings.applications.button.cancel": {
     "message": "Kanselahin"
@@ -2889,10 +2886,10 @@
     "message": "https://example.com/auth/callback"
   },
   "settings.applications.field.redirect-uris": {
-    "message": "Mga redirect uri"
+    "message": "Mga redirect URI"
   },
   "settings.applications.field.scopes": {
-    "message": "Mga Sakop"
+    "message": "Mga sakop"
   },
   "settings.applications.field.url": {
     "message": "URL"
@@ -2902,9 +2899,6 @@
   },
   "settings.applications.modal.header": {
     "message": "Impormasyon ng aplikasyon"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Isang kamaliang naganap"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Ang ikono ng iyong aplikasyon ay na-update."
@@ -3048,10 +3042,10 @@
     "message": "Paksang kulay"
   },
   "settings.pats.action.create": {
-    "message": "Gumawa ng PAT"
+    "message": "Lumikha ng PAT"
   },
   "settings.pats.description": {
-    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Para sa mga karagdagang impormasyon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>. Maaari silang malikha at mabawi sa kahit anong panahon."
+    "message": "Maaaring ma-akses ang mga PAT gamit ang API ng Modrinth. Maaari silang malikha at mabawi sa kahit anong panahon, tingnan ang <doc-link>dokumentasyon ng API ng Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Lumikha ng PAT"
@@ -3142,6 +3136,15 @@
   },
   "ui.latest-news-row.view-all": {
     "message": "Tingnan ang lahat ng balita"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Mag-subscribe"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Naka-subscribe!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Mag-subscribe sa Modrinth newsletter"
   },
   "version.environment.none.description": {
     "message": "Wala pang itinakdang environment para sa bersiyong ito."
