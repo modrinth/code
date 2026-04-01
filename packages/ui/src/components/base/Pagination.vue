@@ -7,10 +7,10 @@
 				:href="linkFunction(page - 1)"
 				@click.prevent="switchPage(page - 1)"
 			>
-				<ChevronLeftIcon />
+				<ChevronRightIcon class="rotate-180" />
 			</a>
 			<button v-else aria-label="Previous Page" @click="switchPage(page - 1)">
-				<ChevronLeftIcon />
+				<ChevronRightIcon class="rotate-180" />
 			</button>
 		</ButtonStyled>
 		<div

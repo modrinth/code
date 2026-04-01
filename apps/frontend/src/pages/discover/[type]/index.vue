@@ -766,7 +766,6 @@ useSeoMeta({
 	</div>
 	<div class="grid grid-cols-[300px,1fr]">
 		<aside aria-label="Filters">
-			<AdPlaceholder v-if="!auth.user && !serverData" />
 			<div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
 			<div
 				class="flex flex-col"
@@ -793,6 +792,7 @@ useSeoMeta({
 						</button>
 					</ButtonStyled>
 				</div>
+				<AdPlaceholder v-if="!auth.user && !serverData" class="ml-2" />
 				<div
 					v-if="serverData && projectType?.id !== 'modpack'"
 					class="card-shadow rounded-[4px] bg-bg-raised p-4"
@@ -995,7 +995,7 @@ useSeoMeta({
 						</template>
 					</ProjectCardList>
 				</div>
-				<div class="pagination-after">
+				<div class="mb-4 flex justify-center">
 					<pagination
 						:page="currentPage"
 						:count="pageCount"
