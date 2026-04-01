@@ -6,20 +6,21 @@
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>
-		<div
+		<component
+			:is="metric.link ? NuxtLink : 'div'"
 			v-for="(metric, index) in metrics"
 			:key="index"
-			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+			:to="metric.link && !loading ? metric.link : undefined"
+			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-bg-raised p-5"
+			:class="
+				metric.link && !loading
+					? 'cursor-pointer transition-transform duration-100 hover:scale-105 active:scale-100'
+					: ''
+			"
 		>
-			<div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
-				<div class="relative z-10">
-					<div class="-mb-0.5 mt-0.5 flex flex-row items-center gap-2">
-						<h2 class="m-0 -ml-0.5 text-3xl font-extrabold text-contrast">
-							{{ metric.value }}
-						</h2>
-						<h3 class="text-sm font-normal text-secondary">/ {{ metric.max }}</h3>
-					</div>
-					<h3 class="flex items-center gap-2 text-base font-normal text-secondary">
+			<div class="relative z-10 flex flex-col gap-3">
+				<div class="flex items-center justify-between">
+					<span class="flex items-center gap-2 text-base font-medium text-primary">
 						{{ metric.title }}
 						<IssuesIcon
 							v-if="metric.warning && !loading"
@@ -27,21 +28,18 @@
 							class="size-5"
 							:style="{ color: 'var(--color-orange)' }"
 						/>
-					</h3>
+					</span>
+					<component :is="metric.icon" class="size-7" />
 				</div>
-				<div class="absolute -left-8 -top-4 h-28 w-56 rounded-full bg-bg-raised blur-lg" />
+				<span class="text-4xl font-semibold text-contrast">
+					{{ metric.value }}
+				</span>
 			</div>
 
-			<component
-				:is="metric.icon"
-				class="absolute right-10 top-10 z-10 size-8"
-				style="width: 2rem; height: 2rem"
-			/>
-
-			<div class="chart-space absolute bottom-0 left-0 right-0">
+			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
 				<ClientOnly>
 					<VueApexCharts
-						v-if="metric.showGraph && !loading"
+						v-if="!loading"
 						type="area"
 						height="142"
 						:options="getChartOptions(metric.warning, index)"
@@ -51,24 +49,12 @@
 					/>
 				</ClientOnly>
 			</div>
-		</div>
-		<nuxt-link
-			:to="loading ? undefined : `/hosting/manage/${serverId}/files`"
-			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
-			:class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
-		>
-			<div class="flex flex-row items-center gap-2">
-				<h2 class="m-0 -ml-0.5 mt-1 text-3xl font-extrabold text-contrast">
-					{{ loading ? '0 B' : formatBytes(stats.storage_usage_bytes) }}
-				</h2>
-			</div>
-			<h3 class="text-base font-normal text-secondary">Storage usage</h3>
-			<FolderOpenIcon class="absolute right-10 top-10 size-8" />
-		</nuxt-link>
+		</component>
 	</div>
 </template>
 
 <script setup lang="ts">
+import { NuxtLink } from '#components'
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
@@ -122,26 +108,37 @@ const updateGraphData = (arr: number[], newValue: number) => {
 }
 
 const metrics = computed(() => {
+	const storageMetric = {
+		title: 'Storage',
+		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes),
+		icon: FolderOpenIcon,
+		data: [] as number[],
+		showGraph: false,
+		warning: null,
+		link: `/hosting/manage/${serverId}/files`,
+	}
+
 	if (props.loading) {
 		return [
 			{
-				title: 'CPU usage',
+				title: 'CPU',
 				value: '0.00%',
-				max: '100%',
 				icon: CpuIcon,
 				data: cpuData.value,
 				showGraph: false,
 				warning: null,
+				link: null,
 			},
 			{
-				title: 'Memory usage',
+				title: 'Memory',
 				value: '0.00%',
-				max: '100%',
 				icon: DatabaseIcon,
 				data: ramData.value,
 				showGraph: false,
 				warning: null,
+				link: null,
 			},
+			storageMetric,
 		]
 	}
 
@@ -156,35 +153,33 @@ const metrics = computed(() => {
 
 	return [
 		{
-			title: 'CPU usage',
+			title: 'CPU',
 			value: `${cpuPercent.toFixed(2)}%`,
-			max: '100%',
 			icon: CpuIcon,
 			data: cpuData.value,
 			showGraph: true,
 			warning: cpuPercent >= 90 ? 'CPU usage is very high' : null,
+			link: null,
 		},
 		{
-			title: 'Memory usage',
+			title: 'Memory',
 			value:
-				userPreferences.value.ramAsNumber || flags.developerMode
+				userPreferences.value.ramAsNumber || flags.value.developerMode
 					? formatBytes(stats.value.ram_usage_bytes)
 					: `${ramPercent.toFixed(2)}%`,
-			max:
-				userPreferences.value.ramAsNumber || flags.developerMode
-					? formatBytes(stats.value.ram_total_bytes)
-					: '100%',
 			icon: DatabaseIcon,
 			data: ramData.value,
 			showGraph: true,
 			warning: ramPercent >= 90 ? 'Memory usage is very high' : null,
+			link: null,
 		},
+		storageMetric,
 	]
 })
 
 const getChartOptions = (hasWarning: string | null, index: number) => ({
 	chart: {
-		type: 'area',
+		type: 'area' as const,
 		animations: { enabled: false },
 		sparkline: { enabled: true },
 		toolbar: { show: false },
@@ -243,9 +238,9 @@ watch(
 <style scoped>
 .chart-space {
 	height: 142px;
-	width: calc(100% + 48px);
-	margin-left: -24px;
-	margin-right: -24px;
+	width: calc(100% + 40px);
+	margin-left: -20px;
+	margin-right: -20px;
 }
 
 .chart {

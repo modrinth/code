@@ -170,7 +170,7 @@ watch(searchQuery, (query) => {
 		const addon = terminalRef.value?.searchAddon
 		if (!addon) return
 		if (query) {
-			addon.findNext(query, { decorations: { activeMatchColorOverviewRuler: '#ffffff' } })
+			addon.findNext(query, { decorations: { activeMatchColorOverviewRuler: '#ffffff', matchOverviewRuler: '#888888' } })
 		} else {
 			addon.clearDecorations()
 		}
