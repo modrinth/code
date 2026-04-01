@@ -11,6 +11,12 @@
   "nags.add-icon.title": {
     "defaultMessage": "Adj hozzá egy ikont"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "Add hozzá az IP címet és portot, amit a Java Edition játékosok használhatnak, hogy fellépjenek a szerveredre."
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "Adj hozzá egy Java Címet"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
@@ -45,13 +51,13 @@
     "defaultMessage": "Cím szerkesztése"
   },
   "nags.feature-gallery-image.description": {
-    "defaultMessage": "A kiemelt galériakép gyakran az első benyomást kelti a projektről."
+    "defaultMessage": "A kiemelt kép gyakran az első benyomást kelti a projektről."
   },
   "nags.feature-gallery-image.title": {
-    "defaultMessage": "Emelj ki egy galériaképet"
+    "defaultMessage": "Emelj ki egy képet"
   },
   "nags.gallery.title": {
-    "defaultMessage": "Látogasd meg a Galéria fület"
+    "defaultMessage": "Látogasd meg a Képek fület"
   },
   "nags.gpl-license-source-required.description": {
     "defaultMessage": "A {type, select, mod {mod} plugin {bővítmény} other {projekt}} licensze megköveteli, hogy a forráskód elérhető legyen. Kérünk, minden további verzióhoz adj meg forráskód linket vagy forrásfájlt, vagy fontold meg egy másik licensz használatát."
@@ -121,6 +127,12 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
+  },
+  "nags.select-compatibility.title": {
+    "defaultMessage": "Kompatibilitás kiválasztása"
+  },
+  "nags.select-country.description": {
+    "defaultMessage": "Tudasd a játékosokkal, hogy melyik régióban található a szervered."
   },
   "nags.select-country.title": {
     "defaultMessage": "Régió választása"
@@ -198,10 +210,10 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.upload-gallery-image.description": {
-    "defaultMessage": "Legalább egy galériakép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
+    "defaultMessage": "Legalább egy kép szükséges a {type, select, resourcepack {forráscsomagod tartalmának bemutatásához, kivéve a hang- és helyi csomagokat. Ha ez jellemzi a csomagodat, kérünk válaszd ki a megfelelő címkét} shader {shadered tartalmának bemutatásához.} other {projekted tartalmának bemutatásához}}."
   },
   "nags.upload-gallery-image.title": {
-    "defaultMessage": "Tölts fel egy galériaképet"
+    "defaultMessage": "Tölts fel egy képet"
   },
   "nags.upload-version.description": {
     "defaultMessage": "Legalább egy verzió szükséges a projekt felülvizsgálatra történő benyújtásához."

@@ -38,6 +38,9 @@
   "app-marketing.download.options-title": {
     "message": "Nedlastingsalternativer"
   },
+  "app-marketing.download.terms": {
+    "message": "Ved å laste ned Modrinth-appen, så godtar du <terms-link>Brukervilkåra-</terms-link>-og-<privacy-link>Personvernerklæringene våre</privacy-link>."
+  },
   "app-marketing.download.title": {
     "message": "Last ned Modrinth-appen (Beta)"
   },
@@ -103,6 +106,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth-appen yter bedre enn mange av de ledende mod-launcherne og bruker kun 150 MB med RAM!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -386,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "Ingen prosjekter i samlingen ennå"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Ingen prosjekt ennå} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "Oppdatert {ago}"
   },
@@ -488,11 +497,23 @@
   "create.project.create-project": {
     "message": "Lag et prosjekt"
   },
+  "create.project.missing-fields-tooltip": {
+    "message": "Manglende felt: {fields}"
+  },
   "create.project.name-label": {
     "message": "Navn"
   },
   "create.project.name-placeholder": {
     "message": "Skriv inn prosjektnavn..."
+  },
+  "create.project.owner-description": {
+    "message": "Sett prosjekteieren som deg sjøl eller ei organisering du er medlem av."
+  },
+  "create.project.owner-label": {
+    "message": "Eier"
+  },
+  "create.project.server-project-title": {
+    "message": "Laging av et nytt serverprosjekt"
   },
   "create.project.summary-description": {
     "message": "En eller to setninger som beskriver prosjektet ditt."
@@ -505,6 +526,15 @@
   },
   "create.project.title": {
     "message": "Lag et prosjekt"
+  },
+  "create.project.type-label": {
+    "message": "Type"
+  },
+  "create.project.type-project": {
+    "message": "Prosjekt"
+  },
+  "create.project.type-server": {
+    "message": "Server"
   },
   "create.project.url-label": {
     "message": "URL"
@@ -544,6 +574,21 @@
   },
   "dashboard.collections.button.create-new": {
     "message": "Lag ny"
+  },
+  "dashboard.collections.empty.get-started-hint": {
+    "message": "Lag den første samlinga di for å komme i gang!"
+  },
+  "dashboard.collections.empty.no-collections": {
+    "message": "Du kan ingen samlinger ennå"
+  },
+  "dashboard.collections.empty.no-match": {
+    "message": "Ingen samlinger samsvarer med søket ditt"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Prøv å juster filtera-eller-søketermene dine."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
   },
   "dashboard.collections.label.search-input": {
     "message": "Søk i samlingene dine"
@@ -619,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "En virksomhet (eller foretak) refererer til en registrert organisasjon, som for eksempel et aksjeselskap, ansvarlig selskap eller et selskap med begrenset ansvar."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Trekker du ut midler som privatperson eller som virksomhet?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Privatperson"
@@ -1091,6 +1139,9 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Har Modrinth Hosting-serverne DDoS-beskyttelse?"
   },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Ja. Alle Modrinth Hosting-serverne kommer med DDoS-beskyttelse, med en kapasitet opp til 17 Tbps noen plasser."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Ofte Stilte Spørsmål"
   },
@@ -1196,6 +1247,9 @@
   "hosting-marketing.know-what-you-need": {
     "message": "Veit du nøyaktig hva du trenger?"
   },
+  "hosting-marketing.medal.info": {
+    "message": "Prøv en gratis <orange>3 GB server</orange> i 5 dager, drevet av <orange>Medal</orange>"
+  },
   "hosting-marketing.medal.learn-more": {
     "message": "Lær mer"
   },
@@ -1246,6 +1300,39 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Velg mellom Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, så kan det kjøre på serveren din."
+  },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Kunne ikke endre modpakkeversjon"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Kunne ikke laste inn versjoner"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Kunne ikke re-installere modpakka"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "Kunne ikke reparere serveren"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Kunne ikke lagre installeringsinnstillinger"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Kunne ikke kople fra modpakka"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Loader} other {{loader}}} versjon"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Serverinstalleringa di har blitt reparert."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparering fullført"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Tilbakestill server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Fjerner all data på serveren din, inkludert verdene dine, modsa dine og konfigurasjonsfilene dine. Sikkerhetskopier blir igjen og kan bli gjenoppretta."
   },
   "hosting.plan.out-of-stock": {
     "message": "Utsolgt"
@@ -1379,6 +1466,9 @@
   "landing.section.for-players.label": {
     "message": "For Spillerer"
   },
+  "landing.section.for-players.tagline": {
+    "message": "Utforsk over {count, number} laginger"
+  },
   "landing.subheading": {
     "message": "Oppdag, spill, og del Minecraft-innhold gjennom den åpenkjeldekode-plattformen vår, bygd for fellesskapet."
   },
@@ -1408,6 +1498,12 @@
   },
   "layout.action.new-project": {
     "message": "Nytt prosjekt"
+  },
+  "layout.action.new-server-project": {
+    "message": "Ny server"
+  },
+  "layout.action.publish": {
+    "message": "Publiser"
   },
   "layout.action.reports": {
     "message": "Gå gjennom rapporter"
@@ -1592,9 +1688,6 @@
   "layout.nav.discover-content": {
     "message": "Utforsk innhold"
   },
-  "layout.nav.feature-flags": {
-    "message": "Funksjonsflagg"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Skaff deg Modrinth App-en"
   },
@@ -1769,6 +1862,9 @@
   "muralpay.field.pix-phone": {
     "message": "PIX-mobil"
   },
+  "muralpay.field.random-key": {
+    "message": "Tilfeldig nøkkel"
+  },
   "muralpay.field.routing-number": {
     "message": "Rutenummer"
   },
@@ -1840,6 +1936,9 @@
   },
   "muralpay.placeholder.enter-pix-email": {
     "message": "Skriv inn PIX-email"
+  },
+  "muralpay.placeholder.enter-random-key": {
+    "message": "Legg til tilfeldig nøkkel"
   },
   "muralpay.placeholder.enter-routing-number": {
     "message": "Skriv inn 9-talls-rutingsnummer"
@@ -1967,6 +2066,9 @@
   "profile.label.collection": {
     "message": "Samling"
   },
+  "profile.label.downloads": {
+    "message": "{count} {countPlural, plural, one {nedlasting} other {nedlastinger}}"
+  },
   "profile.label.joined": {
     "message": "Blei med"
   },
@@ -1984,6 +2086,9 @@
   },
   "profile.label.organizations": {
     "message": "Organisasjoner"
+  },
+  "profile.label.projects": {
+    "message": "{count} {countPlural, plural, one {projekt} other {projekt}}"
   },
   "profile.label.saving": {
     "message": "Lagrer..."
@@ -2066,6 +2171,12 @@
   "project-type.datapack.singular": {
     "message": "Data Pack"
   },
+  "project-type.minecraft_java_server.plural": {
+    "message": "Servere"
+  },
+  "project-type.minecraft_java_server.singular": {
+    "message": "Server"
+  },
   "project-type.mod.plural": {
     "message": "Mods"
   },
@@ -2095,6 +2206,12 @@
   },
   "project-type.resourcepack.singular": {
     "message": "Ressurspakke"
+  },
+  "project-type.server.plural": {
+    "message": "Servere"
+  },
+  "project-type.server.singular": {
+    "message": "Server"
   },
   "project-type.shader.plural": {
     "message": "Shaders"
@@ -2594,6 +2711,9 @@
   "scopes.reportWrite.label": {
     "message": "Skriv rapporter"
   },
+  "scopes.sessionAccess.description": {
+    "message": "Få tilgang til Modrinth-utstedte sesjoner"
+  },
   "scopes.sessionAccess.label": {
     "message": "Gå inn i sesjoner"
   },
@@ -2690,6 +2810,18 @@
   "search.filter.locked.server.sync": {
     "message": "Synkroniser med server"
   },
+  "servers.busy.backup-creating": {
+    "message": "Sikkerhetskopieringsinstanse på veg"
+  },
+  "servers.busy.backup-restoring": {
+    "message": "Gjennoppretting av sikkerhetskopier på veg"
+  },
+  "servers.busy.installing": {
+    "message": "Server blir installert"
+  },
+  "servers.busy.syncing-content": {
+    "message": "Syncing av innhold pågår"
+  },
   "servers.notice.actions": {
     "message": "Handlinger"
   },
@@ -2720,26 +2852,218 @@
   "servers.plan.large.description": {
     "message": "Ideelt for 15 - 25 spillere, modpacks eller tung modding."
   },
-  "servers.plan.large.name": {
-    "message": "Stor"
-  },
   "servers.plan.medium.description": {
     "message": "Flott for 6 - 15 spillere og flere mods."
-  },
-  "servers.plan.medium.name": {
-    "message": "Medium"
   },
   "servers.plan.small.description": {
     "message": "Perfekt for 1 - 5 venner med noen få lette mods."
   },
-  "servers.plan.small.name": {
-    "message": "Lite"
+  "settings.account.button.complete-setup": {
+    "message": "Fullfør oppsett"
+  },
+  "settings.account.data-export.action.download": {
+    "message": "Last ned eksport"
+  },
+  "settings.account.data-export.action.generate": {
+    "message": "Generer eksport"
+  },
+  "settings.account.data-export.action.generating": {
+    "message": "Genererer eksport..."
+  },
+  "settings.account.data-export.description": {
+    "message": "Spør om en kopi av de personlige dataene dine som du har lasta opp til Modrinth. Dette kan ta flere minutt å fullføre."
+  },
+  "settings.account.data-export.title": {
+    "message": "Dataeksport"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "Dette kommer til å **slette alle brukerdataene dine og følgerene dine med en gang**. Dette kommer ikke til å slette prosjekta dine. Du kan ikke angre sletting av kontoen din.<br><br>Viss du trenger hjelp med kontoen din, få støtte fra [Modrinth Discord]-en(https://discord.modrinth.com)."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Slett denne kontoen"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Er du sikker på at du vil slette kontoen din?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Slett konto"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Når du har sletta kontoen din, så er det ingen måte å angre det på. Når du sletter kontoen din, så fjerner du all vedlagt data, bortsett fra prosjekt, fra serverne våre."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Slett konto"
+  },
+  "settings.account.email.action.save": {
+    "message": "Lagre e-post"
+  },
+  "settings.account.email.field.label": {
+    "message": "E-post-adresse"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Skriv inn e-post-adressa di..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Legg til e-post"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Endre e-post"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Kontoinformasjonen din blir ikke vist offentlig."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Fjern passord"
+  },
+  "settings.account.password.action.save": {
+    "message": "Lagre passord"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Inntasta passord stemmer ikke!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Vær så snill å skriv inn passordet ditt for å gå videre."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Bekreft passord"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Bekreft passord"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Bekreft nytt passord"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Bekreft nytt passord"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Nytt passord"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Nytt passord"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Gammalt passord"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Gammalt passord"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Legg til passord"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Endre passord"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Fjern passord"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Legg til"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Autentikatorleverandører"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Handlinger"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Leverandører"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Legg til e-post"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Endre e-post"
+  },
+  "settings.account.security.email.description": {
+    "message": "Endre e-post-en assosiert med kontoen din."
+  },
+  "settings.account.security.email.title": {
+    "message": "E-post"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Legg til passord"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Endre passord"
+  },
+  "settings.account.security.password.description.change": {
+    "message": "Endre passordet brukt for å logge inn i kontoen din."
+  },
+  "settings.account.security.password.description.change-or-remove": {
+    "message": "Endre eller fjern passordet brukt for å logge inn i kontoen din."
+  },
+  "settings.account.security.password.description.set": {
+    "message": "Legg til et fast passord for å logge inn i kontoen din."
+  },
+  "settings.account.security.password.title": {
+    "message": "Passord"
+  },
+  "settings.account.security.providers.action.manage": {
+    "message": "Handter leverandører"
+  },
+  "settings.account.security.providers.description": {
+    "message": "Legg til eller fjern innloggingsmetodene fra kontoen din, inkludert GitHub, GitLab, Microsoft, Discord, Steam, og Google."
+  },
+  "settings.account.security.providers.title": {
+    "message": "Handter autentikatorleverandører"
+  },
+  "settings.account.security.title": {
+    "message": "Kontosikkerhet"
+  },
+  "settings.account.security.two-factor.action.remove": {
+    "message": "Fjern 2FA"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Sett opp 2FA"
+  },
+  "settings.account.security.two-factor.description": {
+    "message": "Legg til ennå et lag med sikkerhet til kontoen din i løpet av innlogginga."
+  },
+  "settings.account.security.two-factor.title": {
+    "message": "Tofaktor-autentikering"
+  },
+  "settings.account.two-factor.backup.intro": {
+    "message": "Last ned og lagre disse sikkerhetskpoiene på et trygt sted. Du kan bruke disse istedenfor en 2FA-kode viss du noen gang mister tilgangen til denne enheta! Du bør beskytte disse kodene sånn som passordet ditt."
+  },
+  "settings.account.two-factor.backup.single-use": {
+    "message": "Sikkerhetskopieringskoder kan bare bli brukt én gang."
+  },
+  "settings.account.two-factor.error.incorrect-code": {
+    "message": "Koden du skreiv inn er feil!"
+  },
+  "settings.account.two-factor.field.code.description": {
+    "message": "Vennligst skriv inn en tofaktor-kode for å fortsette."
+  },
+  "settings.account.two-factor.field.code.label": {
+    "message": "Skriv inn tofaktor-kode"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "Skriv inn kode..."
+  },
+  "settings.account.two-factor.setup.intro": {
+    "message": "Tofaktor-autentisering holder kontoen din beskytta med at du trenger ei anna enhet for å logge inn."
+  },
+  "settings.account.two-factor.setup.manual-secret": {
+    "message": "Viss QR-koden ikke skanner, så kan du manuelt skrive inn hemmeligheta:"
+  },
+  "settings.account.two-factor.setup.scan": {
+    "message": "Skann QR-koden med <authy-link>Authy</authy-link>, <microsoft-authenticator-link>Microsoft Authenticator</microsoft-authenticator-link>, eller hvilken som helst annen 2FA-app for å komme i gang."
+  },
+  "settings.account.two-factor.verify.description": {
+    "message": "Skriv inn engangskoden fra authenticator for å bekrefte tilgang."
+  },
+  "settings.account.two-factor.verify.label": {
+    "message": "Bekreft kode"
   },
   "settings.applications.about": {
     "message": "Om"
   },
   "settings.applications.button.add-more": {
     "message": "Legg til mer"
+  },
+  "settings.applications.button.add-redirect-uri": {
+    "message": "Legg til en omdirings-URI"
   },
   "settings.applications.button.cancel": {
     "message": "Avbryt"
@@ -2801,6 +3125,9 @@
   "settings.applications.field.redirect-uri.placeholder": {
     "message": "https://example.com/auth/callback"
   },
+  "settings.applications.field.redirect-uris": {
+    "message": "Omdirigerings-URI-er"
+  },
   "settings.applications.field.scopes": {
     "message": "Tilganger"
   },
@@ -2810,11 +3137,11 @@
   "settings.applications.field.url.placeholder": {
     "message": "https://example.com"
   },
+  "settings.applications.head-title": {
+    "message": "Apper"
+  },
   "settings.applications.modal.header": {
     "message": "Applikasjonsinformasjon"
-  },
-  "settings.applications.notification.error.title": {
-    "message": "Det har oppstått en feil"
   },
   "settings.applications.notification.icon-updated.description": {
     "message": "Applikasjonsikonet ditt har blitt oppdatert."
@@ -2824,6 +3151,90 @@
   },
   "settings.applications.secret.disclaimer": {
     "message": "Spar på hemmeligheta di, den kommer til å bli gjømt når du forlater denne sida!"
+  },
+  "settings.authorizations.about-this-app": {
+    "message": "Om denne appen"
+  },
+  "settings.authorizations.by": {
+    "message": "fra"
+  },
+  "settings.authorizations.description": {
+    "message": "Når du autoriserer en applikasjon med Modrinth-kontoen din, så gir du tilgang til kontoen din. Du kan handere og gå gjennom tilgang til kontoen din her når som helst."
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Vi kan ikke vise de autoriserte appene dine akkurat nå, vi jobber med å fikse det. Vær så snill å besøk denne sida seinere!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Autoriseringer"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Slett"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Dette kommer til å slette applikasjonstilgangen til kontoen din. Du kan alltids autorisere den igjen seinere."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Er du sikker på at du har lyst å slette denne applikasjonen?"
+  },
+  "settings.billing.charges.description": {
+    "message": "Alle de siste betalingene til Modrinth-kontoen din kommer til å bli lista opp her:"
+  },
+  "settings.billing.charges.product.medal-trial": {
+    "message": "Medal-Server-Prøveperiode"
+  },
+  "settings.billing.charges.product.midas": {
+    "message": "Modrinth Plus"
+  },
+  "settings.billing.charges.product.pyro": {
+    "message": "Modrinth Hosting"
+  },
+  "settings.billing.expires": {
+    "message": "Går ut {date}"
+  },
+  "settings.billing.interval.month": {
+    "message": "måned"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "månedlig"
+  },
+  "settings.billing.interval.year": {
+    "message": "år"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "årlig"
+  },
+  "settings.billing.midas.benefits.ad-free": {
+    "message": "Reklamefri surfing av modrinth.com og Modrinth App-en"
+  },
+  "settings.billing.midas.benefits.badge": {
+    "message": "Modrinth+ merke på profilen din"
+  },
+  "settings.billing.midas.benefits.support": {
+    "message": "Støtt Modrinth og skaperne direkte"
+  },
+  "settings.billing.midas.benefits.title": {
+    "message": "Fordeler"
+  },
+  "settings.billing.midas.save-per-year": {
+    "message": "Spar {amount}/year ved å bytte til årlig fakturering!"
+  },
+  "settings.billing.midas.status.cancelled.line1": {
+    "message": "Du har kansellert abonnementet ditt."
+  },
+  "settings.billing.midas.status.cancelled.line2": {
+    "message": "Du kommer til å beholde fordelene dine heilt til enden av den nåværende faktureringssyklusen."
+  },
+  "settings.billing.midas.status.failed": {
+    "message": "Betalinga av abonnementet ditt feila. Vær så snill å oppdater betalingsmetoden din."
+  },
+  "settings.billing.midas.status.open": {
+    "message": "Akkurat nå, så er du abonnert til:"
+  },
+  "settings.billing.midas.status.processing": {
+    "message": "Betalinga di blir bearbeida. Fordeler blir aktivert når betalinga er fullført."
+  },
+  "settings.billing.midas.upsell": {
+    "message": "Abonner på Modrinth Plus!"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Avslutt abonnement"
@@ -2842,6 +3253,12 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "Er du sikker på at du vil fjerne denne betalingsmetoden?"
+  },
+  "settings.billing.next": {
+    "message": "Neste:"
+  },
+  "settings.billing.or-yearly-save": {
+    "message": "Eller {price} / år (spar {percent}&)!"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Legg til betalingsmetode"
@@ -2864,17 +3281,98 @@
   "settings.billing.payment_method.title": {
     "message": "Betalingsmetoder"
   },
+  "settings.billing.plan.title": {
+    "message": "{size} Plan"
+  },
+  "settings.billing.price.per-interval": {
+    "message": "{price} / {interval}"
+  },
+  "settings.billing.price.slash-interval": {
+    "message": "/{interval}"
+  },
+  "settings.billing.pyro.cpu": {
+    "message": "{shared} Delte CPU-er (utbryter opp til {bursts} CPU-er)"
+  },
+  "settings.billing.pyro.linked-server.not-found": {
+    "message": "Vi kunne ikke finne en tilkopla server for dette abonnementet. Noen av grunnene kan være. Viss du nettopp har kjøpt serveren din, så er dette normalt. Det kan ta opp til en time før serveren din blir bestemt. Men, viss du kjøpte denne serveren for ei stund sia, så kan det hende at den har blitt suspendert. Viss dette ikke er hva du hadde forventa, vennligst ta kontakt med Modrinth Support med følgende informasjon:"
+  },
+  "settings.billing.pyro.linked-server.server-id": {
+    "message": "Server-ID: {id}"
+  },
+  "settings.billing.pyro.linked-server.stripe-id": {
+    "message": "Stripe-ID: {id}"
+  },
+  "settings.billing.pyro.ram": {
+    "message": "{gb} GB RAM"
+  },
+  "settings.billing.pyro.resubscribe.error.text": {
+    "message": "En error oppstod mens vi prøvde å abonnere på Modrinth-serveren din igjen."
+  },
+  "settings.billing.pyro.resubscribe.error.title": {
+    "message": "Error når vi prøvde å abonnere igjen"
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.text": {
+    "message": "Viss serveren for tida er suspendert, så kan det ta opp til 10 minutt for å prøve å betale igjen."
+  },
+  "settings.billing.pyro.resubscribe.request-submitted.title": {
+    "message": "Forespørsel om å abonnere igjen har blitt sendt inn"
+  },
+  "settings.billing.pyro.resubscribe.success.text": {
+    "message": "Serverabonnering abonnert igjen suksessfult"
+  },
+  "settings.billing.pyro.status.failed": {
+    "message": "Betalinga av abonnementet ditt feila. Vær så snill å oppdater betalingsmetoden din, så abonner igjen."
+  },
+  "settings.billing.pyro.status.processing": {
+    "message": "Betalinga di blir bearbeida. Serverfordelene dine blir aktivert når betalinga er fullført."
+  },
+  "settings.billing.pyro.storage": {
+    "message": "{gb} GB SSD"
+  },
+  "settings.billing.pyro.swap": {
+    "message": "{gb} GB Swap"
+  },
   "settings.billing.pyro_subscription.description": {
     "message": "Hold styr på Modrinth Server-abonnementa dine."
   },
   "settings.billing.pyro_subscription.title": {
     "message": "Modrinth Server-Abonnement"
   },
+  "settings.billing.renews": {
+    "message": "Fornyer {date}"
+  },
+  "settings.billing.resubscribe": {
+    "message": "Abonner igjen"
+  },
+  "settings.billing.since": {
+    "message": "Sia {date}"
+  },
+  "settings.billing.subscribe": {
+    "message": "Abonner"
+  },
   "settings.billing.subscription.description": {
     "message": "Hold styr Modrinth-abonnementa dine."
   },
   "settings.billing.subscription.title": {
     "message": "Abonnement"
+  },
+  "settings.billing.switch.switching-to-interval": {
+    "message": "Bytt til {interval}"
+  },
+  "settings.billing.switch.to-interval": {
+    "message": "Bytt til {interval}"
+  },
+  "settings.billing.switch.tooltip.monthly-additional-per-year": {
+    "message": "Månedlig fakturering kommer til å koste deg yttligere {amount} hvert year"
+  },
+  "settings.billing.switches-to-billing-on": {
+    "message": "Bytter til {interval} fakturering på {date}"
+  },
+  "settings.billing.update-method": {
+    "message": "Oppdater metode"
+  },
+  "settings.billing.upgrade": {
+    "message": "Oppgrader"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Deaktiver utviklermodus"
@@ -2888,6 +3386,12 @@
   "settings.display.flags.title": {
     "message": "Skru av/på funksjoner"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Utviklermodus har blitt skrudd av"
+  },
+  "settings.display.notification.developer-mode-deactivated.title": {
+    "message": "Utviklermodus skrudd av"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Datapakkerside"
   },
@@ -2897,6 +3401,15 @@
   "settings.display.project-list-layouts.mod": {
     "message": "Modssida"
   },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galleri"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Rutenett"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Rader"
+  },
   "settings.display.project-list-layouts.modpack": {
     "message": "Modpakkesida"
   },
@@ -2905,6 +3418,9 @@
   },
   "settings.display.project-list-layouts.resourcepack": {
     "message": "Ressurspakkesida"
+  },
+  "settings.display.project-list-layouts.server": {
+    "message": "Serversider"
   },
   "settings.display.project-list-layouts.shader": {
     "message": "Shadersida"
@@ -2954,8 +3470,14 @@
   "settings.display.theme.title": {
     "message": "Fargetema"
   },
+  "settings.head-title": {
+    "message": "Skjerminnstillinger"
+  },
   "settings.pats.action.create": {
     "message": "Lag en PAT"
+  },
+  "settings.pats.description": {
+    "message": "PAT-er kan bli brukt for å få tilgang til API-ene til Modrinth. De kan bli laga og sletta når som helst. For mer informasjon, se <doc-link>API-dokumentasjonen til Modrinth</doc-link>."
   },
   "settings.pats.modal.create.action": {
     "message": "Lag PAT"
@@ -3011,6 +3533,9 @@
   "settings.profile.description": {
     "message": "Profilinformasjonen din er offentlig lesbar på Modrinth og gjennom <docs-link>Modrinth API</docs-link>-en."
   },
+  "settings.profile.head-title": {
+    "message": "Profilinnstillinger"
+  },
   "settings.profile.profile-info": {
     "message": "Profilinformasjon"
   },
@@ -3041,11 +3566,29 @@
   "settings.sessions.unknown-platform": {
     "message": "Ukjent plattform"
   },
+  "settings.sidebar.label.account": {
+    "message": "Konto"
+  },
+  "settings.sidebar.label.developer": {
+    "message": "Utvikler"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Visning"
+  },
   "ui.latest-news-row.latest-news": {
     "message": "Siste nyhetene fra Modrinth"
   },
   "ui.latest-news-row.view-all": {
     "message": "Vis alle nyhetene"
+  },
+  "ui.newsletter-button.subscribe": {
+    "message": "Abonner"
+  },
+  "ui.newsletter-button.subscribed": {
+    "message": "Abonnert!"
+  },
+  "ui.newsletter-button.tooltip": {
+    "message": "Abonner til Modrinth-nyhetsbrevet"
   },
   "version.environment.none.description": {
     "message": "Miljøet for denne versjonen har ikke blitt spesifisert."

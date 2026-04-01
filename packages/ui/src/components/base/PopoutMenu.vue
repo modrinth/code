@@ -6,7 +6,6 @@
 		:placement="placement"
 		:class="dropdownClass"
 		@apply-hide="focusTrigger"
-		@apply-show="focusMenuChild"
 	>
 		<button ref="trigger" v-bind="$attrs" v-tooltip="tooltip">
 			<slot></slot>
@@ -51,14 +50,6 @@ defineProps({
 		required: false,
 	},
 })
-
-function focusMenuChild() {
-	setTimeout(() => {
-		if (menu.value && menu.value.children && menu.value.children.length > 0) {
-			menu.value.children[0].focus()
-		}
-	}, 50)
-}
 
 function hideAndFocusTrigger(hide) {
 	hide()

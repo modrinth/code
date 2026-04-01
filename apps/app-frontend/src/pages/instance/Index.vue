@@ -3,6 +3,7 @@
 		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
+				:key="instance.path"
 				ref="settingsModal"
 				:instance="instance"
 				:offline="offline"
@@ -35,27 +36,6 @@
 									{{ timePlayedHumanized }}
 								</template>
 								<template v-else> Never played </template>
-							</div>
-
-							<div v-if="linkedProjectV3" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-
-							<div
-								v-if="linkedProjectV3"
-								class="flex gap-1.5 items-center font-medium text-primary"
-							>
-								Linked to
-								<Avatar
-									:src="linkedProjectV3.icon_url"
-									:alt="linkedProjectV3.name"
-									:tint-by="instance.path"
-									size="24px"
-								/>
-								<router-link
-									:to="`/project/${linkedProjectV3.slug ?? linkedProjectV3.id}`"
-									class="hover:underline text-primary truncate"
-								>
-									{{ linkedProjectV3.name }}
-								</router-link>
 							</div>
 						</template>
 
@@ -285,6 +265,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import {
+	BoxesIcon,
 	CheckCircleIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
@@ -302,6 +283,7 @@ import {
 	ServerIcon,
 	SettingsIcon,
 	StopCircleIcon,
+	TerminalSquareIcon,
 	UpdatedIcon,
 	UserPlusIcon,
 	XIcon,
@@ -312,6 +294,7 @@ import {
 	ContentPageHeader,
 	injectNotificationManager,
 	LoadingIndicator,
+	NavTabs,
 	OverflowMenu,
 	ServerOnlinePlayers,
 	ServerPing,
@@ -329,7 +312,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
-import NavTabs from '@/components/ui/NavTabs.vue'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
@@ -451,14 +433,22 @@ const tabs = computed(() => [
 	{
 		label: 'Content',
 		href: `${basePath.value}`,
+		icon: BoxesIcon,
+	},
+	{
+		label: 'Files',
+		href: `${basePath.value}/files`,
+		icon: FolderOpenIcon,
 	},
 	{
 		label: 'Worlds',
 		href: `${basePath.value}/worlds`,
+		icon: GlobeIcon,
 	},
 	{
 		label: 'Logs',
 		href: `${basePath.value}/logs`,
+		icon: TerminalSquareIcon,
 	},
 ])
 

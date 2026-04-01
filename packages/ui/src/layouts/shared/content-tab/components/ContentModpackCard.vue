@@ -5,7 +5,7 @@ import {
 	DownloadIcon,
 	HeartIcon,
 	MoreVerticalIcon,
-	SettingsIcon,
+	Settings2Icon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -20,8 +20,8 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu, {
 	type Option as OverflowMenuOption,
 } from '#ui/components/base/OverflowMenu.vue'
-import TagItem from '#ui/components/base/TagItem.vue'
-import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
+import TagTagItem from '#ui/components/base/TagTagItem.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { useRelativeTime } from '#ui/composables/how-ago'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
@@ -36,10 +36,6 @@ import type {
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	updating: {
-		id: 'content.modpack-card.updating',
-		defaultMessage: 'Updating...',
-	},
 	contentHintTitle: {
 		id: 'content.modpack-card.content-hint-title',
 		defaultMessage: 'Modpack content moved',
@@ -142,19 +138,28 @@ onUnmounted(() => {
 		class="@container flex flex-col gap-4 rounded-[20px] bg-bg-raised p-6 shadow-md"
 		:class="{ 'opacity-50': disabled }"
 	>
-		<div class="flex flex-wrap items-start justify-between gap-4">
-			<div class="flex min-w-0 flex-1 items-start gap-4">
+		<div class="flex flex-wrap items-center justify-between gap-4">
+			<div class="flex min-w-0 flex-1 items-center gap-4">
 				<AutoLink :to="projectLink" class="shrink-0">
 					<Avatar :src="project.icon_url" :alt="project.title" size="5rem" no-shadow raised />
 				</AutoLink>
-				<div class="flex flex-col gap-1.5">
-					<AutoLink
-						:to="projectLink"
-						class="text-xl font-semibold leading-8 text-contrast hover:underline"
+				<div class="flex min-w-0 flex-col gap-1.5">
+					<div class="flex min-w-0 flex-col">
+						<AutoLink
+							:to="projectLink"
+							class="truncate text-xl font-semibold text-contrast"
+							:class="projectLink ? 'hover:underline' : ''"
+						>
+							{{ project.title }}
+						</AutoLink>
+						<span v-if="project.filename" class="truncate text-secondary mb-2">
+							{{ project.filename }}
+						</span>
+					</div>
+					<div
+						v-if="owner || version"
+						class="flex flex-nowrap items-center gap-2 overflow-hidden text-secondary"
 					>
-						{{ project.title }}
-					</AutoLink>
-					<div class="flex flex-nowrap items-center gap-2 overflow-hidden text-secondary">
 						<AutoLink
 							v-if="owner"
 							:to="owner.link"
@@ -195,7 +200,7 @@ onUnmounted(() => {
 					<div class="flex items-center gap-2 text-secondary">
 						<SpinnerIcon class="animate-spin" />
 						<span class="font-semibold">{{
-							disabledText ?? formatMessage(messages.updating)
+							disabledText ?? formatMessage(commonMessages.updatingLabel)
 						}}</span>
 					</div>
 				</template>
@@ -268,7 +273,7 @@ onUnmounted(() => {
 									}
 								"
 							>
-								<SettingsIcon />
+								<Settings2Icon />
 							</button>
 						</ButtonStyled>
 					</div>
@@ -305,7 +310,7 @@ onUnmounted(() => {
 									{{ formatMessage(commonMessages.contentLabel) }}
 								</template>
 								<template #settings>
-									<SettingsIcon class="size-5" />
+									<Settings2Icon class="size-5" />
 									{{ formatMessage(commonMessages.settingsLabel) }}
 								</template>
 							</TeleportOverflowMenu></ButtonStyled
@@ -350,21 +355,28 @@ onUnmounted(() => {
 			{{ project.description }}
 		</span>
 
-		<div class="flex flex-wrap items-center gap-3">
-			<div v-if="project.downloads !== undefined" class="flex items-center gap-2 text-secondary">
+		<div
+			v-if="project.downloads != null || project.followers != null || categories?.length"
+			class="flex flex-wrap items-center gap-3"
+		>
+			<div v-if="project.downloads != null" class="flex items-center gap-2 text-secondary">
 				<DownloadIcon class="size-5" />
 				<span class="font-medium">{{ formatCompact(project.downloads) }}</span>
 			</div>
 
-			<div v-if="project.followers !== undefined" class="flex items-center gap-2 text-secondary">
+			<div v-if="project.followers != null" class="flex items-center gap-2 text-secondary">
 				<HeartIcon class="size-5" />
 				<span class="font-medium">{{ formatCompact(project.followers) }}</span>
 			</div>
 
 			<div v-if="categories?.length" class="flex flex-wrap items-center gap-1">
-				<TagItem v-for="cat in categories" :key="cat.name" :action="cat.action">
-					{{ cat.name }}
-				</TagItem>
+				<TagTagItem
+					v-for="cat in categories"
+					:key="cat.name"
+					:tag="cat.name"
+					:action="cat.action"
+					hide-non-loader-icon
+				/>
 			</div>
 		</div>
 	</div>

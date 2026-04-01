@@ -20,7 +20,7 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { formatBytes, formatProjectType } from '@modrinth/utils'
+import { formatBytes } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -29,6 +29,7 @@ import EmptyState from '#ui/components/base/EmptyState.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -39,6 +40,7 @@ import ConfirmBulkUpdateModal from './components/modals/ConfirmBulkUpdateModal.v
 import ConfirmDeletionModal from './components/modals/ConfirmDeletionModal.vue'
 import ConfirmUnlinkModal from './components/modals/ConfirmUnlinkModal.vue'
 import {
+	getClientWarningType,
 	isClientOnlyEnvironment,
 	useBulkOperation,
 	useChangingItems,
@@ -50,6 +52,7 @@ import { injectContentManager } from './providers/content-manager'
 import type { ContentCardTableItem, ContentItem } from './types'
 
 const { formatMessage } = useVIntl()
+const debug = useDebugLogger('ContentPageLayout')
 
 const messages = defineMessages({
 	loadingContent: {
@@ -226,9 +229,8 @@ const { selectedFilters, filterOptions, toggleFilter, applyFilters } = useConten
 	{
 		showTypeFilters: true,
 		showUpdateFilter: ctx.hasUpdateSupport,
-		showClientOnlyFilter: ctx.showClientOnlyFilter ?? false,
+		showWarningsFilter: true,
 		isPackLocked: ctx.isPackLocked,
-		formatProjectType,
 		persistKey: ctx.filterPersistKey,
 	},
 )
@@ -267,7 +269,7 @@ const filteredItems = computed(() => {
 	return applyFilters(searched)
 })
 const tableItems = computed<ContentCardTableItem[]>(() => {
-	return filteredItems.value.map((item) => {
+	const items = filteredItems.value.map((item) => {
 		const base = ctx.mapToTableItem(item)
 		return {
 			...base,
@@ -277,14 +279,45 @@ const tableItems = computed<ContentCardTableItem[]>(() => {
 				isBulkOperating.value ||
 				item.installing === true,
 			installing: item.installing === true,
-			hasUpdate: !ctx.isPackLocked.value && item.has_update,
-			isClientOnly: isClientOnlyEnvironment(item.environment),
+			hasUpdate: item.has_update,
+			isClientOnly:
+				isClientOnlyEnvironment(item.environment) ||
+				!!item.pack_client_retained ||
+				!!item.pack_client_depends,
+			clientWarning: getClientWarningType(item),
+			hideSwitchVersion: !base.versionLink,
 			overflowOptions: ctx.getOverflowOptions?.(item),
 		}
 	})
+
+	const updatable = items.filter((i) => i.hasUpdate)
+	if (updatable.length > 0) {
+		debug('tableItems: items with hasUpdate=true', {
+			count: updatable.length,
+			ids: updatable.map((i) => i.id),
+			isPackLocked: ctx.isPackLocked.value,
+		})
+	}
+
+	return items
 })
 
-const hasOutdatedProjects = computed(() => ctx.items.value.some((p) => p.has_update))
+const hasOutdatedProjects = computed(() => {
+	const outdated = ctx.items.value.filter((p) => p.has_update)
+	if (outdated.length > 0) {
+		debug('hasOutdatedProjects: raw items with has_update=true', {
+			count: outdated.length,
+			items: outdated.map((p) => ({
+				id: p.id,
+				fileName: p.file_name,
+				title: p.project?.title,
+				has_update: p.has_update,
+				update_version_id: p.update_version_id,
+			})),
+		})
+	}
+	return outdated.length > 0
+})
 
 //  Deletion
 const pendingDeletionItems = ref<ContentItem[]>([])
@@ -405,6 +438,13 @@ async function bulkDisable() {
 
 function handleUpdateById(id: string) {
 	ctx.updateItem?.(id)
+}
+
+function handleSwitchVersionById(id: string) {
+	const item = ctx.items.value.find((i) => i.id === id)
+	if (item) {
+		ctx.switchVersion?.(item)
+	}
 }
 
 // Bulk updating
@@ -677,7 +717,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 							</div>
 
 							<ButtonStyled
-								v-if="hasBulkUpdateSupport && !ctx.isPackLocked.value && hasOutdatedProjects"
+								v-if="hasBulkUpdateSupport && hasOutdatedProjects"
 								color="green"
 								type="transparent"
 								color-fill="text"
@@ -705,6 +745,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 						@update:enabled="handleToggleEnabledById"
 						@delete="handleDeleteById"
 						@update="handleUpdateById"
+						@switch-version="handleSwitchVersionById"
 					>
 						<template #empty>
 							<span>{{ formatMessage(messages.noContentFound) }}</span>
@@ -779,11 +820,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 		>
 			<template #actions>
 				<ButtonStyled
-					v-if="
-						hasBulkUpdateSupport &&
-						!ctx.isPackLocked.value &&
-						selectedItems.some((m) => m.has_update)
-					"
+					v-if="hasBulkUpdateSupport && selectedItems.some((m) => m.has_update)"
 					type="transparent"
 					color="green"
 					color-fill="text"
@@ -869,7 +906,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 			:count="pendingDeletionItems.length"
 			:item-type="ctx.contentTypeLabel.value"
 			:variant="ctx.deletionContext ?? 'instance'"
-			:backup-tip="pendingDeletionItems.map((i) => i.project.title).join(', ')"
+			:backup-tip="pendingDeletionItems.map((i) => i.project?.title ?? i.file_name).join(', ')"
 			@delete="confirmDelete"
 		/>
 		<ConfirmBulkUpdateModal

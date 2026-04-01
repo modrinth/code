@@ -10241,6 +10241,7 @@ dependencies = [
 name = "theseus_gui"
 version = "1.0.0-local"
 dependencies = [
+ "async_zip",
  "chrono",
  "daedalus",
  "dashmap",
@@ -10258,6 +10259,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-deep-link",
  "tauri-plugin-dialog",
+ "tauri-plugin-fs",
  "tauri-plugin-http",
  "tauri-plugin-opener",
  "tauri-plugin-os",

@@ -5,6 +5,66 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.export-modal.description-placeholder": {
+    "message": "أدخل وصف التعديل..."
+  },
+  "app.export-modal.export-button": {
+    "message": "تصدير"
+  },
+  "app.export-modal.header": {
+    "message": "تصدير حزمة التعديل"
+  },
+  "app.export-modal.modpack-name-label": {
+    "message": "إسم حزمة التعديل"
+  },
+  "app.export-modal.modpack-name-placeholder": {
+    "message": "إسم حزمة التعديل"
+  },
+  "app.export-modal.select-files-label": {
+    "message": "حدد الملفات والمجلدات المراد تضمينها في الحزمة"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "رقم الإصدار"
+  },
+  "app.export-modal.version-number-placeholder": {
+    "message": "1.0.0"
+  },
+  "app.instance.confirm-delete.admonition-body": {
+    "message": "سيتم حذف جميع البيانات الخاصة بمثيلك نهائيًا، بما في ذلك عوالمك والتكوينات وكل المحتوى المثبت."
+  },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "لا يمكن التراجع عن هذا الإجراء"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "حذف المثيل"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "حذف المثيل"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "تم تثبيت حزمة التعديل بالفعل"
+  },
+  "app.instance.mods.content-type-project": {
+    "message": "مشروع"
+  },
+  "app.instance.mods.project-was-added": {
+    "message": "تمت إضافة \"{name}\""
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "تمت إضافة {count} من المشاريع"
+  },
+  "app.instance.mods.share-text": {
+    "message": "تحقق من المشاريع التي أستخدمها في حزمة التعديل الخاص بي!"
+  },
+  "app.instance.mods.share-title": {
+    "message": "مشاركة محتوى حزمة التعديل"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "تم الرفع بنجاح"
+  },
+  "app.modal.install-to-play.content-required": {
+    "message": "المحتوى مطلوب"
+  },
   "app.modal.install-to-play.header": {
     "message": "نزل للعب"
   },
@@ -12,13 +72,22 @@
     "message": "تثبيت"
   },
   "app.modal.install-to-play.mod-count": {
-    "message": ""
+    "message": "{count, plural, one {# تعديل} other {# تعديلات}}"
+  },
+  "app.modal.install-to-play.required-modpack": {
+    "message": "حزمة التعديل مطلوبة"
+  },
+  "app.modal.install-to-play.server-requires-mods": {
+    "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "حُزْمَة مشاركة"
+    "message": "حزمة مشتركة"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "حُزْمَة خادم مشاركة"
+    "message": "حزمة خادم مشتركة"
+  },
+  "app.modal.install-to-play.view-contents": {
+    "message": "عرض المحتويات"
   },
   "app.modal.update-to-play.header": {
     "message": "حدث للعب"
@@ -41,9 +110,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "خيارات النسخة الافتراضية"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "أعلام الميزات"
-  },
   "app.settings.tabs.java-installations": {
     "message": "تثبيتات جافا"
   },
@@ -55,6 +121,33 @@
   },
   "app.settings.tabs.resource-management": {
     "message": "إدارة الموارد"
+  },
+  "app.update-popup.body": {
+    "message": "تطبيق Modrinth v{version} جاهز للتثبيت! أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-popup.body.download-complete": {
+    "message": "انتهى تنزيل تطبيق Modrinth v{version}. أعد التحميل للتحديث الآن، أو تلقائيًا عند إغلاق تطبيق Modrinth."
+  },
+  "app.update-popup.body.linux": {
+    "message": "تطبيق Modrinth v {version} متاح. استخدم مدير الحزم الخاص بك للتحديث للحصول على أحدث الميزات والإصلاحات!"
+  },
+  "app.update-popup.body.metered": {
+    "message": "تطبيق Modrinth v{version} متاح الآن! وبما أنك متصل بشبكة مقيّدة، لم نقم بتنزيله تلقائيًا."
+  },
+  "app.update-popup.changelog": {
+    "message": "سجل التغيير"
+  },
+  "app.update-popup.download": {
+    "message": "تنزيل ({size})"
+  },
+  "app.update-popup.download-complete": {
+    "message": "اكتمل التنزيل"
+  },
+  "app.update-popup.reload": {
+    "message": "إعادة تحميل"
+  },
+  "app.update-popup.title": {
+    "message": "تحديث متاح"
   },
   "app.update.complete-toast.text": {
     "message": "انقر هنا لعرض سجلّ التغييرات."
@@ -341,9 +434,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "عدم العرض في الصفحة الرئيسية"
   },
-  "instance.worlds.filter.available": {
-    "message": "متاح"
-  },
   "instance.worlds.game_already_open": {
     "message": "النسخة مفتوحة بالفعل"
   },
@@ -352,6 +442,9 @@
   },
   "instance.worlds.incompatible_server": {
     "message": "الخادم غير متوافق"
+  },
+  "instance.worlds.linked_server": {
+    "message": "تدار بواسطة مشروع الخادم"
   },
   "instance.worlds.no_contact": {
     "message": "تعذّر الاتصال بالخادم"
@@ -364,12 +457,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "تشغيل النسخة"
-  },
-  "instance.worlds.type.server": {
-    "message": "الخادم"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "لعب فردي"
   },
   "instance.worlds.view_instance": {
     "message": "عرض النسخة"
@@ -388,5 +475,17 @@
   },
   "search.filter.locked.instance.sync": {
     "message": "مزامنة مع النسخة"
+  },
+  "search.filter.locked.server": {
+    "message": "يقدمها الخادم"
+  },
+  "search.filter.locked.server-environment.title": {
+    "message": "يمكن إضافة التعديلات من جانب العميل فقط إلى مثيل الخادم"
+  },
+  "search.filter.locked.server-game-version.title": {
+    "message": "يتم توفير نسخة اللعبة من قبل الخادم"
+  },
+  "search.filter.locked.server-loader.title": {
+    "message": "يتم توفير المحمّل من قبل الخادم"
   }
 }

@@ -149,13 +149,33 @@ pub async fn install_zipped_mrpack_files(
             file_hashes.push(hash);
         }
 
+        let project_ids: Vec<String> = pack
+            .files
+            .iter()
+            .filter_map(|f| {
+                f.downloads.iter().find_map(|url| {
+                    let parts: Vec<&str> = url.split('/').collect();
+                    let data_idx = parts.iter().position(|&p| p == "data")?;
+                    parts.get(data_idx + 1).map(|s| s.to_string())
+                })
+            })
+            .collect::<std::collections::HashSet<_>>()
+            .into_iter()
+            .collect();
+
         tracing::info!(
-            "Caching {} modpack file hashes for version {}",
+            "Caching {} modpack file hashes and {} project IDs for version {}",
             file_hashes.len(),
+            project_ids.len(),
             version_id
         );
-        CachedEntry::cache_modpack_files(version_id, file_hashes, &state.pool)
-            .await?;
+        CachedEntry::cache_modpack_files(
+            version_id,
+            file_hashes,
+            project_ids,
+            &state.pool,
+        )
+        .await?;
     } else {
         tracing::warn!(
             "No version_id available, skipping modpack file hash caching"

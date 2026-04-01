@@ -203,6 +203,7 @@ import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
+import _Settings2Icon from './icons/settings-2.svg?component'
 import _ShareIcon from './icons/share.svg?component'
 import _ShieldIcon from './icons/shield.svg?component'
 import _ShieldAlertIcon from './icons/shield-alert.svg?component'
@@ -589,6 +590,7 @@ export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const ServerPlusIcon = _ServerPlusIcon
 export const SettingsIcon = _SettingsIcon
+export const Settings2Icon = _Settings2Icon
 export const ShareIcon = _ShareIcon
 export const ShieldIcon = _ShieldIcon
 export const ShieldAlertIcon = _ShieldAlertIcon

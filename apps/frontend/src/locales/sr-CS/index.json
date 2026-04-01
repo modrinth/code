@@ -965,20 +965,11 @@
   "servers.plan.large.description": {
     "message": "Idealno za 15–25 igrača, modpackove ili intenzivno modovanje."
   },
-  "servers.plan.large.name": {
-    "message": "Veliki"
-  },
   "servers.plan.medium.description": {
     "message": "Odlično za 6–15 igrača i više modova."
   },
-  "servers.plan.medium.name": {
-    "message": "Srednje"
-  },
   "servers.plan.small.description": {
     "message": "Savršeno za 1–5 prijatelja sa nekoliko lakih modova."
-  },
-  "servers.plan.small.name": {
-    "message": "Mali"
   },
   "settings.billing.modal.cancel.action": {
     "message": "Otkaži pretplatu"

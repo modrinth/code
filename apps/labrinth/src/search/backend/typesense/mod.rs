@@ -105,18 +105,25 @@ impl Default for RequestConfig {
 }
 
 fn default_query_by() -> Vec<String> {
-    ["indexed_title", "slug", "summary", "indexed_author"]
-        .into_iter()
-        .map(str::to_string)
-        .collect()
+    [
+        "name",
+        "indexed_name",
+        "slug",
+        "author",
+        "indexed_author",
+        "summary",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect()
 }
 
 fn default_query_by_weights() -> Vec<u8> {
-    vec![15, 5, 2, 1]
+    vec![15, 15, 10, 3, 3, 1]
 }
 
 fn default_prefix() -> Vec<bool> {
-    vec![true, true, true, true]
+    vec![true, true, true, true, true, true]
 }
 
 const fn default_prioritize_exact_match() -> bool {
@@ -491,7 +498,7 @@ impl Typesense {
         let mut fields = vec![
             json!({"name": "summary", "type": "string", "facet": false}),
             json!({"name": "slug", "type": "string", "facet": false}),
-            json!({"name": "indexed_title", "type": "string", "facet": false, "stem": true}),
+            json!({"name": "indexed_name", "type": "string", "facet": false, "stem": true}),
             json!({"name": "indexed_author", "type": "string", "facet": false}),
             json!({"name": "log_downloads", "type": "float", "sort": true}),
             json!({"name": "follows", "type": "int32", "facet": true, "sort": true}),

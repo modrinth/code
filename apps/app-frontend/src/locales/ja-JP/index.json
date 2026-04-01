@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "認証サーバーにアクセスできません"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "サーバーをインスタンスに追加"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "サーバーを自身のインスタンスに追加"
+  },
+  "app.browse.add-to-instance": {
+    "message": "インスタンスに追加"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "{instanceName} に追加"
+  },
+  "app.browse.added": {
+    "message": "追加済み"
+  },
+  "app.browse.already-added": {
+    "message": "すでに追加済み"
+  },
+  "app.browse.discover-content": {
+    "message": "コンテンツを探す"
+  },
+  "app.browse.discover-servers": {
+    "message": "サーバーを探す"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "追加済みのサーバーを隠す"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "インストール済みのコンテンツを隠す"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "コンテンツをインスタンスにインストールする"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Modパックの説明を入力…"
   },
@@ -41,17 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "インスタンスを削除"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "このModpackは既に <bold>{instanceName}</bold> インスタンスにインストール済みです。本当に複製しますか？"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "新規作成"
+  },
+  "app.instance.modpack-already-installed.header": {
+    "message": "Modパックはすでにインストール済み"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "インスタンス"
+  },
   "app.instance.mods.content-type-project": {
     "message": "プロジェクト"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "リンクをコピー"
-  },
-  "app.instance.mods.installing": {
-    "message": "インストール中…"
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Modパック"
   },
   "app.instance.mods.project-was-added": {
     "message": "「{name}」が追加されました"
@@ -65,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Modパックのコンテンツを共有"
   },
-  "app.instance.mods.show-file": {
-    "message": "ファイルを表示"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "アップロードに成功しました"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "不明"
+  "app.instance.worlds.add-server": {
+    "message": "サーバーを追加"
   },
-  "app.instance.mods.updating": {
-    "message": "アップデート中…"
+  "app.instance.worlds.browse-servers": {
+    "message": "サーバーを探す"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "'{name}' は **完全に削除**され、元に戻すことはできません。"
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "本当にこのワールドを完全に削除しますか？"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Mod導入済み"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "オフライン"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "オンライン"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "バニラ(Mod非導入)"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "サーバーを追加、またはブラウズして始める"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "サーバー、ワールドは追加されていません"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "'{name}' はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "'{name}' ({address}) はゲーム内を含むサーバーリストから削除され、元に戻すことはできません。"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "本当に {name} を削除しますか？"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "{count} 個のワールドを検索..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "このサーバー"
   },
   "app.modal.install-to-play.content-required": {
     "message": "必須コンテンツ"
@@ -124,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "インスタンスの基本設定"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "機能設定"
   },
   "app.settings.tabs.java-installations": {
     "message": "Javaのインストール設定"
@@ -182,6 +251,24 @@
   "app.update.reload-to-update": {
     "message": "再起動して今すぐ更新"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "オプションを選択"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "互換性の無いバージョン {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "未プレイ"
+  },
+  "app.world.world-item.offline": {
+    "message": "オフライン"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} 人がオンライン"
+  },
   "friends.action.add-friend": {
     "message": "フレンドを追加"
   },
@@ -195,10 +282,10 @@
     "message": "フレンドを追加中"
   },
   "friends.add-friend.username.description": {
-    "message": "これはMinecraftユーザーネームと違う可能性があります！"
+    "message": "これはMinecraftユーザー名とは異なる可能性があります！"
   },
   "friends.add-friend.username.placeholder": {
-    "message": "Modrinthユーザーネームを入力..."
+    "message": "Modrinthユーザー名を入力…"
   },
   "friends.add-friend.username.title": {
     "message": "あなたのフレンドのModrinthユーザー名は何ですか？"
@@ -281,6 +368,12 @@
   "instance.edit-world.title": {
     "message": "ワールドを編集"
   },
+  "instance.files.adding-files": {
+    "message": "ファイルを追加中 ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "名前をつけて保存..."
+  },
   "instance.server-modal.address": {
     "message": "アドレス"
   },
@@ -303,7 +396,7 @@
     "message": "インスタンスを削除"
   },
   "instance.settings.tabs.general.delete.description": {
-    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定などの全てのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
+    "message": "デバイスからインスタンスを削除します。これらには、ワールド、設定などのすべてのインストール済みのファイルが含まれます。インスタンスを削除すると復元することはできません。"
   },
   "instance.settings.tabs.general.deleting.button": {
     "message": "削除中…"
@@ -452,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "ホームに表示しない"
   },
-  "instance.worlds.filter.available": {
-    "message": "利用可能"
-  },
   "instance.worlds.game_already_open": {
     "message": "インスタンスは既に開いています"
   },
@@ -478,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "インスタンスを起動"
-  },
-  "instance.worlds.type.server": {
-    "message": "サーバー"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "シングルプレイ"
   },
   "instance.worlds.view_instance": {
     "message": "インスタンスを表示する"

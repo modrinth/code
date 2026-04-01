@@ -14,6 +14,9 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Lisää Java-osoite"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Lisää kaikki Modrinthin ulkopuolelle suunnatut asiaankuuluvat linkit, kuten verkkosivusto, kauppa tai Discord-kutsu."
+  },
   "nags.add-links-server.title": {
     "defaultMessage": "Lisää ulkoisia linkkejä"
   },
@@ -94,6 +97,9 @@
   },
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Valitse oikea resoluutio"
+  },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Valitse, mitä versioita palvelimesi tukee, valitse modipaketti tai lataa oma."
   },
   "nags.select-license.title": {
     "defaultMessage": "Valitse lisenssi"

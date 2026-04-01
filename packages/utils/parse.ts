@@ -82,7 +82,7 @@ export const configuredXss = new FilterXSS({
 	safeAttrValue(tag, name, value, cssFilter) {
 		if (
 			(tag === 'img' || tag === 'video' || tag === 'audio' || tag === 'source') &&
-			(name === 'src' || name === 'srcset') &&
+			(name === 'src' || name === 'srcset' || name === 'poster') &&
 			!value.startsWith('data:')
 		) {
 			try {

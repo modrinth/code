@@ -21,14 +21,6 @@ const messages = defineMessages({
 		id: 'content.selection-bar.selected-count-simple',
 		defaultMessage: '{count, number} selected',
 	},
-	enable: {
-		id: 'content.selection-bar.enable',
-		defaultMessage: 'Enable',
-	},
-	disable: {
-		id: 'content.selection-bar.disable',
-		defaultMessage: 'Disable',
-	},
 	bulkEnabling: {
 		id: 'content.selection-bar.bulk.enabling',
 		defaultMessage: 'Enabling {progress}/{total} {contentType}...',
@@ -162,13 +154,15 @@ const bulkProgressMessage = computed(() => {
 			<ButtonStyled type="transparent">
 				<button
 					v-tooltip="
-						allEnabled ? formatMessage(messages.allAlreadyEnabled) : formatMessage(messages.enable)
+						allEnabled
+							? formatMessage(messages.allAlreadyEnabled)
+							: formatMessage(commonMessages.enableButton)
 					"
 					:disabled="isBusy || allEnabled"
 					@click="emit('enable')"
 				>
 					<PowerIcon />
-					<span class="bar-label">{{ formatMessage(messages.enable) }}</span>
+					<span class="bar-label">{{ formatMessage(commonMessages.enableButton) }}</span>
 				</button>
 			</ButtonStyled>
 			<ButtonStyled type="transparent">
@@ -176,13 +170,13 @@ const bulkProgressMessage = computed(() => {
 					v-tooltip="
 						allDisabled
 							? formatMessage(messages.allAlreadyDisabled)
-							: formatMessage(messages.disable)
+							: formatMessage(commonMessages.disableButton)
 					"
 					:disabled="isBusy || allDisabled"
 					@click="emit('disable')"
 				>
 					<PowerOffIcon />
-					<span class="bar-label">{{ formatMessage(messages.disable) }}</span>
+					<span class="bar-label">{{ formatMessage(commonMessages.disableButton) }}</span>
 				</button>
 			</ButtonStyled>
 

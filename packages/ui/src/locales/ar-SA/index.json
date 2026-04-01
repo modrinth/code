@@ -56,6 +56,9 @@
   "button.cancel": {
     "defaultMessage": "إلغاء"
   },
+  "button.change-version": {
+    "defaultMessage": "غير الإصدار"
+  },
   "button.clear": {
     "defaultMessage": "امسح"
   },
@@ -89,6 +92,9 @@
   "button.follow": {
     "defaultMessage": "متابعة"
   },
+  "button.hide-snapshots": {
+    "defaultMessage": "إخفاء snapshots"
+  },
   "button.max": {
     "defaultMessage": "حد اقصى"
   },
@@ -107,17 +113,29 @@
   "button.refresh": {
     "defaultMessage": "تحديث"
   },
+  "button.reinstall-modpack": {
+    "defaultMessage": "إعادة تثبيت حزمة التعديل"
+  },
   "button.remove": {
     "defaultMessage": "إزالة"
   },
   "button.remove-image": {
     "defaultMessage": "إزالة الصورة"
   },
+  "button.repair": {
+    "defaultMessage": "إصلاح"
+  },
+  "button.repairing": {
+    "defaultMessage": "جاري الإصلاح..."
+  },
   "button.report": {
     "defaultMessage": "إبلاغ"
   },
   "button.reset": {
     "defaultMessage": "إعادة ضبط"
+  },
+  "button.reset-server": {
+    "defaultMessage": "إعادة ضبط الخادم"
   },
   "button.retry": {
     "defaultMessage": "الإعادة"
@@ -131,6 +149,9 @@
   "button.saving": {
     "defaultMessage": "جاري الحفظ"
   },
+  "button.show-all-versions": {
+    "defaultMessage": "عرض جميع الإصدارات"
+  },
   "button.sign-in": {
     "defaultMessage": "تسجيل الدخول"
   },
@@ -143,8 +164,14 @@
   "button.stop": {
     "defaultMessage": "إيقاف"
   },
+  "button.switch-version": {
+    "defaultMessage": "تبديل الإصدار"
+  },
   "button.unfollow": {
     "defaultMessage": "إلغاء المتابعة"
+  },
+  "button.unlink-modpack": {
+    "defaultMessage": "إلغاء الربط حزمة التعديلات"
   },
   "button.update": {
     "defaultMessage": "تحديث"
@@ -155,9 +182,6 @@
   "changelog.justNow": {
     "defaultMessage": "الآن فقط"
   },
-  "changelog.product.api": {
-    "defaultMessage": "واجهة برمجة التطبيقات"
-  },
   "changelog.product.app": {
     "defaultMessage": "تطبيق"
   },
@@ -165,10 +189,46 @@
     "defaultMessage": "المضيف"
   },
   "changelog.product.web": {
-    "defaultMessage": "موقع إلكتروني"
+    "defaultMessage": "منصّة"
   },
   "collections.label.private": {
     "defaultMessage": "خاص"
+  },
+  "content.confirm-bulk-update.admonition-body": {
+    "defaultMessage": "هل تؤكد رغبتك بتحديث {count, plural, one {# مشروع} other {# مشاريع}} لاصداراتها المتوافقة الأخيرة؟ ينصح بتحديثها واحدا تلو الاۤخر."
+  },
+  "content.confirm-bulk-update.admonition-header": {
+    "defaultMessage": "تحذير التحديث"
+  },
+  "content.confirm-bulk-update.header": {
+    "defaultMessage": "حدث المشاريع"
+  },
+  "content.confirm-bulk-update.update-button": {
+    "defaultMessage": "حدث {count, plural, one {# مشروع} other {# مشاريع}}"
+  },
+  "content.confirm-deletion.admonition-body": {
+    "defaultMessage": "حذف تعديل كليا يمكن أن يؤثر على عالمك و يسبب فقد محتوى أو مشاكل غير متوقعة عند تحميله مرة أخرى."
+  },
+  "content.confirm-deletion.admonition-header": {
+    "defaultMessage": "تحذير الحذف"
+  },
+  "content.confirm-deletion.delete-button": {
+    "defaultMessage": "احذف {count} {count, plural, one {{itemType, select, project {project} version {version} user {user} other {project}}} other {{itemType, select, project {مشاريع} version {versions} user {users} other {projects}}}}"
+  },
+  "content.confirm-deletion.header": {
+    "defaultMessage": "حذف {count, plural, one {{itemType, select, project {project} version {version} user {user} other {content}}} other {{itemType, select, project {مشاريع} version {versions} user {users} other {contents}}}}"
+  },
+  "content.confirm-modpack-update.admonition-body": {
+    "defaultMessage": "أي تعديلات أو محتوى يضاف على حزمة التعديل سيحذف."
+  },
+  "content.confirm-modpack-update.admonition-header": {
+    "defaultMessage": "تحذير {action, select, downgrade {خفض الٳصدار} other {التحديث}}"
+  },
+  "content.confirm-modpack-update.confirm-button": {
+    "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
+  },
+  "content.confirm-modpack-update.header": {
+    "defaultMessage": "{action, select, downgrade {خفض ٳصدار} other {تحديث}} حزمة التعديلات"
   },
   "form.label.address-line": {
     "defaultMessage": "خط عنوان"
@@ -442,9 +502,6 @@
   },
   "label.singleplayer": {
     "defaultMessage": "اللعب الفردي"
-  },
-  "label.sort-by": {
-    "defaultMessage": "فرز حسب"
   },
   "label.success": {
     "defaultMessage": "نجاح"

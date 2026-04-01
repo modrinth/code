@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+	ArrowLeftRightIcon,
 	DownloadIcon,
 	MoreVerticalIcon,
 	SpinnerIcon,
@@ -18,13 +19,18 @@ import BulletDivider from '#ui/components/base/BulletDivider.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
 import type { Option as OverflowMenuOption } from '#ui/components/base/OverflowMenu.vue'
+import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import Toggle from '#ui/components/base/Toggle.vue'
-import TeleportOverflowMenu from '#ui/components/servers/files/explorer/TeleportOverflowMenu.vue'
 import { useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
 import { truncatedTooltip } from '#ui/utils/truncate'
 
-import type { ContentCardProject, ContentCardVersion, ContentOwner } from '../types'
+import type {
+	ClientWarningType,
+	ContentCardProject,
+	ContentCardVersion,
+	ContentOwner,
+} from '../types'
 
 const { formatMessage } = useVIntl()
 
@@ -38,6 +44,8 @@ interface Props {
 	installing?: boolean
 	hasUpdate?: boolean
 	isClientOnly?: boolean
+	clientWarning?: ClientWarningType | null
+	hideSwitchVersion?: boolean
 	overflowOptions?: OverflowMenuOption[]
 	disabled?: boolean
 	showCheckbox?: boolean
@@ -54,6 +62,8 @@ const props = withDefaults(defineProps<Props>(), {
 	installing: false,
 	hasUpdate: false,
 	isClientOnly: false,
+	clientWarning: null,
+	hideSwitchVersion: false,
 	overflowOptions: undefined,
 	disabled: false,
 	showCheckbox: false,
@@ -67,14 +77,31 @@ const emit = defineEmits<{
 	'update:enabled': [value: boolean]
 	delete: [event: MouseEvent]
 	update: []
+	switchVersion: []
 }>()
 
 const instance = getCurrentInstance()
 const hasDeleteListener = computed(() => typeof instance?.vnode.props?.onDelete === 'function')
 const hasUpdateListener = computed(() => typeof instance?.vnode.props?.onUpdate === 'function')
+const hasSwitchVersionListener = computed(
+	() => typeof instance?.vnode.props?.onSwitchVersion === 'function',
+)
 
 const versionNumberRef = ref<HTMLElement | null>(null)
 const fileNameRef = ref<HTMLElement | null>(null)
+
+const isDisabled = computed(() => props.disabled || props.installing)
+
+const clientWarningMessage = computed(() => {
+	switch (props.clientWarning) {
+		case 'retained':
+			return commonMessages.clientRetainedWarning
+		case 'depends':
+			return commonMessages.clientDependsWarning
+		default:
+			return commonMessages.clientOnlyWarning
+	}
+})
 
 const { shift: shiftHeld } = useMagicKeys()
 const deleteHovered = ref(false)
@@ -89,7 +116,7 @@ const deleteHovered = ref(false)
 		<div
 			class="flex min-w-0 items-center gap-4"
 			:class="
-				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[350px] @[800px]:shrink-0 @[800px]:flex-none'
+				hideActions ? 'flex-1' : 'flex-1 @[800px]:w-[45%] @[800px]:shrink-0 @[800px]:flex-none'
 			"
 		>
 			<Checkbox
@@ -140,7 +167,7 @@ const deleteHovered = ref(false)
 							<TriangleAlertIcon class="size-4 shrink-0 text-orange" />
 							<template #popper>
 								<div class="max-w-[18rem] text-sm">
-									{{ formatMessage(commonMessages.clientOnlyWarning) }}
+									{{ formatMessage(clientWarningMessage) }}
 								</div>
 							</template>
 						</Tooltip>
@@ -207,8 +234,8 @@ const deleteHovered = ref(false)
 				>
 					<span ref="versionNumberRef" class="truncate">{{
 						version.version_number.slice(0, Math.ceil(version.version_number.length / 2))
-					}}</span>
-					<span class="shrink-0">{{
+					}}</span
+					><span class="shrink-0">{{
 						version.version_number.slice(Math.ceil(version.version_number.length / 2))
 					}}</span>
 				</AutoLink>
@@ -218,8 +245,8 @@ const deleteHovered = ref(false)
 				>
 					<span ref="fileNameRef" class="truncate">{{
 						version.file_name.slice(0, Math.ceil(version.file_name.length / 2))
-					}}</span>
-					<span class="shrink-0">{{
+					}}</span
+					><span class="shrink-0">{{
 						version.file_name.slice(Math.ceil(version.file_name.length / 2))
 					}}</span>
 				</span>
@@ -232,8 +259,11 @@ const deleteHovered = ref(false)
 		>
 			<slot name="additionalButtonsLeft" />
 
-			<!-- Fixed width container to reserve space for update button -->
-			<div v-if="hasUpdateListener" class="flex w-8 items-center justify-center">
+			<!-- Fixed width container to reserve space for update/switch version button -->
+			<div
+				v-if="hasUpdateListener || hasSwitchVersionListener"
+				class="flex w-8 items-center justify-center"
+			>
 				<ButtonStyled
 					v-if="hasUpdate"
 					circular
@@ -244,10 +274,23 @@ const deleteHovered = ref(false)
 				>
 					<button
 						v-tooltip="formatMessage(commonMessages.updateAvailableLabel)"
-						:disabled="disabled"
+						:disabled="isDisabled"
 						@click="emit('update')"
 					>
 						<DownloadIcon class="size-5" />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled
+					v-else-if="hasSwitchVersionListener && version && !hideSwitchVersion"
+					circular
+					type="transparent"
+				>
+					<button
+						v-tooltip="formatMessage(commonMessages.switchVersionButton)"
+						:disabled="isDisabled"
+						@click="emit('switchVersion')"
+					>
+						<ArrowLeftRightIcon class="size-5" />
 					</button>
 				</ButtonStyled>
 			</div>
@@ -255,7 +298,7 @@ const deleteHovered = ref(false)
 			<Toggle
 				v-if="enabled !== undefined"
 				:model-value="enabled"
-				:disabled="disabled"
+				:disabled="isDisabled"
 				:aria-label="project.title"
 				class="my-auto"
 				@update:model-value="(val) => emit('update:enabled', val as boolean)"
@@ -270,7 +313,7 @@ const deleteHovered = ref(false)
 								: commonMessages.deleteLabel,
 						)
 					"
-					:disabled="disabled"
+					:disabled="isDisabled"
 					@click="emit('delete', $event)"
 					@mouseenter="deleteHovered = true"
 					@mouseleave="deleteHovered = false"
@@ -294,7 +337,7 @@ const deleteHovered = ref(false)
 				<TeleportOverflowMenu
 					v-if="overflowOptions?.length"
 					:options="overflowOptions"
-					:disabled="disabled"
+					:disabled="isDisabled"
 				>
 					<MoreVerticalIcon class="size-5" />
 				</TeleportOverflowMenu>

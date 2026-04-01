@@ -15,8 +15,9 @@ export interface InstallationModpackOwner {
 export interface InstallationModpackData {
 	iconUrl?: string
 	title: string
-	link: string | RouteLocationRaw
+	link?: string | RouteLocationRaw
 	versionNumber?: string
+	filename?: string
 	owner?: InstallationModpackOwner
 }
 
