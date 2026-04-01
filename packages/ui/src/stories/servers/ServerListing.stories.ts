@@ -144,6 +144,7 @@ export const SuspendedModerated: Story = {
 		name: 'Banned Server',
 		status: 'suspended',
 		suspension_reason: 'moderated',
+		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }
 
@@ -152,5 +153,6 @@ export const SuspendedGeneric: Story = {
 		...baseServer,
 		name: 'Server with other suspension reason',
 		status: 'suspended',
+		onDownloadBackup: () => alert('Download backup clicked'),
 	},
 }

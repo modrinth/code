@@ -309,7 +309,7 @@ const noticeButtons = computed<NoticeButtons | null>(() => {
 			return { downloadBackup: true, copyId: true, support: true, manageBilling: true }
 		case 'moderated':
 		case 'suspended':
-			return { copyId: true, support: true }
+			return { downloadBackup: true, copyId: true, support: true }
 		default:
 			return null
 	}
