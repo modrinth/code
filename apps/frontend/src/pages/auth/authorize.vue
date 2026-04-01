@@ -51,7 +51,12 @@
 				</ul>
 			</div>
 			<div class="flex flex-row flex-wrap justify-center gap-2">
-				<Button class="!w-full min-w-[8rem] flex-1 sm:flex-none" large :action="onReject" :disabled="pending">
+				<Button
+					class="!w-full min-w-[8rem] flex-1 sm:flex-none"
+					large
+					:action="onReject"
+					:disabled="pending"
+				>
 					<XIcon />
 					{{ formatMessage(messages.decline) }}
 				</Button>
