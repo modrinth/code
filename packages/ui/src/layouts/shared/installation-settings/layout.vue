@@ -24,6 +24,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
@@ -31,6 +32,7 @@ import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairMo
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
 import ContentDiffModal from './components/ContentDiffModal.vue'
+import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
 import { useInstallationForm } from './composables'
 import { injectInstallationSettings } from './providers/installation-settings'
 
@@ -44,11 +46,17 @@ const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
 const contentDiffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const incompatibleContentModal = ref<InstanceType<typeof IncompatibleContentModal>>()
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isUpdateDowngrade = ref(false)
 
-const form = useInstallationForm(ctx, contentUpdaterModal, contentDiffModal)
+const form = useInstallationForm(
+	ctx,
+	contentUpdaterModal,
+	contentDiffModal,
+	incompatibleContentModal,
+)
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (form.isSaving.value) {
@@ -131,6 +139,16 @@ function handleReinstall() {
 function handleUnlink() {
 	form.cancelEditing()
 	ctx.unlinkModpack()
+}
+
+const emit = defineEmits<{
+	'reset-server': []
+}>()
+
+function handleIncompatibleResetServer() {
+	form.cancelPreview()
+	form.cancelEditing()
+	emit('reset-server')
 }
 
 defineExpose({
@@ -477,6 +495,8 @@ const messages = defineMessages({
 							<Chips
 								v-model="form.selectedPlatform.value"
 								:items="ctx.availablePlatforms"
+								:format-label="formatLoaderLabel"
+								:capitalize="false"
 								:disabled-items="disabledPlatforms"
 								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
@@ -708,8 +728,20 @@ const messages = defineMessages({
 			@unlink="handleUnlink"
 		/>
 
+		<IncompatibleContentModal
+			v-if="form.incompatibleContentVariant.value"
+			ref="incompatibleContentModal"
+			:variant="form.incompatibleContentVariant.value"
+			:loading="form.isVerifying.value || form.isSaving.value"
+			@confirm-loader-change="form.confirmLoaderChange()"
+			@auto-fix="form.confirmAutoFix()"
+			@disable-conflicts="form.confirmDisableConflicts()"
+			@reset-server="handleIncompatibleResetServer"
+			@cancel="form.cancelPreview()"
+		/>
+
 		<ContentDiffModal
-			v-if="form.pendingPreview.value"
+			v-if="form.pendingPreview.value && !form.incompatibleContentVariant.value"
 			ref="contentDiffModal"
 			:header="formatMessage(messages.confirmVersionChangeHeader)"
 			:description="
