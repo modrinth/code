@@ -12,7 +12,12 @@
 </template>
 
 <script setup>
-import { commonProjectSettingsMessages, injectModrinthClient, useVIntl, useDebugLogger } from '@modrinth/ui'
+import {
+	commonProjectSettingsMessages,
+	injectModrinthClient,
+	useDebugLogger,
+	useVIntl,
+} from '@modrinth/ui'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
