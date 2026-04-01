@@ -24,6 +24,7 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
@@ -494,6 +495,8 @@ const messages = defineMessages({
 							<Chips
 								v-model="form.selectedPlatform.value"
 								:items="ctx.availablePlatforms"
+								:format-label="formatLoaderLabel"
+								:capitalize="false"
 								:disabled-items="disabledPlatforms"
 								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
