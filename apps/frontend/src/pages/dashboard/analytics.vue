@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { commonMessages, injectModrinthClient, useVIntl, useDebugLogger } from '@modrinth/ui'
+import { commonProjectSettingsMessages, injectModrinthClient, useVIntl, useDebugLogger } from '@modrinth/ui'
 
 import ChartDisplay from '~/components/ui/charts/ChartDisplay.vue'
 
@@ -25,7 +25,7 @@ definePageMeta({
 })
 
 useHead({
-	title: () => `${formatMessage(commonMessages.analyticsButton)} - Modrinth`,
+	title: () => `${formatMessage(commonProjectSettingsMessages.analytics)} - Modrinth`,
 })
 
 const auth = await useAuth()
