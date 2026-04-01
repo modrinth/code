@@ -4,19 +4,19 @@
 			<div class="flex flex-col gap-4 md:w-[400px]">
 				<p class="m-0">
 					Are you sure you want to
-					<span class="lowercase">{{ confirmActionText }}</span> the server?
+					<span class="lowercase">{{ pendingAction }}</span> the server?
 				</p>
 				<Checkbox
 					v-model="dontAskAgain"
 					label="Don't ask me again"
 					class="text-sm"
-					:disabled="!powerAction"
+					:disabled="!pendingAction"
 				/>
 				<div class="flex flex-row gap-4">
 					<ButtonStyled type="standard" color="brand" @click="executePowerAction">
 						<button>
 							<CheckIcon class="h-5 w-5" />
-							{{ confirmActionText }} server
+							{{ pendingAction }} server
 						</button>
 					</ButtonStyled>
 					<ButtonStyled @click="resetPowerAction">
@@ -31,11 +31,11 @@
 
 		<NewModal
 			ref="detailsModal"
-			:header="`All of ${serverName || 'Server'} info`"
-			@close="closeDetailsModal"
+			:header="`All of ${server.name || 'Server'} info`"
+			@close="detailsModal?.hide()"
 		>
 			<ServerInfoLabels
-				:server-data="serverData"
+				:server-data="server"
 				:show-game-label="true"
 				:show-loader-label="true"
 				:uptime-seconds="uptimeSeconds"
@@ -43,9 +43,9 @@
 				class="mb-6 flex flex-col gap-2"
 			/>
 			<div v-if="flags.advancedDebugInfo" class="markdown-body">
-				<pre>{{ serverData }}</pre>
+				<pre>{{ server }}</pre>
 			</div>
-			<ButtonStyled type="standard" color="brand" @click="closeDetailsModal">
+			<ButtonStyled type="standard" color="brand" @click="detailsModal?.hide()">
 				<button class="w-full">Close</button>
 			</ButtonStyled>
 		</NewModal>
@@ -62,14 +62,14 @@
 					<button :disabled="!canTakeAction" @click="initiateAction('Stop')">
 						<div class="flex gap-1">
 							<StopCircleIcon class="h-5 w-5" />
-							<span>{{ isStoppingState ? 'Stopping...' : 'Stop' }}</span>
+							<span>{{ isStopping ? 'Stopping...' : 'Stop' }}</span>
 						</div>
 					</button>
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand" size="large">
-					<button v-tooltip="busyReason" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<div v-if="isTransitionState" class="grid place-content-center">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+						<div v-if="isTransitioning" class="grid place-content-center">
 							<LoadingIcon />
 						</div>
 						<component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
@@ -116,8 +116,16 @@ import {
 	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, NewModal, ServerInfoLabels } from '@modrinth/ui'
-import type { PowerAction as ServerPowerAction, ServerState } from '@modrinth/utils'
+import {
+	ButtonStyled,
+	Checkbox,
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+	NewModal,
+	ServerInfoLabels,
+	useVIntl,
+} from '@modrinth/ui'
 import { useStorage } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -126,70 +134,60 @@ import LoadingIcon from './icons/LoadingIcon.vue'
 import PanelSpinner from './PanelSpinner.vue'
 import TeleportOverflowMenu from './TeleportOverflowMenu.vue'
 
-const flags = useFeatureFlags()
-
-interface PowerAction {
-	action: ServerPowerAction
-	nextState: ServerState
-}
+type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
 
 const props = defineProps<{
-	isOnline: boolean
-	isActioning: boolean
-	isInstalling: boolean
-	disabled: boolean
-	serverName?: string
-	serverData: object
+	disabled?: boolean
 	uptimeSeconds: number
-	busyReason?: string
 }>()
 
-const emit = defineEmits<{
-	(e: 'action', action: ServerPowerAction): void
-}>()
-
+const { formatMessage } = useVIntl()
+const flags = useFeatureFlags()
 const router = useRouter()
-const serverId = router.currentRoute.value.params.id
+const client = injectModrinthClient()
+const { serverId, server, powerState, busyReasons } = injectModrinthServerContext()
+const { addNotification } = injectNotificationManager()
+
 const confirmActionModal = ref<InstanceType<typeof NewModal> | null>(null)
 const detailsModal = ref<InstanceType<typeof NewModal> | null>(null)
+const pendingAction = ref<PowerAction | null>(null)
+const dontAskAgain = ref(false)
 
 const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	powerDontAskAgain: false,
 })
 
-const serverState = ref<ServerState>(props.isOnline ? 'running' : 'stopped')
-const powerAction = ref<PowerAction | null>(null)
-const dontAskAgain = ref(false)
-const startingDelay = ref(false)
+const isInstalling = computed(() => server.value.status === 'installing')
+const isRunning = computed(() => powerState.value === 'running')
+const isStopping = computed(() => powerState.value === 'stopping')
+const isTransitioning = computed(
+	() => powerState.value === 'starting' || powerState.value === 'stopping',
+)
+const showStopButton = computed(() => isRunning.value || isStopping.value)
+
+const busyTooltip = computed(() =>
+	busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
+)
 
 const canTakeAction = computed(
-	() => !props.isActioning && !startingDelay.value && !isTransitionState.value && !props.busyReason,
+	() => !isTransitioning.value && !props.disabled && busyReasons.value.length === 0,
 )
-const isRunning = computed(() => serverState.value === 'running')
-const isTransitionState = computed(() =>
-	['starting', 'stopping', 'restarting'].includes(serverState.value),
-)
-const isStoppingState = computed(() => serverState.value === 'stopping')
-const showStopButton = computed(() => isRunning.value || isStoppingState.value)
 
 const primaryActionText = computed(() => {
-	const states: Partial<Record<ServerState, string>> = {
-		starting: 'Starting...',
-		restarting: 'Restarting...',
-		running: 'Restart',
-		stopping: 'Stopping...',
-		stopped: 'Start',
+	switch (powerState.value) {
+		case 'starting':
+			return 'Starting...'
+		case 'stopping':
+			return 'Stopping...'
+		case 'running':
+			return 'Restart'
+		default:
+			return 'Start'
 	}
-	return states[serverState.value]
-})
-
-const confirmActionText = computed(() => {
-	if (!powerAction.value) return ''
-	return powerAction.value.action.charAt(0).toUpperCase() + powerAction.value.action.slice(1)
 })
 
 const menuOptions = computed(() => [
-	...(props.isInstalling
+	...(isInstalling.value
 		? []
 		: [
 				{
@@ -221,28 +219,31 @@ const menuOptions = computed(() => [
 ])
 
 async function copyId() {
-	await navigator.clipboard.writeText(serverId as string)
+	await navigator.clipboard.writeText(serverId)
 }
 
-function initiateAction(action: ServerPowerAction) {
+async function sendPowerAction(action: PowerAction) {
+	try {
+		await client.archon.servers_v0.power(serverId, action)
+	} catch (error) {
+		console.error(`Error performing ${action} on server:`, error)
+		addNotification({
+			type: 'error',
+			title: `Failed to ${action.toLowerCase()} server`,
+			text: 'An error occurred while performing this action.',
+		})
+	}
+}
+
+function initiateAction(action: PowerAction) {
 	if (!canTakeAction.value) return
 
-	const stateMap: Record<ServerPowerAction, ServerState> = {
-		Start: 'starting',
-		Stop: 'stopping',
-		Restart: 'restarting',
-		Kill: 'stopping',
-	}
-
 	if (action === 'Start') {
-		emit('action', action)
-		serverState.value = stateMap[action]
-		startingDelay.value = true
-		setTimeout(() => (startingDelay.value = false), 5000)
+		sendPowerAction(action)
 		return
 	}
 
-	powerAction.value = { action, nextState: stateMap[action] }
+	pendingAction.value = action
 
 	if (userPreferences.value.powerDontAskAgain) {
 		executePowerAction()
@@ -256,19 +257,12 @@ function handlePrimaryAction() {
 }
 
 function executePowerAction() {
-	if (!powerAction.value) return
+	if (!pendingAction.value) return
 
-	const { action, nextState } = powerAction.value
-	emit('action', action)
-	serverState.value = nextState
+	sendPowerAction(pendingAction.value)
 
 	if (dontAskAgain.value) {
 		userPreferences.value.powerDontAskAgain = true
-	}
-
-	if (action === 'Start') {
-		startingDelay.value = true
-		setTimeout(() => (startingDelay.value = false), 5000)
 	}
 
 	resetPowerAction()
@@ -276,21 +270,7 @@ function executePowerAction() {
 
 function resetPowerAction() {
 	confirmActionModal.value?.hide()
-	powerAction.value = null
+	pendingAction.value = null
 	dontAskAgain.value = false
 }
-
-function closeDetailsModal() {
-	detailsModal.value?.hide()
-}
-
-watch(
-	() => props.isOnline,
-	(online) => (serverState.value = online ? 'running' : 'stopped'),
-)
-
-watch(
-	() => router.currentRoute.value.fullPath,
-	() => closeDetailsModal(),
-)
 </script>

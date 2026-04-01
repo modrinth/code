@@ -44,7 +44,7 @@
 			/>
 		</div>
 		<span v-if="!props.hideShiftClickHint" class="text-secondary">
-			{{ formatMessage(messages.shiftClickHint) }}
+			{{ props.shiftClickHintOverride ?? formatMessage(messages.shiftClickHint) }}
 		</span>
 	</div>
 </template>
@@ -61,6 +61,7 @@ import { useInlineBackup } from '../../composables/use-inline-backup'
 const props = defineProps<{
 	backupName: string
 	hideShiftClickHint?: boolean
+	shiftClickHintOverride?: string
 }>()
 
 const emit = defineEmits<{

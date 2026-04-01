@@ -18,8 +18,8 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-if="props.restart" type="standard" color="brand">
-							<button :disabled="props.isUpdating" @click="saveAndRestart">
-								{{ props.isUpdating ? 'Saving...' : 'Save & restart' }}
+							<button :disabled="props.isUpdating || isTransitioning" @click="saveAndPower">
+								{{ powerButtonLabel }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -30,7 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonStyled, injectModrinthClient } from '@modrinth/ui'
+import { ButtonStyled, injectModrinthClient, injectModrinthServerContext } from '@modrinth/ui'
+import { computed } from 'vue'
 
 const props = defineProps<{
 	isUpdating: boolean
@@ -42,10 +43,23 @@ const props = defineProps<{
 }>()
 
 const client = injectModrinthClient()
+const { powerState } = injectModrinthServerContext()
 
-const saveAndRestart = async () => {
+const isStopped = computed(() => powerState.value === 'stopped' || powerState.value === 'crashed')
+
+const isTransitioning = computed(
+	() => powerState.value === 'starting' || powerState.value === 'stopping',
+)
+
+const powerButtonLabel = computed(() => {
+	if (props.isUpdating) return 'Saving...'
+	if (isTransitioning.value) return isStopped.value ? 'Save & start' : 'Save & restart'
+	return isStopped.value ? 'Save & start' : 'Save & restart'
+})
+
+const saveAndPower = async () => {
 	props.save()
-	await client.archon.servers_v0.power(props.serverId, 'Restart')
+	await client.archon.servers_v0.power(props.serverId, isStopped.value ? 'Start' : 'Restart')
 }
 </script>
 
