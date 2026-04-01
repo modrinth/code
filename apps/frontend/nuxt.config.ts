@@ -200,10 +200,7 @@ export default defineNuxtConfig({
 
 			console.log('Tags generated!')
 
-			const robotsContent =
-				getDomain() === PROD_MODRINTH_URL && process.env.PREVIEW !== 'true'
-					? 'User-agent: *\nDisallow: /_internal/'
-					: 'User-agent: *\nDisallow: /'
+			const robotsContent = 'User-agent: *\nDisallow: /'
 
 			await fs.writeFile('./src/public/robots.txt', robotsContent)
 		},
