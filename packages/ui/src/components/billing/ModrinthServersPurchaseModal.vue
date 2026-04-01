@@ -416,7 +416,7 @@ function goToBreadcrumbStep(id: string) {
 				<button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
-				<button v-else @click="modal?.hide()">
+				<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>

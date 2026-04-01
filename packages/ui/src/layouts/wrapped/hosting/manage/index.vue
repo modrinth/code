@@ -127,10 +127,10 @@
 							type="search"
 							name="search"
 							autocomplete="off"
-							placeholder="Search servers..."
+							:placeholder="`Search ${filteredData.length} servers...`"
 							wrapper-class="w-full md:w-72"
 						/>
-						<ButtonStyled type="standard">
+						<ButtonStyled type="standard" color="brand">
 							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
 								New server

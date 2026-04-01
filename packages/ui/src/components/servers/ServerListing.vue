@@ -2,11 +2,12 @@
 	<div>
 		<NuxtLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-transform duration-100"
+				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-all duration-150"
 				:class="{
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
+					'hover:brightness-125': !isDisabled,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
@@ -159,9 +160,8 @@
 
 		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
-				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{
-					pendingChange.planSize
-				}}" plan on
+				Your server will {{ pendingChange.verb.toLowerCase() }} to the
+				{{ pendingChange.planSize }} Plan on
 				<span class="font-medium text-contrast">{{ formatDate(pendingChange.date) }}</span
 				>.
 			</div>

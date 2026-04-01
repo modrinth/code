@@ -194,7 +194,7 @@ function selectCustom() {
 			class="flex flex-col gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5 h-full"
 		>
 			<div>
-				<div class="text-[1.75rem] font-semibold text-contrast leading-none">
+				<div class="text-3xl font-semibold text-contrast leading-none">
 					{{ formatMessage(messages.smallTitle) }}
 				</div>
 				<div class="mt-1">
@@ -235,7 +235,7 @@ function selectCustom() {
 		</div>
 
 		<!-- Medium (Most Popular) -->
-		<div v-if="plansByRam.medium && mediumPrice" class="flex flex-col items-center relative">
+		<div v-if="plansByRam.medium && mediumPrice" class="flex flex-col items-center relative h-full">
 			<div
 				class="z-10 -mb-3.5 rounded-full text-sm font-medium text-brand whitespace-nowrap absolute -top-3 right-4 bg-surface-3"
 			>
@@ -254,7 +254,7 @@ function selectCustom() {
 				}"
 			>
 				<div>
-					<div class="text-[1.75rem] font-semibold text-contrast leading-none">
+					<div class="text-3xl font-semibold text-contrast leading-none">
 						{{ formatMessage(messages.mediumTitle) }}
 					</div>
 					<div class="mt-1">
@@ -301,7 +301,7 @@ function selectCustom() {
 			class="flex flex-col gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5 h-full"
 		>
 			<div>
-				<div class="text-[1.75rem] font-semibold text-contrast leading-none">
+				<div class="text-3xl font-semibold text-contrast leading-none">
 					{{ formatMessage(messages.largeTitle) }}
 				</div>
 				<div class="mt-1">
@@ -348,7 +348,7 @@ function selectCustom() {
 		class="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-surface-2 border-2 border-solid border-transparent p-5"
 	>
 		<div class="flex flex-col gap-1">
-			<div class="text-xl font-semibold text-contrast">
+			<div class="text-2xl font-semibold text-contrast">
 				{{ formatMessage(messages.customHeading) }}
 			</div>
 			<div class="text-sm text-secondary">

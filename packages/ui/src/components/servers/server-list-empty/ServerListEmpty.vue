@@ -15,7 +15,7 @@
 			<div class="flex flex-col gap-4 items-start w-full">
 				<div class="flex gap-3 items-start">
 					<div
-						class="bg-surface-4 border border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center"
+						class="bg-surface-4 border border-solid border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center"
 					>
 						<PackageOpenIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
@@ -29,21 +29,21 @@
 
 				<div class="flex gap-3 items-start">
 					<div
-						class="bg-surface-4 border border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center overflow-hidden"
+						class="bg-surface-4 border border-solid border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center overflow-hidden"
 					>
 						<GlobeIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
 					<div class="flex flex-col gap-0.5">
 						<p class="text-base font-semibold text-contrast">Simple setup</p>
 						<p class="text-base font-normal text-primary">
-							Set up your server just like a singleplayer world.
+							Set up your server just like a single player world.
 						</p>
 					</div>
 				</div>
 
 				<div class="flex gap-3 items-start">
 					<div
-						class="bg-surface-4 border border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center overflow-hidden"
+						class="bg-surface-4 border border-solid border-surface-5 rounded-full shrink-0 size-8 flex items-center justify-center overflow-hidden"
 					>
 						<UsersIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
@@ -69,7 +69,7 @@
 					<AutoLink
 						to="https://modrinth.com/hosting"
 						target="_blank"
-						class="flex items-center gap-1"
+						class="flex items-center gap-1 hover:brightness-125"
 					>
 						Learn more about Modrinth Hosting
 						<RightArrowIcon class="size-5 shrink-0" aria-hidden="true" />
