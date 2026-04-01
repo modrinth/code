@@ -8,11 +8,11 @@
 
 		<div
 			v-if="projectInfo"
-			class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 mx-6 mt-6 p-3"
+			class="flex items-center gap-2.5 rounded-[4px] bg-surface-2 mx-6 mt-6 p-3"
 		>
 			<AutoLink :to="projectInfo.link" class="shrink-0">
 				<div
-					class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
+					class="size-14 shrink-0 overflow-hidden rounded-[4px] border border-solid border-surface-5"
 				>
 					<Avatar
 						v-if="projectInfo.iconUrl"

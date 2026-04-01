@@ -141,7 +141,6 @@ provide('selectedInterval', selectedInterval)
 		<OptionGroup
 			v-slot="{ option }"
 			v-model="selectedInterval"
-			class="!bg-button-bg !shadow-none"
 			:options="availableBillingIntervals"
 		>
 			<template v-if="option === 'monthly'"> Pay monthly </template>
@@ -195,7 +194,7 @@ provide('selectedInterval', selectedInterval)
 		/>
 		<div
 			v-if="customStartingPrice"
-			class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
+			class="rounded-[4px] p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
 			:class="!selectedPlan ? 'bg-brand-highlight border-brand' : 'bg-button-bg border-transparent'"
 			role="button"
 			tabindex="0"

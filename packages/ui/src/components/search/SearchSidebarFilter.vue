@@ -39,7 +39,7 @@
 			</div>
 		</template>
 		<template v-if="locked" #default>
-			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-2xl border-divider mx-2">
+			<div class="flex flex-col gap-2 p-3 border-dashed border-2 rounded-[4px] border-divider mx-2">
 				<p class="m-0 font-bold items-center">
 					<slot :name="`locked-${filterType.id}`">
 						{{ formatMessage(messages.lockedTitle, { type: filterType.formatted_name }) }}
@@ -75,7 +75,6 @@
 				autocomplete="off"
 				clearable
 				size="small"
-				input-class="!bg-button-bg"
 				wrapper-class="mx-2 my-1 w-[calc(100%-1rem)]"
 			/>
 
@@ -91,7 +90,6 @@
 							:included="isIncluded"
 							:excluded="isExcluded"
 							@toggle="toggleFilter"
-							@toggle-exclude="toggleNegativeFilter"
 						/>
 					</template>
 					<template v-else>
@@ -106,22 +104,9 @@
 								'mr-3': scrollable,
 							}"
 							@toggle="toggleFilter"
-							@toggle-exclude="toggleNegativeFilter"
 						>
 							<slot name="option" :filter="filterType" :option="option">
-								<span
-									v-if="option.icon"
-									class="inline-flex items-center justify-center shrink-0 h-4 w-4"
-									:style="iconStyle(option)"
-								>
-									<div
-										v-if="typeof option.icon === 'string'"
-										class="h-4 w-4"
-										v-html="option.icon"
-									/>
-									<component :is="option.icon" v-else class="h-4 w-4" />
-								</span>
-								<span class="truncate text-sm" :style="iconStyle(option)">
+								<span class="truncate text-sm">
 									{{ option.formatted_name ?? option.id }}
 								</span>
 							</slot>
@@ -129,13 +114,9 @@
 					</template>
 					<button
 						v-if="filterType.display === 'expandable'"
-						class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98]"
+						class="flex bg-transparent text-secondary border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm"
 						@click="showMore = !showMore"
 					>
-						<DropdownIcon
-							class="h-4 w-4 transition-transform"
-							:class="{ 'rotate-180': showMore }"
-						/>
 						<span class="truncate text-sm">
 							{{ showMore ? formatMessage(messages.showFewer) : formatMessage(messages.showMore) }}
 						</span>
@@ -178,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { BanIcon, DropdownIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
+import { BanIcon, LockOpenIcon, SearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
@@ -271,22 +252,6 @@ const scrollable = computed(
 	() => visibleOptions.value.length >= 10 && props.filterType.display === 'scrollable',
 )
 
-function iconStyle(option: FilterOption) {
-	// Match project page platform coloring (Forge/Fabric/Velocity/etc.) while leaving other
-	// filter icons unchanged.
-	if (
-		props.filterType.id === 'mod_loader' ||
-		props.filterType.id === 'modpack_loader' ||
-		props.filterType.id === 'plugin_loader' ||
-		props.filterType.id === 'plugin_platform' ||
-		props.filterType.id === 'shader_loader'
-	) {
-		return { color: `var(--color-platform-${option.id})` }
-	}
-
-	return undefined
-}
-
 function groupEnabled(group: string) {
 	return toggledGroups.value.includes(group)
 }
@@ -331,11 +296,17 @@ function isProvided(filter: FilterOption, negative: boolean) {
 type FilterState = 'include' | 'exclude' | 'ignore'
 
 function toggleFilter(filter: FilterOption) {
-	setFilter(filter, isIncluded(filter) || isExcluded(filter) ? 'ignore' : 'include')
-}
-
-function toggleNegativeFilter(filter: FilterOption) {
-	setFilter(filter, isExcluded(filter) ? 'ignore' : 'exclude')
+	if (props.filterType.supports_negative_filter) {
+		if (isExcluded(filter)) {
+			setFilter(filter, 'ignore')
+		} else if (isIncluded(filter)) {
+			setFilter(filter, 'exclude')
+		} else {
+			setFilter(filter, 'include')
+		}
+	} else {
+		setFilter(filter, isIncluded(filter) ? 'ignore' : 'include')
+	}
 }
 
 function setFilter(filter: FilterOption, state: FilterState) {

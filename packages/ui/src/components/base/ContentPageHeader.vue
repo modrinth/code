@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-2 border-0 border-b border-solid border-divider pb-4">
+	<div class="flex flex-col gap-2 border-0 border-b border-solid border-divider pb-4 px-4">
 		<div class="grid grid-cols-[1fr_auto] gap-y-6">
 			<div class="flex gap-4 w-full">
 				<slot name="icon" />

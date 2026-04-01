@@ -1,7 +1,7 @@
 <template>
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
-		<div class="flex flex-col gap-3 font-semibold [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
+		<h2 class="text-primary text-base m-0">{{ formatMessage(commonMessages.detailsLabel) }}</h2>
+		<div class="flex flex-col gap-3 font-normal [&>div]:flex [&>div]:gap-2 [&>div]:items-center">
 			<div v-if="!hideLicense">
 				<BookTextIcon aria-hidden="true" />
 				<div>

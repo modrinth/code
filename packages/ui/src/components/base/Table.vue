@@ -1,5 +1,5 @@
 <template>
-	<div class="overflow-hidden rounded-2xl border border-solid border-surface-3">
+	<div class="overflow-hidden rounded-[4px] border border-solid border-surface-3">
 		<table class="w-full border-separate border-spacing-0">
 			<thead>
 				<tr class="bg-surface-3">

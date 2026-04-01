@@ -72,7 +72,7 @@
 				<div
 					v-for="i in 3"
 					:key="i"
-					class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4"
+					class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-[4px] border-[1px] border-solid border-button-bg bg-bg-raised p-4"
 				>
 					<div class="size-16 rounded-xl bg-button-bg"></div>
 					<div class="flex flex-1 flex-col gap-2">

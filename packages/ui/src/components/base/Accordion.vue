@@ -8,11 +8,12 @@
 			<slot name="button" :open="isOpen">
 				<div class="flex items-center gap-1 w-full text-contrast">
 					<slot name="title" :open="isOpen" />
-					<DropdownIcon
+					<span
 						v-if="!forceOpen"
-						class="ml-auto size-5 transition-transform duration-300 shrink-0 text-contrast"
+						class="ml-auto size-5 shrink-0 text-contrast"
 						:class="{ 'rotate-180': isOpen }"
-					/>
+						>▼</span
+					>
 				</div>
 			</slot>
 			<slot name="summary" />
@@ -32,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownIcon } from '@modrinth/assets'
 import { computed, ref, useSlots, watch } from 'vue'
 
 const props = withDefaults(
@@ -102,7 +102,6 @@ defineOptions({
 .accordion-content {
 	display: grid;
 	grid-template-rows: 0fr;
-	transition: grid-template-rows 0.3s ease-in-out;
 }
 
 @media (prefers-reduced-motion) {

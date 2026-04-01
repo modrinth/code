@@ -1,5 +1,5 @@
 <template>
-	<div class="card-shadow flex flex-col gap-4 rounded-2xl bg-bg-raised p-4">
+	<div class="card-shadow flex flex-col gap-4 rounded-[4px] bg-bg-raised p-4">
 		<div class="flex items-center gap-4">
 			<div
 				class="flex items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg p-2"

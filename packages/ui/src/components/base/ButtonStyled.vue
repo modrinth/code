@@ -4,6 +4,7 @@ import { computed } from 'vue'
 const props = withDefaults(
 	defineProps<{
 		color?: 'standard' | 'brand' | 'red' | 'orange' | 'green' | 'blue' | 'purple' | 'medal-promo'
+		customColor?: string
 		size?: 'standard' | 'large' | 'small'
 		circular?: boolean
 		type?: 'standard' | 'outlined' | 'transparent' | 'highlight' | 'highlight-colored-text' | 'chip'
@@ -25,6 +26,9 @@ const props = withDefaults(
 )
 
 const highlightedColorVar = computed(() => {
+	if (props.customColor) {
+		return null
+	}
 	switch (props.color) {
 		case 'brand':
 			return 'var(--color-brand-highlight)'
@@ -46,6 +50,9 @@ const highlightedColorVar = computed(() => {
 })
 
 const colorVar = computed(() => {
+	if (props.customColor) {
+		return props.customColor
+	}
 	switch (props.color) {
 		case 'brand':
 			return 'var(--color-brand)'
@@ -69,7 +76,7 @@ const colorVar = computed(() => {
 
 const height = computed(() => {
 	if (props.size === 'large') {
-		return '3rem'
+		return '2.5rem'
 	} else if (props.size === 'small') {
 		return '1.5rem'
 	}
@@ -78,7 +85,7 @@ const height = computed(() => {
 
 const width = computed(() => {
 	if (props.size === 'large') {
-		return props.circular ? '3rem' : 'auto'
+		return props.circular ? '2.5rem' : 'auto'
 	} else if (props.size === 'small') {
 		return props.circular ? '1.5rem' : 'auto'
 	}
@@ -86,9 +93,9 @@ const width = computed(() => {
 })
 
 const paddingX = computed(() => {
-	let padding = props.circular ? '0.5rem' : '0.75rem'
+	let padding = props.circular ? '0.5rem' : '1.25rem'
 	if (props.size === 'large') {
-		padding = props.circular ? '0.75rem' : '1rem'
+		padding = props.circular ? '0.5rem' : '1.25rem'
 	} else if (props.size === 'small') {
 		padding = props.circular ? '0.125rem' : '0.5rem'
 	}
@@ -97,7 +104,7 @@ const paddingX = computed(() => {
 
 const paddingY = computed(() => {
 	if (props.size === 'large') {
-		return '0.75rem'
+		return '0.5rem'
 	}
 	return '0.5rem'
 })
@@ -119,21 +126,12 @@ const fontWeight = computed(() => {
 })
 
 const radius = computed(() => {
-	if (props.circular) {
-		return '99999px'
-	}
-
-	if (props.size === 'large') {
-		return '1rem'
-	} else if (props.size === 'small') {
-		return '0.5rem'
-	}
-	return '0.75rem'
+	return '5px'
 })
 
 const iconSize = computed(() => {
 	if (props.size === 'large') {
-		return '1.5rem'
+		return '1.25rem'
 	} else if (props.size === 'small') {
 		return '1rem'
 	}
@@ -202,7 +200,7 @@ const colorVariables = computed(() => {
 		hoverColors.bg = 'transparent'
 	}
 
-	if (props.type === 'outlined' || props.type === 'transparent') {
+	if (props.type === 'outlined') {
 		colors.bg = 'transparent'
 		colors = setColorFill(colors, props.colorFill === 'auto' ? 'text' : props.colorFill)
 		hoverColors = setColorFill(
@@ -263,18 +261,25 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
-	box-shadow: var(--_box-shadow, inset 0 0 0 transparent);
-	transition:
-		scale 0.125s ease-in-out,
-		background-color 0.25s ease-in-out,
-		color 0.25s ease-in-out,
-		filter 0.25s ease-in-out;
+	@apply flex flex-row items-center justify-center border-solid border border-[rgba(0,0,0,0.2)] bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[4px] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
+	position: relative;
 
 	svg:first-child {
 		color: var(--_icon, var(--_text));
-		transition: color 0.25s ease-in-out;
 		flex-shrink: 0;
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to bottom,
+			rgba(255, 255, 255, 0.8),
+			rgba(0, 0, 0, 0),
+			rgba(0, 0, 0, 0.3)
+		);
+		border-radius: 4px;
 	}
 
 	&[disabled],
@@ -282,12 +287,6 @@ const fontSize = computed(() => {
 	&.disabled,
 	&.looks-disabled {
 		@apply opacity-50;
-	}
-
-	&[disabled],
-	&[disabled='true'],
-	&.disabled {
-		@apply cursor-not-allowed;
 	}
 
 	&:not([disabled]):not([disabled='true']):not(.disabled) {
@@ -298,32 +297,6 @@ const fontSize = computed(() => {
 			color: var(--_hover-icon, var(--_hover-text));
 		}
 	}
-}
-
-.btn-wrapper:not(.chip) :deep(:is(button, a, .button-like):first-child),
-.btn-wrapper:not(.chip) :slotted(:is(button, a, .button-like):first-child),
-.btn-wrapper:not(.chip) :slotted(*) > :is(button, a, .button-like):first-child,
-.btn-wrapper:not(.chip) :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
-.btn-wrapper:not(.chip)
-	:slotted(*)
-	> *:first-child
-	> *:first-child
-	> :is(button, a, .button-like):first-child {
-	&:not([disabled]):not([disabled='true']):not(.disabled) {
-		@apply active:scale-95;
-	}
-}
-
-.btn-wrapper.outline :deep(:is(button, a, .button-like):first-child),
-.btn-wrapper.outline :slotted(:is(button, a, .button-like):first-child),
-.btn-wrapper.outline :slotted(*) > :is(button, a, .button-like):first-child,
-.btn-wrapper.outline :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
-.btn-wrapper.outline
-	:slotted(*)
-	> *:first-child
-	> *:first-child
-	> :is(button, a, .button-like):first-child {
-	@apply border-current;
 }
 
 /*noinspection CssUnresolvedCustomProperty*/

@@ -321,125 +321,102 @@
 				</div>
 			</div>
 		</Modal>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(messages.accountSecurityTitle) }}</h2>
+		<section class="flex flex-col">
+			<label>
+				<p class="mb-2 mt-0 font-bold">{{ formatMessage(messages.emailFieldTitle) }}</p>
+			</label>
+			<ButtonStyled>
+				<button type="button" class="iconified-button" @click="$refs.changeEmailModal.show()">
+					<template v-if="auth.user.email">
+						{{ formatMessage(messages.changeEmailButton) }}
+					</template>
+					<template v-else>
+						{{ formatMessage(messages.addEmailButton) }}
+					</template>
+				</button>
+			</ButtonStyled>
 
-			<div class="adjacent-input">
-				<label for="theme-selector">
-					<span class="label__title">{{ formatMessage(messages.emailFieldTitle) }}</span>
-					<span class="label__description">{{
-						formatMessage(messages.emailFieldDescription)
-					}}</span>
-				</label>
-				<div>
-					<button class="iconified-button" @click="$refs.changeEmailModal.show()">
-						<template v-if="auth.user.email">
-							<EditIcon />
-							{{ formatMessage(messages.changeEmailButton) }}
-						</template>
-						<template v-else>
-							<PlusIcon />
-							{{ formatMessage(messages.addEmailButton) }}
-						</template>
-					</button>
-				</div>
-			</div>
-			<div class="adjacent-input">
-				<label for="theme-selector">
-					<span class="label__title">{{ formatMessage(messages.passwordFieldTitle) }}</span>
-					<span v-if="auth.user.has_password" class="label__description">
-						{{
-							auth.user.auth_providers.length > 0
-								? formatMessage(messages.passwordDescriptionChangeOrRemove)
-								: formatMessage(messages.passwordDescriptionChange)
-						}}
-					</span>
-					<span v-else class="label__description">
-						{{ formatMessage(messages.passwordDescriptionSet) }}
-					</span>
-				</label>
-				<div>
-					<button
-						class="iconified-button"
-						@click="
-							() => {
-								oldPassword = ''
-								newPassword = ''
-								confirmNewPassword = ''
-								removePasswordMode = false
-								$refs.managePasswordModal.show()
-							}
-						"
-					>
-						<KeyIcon />
-						<template v-if="auth.user.has_password">{{
-							formatMessage(messages.changePasswordButton)
-						}}</template>
-						<template v-else> {{ formatMessage(messages.addPasswordButton) }} </template>
-					</button>
-				</div>
-			</div>
-			<div class="adjacent-input">
-				<label for="theme-selector">
-					<span class="label__title">{{ formatMessage(messages.twoFactorFieldTitle) }}</span>
-					<span class="label__description">{{
-						formatMessage(messages.twoFactorFieldDescription)
-					}}</span>
-				</label>
-				<div>
-					<button class="iconified-button" @click="showTwoFactorModal">
-						<template v-if="auth.user.has_totp">
-							<TrashIcon /> {{ formatMessage(messages.twoFactorRemoveButton) }}
-						</template>
-						<template v-else>
-							<PlusIcon /> {{ formatMessage(messages.twoFactorSetupButton) }}
-						</template>
-					</button>
-				</div>
-			</div>
-			<div class="adjacent-input">
-				<label for="theme-selector">
-					<span class="label__title">{{ formatMessage(messages.manageProvidersFieldTitle) }}</span>
-					<span class="label__description">{{
-						formatMessage(messages.manageProvidersFieldDescription)
-					}}</span>
-				</label>
-				<div>
-					<button class="iconified-button" @click="$refs.manageProvidersModal.show()">
-						<SettingsIcon /> {{ formatMessage(messages.manageProvidersButton) }}
-					</button>
-				</div>
-			</div>
+			<label>
+				<p class="mb-2 mt-4 font-bold">{{ formatMessage(messages.passwordFieldTitle) }}</p>
+			</label>
+			<ButtonStyled>
+				<button
+					type="button"
+					class="iconified-button"
+					@click="
+						() => {
+							oldPassword = ''
+							newPassword = ''
+							confirmNewPassword = ''
+							removePasswordMode = false
+							$refs.managePasswordModal.show()
+						}
+					"
+				>
+					<template v-if="auth.user.has_password">{{
+						formatMessage(messages.changePasswordButton)
+					}}</template>
+					<template v-else> {{ formatMessage(messages.addPasswordButton) }} </template>
+				</button>
+			</ButtonStyled>
+
+			<label>
+				<p class="mb-2 mt-4 font-bold">{{ formatMessage(messages.twoFactorFieldTitle) }}</p>
+			</label>
+			<ButtonStyled>
+				<button type="button" class="iconified-button" @click="showTwoFactorModal">
+					<template v-if="auth.user.has_totp">
+						{{ formatMessage(messages.twoFactorRemoveButton) }}
+					</template>
+					<template v-else>
+						{{ formatMessage(messages.twoFactorSetupButton) }}
+					</template>
+				</button>
+			</ButtonStyled>
+
+			<label>
+				<p class="mb-2 mt-4 font-bold">{{ formatMessage(messages.manageProvidersFieldTitle) }}</p>
+			</label>
+			<ButtonStyled>
+				<button type="button" class="iconified-button" @click="$refs.manageProvidersModal.show()">
+					{{ formatMessage(messages.manageProvidersButton) }}
+				</button>
+			</ButtonStyled>
 		</section>
 
-		<section id="data-export" class="universal-card">
-			<h2>{{ formatMessage(messages.dataExportTitle) }}</h2>
-			<p>{{ formatMessage(messages.dataExportDescription) }}</p>
-			<a v-if="generated" class="iconified-button" :href="generated" download="export.json">
-				<DownloadIcon />
-				{{ formatMessage(messages.downloadExportButton) }}
-			</a>
-			<button v-else class="iconified-button" :disabled="generatingExport" @click="exportData">
-				<template v-if="generatingExport">
-					<UpdatedIcon /> {{ formatMessage(messages.generatingExportButton) }}
-				</template>
-				<template v-else>
-					<UpdatedIcon /> {{ formatMessage(messages.generateExportButton) }}
-				</template>
-			</button>
+		<section id="data-export" class="flex flex-col border-t border-divider">
+			<p class="mb-1 font-bold">{{ formatMessage(messages.dataExportTitle) }}</p>
+			<p class="mb-2 mt-0">{{ formatMessage(messages.dataExportDescription) }}</p>
+			<ButtonStyled v-if="generated">
+				<a class="iconified-button" :href="generated" download="export.json">
+					{{ formatMessage(messages.downloadExportButton) }}
+				</a>
+			</ButtonStyled>
+			<ButtonStyled v-else>
+				<button
+					type="button"
+					class="iconified-button"
+					:disabled="generatingExport"
+					@click="exportData"
+				>
+					<template v-if="generatingExport">
+						{{ formatMessage(messages.generatingExportButton) }}
+					</template>
+					<template v-else>
+						{{ formatMessage(messages.generateExportButton) }}
+					</template>
+				</button>
+			</ButtonStyled>
 		</section>
 
-		<section id="delete-account" class="universal-card">
-			<h2>{{ formatMessage(messages.deleteAccountSectionTitle) }}</h2>
-			<p>{{ formatMessage(messages.deleteAccountSectionDescription) }}</p>
-			<button
-				type="button"
-				class="iconified-button danger-button"
-				@click="$refs.modal_confirm.show()"
-			>
-				<TrashIcon />
-				{{ formatMessage(messages.deleteAccountButton) }}
-			</button>
+		<section id="delete-account" class="flex flex-col border-t border-divider">
+			<p class="mb-1 font-bold">{{ formatMessage(messages.deleteAccountSectionTitle) }}</p>
+			<p class="mb-2 mt-0">{{ formatMessage(messages.deleteAccountSectionDescription) }}</p>
+			<ButtonStyled color="red">
+				<button type="button" class="iconified-button" @click="$refs.modal_confirm.show()">
+					{{ formatMessage(messages.deleteAccountButton) }}
+				</button>
+			</ButtonStyled>
 		</section>
 	</div>
 </template>
@@ -447,19 +424,15 @@
 <script setup>
 import {
 	CheckIcon,
-	DownloadIcon,
-	EditIcon,
 	ExternalIcon,
 	LeftArrowIcon,
-	PlusIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SettingsIcon,
 	TrashIcon,
-	UpdatedIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	ConfirmModal,
 	defineMessages,
@@ -468,7 +441,6 @@ import {
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
-import KeyIcon from 'assets/icons/auth/key.svg'
 import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
 import GithubIcon from 'assets/icons/auth/sso-github.svg'
 import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex gap-1.5 items-center justify-between px-3 pr-1.5 py-1.5 rounded-2xl bg-bg">
+	<div class="flex gap-1.5 items-center justify-between px-3 pr-1.5 py-1.5 rounded-[4px] bg-bg">
 		<div class="grid grid-cols-[auto_1fr] gap-1.5 items-center">
 			<Avatar :src="icon" size="34px" class="!rounded-xl !shadow-none" raised />
 			<div class="flex flex-col items-start overflow-hidden">

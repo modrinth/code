@@ -12,8 +12,7 @@
 		<component
 			:is="icon"
 			v-if="icon && variant === 'filled' && !multiline"
-			class="absolute left-3 h-5 w-5 z-[1] pointer-events-none transition-colors"
-			:class="[isFocused ? 'opacity-100 text-contrast' : 'opacity-60 text-secondary']"
+			class="pointer-events-none absolute left-2 z-[1] h-4 w-4 text-gray-600"
 			aria-hidden="true"
 		/>
 
@@ -30,17 +29,15 @@
 			:autocomplete="autocomplete"
 			:maxlength="maxlength"
 			:rows="rows"
-			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow bg-surface-4 border-none rounded-xl"
+			class="retro-field retro-field-textarea w-full box-border"
 			:class="[
 				inputClass,
-				'pl-3 pr-3 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				'pl-2 pr-2 py-1.5 text-sm',
+				error && 'retro-field--error',
 				disabled ? 'cursor-not-allowed' : '',
 				resizeClass,
 			]"
 			@input="onInput"
-			@focus="isFocused = true"
-			@blur="isFocused = false"
 		/>
 
 		<!-- Single-line input -->
@@ -60,46 +57,45 @@
 			:min="min"
 			:max="max"
 			:step="step"
-			class="w-full text-primary placeholder:text-secondary focus:text-contrast font-medium transition-[shadow,color] appearance-none shadow-none focus:ring-4 focus:ring-brand-shadow"
+			class="retro-field w-full box-border"
 			:class="[
 				inputClass,
-				variant === 'filled' && icon ? 'pl-10' : 'pl-3',
-				clearable && model && variant === 'filled' ? 'pr-8' : 'pr-3',
-				size === 'small' ? 'h-8 py-1.5 text-sm' : 'h-9 py-2 text-base',
-				error ? 'outline outline-2 outline-red bg-warning-bg' : 'outline-none',
+				variant === 'filled' && icon ? 'pl-8' : 'pl-2',
+				clearable && model && variant === 'filled' ? 'pr-7' : 'pr-2',
+				size === 'small' ? 'h-7 py-0.5 text-xs' : 'h-8 py-1 text-sm',
+				error && 'retro-field--error',
 				disabled ? 'cursor-not-allowed' : '',
 				variant === 'outlined'
-					? 'bg-transparent border border-solid border-button-bg rounded-l-xl border-r-0'
-					: 'bg-surface-4 border-none rounded-xl',
+					? 'retro-field--outlined-left rounded-none border-r-0'
+					: 'rounded-none',
 			]"
 			@input="onInput"
-			@focus="isFocused = true"
-			@blur="isFocused = false"
 		/>
 
 		<!-- Clear button (right side, filled variant, single-line only) -->
 		<button
 			v-if="!multiline && clearable && model && !disabled && !readonly && variant === 'filled'"
 			type="button"
-			class="absolute right-0.5 z-[1] p-2 bg-transparent border-none text-secondary hover:text-contrast transition-colors cursor-pointer select-none"
+			class="retro-outset-btn absolute right-0.5 top-1/2 z-[1] -translate-y-1/2 cursor-pointer p-0.5 select-none"
 			aria-label="Clear input"
 			@click="clear"
 		>
-			<XIcon class="h-5 w-5" />
+			<XIcon class="h-3.5 w-3.5 text-black" />
 		</button>
 
 		<!-- Right icon button (outlined variant, single-line only) -->
 		<button
 			v-if="!multiline && variant === 'outlined'"
 			type="button"
-			class="flex items-center justify-center px-2 bg-transparent border border-solid border-button-bg rounded-r-xl text-secondary hover:text-contrast transition-colors shrink-0"
+			class="retro-outset-btn flex shrink-0 items-center justify-center px-2 text-black"
+			:class="size === 'small' ? 'h-7 min-w-[1.75rem]' : 'h-8 min-w-[2rem]'"
 			:aria-label="clearable && model ? 'Clear input' : 'Search'"
 			:tabindex="clearable && model ? undefined : -1"
 			@click="clearable && model ? clear() : undefined"
 		>
-			<XIcon v-if="clearable && model" class="h-4 w-4" />
-			<component :is="icon" v-else-if="icon" class="h-4 w-4" />
-			<SearchIcon v-else class="h-4 w-4" />
+			<XIcon v-if="clearable && model" class="h-3.5 w-3.5" />
+			<component :is="icon" v-else-if="icon" class="h-3.5 w-3.5" />
+			<SearchIcon v-else class="h-3.5 w-3.5" />
 		</button>
 
 		<!-- Custom rightside slot -->
@@ -157,7 +153,6 @@ const emit = defineEmits<{
 }>()
 
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement>()
-const isFocused = ref(false)
 const resizeClass = computed(
 	() => ({ none: 'resize-none', vertical: 'resize-y', both: 'resize' })[props.resize ?? 'none'],
 )
@@ -179,3 +174,40 @@ function clear() {
 	emit('clear')
 }
 </script>
+
+<style scoped>
+.retro-field {
+	font-family: Tahoma, Verdana, 'MS Sans Serif', Arial, sans-serif;
+	color: black;
+	background: white;
+	border: 2px solid;
+	border-color: #838383;
+	appearance: none;
+}
+
+.retro-field::placeholder {
+	color: #6d6d6d;
+}
+
+.retro-field:focus {
+	border-color: #838383;
+	outline: 1px dotted #000;
+	outline-offset: -3px;
+}
+
+.retro-field:disabled {
+	color: #acacac;
+	background: #e8e8e8;
+	box-shadow: none;
+}
+
+.retro-field-textarea {
+	min-height: 4.5rem;
+	line-height: 1.35;
+}
+
+.retro-field--outlined-left {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+</style>

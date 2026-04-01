@@ -40,7 +40,7 @@ function setRegion() {
 <template>
 	<button
 		:disabled="outOfStock"
-		class="rounded-2xl p-4 font-semibold transition-all border-2 border-solid flex flex-col items-center gap-3"
+		class="rounded-[4px] p-4 font-semibold transition-all border-2 border-solid flex flex-col items-center gap-3"
 		:class="{
 			'bg-button-bg border-transparent text-primary': !isCurrentRegion,
 			'bg-brand-highlight border-brand text-contrast': isCurrentRegion,

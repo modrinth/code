@@ -1,38 +1,24 @@
 <template>
-	<div class="mx-auto max-w-[1280px] p-4 !py-8 sm:py-32">
-		<div class="my-8 flex items-center justify-between">
-			<h2 class="m-0 mx-auto text-3xl font-extrabold sm:text-4xl">
-				{{ formatMessage(messages.latestNews) }}
-			</h2>
+	<div class="mx-auto max-w-[1280px] border border-solid border-[#c3c3c3] bg-[#EFEFEF] p-4">
+		<div>
+			<h2 class="m-0 mb-2 text-lg font-bold">News feed</h2>
 		</div>
 
-		<div v-if="latestArticles" class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-			<div
-				v-for="(article, index) in latestArticles"
-				:key="article.slug"
-				:class="{ 'max-xl:hidden': index === 2 }"
-			>
-				<NewsArticleCard :article="article" />
+		<div v-if="latestArticles" class="flex flex-col gap-2">
+			<div v-for="article in latestArticles" :key="article.slug">
+				<NewsArticleListItem :article="article" />
 			</div>
 		</div>
-		<div class="mx-2 my-8 flex w-full items-center justify-center">
-			<ButtonStyled color="brand" size="large">
-				<nuxt-link to="/news">
-					<NewspaperIcon />
-					{{ formatMessage(messages.viewAll) }}
-				</nuxt-link>
-			</ButtonStyled>
+		<div class="mt-4">
+			<nuxt-link to="/news" class="text-link"> Read more articles ►</nuxt-link>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { NewspaperIcon } from '@modrinth/assets'
 import { articles as rawArticles } from '@modrinth/blog'
-import { ButtonStyled, defineMessages, NewsArticleCard, useVIntl } from '@modrinth/ui'
+import { NewsArticleListItem } from '@modrinth/ui'
 import { computed, ref } from 'vue'
-
-const { formatMessage } = useVIntl()
 
 const articles = ref(
 	rawArticles
@@ -51,16 +37,5 @@ const articles = ref(
 		.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
 )
 
-const messages = defineMessages({
-	latestNews: {
-		id: 'ui.latest-news-row.latest-news',
-		defaultMessage: 'Latest news from Modrinth',
-	},
-	viewAll: {
-		id: 'ui.latest-news-row.view-all',
-		defaultMessage: 'View all news',
-	},
-})
-
-const latestArticles = computed(() => articles.value.slice(0, 3))
+const latestArticles = computed(() => articles.value.slice(0, 10))
 </script>

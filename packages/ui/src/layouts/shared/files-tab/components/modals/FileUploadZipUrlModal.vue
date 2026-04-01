@@ -9,7 +9,7 @@
 				<div
 					v-for="(step, i) in steps"
 					:key="i"
-					class="flex flex-1 flex-col gap-2 overflow-clip rounded-[20px] bg-surface-2 p-3"
+					class="flex flex-1 flex-col gap-2 overflow-clip rounded-[4px] bg-surface-2 p-3"
 				>
 					<span
 						class="flex size-6 shrink-0 items-center justify-center rounded-full border border-solid border-surface-5 bg-surface-4 font-medium text-contrast"

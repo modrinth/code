@@ -1,6 +1,6 @@
 <template>
-	<div v-if="allTags.length > 0" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
+	<div v-if="allTags.length > 0" class="flex flex-col gap-1 mt-4">
+		<h2 class="text-primary text-base m-0">{{ formatMessage(messages.title) }}</h2>
 		<div class="flex flex-wrap gap-1">
 			<TagItem
 				v-for="tag in allTags"

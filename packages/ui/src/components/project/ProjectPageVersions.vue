@@ -42,14 +42,14 @@
 	</div>
 	<div
 		v-if="versions.length > 0"
-		class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content]"
+		class="flex flex-col gap-2 rounded-[4px] border border-solid border-black supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content]"
 		:class="[
 			hasMultipleEnvironments
 				? 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_auto_min-content] has-environment'
 				: 'supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content] no-environment',
 		]"
 	>
-		<div class="versions-grid-row">
+		<div class="versions-grid-row mt-2">
 			<div class="w-9 max-sm:hidden"></div>
 			<div class="text-sm font-bold text-contrast max-sm:hidden">Name</div>
 			<div
@@ -87,7 +87,7 @@
 		<template v-for="(version, index) in currentVersions" :key="index">
 			<!-- Row divider -->
 			<div
-				class="versions-grid-row h-px w-full bg-surface-5"
+				class="versions-grid-row h-px w-full bg-black"
 				:class="{
 					'max-sm:!hidden': index === 0,
 				}"
@@ -95,16 +95,17 @@
 			<div class="versions-grid-row group relative">
 				<AutoLink
 					v-if="!!versionLink"
-					class="absolute inset-[calc(-1rem-2px)_-2rem] before:absolute before:inset-0 before:transition-all before:content-[''] hover:before:backdrop-brightness-110"
+					class="absolute inset-[calc(-10px)_0]"
 					:to="versionLink?.(version)"
 				/>
 				<div class="flex flex-col justify-center gap-2 sm:contents">
 					<div class="flex flex-row items-center gap-2 sm:contents">
 						<div class="self-center">
-							<div class="relative z-[1] cursor-pointer">
+							<div class="relative z-[1] cursor-pointer pl-4">
 								<VersionChannelIndicator
 									v-tooltip="`Toggle filter for ${version.version_type}`"
 									:channel="version.version_type"
+									size="sm"
 									@click="versionFilters?.toggleFilter('channel', version.version_type)"
 								/>
 							</div>
@@ -118,9 +119,6 @@
 						>
 							<div class="font-bold text-contrast text-ellipsis overflow-hidden">
 								{{ version.version_number }}
-							</div>
-							<div class="text-xs font-medium text-ellipsis overflow-hidden">
-								{{ version.name }}
 							</div>
 						</div>
 					</div>
@@ -219,32 +217,20 @@
 								v-tooltip="formatDateTime(version.date_published)"
 								class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
 							>
-								<CalendarIcon class="xl:hidden" />
-								{{ formatRelativeTime(new Date(version.date_published)) }}
+								Uploaded {{ formatRelativeTime(new Date(version.date_published)) }}
 							</div>
 							<div
 								class="pointer-events-none z-[1] flex items-center gap-1 font-medium xl:self-center"
 							>
-								<DownloadIcon class="xl:hidden" />
-								{{ formatCompactNumber(version.downloads) }}
+								{{ formatCompactNumber(version.downloads) }} downloads
 							</div>
 						</div>
 					</div>
 				</div>
 				<div
-					class="flex items-start justify-end gap-1 sm:items-center z-[1] max-[400px]:flex-col max-[400px]:justify-start"
+					class="flex items-start pr-4 justify-end gap-1 sm:items-center z-[1] max-[400px]:flex-col max-[400px]:justify-start"
 				>
 					<slot name="actions" :version="version"></slot>
-				</div>
-				<div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
-					<div
-						v-for="(file, fileIdx) in version.files"
-						:key="`platform-tag-${fileIdx}`"
-						:class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
-					>
-						<StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
-						{{ file.filename }} - {{ formatBytes(file.size) }}
-					</div>
 				</div>
 			</div>
 		</template>
@@ -260,7 +246,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, getLoaderIcon, PlusIcon, StarIcon } from '@modrinth/assets'
+import { getLoaderIcon, PlusIcon } from '@modrinth/assets'
 import {
 	AutoLink,
 	ButtonStyled,
@@ -272,12 +258,7 @@ import {
 	VersionChannelIndicator,
 	VersionFilterControl,
 } from '@modrinth/ui'
-import {
-	formatBytes,
-	formatVersionsForDisplay,
-	type GameVersionTag,
-	type Version,
-} from '@modrinth/utils'
+import { formatVersionsForDisplay, type GameVersionTag, type Version } from '@modrinth/utils'
 import { Menu } from 'floating-vue'
 import { computed, type Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

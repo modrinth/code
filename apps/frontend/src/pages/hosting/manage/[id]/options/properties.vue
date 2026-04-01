@@ -22,7 +22,7 @@
 						has more detailed information.
 					</div>
 				</div>
-				<div class="flex flex-col gap-4 rounded-2xl bg-table-alternateRow p-4">
+				<div class="flex flex-col gap-4 rounded-[4px] bg-table-alternateRow p-4">
 					<div class="w-full text-sm">
 						<label for="search-server-properties" class="sr-only"> Search server properties </label>
 						<StyledInput

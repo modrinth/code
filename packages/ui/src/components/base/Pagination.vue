@@ -25,25 +25,15 @@
 			<div v-if="item === '-'" class="rotate-90 grid place-content-center">
 				<EllipsisVerticalIcon />
 			</div>
-			<ButtonStyled
-				v-else
-				circular
-				:color="page === item ? 'brand' : 'standard'"
-				:type="page === item ? 'highlight' : 'transparent'"
-			>
+			<ButtonStyled v-else circular :color="page === item ? 'brand' : 'standard'">
 				<a
 					v-if="linkFunction"
 					:href="linkFunction(item)"
-					:class="page === item ? '!text-brand' : ''"
 					@click.prevent="page !== item ? switchPage(item) : null"
 				>
 					{{ item }}
 				</a>
-				<button
-					v-else
-					:class="page === item ? '!text-brand' : ''"
-					@click="page !== item ? switchPage(item) : null"
-				>
+				<button v-else @click="page !== item ? switchPage(item) : null">
 					{{ item }}
 				</button>
 			</ButtonStyled>

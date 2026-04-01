@@ -9,20 +9,7 @@ withDefaults(
 )
 </script>
 <template>
-	<div
-		class="gap-3"
-		:class="{
-			'flex flex-col': layout === 'list',
-			'grid grid-project-list': layout === 'grid' || layout === 'gallery',
-		}"
-		role="list"
-	>
+	<div class="gap-3 flex flex-col" role="list">
 		<slot />
 	</div>
 </template>
-<style scoped lang="scss">
-.grid-project-list {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-}
-</style>

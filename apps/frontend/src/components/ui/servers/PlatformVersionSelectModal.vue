@@ -26,7 +26,7 @@
 			<div v-if="!isSecondPhase" class="flex flex-col gap-4">
 				<div class="mx-auto flex flex-row items-center gap-4">
 					<div
-						class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
+						class="grid size-16 place-content-center rounded-[4px] border-[2px] border-solid border-button-border bg-button-bg shadow-sm"
 					>
 						<LoaderIcon class="size-10" :loader="selectedLoader" />
 					</div>
@@ -46,13 +46,13 @@
 						<path d="M9 9h3V5l7 7-7 7v-4H9V9z" />
 					</svg>
 					<div
-						class="grid size-16 place-content-center rounded-2xl border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
+						class="grid size-16 place-content-center rounded-[4px] border-[2px] border-solid border-button-border bg-table-alternateRow shadow-sm"
 					>
 						<ServerIcon class="size-10" />
 					</div>
 				</div>
 
-				<div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+				<div class="flex w-full flex-col gap-2 rounded-[4px] bg-table-alternateRow p-4">
 					<div class="text-lg font-bold text-contrast">Minecraft version</div>
 					<Combobox
 						v-model="selectedMCVersion"
@@ -80,7 +80,7 @@
 
 				<div
 					v-if="selectedLoader.toLowerCase() !== 'vanilla'"
-					class="flex w-full flex-col gap-2 rounded-2xl p-4"
+					class="flex w-full flex-col gap-2 rounded-[4px] p-4"
 					:class="{
 						'bg-table-alternateRow':
 							!selectedMCVersion || isLoading || selectedLoaderVersions.length > 0,
@@ -137,7 +137,7 @@
 
 				<div
 					v-if="!initialSetup"
-					class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4"
+					class="flex w-full flex-col gap-2 rounded-[4px] bg-table-alternateRow p-4"
 				>
 					<div class="flex w-full flex-row items-center justify-between">
 						<label class="w-full text-lg font-bold text-contrast" for="hard-reset">

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { PlayIcon } from '@modrinth/assets'
-
 import { useCompactNumber, useVIntl } from '../../../composables'
 import { commonMessages } from '../../../utils'
 import { StatItem } from '../../base'
@@ -23,7 +21,6 @@ defineProps<{
 		"
 		class="smart-clickable:allow-pointer-events w-max"
 	>
-		<PlayIcon />
 		{{
 			hideLabel
 				? formatCompactNumber(recentPlays)

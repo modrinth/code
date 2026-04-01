@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, GlobeIcon, ServerIcon } from '@modrinth/assets'
 
 import { defineMessages, useVIntl } from '../../../composables'
 import { TagItem } from '../../base'
@@ -37,11 +36,9 @@ const messages = defineMessages({
 <template>
 	<TagItem class="empty:hidden">
 		<template v-if="clientSide === 'optional' && serverSide === 'optional'">
-			<GlobeIcon aria-hidden="true" />
 			{{ formatMessage(messages.clientOrServer) }}
 		</template>
 		<template v-else-if="clientSide === 'required' && serverSide === 'required'">
-			<GlobeIcon aria-hidden="true" />
 			{{ formatMessage(messages.clientAndServer) }}
 		</template>
 		<template
@@ -50,7 +47,6 @@ const messages = defineMessages({
 				(serverSide === 'optional' || serverSide === 'unsupported')
 			"
 		>
-			<ClientIcon aria-hidden="true" />
 			{{ formatMessage(messages.client) }}
 		</template>
 		<template
@@ -59,7 +55,6 @@ const messages = defineMessages({
 				(clientSide === 'optional' || clientSide === 'unsupported')
 			"
 		>
-			<ServerIcon aria-hidden="true" />
 			{{ formatMessage(messages.server) }}
 		</template>
 	</TagItem>

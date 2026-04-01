@@ -1,9 +1,9 @@
 <template>
-	<div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+	<div class="flex w-full flex-col gap-1 rounded-[4px] bg-table-alternateRow p-2">
 		<div
 			v-for="loader in vanillaLoaders"
 			:key="loader.name"
-			class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+			class="group relative flex items-center justify-between rounded-[4px] p-2 pr-2.5 hover:bg-bg"
 		>
 			<LoaderSelectorCard
 				:loader="loader"
@@ -18,11 +18,11 @@
 
 	<div class="mt-4">
 		<h2 class="mb-2 px-2 text-lg font-bold text-contrast">Mod loaders</h2>
-		<div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+		<div class="flex w-full flex-col gap-1 rounded-[4px] bg-table-alternateRow p-2">
 			<div
 				v-for="loader in modLoaders"
 				:key="loader.name"
-				class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+				class="group relative flex items-center justify-between rounded-[4px] p-2 pr-2.5 hover:bg-bg"
 			>
 				<LoaderSelectorCard
 					:loader="loader"
@@ -38,11 +38,11 @@
 
 	<div class="mt-4">
 		<h2 class="mb-2 px-2 text-lg font-bold text-contrast">Plugin loaders</h2>
-		<div class="flex w-full flex-col gap-1 rounded-2xl bg-table-alternateRow p-2">
+		<div class="flex w-full flex-col gap-1 rounded-[4px] bg-table-alternateRow p-2">
 			<div
 				v-for="loader in pluginLoaders"
 				:key="loader.name"
-				class="group relative flex items-center justify-between rounded-2xl p-2 pr-2.5 hover:bg-bg"
+				class="group relative flex items-center justify-between rounded-[4px] p-2 pr-2.5 hover:bg-bg"
 			>
 				<LoaderSelectorCard
 					:loader="loader"

@@ -166,7 +166,7 @@ onMounted(() => {
 			<ShareArticleButtons :title="article.title" :url="articleUrl" />
 			<img
 				:src="article.thumbnail"
-				class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-2xl"
+				class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover sm:rounded-[4px]"
 				:alt="article.title"
 			/>
 			<div class="markdown-body" v-html="article.html" />

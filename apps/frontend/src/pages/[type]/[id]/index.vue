@@ -1,6 +1,6 @@
 <template>
 	<section class="normal-page__content">
-		<div v-if="projectV2.body" class="card">
+		<div v-if="projectV2.body">
 			<ProjectPageDescription :description="projectV2.body" />
 		</div>
 		<p v-else class="ml-2">

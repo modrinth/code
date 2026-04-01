@@ -24,7 +24,7 @@ defineProps<{
 			:to="author.link"
 			:class="
 				author.link
-					? 'custom-focus-indicator text-inherit outline-none group focus-visible:text-[--color-focus-ring] smart-clickable:allow-pointer-events'
+					? 'custom-focus-indicator text-inherit outline-none group focus-visible:text-link smart-clickable:allow-pointer-events'
 					: ''
 			"
 		>

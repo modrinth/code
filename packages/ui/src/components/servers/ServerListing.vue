@@ -2,7 +2,7 @@
 	<div>
 		<NuxtLink :to="status === 'suspended' ? '' : `/hosting/manage/${props.server_id}`">
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
+				class="flex flex-row items-center overflow-x-hidden rounded-[4px] border-[1px] border-solid border-button-bg bg-bg-raised p-4 transition-transform duration-100"
 				:class="{
 					'!rounded-b-none border-b-0': status === 'suspended' || !!pendingChange,
 					'opacity-75': status === 'suspended',
@@ -14,7 +14,7 @@
 				<ServerIcon v-if="status !== 'suspended'" :image="image" />
 				<div
 					v-else
-					class="bg-bg-secondary flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
+					class="bg-bg-secondary flex size-16 items-center justify-center rounded-[4px] border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 				>
 					<LockIcon class="size-12 text-secondary" />
 				</div>
@@ -63,7 +63,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your server has been cancelled. Please update your
@@ -73,7 +73,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
@@ -84,7 +84,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
@@ -94,7 +94,7 @@
 		</div>
 		<div
 			v-if="pendingChange && status !== 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-orange bg-bg-orange p-4 text-sm font-bold text-contrast"
 		>
 			<div>
 				Your server will {{ pendingChange.verb.toLowerCase() }} to the "{{

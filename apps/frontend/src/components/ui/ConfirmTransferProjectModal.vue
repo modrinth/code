@@ -20,7 +20,7 @@
 				>.
 			</Admonition>
 			<div
-				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-2xl bg-surface-2 p-4"
+				class="grid grid-cols-[1fr_auto_1fr] items-center justify-center gap-6 rounded-[4px] bg-surface-2 p-4"
 			>
 				<div class="flex items-center gap-2">
 					<Avatar :src="currentOwner.avatar_url" :alt="currentOwner.username" size="xs" circle />

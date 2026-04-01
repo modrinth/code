@@ -1,9 +1,9 @@
 <template>
 	<ServersUpgradeModalWrapper ref="upgradeModal" />
-	<section class="universal-card experimental-styles-within">
-		<h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
-		<p>{{ formatMessage(messages.subscriptionDescription) }}</p>
-		<div class="universal-card recessed">
+	<section class="experimental-styles-within flex flex-col">
+		<p class="mb-1 mt-0 font-bold">{{ formatMessage(messages.subscriptionTitle) }}</p>
+		<p class="mb-2 mt-0">{{ formatMessage(messages.subscriptionDescription) }}</p>
+		<div class="rounded-[4px] border border-solid border-black p-4">
 			<ConfirmModal
 				ref="modalCancel"
 				:title="formatMessage(cancelModalMessages.title)"
@@ -274,7 +274,7 @@
 			<div
 				v-for="(subscription, index) in pyroSubscriptions"
 				:key="index"
-				class="universal-card recessed mt-4"
+				class="mt-4 rounded-[4px] border border-solid border-black p-4"
 			>
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
@@ -535,7 +535,7 @@
 		</div>
 	</section>
 
-	<section class="universal-card experimental-styles-within">
+	<section class="experimental-styles-within mt-8 flex flex-col border-t border-divider pt-8">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(deleteModalMessages.title)"
@@ -571,28 +571,27 @@
 			:create-setup-intent="createSetupIntent"
 			:on-error="handleError"
 		/>
-		<div class="header__row">
-			<div class="header__title">
-				<h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
+		<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+			<p class="m-0 font-bold">{{ formatMessage(messages.paymentMethodTitle) }}</p>
+			<div class="flex flex-wrap items-center gap-3">
+				<nuxt-link class="inline-flex items-center gap-1 text-link" to="/settings/billing/charges">
+					<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
+				</nuxt-link>
+				<ButtonStyled color="brand">
+					<button type="button" @click="addPaymentMethod">
+						<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
+					</button>
+				</ButtonStyled>
 			</div>
-			<nuxt-link class="btn" to="/settings/billing/charges">
-				<HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
-			</nuxt-link>
-			<button class="btn" @click="addPaymentMethod">
-				<PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
-			</button>
 		</div>
-		<div
-			v-if="!paymentMethods || paymentMethods.length === 0"
-			class="universal-card recessed !mb-0"
-		>
+		<p v-if="!paymentMethods || paymentMethods.length === 0" class="text-secondary">
 			{{ formatMessage(messages.paymentMethodNone) }}
-		</div>
-		<div v-else class="flex flex-col gap-4">
+		</p>
+		<div v-else class="flex flex-col gap-0">
 			<div
 				v-for="(method, index) in paymentMethods"
 				:key="index"
-				class="universal-card recessed !mb-0 flex items-center justify-between"
+				class="flex items-center justify-between gap-4 border-t border-divider py-4 first:border-t-0 first:pt-0"
 			>
 				<div class="flex gap-2">
 					<component :is="getPaymentMethodIcon(method.type)" class="h-8 w-8" />

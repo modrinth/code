@@ -1,13 +1,5 @@
 <template>
-	<SmartClickable class="w-full project-card-container">
-		<template v-if="link" #clickable>
-			<AutoLink
-				:to="link"
-				class="rounded-xl no-outline no-click-animation custom-focus-indicator"
-				@mouseenter="$emit('mouseenter')"
-				@mouseleave="$emit('mouseleave')"
-			></AutoLink>
-		</template>
+	<div class="w-full project-card-container">
 		<div v-if="layout === 'grid'" :class="[baseCardStyle, 'flex flex-col']">
 			<div
 				:style="{ '--_project-color': cssColor }"
@@ -33,7 +25,14 @@
 						<div class="grid grid-cols-[1fr_auto] gap-4">
 							<div class="flex flex-col gap-1">
 								<div class="flex gap-2 items-center">
-									<ProjectCardTitle :title="title" compact />
+									<AutoLink
+										:to="link"
+										class="text-blue underline"
+										@mouseenter="$emit('mouseenter')"
+										@mouseleave="$emit('mouseleave')"
+									>
+										<ProjectCardTitle :title="title" compact />
+									</AutoLink>
 									<ProjectCardAuthor v-if="author" :author="author" />
 									<ProjectStatusBadge v-if="status" :status="status" class="text-sm" />
 								</div>
@@ -113,7 +112,14 @@
 			/>
 			<div class="flex flex-col gap-2 grid-project-card-list__info">
 				<div class="flex gap-2 items-center">
-					<ProjectCardTitle :title="title" />
+					<AutoLink
+						:to="link"
+						class="text-link underline"
+						@mouseenter="$emit('mouseenter')"
+						@mouseleave="$emit('mouseleave')"
+					>
+						<ProjectCardTitle :title="title" />
+					</AutoLink>
 					<ProjectCardAuthor v-if="author" :author="author" />
 					<ProjectStatusBadge v-if="status" :status="status" />
 				</div>
@@ -129,15 +135,10 @@
 				<slot name="actions" />
 			</div>
 			<div
-				class="flex flex-col gap-3 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
+				class="flex flex-col gap-2 items-end shrink-0 ml-auto empty:hidden grid-project-card-list__stats"
 				:class="{ 'mt-3': !!$slots.actions }"
 			>
-				<div
-					v-if="downloads !== undefined || followers !== undefined"
-					class="flex items-center gap-3"
-				>
-					<ProjectCardStats :downloads="downloads" :followers="followers" />
-				</div>
+				<ProjectCardStats :downloads="downloads" :followers="followers" />
 				<ProjectCardDate v-if="date && autoDisplayDate" :type="autoDisplayDate" :date="date" />
 			</div>
 			<div class="mt-auto flex items-center gap-3 grid-project-card-list__tags">
@@ -155,7 +156,7 @@
 							:hide-label="true"
 						/>
 					</template>
-					<div class="flex items-center gap-1">
+					<div class="flex items-center gap-3">
 						<template v-if="isServerProject">
 							<ServerPing v-if="serverPing && serverStatusOnline" :ping="serverPing" />
 							<ServerRegion v-if="serverRegion" :region="serverRegion" />
@@ -185,7 +186,7 @@
 				</div>
 			</div>
 		</div>
-	</SmartClickable>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -194,7 +195,6 @@ import dayjs from 'dayjs'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar } from '../../base'
-import { SmartClickable } from '../../base/index.ts'
 import ProjectStatusBadge from '../ProjectStatusBadge.vue'
 import ServerModpackContent from '../server/ServerModpackContent.vue'
 import ServerOnlinePlayers from '../server/ServerOnlinePlayers.vue'
@@ -254,7 +254,7 @@ const props = defineProps<{
 }>()
 
 const baseCardStyle =
-	'w-full h-full border-[1px] border-solid border-surface-4 overflow-hidden bg-surface-3 rounded-2xl transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
+	'w-full h-full transition-all smart-clickable:outline-on-focus smart-clickable:highlight-on-hover'
 
 const updatedDate = computed(() =>
 	props.dateUpdated ? dayjs(props.dateUpdated).toDate() : undefined,

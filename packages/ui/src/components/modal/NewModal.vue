@@ -33,22 +33,22 @@
 				role="dialog"
 				aria-modal="true"
 				:aria-labelledby="headerId"
-				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+				class="modal-body flex flex-col bg-[#e5e5e5] rounded-[4px] border border-solid border-[black]"
 				@keydown="handleKeyDown"
 			>
 				<div
 					v-if="!hideHeader"
 					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
+					class="grid grid-cols-[auto_min-content] items-center gap-4 px-6 py-3 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
 				>
 					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
 						<slot name="title">
-							<span v-if="header" :id="headerId" class="text-2xl font-semibold text-contrast">
+							<span v-if="header" :id="headerId" class="text-lg text-contrast">
 								{{ header }}
 							</span>
 						</slot>
 					</div>
-					<ButtonStyled v-if="closable" circular>
+					<ButtonStyled v-if="closable" circular color="red">
 						<button
 							v-tooltip="closeLabel"
 							:aria-label="closeLabel"
@@ -364,27 +364,7 @@ function handleKeyDown(event: KeyboardEvent) {
 	inset: -5rem;
 	z-index: 19;
 	opacity: 0;
-	transition: all 0.2s ease-out;
-	//transform: translate(
-	//    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
-	//    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
-	//  )
-	//  scaleX(0.8) scaleY(0.5);
-	border-radius: 180px;
-	//filter: blur(5px);
-
-	// Fade variants
-	&.standard {
-		background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
-	}
-
-	&.warning {
-		background: linear-gradient(to bottom, rgba(48, 38, 29, 0.52) 0%, rgba(26, 20, 14, 0.95) 100%);
-	}
-
-	&.danger {
-		background: linear-gradient(to bottom, rgba(43, 18, 26, 0.52) 0%, rgba(49, 10, 15, 0.95) 100%);
-	}
+	background: rgba(0, 0, 0, 0.7);
 
 	@media (prefers-reduced-motion) {
 		transition: none !important;
@@ -393,12 +373,6 @@ function handleKeyDown(event: KeyboardEvent) {
 	&.shown {
 		opacity: 1;
 		visibility: visible;
-		backdrop-filter: blur(5px);
-	}
-
-	&.noblur {
-		backdrop-filter: none;
-		filter: none;
 	}
 }
 

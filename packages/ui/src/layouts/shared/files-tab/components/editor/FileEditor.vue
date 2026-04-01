@@ -1,7 +1,7 @@
 <template>
 	<div
 		ref="editorContainer"
-		class="flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
+		class="flex flex-col overflow-hidden rounded-[4px] border border-solid border-surface-4 shadow-sm"
 	>
 		<component
 			:is="props.editorComponent"
@@ -11,13 +11,13 @@
 			theme="modrinth"
 			:print-margin="false"
 			:style="{ height: editorHeight, fontSize: '0.875rem' }"
-			class="ace-modrinth rounded-[20px]"
+			class="ace-modrinth rounded-[4px]"
 			@init="onEditorInit"
 		/>
 		<FileImageViewer v-else-if="isEditingImage && imagePreview" :image-blob="imagePreview" />
 		<div
 			v-else-if="isLoading || !props.editorComponent"
-			class="flex items-center justify-center rounded-[20px] bg-bg-raised"
+			class="flex items-center justify-center rounded-[4px] bg-bg-raised"
 			:style="{ height: editorHeight }"
 		>
 			<SpinnerIcon class="h-8 w-8 animate-spin text-secondary" />

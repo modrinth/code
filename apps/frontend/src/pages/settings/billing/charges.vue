@@ -1,18 +1,18 @@
 <template>
 	<div>
-		<section class="card">
+		<section class="flex flex-col">
 			<Breadcrumbs
 				:current-title="formatMessage(messages.title)"
 				:link-stack="[
 					{ href: '/settings/billing', label: formatMessage(commonSettingsMessages.billing) },
 				]"
 			/>
-			<h2>{{ formatMessage(messages.title) }}</h2>
-			<p>{{ formatMessage(messages.description) }}</p>
+			<p class="mb-2 mt-2 font-bold">{{ formatMessage(messages.title) }}</p>
+			<p class="mb-4">{{ formatMessage(messages.description) }}</p>
 			<div
 				v-for="charge in charges"
 				:key="charge.id"
-				class="universal-card recessed flex items-center justify-between gap-4"
+				class="flex items-center justify-between gap-4 border-t border-divider py-4 first:border-t-0 first:pt-0"
 			>
 				<div class="flex flex-col gap-1">
 					<div class="flex items-center gap-1">
@@ -70,6 +70,10 @@ const formatDate = useFormatDateTime({
 })
 
 const messages = defineMessages({
+	title: {
+		id: 'settings.billing.charges.title',
+		defaultMessage: 'Charge history',
+	},
 	description: {
 		id: 'settings.billing.charges.description',
 		defaultMessage: 'All of your past charges to your Modrinth account will be listed here:',

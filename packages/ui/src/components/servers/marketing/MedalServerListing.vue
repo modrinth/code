@@ -1,8 +1,8 @@
 <template>
-	<div class="rounded-2xl shadow-xl">
+	<div class="rounded-[4px] shadow-xl">
 		<div
-			class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-t-2xl p-4 transition-transform duration-100"
-			:class="status === 'suspended' ? 'rounded-b-none border-b-0 opacity-75' : 'rounded-b-2xl'"
+			class="medal-promotion flex flex-row items-center overflow-x-hidden rounded-t-[4px] p-4 transition-transform duration-100"
+			:class="status === 'suspended' ? 'rounded-b-none border-b-0 opacity-75' : 'rounded-b-[4px]'"
 			data-pyro-server-listing
 			:data-pyro-server-listing-id="server_id"
 		>
@@ -89,14 +89,14 @@
 
 		<div
 			v-if="status === 'suspended' && suspension_reason === 'upgrading'"
-			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-row items-center gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
 			<LoaderCircleIcon class="size-5 animate-spin" />
 			Your server's hardware is currently being upgraded and will be back online shortly.
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your Medal server trial has ended and your server has
@@ -105,7 +105,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
@@ -116,7 +116,7 @@
 		</div>
 		<div
 			v-else-if="status === 'suspended'"
-			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
+			class="relative flex w-full flex-col gap-2 rounded-b-[4px] border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
 				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your

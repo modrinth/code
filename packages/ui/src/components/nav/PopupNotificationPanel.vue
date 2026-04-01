@@ -14,7 +14,7 @@
 				@mouseleave="setNotificationTimer(item)"
 			>
 				<div
-					class="flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
+					class="flex w-full flex-col gap-3 overflow-hidden rounded-[4px] bg-bg-raised shadow-xl border-surface-5 border-solid border p-4"
 				>
 					<div class="flex flex-col gap-2 w-full">
 						<div class="flex items-center justify-between gap-2.5">

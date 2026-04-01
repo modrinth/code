@@ -1,7 +1,7 @@
 <template>
-	<div class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
-		<div class="flex flex-col gap-3 font-semibold">
+	<div class="flex flex-col gap-1 mt-4">
+		<h2 class="text-primary text-base m-0">{{ formatMessage(messages.title) }}</h2>
+		<div class="flex flex-col gap-2 font-semibold">
 			<template v-if="organization">
 				<AutoLink
 					class="flex gap-2 items-center w-fit text-primary leading-[1.2] group"
@@ -13,12 +13,11 @@
 						<span class="group-hover:underline">
 							{{ organization.name }}
 						</span>
-						<span class="text-secondary text-sm font-medium flex items-center gap-1"
-							><OrganizationIcon /> {{ formatMessage(messages.organization) }}</span
-						>
+						<span class="text-secondary text-sm flex items-center gap-1 font-bold">
+							{{ formatMessage(messages.organization) }}
+						</span>
 					</div>
 				</AutoLink>
-				<hr v-if="sortedMembers.length > 0" class="w-full border-button-border my-0.5" />
 			</template>
 			<AutoLink
 				v-for="member in sortedMembers"
@@ -45,7 +44,7 @@
 	</div>
 </template>
 <script setup lang="ts">
-import { CrownIcon, ExternalIcon, OrganizationIcon } from '@modrinth/assets'
+import { CrownIcon, ExternalIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'

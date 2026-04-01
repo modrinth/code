@@ -39,32 +39,38 @@ const socialLinks: {
 	href: string
 	icon: Component
 	rel?: string
+	brandColor: string
 }[] = [
 	{
 		label: defineMessage({ id: 'layout.footer.social.discord', defaultMessage: 'Discord' }),
 		href: 'https://discord.modrinth.com',
 		icon: DiscordIcon,
+		brandColor: '#7089DA',
+	},
+	{
+		label: defineMessage({ id: 'layout.footer.social.twitter', defaultMessage: 'Twitter' }),
+		href: 'https://twitter.com/modrinth',
+		icon: TwitterIcon,
+		brandColor: '#16D4FA',
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.bluesky', defaultMessage: 'Bluesky' }),
 		href: 'https://bsky.app/profile/modrinth.com',
 		icon: BlueskyIcon,
+		brandColor: '#0085FF',
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.mastodon', defaultMessage: 'Mastodon' }),
 		href: 'https://floss.social/@modrinth',
 		icon: MastodonIcon,
 		rel: 'me',
-	},
-	{
-		label: defineMessage({ id: 'layout.footer.social.x', defaultMessage: 'X' }),
-		href: 'https://x.com/modrinth',
-		icon: TwitterIcon,
+		brandColor: '#6364FF',
 	},
 	{
 		label: defineMessage({ id: 'layout.footer.social.github', defaultMessage: 'GitHub' }),
 		href: 'https://github.com/modrinth',
 		icon: GithubIcon,
+		brandColor: '#5a5a5a',
 	},
 ]
 
@@ -197,8 +203,6 @@ const footerLinks: {
 
 const developerModeCounter = ref(0)
 
-const state = useGeneratedState()
-
 function developerModeIncrement() {
 	developerModeCounter.value++
 	if (developerModeCounter.value >= 5) {
@@ -240,12 +244,12 @@ function developerModeIncrement() {
 						class="text-logo button-base h-6 w-auto text-contrast lg:h-8"
 						@click="developerModeIncrement()"
 					/>
-					<div class="flex flex-wrap justify-center gap-px sm:-mx-2">
+					<div class="flex flex-wrap justify-center gap-1 sm:-mx-2">
 						<ButtonStyled
 							v-for="(social, index) in socialLinks"
 							:key="`footer-social-${index}`"
 							circular
-							type="transparent"
+							:custom-color="social.brandColor"
 						>
 							<a
 								v-tooltip="formatMessage(social.label)"
@@ -272,7 +276,7 @@ function developerModeIncrement() {
 								</template>
 							</IntlFormatted>
 						</p>
-						<p class="m-0">© {{ state.buildYear ?? '2025' }} Rinth, Inc.</p>
+						<p class="m-0">© 2008 Rinth, Inc.</p>
 					</div>
 				</div>
 				<div class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:contents">
@@ -326,6 +330,11 @@ function developerModeIncrement() {
 			</p>
 			<div class="flex justify-center text-center text-xs font-medium text-secondary opacity-50">
 				{{ formatMessage(messages.legalDisclaimer) }}
+			</div>
+			<div>
+				<p>
+					Some icons are from <a href="https://www.gnome.org" target="_blank">GNOME Project</a>.
+				</p>
 			</div>
 		</div>
 	</footer>

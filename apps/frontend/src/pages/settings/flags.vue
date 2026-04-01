@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SearchIcon } from '@modrinth/assets'
-import { ButtonStyled, StyledInput, Toggle } from '@modrinth/ui'
+import { ButtonStyled, Checkbox, StyledInput } from '@modrinth/ui'
 import Fuse from 'fuse.js'
 import { computed, ref, shallowReactive } from 'vue'
 
@@ -47,17 +47,22 @@ useSeoMeta({
 			type="search"
 			:icon="SearchIcon"
 			placeholder="Search flags..."
-			wrapper-class="w-full rounded-xl bg-bg-raised"
+			wrapper-class="w-full"
 		/>
 	</div>
 	<div class="flex flex-col gap-2">
 		<div
 			v-for="flag in filteredFlags"
 			:key="`flag-${flag}`"
-			class="flex flex-row flex-wrap items-center gap-2 rounded-2xl bg-bg-raised p-4"
+			class="flex flex-row flex-wrap items-center gap-2"
 		>
+			<Checkbox
+				:id="`toggle-${flag}`"
+				v-model="flags[flag]"
+				@update:model-value="() => saveFeatureFlags()"
+			/>
 			<label :for="`toggle-${flag}`" class="flex-1">
-				<span class="block font-semibold capitalize">
+				<span class="mb-1 block font-bold capitalize">
 					{{ flag.replaceAll('_', ' ') }}
 				</span>
 				<p class="m-0 text-secondary">
@@ -73,11 +78,6 @@ useSeoMeta({
 						Reset to default
 					</button>
 				</ButtonStyled>
-				<Toggle
-					:id="`toggle-${flag}`"
-					v-model="flags[flag]"
-					@update:model-value="() => saveFeatureFlags()"
-				/>
 			</div>
 		</div>
 		<p v-if="filteredFlags.length === 0" class="text-center text-secondary">

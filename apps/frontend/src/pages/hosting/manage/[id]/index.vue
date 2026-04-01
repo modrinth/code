@@ -61,7 +61,7 @@
 			/>
 
 			<div
-				class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-2xl border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
+				class="relative flex h-[700px] w-full flex-col gap-3 overflow-hidden rounded-[4px] border border-divider bg-bg-raised p-4 transition-all duration-300 ease-in-out md:p-8"
 				:class="{ 'border-0': !isConnected || isWsAuthIncorrect }"
 			>
 				<div class="flex items-center justify-between">
@@ -106,7 +106,7 @@
 								}}</span>
 								<span> {{ bestSuggestion }} </span>
 								<button
-									class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none dark:bg-highlight"
+									class="text pointer-events-auto ml-2 cursor-pointer rounded-md border-none bg-white text-sm focus:outline-none"
 									aria-label="Accept suggestion"
 									style="transform: translateY(-1px)"
 									@click="acceptSuggestion"

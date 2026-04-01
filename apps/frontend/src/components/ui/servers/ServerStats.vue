@@ -9,7 +9,7 @@
 		<div
 			v-for="(metric, index) in metrics"
 			:key="index"
-			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-[4px] bg-bg-raised p-8"
 		>
 			<div class="relative z-10 -ml-3 w-fit rounded-xl px-3 py-1">
 				<div class="relative z-10">
@@ -54,7 +54,7 @@
 		</div>
 		<nuxt-link
 			:to="loading ? undefined : `/hosting/manage/${serverId}/files`"
-			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+			class="relative isolate min-h-[156px] w-full overflow-hidden rounded-[4px] bg-bg-raised p-8"
 			:class="loading ? '' : 'transition-transform duration-100 hover:scale-105 active:scale-100'"
 		>
 			<div class="flex flex-row items-center gap-2">

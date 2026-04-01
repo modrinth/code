@@ -4,12 +4,22 @@ import { injectI18n } from '../providers/i18n'
 
 const formatterCache = new LRUCache<string, Intl.DateTimeFormat>({ max: 40 })
 
+function applyDateOffset(date: Date): Date {
+	const offset = new Date(date)
+	offset.setUTCFullYear(offset.getUTCFullYear() - 18)
+	return offset
+}
+
 export function useFormatDateTime(options?: Intl.DateTimeFormatOptions) {
 	const { locale } = injectI18n()
 
 	function format(date?: Date | number | string): string {
 		if (typeof date === 'number' || typeof date === 'string') {
 			date = new Date(date)
+		}
+
+		if (date) {
+			date = applyDateOffset(date)
 		}
 
 		const formatter = getFormatter(locale.value, options)

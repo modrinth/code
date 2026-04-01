@@ -1,10 +1,14 @@
 <template>
-	<div class="universal-card">
-		<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.sessions) }}</h2>
-		<p class="preserve-lines">
+	<div class="flex flex-col">
+		<p class="mb-1 mt-0 font-bold">{{ formatMessage(commonSettingsMessages.sessions) }}</p>
+		<p class="preserve-lines mb-2 mt-0">
 			{{ formatMessage(messages.sessionsDescription) }}
 		</p>
-		<div v-for="session in sessions" :key="session.id" class="universal-card recessed session mt-4">
+		<div
+			v-for="session in sessions"
+			:key="session.id"
+			class="session mt-6 border-t border-divider first:mt-0 first:border-t-0 first:pt-0"
+		>
 			<div>
 				<div>
 					<strong>
@@ -34,16 +38,18 @@
 			</div>
 			<div class="input-group">
 				<i v-if="session.current">{{ formatMessage(messages.currentSessionLabel) }}</i>
-				<button v-else class="iconified-button raised-button" @click="revokeSession(session.id)">
-					<XIcon /> {{ formatMessage(messages.revokeSessionButton) }}
-				</button>
+				<ButtonStyled v-else color="red">
+					<button type="button" class="iconified-button" @click="revokeSession(session.id)">
+						{{ formatMessage(messages.revokeSessionButton) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
 </template>
 <script setup>
-import { XIcon } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	commonMessages,
 	commonSettingsMessages,
 	defineMessages,

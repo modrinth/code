@@ -128,22 +128,17 @@ function hash(str: string): number {
 .avatar {
 	--_size: 2rem;
 
-	border: 1px solid var(--surface-5);
+	border: 1px solid #aaaaaa;
 	background-color: var(--color-button-bg);
 	object-fit: contain;
-	border-radius: calc(16 / 96 * var(--_override-size, var(--_size)));
+	border-radius: 4px;
 	position: relative;
 	height: var(--_override-size, var(--_size));
 	width: var(--_override-size, var(--_size));
 	min-height: var(--_override-size, var(--_size));
 	min-width: var(--_override-size, var(--_size));
 
-	&.circle {
-		border-radius: 50%;
-	}
-
 	&:not(.no-shadow) {
-		box-shadow: var(--shadow-card);
 	}
 
 	&.no-shadow {

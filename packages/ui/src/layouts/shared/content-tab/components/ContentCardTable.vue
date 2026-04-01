@@ -174,7 +174,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 	<div
 		role="table"
 		class="@container border border-solid border-surface-4 shadow-sm overflow-clip"
-		:class="[flat ? '' : 'rounded-[20px]', isStuck || hideHeader ? 'border-t-0' : '']"
+		:class="[flat ? '' : 'rounded-[4px]', isStuck || hideHeader ? 'border-t-0' : '']"
 	>
 		<div
 			v-if="!hideHeader"
@@ -184,7 +184,7 @@ function handleSort(column: ContentCardTableSortColumn) {
 			:class="[
 				flat || isStuck ? 'rounded-none' : 'rounded-t-[20px]',
 				isStuck
-					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4 shadow-md before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
+					? 'transition-[border-radius] duration-100 border-0 border-y border-solid border-surface-4  before:pointer-events-none before:absolute before:inset-x-0 before:-top-4 before:h-5 before:bg-surface-3'
 					: '',
 			]"
 		>

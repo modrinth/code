@@ -132,7 +132,7 @@
 			class="expanded-image-modal"
 			@click="expandedGalleryItem = null"
 		>
-			<div class="content">
+			<div class="content relative">
 				<img
 					class="image"
 					:class="{ 'zoomed-in': zoomedIn }"
@@ -144,7 +144,13 @@
 					:alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
 					@click.stop
 				/>
-
+				<div class="absolute right-1 top-1">
+					<ButtonStyled circular>
+						<button @click="expandedGalleryItem = null">
+							<XIcon aria-hidden="true" />
+						</button>
+					</ButtonStyled>
+				</div>
 				<div class="floating" @click.stop>
 					<div class="text">
 						<h2 v-if="expandedGalleryItem.title">
@@ -154,59 +160,25 @@
 							{{ expandedGalleryItem.description }}
 						</p>
 					</div>
-					<div class="controls">
-						<div class="buttons">
-							<button class="close circle-button" @click="expandedGalleryItem = null">
-								<XIcon aria-hidden="true" />
-							</button>
-							<a
-								class="open circle-button"
-								target="_blank"
-								:href="
-									expandedGalleryItem?.raw_url
-										? expandedGalleryItem?.raw_url
-										: 'https://cdn.modrinth.com/placeholder-banner.svg'
-								"
-							>
-								<ExternalIcon aria-hidden="true" />
-							</a>
-							<button class="circle-button" @click="zoomedIn = !zoomedIn">
-								<ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
-								<ContractIcon v-else aria-hidden="true" />
-							</button>
-							<button
-								v-if="filteredGallery.length > 1"
-								class="previous circle-button"
-								@click="previousImage()"
-							>
-								<LeftArrowIcon aria-hidden="true" />
-							</button>
-							<button
-								v-if="filteredGallery.length > 1"
-								class="next circle-button"
-								@click="nextImage()"
-							>
-								<RightArrowIcon aria-hidden="true" />
-							</button>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
 
 		<div v-if="currentMember && filteredGallery.length" class="card header-buttons">
-			<FileInput
-				:max-size="5242880"
-				:accept="acceptFileTypes"
-				prompt="Upload an image"
-				aria-label="Upload an image"
-				class="iconified-button brand-button"
-				:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
-				@change="handleFiles"
-			>
-				<UploadIcon aria-hidden="true" />
-			</FileInput>
-			<span class="indicator">
+			<ButtonStyled color="brand">
+				<FileInput
+					:max-size="5242880"
+					:accept="acceptFileTypes"
+					prompt="Upload an image"
+					aria-label="Upload an image"
+					class="button-like"
+					:disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+					@change="handleFiles"
+				>
+					<UploadIcon aria-hidden="true" />
+				</FileInput>
+			</ButtonStyled>
+			<span class="flex items-center gap-1">
 				<InfoIcon aria-hidden="true" /> Click to choose an image or drag one onto this page
 			</span>
 			<DropArea
@@ -233,14 +205,10 @@
 						</p>
 					</div>
 				</div>
-				<div class="gallery-bottom">
-					<div class="gallery-created">
-						<CalendarIcon aria-hidden="true" aria-label="Date created" />
-						{{ formatDate(item.created) }}
-					</div>
-					<div v-if="currentMember" class="gallery-buttons input-group">
+				<div class="mt-1">
+					<div v-if="currentMember" class="flex gap-3">
 						<button
-							class="iconified-button"
+							class="m-0 w-fit bg-transparent p-0 text-link"
 							@click="
 								() => {
 									resetEdit()
@@ -253,11 +221,10 @@
 								}
 							"
 						>
-							<EditIcon aria-hidden="true" />
 							Edit
 						</button>
 						<button
-							class="iconified-button"
+							class="m-0 w-fit bg-transparent p-0 text-link"
 							@click="
 								() => {
 									deleteIndex = index
@@ -265,8 +232,7 @@
 								}
 							"
 						>
-							<TrashIcon aria-hidden="true" />
-							Remove
+							Delete
 						</button>
 					</div>
 				</div>
@@ -286,41 +252,27 @@
 
 <script setup lang="ts">
 import {
-	CalendarIcon,
-	ContractIcon,
-	EditIcon,
-	ExpandIcon,
-	ExternalIcon,
 	ImageIcon,
 	InfoIcon,
-	LeftArrowIcon,
 	PlusIcon,
-	RightArrowIcon,
 	SaveIcon,
 	StarIcon,
 	TransferIcon,
-	TrashIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
+	ButtonStyled,
 	ConfirmModal,
 	DropArea,
 	FileInput,
 	injectProjectPageContext,
 	NewModal as Modal,
 	StyledInput,
-	useFormatDateTime,
 } from '@modrinth/ui'
 import { useEventListener } from '@vueuse/core'
 
 import { isPermission } from '~/utils/permissions.ts'
-
-const formatDate = useFormatDateTime({
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-})
 
 // Single DI injection
 const {
@@ -531,7 +483,7 @@ async function deleteGalleryImage() {
 	width: 100%;
 	height: 100%;
 	background-color: #000000;
-	background-color: rgba(0, 0, 0, 0.7);
+	background-color: rgba(0, 0, 0, 0.6);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -585,7 +537,8 @@ async function deleteGalleryImage() {
 			transform: translate(-50%, -50%);
 			max-width: calc(100vw - 2 * var(--spacing-card-lg));
 			max-height: calc(100vh - 2 * var(--spacing-card-lg));
-			border-radius: var(--size-rounded-card);
+			border-radius: 0;
+			border: 2px solid black;
 
 			&.zoomed-in {
 				object-fit: cover;
@@ -607,17 +560,6 @@ async function deleteGalleryImage() {
 			opacity: 1;
 			padding: 2rem 2rem 0 2rem;
 
-			&:not(&:hover) {
-				opacity: 0.4;
-				.text {
-					transform: translateY(2.5rem) scale(0.8);
-					opacity: 0;
-				}
-				.controls {
-					transform: translateY(0.25rem) scale(0.9);
-				}
-			}
-
 			.text {
 				display: flex;
 				flex-direction: column;
@@ -625,19 +567,19 @@ async function deleteGalleryImage() {
 				transition:
 					opacity 0.25s ease-in-out,
 					transform 0.25s ease-in-out;
-				text-shadow: 1px 1px 10px #000000d4;
+				text-shadow: 2px 2px 1px #000000d4;
 				margin-bottom: 0.25rem;
 				gap: 0.5rem;
 
 				h2 {
-					color: var(--dark-color-text-dark);
+					color: #ffffff;
 					font-size: 1.25rem;
 					text-align: center;
 					margin: 0;
 				}
 
 				p {
-					color: var(--dark-color-text);
+					color: rgba(255, 255, 255, 0.88);
 					margin: 0;
 				}
 			}
@@ -681,7 +623,7 @@ async function deleteGalleryImage() {
 		width: 100%;
 		margin-top: 0;
 		margin-bottom: 0;
-		border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
+		border-radius: 4px;
 
 		aspect-ratio: 16 / 9;
 		object-fit: cover;
@@ -689,16 +631,18 @@ async function deleteGalleryImage() {
 
 	.gallery-body {
 		width: calc(100% - 2 * var(--spacing-card-md));
-		padding: var(--spacing-card-sm) var(--spacing-card-md);
+		padding-top: 0.5rem;
 		overflow-wrap: anywhere;
 
 		.gallery-info {
 			h2 {
 				margin-bottom: 0.5rem;
+				font-size: 1rem;
 			}
 
 			p {
 				margin: 0 0 0.5rem 0;
+				font-size: 0.8rem;
 			}
 		}
 	}

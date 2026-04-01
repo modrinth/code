@@ -1,26 +1,11 @@
 <template>
 	<div class="static w-full grid-cols-1 md:relative md:flex">
 		<div class="static h-full flex-col pb-4 md:flex md:pb-0 md:pr-4">
-			<div class="z-10 flex select-none flex-col gap-2 rounded-2xl bg-bg-raised p-4 md:w-[16rem]">
-				<div
-					v-for="link in navLinks.filter((x) => x.shown === undefined || x.shown)"
-					:key="link.label"
-				>
-					<NuxtLink
-						:to="link.href"
-						class="flex items-center gap-2 rounded-xl p-2 hover:bg-button-bg"
-						:class="{ 'bg-button-bg text-contrast': route.path === link.href }"
-					>
-						<div class="flex items-center gap-2 font-bold">
-							<component :is="link.icon" class="size-6" />
-							{{ link.label }}
-						</div>
-
-						<div class="flex-grow" />
-						<RightArrowIcon v-if="link.external" class="size-4" />
-					</NuxtLink>
-				</div>
-			</div>
+			<NavStack
+				class="z-10 select-none md:w-[16rem]"
+				aria-label="Server options"
+				:items="navStackItems"
+			/>
 		</div>
 
 		<div class="h-full w-full">
@@ -30,12 +15,15 @@
 </template>
 
 <script setup lang="ts">
-import { RightArrowIcon } from '@modrinth/assets'
+import type { Component } from 'vue'
+import { computed } from 'vue'
 import type { RouteLocationNormalized } from 'vue-router'
+
+import NavStack, { type NavStackEntry } from '~/components/ui/NavStack.vue'
 
 const emit = defineEmits(['reinstall'])
 
-defineProps<{
+const props = defineProps<{
 	navLinks: {
 		label: string
 		href: string
@@ -45,6 +33,16 @@ defineProps<{
 	}[]
 	route: RouteLocationNormalized
 }>()
+
+const navStackItems = computed<NavStackEntry[]>(() =>
+	props.navLinks.map((link) => ({
+		label: link.label,
+		link: link.href,
+		icon: link.icon,
+		chevron: link.external,
+		shown: link.shown,
+	})),
+)
 
 const onReinstall = (...args: any[]) => {
 	emit('reinstall', ...args)

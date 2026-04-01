@@ -2,7 +2,7 @@
 	<div class="flex w-full max-w-full flex-col gap-6">
 		<div class="flex flex-col gap-4">
 			<span class="font-semibold text-contrast">Add dependency</span>
-			<div class="flex flex-col gap-3 rounded-2xl border border-solid border-surface-5 p-4">
+			<div class="flex flex-col gap-3 rounded-[4px] border border-solid border-surface-5 p-4">
 				<div class="grid gap-2.5">
 					<span class="font-semibold text-contrast">Project</span>
 					<DependencySelect v-model="newDependencyProjectId" />

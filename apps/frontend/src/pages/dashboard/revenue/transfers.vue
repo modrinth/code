@@ -24,7 +24,7 @@
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+			<div class="flex flex-col gap-3 rounded-[4px] bg-surface-3 p-5">
 				<div class="flex w-full justify-between">
 					<span class="my-auto font-medium">{{ formatMessage(messages.received) }}</span>
 					<ArrowDownLeftIcon class="size-6" />
@@ -33,7 +33,7 @@
 					formatMoney(totalReceived)
 				}}</span>
 			</div>
-			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+			<div class="flex flex-col gap-3 rounded-[4px] bg-surface-3 p-5">
 				<div class="flex w-full justify-between">
 					<span class="my-auto font-medium">{{ formatMessage(messages.withdrawn) }}</span>
 					<ArrowUpRightIcon class="size-6" />
@@ -42,7 +42,7 @@
 					formatMoney(totalWithdrawn)
 				}}</span>
 			</div>
-			<div class="flex flex-col gap-3 rounded-2xl bg-surface-3 p-5">
+			<div class="flex flex-col gap-3 rounded-[4px] bg-surface-3 p-5">
 				<div class="flex w-full justify-between">
 					<span class="my-auto font-medium">{{ formatMessage(messages.transactions) }}</span>
 					<GenericListIcon class="size-6" />

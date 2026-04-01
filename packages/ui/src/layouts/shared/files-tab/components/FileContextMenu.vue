@@ -11,7 +11,7 @@
 			<div
 				v-if="visible"
 				ref="menuRef"
-				class="experimental-styles-within fixed isolate z-[9999] flex w-fit min-w-[180px] flex-col gap-2 overflow-hidden rounded-2xl border border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
+				class="experimental-styles-within fixed isolate z-[9999] flex w-fit min-w-[180px] flex-col gap-2 overflow-hidden rounded-[4px] border border-solid border-surface-5 bg-bg-raised p-2 shadow-lg"
 				:style="{ left: `${position.x}px`, top: `${position.y}px` }"
 				role="menu"
 				tabindex="-1"

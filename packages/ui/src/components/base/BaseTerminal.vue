@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex size-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
+		class="flex size-full flex-col bg-surface-2 overflow-hidden rounded-[4px] border border-solid border-surface-4"
 	>
 		<div class="relative min-h-0 pb-1 flex-1 overflow-hidden">
 			<div ref="containerRef" class="size-full pl-2" />

@@ -11,7 +11,7 @@
 		@mouseenter="handleMouseEnter"
 		@pointerdown="handlePointerDown"
 	>
-		<div class="pointer-events-none flex flex-1 items-center gap-3 truncate">
+		<div class="pointer-events-none flex flex-1 items-center gap-2 truncate">
 			<Checkbox
 				class="pointer-events-auto"
 				:model-value="selected"
@@ -84,20 +84,21 @@
 
 <script setup lang="ts">
 import {
-	BoxIcon,
 	BracesIcon,
 	ClipboardCopyIcon,
 	DownloadIcon,
 	EditIcon,
 	FolderCogIcon,
+	FolderModsIcon,
 	FolderOpenIcon,
 	GlassesIcon,
-	GlobeIcon,
 	MoreHorizontalIcon,
 	PackageOpenIcon,
 	PaintbrushIcon,
 	RightArrowIcon,
+	SavesIcon,
 	TrashIcon,
+	WorldIcon,
 } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
@@ -177,7 +178,7 @@ const formatDateTime = useFormatDateTime({
 const containerClasses = computed(() => {
 	const dropTarget = isDropTarget.value
 	return [
-		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-3 pr-4 py-3 focus:!outline-none',
+		'group m-0 flex w-full select-none items-center justify-between overflow-hidden border-0 border-t border-solid border-surface-4 pl-2 pr-2 py-1 focus:!outline-none',
 		dropTarget
 			? '!bg-brand-highlight'
 			: props.selected
@@ -185,9 +186,9 @@ const containerClasses = computed(() => {
 				: props.index % 2 === 0
 					? 'bg-surface-2'
 					: 'bg-surface-1.5',
-		props.isLast ? 'rounded-b-[20px]' : '',
-		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-surface-2.5' : '',
-		'transition-colors duration-100 focus:!outline-none',
+		props.isLast ? 'rounded-b-[4px]' : '',
+		isEditableFile.value || props.type === 'directory' ? 'cursor-pointer hover:bg-[#d5d5d5]' : '',
+		'focus:!outline-none',
 	]
 })
 
@@ -272,8 +273,9 @@ const menuOptions = computed(() => {
 const iconComponent = computed(() => {
 	if (props.type === 'directory') {
 		if (props.name === 'config') return FolderCogIcon
-		if (props.name === 'world' || props.name === 'saves') return GlobeIcon
-		if (props.name === 'mods') return BoxIcon
+		if (props.name === 'world') return WorldIcon
+		if (props.name === 'saves') return SavesIcon
+		if (props.name === 'mods') return FolderModsIcon
 		if (props.name === 'resourcepacks') return PaintbrushIcon
 		if (props.name === 'shaderpacks') return GlassesIcon
 		if (props.name === 'datapacks') return BracesIcon

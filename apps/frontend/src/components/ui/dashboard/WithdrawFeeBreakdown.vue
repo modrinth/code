@@ -7,7 +7,7 @@
 		leave-from-class="opacity-100 max-h-40"
 		leave-to-class="opacity-0 max-h-0"
 	>
-		<div v-if="amount > 0" class="flex flex-col gap-2.5 rounded-[20px] bg-surface-2 p-4">
+		<div v-if="amount > 0" class="flex flex-col gap-2.5 rounded-[4px] bg-surface-2 p-4">
 			<template v-if="isGiftCard && shouldShowExchangeRate">
 				<div class="flex items-center justify-between">
 					<span class="text-primary">{{ formatMessage(messages.feeBreakdownGiftCardValue) }}</span>

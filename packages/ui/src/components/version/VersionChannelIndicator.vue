@@ -52,13 +52,9 @@ const messages = defineMessages({
 <template>
 	<div
 		:class="[
-			'flex font-bold justify-center items-center rounded-full',
+			'flex font-bold justify-center items-center rounded-[4px] text-white',
 			sizeClasses,
-			channel === 'release'
-				? 'bg-bg-green text-brand-green'
-				: channel === 'beta'
-					? 'bg-bg-orange text-brand-orange'
-					: 'bg-bg-red text-brand-red',
+			channel === 'release' ? 'bg-green ' : channel === 'beta' ? 'bg-orange ' : 'bg-red ',
 		]"
 	>
 		{{ channel ? formatMessage(messages[`${channel}Symbol`]) : '?' }}

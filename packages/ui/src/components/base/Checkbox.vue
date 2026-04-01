@@ -1,24 +1,19 @@
 <template>
 	<button
-		class="group bg-transparent border-none p-0 m-0 flex items-center gap-3 checkbox-outer outline-offset-4 text-contrast"
+		class="group bg-transparent border-none p-0 m-0 flex items-center gap-2 checkbox-outer outline-offset-4 text-contrast"
 		:disabled="disabled"
-		:class="
-			disabled
-				? 'cursor-not-allowed opacity-50'
-				: 'cursor-pointer hover:brightness-[--hover-brightness] focus-visible:brightness-[--hover-brightness]'
-		"
+		:class="disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
 		:aria-label="description || label"
 		:aria-checked="modelValue"
 		role="checkbox"
 		@click="toggle"
 	>
 		<span
-			class="w-5 h-5 rounded-md flex items-center justify-center border-[1px] border-solid"
+			class="w-4 h-4 flex rounded-[2px] items-center justify-center border-[1px] border-solid"
 			:class="
 				(modelValue
-					? 'bg-brand border-button-border text-brand-inverted'
-					: 'bg-surface-2 border-surface-5') +
-				(disabled ? '' : ' checkbox-shadow group-active:scale-95')
+					? 'bg-brand border-transparent text-brand-inverted'
+					: 'bg-surface-2 border-[#888888]') + (disabled ? '' : '')
 			"
 		>
 			<MinusIcon v-if="indeterminate" aria-hidden="true" stroke-width="3" />
@@ -63,9 +58,3 @@ function toggle() {
 	}
 }
 </script>
-
-<style lang="scss" scoped>
-.checkbox-shadow {
-	box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.08);
-}
-</style>

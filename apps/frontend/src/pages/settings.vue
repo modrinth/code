@@ -14,12 +14,6 @@
 								label: formatMessage(commonSettingsMessages.appearance),
 								icon: PaintbrushIcon,
 							},
-							{
-								link: '/settings/language',
-								label: formatMessage(commonSettingsMessages.language),
-								icon: LanguagesIcon,
-								badge: `${formatMessage(commonMessages.beta)}`,
-							},
 							flags.developerMode
 								? {
 										link: '/settings/flags',
@@ -93,7 +87,6 @@ import {
 	CardIcon,
 	GridIcon,
 	KeyIcon,
-	LanguagesIcon,
 	MonitorSmartphoneIcon,
 	PaintbrushIcon,
 	ServerIcon,

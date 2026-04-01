@@ -170,7 +170,7 @@
 										<div
 											:style="{
 												'--color-brand': isUsingProjectColors
-													? intToRgba(project.color, project.id, theme.active ?? undefined)
+													? intToRgba(project.color, project.id, 'light')
 													: getDefaultColor(project.id),
 											}"
 											class="legend__item__color"
@@ -339,7 +339,6 @@ const { formatCompactNumber } = useCompactNumber()
 const formatMoney = useFormatMoney()
 
 const router = useNativeRouter()
-const theme = useTheme()
 
 debug('setup start', { server: import.meta.server, client: import.meta.client })
 

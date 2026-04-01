@@ -1,7 +1,7 @@
 <template>
 	<div
 		:class="[
-			'relative flex flex-col rounded-2xl border-[1px] border-solid p-4 gap-3 text-contrast',
+			'relative flex flex-col rounded-[4px] border-[1px] border-solid p-4 gap-3 text-contrast',
 			typeClasses[type],
 		]"
 	>

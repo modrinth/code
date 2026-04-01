@@ -1,7 +1,7 @@
 <template>
 	<nav :aria-label="ariaLabel" class="w-full">
 		<ul
-			class="card-shadow m-0 flex list-none flex-col items-start gap-1.5 rounded-2xl bg-bg-raised p-4"
+			class="m-0 flex list-none flex-col items-start overflow-hidden rounded-[4px] border border-solid border-black bg-white p-0"
 		>
 			<slot v-if="hasSlotContent" />
 
@@ -9,54 +9,27 @@
 				<li v-for="(item, idx) in filteredItems" :key="getKey(item, idx)" class="contents">
 					<hr v-if="isSeparator(item)" class="my-1 w-full border-t border-solid" />
 
-					<div
-						v-else-if="isHeading(item)"
-						class="px-4 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-secondary"
-					>
+					<div v-else-if="isHeading(item)" class="px-3 pb-1 pt-2 text-sm font-bold tracking-wide">
 						{{ item.label }}
 					</div>
 
 					<NuxtLink
 						v-else-if="item.link ?? item.to"
 						:to="(item.link ?? item.to) as string"
-						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 border border-solid border-transparent bg-transparent px-3 py-1 text-left text-base leading-tight text-button-text hover:bg-[#dddddd] hover:text-contrast"
 						:class="{ 'is-active': isActive(item as NavStackLinkItem) }"
 					>
-						<component
-							:is="item.icon"
-							v-if="item.icon"
-							aria-hidden="true"
-							class="h-5 w-5 shrink-0"
-						/>
 						<span class="text-contrast">{{ item.label }}</span>
-						<span
-							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
-						>
-							{{ String(item.badge) }}
-						</span>
 						<span v-if="item.chevron" class="ml-auto"><ChevronRightIcon /></span>
 					</NuxtLink>
 
 					<button
 						v-else-if="item.action"
-						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap rounded-xl border-none bg-transparent px-4 py-2.5 text-left text-base font-semibold leading-tight text-button-text transition-all hover:bg-button-bg hover:text-contrast active:scale-[0.97]"
+						class="nav-item inline-flex w-full cursor-pointer items-center gap-2 text-nowrap border-none bg-transparent px-4 py-2.5 text-left text-base leading-tight text-button-text hover:bg-[#dddddd] hover:text-contrast"
 						:class="{ 'danger-button': item.danger }"
 						@click="item.action"
 					>
-						<component
-							:is="item.icon"
-							v-if="item.icon"
-							aria-hidden="true"
-							class="h-5 w-5 shrink-0"
-						/>
 						<span class="text-contrast">{{ item.label }}</span>
-						<span
-							v-if="item.badge != null"
-							class="rounded-full bg-brand-highlight px-2 text-sm font-bold text-brand"
-						>
-							{{ String(item.badge) }}
-						</span>
 					</button>
 
 					<span v-else>You frog. 🐸</span>
@@ -145,11 +118,18 @@ li {
 }
 .router-link-exact-active.nav-item,
 .nav-item.is-active {
-	background: var(--color-button-bg-selected);
-	color: var(--color-button-text-selected);
+	background: #e9eff7;
+	color: black;
+	font-weight: bold;
+	border: 1px solid #aecff7;
+	border-inline: 0;
 }
 .router-link-exact-active.nav-item .text-contrast,
 .nav-item.is-active .text-contrast {
-	color: var(--color-button-text-selected);
+	color: black;
+}
+.router-link-exact-active.nav-item svg.text-contrast,
+.nav-item.is-active svg.text-contrast {
+	color: black;
 }
 </style>

@@ -4,7 +4,7 @@
 			'flex flex-col items-center justify-center  cursor-pointer border-2 border-dashed bg-surface-4 text-contrast transition-colors',
 			size === 'small' ? 'p-5' : size === 'medium' ? 'p-10' : 'p-12',
 			size === 'small' ? 'gap-2' : 'gap-4',
-			size === 'small' ? 'rounded-2xl' : 'rounded-3xl',
+			size === 'small' ? 'rounded-[4px]' : 'rounded-3xl',
 			isDragOver ? 'border-purple' : 'border-surface-5',
 		]"
 		@dragover.prevent="onDragOver"
@@ -15,7 +15,7 @@
 			:class="[
 				'grid place-content-center  text-brand border-brand border-solid border bg-highlight-green',
 				size === 'small' ? 'w-10 h-10' : 'h-14 w-14',
-				size === 'small' ? 'rounded-xl' : 'rounded-2xl',
+				size === 'small' ? 'rounded-xl' : 'rounded-[4px]',
 			]"
 		>
 			<FolderUpIcon

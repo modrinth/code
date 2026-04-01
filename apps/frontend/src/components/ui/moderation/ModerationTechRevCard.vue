@@ -904,13 +904,13 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 </script>
 
 <template>
-	<div class="shadow-card overflow-hidden rounded-2xl border border-surface-5 bg-surface-3">
+	<div class="shadow-card overflow-hidden rounded-[4px] border border-surface-5 bg-surface-3">
 		<div class="flex flex-col gap-4 bg-surface-3 p-4">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
 					<Avatar
 						:src="item.project.icon_url"
-						class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
+						class="rounded-[4px] border border-surface-5 bg-surface-4 !shadow-none"
 						size="4rem"
 					/>
 
@@ -1071,7 +1071,7 @@ async function handleSubmitReview(verdict: 'safe' | 'unsafe') {
 					class="flex items-center justify-between border-0 border-x border-b border-solid border-surface-3 bg-surface-2 px-4 py-3"
 					:class="{
 						'rounded-bl-2xl rounded-br-2xl': idx === allFiles.length - 1,
-						'bg-[#E8E8E8] dark:bg-[#1A1C20]': idx % 2 === 1,
+						'bg-[#E8E8E8]': idx % 2 === 1,
 					}"
 				>
 					<div class="flex items-center gap-3">

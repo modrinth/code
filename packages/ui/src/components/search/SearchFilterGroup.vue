@@ -21,7 +21,6 @@
 						:excluded="excluded(option)"
 						:supports-negative-filter="supportsNegativeFilter"
 						@toggle="(o) => emit('toggle', o)"
-						@toggle-exclude="(o) => emit('toggleExclude', o)"
 					>
 						<span
 							v-if="option.icon"
@@ -57,7 +56,6 @@ defineProps<{
 
 const emit = defineEmits<{
 	toggle: [option: FilterOption]
-	toggleExclude: [option: FilterOption]
 }>()
 
 const open = ref(false)

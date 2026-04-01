@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 
 import { useCompactNumber, useVIntl } from '../../../composables'
@@ -26,10 +25,7 @@ defineProps<{
 		"
 		class="flex items-center gap-2 trim-text-box smart-clickable:allow-pointer-events"
 	>
-		<DownloadIcon class="size-5 shrink-0" />
-		<span class="font-medium">
-			{{ formatCompactNumber(downloads) }}
-		</span>
+		<span class="font-medium"> {{ formatCompactNumber(downloads) }} downloads </span>
 	</div>
 	<div
 		v-if="followers !== undefined"
@@ -42,10 +38,7 @@ defineProps<{
 		"
 		class="flex items-center gap-2 trim-text-box smart-clickable:allow-pointer-events"
 	>
-		<HeartIcon class="size-5 shrink-0" />
-		<span class="font-medium">
-			{{ formatCompactNumber(followers) }}
-		</span>
+		<span class="font-medium"> {{ formatCompactNumber(followers) }} followers </span>
 	</div>
 </template>
 <style scoped>

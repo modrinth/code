@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="relative flex h-[750px] items-center justify-center overflow-hidden rounded-[20px] bg-black"
+		class="relative flex h-[750px] items-center justify-center overflow-hidden rounded-[4px] bg-black"
 	>
 		<div v-if="state.hasError" class="flex flex-col items-center justify-center gap-4">
 			<TriangleAlertIcon class="size-8 text-red" />
@@ -22,7 +22,7 @@
 
 		<div
 			v-if="isReady"
-			class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-2xl bg-surface-3/80 p-1.5 backdrop-blur-sm"
+			class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-[4px] bg-surface-3/80 p-1.5 backdrop-blur-sm"
 		>
 			<ButtonStyled type="transparent">
 				<button v-tooltip="formatMessage(messages.zoomIn)" @click="zoomIn">

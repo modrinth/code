@@ -25,7 +25,7 @@ withDefaults(
 .timeline-indicator {
 	background-image: linear-gradient(
 		to bottom,
-		var(--timeline-line-color, var(--color-raised-bg)) 66%,
+		var(--timeline-line-color, rgb(0 0 0 / 0.2)) 66%,
 		rgba(255, 255, 255, 0) 0%
 	);
 	background-size: 100% 30px;

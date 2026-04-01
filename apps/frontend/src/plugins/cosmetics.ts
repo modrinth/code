@@ -1,5 +1,3 @@
-import type { DarkTheme } from './theme/index.ts'
-
 export type DisplayMode = 'list' | 'gallery' | 'grid'
 
 export type DisplayLocation =
@@ -19,7 +17,6 @@ export interface Cosmetics {
 	externalLinksNewTab: boolean
 	notUsingBlockers: boolean
 	hideModrinthAppPromos: boolean
-	preferredDarkTheme: DarkTheme
 	searchDisplayMode: Record<DisplayLocation, DisplayMode>
 	hideStagingBanner: boolean
 }
@@ -40,7 +37,6 @@ export default defineNuxtPlugin({
 				externalLinksNewTab: true,
 				notUsingBlockers: false,
 				hideModrinthAppPromos: false,
-				preferredDarkTheme: 'dark',
 				searchDisplayMode: {
 					mod: 'list',
 					plugin: 'list',

@@ -80,14 +80,13 @@
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
-							<UsersIcon class="h-6 w-6 text-secondary" />
+							<UserIcon class="h-6 w-6 text-secondary" />
 							{{ formatCompactNumber(acceptedMembers?.length || 0) }}
 							members
 						</div>
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
-							<BoxIcon class="h-6 w-6 text-secondary" />
 							{{ formatCompactNumber(projects?.length || 0) }}
 							projects
 						</div>
@@ -95,66 +94,43 @@
 							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 font-semibold"
 						>
-							<DownloadIcon class="h-6 w-6 text-secondary" />
 							{{ formatCompactNumber(sumDownloads) }}
 							downloads
 						</div>
 					</template>
 					<template #actions>
-						<ButtonStyled v-if="auth.user && currentMember" size="large">
-							<NuxtLink :to="`/organization/${organization.slug}/settings`">
-								<SettingsIcon aria-hidden="true" />
-								Manage
-							</NuxtLink>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'manage-projects',
-										action: () =>
-											router.push('/organization/' + organization?.slug + '/settings/projects'),
-										hoverFilledOnly: true,
-										shown: !!(auth.user && currentMember),
-									},
-									{ divider: true, shown: !!(auth?.user && currentMember) },
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-								]"
-								aria-label="More options"
+						<div class="flex flex-col gap-2">
+							<nuxt-link
+								v-if="!!(auth.user && currentMember)"
+								:to="'/organization/' + organization?.slug + '/settings'"
+								class="text-link"
 							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #manage-projects>
-									<BoxIcon aria-hidden="true" />
-									Manage projects
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+								Edit organization ►
+							</nuxt-link>
+							<nuxt-link
+								v-if="!!(auth.user && currentMember)"
+								:to="'/organization/' + organization?.slug + '/settings/projects'"
+								class="text-link"
+							>
+								Manage projects ►
+							</nuxt-link>
+						</div>
 					</template>
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__sidebar">
 				<AdPlaceholder v-if="!auth.user" />
-
-				<div class="card flex-card">
-					<h2>Members</h2>
+				<div>
+					<h2 class="m-0 mb-1 text-lg font-bold">Members</h2>
 					<div class="details-list">
 						<template v-for="member in acceptedMembers" :key="member?.user.id">
 							<nuxt-link
-								class="details-list__item details-list__item--type-large"
+								class="details-list__item details-list__item--type-large group"
 								:to="`/user/${member?.user?.username}`"
 							>
 								<Avatar :src="member?.user.avatar_url" circle />
 								<div class="rows">
-									<span class="flex items-center gap-1">
+									<span class="flex items-center gap-1 group-hover:underline">
 										{{ member?.user?.username }}
 										<CrownIcon
 											v-if="member?.is_owner"
@@ -186,10 +162,13 @@
 						</button>
 					</div>
 				</div>
-				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="navLinks.length > 2" class="max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" replace />
 				</div>
-				<ProjectCardList v-if="projects && projects.length > 0">
+				<ProjectCardList
+					v-if="projects && projects.length > 0"
+					class="mx-4 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3"
+				>
 					<template
 						v-for="project in (route.params.projectType !== undefined
 							? (projects ?? []).filter((x) =>
@@ -210,6 +189,7 @@
 					>
 						<ProjectCard
 							v-if="isProjectServer(project)"
+							class="rounded-[4px] bg-white"
 							:link="`/server/${project.slug || project.id}`"
 							:title="project.name"
 							:icon-url="project.icon_url"
@@ -234,6 +214,7 @@
 						/>
 						<ProjectCard
 							v-else
+							class="rounded-[4px] bg-white"
 							:link="`/${project.project_types[0] ?? 'project'}/${project.slug || project.id}`"
 							:title="project.name"
 							:icon-url="project.icon_url"
@@ -283,24 +264,20 @@ import {
 	BoxIcon,
 	ChartIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
 	CrownIcon,
-	DownloadIcon,
-	MoreVerticalIcon,
 	OrganizationIcon,
 	SettingsIcon,
 	SpinnerIcon,
+	UserIcon,
 	UsersIcon,
 	XIcon,
 } from '@modrinth/assets'
 import {
 	Avatar,
-	ButtonStyled,
 	commonMessages,
 	ContentPageHeader,
 	injectModrinthClient,
 	NavTabs,
-	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
 	useCompactNumber,
@@ -319,6 +296,7 @@ import {
 	OrganizationContext,
 	provideOrganizationContext,
 } from '~/providers/organization-context.ts'
+import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { isPermission } from '~/utils/permissions.ts'
 
 type ProjectV3 = Labrinth.Projects.v3.Project & {
@@ -336,9 +314,7 @@ const auth: { user: any } & any = await useAuth()
 const user = await useUser()
 const cosmetics = useCosmetics()
 const route = useNativeRoute()
-const router = useRouter()
 const tags = useGeneratedState()
-const config = useRuntimeConfig()
 const modal_creation = useTemplateRef('modal_creation')
 
 const orgId = useRouteId()
@@ -557,16 +533,6 @@ const navLinks = computed(() => [
 		.slice()
 		.sort((a, b) => a.label.localeCompare(b.label)),
 ])
-
-async function copyId() {
-	await navigator.clipboard.writeText(organization.value?.id ?? '')
-}
-
-async function copyPermalink() {
-	await navigator.clipboard.writeText(
-		`${config.public.siteUrl}/organization/${organization.value?.id}`,
-	)
-}
 </script>
 
 <style scoped lang="scss">

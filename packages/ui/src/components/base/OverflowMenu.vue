@@ -10,49 +10,60 @@
 		<slot></slot>
 		<template #menu>
 			<slot name="menu-header" />
-			<template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
-				<div
-					v-if="isDivider(option)"
-					:key="`divider-${index}`"
-					class="h-px mx-3 my-2 bg-surface-5"
-				></div>
-				<Button
-					v-else
-					:key="`option-${option.id}`"
-					v-tooltip="option.tooltip"
-					:color="option.color ? option.color : 'default'"
-					:hover-filled="option.hoverFilled"
-					:hover-filled-only="option.hoverFilledOnly"
-					transparent
-					:v-close-popper="!option.remainOnClick"
-					:action="
-						option.action
-							? (event: MouseEvent) => {
-									option.action?.(event)
-									if (!option.remainOnClick) {
-										close()
-									}
-								}
-							: undefined
-					"
-					:link="option.link ? option.link : undefined"
-					:external="option.external ? option.external : false"
-					:disabled="option.disabled"
-					@click="
-						() => {
-							if (option.link && !option.remainOnClick) {
-								close()
-							}
-						}
-					"
+			<div class="p-[2px]">
+				<template
+					v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)"
 				>
-					<template v-if="!$slots[option.id]">
-						<component :is="option.icon" v-if="option.icon" class="size-5" />
-						{{ option.id }}
-					</template>
-					<slot :name="option.id"></slot>
-				</Button>
-			</template>
+					<div
+						v-if="isDivider(option)"
+						:key="`divider-${index}`"
+						class="h-px my-1 mx-[-2px] bg-[#979797]"
+					></div>
+					<AutoLink
+						v-else
+						:key="`option-${option.id}`"
+						v-tooltip="option.tooltip"
+						class="flex w-full items-center gap-3 rounded-[2px] px-4 py-1 border !border-solid border-transparent [&>svg]:size-5"
+						:class="{
+							'hover:bg-[#E9EFF7] hover:border-[#AECFF7]': !option.color,
+							'hover:bg-[--color-red-100] hover:border-[--color-red-300]':
+								option.color === 'red' || option.color === 'danger',
+							'hover:bg-[--color-orange-100] hover:border-[--color-orange-200]':
+								option.color === 'orange',
+							'hover:bg-[--color-green-100] hover:border-[--color-green-400]':
+								option.color === 'green' || option.color === 'primary',
+						}"
+						:v-close-popper="!option.remainOnClick"
+						:to="
+							option.action
+								? (event: MouseEvent) => {
+										option.action?.(event)
+										if (!option.remainOnClick) {
+											close()
+										}
+									}
+								: option.link
+									? option.link
+									: undefined
+						"
+						:external="option.external ? option.external : false"
+						:disabled="option.disabled"
+						@click="
+							() => {
+								if (option.link && !option.remainOnClick) {
+									close()
+								}
+							}
+						"
+					>
+						<template v-if="!$slots[option.id]">
+							<component :is="option.icon" v-if="option.icon" class="size-5" />
+							{{ option.id }}
+						</template>
+						<slot :name="option.id"></slot>
+					</AutoLink>
+				</template>
+			</div>
 		</template>
 	</PopoutMenu>
 </template>
@@ -60,7 +71,8 @@
 <script setup lang="ts">
 import { type Component, type Ref, ref } from 'vue'
 
-import Button from './Button.vue'
+import { AutoLink } from '#ui/components'
+
 import PopoutMenu from './PopoutMenu.vue'
 
 interface BaseOption {

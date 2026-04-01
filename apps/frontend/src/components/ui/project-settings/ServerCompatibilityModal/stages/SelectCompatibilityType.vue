@@ -11,7 +11,7 @@
 					@click="selectType(option.value)"
 				>
 					<div
-						class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-solid border-surface-5"
+						class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[4px] border border-solid border-surface-5"
 					>
 						<component :is="option.icon" class="h-9 w-9 text-secondary" />
 					</div>

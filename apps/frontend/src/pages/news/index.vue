@@ -68,13 +68,13 @@ useSeoMeta({
 			>
 				<nuxt-link
 					:to="`${featuredArticle.path}`"
-					class="active:scale-[0.99]! group flex cursor-pointer transition-all ease-in-out hover:brightness-125"
+					class="group flex cursor-pointer transition-all ease-in-out hover:brightness-125"
 				>
 					<article class="featured-article px-6">
 						<div class="featured-image-container">
 							<img
 								:src="featuredArticle.thumbnail"
-								class="aspect-video w-full rounded-2xl border-[1px] border-solid border-button-border object-cover"
+								class="aspect-video w-full rounded-[4px] border-[1px] border-solid border-button-border object-cover"
 							/>
 						</div>
 						<div class="featured-content">
@@ -118,14 +118,13 @@ useSeoMeta({
 .page {
 	> *:not(.full-width-bg),
 	> .full-width-bg > * {
-		max-width: 56rem;
 		margin-inline: auto;
 	}
 }
 
 .brand-gradient-bg {
-	background: var(--brand-gradient-bg);
-	border-color: var(--brand-gradient-border);
+	background: transparent;
+	border-color: transparent;
 }
 
 .featured-article {

@@ -61,23 +61,21 @@
 								<li
 									v-for="(segment, index) in breadcrumbs"
 									:key="`${segment || index}-group`"
-									class="relative flex shrink-0 items-center text-sm"
+									class="relative flex shrink-0 items-center"
 								>
 									<div class="flex shrink-0 items-center">
-										<ButtonStyled type="transparent">
-											<button
-												class="cursor-pointer whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-												:aria-current="
-													!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
-												"
-												:class="{
-													'!text-contrast': !isEditing && index === breadcrumbs.length - 1,
-												}"
-												@click="$emit('navigate', index)"
-											>
-												{{ segment || '' }}
-											</button>
-										</ButtonStyled>
+										<button
+											class="cursor-pointer hover:underline bg-transparent px-2 whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+											:aria-current="
+												!isEditing && index === breadcrumbs.length - 1 ? 'location' : undefined
+											"
+											:class="{
+												'!text-contrast !font-bold': !isEditing && index === breadcrumbs.length - 1,
+											}"
+											@click="$emit('navigate', index)"
+										>
+											{{ segment || '' }}
+										</button>
 										<ChevronRightIcon
 											v-if="index < breadcrumbs.length - 1 || isEditing"
 											class="size-4 flex-shrink-0 text-secondary"
@@ -120,7 +118,7 @@
 					>
 						<RefreshCwIcon
 							aria-hidden="true"
-							class="h-5 w-5 transition-transform"
+							class="h-5 w-5"
 							:class="refreshing ? 'animate-spin' : ''"
 						/>
 						{{ formatMessage(commonMessages.refreshButton) }}
@@ -386,7 +384,6 @@ const isLogFile = computed(() => {
 .breadcrumb-move,
 .breadcrumb-enter-active,
 .breadcrumb-leave-active {
-	transition: all 0.2s ease;
 }
 
 .breadcrumb-enter-from {

@@ -29,45 +29,42 @@
 					</span>
 				</slot>
 			</div>
-			<DropdownIcon class="arrow" :class="{ rotate: dropdownVisible }" />
+			<span class="arrow" :class="{ rotate: dropdownVisible }">▼</span>
 		</div>
 		<div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">
-			<transition name="options">
+			<div
+				v-show="dropdownVisible"
+				class="options"
+				role="listbox"
+				:class="{ down: !renderUp, up: renderUp }"
+			>
 				<div
-					v-show="dropdownVisible"
-					class="options"
-					role="listbox"
-					:class="{ down: !renderUp, up: renderUp }"
+					v-for="(option, index) in options"
+					:key="index"
+					ref="optionElements"
+					tabindex="-1"
+					role="option"
+					:class="{ 'selected-option': selectedValue === option }"
+					:aria-selected="selectedValue === option"
+					class="option"
+					@click="selectOption(option, index)"
+					@keydown.space.prevent="selectOption(option, index)"
 				>
-					<div
-						v-for="(option, index) in options"
-						:key="index"
-						ref="optionElements"
-						tabindex="-1"
-						role="option"
-						:class="{ 'selected-option': selectedValue === option }"
-						:aria-selected="selectedValue === option"
-						class="option"
-						@click="selectOption(option, index)"
-						@keydown.space.prevent="selectOption(option, index)"
-					>
-						<input
-							:id="`${name}-${index}`"
-							v-model="radioValue"
-							type="radio"
-							:value="option"
-							:name="name"
-						/>
-						<label :for="`${name}-${index}`">{{ getOptionLabel(option) }}</label>
-					</div>
+					<input
+						:id="`${name}-${index}`"
+						v-model="radioValue"
+						type="radio"
+						:value="option"
+						:name="name"
+					/>
+					<label :for="`${name}-${index}`">{{ getOptionLabel(option) }}</label>
 				</div>
-			</transition>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { DropdownIcon } from '@modrinth/assets'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -204,7 +201,7 @@ const isChildOfDropdown = (element) => {
 <style lang="scss" scoped>
 .animated-dropdown {
 	width: 20rem;
-	height: 40px;
+	height: 32px;
 	position: relative;
 	display: inline-block;
 
@@ -219,17 +216,14 @@ const isChildOfDropdown = (element) => {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: var(--gap-sm) var(--gap-lg);
+		padding: 2px 14px;
 		background-color: var(--color-button-bg);
 		gap: var(--gap-md);
 		cursor: pointer;
 		user-select: none;
-		border-radius: var(--radius-md);
-		box-shadow:
-			var(--shadow-inset-sm),
-			0 0 0 0 transparent;
-
-		transition: 0.05s;
+		border-radius: 0;
+		border: 1px solid #777777;
+		font-weight: 500;
 
 		&:not(.render-down):not(.render-up) {
 			transition-delay: 0.2s;
@@ -241,23 +235,12 @@ const isChildOfDropdown = (element) => {
 			opacity: 0.5;
 		}
 
-		&.render-up {
-			border-radius: 0 0 var(--radius-md) var(--radius-md);
-		}
-
-		&.render-down {
-			border-radius: var(--radius-md) var(--radius-md) 0 0;
-		}
-
 		&:focus {
 			outline: 0;
 			filter: brightness(1.25);
-			transition: filter 0.1s ease-in-out;
 		}
 
 		.arrow {
-			transition: transform 0.2s ease;
-
 			&.rotate {
 				transform: rotate(180deg);
 			}
@@ -268,15 +251,14 @@ const isChildOfDropdown = (element) => {
 		z-index: 10;
 		max-height: v-bind('maxVisibleOptions ? `calc(${maxVisibleOptions} * 3rem)` : "18.75rem"');
 		overflow-y: auto;
-		box-shadow:
-			var(--shadow-inset-sm),
-			0 0 0 0 transparent;
+		box-shadow: 3px 3px 2px 0px rgb(64 64 64 / 0.4);
+		border: 1px solid black;
 
 		.option {
 			background-color: var(--color-button-bg);
 			display: flex;
 			align-items: center;
-			padding: var(--gap-md);
+			padding: 6px 16px;
 			cursor: pointer;
 			user-select: none;
 
@@ -286,19 +268,20 @@ const isChildOfDropdown = (element) => {
 
 			&:hover {
 				filter: brightness(0.85);
-				transition: filter 0.2s ease-in-out;
 			}
 
 			&:focus {
 				outline: 0;
 				filter: brightness(0.85);
-				transition: filter 0.2s ease-in-out;
 			}
 
 			&.selected-option {
-				background-color: var(--color-brand);
-				color: var(--color-accent-contrast);
-				font-weight: bolder;
+				font-weight: bold;
+
+				&::after {
+					content: '✔︎';
+					margin-left: auto;
+				}
 			}
 
 			input {
@@ -310,7 +293,6 @@ const isChildOfDropdown = (element) => {
 
 .options-enter-active,
 .options-leave-active {
-	transition: transform 0.2s ease;
 }
 
 .options-enter-from,
@@ -337,15 +319,14 @@ const isChildOfDropdown = (element) => {
 	width: 100%;
 	overflow: auto;
 	z-index: 9;
+	box-shadow: 3px 3px 2px 0px rgb(64 64 64 / 0.4);
 
 	&.up {
 		top: 0;
 		transform: translateY(-99.999%);
-		border-radius: var(--radius-md) var(--radius-md) 0 0;
 	}
 
 	&.down {
-		border-radius: 0 0 var(--radius-md) var(--radius-md);
 	}
 }
 </style>

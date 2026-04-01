@@ -16,7 +16,7 @@
 				@mouseenter="stopTimer(item)"
 				@mouseleave="setNotificationTimer(item)"
 			>
-				<div class="flex w-full gap-2 overflow-hidden rounded-lg bg-bg-raised shadow-xl">
+				<div class="flex w-full gap-2 overflow-hidden rounded-[4px] bg-bg-raised shadow-xl">
 					<div
 						class="w-2"
 						:class="{
@@ -37,12 +37,7 @@
 								'text-green': item.type === 'success',
 								'text-blue': !item.type || !['error', 'warning', 'success'].includes(item.type),
 							}"
-						>
-							<IssuesIcon v-if="item.type === 'warning'" class="h-6 w-6" />
-							<CheckCircleIcon v-else-if="item.type === 'success'" class="h-6 w-6" />
-							<XCircleIcon v-else-if="item.type === 'error'" class="h-6 w-6" />
-							<InfoIcon v-else class="h-6 w-6" />
-						</div>
+						></div>
 						<div class="m-0 text-wrap font-bold text-contrast">{{ item.title }}</div>
 						<div class="flex items-center gap-1">
 							<div v-if="item.count && item.count > 1" class="text-xs font-bold text-contrast">
@@ -81,15 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-	CheckCircleIcon,
-	CheckIcon,
-	CopyIcon,
-	InfoIcon,
-	IssuesIcon,
-	XCircleIcon,
-	XIcon,
-} from '@modrinth/assets'
+import { CheckIcon, CopyIcon, XIcon } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { injectNotificationManager, type WebNotification } from '../../providers'

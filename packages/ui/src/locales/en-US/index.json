@@ -2426,8 +2426,14 @@
   "search.filter.locked.default.unlock": {
     "defaultMessage": "Unlock filter"
   },
-  "search.filter.option.exclusion.add.tooltip": {
-    "defaultMessage": "Exclude"
+  "search.filter.option.aria.excluded": {
+    "defaultMessage": "{name}, excluded from search"
+  },
+  "search.filter.option.aria.included": {
+    "defaultMessage": "{name}, included in search"
+  },
+  "search.filter.option.aria.off": {
+    "defaultMessage": "{name}, not used as filter"
   },
   "search.filter.option.search.clear.aria_label": {
     "defaultMessage": "Clear search"

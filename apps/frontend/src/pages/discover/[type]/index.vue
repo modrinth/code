@@ -4,14 +4,10 @@ import {
 	BookmarkIcon,
 	CheckIcon,
 	DownloadIcon,
-	FilterIcon,
 	GameIcon,
-	GridIcon,
 	HeartIcon,
-	ImageIcon,
 	InfoIcon,
 	LeftArrowIcon,
-	ListIcon,
 	MinecraftServerIcon,
 	MoreVerticalIcon,
 	SearchIcon,
@@ -30,7 +26,6 @@ import {
 	Pagination,
 	ProjectCard,
 	ProjectCardList,
-	SearchFilterControl,
 	SearchSidebarFilter,
 	type SortType,
 	StyledInput,
@@ -39,7 +34,6 @@ import {
 	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
-import { capitalizeString, cycleValue } from '@modrinth/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useThrottleFn, useTimeoutFn } from '@vueuse/core'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -49,7 +43,7 @@ import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import { projectQueryOptions } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { withLabrinthCanaryHeader } from '~/helpers/canary.ts'
-import type { DisplayLocation, DisplayMode } from '~/plugins/cosmetics.ts'
+import type { DisplayMode } from '~/plugins/cosmetics.ts'
 
 const { formatMessage } = useVIntl()
 const debug = useDebugLogger('Discover')
@@ -62,7 +56,6 @@ const filtersMenuOpen = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
 const auth = await useAuth()
@@ -120,14 +113,7 @@ const isServerType = computed(() => currentType.value === 'server')
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 const projectTypes = computed(() => (projectType.value ? [projectType.value.id] : []))
 
-const resultsDisplayLocation = computed<DisplayLocation | undefined>(
-	() => projectType.value?.id as DisplayLocation,
-)
-const resultsDisplayMode = computed<DisplayMode>(() =>
-	resultsDisplayLocation.value
-		? cosmetics.value.searchDisplayMode[resultsDisplayLocation.value]
-		: 'list',
-)
+const resultsDisplayMode = computed<DisplayMode>(() => 'list')
 
 const currentServerId = computed(() => queryAsString(route.query.sid) || null)
 const fromContext = computed(() => queryAsString(route.query.from) || null)
@@ -618,28 +604,6 @@ watch([effectiveCurrentFilters], () => {
 
 const throttledSearch = useThrottleFn(() => updateSearchResults(), 500, true)
 
-function cycleSearchDisplayMode() {
-	if (!resultsDisplayLocation.value) {
-		// if no display location, abort
-		return
-	}
-	cosmetics.value.searchDisplayMode[resultsDisplayLocation.value] = cycleValue(
-		cosmetics.value.searchDisplayMode[resultsDisplayLocation.value],
-		tags.value.projectViewModes.filter((x) => x !== 'grid'),
-	)
-	setClosestMaxResults()
-}
-
-function setClosestMaxResults() {
-	const maxResultsOptions = maxResultsForView.value[resultsDisplayMode.value] ?? [20]
-	const currentMax = maxResults.value
-	if (!maxResultsOptions.includes(currentMax)) {
-		maxResults.value = maxResultsOptions.reduce((prev: number, curr: number) => {
-			return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
-		})
-	}
-}
-
 const ogTitle = computed(
 	() =>
 		`Search ${projectType.value?.display ?? 'project'}s${query.value ? ' | ' + query.value : ''}`,
@@ -760,334 +724,288 @@ useSeoMeta({
 			}}
 		</h1>
 	</Teleport>
-
-	<aside
-		:class="{
-			'normal-page__sidebar': true,
-		}"
-		aria-label="Filters"
-	>
-		<AdPlaceholder v-if="!auth.user && !serverData" />
-		<div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
-		<div
-			class="flex flex-col gap-3"
-			:class="{
-				'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
-			}"
-		>
-			<div
-				v-if="filtersMenuOpen"
-				class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
+	<div class="mx-4 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3">
+		<StyledInput
+			v-model="query"
+			:icon="SearchIcon"
+			type="text"
+			autocomplete="off"
+			:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
+			clearable
+			wrapper-class="w-full mb-2"
+			input-class="!h-12"
+			@input="throttledSearch()"
+			@clear="updateSearchResults()"
+		/>
+		<div class="flex flex-wrap items-center gap-2">
+			<DropdownSelect
+				v-slot="{ selected }"
+				v-model="effectiveCurrentSortType"
+				class="!w-auto flex-grow md:flex-grow-0"
+				name="Sort by"
+				:options="[...effectiveSortTypes]"
+				:display-name="(option?: SortType) => option?.display"
+				@change="updateSearchResults()"
 			>
-				<h3 class="m-0 text-lg text-contrast">Filters</h3>
-				<ButtonStyled circular>
-					<button
-						@click="
-							() => {
-								filtersMenuOpen = false
-								scrollToTop('instant')
-							}
-						"
-					>
-						<XIcon />
-					</button>
-				</ButtonStyled>
-			</div>
-			<div
-				v-if="serverData && projectType?.id !== 'modpack'"
-				class="card-shadow rounded-2xl bg-bg-raised p-4"
+				<span>Sort by: </span>
+				<span>{{ selected }}</span>
+			</DropdownSelect>
+			<DropdownSelect
+				v-slot="{ selected }"
+				v-model="maxResults"
+				name="Max results"
+				:options="currentMaxResultsOptions"
+				:default-value="maxResults"
+				class="!w-auto flex-grow md:flex-grow-0"
+				@change="updateSearchResults()"
 			>
-				<Checkbox
-					v-model="serverHideInstalled"
-					label="Hide installed content"
-					class="filter-checkbox"
-					@update:model-value="updateSearchResults()"
-				/>
-			</div>
-			<template v-if="isServerType">
-				<SearchSidebarFilter
-					v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
-					:key="`server-filter-${filterType.id}`"
-					v-model:selected-filters="serverCurrentFilters"
-					v-model:toggled-groups="serverToggledGroups"
-					:provided-filters="[]"
-					:filter-type="filterType"
-					:class="
-						filtersMenuOpen
-							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-							: 'card-shadow rounded-2xl bg-bg-raised'
-					"
-					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-					content-class="mb-4 mx-3"
-					inner-panel-class="p-1"
-					:open-by-default="
-						![
-							'server_category_minecraft_server_meta',
-							'server_category_minecraft_server_community',
-							'server_game_version',
-							'server_status',
-						].includes(filterType.id)
-					"
-				>
-					<template #header>
-						<h3 class="m-0 text-lg">{{ filterType.formatted_name }}</h3>
-					</template>
-				</SearchSidebarFilter>
-			</template>
-			<template v-else>
-				<SearchSidebarFilter
-					v-for="filter in filters.filter((f) => f.display !== 'none')"
-					:key="`filter-${filter.id}`"
-					v-model:selected-filters="currentFilters"
-					v-model:toggled-groups="toggledGroups"
-					v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-					:provided-filters="serverFilters"
-					:filter-type="filter"
-					:class="
-						filtersMenuOpen
-							? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
-							: 'card-shadow rounded-2xl bg-bg-raised'
-					"
-					button-class="button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none"
-					content-class="mb-4 mx-3"
-					inner-panel-class="p-1"
-					:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
-				>
-					<template #header>
-						<h3 class="m-0 text-lg">{{ filter.formatted_name }}</h3>
-					</template>
-					<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
-						<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
-							<InfoIcon class="mt-1 size-4" />
-							<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
-						</div>
-					</template>
-					<template #locked-game_version>
-						{{ formatMessage(messages.gameVersionProvidedByServer) }}
-					</template>
-					<template #locked-mod_loader>
-						{{ formatMessage(messages.modLoaderProvidedByServer) }}
-					</template>
-					<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
-				</SearchSidebarFilter>
-			</template>
+				<span>View: </span>
+				<span>{{ selected }}</span>
+			</DropdownSelect>
 		</div>
-	</aside>
-	<section class="normal-page__content">
-		<div class="flex flex-col gap-3">
-			<StyledInput
-				v-model="query"
-				:icon="SearchIcon"
-				type="text"
-				autocomplete="off"
-				:placeholder="`Search ${projectType?.display ?? 'project'}s...`"
-				clearable
-				wrapper-class="w-full"
-				input-class="!h-12"
-				@input="throttledSearch()"
-				@clear="updateSearchResults()"
-			/>
-			<div class="flex flex-wrap items-center gap-2">
-				<DropdownSelect
-					v-slot="{ selected }"
-					v-model="effectiveCurrentSortType"
-					class="!w-auto flex-grow md:flex-grow-0"
-					name="Sort by"
-					:options="[...effectiveSortTypes]"
-					:display-name="(option?: SortType) => option?.display"
-					@change="updateSearchResults()"
+	</div>
+	<div class="grid grid-cols-[300px,1fr]">
+		<aside aria-label="Filters">
+			<AdPlaceholder v-if="!auth.user && !serverData" />
+			<div v-if="filtersMenuOpen" class="fixed inset-0 z-40 bg-bg"></div>
+			<div
+				class="flex flex-col"
+				:class="{
+					'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised': filtersMenuOpen,
+					'h-full border-0 border-r border-solid border-[#b5b5b5] pr-4': !filtersMenuOpen,
+				}"
+			>
+				<div
+					v-if="filtersMenuOpen"
+					class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
 				>
-					<span class="font-semibold text-primary">Sort by: </span>
-					<span class="font-semibold text-secondary">{{ selected }}</span>
-				</DropdownSelect>
-				<DropdownSelect
-					v-slot="{ selected }"
-					v-model="maxResults"
-					name="Max results"
-					:options="currentMaxResultsOptions"
-					:default-value="maxResults"
-					class="!w-auto flex-grow md:flex-grow-0"
-					@change="updateSearchResults()"
-				>
-					<span class="font-semibold text-primary">View: </span>
-					<span class="font-semibold text-secondary">{{ selected }}</span>
-				</DropdownSelect>
-				<div class="lg:hidden">
-					<ButtonStyled>
-						<button @click="filtersMenuOpen = true">
-							<FilterIcon />
-							Filter results...
+					<h3 class="m-0 text-lg text-contrast">Filters</h3>
+					<ButtonStyled circular>
+						<button
+							@click="
+								() => {
+									filtersMenuOpen = false
+									scrollToTop('instant')
+								}
+							"
+						>
+							<XIcon />
 						</button>
 					</ButtonStyled>
 				</div>
-				<ButtonStyled circular>
-					<button
-						:v-tooltip="capitalizeString(resultsDisplayMode + ' view')"
-						:aria-label="capitalizeString(resultsDisplayMode + ' view')"
-						@click="cycleSearchDisplayMode()"
-					>
-						<GridIcon v-if="resultsDisplayMode === 'grid'" />
-						<ImageIcon v-else-if="resultsDisplayMode === 'gallery'" />
-						<ListIcon v-else />
-					</button>
-				</ButtonStyled>
-				<Pagination
-					:page="currentPage"
-					:count="pageCount"
-					class="mx-auto sm:ml-auto sm:mr-0"
-					@switch-page="updateSearchResults"
-				/>
-			</div>
-			<SearchFilterControl
-				v-if="isServerType"
-				v-model:selected-filters="serverCurrentFilters"
-				:filters="serverFilterTypes"
-				:provided-filters="[]"
-				:overridden-provided-filter-types="[]"
-			/>
-			<SearchFilterControl
-				v-else
-				v-model:selected-filters="currentFilters"
-				:filters="filters.filter((f) => f.display !== 'none')"
-				:provided-filters="serverFilters"
-				:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-message="messages.providedByServer"
-			/>
-			<LogoAnimated v-if="searchLoading && !noLoad" />
-			<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
-				<p>No results found for your query!</p>
-			</div>
-			<div v-else class="search-results-container">
-				<ProjectCardList
-					aria-label="Search results"
-					:layout="
-						resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-					"
+				<div
+					v-if="serverData && projectType?.id !== 'modpack'"
+					class="card-shadow rounded-[4px] bg-bg-raised p-4"
 				>
-					<template v-if="isServerType">
-						<ProjectCard
-							v-for="result in serverResults?.hits"
-							:key="`server-${result.project_id}`"
-							:link="`/server/${result.slug ?? result.project_id}`"
-							:title="result.name"
-							:icon-url="result.icon_url || undefined"
-							:summary="result.summary"
-							:tags="result.categories"
-							:server-online-players="result.minecraft_java_server?.ping?.data?.players_online ?? 0"
-							:server-region="result.minecraft_server?.region"
-							:server-recent-plays="result.minecraft_java_server?.verified_plays_2w ?? 0"
-							:server-status-online="!!result.minecraft_java_server?.ping?.data"
-							:server-modpack-content="getServerModpackContent(result)"
-							is-server-project
-							exclude-loaders
-							:color="result.color ?? undefined"
-							:banner="result.featured_gallery ?? undefined"
-							:layout="
-								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-							"
-							:max-tags="2"
-							@mouseenter="handleServerProjectMouseEnter(result)"
-							@mouseleave="handleProjectHoverEnd"
-						/>
-					</template>
-					<template v-else>
-						<ProjectCard
-							v-for="result in projectResults?.hits"
-							:key="result.project_id"
-							:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
-							:title="result.title"
-							:icon-url="result.icon_url"
-							:author="{ name: result.author, link: `/user/${result.author}` }"
-							:date-updated="result.date_modified"
-							:date-published="result.date_created"
-							:displayed-date="effectiveCurrentSortType.name === 'newest' ? 'published' : 'updated'"
-							:downloads="result.downloads"
-							:summary="result.description"
-							:tags="result.display_categories"
-							:all-tags="result.categories"
-							:deprioritized-tags="deprioritizedTags"
-							:exclude-loaders="excludeLoaders"
-							:followers="result.follows"
-							:banner="result.featured_gallery ?? undefined"
-							:color="result.color ?? undefined"
-							:environment="
-								['mod', 'modpack'].includes(currentType)
-									? {
-											clientSide: result.client_side as Labrinth.Projects.v2.Environment,
-											serverSide: result.server_side as Labrinth.Projects.v2.Environment,
-										}
-									: undefined
-							"
-							:layout="
-								resultsDisplayMode === 'grid' || resultsDisplayMode === 'gallery' ? 'grid' : 'list'
-							"
-							@mouseenter="handleProjectMouseEnter(result)"
-							@mouseleave="handleProjectHoverEnd"
-						>
-							<template v-if="flags.showDiscoverProjectButtons || serverData" #actions>
-								<template v-if="flags.showDiscoverProjectButtons">
-									<ButtonStyled color="brand">
-										<button>
-											<DownloadIcon />
-											Download
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular>
-										<button>
-											<HeartIcon />
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular>
-										<button>
-											<BookmarkIcon />
-										</button>
-									</ButtonStyled>
-									<ButtonStyled circular type="transparent">
-										<button>
-											<MoreVerticalIcon />
-										</button>
-									</ButtonStyled>
-								</template>
-								<template v-else-if="serverData">
-									<ButtonStyled color="brand" type="outlined">
-										<button
-											v-if="
-												(result as InstallableSearchResult).installed ||
-												(serverContentData &&
-													(serverContentData.addons ?? []).find(
-														(x) => x.project_id === result.project_id,
-													)) ||
-												serverData.upstream?.project_id === result.project_id
-											"
-											disabled
-										>
-											<CheckIcon />
-											Installed
-										</button>
-										<button v-else-if="(result as InstallableSearchResult).installing" disabled>
-											Installing...
-										</button>
-										<button v-else @click="serverInstall(result as InstallableSearchResult)">
-											<DownloadIcon />
-											Install
-										</button>
-									</ButtonStyled>
-								</template>
-							</template>
-						</ProjectCard>
-					</template>
-				</ProjectCardList>
+					<Checkbox
+						v-model="serverHideInstalled"
+						label="Hide installed content"
+						class="filter-checkbox"
+						@update:model-value="updateSearchResults()"
+					/>
+				</div>
+				<template v-if="isServerType">
+					<SearchSidebarFilter
+						v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
+						:key="`server-filter-${filterType.id}`"
+						v-model:selected-filters="serverCurrentFilters"
+						v-model:toggled-groups="serverToggledGroups"
+						:provided-filters="[]"
+						:filter-type="filterType"
+						:class="
+							filtersMenuOpen
+								? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+								: 'card-shadow rounded-[4px] bg-bg-raised'
+						"
+						button-class="flex flex-col gap-1 px-6 py-2 w-full bg-transparent cursor-pointer border-none"
+						content-class="mb-4 mx-3"
+						inner-panel-class="p-1"
+						:open-by-default="
+							![
+								'server_category_minecraft_server_meta',
+								'server_category_minecraft_server_community',
+								'server_game_version',
+								'server_status',
+							].includes(filterType.id)
+						"
+					>
+						<template #header>
+							<h3 class="m-0 text-base">{{ filterType.formatted_name }}</h3>
+						</template>
+					</SearchSidebarFilter>
+				</template>
+				<template v-else>
+					<SearchSidebarFilter
+						v-for="filter in filters.filter((f) => f.display !== 'none')"
+						:key="`filter-${filter.id}`"
+						v-model:selected-filters="currentFilters"
+						v-model:toggled-groups="toggledGroups"
+						v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
+						:provided-filters="serverFilters"
+						:filter-type="filter"
+						:class="
+							filtersMenuOpen
+								? 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+								: ''
+						"
+						button-class="flex flex-col gap-1 px-4 py-2 w-full bg-transparent cursor-pointer border-none"
+						content-class="mb-4 mx-2"
+						inner-panel-class="p-1"
+						:open-by-default="!(currentType === 'shader' && filter.id === 'game_version')"
+					>
+						<template #header>
+							<h3 class="m-0 text-base font-normal">{{ filter.formatted_name }}</h3>
+						</template>
+						<template v-if="currentType === 'shader' && filter.id === 'game_version'" #prefix>
+							<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+								<InfoIcon class="mt-1 size-4" />
+								<span> {{ formatMessage(messages.gameVersionShaderMessage) }}</span>
+							</div>
+						</template>
+						<template #locked-game_version>
+							{{ formatMessage(messages.gameVersionProvidedByServer) }}
+						</template>
+						<template #locked-mod_loader>
+							{{ formatMessage(messages.modLoaderProvidedByServer) }}
+						</template>
+						<template #sync-button> {{ formatMessage(messages.syncFilterButton) }}</template>
+					</SearchSidebarFilter>
+				</template>
 			</div>
-			<div class="pagination-after">
-				<pagination
-					:page="currentPage"
-					:count="pageCount"
-					class="justify-end"
-					@switch-page="updateSearchResults"
-				/>
+		</aside>
+		<section>
+			<div class="flex flex-col gap-3">
+				<LogoAnimated v-if="searchLoading && !noLoad" />
+				<div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
+					<p>No results found for your query!</p>
+				</div>
+				<div v-else class="search-results-container">
+					<ProjectCardList aria-label="Search results" layout="list">
+						<template v-if="isServerType">
+							<ProjectCard
+								v-for="result in serverResults?.hits"
+								:key="`server-${result.project_id}`"
+								:link="`/server/${result.slug ?? result.project_id}`"
+								:title="result.name"
+								:icon-url="result.icon_url || undefined"
+								:summary="result.summary"
+								:tags="result.categories"
+								:server-online-players="
+									result.minecraft_java_server?.ping?.data?.players_online ?? 0
+								"
+								:server-region="result.minecraft_server?.region"
+								:server-recent-plays="result.minecraft_java_server?.verified_plays_2w ?? 0"
+								:server-status-online="!!result.minecraft_java_server?.ping?.data"
+								:server-modpack-content="getServerModpackContent(result)"
+								is-server-project
+								exclude-loaders
+								:color="result.color ?? undefined"
+								:banner="result.featured_gallery ?? undefined"
+								layout="list"
+								:max-tags="2"
+								@mouseenter="handleServerProjectMouseEnter(result)"
+								@mouseleave="handleProjectHoverEnd"
+							/>
+						</template>
+						<template v-else>
+							<ProjectCard
+								v-for="result in projectResults?.hits"
+								:key="result.project_id"
+								:link="`/${projectType?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`"
+								:title="result.title"
+								:icon-url="result.icon_url"
+								:author="{ name: result.author, link: `/user/${result.author}` }"
+								:date-updated="result.date_modified"
+								:date-published="result.date_created"
+								:displayed-date="
+									effectiveCurrentSortType.name === 'newest' ? 'published' : 'updated'
+								"
+								:downloads="result.downloads"
+								:summary="result.description"
+								:tags="result.display_categories"
+								:all-tags="result.categories"
+								:deprioritized-tags="deprioritizedTags"
+								:exclude-loaders="excludeLoaders"
+								:followers="result.follows"
+								:banner="result.featured_gallery ?? undefined"
+								:color="result.color ?? undefined"
+								:environment="
+									['mod', 'modpack'].includes(currentType)
+										? {
+												clientSide: result.client_side as Labrinth.Projects.v2.Environment,
+												serverSide: result.server_side as Labrinth.Projects.v2.Environment,
+											}
+										: undefined
+								"
+								layout="list"
+								@mouseenter="handleProjectMouseEnter(result)"
+								@mouseleave="handleProjectHoverEnd"
+							>
+								<template v-if="flags.showDiscoverProjectButtons || serverData" #actions>
+									<template v-if="flags.showDiscoverProjectButtons">
+										<ButtonStyled color="brand">
+											<button>
+												<DownloadIcon />
+												Download
+											</button>
+										</ButtonStyled>
+										<ButtonStyled circular>
+											<button>
+												<HeartIcon />
+											</button>
+										</ButtonStyled>
+										<ButtonStyled circular>
+											<button>
+												<BookmarkIcon />
+											</button>
+										</ButtonStyled>
+										<ButtonStyled circular type="transparent">
+											<button>
+												<MoreVerticalIcon />
+											</button>
+										</ButtonStyled>
+									</template>
+									<template v-else-if="serverData">
+										<ButtonStyled color="brand" type="outlined">
+											<button
+												v-if="
+													(result as InstallableSearchResult).installed ||
+													(serverContentData &&
+														(serverContentData.addons ?? []).find(
+															(x) => x.project_id === result.project_id,
+														)) ||
+													serverData.upstream?.project_id === result.project_id
+												"
+												disabled
+											>
+												<CheckIcon />
+												Installed
+											</button>
+											<button v-else-if="(result as InstallableSearchResult).installing" disabled>
+												Installing...
+											</button>
+											<button v-else @click="serverInstall(result as InstallableSearchResult)">
+												<DownloadIcon />
+												Install
+											</button>
+										</ButtonStyled>
+									</template>
+								</template>
+							</ProjectCard>
+						</template>
+					</ProjectCardList>
+				</div>
+				<div class="pagination-after">
+					<pagination
+						:page="currentPage"
+						:count="pageCount"
+						class="justify-end"
+						@switch-page="updateSearchResults"
+					/>
+				</div>
 			</div>
-		</div>
-	</section>
+		</section>
+	</div>
 
 	<CreationFlowModal
 		v-if="currentServerId && projectType?.id === 'modpack'"

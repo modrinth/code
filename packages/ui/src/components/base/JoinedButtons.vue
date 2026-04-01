@@ -7,7 +7,7 @@
 			</button>
 		</ButtonStyled>
 		<ButtonStyled v-if="dropdownActions.length > 0" :color="color">
-			<OverflowMenu class="btn-dropdown-animation" :options="dropdownOptions" :disabled="disabled">
+			<OverflowMenu class="" :options="dropdownOptions" :disabled="disabled">
 				<DropdownIcon />
 				<template v-for="action in dropdownActions" :key="action.id" #[action.id]>
 					<component :is="action.icon" v-if="action.icon" aria-hidden="true" />

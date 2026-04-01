@@ -19,7 +19,7 @@
 		>
 			<template v-if="showChevron" #right>
 				<ChevronLeftIcon
-					class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary transition-transform duration-150"
+					class="pointer-events-none absolute right-3 top-1/2 size-5 -translate-y-1/2 text-secondary"
 					:class="isOpen ? (openDirection === 'down' ? 'rotate-90' : '-rotate-90') : '-rotate-90'"
 				/>
 			</template>
@@ -31,7 +31,7 @@
 			ref="triggerRef"
 			role="button"
 			tabindex="0"
-			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left transition-all duration-200 text-button-text"
+			class="relative flex min-h-5 w-full items-center justify-between overflow-hidden rounded-xl bg-surface-4 px-4 py-2.5 text-left text-button-text"
 			:class="[
 				props.triggerClass,
 				{
@@ -68,12 +68,7 @@
 		</span>
 
 		<Teleport to="#teleports">
-			<Transition
-				enter-active-class="transition-opacity duration-150"
-				leave-active-class="transition-opacity duration-150"
-				enter-from-class="opacity-0"
-				leave-to-class="opacity-0"
-			>
+			<Transition enter-from-class="opacity-0" leave-to-class="opacity-0">
 				<div
 					v-if="isOpen"
 					ref="dropdownRef"

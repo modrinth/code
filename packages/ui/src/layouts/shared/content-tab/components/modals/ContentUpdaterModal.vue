@@ -531,11 +531,12 @@ function getVersionTypeBadgeClasses(version: Labrinth.Versions.v2.Version): stri
 }
 
 function formatLongDate(dateString: string): string {
-	return new Date(dateString).toLocaleDateString('en-US', {
+	const formatDateTime = useFormatDateTime({
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric',
 	})
+	return formatDateTime(dateString)
 }
 
 function formatLoaderGameVersion(version: Labrinth.Versions.v2.Version): string {

@@ -6,7 +6,7 @@
 			</span>
 		</div>
 		<div class="flex w-full flex-col gap-3">
-			<div class="span-4 flex w-full flex-col gap-2.5 rounded-2xl bg-surface-2 p-4">
+			<div class="span-4 flex w-full flex-col gap-2.5 rounded-[4px] bg-surface-2 p-4">
 				<div
 					class="flex w-full flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-0"
 				>

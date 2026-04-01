@@ -9,98 +9,71 @@
 			projectV3?.link_urls.store?.url ||
 			project.donation_urls.length > 0
 		"
-		class="flex flex-col gap-3"
+		class="flex flex-col gap-1 mt-4"
 	>
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
-		<div
-			class="flex flex-col gap-3 font-semibold [&>a]:flex [&>a]:gap-2 [&>a]:items-center [&>a]:w-fit [&>a]:text-primary [&>a]:leading-[1.2] [&>a:hover]:underline"
-		>
+		<div class="flex flex-col gap-1.5">
 			<a
 				v-if="project.issues_url"
 				:href="project.issues_url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<IssuesIcon aria-hidden="true" />
 				{{ formatMessage(messages.issues) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 			<a
 				v-if="project.source_url"
 				:href="project.source_url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<CodeIcon aria-hidden="true" />
 				{{ formatMessage(messages.source) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 			<a
 				v-if="project.wiki_url"
 				:href="project.wiki_url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<WikiIcon aria-hidden="true" />
 				{{ formatMessage(messages.wiki) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 			<a
 				v-if="project.discord_url"
 				:href="project.discord_url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<DiscordIcon class="shrink" aria-hidden="true" />
 				{{ formatMessage(messages.discord) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 			<a
 				v-if="projectV3?.link_urls.site?.url"
 				:href="projectV3?.link_urls.site?.url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<GlobeIcon aria-hidden="true" />
 				{{ formatMessage(messages.site) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 			<a
 				v-if="projectV3?.link_urls.store?.url"
 				:href="projectV3?.link_urls.store?.url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<StoreIcon aria-hidden="true" />
 				{{ formatMessage(messages.store) }}
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
-			<hr
-				v-if="
-					(project.issues_url ||
-						project.source_url ||
-						project.wiki_url ||
-						project.discord_url ||
-						projectV3?.link_urls.site?.url ||
-						projectV3?.link_urls.store?.url) &&
-					project.donation_urls.length > 0
-				"
-				class="w-full border-button-border my-0.5"
-			/>
 			<a
 				v-for="(donation, index) in project.donation_urls"
 				:key="index"
 				:href="donation.url"
 				:target="linkTarget"
 				rel="noopener nofollow ugc"
+				class="text-link"
 			>
-				<BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
-				<PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
-				<KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
-				<PayPalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
-				<OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
-				<HeartIcon v-else-if="donation.id === 'github'" />
-				<CurrencyIcon v-else />
 				<span v-if="donation.id === 'bmac'">{{ formatMessage(messages.donateBmac) }}</span>
 				<span v-else-if="donation.id === 'patreon'">{{
 					formatMessage(messages.donatePatreon)
@@ -109,29 +82,12 @@
 				<span v-else-if="donation.id === 'ko-fi'">{{ formatMessage(messages.donateKoFi) }}</span>
 				<span v-else-if="donation.id === 'github'">{{ formatMessage(messages.donateGithub) }}</span>
 				<span v-else>{{ formatMessage(messages.donateGeneric) }}</span>
-				<ExternalIcon aria-hidden="true" class="external-icon" />
 			</a>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	BuyMeACoffeeIcon,
-	CodeIcon,
-	CurrencyIcon,
-	DiscordIcon,
-	ExternalIcon,
-	GlobeIcon,
-	HeartIcon,
-	IssuesIcon,
-	KoFiIcon,
-	OpenCollectiveIcon,
-	PatreonIcon,
-	PayPalIcon,
-	StoreIcon,
-	WikiIcon,
-} from '@modrinth/assets'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 

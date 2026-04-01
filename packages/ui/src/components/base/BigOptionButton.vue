@@ -1,11 +1,11 @@
 <template>
 	<button
-		class="group flex w-full hover:cursor-pointer items-center gap-3 rounded-[20px] p-3 text-left transition-all hover:brightness-110 active:scale-[0.98] border-none"
+		class="group flex w-full hover:cursor-pointer items-center gap-3 rounded-[4px] p-3 text-left transition-all hover:brightness-110 active:scale-[0.98] border-none"
 		:class="selected ? 'bg-brand-highlight' : 'bg-surface-4'"
 		@click="$emit('click')"
 	>
 		<div
-			class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-solid"
+			class="flex h-14 w-14 shrink-0 items-center justify-center rounded-[4px] border border-solid"
 			:class="selected ? 'border-brand' : 'border-surface-5'"
 		>
 			<component

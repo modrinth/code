@@ -9,7 +9,7 @@
 		<div
 			v-if="isDragging"
 			:class="[
-				'absolute inset-0 flex items-center justify-center rounded-2xl bg-black/60 text-contrast shadow',
+				'absolute inset-0 flex items-center justify-center rounded-[4px] bg-black/60 text-contrast shadow',
 				overlayClass,
 			]"
 		>

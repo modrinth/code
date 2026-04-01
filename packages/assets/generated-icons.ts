@@ -91,6 +91,7 @@ import _FileIcon from './icons/file.svg?component'
 import _FileArchiveIcon from './icons/file-archive.svg?component'
 import _FileCodeIcon from './icons/file-code.svg?component'
 import _FileImageIcon from './icons/file-image.svg?component'
+import _FileJarIcon from './icons/file-jar.svg?component'
 import _FilePlusIcon from './icons/file-plus.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
@@ -98,6 +99,7 @@ import _FilterXIcon from './icons/filter-x.svg?component'
 import _FolderIcon from './icons/folder.svg?component'
 import _FolderArchiveIcon from './icons/folder-archive.svg?component'
 import _FolderCogIcon from './icons/folder-cog.svg?component'
+import _FolderModsIcon from './icons/folder-mods.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _FolderUpIcon from './icons/folder-up.svg?component'
@@ -120,6 +122,7 @@ import _Heading3Icon from './icons/heading-3.svg?component'
 import _HeartIcon from './icons/heart.svg?component'
 import _HeartHandshakeIcon from './icons/heart-handshake.svg?component'
 import _HeartMinusIcon from './icons/heart-minus.svg?component'
+import _HelpFaqIcon from './icons/help-faq.svg?component'
 import _HistoryIcon from './icons/history.svg?component'
 import _HomeIcon from './icons/home.svg?component'
 import _ImageIcon from './icons/image.svg?component'
@@ -196,6 +199,7 @@ import _RotateClockwiseIcon from './icons/rotate-clockwise.svg?component'
 import _RotateCounterClockwiseIcon from './icons/rotate-counter-clockwise.svg?component'
 import _RssIcon from './icons/rss.svg?component'
 import _SaveIcon from './icons/save.svg?component'
+import _SavesIcon from './icons/saves.svg?component'
 import _ScaleIcon from './icons/scale.svg?component'
 import _ScanEyeIcon from './icons/scan-eye.svg?component'
 import _SearchIcon from './icons/search.svg?component'
@@ -478,6 +482,7 @@ export const FileIcon = _FileIcon
 export const FileArchiveIcon = _FileArchiveIcon
 export const FileCodeIcon = _FileCodeIcon
 export const FileImageIcon = _FileImageIcon
+export const FileJarIcon = _FileJarIcon
 export const FilePlusIcon = _FilePlusIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
@@ -485,6 +490,7 @@ export const FilterXIcon = _FilterXIcon
 export const FolderIcon = _FolderIcon
 export const FolderArchiveIcon = _FolderArchiveIcon
 export const FolderCogIcon = _FolderCogIcon
+export const FolderModsIcon = _FolderModsIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const FolderUpIcon = _FolderUpIcon
@@ -507,6 +513,7 @@ export const Heading3Icon = _Heading3Icon
 export const HeartIcon = _HeartIcon
 export const HeartHandshakeIcon = _HeartHandshakeIcon
 export const HeartMinusIcon = _HeartMinusIcon
+export const HelpFaqIcon = _HelpFaqIcon
 export const HistoryIcon = _HistoryIcon
 export const HomeIcon = _HomeIcon
 export const ImageIcon = _ImageIcon
@@ -583,6 +590,7 @@ export const RotateClockwiseIcon = _RotateClockwiseIcon
 export const RotateCounterClockwiseIcon = _RotateCounterClockwiseIcon
 export const RssIcon = _RssIcon
 export const SaveIcon = _SaveIcon
+export const SavesIcon = _SavesIcon
 export const ScaleIcon = _ScaleIcon
 export const ScanEyeIcon = _ScanEyeIcon
 export const SearchIcon = _SearchIcon

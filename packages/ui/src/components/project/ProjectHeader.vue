@@ -31,10 +31,9 @@
 								}),
 							)
 						"
-						class="flex items-center gap-2 font-semibold cursor-help"
+						class="flex items-center gap-2"
 					>
-						<DownloadIcon class="h-6 w-6 text-secondary" />
-						{{ formatCompactNumber(project.downloads) }}
+						{{ formatCompactNumber(project.downloads) }} downloads
 					</div>
 					<div
 						v-tooltip="
@@ -44,26 +43,12 @@
 								}),
 							)
 						"
-						class="flex items-center gap-2 cursor-help"
+						class="flex items-center gap-2"
 						:class="{ 'md:border-r': project.categories.length > 0 }"
 					>
-						<HeartIcon class="h-6 w-6 text-secondary" />
-						<span class="font-semibold">
-							{{ formatCompactNumber(project.followers) }}
-						</span>
+						{{ formatCompactNumber(project.followers) }} followers
 					</div>
 				</template>
-				<div v-if="project.categories.length > 0" class="hidden items-center gap-2 md:flex">
-					<div class="flex flex-wrap gap-2">
-						<TagItem
-							v-for="(category, index) in project.categories"
-							:key="index"
-							:action="() => router.push(`${searchUrl}?f=categories:${category}`)"
-						>
-							<FormattedTag :tag="category" />
-						</TagItem>
-					</div>
-				</div>
 			</div>
 		</template>
 		<template #actions>
@@ -73,21 +58,16 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import { DownloadIcon, HeartIcon } from '@modrinth/assets'
 import { capitalizeString, type Project } from '@modrinth/utils'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 import { useCompactNumber, useVIntl } from '../../composables'
 import { commonMessages } from '../../utils'
 import Avatar from '../base/Avatar.vue'
 import ContentPageHeader from '../base/ContentPageHeader.vue'
-import FormattedTag from '../base/FormattedTag.vue'
-import TagItem from '../base/TagItem.vue'
 import ProjectStatusBadge from './ProjectStatusBadge.vue'
 import ServerDetails from './server/ServerDetails.vue'
 
-const router = useRouter()
 const { formatMessage } = useVIntl()
 const { formatCompactNumber } = useCompactNumber()
 
@@ -101,10 +81,6 @@ const props = withDefaults(
 	{
 		member: false,
 	},
-)
-
-const searchUrl = computed(
-	() => `/discover/${isServerProject.value ? 'servers' : `${props.project.project_type}s`}`,
 )
 
 const isServerProject = computed(() => !!props.projectV3?.minecraft_server)

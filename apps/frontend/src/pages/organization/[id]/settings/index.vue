@@ -1,8 +1,8 @@
 <script setup>
-import { TrashIcon, UploadIcon } from '@modrinth/assets'
 import {
 	Avatar,
 	Button,
+	ButtonStyled,
 	ConfirmModal,
 	FileInput,
 	injectNotificationManager,
@@ -161,27 +161,29 @@ const onDeleteOrganization = useClientTry(async () => {
 					size="md"
 					class="project__icon"
 				/>
-				<div class="input-stack">
-					<FileInput
-						id="project-icon"
-						:max-size="262144"
-						:show-icon="true"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						class="btn"
-						prompt="Upload icon"
-						:disabled="!hasPermission"
-						@change="showPreviewImage"
-					>
-						<UploadIcon />
-					</FileInput>
-					<Button
-						v-if="!deletedIcon && (previewImage || organization.icon_url)"
-						:disabled="!hasPermission"
-						@click="markIconForDeletion"
-					>
-						<TrashIcon />
-						Remove icon
-					</Button>
+				<div class="input-stack flex flex-col gap-1">
+					<ButtonStyled>
+						<FileInput
+							id="project-icon"
+							:max-size="262144"
+							:show-icon="true"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							class="button-like"
+							prompt="Upload icon"
+							:disabled="!hasPermission"
+							@change="showPreviewImage"
+						>
+						</FileInput>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button
+							v-if="!deletedIcon && (previewImage || organization.icon_url)"
+							:disabled="!hasPermission"
+							@click="markIconForDeletion"
+						>
+							Remove icon
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 
@@ -231,10 +233,11 @@ const onDeleteOrganization = useClientTry(async () => {
 				Deleting your organization will transfer all of its projects to the organization owner. This
 				action cannot be undone.
 			</p>
-			<Button color="danger" @click="() => $refs.modal_deletion.show()">
-				<TrashIcon />
-				Delete organization
-			</Button>
+			<ButtonStyled color="red">
+				<Button color="danger" @click="() => $refs.modal_deletion.show()">
+					Delete organization
+				</Button>
+			</ButtonStyled>
 		</div>
 		<UnsavedChangesPopup
 			:original="originalState"

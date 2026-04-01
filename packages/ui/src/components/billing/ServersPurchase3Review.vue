@@ -179,7 +179,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 
 <template>
 	<div class="grid sm:grid-cols-[3fr_2fr] gap-4">
-		<div class="bg-table-alternateRow p-4 rounded-2xl">
+		<div class="bg-table-alternateRow p-4 rounded-[4px]">
 			<div class="flex items-center gap-2 mb-3">
 				<ModrinthServersIcon class="flex h-5 w-fit" />
 				<TagItem>{{ planName }}</TagItem>
@@ -195,7 +195,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 			</div>
 		</div>
 		<div
-			class="bg-table-alternateRow p-4 rounded-2xl flex flex-col gap-2 items-center justify-center"
+			class="bg-table-alternateRow p-4 rounded-[4px] flex flex-col gap-2 items-center justify-center"
 		>
 			<img
 				v-if="flag"
@@ -237,7 +237,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 					? 'bg-button-bg border-transparent'
 					: 'bg-transparent  border-button-border'
 			"
-			class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+			class="rounded-[4px] active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
 			@click="setInterval('monthly')"
 		>
 			<RadioButtonCheckedIcon v-if="interval === 'monthly'" class="size-6 text-brand" />
@@ -257,7 +257,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 					? 'bg-button-bg border-transparent'
 					: 'bg-transparent  border-button-border'
 			"
-			class="rounded-2xl active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
+			class="rounded-[4px] active:scale-[0.98] transition-transform duration-100 border-2 border-solid p-4 flex items-center gap-2"
 			@click="setInterval('quarterly')"
 		>
 			<RadioButtonCheckedIcon v-if="interval === 'quarterly'" class="size-6 text-brand" />
@@ -306,14 +306,14 @@ function setInterval(newInterval: ServerBillingInterval) {
 		</template>
 		<div
 			v-else
-			class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
+			class="p-4 rounded-[4px] bg-table-alternateRow text-sm text-secondary leading-relaxed"
 		>
 			No payment required. Your downgrade will apply at the end of the current billing period.
 		</div>
 	</div>
 	<div
 		v-if="!noPaymentRequired"
-		class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-2xl gap-2 text-secondary"
+		class="mt-2 flex items-center pl-4 pr-2 py-3 bg-bg rounded-[4px] gap-2 text-secondary"
 	>
 		<template v-if="selectedPaymentMethod">
 			<FormattedPaymentMethod :method="selectedPaymentMethod" />

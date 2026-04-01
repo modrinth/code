@@ -1156,18 +1156,6 @@ onUnmounted(() => {
 	line-height: 1.5em;
 }
 
-html.light-mode .console {
-	--console-bg: var(--color-bg);
-}
-
-html.dark-mode .console {
-	--console-bg: black;
-}
-
-html.oled-mode .console {
-	--console-bg: black;
-}
-
 .console {
 	background: var(--console-bg);
 }
@@ -1217,14 +1205,6 @@ html.oled-mode .console {
 	background: linear-gradient(
 		to top,
 		color-mix(in srgb, var(--color-bg), transparent var(--transparency)) 0%,
-		rgba(0, 0, 0, 0) 100%
-	);
-}
-
-html.dark-mode .progressive-gradient {
-	background: linear-gradient(
-		to top,
-		color-mix(in srgb, black, transparent var(--transparency)) 0%,
 		rgba(0, 0, 0, 0) 100%
 	);
 }

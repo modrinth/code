@@ -1,44 +1,37 @@
 <template>
-	<div class="search-filter-option group flex gap-1 items-center">
-		<button
-			:class="`flex border-none cursor-pointer !w-full items-center gap-2 truncate rounded-xl px-2 py-2 [@media(hover:hover)]:py-1 text-sm font-semibold transition-all hover:text-contrast focus-visible:text-contrast active:scale-[0.98] ${included ? 'bg-brand-highlight text-contrast hover:brightness-125' : excluded ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg focus-visible:bg-button-bg [&>svg.check-icon]:hover:text-brand [&>svg.check-icon]:focus-visible:text-brand'}`"
-			@click="() => emit('toggle', option)"
+	<button
+		type="button"
+		class="search-filter-option group bg-transparent border-none p-0 m-0 flex w-full max-w-full items-center gap-2 px-2 py-0.5 text-left outline-offset-4 checkbox-outer cursor-pointer text-contrast"
+		:aria-label="ariaLabel"
+		:aria-checked="ariaChecked"
+		role="checkbox"
+		@click="emit('toggle', option)"
+	>
+		<span
+			class="w-4 h-4 flex rounded-[2px] items-center justify-center border-[1px] border-solid shrink-0"
+			:class="boxClass"
+		>
+			<BanIcon v-if="excluded" aria-hidden="true" stroke-width="3" />
+			<CheckIcon v-else-if="included" aria-hidden="true" stroke-width="3" />
+		</span>
+		<span
+			class="flex min-w-0 flex-1 items-center gap-2 truncate text-sm"
+			:class="labelClass"
+			aria-hidden="true"
 		>
 			<slot> </slot>
-			<BanIcon
-				v-if="excluded"
-				:class="`filter-action-icon ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${excluded ? '' : '[@media(hover:hover)]:opacity-0'}`"
-				aria-hidden="true"
-			/>
-			<CheckIcon
-				v-else
-				:class="`filter-action-icon check-icon ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${included ? '' : '[@media(hover:hover)]:opacity-0'}`"
-				aria-hidden="true"
-			/>
-		</button>
-		<div
-			v-if="supportsNegativeFilter && !excluded"
-			class="w-px h-[1.75rem] bg-button-bg [@media(hover:hover)]:contents"
-			:class="{ 'opacity-0': included }"
-		></div>
-		<button
-			v-if="supportsNegativeFilter && !excluded"
-			v-tooltip="formatMessage(messages.excludeTooltip)"
-			class="flex border-none cursor-pointer items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary [@media(hover:hover)]:opacity-0 transition-all hover:bg-button-bg hover:text-red focus-visible:bg-button-bg focus-visible:text-red active:scale-[0.96]"
-			@click="() => emit('toggleExclude', option)"
-		>
-			<BanIcon class="filter-action-icon h-4 w-4" aria-hidden="true" />
-		</button>
-	</div>
+		</span>
+	</button>
 </template>
 
 <script setup lang="ts">
 import { BanIcon, CheckIcon } from '@modrinth/assets'
+import { computed } from 'vue'
 
 import { defineMessages, useVIntl } from '../../composables/i18n'
 import type { FilterOption } from '../../utils/search'
 
-withDefaults(
+const props = withDefaults(
 	defineProps<{
 		option: FilterOption
 		included: boolean
@@ -54,22 +47,62 @@ const { formatMessage } = useVIntl()
 
 const emit = defineEmits<{
 	toggle: [option: FilterOption]
-	toggleExclude: [option: FilterOption]
 }>()
 
+const optionName = computed(() => props.option.formatted_name ?? props.option.id)
+
+const ariaLabel = computed(() => {
+	if (props.excluded) {
+		return formatMessage(messages.stateExcluded, { name: optionName.value })
+	}
+	if (props.included) {
+		return formatMessage(messages.stateIncluded, { name: optionName.value })
+	}
+	return formatMessage(messages.stateOff, { name: optionName.value })
+})
+
+const ariaChecked = computed(() => {
+	if (props.supportsNegativeFilter) {
+		if (props.excluded) {
+			return 'mixed' as const
+		}
+		return props.included
+	}
+	return props.included
+})
+
+const boxClass = computed(() => {
+	if (props.excluded) {
+		return 'bg-highlight-red border-transparent text-contrast'
+	}
+	if (props.included) {
+		return 'bg-brand border-transparent text-brand-inverted'
+	}
+	return 'bg-surface-2 border-[#888888]'
+})
+
+const labelClass = computed(() => {
+	if (props.excluded) {
+		return 'text-brand-red'
+	}
+	if (props.included) {
+		return 'text-contrast'
+	}
+	return 'text-secondary group-hover:text-contrast'
+})
+
 const messages = defineMessages({
-	excludeTooltip: {
-		id: 'search.filter.option.exclusion.add.tooltip',
-		defaultMessage: 'Exclude',
+	stateExcluded: {
+		id: 'search.filter.option.aria.excluded',
+		defaultMessage: '{name}, excluded from search',
+	},
+	stateIncluded: {
+		id: 'search.filter.option.aria.included',
+		defaultMessage: '{name}, included in search',
+	},
+	stateOff: {
+		id: 'search.filter.option.aria.off',
+		defaultMessage: '{name}, not used as filter',
 	},
 })
 </script>
-<style scoped lang="scss">
-.search-filter-option:hover,
-.search-filter-option:has(button:focus-visible) {
-	button,
-	.filter-action-icon {
-		opacity: 1;
-	}
-}
-</style>

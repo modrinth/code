@@ -140,11 +140,11 @@ const deleteHovered = ref(false)
 						:alt="project.title"
 						size="3rem"
 						no-shadow
-						class="rounded-2xl border border-surface-5"
+						class="rounded-[4px] border border-surface-5"
 					/>
 					<div
 						v-if="installing"
-						class="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/20"
+						class="absolute inset-0 flex items-center justify-center rounded-[4px] bg-black/20"
 					>
 						<SpinnerIcon class="size-5 animate-spin text-white" />
 					</div>

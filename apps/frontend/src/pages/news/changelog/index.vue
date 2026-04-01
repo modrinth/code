@@ -49,9 +49,11 @@ const changelogEntries = computed(() =>
 			},
 		]"
 		query="filter"
-		class="mb-4"
 	/>
-	<Timeline fade-out-end>
+	<Timeline
+		fade-out-end
+		class="mx-4 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3"
+	>
 		<ChangelogEntry
 			v-for="(entry, index) in changelogEntries"
 			:key="entry.date"

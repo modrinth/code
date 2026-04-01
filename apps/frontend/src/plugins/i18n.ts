@@ -168,23 +168,9 @@ export default defineNuxtPlugin({
 		async function setLocale(newLocale: string): Promise<void> {
 			debug('setLocale: called', { newLocale, currentLocale: locale.value })
 
-			if (!LOCALES.some((l) => l.code === newLocale)) {
-				debug('setLocale: invalid locale', newLocale)
-				return
-			}
-
-			await loadLocale(newLocale)
-
-			debug('setLocale: loaded', {
-				newLocale,
-				cacheHas: messageCache.has(newLocale),
-				cacheKeys: messageCache.get(newLocale)
-					? Object.keys(messageCache.get(newLocale)!).length
-					: 0,
-			})
-
-			locale.value = newLocale
-			useCookie('locale', { maxAge: 31536000, path: '/' }).value = newLocale
+			locale.value = DEFAULT_LOCALE
+			useCookie('locale', { maxAge: 31536000, path: '/' }).value = DEFAULT_LOCALE
+			return
 		}
 
 		// Detect initial locale (cookie > Accept-Language > default)
@@ -205,8 +191,8 @@ export default defineNuxtPlugin({
 
 		// Load locales (hits cache after first request)
 		await loadLocale(DEFAULT_LOCALE)
-		if (detectedLocale !== DEFAULT_LOCALE) await loadLocale(detectedLocale)
-		locale.value = detectedLocale
+		locale.value = DEFAULT_LOCALE
+		useCookie('locale', { maxAge: 31536000, path: '/' }).value = DEFAULT_LOCALE
 
 		debug('init: complete', { locale: locale.value })
 

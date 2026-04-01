@@ -2,7 +2,7 @@
 	<div class="relative h-full w-full">
 		<div class="flex h-full w-full flex-col gap-4">
 			<div
-				class="rounded-2xl border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
+				class="rounded-[4px] border-[1px] border-solid border-orange bg-bg-orange p-4 text-contrast"
 			>
 				These settings are for advanced users. Changing them can break your server.
 			</div>

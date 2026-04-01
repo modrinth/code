@@ -27,7 +27,7 @@
 					class="w-full max-w-full"
 				/>
 
-				<div class="flex w-full flex-col gap-2 rounded-2xl bg-table-alternateRow p-4">
+				<div class="flex w-full flex-col gap-2 rounded-[4px] bg-table-alternateRow p-4">
 					<div class="flex w-full flex-row items-center justify-between">
 						<label class="w-full text-lg font-bold text-contrast" for="modpack-hard-reset">
 							Erase all data

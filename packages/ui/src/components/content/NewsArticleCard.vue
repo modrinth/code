@@ -20,21 +20,21 @@ defineProps<{
 <template>
 	<AutoLink
 		:to="article.path"
-		class="active:scale-[0.99]! group flex flex-col transition-all ease-in-out hover:brightness-125 cursor-pointer"
+		class="active:scale-[0.99]! group flex flex-col transition-all ease-in-out cursor-pointer"
 	>
 		<article class="flex h-full grow flex-col gap-4">
 			<img
 				:src="article.thumbnail"
-				class="aspect-video w-full rounded-xl border-[1px] border-solid border-button-border object-cover"
+				class="aspect-video w-full rounded-[4px] border-[1px] border-solid border-button-border object-cover"
 			/>
 			<div class="flex grow flex-col gap-2">
-				<h3 class="m-0 text-base leading-tight group-hover:underline">
+				<h3 class="m-0 text-base text-link leading-tight group-hover:underline">
 					{{ article.title }}
 				</h3>
-				<p v-if="article.summary" class="m-0 text-sm leading-tight text-primary">
+				<p v-if="article.summary" class="m-0 leading-tight text-primary">
 					{{ article.summary }}
 				</p>
-				<div class="mt-auto text-sm text-secondary">
+				<div class="mt-auto text-secondary">
 					{{ formatDate(article.date) }}
 				</div>
 			</div>

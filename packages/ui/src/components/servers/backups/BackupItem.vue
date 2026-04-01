@@ -171,7 +171,7 @@ const messages = defineMessages({
 </script>
 <template>
 	<div
-		class="grid items-center gap-4 rounded-2xl bg-bg-raised p-4 shadow-md"
+		class="grid items-center gap-4 rounded-[4px] bg-bg-raised p-4"
 		:class="
 			preview
 				? 'grid-cols-1'
@@ -180,7 +180,7 @@ const messages = defineMessages({
 	>
 		<div class="flex flex-row gap-4 items-center">
 			<div
-				class="flex size-12 shrink-0 items-center justify-center rounded-2xl border-solid border-[1px] border-surface-5 bg-surface-4 md:size-16"
+				class="flex size-12 shrink-0 items-center justify-center rounded-[4px] border-solid border-[1px] border-surface-5 bg-surface-4 md:size-16"
 			>
 				<component :is="backupIcon" class="size-7 text-secondary md:size-10" />
 			</div>

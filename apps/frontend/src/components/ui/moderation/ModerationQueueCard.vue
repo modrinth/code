@@ -1,11 +1,11 @@
 <template>
-	<div class="shadow-card rounded-2xl border border-surface-5 bg-surface-3 p-4">
+	<div class="shadow-card rounded-[4px] border border-surface-5 bg-surface-3 p-4">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-4">
 				<Avatar
 					:src="queueEntry.project.icon_url"
 					size="4rem"
-					class="rounded-2xl border border-surface-5 bg-surface-4 !shadow-none"
+					class="rounded-[4px] border border-surface-5 bg-surface-4 !shadow-none"
 				/>
 				<div class="flex flex-col gap-1.5">
 					<div class="flex items-center gap-2">

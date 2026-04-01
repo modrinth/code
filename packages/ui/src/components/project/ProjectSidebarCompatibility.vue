@@ -1,9 +1,8 @@
 <template>
 	<div v-if="project.versions.length > 0" class="flex flex-col gap-3">
-		<h2 class="text-lg m-0">{{ formatMessage(messages.title) }}</h2>
 		<section class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.minecraftJava) }}</h3>
-			<div class="flex flex-wrap gap-1">
+			<h3 class="text-primary text-base m-0">Supported Minecraft versions</h3>
+			<div class="flex flex-wrap gap-3">
 				<TagItem
 					v-for="version in getVersionsToDisplay(project, tags.gameVersions)"
 					:key="`version-tag-${version}`"
@@ -13,8 +12,8 @@
 			</div>
 		</section>
 		<section v-if="project.project_type !== 'resourcepack'" class="flex flex-col gap-2">
-			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.platforms) }}</h3>
-			<div class="flex flex-wrap gap-1">
+			<h3 class="text-primary text-base m-0">Supported platforms</h3>
+			<div class="flex flex-wrap gap-3">
 				<template v-if="noModpackLoader">
 					<TagItem class="border !border-solid border-surface-5 hover:no-underline">
 						No mod loader
@@ -27,7 +26,6 @@
 						:action="() => router.push(`/${project.project_type}s?g=categories:${platform}`)"
 						:style="`--_color: var(--color-platform-${platform})`"
 					>
-						<component :is="getLoaderIcon(platform)" v-if="getLoaderIcon(platform)" />
 						<FormattedTag :tag="platform" enforce-type="loader" />
 					</TagItem>
 				</template>
@@ -35,9 +33,8 @@
 		</section>
 		<section v-if="showEnvironments" class="flex flex-col gap-2">
 			<h3 class="text-primary text-base m-0">{{ formatMessage(messages.environments) }}</h3>
-			<div class="flex flex-wrap gap-1">
+			<div class="flex flex-wrap gap-3">
 				<TagItem v-for="tag in primaryEnvironmentTags" :key="`environment-tag-${tag.message.id}`">
-					<component :is="tag.icon" />
 					{{ formatMessage(tag.message) }}
 				</TagItem>
 			</div>
@@ -93,13 +90,7 @@
 </template>
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
-import {
-	ClientIcon,
-	getLoaderIcon,
-	MonitorSmartphoneIcon,
-	ServerIcon,
-	UserIcon,
-} from '@modrinth/assets'
+import { ClientIcon, MonitorSmartphoneIcon, ServerIcon, UserIcon } from '@modrinth/assets'
 import { FormattedTag, TagItem } from '@modrinth/ui'
 import type { EnvironmentV3, GameVersionTag, PlatformTag } from '@modrinth/utils'
 import { getVersionsToDisplay } from '@modrinth/utils'

@@ -1,8 +1,7 @@
 <template>
 	<div>
-		<section class="card">
-			<h2 class="text-2xl">{{ formatMessage(messages.title) }}</h2>
-			<p class="mb-4">
+		<section class="flex flex-col">
+			<p class="mb-2 mt-0">
 				<IntlFormatted :message-id="messages.description">
 					<template #docs-link="{ children }">
 						<a href="https://docs.modrinth.com/" target="_blank" class="text-link">
@@ -11,9 +10,6 @@
 					</template>
 				</IntlFormatted>
 			</p>
-			<label>
-				<span class="label__title">{{ formatMessage(messages.profilePicture) }}</span>
-			</label>
 			<div class="avatar-changer">
 				<Avatar
 					:src="previewImage ? previewImage : avatarUrl"
@@ -21,53 +17,50 @@
 					circle
 					:alt="auth.user.username"
 				/>
-				<div class="input-stack">
-					<FileInput
-						:max-size="262144"
-						:show-icon="true"
-						class="btn"
-						:prompt="formatMessage(commonMessages.uploadImageButton)"
-						accept="image/png,image/jpeg,image/gif,image/webp"
-						@change="showPreviewImage"
-					>
-						<UploadIcon />
-					</FileInput>
-					<Button v-if="avatarUrl !== null" :action="removePreviewImage">
-						<TrashIcon />
-						{{ formatMessage(commonMessages.removeImageButton) }}
-					</Button>
-					<Button
-						v-if="previewImage"
-						:action="
-							() => {
-								icon = null
-								previewImage = null
-							}
-						"
-					>
-						<UndoIcon />
-						{{ formatMessage(commonMessages.resetButton) }}
-					</Button>
+				<div class="flex flex-col gap-1">
+					<ButtonStyled>
+						<FileInput
+							:max-size="262144"
+							:show-icon="true"
+							class="button-like"
+							:prompt="formatMessage(commonMessages.uploadImageButton)"
+							accept="image/png,image/jpeg,image/gif,image/webp"
+							@change="showPreviewImage"
+						>
+						</FileInput>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button v-if="avatarUrl !== null" @click="removePreviewImage">
+							{{ formatMessage(commonMessages.removeImageButton) }}
+						</button>
+					</ButtonStyled>
+					<ButtonStyled>
+						<button
+							v-if="previewImage"
+							@click="
+								() => {
+									icon = null
+									previewImage = null
+								}
+							"
+						>
+							{{ formatMessage(commonMessages.resetButton) }}
+						</button>
+					</ButtonStyled>
 				</div>
 			</div>
 			<label for="username-field">
-				<span class="label__title">{{ formatMessage(commonMessages.usernameLabel) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.usernameDescription) }}
-				</span>
+				<p class="mb-2 mt-4 font-bold">{{ formatMessage(commonMessages.usernameLabel) }}</p>
 			</label>
 			<StyledInput id="username-field" v-model="current.username" />
 			<label for="bio-field">
-				<span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
-				<span class="label__description">
-					{{ formatMessage(messages.bioDescription) }}
-				</span>
+				<p class="mb-2 mt-4 font-bold">{{ formatMessage(messages.bioTitle) }}</p>
 			</label>
 			<StyledInput id="bio-field" v-model="current.bio" multiline />
 			<div class="input-group mt-4">
-				<Button :link="`/user/${auth.user.username}`">
-					<UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
-				</Button>
+				<nuxt-link :to="`/user/${auth.user.username}`" class="text-link">
+					{{ formatMessage(commonMessages.visitYourProfile) }}
+				</nuxt-link>
 			</div>
 		</section>
 		<UnsavedChangesPopup
@@ -81,10 +74,9 @@
 </template>
 
 <script setup>
-import { TrashIcon, UndoIcon, UploadIcon, UserIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	defineMessages,
 	FileInput,

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
+	<div class="flex flex-col gap-6">
 		<ConfirmModal
 			ref="resetToOnboardingModal"
 			:title="formatMessage(messages.resetToOnboardingModalTitle)"

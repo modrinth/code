@@ -26,6 +26,5 @@ useSeoMeta({
 	padding: 1rem;
 	margin-left: auto;
 	margin-right: auto;
-	max-width: 56rem;
 }
 </style>

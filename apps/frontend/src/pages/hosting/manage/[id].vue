@@ -96,16 +96,15 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
-		<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
-			<LeftArrowIcon />
-			All servers
+		<NuxtLink to="/hosting/manage" class="breadcrumb goto-link mb-4 mt-4 flex w-fit items-center">
+			« All servers
 		</NuxtLink>
 		<ContentPageHeader>
 			<template #icon>
@@ -197,10 +196,13 @@
 				<NavTabs :links="navLinks" replace />
 			</div>
 
-			<div data-pyro-mount class="h-full w-full flex-1">
+			<div
+				data-pyro-mount
+				class="mx-4 h-full w-full flex-1 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3"
+			>
 				<div
 					v-if="error"
-					class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+					class="mx-auto mb-4 flex justify-between gap-2 rounded-[4px] border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
 				>
 					<div class="flex flex-row gap-4">
 						<IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
@@ -295,7 +297,7 @@
 				<div
 					v-if="!isConnected && !isReconnecting && !isLoading"
 					data-pyro-server-ws-error
-					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
+					class="mb-4 flex w-full flex-row items-center gap-4 rounded-[4px] bg-bg-red p-4 text-contrast"
 				>
 					<IssuesIcon class="size-5 text-red" />
 					Something went wrong...
@@ -304,7 +306,7 @@
 				<div
 					v-if="isReconnecting"
 					data-pyro-server-ws-reconnecting
-					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
+					class="mb-4 flex w-full flex-row items-center gap-4 rounded-[4px] bg-bg-orange p-4 text-sm text-contrast"
 				>
 					<PanelSpinner />
 					Hang on, we're reconnecting to your server.
@@ -352,7 +354,7 @@
 		class="experimental-styles-within relative mx-auto mt-6 box-border w-full min-w-0 max-w-[1280px] px-6"
 	>
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Server data</h2>
-		<pre class="markdown-body w-full overflow-auto rounded-2xl bg-bg-raised p-4 text-sm">{{
+		<pre class="markdown-body w-full overflow-auto rounded-[4px] bg-bg-raised p-4 text-sm">{{
 			safeStringify(serverData)
 		}}</pre>
 	</div>
@@ -371,7 +373,6 @@ import {
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
-	LeftArrowIcon,
 	LinkIcon,
 	LockIcon,
 	RightArrowIcon,

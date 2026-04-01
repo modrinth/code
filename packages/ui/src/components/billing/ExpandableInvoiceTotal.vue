@@ -26,7 +26,7 @@ const periodSuffix = computed(() => {
 </script>
 <template>
 	<Accordion
-		class="rounded-2xl overflow-hidden bg-bg"
+		class="rounded-[4px] overflow-hidden bg-bg"
 		button-class="bg-transparent p-0 w-full p-4 active:scale-[0.98] transition-transform duration-100"
 	>
 		<template #title>

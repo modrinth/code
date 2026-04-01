@@ -119,7 +119,7 @@
 						</label>
 						<div class="mt-2">
 							<label
-								class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-dashed border-surface-5 transition-colors"
+								class="flex cursor-pointer flex-col items-center justify-center rounded-[4px] border-dashed border-surface-5 transition-colors"
 								:class="
 									!deletedBanner && (bannerPreview || bannerGalleryImage?.url)
 										? 'border-none'
@@ -128,7 +128,7 @@
 							>
 								<div
 									v-if="!deletedBanner && (bannerPreview || bannerGalleryImage?.url)"
-									class="relative h-full w-full overflow-hidden rounded-2xl"
+									class="relative h-full w-full overflow-hidden rounded-[4px]"
 								>
 									<img
 										:src="bannerPreview || bannerGalleryImage?.url"

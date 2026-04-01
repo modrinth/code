@@ -74,7 +74,7 @@ const mostPopularStyle = computed(() => {
 
 <template>
 	<div
-		class="rounded-2xl p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
+		class="rounded-[4px] p-4 font-semibold transition-all duration-300 experimental-styles-within h-full border-2 border-solid cursor-pointer select-none"
 		:class="{
 			'bg-brand-highlight border-brand': selected,
 			'bg-button-bg border-transparent': !selected,

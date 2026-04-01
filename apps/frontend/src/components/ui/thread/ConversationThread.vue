@@ -204,7 +204,7 @@
 									Reject
 								</button>
 								<OverflowMenu
-									class="btn btn-danger btn-dropdown-animation icon-only"
+									class="btn btn-danger icon-only"
 									:options="
 										replyBody
 											? [

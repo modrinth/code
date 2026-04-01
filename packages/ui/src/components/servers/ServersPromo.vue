@@ -20,7 +20,7 @@ withDefaults(
 </script>
 <template>
 	<div
-		class="brand-gradient-bg card-shadow bg-bg relative p-4 border-[1px] border-solid border-brand rounded-2xl grid grid-cols-[1fr_auto] overflow-hidden"
+		class="brand-gradient-bg card-shadow bg-bg relative p-4 border-[1px] border-solid border-brand rounded-[4px] grid grid-cols-[1fr_auto] overflow-hidden"
 	>
 		<ModrinthIcon
 			class="absolute -top-12 -right-12 size-48 text-brand-highlight opacity-25"

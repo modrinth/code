@@ -10,7 +10,7 @@
 		<div class="flex flex-col gap-4">
 			<span class="text-base font-medium text-secondary"> Setup your server (~2mins) </span>
 
-			<div class="rounded-[20px] border border-solid border-surface-5 bg-surface-3 p-5">
+			<div class="rounded-[4px] border border-solid border-surface-5 bg-surface-3 p-5">
 				<div class="flex flex-col">
 					<div v-for="(step, i) in steps" :key="i" class="flex gap-3">
 						<div class="flex w-10 shrink-0 flex-col items-center">

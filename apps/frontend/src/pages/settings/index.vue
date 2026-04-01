@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
-			<CodeIcon class="inline-flex" />
 			<IntlFormatted :message-id="developerModeBanner.description">
 				<template #strong="{ children }">
 					<strong>
@@ -9,166 +8,54 @@
 					</strong>
 				</template>
 			</IntlFormatted>
-			<Button :action="() => disableDeveloperMode()">
-				{{ formatMessage(developerModeBanner.deactivate) }}
-			</Button>
+			<ButtonStyled color="red">
+				<button type="button" class="mt-2" @click="disableDeveloperMode">
+					{{ formatMessage(developerModeBanner.deactivate) }}
+				</button>
+			</ButtonStyled>
 		</MessageBanner>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
-			<p>{{ formatMessage(colorTheme.description) }}</p>
-			<ThemeSelector
-				:update-color-theme="updateColorTheme"
-				:current-theme="theme.preferred"
-				:theme-options="themeOptions"
-				:system-theme-color="systemTheme"
-			/>
-		</section>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(projectListLayouts.title) }}</h2>
-			<p class="mb-4">{{ formatMessage(projectListLayouts.description) }}</p>
-			<div class="project-lists">
-				<div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
-					<div class="label">
-						<div class="label__title">
-							{{
-								projectListLayouts[projectType.id]
-									? formatMessage(projectListLayouts[projectType.id])
-									: projectType.id
-							}}
-						</div>
-					</div>
-					<div class="project-list-layouts">
-						<button
-							class="preview-radio button-base"
-							:class="{
-								selected: cosmetics.searchDisplayMode[projectType.id] === 'list',
-							}"
-							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
-						>
-							<div class="preview">
-								<div class="layout-list-mode">
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-								</div>
-							</div>
-							<div class="label">
-								<RadioButtonCheckedIcon
-									v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-									class="radio shrink-0"
-								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
-								{{ formatMessage(layoutMode.rows) }}
-							</div>
-						</button>
-						<button
-							class="preview-radio button-base"
-							:class="{
-								selected:
-									cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
-									cosmetics.searchDisplayMode[projectType.id] === 'grid',
-							}"
-							@click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
-						>
-							<div class="preview">
-								<div class="layout-gallery-mode">
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-									<div class="example-card card"></div>
-								</div>
-							</div>
-							<div class="label">
-								<RadioButtonCheckedIcon
-									v-if="
-										cosmetics.searchDisplayMode[projectType.id] === 'gallery' ||
-										cosmetics.searchDisplayMode[projectType.id] === 'grid'
-									"
-									class="radio shrink-0"
-								/>
-								<RadioButtonIcon v-else class="radio shrink-0" />
-								{{ formatMessage(layoutMode.grid) }}
-							</div>
-						</button>
-					</div>
-				</div>
-			</div>
-		</section>
-		<section class="universal-card">
-			<h2 class="text-2xl">{{ formatMessage(toggleFeatures.title) }}</h2>
-			<p class="mb-4">{{ formatMessage(toggleFeatures.description) }}</p>
+		<section>
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
+					<Checkbox id="advanced-rendering" v-model="cosmetics.advancedRendering" />
 					<label for="advanced-rendering" class="flex-1">
-						<span class="block font-semibold text-contrast">
+						<span class="mb-1 block font-bold text-contrast">
 							{{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
 						</span>
 						<span class="text-secondary">
 							{{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
 						</span>
 					</label>
-					<Toggle id="advanced-rendering" v-model="cosmetics.advancedRendering" class="shrink-0" />
 				</div>
 				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
+					<Checkbox
+						id="external-links-new-tab"
+						v-model="cosmetics.externalLinksNewTab"
+						class="shrink-0"
+					/>
 					<label for="external-links-new-tab" class="flex-1">
-						<span class="block font-semibold text-contrast">
+						<span class="mb-1 block font-bold text-contrast">
 							{{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
 						</span>
 						<span class="text-secondary">
 							{{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
 						</span>
 					</label>
-					<Toggle
-						id="external-links-new-tab"
-						v-model="cosmetics.externalLinksNewTab"
-						class="shrink-0"
-					/>
 				</div>
 				<div v-if="false" class="flex flex-row flex-wrap items-center justify-between gap-2">
+					<Checkbox
+						id="modrinth-app-promos"
+						v-model="cosmetics.hideModrinthAppPromos"
+						class="shrink-0"
+					/>
 					<label for="modrinth-app-promos" class="flex-1">
-						<span class="block font-semibold text-contrast">
+						<span class="mb-1 block font-bold text-contrast">
 							{{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
 						</span>
 						<span class="text-secondary">
 							{{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
 						</span>
 					</label>
-					<Toggle
-						id="modrinth-app-promos"
-						v-model="cosmetics.hideModrinthAppPromos"
-						class="shrink-0"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="search-layout-toggle" class="flex-1">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="search-layout-toggle"
-						v-model="cosmetics.rightSearchLayout"
-						class="shrink-0"
-					/>
-				</div>
-				<div class="flex flex-row flex-wrap items-center justify-between gap-2">
-					<label for="project-layout-toggle" class="">
-						<span class="block font-semibold text-contrast">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
-						</span>
-						<span class="text-secondary">
-							{{ formatMessage(toggleFeatures.leftAlignedContentSidebarDescription) }}
-						</span>
-					</label>
-					<Toggle
-						id="project-layout-toggle"
-						v-model="cosmetics.leftContentLayout"
-						class="shrink-0"
-					/>
 				</div>
 			</div>
 		</section>
@@ -176,22 +63,17 @@
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, RadioButtonCheckedIcon, RadioButtonIcon } from '@modrinth/assets'
 import {
-	Button,
+	ButtonStyled,
+	Checkbox,
 	defineMessages,
 	injectNotificationManager,
 	IntlFormatted,
 	normalizeChildren,
-	ThemeSelector,
-	Toggle,
 	useVIntl,
 } from '@modrinth/ui'
-import { formatProjectType } from '@modrinth/utils'
 
 import MessageBanner from '~/components/ui/MessageBanner.vue'
-import type { DisplayLocation } from '~/plugins/cosmetics'
-import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
@@ -219,21 +101,6 @@ useHead({
 	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
-const layoutMode = defineMessages({
-	rows: {
-		id: 'settings.display.project-list-layouts.mode.rows',
-		defaultMessage: 'Rows',
-	},
-	grid: {
-		id: 'settings.display.project-list-layouts.mode.grid',
-		defaultMessage: 'Grid',
-	},
-	gallery: {
-		id: 'settings.display.project-list-layouts.mode.gallery',
-		defaultMessage: 'Gallery',
-	},
-})
-
 const notifications = defineMessages({
 	developerModeDeactivatedTitle: {
 		id: 'settings.display.notification.developer-mode-deactivated.title',
@@ -242,65 +109,6 @@ const notifications = defineMessages({
 	developerModeDeactivatedText: {
 		id: 'settings.display.notification.developer-mode-deactivated.text',
 		defaultMessage: 'Developer mode has been disabled',
-	},
-})
-
-const colorTheme = defineMessages({
-	title: {
-		id: 'settings.display.theme.title',
-		defaultMessage: 'Color theme',
-	},
-	description: {
-		id: 'settings.display.theme.description',
-		defaultMessage: 'Select your preferred color theme for Modrinth on this device.',
-	},
-})
-
-const projectListLayouts = defineMessages({
-	title: {
-		id: 'settings.display.project-list-layouts.title',
-		defaultMessage: 'Project list layouts',
-	},
-	description: {
-		id: 'settings.display.project-list-layouts.description',
-		defaultMessage:
-			'Select your preferred layout for each page that displays project lists on this device.',
-	},
-	mod: {
-		id: 'settings.display.project-list-layouts.mod',
-		defaultMessage: 'Mods page',
-	},
-	plugin: {
-		id: 'settings.display.project-list-layouts.plugin',
-		defaultMessage: 'Plugins page',
-	},
-	datapack: {
-		id: 'settings.display.project-list-layouts.datapack',
-		defaultMessage: 'Data Packs page',
-	},
-	shader: {
-		id: 'settings.display.project-list-layouts.shader',
-		defaultMessage: 'Shaders page',
-	},
-	resourcepack: {
-		id: 'settings.display.project-list-layouts.resourcepack',
-		defaultMessage: 'Resource Packs page',
-	},
-	modpack: {
-		id: 'settings.display.project-list-layouts.modpack',
-		defaultMessage: 'Modpacks page',
-	},
-	server: {
-		id: 'settings.display.project-list-layouts.server',
-		defaultMessage: 'Servers page',
-	},
-	user: {
-		id: 'settings.display.project-list-layouts.user',
-		defaultMessage: 'User profile pages',
-	},
-	collection: {
-		id: 'settings.display.project-list.layouts.collection',
-		defaultMessage: 'Collection',
 	},
 })
 
@@ -360,44 +168,6 @@ const toggleFeatures = defineMessages({
 
 const cosmetics = useCosmetics()
 const flags = useFeatureFlags()
-const tags = useGeneratedState()
-
-const theme = useTheme()
-
-// On the server the value of native theme can be 'unknown'. To hydrate
-// correctly, we need to make sure we aren't using 'unknown' and values between
-// server and client renders are in sync.
-
-const serverSystemTheme = useState(() => {
-	const theme_ = theme.native
-	if (theme_ === 'unknown') return 'light'
-	return theme_
-})
-
-const systemTheme = useMountedValue((mounted): Theme => {
-	const systemTheme_ = mounted ? theme.native : serverSystemTheme.value
-	return systemTheme_ === 'light' ? theme.preferences.light : theme.preferences.dark
-})
-
-const themeOptions = computed(() => {
-	const options: ('system' | Theme)[] = ['system', 'light', 'dark', 'oled']
-	if (flags.value.developerMode || theme.preferred === 'retro') {
-		options.push('retro')
-	}
-	return options
-})
-
-function updateColorTheme(value: Theme | 'system') {
-	if (value !== 'system') {
-		if (isDarkTheme(value)) {
-			theme.preferences.dark = value
-		} else {
-			theme.preferences.light = value
-		}
-	}
-
-	theme.preferred = value
-}
 
 function disableDeveloperMode() {
 	flags.value.developerMode = !flags.value.developerMode
@@ -408,24 +178,6 @@ function disableDeveloperMode() {
 		type: 'success',
 	})
 }
-
-const listTypes = computed(() => {
-	const types = tags.value.projectTypes.map((type) => {
-		return {
-			id: type.id as DisplayLocation,
-			name: formatProjectType(type.id) + 's',
-			display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
-		}
-	})
-
-	types.push({
-		id: 'user' as DisplayLocation,
-		name: 'User profiles',
-		display: 'user pages',
-	})
-
-	return types
-})
 </script>
 <style scoped lang="scss">
 .project-lists {

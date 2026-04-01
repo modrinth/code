@@ -28,7 +28,7 @@ defineProps<{
 }>()
 </script>
 <template>
-	<div class="col-span-full grid grid-cols-subgrid gap-4 rounded-2xl bg-bg-raised p-4">
+	<div class="col-span-full grid grid-cols-subgrid gap-4 rounded-[4px] bg-bg-raised p-4">
 		<div class="col-span-full grid grid-cols-subgrid items-center gap-4">
 			<div>
 				<CopyCode :text="`${notice.id}`" />

@@ -45,15 +45,7 @@
 			</div>
 		</div>
 
-		<div v-else class="experimental-styles-within">
-			<NewModal ref="settingsModal">
-				<template #title>
-					<Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-					<span class="text-lg font-extrabold text-contrast">
-						{{ formatMessage(messages.settingsTitle) }}
-					</span>
-				</template>
-			</NewModal>
+		<div v-else>
 			<NewModal
 				ref="modalLicense"
 				:header="project.license.name ? project.license.name : formatMessage(messages.licenseTitle)"
@@ -74,26 +66,6 @@
 				/>
 			</NewModal>
 			<OpenInAppModal ref="openInAppModal" />
-			<div
-				class="over-the-top-download-animation"
-				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
-			>
-				<div>
-					<div
-						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-					></div>
-
-					<div
-						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-					></div>
-
-					<div
-						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
-					>
-						<DownloadIcon class="h-20 w-20 text-contrast" />
-					</div>
-				</div>
-			</div>
 			<NewModal
 				ref="downloadModal"
 				:on-show="
@@ -147,11 +119,11 @@
 							</div>
 
 							<div class="flex items-center gap-4 px-4">
-								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+								<div class="flex h-[2px] w-full rounded-[4px] bg-button-bg"></div>
 								<span class="flex-shrink-0 text-sm font-semibold text-secondary">
 									{{ formatMessage(commonMessages.orLabel) }}
 								</span>
-								<div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+								<div class="flex h-[2px] w-full rounded-[4px] bg-button-bg"></div>
 							</div>
 						</div>
 
@@ -446,362 +418,147 @@
 						:member="!!currentMember"
 					>
 						<template #actions>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="lg:!hidden"
-								circular
-							>
-								<nuxt-link
-									v-tooltip="'Edit project'"
-									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
-								>
-									<SettingsIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
-							<ButtonStyled
-								v-if="auth.user && currentMember"
-								size="large"
-								color="brand"
-								class="max-lg:!hidden"
-							>
-								<nuxt-link
-									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-									class="!font-bold"
-								>
-									<SettingsIcon aria-hidden="true" />
-									Edit project
-								</nuxt-link>
-							</ButtonStyled>
-
-							<div class="hidden sm:contents">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
-											? `standard`
-											: `brand`
-									"
-									:circular="!!auth.user && !!currentMember"
-								>
-									<button
-										v-tooltip="
-											auth.user && currentMember ? formatMessage(commonMessages.downloadButton) : ''
-										"
-										@click="(event) => downloadModal.show(event)"
-									>
-										<DownloadIcon aria-hidden="true" />
-										{{
-											auth.user && currentMember ? '' : formatMessage(commonMessages.downloadButton)
-										}}
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									:color="
-										(auth.user && currentMember) || route.name === 'type-id-version-version'
-											? `standard`
-											: `brand`
-									"
-									:circular="!!auth.user && !!currentMember"
-								>
-									<button
-										v-tooltip="auth.user && currentMember && !openInAppModal?.open ? 'Play' : ''"
-										@click="handlePlayServerProject"
-									>
-										<PlayIcon aria-hidden="true" />
-										{{ auth.user && currentMember ? '' : 'Play' }}
-									</button>
-								</ButtonStyled>
-							</div>
-
-							<div class="contents sm:hidden">
-								<ButtonStyled
-									v-if="!isServerProject"
-									size="large"
-									circular
-									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
-											? `standard`
-											: `brand`
-									"
-								>
-									<button
-										:aria-label="formatMessage(commonMessages.downloadButton)"
-										class="flex sm:hidden"
-										@click="(event) => downloadModal.show(event)"
-									>
-										<DownloadIcon aria-hidden="true" />
-									</button>
-								</ButtonStyled>
-								<ButtonStyled
-									v-else
-									size="large"
-									circular
-									:color="
-										route.name === 'type-id-version-version' || (auth.user && currentMember)
-											? `standard`
-											: `brand`
-									"
-								>
-									<button aria-label="Play" class="flex sm:hidden" @click="handlePlayServerProject">
-										<PlayIcon aria-hidden="true" />
-									</button>
-								</ButtonStyled>
-							</div>
-							<Tooltip
-								v-if="canCreateServerFrom && flags.showProjectPageQuickServerButton"
-								theme="dismissable-prompt"
-								:triggers="[]"
-								:shown="flags.showProjectPageCreateServersTooltip"
-								:auto-hide="false"
-								placement="bottom-start"
-							>
-								<ButtonStyled size="large" circular>
-									<nuxt-link
-										v-tooltip="formatMessage(messages.createServerTooltip)"
-										:to="`/hosting?project=${project.id}#plan`"
-										@click="
-											() => {
-												flags.showProjectPageCreateServersTooltip = false
-												saveFeatureFlags()
-											}
-										"
-									>
-										<ServerPlusIcon aria-hidden="true" />
-									</nuxt-link>
-								</ButtonStyled>
-								<template #popper>
-									<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
-										<div class="flex min-w-60 items-center justify-between gap-4">
-											<h3
-												class="m-0 flex items-center gap-2 whitespace-nowrap text-base font-bold text-contrast"
+							<div class="flex flex-col items-end gap-2">
+								<div class="flex gap-1">
+									<div class="hidden sm:contents">
+										<ButtonStyled
+											v-if="!isServerProject"
+											size="large"
+											:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+										>
+											<button @click="(event) => downloadModal.show(event)">Download</button>
+										</ButtonStyled>
+										<ButtonStyled
+											v-else
+											size="large"
+											:color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+										>
+											<button
+												v-tooltip="
+													auth.user && currentMember && !openInAppModal?.open ? 'Play' : ''
+												"
+												@click="handlePlayServerProject"
 											>
-												{{ formatMessage(messages.serversPromoTitle) }}
-												<TagItem
-													:style="{
-														'--_color': 'var(--color-brand)',
-														'--_bg-color': 'var(--color-brand-highlight)',
-													}"
-													>{{ formatMessage(commonMessages.newBadge) }}</TagItem
-												>
-											</h3>
-											<ButtonStyled size="small" circular>
-												<button
-													v-tooltip="formatMessage(messages.dontShowAgain)"
-													@click="
-														() => {
-															flags.showProjectPageCreateServersTooltip = false
-															saveFeatureFlags()
-														}
-													"
-												>
-													<XIcon aria-hidden="true" />
-												</button>
-											</ButtonStyled>
-										</div>
-
-										<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
-											{{ formatMessage(messages.serversPromoDescription) }}
-										</p>
-
-										<p class="m-0 text-wrap text-sm font-bold text-primary">
-											<IntlFormatted
-												:message-id="messages.serversPromoPricing"
-												:values="{
-													price: formatPrice(500, 'USD', true),
-												}"
-											>
-												<template #small="{ children }">
-													<span class="text-xs">
-														<component :is="() => children" />
-													</span>
-												</template>
-											</IntlFormatted>
-										</p>
+												<PlayIcon aria-hidden="true" />
+												Play
+											</button>
+										</ButtonStyled>
 									</div>
-								</template>
-							</Tooltip>
-							<ButtonStyled size="large" circular>
-								<ClientOnly>
-									<button
-										v-if="auth.user"
-										v-tooltip="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										:aria-label="
-											following
-												? formatMessage(commonMessages.unfollowButton)
-												: formatMessage(commonMessages.followButton)
-										"
-										@click="userFollowProject(project)"
-									>
-										<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
-									</button>
-									<nuxt-link
-										v-else
-										v-tooltip="formatMessage(commonMessages.followButton)"
-										to="/auth/sign-in"
-										:aria-label="formatMessage(commonMessages.followButton)"
-									>
-										<HeartIcon aria-hidden="true" />
-									</nuxt-link>
-									<template #fallback>
-										<nuxt-link
-											v-tooltip="formatMessage(commonMessages.followButton)"
-											to="/auth/sign-in"
-											:aria-label="formatMessage(commonMessages.followButton)"
-										>
-											<HeartIcon aria-hidden="true" />
-										</nuxt-link>
-									</template>
-								</ClientOnly>
-							</ButtonStyled>
-							<ButtonStyled size="large" circular>
-								<PopoutMenu
-									v-if="auth.user"
-									:tooltip="
-										collections.some((x) => x.projects.includes(project.id))
-											? formatMessage(commonMessages.savedLabel)
-											: formatMessage(commonMessages.saveButton)
-									"
-									from="top-right"
-									:aria-label="formatMessage(commonMessages.saveButton)"
-									:dropdown-id="`${baseId}-save`"
-								>
-									<BookmarkIcon
-										aria-hidden="true"
-										:fill="
-											collections.some((x) => x.projects.includes(project.id))
-												? 'currentColor'
-												: 'none'
-										"
-									/>
-									<template #menu>
-										<StyledInput
-											v-model="displayCollectionsSearch"
-											:placeholder="formatMessage(commonMessages.searchPlaceholder)"
-											wrapper-class="menu-search"
-										/>
-										<div v-if="collections.length > 0" class="collections-list text-primary">
-											<Checkbox
-												v-for="option in collections
-													.slice()
-													.sort((a, b) => a.name.localeCompare(b.name))"
-												:key="option.id"
-												:model-value="option.projects.includes(project.id)"
-												class="popout-checkbox"
-												@update:model-value="() => onUserCollectProject(option, project.id)"
+
+									<ButtonStyled size="large" circular>
+										<ClientOnly>
+											<button
+												v-if="auth.user"
+												v-tooltip="
+													following
+														? formatMessage(commonMessages.unfollowButton)
+														: formatMessage(commonMessages.followButton)
+												"
+												:aria-label="
+													following
+														? formatMessage(commonMessages.unfollowButton)
+														: formatMessage(commonMessages.followButton)
+												"
+												@click="userFollowProject(project)"
 											>
-												{{ option.name }}
-											</Checkbox>
-										</div>
-
-										<div v-else class="menu-text">
-											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
-										</div>
-										<button
-											class="btn collection-button"
-											@click="(event) => $refs.modal_collection.show(event)"
+												<HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+											</button>
+											<nuxt-link
+												v-else
+												v-tooltip="formatMessage(commonMessages.followButton)"
+												to="/auth/sign-in"
+												:aria-label="formatMessage(commonMessages.followButton)"
+											>
+												<HeartIcon aria-hidden="true" />
+											</nuxt-link>
+											<template #fallback>
+												<nuxt-link
+													v-tooltip="formatMessage(commonMessages.followButton)"
+													to="/auth/sign-in"
+													:aria-label="formatMessage(commonMessages.followButton)"
+												>
+													<HeartIcon aria-hidden="true" />
+												</nuxt-link>
+											</template>
+										</ClientOnly>
+									</ButtonStyled>
+									<ButtonStyled size="large" circular>
+										<PopoutMenu
+											v-if="auth.user"
+											:tooltip="
+												collections.some((x) => x.projects.includes(project.id))
+													? formatMessage(commonMessages.savedLabel)
+													: formatMessage(commonMessages.saveButton)
+											"
+											from="top-right"
+											:aria-label="formatMessage(commonMessages.saveButton)"
+											:dropdown-id="`${baseId}-save`"
 										>
-											<PlusIcon aria-hidden="true" />
-											{{ formatMessage(messages.createNewCollection) }}
-										</button>
-									</template>
-								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-									<BookmarkIcon aria-hidden="true" />
-								</nuxt-link>
-							</ButtonStyled>
+											<BookmarkIcon
+												aria-hidden="true"
+												:fill="
+													collections.some((x) => x.projects.includes(project.id))
+														? 'currentColor'
+														: 'none'
+												"
+											/>
+											<template #menu>
+												<StyledInput
+													v-model="displayCollectionsSearch"
+													:placeholder="formatMessage(commonMessages.searchPlaceholder)"
+													wrapper-class="menu-search"
+												/>
+												<div v-if="collections.length > 0" class="collections-list text-primary">
+													<Checkbox
+														v-for="option in collections
+															.slice()
+															.sort((a, b) => a.name.localeCompare(b.name))"
+														:key="option.id"
+														:model-value="option.projects.includes(project.id)"
+														class="popout-checkbox"
+														@update:model-value="() => onUserCollectProject(option, project.id)"
+													>
+														{{ option.name }}
+													</Checkbox>
+												</div>
 
-							<ButtonStyled size="large" circular type="transparent">
-								<OverflowMenu
-									:tooltip="formatMessage(commonMessages.moreOptionsButton)"
-									:options="[
-										{
-											id: 'analytics',
-											link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
-											hoverOnly: true,
-											shown: auth.user && !!currentMember,
-										},
-										{
-											divider: true,
-											shown: auth.user && !!currentMember,
-										},
-										{
-											id: 'moderation-checklist',
-											action: () => {
-												moderationStore.setSingleProject(project.id)
-												showModerationChecklist = true
-											},
-											color: 'orange',
-											hoverOnly: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
-											divider: true,
-											shown:
-												auth.user &&
-												tags.staffRoles.includes(auth.user.role) &&
-												!showModerationChecklist,
-										},
-										{
-											id: 'tech-review',
-											link: `/moderation/technical-review/${project.id}`,
-											color: 'orange',
-											hoverOnly: true,
-											shown: auth.user && tags.staffRoles.includes(auth.user.role),
-										},
-										{
-											divider: true,
-											shown: auth.user && tags.staffRoles.includes(auth.user.role),
-										},
-										{
-											id: 'report',
-											action: () =>
-												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-											color: 'red',
-											hoverOnly: true,
-											shown: !isMember,
-										},
-										{ id: 'copy-id', action: () => copyId() },
-										{ id: 'copy-permalink', action: () => copyPermalink() },
-									]"
-									:aria-label="formatMessage(commonMessages.moreOptionsButton)"
-									:dropdown-id="`${baseId}-more-options`"
+												<div v-else class="menu-text">
+													<p class="popout-text">
+														{{ formatMessage(messages.noCollectionsFound) }}
+													</p>
+												</div>
+												<button
+													class="btn collection-button"
+													@click="(event) => $refs.modal_collection.show(event)"
+												>
+													<PlusIcon aria-hidden="true" />
+													{{ formatMessage(messages.createNewCollection) }}
+												</button>
+											</template>
+										</PopoutMenu>
+										<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+											<BookmarkIcon aria-hidden="true" />
+										</nuxt-link>
+									</ButtonStyled>
+								</div>
+
+								<nuxt-link
+									v-if="currentMember"
+									:to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+									class="text-link"
 								>
-									<MoreVerticalIcon aria-hidden="true" />
-									<template #analytics>
-										<ChartIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.analyticsButton) }}
-									</template>
-									<template #moderation-checklist>
-										<ScaleIcon aria-hidden="true" /> {{ formatMessage(messages.reviewProject) }}
-									</template>
-									<template #tech-review> <ScanEyeIcon aria-hidden="true" /> Tech review </template>
-									<template #report>
-										<ReportIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.reportButton) }}
-									</template>
-									<template #copy-id>
-										<ClipboardCopyIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.copyIdButton) }}
-									</template>
-									<template #copy-permalink>
-										<ClipboardCopyIcon aria-hidden="true" />
-										{{ formatMessage(commonMessages.copyPermalinkButton) }}
-									</template>
-								</OverflowMenu>
-							</ButtonStyled>
+									Edit project ►
+								</nuxt-link>
+								<button
+									v-if="!isMember"
+									class="w-fit bg-transparent p-0 text-link"
+									@click="
+										() => (auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'))
+									"
+								>
+									Report project
+								</button>
+							</div>
 						</template>
 					</ProjectHeader>
 					<ProjectMemberHeader
@@ -871,32 +628,29 @@
 						:supported-versions="serverSupportedVersions"
 						:loaders="serverModpackLoaders"
 						:status-online="projectV3?.minecraft_java_server?.ping?.data != null"
-						class="card flex-card experimental-styles-within"
+						class=""
 					/>
 					<ProjectSidebarCompatibility
 						v-if="projectV3Loaded && !isServerProject"
 						:project="project"
 						:tags="tags"
 						:project-v3="projectV3"
-						class="card flex-card experimental-styles-within"
+						class=""
 					/>
 					<AdPlaceholder v-if="!auth.user && tags.approvedStatuses.includes(project.status)" />
 					<ProjectSidebarLinks
 						:project="project"
 						:project-v3="projectV3"
 						:link-target="$external()"
-						class="card flex-card experimental-styles-within"
+						class=""
 					/>
-					<ProjectSidebarTags
-						:project="project"
-						class="card flex-card experimental-styles-within"
-					/>
+					<ProjectSidebarTags :project="project" class="" />
 					<ProjectSidebarCreators
 						:organization="organization"
 						:members="members"
 						:org-link="(slug) => `/organization/${slug}`"
 						:user-link="(username) => `/user/${username}`"
-						class="card flex-card experimental-styles-within"
+						class=""
 					/>
 					<!-- TODO: Finish license modal and enable -->
 					<ProjectSidebarDetails
@@ -905,14 +659,13 @@
 						:has-versions="versions.length > 0"
 						:link-target="$external()"
 						:show-followers="isServerProject"
-						class="card flex-card experimental-styles-within"
+						class=""
 					/>
-					<div class="card flex-card experimental-styles-within">
-						<h2>{{ formatMessage(detailsMessages.title) }}</h2>
+					<div class="mt-4 flex flex-col gap-1">
+						<h2 class="m-0 text-base text-primary">{{ formatMessage(detailsMessages.title) }}</h2>
 
 						<div class="details-list">
 							<div v-if="projectV3Loaded && !isServerProject" class="details-list__item">
-								<BookTextIcon aria-hidden="true" />
 								<div>
 									{{ formatMessage(messages.licensedLabel) }}
 									<a
@@ -923,7 +676,6 @@
 										rel="noopener nofollow ugc"
 									>
 										{{ licenseIdDisplay }}
-										<ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
 									</a>
 									<span
 										v-else-if="
@@ -940,7 +692,6 @@
 							</div>
 
 							<div v-if="isServerProject" class="details-list__item">
-								<HeartIcon aria-hidden="true" />
 								<div>
 									{{
 										capitalizeString(
@@ -956,7 +707,6 @@
 								v-tooltip="formatDateTime(project.approved)"
 								class="details-list__item"
 							>
-								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
 										capitalizeString(
@@ -969,7 +719,6 @@
 							</div>
 
 							<div v-else v-tooltip="formatDateTime(project.published)" class="details-list__item">
-								<CalendarIcon aria-hidden="true" />
 								<div>
 									{{
 										capitalizeString(formatMessage(detailsMessages.created, { date: createdDate }))
@@ -982,7 +731,6 @@
 								v-tooltip="formatDateTime(project.queued)"
 								class="details-list__item"
 							>
-								<ScaleIcon aria-hidden="true" />
 								<div>
 									{{
 										capitalizeString(
@@ -999,7 +747,6 @@
 								v-tooltip="formatDateTime(project.updated)"
 								class="details-list__item"
 							>
-								<VersionIcon aria-hidden="true" />
 								<div>
 									{{
 										capitalizeString(formatMessage(detailsMessages.updated, { date: updatedDate }))
@@ -1011,8 +758,10 @@
 				</div>
 
 				<div class="normal-page__content">
-					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace class="mb-4" /></div>
-					<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
+					<div class="overflow-x-auto"><NavTabs :links="navLinks" replace /></div>
+					<div class="mx-4 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3">
+						<NuxtPage @on-download="triggerDownloadAnimation" @delete-version="deleteVersion" />
+					</div>
 				</div>
 			</div>
 		</div>
@@ -1039,31 +788,19 @@
 <script setup>
 import {
 	BookmarkIcon,
-	BookTextIcon,
-	CalendarIcon,
-	ChartIcon,
 	CheckIcon,
 	ChevronRightIcon,
-	ClipboardCopyIcon,
-	DownloadIcon,
 	ExternalIcon,
 	GameIcon,
 	HeartIcon,
 	InfoIcon,
 	ListIcon,
 	ModrinthIcon,
-	MoreVerticalIcon,
 	PlayIcon,
 	PlusIcon,
-	ReportIcon,
-	ScaleIcon,
-	ScanEyeIcon,
 	SearchIcon,
-	ServerPlusIcon,
 	SettingsIcon,
-	VersionIcon,
 	WrenchIcon,
-	XIcon,
 } from '@modrinth/assets'
 import {
 	Admonition,
@@ -1075,11 +812,9 @@ import {
 	getTagMessage,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
 	NavTabs,
 	NewModal,
 	OpenInAppModal,
-	OverflowMenu,
 	PopoutMenu,
 	ProjectBackgroundGradient,
 	ProjectEnvironmentModal,
@@ -1094,10 +829,8 @@ import {
 	ScrollablePanel,
 	ServersPromo,
 	StyledInput,
-	TagItem,
 	useDebugLogger,
 	useFormatDateTime,
-	useFormatPrice,
 	useRelativeTime,
 	useVIntl,
 } from '@modrinth/ui'
@@ -1106,7 +839,6 @@ import { capitalizeString, formatProjectType, renderString } from '@modrinth/uti
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocalStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
-import { Tooltip } from 'floating-vue'
 import { nextTick, useTemplateRef, watch } from 'vue'
 
 import { navigateTo } from '#app'
@@ -1121,7 +853,6 @@ import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
-import { useModerationStore } from '~/store/moderation.ts'
 import { reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
@@ -1130,8 +861,6 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
-const config = useRuntimeConfig()
-const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
@@ -1143,7 +872,6 @@ const flags = useFeatureFlags()
 const cosmetics = useCosmetics()
 
 const { formatMessage } = useVIntl()
-const formatPrice = useFormatPrice()
 const formatDateTime = useFormatDateTime({
 	timeStyle: 'short',
 	dateStyle: 'long',
@@ -1151,7 +879,6 @@ const formatDateTime = useFormatDateTime({
 
 const debug = useDebugLogger('DownloadModal')
 
-const settingsModal = ref()
 const downloadModal = ref()
 const openInAppModal = ref()
 const overTheTopDownloadAnimation = ref()
@@ -2287,11 +2014,6 @@ const description = computed(() =>
 		: '',
 )
 
-const canCreateServerFrom = computed(() => {
-	if (!project.value) return false
-	return project.value.project_type === 'modpack' && project.value.server_side !== 'unsupported'
-})
-
 if (!route.name.startsWith('type-id-settings')) {
 	useSeoMeta({
 		title: () => title.value,
@@ -2477,14 +2199,6 @@ async function deleteGalleryItem(imageUrl) {
 			},
 		)
 	})
-}
-
-async function copyId() {
-	await navigator.clipboard.writeText(project.value.id)
-}
-
-async function copyPermalink() {
-	await navigator.clipboard.writeText(`${config.public.siteUrl}/project/${project.value.id}`)
 }
 
 const collapsedChecklist = ref(false)
@@ -2684,7 +2398,7 @@ provideProjectPageContext({
 }
 
 :deep(.accordion-with-bg) {
-	@apply rounded-2xl bg-bg p-2;
+	@apply rounded-[4px] bg-bg p-2;
 	--scrollable-pane-bg: var(--color-bg);
 }
 

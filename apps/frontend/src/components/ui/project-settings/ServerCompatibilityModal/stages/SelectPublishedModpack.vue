@@ -4,7 +4,7 @@
 		<div class="flex flex-col gap-2">
 			<div class="font-semibold text-contrast">Select modpack</div>
 
-			<div class="flex flex-col gap-6 rounded-2xl border border-solid border-surface-5 p-4">
+			<div class="flex flex-col gap-6 rounded-[4px] border border-solid border-surface-5 p-4">
 				<div class="flex flex-col gap-2">
 					<label class="font-semibold text-contrast">Project</label>
 					<ProjectCombobox
@@ -32,7 +32,7 @@
 					/>
 				</div>
 			</div>
-			<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-4">
+			<div v-if="selectedVersion" class="flex flex-col gap-4 rounded-[4px] bg-surface-2 p-4">
 				<div class="flex items-center justify-between">
 					<div class="text-secondary">Game version</div>
 					<div class="flex flex-wrap gap-1">

@@ -1,9 +1,5 @@
 <template>
-	<div
-		ref="scrollListener"
-		data-pyro
-		class="servers-hero relative isolate -mt-44 h-full min-h-screen pt-8"
-	>
+	<div class="px-4 pb-6">
 		<ModrinthServersPurchaseModal
 			v-if="customer"
 			:key="`purchase-modal-${customer.id}`"
@@ -28,633 +24,196 @@
 			:affiliate-code="affiliateCode"
 		/>
 
-		<section
-			class="mx-auto mt-32 flex min-h-[calc(80vh-0px)] max-w-7xl flex-col justify-center px-5 sm:mt-20 sm:min-h-[calc(100vh-0px)] sm:pl-10 lg:pl-3"
-		>
-			<div class="z-[5] flex w-full flex-col gap-8">
-				<div class="flex flex-col gap-4">
-					<div
-						class="relative h-fit w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-					>
-						{{ formatMessage(commonMessages.betaRelease) }}
-					</div>
-					<h1 class="relative m-0 max-w-3xl text-3xl font-bold !leading-[110%] md:text-6xl">
-						{{ formatMessage(messages.hostWithModrinth) }}
-					</h1>
-				</div>
-				<h2
-					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
-				>
-					{{ formatMessage(messages.hostingDescription) }}
-				</h2>
-				<div class="relative flex w-full flex-wrap items-center gap-8 align-middle sm:w-fit">
-					<div
-						class="flex w-full flex-col items-center gap-5 text-center align-middle sm:w-fit sm:flex-row"
-					>
-						<ButtonStyled color="brand" size="large">
-							<nuxt-link class="w-fit" to="#plan">
-								<GameIcon aria-hidden="true" />
-								{{
-									hasServers
-										? formatMessage(messages.startANewServer)
-										: formatMessage(messages.startYourServer)
-								}}
-							</nuxt-link>
-						</ButtonStyled>
-						<ButtonStyled v-if="hasServers" type="outlined" size="large">
-							<nuxt-link class="w-fit" to="/hosting/manage">
-								<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.manageYourServers) }}
-							</nuxt-link>
-						</ButtonStyled>
-					</div>
-				</div>
+		<div class="mx-auto">
+			<h1 class="mb-2 mt-6 text-3xl font-normal">Modrinth Hosting</h1>
+			<p class="m-0 text-secondary">
+				Spin up a server in minutes. Install modpacks from Modrinth, manage files in your browser,
+				and play with friends—no separate panel login.
+			</p>
+
+			<div class="mt-4 flex flex-wrap gap-3">
+				<ButtonStyled color="brand" size="large">
+					<nuxt-link class="flex w-fit items-center gap-2" to="#plans">
+						{{ hasServers ? 'Start a new server' : 'Start your server' }}
+					</nuxt-link>
+				</ButtonStyled>
+				<ButtonStyled v-if="hasServers" type="outlined" size="large">
+					<nuxt-link class="flex w-fit items-center gap-2" to="/hosting/manage">
+						<SettingsIcon aria-hidden="true" class="size-5 shrink-0" />
+						Manage your servers
+					</nuxt-link>
+				</ButtonStyled>
+			</div>
+
+			<div class="mt-8 border border-solid border-[#96CEE0] bg-[#E6F1F5] p-4">
+				<p class="m-0 text-lg font-bold">Every plan includes</p>
+				<ul class="mb-0 mt-2 list-disc space-y-1 pl-6">
+					<li>One-click installs for mods and modpacks from Modrinth</li>
+					<li>A custom modrinth.gg domain name for your server</li>
+					<li>Access your files manually whenever you wish with SFTP</li>
+					<li>
+						Access your server's console, installed content, files, and settings all from the
+						Modrinth web page.
+					</li>
+					<li>Up to 15 off-site backups stored at a time</li>
+					<li>High-performance AMD CPUs</li>
+					<li>Access to our dedicated support team that can help you if you run into issues.</li>
+				</ul>
 			</div>
 
 			<div
-				class="absolute left-[55%] top-56 z-[5] hidden h-full max-h-[calc(100vh-10rem)] w-full rotate-1 xl:block"
+				id="plans"
+				class="mt-8 scroll-mt-4 border border-solid border-[#c3c3c3] bg-[#EFEFEF] p-4"
 			>
-				<img
-					src="https://cdn.modrinth.com/servers/panel-right-dark.webp"
-					alt=""
-					aria-hidden="true"
-					class="pointer-events-none h-full w-fit select-none"
-				/>
-			</div>
-
-			<div
-				class="top-26 pointer-events-none absolute left-0 z-[4] flex h-screen w-full flex-row items-end gap-24 sm:-right-1/4 sm:top-14"
-			>
-				<div
-					class="pointer-events-none absolute left-0 right-0 top-8 max-h-[90%] overflow-hidden sm:top-28 sm:mt-0"
-					style="mask-image: linear-gradient(black, transparent 80%)"
-				>
-					<img
-						src="https://cdn.modrinth.com/servers/bigrinth.webp"
-						alt=""
-						aria-hidden="true"
-						class="pointer-events-none w-full animate-spin select-none p-4 opacity-50"
-						style="
-							animation-duration: 172s !important;
-							animation-timing-function: linear;
-							animation-iteration-count: infinite;
-						"
-					/>
-				</div>
-			</div>
-		</section>
-
-		<section
-			class="relative flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:pt-48"
-		>
-			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
-				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-				>
-					{{ formatMessage(messages.whyModrinthHosting) }}
-				</div>
-				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-					{{ formatMessage(messages.whyHeading) }}
-				</h1>
-				<h2
-					class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-				>
-					{{ formatMessage(messages.whyDescription) }}
-				</h2>
-				<img
-					src="https://cdn.modrinth.com/servers/excitement.webp"
-					alt=""
-					class="absolute right-14 top-0 hidden max-w-[360px] lg:block"
-				/>
-				<div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-8 text-brand"
-						>
-							<path
-								d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"
-							/>
-							<rect x="3" y="14" width="7" height="7" rx="1" />
-							<circle cx="17.5" cy="17.5" r="3.5" />
-						</svg>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.whereModsAre) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.whereModsAreDescription) }}
-						</h3>
-					</div>
-
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<LoaderIcon loader="fabric" class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.yourFavoriteMods) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.yourFavoriteModsDescription) }}
-						</h3>
-					</div>
-				</div>
-				<div class="relative">
-					<img
-						src="https://cdn.modrinth.com/servers/installation-dark.webp"
-						alt=""
-						class="hidden w-full rounded-2xl sm:block"
-					/>
-				</div>
-				<div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-3">
-					<div class="flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-8 text-brand"
-						>
-							<rect width="20" height="16" x="2" y="4" rx="2" />
-							<path d="M6 8h.01" />
-							<path d="M10 8h.01" />
-							<path d="M14 8h.01" />
-						</svg>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.allOnModrinth) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.allOnModrinthDescription) }}
-						</h3>
-					</div>
-
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-8 text-brand"
-						>
-							<polygon points="13 19 22 12 13 5 13 19" />
-							<polygon points="2 19 11 12 2 5 2 19" />
-						</svg>
-						<h2 class="m-0 text-lg font-bold">
-							{{ formatMessage(messages.modernReliableHosting) }}
-						</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							<IntlFormatted :message-id="messages.modernReliableHostingDescription">
-								<template #contrast="{ children }">
-									<span class="text-contrast"><component :is="() => children" /></span>
-								</template>
-							</IntlFormatted>
-						</h3>
-					</div>
-
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<ServerIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.consistentlyFast) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.consistentlyFastDescription) }}
-						</h3>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section
-			class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
-		>
-			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-			<div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
-				<div
-					class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
-				>
-					{{ formatMessage(messages.includedWithYourServer) }}
-				</div>
-				<h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-					{{ formatMessage(messages.includedHeading) }}
-				</h1>
-				<h2
-					class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
-				>
-					{{ formatMessage(messages.includedDescription) }}
-				</h2>
-				<img
-					src="https://cdn.modrinth.com/servers/waving.webp"
-					alt=""
-					class="absolute right-8 top-40 hidden max-w-[480px] lg:block"
-				/>
-				<div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
-					<div class="grid w-full grid-cols-1 gap-8">
-						<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="size-8 text-brand"
-							>
-								<circle cx="12" cy="12" r="10" />
-								<path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-								<path d="M2 12h20" />
-							</svg>
-							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.customUrl) }}</h2>
-							<h3 class="m-0 text-base font-normal text-secondary">
-								<IntlFormatted :message-id="messages.customUrlDescription">
-									<template #contrast="{ children }">
-										<span class="text-contrast"><component :is="() => children" /></span>
-									</template>
-								</IntlFormatted>
-							</h3>
-							<div
-								aria-hidden="true"
-								class="ooh-shiny absolute right-4 top-4 flex items-center justify-center rounded-full bg-bg-raised p-4"
-							>
-								<span class="font-bold text-contrast">{{ currentText }}</span
-								>.modrinth.gg
-							</div>
-						</div>
-						<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="size-8 text-brand"
-							>
-								<path d="M12 13v8" />
-								<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-								<path d="m8 17 4-4 4 4" />
-							</svg>
-							<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.backupsIncluded) }}</h2>
-							<h3 class="m-0 text-base font-normal text-secondary">
-								{{ formatMessage(messages.backupsIncludedDescription) }}
-							</h3>
-						</div>
-					</div>
-					<div
-						style="
-							background: radial-gradient(
-								86.12% 101.64% at 95.97% 94.07%,
-								rgba(27, 217, 106, 0.23) 0%,
-								rgba(14, 115, 56, 0.2) 100%
-							);
-							border: 1px solid rgba(12, 107, 52, 0.55);
-							box-shadow: 0px 12px 38.1px rgba(27, 217, 106, 0.13);
-						"
-						class="relative flex flex-col gap-4 overflow-hidden rounded-2xl p-6 text-left sm:backdrop-blur-xl md:p-12"
-					>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.fileManager) }}</h2>
-						<h3 class="m-0 text-base font-normal">
-							{{ formatMessage(messages.fileManagerDescription) }}
-						</h3>
-
-						<img
-							src="https://cdn.modrinth.com/servers/content-dark.webp"
-							alt=""
-							class="absolute -bottom-12 -right-[15%] hidden max-w-2xl rounded-2xl bg-brand p-4 lg:block"
-						/>
-					</div>
-				</div>
-				<div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<TerminalSquareIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">
-							{{ formatMessage(messages.powerfulConsole) }}
-						</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.powerfulConsoleDescription) }}
-						</h3>
-					</div>
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-8 text-brand"
-						>
-							<path
-								d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
-							/>
-							<path
-								d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"
-							/>
-							<path d="m18 15-2-2" />
-							<path d="m15 18-2-2" />
-						</svg>
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.help) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.helpDescription) }}
-						</h3>
-					</div>
-				</div>
-
-				<div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<TransferIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.sftpAccess) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.sftpAccessDescription) }}
-						</h3>
-					</div>
-					<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-						<VersionIcon class="size-8 text-brand" />
-						<h2 class="m-0 text-lg font-bold">{{ formatMessage(messages.advancedNetworking) }}</h2>
-						<h3 class="m-0 text-base font-normal text-secondary">
-							{{ formatMessage(messages.advancedNetworkingDescription) }}
-						</h3>
-					</div>
-				</div>
-				<div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
-					<h1 class="m-0 text-lg font-bold">{{ formatMessage(messages.faqHeading) }}</h1>
-					<div class="details-hide flex flex-col gap-1">
-						<details nav-hash="cpus" class="group" :open="$route.hash === '#cpus'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqCpuKind) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqCpuKindAnswer) }}
-							</p>
-						</details>
-						<details nav-hash="cpu-burst" class="group" :open="$route.hash === '#cpu-burst'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqBurstThreads) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqBurstThreadsAnswer) }}
-							</p>
-						</details>
-
-						<details nav-hash="ddos" class="group" :open="$route.hash === '#ddos'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqDDOSProtection) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqDDOSProtectionAnswer) }}
-							</p>
-						</details>
-
-						<details nav-hash="region" class="group" :open="$route.hash === '#region'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqLocation) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqLocationAnswer) }}
-							</p>
-						</details>
-
-						<details nav-hash="storage" class="group" :open="$route.hash === '#storage'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqIncreaseStorage) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqIncreaseStorageAnswer) }}
-							</p>
-						</details>
-
-						<details nav-hash="performance" class="group" :open="$route.hash === '#performance'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqHowFast) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqHowFastAnswer) }}
-							</p>
-							<p class="mb-0 ml-6 mt-3 leading-[160%]">
-								{{ formatMessage(messages.faqHowFastAnswerTwo) }}
-							</p>
-						</details>
-
-						<details nav-hash="prices" class="group" :open="$route.hash === '#prices'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqCurrency) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqCurrencyAnswer) }}
-							</p>
-						</details>
-
-						<details nav-hash="versions" class="group" :open="$route.hash === '#versions'">
-							<summary class="flex cursor-pointer items-center py-3 font-medium text-contrast">
-								<span class="mr-2 transition-transform duration-200 group-open:rotate-90">
-									<RightArrowIcon />
-								</span>
-								{{ formatMessage(messages.faqVersionsLoaders) }}
-							</summary>
-							<p class="m-0 ml-6 leading-[160%]">
-								{{ formatMessage(messages.faqVersionsLoadersAnswer) }}
-							</p>
-							<p class="m-0 ml-6 mt-3 leading-[160%]">
-								{{ formatMessage(messages.faqVersionsLoadersAnswerTwo) }}
-							</p>
-						</details>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section
-			class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
-		>
-			<div class="faded-brand-line absolute left-0 top-0 h-[1px] w-full"></div>
-			<div
-				nav-hash="plan"
-				class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center"
-			>
-				<h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
-					{{ formatMessage(messages.serverForEveryone) }}
-				</h1>
-				<p class="m-0 flex items-center gap-1">
-					{{ formatMessage(messages.availableLocations) }}
+				<h2 class="m-0 text-lg font-bold">Plans & pricing</h2>
+				<p class="mb-4 mt-2 text-secondary">
+					Available in North America, Europe, and Southeast Asia for wide coverage.
 				</p>
 
-				<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-					<span></span>
-					<OptionGroup v-slot="{ option }" v-model="billingPeriod" :options="billingPeriods">
-						<template v-if="option === 'monthly'">
-							{{ formatMessage(messages.payMonthly) }}
-						</template>
-						<span v-else-if="option === 'quarterly'">
-							{{ formatMessage(messages.payQuarterly) }}
-						</span>
-						<span v-else-if="option === 'yearly'"> {{ formatMessage(messages.payYearly) }} </span>
-					</OptionGroup>
-					<template v-if="billingPeriods.includes('quarterly')">
-						<button
-							v-if="billingPeriod !== 'quarterly'"
-							class="bg-transparent p-0 text-sm font-medium text-brand hover:underline active:scale-95"
-							@click="billingPeriod = 'quarterly'"
-						>
-							{{ formatMessage(messages.saveWithQuarterly) }}
-						</button>
-						<span v-else class="bg-transparent p-0 text-sm font-medium text-brand">
-							{{ formatMessage(messages.saveWithQuarterly) }}
-						</span>
-					</template>
-					<span v-else></span>
-				</div>
+				<OptionGroup v-slot="{ option }" v-model="billingPeriod" :options="billingPeriods">
+					<template v-if="option === 'monthly'">Pay monthly</template>
+					<span v-else-if="option === 'quarterly'">Pay quarterly</span>
+					<span v-else-if="option === 'yearly'">Pay yearly</span>
+				</OptionGroup>
+				<p v-if="billingPeriods.includes('quarterly')">Save 16% with quarterly billing!</p>
 
-				<MedalPlanPromotion v-if="flags.enableMedalPromotion" />
-
-				<ul class="m-0 flex w-full grid-cols-3 flex-col gap-8 p-0 lg:grid">
-					<ServerPlanSelector
-						:capacity="capacityStatuses?.small?.available"
-						plan="small"
-						:ram="plans.small.metadata.ram"
-						:storage="plans.small.metadata.storage"
-						:cpus="plans.small.metadata.cpu"
-						:price="
-							plans.small?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
-								?.intervals?.[billingPeriod]
-						"
-						:interval="billingPeriod"
-						:currency="selectedCurrency"
-						:is-usa="country.toLowerCase() === 'us'"
-						@select="selectProduct('small')"
-						@scroll-to-faq="scrollToFaq()"
-					/>
-					<ServerPlanSelector
-						:capacity="capacityStatuses?.medium?.available"
-						plan="medium"
-						:ram="plans.medium.metadata.ram"
-						:storage="plans.medium.metadata.storage"
-						:cpus="plans.medium.metadata.cpu"
-						:price="
-							plans.medium?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
-								?.intervals?.[billingPeriod]
-						"
-						:interval="billingPeriod"
-						:currency="selectedCurrency"
-						:is-usa="country.toLowerCase() === 'us'"
-						@select="selectProduct('medium')"
-						@scroll-to-faq="scrollToFaq()"
-					/>
-					<ServerPlanSelector
-						:capacity="capacityStatuses?.large?.available"
-						:ram="plans.large.metadata.ram"
-						:storage="plans.large.metadata.storage"
-						:cpus="plans.large.metadata.cpu"
-						:price="
-							plans.large?.prices?.find((x) => x.currency_code === selectedCurrency)?.prices
-								?.intervals?.[billingPeriod]
-						"
-						:currency="selectedCurrency"
-						:is-usa="country.toLowerCase() === 'us'"
-						plan="large"
-						:interval="billingPeriod"
-						@select="selectProduct('large')"
-						@scroll-to-faq="scrollToFaq()"
-					/>
-				</ul>
+				<table
+					class="mt-6 w-full border-collapse border border-solid border-[#c3c3c3] bg-[#fafafa] text-left text-sm"
+				>
+					<thead>
+						<tr class="bg-[#e8e8e8]">
+							<th class="border border-solid border-[#c3c3c3] p-2">Plan</th>
+							<th class="border border-solid border-[#c3c3c3] p-2">RAM</th>
+							<th class="border border-solid border-[#c3c3c3] p-2">Storage</th>
+							<th class="border border-solid border-[#c3c3c3] p-2">CPU</th>
+							<th class="border border-solid border-[#c3c3c3] p-2">Price</th>
+							<th class="border border-solid border-[#c3c3c3] p-2">Order</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="border border-solid border-[#c3c3c3] p-2 font-medium">Small</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.small.metadata.ram }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.small.metadata.storage }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.small.metadata.cpu }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ formatPlanIntervalPrice(plans.small) }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								<button
+									v-if="capacityStatuses?.small?.available !== 0"
+									class="m-0 bg-transparent p-0 text-link"
+									type="button"
+									@click="selectProduct('small')"
+								>
+									Order ►
+								</button>
+								<span v-else class="text-secondary">Sold out</span>
+							</td>
+						</tr>
+						<tr>
+							<td class="border border-solid border-[#c3c3c3] p-2 font-medium">Medium</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.medium.metadata.ram }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.medium.metadata.storage }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.medium.metadata.cpu }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ formatPlanIntervalPrice(plans.medium) }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								<button
+									v-if="capacityStatuses?.medium?.available !== 0"
+									class="m-0 bg-transparent p-0 text-link"
+									type="button"
+									@click="selectProduct('medium')"
+								>
+									Order ►
+								</button>
+								<span v-else class="text-secondary">Sold out</span>
+							</td>
+						</tr>
+						<tr>
+							<td class="border border-solid border-[#c3c3c3] p-2 font-medium">Large</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.large.metadata.ram }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.large.metadata.storage }} MB
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ plans.large.metadata.cpu }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								{{ formatPlanIntervalPrice(plans.large) }}
+							</td>
+							<td class="border border-solid border-[#c3c3c3] p-2">
+								<button
+									v-if="capacityStatuses?.large?.available !== 0"
+									class="m-0 bg-transparent p-0 text-link"
+									type="button"
+									@click="selectProduct('large')"
+								>
+									Order ►
+								</button>
+								<span v-else class="text-secondary">Sold out</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 
 				<div
-					class="mb-24 flex w-full flex-col items-start justify-between gap-4 rounded-2xl bg-bg p-8 text-left lg:flex-row lg:gap-0"
+					class="mt-6 flex flex-col gap-2 border border-dashed border-[#c3c3c3] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
 				>
-					<div class="flex flex-col gap-4">
-						<h1 class="m-0">{{ formatMessage(messages.knowWhatYouNeed) }}</h1>
-						<h2 class="m-0 text-base font-normal text-primary">
-							{{ formatMessage(messages.pickCustomizedPlan) }}
-						</h2>
-					</div>
-
-					<div
-						class="experimental-styles-within flex w-full flex-col-reverse gap-2 md:w-auto md:flex-col md:items-center"
-					>
-						<ButtonStyled color="standard" size="large">
-							<button class="w-full md:w-fit" @click="selectProduct('custom')">
-								{{ formatMessage(messages.getStartedButton) }}
-								<RightArrowIcon class="shrink-0" />
-							</button>
-						</ButtonStyled>
-						<p v-if="lowestPrice" class="m-0 text-sm">
-							{{
-								formatMessage(messages.startingAtPrice, {
-									price: formatPrice(lowestPrice, selectedCurrency, true),
-								})
-							}}
+					<div>
+						<p class="m-0 font-bold">Know exactly what you need?</p>
+						<p class="m-0 mt-1 text-secondary">
+							Pick a customized plan with just the specs you need.
+						</p>
+						<p v-if="lowestPrice" class="m-0 mt-1">
+							Starting at {{ formatPrice(lowestPrice, selectedCurrency, true) }} / month
 						</p>
 					</div>
+					<ButtonStyled color="standard" size="large">
+						<button class="flex items-center gap-2" type="button" @click="selectProduct('custom')">
+							Get started
+							<RightArrowIcon class="shrink-0" />
+						</button>
+					</ButtonStyled>
 				</div>
+
+				<p class="m-0 mt-6 text-center text-xs text-secondary">
+					Prices shown for the selected billing period. Taxes may apply.
+				</p>
 			</div>
-		</section>
+		</div>
 	</div>
 </template>
 
 <script setup>
-import {
-	BoxIcon,
-	GameIcon,
-	RightArrowIcon,
-	ServerIcon,
-	TerminalSquareIcon,
-	TransferIcon,
-	VersionIcon,
-} from '@modrinth/assets'
+import { RightArrowIcon, SettingsIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	commonMessages,
-	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	useFormatPrice,
-	useVIntl,
 } from '@modrinth/ui'
 import { monthsInInterval } from '@modrinth/ui/src/utils/billing.ts'
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import OptionGroup from '~/components/ui/OptionGroup.vue'
-import LoaderIcon from '~/components/ui/servers/icons/LoaderIcon.vue'
-import MedalPlanPromotion from '~/components/ui/servers/marketing/MedalPlanPromotion.vue'
-import ServerPlanSelector from '~/components/ui/servers/marketing/ServerPlanSelector.vue'
 import { products } from '~/generated/state.json'
 
 const route = useRoute()
@@ -678,286 +237,7 @@ if (affiliateCode.value) {
 }
 
 const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 const formatPrice = useFormatPrice()
-const flags = useFeatureFlags()
-
-const messages = defineMessages({
-	hostWithModrinth: {
-		id: 'hosting-marketing.hero.host-with-modrinth',
-		defaultMessage: 'Host your next server with Modrinth Hosting',
-	},
-	hostingDescription: {
-		id: 'hosting-marketing.hero.hosting-description',
-		defaultMessage:
-			'Modrinth Hosting is the easiest way to host your own Minecraft: Java Edition server. Seamlessly install and play your favorite mods and modpacks, all within the Modrinth platform.',
-	},
-	startANewServer: {
-		id: 'hosting-marketing.hero.button.start-a-new-server',
-		defaultMessage: 'Start a new server',
-	},
-	startYourServer: {
-		id: 'hosting-marketing.hero.button.start-your-server',
-		defaultMessage: 'Start your server',
-	},
-	manageYourServers: {
-		id: 'hosting-marketing.hero.button.manage-your-servers',
-		defaultMessage: 'Manage your servers',
-	},
-	whyModrinthHosting: {
-		id: 'hosting-marketing.why.why-modrinth-hosting',
-		defaultMessage: 'Why Modrinth Hosting?',
-	},
-	whyHeading: {
-		id: 'hosting-marketing.why.heading',
-		defaultMessage: "Find a modpack. Now it's a server.",
-	},
-	whyDescription: {
-		id: 'hosting-marketing.why.description',
-		defaultMessage:
-			"Choose from the thousands of modpacks on Modrinth or create your own. Invite your friends when you're ready to play.",
-	},
-	whereModsAre: {
-		id: 'hosting-marketing.why.where-mods-are',
-		defaultMessage: 'Play where your mods are',
-	},
-	whereModsAreDescription: {
-		id: 'hosting-marketing.why.where-mods-are.description',
-		defaultMessage:
-			'Modrinth Hosting seamlessly integrates the mod and modpack installation process into your server.',
-	},
-	yourFavoriteMods: {
-		id: 'hosting-marketing.why.your-favorite-mods',
-		defaultMessage: 'All your favorite mods',
-	},
-	yourFavoriteModsDescription: {
-		id: 'hosting-marketing.why.your-favorite-mods.description',
-		defaultMessage:
-			"Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server.",
-	},
-	allOnModrinth: {
-		id: 'hosting-marketing.why.all-on-modrinth',
-		defaultMessage: 'Manage it all on Modrinth',
-	},
-	allOnModrinthDescription: {
-		id: 'hosting-marketing.why.all-on-modrinth.description',
-		defaultMessage:
-			'Your server, mods, players, and more are all on Modrinth. No need to switch between platforms.',
-	},
-	modernReliableHosting: {
-		id: 'hosting-marketing.why.modern-reliable-hosting',
-		defaultMessage: 'Experience modern, reliable hosting',
-	},
-	modernReliableHostingDescription: {
-		id: 'hosting-marketing.why.modern-reliable-hosting.description',
-		defaultMessage:
-			'Modrinth Hosting servers are hosted on <contrast>high-performance AMD CPUs with DDR5 RAM</contrast>, running on custom-built software to ensure your server performs smoothly.',
-	},
-	consistentlyFast: {
-		id: 'hosting-marketing.why.consistently-fast',
-		defaultMessage: 'Consistently fast',
-	},
-	consistentlyFastDescription: {
-		id: 'hosting-marketing.why.consistently-fast.description',
-		defaultMessage:
-			'Our infrastructure is never overloaded, meaning each server hosted with Modrinth always runs at its full performance.',
-	},
-	includedWithYourServer: {
-		id: 'hosting-marketing.included.with-your-server',
-		defaultMessage: 'Included with your server',
-	},
-	includedHeading: {
-		id: 'hosting-marketing.included.heading',
-		defaultMessage: 'Comes with all the features you need.',
-	},
-	includedDescription: {
-		id: 'hosting-marketing.included.description',
-		defaultMessage:
-			'Included with every server is a suite of features designed to provide a hosting experience that only Modrinth can offer.',
-	},
-	customUrl: {
-		id: 'hosting-marketing.included.custom-url',
-		defaultMessage: 'Custom URL',
-	},
-	customUrlDescription: {
-		id: 'hosting-marketing.included.custom-url.description',
-		defaultMessage: 'Share your server with a custom <contrast>modrinth.gg</contrast> URL.',
-	},
-	backupsIncluded: {
-		id: 'hosting-marketing.included.backups-included',
-		defaultMessage: 'Backups included',
-	},
-	backupsIncludedDescription: {
-		id: 'hosting-marketing.included.backups-included.description',
-		defaultMessage: 'Every server comes with 15 backups stored securely off-site.',
-	},
-	fileManager: {
-		id: 'hosting-marketing.included.file-manager',
-		defaultMessage: 'Easy to use file manager',
-	},
-	fileManagerDescription: {
-		id: 'hosting-marketing.included.file-manager.description',
-		defaultMessage: 'Search, manage, edit, and upload files directly to your server with ease.',
-	},
-	powerfulConsole: {
-		id: 'hosting-marketing.included.powerful-console',
-		defaultMessage: 'A powerful console, server properties manager, and more',
-	},
-	powerfulConsoleDescription: {
-		id: 'hosting-marketing.included.powerful-console.description',
-		defaultMessage: 'Modrinth Hosting comes with powerful tools to manage your server.',
-	},
-	help: {
-		id: 'hosting-marketing.included.help',
-		defaultMessage: 'Help when you need it',
-	},
-	helpDescription: {
-		id: 'hosting-marketing.included.help.description',
-		defaultMessage: 'Reach out to the Modrinth team for help with your server at any time.',
-	},
-	sftpAccess: {
-		id: 'hosting-marketing.included.sftp-access',
-		defaultMessage: 'SFTP access',
-	},
-	sftpAccessDescription: {
-		id: 'hosting-marketing.included.sftp-access.description',
-		defaultMessage: "Access your server's files directly with SFTP built into Modrinth Hosting.",
-	},
-	advancedNetworking: {
-		id: 'hosting-marketing.included.advanced-networking',
-		defaultMessage: 'Advanced networking management',
-	},
-	advancedNetworkingDescription: {
-		id: 'hosting-marketing.included.advanced-networking.description',
-		defaultMessage:
-			'Add your own domain to your server, reserve up to 15 ports for mods that require them, and more.',
-	},
-	faqHeading: {
-		id: 'hosting-marketing.faq.heading',
-		defaultMessage: 'Frequently Asked Questions',
-	},
-	faqCpuKind: {
-		id: 'hosting-marketing.faq.cpu-kind',
-		defaultMessage: 'What kind of CPUs do Modrinth Hosting servers run on?',
-	},
-	faqCpuKindAnswer: {
-		id: 'hosting-marketing.faq.cpu-kind.answer',
-		defaultMessage:
-			'Modrinth Hosting servers are powered by AMD Ryzen 7900 and 7950X3D equivalent CPUs at 5+ GHz, paired with DDR5 memory.',
-	},
-	faqBurstThreads: {
-		id: 'hosting-marketing.faq.burst-threads',
-		defaultMessage: 'How do CPU burst threads work?',
-	},
-	faqBurstThreadsAnswer: {
-		id: 'hosting-marketing.faq.burst-threads.answer',
-		defaultMessage:
-			'When your server is under heavy load, we temporarily give it access to additional CPU threads to help mitigate lag spikes and instability. This helps prevent the TPS from going below 20, ensuring the smoothest experience possible. Since those extra CPU threads are only shortly available during high load periods, they might not show up in Spark reports or other profiling tools.',
-	},
-	faqDDOSProtection: {
-		id: 'hosting-marketing.faq.ddos-protection',
-		defaultMessage: 'Do Modrinth Hosting servers have DDoS protection?',
-	},
-	faqDDOSProtectionAnswer: {
-		id: 'hosting-marketing.faq.ddos-protection.answer',
-		defaultMessage:
-			'Yes. All Modrinth Hosting servers come with DDoS protection, with up to 17 Tbps capacity in some locations.',
-	},
-	faqLocation: {
-		id: 'hosting-marketing.faq.location',
-		defaultMessage: 'Where are Modrinth Hosting servers located? Can I choose a region?',
-	},
-	faqLocationAnswer: {
-		id: 'hosting-marketing.faq.location.answer',
-		defaultMessage:
-			"We have servers available in North America, Europe, and Southeast Asia at the moment that you can choose upon purchase. More regions to come in the future! If you'd like to switch your region, please contact support.",
-	},
-	faqIncreaseStorage: {
-		id: 'hosting-marketing.faq.increase-storage',
-		defaultMessage: 'Can I increase the storage on my server?',
-	},
-	faqIncreaseStorageAnswer: {
-		id: 'hosting-marketing.faq.increase-storage.answer',
-		defaultMessage:
-			'Yes, storage can be increased on your server at no additional cost. If you need more storage, reach out to Modrinth Support.',
-	},
-	faqHowFast: {
-		id: 'hosting-marketing.faq.how-fast',
-		defaultMessage: 'How fast are Modrinth Hosting servers?',
-	},
-	faqHowFastAnswer: {
-		id: 'hosting-marketing.faq.how-fast.answer.one',
-		defaultMessage:
-			"Modrinth Hosting servers are hosted on very modern high-performance hardware, but it's tough to say how exactly that will translate into how fast your server will run because there are so many factors that affect it, such as the mods, data packs, or plugins you're running on your server, and even user behavior.",
-	},
-	faqHowFastAnswerTwo: {
-		id: 'hosting-marketing.faq.how-fast.answer.two',
-		defaultMessage:
-			"Most performance issues that arise tend to be the fault of an unoptimized modpack, mod, data pack, or plugin that causes the server to lag. Since our servers are very high-end, you shouldn't run into much trouble as long as you pick an appropriate plan for the content you're running on the server.",
-	},
-	faqCurrency: {
-		id: 'hosting-marketing.faq.currency',
-		defaultMessage: 'What currency are the prices in?',
-	},
-	faqCurrencyAnswer: {
-		id: 'hosting-marketing.faq.currency.answer',
-		defaultMessage: 'All prices are listed in United States Dollars (USD).',
-	},
-	faqVersionsLoaders: {
-		id: 'hosting-marketing.faq.versions-loaders',
-		defaultMessage: 'What Minecraft versions and loaders can be used?',
-	},
-	faqVersionsLoadersAnswer: {
-		id: 'hosting-marketing.faq.versions-loaders.answer.one',
-		defaultMessage:
-			'Modrinth Hosting servers can run any version of Minecraft: Java Edition going all the way back to version 1.2.5, including snapshot versions.',
-	},
-	faqVersionsLoadersAnswerTwo: {
-		id: 'hosting-marketing.faq.versions-loaders.answer.two',
-		defaultMessage:
-			'We also support a wide range of mod and plugin loaders, including Fabric, Quilt, Forge, and NeoForge for mods, as well as Paper and Purpur for plugins. Availability depends on whether the mod or plugin loader supports the selected Minecraft version.',
-	},
-	serverForEveryone: {
-		id: 'hosting-marketing.server-for-everyone',
-		defaultMessage: "There's a server for everyone",
-	},
-	availableLocations: {
-		id: 'hosting-marketing.available-locations',
-		defaultMessage: 'Available in North America, Europe, and Southeast Asia for wide coverage.',
-	},
-	payMonthly: {
-		id: 'hosting-marketing.billing.monthly',
-		defaultMessage: 'Pay monthly',
-	},
-	payQuarterly: {
-		id: 'hosting-marketing.billing.quarterly',
-		defaultMessage: 'Pay quarterly',
-	},
-	payYearly: {
-		id: 'hosting-marketing.billing.yearly',
-		defaultMessage: 'Pay yearly',
-	},
-	saveWithQuarterly: {
-		id: 'hosting-marketing.billing.save-with-quarterly',
-		defaultMessage: 'Save 16% with quarterly billing!',
-	},
-	knowWhatYouNeed: {
-		id: 'hosting-marketing.know-what-you-need',
-		defaultMessage: 'Know exactly what you need?',
-	},
-	pickCustomizedPlan: {
-		id: 'hosting-marketing.pick-customized-plan',
-		defaultMessage: 'Pick a customized plan with just the specs you need.',
-	},
-	getStartedButton: {
-		id: 'hosting-marketing.get-started',
-		defaultMessage: 'Get started',
-	},
-	startingAtPrice: {
-		id: 'hosting-marketing.billing.starting-at',
-		defaultMessage: 'Starting at {price} / month',
-	},
-})
 
 const billingPeriods = ref(['monthly', 'quarterly'])
 const billingPeriod = ref(billingPeriods.value.includes('quarterly') ? 'quarterly' : 'monthly')
@@ -968,6 +248,8 @@ const pyroProducts = products
 const pyroPlanProducts = pyroProducts.filter(
 	(p) => p.metadata.ram === 4096 || p.metadata.ram === 6144 || p.metadata.ram === 8192,
 )
+
+const selectedCurrency = ref('USD')
 
 const lowestPrice = computed(() => {
 	const amount = pyroProducts[0]?.prices?.find(
@@ -988,25 +270,12 @@ useSeoMeta({
 })
 
 const auth = await useAuth()
-const data = useNuxtApp()
 const config = useRuntimeConfig()
 const purchaseModal = ref(null)
-const country = useUserCountry()
 const customer = ref(null)
 const paymentMethods = ref([])
 const selectedProduct = ref(null)
-const customServer = ref(false)
-const showModal = ref(false)
-const modalKey = ref(0)
-
-const words = ['my-smp', 'medieval-masters', 'create-server', 'mega-smp', 'spookypack']
-const currentWordIndex = ref(0)
-const currentText = ref('')
-const isDeleting = ref(false)
-const typingSpeed = 75
-const deletingSpeed = 25
-const pauseTime = 2000
-const selectedCurrency = ref('USD')
+const selectedProjectId = ref()
 
 const loggedOut = computed(() => !auth.value.user)
 const outOfStockUrl = 'https://discord.modrinth.com'
@@ -1055,13 +324,12 @@ async function fetchCapacityStatuses(customProduct = null) {
 			return {
 				custom: await capacityChecks[0],
 			}
-		} else {
-			return {
-				small: await capacityChecks[0],
-				medium: await capacityChecks[1],
-				large: await capacityChecks[2],
-				custom: await capacityChecks[3],
-			}
+		}
+		return {
+			small: await capacityChecks[0],
+			medium: await capacityChecks[1],
+			large: await capacityChecks[2],
+			custom: await capacityChecks[3],
 		}
 	} catch (error) {
 		console.error('Error checking server capacities:', error)
@@ -1077,7 +345,7 @@ async function fetchCapacityStatuses(customProduct = null) {
 const { data: capacityStatuses, refetch: refreshCapacity } = useQuery({
 	queryKey: ['server', 'capacity', 'all'],
 	queryFn: fetchCapacityStatuses,
-	staleTime: 0, // Dont cache stock data
+	staleTime: 0,
 	gcTime: 0,
 })
 
@@ -1085,26 +353,6 @@ const isSmallAtCapacity = computed(() => capacityStatuses.value?.small?.availabl
 const isMediumAtCapacity = computed(() => capacityStatuses.value?.medium?.available === 0)
 const isLargeAtCapacity = computed(() => capacityStatuses.value?.large?.available === 0)
 const isCustomAtCapacity = computed(() => capacityStatuses.value?.custom?.available === 0)
-
-const startTyping = () => {
-	const currentWord = words[currentWordIndex.value]
-	if (isDeleting.value) {
-		if (currentText.value.length > 0) {
-			currentText.value = currentText.value.slice(0, -1)
-			setTimeout(startTyping, deletingSpeed)
-		} else {
-			isDeleting.value = false
-			currentWordIndex.value = (currentWordIndex.value + 1) % words.length
-			setTimeout(startTyping, typingSpeed)
-		}
-	} else if (currentText.value.length < currentWord.length) {
-		currentText.value = currentWord.slice(0, currentText.value.length + 1)
-		setTimeout(startTyping, typingSpeed)
-	} else {
-		isDeleting.value = true
-		setTimeout(startTyping, pauseTime)
-	}
-}
 
 const handleError = (err) => {
 	addNotification({
@@ -1133,33 +381,9 @@ async function fetchPaymentData() {
 	}
 }
 
-const selectedProjectId = ref()
-
 const isAtCapacity = computed(
 	() => isSmallAtCapacity.value && isMediumAtCapacity.value && isLargeAtCapacity.value,
 )
-
-const scrollToFaq = () => {
-	if (route.hash) {
-		// where nav-hash === route.hash
-		const faq = document.querySelector(`[nav-hash="${route.hash.slice(1)}"]`)
-		if (faq) {
-			faq.open = true
-			const top = faq.getBoundingClientRect().top
-			const offset = window.innerHeight / 2 - faq.clientHeight / 2
-			window.scrollTo({ top: window.scrollY + top - offset, behavior: 'smooth' })
-		}
-	}
-}
-
-onMounted(() => {
-	scrollToFaq()
-	if (route.query?.project) {
-		selectedProjectId.value = route.query?.project
-	}
-})
-
-watch(() => route.hash, scrollToFaq)
 
 const plans = {
 	small: pyroPlanProducts?.[0],
@@ -1168,14 +392,27 @@ const plans = {
 	custom: pyroProducts || [],
 }
 
+function formatBillingPeriodSuffix(interval) {
+	const months = monthsInInterval[interval]
+	if (months === 1) return ' / month'
+	return ` / ${months} months`
+}
+
+function formatPlanIntervalPrice(plan) {
+	const raw = plan?.prices?.find((x) => x.currency_code === selectedCurrency.value)?.prices
+		?.intervals?.[billingPeriod.value]
+	if (raw == null) return '—'
+	return `${formatPrice(raw, selectedCurrency.value, true)}${formatBillingPeriodSuffix(billingPeriod.value)}`
+}
+
 const selectProduct = async (product) => {
+	const data = useNuxtApp()
 	if (loggedOut.value) {
 		data.$router.push(`/auth/sign-in?redirect=${encodeURIComponent('/servers?plan=' + product)}`)
 		return
 	}
 
 	await refreshCapacity()
-	console.log(capacityStatuses.value)
 
 	if ((product === 'custom' && isCustomAtCapacity.value) || isAtCapacity.value) {
 		addNotification({
@@ -1201,16 +438,12 @@ const selectProduct = async (product) => {
 		return
 	}
 
-	// required for the purchase modal
 	if (!pyroProducts.metadata) {
 		pyroProducts.metadata = {}
 	}
 	pyroProducts.metadata.type = 'pyro'
 
-	customServer.value = product === 'custom'
 	selectedProduct.value = selectedPlan
-	showModal.value = true
-	modalKey.value++
 	await nextTick()
 
 	if (product === 'custom') {
@@ -1223,7 +456,7 @@ const selectProduct = async (product) => {
 const planQuery = async () => {
 	if ('plan' in route.query) {
 		await nextTick()
-		const planElement = document.querySelector(`[nav-hash="plan"]`)
+		const planElement = document.getElementById('plans')
 		if (planElement) {
 			planElement.scrollIntoView({ behavior: 'smooth' })
 			if (route.query.plan !== null) {
@@ -1302,52 +535,21 @@ function runPingTest(region, index = 1) {
 }
 
 onMounted(() => {
-	startTyping()
+	if (route.query?.project) {
+		selectedProjectId.value = route.query?.project
+	}
 	planQuery()
 	pingRegions()
+	fetchPaymentData()
 })
 
 watch(customer, (newCustomer) => {
 	if (newCustomer) planQuery()
 })
 
-onMounted(() => {
-	document.body.style.background = 'var(--color-accent-contrast)'
-	document.body.style.overflowX = 'hidden !important'
-	const layoutDiv = document.querySelector('.layout')
-	if (layoutDiv) {
-		layoutDiv.style.background = 'var(--color-accent-contrast)'
-	}
-	fetchPaymentData()
-})
-
 onUnmounted(() => {
-	document.body.style.background = ''
-	document.body.style.overflowX = ''
-	const layoutDiv = document.querySelector('.layout')
-	if (layoutDiv) {
-		layoutDiv.style.background = ''
-	}
 	if (window.Stripe) {
 		window.Stripe = null
 	}
 })
 </script>
-
-<style scoped>
-.servers-hero {
-	background: radial-gradient(
-		65% 30% at 50% -10%,
-		var(--color-brand-highlight) 0%,
-		var(--color-accent-contrast) 100%
-	);
-}
-
-.faded-brand-line {
-	background: linear-gradient(to right, var(--color-brand-highlight), transparent);
-}
-
-.details-hide summary::-webkit-details-marker {
-	display: none;
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-	<div class="universal-card">
+	<div class="flex flex-col">
 		<ConfirmModal
 			ref="modal_confirm"
 			:title="formatMessage(messages.revokeConfirmTitle)"
@@ -7,26 +7,26 @@
 			:proceed-label="formatMessage(messages.revokeAction)"
 			@proceed="revokeApp(revokingId)"
 		/>
-		<h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
-		<p>
+		<p class="mb-1 mt-0 font-bold">{{ formatMessage(commonSettingsMessages.authorizedApps) }}</p>
+		<p class="mb-2 mt-0">
 			{{ formatMessage(messages.description) }}
 		</p>
-		<div v-if="appInfoLookup.length === 0" class="universal-card recessed">
+		<p v-if="appInfoLookup.length === 0" class="text-secondary">
 			{{ formatMessage(messages.emptyState) }}
-		</div>
+		</p>
 		<div
 			v-for="authorization in appInfoLookup"
 			:key="authorization.id"
-			class="universal-card recessed token mt-4"
+			class="token mt-6 border-t border-divider pt-6 first:mt-0 first:border-t-0 first:pt-0"
 		>
 			<div class="token-content">
 				<div>
 					<div class="icon-name">
 						<Avatar :src="authorization.app.icon_url" />
 						<div>
-							<h2 class="token-title">
+							<p class="token-title m-0 font-bold">
 								{{ authorization.app.name }}
-							</h2>
+							</p>
 							<div>
 								{{ formatMessage(messages.byLabel) }}
 								<nuxt-link class="text-link" :to="'/user/' + authorization.owner.id">{{
@@ -69,19 +69,20 @@
 			</div>
 
 			<div class="input-group">
-				<Button
-					color="danger"
-					icon-only
-					@click="
-						() => {
-							revokingId = authorization.app_id
-							$refs.modal_confirm.show()
-						}
-					"
-				>
-					<TrashIcon />
-					{{ formatMessage(messages.revokeAction) }}
-				</Button>
+				<ButtonStyled color="red">
+					<button
+						type="button"
+						@click="
+							() => {
+								revokingId = authorization.app_id
+								$refs.modal_confirm.show()
+							}
+						"
+					>
+						<TrashIcon />
+						{{ formatMessage(messages.revokeAction) }}
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</div>
@@ -90,7 +91,7 @@
 import { CheckIcon, TrashIcon } from '@modrinth/assets'
 import {
 	Avatar,
-	Button,
+	ButtonStyled,
 	commonMessages,
 	commonSettingsMessages,
 	ConfirmModal,

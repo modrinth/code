@@ -151,7 +151,7 @@
 				<div
 					v-for="notice in notices"
 					:key="`notice-${notice.id}`"
-					class="col-span-full grid grid-cols-subgrid gap-4 rounded-2xl bg-bg-raised p-4"
+					class="col-span-full grid grid-cols-subgrid gap-4 rounded-[4px] bg-bg-raised p-4"
 				>
 					<div class="col-span-full grid grid-cols-subgrid items-center gap-4">
 						<div>

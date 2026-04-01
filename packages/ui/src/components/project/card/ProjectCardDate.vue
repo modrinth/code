@@ -44,7 +44,7 @@ const tooltip = computed(() =>
 
 <template>
 	<div v-tooltip="tooltip" class="flex items-center gap-2 smart-clickable:allow-pointer-events">
-		<component :is="types[props.type].icon" class="size-5 shrink-0" />
-		{{ capitalizeString(formatRelativeTime(date)) }}
+		{{ type === 'updated' ? 'Updated ' : 'Published ' }}
+		{{ formatRelativeTime(date) }}
 	</div>
 </template>

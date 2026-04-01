@@ -43,21 +43,17 @@
 				:open-modal="currentMember ? () => handleOpenCreateVersionModal() : undefined"
 			>
 				<template #actions="{ version }">
-					<ButtonStyled circular type="transparent">
+					<ButtonStyled color="brand" size="small">
 						<a
-							v-tooltip="`Download`"
 							:href="getPrimaryFile(version).url"
-							class="hover:!bg-button-bg [&>svg]:!text-green"
 							aria-label="Download"
 							@click="emit('onDownload')"
 						>
-							<DownloadIcon aria-hidden="true" />
+							Download
 						</a>
 					</ButtonStyled>
-					<ButtonStyled v-if="currentMember" circular type="transparent">
+					<ButtonStyled v-if="currentMember" size="small">
 						<OverflowMenu
-							v-tooltip="'Edit version'"
-							class="hover:!bg-button-bg"
 							:dropdown-id="`${baseDropdownId}-edit-${version.id}`"
 							:options="[
 								{
@@ -75,7 +71,7 @@
 							]"
 							aria-label="Edit version"
 						>
-							<EditIcon aria-hidden="true" />
+							Edit
 							<template #edit-files>
 								<FileIcon aria-hidden="true" />
 								Edit files
@@ -87,142 +83,6 @@
 							<template #edit-metadata>
 								<BoxIcon aria-hidden="true" />
 								Edit metadata
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-					<ButtonStyled circular type="transparent">
-						<OverflowMenu
-							v-tooltip="'More options'"
-							class="hover:!bg-button-bg"
-							:dropdown-id="`${baseDropdownId}-${version.id}`"
-							:options="[
-								{
-									id: 'download',
-									color: 'primary',
-									hoverFilled: true,
-									link: getPrimaryFile(version).url,
-									action: () => {
-										emit('onDownload')
-									},
-								},
-								{
-									id: 'new-tab',
-									action: () => {},
-									link: `/${project.project_type}/${
-										project.slug ? project.slug : project.id
-									}/version/${encodeURI(version.displayUrlEnding)}`,
-									external: true,
-								},
-								{
-									id: 'copy-link',
-									action: () =>
-										copyToClipboard(
-											`https://modrinth.com/${project.project_type}/${
-												project.slug ? project.slug : project.id
-											}/version/${encodeURI(version.displayUrlEnding)}`,
-										),
-								},
-								{
-									id: 'share',
-									action: () => {},
-									shown: false,
-								},
-								{
-									id: 'report',
-									color: 'red',
-									hoverFilled: true,
-									action: () =>
-										auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in'),
-									shown: !currentMember,
-								},
-								{ divider: true, shown: currentMember || flags.developerMode },
-								{
-									id: 'copy-id',
-									action: () => {
-										copyToClipboard(version.id)
-									},
-									shown: currentMember || flags.developerMode,
-								},
-								{
-									id: 'copy-maven',
-									action: () => {
-										copyToClipboard(`maven.modrinth:${project.slug}:${version.id}`)
-									},
-									shown: flags.developerMode,
-								},
-								{ divider: true, shown: !!currentMember },
-								{
-									id: 'edit-metadata',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'metadata'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'edit-details',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-details'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'edit-files',
-									action: () => handleOpenEditVersionModal(version.id, project.id, 'add-files'),
-									shown: !!currentMember,
-								},
-								{
-									id: 'delete',
-									color: 'red',
-									hoverFilled: true,
-									action: () => {
-										selectedVersion = version.id
-										deleteVersionModal?.show()
-									},
-									shown: !!currentMember,
-								},
-							]"
-							aria-label="More options"
-						>
-							<MoreVerticalIcon aria-hidden="true" />
-							<template #download>
-								<DownloadIcon aria-hidden="true" />
-								Download
-							</template>
-							<template #new-tab>
-								<ExternalIcon aria-hidden="true" />
-								Open in new tab
-							</template>
-							<template #copy-link>
-								<LinkIcon aria-hidden="true" />
-								Copy link
-							</template>
-							<template #share>
-								<ShareIcon aria-hidden="true" />
-								Share
-							</template>
-							<template #report>
-								<ReportIcon aria-hidden="true" />
-								Report
-							</template>
-							<template #edit-files>
-								<FileIcon aria-hidden="true" />
-								Edit files
-							</template>
-							<template #edit-details>
-								<InfoIcon aria-hidden="true" />
-								Edit details
-							</template>
-							<template #edit-metadata>
-								<BoxIcon aria-hidden="true" />
-								Edit metadata
-							</template>
-							<template #delete>
-								<TrashIcon aria-hidden="true" />
-								Delete
-							</template>
-							<template #copy-id>
-								<ClipboardCopyIcon aria-hidden="true" />
-								Copy ID
-							</template>
-							<template #copy-maven>
-								<ClipboardCopyIcon aria-hidden="true" />
-								Copy Maven coordinates
 							</template>
 						</OverflowMenu>
 					</ButtonStyled>
@@ -242,21 +102,7 @@
 </template>
 
 <script setup>
-import {
-	BoxIcon,
-	ClipboardCopyIcon,
-	DownloadIcon,
-	EditIcon,
-	ExternalIcon,
-	FileIcon,
-	InfoIcon,
-	LinkIcon,
-	MoreVerticalIcon,
-	ReportIcon,
-	ShareIcon,
-	SpinnerIcon,
-	TrashIcon,
-} from '@modrinth/assets'
+import { BoxIcon, FileIcon, InfoIcon, SpinnerIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
 	ConfirmModal,
@@ -269,11 +115,9 @@ import {
 import { onMounted, useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
-import { reportVersion } from '~/utils/report-helpers.ts'
 
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
-const auth = await useAuth()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -311,10 +155,6 @@ const baseDropdownId = useId()
 
 function getPrimaryFile(version) {
 	return version.files.find((x) => x.primary) || version.files[0]
-}
-
-async function copyToClipboard(text) {
-	await navigator.clipboard.writeText(text)
 }
 
 async function deleteVersion() {

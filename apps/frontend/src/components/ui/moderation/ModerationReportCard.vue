@@ -1,5 +1,5 @@
 <template>
-	<div class="overflow-hidden rounded-2xl">
+	<div class="overflow-hidden rounded-[4px]">
 		<div class="bg-bg-raised p-4">
 			<div
 				class="flex w-full flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0"
@@ -65,7 +65,7 @@
 						size="4rem"
 						:class="[
 							'flex-shrink-0 border border-surface-5 bg-surface-4 !shadow-none',
-							report.item_type !== 'user' && 'rounded-2xl',
+							report.item_type !== 'user' && 'rounded-[4px]',
 						]"
 					/>
 

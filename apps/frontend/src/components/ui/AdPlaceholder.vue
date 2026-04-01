@@ -1,26 +1,18 @@
 <template>
-	<div class="wrapper relative mb-3 flex w-full justify-center rounded-2xl">
+	<div class="wrapper relative mb-3 mt-3 flex w-full justify-center">
 		<AutoLink
 			:to="currentAd.link"
 			:aria-label="currentAd.description"
-			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 rounded-[inherit] bg-bg-raised"
+			class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 bg-bg-raised"
 		>
 			<img
-				:src="currentAd.light"
+				:src="currentAd.src"
 				aria-hidden="true"
 				:alt="currentAd.description"
-				class="light-image hidden rounded-[inherit]"
-			/>
-			<img
-				:src="currentAd.dark"
-				aria-hidden="true"
-				:alt="currentAd.description"
-				class="dark-image rounded-[inherit]"
+				class="rounded-[inherit]"
 			/>
 		</AutoLink>
-		<div
-			class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
-		>
+		<div class="absolute top-0 flex items-center justify-center overflow-hidden bg-bg-raised">
 			<div id="modrinth-rail-1" />
 		</div>
 	</div>
@@ -62,14 +54,12 @@ useHead({
 
 const AD_PRESETS = {
 	medal: {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-dark.webp',
+		src: 'https://cdn-raw.modrinth.com/modrinth-hosting-medal-light.webp',
 		description: 'Host your next server with Modrinth Hosting',
 		link: '/hosting?plan&ref=medal',
 	},
 	'modrinth-hosting': {
-		light: 'https://cdn-raw.modrinth.com/modrinth-hosting-light.webp',
-		dark: 'https://cdn-raw.modrinth.com/modrinth-hosting-dark.webp',
+		src: 'https://cdn-raw.modrinth.com/modrinth-hosting-light.webp',
 		description: 'Host your next server with Modrinth Hosting',
 		link: '/hosting',
 	},
@@ -110,7 +100,6 @@ iframe[id^='google_ads_iframe'] {
 
 #qc-cmp2-ui {
 	background: var(--color-raised-bg);
-	border-radius: var(--radius-lg);
 	color: var(--color-base);
 }
 
@@ -123,7 +112,6 @@ iframe[id^='google_ads_iframe'] {
 #qc-cmp2-ui button[mode='secondary'] {
 	background: var(--color-brand);
 	color: var(--color-accent-contrast);
-	border-radius: var(--radius-lg);
 	border: none;
 }
 
@@ -158,19 +146,5 @@ iframe[id^='google_ads_iframe'] {
 }
 
 .wrapper > * {
-	box-shadow: var(--shadow-card);
-}
-</style>
-
-<style lang="scss" scoped>
-.light,
-.light-mode {
-	.dark-image {
-		display: none;
-	}
-
-	.light-image {
-		display: block;
-	}
 }
 </style>

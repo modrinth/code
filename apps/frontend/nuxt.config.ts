@@ -13,11 +13,7 @@ const preloadedFonts = [
 	'inter/Inter-Bold.woff2',
 ]
 
-const favicons = {
-	'(prefers-color-scheme:no-preference)': '/favicon-light.ico',
-	'(prefers-color-scheme:light)': '/favicon-light.ico',
-	'(prefers-color-scheme:dark)': '/favicon.ico',
-}
+const faviconHref = '/favicon.png'
 
 const PROD_MODRINTH_URL = 'https://modrinth.com'
 const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
@@ -30,6 +26,12 @@ export default defineNuxtConfig({
 				lang: 'en',
 			},
 			title: 'Modrinth',
+			meta: [
+				{
+					name: 'viewport',
+					content: 'width=1024',
+				},
+			],
 			link: [
 				// The type is necessary because the linter can't always compare this very nested/complex type on itself
 				...preloadedFonts.map((font): object => {
@@ -41,12 +43,17 @@ export default defineNuxtConfig({
 						crossorigin: 'anonymous',
 					}
 				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'icon', type: 'image/x-icon', href, media }
-				}),
-				...Object.entries(favicons).map(([media, href]): object => {
-					return { rel: 'apple-touch-icon', type: 'image/x-icon', href, media, sizes: '64x64' }
-				}),
+				{
+					rel: 'icon',
+					type: 'image/x-icon',
+					href: faviconHref,
+				},
+				{
+					rel: 'apple-touch-icon',
+					type: 'image/x-icon',
+					href: faviconHref,
+					sizes: '64x64',
+				},
 				{
 					rel: 'search',
 					type: 'application/opensearchdescription+xml',
@@ -294,12 +301,6 @@ export default defineNuxtConfig({
 		},
 	},
 	routeRules: {
-		'/**': {
-			headers: {
-				'Accept-CH': 'Sec-CH-Prefers-Color-Scheme',
-				'Critical-CH': 'Sec-CH-Prefers-Color-Scheme',
-			},
-		},
 		'/dashboard/revenue/withdraw': {
 			redirect: {
 				to: '/dashboard/revenue',

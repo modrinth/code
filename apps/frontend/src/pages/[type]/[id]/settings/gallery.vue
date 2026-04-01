@@ -590,14 +590,14 @@ onUnmounted(() => {
 				gap: 0.5rem;
 
 				h2 {
-					color: var(--dark-color-text-dark);
+					color: #ffffff;
 					font-size: 1.25rem;
 					text-align: center;
 					margin: 0;
 				}
 
 				p {
-					color: var(--dark-color-text);
+					color: rgba(255, 255, 255, 0.88);
 					margin: 0;
 				}
 			}

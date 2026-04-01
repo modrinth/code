@@ -3,7 +3,7 @@
 		<div class="flex items-center gap-4">
 			<div
 				class="h-4 w-4 rounded-full border-2 border-solid border-button-border"
-				:class="recent || first ? 'bg-brand' : 'bg-button-bg'"
+				:class="recent || first ? 'bg-green-orb' : 'bg-grey-orb'"
 			/>
 			<div class="flex flex-wrap items-center gap-2">
 				<AutoLink
@@ -35,7 +35,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="ml-8 mt-3 rounded-2xl bg-bg-raised px-4 py-3">
+		<div class="ml-8 mt-3">
 			<div class="changelog-body" v-html="renderHighlightedString(entry.body)" />
 		</div>
 	</div>
@@ -117,6 +117,16 @@ const messages = defineMessages({
 		margin: 0;
 	}
 
+	h2 {
+		font-size: 1.15rem;
+		margin-bottom: 0.5rem;
+		opacity: 0.8;
+
+		&:not(:first-child) {
+			margin-top: 1rem;
+		}
+	}
+
 	ul {
 		padding-left: 1.25rem;
 		margin: 0;
@@ -167,5 +177,17 @@ const messages = defineMessages({
 		max-width: 100%;
 		border-radius: var(--radius-md);
 	}
+}
+
+.bg-green-orb {
+	background: radial-gradient(75.25% 75.25% at 37.63% 28.09%, #fff 0%, #1bd96a 100%);
+	border: 1px solid #3bb66d;
+	box-shadow: 1px 1px 3px 1px rgb(0 0 0 / 0.6);
+}
+
+.bg-grey-orb {
+	background: radial-gradient(75.25% 75.25% at 37.63% 28.09%, #fff 0%, #d9d9d9 100%);
+	border: 1px solid #b5b5b5;
+	box-shadow: 1px 1px 3px 1px rgb(0 0 0 / 0.1);
 }
 </style>

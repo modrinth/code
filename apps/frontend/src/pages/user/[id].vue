@@ -142,7 +142,7 @@
 						{{
 							user.bio
 								? user.bio
-								: projects.length === 0
+								: projects?.length === 0
 									? formatMessage(messages.bioFallbackUser)
 									: formatMessage(messages.bioFallbackCreator)
 						}}
@@ -151,7 +151,6 @@
 						<div
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
-							<BoxIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileProjectsLabel, {
 									count: formatCompactNumber(projects?.length || 0),
@@ -163,7 +162,6 @@
 							v-tooltip="formatNumber(sumDownloads)"
 							class="flex items-center gap-2 border-0 border-r border-solid border-divider pr-4 font-semibold"
 						>
-							<DownloadIcon class="h-6 w-6 text-secondary" />
 							{{
 								formatMessage(messages.profileDownloadsLabel, {
 									count: formatCompactNumber(sumDownloads),
@@ -175,274 +173,209 @@
 							v-tooltip="formatDateTime(user.created)"
 							class="flex items-center gap-2 font-semibold"
 						>
-							<CalendarIcon class="h-6 w-6 text-secondary" />
 							{{ formatMessage(messages.profileJoinedLabel) }}
 							{{ formatRelativeTime(user.created) }}
 						</div>
 					</template>
 					<template #actions>
-						<ButtonStyled size="large">
-							<NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
-								<EditIcon aria-hidden="true" />
-								{{ formatMessage(commonMessages.editButton) }}
-							</NuxtLink>
-						</ButtonStyled>
-						<ButtonStyled size="large" circular type="transparent">
-							<OverflowMenu
-								:options="[
-									{
-										id: 'manage-projects',
-										action: () => navigateTo('/dashboard/projects'),
-										hoverOnly: true,
-										shown: auth.user && auth.user.id === user.id,
-									},
-									{ divider: true, shown: auth.user && auth.user.id === user.id },
-									{
-										id: 'report',
-										action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
-										color: 'red',
-										hoverOnly: true,
-										shown: auth.user?.id !== user.id,
-									},
-									{ id: 'copy-id', action: () => copyId() },
-									{ id: 'copy-permalink', action: () => copyPermalink() },
-									{
-										divider: true,
-										shown: auth.user && isAdmin(auth.user),
-									},
-									{
-										id: 'open-billing',
-										action: () => navigateTo(`/admin/billing/${user.id}`),
-										shown: auth.user && isStaff(auth.user),
-									},
-									{
-										id: 'toggle-affiliate',
-										action: () => toggleAffiliate(user.id),
-										shown: isAdminViewing,
-										remainOnClick: true,
-										color: isAffiliate ? 'red' : 'orange',
-									},
-									{
-										id: 'open-info',
-										action: () => $refs.userDetailsModal.show(),
-										shown: auth.user && isStaff(auth.user),
-									},
-									{
-										id: 'edit-role',
-										action: () => openRoleEditModal(),
-										shown: auth.user && isAdmin(auth.user),
-									},
-								]"
-								aria-label="More options"
-								:dropdown-id="`${baseId}-more-options`"
+						<div class="flex flex-col gap-2">
+							<nuxt-link
+								v-if="auth.user && auth.user.id === user.id"
+								to="/settings/profile"
+								class="text-link"
 							>
-								<MoreVerticalIcon aria-hidden="true" />
-								<template #manage-projects>
-									<BoxIcon aria-hidden="true" />
-									{{ formatMessage(messages.profileManageProjectsButton) }}
-								</template>
-								<template #report>
-									<ReportIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.reportButton) }}
-								</template>
-								<template #copy-id>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyIdButton) }}
-								</template>
-								<template #copy-permalink>
-									<ClipboardCopyIcon aria-hidden="true" />
-									{{ formatMessage(commonMessages.copyPermalinkButton) }}
-								</template>
-								<template #open-billing>
-									<CurrencyIcon aria-hidden="true" />
-									{{ formatMessage(messages.billingButton) }}
-								</template>
-								<template #open-info>
-									<InfoIcon aria-hidden="true" />
-									{{ formatMessage(messages.infoButton) }}
-								</template>
-								<template #toggle-affiliate>
-									<AffiliateIcon aria-hidden="true" />
-									{{
-										formatMessage(
-											isAffiliate ? messages.removeAffiliateButton : messages.setAffiliateButton,
-										)
-									}}
-								</template>
-								<template #edit-role>
-									<EditIcon aria-hidden="true" />
-									{{ formatMessage(messages.editRoleButton) }}
-								</template>
-							</OverflowMenu>
-						</ButtonStyled>
+								Edit profile ►
+							</nuxt-link>
+							<nuxt-link
+								v-if="auth.user && auth.user.id === user.id"
+								to="/dashboard/projects"
+								class="text-link"
+							>
+								Manage projects ►
+							</nuxt-link>
+							<button
+								v-if="auth.user?.id !== user.id"
+								class="bg-transparent p-0 text-link"
+								@click="() => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in'))"
+							>
+								⚠︎ Report user
+							</button>
+						</div>
 					</template>
 				</ContentPageHeader>
 			</div>
 			<div class="normal-page__content">
-				<div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+				<div v-if="navLinks?.length > 2" class="max-w-full overflow-x-auto">
 					<NavTabs :links="navLinks" replace />
 				</div>
-				<div v-if="projects?.length > 0">
-					<ProjectCardList
-						v-if="route.params.projectType !== 'collections'"
-						:layout="cosmetics.searchDisplayMode.user"
+				<div class="mx-4 rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3">
+					<div v-if="projects?.length > 0">
+						<ProjectCardList
+							v-if="route.params.projectType !== 'collections'"
+							:layout="cosmetics.searchDisplayMode.user"
+						>
+							<ProjectCard
+								v-for="project in (route.params.projectType !== undefined
+									? projects.filter(
+											(x) =>
+												x.project_type ===
+												route.params.projectType.substr(0, route.params.projectType?.length - 1),
+										)
+									: projects
+								)
+									.slice()
+									.sort((a, b) => b.downloads - a.downloads)"
+								:key="project.id"
+								class="rounded-[4px] bg-white"
+								:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
+								:title="project.title"
+								:icon-url="project.icon_url"
+								:date-updated="project.updated"
+								:downloads="project.downloads"
+								:summary="project.description"
+								:tags="[...project.categories]"
+								:all-tags="[
+									...project.categories,
+									...project.loaders,
+									...project.additional_categories,
+								]"
+								:followers="project.followers"
+								:banner="project.gallery.find((element) => element.featured)?.url"
+								:color="project.color ?? undefined"
+								:environment="{
+									clientSide: project.client_side,
+									serverSide: project.server_side,
+								}"
+								:layout="
+									cosmetics.searchDisplayMode.user === 'grid' ||
+									cosmetics.searchDisplayMode.user === 'gallery'
+										? 'grid'
+										: 'list'
+								"
+								:status="project.status"
+							/>
+						</ProjectCardList>
+					</div>
+					<div
+						v-else-if="
+							(route.params.projectType && route.params.projectType !== 'collections') ||
+							(!route.params.projectType && collections?.length === 0)
+						"
+						class="error"
 					>
-						<ProjectCard
-							v-for="project in (route.params.projectType !== undefined
-								? projects.filter(
-										(x) =>
-											x.project_type ===
-											route.params.projectType.substr(0, route.params.projectType.length - 1),
-									)
-								: projects
-							)
-								.slice()
-								.sort((a, b) => b.downloads - a.downloads)"
-							:key="project.id"
-							:link="`/${project.project_type ?? 'project'}/${project.slug ? project.slug : project.id}`"
-							:title="project.title"
-							:icon-url="project.icon_url"
-							:date-updated="project.updated"
-							:downloads="project.downloads"
-							:summary="project.description"
-							:tags="[...project.categories]"
-							:all-tags="[
-								...project.categories,
-								...project.loaders,
-								...project.additional_categories,
-							]"
-							:followers="project.followers"
-							:banner="project.gallery.find((element) => element.featured)?.url"
-							:color="project.color ?? undefined"
-							:environment="{
-								clientSide: project.client_side,
-								serverSide: project.server_side,
-							}"
-							:layout="
-								cosmetics.searchDisplayMode.user === 'grid' ||
-								cosmetics.searchDisplayMode.user === 'gallery'
-									? 'grid'
-									: 'list'
-							"
-							:status="project.status"
-						/>
-					</ProjectCardList>
-				</div>
-				<div
-					v-else-if="
-						(route.params.projectType && route.params.projectType !== 'collections') ||
-						(!route.params.projectType && collections?.length === 0)
-					"
-					class="error"
-				>
-					<UpToDate class="icon" />
-					<br />
-					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
-						<IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
-							<template #create-link="{ children }">
-								<a class="link" @click.prevent="$refs.modal_creation.show()">
-									<component :is="() => children" />
-								</a>
-							</template>
-						</IntlFormatted>
-					</span>
-					<span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
-				</div>
-				<div
-					v-if="!route.params.projectType || route.params.projectType === 'collections'"
-					class="collections-grid"
-				>
-					<nuxt-link
-						v-for="collection in (collections ?? []).sort(
-							(a, b) => new Date(b.created) - new Date(a.created),
-						)"
-						:key="collection.id"
-						:to="`/collection/${collection.id}`"
-						class="card collection-item"
+						<UpToDate class="icon" />
+						<br />
+						<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+							<IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
+								<template #create-link="{ children }">
+									<a class="link" @click.prevent="$refs.modal_creation.show()">
+										<component :is="() => children" />
+									</a>
+								</template>
+							</IntlFormatted>
+						</span>
+						<span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
+					</div>
+					<div
+						v-if="!route.params.projectType || route.params.projectType === 'collections'"
+						class="collections-grid"
+						:class="{
+							'mt-3': !route.params.projectType && projects?.length !== 0,
+						}"
 					>
-						<div class="collection">
-							<Avatar :src="collection.icon_url" size="64px" />
-							<div class="details">
-								<h2 class="title">{{ collection.name }}</h2>
-								<div class="stats">
-									<LibraryIcon aria-hidden="true" />
-									{{ formatMessage(messages.collectionLabel) }}
+						<nuxt-link
+							v-for="collection in (collections ?? []).sort(
+								(a, b) => new Date(b.created) - new Date(a.created),
+							)"
+							:key="collection.id"
+							:to="`/collection/${collection.id}`"
+							class="collection-item rounded-[4px] bg-white p-4"
+						>
+							<div class="collection">
+								<Avatar :src="collection.icon_url" size="64px" />
+								<div class="details">
+									<h2 class="title">{{ collection.name }}</h2>
+									<div class="stats">
+										<LibraryIcon aria-hidden="true" />
+										{{ formatMessage(messages.collectionLabel) }}
+									</div>
 								</div>
 							</div>
-						</div>
-						<div class="description">
-							{{ collection.description }}
-						</div>
-						<div class="stat-bar">
-							<div class="stats">
-								<BoxIcon />
-								{{
-									`${$formatNumber(collection.projects?.length || 0, false)} project${
-										(collection.projects?.length || 0) !== 1 ? 's' : ''
-									}`
-								}}
+							<div class="description">
+								{{ collection.description }}
 							</div>
-							<div class="stats">
-								<template v-if="collection.status === 'listed'">
-									<GlobeIcon />
-									<span> {{ formatMessage(commonMessages.publicLabel) }} </span>
-								</template>
-								<template v-else-if="collection.status === 'unlisted'">
-									<LinkIcon />
-									<span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
-								</template>
-								<template v-else-if="collection.status === 'private'">
-									<LockIcon />
-									<span> {{ formatMessage(commonMessages.privateLabel) }} </span>
-								</template>
-								<template v-else-if="collection.status === 'rejected'">
-									<XIcon />
-									<span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
-								</template>
+							<div class="stat-bar">
+								<div class="stats">
+									<BoxIcon />
+									{{
+										`${$formatNumber(collection.projects?.length || 0, false)} project${
+											(collection.projects?.length || 0) !== 1 ? 's' : ''
+										}`
+									}}
+								</div>
+								<div class="stats">
+									<template v-if="collection.status === 'listed'">
+										<GlobeIcon />
+										<span> {{ formatMessage(commonMessages.publicLabel) }} </span>
+									</template>
+									<template v-else-if="collection.status === 'unlisted'">
+										<LinkIcon />
+										<span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
+									</template>
+									<template v-else-if="collection.status === 'private'">
+										<LockIcon />
+										<span> {{ formatMessage(commonMessages.privateLabel) }} </span>
+									</template>
+									<template v-else-if="collection.status === 'rejected'">
+										<XIcon />
+										<span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
+									</template>
+								</div>
 							</div>
-						</div>
-					</nuxt-link>
-				</div>
-				<div
-					v-if="route.params.projectType === 'collections' && collections?.length === 0"
-					class="error"
-				>
-					<UpToDate class="icon" />
-					<br />
-					<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
-						<IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
-							<template #create-link="{ children }">
-								<a
-									class="link"
-									@click.prevent="(event) => $refs.modal_collection_creation.show(event)"
-								>
-									<component :is="() => children" />
-								</a>
-							</template>
-						</IntlFormatted>
-					</span>
-					<span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
+						</nuxt-link>
+					</div>
+					<div
+						v-if="route.params.projectType === 'collections' && collections?.length === 0"
+						class="error"
+					>
+						<UpToDate class="icon" />
+						<br />
+						<span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+							<IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
+								<template #create-link="{ children }">
+									<a
+										class="link"
+										@click.prevent="(event) => $refs.modal_collection_creation.show(event)"
+									>
+										<component :is="() => children" />
+									</a>
+								</template>
+							</IntlFormatted>
+						</span>
+						<span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
+					</div>
 				</div>
 			</div>
 			<div class="normal-page__sidebar">
-				<div v-if="organizations?.length > 0" class="card flex-card">
-					<h2 class="text-lg text-contrast">
+				<div v-if="organizations?.length > 0" class="mb-4">
+					<h2 class="mb-1 mt-0 text-lg text-contrast">
 						{{ formatMessage(messages.profileOrganizations) }}
 					</h2>
-					<div class="flex flex-wrap gap-2">
+					<div class="flex flex-col gap-2">
 						<nuxt-link
 							v-for="org in sortedOrgs"
 							:key="org.id"
 							v-tooltip="org.name"
-							class="organization"
+							class="flex items-center gap-2 font-bold text-link"
 							:to="`/organization/${org.slug}`"
 						>
-							<Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="3rem" />
+							<Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="2rem" />
+							{{ org.name }}
 						</nuxt-link>
 					</div>
 				</div>
-				<div v-if="badges.length > 0" class="card flex-card">
-					<h2 class="text-lg text-contrast">
+				<div v-if="badges?.length > 0">
+					<h2 class="mb-1 mt-0 text-lg text-contrast">
 						{{ formatMessage(messages.profileBadges) }}
 					</h2>
 					<div class="flex flex-wrap gap-2">
@@ -468,19 +401,11 @@
 import {
 	AffiliateIcon,
 	BoxIcon,
-	CalendarIcon,
 	CheckIcon,
-	ClipboardCopyIcon,
-	CurrencyIcon,
-	DownloadIcon,
-	EditIcon,
 	GlobeIcon,
-	InfoIcon,
 	LibraryIcon,
 	LinkIcon,
 	LockIcon,
-	MoreVerticalIcon,
-	ReportIcon,
 	SaveIcon,
 	SpinnerIcon,
 	XIcon,
@@ -497,7 +422,6 @@ import {
 	IntlFormatted,
 	NavTabs,
 	NewModal,
-	OverflowMenu,
 	ProjectCard,
 	ProjectCardList,
 	TagItem,
@@ -508,7 +432,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import { onServerPrefetch } from 'vue'
 
 import TenMClubBadge from '~/assets/images/badges/10m-club.svg?component'
@@ -522,6 +446,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
+import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
@@ -529,8 +454,6 @@ const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
-const config = useRuntimeConfig()
-const queryClient = useQueryClient()
 
 const { formatMessage } = useVIntl()
 const formatNumber = useFormatNumber()
@@ -542,8 +465,6 @@ const formatDateTime = useFormatDateTime({
 })
 
 const { addNotification } = injectNotificationManager()
-
-const baseId = useId()
 
 const messages = defineMessages({
 	profileProjectsLabel: {
@@ -841,21 +762,8 @@ const badges = computed(() => {
 	return badges
 })
 
-async function copyId() {
-	await navigator.clipboard.writeText(user.value.id)
-}
-
-async function copyPermalink() {
-	await navigator.clipboard.writeText(`${config.public.siteUrl}/user/${user.value.id}`)
-}
-
 const isAffiliate = computed(() => user.value?.badges & UserBadge.AFFILIATE)
 const isAdminViewing = computed(() => isAdmin(auth.value.user))
-
-async function toggleAffiliate(id) {
-	await client.labrinth.users_v2.patch(id, { badges: user.value.badges ^ (1 << 7) })
-	queryClient.invalidateQueries({ queryKey: ['user', route.params.id] })
-}
 
 const navLinks = computed(() => [
 	{
@@ -883,11 +791,6 @@ const roleOptions = [
 ]
 
 const editRoleModal = useTemplateRef('editRoleModal')
-
-const openRoleEditModal = () => {
-	selectedRole.value = user.value.role
-	editRoleModal.value?.show()
-}
 
 const cancelRoleEdit = () => {
 	selectedRole.value = user.value.role
@@ -938,7 +841,6 @@ export default defineNuxtComponent({
 	}
 
 	gap: var(--gap-md);
-	margin-top: var(--gap-md);
 
 	.collection-item {
 		display: flex;

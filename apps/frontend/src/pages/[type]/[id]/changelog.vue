@@ -55,10 +55,9 @@
 								</div>
 								<a
 									:href="version.primaryFile?.url"
-									class="iconified-button download"
+									class="text-link"
 									:title="`Download ${version.name}`"
 								>
-									<DownloadIcon aria-hidden="true" />
 									Download
 								</a>
 							</div>
@@ -85,7 +84,7 @@
 	</div>
 </template>
 <script setup>
-import { DownloadIcon, SpinnerIcon } from '@modrinth/assets'
+import { SpinnerIcon } from '@modrinth/assets'
 import {
 	injectModrinthClient,
 	injectProjectPageContext,
@@ -287,6 +286,10 @@ function updateQuery(newQueries) {
 
 	.markdown-body {
 		margin: 0.5rem 0.5rem 0 0;
+
+		ul {
+			padding-left: 1.25rem;
+		}
 	}
 
 	.version-header {
@@ -309,7 +312,7 @@ function updateQuery(newQueries) {
 
 			h2 {
 				margin: 0;
-				font-size: var(--font-size-lg);
+				font-size: 1rem;
 			}
 
 			h2,

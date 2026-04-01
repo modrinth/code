@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { HistoryIcon, SaveIcon, SpinnerIcon } from '@modrinth/assets'
+import { SaveIcon, SpinnerIcon } from '@modrinth/assets'
 import { isEqual } from 'es-toolkit'
 import { type Component, computed } from 'vue'
 
@@ -54,13 +54,12 @@ function localizeIfPossible(message: MessageDescriptor | string) {
 		<div class="ml-auto flex gap-2">
 			<ButtonStyled v-if="canReset" type="transparent">
 				<button :disabled="saving" @click="(e) => emit('reset', e)">
-					<HistoryIcon /> {{ formatMessage(commonMessages.resetButton) }}
+					{{ formatMessage(commonMessages.resetButton) }}
 				</button>
 			</ButtonStyled>
 			<ButtonStyled color="brand">
 				<button :disabled="saving" @click="(e) => emit('save', e)">
 					<SpinnerIcon v-if="saving" class="animate-spin" />
-					<component :is="saveIcon" v-else />
 					{{ localizeIfPossible(saving ? savingLabel : saveLabel) }}
 				</button>
 			</ButtonStyled>

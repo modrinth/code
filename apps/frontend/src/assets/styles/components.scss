@@ -57,18 +57,11 @@
   Cards and body styling
 */
 .base-card {
-	@extend .padding-lg;
-
 	position: relative;
-
-	background-color: var(--color-raised-bg);
-	border-radius: var(--size-rounded-card);
 
 	margin-bottom: var(--spacing-card-md);
 	outline: 2px solid transparent;
 	outline-offset: -2px;
-
-	box-shadow: var(--shadow-card);
 
 	.card__overlay {
 		position: absolute;
@@ -213,7 +206,7 @@
 		}
 	}
 
-	:where(input) {
+	:where(input:not([type='radio']):not([type='checkbox'])) {
 		box-sizing: border-box;
 		max-height: 40px;
 		max-width: 100%;
@@ -392,7 +385,6 @@
 
 	&:focus-visible:not(&:disabled),
 	&:hover:not(&:disabled) {
-		cursor: pointer;
 		filter: brightness(0.85);
 	}
 
@@ -436,7 +428,6 @@ tr.button-transparent {
 
 	&:focus-visible:not(&:disabled) > *,
 	&:hover:not(&:disabled) > * {
-		cursor: pointer;
 		filter: brightness(0.85);
 		background-color: var(--color-raised-bg);
 	}
@@ -507,7 +498,6 @@ tr.button-transparent {
 	margin: 0;
 	font-size: var(--font-size-nm);
 	align-items: center;
-	cursor: pointer;
 	width: fit-content;
 	height: fit-content;
 	transition:
@@ -1140,8 +1130,7 @@ svg.inline-svg {
 	.list-style {
 		display: flex;
 		flex-direction: column;
-		gap: var(--gap-12);
-		font-weight: var(--weight-bold);
+		gap: 6px;
 
 		hr {
 			width: 100%;

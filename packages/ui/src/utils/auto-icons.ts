@@ -11,7 +11,10 @@ import {
 	FileCodeIcon,
 	FileIcon,
 	FileImageIcon,
+	FileJarIcon,
 	FileTextIcon,
+	FolderCogIcon,
+	FolderModsIcon,
 	FolderOpenIcon,
 	GithubIcon,
 	GlassesIcon,
@@ -25,9 +28,11 @@ import {
 	PayPalIcon,
 	PlugIcon,
 	PolygonIcon,
+	SavesIcon,
 	UnknownIcon,
 	UpdatedIcon,
 	USDCColorIcon,
+	WorldIcon,
 	XCircleIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -84,8 +89,10 @@ export const PROJECT_STATUS_ICONS: Record<ProjectStatus, Component> = {
 }
 
 export const DIRECTORY_ICONS: Record<string, Component> = {
-	config: FolderOpenIcon,
-	world: FolderOpenIcon,
+	config: FolderCogIcon,
+	world: WorldIcon,
+	saves: SavesIcon,
+	mods: FolderModsIcon,
 	resourcepacks: PaintbrushIcon,
 	_default: FolderOpenIcon,
 }
@@ -124,6 +131,10 @@ export function getDirectoryIcon(name: string): Component {
 
 export function getFileExtensionIcon(extension: string): Component {
 	const ext: string = extension.toLowerCase()
+
+	if (ext === 'jar') {
+		return FileJarIcon
+	}
 
 	if ((FILE_CODE_EXTENSIONS as readonly string[]).includes(ext)) {
 		return FileCodeIcon

@@ -31,7 +31,7 @@
 				<div
 					v-for="launcher in visibleLaunchers"
 					:key="launcher.name"
-					class="flex flex-col rounded-[20px] border border-solid border-surface-4 shadow-sm overflow-clip"
+					class="flex flex-col rounded-[4px] border border-solid border-surface-4 shadow-sm overflow-clip"
 				>
 					<!-- Launcher header -->
 					<button

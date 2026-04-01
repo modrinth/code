@@ -21,7 +21,7 @@ const ariaLabelByType = computed(() => `Banner with ${props.messageType} message
 	min-height: var(--font-size-2xl);
 
 	background: var(--color-raised-bg);
-	border-radius: var(--size-rounded-card);
+	border-radius: 4px;
 	overflow: hidden;
 	outline: 2px solid transparent;
 	outline-offset: -2px;
@@ -41,17 +41,20 @@ const ariaLabelByType = computed(() => `Banner with ${props.messageType} message
 }
 
 .message-banner__content {
-	padding: var(--spacing-card-md) var(--spacing-card-lg);
+	padding: 12px;
+	border-radius: 4px;
 }
 
 .message-banner__content_warning {
-	border-left: 0.5rem solid var(--color-warning-banner-side);
+	border: 1px solid var(--color-warning-banner-side);
+	border-radius: 4px;
 	background-color: var(--color-warning-banner-bg);
 	color: var(--color-warning-banner-text);
 }
 
 .message-banner__content_information {
-	border-left: 0.5rem solid var(--color-info-banner-side);
+	border: 1px solid var(--color-info-banner-side);
+	border-radius: 4px;
 	background-color: var(--color-info-banner-bg);
 	color: var(--color-info-banner-text);
 }

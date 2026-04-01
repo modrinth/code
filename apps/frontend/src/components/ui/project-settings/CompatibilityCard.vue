@@ -59,7 +59,7 @@
 
 			<div
 				v-if="content"
-				class="flex justify-between gap-4 rounded-2xl border border-solid border-surface-5 p-4"
+				class="flex justify-between gap-4 rounded-[4px] border border-solid border-surface-5 p-4"
 			>
 				<!-- kind = vanilla -->
 				<div
@@ -95,7 +95,7 @@
 				>
 					<div class="flex w-full flex-col gap-2">
 						<div class="font-medium text-secondary">Required modpack</div>
-						<div class="w-fullitems-center flex gap-3 rounded-2xl bg-surface-1 p-3">
+						<div class="w-fullitems-center flex gap-3 rounded-[4px] bg-surface-1 p-3">
 							<Avatar
 								v-if="!usingCustomMrpack"
 								:src="modpackProject.icon_url"
@@ -130,7 +130,7 @@
 											v-if="modpackOrg?.icon_url"
 											:src="modpackOrg.icon_url"
 											size="24px"
-											class="rounded-2xl"
+											class="rounded-[4px]"
 										/>
 										{{ modpackOrg.name }}
 									</NuxtLink>

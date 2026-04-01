@@ -117,7 +117,7 @@ const billingMonths = computed(() => {
 						}
 					: undefined
 			"
-			class="flex w-full flex-col justify-between gap-4 rounded-2xl bg-bg p-8 text-left"
+			class="flex w-full flex-col justify-between gap-4 rounded-[4px] bg-bg p-8 text-left"
 		>
 			<div class="flex flex-col gap-2">
 				<div class="flex flex-row flex-wrap items-center gap-3">

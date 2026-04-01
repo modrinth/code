@@ -254,7 +254,6 @@
 							v-tooltip="formatDateTime(collection.created)"
 							class="flex w-fit items-center gap-2"
 						>
-							<CalendarIcon aria-hidden="true" />
 							{{
 								formatMessage(messages.createdAtLabel, {
 									ago: formatRelativeTime(collection.created),
@@ -266,7 +265,6 @@
 							v-tooltip="formatDateTime(collection.updated)"
 							class="flex w-fit items-center gap-2"
 						>
-							<UpdatedIcon aria-hidden="true" />
 							{{
 								formatMessage(messages.updatedAtLabel, {
 									ago: formatRelativeTime(collection.updated),
@@ -295,6 +293,7 @@
 			<ProjectCardList
 				v-if="projects && projects?.length > 0"
 				:layout="cosmetics.searchDisplayMode.collection"
+				class="rounded-[4px] border border-solid border-[#b5b5b5] bg-[#b5b5b5] p-3"
 			>
 				<ProjectCard
 					v-for="project in (route.params.projectType !== undefined
@@ -308,6 +307,7 @@
 						.slice()
 						.sort((a, b) => b.downloads - a.downloads)"
 					:key="project.id"
+					class="rounded-[4px] bg-white"
 					:link="`/${project.project_type}/${project.slug ?? project.id}`"
 					:title="project.title"
 					:icon-url="project.icon_url"
@@ -367,7 +367,6 @@
 
 <script setup>
 import {
-	CalendarIcon,
 	ChevronLeftIcon,
 	CompassIcon,
 	EditIcon,
@@ -378,7 +377,6 @@ import {
 	SaveIcon,
 	SpinnerIcon,
 	TrashIcon,
-	UpdatedIcon,
 	UploadIcon,
 	XIcon,
 } from '@modrinth/assets'

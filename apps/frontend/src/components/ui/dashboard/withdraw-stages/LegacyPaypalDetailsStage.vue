@@ -29,7 +29,7 @@
 				}}</span>
 			</label>
 
-			<div class="flex flex-col gap-2 rounded-2xl bg-surface-2 px-4 py-2.5">
+			<div class="flex flex-col gap-2 rounded-[4px] bg-surface-2 px-4 py-2.5">
 				<span>{{ paypalEmail }}</span>
 			</div>
 		</div>
