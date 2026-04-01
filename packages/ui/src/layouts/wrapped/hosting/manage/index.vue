@@ -1,7 +1,7 @@
 <template>
 	<div
 		data-pyro-server-list-root
-		class="experimental-styles-within relative mx-auto mb-6 flex w-full max-w-[1280px] flex-col px-6"
+		class="experimental-styles-within relative mx-auto mb-6 flex w-full flex-col p-6"
 		:class="serverList.length ? 'min-h-screen' : 'min-h-[calc(100vh-4.5rem)]'"
 	>
 		<ServersGuestPlanModal
@@ -117,9 +117,11 @@
 			</div>
 
 			<div v-else key="list">
-				<div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-					<h1 class="w-full text-4xl font-bold text-contrast">Servers</h1>
-					<div class="mb-4 flex w-full flex-row items-center justify-end gap-2 md:mb-0 md:gap-4">
+				<div
+					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
+				>
+					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">Servers</h1>
+					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
 						<StyledInput
 							id="search"
 							v-model="searchInput"
