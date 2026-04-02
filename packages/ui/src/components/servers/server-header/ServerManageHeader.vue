@@ -1,73 +1,75 @@
 <template>
-	<AutoLink :to="props.backHref" :class="props.breadcrumbClass">
-		<LeftArrowIcon />
-		{{ props.backLabel }}
-	</AutoLink>
-	<ContentPageHeader :class="props.headerClass">
-		<template #icon>
-			<ServerIcon :image="headerImage" />
-		</template>
-		<template #title>
-			{{ props.server?.name || 'Server' }}
-		</template>
-		<template #stats>
-			<div
-				v-if="props.server?.flows?.intro"
-				class="flex items-center gap-2 font-semibold text-secondary"
-			>
-				<SettingsIcon />
-				Configuring server...
-			</div>
-			<div v-else class="flex flex-wrap items-center gap-2">
-				<div v-if="props.server?.loader" class="flex items-center gap-2 font-medium capitalize">
-					<LoaderIcon :loader="props.server.loader" class="flex shrink-0 [&&]:size-5" />
-					{{ props.server.loader }} {{ props.server.mc_version }}
-				</div>
-
+	<div class="w-full flex flex-col gap-4">
+		<AutoLink :to="props.backHref" :class="props.breadcrumbClass">
+			<LeftArrowIcon />
+			{{ props.backLabel }}
+		</AutoLink>
+		<ContentPageHeader :class="props.headerClass">
+			<template #icon>
+				<ServerIcon :image="headerImage" class="size-20 !rounded-2xl" />
+			</template>
+			<template #title>
+				{{ props.server?.name || 'Server' }}
+			</template>
+			<template #stats>
 				<div
-					v-if="props.server?.loader && props.server?.net?.domain"
-					class="h-1.5 w-1.5 rounded-full bg-surface-5"
-				/>
-
-				<div
-					v-if="props.server?.net?.domain"
-					v-tooltip="'Copy server address'"
-					class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
-					@click="copyServerAddress"
+					v-if="props.server?.flows?.intro"
+					class="flex items-center gap-2 font-semibold text-secondary"
 				>
-					<LinkIcon class="flex size-5 shrink-0" />
-					{{ props.server.net.domain }}.modrinth.gg
+					<SettingsIcon />
+					Configuring server...
 				</div>
+				<div v-else class="flex flex-wrap items-center gap-2">
+					<div v-if="props.server?.loader" class="flex items-center gap-2 font-medium capitalize">
+						<LoaderIcon :loader="props.server.loader" class="flex shrink-0 [&&]:size-5" />
+						{{ props.server.loader }} {{ props.server.mc_version }}
+					</div>
 
-				<div v-if="showUptime" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
-
-				<div v-if="showUptime" class="flex items-center gap-2 font-medium">
-					<TimerIcon class="flex size-5 shrink-0" />
-					{{ formattedUptime }}
-				</div>
-
-				<div
-					v-if="showProject && (props.server?.loader || props.server?.net?.domain || showUptime)"
-					class="h-1.5 w-1.5 rounded-full bg-surface-5"
-				/>
-
-				<div v-if="showProject" class="flex items-center gap-1.5 font-medium text-primary">
-					Linked to
-					<Avatar
-						:src="props.serverProject?.icon_url ?? undefined"
-						:alt="props.serverProject?.title ?? ''"
-						size="24px"
+					<div
+						v-if="props.server?.loader && props.server?.net?.domain"
+						class="h-1.5 w-1.5 rounded-full bg-surface-5"
 					/>
-					<AutoLink :to="serverProjectLink" class="truncate text-primary hover:underline">
-						{{ props.serverProject?.title }}
-					</AutoLink>
+
+					<div
+						v-if="props.server?.net?.domain"
+						v-tooltip="'Copy server address'"
+						class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
+						@click="copyServerAddress"
+					>
+						<LinkIcon class="flex size-5 shrink-0" />
+						{{ props.server.net.domain }}.modrinth.gg
+					</div>
+
+					<div v-if="showUptime" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
+
+					<div v-if="showUptime" class="flex items-center gap-2 font-medium">
+						<TimerIcon class="flex size-5 shrink-0" />
+						{{ formattedUptime }}
+					</div>
+
+					<div
+						v-if="showProject && (props.server?.loader || props.server?.net?.domain || showUptime)"
+						class="h-1.5 w-1.5 rounded-full bg-surface-5"
+					/>
+
+					<div v-if="showProject" class="flex items-center gap-1.5 font-medium text-primary">
+						Linked to
+						<Avatar
+							:src="props.serverProject?.icon_url ?? undefined"
+							:alt="props.serverProject?.title ?? ''"
+							size="24px"
+						/>
+						<AutoLink :to="serverProjectLink" class="truncate text-primary hover:underline">
+							{{ props.serverProject?.title }}
+						</AutoLink>
+					</div>
 				</div>
-			</div>
-		</template>
-		<template #actions>
-			<slot name="actions" />
-		</template>
-	</ContentPageHeader>
+			</template>
+			<template #actions>
+				<slot name="actions" />
+			</template>
+		</ContentPageHeader>
+	</div>
 </template>
 
 <script setup lang="ts">
