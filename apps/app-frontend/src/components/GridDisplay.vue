@@ -1,5 +1,6 @@
 <script setup>
 import {
+	ChevronDownIcon,
 	ClipboardCopyIcon,
 	EyeIcon,
 	FolderOpenIcon,
@@ -11,6 +12,7 @@ import {
 } from '@modrinth/assets'
 import {
 	DropdownSelect,
+	Collapsible,
 	formatLoader,
 	injectNotificationManager,
 	StyledInput,
@@ -133,12 +135,33 @@ const state = useStorage(
 	{
 		group: 'Group',
 		sortBy: 'Name',
+		collapsedGroups: [],
 	},
 	localStorage,
 	{ mergeDefaults: true },
 )
 
 const search = ref('')
+const collapsedSectionKeys = computed(() => new Set(state.value.collapsedGroups ?? []))
+
+const getSectionKey = (sectionName) => `${state.value.group}:${sectionName}`
+
+const isSectionCollapsed = (sectionName) => {
+	return collapsedSectionKeys.value.has(getSectionKey(sectionName))
+}
+
+const toggleSectionCollapsed = (sectionName) => {
+	const sectionKey = getSectionKey(sectionName)
+	const collapsedSections = new Set(state.value.collapsedGroups ?? [])
+
+	if (collapsedSections.has(sectionKey)) {
+		collapsedSections.delete(sectionKey)
+	} else {
+		collapsedSections.add(sectionKey)
+	}
+
+	state.value.collapsedGroups = [...collapsedSections]
+}
 
 const filteredResults = computed(() => {
 	const { group = 'Group', sortBy = 'Name' } = state.value
@@ -289,18 +312,34 @@ const filteredResults = computed(() => {
 		class="row"
 	>
 		<div v-if="instanceSection.key !== 'None'" class="divider">
-			<p>{{ instanceSection.key }}</p>
+			<button
+				class="divider-toggle"
+				:aria-expanded="!isSectionCollapsed(instanceSection.key)"
+				@click="toggleSectionCollapsed(instanceSection.key)"
+			>
+				<p>{{ instanceSection.key }}</p>
+				<ChevronDownIcon
+					class="chevron"
+					:class="{ collapsed: isSectionCollapsed(instanceSection.key) }"
+					aria-hidden="true"
+				/>
+			</button>
 			<hr aria-hidden="true" />
 		</div>
-		<section class="instances">
-			<Instance
-				v-for="instance in instanceSection.value"
-				ref="instanceComponents"
-				:key="instance.path + instance.install_stage"
-				:instance="instance"
-				@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
-			/>
-		</section>
+		<Collapsible
+			base-class="instances-collapsible"
+			:collapsed="instanceSection.key !== 'None' && isSectionCollapsed(instanceSection.key)"
+		>
+			<section class="instances">
+				<Instance
+					v-for="instance in instanceSection.value"
+					ref="instanceComponents"
+					:key="instance.path + instance.install_stage"
+					:instance="instance"
+					@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+				/>
+			</section>
+		</Collapsible>
 	</div>
 	<ConfirmDeleteInstanceModal ref="confirmModal" @delete="deleteProfile" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
@@ -328,12 +367,36 @@ const filteredResults = computed(() => {
 		width: 100%;
 		gap: 1rem;
 		margin-bottom: 1rem;
+		min-height: 1.5rem;
+
+		.divider-toggle {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			background: transparent;
+			border: none;
+			padding: 0;
+			cursor: pointer;
+			color: var(--color-contrast);
+			font: inherit;
+		}
 
 		p {
 			margin: 0;
 			font-size: 1rem;
 			white-space: nowrap;
 			color: var(--color-contrast);
+		}
+
+		.chevron {
+			width: 1rem;
+			height: 1rem;
+			color: var(--color-secondary);
+			transition: transform 0.15s ease;
+
+			&.collapsed {
+				transform: rotate(-90deg);
+			}
 		}
 
 		hr {
@@ -393,5 +456,10 @@ const filteredResults = computed(() => {
 	margin-right: auto;
 	scroll-behavior: smooth;
 	overflow-y: auto;
+}
+
+.instances-collapsible {
+	align-self: stretch;
+	width: 100%;
 }
 </style>
