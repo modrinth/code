@@ -4,10 +4,12 @@
 		<div class="flex flex-col gap-8 items-start pr-8 shrink-0 w-[380px]">
 			<!-- Heading -->
 			<div class="flex flex-col gap-2 items-start w-[300px]">
-				<p class="text-sm text-secondary">Modrinth Hosting</p>
-				<p class="text-[30px] leading-9 font-semibold text-contrast">No servers yet</p>
+				<p class="text-sm text-secondary">{{ formatMessage(messages.modrinthHostingLabel) }}</p>
+				<p class="text-[30px] leading-9 font-semibold text-contrast">
+					{{ formatMessage(messages.noServersTitle) }}
+				</p>
 				<p class="text-base font-normal text-primary">
-					Install mods, invite friends, and play together all from the Modrinth App.
+					{{ formatMessage(messages.noServersDescription) }}
 				</p>
 			</div>
 
@@ -20,9 +22,11 @@
 						<PackageOpenIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
 					<div class="flex flex-col gap-0.5">
-						<p class="text-base font-semibold text-contrast">One-click mod installs</p>
+						<p class="text-base font-semibold text-contrast">
+							{{ formatMessage(messages.oneClickModInstallsTitle) }}
+						</p>
 						<p class="text-base font-normal text-primary">
-							Pick your favourite mods and we handle the rest.
+							{{ formatMessage(messages.oneClickModInstallsDescription) }}
 						</p>
 					</div>
 				</div>
@@ -34,9 +38,11 @@
 						<GlobeIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
 					<div class="flex flex-col gap-0.5">
-						<p class="text-base font-semibold text-contrast">Simple setup</p>
+						<p class="text-base font-semibold text-contrast">
+							{{ formatMessage(messages.simpleSetupTitle) }}
+						</p>
 						<p class="text-base font-normal text-primary">
-							Set up your server just like a single player world.
+							{{ formatMessage(messages.simpleSetupDescription) }}
 						</p>
 					</div>
 				</div>
@@ -48,9 +54,11 @@
 						<UsersIcon class="size-5 text-secondary" aria-hidden="true" />
 					</div>
 					<div class="flex flex-col gap-0.5">
-						<p class="text-base font-semibold text-contrast">Play with friends</p>
+						<p class="text-base font-semibold text-contrast">
+							{{ formatMessage(messages.playWithFriendsTitle) }}
+						</p>
 						<p class="text-base font-normal text-primary">
-							Invite friends and get them set up right in the Modrinth App.
+							{{ formatMessage(messages.playWithFriendsDescription) }}
 						</p>
 					</div>
 				</div>
@@ -62,7 +70,7 @@
 					<ButtonStyled color="brand">
 						<button @click="onClickNewServer?.()">
 							<PlusIcon aria-hidden="true" />
-							New server
+							{{ formatMessage(messages.newServerButton) }}
 						</button>
 					</ButtonStyled>
 
@@ -71,7 +79,7 @@
 						target="_blank"
 						class="flex items-center gap-1 hover:brightness-125"
 					>
-						Learn more about Modrinth Hosting
+						{{ formatMessage(messages.learnMoreLink) }}
 						<RightArrowIcon class="size-5 shrink-0" aria-hidden="true" />
 					</AutoLink>
 				</div>
@@ -80,11 +88,13 @@
 					<div class="h-px w-full bg-surface-5" />
 
 					<div class="flex gap-3 items-center flex-wrap">
-						<p class="text-base font-normal text-primary">Already have a server?</p>
+						<p class="text-base font-normal text-primary">
+							{{ formatMessage(messages.alreadyHaveServerLabel) }}
+						</p>
 						<ButtonStyled>
 							<button @click="onClickSignIn?.()">
 								<LogInIcon aria-hidden="true" />
-								Sign in
+								{{ formatMessage(messages.signInButton) }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -146,6 +156,7 @@ import { AutoLink } from '@modrinth/ui'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import imgAircraft from './grid-images/aircraft.png'
 import imgAlexs from "./grid-images/alex's.png"
 import imgArtifacts from './grid-images/artifacts.png'
@@ -181,6 +192,62 @@ withDefaults(
 
 const GRID_ROWS = 6
 const GRID_COLS = 5
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	modrinthHostingLabel: {
+		id: 'servers.list-empty.modrinth-hosting-label',
+		defaultMessage: 'Modrinth Hosting',
+	},
+	noServersTitle: {
+		id: 'servers.list-empty.no-servers-title',
+		defaultMessage: 'No servers yet',
+	},
+	noServersDescription: {
+		id: 'servers.list-empty.no-servers-description',
+		defaultMessage: 'Install mods, invite friends, and play together all from the Modrinth App.',
+	},
+	oneClickModInstallsTitle: {
+		id: 'servers.list-empty.one-click-mod-installs-title',
+		defaultMessage: 'One-click mod installs',
+	},
+	oneClickModInstallsDescription: {
+		id: 'servers.list-empty.one-click-mod-installs-description',
+		defaultMessage: 'Pick your favourite mods and we handle the rest.',
+	},
+	simpleSetupTitle: {
+		id: 'servers.list-empty.simple-setup-title',
+		defaultMessage: 'Simple setup',
+	},
+	simpleSetupDescription: {
+		id: 'servers.list-empty.simple-setup-description',
+		defaultMessage: 'Set up your server just like a single player world.',
+	},
+	playWithFriendsTitle: {
+		id: 'servers.list-empty.play-with-friends-title',
+		defaultMessage: 'Play with friends',
+	},
+	playWithFriendsDescription: {
+		id: 'servers.list-empty.play-with-friends-description',
+		defaultMessage: 'Invite friends and get them set up right in the Modrinth App.',
+	},
+	newServerButton: {
+		id: 'servers.list-empty.new-server-button',
+		defaultMessage: 'New server',
+	},
+	learnMoreLink: {
+		id: 'servers.list-empty.learn-more-link',
+		defaultMessage: 'Learn more about Modrinth Hosting',
+	},
+	alreadyHaveServerLabel: {
+		id: 'servers.list-empty.already-have-server-label',
+		defaultMessage: 'Already have a server?',
+	},
+	signInButton: {
+		id: 'servers.list-empty.sign-in-button',
+		defaultMessage: 'Sign in',
+	},
+})
 
 const GRID_IMAGES = [
 	imgYum1,

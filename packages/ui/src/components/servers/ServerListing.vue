@@ -34,7 +34,8 @@
 							v-if="isConfiguring"
 							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
 						>
-							<SparklesIcon class="size-5 shrink-0 font-semibold" /> New
+							<SparklesIcon class="size-5 shrink-0 font-semibold" />
+							{{ formatMessage(messages.newLabel) }}
 						</div>
 					</div>
 
@@ -47,9 +48,9 @@
 							:src="iconUrl"
 							no-shadow
 							style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
-							alt="Server Icon"
+							:alt="formatMessage(messages.serverIconAlt)"
 						/>
-						Using {{ projectData?.title || 'Unknown' }}
+						{{ formatMessage(messages.usingProjectLabel, { projectTitle: projectData?.title }) }}
 					</div>
 
 					<ServerInfoLabels
@@ -81,41 +82,79 @@
 
 		<div v-if="noticeType" class="server-listing-notice">
 			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
-				Please wait while we set up your server. This can take up to 10 minutes.
+				{{ formatMessage(messages.provisioningNotice) }}
 			</div>
 			<div v-else-if="noticeType === 'upgrading'" class="flex gap-2">
-				Your server's hardware is currently being upgraded and will be back online shortly.
+				{{ formatMessage(messages.upgradingNotice) }}
 			</div>
 			<div v-else-if="noticeType === 'cancelled' || noticeType === 'paymentfailed'">
-				Your subscription was cancelled<template v-if="cancellationDate">
-					on
-					<span class="font-medium text-contrast">
-						{{ formatDate(cancellationDate) }}
-					</span></template
-				><template v-if="noticeType === 'paymentfailed'"> due to payment failure</template
-				>.<template v-if="!isFilesExpired">
-					Your files will be kept for
-					<span class="font-medium text-red"
-						>{{ filesRemainingDays }} more {{ filesRemainingDays === 1 ? 'day' : 'days' }}</span
-					>
-					and can be downloaded below before they're deleted.</template
+				<IntlFormatted
+					v-if="noticeType === 'paymentfailed' && cancellationDate"
+					:message-id="messages.subscriptionCancelledPaymentFailedOnDate"
+					:values="{ formattedDate: formatDate(cancellationDate) }"
 				>
+					<template #date="{ children }">
+						<span class="font-medium text-contrast"><component :is="() => children" /></span>
+					</template>
+				</IntlFormatted>
+
+				<span v-else-if="noticeType === 'paymentfailed'">
+					{{ formatMessage(messages.subscriptionCancelledPaymentFailed) }}
+				</span>
+
+				<IntlFormatted
+					v-else-if="cancellationDate"
+					:message-id="messages.subscriptionCancelledOnDate"
+					:values="{ formattedDate: formatDate(cancellationDate) }"
+				>
+					<template #date="{ children }">
+						<span class="font-medium text-contrast"><component :is="() => children" /></span>
+					</template>
+				</IntlFormatted>
+
+				<span v-else>
+					{{ formatMessage(messages.subscriptionCancelled) }}
+				</span>
+
+				{{ ' ' }}
+				<IntlFormatted
+					v-if="!isFilesExpired"
+					:message-id="messages.filesKeptForDownload"
+					:values="{ daysRemaining: filesRemainingDays }"
+				>
+					<template #days-remaining="{ children }">
+						<span class="font-medium text-red">
+							<component :is="() => children" />
+						</span>
+					</template>
+				</IntlFormatted>
 			</div>
+
 			<div v-else-if="noticeType === 'setToCancel'">
-				Your subscription is set to cancel<template v-if="cancellationDate">
-					on
-					<span class="font-medium text-contrast">
-						{{ formatDate(cancellationDate) }}
-					</span></template
-				>.<template v-if="!isFilesExpired">
-					Your files will be preserved for 30 days after cancellation.
+				<IntlFormatted
+					v-if="cancellationDate"
+					:message-id="messages.subscriptionSetToCancelOnDate"
+					:values="{ formattedDate: formatDate(cancellationDate) }"
+				>
+					<template #date="{ children }">
+						<span class="font-medium text-contrast">
+							<component :is="() => children" />
+						</span>
+					</template>
+				</IntlFormatted>
+
+				<span v-else>{{ formatMessage(messages.subscriptionSetToCancel) }}</span>
+
+				<template v-if="!isFilesExpired">
+					{{ ' ' }}
+					{{ formatMessage(messages.filesPreservedAfterCancellation) }}
 				</template>
 			</div>
 			<div v-else-if="noticeType === 'moderated'">
-				Your server has been suspended by moderation action.
+				{{ formatMessage(messages.moderatedNotice) }}
 			</div>
 			<div v-else>
-				Your server has been suspended. Please contact Modrinth Support for more information.
+				{{ formatMessage(messages.suspendedNotice) }}
 			</div>
 
 			<div v-if="noticeButtons" class="flex gap-2">
@@ -125,7 +164,7 @@
 					circular
 				>
 					<button
-						v-tooltip="'Download latest backup'"
+						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
 						class="!border-surface-5"
 						@click="onDownloadBackup"
 					>
@@ -134,36 +173,48 @@
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
 					<button
-						v-tooltip="'Copy code to clipboard'"
+						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
 						class="!border-surface-5"
 						@click="copyToClipboard(server_id)"
 					>
-						<template v-if="copied"> Copied <CheckIcon class="text-green" /> </template>
-						<template v-else> Copy ID <CopyIcon /> </template>
+						<template v-if="copied">
+							{{ formatMessage(messages.copiedLabel) }} <CheckIcon class="text-green" />
+						</template>
+						<template v-else> {{ formatMessage(messages.copyIdLabel) }} <CopyIcon /> </template>
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.support">
 					<a href="https://support.modrinth.com/en/" target="_blank"
-						><MessagesSquareIcon /> Support
+						><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
 					</a>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.manageBilling" color="brand">
 					<AutoLink :to="`/settings/billing#server-${server_id}`">
-						<CardIcon /> Manage billing
+						<CardIcon /> {{ formatMessage(messages.manageBillingLabel) }}
 					</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.resubscribe && onResubscribe" color="brand">
-					<button @click="onResubscribe"><RotateCounterClockwiseIcon /> Resubscribe</button>
+					<button @click="onResubscribe">
+						<RotateCounterClockwiseIcon /> {{ formatMessage(messages.resubscribeLabel) }}
+					</button>
 				</ButtonStyled>
 			</div>
 		</div>
 
 		<div v-if="pendingChange && status !== 'suspended'" class="server-listing-notice">
 			<div>
-				Your server will {{ pendingChange.verb.toLowerCase() }} to the
-				{{ pendingChange.planSize }} Plan on
-				<span class="font-medium text-contrast">{{ formatDate(pendingChange.date) }}</span
-				>.
+				<IntlFormatted
+					:message-id="messages.pendingChangeNotice"
+					:values="{
+						verb: pendingChange.verb.toLowerCase(),
+						planSize: pendingChange.planSize,
+						formattedDate: formatDate(pendingChange.date),
+					}"
+				>
+					<template #date="{ children }">
+						<span class="font-medium text-contrast"><component :is="() => children" /></span>
+					</template>
+				</IntlFormatted>
 			</div>
 			<ServersSpecs
 				class="!font-normal !text-primary"
@@ -196,13 +247,116 @@ import {
 	RotateCounterClockwiseIcon,
 } from '../../../../assets/generated-icons'
 import { useFormatDateTime } from '../../composables'
+import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import Avatar from '../base/Avatar.vue'
+import IntlFormatted from '../base/IntlFormatted.vue'
 import ServersSpecs from '../billing/ServersSpecs.vue'
 import ServerIcon from './icons/ServerIcon.vue'
 import ServerInfoLabels from './labels/ServerInfoLabels.vue'
 
 const formatDate = useFormatDateTime({ dateStyle: 'long' })
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	newLabel: {
+		id: 'servers.listing.new-label',
+		defaultMessage: 'New',
+	},
+	serverIconAlt: {
+		id: 'servers.listing.server-icon-alt',
+		defaultMessage: 'Server icon',
+	},
+	usingProjectLabel: {
+		id: 'servers.listing.using-project-label',
+		defaultMessage: 'Using {projectTitle}',
+	},
+	provisioningNotice: {
+		id: 'servers.listing.notice.provisioning',
+		defaultMessage: 'Please wait while we set up your server. This can take up to 10 minutes.',
+	},
+	upgradingNotice: {
+		id: 'servers.listing.notice.upgrading',
+		defaultMessage:
+			"Your server's hardware is currently being upgraded and will be back online shortly.",
+	},
+	subscriptionCancelled: {
+		id: 'servers.listing.notice.subscription-cancelled',
+		defaultMessage: 'Your subscription was cancelled.',
+	},
+	subscriptionCancelledOnDate: {
+		id: 'servers.listing.notice.subscription-cancelled-on-date',
+		defaultMessage: 'Your subscription was cancelled on <date>{formattedDate}</date>. ',
+	},
+	subscriptionCancelledPaymentFailed: {
+		id: 'servers.listing.notice.subscription-cancelled-payment-failed',
+		defaultMessage: 'Your subscription was cancelled due to payment failure.',
+	},
+	subscriptionCancelledPaymentFailedOnDate: {
+		id: 'servers.listing.notice.subscription-cancelled-payment-failed-on-date',
+		defaultMessage:
+			'Your subscription was cancelled on <date>{formattedDate}</date> due to payment failure. ',
+	},
+	filesKeptForDownload: {
+		id: 'servers.listing.notice.files-kept-for-download',
+		defaultMessage:
+			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining> and can be downloaded below before they are deleted. ',
+	},
+	subscriptionSetToCancel: {
+		id: 'servers.listing.notice.subscription-set-to-cancel',
+		defaultMessage: 'Your subscription is set to cancel.',
+	},
+	subscriptionSetToCancelOnDate: {
+		id: 'servers.listing.notice.subscription-set-to-cancel-on-date',
+		defaultMessage: 'Your subscription is set to cancel on <date>{formattedDate}</date>. ',
+	},
+	filesPreservedAfterCancellation: {
+		id: 'servers.listing.notice.files-preserved-after-cancellation',
+		defaultMessage: 'Your files will be preserved for 30 days after cancellation.',
+	},
+	moderatedNotice: {
+		id: 'servers.listing.notice.moderated',
+		defaultMessage: 'Your server has been suspended by moderation action. ',
+	},
+	suspendedNotice: {
+		id: 'servers.listing.notice.suspended',
+		defaultMessage:
+			'Your server has been suspended. Please contact Modrinth Support for more information.',
+	},
+	downloadLatestBackupTooltip: {
+		id: 'servers.listing.download-latest-backup-tooltip',
+		defaultMessage: 'Download latest backup',
+	},
+	copyCodeToClipboardTooltip: {
+		id: 'servers.listing.copy-code-tooltip',
+		defaultMessage: 'Copy code to clipboard',
+	},
+	copiedLabel: {
+		id: 'servers.listing.copied-label',
+		defaultMessage: 'Copied',
+	},
+	copyIdLabel: {
+		id: 'servers.listing.copy-id-label',
+		defaultMessage: 'Copy ID',
+	},
+	supportLabel: {
+		id: 'servers.listing.support-label',
+		defaultMessage: 'Support',
+	},
+	manageBillingLabel: {
+		id: 'servers.listing.manage-billing-label',
+		defaultMessage: 'Manage billing',
+	},
+	resubscribeLabel: {
+		id: 'servers.listing.resubscribe-label',
+		defaultMessage: 'Resubscribe',
+	},
+	pendingChangeNotice: {
+		id: 'servers.listing.notice.pending-change',
+		defaultMessage:
+			'Your server will {verb} to the {planSize} Plan on <date>{formattedDate}</date>. ',
+	},
+})
 
 export type PendingChange = {
 	planSize: string

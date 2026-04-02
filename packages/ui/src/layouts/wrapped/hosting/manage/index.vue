@@ -43,28 +43,24 @@
 						<div class="grid place-content-center rounded-full bg-bg-blue p-4">
 							<HammerIcon class="size-12 text-blue" />
 						</div>
-						<h1 class="m-0 w-fit text-3xl font-bold">Servers could not be loaded</h1>
+						<h1 class="m-0 w-fit text-3xl font-bold">{{ formatMessage(messages.errorTitle) }}</h1>
 					</div>
-					<p class="text-lg text-secondary">We may have temporary issues with our servers.</p>
+					<p class="text-lg text-secondary">{{ formatMessage(messages.errorDescription) }}</p>
 					<ul class="m-0 list-disc space-y-4 p-0 pl-4 text-left text-sm leading-[170%]">
+						<li>{{ formatMessage(messages.errorAlertNotice) }}</li>
 						<li>
-							Our systems automatically alert our team when there's an issue. We are already working
-							on getting them back online.
+							<IntlFormatted :message-id="messages.errorQueueNotice">
+								<template #warning="{ children }">
+									<span class="font-medium text-contrast"
+										><component :is="() => children"
+									/></span>
+								</template>
+							</IntlFormatted>
 						</li>
-						<li>
-							If you recently purchased your Modrinth Hosting server, it is currently in a queue and
-							will appear here as soon as it's ready. <br />
-							<span class="font-medium text-contrast"
-								>Do not attempt to purchase a new server.</span
-							>
-						</li>
-						<li>
-							If you require personalized support regarding the status of your server, please
-							contact Modrinth Support.
-						</li>
+						<li>{{ formatMessage(messages.errorSupportNotice) }}</li>
 
 						<li v-if="fetchError" class="text-red">
-							<p>Error details:</p>
+							<p>{{ formatMessage(messages.errorDetails) }}</p>
 							<CopyCode
 								:text="(fetchError as ModrinthServersFetchError).message || 'Unknown error'"
 								:copyable="false"
@@ -76,11 +72,11 @@
 				</div>
 				<ButtonStyled size="large" type="standard" color="brand">
 					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com"
-						>Contact Modrinth Support</AutoLink
+						>{{ formatMessage(messages.contactSupportButton) }}</AutoLink
 					>
 				</ButtonStyled>
 				<ButtonStyled size="large" @click="() => router.go(0)">
-					<button class="mt-3 !w-full">Reload</button>
+					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -89,7 +85,7 @@
 			<div v-if="isLoading && !serverResponse" key="loading" class="flex flex-col gap-4 py-8">
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
-					<p class="m-0 mt-2 text-secondary">Loading your servers...</p>
+					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
 				</div>
 				<div
 					v-for="i in 3"
@@ -120,7 +116,7 @@
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
-					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">Servers</h1>
+					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">{{ formatMessage(messages.serversTitle) }}</h1>
 					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
 						<StyledInput
 							id="search"
@@ -129,17 +125,17 @@
 							type="search"
 							name="search"
 							autocomplete="off"
-							:placeholder="`Search ${filteredData.length} servers...`"
+							:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
 							wrapper-class="w-full md:w-72"
 						/>
 						<ButtonStyled type="standard" color="brand">
 							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
 								<PlusIcon />
-								New server
+								{{ formatMessage(messages.newServerButton) }}
 							</AutoLink>
 							<button v-else @click="openPurchaseModal">
 								<PlusIcon />
-								New server
+								{{ formatMessage(messages.newServerButton) }}
 							</button>
 						</ButtonStyled>
 					</div>
@@ -158,7 +154,7 @@
 						class="bg-brand/10 my-4 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-brand"
 					>
 						<LoaderCircleIcon class="size-4 animate-spin" />
-						<span>Checking for new servers...</span>
+						<span>{{ formatMessage(messages.checkingForNewServers) }}</span>
 					</div>
 				</Transition>
 
@@ -187,7 +183,7 @@
 				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
 					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
 				</div>
-				<div v-else>No servers found.</div>
+				<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
 			</div>
 		</Transition>
 	</div>
@@ -200,15 +196,18 @@ import {
 	AutoLink,
 	ButtonStyled,
 	CopyCode,
+	defineMessages,
 	injectAuth,
 	injectModrinthClient,
 	injectNotificationManager,
+	IntlFormatted,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
 	ServersGuestPlanModal,
 	StyledInput,
 	useServerBackupDownload,
+	useVIntl,
 } from '@modrinth/ui'
 import type { ModrinthServersFetchError } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -234,6 +233,89 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+	errorTitle: { id: 'servers.manage.error.title', defaultMessage: 'Servers could not be loaded' },
+	errorDescription: {
+		id: 'servers.manage.error.description',
+		defaultMessage: 'We may have temporary issues with our servers.',
+	},
+	errorAlertNotice: {
+		id: 'servers.manage.error.alert-notice',
+		defaultMessage:
+			"Our systems automatically alert our team when there's an issue. We are already working on getting them back online.",
+	},
+	errorQueueNotice: {
+		id: 'servers.manage.error.queue-notice',
+		defaultMessage:
+			"If you recently purchased your Modrinth Hosting server, it is currently in a queue and will appear here as soon as it's ready. <warning>Do not attempt to purchase a new server.</warning>",
+	},
+	errorSupportNotice: {
+		id: 'servers.manage.error.support-notice',
+		defaultMessage:
+			'If you require personalized support regarding the status of your server, please contact Modrinth Support.',
+	},
+	errorDetails: { id: 'servers.manage.error.details', defaultMessage: 'Error details:' },
+	contactSupportButton: {
+		id: 'servers.manage.contact-support-button',
+		defaultMessage: 'Contact Modrinth Support',
+	},
+	reloadButton: { id: 'servers.manage.reload-button', defaultMessage: 'Reload' },
+	loadingServers: {
+		id: 'servers.manage.loading-servers',
+		defaultMessage: 'Loading your servers...',
+	},
+	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Servers' },
+	searchPlaceholder: {
+		id: 'servers.manage.search-placeholder',
+		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',
+	},
+	newServerButton: { id: 'servers.manage.new-server-button', defaultMessage: 'New server' },
+	checkingForNewServers: {
+		id: 'servers.manage.checking-for-new-servers',
+		defaultMessage: 'Checking for new servers...',
+	},
+	noServersFound: { id: 'servers.manage.no-servers-found', defaultMessage: 'No servers found.' },
+	handleErrorTitle: {
+		id: 'servers.manage.handle-error.title',
+		defaultMessage: 'An error occurred',
+	},
+	purchaseUnavailableTitle: {
+		id: 'servers.manage.purchase-unavailable.title',
+		defaultMessage: 'Purchase unavailable',
+	},
+	purchaseUnavailableText: {
+		id: 'servers.manage.purchase-unavailable.text',
+		defaultMessage:
+			'Payment information is still loading. Opening checkout as soon as it is ready.',
+	},
+	resubscribeSubmittedTitle: {
+		id: 'servers.manage.resubscribe-submitted.title',
+		defaultMessage: 'Resubscription request submitted',
+	},
+	resubscribeSubmittedText: {
+		id: 'servers.manage.resubscribe-submitted.text',
+		defaultMessage:
+			'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
+	},
+	resubscribeSuccessTitle: {
+		id: 'servers.manage.resubscribe-success.title',
+		defaultMessage: 'Success',
+	},
+	resubscribeSuccessText: {
+		id: 'servers.manage.resubscribe-success.text',
+		defaultMessage: 'Server subscription resubscribed successfully',
+	},
+	resubscribeErrorTitle: {
+		id: 'servers.manage.resubscribe-error.title',
+		defaultMessage: 'Error resubscribing',
+	},
+	resubscribeErrorText: {
+		id: 'servers.manage.resubscribe-error.text',
+		defaultMessage: 'An error occurred while resubscribing to your Modrinth server.',
+	},
+})
 
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
@@ -538,7 +620,7 @@ const canOpenPurchaseModal = computed(() => {
 function handleError(err: unknown) {
 	const error = err as Error & { data?: { description?: string } }
 	addNotification({
-		title: 'An error occurred',
+		title: formatMessage(messages.handleErrorTitle),
 		type: 'error',
 		text: error?.message ?? error?.data?.description ?? String(err),
 	})
@@ -559,8 +641,8 @@ const hostingPurchaseIntent = createHostingPurchaseIntentContext({
 	checkoutModal: purchaseModal,
 	onCheckoutPending: () => {
 		addNotification({
-			title: 'Purchase unavailable',
-			text: 'Payment information is still loading. Opening checkout as soon as it is ready.',
+			title: formatMessage(messages.purchaseUnavailableTitle),
+			text: formatMessage(messages.purchaseUnavailableText),
 			type: 'info',
 		})
 	},
@@ -633,7 +715,6 @@ type ResubscribeRequest = {
 	subscriptionId: string
 	wasSuspended: boolean
 }
-
 
 function getProductFromPriceId(priceId: string | null | undefined) {
 	if (!priceId) return null
@@ -740,21 +821,21 @@ async function handleResubscribeConfirm({ subscriptionId, wasSuspended }: Resubs
 		])
 		if (wasSuspended) {
 			addNotification({
-				title: 'Resubscription request submitted',
-				text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
+				title: formatMessage(messages.resubscribeSubmittedTitle),
+				text: formatMessage(messages.resubscribeSubmittedText),
 				type: 'success',
 			})
 		} else {
 			addNotification({
-				title: 'Success',
-				text: 'Server subscription resubscribed successfully',
+				title: formatMessage(messages.resubscribeSuccessTitle),
+				text: formatMessage(messages.resubscribeSuccessText),
 				type: 'success',
 			})
 		}
 	} catch {
 		addNotification({
-			title: 'Error resubscribing',
-			text: 'An error occurred while resubscribing to your Modrinth server.',
+			title: formatMessage(messages.resubscribeErrorTitle),
+			text: formatMessage(messages.resubscribeErrorText),
 			type: 'error',
 		})
 	}
