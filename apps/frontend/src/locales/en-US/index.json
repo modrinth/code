@@ -3282,7 +3282,7 @@
     "message": "Error resubscribing"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made."
+    "message": "If the server is currently cancelled, it may take 10-15 minutes to set up the server."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Resubscription request submitted"
