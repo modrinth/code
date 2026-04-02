@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NuxtLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
+		<RouterLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-all duration-150"
 				:class="{
@@ -78,7 +78,7 @@
 					/>
 				</div>
 			</div>
-		</NuxtLink>
+		</RouterLink>
 
 		<div v-if="noticeType" class="server-listing-notice">
 			<div v-if="noticeType === 'provisioning'" class="flex gap-2">

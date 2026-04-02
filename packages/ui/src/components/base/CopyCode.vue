@@ -1,6 +1,6 @@
 <template>
 	<button
-		class="!m-0 inline-flex w-fit select-text items-center gap-2 rounded-[10px] bg-[var(--color-button-bg)] px-2 py-1 font-mono text-sm text-primary transition-[opacity,filter,transform,outline] duration-200 ease-in-out hover:brightness-[0.85] active:scale-95 active:brightness-[0.8] motion-reduce:transition-none [&>svg]:h-[1em] [&>svg]:w-[1em]"
+		class="!m-0 inline-flex w-fit select-text items-center gap-2 rounded-[10px] bg-[var(--color-button-bg)] px-2 py-1 font-mono text-sm text-primary transition-[opacity,filter,transform,outline] duration-200 ease-in-out hover:brightness-[1.25] active:scale-95 active:brightness-[0.8] motion-reduce:transition-none [&>svg]:h-[1em] [&>svg]:w-[1em]"
 		:title="formatMessage(copiedMessage)"
 		@click="copyText"
 	>

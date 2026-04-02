@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import * as Pages from '@/pages'
+import * as Hosting from '@/pages/hosting/manage'
 import * as Instance from '@/pages/instance'
 import * as Library from '@/pages/library'
 import * as Project from '@/pages/project'
@@ -34,6 +35,36 @@ export default new createRouter({
 			meta: {
 				breadcrumb: [{ name: 'Servers' }],
 			},
+		},
+		{
+			path: '/hosting/manage/:id',
+			name: 'ServerManage',
+			component: Hosting.Index,
+			children: [
+				{
+					path: '',
+					redirect: (to) => {
+						const rawId = Array.isArray(to.params.id) ? to.params.id[0] : to.params.id
+						if (!rawId) return '/hosting/manage'
+						return `/hosting/manage/${encodeURIComponent(rawId)}/content`
+					},
+				},
+				{
+					path: 'content',
+					name: 'ServerManageContent',
+					component: Hosting.Content,
+				},
+				{
+					path: 'files',
+					name: 'ServerManageFiles',
+					component: Hosting.Files,
+				},
+				{
+					path: 'backups',
+					name: 'ServerManageBackups',
+					component: Hosting.Backups,
+				},
+			],
 		},
 		{
 			path: '/browse/:projectType',
