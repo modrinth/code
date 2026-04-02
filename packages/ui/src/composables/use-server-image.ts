@@ -1,6 +1,9 @@
 import type { Archon } from '@modrinth/api-client'
-import { injectModrinthClient } from '@modrinth/ui'
 import { type ComputedRef, ref, watch } from 'vue'
+
+import { injectModrinthClient } from '#ui/providers'
+
+const imageCache = new Map<string, string>()
 
 // TODO: Remove and use V1 when available
 export function useServerImage(
@@ -10,23 +13,23 @@ export function useServerImage(
 	const client = injectModrinthClient()
 	const image = ref<string | undefined>()
 
-	const sharedImage = useState<string | undefined>(`server-icon-${serverId}`)
-	if (sharedImage.value) {
-		image.value = sharedImage.value
+	const cached = imageCache.get(serverId)
+	if (cached) {
+		image.value = cached
 	}
 
 	async function loadImage() {
-		if (sharedImage.value) {
-			image.value = sharedImage.value
+		if (typeof window === 'undefined') return
+
+		if (imageCache.has(serverId)) {
+			image.value = imageCache.get(serverId)
 			return
 		}
 
-		if (import.meta.server) return
-
-		const cached = localStorage.getItem(`server-icon-${serverId}`)
-		if (cached) {
-			sharedImage.value = cached
-			image.value = cached
+		const localCached = localStorage.getItem(`server-icon-${serverId}`)
+		if (localCached) {
+			imageCache.set(serverId, localCached)
+			image.value = localCached
 			return
 		}
 
@@ -34,9 +37,7 @@ export function useServerImage(
 		const upstreamVal = upstream.value
 		if (upstreamVal?.project_id) {
 			try {
-				const project = await $fetch<{ icon_url?: string }>(
-					`https://api.modrinth.com/v2/project/${upstreamVal.project_id}`,
-				)
+				const project = await client.labrinth.projects_v2.get(upstreamVal.project_id)
 				projectIconUrl = project.icon_url
 			} catch {
 				// project fetch failed, continue without icon url
@@ -48,18 +49,19 @@ export function useServerImage(
 
 			if (fileData instanceof Blob) {
 				const dataURL = await resizeImage(fileData, 512)
-				sharedImage.value = dataURL
+				imageCache.set(serverId, dataURL)
 				localStorage.setItem(`server-icon-${serverId}`, dataURL)
 				image.value = dataURL
 				return
 			}
-		} catch (error: any) {
-			if (error?.statusCode >= 500) {
+		} catch (error: unknown) {
+			const statusCode = (error as { statusCode?: number })?.statusCode
+			if (statusCode != null && statusCode >= 500) {
 				image.value = undefined
 				return
 			}
 
-			if (error?.statusCode === 404 && projectIconUrl) {
+			if (statusCode === 404 && projectIconUrl) {
 				try {
 					const response = await fetch(projectIconUrl)
 					if (!response.ok) throw new Error('Failed to fetch icon')
@@ -90,7 +92,7 @@ export function useServerImage(
 								}
 							}, 'image/png')
 							const result = canvas.toDataURL('image/png')
-							sharedImage.value = result
+							imageCache.set(serverId, result)
 							localStorage.setItem(`server-icon-${serverId}`, result)
 							resolve(result)
 							URL.revokeObjectURL(img.src)
@@ -99,8 +101,8 @@ export function useServerImage(
 					})
 					image.value = dataURL
 					return
-				} catch (externalError: any) {
-					console.debug('Could not process external icon:', externalError.message)
+				} catch (externalError: unknown) {
+					console.debug('Could not process external icon:', (externalError as Error).message)
 				}
 			}
 		}

@@ -718,7 +718,7 @@ import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useIntervalFn } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 import ServersUpgradeModalWrapper from '~/components/ui/servers/ServersUpgradeModalWrapper.vue'
 import { products } from '~/generated/state.json'
 

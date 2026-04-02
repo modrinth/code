@@ -43,11 +43,8 @@ export default new createRouter({
 			children: [
 				{
 					path: '',
-					redirect: (to) => {
-						const rawId = Array.isArray(to.params.id) ? to.params.id[0] : to.params.id
-						if (!rawId) return '/hosting/manage'
-						return `/hosting/manage/${encodeURIComponent(rawId)}/content`
-					},
+					name: 'ServerManageOverview',
+					component: Hosting.Overview,
 				},
 				{
 					path: 'content',

@@ -39,19 +39,11 @@
 				>
 					<SpinnerIcon v-if="installing" class="animate-spin" />
 					<template v-else-if="!installed">
-						<DownloadIcon v-if="modpack || instance" />
+						<DownloadIcon v-if="shouldUseInstallIcon" />
 						<PlusIcon v-else />
 					</template>
 					<CheckIcon v-else />
-					{{
-						installing
-							? 'Installing'
-							: installed
-								? 'Installed'
-								: modpack || instance
-									? 'Install'
-									: 'Add to an instance'
-					}}
+					{{ installActionLabel }}
 				</button>
 			</ButtonStyled>
 		</template>
@@ -109,14 +101,44 @@ const props = defineProps({
 		type: String,
 		default: null,
 	},
+	customInstall: {
+		type: Function,
+		default: null,
+	},
 })
 
 const emit = defineEmits(['open', 'install'])
 
 const installing = ref(false)
+const installActionLabel = computed(() =>
+	installing.value
+		? 'Installing'
+		: props.installed
+			? 'Installed'
+			: props.customInstall || modpack.value || props.instance
+				? 'Install'
+				: 'Add to an instance',
+)
+const shouldUseInstallIcon = computed(
+	() => !!props.customInstall || !!modpack.value || !!props.instance,
+)
 
 async function install() {
 	installing.value = true
+	if (props.customInstall) {
+		try {
+			const didInstall = await props.customInstall(props.project)
+			if (didInstall !== false) {
+				emit('install', props.project.project_id ?? props.project.id)
+			}
+		} catch (err) {
+			handleError(err)
+		} finally {
+			installing.value = false
+		}
+		return
+	}
+
 	await installVersion(
 		props.project.project_id ?? props.project.id,
 		null,

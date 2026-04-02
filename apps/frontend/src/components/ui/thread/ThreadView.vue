@@ -90,7 +90,7 @@ import dayjs from 'dayjs'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isStaff } from '~/helpers/users.js'
 
-import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
+import { ChevronDownIcon } from '@modrinth/assets'
 import ThreadMessage from './ThreadMessage.vue'
 
 const { addNotification } = injectNotificationManager()

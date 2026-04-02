@@ -11,6 +11,7 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -95,6 +96,7 @@ const leaveMessages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
+const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -409,6 +411,16 @@ const currentGameVersion = computed(() => contentQuery.data.value?.game_version 
 const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
 
 function handleBrowseContent() {
+	const contentType = type.value
+	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
+		browseServerContent({
+			serverId,
+			worldId: worldId.value,
+			type: contentType as 'mod' | 'plugin' | 'datapack',
+		})
+		return
+	}
+
 	router.push({
 		path: `/discover/${type.value}s`,
 		query: { sid: serverId, wid: worldId.value },
@@ -894,7 +906,7 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	openSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	mapToTableItem: (item) => {

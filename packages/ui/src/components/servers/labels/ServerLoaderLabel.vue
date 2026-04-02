@@ -6,9 +6,9 @@
 			<div v-else class="size-5 shrink-0 animate-pulse rounded-full bg-button-border"></div>
 			<AutoLink
 				v-if="isLink"
-				:to="serverId ? `/hosting/manage/${serverId}/options/loader` : ''"
+				:to="settingsLinkTarget"
 				class="flex min-w-0 items-center text-sm font-semibold"
-				:class="serverId ? 'hover:underline' : ''"
+				:class="settingsLinkTarget ? 'hover:underline' : ''"
 			>
 				<span v-if="loader">
 					{{ loader }}
@@ -34,7 +34,9 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+import { injectServerSettingsModal } from '#ui/providers/server-settings-modal'
 
 import AutoLink from '../../base/AutoLink.vue'
 import LoaderIcon from '../icons/LoaderIcon.vue'
@@ -47,6 +49,11 @@ defineProps<{
 	isLink?: boolean
 }>()
 
-const route = useRoute()
-const serverId = route.params.id as string
+const settingsModal = injectServerSettingsModal(null)
+const settingsLinkTarget = computed(() => {
+	if (settingsModal) {
+		return () => settingsModal.openServerSettings({ tabId: 'installation' })
+	}
+	return ''
+})
 </script>

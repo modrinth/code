@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Failed to load server settings"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -2692,6 +2695,18 @@
   },
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
+  },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Backup creation in progress"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Backup restore in progress"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Server is installing"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Content sync in progress"
   },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"

@@ -1,40 +1,36 @@
 <script setup lang="ts">
-import {
-	type Archon,
-	clearNodeAuthState,
-	type Labrinth,
-	setNodeAuthState,
-} from '@modrinth/api-client'
+import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
+import { useQueryClient } from '@tanstack/vue-query'
+import { computed, nextTick, onUnmounted, reactive, ref } from 'vue'
+
+import type { TabbedModalTab } from '#ui/components'
+import { TabbedModal } from '#ui/components'
+import { defineMessage, defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	type BusyReason,
-	commonMessages,
-	defineMessage,
-	defineMessages,
-	injectModrinthClient,
-	injectNotificationManager,
-	provideModrinthServerContext,
-	provideServerSettings,
 	ServerSettingsAdvancedPage,
 	ServerSettingsGeneralPage,
 	ServerSettingsInstallationPage,
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
 	serverSettingsTabDefinitions,
-	TabbedModal,
-	type TabbedModalTab,
-	useVIntl,
-} from '@modrinth/ui'
-import { useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onUnmounted, reactive, ref } from 'vue'
-
-import { get_user } from '@/helpers/cache'
-import { get as getCreds } from '@/helpers/mr_auth'
+	type ServerSettingsTabId,
+} from '#ui/layouts/shared/server-settings'
+import { provideServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
+import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
+import { type BusyReason, provideModrinthServerContext } from '#ui/providers/server-context'
+import { commonMessages } from '#ui/utils/common-messages'
 
 type ShowOptions = {
 	serverId: string
 	tabIndex?: number
+	tabId?: ServerSettingsTabId
 }
+
+const props = defineProps<{
+	resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
+	browseModpacks?: (args: { serverId: string; worldId: string | null; from: 'reset-server' }) => void | Promise<void>
+}>()
 
 const { formatMessage } = useVIntl()
 const queryClient = useQueryClient()
@@ -59,8 +55,8 @@ const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
 
-function browseModpacks() {
-	// Stub for app browse-modpacks flow. Intentionally no-op for now.
+function browseModpacks(args: { serverId: string; worldId: string | null; from: 'reset-server' }) {
+	props.browseModpacks?.(args)
 }
 
 const isConnected = ref(true)
@@ -139,6 +135,26 @@ provideModrinthServerContext({
 	fsOps,
 	fsQueuedOps,
 	refreshFsAuth,
+	stats: ref({
+		current: {
+			cpu_percent: 0,
+			ram_usage_bytes: 0,
+			ram_total_bytes: 1,
+			storage_usage_bytes: 0,
+			storage_total_bytes: 0,
+		},
+		past: {
+			cpu_percent: 0,
+			ram_usage_bytes: 0,
+			ram_total_bytes: 1,
+			storage_usage_bytes: 0,
+			storage_total_bytes: 0,
+		},
+		graph: { cpu: [], ram: [] },
+	}),
+	isWsAuthIncorrect: ref(false),
+	powerStateDetails: ref(undefined),
+	uptimeSeconds: ref(0),
 })
 
 const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
@@ -164,7 +180,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			return {
 				name,
 				icon: tab.icon,
-				href: `https://modrinth.com${tab.href(ctx)}`,
+				href: tab.href ? `https://modrinth.com${tab.href(ctx)}` : undefined,
 				shown,
 			}
 		}
@@ -178,49 +194,98 @@ const tabs = computed<TabbedModalTab[]>(() =>
 	}),
 )
 
-async function resolveViewer() {
+async function fetchViewer() {
 	currentUserId.value = null
 	currentUserRole.value = null
 
-	const credentials = await getCreds().catch(() => null)
-	if (!credentials?.user_id) {
-		return
-	}
-
-	currentUserId.value = credentials.user_id
-
-	const user = await get_user(credentials.user_id, 'bypass').catch(() => null)
-	const typedUser = user as Labrinth.Users.v2.User | null
-	currentUserRole.value = typedUser?.role ?? null
+	const result = await props.resolveViewer()
+	currentUserId.value = result.userId
+	currentUserRole.value = result.userRole
 }
 
-async function show({ serverId, tabIndex }: ShowOptions) {
+async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 	try {
-		const [serverData, serverFull] = await Promise.all([
-			queryClient.fetchQuery({
-				queryKey: ['servers', 'detail', serverId],
-				queryFn: () => client.archon.servers_v0.get(serverId),
-			}),
-			queryClient.fetchQuery({
-				queryKey: ['servers', 'v1', 'detail', serverId],
-				queryFn: () => client.archon.servers_v1.get(serverId),
-			}),
-			resolveViewer(),
+		currentServerId.value = serverId
+
+		const cachedServer = queryClient.getQueryData<Archon.Servers.v0.Server>([
+			'servers',
+			'detail',
+			serverId,
+		])
+		const cachedFull = queryClient.getQueryData<Archon.Servers.v1.Server>([
+			'servers',
+			'v1',
+			'detail',
+			serverId,
 		])
 
-		currentServerId.value = serverId
-		server.value = serverData
-		const activeWorld = serverFull.worlds.find((world) => world.is_active)
-		worldId.value = activeWorld?.id ?? serverFull.worlds[0]?.id ?? null
-
-		setNodeAuthState(() => fsAuth.value, refreshFsAuth)
-		await refreshFsAuth().catch(() => {})
+		if (cachedServer) server.value = cachedServer
+		if (cachedFull) {
+			const activeWorld = cachedFull.worlds.find((world) => world.is_active)
+			worldId.value = activeWorld?.id ?? cachedFull.worlds[0]?.id ?? null
+		}
 
 		modal.value?.show()
-		const visibleTabsCount = tabs.value.filter((tab) => tab.shown !== false).length
-		const requestedTab = tabIndex ?? 0
-		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabsCount - 1, 0))
+		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
+		let requestedTab = tabIndex ?? 0
+		if (tabId) {
+			const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
+			if (defIndex >= 0) {
+				const visibleIndex = visibleTabs.findIndex(
+					(_, i) => tabs.value.indexOf(visibleTabs[i]) === defIndex,
+				)
+				if (visibleIndex >= 0) requestedTab = visibleIndex
+			}
+		}
+		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
 		nextTick(() => modal.value?.setTab(clampedTab))
+
+		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
+
+		if (!cachedServer || !cachedFull) {
+			fetchPromises.push(
+				queryClient
+					.fetchQuery({
+						queryKey: ['servers', 'detail', serverId],
+						queryFn: () => client.archon.servers_v0.get(serverId),
+					})
+					.then((data) => {
+						server.value = data
+					}),
+				queryClient
+					.fetchQuery({
+						queryKey: ['servers', 'v1', 'detail', serverId],
+						queryFn: () => client.archon.servers_v1.get(serverId),
+					})
+					.then((data) => {
+						const activeWorld = data.worlds.find((world) => world.is_active)
+						worldId.value = activeWorld?.id ?? data.worlds[0]?.id ?? null
+					}),
+			)
+		}
+
+		await Promise.all(fetchPromises)
+
+		setNodeAuthState(() => fsAuth.value, refreshFsAuth)
+		refreshFsAuth().catch(() => {})
+
+		if (worldId.value) {
+			queryClient.prefetchQuery({
+				queryKey: ['servers', 'properties', 'v1', serverId, worldId.value],
+				queryFn: () => client.archon.properties_v1.getProperties(serverId, worldId.value!),
+			})
+			queryClient.prefetchQuery({
+				queryKey: ['content', 'list', 'v1', serverId],
+				queryFn: () =>
+					client.archon.content_v1.getAddons(serverId, worldId.value!, {
+						from_modpack: false,
+					}),
+			})
+			queryClient.prefetchQuery({
+				queryKey: ['servers', 'startup', 'v1', serverId, worldId.value],
+				queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
+			})
+		}
 	} catch (error) {
 		console.error(error)
 		addNotification({

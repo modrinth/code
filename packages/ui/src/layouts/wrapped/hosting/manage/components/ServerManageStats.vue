@@ -2,19 +2,19 @@
 	<div
 		data-pyro-server-stats
 		style="font-variant-numeric: tabular-nums"
-		class="flex select-none flex-col items-center gap-6 md:flex-row"
+		class="flex select-none flex-col items-center gap-4 md:flex-row"
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>
 		<component
-			:is="metric.link ? NuxtLink : 'div'"
+			:is="metric.link ? RouterLink : 'div'"
 			v-for="(metric, index) in metrics"
 			:key="index"
 			:to="metric.link && !loading ? metric.link : undefined"
 			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
 			:class="
 				metric.link && !loading
-					? 'cursor-pointer transition-transform duration-100 hover:scale-105 active:scale-100'
+					? 'cursor-pointer transition-transform duration-100 hover:brightness-125 active:scale-95'
 					: ''
 			"
 		>
@@ -45,17 +45,16 @@
 			</div>
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
-				<ClientOnly>
-					<VueApexCharts
-						v-if="!loading"
-						type="area"
-						height="142"
-						:options="getChartOptions(metric.warning, index)"
-						:series="[{ name: metric.title, data: metric.data }]"
-						class="chart"
-						:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
-					/>
-				</ClientOnly>
+				<component
+					:is="apexChartComponent"
+					v-if="!loading && apexChartComponent"
+					type="area"
+					height="142"
+					:options="getChartOptions(metric.warning, index)"
+					:series="[{ name: metric.title, data: metric.data }]"
+					class="chart"
+					:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
+				/>
 			</div>
 		</component>
 	</div>
@@ -65,33 +64,48 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { computed, ref, shallowRef } from 'vue'
+import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { RouterLink } from 'vue-router'
 
-import { NuxtLink } from '#components'
+import { injectModrinthServerContext } from '#ui/providers'
 
-const flags = useFeatureFlags()
-const route = useNativeRoute()
-const serverId = route.params.id
-const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
+const { serverId } = injectModrinthServerContext()
 
+const props = withDefaults(
+	defineProps<{
+		data?: Stats
+		loading?: boolean
+		showMemoryAsBytes?: boolean
+	}>(),
+	{
+		data: undefined,
+		loading: false,
+		showMemoryAsBytes: false,
+	},
+)
+
+const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
-
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+const storageKey = computed(() => `pyro-server-${serverId || 'unknown'}-preferences`)
+const userPreferences = useStorage(storageKey, {
 	ramAsNumber: false,
-})
-
-const props = withDefaults(defineProps<{ data?: Stats; loading?: boolean }>(), {
-	loading: false,
 })
 
 const stats = shallowRef(
 	props.data?.current || {
 		cpu_percent: 0,
 		ram_usage_bytes: 0,
-		ram_total_bytes: 1, // Avoid division by zero
+		ram_total_bytes: 1,
 		storage_usage_bytes: 0,
 	},
 )
+
+const cpuData = ref<number[]>(Array(20).fill(0))
+const ramData = ref<number[]>(Array(20).fill(0))
+
+onMounted(async () => {
+	apexChartComponent.value = (await import('vue3-apexcharts')).default
+})
 
 const onChartReady = (index: number) => {
 	chartsReady.value.add(index)
@@ -108,9 +122,6 @@ const formatBytes = (bytes: number) => {
 	return `${Math.round(value * 10) / 10} ${units[unit]}`
 }
 
-const cpuData = ref<number[]>(Array(20).fill(0))
-const ramData = ref<number[]>(Array(20).fill(0))
-
 const updateGraphData = (arr: number[], newValue: number) => {
 	arr.push(newValue)
 	arr.shift()
@@ -124,7 +135,7 @@ const metrics = computed(() => {
 		data: [] as number[],
 		showGraph: false,
 		warning: null,
-		link: `/hosting/manage/${serverId}/files`,
+		link: `/hosting/manage/${encodeURIComponent(serverId)}/files`,
 	}
 
 	if (props.loading) {
@@ -173,7 +184,7 @@ const metrics = computed(() => {
 		{
 			title: 'Memory',
 			value:
-				userPreferences.value.ramAsNumber || flags.value.developerMode
+				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
 					? formatBytes(stats.value.ram_usage_bytes)
 					: `${ramPercent.toFixed(2)}%`,
 			icon: DatabaseIcon,

@@ -95,6 +95,19 @@ const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 
+const props = withDefaults(
+	defineProps<{
+		browseModpacks?: (args: {
+			serverId: string
+			worldId: string | null
+			from: 'onboarding'
+		}) => void | Promise<void>
+	}>(),
+	{
+		browseModpacks: undefined,
+	},
+)
+
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 
 const uploading = ref(false)
@@ -109,6 +122,15 @@ const openModal = () => modalRef.value?.show()
 onBeforeUnmount(() => modalRef.value?.hide())
 
 function onBrowseModpacks() {
+	if (props.browseModpacks) {
+		props.browseModpacks({
+			serverId,
+			worldId: worldId.value,
+			from: 'onboarding',
+		})
+		return
+	}
+
 	router.push({
 		path: '/discover/modpacks',
 		query: { sid: serverId, from: 'onboarding', wid: worldId.value },
