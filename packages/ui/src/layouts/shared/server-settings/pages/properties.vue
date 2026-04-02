@@ -1,5 +1,5 @@
 <template>
-	<div class="relative h-full w-full select-none">
+	<div class="relative h-screen w-full select-none max-h-[min(70vh,750px)]">
 		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4">
 			<Admonition
 				v-if="hasNoProperties"
