@@ -1,12 +1,17 @@
 <template>
-	<Admonition type="info" show-actions-underneath>
+	<Admonition :type="contentError ? 'critical' : 'info'" :show-actions-underneath="!contentError">
 		<template #icon>
-			<slot name="icon">
+			<slot v-if="!contentError" name="icon">
 				<SpinnerIcon class="h-6 w-6 flex-none animate-spin text-brand-blue" />
 			</slot>
 		</template>
-		<template #header>We're preparing your server!</template>
-		<template v-if="progress">{{ phaseLabel }}</template>
+		<template #header>
+			{{ contentError ? 'Installation error' : "We're preparing your server!" }}
+		</template>
+		<template v-if="contentError">
+			{{ errorLabel }}
+		</template>
+		<template v-else-if="progress">{{ phaseLabel }}</template>
 		<div v-else class="ticker-container">
 			<div class="ticker-content">
 				<div
@@ -19,7 +24,15 @@
 				</div>
 			</div>
 		</div>
-		<template #actions>
+		<template v-if="contentError" #top-right-actions>
+			<ButtonStyled color="red" type="outlined">
+				<button class="!border" @click="emit('retry')">
+					<RotateCounterClockwiseIcon class="size-5" />
+					Retry
+				</button>
+			</ButtonStyled>
+		</template>
+		<template v-if="!contentError" #actions>
 			<ProgressBar
 				v-if="progress"
 				:progress="progress.percent"
@@ -33,10 +46,12 @@
 </template>
 
 <script setup lang="ts">
+import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import SpinnerIcon from '@modrinth/assets/icons/spinner.svg'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 import Admonition from '../base/Admonition.vue'
+import ButtonStyled from '../base/ButtonStyled.vue'
 import ProgressBar from '../base/ProgressBar.vue'
 
 export interface SyncProgress {
@@ -44,9 +59,47 @@ export interface SyncProgress {
 	percent: number
 }
 
+export interface ContentError {
+	step: string
+	description: string
+}
+
 const props = defineProps<{
 	progress?: SyncProgress | null
+	contentError?: ContentError | null
 }>()
+
+const emit = defineEmits<{
+	retry: []
+}>()
+
+const errorLabel = computed(() => {
+	const desc = props.contentError?.description?.toLowerCase()
+	const step = props.contentError?.step
+
+	if (step === 'modloader') {
+		if (desc === 'the specified version may be incorrect') {
+			return 'The specified loader or Minecraft version could not be installed. It may be invalid or unsupported.'
+		}
+		if (desc === 'this version is not yet supported') {
+			return 'This version of Minecraft or loader is not yet supported by Modrinth Hosting.'
+		}
+		if (desc === 'internal error') {
+			return 'An internal error occurred while installing the platform. Please try again.'
+		}
+	}
+
+	if (step === 'modpack') {
+		if (desc?.includes('no primary file')) {
+			return 'The modpack version has no downloadable file. It may have been packaged incorrectly.'
+		}
+		if (desc?.includes('failed to install')) {
+			return 'Failed to install the modpack. It may be corrupted or incompatible.'
+		}
+	}
+
+	return props.contentError?.description ?? 'An unexpected error occurred during installation.'
+})
 
 const phaseLabel = computed(() => {
 	switch (props.progress?.phase) {

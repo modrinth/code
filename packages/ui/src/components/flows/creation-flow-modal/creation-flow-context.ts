@@ -307,8 +307,19 @@ export function createCreationFlowContext(
 		isImportMode.value = false
 		setupType.value = type
 		if (type === 'modpack') {
+			selectedLoader.value = null
+			selectedLoaderVersion.value = null
+			loaderVersionType.value = 'stable'
 			modal.value?.setStage('modpack')
 		} else {
+			modpackSelection.value = null
+			modpackFile.value = null
+			modpackFilePath.value = null
+			if (type === 'vanilla') {
+				selectedLoader.value = null
+				selectedLoaderVersion.value = null
+				loaderVersionType.value = 'stable'
+			}
 			// both custom and vanilla go to custom-setup
 			// vanilla just hides loader chips via hideLoaderChips computed
 			modal.value?.setStage('custom-setup')
