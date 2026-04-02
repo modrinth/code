@@ -1023,7 +1023,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LibraryIcon />
 			</NavButton>
 			<NavButton
-				v-if="themeStore.featureFlags.servers_in_app"
 				v-tooltip.right="'Servers'"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
