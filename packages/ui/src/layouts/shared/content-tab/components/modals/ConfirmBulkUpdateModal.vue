@@ -13,6 +13,7 @@
 			<InlineBackupCreator
 				ref="backupCreator"
 				:backup-name="backupTip ? `Before bulk update (${backupTip})` : 'Before bulk update'"
+				:shift-click-hint-override="formatMessage(messages.shiftClickHint)"
 				@update:buttons-disabled="buttonsDisabled = $event"
 			/>
 		</div>
@@ -67,6 +68,11 @@ const messages = defineMessages({
 	updateButton: {
 		id: 'content.confirm-bulk-update.update-button',
 		defaultMessage: 'Update {count, plural, one {# project} other {# projects}}',
+	},
+	shiftClickHint: {
+		id: 'content.confirm-bulk-update.shift-click-hint',
+		defaultMessage:
+			'Hold Shift while clicking "Update all" to skip this confirmation in the future.',
 	},
 })
 
