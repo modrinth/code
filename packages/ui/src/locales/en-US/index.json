@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Failed to load server settings"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },

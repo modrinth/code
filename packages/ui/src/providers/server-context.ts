@@ -1,4 +1,5 @@
 import type { Archon } from '@modrinth/api-client'
+import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Reactive, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
@@ -34,8 +35,12 @@ export interface ModrinthServerContext {
 
 	// Websocket state
 	readonly isConnected: Ref<boolean>
+	readonly isWsAuthIncorrect: Ref<boolean>
 	readonly powerState: Ref<Archon.Websocket.v0.PowerState>
+	readonly powerStateDetails: Ref<{ oom_killed?: boolean; exit_code?: number } | undefined>
 	readonly isServerRunning: ComputedRef<boolean>
+	readonly stats: Ref<Stats>
+	readonly uptimeSeconds: Ref<number>
 	readonly backupsState: Reactive<BackupsState>
 	markBackupCancelled: (backupId: string) => void
 

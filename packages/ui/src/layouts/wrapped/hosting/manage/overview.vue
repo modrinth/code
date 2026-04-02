@@ -4,7 +4,7 @@
 			Your server is still accessible during this time.
 		</Admonition>
 		<Admonition
-			v-if="inspectingError && props.isConnected && !props.isWsAuthIncorrect"
+			v-if="inspectingError && isConnected && !isWsAuthIncorrect"
 			data-pyro-servers-inspecting-error
 			type="critical"
 			:header="`${serverData?.name} shut down unexpectedly.`"
@@ -34,14 +34,14 @@
 					</div>
 				</div>
 			</template>
-			<template v-else-if="props.serverPowerState === 'crashed'">
-				<template v-if="props.powerStateDetails?.oom_killed">
+			<template v-else-if="serverPowerState === 'crashed'">
+				<template v-if="powerStateDetails?.oom_killed">
 					The server stopped because it ran out of memory. There may be a memory leak caused by a
 					mod or plugin, or you may need to upgrade your Modrinth Server.
 				</template>
-				<template v-else-if="props.powerStateDetails?.exit_code !== undefined">
-					Your server exited with code {{ props.powerStateDetails.exit_code }}.
-					<template v-if="props.powerStateDetails.exit_code === 1">
+				<template v-else-if="powerStateDetails?.exit_code !== undefined">
+					Your server exited with code {{ powerStateDetails.exit_code }}.
+					<template v-if="powerStateDetails.exit_code === 1">
 						There may be a mod or plugin causing the issue, or an issue with your server
 						configuration.
 					</template>
@@ -56,8 +56,8 @@
 
 		<div class="flex flex-col-reverse gap-6 md:flex-col">
 			<ServerManageStats
-				:data="props.isConnected && !props.isWsAuthIncorrect ? props.stats : undefined"
-				:loading="!props.isConnected || props.isWsAuthIncorrect"
+				:data="isConnected && !isWsAuthIncorrect ? stats : undefined"
+				:loading="!isConnected || isWsAuthIncorrect"
 			/>
 
 			<div class="flex h-[700px] flex-col gap-4">
@@ -68,7 +68,7 @@
 		</div>
 
 		<div
-			v-if="props.isWsAuthIncorrect"
+			v-if="isWsAuthIncorrect"
 			class="absolute inset-0 flex flex-col items-center justify-center bg-bg"
 		>
 			<h2>Could not connect to the server.</h2>
@@ -81,7 +81,6 @@
 </template>
 
 <script setup lang="ts">
-import type { ServerState, Stats } from '@modrinth/utils'
 import { computed, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
@@ -91,22 +90,18 @@ import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers
 
 import ServerManageStats from './components/ServerManageStats.vue'
 
-type ServerProps = {
-	isConnected: boolean
-	isWsAuthIncorrect: boolean
-	stats: Stats
-	serverPowerState: ServerState
-	powerStateDetails?: {
-		oom_killed?: boolean
-		exit_code?: number
-	}
-}
-
-const props = defineProps<ServerProps>()
-
 const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
-const { server: serverData, serverId, busyReasons } = injectModrinthServerContext()
+const {
+	server: serverData,
+	serverId,
+	busyReasons,
+	isConnected,
+	isWsAuthIncorrect,
+	stats,
+	powerState: serverPowerState,
+	powerStateDetails,
+} = injectModrinthServerContext()
 const modrinthServersConsole = useModrinthServersConsole()
 
 provideConsoleManager({
@@ -119,11 +114,11 @@ provideConsoleManager({
 		}
 	},
 	showCommandInput: true,
-	loading: computed(() => !props.isConnected || props.isWsAuthIncorrect),
+	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
 	onClear: () => {
 		modrinthServersConsole.clear()
 	},
-	shareDisabled: computed(() => !props.isConnected),
+	shareDisabled: computed(() => !isConnected.value),
 })
 
 const backupBusyReason = computed(() => {
@@ -208,9 +203,9 @@ const clearError = () => {
 }
 
 watch(
-	() => props.serverPowerState,
+	() => serverPowerState.value,
 	(newVal) => {
-		if (newVal === 'crashed' && !props.powerStateDetails?.oom_killed) {
+		if (newVal === 'crashed' && !powerStateDetails.value?.oom_killed) {
 			void inspectError()
 		} else {
 			clearError()
@@ -218,7 +213,7 @@ watch(
 	},
 )
 
-if (props.serverPowerState === 'crashed' && !props.powerStateDetails?.oom_killed) {
+if (serverPowerState.value === 'crashed' && !powerStateDetails.value?.oom_killed) {
 	void inspectError()
 }
 </script>
