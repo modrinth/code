@@ -4,7 +4,7 @@
 			Your server is still accessible during this time.
 		</Admonition>
 		<Admonition
-			v-if="inspectingError && isConnected && !isWsAuthIncorrect"
+			v-if="inspectingError && props.isConnected && !props.isWsAuthIncorrect"
 			data-pyro-servers-inspecting-error
 			type="critical"
 			:header="`${serverData?.name} shut down unexpectedly.`"
@@ -56,8 +56,8 @@
 
 		<div class="flex flex-col-reverse gap-6 md:flex-col">
 			<ServerManageStats
-				:data="isConnected && !isWsAuthIncorrect ? stats : undefined"
-				:loading="!isConnected || isWsAuthIncorrect"
+				:data="props.isConnected && !props.isWsAuthIncorrect ? props.stats : undefined"
+				:loading="!props.isConnected || props.isWsAuthIncorrect"
 			/>
 
 			<div class="flex h-[700px] flex-col gap-4">
@@ -68,7 +68,7 @@
 		</div>
 
 		<div
-			v-if="isWsAuthIncorrect"
+			v-if="props.isWsAuthIncorrect"
 			class="absolute inset-0 flex flex-col items-center justify-center bg-bg"
 		>
 			<h2>Could not connect to the server.</h2>
@@ -100,7 +100,6 @@ type ServerProps = {
 		oom_killed?: boolean
 		exit_code?: number
 	}
-	isServerRunning: boolean
 }
 
 const props = defineProps<ServerProps>()
@@ -109,10 +108,6 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const { server: serverData, serverId, busyReasons } = injectModrinthServerContext()
 const modrinthServersConsole = useModrinthServersConsole()
-
-const isConnected = computed(() => props.isConnected)
-const isWsAuthIncorrect = computed(() => props.isWsAuthIncorrect)
-const stats = computed(() => props.stats)
 
 provideConsoleManager({
 	logLines: modrinthServersConsole.output,

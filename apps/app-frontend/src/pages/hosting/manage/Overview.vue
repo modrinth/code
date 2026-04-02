@@ -11,7 +11,6 @@ type ServerProps = {
 		oom_killed?: boolean
 		exit_code?: number
 	}
-	isServerRunning: boolean
 }
 
 const props = defineProps<ServerProps>()

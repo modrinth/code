@@ -151,7 +151,6 @@ const {
 	disconnectSocket,
 	fsAuth,
 	isConnected,
-	isServerRunning,
 	isWsAuthIncorrect,
 	powerStateDetails,
 	refreshFsAuth,
@@ -243,7 +242,6 @@ onUnmounted(() => {
 const overviewChildProps = computed(() => ({
 	isConnected: isConnected.value,
 	isWsAuthIncorrect: isWsAuthIncorrect.value,
-	isServerRunning: isServerRunning.value,
 	stats: stats.value,
 	serverPowerState: serverPowerState.value,
 	powerStateDetails: powerStateDetails.value,

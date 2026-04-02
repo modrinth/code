@@ -42,14 +42,9 @@ export function useServerPowerAction(options?: {
 		busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
 	)
 
-	const canTakeAction = computed(() => {
-		console.log('Checking if can take action:', {
-			isTransitioning: isTransitioning.value,
-			disabled: options?.disabled?.value,
-			busyReasons: busyReasons.value,
-		})
-		return !isTransitioning.value && !options?.disabled?.value && busyReasons.value.length === 0
-	})
+	const canTakeAction = computed(
+		() => !isTransitioning.value && !options?.disabled?.value && busyReasons.value.length === 0,
+	)
 
 	const primaryActionText = computed(() => {
 		switch (powerState.value) {

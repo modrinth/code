@@ -65,13 +65,11 @@ import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/ass
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
-const route = useRoute()
-const serverId = computed(() => {
-	const rawId = route.params.id
-	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
-})
+import { injectModrinthServerContext } from '#ui/providers'
+
+const { serverId } = injectModrinthServerContext()
 
 const props = withDefaults(
 	defineProps<{
@@ -88,8 +86,8 @@ const props = withDefaults(
 
 const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
-const storageKey = computed(() => `pyro-server-${serverId.value || 'unknown'}-preferences`)
-const userPreferences = useStorage(storageKey.value, {
+const storageKey = computed(() => `pyro-server-${serverId || 'unknown'}-preferences`)
+const userPreferences = useStorage(storageKey, {
 	ramAsNumber: false,
 })
 
@@ -137,7 +135,7 @@ const metrics = computed(() => {
 		data: [] as number[],
 		showGraph: false,
 		warning: null,
-		link: `/hosting/manage/${encodeURIComponent(serverId.value)}/files`,
+		link: `/hosting/manage/${encodeURIComponent(serverId)}/files`,
 	}
 
 	if (props.loading) {

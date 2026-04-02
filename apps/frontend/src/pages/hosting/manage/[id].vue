@@ -274,7 +274,6 @@
 					:route="route"
 					:is-connected="isConnected"
 					:is-ws-auth-incorrect="isWSAuthIncorrect"
-					:is-server-running="isServerRunning"
 					:stats="stats"
 					:server-power-state="serverPowerState"
 					:power-state-details="powerStateDetails"
@@ -495,7 +494,6 @@ const {
 	fsOps,
 	fsQueuedOps,
 	isConnected,
-	isServerRunning,
 	isWsAuthIncorrect: isWSAuthIncorrect,
 	powerStateDetails,
 	serverPowerState,
