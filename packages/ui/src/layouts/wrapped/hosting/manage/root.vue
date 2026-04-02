@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="filteredNotices.length > 0"
-		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 p-6"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
@@ -96,7 +96,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 p-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -113,7 +113,7 @@
 				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
 					<PanelServerActionButton :disabled="!!installError" />
 					<ButtonStyled circular size="large">
-						<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
+						<button v-tooltip="'Server settings'" @click="() => openServerSettingsModal()">
 							<SettingsIcon />
 						</button>
 					</ButtonStyled>
@@ -373,7 +373,11 @@ const props = withDefaults(
 		authUser?: { id: string; username: string; email: string; created: string }
 		navigateToBilling?: () => void
 		navigateToServers?: () => void
-		browseModpacks?: (args: { serverId: string; worldId: string | null; from: 'reset-server' }) => void | Promise<void>
+		browseModpacks?: (args: {
+			serverId: string
+			worldId: string | null
+			from: 'reset-server'
+		}) => void | Promise<void>
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -411,7 +415,6 @@ const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>
 
 const INTERCOM_APP_ID = 'ykeritl9'
 
-
 const { data: serverData, error: serverQueryError } = useQuery({
 	queryKey: ['servers', 'detail', props.serverId],
 	queryFn: () => client.archon.servers_v0.get(props.serverId)!,
@@ -447,7 +450,6 @@ const serverImage = useServerImage(
 	computed(() => serverData.value?.upstream ?? null),
 )
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
-
 
 const cancelledBackups = new Set<string>()
 const markBackupCancelled = (backupId: string) => {
@@ -509,7 +511,6 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 	}
 }
 
-
 const {
 	backupsState,
 	cleanupCoreRuntime,
@@ -531,7 +532,6 @@ const {
 	eventGuard: () => isMounted.value,
 	onStateEvent,
 })
-
 
 const navLinks = computed<Tab[]>(() => [
 	{
@@ -561,7 +561,6 @@ const navLinks = computed<Tab[]>(() => [
 	...props.additionalTabs,
 ])
 
-
 const filteredNotices = computed(
 	() => serverData.value?.notices?.filter((n) => n.level !== 'survey') ?? [],
 )
@@ -583,7 +582,6 @@ async function dismissSurvey() {
 	if (noticeId === undefined) return
 	await dismissNotice(noticeId)
 }
-
 
 type TallyPopupOptions = {
 	key?: string
@@ -668,7 +666,6 @@ function loadTallyScript() {
 	document.head.appendChild(script)
 }
 
-
 async function handleContentRetry() {
 	if (!worldId.value) return
 	try {
@@ -680,7 +677,6 @@ async function handleContentRetry() {
 		})
 	}
 }
-
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
 	if (data.task === 'file') return
@@ -794,7 +790,6 @@ const handleNewMod = () => {
 	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 }
 
-
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
 	debug('[root.vue] handleInstallationResult received:', data)
 	switch (data.result) {
@@ -839,7 +834,6 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 		}
 	}
 }
-
 
 const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
@@ -936,7 +930,6 @@ async function invalidateAfterInstall() {
 	}, 2000)
 }
 
-
 const nodeAccessible = ref(true)
 
 const nodeUnavailableDetails = computed(() => [
@@ -1032,7 +1025,6 @@ const nodeUnavailableAction = computed(() => ({
 	disabled: false,
 }))
 
-
 const copyServerDebugInfo = () => {
 	const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`
 	navigator.clipboard.writeText(debugInfo)
@@ -1053,7 +1045,11 @@ function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 	serverSettingsModal.value?.show({ serverId: props.serverId, tabId })
 }
 
-function handleBrowseModpacks(args: { serverId: string; worldId: string | null; from: 'reset-server' }) {
+function handleBrowseModpacks(args: {
+	serverId: string
+	worldId: string | null
+	from: 'reset-server'
+}) {
 	props.browseModpacks?.(args)
 }
 
@@ -1077,7 +1073,6 @@ function safeStringify(obj: unknown, indent = ' '): string {
 		indent,
 	)
 }
-
 
 async function testNodeReachability(): Promise<boolean> {
 	const nodeInstance = serverData.value?.node?.instance
@@ -1114,7 +1109,6 @@ async function testNodeReachability(): Promise<boolean> {
 		return false
 	}
 }
-
 
 function initializeServer() {
 	if (serverData.value?.status === 'suspended') {
@@ -1162,7 +1156,6 @@ function initializeServer() {
 	}
 }
 
-
 const cleanup = () => {
 	isMounted.value = false
 
@@ -1177,7 +1170,6 @@ const cleanup = () => {
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }
-
 
 onMounted(() => {
 	isMounted.value = true

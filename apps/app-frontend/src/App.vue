@@ -1200,7 +1200,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</div>
 			</transition>
 			<div
-				class="loading-indicator-container h-8 fixed z-50"
+				class="loading-indicator-container h-8 fixed z-50 pointer-events-none"
 				:style="{
 					top: 'calc(var(--top-bar-height))',
 					left: 'calc(var(--left-bar-width))',

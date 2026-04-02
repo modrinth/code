@@ -14,7 +14,7 @@
 			class="relative isolate min-h-[145px] w-full overflow-hidden rounded-[20px] bg-surface-3 p-5"
 			:class="
 				metric.link && !loading
-					? 'cursor-pointer transition-transform duration-100 hover:scale-105 active:scale-100'
+					? 'cursor-pointer transition-transform duration-100 hover:brightness-125 active:scale-95'
 					: ''
 			"
 		>
@@ -87,7 +87,7 @@ const props = withDefaults(
 const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
 const storageKey = computed(() => `pyro-server-${serverId || 'unknown'}-preferences`)
-const userPreferences = useStorage(storageKey, {
+const userPreferences = useStorage(storageKey.value, {
 	ramAsNumber: false,
 })
 
