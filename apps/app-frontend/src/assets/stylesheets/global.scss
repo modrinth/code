@@ -77,12 +77,8 @@ body {
 }
 
 a {
-	color: var(--color-link);
+	color: inherit;
 	text-decoration: none;
-
-	&:hover {
-		text-decoration: none;
-	}
 }
 
 .badge {
@@ -172,6 +168,13 @@ img {
 	&:not(caption) {
 		position: absolute !important;
 	}
+}
+
+button,
+input[type='button'] {
+	cursor: pointer;
+	border: none;
+	outline: 2px solid transparent;
 }
 
 @import '@modrinth/assets/omorphia.scss';

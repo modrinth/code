@@ -519,7 +519,7 @@ async function modifyCharge() {
 		})
 		addNotification({
 			title: 'Modifications made',
-			text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+			text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
 			type: 'success',
 		})
 		await refreshCharges()
