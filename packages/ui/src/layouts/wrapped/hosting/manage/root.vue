@@ -291,7 +291,11 @@
 		}}</pre>
 	</div>
 	<Suspense>
-		<ServerSettingsModal ref="serverSettingsModal" :resolve-viewer="resolveViewer" />
+		<ServerSettingsModal
+			ref="serverSettingsModal"
+			:resolve-viewer="resolveViewer"
+			:browse-modpacks="handleBrowseModpacks"
+		/>
 	</Suspense>
 </template>
 
@@ -369,6 +373,7 @@ const props = withDefaults(
 		authUser?: { id: string; username: string; email: string; created: string }
 		navigateToBilling?: () => void
 		navigateToServers?: () => void
+		browseModpacks?: (args: { serverId: string; worldId: string | null; from: 'reset-server' }) => void | Promise<void>
 	}>(),
 	{
 		showCopyIdAction: false,
@@ -381,6 +386,7 @@ const props = withDefaults(
 		authUser: undefined,
 		navigateToBilling: undefined,
 		navigateToServers: undefined,
+		browseModpacks: undefined,
 	},
 )
 
@@ -405,7 +411,6 @@ const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>
 
 const INTERCOM_APP_ID = 'ykeritl9'
 
-// --- Server data queries ---
 
 const { data: serverData, error: serverQueryError } = useQuery({
 	queryKey: ['servers', 'detail', props.serverId],
@@ -443,7 +448,6 @@ const serverImage = useServerImage(
 )
 const { data: serverProject } = useServerProject(computed(() => serverData.value?.upstream ?? null))
 
-// --- Installation progress tracking ---
 
 const cancelledBackups = new Set<string>()
 const markBackupCancelled = (backupId: string) => {
@@ -505,7 +509,6 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 	}
 }
 
-// --- Core runtime ---
 
 const {
 	backupsState,
@@ -529,7 +532,6 @@ const {
 	onStateEvent,
 })
 
-// --- Navigation tabs ---
 
 const navLinks = computed<Tab[]>(() => [
 	{
@@ -559,7 +561,6 @@ const navLinks = computed<Tab[]>(() => [
 	...props.additionalTabs,
 ])
 
-// --- Notices ---
 
 const filteredNotices = computed(
 	() => serverData.value?.notices?.filter((n) => n.level !== 'survey') ?? [],
@@ -583,7 +584,6 @@ async function dismissSurvey() {
 	await dismissNotice(noticeId)
 }
 
-// --- Tally survey ---
 
 type TallyPopupOptions = {
 	key?: string
@@ -668,7 +668,6 @@ function loadTallyScript() {
 	document.head.appendChild(script)
 }
 
-// --- Content retry ---
 
 async function handleContentRetry() {
 	if (!worldId.value) return
@@ -682,7 +681,6 @@ async function handleContentRetry() {
 	}
 }
 
-// --- WebSocket event handlers ---
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
 	if (data.task === 'file') return
@@ -796,7 +794,6 @@ const handleNewMod = () => {
 	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
 }
 
-// --- Installation result ---
 
 const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallationResultEvent) => {
 	debug('[root.vue] handleInstallationResult received:', data)
@@ -843,7 +840,6 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 	}
 }
 
-// --- Reinstall handlers ---
 
 const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
@@ -940,7 +936,6 @@ async function invalidateAfterInstall() {
 	}, 2000)
 }
 
-// --- Error state computeds ---
 
 const nodeAccessible = ref(true)
 
@@ -1037,7 +1032,6 @@ const nodeUnavailableAction = computed(() => ({
 	disabled: false,
 }))
 
-// --- Debug / copy ---
 
 const copyServerDebugInfo = () => {
 	const debugInfo = `Server ID: ${serverData.value?.server_id}\nError: ${errorMessage.value}\nKind: ${serverData.value?.upstream?.kind}\nProject ID: ${serverData.value?.upstream?.project_id}\nVersion ID: ${serverData.value?.upstream?.version_id}\nLog: ${errorLog.value}`
@@ -1049,7 +1043,6 @@ const copyServerDebugInfo = () => {
 }
 
 const openInstallLog = () => {
-	// Navigate to files page with editing query param — works via router on both platforms
 	const url = `/hosting/manage/${props.serverId}/files?editing=${encodeURIComponent(errorLogFile.value)}`
 	window.history.pushState({}, '', url)
 	window.dispatchEvent(new PopStateEvent('popstate'))
@@ -1058,6 +1051,10 @@ const openInstallLog = () => {
 function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 	if (!props.serverId) return
 	serverSettingsModal.value?.show({ serverId: props.serverId, tabId })
+}
+
+function handleBrowseModpacks(args: { serverId: string; worldId: string | null; from: 'reset-server' }) {
+	props.browseModpacks?.(args)
 }
 
 provideServerSettingsModal({
@@ -1081,7 +1078,6 @@ function safeStringify(obj: unknown, indent = ' '): string {
 	)
 }
 
-// --- Node reachability ---
 
 async function testNodeReachability(): Promise<boolean> {
 	const nodeInstance = serverData.value?.node?.instance
@@ -1119,7 +1115,6 @@ async function testNodeReachability(): Promise<boolean> {
 	}
 }
 
-// --- Initialization ---
 
 function initializeServer() {
 	if (serverData.value?.status === 'suspended') {
@@ -1167,7 +1162,6 @@ function initializeServer() {
 	}
 }
 
-// --- Cleanup ---
 
 const cleanup = () => {
 	isMounted.value = false
@@ -1184,7 +1178,6 @@ const cleanup = () => {
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }
 
-// --- Lifecycle ---
 
 onMounted(() => {
 	isMounted.value = true
@@ -1231,6 +1224,9 @@ onMounted(() => {
 	if (route.query.openSettings) {
 		const tabId = route.query.openSettings as ServerSettingsTabId
 		router.replace({ query: { ...route.query, openSettings: undefined } })
+		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: ['content', 'list', 'v1', props.serverId] })
+		queryClient.invalidateQueries({ queryKey: ['servers', 'startup', 'v1', props.serverId] })
 		nextTick(() => openServerSettingsModal(tabId))
 	}
 })

@@ -29,6 +29,7 @@ type ShowOptions = {
 
 const props = defineProps<{
 	resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
+	browseModpacks?: (args: { serverId: string; worldId: string | null; from: 'reset-server' }) => void | Promise<void>
 }>()
 
 const { formatMessage } = useVIntl()
@@ -54,8 +55,8 @@ const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
 
-function browseModpacks() {
-	// Stub for app browse-modpacks flow. Intentionally no-op for now.
+function browseModpacks(args: { serverId: string; worldId: string | null; from: 'reset-server' }) {
+	props.browseModpacks?.(args)
 }
 
 const isConnected = ref(true)
