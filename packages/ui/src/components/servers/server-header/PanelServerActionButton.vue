@@ -44,6 +44,7 @@ import { LoaderCircleIcon, PlayIcon, StopCircleIcon, UpdatedIcon } from '@modrin
 import { computed, ref } from 'vue'
 
 import { ButtonStyled } from '#ui/components'
+
 import PanelActionConfirmModal from './PanelActionConfirmModal.vue'
 import {
 	type PanelActionConfirmModalController,

@@ -75,13 +75,15 @@ const appendGraphData = (dataArray: number[], newValue: number): number[] => {
 const mapPowerStateFromStateEvent = (
 	data: Archon.Websocket.v0.WSStateEvent,
 ): Archon.Websocket.v0.PowerState => {
-	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> = {
-		not_ready: 'stopped',
-		starting: 'starting',
-		running: 'running',
-		stopping: 'stopping',
-		idle: data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
-	}
+	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
+		{
+			not_ready: 'stopped',
+			starting: 'starting',
+			running: 'running',
+			stopping: 'stopping',
+			idle:
+				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
+		}
 	return powerMap[data.power_variant]
 }
 

@@ -51,9 +51,7 @@
 						<li>
 							<IntlFormatted :message-id="messages.errorQueueNotice">
 								<template #warning="{ children }">
-									<span class="font-medium text-contrast"
-										><component :is="() => children"
-									/></span>
+									<span class="font-medium text-contrast"><component :is="() => children" /></span>
 								</template>
 							</IntlFormatted>
 						</li>
@@ -71,9 +69,9 @@
 					</ul>
 				</div>
 				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com"
-						>{{ formatMessage(messages.contactSupportButton) }}</AutoLink
-					>
+					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com">{{
+						formatMessage(messages.contactSupportButton)
+					}}</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled size="large" @click="() => router.go(0)">
 					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
@@ -116,7 +114,9 @@
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
-					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">{{ formatMessage(messages.serversTitle) }}</h1>
+					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
+						{{ formatMessage(messages.serversTitle) }}
+					</h1>
 					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
 						<StyledInput
 							id="search"
@@ -125,7 +125,9 @@
 							type="search"
 							name="search"
 							autocomplete="off"
-							:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
+							:placeholder="
+								formatMessage(messages.searchPlaceholder, { count: filteredData.length })
+							"
 							wrapper-class="w-full md:w-72"
 						/>
 						<ButtonStyled type="standard" color="brand">

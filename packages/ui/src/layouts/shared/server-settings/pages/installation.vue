@@ -167,7 +167,7 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	reinstall: [any?]
+	reinstall: [unknown?]
 	'reinstall-failed': []
 }>()
 
@@ -766,7 +766,7 @@ watch(
 	},
 )
 
-function onReinstall(event?: any) {
+function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
 	emit('reinstall', event)
 }

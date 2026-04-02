@@ -54,13 +54,20 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, InfoIcon, MoreVerticalIcon, ServerIcon, SlashIcon } from '@modrinth/assets'
+import {
+	ClipboardCopyIcon,
+	InfoIcon,
+	MoreVerticalIcon,
+	ServerIcon,
+	SlashIcon,
+} from '@modrinth/assets'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { ButtonStyled, NewModal, ServerInfoLabels } from '#ui/components'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { injectModrinthServerContext } from '#ui/providers'
+
 import PanelActionConfirmModal from './PanelActionConfirmModal.vue'
 import {
 	type PanelActionConfirmModalController,

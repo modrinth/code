@@ -11,7 +11,10 @@
 			{{ props.server?.name || 'Server' }}
 		</template>
 		<template #stats>
-			<div v-if="props.server?.flows?.intro" class="flex items-center gap-2 font-semibold text-secondary">
+			<div
+				v-if="props.server?.flows?.intro"
+				class="flex items-center gap-2 font-semibold text-secondary"
+			>
 				<SettingsIcon />
 				Configuring server...
 			</div>

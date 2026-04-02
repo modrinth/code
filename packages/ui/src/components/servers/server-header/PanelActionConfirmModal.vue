@@ -35,6 +35,7 @@ import { CheckIcon, XIcon } from '@modrinth/assets'
 import { computed, ref } from 'vue'
 
 import { ButtonStyled, Checkbox, NewModal } from '#ui/components'
+
 import type { PowerAction } from './use-server-power-action'
 
 const props = defineProps<{
