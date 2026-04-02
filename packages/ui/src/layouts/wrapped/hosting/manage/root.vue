@@ -127,7 +127,10 @@
 			</template>
 		</ServerManageHeader>
 
-		<ServerOnboardingPanelPage v-if="serverData.flows?.intro" />
+		<ServerOnboardingPanelPage
+			v-if="serverData.flows?.intro"
+			:browse-modpacks="handleBrowseModpacks"
+		/>
 
 		<template v-else>
 			<div
@@ -376,7 +379,12 @@ const props = withDefaults(
 		browseModpacks?: (args: {
 			serverId: string
 			worldId: string | null
-			from: 'reset-server'
+			from: 'reset-server' | 'onboarding'
+		}) => void | Promise<void>
+		browseContent?: (args: {
+			serverId: string
+			worldId: string | null
+			type: 'mod' | 'plugin' | 'datapack'
 		}) => void | Promise<void>
 	}>(),
 	{
@@ -391,6 +399,7 @@ const props = withDefaults(
 		navigateToBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
+		browseContent: undefined,
 	},
 )
 
@@ -1048,13 +1057,22 @@ function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 function handleBrowseModpacks(args: {
 	serverId: string
 	worldId: string | null
-	from: 'reset-server'
+	from: 'reset-server' | 'onboarding'
 }) {
 	props.browseModpacks?.(args)
 }
 
+function handleBrowseContent(args: {
+	serverId: string
+	worldId: string | null
+	type: 'mod' | 'plugin' | 'datapack'
+}) {
+	props.browseContent?.(args)
+}
+
 provideServerSettingsModal({
 	openServerSettings: (options) => openServerSettingsModal(options?.tabId),
+	browseServerContent: (args) => handleBrowseContent(args),
 })
 
 function safeStringify(obj: unknown, indent = ' '): string {

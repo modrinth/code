@@ -12,10 +12,22 @@
 		:auth-user="authUser"
 		:navigate-to-billing="() => router.push('/settings/billing')"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
-		:browse-modpacks="({ serverId: sid, worldId: wid, from }) => navigateTo({
-			path: '/discover/modpacks',
-			query: { sid, from, wid: wid ?? undefined },
-		})"
+		:browse-modpacks="
+			({ serverId: sid, worldId: wid, from }) => {
+				navigateTo({
+					path: '/discover/modpacks',
+					query: { sid, from, wid: wid ?? undefined },
+				})
+			}
+		"
+		:browse-content="
+			({ serverId: sid, worldId: wid, type }) => {
+				navigateTo({
+					path: `/discover/${type}s`,
+					query: { sid, wid: wid ?? undefined },
+				})
+			}
+		"
 	>
 		<template #default="{ onReinstall, onReinstallFailed }">
 			<NuxtPage :route="route" @reinstall="onReinstall" @reinstall-failed="onReinstallFailed" />

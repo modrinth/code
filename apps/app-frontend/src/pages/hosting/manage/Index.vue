@@ -8,6 +8,22 @@
 			:show-copy-id-action="themeStore.devMode"
 			:navigate-to-billing="() => router.push('/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
+			:browse-modpacks="
+				({ serverId: sid, worldId: wid, from }) => {
+					router.push({
+						path: '/browse/modpack',
+						query: { sid, wid: wid ?? undefined, from },
+					})
+				}
+			"
+			:browse-content="
+				({ serverId: sid, worldId: wid, type }) => {
+					router.push({
+						path: `/browse/${type}`,
+						query: { sid, wid: wid ?? undefined },
+					})
+				}
+			"
 		>
 			<template #default="{ onReinstall, onReinstallFailed }">
 				<RouterView v-slot="{ Component }">

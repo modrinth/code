@@ -96,7 +96,7 @@ const leaveMessages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
-const { openServerSettings } = injectServerSettingsModal()
+const { openServerSettings, browseServerContent } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -411,6 +411,16 @@ const currentGameVersion = computed(() => contentQuery.data.value?.game_version 
 const currentLoader = computed(() => contentQuery.data.value?.modloader ?? '')
 
 function handleBrowseContent() {
+	const contentType = type.value
+	if (browseServerContent && ['mod', 'plugin', 'datapack'].includes(contentType)) {
+		browseServerContent({
+			serverId,
+			worldId: worldId.value,
+			type: contentType as 'mod' | 'plugin' | 'datapack',
+		})
+		return
+	}
+
 	router.push({
 		path: `/discover/${type.value}s`,
 		query: { sid: serverId, wid: worldId.value },

@@ -5,6 +5,7 @@ import {
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
+	LeftArrowIcon,
 	PlayIcon,
 	PlusIcon,
 	SearchIcon,
@@ -16,6 +17,7 @@ import {
 	ButtonStyled,
 	Checkbox,
 	commonMessages,
+	CreationFlowModal,
 	defineMessages,
 	DropdownSelect,
 	injectNotificationManager,
@@ -39,15 +41,14 @@ import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import type Instance from '@/components/ui/Instance.vue'
 import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
 import {
-	get as getInstance,
 	get_installed_project_ids as getInstalledProjectIds,
+	get as getInstance,
 	kill,
 	list as listInstances,
 } from '@/helpers/profile.js'
@@ -55,6 +56,10 @@ import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
+import {
+	createServerInstallContent,
+	provideServerInstallContent,
+} from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 
@@ -66,6 +71,31 @@ const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
+const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+provideServerInstallContent(serverInstallContent)
+const {
+	serverIdQuery,
+	serverFlowFrom,
+	isFromWorlds,
+	isServerContext,
+	isSetupServerContext,
+	effectiveServerWorldId,
+	serverContextServerData,
+	serverContentProjectIds,
+	serverBackUrl,
+	serverBackLabel,
+	serverBrowseHeading,
+	initServerContext,
+	watchServerContextChanges,
+	searchServerModpacks,
+	getServerProjectVersions,
+	enforceSetupModpackRoute,
+	installProjectToServer,
+	onServerFlowBack,
+	handleServerModpackFlowCreate,
+	markServerProjectInstalled,
+} = serverInstallContent
 
 const projectTypes = computed(() => {
 	debugLog('projectTypes computed', route.params.projectType)
@@ -110,7 +140,6 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
-const isFromWorlds = computed(() => route.query.from === 'worlds')
 
 if (isFromWorlds.value && route.params.projectType !== 'server') {
 	router.replace({
@@ -119,16 +148,28 @@ if (isFromWorlds.value && route.params.projectType !== 'server') {
 	})
 }
 
+enforceSetupModpackRoute(route.params.projectType as string | undefined)
+
 const allInstalledIds = computed(
 	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
 )
 
-const PERSISTENT_QUERY_PARAMS = ['i', 'ai', 'from']
+const PERSISTENT_QUERY_PARAMS = ['i', 'ai', 'sid', 'wid', 'from']
+
+watchServerContextChanges()
 
 await initInstanceContext()
 
 async function initInstanceContext() {
-	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
+	debugLog('initInstanceContext', {
+		queryI: route.query.i,
+		queryAi: route.query.ai,
+		querySid: route.query.sid,
+		queryWid: route.query.wid,
+		queryFrom: route.query.from,
+	})
+	await initServerContext()
+
 	if (route.query.i) {
 		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
 		debugLog('instance loaded', {
@@ -266,6 +307,14 @@ const activeGameVersion = computed(() => {
 	if (filter) return filter.option
 	return instance.value?.game_version ?? null
 })
+
+function onSearchResultInstalled(id: string) {
+	if (isServerContext.value) {
+		markServerProjectInstalled(id)
+		return
+	}
+	newlyInstalled.value.push(id)
+}
 
 const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 const filteredServerHits = computed(() => {
@@ -581,11 +630,10 @@ async function refreshSearch() {
 				page: 1,
 			}
 		} else {
-			if (instance.value) {
-				const allInstalledIds = new Set([
-					...newlyInstalled.value,
-					...(installedProjectIds.value ?? []),
-				])
+			if (instance.value || isServerContext.value) {
+				const allInstalledIds = instance.value
+					? new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])])
+					: serverContentProjectIds.value
 
 				rawResults.result.hits = rawResults.result.hits.map((val) => ({
 					...val,
@@ -622,6 +670,13 @@ async function refreshSearch() {
 		for (const [key, value] of Object.entries(route.query)) {
 			if (PERSISTENT_QUERY_PARAMS.includes(key)) {
 				persistentParams[key] = value
+			}
+		}
+
+		if (serverIdQuery.value) {
+			persistentParams.sid = serverIdQuery.value
+			if (effectiveServerWorldId.value) {
+				persistentParams.wid = effectiveServerWorldId.value
 			}
 		}
 
@@ -673,6 +728,11 @@ function clearSearch() {
 watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
+		if (isSetupServerContext.value) {
+			enforceSetupModpackRoute(newType)
+			if (newType !== 'modpack') return
+		}
+
 		// Check if the newType is not the same as the current value
 		if (!newType || newType === projectType.value) return
 
@@ -731,9 +791,19 @@ const selectableProjectTypes = computed(() => {
 	if (route.query.from) {
 		params.from = route.query.from
 	}
+	if (route.query.sid) {
+		params.sid = route.query.sid
+	}
+	if (effectiveServerWorldId.value) {
+		params.wid = effectiveServerWorldId.value
+	}
 
 	const queryString = new URLSearchParams(params as Record<string, string>).toString()
 	const suffix = queryString ? `?${queryString}` : ''
+
+	if (isSetupServerContext.value) {
+		return [{ label: 'Modpacks', href: `/browse/modpack${suffix}` }]
+	}
 
 	if (isFromWorlds.value) {
 		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
@@ -897,7 +967,24 @@ previousFilterState.value = JSON.stringify({
 		</template>
 	</Teleport>
 	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
-		<template v-if="instance">
+		<template v-if="isServerContext && serverContextServerData">
+			<div class="mb-1 flex flex-wrap items-center justify-between gap-3">
+				<div class="flex min-w-0 flex-col gap-1">
+					<span class="text-lg font-bold text-contrast">{{ serverContextServerData.name }}</span>
+					<span class="text-sm font-medium text-secondary">
+						{{ serverContextServerData.loader }} {{ serverContextServerData.mc_version }}
+					</span>
+				</div>
+				<ButtonStyled>
+					<button @click="router.push(serverBackUrl)">
+						<LeftArrowIcon />
+						{{ serverBackLabel }}
+					</button>
+				</ButtonStyled>
+			</div>
+			<h1 class="m-0 mb-1 text-xl font-extrabold">{{ serverBrowseHeading }}</h1>
+		</template>
+		<template v-else-if="instance">
 			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
 			<h1 class="m-0 mb-1 text-xl">
 				{{
@@ -911,7 +998,7 @@ previousFilterState.value = JSON.stringify({
 				be lost when you update the server instance content.
 			</Admonition>
 		</template>
-		<NavTabs :links="selectableProjectTypes" />
+		<NavTabs v-if="!isServerContext" :links="selectableProjectTypes" />
 		<StyledInput
 			v-model="query"
 			:icon="SearchIcon"
@@ -1104,12 +1191,17 @@ previousFilterState.value = JSON.stringify({
 									loader.supported_project_types?.includes(projectType),
 							),
 						]"
-						:installed="result.installed || allInstalledIds.has(result.project_id || '')"
-						@install="
-							(id) => {
-								newlyInstalled.push(id)
-							}
+						:installed="
+							result.installed ||
+							allInstalledIds.has(result.project_id || '') ||
+							serverContentProjectIds.has(result.project_id || '')
 						"
+						:custom-install="
+							isServerContext && ['modpack', 'mod', 'plugin', 'datapack'].includes(projectType)
+								? installProjectToServer
+								: undefined
+						"
+						@install="onSearchResultInstalled"
 						@contextmenu.prevent.stop="(event: any) => handleRightClick(event, result)"
 					/>
 				</template>
@@ -1128,5 +1220,19 @@ previousFilterState.value = JSON.stringify({
 				/>
 			</div>
 		</div>
+
+		<CreationFlowModal
+			v-if="isServerContext && projectType === 'modpack'"
+			ref="serverSetupModalRef"
+			:type="serverFlowFrom === 'reset-server' ? 'reset-server' : 'server-onboarding'"
+			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+			:show-snapshot-toggle="true"
+			:on-back="onServerFlowBack"
+			:search-modpacks="searchServerModpacks"
+			:get-project-versions="getServerProjectVersions"
+			@hide="() => {}"
+			@browse-modpacks="() => {}"
+			@create="handleServerModpackFlowCreate"
+		/>
 	</div>
 </template>
