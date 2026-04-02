@@ -866,8 +866,8 @@
 				<div class="normal-page__sidebar">
 					<div class="mb-4">
 						<OldButtonStyled>
-							<a :href="legacyUrl" class="!gap-3 !text-white">
-								<img src="/beenz.png" alt="beenz icon" class="h-5 w-auto" /> Give beenz
+							<a :href="legacyDonateUrl" class="!gap-3 !text-white">
+								<img src="/beenz.png" alt="beenz icon" class="h-5 w-auto" /> Donate with beenz
 							</a>
 						</OldButtonStyled>
 					</div>
@@ -1145,7 +1145,7 @@ const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
 
-const legacyUrl = computed(() => `https://legacy.modrinth.com${route.fullPath}`)
+const legacyDonateUrl = computed(() => `https://legacy.modrinth.com${route.fullPath}`)
 
 const auth = await useAuth()
 const user = await useUser()
