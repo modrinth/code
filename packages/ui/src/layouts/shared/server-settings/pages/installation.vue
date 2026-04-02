@@ -1,5 +1,5 @@
 <template>
-	<div class="flex flex-col gap-6 rounded-2xl bg-surface-3 p-6">
+	<div class="flex flex-col gap-6">
 		<ConfirmModal
 			ref="resetToOnboardingModal"
 			:title="formatMessage(messages.resetToOnboardingModalTitle)"
@@ -8,7 +8,7 @@
 			@proceed="confirmResetToOnboarding"
 		/>
 
-		<InstallationSettingsLayout ref="installationSettingsLayout">
+		<InstallationSettingsLayout ref="installationSettingsLayout" @reset-server="setupModal?.show()">
 			<template #extra>
 				<div class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">{{
@@ -60,26 +60,25 @@
 <script setup lang="ts">
 import type { Archon, LauncherMeta } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
-
-import { ButtonStyled, ConfirmModal, ServerSetupModal } from '#ui/components'
-import { useDebugLogger } from '#ui/composables/debug-logger'
-import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
-	InstallationSettingsLayout,
-	provideInstallationSettings,
-} from '#ui/layouts/shared/installation-settings'
-import {
+	ButtonStyled,
+	commonMessages,
+	ConfirmModal,
+	defineMessages,
+	formatLoaderLabel,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettings,
 	injectTags,
-} from '#ui/providers'
-import { commonMessages } from '#ui/utils/common-messages'
-import { formatLoaderLabel } from '#ui/utils/loaders'
-
-import { injectServerSettings } from '../providers'
+	InstallationSettingsLayout,
+	provideInstallationSettings,
+	ServerSetupModal,
+	useDebugLogger,
+	useVIntl,
+} from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
+import { computed, ref, watch } from 'vue'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
@@ -168,7 +167,7 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	reinstall: [unknown?]
+	reinstall: [any?]
 	'reinstall-failed': []
 }>()
 
@@ -255,6 +254,26 @@ const purpurBuildsQuery = useQuery({
 	queryKey: computed(() => ['purpur-builds', editingGameVersion.value] as const),
 	queryFn: () => client.purpur.versions_v2.getBuilds(editingGameVersion.value),
 	enabled: computed(() => editingPlatform.value === 'purpur' && !!editingGameVersion.value),
+	staleTime: 5 * 60 * 1000,
+})
+
+const paperSupportedVersionsQuery = useQuery({
+	queryKey: ['paper-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.paper.versions_v3.getProject()
+		return new Set(Object.values(project.versions).flat())
+	},
+	enabled: computed(() => editingPlatform.value === 'paper'),
+	staleTime: 5 * 60 * 1000,
+})
+
+const purpurSupportedVersionsQuery = useQuery({
+	queryKey: ['purpur-supported-versions'] as const,
+	queryFn: async () => {
+		const project = await client.purpur.versions_v2.getProject()
+		return new Set(project.versions)
+	},
+	enabled: computed(() => editingPlatform.value === 'purpur'),
 	staleTime: 5 * 60 * 1000,
 })
 
@@ -365,17 +384,33 @@ provideInstallationSettings({
 			? tags.gameVersions.value
 			: tags.gameVersions.value.filter((v) => v.version_type === 'release')
 
-		if (loader && loader !== 'vanilla' && !['paper', 'purpur'].includes(loader)) {
-			const manifest = manifestQuery.data.value?.gameVersions
-			if (manifest) {
-				const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
-				if (!hasPlaceholder) {
-					const supportedVersions = new Set(
-						manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
-					)
+		if (loader && loader !== 'vanilla') {
+			if (loader === 'paper') {
+				const supported = paperSupportedVersionsQuery.data.value
+				if (supported) {
 					return versions
-						.filter((v) => supportedVersions.has(v.version))
+						.filter((v) => supported.has(v.version))
 						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else if (loader === 'purpur') {
+				const supported = purpurSupportedVersionsQuery.data.value
+				if (supported) {
+					return versions
+						.filter((v) => supported.has(v.version))
+						.map((v) => ({ value: v.version, label: v.version }))
+				}
+			} else {
+				const manifest = manifestQuery.data.value?.gameVersions
+				if (manifest) {
+					const hasPlaceholder = manifest.some((x) => x.id === '${modrinth.gameVersion}')
+					if (!hasPlaceholder) {
+						const supportedVersions = new Set(
+							manifest.filter((x) => x.loaders.length > 0).map((x) => x.id),
+						)
+						return versions
+							.filter((v) => supportedVersions.has(v.version))
+							.map((v) => ({ value: v.version, label: v.version }))
+					}
 				}
 			}
 		}
@@ -389,8 +424,22 @@ provideInstallationSettings({
 	},
 
 	resolveHasSnapshots(loader) {
-		if (loader === 'vanilla' || ['paper', 'purpur'].includes(loader)) {
+		if (loader === 'vanilla') {
 			return tags.gameVersions.value.some((v) => v.version_type !== 'release')
+		}
+		if (loader === 'paper') {
+			const supported = paperSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
+		}
+		if (loader === 'purpur') {
+			const supported = purpurSupportedVersionsQuery.data.value
+			if (!supported) return false
+			return tags.gameVersions.value.some(
+				(v) => v.version_type !== 'release' && supported.has(v.version),
+			)
 		}
 		const manifest = manifestQuery.data.value?.gameVersions
 		if (!manifest) return false
@@ -407,6 +456,9 @@ provideInstallationSettings({
 		debug('save: called with', { platform, gameVersion, loaderVersionId })
 		const currentPlatform = server.value?.loader?.toLowerCase() ?? 'vanilla'
 		const platformChanged = platform !== currentPlatform
+		const gameVersionChanged = gameVersion !== (server.value?.mc_version ?? '')
+		const loaderVersionChanged =
+			loaderVersionId !== null && loaderVersionId !== (server.value?.loader_version ?? '')
 
 		let resolvedLoaderVersion = loaderVersionId
 		if (!resolvedLoaderVersion && platform !== 'vanilla') {
@@ -417,12 +469,12 @@ provideInstallationSettings({
 		debug('save: emitting reinstall before API call')
 		emit(
 			'reinstall',
-			platformChanged
+			platformChanged || loaderVersionChanged
 				? { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion }
 				: { mVersion: gameVersion },
 		)
 		try {
-			if (platformChanged) {
+			if (platformChanged || loaderVersionChanged) {
 				const request: Archon.Content.v1.InstallWorldContent = {
 					content_variant: 'bare',
 					loader: toApiLoader(platform),
@@ -430,9 +482,9 @@ provideInstallationSettings({
 					game_version: gameVersion || undefined,
 					soft_override: true,
 				}
-				debug('save: platform changed, calling installContent', request)
+				debug('save: platform/loader version changed, calling installContent', request)
 				await client.archon.content_v1.installContent(serverId, worldId.value!, request)
-			} else {
+			} else if (gameVersionChanged) {
 				debug('save: game version only, calling applyGameVersionUpdate', gameVersion)
 				await client.archon.content_v1.applyGameVersionUpdate(serverId, worldId.value!, gameVersion)
 			}
@@ -614,8 +666,66 @@ provideInstallationSettings({
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
 
-	lockPlatform: true,
-	hideLoaderVersion: true,
+	lockPlatform: false,
+	hideLoaderVersion: false,
+
+	async disableAllContent() {
+		debug('disableAllContent: fetching all addons')
+		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
+		const items = (addons.addons ?? [])
+			.filter((a) => !a.disabled)
+			.map((a) => ({ kind: a.kind, filename: a.filename }))
+		if (items.length > 0) {
+			debug('disableAllContent: disabling', items.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		}
+		debug('disableAllContent: done')
+	},
+
+	async disableIncompatibleContent(diffs) {
+		debug('disableIncompatibleContent: processing', diffs.length, 'diffs')
+		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
+		const removedFiles = new Set(diffs.filter((d) => d.type === 'removed').map((d) => d.fileName))
+		const items = (addons.addons ?? [])
+			.filter((a) => !a.disabled && removedFiles.has(a.filename))
+			.map((a) => ({ kind: a.kind, filename: a.filename }))
+		if (items.length > 0) {
+			debug('disableIncompatibleContent: disabling', items.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		}
+		debug('disableIncompatibleContent: done')
+	},
+
+	async saveWithoutAutoFix(platform, gameVersion, loaderVersionId) {
+		debug('saveWithoutAutoFix: called with', { platform, gameVersion, loaderVersionId })
+		let resolvedLoaderVersion = loaderVersionId
+		if (!resolvedLoaderVersion && platform !== 'vanilla') {
+			const versions = getLoaderVersionsForGameVersion(platform, gameVersion)
+			resolvedLoaderVersion = versions[0]?.id ?? null
+		}
+		emit('reinstall', { loader: platform, lVersion: resolvedLoaderVersion, mVersion: gameVersion })
+		try {
+			const request: Archon.Content.v1.InstallWorldContent = {
+				content_variant: 'bare',
+				loader: toApiLoader(platform),
+				version: resolvedLoaderVersion ?? '',
+				game_version: gameVersion || undefined,
+				soft_override: true,
+			}
+			debug('saveWithoutAutoFix: calling installContent', request)
+			await client.archon.content_v1.installContent(serverId, worldId.value!, request)
+			debug('saveWithoutAutoFix: succeeded, invalidating')
+			invalidateServerState()
+		} catch (err) {
+			debug('saveWithoutAutoFix: failed', err)
+			emit('reinstall-failed')
+			addNotification({
+				type: 'error',
+				text: err instanceof Error ? err.message : formatMessage(messages.failedToSaveSettings),
+			})
+			throw err
+		}
+	},
 
 	async previewSave(_platform, gameVersion, _loaderVersionId, signal) {
 		const result = await client.archon.content_v1.getUpdateGameVersionPreview(
@@ -656,12 +766,13 @@ watch(
 	},
 )
 
-function onReinstall(event?: unknown) {
+function onReinstall(event?: any) {
 	installationSettingsLayout.value?.cancelEditing()
 	emit('reinstall', event)
 }
 
 function onBrowseModpacks() {
+	debug('onBrowseModpacks: navigating to modpack discovery')
 	serverSettings.browseModpacks({
 		serverId,
 		worldId: worldId.value,

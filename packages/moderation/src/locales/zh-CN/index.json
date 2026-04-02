@@ -12,7 +12,7 @@
     "defaultMessage": "添加图标"
   },
   "nags.add-java-address.description": {
-    "defaultMessage": "添加IP地址和端口，Java 版玩家可以使用它们加入你的服务器。"
+    "defaultMessage": "添加 IP 地址和端口，Java 版玩家可以使用它们加入到你的服务器。"
   },
   "nags.add-java-address.title": {
     "defaultMessage": "添加 Java 地址"
@@ -123,7 +123,7 @@
     "defaultMessage": "Discord 邀请链接不可用作其他类型的链接。请将你的 Discord 链接仅放置在 “Discord 邀请链接” 输入框中。"
   },
   "nags.misused-discord-link.title": {
-    "defaultMessage": "移动 Discord 邀请链接"
+    "defaultMessage": "移动 Discord 邀请链接位置"
   },
   "nags.moderation.title": {
     "defaultMessage": "访问审核页面"

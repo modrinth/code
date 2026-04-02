@@ -1,7 +1,7 @@
 <template>
-	<div class="relative h-full w-full overflow-y-auto">
+	<div class="relative h-full w-full">
 		<div v-if="data" class="flex h-full w-full flex-col">
-			<div class="card flex flex-col gap-6">
+			<div class="flex flex-col gap-6">
 				<div class="flex justify-start gap-16">
 					<div class="flex max-w-[500px] grow flex-col gap-6">
 						<!-- Server name -->
@@ -17,24 +17,23 @@
 									:maxlength="48"
 									@keyup.enter="!serverName && saveGeneral"
 								/>
-								<span v-if="!serverName" class="text-sm text-rose-400">
-									Server name must be at least 1 character long.
-								</span>
-								<span v-if="!isValidServerName" class="text-sm text-rose-400">
-									Server name can contain any character.
-								</span>
+								<span>This name is only visible on Modrinth.</span>
+								<div class="text-red font-medium">
+									<span v-if="!isValidServerName"> Server name cannot be empty. </span>
+								</div>
 							</div>
-							<span>This name is only visible on Modrinth.</span>
 						</div>
 
 						<!-- Hostname -->
 						<div class="flex flex-col gap-2.5">
 							<label for="server-subdomain" class="flex flex-col gap-2.5">
 								<span class="text-lg font-semibold text-contrast">Hostname</span>
-								<div class="text-input-wrapper !w-full px-3">
+								<div
+									class="flex w-full overflow-hidden rounded-xl bg-button-bg px-3 [box-shadow:var(--shadow-inset-sm)] transition-[box-shadow] duration-100 ease-in-out focus-within:[box-shadow:0_0_0_0.25rem_var(--color-brand-shadow)]"
+								>
 									<div class="relative inline-flex min-h-9 items-center">
 										<span
-											class="pointer-events-none invisible whitespace-pre text-base font-medium"
+											class="pointer-events-none invisible whitespace-pre px-px text-base font-medium"
 											aria-hidden="true"
 											>{{ serverSubdomain || 'Enter subdomain...' }}</span
 										>
@@ -43,14 +42,14 @@
 											:value="serverSubdomain"
 											placeholder="Enter subdomain..."
 											:maxlength="32"
-											class="absolute inset-0 bg-transparent !p-0 text-base font-medium text-primary outline-none transition-colors placeholder:text-secondary focus:text-contrast"
+											class="absolute left-px inset-0 bg-transparent !p-0 text-base font-medium text-primary !shadow-none transition-colors placeholder:text-secondary focus:text-contrast"
 											autocomplete="off"
 											@input="serverSubdomain = ($event.target as HTMLInputElement).value"
 											@keyup.enter="saveGeneral"
 										/>
 									</div>
 									<div
-										class="text-input-wrapper__after"
+										class="flex min-h-9 shrink-0 select-none items-center py-2 pr-4 font-medium opacity-50 [filter:grayscale(50%)]"
 										:class="!serverSubdomain ? '!ml-auto' : ''"
 									>
 										.modrinth.gg
@@ -58,7 +57,7 @@
 								</div>
 							</label>
 							<span>Your friends can connect to your server using this address.</span>
-							<div v-if="!isValidSubdomain" class="flex flex-col text-sm text-red">
+							<div v-if="!isValidSubdomain" class="text-red font-medium">
 								<span v-if="!isValidLengthSubdomain">
 									Subdomain must be at least 5 characters long.
 								</span>
@@ -109,7 +108,7 @@
 					:key="key"
 					class="flex items-center justify-between gap-2"
 				>
-					<label :for="`pref-${key}`" class="flex flex-col gap-2">
+					<label :for="`pref-${key}`" class="flex flex-col gap-1">
 						<div class="flex flex-row items-center gap-2">
 							<span class="text-lg font-semibold text-contrast">{{ prefConfig.displayName }}</span>
 							<div
@@ -181,7 +180,9 @@ const data = server
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
 const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5)
-const isValidCharsSubdomain = computed(() => /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value))
+const isValidCharsSubdomain = computed(
+	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
+)
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
 const icon = ref<string | undefined>(undefined)
 

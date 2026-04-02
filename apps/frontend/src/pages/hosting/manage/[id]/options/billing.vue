@@ -3,5 +3,5 @@ import { ServerSettingsBillingPage } from '@modrinth/ui'
 </script>
 
 <template>
-	<ServerSettingsBillingPage />
+	<ServerSettingsBillingPage class="card" />
 </template>

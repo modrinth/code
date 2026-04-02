@@ -172,17 +172,7 @@
 			</template>
 			<template #actions>
 				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
-					<PanelServerActionButton
-						:is-online="isServerRunning"
-						:is-actioning="isActioning"
-						:is-installing="serverData.status === 'installing'"
-						:disabled="isActioning || !!error"
-						:server-name="serverData.name"
-						:server-data="serverData"
-						:uptime-seconds="uptimeSeconds"
-						:busy-reason="busyReasons.length > 0 ? formatMessage(busyReasons[0].reason) : undefined"
-						@action="sendPowerAction"
-					/>
+					<PanelServerActionButton :disabled="!!error" :uptime-seconds="uptimeSeconds" />
 				</div>
 			</template>
 		</ContentPageHeader>
@@ -320,12 +310,14 @@
 				>
 					<InstallingBanner
 						v-if="
-							(serverData.status === 'installing' || isSyncingContent) &&
+							(serverData.status === 'installing' || isSyncingContent || contentError) &&
 							syncProgress?.phase !== 'Analyzing'
 						"
 						data-pyro-server-installing
 						class="mb-4"
 						:progress="syncProgress"
+						:content-error="contentError"
+						@retry="handleContentRetry"
 					>
 						<template #icon>
 							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
@@ -398,9 +390,8 @@ import {
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
-	useVIntl,
 } from '@modrinth/ui'
-import type { PowerAction, Stats } from '@modrinth/utils'
+import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -416,7 +407,6 @@ import { useServerProject } from '~/composables/servers/use-server-project.ts'
 import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
-const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 
 const isReconnecting = ref(false)
@@ -505,7 +495,6 @@ const modrinthServersConsole = useModrinthServersConsole()
 const queryClient = useQueryClient()
 const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
-const isActioning = ref(false)
 const isServerRunning = computed(() => serverPowerState.value === 'running')
 const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
@@ -518,6 +507,7 @@ const markBackupCancelled = (backupId: string) => {
 
 // Parthenon state event
 const syncProgress = ref<Archon.Websocket.v0.SyncContentProgress | null>(null)
+const contentError = ref<Archon.Websocket.v0.SyncContentError | null>(null)
 const syncProgressActive = ref(false)
 const isAwaitingPostInstallRefresh = ref(false)
 const { start: startSyncHide, stop: cancelSyncHide } = useTimeoutFn(
@@ -845,6 +835,7 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 		serverStatus: serverData.value?.status,
 	})
 	syncProgress.value = data.progress
+	contentError.value = data.content_error
 
 	// Sync power state from the state event
 	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
@@ -878,6 +869,7 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			hasSeenInstallProgress = true
 		} else if (
 			data.progress == null &&
+			data.content_error == null &&
 			serverData.value.status === 'installing' &&
 			hasSeenInstallProgress
 		) {
@@ -886,6 +878,18 @@ const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
 			applyOptimisticCompletion()
 			invalidateAfterInstall()
 		}
+	}
+}
+
+async function handleContentRetry() {
+	if (!worldId.value) return
+	try {
+		await client.archon.content_v1.repair(serverId, worldId.value)
+	} catch (err) {
+		addNotification({
+			type: 'error',
+			text: err instanceof Error ? err.message : 'Failed to retry installation',
+		})
 	}
 }
 
@@ -1181,7 +1185,8 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 }
 
 const updateStats = (currentStats: Stats['current']) => {
-	isConnected.value = true
+	if (!isMounted.value) return
+	if (!isConnected.value) isConnected.value = true
 	stats.value = {
 		current: currentStats,
 		past: { ...stats.value.current },
@@ -1217,43 +1222,6 @@ const updateGraphData = (dataArray: number[], newValue: number): number[] => {
 	const updated = [...dataArray, newValue]
 	if (updated.length > 10) updated.shift()
 	return updated
-}
-
-const toAdverb = (word: string) => {
-	if (word.endsWith('p')) {
-		return word + 'ping'
-	}
-	if (word.endsWith('e')) {
-		return word.slice(0, -1) + 'ing'
-	}
-	if (word.endsWith('ie')) {
-		return word.slice(0, -2) + 'ying'
-	}
-	return word + 'ing'
-}
-
-const sendPowerAction = async (action: PowerAction) => {
-	const actionName = action.charAt(0).toUpperCase() + action.slice(1)
-	try {
-		isActioning.value = true
-		await client.archon.servers_v0.power(serverId, action)
-	} catch (error) {
-		console.error(`Error ${toAdverb(actionName)} server:`, error)
-		notifyError(
-			`Error ${toAdverb(actionName)} server`,
-			'An error occurred while performing this action.',
-		)
-	} finally {
-		isActioning.value = false
-	}
-}
-
-const notifyError = (title: string, text: string) => {
-	addNotification({
-		title,
-		text,
-		type: 'error',
-	})
 }
 
 const nodeUnavailableDetails = computed(() => [

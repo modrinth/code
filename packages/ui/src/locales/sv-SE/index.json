@@ -68,8 +68,14 @@
   "button.continue": {
     "defaultMessage": "Fortsätt"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Kopiera filnamn"
+  },
   "button.copy-id": {
     "defaultMessage": "Kopiera ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Kopiera länk"
   },
   "button.copy-permalink": {
     "defaultMessage": "Kopiera permanent länk"
@@ -80,6 +86,9 @@
   "button.decline": {
     "defaultMessage": "Neka"
   },
+  "button.disable": {
+    "defaultMessage": "Inaktivera"
+  },
   "button.download": {
     "defaultMessage": "Ladda ner"
   },
@@ -88,6 +97,12 @@
   },
   "button.edit": {
     "defaultMessage": "Redigera"
+  },
+  "button.enable": {
+    "defaultMessage": "Aktivera"
+  },
+  "button.extract": {
+    "defaultMessage": "Extrahera"
   },
   "button.follow": {
     "defaultMessage": "Följ"
@@ -101,11 +116,17 @@
   "button.more-options": {
     "defaultMessage": "Fler alternativ"
   },
+  "button.move": {
+    "defaultMessage": "Flytta"
+  },
   "button.next": {
     "defaultMessage": "Nästa"
   },
   "button.open-folder": {
     "defaultMessage": "Öppna mapp"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "Öppna i mapp"
   },
   "button.play": {
     "defaultMessage": "Spela"
@@ -121,6 +142,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Ta bort bild"
+  },
+  "button.rename": {
+    "defaultMessage": "Byt namn"
   },
   "button.repair": {
     "defaultMessage": "Reparera"
@@ -152,6 +176,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Visa alla versioner"
   },
+  "button.show-file": {
+    "defaultMessage": "Visa fil"
+  },
   "button.sign-in": {
     "defaultMessage": "Logga in"
   },
@@ -171,7 +198,7 @@
     "defaultMessage": "Avfölj"
   },
   "button.unlink-modpack": {
-    "defaultMessage": "Koppla bort modd-paket"
+    "defaultMessage": "Avlänka modpaketet"
   },
   "button.update": {
     "defaultMessage": "Uppdatera"
@@ -182,9 +209,6 @@
   "changelog.justNow": {
     "defaultMessage": "Just nu"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -192,7 +216,7 @@
     "defaultMessage": "Hosting"
   },
   "changelog.product.web": {
-    "defaultMessage": "Webbsida"
+    "defaultMessage": "Plattform"
   },
   "collections.label.private": {
     "defaultMessage": "Privat"
@@ -207,7 +231,7 @@
     "defaultMessage": "Uppdatera projekt"
   },
   "content.confirm-bulk-update.update-button": {
-    "defaultMessage": "Uppdatera {count, plural, one {# projekt} other {# projekt}}"
+    "defaultMessage": "Uppdatera {count} projekt"
   },
   "content.confirm-deletion.admonition-body": {
     "defaultMessage": "Att radera en mod kan ständigt påverka din värld och kan orsaka försvunnen innehåll eller oförväntade problem när den öppnas igen."
@@ -222,28 +246,31 @@
     "defaultMessage": "Radera {count, plural, one {{itemType, select, project {projekt} version {version} user {användare} other {projekt}}} other {{itemType, select, project {projekt} version {versioner} user {användare} other {projekt}}}}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Alla mods eller innehåll som du lade till över modpacken kommer att raderas."
+    "defaultMessage": "Alla moddar eller innehåll som du lade till över modpaketet kommer att raderas."
+  },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Alla moddar eller innehåll du har lagt till utöver modpaketet kommer bevaras."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Varning om att {action, select, downgrade {nedgradera} other {uppdatera}}"
   },
   "content.confirm-modpack-update.confirm-button": {
-    "defaultMessage": "{action, select, downgrade {Degradera} other {Uppgradera}} modpack"
+    "defaultMessage": "{action, select, downgrade {Nedgradera} other {Uppgradera}} modpaket"
   },
   "content.confirm-modpack-update.header": {
-    "defaultMessage": "{action, select, downgrade {Degradera} other {Uppgradera}} modpack"
+    "defaultMessage": "{action, select, downgrade {Nedgradera} other {Uppgradera}} modpaket"
   },
   "content.confirm-unlink.admonition-body": {
-    "defaultMessage": "Moddar och innehåll kommer blandas med det du lade till över modpacken, och kommer sluta att få uppdateringar."
+    "defaultMessage": "Moddar och innehåll kommer blandas med det du lade till över modpaketen, och kommer sluta få uppdateringar."
   },
   "content.confirm-unlink.admonition-header": {
-    "defaultMessage": "Urkopplar modpack"
+    "defaultMessage": "Avlänkar modpaket"
   },
   "content.confirm-unlink.header": {
-    "defaultMessage": "Urkopplar modpacket"
+    "defaultMessage": "Avlänka modpaket"
   },
   "content.confirm-unlink.unlink-button": {
-    "defaultMessage": "Urkoppla"
+    "defaultMessage": "Avlänka"
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} tillagd"
@@ -252,7 +279,7 @@
     "defaultMessage": "Lade till (beroende)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Tog bort"
+    "defaultMessage": "Inaktiverad"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Uppdaterade"
@@ -299,14 +326,11 @@
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Visa inte igen"
   },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Uppdaterar..."
-  },
   "content.page-layout.additional-content": {
-    "defaultMessage": "Extra innehåll"
+    "defaultMessage": "Ytterligare innehåll"
   },
   "content.page-layout.browse-content": {
-    "defaultMessage": "Hitta innehåll"
+    "defaultMessage": "Utforska innehåll"
   },
   "content.page-layout.busy-description": {
     "defaultMessage": "Vänta på att operationen klaras innan du redigerar innehåll."
@@ -315,7 +339,7 @@
     "defaultMessage": "Hitta eller ladda upp {contentType} för att börja"
   },
   "content.page-layout.empty.modpack-hint": {
-    "defaultMessage": "Lägg till extra innehåll över denna modpack"
+    "defaultMessage": "Lägg till ytterligare innehåll över modpaketet"
   },
   "content.page-layout.empty.no-content-installed": {
     "defaultMessage": "Inget innehåll installerat"
@@ -404,17 +428,17 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Uppdaterar {contentType}..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Inaktivera"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Aktivera"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} valda"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} valda"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Skriv över"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Över 100 filer kommer att skrivas över om du fortsätter med extrahering; här är några av dem."
   },
   "form.label.address-line": {
     "defaultMessage": "Adresslinje"
@@ -518,9 +542,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Kvalitet"
   },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Kopiera länk"
-  },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Kunde inte radera innehållet"
   },
@@ -534,7 +555,7 @@
     "defaultMessage": "Kunde inte uppdatera innehållet"
   },
   "hosting.content.failed-to-load-modpack-content": {
-    "defaultMessage": "Kunde inte ladda modpack-innehållet"
+    "defaultMessage": "Kunde inte ladda modpaketets innehåll"
   },
   "hosting.content.failed-to-load-versions": {
     "defaultMessage": "Kunde inte ladda versionerna"
@@ -546,13 +567,19 @@
     "defaultMessage": "Kunde inte växla {name}"
   },
   "hosting.content.failed-to-unlink": {
-    "defaultMessage": "Kunde inte urkoppla modpacken"
+    "defaultMessage": "Kunde inte avlänka modpaketet"
   },
   "hosting.content.failed-to-update": {
     "defaultMessage": "Kunde inte uppdatera"
   },
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Kunde inte ladda upp filen"
+  },
+  "hosting.specs.burst": {
+    "defaultMessage": "Ökar upp till {cpus} CPU:er"
+  },
+  "hosting.specs.burst.tooltip": {
+    "defaultMessage": "CPU-ökning låter din server att för tillfället använda fler tråd för att försöka dämpa TPS-spikar. Klicka för mer info."
   },
   "hosting.specs.gb-ram": {
     "defaultMessage": "{ram} GB RAM"
@@ -621,7 +648,7 @@
     "defaultMessage": "Vi rekommenderar inte att du ändrar installationsinställningarna efter att du har installerat innehållet. Om du vill ändra dem måste du starta om servern."
   },
   "installation-settings.linked-instance.title": {
-    "defaultMessage": "{projectType, select, server {Det} other {Den}} kopplade {projectType, select, server {serverprojektet} other {modpacken}}"
+    "defaultMessage": "Länkat {projectType, select, server {serverprojekt} other {modpaket}}"
   },
   "installation-settings.loader-version": {
     "defaultMessage": "{loader} version"
@@ -630,10 +657,10 @@
     "defaultMessage": "Du kommer att behöva ställa om din server för att ändra loader."
   },
   "installation-settings.reinstall-modpack.description": {
-    "defaultMessage": "Ominstallering av modpacken ställer om {type, select, server {serverns} other {instansens}} innehåll till dess originella skick, vilket kommer ta bort mods eller innehåll som du lagt till."
+    "defaultMessage": "Ominstallering av modpaketet återställer {type, select, server {serverns} other {instansens}} innehåll till dess originella skick, vilket kommer ta bort moddar eller innehåll som du lagt till."
   },
   "installation-settings.reinstall-modpack.title": {
-    "defaultMessage": "Ominstallera modpack"
+    "defaultMessage": "Ominstallera modpaket"
   },
   "installation-settings.reinstalling-modpack": {
     "defaultMessage": "Ominstallerar modpack"
@@ -660,10 +687,10 @@
     "defaultMessage": "Sök efter spelversion..."
   },
   "installation-settings.unlink": {
-    "defaultMessage": "Urkoppla"
+    "defaultMessage": "Avlänka"
   },
   "installation-settings.unlink.description": {
-    "defaultMessage": "Att avkoppla kommer ständigt avkoppla denna {type, select, server {server} other {instans}} från {projectType, select, server {server} other {modpack}}-projektet, vilket ska låta dig ändra loadern och Minecraft-versionen, men du kommer inte att få uppdateringar i framtiden."
+    "defaultMessage": "Att avlänka kommer permanent avkoppla denna {type, select, server {server} other {instans}} från {projectType, select, server {server} other {modpaket}}-projektet, vilket ska låta dig ändra loadern och Minecraft-versionen, men du kommer inte att få uppdateringar i framtiden."
   },
   "installation-settings.verifying": {
     "defaultMessage": "Verifierar..."
@@ -707,15 +734,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "Filer laddas fortfarande upp. Om du lämnar sidan kommer uppladdningen avbrytas och dina ändringar kommer förloras."
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Lämna sida"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Stanna på sidan"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Lämna sidan?"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "Uppladdning pågår"
   },
@@ -725,26 +743,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Befintliga instanser"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Spelversion"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Välj spelversion"
   },
   "instances.content-install.header": {
     "defaultMessage": "Installera projekt"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Göm snapshottar"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Installera"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Installerad"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Installerar..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Instanstyp"
@@ -773,20 +782,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Välj ikon"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Visa alla versioner"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Kopiera länk"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Modpaketet innehåller inget ytterligare innehåll."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Inget innehåll hittades"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Allt"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Modpaketets innehåll"
@@ -1616,6 +1616,33 @@
   "project.server.customModpackTooltip": {
     "defaultMessage": "Detta projektet använder ett modpaket"
   },
+  "project.server.language.af": {
+    "defaultMessage": "Afrikaans"
+  },
+  "project.server.language.am": {
+    "defaultMessage": "Amhariska"
+  },
+  "project.server.language.ar": {
+    "defaultMessage": "Arabiska"
+  },
+  "project.server.language.az": {
+    "defaultMessage": "Azerbajdzjanska"
+  },
+  "project.server.language.be": {
+    "defaultMessage": "Vitryska"
+  },
+  "project.server.language.bg": {
+    "defaultMessage": "Bulgariska"
+  },
+  "project.server.language.bn": {
+    "defaultMessage": "Bengali"
+  },
+  "project.server.language.bs": {
+    "defaultMessage": "Bosniska"
+  },
+  "project.server.language.ca": {
+    "defaultMessage": "Katalanska"
+  },
   "project.server.language.cs": {
     "defaultMessage": "Tjeckiska"
   },
@@ -1766,6 +1793,69 @@
   "project.server.language.sr": {
     "defaultMessage": "Serbiska"
   },
+  "project.server.language.sv": {
+    "defaultMessage": "Svenska"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Thailändska"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filippinska"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turkiska"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukrainska"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Uzbekiska"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Vietnamesiska"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Kinesiska"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
+  "project.server.ping.ms": {
+    "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asien"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australien"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Mellanöstern"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Ryssland"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Sydamerika"
+  },
   "project.server.region.tooltip": {
     "defaultMessage": "Servern är hostad i {regionName}"
   },
@@ -1864,6 +1954,9 @@
   },
   "project.settings.environment.suboption.accessibility-option-label": {
     "defaultMessage": "{title}: {description}"
+  },
+  "project.settings.environment.suboption.accessibility-suboption-group-label": {
+    "defaultMessage": "Underalternativ av {option}"
   },
   "project.settings.environment.title": {
     "defaultMessage": "Miljö"
@@ -2021,8 +2114,53 @@
   "search.filter_type.server_language": {
     "defaultMessage": "Språk"
   },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Region"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Status"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Laddare"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Moddat"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanilla"
+  },
+  "servers.backups.admonition.backup-failed.description": {
+    "defaultMessage": "Något gick fel när säkerhetskopian {backupName} skapades. Vänligen försök igen eller kontakta support om felet återkommer."
+  },
+  "servers.backups.admonition.backup-failed.title": {
+    "defaultMessage": "Säkerhetskopiering misslyckades"
+  },
+  "servers.backups.admonition.backup-queued.description": {
+    "defaultMessage": "{backupName} är köad och kommer startas strax."
+  },
+  "servers.backups.admonition.backup-queued.title": {
+    "defaultMessage": "Säkerhetskopia köad"
+  },
+  "servers.backups.admonition.creating-backup.description": {
+    "defaultMessage": "Sparar världdata och serverkonfigurationen för {backupName}. Detta kan tå några minuter."
+  },
+  "servers.backups.admonition.creating-backup.title": {
+    "defaultMessage": "Skapar säkerhetskopia"
+  },
+  "servers.backups.admonition.fallback-name": {
+    "defaultMessage": "Din säkerhetskopia"
+  },
+  "servers.backups.admonition.restore-failed.description": {
+    "defaultMessage": "Något gick fel när vi försökte återställa från säkerhetskopian {backupName}. Vänligen försök igen eller kontakta support om felet återkommer."
+  },
+  "servers.backups.admonition.restore-failed.title": {
+    "defaultMessage": "Äterställning från säkerhetskopia misslyckades"
+  },
+  "servers.backups.admonition.restore-queued.description": {
+    "defaultMessage": "Återställning från {backupName} är köad och kommer att börja strax."
+  },
+  "servers.backups.admonition.restore-queued.title": {
+    "defaultMessage": "Återställning från säkerhetskopia köad"
   },
   "servers.backups.admonition.restore-successful.description": {
     "defaultMessage": "Din server har återställts till {backupName} och är redo för att startas."
@@ -2153,6 +2291,21 @@
   "servers.region.western-europe": {
     "defaultMessage": "Västeuropa"
   },
+  "servers.setup.rate-limit.text": {
+    "defaultMessage": "Du blir hastighetsbegränsad. Vänligen försök igen senare."
+  },
+  "servers.setup.rate-limit.title": {
+    "defaultMessage": "Kunde inte ominstallera servern"
+  },
+  "servers.setup.reinstall-failed.text": {
+    "defaultMessage": "Ett oförväntat fel uppstod under ominstalleringen. Vänligen försök igen senare."
+  },
+  "servers.setup.reinstall-failed.title": {
+    "defaultMessage": "Ominstallation misslyckades"
+  },
+  "servers.setup.upload-warning": {
+    "defaultMessage": "Vänligen stäng inte sidan medan uppladdningen pågår."
+  },
   "servers.setup.uploading-modpack.header": {
     "defaultMessage": "Laddar upp modpaket"
   },
@@ -2183,6 +2336,12 @@
   "settings.display.theme.oled": {
     "defaultMessage": "OLED"
   },
+  "settings.display.theme.preferred-dark-theme": {
+    "defaultMessage": "Önskat mörkt tema"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "defaultMessage": "Önskat ljust tema"
+  },
   "settings.display.theme.retro": {
     "defaultMessage": "Retro"
   },
@@ -2199,10 +2358,16 @@
     "defaultMessage": "Sökresultat"
   },
   "settings.language.description": {
-    "defaultMessage": "Välj språk för denna {platform}. Översättningar är utförda av volontärer <crowdin-link>på Crowdin</crowdin-link>."
+    "defaultMessage": "Välj språk för {platform}n. Översättningar görs av volontärer <crowdin-link>på Crowdin</crowdin-link>."
   },
   "settings.language.languages.search-field.placeholder": {
     "defaultMessage": "Sök efter ett språk..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "defaultMessage": "{matches, plural, =0 {Inga språk matchar} other {# språk matchar}} din sökning."
+  },
+  "settings.language.languages.search.no-results": {
+    "defaultMessage": "Inget språk matchar din sökning."
   },
   "settings.language.platform.app": {
     "defaultMessage": "app"
@@ -2215,6 +2380,9 @@
   },
   "settings.language.warning": {
     "defaultMessage": "Om du ändrar språket på {platform}n kan vissa delar av innehållet visas på engelska om det inte finns någon översättning tillgänglig. {platform}n är ännu inte helt översatt, så vissa delar av innehållet kan fortfarande vara på engelska för vissa språk."
+  },
+  "settings.pats.title": {
+    "defaultMessage": "Personliga åtkomstnycklar"
   },
   "settings.profile.title": {
     "defaultMessage": "Offentlig profil"
@@ -2300,8 +2468,14 @@
   "tag.category.creative-mode": {
     "defaultMessage": "Kreativt läge"
   },
+  "tag.category.creator-community": {
+    "defaultMessage": "Kreatör-community"
+  },
   "tag.category.cursed": {
     "defaultMessage": "Förbannat"
+  },
+  "tag.category.custom-content": {
+    "defaultMessage": "Egengjort innehåll"
   },
   "tag.category.decoration": {
     "defaultMessage": "Dekoration"
@@ -2336,6 +2510,9 @@
   "tag.category.gui": {
     "defaultMessage": "GUI"
   },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Hardcore-läge"
+  },
   "tag.category.high": {
     "defaultMessage": "Hög"
   },
@@ -2348,8 +2525,14 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Köksvask"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Bibliotek"
+  },
+  "tag.category.lifesteal": {
+    "defaultMessage": "Lifesteal"
   },
   "tag.category.lightweight": {
     "defaultMessage": "Resurs-snålt"
@@ -2369,8 +2552,17 @@
   "tag.category.medium": {
     "defaultMessage": "Medel"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Mikrospel"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minispel"
+  },
+  "tag.category.minigames": {
+    "defaultMessage": "Minispel"
+  },
+  "tag.category.mmo": {
+    "defaultMessage": "MMO"
   },
   "tag.category.mobs": {
     "defaultMessage": "Varelser"
@@ -2384,8 +2576,17 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Flerspelarläge"
   },
+  "tag.category.network": {
+    "defaultMessage": "Nätverk"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Offlineläge"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Optimering"
+  },
+  "tag.category.parkour": {
+    "defaultMessage": "Parkour"
   },
   "tag.category.path-tracing": {
     "defaultMessage": "Vägspårning"
@@ -2393,17 +2594,44 @@
   "tag.category.pbr": {
     "defaultMessage": "PBR"
   },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Personliga världar"
+  },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Potatis"
+  },
+  "tag.category.prison": {
+    "defaultMessage": "Fängelse"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
   },
   "tag.category.quests": {
     "defaultMessage": "Uppdrag"
   },
+  "tag.category.racing": {
+    "defaultMessage": "Racing"
+  },
   "tag.category.realistic": {
     "defaultMessage": "Realistiskt"
   },
+  "tag.category.recording-smp": {
+    "defaultMessage": "Filmnings-SMP"
+  },
   "tag.category.reflections": {
     "defaultMessage": "Reflektioner"
+  },
+  "tag.category.roleplay": {
+    "defaultMessage": "Rollspel"
+  },
+  "tag.category.rpg": {
+    "defaultMessage": "RPG"
   },
   "tag.category.screenshot": {
     "defaultMessage": "Fotografi"
@@ -2417,17 +2645,35 @@
   "tag.category.simplistic": {
     "defaultMessage": "Simplistiskt"
   },
+  "tag.category.skyblock": {
+    "defaultMessage": "Skyblock"
+  },
+  "tag.category.smp": {
+    "defaultMessage": "SMP"
+  },
   "tag.category.social": {
     "defaultMessage": "Socialt"
   },
   "tag.category.storage": {
     "defaultMessage": "Lagring"
   },
+  "tag.category.survival-mode": {
+    "defaultMessage": "Överlevnadsläge"
+  },
+  "tag.category.teams": {
+    "defaultMessage": "Lag"
+  },
+  "tag.category.technical": {
+    "defaultMessage": "Tekniskt"
+  },
   "tag.category.technology": {
     "defaultMessage": "Teknologi"
   },
   "tag.category.themed": {
     "defaultMessage": "Tematiskt"
+  },
+  "tag.category.towns": {
+    "defaultMessage": "Städer"
   },
   "tag.category.transportation": {
     "defaultMessage": "Transport"
@@ -2440,6 +2686,9 @@
   },
   "tag.category.vanilla-like": {
     "defaultMessage": "Vanilla-liknande"
+  },
+  "tag.category.world-resets": {
+    "defaultMessage": "Världomställningar"
   },
   "tag.category.worldgen": {
     "defaultMessage": "Världsgenerering"

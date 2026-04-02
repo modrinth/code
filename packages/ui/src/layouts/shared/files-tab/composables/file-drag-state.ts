@@ -75,6 +75,7 @@ function cleanup() {
 	dragStarted.value = false
 	document.removeEventListener('pointermove', onPointerMove)
 	document.removeEventListener('pointerup', onPointerUp)
+	document.removeEventListener('pointercancel', onPointerCancel)
 	if (wasDrag) {
 		clickSuppressed = true
 		requestAnimationFrame(() => {
@@ -84,6 +85,10 @@ function cleanup() {
 }
 
 let onDropCallback: ((source: FileDragData, destination: string) => void) | null = null
+
+function onPointerCancel() {
+	cleanup()
+}
 
 function onPointerUp() {
 	if (dragStarted.value && activeDrag.value && dragTarget.value) {
@@ -111,4 +116,5 @@ export function startFileDrag(
 
 	document.addEventListener('pointermove', onPointerMove)
 	document.addEventListener('pointerup', onPointerUp)
+	document.addEventListener('pointercancel', onPointerCancel)
 }

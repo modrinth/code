@@ -150,6 +150,10 @@ const filterOptions = computed(() => {
 			}
 		})
 
+	if (items.value.some((item) => getClientWarningType(item) !== null)) {
+		options.push({ id: 'warnings', label: 'Warnings' })
+	}
+
 	if (items.value.some((item) => !item.enabled)) {
 		options.push({ id: 'disabled', label: 'Disabled' })
 	}
@@ -175,16 +179,18 @@ function toggleFilter(filterId: string) {
 	}
 }
 
-const attributeFilterIds = new Set(['disabled'])
+const attributeFilterIds = new Set(['disabled', 'warnings'])
 
 const typeFilteredCount = computed(() => {
 	if (selectedFilters.value.length === 0) return items.value.length
 	const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
 	const hasDisabledFilter = selectedFilters.value.includes('disabled')
+	const hasWarningsFilter = selectedFilters.value.includes('warnings')
 	return items.value.filter((item) => {
 		if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 			return false
 		if (hasDisabledFilter && item.enabled) return false
+		if (hasWarningsFilter && getClientWarningType(item) === null) return false
 		return true
 	}).length
 })
@@ -206,10 +212,12 @@ const filteredItems = computed(() => {
 	if (selectedFilters.value.length > 0) {
 		const typeFilters = selectedFilters.value.filter((f) => !attributeFilterIds.has(f))
 		const hasDisabledFilter = selectedFilters.value.includes('disabled')
+		const hasWarningsFilter = selectedFilters.value.includes('warnings')
 		result = result.filter((item) => {
 			if (typeFilters.length > 0 && !typeFilters.includes(normalizeProjectType(item.project_type)))
 				return false
 			if (hasDisabledFilter && item.enabled) return false
+			if (hasWarningsFilter && getClientWarningType(item) === null) return false
 			return true
 		})
 	}

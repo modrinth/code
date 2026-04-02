@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Falha ao reparar o servidor"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Falha ao redefinir o servidor para a integração"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Falha ao salvar as configurações de instalação"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Remove todos os dados do seu servidor, incluindo seus mundos, mods e arquivos de configuração. As cópias de segurança permanecerão e poderão ser restauradas."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Redefinir para a integração"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Isso enviará o servidor de volta para a integração, para que a configuração possa ser concluída novamente. Tem certeza de que deseja continuar?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Redefinir para a integração"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "O servidor foi retornado ao fluxo de integração."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Servidor redefinido para a integração"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Opções de suporte"
   },
   "hosting.plan.out-of-stock": {
     "message": "Esgotado"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Descubra conteúdo"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Sinalização de recursos"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Baixe o Modrinth App"

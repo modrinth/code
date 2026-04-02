@@ -80,6 +80,9 @@
   "button.decline": {
     "defaultMessage": "סרב"
   },
+  "button.disable": {
+    "defaultMessage": "השבת"
+  },
   "button.download": {
     "defaultMessage": "הורדה"
   },
@@ -88,6 +91,12 @@
   },
   "button.edit": {
     "defaultMessage": "ערוך"
+  },
+  "button.enable": {
+    "defaultMessage": "אפשר"
+  },
+  "button.extract": {
+    "defaultMessage": "חלץ"
   },
   "button.follow": {
     "defaultMessage": "עקוב"
@@ -101,11 +110,17 @@
   "button.more-options": {
     "defaultMessage": "אפשרויות נוספות"
   },
+  "button.move": {
+    "defaultMessage": "הזז"
+  },
   "button.next": {
     "defaultMessage": "הבא"
   },
   "button.open-folder": {
     "defaultMessage": "פתח תיקיה"
+  },
+  "button.open-in-folder": {
+    "defaultMessage": "פתח בתקייה"
   },
   "button.play": {
     "defaultMessage": "שחק"
@@ -121,6 +136,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "מחק תמונה"
+  },
+  "button.rename": {
+    "defaultMessage": "שנה שם"
   },
   "button.repair": {
     "defaultMessage": "תקן"
@@ -152,6 +170,9 @@
   "button.show-all-versions": {
     "defaultMessage": "הצג את כל הגרסאות"
   },
+  "button.show-file": {
+    "defaultMessage": "הצג קובץ"
+  },
   "button.sign-in": {
     "defaultMessage": "התחבר"
   },
@@ -182,17 +203,11 @@
   "changelog.justNow": {
     "defaultMessage": "רק לעכשיו"
   },
-  "changelog.product.api": {
-    "defaultMessage": "ממשק API"
-  },
   "changelog.product.app": {
     "defaultMessage": "אפליקציה"
   },
   "changelog.product.hosting": {
     "defaultMessage": "ארח"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "אתר אינטרנט"
   },
   "collections.label.private": {
     "defaultMessage": "פרטי"
@@ -231,10 +246,43 @@
     "defaultMessage": "נוסף (תלות)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "הוסר"
+    "defaultMessage": "מושבת"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "עודכן"
+  },
+  "content.inline-backup.backing-up": {
+    "defaultMessage": "יוצר גיבוי..."
+  },
+  "content.inline-backup.create-backup": {
+    "defaultMessage": "צור גיבוי"
+  },
+  "content.modpack-card.dismiss-hint": {
+    "defaultMessage": "אל תציג שוב"
+  },
+  "content.page-layout.additional-content": {
+    "defaultMessage": "תוכן נוסף"
+  },
+  "content.page-layout.empty.no-content-installed": {
+    "defaultMessage": "אין תוכן מותקן"
+  },
+  "content.page-layout.empty.no-extra-content-installed": {
+    "defaultMessage": "איו תוכן נוסף מותקן"
+  },
+  "content.page-layout.failed-to-load": {
+    "defaultMessage": "טעינת התוכן נכשלה"
+  },
+  "content.page-layout.loading": {
+    "defaultMessage": "טוען תוכן..."
+  },
+  "content.page-layout.no-content-found": {
+    "defaultMessage": "לא נמצא תוכן."
+  },
+  "content.page-layout.please-wait": {
+    "defaultMessage": "אנא המתן"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "שתף"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"

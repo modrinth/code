@@ -1,5 +1,5 @@
 <template>
-	<div class="contents">
+	<div>
 		<NewModal ref="newAllocationModal" header="New allocation" width="550px">
 			<form class="flex w-full flex-col gap-2" @submit.prevent="addNewAllocation">
 				<label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
@@ -56,7 +56,7 @@
 			@proceed="confirmDeleteAllocation"
 		/>
 
-		<div class="relative h-full w-full overflow-y-auto">
+		<div class="relative w-full">
 			<div
 				v-if="allocationsError"
 				class="flex w-full flex-col items-center justify-center gap-4 p-4"
@@ -82,7 +82,7 @@
 				</div>
 			</div>
 			<div v-else-if="data" class="flex h-full w-full flex-col justify-between gap-4">
-				<div class="card flex h-full flex-col gap-6">
+				<div class="flex h-full flex-col gap-6">
 					<!-- Allocations section -->
 					<div class="flex flex-col gap-2.5">
 						<span class="text-lg font-semibold text-contrast">Allocations</span>

@@ -4,6 +4,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { createContext } from '#ui/providers/create-context'
 
 import type {
+	ContentDiffItem,
 	ContentDiffPreview,
 	GameVersionOption,
 	InstallationInfoRow,
@@ -61,6 +62,26 @@ export interface InstallationSettingsContext {
 
 	lockPlatform?: boolean
 	hideLoaderVersion?: boolean
+
+	/** Bulk-disable all addons on the server (used before switching loaders). */
+	disableAllContent?: () => Promise<void>
+
+	/**
+	 * Disable only the incompatible addons identified in a content diff preview.
+	 * Used when the user chooses "Disable conflicts" instead of "Auto-fix".
+	 */
+	disableIncompatibleContent?: (diffs: ContentDiffItem[]) => Promise<void>
+
+	/**
+	 * Save the installation settings without auto-resolving content.
+	 * Uses installContent with soft_override instead of applyGameVersionUpdate.
+	 */
+	saveWithoutAutoFix?: (
+		platform: string,
+		gameVersion: string,
+		loaderVersionId: string | null,
+	) => Promise<void>
+
 	previewSave?: (
 		platform: string,
 		gameVersion: string,

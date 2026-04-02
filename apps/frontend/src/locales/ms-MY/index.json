@@ -177,7 +177,7 @@
     "message": "anda gunakan sebelum ini"
   },
   "app-marketing.hero.app-screenshot-alt": {
-    "message": "Petikan skrin Modrinth App dengan pemasangan Cobblemon dibuka ke halaman 'Kandungan'."
+    "message": "Petikan skrin Modrinth App dengan pemasangan Cobblemon dibuka ke laman 'Kandungan'."
   },
   "app-marketing.hero.description": {
     "message": "Modrinth App ialah sebuah pelancar sumber terbuka unik yang membolehkan anda memainkan mod kegemaran anda dan memastikannya dikemas kini, semuanya dalam satu pakej kecil yang kemas."
@@ -1020,19 +1020,19 @@
     "message": "Koleksi tidak dijumpai"
   },
   "error.generic.404.subtitle": {
-    "message": "Halaman yang anda cari nampaknya tidak wujud."
+    "message": "Laman yang anda cari nampaknya tidak wujud."
   },
   "error.generic.404.title": {
-    "message": "Halaman tidak dijumpai"
+    "message": "Laman tidak dijumpai"
   },
   "error.generic.451.subtitle": {
-    "message": "Halaman ini telah disekat atas sebab undang-undang, seperti penapisan kerajaan atau prosiding undang-undang yang berterusan."
+    "message": "Laman ini telah disekat atas sebab undang-undang, seperti penapisan kerajaan atau prosiding undang-undang yang berterusan."
   },
   "error.generic.451.title": {
     "message": "Kandungan tidak tersedia atas sebab undang-undang"
   },
   "error.generic.default.list_item.1": {
-    "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>halaman Status</status-link> kami."
+    "message": "Semak sama ada Modrinth tidak berfungsi pada <status-link>laman Status</status-link> kami."
   },
   "error.generic.default.list_item.2": {
     "message": "Jika ralat ini terus berlaku, anda mungkin ingin memberitahu Pasukan Modrinth dengan menyertai <discord-link>pelayan Discord</discord-link> kami."
@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Gagal membaiki pelayan"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Gagal menyimpan tetapan pemasangan"
   },
@@ -1334,6 +1337,24 @@
   "hosting.loader.reset-server-description": {
     "message": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal tersedia dan boleh dipulihkan."
   },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Tetap semula ke proses penetapan awal"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Pelayan telah dikembalikan ke aliran penetapan awal."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Pelayan ditetapkan semula ke proses penetapan awal"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Pilihan sokongan"
+  },
   "hosting.plan.out-of-stock": {
     "message": "Kehabisan stok"
   },
@@ -1353,13 +1374,13 @@
     "message": "Sentiasa Berkembang"
   },
   "landing.creator.feature.data-statistics.description": {
-    "message": "Dapatkan laporan terperinci tentang paparan halaman, kiraan muat turun dan hasil pendapatan"
+    "message": "Dapatkan laporan terperinci tentang tontonan laman, kiraan muat turun dan hasil pendapatan"
   },
   "landing.creator.feature.data-statistics.title": {
     "message": "Data dan Statistik"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Serlahkan projek anda kepada beribu-ribu pengguna melalui carian, halaman utama kami, pelayan Discord dan lebih banyak cara yang akan datang pada masa hadapan!"
+    "message": "Serlahkan projek anda kepada beribu-ribu pengguna melalui carian, laman utama kami, pelayan Discord dan lebih banyak cara yang akan datang pada masa hadapan!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Penemuan"
@@ -1371,7 +1392,7 @@
     "message": "Ekosistem yang Pelbagai"
   },
   "landing.creator.feature.monetization.description": {
-    "message": "Dapatkan hasil pendapatan iklan berbayar daripada halaman projek anda dan keluarkan dana anda pada bila-bila masa"
+    "message": "Dapatkan hasil pendapatan iklan berbayar daripada laman projek anda dan keluarkan dana anda pada bila-bila masa"
   },
   "landing.creator.feature.monetization.title": {
     "message": "Pengewangan"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Temui kandungan"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Penetapan ciri"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Dapatkan Modrinth App"
@@ -2346,7 +2364,7 @@
     "message": "Ralat semasa memuat data projek{message}"
   },
   "project.error.page-not-found": {
-    "message": "Halaman tidak dapat dijumpai"
+    "message": "Laman tidak dapat dijumpai"
   },
   "project.error.project-not-found": {
     "message": "Projek tidak dijumpai"
@@ -3165,7 +3183,7 @@
     "message": "Apabila anda membenarkan aplikasi ini dengan akaun Modrinth anda, anda memberikannya akses kepada akaun anda. Anda boleh mengurus dan menyemak akses kepada akaun anda di sini pada bila-bila masa."
   },
   "settings.authorizations.empty-state": {
-    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi halaman ini pada tarikh yang akan datang!"
+    "message": "Kami tidak dapat memaparkan aplikasi yang dibenarkan oleh anda pada masa ini, kami sedang berusaha untuk memperbaikinya. Sila kunjungi laman ini pada tarikh yang akan datang!"
   },
   "settings.authorizations.head-title": {
     "message": "Kebenaran"
@@ -3381,7 +3399,7 @@
     "message": "Nyahaktifkan mod pembangun"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Mod pembangun</strong> kini aktif. Ini akan membolehkan anda melihat ID dalaman pelbagai perkara di seluruh Modrinth yang mungkin berguna jika anda seorang pembangun yang menggunakan API Modrinth. Klik pada logo Modrinth di bahagian bawah halaman sebanyak 5 kali untuk menogol mod pembangun."
+    "message": "<strong>Mod pembangun</strong> kini aktif. Ini akan membolehkan anda melihat ID dalaman pelbagai perkara di seluruh Modrinth yang mungkin berguna jika anda seorang pembangun yang menggunakan API Modrinth. Klik pada logo Modrinth di bahagian bawah laman sebanyak 5 kali untuk menogol mod pembangun."
   },
   "settings.display.flags.description": {
     "message": "Dayakan atau nyahdayakan ciri tertentu pada peranti ini."
@@ -3396,13 +3414,13 @@
     "message": "Mod pembangun dinyahaktifkan"
   },
   "settings.display.project-list-layouts.datapack": {
-    "message": "Halaman Pek Data"
+    "message": "Laman Pek Data"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Pilih susun atur pilihan anda untuk setiap halaman yang memaparkan senarai projek pada peranti ini."
+    "message": "Pilih susun atur pilihan anda untuk setiap laman yang memaparkan senarai projek pada peranti ini."
   },
   "settings.display.project-list-layouts.mod": {
-    "message": "Halaman Mod"
+    "message": "Laman Mod"
   },
   "settings.display.project-list-layouts.mode.gallery": {
     "message": "Galeri"
@@ -3414,25 +3432,25 @@
     "message": "Barisan"
   },
   "settings.display.project-list-layouts.modpack": {
-    "message": "Halaman Pek Mod"
+    "message": "Laman Pek Mod"
   },
   "settings.display.project-list-layouts.plugin": {
-    "message": "Halaman Pemalam"
+    "message": "Laman Pemalam"
   },
   "settings.display.project-list-layouts.resourcepack": {
-    "message": "Halaman Pek Sumber"
+    "message": "Laman Pek Sumber"
   },
   "settings.display.project-list-layouts.server": {
-    "message": "Halaman Pelayan"
+    "message": "Laman Pelayan"
   },
   "settings.display.project-list-layouts.shader": {
-    "message": "Halaman Pembayang"
+    "message": "Laman Pembayang"
   },
   "settings.display.project-list-layouts.title": {
     "message": "Susun atur senarai projek"
   },
   "settings.display.project-list-layouts.user": {
-    "message": "Halaman profil pengguna"
+    "message": "Laman profil pengguna"
   },
   "settings.display.project-list.layouts.collection": {
     "message": "Koleksi"
@@ -3444,28 +3462,28 @@
     "message": "Pemaparan lanjutan"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Buka pautan yang membawa anda ke luar Modrinth dalam tab baharu. Tidak kira tetapan ini, pautan pada domain yang sama dan dalam keterangan berformat Markdown akan dibuka dalam tab yang sama dan pautan pada iklan dan halaman sunting akan dibuka dalam tab baharu."
+    "message": "Buka pautan yang membawa anda ke luar Modrinth dalam tab baharu. Tidak kira tetapan ini, pautan pada domain yang sama dan dalam keterangan berformat Markdown akan dibuka dalam tab yang sama dan pautan pada iklan dan laman sunting akan dibuka dalam tab baharu."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
     "message": "Buka pautan luaran dalam tab baharu"
   },
   "settings.display.sidebar.hide-app-promos.description": {
-    "message": "Menyembunyikan butang \"Dapatkan Modrinth App\" daripada navigasi utama. Halaman Modrinth App masih boleh dijumpai pada halaman pendaratan atau dalam pengaki."
+    "message": "Menyembunyikan butang \"Dapatkan Modrinth App\" daripada navigasi utama. Laman Modrinth App masih boleh dijumpai pada halaman pendaratan atau dalam pengaki."
   },
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Sembunyikan promosi Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Bar sisi carian dijajar kiri pada halaman kandungan"
+    "message": "Bar sisi carian dijajar kiri pada laman kandungan"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Menjajarkan bar sisi butiran projek ke sebelah kiri kandungan halaman."
+    "message": "Menjajarkan bar sisi butiran projek ke sebelah kiri kandungan laman."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.description": {
     "message": "Menjajarkan bar sisi penapis ke sebelah kanan hasil carian."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Bar sisi penapis dijajar kanan pada halaman carian"
+    "message": "Bar sisi penapis dijajar kanan pada laman carian"
   },
   "settings.display.theme.description": {
     "message": "Pilih tema warna pilihan anda untuk Modrinth pada peranti ini."

@@ -31,22 +31,28 @@
 						<ChevronRightIcon />
 
 						<span class="truncate">
-							<span class="text-medal-orange">
-								{{ timeLeftCountdown.days }}
-							</span>
-							days
-							<span class="text-medal-orange">
-								{{ timeLeftCountdown.hours }}
-							</span>
-							hours
-							<span class="text-medal-orange">
-								{{ timeLeftCountdown.minutes }}
-							</span>
-							minutes
-							<span class="text-medal-orange">
-								{{ timeLeftCountdown.seconds }}
-							</span>
-							seconds remaining...
+							<IntlFormatted
+								:message-id="messages.countdownRemaining"
+								:values="{
+									days: timeLeftCountdown.days,
+									hours: timeLeftCountdown.hours,
+									minutes: timeLeftCountdown.minutes,
+									seconds: timeLeftCountdown.seconds,
+								}"
+							>
+								<template #days-count="{ children }">
+									<span class="text-medal-orange"><component :is="() => children" /></span>
+								</template>
+								<template #hours-count="{ children }">
+									<span class="text-medal-orange"><component :is="() => children" /></span>
+								</template>
+								<template #minutes-count="{ children }">
+									<span class="text-medal-orange"><component :is="() => children" /></span>
+								</template>
+								<template #seconds-count="{ children }">
+									<span class="text-medal-orange"><component :is="() => children" /></span>
+								</template>
+							</IntlFormatted>
 						</span>
 					</div>
 
@@ -58,16 +64,16 @@
 							:src="iconUrl"
 							no-shadow
 							style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
-							alt="Server Icon"
+							:alt="formatMessage(messages.serverIconAlt)"
 						/>
-						Using {{ projectData?.title || 'Unknown' }}
+						{{ formatMessage(messages.usingProjectLabel, { projectTitle: projectData?.title }) }}
 					</div>
 
 					<div
 						v-if="isConfiguring"
 						class="text-medal-orange flex min-w-0 items-center gap-2 truncate text-sm font-semibold"
 					>
-						<SparklesIcon class="size-5 shrink-0" /> New server
+						<SparklesIcon class="size-5 shrink-0" /> {{ formatMessage(messages.newServerLabel) }}
 					</div>
 					<ServerInfoLabels
 						v-else
@@ -75,14 +81,16 @@
 						:show-game-label="showGameLabel"
 						:show-loader-label="showLoaderLabel"
 						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-secondary *:hidden sm:flex-row sm:*:flex"
+						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-4 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</AutoLink>
 
 			<div v-if="isNuxt" class="z-10 ml-auto">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
-					<button class="my-auto" @click="handleUpgrade"><RocketIcon /> Upgrade</button>
+					<button class="my-auto" @click="handleUpgrade">
+						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
+					</button>
 				</ButtonStyled>
 			</div>
 		</div>
@@ -92,15 +100,15 @@
 			class="relative flex w-full flex-row items-center gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-blue bg-bg-blue p-4 text-sm font-bold text-contrast"
 		>
 			<LoaderCircleIcon class="size-5 animate-spin" />
-			Your server's hardware is currently being upgraded and will be back online shortly.
+			{{ formatMessage(messages.upgradingNotice) }}
 		</div>
 		<div
 			v-else-if="status === 'suspended' && suspension_reason === 'cancelled'"
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your Medal server trial has ended and your server has
-				been suspended. Please upgrade to continue to use your server.
+				<TriangleAlertIcon class="!size-5" />
+				{{ formatMessage(messages.medalTrialEndedNotice) }}
 			</div>
 		</div>
 		<div
@@ -108,9 +116,12 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended:
-				{{ suspension_reason }}. Please update your billing information or contact Modrinth Support
-				for more information.
+				<TriangleAlertIcon class="!size-5" />
+				{{
+					formatMessage(messages.suspendedWithReasonNotice, {
+						reason: suspension_reason,
+					})
+				}}
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -119,8 +130,8 @@
 			class="relative flex w-full flex-col gap-2 rounded-b-2xl border-[1px] border-t-0 border-solid border-bg-red bg-bg-red p-4 text-sm font-bold text-contrast"
 		>
 			<div class="flex flex-row gap-2">
-				<TriangleAlertIcon class="!size-5" /> Your server has been suspended. Please update your
-				billing information or contact Modrinth Support for more information.
+				<TriangleAlertIcon class="!size-5" />
+				{{ formatMessage(messages.suspendedNotice) }}
 			</div>
 			<CopyCode :text="`${props.server_id}`" class="ml-auto" />
 		</div>
@@ -143,11 +154,13 @@ import dayjs from 'dayjs'
 import dayjsDuration from 'dayjs/plugin/duration'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
+import { defineMessages, useVIntl } from '../../../composables/i18n'
 import { injectModrinthClient } from '../../../providers/api-client'
 import AutoLink from '../../base/AutoLink.vue'
 import Avatar from '../../base/Avatar.vue'
 import ButtonStyled from '../../base/ButtonStyled.vue'
 import CopyCode from '../../base/CopyCode.vue'
+import IntlFormatted from '../../base/IntlFormatted.vue'
 import ServerInfoLabels from '../labels/ServerInfoLabels.vue'
 import MedalBackgroundImage from './MedalBackgroundImage.vue'
 
@@ -171,6 +184,7 @@ type MedalServerListingProps = {
 const props = defineProps<MedalServerListingProps>()
 
 const emit = defineEmits<{ (e: 'upgrade'): void }>()
+const { formatMessage } = useVIntl()
 
 const client = injectModrinthClient()
 
@@ -190,6 +204,50 @@ const { data: projectData } = useQuery({
 
 const iconUrl = computed(() => projectData.value?.icon_url || undefined)
 const isConfiguring = computed(() => props.flows?.intro)
+
+const messages = defineMessages({
+	countdownRemaining: {
+		id: 'servers.medal-listing.countdown.remaining',
+		defaultMessage:
+			'<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining...',
+	},
+	serverIconAlt: {
+		id: 'servers.medal-listing.server-icon-alt',
+		defaultMessage: 'Server icon',
+	},
+	usingProjectLabel: {
+		id: 'servers.medal-listing.using-project-label',
+		defaultMessage: 'Using {projectTitle}',
+	},
+	newServerLabel: {
+		id: 'servers.medal-listing.new-server-label',
+		defaultMessage: 'New server',
+	},
+	upgradeButton: {
+		id: 'servers.medal-listing.upgrade-button',
+		defaultMessage: 'Upgrade',
+	},
+	upgradingNotice: {
+		id: 'servers.medal-listing.notice.upgrading',
+		defaultMessage:
+			"Your server's hardware is currently being upgraded and will be back online shortly.",
+	},
+	medalTrialEndedNotice: {
+		id: 'servers.medal-listing.notice.medal-trial-ended',
+		defaultMessage:
+			'Your Medal server trial has ended and your server has been suspended. Please upgrade to continue using your server.',
+	},
+	suspendedWithReasonNotice: {
+		id: 'servers.medal-listing.notice.suspended-with-reason',
+		defaultMessage:
+			'Your server has been suspended: {reason}. Please update your billing information or contact Modrinth Support for more information.',
+	},
+	suspendedNotice: {
+		id: 'servers.medal-listing.notice.suspended',
+		defaultMessage:
+			'Your server has been suspended. Please update your billing information or contact Modrinth Support for more information.',
+	},
+})
 
 const timeLeftCountdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 const expiryDate = computed(() => (props.medal_expires ? dayjs(props.medal_expires) : null))
