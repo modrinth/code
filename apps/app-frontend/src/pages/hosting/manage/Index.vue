@@ -5,78 +5,27 @@
 		</div>
 		<div v-else-if="hasError" class="py-8 text-secondary">Failed to load server.</div>
 		<template v-else>
-			<!-- TODO-SERVERS: make a shared server header component for website and app to share -->
-			<RouterLink
-				to="/hosting/manage"
-				class="breadcrumb goto-link mt-6 mb-4 flex w-fit items-center"
+			<ServerManageHeader
+				:server="server"
+				:server-image="serverImage"
+				:server-project="serverProject"
+				:server-project-link="serverProjectLink"
+				breadcrumb-class="breadcrumb goto-link mt-6 mb-4 flex w-fit items-center"
+				header-class="mb-4"
+				:show-uptime="false"
 			>
-				<LeftArrowIcon />
-				All servers
-			</RouterLink>
-			<ContentPageHeader class="mb-4">
-				<template #icon>
-					<ServerIcon
-						:image="
-							server.is_medal
-								? 'https://cdn-raw.modrinth.com/medal_icon.webp'
-								: (serverImage ?? undefined)
-						"
-					/>
-				</template>
-				<template #title>
-					{{ server.name || 'Server' }}
-				</template>
-				<template #stats>
-					<div
-						v-if="server.flows?.intro"
-						class="flex items-center gap-2 font-semibold text-secondary"
-					>
-						<SettingsIcon />
-						Configuring server...
-					</div>
-					<div v-else class="flex flex-wrap items-center gap-2">
-						<div v-if="server.loader" class="flex items-center gap-2 font-medium capitalize">
-							<LoaderIcon :loader="server.loader" class="flex shrink-0 [&&]:size-5" />
-							{{ server.loader }} {{ server.mc_version }}
-						</div>
-
-						<div
-							v-if="server.loader && server.net?.domain"
-							class="h-1.5 w-1.5 rounded-full bg-surface-5"
-						/>
-
-						<div
-							v-if="server.net?.domain"
-							v-tooltip="'Copy server address'"
-							class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
-							@click="copyServerAddress"
-						>
-							<LinkIcon class="flex size-5 shrink-0" />
-							{{ server.net.domain }}.modrinth.gg
-						</div>
-
-						<div
-							v-if="serverProject && (server.loader || server.net?.domain)"
-							class="h-1.5 w-1.5 rounded-full bg-surface-5"
-						/>
-
-						<div v-if="serverProject" class="flex items-center gap-1.5 font-medium text-primary">
-							Linked to
-							<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
-							<RouterLink :to="serverProjectLink" class="truncate text-primary hover:underline">
-								{{ serverProject.title }}
-							</RouterLink>
-						</div>
-					</div>
-				</template>
 				<template #actions>
-					<ButtonStyled circular size="large">
-						<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
-							<SettingsIcon />
-						</button>
-					</ButtonStyled>
+					<div class="flex gap-2" v-if="isConnected && !server.flows?.intro">
+						<PanelServerActionButton />
+						<ButtonStyled circular size="large">
+							<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
+								<SettingsIcon />
+							</button>
+						</ButtonStyled>
+						<PanelServerOverflowMenu :show-copy-id-action="themeStore.devMode" />
+					</div>
 				</template>
-			</ContentPageHeader>
+			</ServerManageHeader>
 
 			<div class="mb-4">
 				<NavTabs :links="tabs" />
@@ -103,38 +52,30 @@
 
 <script setup lang="ts">
 import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
+import { BoxesIcon, DatabaseBackupIcon, FolderOpenIcon, SettingsIcon } from '@modrinth/assets'
 import {
-	BoxesIcon,
-	DatabaseBackupIcon,
-	FolderOpenIcon,
-	LeftArrowIcon,
-	LinkIcon,
-	SettingsIcon,
-} from '@modrinth/assets'
-import {
-	Avatar,
 	type BusyReason,
 	ButtonStyled,
-	ContentPageHeader,
 	defineMessage,
 	injectModrinthClient,
-	injectNotificationManager,
-	LoaderIcon,
 	LoadingIndicator,
 	NavTabs,
+	PanelServerActionButton,
+	PanelServerOverflowMenu,
 	provideModrinthServerContext,
-	ServerIcon,
+	ServerManageHeader,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onUnmounted, reactive, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import ServerSettingsModal from '@/components/ui/modal/ServerSettingsModal.vue'
+import { useTheming } from '@/store/theme'
 
 const route = useRoute()
+const themeStore = useTheming()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
-const { addNotification } = injectNotificationManager()
 
 const serverId = computed(() => {
 	const rawId = route.params.id
@@ -196,11 +137,13 @@ const serverProjectLink = computed(() => {
 	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
 })
 
-const isConnected = ref(true)
+const isConnected = ref(false)
 const powerState = ref<Archon.Websocket.v0.PowerState>('stopped')
 const isServerRunning = computed(() => powerState.value === 'running')
 const backupsState = reactive(new Map())
 const isSyncingContent = ref(false)
+const socketUnsubscribers = ref<(() => void)[]>([])
+const connectedSocketServerId = ref<string | null>(null)
 
 const busyReasons = computed<BusyReason[]>(() => {
 	const reasons: BusyReason[] = []
@@ -277,26 +220,94 @@ function markBackupCancelled(backupId: string) {
 	backupsState.delete(backupId)
 }
 
-function copyServerAddress() {
-	if (!server.value?.net?.domain) return
-	navigator.clipboard.writeText(server.value.net.domain + '.modrinth.gg')
-	addNotification({
-		title: 'Server address copied',
-		text: "Your server's address has been copied to your clipboard.",
-		type: 'success',
-	})
-}
-
 function openServerSettingsModal() {
 	if (!serverId.value) return
 	serverSettingsModal.value?.show({ serverId: serverId.value })
 }
 
+function setPowerState(state: Archon.Websocket.v0.PowerState) {
+	powerState.value = state
+}
+
+function handlePowerState(data: Archon.Websocket.v0.WSPowerStateEvent) {
+	setPowerState(data.state)
+}
+
+function handleState(data: Archon.Websocket.v0.WSStateEvent) {
+	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
+		{
+			not_ready: 'stopped',
+			starting: 'starting',
+			running: 'running',
+			stopping: 'stopping',
+			idle:
+				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
+		}
+	setPowerState(powerMap[data.power_variant])
+}
+
+function disconnectSocket(targetServerId?: string) {
+	for (const unsub of socketUnsubscribers.value) unsub()
+	socketUnsubscribers.value = []
+
+	if (targetServerId) {
+		client.archon.sockets.disconnect(targetServerId)
+	}
+	connectedSocketServerId.value = null
+	isConnected.value = false
+	setPowerState('stopped')
+}
+
+async function connectSocket(targetServerId: string) {
+	if (connectedSocketServerId.value === targetServerId && isConnected.value) {
+		return
+	}
+	disconnectSocket(targetServerId)
+
+	try {
+		await client.archon.sockets.safeConnect(targetServerId, { force: true })
+		connectedSocketServerId.value = targetServerId
+		isConnected.value = true
+		socketUnsubscribers.value = [
+			client.archon.sockets.on(targetServerId, 'state', handleState),
+			client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
+			client.archon.sockets.on(targetServerId, 'auth-incorrect', () => {
+				isConnected.value = false
+			}),
+			client.archon.sockets.on(targetServerId, 'auth-ok', () => {
+				isConnected.value = true
+			}),
+		]
+	} catch (error) {
+		console.error('[hosting/manage] Failed to connect server socket:', error)
+		isConnected.value = false
+	}
+}
+
 watch(
 	() => serverId.value,
-	() => {
+	(newServerId, oldServerId) => {
+		if (oldServerId && oldServerId !== newServerId) {
+			disconnectSocket(oldServerId)
+		}
 		fsAuth.value = null
 		void refreshFsAuth().catch(() => {})
+	},
+	{ immediate: true },
+)
+
+watch(
+	() => [serverId.value, serverQuery.data.value] as const,
+	([currentServerId, currentServer]) => {
+		if (!currentServerId || !currentServer) return
+		if (currentServer.status === 'suspended' || currentServer.node === null) {
+			disconnectSocket(currentServerId)
+			return
+		}
+		if (connectedSocketServerId.value === currentServerId && isConnected.value) {
+			return
+		}
+		void connectSocket(currentServerId)
 	},
 	{ immediate: true },
 )
@@ -323,6 +334,7 @@ provideModrinthServerContext({
 setNodeAuthState(() => fsAuth.value, refreshFsAuth)
 
 onUnmounted(() => {
+	disconnectSocket(serverId.value || undefined)
 	clearNodeAuthState()
 })
 

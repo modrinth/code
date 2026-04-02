@@ -103,79 +103,24 @@
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
-		<NuxtLink to="/hosting/manage" class="breadcrumb goto-link flex w-fit items-center">
-			<LeftArrowIcon />
-			All servers
-		</NuxtLink>
-		<ContentPageHeader>
-			<template #icon>
-				<ServerIcon
-					:image="
-						serverData.is_medal ? 'https://cdn-raw.modrinth.com/medal_icon.webp' : serverImage
-					"
-				/>
-			</template>
-			<template #title>
-				{{ serverData.name }}
-			</template>
-			<template #stats>
-				<div
-					v-if="serverData.flows?.intro"
-					class="flex items-center gap-2 font-semibold text-secondary"
-				>
-					<SettingsIcon /> Configuring server...
-				</div>
-				<div v-else class="flex flex-wrap items-center gap-2">
-					<div v-if="serverData.loader" class="flex items-center gap-2 font-medium capitalize">
-						<LoaderIcon :loader="serverData.loader" class="flex shrink-0 [&&]:size-5" />
-						{{ serverData.loader }} {{ serverData.mc_version }}
-					</div>
-
-					<div
-						v-if="serverData.loader && serverData.net?.domain"
-						class="h-1.5 w-1.5 rounded-full bg-surface-5"
-					></div>
-
-					<div
-						v-if="serverData.net?.domain"
-						v-tooltip="'Copy server address'"
-						class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
-						@click="copyServerAddress"
-					>
-						<LinkIcon class="flex size-5 shrink-0" />
-						{{ serverData.net.domain }}.modrinth.gg
-					</div>
-
-					<div v-if="uptimeSeconds" class="h-1.5 w-1.5 rounded-full bg-surface-5"></div>
-
-					<div v-if="uptimeSeconds" class="flex items-center gap-2 font-medium">
-						<TimerIcon class="flex size-5 shrink-0" />
-						{{ formattedUptime }}
-					</div>
-
-					<div
-						v-if="serverProject && (serverData.loader || serverData.net?.domain || uptimeSeconds)"
-						class="h-1.5 w-1.5 rounded-full bg-surface-5"
-					></div>
-
-					<div v-if="serverProject" class="flex items-center gap-1.5 font-medium text-primary">
-						Linked to
-						<Avatar :src="serverProject.icon_url" :alt="serverProject.title" size="24px" />
-						<NuxtLink
-							:to="`/project/${serverProject.slug ?? serverProject.id}`"
-							class="truncate text-primary hover:underline"
-						>
-							{{ serverProject.title }}
-						</NuxtLink>
-					</div>
-				</div>
-			</template>
+		<ServerManageHeader
+			:server="serverData"
+			:server-image="serverImage"
+			:server-project="serverProject"
+			:uptime-seconds="uptimeSeconds"
+		>
 			<template #actions>
 				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
-					<PanelServerActionButton :disabled="!!error" :uptime-seconds="uptimeSeconds" />
+					<PanelServerActionButton :disabled="!!error" />
+					<PanelServerOverflowMenu
+						:disabled="!!error"
+						:uptime-seconds="uptimeSeconds"
+						:show-copy-id-action="flags.developerMode"
+						:show-debug-info="flags.advancedDebugInfo"
+					/>
 				</div>
 			</template>
-		</ContentPageHeader>
+		</ServerManageHeader>
 
 		<ServerOnboardingPanelPage v-if="serverData.flows?.intro" />
 
@@ -363,30 +308,27 @@ import {
 	FolderOpenIcon,
 	IssuesIcon,
 	LayoutTemplateIcon,
-	LeftArrowIcon,
-	LinkIcon,
 	LockIcon,
 	RightArrowIcon,
 	SettingsIcon,
-	TimerIcon,
 	TransferIcon,
 } from '@modrinth/assets'
 import type { BusyReason } from '@modrinth/ui'
 import {
-	Avatar,
 	BackupProgressAdmonitions,
 	ButtonStyled,
-	ContentPageHeader,
 	defineMessage,
 	ErrorInformationCard,
 	formatLoaderLabel,
 	injectModrinthClient,
 	injectNotificationManager,
 	InstallingBanner,
-	LoaderIcon,
 	NavTabs,
+	PanelServerActionButton,
+	PanelServerOverflowMenu,
 	provideModrinthServerContext,
 	ServerIcon,
+	ServerManageHeader,
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
@@ -400,7 +342,6 @@ import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { reloadNuxtApp } from '#app'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
 import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerCountdown.vue'
-import PanelServerActionButton from '~/components/ui/servers/PanelServerActionButton.vue'
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import { useServerImage } from '~/composables/servers/use-server-image.ts'
 import { useServerProject } from '~/composables/servers/use-server-project.ts'
@@ -604,29 +545,6 @@ provideModrinthServerContext({
 })
 
 const uptimeSeconds = ref(0)
-
-const formattedUptime = computed(() => {
-	const days = Math.floor(uptimeSeconds.value / (24 * 3600))
-	const hours = Math.floor((uptimeSeconds.value % (24 * 3600)) / 3600)
-	const minutes = Math.floor((uptimeSeconds.value % 3600) / 60)
-	const seconds = uptimeSeconds.value % 60
-
-	let formatted = ''
-	if (days > 0) formatted += `${days}d `
-	if (hours > 0 || days > 0) formatted += `${hours}h `
-	formatted += `${minutes}m ${seconds}s`
-	return formatted.trim()
-})
-
-function copyServerAddress() {
-	if (!serverData.value?.net?.domain) return
-	navigator.clipboard.writeText(serverData.value.net.domain + '.modrinth.gg')
-	addNotification({
-		title: 'Server address copied',
-		text: "Your server's address has been copied to your clipboard.",
-		type: 'success',
-	})
-}
 
 const copied = ref(false)
 const error = ref<Error | null>(null)
