@@ -87,7 +87,7 @@ const props = withDefaults(
 const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
 const storageKey = computed(() => `pyro-server-${serverId || 'unknown'}-preferences`)
-const userPreferences = useStorage(storageKey.value, {
+const userPreferences = useStorage(storageKey, {
 	ramAsNumber: false,
 })
 

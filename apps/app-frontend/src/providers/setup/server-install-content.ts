@@ -270,7 +270,6 @@ export function createServerInstallContent(opts: {
 			const versions = await client.labrinth.versions_v2.getProjectVersions(project.project_id, {
 				include_changelog: false,
 			})
-			console.log(project)
 			const versionId = versions[0]?.id ?? project.version_id
 			if (!versionId) {
 				throw new Error('No version found for this modpack')
