@@ -286,7 +286,7 @@
 								v-bind="subscription.serverInfo"
 								:pending-change="getPendingChange(subscription)"
 								:cancellation-date="getCancellationDate(subscription)"
-								:on-download-backup="getLatestBackupDownload(subscription.serverInfo)"
+								:on-download-backup="getBackupDownloadForServer(subscription.serverInfo)"
 							/>
 							<div v-else class="w-fit">
 								<p>
@@ -710,6 +710,7 @@ import {
 	ServerListing,
 	useFormatDateTime,
 	useFormatPrice,
+	useServerBackupDownload,
 	useVIntl,
 } from '@modrinth/ui'
 import { calculateSavings, getCurrency } from '@modrinth/utils'
@@ -723,6 +724,7 @@ import { products } from '~/generated/state.json'
 
 const { addNotification, handleError } = injectNotificationManager()
 const client = injectModrinthClient()
+const { getLatestBackupDownload } = useServerBackupDownload()
 definePageMeta({
 	middleware: 'auth',
 })
@@ -1355,44 +1357,8 @@ function handlePyroResubscribeConfirm({ subscriptionId, wasSuspended }) {
 	return resubscribePyro(subscriptionId, wasSuspended)
 }
 
-function getLatestBackupDownload(serverInfo) {
-	const serverFull = serverFullList.value?.find((s) => s.id === serverInfo.server_id)
-	if (!serverFull) return null
-
-	const activeWorld = serverFull.worlds.find((w) => w.is_active) ?? serverFull.worlds[0]
-	if (!activeWorld?.backups?.length) return null
-
-	const latestBackup = activeWorld.backups
-		.filter((b) => b.status === 'done')
-		.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
-	if (!latestBackup) return null
-
-	return async () => {
-		try {
-			const server = await client.archon.servers_v0.get(serverInfo.server_id)
-			const kyrosUrl = server.node?.instance
-			const jwt = server.node?.token
-			if (!kyrosUrl || !jwt) {
-				addNotification({
-					title: 'Download unavailable',
-					text: 'Server connection info is not available. Please contact support.',
-					type: 'error',
-				})
-				return
-			}
-
-			window.open(
-				`https://${kyrosUrl}/modrinth/v0/backups/${latestBackup.id}/download?auth=${jwt}`,
-				'_blank',
-			)
-		} catch {
-			addNotification({
-				title: 'Download failed',
-				text: 'An error occurred while trying to download the backup.',
-				type: 'error',
-			})
-		}
-	}
+function getBackupDownloadForServer(serverInfo) {
+	return getLatestBackupDownload(serverInfo.server_id, serverFullList.value)
 }
 
 const refresh = async () => {
