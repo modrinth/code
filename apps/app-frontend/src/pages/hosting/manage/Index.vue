@@ -1,30 +1,32 @@
 <template>
-	<ServersManageRootLayout
-		:server-id="serverId"
-		:reload-page="() => router.go(0)"
-		:resolve-viewer="resolveViewer"
-		:show-uptime="false"
-		:show-copy-id-action="themeStore.devMode"
-		:navigate-to-billing="() => router.push('/settings/billing')"
-		:navigate-to-servers="() => router.push('/hosting/manage')"
-	>
-		<template #default="{ onReinstall, onReinstallFailed }">
-			<RouterView v-slot="{ Component }">
-				<template v-if="Component">
-					<Suspense>
-						<component
-							:is="Component"
-							@reinstall="onReinstall"
-							@reinstall-failed="onReinstallFailed"
-						/>
-						<template #fallback>
-							<LoadingIndicator />
-						</template>
-					</Suspense>
-				</template>
-			</RouterView>
-		</template>
-	</ServersManageRootLayout>
+	<div class="h-full w-full py-6">
+		<ServersManageRootLayout
+			:server-id="serverId"
+			:reload-page="() => router.go(0)"
+			:resolve-viewer="resolveViewer"
+			:show-uptime="false"
+			:show-copy-id-action="themeStore.devMode"
+			:navigate-to-billing="() => router.push('/settings/billing')"
+			:navigate-to-servers="() => router.push('/hosting/manage')"
+		>
+			<template #default="{ onReinstall, onReinstallFailed }">
+				<RouterView v-slot="{ Component }">
+					<template v-if="Component">
+						<Suspense>
+							<component
+								:is="Component"
+								@reinstall="onReinstall"
+								@reinstall-failed="onReinstallFailed"
+							/>
+							<template #fallback>
+								<LoadingIndicator />
+							</template>
+						</Suspense>
+					</template>
+				</RouterView>
+			</template>
+		</ServersManageRootLayout>
+	</div>
 </template>
 
 <script setup lang="ts">

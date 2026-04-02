@@ -1,7 +1,7 @@
 <template>
 	<div
 		v-if="filteredNotices.length > 0"
-		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 p-6"
+		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
@@ -96,7 +96,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 p-6 transition-all duration-300"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
