@@ -704,9 +704,7 @@
 										</div>
 
 										<div v-else class="menu-text">
-											<p class="popout-text">
-												{{ formatMessage(messages.noCollectionsFound) }}
-											</p>
+											<p class="popout-text">{{ formatMessage(messages.noCollectionsFound) }}</p>
 										</div>
 										<button
 											class="btn collection-button"
@@ -864,13 +862,6 @@
 				</div>
 
 				<div class="normal-page__sidebar">
-					<div class="mb-4">
-						<OldButtonStyled>
-							<a :href="legacyDonateUrl" class="!gap-3 !text-white">
-								<img src="/beenz.png" alt="beenz icon" class="h-5 w-auto" /> Donate with beenz
-							</a>
-						</OldButtonStyled>
-					</div>
 					<ProjectSidebarServerInfo
 						v-if="isServerProject && serverDataLoaded"
 						:project-v3="projectV3"
@@ -1125,7 +1116,6 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
-import OldButtonStyled from '~/components/ui/OldButtonStyled.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
@@ -1144,8 +1134,6 @@ const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()
 const { addNotification } = notifications
-
-const legacyDonateUrl = computed(() => `https://legacy.modrinth.com${route.fullPath}`)
 
 const auth = await useAuth()
 const user = await useUser()
