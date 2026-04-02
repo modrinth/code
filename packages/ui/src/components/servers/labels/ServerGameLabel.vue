@@ -9,9 +9,9 @@
 		<GameIcon aria-hidden="true" />
 		<AutoLink
 			v-if="isLink"
-			:to="serverId ? `/hosting/manage/${serverId}/options/loader` : ''"
+			:to="settingsLinkTarget"
 			class="flex min-w-0 items-center truncate text-sm font-semibold"
-			:class="serverId ? 'hover:underline' : ''"
+			:class="settingsLinkTarget ? 'hover:underline' : ''"
 		>
 			<div class="flex flex-row items-center gap-1">
 				{{ game[0].toUpperCase() + game.slice(1) }}
@@ -29,7 +29,9 @@
 
 <script setup lang="ts">
 import { GameIcon } from '@modrinth/assets'
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+import { injectServerSettingsModal } from '#ui/providers/server-settings-modal'
 
 import AutoLink from '../../base/AutoLink.vue'
 import Separator from './Separator.vue'
@@ -41,6 +43,11 @@ defineProps<{
 	noSeparator?: boolean
 }>()
 
-const route = useRoute()
-const serverId = route.params.id as string
+const settingsModal = injectServerSettingsModal(null)
+const settingsLinkTarget = computed(() => {
+	if (settingsModal) {
+		return () => settingsModal.openServerSettings({ tabId: 'installation' })
+	}
+	return ''
+})
 </script>

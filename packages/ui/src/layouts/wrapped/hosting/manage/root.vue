@@ -214,13 +214,10 @@
 										</button>
 									</ButtonStyled>
 									<ButtonStyled color="red" type="standard">
-										<RouterLink
-											class="whitespace-pre"
-											:to="`/hosting/manage/${serverId}/options/loader`"
-										>
+										<button class="whitespace-pre" @click="openServerSettingsModal('installation')">
 											<RightArrowIcon />
 											Change Loader
-										</RouterLink>
+										</button>
 									</ButtonStyled>
 								</div>
 							</div>
@@ -321,8 +318,8 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
@@ -340,7 +337,12 @@ import {
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
 import { useDebugLogger, useServerImage, useServerProject } from '#ui/composables'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
-import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
+import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
+import {
+	injectModrinthClient,
+	injectNotificationManager,
+	provideServerSettingsModal,
+} from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
@@ -385,6 +387,8 @@ const props = withDefaults(
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
+const route = useRoute()
+const router = useRouter()
 const debug = useDebugLogger('ServerManage')
 
 const isReconnecting = ref(false)
@@ -1051,10 +1055,14 @@ const openInstallLog = () => {
 	window.dispatchEvent(new PopStateEvent('popstate'))
 }
 
-function openServerSettingsModal() {
+function openServerSettingsModal(tabId?: ServerSettingsTabId) {
 	if (!props.serverId) return
-	serverSettingsModal.value?.show({ serverId: props.serverId })
+	serverSettingsModal.value?.show({ serverId: props.serverId, tabId })
 }
+
+provideServerSettingsModal({
+	openServerSettings: (options) => openServerSettingsModal(options?.tabId),
+})
 
 function safeStringify(obj: unknown, indent = ' '): string {
 	const seen = new WeakSet()
@@ -1218,6 +1226,12 @@ onMounted(() => {
 	loadTallyScript()
 	if (surveyNotice.value) {
 		showSurvey()
+	}
+
+	if (route.query.openSettings) {
+		const tabId = route.query.openSettings as ServerSettingsTabId
+		router.replace({ query: { ...route.query, openSettings: undefined } })
+		nextTick(() => openServerSettingsModal(tabId))
 	}
 })
 

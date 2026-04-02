@@ -11,6 +11,7 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectServerSettingsModal,
 } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
@@ -95,6 +96,7 @@ const leaveMessages = defineMessages({
 const client = injectModrinthClient()
 const { server, worldId, busyReasons, isSyncingContent } = injectModrinthServerContext()
 const { addNotification } = injectNotificationManager()
+const { openServerSettings } = injectServerSettingsModal()
 const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
@@ -894,7 +896,7 @@ provideContentManager({
 	updateModpack: handleModpackUpdate,
 	viewModpackContent: handleViewModpackContent,
 	unlinkModpack: handleModpackUnlink,
-	openSettings: () => router.push(`/hosting/manage/${serverId}/options/loader`),
+	openSettings: () => openServerSettings({ tabId: 'installation' }),
 	switchVersion: handleSwitchVersion,
 	getOverflowOptions,
 	mapToTableItem: (item) => {

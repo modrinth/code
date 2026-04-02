@@ -29,11 +29,15 @@
 			</template>
 
 			<template #extra-modals>
-				<ServerSetupModal
-					ref="setupModal"
-					@reinstall="onReinstall"
-					@browse-modpacks="onBrowseModpacks"
-				/>
+				<Teleport to="body">
+					<div class="relative z-[100]">
+						<ServerSetupModal
+							ref="setupModal"
+							@reinstall="onReinstall"
+							@browse-modpacks="onBrowseModpacks"
+						/>
+					</div>
+				</Teleport>
 			</template>
 		</InstallationSettingsLayout>
 

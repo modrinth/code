@@ -14,6 +14,7 @@ import {
 	ServerSettingsNetworkPage,
 	ServerSettingsPropertiesPage,
 	serverSettingsTabDefinitions,
+	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
 import { provideServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
 import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
@@ -23,6 +24,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 type ShowOptions = {
 	serverId: string
 	tabIndex?: number
+	tabId?: ServerSettingsTabId
 }
 
 const props = defineProps<{
@@ -177,7 +179,7 @@ const tabs = computed<TabbedModalTab[]>(() =>
 			return {
 				name,
 				icon: tab.icon,
-				href: `https://modrinth.com${tab.href(ctx)}`,
+				href: tab.href ? `https://modrinth.com${tab.href(ctx)}` : undefined,
 				shown,
 			}
 		}
@@ -200,7 +202,7 @@ async function fetchViewer() {
 	currentUserRole.value = result.userRole
 }
 
-async function show({ serverId, tabIndex }: ShowOptions) {
+async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 	try {
 		currentServerId.value = serverId
 
@@ -223,9 +225,18 @@ async function show({ serverId, tabIndex }: ShowOptions) {
 		}
 
 		modal.value?.show()
-		const visibleTabsCount = tabs.value.filter((tab) => tab.shown !== false).length
-		const requestedTab = tabIndex ?? 0
-		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabsCount - 1, 0))
+		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
+		let requestedTab = tabIndex ?? 0
+		if (tabId) {
+			const defIndex = serverSettingsTabDefinitions.findIndex((d) => d.id === tabId)
+			if (defIndex >= 0) {
+				const visibleIndex = visibleTabs.findIndex(
+					(_, i) => tabs.value.indexOf(visibleTabs[i]) === defIndex,
+				)
+				if (visibleIndex >= 0) requestedTab = visibleIndex
+			}
+		}
+		const clampedTab = Math.min(Math.max(requestedTab, 0), Math.max(visibleTabs.length - 1, 0))
 		nextTick(() => modal.value?.setTab(clampedTab))
 
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
