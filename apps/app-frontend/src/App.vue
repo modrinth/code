@@ -5,6 +5,7 @@ import {
 	nodeAuthState,
 	PanelVersionFeature,
 	TauriModrinthClient,
+	VerboseLoggingFeature,
 } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
@@ -146,6 +147,7 @@ const tauriApiClient = new TauriModrinthClient({
 			token: async () => (await getCreds())?.session,
 		}),
 		new PanelVersionFeature(),
+		new VerboseLoggingFeature(),
 	],
 })
 provideModrinthClient(tauriApiClient)
@@ -420,6 +422,7 @@ const route = useRoute()
 
 const loading = useLoading()
 loading.setEnabled(false)
+loading.startLoading()
 
 const error = useError()
 const errorModal = ref()
@@ -1023,6 +1026,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				v-if="themeStore.featureFlags.servers_in_app"
 				v-tooltip.right="'Servers'"
 				to="/hosting/manage"
+				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
+				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
 			>
 				<ServerIcon />
 			</NavButton>

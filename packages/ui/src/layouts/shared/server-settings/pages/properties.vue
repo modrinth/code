@@ -346,6 +346,7 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
+let previousSpawnProtection = '16'
 
 function syncFormFromData() {
 	if (!propsData.value) return
@@ -379,8 +380,6 @@ watch(
 watch(powerState, () => {
 	queryClient.invalidateQueries({ queryKey: queryKey.value })
 })
-
-let previousSpawnProtection = '16'
 
 const combinedGamemode = computed<CombinedGamemode>({
 	get() {
