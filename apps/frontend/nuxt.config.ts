@@ -15,7 +15,7 @@ const preloadedFonts = [
 
 const faviconHref = '/favicon.png'
 
-const PROD_MODRINTH_URL = 'https://legacy.modrinth.com'
+const PROD_MODRINTH_URL = 'https://april-fools-2026.modrinth.com'
 const STAGING_MODRINTH_URL = 'https://staging.modrinth.com'
 
 export default defineNuxtConfig({

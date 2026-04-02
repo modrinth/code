@@ -8,7 +8,7 @@
 		"directory": "./.output/public/"
 	},
 	"compatibility_flags": ["nodejs_compat_v2"],
-	"routes": ["legacy.modrinth.com/*"],
+	"routes": ["april-fools-2026.modrinth.com/*", "legacy.modrinth.com/*"],
 	"preview_urls": true,
 	"workers_dev": true,
 	"limits": {
