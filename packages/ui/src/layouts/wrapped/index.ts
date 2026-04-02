@@ -3,3 +3,4 @@ export { default as ServersManageBackupsPage } from './hosting/manage/backups.vu
 export { default as ServersManageContentPage } from './hosting/manage/content.vue'
 export { default as ServersManageFilesPage } from './hosting/manage/files.vue'
 export { default as ServersManagePageIndex } from './hosting/manage/index.vue'
+export { default as ServersManageOverviewPage } from './hosting/manage/overview.vue'

@@ -7,7 +7,7 @@
 		:aria-hidden="loading"
 	>
 		<component
-			:is="metric.link ? NuxtLink : 'div'"
+			:is="metric.link ? RouterLink : 'div'"
 			v-for="(metric, index) in metrics"
 			:key="index"
 			:to="metric.link && !loading ? metric.link : undefined"
@@ -45,17 +45,16 @@
 			</div>
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
-				<ClientOnly>
-					<VueApexCharts
-						v-if="!loading"
-						type="area"
-						height="142"
-						:options="getChartOptions(metric.warning, index)"
-						:series="[{ name: metric.title, data: metric.data }]"
-						class="chart"
-						:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
-					/>
-				</ClientOnly>
+				<component
+					:is="apexChartComponent"
+					v-if="!loading && apexChartComponent"
+					type="area"
+					height="142"
+					:options="getChartOptions(metric.warning, index)"
+					:series="[{ name: metric.title, data: metric.data }]"
+					class="chart"
+					:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
+				/>
 			</div>
 		</component>
 	</div>
@@ -65,33 +64,50 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { computed, ref, shallowRef } from 'vue'
+import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 
-import { NuxtLink } from '#components'
-
-const flags = useFeatureFlags()
-const route = useNativeRoute()
-const serverId = route.params.id
-const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
-
-const chartsReady = ref(new Set<number>())
-
-const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
-	ramAsNumber: false,
+const route = useRoute()
+const serverId = computed(() => {
+	const rawId = route.params.id
+	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
 })
 
-const props = withDefaults(defineProps<{ data?: Stats; loading?: boolean }>(), {
-	loading: false,
+const props = withDefaults(
+	defineProps<{
+		data?: Stats
+		loading?: boolean
+		showMemoryAsBytes?: boolean
+	}>(),
+	{
+		data: undefined,
+		loading: false,
+		showMemoryAsBytes: false,
+	},
+)
+
+const apexChartComponent = shallowRef<Component | null>(null)
+const chartsReady = ref(new Set<number>())
+const storageKey = computed(() => `pyro-server-${serverId.value || 'unknown'}-preferences`)
+const userPreferences = useStorage(storageKey.value, {
+	ramAsNumber: false,
 })
 
 const stats = shallowRef(
 	props.data?.current || {
 		cpu_percent: 0,
 		ram_usage_bytes: 0,
-		ram_total_bytes: 1, // Avoid division by zero
+		ram_total_bytes: 1,
 		storage_usage_bytes: 0,
 	},
 )
+
+const cpuData = ref<number[]>(Array(20).fill(0))
+const ramData = ref<number[]>(Array(20).fill(0))
+
+onMounted(async () => {
+	apexChartComponent.value = (await import('vue3-apexcharts')).default
+})
 
 const onChartReady = (index: number) => {
 	chartsReady.value.add(index)
@@ -108,9 +124,6 @@ const formatBytes = (bytes: number) => {
 	return `${Math.round(value * 10) / 10} ${units[unit]}`
 }
 
-const cpuData = ref<number[]>(Array(20).fill(0))
-const ramData = ref<number[]>(Array(20).fill(0))
-
 const updateGraphData = (arr: number[], newValue: number) => {
 	arr.push(newValue)
 	arr.shift()
@@ -124,7 +137,7 @@ const metrics = computed(() => {
 		data: [] as number[],
 		showGraph: false,
 		warning: null,
-		link: `/hosting/manage/${serverId}/files`,
+		link: `/hosting/manage/${encodeURIComponent(serverId.value)}/files`,
 	}
 
 	if (props.loading) {
@@ -173,7 +186,7 @@ const metrics = computed(() => {
 		{
 			title: 'Memory',
 			value:
-				userPreferences.value.ramAsNumber || flags.value.developerMode
+				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
 					? formatBytes(stats.value.ram_usage_bytes)
 					: `${ramPercent.toFixed(2)}%`,
 			icon: DatabaseIcon,

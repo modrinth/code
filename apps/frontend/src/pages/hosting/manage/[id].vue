@@ -298,7 +298,7 @@
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon } from '@modrinth/api-client'
-import { clearNodeAuthState, ModrinthApiError, setNodeAuthState } from '@modrinth/api-client'
+import { ModrinthApiError } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -313,11 +313,9 @@ import {
 	SettingsIcon,
 	TransferIcon,
 } from '@modrinth/assets'
-import type { BusyReason } from '@modrinth/ui'
 import {
 	BackupProgressAdmonitions,
 	ButtonStyled,
-	defineMessage,
 	ErrorInformationCard,
 	formatLoaderLabel,
 	injectModrinthClient,
@@ -326,18 +324,17 @@ import {
 	NavTabs,
 	PanelServerActionButton,
 	PanelServerOverflowMenu,
-	provideModrinthServerContext,
 	ServerIcon,
 	ServerManageHeader,
 	ServerNotice,
 	ServerOnboardingPanelPage,
 	useDebugLogger,
+	useServerManageCoreRuntime,
 } from '@modrinth/ui'
-import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { reloadNuxtApp } from '#app'
 import PanelErrorIcon from '~/components/ui/servers/icons/PanelErrorIcon.vue'
@@ -345,7 +342,6 @@ import MedalServerCountdown from '~/components/ui/servers/marketing/MedalServerC
 import PanelSpinner from '~/components/ui/servers/PanelSpinner.vue'
 import { useServerImage } from '~/composables/servers/use-server-image.ts'
 import { useServerProject } from '~/composables/servers/use-server-project.ts'
-import { useModrinthServersConsole } from '~/store/console.ts'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
@@ -353,7 +349,6 @@ const client = injectModrinthClient()
 const isReconnecting = ref(false)
 const isLoading = ref(true)
 const isMounted = ref(true)
-const unsubscribers = ref<(() => void)[]>([])
 const flags = useFeatureFlags()
 
 const INTERCOM_APP_ID = ref('ykeritl9')
@@ -430,16 +425,7 @@ function safeStringify(obj: unknown, indent = ' '): string {
 	)
 }
 
-const isConnected = ref(false)
-const isWSAuthIncorrect = ref(false)
-const modrinthServersConsole = useModrinthServersConsole()
 const queryClient = useQueryClient()
-const cpuData = ref<number[]>([])
-const ramData = ref<number[]>([])
-const isServerRunning = computed(() => serverPowerState.value === 'running')
-const serverPowerState = ref<Archon.Websocket.v0.PowerState>('stopped')
-const powerStateDetails = ref<{ oom_killed?: boolean; exit_code?: number }>()
-const backupsState = reactive(new Map())
 const cancelledBackups = new Set<string>()
 
 const markBackupCancelled = (backupId: string) => {
@@ -470,120 +456,67 @@ const isSyncingContent = computed(
 	() => syncProgressActive.value || isAwaitingPostInstallRefresh.value,
 )
 
-const busyReasons = computed(() => {
-	const reasons: BusyReason[] = []
-	if (serverData.value?.status === 'installing') {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.installing',
-				defaultMessage: 'Server is installing',
-			}),
-		})
-	}
-	if (isSyncingContent.value) {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.syncing-content',
-				defaultMessage: 'Content sync in progress',
-			}),
-		})
-	}
-	for (const entry of backupsState.values()) {
-		if (entry.create?.state === 'ongoing') {
-			reasons.push({
-				reason: defineMessage({
-					id: 'servers.busy.backup-creating',
-					defaultMessage: 'Backup creation in progress',
-				}),
-			})
-			break
-		}
-		if (entry.restore?.state === 'ongoing') {
-			reasons.push({
-				reason: defineMessage({
-					id: 'servers.busy.backup-restoring',
-					defaultMessage: 'Backup restore in progress',
-				}),
-			})
-			break
-		}
-	}
-	return reasons
-})
+let hasSeenInstallProgress = false
 
-const fsAuth = ref<{ url: string; token: string } | null>(null)
-const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
-const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
+const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
+	debug('[id.vue] handleState received:', {
+		power_variant: data.power_variant,
+		progress: data.progress,
+		serverStatus: serverData.value?.status,
+	})
+	syncProgress.value = data.progress
+	contentError.value = data.content_error
 
-const refreshFsAuth = async () => {
-	try {
-		const auth = await client.archon.servers_v0.getFilesystemAuth(serverId)
-		fsAuth.value = auth
-	} catch (error) {
-		console.error('Failed to refresh filesystem auth:', error)
-		throw error
+	if (serverData.value) {
+		if (data.progress != null && serverData.value.status !== 'installing') {
+			debug('[id.vue] handleState: progress != null, setting status to installing')
+			hasSeenInstallProgress = true
+			updateServerData({ status: 'installing' })
+		} else if (data.progress != null) {
+			hasSeenInstallProgress = true
+		} else if (
+			data.progress == null &&
+			data.content_error == null &&
+			serverData.value.status === 'installing' &&
+			hasSeenInstallProgress
+		) {
+			debug('[id.vue] handleState: progress null + was installing, applying optimistic update')
+			hasSeenInstallProgress = false
+			applyOptimisticCompletion()
+			invalidateAfterInstall()
+		}
 	}
 }
 
-setNodeAuthState(() => fsAuth.value, refreshFsAuth)
-
-provideModrinthServerContext({
-	serverId,
-	worldId,
-	server: serverData as Ref<Archon.Servers.v0.Server>,
-	isConnected,
-	powerState: serverPowerState,
-	isServerRunning,
+const {
 	backupsState,
-	markBackupCancelled,
-	isSyncingContent,
-	busyReasons,
-	fsAuth,
+	cleanupCoreRuntime,
+	connectSocket,
 	fsOps,
 	fsQueuedOps,
-	refreshFsAuth,
+	isConnected,
+	isServerRunning,
+	isWsAuthIncorrect: isWSAuthIncorrect,
+	powerStateDetails,
+	serverPowerState,
+	stats,
+	uptimeSeconds,
+} = useServerManageCoreRuntime({
+	serverId: computed(() => serverId),
+	worldId,
+	server: serverData,
+	isSyncingContent,
+	markBackupCancelled,
+	includeBackupBusyReasons: true,
+	setDisconnectedOnAuthIncorrect: false,
+	syncUptimeFromState: true,
+	incrementUptimeLocally: true,
+	eventGuard: () => isMounted.value,
+	onStateEvent,
 })
-
-const uptimeSeconds = ref(0)
 
 const copied = ref(false)
 const error = ref<Error | null>(null)
-
-const initialConsoleMessage = [
-	'   __________________________________________________',
-	' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
-	'|   Press the green start button to start your server! |',
-	' \\____________________________________________________/',
-	'\x1B[32m     _    _ \x1B[37m',
-	'\x1B[32m    (o)--(o)      \x1B[37m',
-	'\x1B[32m   /.______.\\\x1B[37m',
-	'\x1B[32m   \\________/     \x1B[37m',
-	'\x1B[32m  ./        \\.    \x1B[37m',
-	'\x1B[32m ( .        , )\x1B[37m',
-	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
-	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
-]
-
-const stats = ref<Stats>({
-	current: {
-		cpu_percent: 0,
-		ram_usage_bytes: 0,
-		ram_total_bytes: 1,
-		storage_usage_bytes: 0,
-		storage_total_bytes: 0,
-	},
-	past: {
-		cpu_percent: 0,
-		ram_usage_bytes: 0,
-		ram_total_bytes: 1,
-		storage_usage_bytes: 0,
-		storage_total_bytes: 0,
-	},
-	graph: {
-		cpu: [],
-		ram: [],
-	},
-})
 
 const navLinks = [
 	{
@@ -706,99 +639,6 @@ function showSurvey() {
 	}
 }
 
-let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
-
-const startUptimeUpdates = () => {
-	uptimeIntervalId = setInterval(() => {
-		uptimeSeconds.value += 1
-	}, 1000)
-}
-
-const stopUptimeUpdates = () => {
-	if (uptimeIntervalId) {
-		clearInterval(uptimeIntervalId)
-	}
-}
-
-const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
-	const log = data.message.split('\n').filter((l) => l.trim())
-	modrinthServersConsole.addLines(log)
-}
-
-const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
-	updateStats({
-		cpu_percent: data.cpu_percent,
-		ram_usage_bytes: data.ram_usage_bytes,
-		ram_total_bytes: data.ram_total_bytes,
-		storage_usage_bytes: data.storage_usage_bytes,
-		storage_total_bytes: data.storage_total_bytes,
-	})
-}
-
-const handlePowerState = (data: Archon.Websocket.v0.WSPowerStateEvent) => {
-	if (data.state === 'crashed') {
-		updatePowerState(data.state, {
-			oom_killed: data.oom_killed,
-			exit_code: data.exit_code,
-		})
-	} else {
-		updatePowerState(data.state)
-	}
-}
-
-const handleState = (data: Archon.Websocket.v0.WSStateEvent) => {
-	debug('[id.vue] handleState received:', {
-		power_variant: data.power_variant,
-		progress: data.progress,
-		serverStatus: serverData.value?.status,
-	})
-	syncProgress.value = data.progress
-	contentError.value = data.content_error
-
-	// Sync power state from the state event
-	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
-		{
-			not_ready: 'stopped',
-			starting: 'starting',
-			running: 'running',
-			stopping: 'stopping',
-			idle:
-				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
-		}
-	updatePowerState(powerMap[data.power_variant], {
-		exit_code: data.exit_code ?? undefined,
-		oom_killed: data.was_oom,
-	})
-
-	// Sync uptime
-	if (data.uptime > 0) {
-		stopUptimeUpdates()
-		uptimeSeconds.value = data.uptime
-		startUptimeUpdates()
-	}
-
-	// Update installing status from progress presence
-	if (serverData.value) {
-		if (data.progress != null && serverData.value.status !== 'installing') {
-			debug('[id.vue] handleState: progress != null, setting status to installing')
-			hasSeenInstallProgress = true
-			updateServerData({ status: 'installing' })
-		} else if (data.progress != null) {
-			hasSeenInstallProgress = true
-		} else if (
-			data.progress == null &&
-			data.content_error == null &&
-			serverData.value.status === 'installing' &&
-			hasSeenInstallProgress
-		) {
-			debug('[id.vue] handleState: progress null + was installing, applying optimistic update')
-			hasSeenInstallProgress = false
-			applyOptimisticCompletion()
-			invalidateAfterInstall()
-		}
-	}
-}
-
 async function handleContentRetry() {
 	if (!worldId.value) return
 	try {
@@ -809,16 +649,6 @@ async function handleContentRetry() {
 			text: err instanceof Error ? err.message : 'Failed to retry installation',
 		})
 	}
-}
-
-const handleUptime = (data: Archon.Websocket.v0.WSUptimeEvent) => {
-	stopUptimeUpdates()
-	uptimeSeconds.value = data.uptime
-	startUptimeUpdates()
-}
-
-const handleAuthIncorrect = () => {
-	isWSAuthIncorrect.value = true
 }
 
 const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) => {
@@ -937,7 +767,6 @@ const handleNewMod = () => {
 const newLoader = ref<string | null>(null)
 const newLoaderVersion = ref<string | null>(null)
 const newMCVersion = ref<string | null>(null)
-let hasSeenInstallProgress = false
 
 const onReinstall = async (potentialArgs: any) => {
 	debug('[id.vue] onReinstall called with:', potentialArgs)
@@ -1102,46 +931,6 @@ const handleInstallationResult = async (data: Archon.Websocket.v0.WSInstallation
 	}
 }
 
-const updateStats = (currentStats: Stats['current']) => {
-	if (!isMounted.value) return
-	if (!isConnected.value) isConnected.value = true
-	stats.value = {
-		current: currentStats,
-		past: { ...stats.value.current },
-		graph: {
-			cpu: updateGraphData(cpuData.value, currentStats.cpu_percent),
-			ram: updateGraphData(
-				ramData.value,
-				Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
-			),
-		},
-	}
-}
-
-const updatePowerState = (
-	state: Archon.Websocket.v0.PowerState,
-	details?: { oom_killed?: boolean; exit_code?: number },
-) => {
-	serverPowerState.value = state
-
-	if (state === 'crashed') {
-		powerStateDetails.value = details
-	} else {
-		powerStateDetails.value = undefined
-	}
-
-	if (state === 'stopped' || state === 'crashed') {
-		stopUptimeUpdates()
-		uptimeSeconds.value = 0
-	}
-}
-
-const updateGraphData = (dataArray: number[], newValue: number): number[] => {
-	const updated = [...dataArray, newValue]
-	if (updated.length > 10) updated.shift()
-	return updated
-}
-
 const nodeUnavailableDetails = computed(() => [
 	{
 		label: 'Server ID',
@@ -1256,20 +1045,12 @@ const cleanup = () => {
 
 	shutdown()
 
-	stopUptimeUpdates()
+	cleanupCoreRuntime(serverId)
 
-	unsubscribers.value.forEach((unsub) => unsub())
-	unsubscribers.value = []
-
-	client.archon.sockets.disconnect(serverId)
-
-	isConnected.value = false
 	isReconnecting.value = false
 	isLoading.value = true
 
 	cancelledBackups.clear()
-
-	clearNodeAuthState()
 
 	DOMPurify.removeHook('afterSanitizeAttributes')
 }
@@ -1354,36 +1135,16 @@ function initializeServer() {
 	if (serverError.value) {
 		isLoading.value = false
 	} else {
-		client.archon.sockets
-			.safeConnect(serverId)
-			.then(() => {
-				modrinthServersConsole.clear()
-				isConnected.value = true
-				isLoading.value = false
-
-				for (const line of initialConsoleMessage) {
-					modrinthServersConsole.addLine(line)
-				}
-
-				unsubscribers.value = [
-					client.archon.sockets.on(serverId, 'log', handleLog),
-					client.archon.sockets.on(serverId, 'stats', handleStats),
-					client.archon.sockets.on(serverId, 'state', handleState),
-					client.archon.sockets.on(serverId, 'power-state', handlePowerState),
-					client.archon.sockets.on(serverId, 'uptime', handleUptime),
-					client.archon.sockets.on(serverId, 'auth-incorrect', handleAuthIncorrect),
-					client.archon.sockets.on(serverId, 'auth-ok', () => {}),
-					client.archon.sockets.on(serverId, 'installation-result', handleInstallationResult),
-					client.archon.sockets.on(serverId, 'backup-progress', handleBackupProgress),
-					client.archon.sockets.on(serverId, 'filesystem-ops', handleFilesystemOps),
-					client.archon.sockets.on(serverId, 'new-mod', handleNewMod),
-				]
-			})
-			.catch((error) => {
-				debug('[id.vue] Failed to connect WebSocket:', error)
-				isConnected.value = false
-				isLoading.value = false
-			})
+		void connectSocket(serverId, {
+			extraSubscriptions: (targetServerId) => [
+				client.archon.sockets.on(targetServerId, 'installation-result', handleInstallationResult),
+				client.archon.sockets.on(targetServerId, 'backup-progress', handleBackupProgress),
+				client.archon.sockets.on(targetServerId, 'filesystem-ops', handleFilesystemOps),
+				client.archon.sockets.on(targetServerId, 'new-mod', handleNewMod),
+			],
+		}).finally(() => {
+			isLoading.value = false
+		})
 	}
 
 	if (serverData.value?.flows?.intro && serverProject.value) {

@@ -15,7 +15,7 @@
 				:show-uptime="false"
 			>
 				<template #actions>
-					<div class="flex gap-2" v-if="isConnected && !server.flows?.intro">
+					<div v-if="isConnected && !server.flows?.intro" class="flex gap-2">
 						<PanelServerActionButton />
 						<ButtonStyled circular size="large">
 							<button v-tooltip="'Server settings'" @click="openServerSettingsModal">
@@ -35,10 +35,13 @@
 				<Suspense>
 					<ServerSettingsModal ref="serverSettingsModal" />
 				</Suspense>
-				<RouterView v-slot="{ Component }">
+				<RouterView v-slot="{ Component, route: childRoute }">
 					<template v-if="Component">
 						<Suspense>
-							<component :is="Component" />
+							<component
+								:is="Component"
+								v-bind="childRoute.name === 'ServerManageOverview' ? overviewChildProps : undefined"
+							/>
 							<template #fallback>
 								<LoadingIndicator />
 							</template>
@@ -51,22 +54,26 @@
 </template>
 
 <script setup lang="ts">
-import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
-import { BoxesIcon, DatabaseBackupIcon, FolderOpenIcon, SettingsIcon } from '@modrinth/assets'
+import type { Archon } from '@modrinth/api-client'
 import {
-	type BusyReason,
+	BoxesIcon,
+	DatabaseBackupIcon,
+	FolderOpenIcon,
+	LayoutTemplateIcon,
+	SettingsIcon,
+} from '@modrinth/assets'
+import {
 	ButtonStyled,
-	defineMessage,
 	injectModrinthClient,
 	LoadingIndicator,
 	NavTabs,
 	PanelServerActionButton,
 	PanelServerOverflowMenu,
-	provideModrinthServerContext,
 	ServerManageHeader,
+	useServerManageCoreRuntime,
 } from '@modrinth/ui'
-import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, onUnmounted, reactive, ref, watch } from 'vue'
+import { useQuery } from '@tanstack/vue-query'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import ServerSettingsModal from '@/components/ui/modal/ServerSettingsModal.vue'
@@ -75,7 +82,6 @@ import { useTheming } from '@/store/theme'
 const route = useRoute()
 const themeStore = useTheming()
 const client = injectModrinthClient()
-const queryClient = useQueryClient()
 
 const serverId = computed(() => {
 	const rawId = route.params.id
@@ -137,38 +143,27 @@ const serverProjectLink = computed(() => {
 	return `/project/${serverProject.value.slug ?? serverProject.value.id}`
 })
 
-const isConnected = ref(false)
-const powerState = ref<Archon.Websocket.v0.PowerState>('stopped')
-const isServerRunning = computed(() => powerState.value === 'running')
-const backupsState = reactive(new Map())
 const isSyncingContent = ref(false)
-const socketUnsubscribers = ref<(() => void)[]>([])
-const connectedSocketServerId = ref<string | null>(null)
-
-const busyReasons = computed<BusyReason[]>(() => {
-	const reasons: BusyReason[] = []
-	if (server.value?.status === 'installing') {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.installing',
-				defaultMessage: 'Server is installing',
-			}),
-		})
-	}
-	if (isSyncingContent.value) {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.syncing-content',
-				defaultMessage: 'Content sync in progress',
-			}),
-		})
-	}
-	return reasons
+const {
+	cleanupCoreRuntime,
+	connectSocket,
+	connectedSocketServerId,
+	disconnectSocket,
+	fsAuth,
+	isConnected,
+	isServerRunning,
+	isWsAuthIncorrect,
+	powerStateDetails,
+	refreshFsAuth,
+	serverPowerState,
+	stats,
+} = useServerManageCoreRuntime({
+	serverId,
+	worldId,
+	server,
+	isSyncingContent,
+	setDisconnectedOnAuthIncorrect: true,
 })
-
-const fsAuth = ref<{ url: string; token: string } | null>(null)
-const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
-const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
 
 async function processImageBlob(blob: Blob, size: number): Promise<string> {
 	return new Promise((resolve) => {
@@ -205,83 +200,9 @@ const { data: serverImage } = useQuery({
 	enabled: computed(() => !!serverId.value && server.value.status === 'available'),
 })
 
-async function refreshFsAuth() {
-	if (!serverId.value) {
-		fsAuth.value = null
-		return
-	}
-	fsAuth.value = await queryClient.fetchQuery({
-		queryKey: ['servers', 'filesystem-auth', serverId.value],
-		queryFn: () => client.archon.servers_v0.getFilesystemAuth(serverId.value),
-	})
-}
-
-function markBackupCancelled(backupId: string) {
-	backupsState.delete(backupId)
-}
-
 function openServerSettingsModal() {
 	if (!serverId.value) return
 	serverSettingsModal.value?.show({ serverId: serverId.value })
-}
-
-function setPowerState(state: Archon.Websocket.v0.PowerState) {
-	powerState.value = state
-}
-
-function handlePowerState(data: Archon.Websocket.v0.WSPowerStateEvent) {
-	setPowerState(data.state)
-}
-
-function handleState(data: Archon.Websocket.v0.WSStateEvent) {
-	const powerMap: Record<Archon.Websocket.v0.FlattenedPowerState, Archon.Websocket.v0.PowerState> =
-		{
-			not_ready: 'stopped',
-			starting: 'starting',
-			running: 'running',
-			stopping: 'stopping',
-			idle:
-				data.was_oom || (data.exit_code != null && data.exit_code !== 0) ? 'crashed' : 'stopped',
-		}
-	setPowerState(powerMap[data.power_variant])
-}
-
-function disconnectSocket(targetServerId?: string) {
-	for (const unsub of socketUnsubscribers.value) unsub()
-	socketUnsubscribers.value = []
-
-	if (targetServerId) {
-		client.archon.sockets.disconnect(targetServerId)
-	}
-	connectedSocketServerId.value = null
-	isConnected.value = false
-	setPowerState('stopped')
-}
-
-async function connectSocket(targetServerId: string) {
-	if (connectedSocketServerId.value === targetServerId && isConnected.value) {
-		return
-	}
-	disconnectSocket(targetServerId)
-
-	try {
-		await client.archon.sockets.safeConnect(targetServerId, { force: true })
-		connectedSocketServerId.value = targetServerId
-		isConnected.value = true
-		socketUnsubscribers.value = [
-			client.archon.sockets.on(targetServerId, 'state', handleState),
-			client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),
-			client.archon.sockets.on(targetServerId, 'auth-incorrect', () => {
-				isConnected.value = false
-			}),
-			client.archon.sockets.on(targetServerId, 'auth-ok', () => {
-				isConnected.value = true
-			}),
-		]
-	} catch (error) {
-		console.error('[hosting/manage] Failed to connect server socket:', error)
-		isConnected.value = false
-	}
 }
 
 watch(
@@ -304,41 +225,36 @@ watch(
 			disconnectSocket(currentServerId)
 			return
 		}
-		if (connectedSocketServerId.value === currentServerId && isConnected.value) {
+		if (
+			connectedSocketServerId.value === currentServerId &&
+			(isConnected.value || isWsAuthIncorrect.value)
+		) {
 			return
 		}
-		void connectSocket(currentServerId)
+		void connectSocket(currentServerId, { force: true })
 	},
 	{ immediate: true },
 )
 
-provideModrinthServerContext({
-	get serverId() {
-		return serverId.value
-	},
-	worldId,
-	server,
-	isConnected,
-	powerState,
-	isServerRunning,
-	backupsState,
-	markBackupCancelled,
-	isSyncingContent,
-	busyReasons,
-	fsAuth,
-	fsOps,
-	fsQueuedOps,
-	refreshFsAuth,
-})
-
-setNodeAuthState(() => fsAuth.value, refreshFsAuth)
-
 onUnmounted(() => {
-	disconnectSocket(serverId.value || undefined)
-	clearNodeAuthState()
+	cleanupCoreRuntime(serverId.value || undefined)
 })
+
+const overviewChildProps = computed(() => ({
+	isConnected: isConnected.value,
+	isWsAuthIncorrect: isWsAuthIncorrect.value,
+	isServerRunning: isServerRunning.value,
+	stats: stats.value,
+	serverPowerState: serverPowerState.value,
+	powerStateDetails: powerStateDetails.value,
+}))
 
 const tabs = computed(() => [
+	{
+		label: 'Overview',
+		href: basePath.value,
+		icon: LayoutTemplateIcon,
+	},
 	{
 		label: 'Content',
 		href: `${basePath.value}/content`,
