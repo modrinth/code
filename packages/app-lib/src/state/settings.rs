@@ -55,6 +55,7 @@ pub enum FeatureFlag {
     ProjectBackground,
     WorldsTab,
     WorldsInHome,
+    ServersInApp,
     ServerProjectQa,
     I18nDebug,
 }
@@ -130,22 +131,7 @@ impl Settings {
             feature_flags: res
                 .feature_flags
                 .as_ref()
-                .and_then(|x| {
-                    // to not make deseralization fail from stale feature flags settings
-                    let raw: HashMap<String, bool> =
-                        serde_json::from_str(x).ok()?;
-                    Some(
-                        raw.into_iter()
-                            .filter_map(|(key, value)| {
-                                serde_json::from_value(
-                                    serde_json::Value::String(key),
-                                )
-                                .ok()
-                                .map(|feature_flag| (feature_flag, value))
-                            })
-                            .collect(),
-                    )
-                })
+                .and_then(|x| serde_json::from_str(x).ok())
                 .unwrap_or_default(),
             skipped_update: res.skipped_update,
             pending_update_toast_for_version: res
