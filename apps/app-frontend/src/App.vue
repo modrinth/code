@@ -1264,10 +1264,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList
-								:credentials="credentials"
-								:sign-in="() => signIn()"
-							/>
+							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
 					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">

@@ -249,8 +249,6 @@ const { data: serverImage } = useQuery({
 	queryFn: async (): Promise<string | null> => {
 		if (!serverId.value || server.value.status !== 'available') return null
 
-		const auth = await client.archon.servers_v0.getFilesystemAuth(serverId.value)
-
 		try {
 			const blob = await client.kyros.files_v0.downloadFile('/server-icon-original.png')
 			return await processImageBlob(blob, 512)
