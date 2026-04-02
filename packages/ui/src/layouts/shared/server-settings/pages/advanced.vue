@@ -57,8 +57,8 @@
 								>
 									<div class="flex items-center gap-1.5 h-full w-full">
 										<div
-											class="h-full flex justify-between grow items-center"
 											v-tooltip="'Copy SFTP Password'"
+											class="h-full flex justify-between grow items-center"
 										>
 											<div class="truncate font-semibold">
 												{{

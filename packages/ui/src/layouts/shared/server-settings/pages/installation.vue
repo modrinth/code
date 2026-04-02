@@ -772,6 +772,7 @@ function onReinstall(event?: any) {
 }
 
 function onBrowseModpacks() {
+	debug('onBrowseModpacks: navigating to modpack discovery')
 	serverSettings.browseModpacks({
 		serverId,
 		worldId: worldId.value,

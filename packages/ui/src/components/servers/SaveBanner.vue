@@ -32,9 +32,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
-import { computed } from 'vue'
 
 const props = defineProps<{
 	isUpdating: boolean
