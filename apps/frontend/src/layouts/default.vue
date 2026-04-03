@@ -501,7 +501,7 @@
 				</OverflowMenu>
 				<template v-else>
 					<ButtonStyled color="brand">
-						<nuxt-link to="/auth/sign-in">
+						<nuxt-link :to="signInRouteObj">
 							<LogInIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.signInButton) }}
 						</nuxt-link>
@@ -556,7 +556,7 @@
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
 						</div>
 					</NuxtLink>
-					<nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
+					<nuxt-link v-else class="iconified-button brand-button" :to="signInRouteObj">
 						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
 					</nuxt-link>
 				</div>
@@ -761,6 +761,7 @@ import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateMo
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
 import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
@@ -779,6 +780,7 @@ const flags = useFeatureFlags()
 const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
 
