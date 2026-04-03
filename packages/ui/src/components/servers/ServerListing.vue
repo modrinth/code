@@ -7,7 +7,7 @@
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
-					'hover:brightness-125': !isDisabled,
+					'hoverable': !isDisabled,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
@@ -74,7 +74,7 @@
 						:show-player-count="showPlayerCount"
 						:class="{ 'opacity-50': isDisabled }"
 						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
+						class="flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</div>
@@ -582,5 +582,9 @@ async function copyToClipboard(text: string) {
 <style scoped>
 .server-listing-notice {
 	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
+}
+
+.hoverable:hover:not(:has([data-subdomain-label]:hover)) {
+	filter: brightness(1.25);
 }
 </style>

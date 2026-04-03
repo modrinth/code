@@ -1,11 +1,12 @@
 <template>
-	<div v-tooltip="'Change server loader'" class="flex min-w-0 flex-row items-center gap-2 truncate">
+	<div class="flex min-w-0 flex-row items-center gap-2 truncate">
 		<Separator v-if="!noSeparator" />
 		<div class="flex flex-row items-center gap-1.5">
 			<LoaderIcon v-if="loader" :loader="loader" />
 			<div v-else class="size-5 shrink-0 animate-pulse rounded-full bg-button-border"></div>
 			<AutoLink
 				v-if="isLink"
+				v-tooltip="'Change server loader'"
 				:to="settingsLinkTarget"
 				class="flex min-w-0 items-center text-sm font-semibold"
 				:class="settingsLinkTarget ? 'hover:underline' : ''"
@@ -19,7 +20,7 @@
 					<span class="inline-block h-4 w-12 animate-pulse rounded bg-button-border"></span>
 				</span>
 			</AutoLink>
-			<div v-else class="min-w-0 text-sm font-semibold">
+			<div v-else class="pointer-events-none min-w-0 text-sm font-semibold">
 				<span v-if="loader">
 					{{ loader }}
 					<span v-if="loaderVersion">{{ loaderVersion }}</span>
