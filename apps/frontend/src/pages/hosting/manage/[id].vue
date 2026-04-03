@@ -1335,18 +1335,11 @@ async function initializeIntercom() {
 	if (!auth.value?.user) return
 
 	try {
-		const intercomData = await $fetch<{
-			token: string
-			user: AuthUser
-		}>('/api/intercom/messenger-jwt')
+		const intercomData = await $fetch<{ token: string }>('/api/intercom/messenger-jwt')
 
 		Intercom({
 			app_id: config.public.intercomAppId,
 			intercom_user_jwt: intercomData.token,
-			user_id: intercomData.user.id,
-			name: intercomData.user.username,
-			email: intercomData.user.email,
-			created_at: Math.floor(new Date(intercomData.user.created).getTime() / 1000),
 			session_duration: 1000 * 60 * 60 * 24,
 		})
 	} catch (error) {
