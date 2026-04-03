@@ -626,6 +626,9 @@
   "files.navbar.file-navigation": {
     "defaultMessage": "File navigation"
   },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Find in file"
+  },
   "files.navbar.home": {
     "defaultMessage": "Home"
   },
@@ -640,9 +643,6 @@
   },
   "files.navbar.search-files": {
     "defaultMessage": "Search files"
-  },
-  "files.navbar.search-in-file": {
-    "defaultMessage": "Search in file"
   },
   "files.navbar.share-to-mclogs": {
     "defaultMessage": "Share to mclo.gs"

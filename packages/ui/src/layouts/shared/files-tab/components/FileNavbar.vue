@@ -191,13 +191,13 @@
 					<ShareIcon />
 				</Button>
 				<Button
-					v-tooltip="formatMessage(messages.searchInFile)"
+					v-tooltip="formatMessage(messages.findInFile)"
 					icon-only
-					:transparent="!isEditorSearchOpen"
-					:color="isEditorSearchOpen ? 'brand' : undefined"
-					:aria-label="formatMessage(messages.searchInFile)"
-					:aria-pressed="isEditorSearchOpen"
-					@click="$emit('search')"
+					:transparent="!isEditorFindOpen"
+					:color="isEditorFindOpen ? 'brand' : undefined"
+					:aria-label="formatMessage(messages.findInFile)"
+					:aria-pressed="isEditorFindOpen"
+					@click="$emit('find')"
 				>
 					<SearchIcon />
 				</Button>
@@ -286,9 +286,9 @@ const messages = defineMessages({
 		id: 'files.navbar.share-to-mclogs',
 		defaultMessage: 'Share to mclo.gs',
 	},
-	searchInFile: {
-		id: 'files.navbar.search-in-file',
-		defaultMessage: 'Search in file',
+	findInFile: {
+		id: 'files.navbar.find-in-file',
+		defaultMessage: 'Find in file',
 	},
 })
 
@@ -298,7 +298,7 @@ const props = defineProps<{
 	editingFileName?: string
 	editingFilePath?: string
 	isEditingImage?: boolean
-	isEditorSearchOpen?: boolean
+	isEditorFindOpen?: boolean
 	searchQuery: string
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
@@ -318,7 +318,7 @@ const emit = defineEmits<{
 	unzipFromUrl: [cf: boolean]
 	refresh: []
 	share: []
-	search: []
+	find: []
 }>()
 
 const refreshing = ref(false)
