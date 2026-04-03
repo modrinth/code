@@ -396,7 +396,7 @@ type ServerListingProps = {
 
 const props = defineProps<ServerListingProps>()
 
-const { kyros, labrinth } = injectModrinthClient()
+const { archon, kyros, labrinth } = injectModrinthClient()
 
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
@@ -514,11 +514,30 @@ const { data: image } = useQuery({
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			try {
-				const blob = await kyros.files_v0.downloadFile('/server-icon-original.png')
+			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
 
-				return await processImageBlob(blob, 512)
-			} catch {
+			try {
+				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+				return await processImageBlob(blob, 64)
+			} catch (error) {
+				const statusCode = (error as { statusCode?: number })?.statusCode
+				if (statusCode != null && statusCode !== 404) {
+					throw error
+				}
+
+				try {
+					const originalBlob = await kyros.files_v0.downloadFileWithAuth(
+						fsAuth,
+						'/server-icon-original.png',
+					)
+					return await processImageBlob(originalBlob, 64)
+				} catch (originalError) {
+					const originalStatusCode = (originalError as { statusCode?: number })?.statusCode
+					if (originalStatusCode != null && originalStatusCode !== 404) {
+						throw originalError
+					}
+				}
+
 				const projectIcon = iconUrl.value
 				if (projectIcon) {
 					const response = await fetch(projectIcon)
@@ -528,22 +547,24 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					kyros.files_v0.uploadFile('/server-icon.png', scaledFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					kyros.files_v0.uploadFile('/server-icon-original.png', originalFile)
+					await kyros.files_v0
+						.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
+						.promise
 
 					return scaledDataUrl
 				}
 			}
+
+			return null
 		} catch (error) {
 			console.debug('Icon processing failed:', error)
 			return null
 		}
-
-		return null
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
