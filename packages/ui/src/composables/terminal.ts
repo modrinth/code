@@ -54,6 +54,7 @@ function buildTerminalTheme() {
 		scrollbarSliderBackground: surface5,
 		scrollbarSliderHoverBackground: surface5,
 		scrollbarSliderActiveBackground: surface5,
+		overviewRulerBorder: 'transparent',
 	}
 }
 

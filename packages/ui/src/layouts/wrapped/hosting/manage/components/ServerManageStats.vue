@@ -20,7 +20,7 @@
 		>
 			<div class="relative z-10 flex flex-col gap-2">
 				<div class="flex items-center justify-between">
-					<span class="flex items-center gap-2 font-medium text-primary">
+					<span class="stat-drop-shadow flex items-center gap-2 font-medium text-lg text-primary">
 						{{ metric.title }}
 						<IssuesIcon
 							v-if="metric.warning && !loading"
@@ -30,18 +30,18 @@
 						/>
 					</span>
 					<span class="relative">
-						<component :is="metric.icon" class="relative z-10 size-7" />
-						<div
+						<component :is="metric.icon" class="stat-drop-shadow relative z-10 size-8" />
+						<!-- <div
 							class="absolute -right-4 -top-4 -z-10 size-14 rounded-full bg-surface-3 opacity-50 blur-lg"
-						/>
+						/> -->
 					</span>
 				</div>
-				<span class="text-4xl font-semibold text-contrast">
+				<span class="stat-drop-shadow text-4xl font-semibold text-contrast">
 					{{ metric.value }}
 				</span>
-				<div
+				<!-- <div
 					class="absolute -left-8 -top-4 -z-10 h-28 w-56 rounded-full bg-surface-3 opacity-50 blur-lg"
-				/>
+				/> -->
 			</div>
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
@@ -64,7 +64,7 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { type Component, computed, onMounted, shallowRef, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { injectModrinthServerContext } from '#ui/providers'
@@ -100,8 +100,15 @@ const stats = shallowRef(
 	},
 )
 
-const cpuData = ref<number[]>(Array(20).fill(0))
-const ramData = ref<number[]>(Array(20).fill(0))
+const GRAPH_SIZE = 20
+
+const padGraph = (data: number[]) => {
+	if (data.length >= GRAPH_SIZE) return data.slice(-GRAPH_SIZE)
+	return [...Array(GRAPH_SIZE - data.length).fill(0), ...data]
+}
+
+const cpuData = computed(() => padGraph(props.data?.graph.cpu ?? []))
+const ramData = computed(() => padGraph(props.data?.graph.ram ?? []))
 
 onMounted(async () => {
 	apexChartComponent.value = (await import('vue3-apexcharts')).default
@@ -120,11 +127,6 @@ const formatBytes = (bytes: number) => {
 		unit++
 	}
 	return `${Math.round(value * 10) / 10} ${units[unit]}`
-}
-
-const updateGraphData = (arr: number[], newValue: number) => {
-	arr.push(newValue)
-	arr.shift()
 }
 
 const metrics = computed(() => {
@@ -167,9 +169,6 @@ const metrics = computed(() => {
 		100,
 	)
 	const cpuPercent = Math.min(stats.value.cpu_percent, 100)
-
-	updateGraphData(cpuData.value, cpuPercent)
-	updateGraphData(ramData.value, ramPercent)
 
 	return [
 		{
@@ -256,6 +255,10 @@ watch(
 </script>
 
 <style scoped>
+.stat-drop-shadow {
+	filter: drop-shadow(0 4px 6px var(--surface-3));
+}
+
 .chart-space {
 	height: 142px;
 	width: calc(100% + 40px);

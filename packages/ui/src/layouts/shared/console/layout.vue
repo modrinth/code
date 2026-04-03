@@ -21,15 +21,6 @@
 					class="w-[220px]"
 					@update:model-value="handleLogSourceChange"
 				/>
-				<ButtonStyled circular>
-					<button
-						v-tooltip="'Open fullscreen'"
-						aria-label="Open fullscreen"
-						@click="enterFullscreen"
-					>
-						<ExpandIcon />
-					</button>
-				</ButtonStyled>
 			</div>
 
 			<div class="flex items-center justify-between">
@@ -38,6 +29,7 @@
 					:share-disabled="resolvedShareDisabled"
 					@clear="handleClear"
 					@share="handleShare"
+					@expand="enterFullscreen"
 				/>
 			</div>
 		</template>
@@ -56,12 +48,11 @@
 </template>
 
 <script setup lang="ts">
-import { ExpandIcon, SearchIcon } from '@modrinth/assets'
+import { SearchIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
-import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'

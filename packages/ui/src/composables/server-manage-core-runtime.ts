@@ -177,15 +177,17 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const updateStats = (currentStats: Stats['current']) => {
 		if (!shouldProcessEvent()) return
 		if (!isConnected.value) isConnected.value = true
+		cpuData.value = appendGraphData(cpuData.value, currentStats.cpu_percent)
+		ramData.value = appendGraphData(
+			ramData.value,
+			Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
+		)
 		stats.value = {
 			current: currentStats,
 			past: { ...stats.value.current },
 			graph: {
-				cpu: appendGraphData(cpuData.value, currentStats.cpu_percent),
-				ram: appendGraphData(
-					ramData.value,
-					Math.floor((currentStats.ram_usage_bytes / currentStats.ram_total_bytes) * 100),
-				),
+				cpu: cpuData.value,
+				ram: ramData.value,
 			},
 		}
 	}

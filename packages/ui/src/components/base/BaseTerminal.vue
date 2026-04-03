@@ -1,11 +1,17 @@
 <template>
 	<div
 		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="fullscreen && snappedHeight ? { maxHeight: snappedHeight + 'px' } : (!fullscreen && componentHeight ? { height: componentHeight + 'px' } : {})"
+		:style="
+			fullscreen && snappedHeight
+				? { maxHeight: snappedHeight + 'px' }
+				: !fullscreen && componentHeight
+					? { height: componentHeight + 'px' }
+					: {}
+		"
 		:class="{ 'h-full': fullscreen }"
 	>
 		<div class="relative min-h-0 flex-1 overflow-hidden">
-			<div ref="containerRef" class="size-full pl-2" />
+			<div ref="containerRef" class="size-full pl-2 mt-0.5" />
 			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
 					<button
@@ -18,8 +24,8 @@
 				</ButtonStyled>
 			</div>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4">
-				<ButtonStyled circular type="highlight">
-					<button class="!shadow-none" aria-label="Scroll to bottom" @click="scrollToBottom">
+				<ButtonStyled circular type="highlight" size="large">
+					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
 						<ChevronDownIcon />
 					</button>
 				</ButtonStyled>
@@ -77,21 +83,30 @@ const componentHeight = ref(0)
 
 const snappedHeight = ref<number | null>(null)
 
-const { terminal, searchAddon, isAtBottom, write, writeln, clear, reset, fit: rawFit, scrollToBottom } =
-	useTerminal({
-		container: containerRef,
-		scrollback: props.scrollback,
-		onReady: (term) => {
-			nextTick(() => {
-				updateComponentHeight()
-				snapToRows()
-			})
-			emit('ready', term)
-		},
-		onResize: () => {
+const {
+	terminal,
+	searchAddon,
+	isAtBottom,
+	write,
+	writeln,
+	clear,
+	reset,
+	fit: rawFit,
+	scrollToBottom,
+} = useTerminal({
+	container: containerRef,
+	scrollback: props.scrollback,
+	onReady: (term) => {
+		nextTick(() => {
 			updateComponentHeight()
-		},
-	})
+			snapToRows()
+		})
+		emit('ready', term)
+	},
+	onResize: () => {
+		updateComponentHeight()
+	},
+})
 
 function snapToRows() {
 	if (!props.fullscreen) {
@@ -134,16 +149,19 @@ function fit() {
 	snapToRows()
 }
 
-watch(() => props.fullscreen, () => {
-	if (props.fullscreen) {
-		nextTick(() => {
-			rawFit()
-			nextTick(() => snapToRows())
-		})
-	} else {
-		snappedHeight.value = null
-	}
-})
+watch(
+	() => props.fullscreen,
+	() => {
+		if (props.fullscreen) {
+			nextTick(() => {
+				rawFit()
+				nextTick(() => snapToRows())
+			})
+		} else {
+			snappedHeight.value = null
+		}
+	},
+)
 
 function updateComponentHeight() {
 	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
@@ -183,5 +201,15 @@ defineExpose({
 .xterm .xterm-screen {
 	margin-left: auto !important;
 	margin-right: auto !important;
+}
+
+.xterm-scrollable-element > .scrollbar.vertical {
+	width: 8px !important;
+}
+
+.xterm-scrollable-element > .scrollbar.vertical > div {
+	width: 6px !important;
+	border-radius: 8px !important;
+	contain: layout style !important;
 }
 </style>
