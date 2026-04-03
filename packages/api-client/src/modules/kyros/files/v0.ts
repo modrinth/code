@@ -208,6 +208,28 @@ export class KyrosFilesV0Module extends AbstractModule {
 	}
 
 	/**
+	 * Delete a file or folder using explicit filesystem auth credentials.
+	 *
+	 * @param auth - Filesystem auth (url + token) from Archon
+	 * @param path - Path to delete
+	 * @param recursive - If true, delete directory contents recursively
+	 */
+	public async deleteFileOrFolderWithAuth(
+		auth: NodeFsAuth,
+		path: string,
+		recursive: boolean,
+	): Promise<void> {
+		return this.client.request<void>('/fs/delete', {
+			api: this.getNodeBaseUrl(auth),
+			version: 'modrinth/v0',
+			method: 'DELETE',
+			params: { path, recursive },
+			headers: { Authorization: `Bearer ${auth.token}` },
+			skipAuth: true,
+		})
+	}
+
+	/**
 	 * Extract an archive file (zip, tar, etc.)
 	 *
 	 * Uses v1 API endpoint.

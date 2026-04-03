@@ -454,7 +454,7 @@ const worldId = computed(() => {
 	return activeWorld?.id ?? serverFull.value.worlds[0]?.id ?? null
 })
 
-const serverImage = useServerImage(
+const { image: serverImage } = useServerImage(
 	props.serverId,
 	computed(() => serverData.value?.upstream ?? null),
 )
