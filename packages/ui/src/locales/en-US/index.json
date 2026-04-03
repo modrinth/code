@@ -497,6 +497,27 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "File saved"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Close"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Find"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} of {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Next match"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "No results"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Previous match"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Toggle replace"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Your log file URL has been copied to your clipboard."
   },
@@ -510,34 +531,13 @@
     "defaultMessage": "Replace All"
   },
   "files.editor.replace-in-file": {
-    "defaultMessage": "Replace..."
+    "defaultMessage": "Replace"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Could not save the file."
   },
   "files.editor.save-failed-title": {
     "defaultMessage": "Save failed"
-  },
-  "files.editor.search-close": {
-    "defaultMessage": "Close search"
-  },
-  "files.editor.search-in-file": {
-    "defaultMessage": "Search..."
-  },
-  "files.editor.search-match-count": {
-    "defaultMessage": "{current} of {total}"
-  },
-  "files.editor.search-next-match": {
-    "defaultMessage": "Next match"
-  },
-  "files.editor.search-no-results": {
-    "defaultMessage": "No results"
-  },
-  "files.editor.search-previous-match": {
-    "defaultMessage": "Previous match"
-  },
-  "files.editor.search-toggle-replace": {
-    "defaultMessage": "Toggle replace"
   },
   "files.error.go-to-home": {
     "defaultMessage": "Go to home folder"

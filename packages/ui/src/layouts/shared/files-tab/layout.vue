@@ -55,7 +55,7 @@
 						:editing-file-name="ctx.editingFile.value?.name"
 						:editing-file-path="ctx.editingFile.value?.path"
 						:is-editing-image="fileEditorRef?.isEditingImage"
-						:is-editor-search-open="fileEditorRef?.isSearchOpen"
+						:is-editor-search-open="fileEditorRef?.isFindOpen"
 						:search-query="searchQuery"
 						:show-refresh-button="showRefreshButton"
 						:show-install-from-url="ctx.showInstallFromUrl"
@@ -72,7 +72,7 @@
 						@unzip-from-url="showUnzipFromUrlModal"
 						@refresh="ctx.refresh"
 						@share="() => fileEditorRef?.shareToMclogs()"
-						@search="() => fileEditorRef?.toggleSearch()"
+						@search="() => fileEditorRef?.toggleFind()"
 					/>
 
 					<div v-if="!isEditing">

@@ -3,11 +3,11 @@
 		ref="editorContainer"
 		class="relative flex flex-col overflow-hidden rounded-[20px] border border-solid border-surface-4 shadow-sm"
 	>
-		<Transition name="search-bar">
+		<Transition name="find">
 			<div
-				v-if="isSearchOpen && !isEditingImage"
+				v-if="isFindOpen && !isEditingImage"
 				class="absolute right-3 top-3 z-10 flex flex-col gap-1 rounded-2xl border border-solid border-surface-5 bg-surface-3 p-1.5 shadow-lg"
-				@keydown.escape.stop="closeSearch"
+				@keydown.escape.stop="closeFind"
 			>
 				<!-- Find row -->
 				<div class="flex items-center gap-1">
@@ -28,24 +28,23 @@
 						@keydown.shift.enter.prevent.stop="findPrevious"
 					>
 						<StyledInput
-							ref="searchInputRef"
-							v-model="inFileSearchQuery"
-							:icon="SearchIcon"
+							ref="findInputRef"
+							v-model="inFileFindQuery"
 							type="search"
 							size="small"
 							autocomplete="off"
-							:placeholder="formatMessage(messages.searchInFile)"
+							:placeholder="formatMessage(messages.findInFile)"
 							wrapper-class="w-44"
 						/>
 					</div>
 					<span class="min-w-[6rem] px-1 text-right text-sm text-secondary tabular-nums">
 						{{
-							searchMatchCount > 0
+							findMatchCount > 0
 								? formatMessage(messages.matchCount, {
-										current: currentSearchMatch,
-										total: searchMatchCount,
+										current: currentFindMatch,
+										total: findMatchCount,
 									})
-								: inFileSearchQuery
+								: inFileFindQuery
 									? formatMessage(messages.noResults)
 									: ''
 						}}
@@ -54,7 +53,7 @@
 						v-tooltip="formatMessage(messages.previousMatch)"
 						icon-only
 						transparent
-						:disabled="searchMatchCount === 0"
+						:disabled="findMatchCount === 0"
 						:aria-label="formatMessage(messages.previousMatch)"
 						@click="findPrevious"
 					>
@@ -64,7 +63,7 @@
 						v-tooltip="formatMessage(messages.nextMatch)"
 						icon-only
 						transparent
-						:disabled="searchMatchCount === 0"
+						:disabled="findMatchCount === 0"
 						:aria-label="formatMessage(messages.nextMatch)"
 						@click="findNext"
 					>
@@ -72,11 +71,11 @@
 					</Button>
 					<div class="mx-0.5 h-4 w-px bg-surface-5" />
 					<Button
-						v-tooltip="formatMessage(messages.closeSearch)"
+						v-tooltip="formatMessage(messages.closeFind)"
 						icon-only
 						transparent
-						:aria-label="formatMessage(messages.closeSearch)"
-						@click="closeSearch"
+						:aria-label="formatMessage(messages.closeFind)"
+						@click="closeFind"
 					>
 						<XIcon />
 					</Button>
@@ -84,7 +83,7 @@
 
 				<!-- Replace row -->
 				<div v-if="isReplaceOpen" class="flex items-center gap-1">
-					<div class="w-8 flex-shrink-0" />
+					<div class="w-9 flex-shrink-0" />
 					<div @keydown.enter.prevent.stop="replaceOne">
 						<StyledInput
 							ref="replaceInputRef"
@@ -99,7 +98,7 @@
 					<ButtonStyled type="outlined">
 						<button
 							class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
-							:disabled="searchMatchCount === 0"
+							:disabled="findMatchCount === 0"
 							@click="replaceOne"
 						>
 							{{ formatMessage(messages.replace) }}
@@ -108,7 +107,7 @@
 					<ButtonStyled type="outlined">
 						<button
 							class="!h-8 whitespace-nowrap !border !border-surface-5 px-2 text-sm disabled:opacity-50"
-							:disabled="searchMatchCount === 0"
+							:disabled="findMatchCount === 0"
 							@click="replaceAllOccurrences"
 						>
 							{{ formatMessage(messages.replaceAll) }}
@@ -144,7 +143,6 @@ import {
 	ChevronDownIcon,
 	ChevronRightIcon,
 	ChevronUpIcon,
-	SearchIcon,
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
@@ -247,37 +245,37 @@ const messages = defineMessages({
 		id: 'files.editor.failed-to-share-text',
 		defaultMessage: 'Could not upload to mclo.gs.',
 	},
-	searchInFile: {
-		id: 'files.editor.search-in-file',
-		defaultMessage: 'Search...',
+	findInFile: {
+		id: 'files.editor.find-in-file',
+		defaultMessage: 'Find',
 	},
 	matchCount: {
-		id: 'files.editor.search-match-count',
+		id: 'files.editor.find-match-count',
 		defaultMessage: '{current} of {total}',
 	},
 	noResults: {
-		id: 'files.editor.search-no-results',
+		id: 'files.editor.find-no-results',
 		defaultMessage: 'No results',
 	},
 	previousMatch: {
-		id: 'files.editor.search-previous-match',
+		id: 'files.editor.find-previous-match',
 		defaultMessage: 'Previous match',
 	},
 	nextMatch: {
-		id: 'files.editor.search-next-match',
+		id: 'files.editor.find-next-match',
 		defaultMessage: 'Next match',
 	},
-	closeSearch: {
-		id: 'files.editor.search-close',
-		defaultMessage: 'Close search',
+	closeFind: {
+		id: 'files.editor.find-close',
+		defaultMessage: 'Close',
 	},
 	toggleReplace: {
-		id: 'files.editor.search-toggle-replace',
+		id: 'files.editor.find-toggle-replace',
 		defaultMessage: 'Toggle replace',
 	},
 	replaceInFile: {
 		id: 'files.editor.replace-in-file',
-		defaultMessage: 'Replace...',
+		defaultMessage: 'Replace',
 	},
 	replace: {
 		id: 'files.editor.replace',
@@ -298,16 +296,16 @@ const editorInstance = ref<AceEditorInstance | null>(null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
 
-const isSearchOpen = ref(false)
+const isFindOpen = ref(false)
 const isReplaceOpen = ref(false)
-const inFileSearchQuery = ref('')
+const inFileFindQuery = ref('')
 const replaceQuery = ref('')
-const searchMatchCount = ref(0)
-const currentSearchMatch = ref(0)
-const searchInputRef = ref<{ focus: () => void } | null>(null)
+const findMatchCount = ref(0)
+const currentFindMatch = ref(0)
+const findInputRef = ref<{ focus: () => void } | null>(null)
 const replaceInputRef = ref<{ focus: () => void } | null>(null)
 
-watch(inFileSearchQuery, handleSearchInput)
+watch(inFileFindQuery, handleFindInput)
 
 function updateEditorHeight() {
 	if (editorContainer.value) {
@@ -331,7 +329,7 @@ watch(
 	() => props.file,
 	async (newFile) => {
 		if (newFile) {
-			closeSearch()
+			closeFind()
 			await loadFileContent(newFile)
 			nextTick(updateEditorHeight)
 		} else {
@@ -398,16 +396,16 @@ function onEditorInit(editor: AceEditorInstance) {
 	editor.commands.addCommand({
 		name: 'find',
 		bindKey: { win: 'Ctrl-F', mac: 'Command-F' },
-		exec: () => toggleSearch(),
+		exec: () => toggleFind(),
 	})
 
 	editor.commands.addCommand({
 		name: 'replace',
 		bindKey: { win: 'Ctrl-H', mac: 'Command-Option-F' },
 		exec: () => {
-			isSearchOpen.value = true
+			isFindOpen.value = true
 			isReplaceOpen.value = true
-			nextTick(() => searchInputRef.value?.focus())
+			nextTick(() => findInputRef.value?.focus())
 		},
 	})
 }
@@ -481,13 +479,13 @@ function countOccurrences(content: string, query: string): number {
 	return (content.match(new RegExp(escaped, 'gi')) ?? []).length
 }
 
-function toggleSearch() {
-	if (isSearchOpen.value) {
-		closeSearch()
+function toggleFind() {
+	if (isFindOpen.value) {
+		closeFind()
 	} else {
-		isSearchOpen.value = true
+		isFindOpen.value = true
 		isReplaceOpen.value = false
-		nextTick(() => searchInputRef.value?.focus())
+		nextTick(() => findInputRef.value?.focus())
 	}
 }
 
@@ -498,78 +496,78 @@ function toggleReplace() {
 	}
 }
 
-function closeSearch() {
-	isSearchOpen.value = false
+function closeFind() {
+	isFindOpen.value = false
 	isReplaceOpen.value = false
-	inFileSearchQuery.value = ''
+	inFileFindQuery.value = ''
 	replaceQuery.value = ''
-	searchMatchCount.value = 0
-	currentSearchMatch.value = 0
+	findMatchCount.value = 0
+	currentFindMatch.value = 0
 	editorInstance.value?.find('', { wrap: true })
 	editorInstance.value?.focus()
 }
 
 function replaceOne() {
 	const editor = editorInstance.value
-	if (!editor || searchMatchCount.value === 0) return
+	if (!editor || findMatchCount.value === 0) return
 	editor.replace(replaceQuery.value)
 	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileSearchQuery.value)
-		searchMatchCount.value = count
-		currentSearchMatch.value = count > 0 ? Math.min(currentSearchMatch.value, count) : 0
+		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
+		findMatchCount.value = count
+		currentFindMatch.value = count > 0 ? Math.min(currentFindMatch.value, count) : 0
 	})
 }
 
 function replaceAllOccurrences() {
 	const editor = editorInstance.value
-	if (!editor || searchMatchCount.value === 0) return
+	if (!editor || findMatchCount.value === 0) return
 	editor.replaceAll(replaceQuery.value)
 	nextTick(() => {
-		const count = countOccurrences(fileContent.value, inFileSearchQuery.value)
-		searchMatchCount.value = count
-		currentSearchMatch.value = count > 0 ? 1 : 0
+		const count = countOccurrences(fileContent.value, inFileFindQuery.value)
+		findMatchCount.value = count
+		currentFindMatch.value = count > 0 ? 1 : 0
 		if (count > 0) {
-			editor.find(inFileSearchQuery.value, { wrap: true, caseSensitive: false })
+			editor.find(inFileFindQuery.value, { wrap: true, caseSensitive: false })
 		}
 	})
 }
 
-function handleSearchInput() {
+function handleFindInput() {
 	const editor = editorInstance.value
 	if (!editor) return
 
-	const query = inFileSearchQuery.value
+	const query = inFileFindQuery.value
 	if (!query) {
-		searchMatchCount.value = 0
-		currentSearchMatch.value = 0
+		findMatchCount.value = 0
+		currentFindMatch.value = 0
 		editor.find('', { wrap: true })
 		return
 	}
 
 	const count = countOccurrences(fileContent.value, query)
-	searchMatchCount.value = count
+	findMatchCount.value = count
 
 	if (count > 0) {
 		editor.find(query, { wrap: true, caseSensitive: false })
-		currentSearchMatch.value = 1
+		currentFindMatch.value = 1
 	} else {
-		currentSearchMatch.value = 0
+		currentFindMatch.value = 0
 	}
 }
 
 function findNext() {
 	const editor = editorInstance.value
-	if (!editor || searchMatchCount.value === 0) return
+	if (!editor || findMatchCount.value === 0) return
 	editor.findNext()
-	currentSearchMatch.value = (currentSearchMatch.value % searchMatchCount.value) + 1
+	currentFindMatch.value = (currentFindMatch.value % findMatchCount.value) + 1
 }
 
 function findPrevious() {
 	const editor = editorInstance.value
-	if (!editor || searchMatchCount.value === 0) return
+	if (!editor || findMatchCount.value === 0) return
 	editor.findPrevious()
-	currentSearchMatch.value =
-		((currentSearchMatch.value - 2 + searchMatchCount.value) % searchMatchCount.value) + 1
+	currentFindMatch.value =
+		((currentFindMatch.value - 2 + findMatchCount.value) % findMatchCount.value) + 1
 }
 
 function close() {
@@ -588,24 +586,24 @@ defineExpose({
 	shareToMclogs,
 	close,
 	isEditingImage,
-	isSearchOpen,
+	isFindOpen,
 	fileContent,
 	hasUnsavedChanges,
 	revertChanges,
-	toggleSearch,
+	toggleFind,
 })
 </script>
 
 <style scoped>
-.search-bar-enter-active,
-.search-bar-leave-active {
+.find-enter-active,
+.find-leave-active {
 	transition:
 		opacity 0.15s ease,
 		transform 0.15s ease;
 }
 
-.search-bar-enter-from,
-.search-bar-leave-to {
+.find-enter-from,
+.find-leave-to {
 	opacity: 0;
 	transform: translateY(-4px) scale(0.97);
 }
