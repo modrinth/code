@@ -29,7 +29,11 @@ type ShowOptions = {
 
 const props = defineProps<{
 	resolveViewer: () => Promise<{ userId: string | null; userRole: string | null }>
-	browseModpacks?: (args: { serverId: string; worldId: string | null; from: 'reset-server' }) => void | Promise<void>
+	browseModpacks?: (args: {
+		serverId: string
+		worldId: string | null
+		from: 'reset-server'
+	}) => void | Promise<void>
 }>()
 
 const { formatMessage } = useVIntl()
@@ -54,10 +58,6 @@ const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
-
-function browseModpacks(args: { serverId: string; worldId: string | null; from: 'reset-server' }) {
-	props.browseModpacks?.(args)
-}
 
 const isConnected = ref(true)
 const powerState = ref<Archon.Websocket.v0.PowerState>('stopped')
@@ -115,7 +115,7 @@ provideServerSettings({
 	isApp,
 	currentUserId,
 	currentUserRole,
-	browseModpacks,
+	browseModpacks: props.browseModpacks ?? (() => {}),
 })
 
 provideModrinthServerContext({
@@ -212,7 +212,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 			'detail',
 			serverId,
 		])
-		const cachedFull = queryClient.getQueryData<Archon.Servers.v1.Server>([
+		const cachedFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>([
 			'servers',
 			'v1',
 			'detail',

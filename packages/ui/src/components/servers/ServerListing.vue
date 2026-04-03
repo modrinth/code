@@ -552,8 +552,7 @@ const { data: image } = useQuery({
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					await kyros.files_v0
-						.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
 						.promise
 
 					return scaledDataUrl

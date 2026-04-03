@@ -64,7 +64,7 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { type Component, computed, onMounted, shallowRef, ref, watch } from 'vue'
+import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { injectModrinthServerContext } from '#ui/providers'
