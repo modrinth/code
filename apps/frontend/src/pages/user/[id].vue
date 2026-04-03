@@ -353,9 +353,7 @@
 					class="collections-grid"
 				>
 					<nuxt-link
-						v-for="collection in (collections ?? []).sort(
-							(a, b) => new Date(b.created) - new Date(a.created),
-						)"
+						v-for="collection in sortedCollections"
 						:key="collection.id"
 						:to="`/collection/${collection.id}`"
 						class="card collection-item"
@@ -747,6 +745,17 @@ onServerPrefetch(async () => {
 const sortedOrgs = computed(() =>
 	organizations.value ? [...organizations.value].sort((a, b) => a.name.localeCompare(b.name)) : [],
 )
+
+const sortedCollections = computed(() => {
+	const list = collections.value
+	if (!list?.length) return []
+	return [...list].sort((a, b) => {
+		const updatedB = new Date(b.updated).getTime()
+		const updatedA = new Date(a.updated).getTime()
+		if (updatedB !== updatedA) return updatedB - updatedA
+		return new Date(b.created).getTime() - new Date(a.created).getTime()
+	})
+})
 
 const title = computed(() => (user.value ? `${user.value.username} - Modrinth` : 'Modrinth'))
 const description = computed(() =>
