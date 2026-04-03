@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Reparatur des Servers fehlgeschlagen"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Server konnte nicht in den Onboarding-Zustand zurückgesetzt werden"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Speichern der Installationseinstellungen ist fehlgeschlagen"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Entfernt alle Daten auf deinem Server, einschließlich deiner Welten, Mods und Konfigurationsdateien. Die Sicherungen bleiben erhalten und können wiederhergestellt werden."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Auf Onboarding zurücksetzen"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Dadurch wird der Server in den Onboarding-Zustand zurückgesetzt, sodass die Einrichtung erneut abgeschlossen werden kann. Möchtest du wirklich fortfahren?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Auf Onboarding zurücksetzen"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Der Server wurde in den Onboarding-Ablauf zurückgesetzt."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Server auf Onboarding zurückgesetzt"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Supportoptionen"
   },
   "hosting.plan.out-of-stock": {
     "message": "Nicht verfügbar"
@@ -1687,9 +1708,6 @@
   },
   "layout.nav.discover-content": {
     "message": "Inhalte entdecken"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Funktionsflags"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App herunterladen"

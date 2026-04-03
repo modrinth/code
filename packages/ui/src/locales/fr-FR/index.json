@@ -68,8 +68,17 @@
   "button.continue": {
     "defaultMessage": "Continuer"
   },
+  "button.copy-filename": {
+    "defaultMessage": "Copier le nom du fichier"
+  },
+  "button.copy-full-path": {
+    "defaultMessage": "Copier le chemin entier"
+  },
   "button.copy-id": {
     "defaultMessage": "Copier l'ID"
+  },
+  "button.copy-link": {
+    "defaultMessage": "Copier le lien"
   },
   "button.copy-permalink": {
     "defaultMessage": "Copier le lien permanent"
@@ -80,6 +89,9 @@
   "button.decline": {
     "defaultMessage": "Refuser"
   },
+  "button.disable": {
+    "defaultMessage": "Désactiver"
+  },
   "button.download": {
     "defaultMessage": "Télécharger"
   },
@@ -88,6 +100,12 @@
   },
   "button.edit": {
     "defaultMessage": "Éditer"
+  },
+  "button.enable": {
+    "defaultMessage": "Activer"
+  },
+  "button.extract": {
+    "defaultMessage": "Extraire"
   },
   "button.follow": {
     "defaultMessage": "J'adore"
@@ -101,10 +119,16 @@
   "button.more-options": {
     "defaultMessage": "Plus d'options"
   },
+  "button.move": {
+    "defaultMessage": "Déplacer"
+  },
   "button.next": {
     "defaultMessage": "Suivant"
   },
   "button.open-folder": {
+    "defaultMessage": "Ouvrir le dossier"
+  },
+  "button.open-in-folder": {
     "defaultMessage": "Ouvrir le dossier"
   },
   "button.play": {
@@ -121,6 +145,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Supprimer l'image"
+  },
+  "button.rename": {
+    "defaultMessage": "Renommer"
   },
   "button.repair": {
     "defaultMessage": "Réparer"
@@ -152,6 +179,9 @@
   "button.show-all-versions": {
     "defaultMessage": "Afficher toutes les versions"
   },
+  "button.show-file": {
+    "defaultMessage": "Montrer le fichier"
+  },
   "button.sign-in": {
     "defaultMessage": "Se connecter"
   },
@@ -182,9 +212,6 @@
   "changelog.justNow": {
     "defaultMessage": "À l'instant"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
@@ -192,7 +219,7 @@
     "defaultMessage": "Hébergement "
   },
   "changelog.product.web": {
-    "defaultMessage": "Site web"
+    "defaultMessage": "Plateforme"
   },
   "collections.label.private": {
     "defaultMessage": "Privé"
@@ -224,6 +251,9 @@
   "content.confirm-modpack-update.admonition-body": {
     "defaultMessage": "Tous les mods ou contenus que vous avez ajoutés en haut du modpack seront supprimés."
   },
+  "content.confirm-modpack-update.admonition-body-app": {
+    "defaultMessage": "Tous les mods ou contenus que vous avez ajoutés sur le dessus du modpack seront conservés."
+  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Avertissement {action, select, downgrade {rétrogradation} other {mise à jour}}"
   },
@@ -252,7 +282,7 @@
     "defaultMessage": "Ajouté (dépendance)"
   },
   "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Retiré"
+    "defaultMessage": "Désactivé"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Mis à jour"
@@ -298,9 +328,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Ne plus afficher"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Mise à jour en cours..."
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Contenu supplémentaire"
@@ -404,17 +431,344 @@
   "content.selection-bar.bulk.updating-waiting": {
     "defaultMessage": "Mise à jour de {contentType} en cours..."
   },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Désactiver"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Activer"
-  },
   "content.selection-bar.selected-count": {
     "defaultMessage": "{count} {contentType} {count, plural, one {sélectionné} other {sélectionnés}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} {count, plural, one {sélectionné} other {sélectionnés}}"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Extraire le sommaire"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Écraser"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Plus de 100 fichiers seront écrasés si vous procédez à l'extraction ; en voici quelques-uns."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count, plural, one {Le fichier suivant existe déjà sur votre serveur, et sera écrasé} other {Les # fichiers suivants existent déjà sur votre serveur, et seront écrasés}} si vous procédez à l'extraction."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} écrasés"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Écrasé"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Les fichiers seront écrasés"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Créer le {type, select, directory {dossier}other {fichier}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Créer un {type, select, directory {dossier}other {fichier}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "ex. mon-dossier"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "ex. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Suppression de « {name} »"
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Supprimer le fichier"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Ce dossier et tout son contenu seront supprimés} other {Ce fichier sera supprimé}} définitivement. Cette action est irréversible."
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Impossible de charger le contenu du fichier"
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Impossible d'ouvrir le fichier"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Impossible de télécharger sur mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Impossible de partager le fichier"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Votre fichier a été sauvegardé."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "FIchier sauvegardé"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "Votre URL de fichier journal a été copié dans le presse-papiers."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL de fichier journal copiée"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Impossible de sauvegarder le fichier."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Sauvegarde a échoué"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Revenir au dossier d'accueil"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Réessayer"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Image trop large pour être affichée (max. {maxDimension} × {maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Fichier image invalide ou vide."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Impossible de charger l'image"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Réinitialiser le zoom"
+  },
+  "files.image_viewer.viewed_image_alt": {
+    "defaultMessage": "Image vue"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Zommer"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Dézoomer"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Les opérations de fichier sont désactivées pendant que l'opération est en cours."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Erreur en cours d'exécution sèche"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "L'exécution sèche a échoué"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "Aucun fichier ou dossier présents."
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Ce dossier est vide"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "Il est possible que ce dossier n'existe pas."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Impossible de charger les fichiers"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "L'extraction a commencé"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Chargement des fichiers..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count, plural, one {# sélectionné} other {# sélectionnés}}"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Vous avez des changements non sauvegardés."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Localisation actuelle"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Chemin de destination"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "ex. /mon-dossier"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Déplacer le dossier} other {Déplacer le fichier}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Retour vers l'accueil"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Navigation par fil d'Ariane"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Créer nouveau..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "Navigation dans les fichiers"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Acceuil"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Installer le pack CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Nouveau fichier"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Nouveau dossier"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Rechercher des fichiers"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Partager vers mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Importer un fichier"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Importer depuis un fichier .zip"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Importer depuis une URL .zip"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} extraits"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "{source} en cours d'extraction"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Échec"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpack depuis URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent} %)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Importation des fichiers ({completed}/{total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Renommer {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nouveau nom"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# objet} other {# objets}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Créé"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modifié"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Nom"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Taille"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Vous avez des changements non sauvegardés qui seront perdus si vous partez. Voulez-vous sauver avant de partir ?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Annuler"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Modifications non sauvegardées"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Annulé"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Échec — Fichier existe déjà"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Échec — {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Échec — Type de fichier incorrect"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Impossible d'importer {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Fichier"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "Téléchargements de {fileType}"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "L'importation avait un type de fichier incorret"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Une erreur inattendue est survenue."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} restants"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Déposez des {type, select, undefined {fichiers} other {{type}s}} ici pour mettre en ligne"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Le nom ne doit contenir que des caractères alphanumériques, des tirets, des tirets bas, ou des espaces."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Le nom ne doit contenir que des caractères alphanumériques, des tirets, des tirets bas, des points, ou des espaces."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nom"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Un nom est requis."
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "Installer modapck CurseForge"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Installer un modpack CurseForge"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Impossible de trouver un modpack CurseForge à cette URL."
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Impossible de trouver le modpack CurseForge"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Entrez un lien"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "L'URL doit être une URL de version de modpack CurseForge."
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "L'URL doit être valide."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "Une URL est requise."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installer"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Échec de l'installation"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "Copiez l'URL de la page de la version et collez-la ci-dessous."
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Copier l'URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Parcourez CurseForge et localisez le modpack que vous cherchez."
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Trouver le modpack"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Allez dans l'onglet « Fichiers » et sélectionnez la version à installer."
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Sélectionner une version"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Une erreur inconnue est survenue"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Copiez-collez l'URL de téléchargement directe ou un fichier .zip."
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Importation du contenu du .zip par URL"
   },
   "form.label.address-line": {
     "defaultMessage": "Ligne d'adresse"
@@ -517,9 +871,6 @@
   },
   "header.category.resolutions": {
     "defaultMessage": "Résolution"
-  },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Copier le lien"
   },
   "hosting.content.failed-to-bulk-delete": {
     "defaultMessage": "Impossible de supprimer le contenu"
@@ -713,15 +1064,6 @@
   "instances.confirm-leave-modal.body": {
     "defaultMessage": "Des fichiers sont encore entrain d'être téléversés. Quitter cette page annulera le téléversement et les changements effectués pourront être perdus."
   },
-  "instances.confirm-leave-modal.leave": {
-    "defaultMessage": "Quitter la page"
-  },
-  "instances.confirm-leave-modal.stay": {
-    "defaultMessage": "Rester sur la page"
-  },
-  "instances.confirm-leave-modal.title": {
-    "defaultMessage": "Quitter la page ?"
-  },
   "instances.confirm-leave-modal.upload-in-progress": {
     "defaultMessage": "Téléversement en cours"
   },
@@ -731,26 +1073,17 @@
   "instances.content-install.existing-tab": {
     "defaultMessage": "Instance existante"
   },
-  "instances.content-install.game-version-label": {
-    "defaultMessage": "Version du jeu"
-  },
   "instances.content-install.game-version-placeholder": {
     "defaultMessage": "Sélectionner la version du jeu"
   },
   "instances.content-install.header": {
     "defaultMessage": "Installer le projet"
   },
-  "instances.content-install.hide-snapshots": {
-    "defaultMessage": "Masquer les snapshots"
-  },
   "instances.content-install.install-button": {
     "defaultMessage": "Installer"
   },
   "instances.content-install.installed-badge": {
     "defaultMessage": "Installé"
-  },
-  "instances.content-install.installing-label": {
-    "defaultMessage": "Installation en cours..."
   },
   "instances.content-install.instance-type": {
     "defaultMessage": "Type d'instance"
@@ -779,20 +1112,11 @@
   "instances.content-install.select-icon": {
     "defaultMessage": "Sélectionnez l'icône"
   },
-  "instances.content-install.show-all-versions": {
-    "defaultMessage": "Afficher toutes les versions"
-  },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Copier le lien"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Aucun contenu supplémentaire n'est inclus dans ce modpack."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Aucun contenu trouvé"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Tout"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Contenu du modpack"
@@ -872,8 +1196,14 @@
   "label.changes-saved": {
     "defaultMessage": "Changements enregistrés"
   },
+  "label.client-depends-warning": {
+    "defaultMessage": "Ce mod dépend d'un mod côté client et peut causer des problèmes lors du démarrage de votre serveur"
+  },
   "label.client-only-warning": {
     "defaultMessage": "Ceci est un mod coté client et peut causer des problèmes. Nous l'avons gardé activé car l'auteur a mal étiqueté les environnements, le loader devrait résoudre le conflit."
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "Il s'agit d'un mod côté client qui a été installé en tant que dépendance et peut causer des problèmes lors du démarrage de votre serveur"
   },
   "label.collections": {
     "defaultMessage": "Collections"
@@ -884,6 +1214,15 @@
   "label.content": {
     "defaultMessage": "Contenu"
   },
+  "label.copied-filename": {
+    "defaultMessage": "Nom du fichier copié"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Chemin copié"
+  },
+  "label.create-failed": {
+    "defaultMessage": "La création a échoué"
+  },
   "label.created-ago": {
     "defaultMessage": "Créé {ago}"
   },
@@ -892,6 +1231,9 @@
   },
   "label.delete": {
     "defaultMessage": "Supprimer"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "La suppression a échoué"
   },
   "label.delete-immediately": {
     "defaultMessage": "Supprimer immédiatement"
@@ -902,6 +1244,12 @@
   "label.details": {
     "defaultMessage": "Détails"
   },
+  "label.done": {
+    "defaultMessage": "Terminé"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Le téléchargement a échoué"
+  },
   "label.email": {
     "defaultMessage": "Adresse e-mail"
   },
@@ -910,6 +1258,9 @@
   },
   "label.error": {
     "defaultMessage": "Erreur"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "L'extraction a échoué"
   },
   "label.filter-by": {
     "defaultMessage": "Filtrer par"
@@ -937,6 +1288,9 @@
   },
   "label.modpack": {
     "defaultMessage": "Modpack"
+  },
+  "label.move-failed": {
+    "defaultMessage": "Le déplacement a échoué"
   },
   "label.no": {
     "defaultMessage": "Non"
@@ -982,6 +1336,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Rejeté"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Renommer a échoué"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "J'accepte les <terms-link>Conditions générales du programme de récompenses</terms-link>"
@@ -1030,6 +1387,12 @@
   },
   "label.update-available": {
     "defaultMessage": "Mise à jour disponible"
+  },
+  "label.updating": {
+    "defaultMessage": "Mise à jour..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "L'importation a échoué"
   },
   "label.username": {
     "defaultMessage": "Pseudo"
@@ -1200,7 +1563,7 @@
     "defaultMessage": "Modérateur"
   },
   "omorphia.component.badge.label.modrinth-team": {
-    "defaultMessage": "Équipe de Modrinth"
+    "defaultMessage": "Modrinth Team"
   },
   "omorphia.component.badge.label.pending": {
     "defaultMessage": "En attente"
@@ -2357,6 +2720,9 @@
   "settings.display.theme.title": {
     "defaultMessage": "Couleur du thème"
   },
+  "settings.feature-flags.title": {
+    "defaultMessage": "Feature flags"
+  },
   "settings.language.categories.default": {
     "defaultMessage": "Langues standard"
   },
@@ -2718,7 +3084,7 @@
     "defaultMessage": "Utile"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Semblable au vanilla"
+    "defaultMessage": "Goût Vanilla"
   },
   "tag.category.whitelisted": {
     "defaultMessage": "Liste Blanche"
@@ -2821,6 +3187,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Vous avez des modifications non enregistrées."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Vous avez des modifications non sauvegardées qui seront perdues si vous quittez cette page."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Vous avez des modifications non sauvegardées"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Quitter la page"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Rester sur la page"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Quitter la page ?"
   }
 }
 

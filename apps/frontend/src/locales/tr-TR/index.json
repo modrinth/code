@@ -38,6 +38,9 @@
   "app-marketing.download.options-title": {
     "message": "İndirme seçenekleri"
   },
+  "app-marketing.download.terms": {
+    "message": "Modrinth Uygulamasını indirerek <terms-link>Kullanım Şartları</terms-link> ve <privacy-link>Gizlilik Politikamızı</privacy-link> kabul etmiş olursunuz"
+  },
   "app-marketing.download.title": {
     "message": "Modrinth App'i İndir (Beta)"
   },
@@ -103,6 +106,9 @@
   },
   "app-marketing.features.performance.cpu-percent": {
     "message": "% CPU"
+  },
+  "app-marketing.features.performance.description": {
+    "message": "Modrinth Uygulaması, yalnızca 150 MB RAM kullanarak birçok önde gelen mod yöneticisinden daha iyi performans gösterir!"
   },
   "app-marketing.features.performance.discord": {
     "message": "Discord"
@@ -386,6 +392,9 @@
   "collection.label.no-projects": {
     "message": "Koleksiyonda henüz proje yok"
   },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {Henüz proje yok} other {<stat>{count}</stat> {type}}}"
+  },
   "collection.label.updated-at": {
     "message": "{ago} güncellendi"
   },
@@ -572,6 +581,15 @@
   "dashboard.collections.empty.no-collections": {
     "message": "Henüz koleksiyonun yok"
   },
+  "dashboard.collections.empty.no-match": {
+    "message": "Aramanızla eşleşen koleksiyon yok"
+  },
+  "dashboard.collections.empty.no-match-hint": {
+    "message": "Filtrelerinizi veya arama terimlerinizi değiştirmeyi deneyin."
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count} {countPlural, plural, one {proje} other {projeler}}"
+  },
   "dashboard.collections.label.search-input": {
     "message": "Koleksiyonlarında ara"
   },
@@ -646,6 +664,9 @@
   },
   "dashboard.creator-withdraw-modal.kyc.entity-description": {
     "message": "İşletme kuruluşu, şirket, ortaklık veya LLC gibi kayıtlı bir organizasyonu ifade eder."
+  },
+  "dashboard.creator-withdraw-modal.kyc.entity-question": {
+    "message": "Bireysel olarak mı yoksa işletme olarak mı çekim yapıyorsunuz?"
   },
   "dashboard.creator-withdraw-modal.kyc.private-individual": {
     "message": "Özel şahıs"
@@ -819,10 +840,10 @@
     "message": "PayPal International için USD seçtiniz. Daha iyi ücretler için <direct-paypal-link>doğrudan PayPal'a geçin</direct-paypal-link> (≈%6 yerine ≈%2)."
   },
   "dashboard.creator-withdraw-modal.withdraw-button": {
-    "message": "Çekme"
+    "message": "Para Çek"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit": {
-    "message": "Çekme limiti"
+    "message": "Para Çekme limiti"
   },
   "dashboard.creator-withdraw-modal.withdraw-limit-used": {
     "message": "<b>{withdrawLimit}</b> çekme limitinizi kadarını kullandınız. Daha fazla çekmek için vergi formunu gerekir."
@@ -1118,6 +1139,9 @@
   "hosting-marketing.faq.ddos-protection": {
     "message": "Modrinth Hosting sunucularında DDoS koruması var mı?"
   },
+  "hosting-marketing.faq.ddos-protection.answer": {
+    "message": "Evet. Tüm Modrinth Hosting sunucuları DDoS korumasıyla gelir ve bazı konumlarda 17 Tbps’e kadar kapasiteye sahiptir."
+  },
   "hosting-marketing.faq.heading": {
     "message": "Sıkça Sorulan Sorular"
   },
@@ -1223,6 +1247,9 @@
   "hosting-marketing.know-what-you-need": {
     "message": "İhtiyacınız olan şeyi tam olarak biliyor musunuz?"
   },
+  "hosting-marketing.medal.info": {
+    "message": "5 gün boyunca <orange>Medal</orange> tarafından desteklenen ücretsiz bir <orange>3 GB sunucu</orange>yu deneyin"
+  },
   "hosting-marketing.medal.learn-more": {
     "message": "Daha fazla öğrenin"
   },
@@ -1280,14 +1307,38 @@
   "hosting.loader.failed-to-load-versions": {
     "message": "Sürümler yüklenemedi"
   },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Mod paketi yeniden yüklenemedi"
+  },
   "hosting.loader.failed-to-repair": {
     "message": "Sunucu tamiri başarısız oldu"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Sunucu başlangıç ayarlarına sıfırlanamadı"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "message": "Kurulum ayarları kaydedilemedi"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "message": "Mod paketi bağlantısı kaldırılamadı"
+  },
+  "hosting.loader.loader-version": {
+    "message": "{loader, select, null {Yükleyici} other {Yükleyici}} sürüm"
+  },
+  "hosting.loader.repair-started-text": {
+    "message": "Sunucu kurulumunuz başarıyla onarıldı."
   },
   "hosting.loader.repair-started-title": {
     "message": "Tamir tamamlandı"
   },
   "hosting.loader.reset-server": {
     "message": "Sunucuyu sıfırla"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Kurulum aşamasına sıfırla"
   },
   "hosting.plan.out-of-stock": {
     "message": "Stokta yok"
@@ -1639,9 +1690,6 @@
   },
   "layout.nav.discover-content": {
     "message": "İçerik keşfet"
-  },
-  "layout.nav.feature-flags": {
-    "message": "Özellik bayrakları"
   },
   "layout.nav.get-modrinth-app": {
     "message": "Modrinth App yükle"
@@ -2794,6 +2842,21 @@
   },
   "servers.plan.small.description": {
     "message": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Hesabınızı silmek istediğinizden emin misiniz?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.delete.section.title": {
+    "message": "Hesabı sil"
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "E-posta Ekle"
   },
   "settings.account.password.error.mismatch": {
     "message": "Parolalar uyuşmuyor!"

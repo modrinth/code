@@ -611,6 +611,11 @@ export namespace Archon {
 				percent: number
 			}
 
+			export type SyncContentError = {
+				step: string
+				description: string
+			}
+
 			export type WSStateEvent = {
 				event: 'state'
 				debug: string
@@ -620,6 +625,7 @@ export namespace Archon {
 				target: 'start' | 'stop' | 'restart' | null
 				uptime: number
 				progress: SyncContentProgress | null
+				content_error: SyncContentError | null
 			}
 
 			// Outgoing messages (client -> server)

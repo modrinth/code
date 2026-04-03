@@ -140,14 +140,8 @@
   "changelog.justNow": {
     "defaultMessage": "Juuri nyt"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Sovellus"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "Nettisivu"
   },
   "collections.label.private": {
     "defaultMessage": "Yksityinen"

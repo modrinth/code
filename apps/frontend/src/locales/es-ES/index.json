@@ -1688,9 +1688,6 @@
   "layout.nav.discover-content": {
     "message": "Descubra el contenido"
   },
-  "layout.nav.feature-flags": {
-    "message": "Banderas de características"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Descargar la aplicación Modrinth"
   },

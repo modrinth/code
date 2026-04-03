@@ -1658,9 +1658,6 @@
   "layout.nav.discover-content": {
     "message": "Ontdek content"
   },
-  "layout.nav.feature-flags": {
-    "message": "Functie vlaggen"
-  },
   "layout.nav.get-modrinth-app": {
     "message": "Download Modrinth App"
   },
