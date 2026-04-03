@@ -773,6 +773,7 @@ watch(
 function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
 	emit('reinstall', event)
+	serverSettings.closeModal?.()
 }
 
 function onBrowseModpacks() {
@@ -800,6 +801,7 @@ async function confirmResetToOnboarding() {
 			title: formatMessage(messages.resetToOnboardingSuccessTitle),
 			text: formatMessage(messages.resetToOnboardingSuccessDescription),
 		})
+		serverSettings.closeModal?.()
 	} catch (err) {
 		addNotification({
 			type: 'error',

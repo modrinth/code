@@ -116,6 +116,7 @@ provideServerSettings({
 	currentUserId,
 	currentUserRole,
 	browseModpacks: props.browseModpacks ?? (() => {}),
+	closeModal: () => hide(),
 })
 
 provideModrinthServerContext({
