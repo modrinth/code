@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Update projects"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Hold Shift while clicking \"Update all\" to skip this confirmation in the future."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Update {count, plural, one {# project} other {# projects}}"
   },
@@ -1009,6 +1012,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "We don't recommend editing your installation settings after installing content. If you want to edit them reset your server."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Auto-fix"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Change loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Disable conflicts"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "When changing the game version, we can either disable incompatible installed content or attempt to resolve the incompatibilities."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Incompatibility warning"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Incompatible content installed"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "When changing the loader, all installed content will be disabled. We recommend resetting your server instead."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Changing loaders is destructive"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Linked {projectType, select, server {server project} other {modpack}}"
