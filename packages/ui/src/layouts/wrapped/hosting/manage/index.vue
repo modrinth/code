@@ -544,9 +544,16 @@ const fuse = computed(() => {
 	})
 })
 
-function introToTop(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
+function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
 	return array.slice().sort((a, b) => {
-		return Number(b.flows?.intro) - Number(a.flows?.intro)
+		const aSuspended = a.status === 'suspended' ? 1 : 0
+		const bSuspended = b.status === 'suspended' ? 1 : 0
+		if (aSuspended !== bSuspended) return aSuspended - bSuspended
+
+		const introDiff = Number(b.flows?.intro) - Number(a.flows?.intro)
+		if (introDiff !== 0) return introDiff
+
+		return (a.name || '').localeCompare(b.name || '')
 	})
 }
 
@@ -562,9 +569,9 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
 	const base = !searchInput.value.trim()
-		? introToTop(serverList.value)
+		? sortServers(serverList.value)
 		: fuse.value
-			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			? sortServers(fuse.value.search(searchInput.value).map((result) => result.item))
 			: []
 	return base.filter((server) => !filesExpired(server))
 })
