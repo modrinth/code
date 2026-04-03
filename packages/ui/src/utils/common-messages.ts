@@ -949,6 +949,10 @@ export const commonProjectSettingsMessages = defineMessages({
 		id: 'project.settings.versions.title',
 		defaultMessage: 'Versions',
 	},
+	permissions: {
+		id: 'project.settings.versions.permissions',
+		defaultMessage: 'Permissions',
+	},
 	view: {
 		id: 'project.settings.view.title',
 		defaultMessage: 'View',
