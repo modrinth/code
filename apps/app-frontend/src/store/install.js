@@ -11,8 +11,20 @@ import {
 } from '@/helpers/worlds.ts'
 
 export const findPreferredVersion = (versions, project, instance) => {
+	// When `project` is passed in from this stack trace:
+	// - `installVersionDependencies`
+	// - `install.js/install` - `installVersionDependencies` call
+	//
+	// ..then `project` is actually a `Dependency` struct of a cached `Version`.
+	// `Dependency` does not have a `project_type` field,
+	// so we default it to `mod`.
+	//
+	// If we don't default here, then this `.find` will ignore version/instance
+	// loader mismatches, and you'll end up e.g. installing NeoForge mods for a
+	// Fabric instance.
 	const projectType = project.project_type ?? 'mod'
 
+	// If we can find a version using strictly the instance loader then prefer that
 	let version = versions.find(
 		(v) =>
 			v.game_versions.includes(instance.game_version) &&
@@ -20,6 +32,7 @@ export const findPreferredVersion = (versions, project, instance) => {
 	)
 
 	if (!version) {
+		// Otherwise use first compatible version (in addition to versions with the instance loader this includes datapacks)
 		version = versions.find((v) => isVersionCompatible(v, project, instance))
 	}
 
@@ -94,7 +107,7 @@ export const installVersionDependencies = async (profile, version, onDepInstalli
 		announcedProjects.add(projectId)
 	}
 
-	const resolveDependency = async (dep, inputVersion) => {
+	const resolveDependency = async (dep) => {
 		let depVersion = null
 		let depProjectId = dep.project_id ?? null
 
