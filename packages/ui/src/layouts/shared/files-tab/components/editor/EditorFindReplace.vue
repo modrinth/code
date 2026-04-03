@@ -20,7 +20,7 @@
 					/>
 				</Button>
 				<div
-					@keydown.enter.prevent.stop="emit('findNext')"
+					@keydown.enter.exact.prevent.stop="emit('findNext')"
 					@keydown.shift.enter.prevent.stop="emit('findPrevious')"
 				>
 					<StyledInput
