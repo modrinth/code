@@ -2573,6 +2573,9 @@
   "project.settings.upload.title": {
     "defaultMessage": "Upload"
   },
+  "project.settings.versions.permissions": {
+    "defaultMessage": "Permissions"
+  },
   "project.settings.versions.title": {
     "defaultMessage": "Versions"
   },
