@@ -204,6 +204,9 @@ const colorVariables = computed(() => {
 
 	if (props.type === 'outlined' || props.type === 'transparent') {
 		colors.bg = 'transparent'
+		if (props.hoverColorFill === 'none') {
+			hoverColors.bg = 'transparent'
+		}
 		colors = setColorFill(colors, props.colorFill === 'auto' ? 'text' : props.colorFill)
 		hoverColors = setColorFill(
 			hoverColors,

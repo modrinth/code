@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="flex min-h-0 flex-col"
-		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6' : 'gap-4'"
+		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 pt-12' : 'gap-4'"
 	>
 		<template v-if="!isFullscreen">
 			<div class="flex items-center gap-2">
@@ -45,7 +45,7 @@
 		<BaseTerminal
 			ref="terminalRef"
 			class="min-h-0"
-			:class="{ 'flex-1': isFullscreen }"
+			:class="{ 'flex-1 my-auto': isFullscreen }"
 			:show-input="resolvedShowInput"
 			:fullscreen="isFullscreen"
 			@command="handleCommand"
@@ -64,6 +64,7 @@ import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import { injectModalBehavior } from '#ui/providers/modal-behavior'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
@@ -72,6 +73,7 @@ import { injectConsoleManager } from './providers'
 import type { LogLevel } from './types'
 
 const ctx = injectConsoleManager()
+const modalBehavior = injectModalBehavior()
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
@@ -81,6 +83,7 @@ const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters(
 onBeforeUnmount(() => {
 	if (isFullscreen.value) {
 		document.body.style.overflow = ''
+		modalBehavior?.onHide?.()
 	}
 })
 
@@ -120,6 +123,7 @@ function rewriteFiltered() {
 function enterFullscreen() {
 	isFullscreen.value = true
 	document.body.style.overflow = 'hidden'
+	modalBehavior?.onShow?.()
 	nextTick(() => {
 		terminalRef.value?.fit()
 	})
@@ -128,6 +132,7 @@ function enterFullscreen() {
 function exitFullscreen() {
 	isFullscreen.value = false
 	document.body.style.overflow = ''
+	modalBehavior?.onHide?.()
 	nextTick(() => {
 		terminalRef.value?.fit()
 	})

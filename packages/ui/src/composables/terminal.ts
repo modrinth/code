@@ -62,6 +62,7 @@ export interface UseTerminalOptions {
 	options?: ITerminalOptions
 	scrollback?: number
 	onReady?: (terminal: Terminal) => void
+	onResize?: () => void
 }
 
 export interface UseTerminalReturn {
@@ -220,6 +221,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 			if (d) {
 				term.resize(d.cols, d.rows)
 			}
+			options.onResize?.()
 		})
 		resizeObserver.observe(container)
 

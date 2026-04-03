@@ -1,12 +1,12 @@
 <template>
 	<div class="flex items-center gap-0.5">
-		<ButtonStyled type="transparent" circular>
+		<ButtonStyled type="transparent" circular hover-color-fill="none">
 			<button @click="emit('clear')">
 				<XIcon />
 				Clear
 			</button>
 		</ButtonStyled>
-		<ButtonStyled type="transparent" circular>
+		<ButtonStyled type="transparent" circular hover-color-fill="none">
 			<button :disabled="shareDisabled" @click="emit('share')">
 				<ShareIcon />
 				Share

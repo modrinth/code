@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="!fullscreen && componentHeight ? { height: componentHeight + 'px' } : {}"
+		:style="fullscreen && snappedHeight ? { maxHeight: snappedHeight + 'px' } : (!fullscreen && componentHeight ? { height: componentHeight + 'px' } : {})"
 		:class="{ 'h-full': fullscreen }"
 	>
 		<div class="relative min-h-0 flex-1 overflow-hidden">
@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ChevronDownIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
-import { nextTick, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -75,17 +75,75 @@ const inputRef = ref<HTMLElement | null>(null)
 const commandInput = ref('')
 const componentHeight = ref(0)
 
-const { terminal, searchAddon, isAtBottom, write, writeln, clear, reset, fit, scrollToBottom } =
+const snappedHeight = ref<number | null>(null)
+
+const { terminal, searchAddon, isAtBottom, write, writeln, clear, reset, fit: rawFit, scrollToBottom } =
 	useTerminal({
 		container: containerRef,
 		scrollback: props.scrollback,
 		onReady: (term) => {
 			nextTick(() => {
 				updateComponentHeight()
+				snapToRows()
 			})
 			emit('ready', term)
 		},
+		onResize: () => {
+			updateComponentHeight()
+		},
 	})
+
+function snapToRows() {
+	if (!props.fullscreen) {
+		snappedHeight.value = null
+		return
+	}
+	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
+	if (!screen) {
+		snappedHeight.value = null
+		return
+	}
+	const inputH = inputRef.value?.offsetHeight ?? 0
+	const borderW = 2
+	snappedHeight.value = screen.offsetHeight + inputH + borderW
+}
+
+let resizeDebounce: ReturnType<typeof setTimeout> | null = null
+
+function handleWindowResize() {
+	if (!props.fullscreen) return
+	if (resizeDebounce) clearTimeout(resizeDebounce)
+	snappedHeight.value = null
+	resizeDebounce = setTimeout(() => {
+		rawFit()
+		nextTick(() => snapToRows())
+	}, 50)
+}
+
+onMounted(() => {
+	window.addEventListener('resize', handleWindowResize)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', handleWindowResize)
+	if (resizeDebounce) clearTimeout(resizeDebounce)
+})
+
+function fit() {
+	rawFit()
+	snapToRows()
+}
+
+watch(() => props.fullscreen, () => {
+	if (props.fullscreen) {
+		nextTick(() => {
+			rawFit()
+			nextTick(() => snapToRows())
+		})
+	} else {
+		snappedHeight.value = null
+	}
+})
 
 function updateComponentHeight() {
 	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
