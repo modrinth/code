@@ -1471,13 +1471,13 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.desktop-only {
 		display: none;
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.mobile-navigation {
 		display: flex;
 	}
