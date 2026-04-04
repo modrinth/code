@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", d.dependency_type, m.slug as \"slug\" FROM dependencies d\n                    INNER JOIN mods m ON m.id = d.mod_dependency_id\n                WHERE dependent_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_dependency_id: DBProjectId",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "dependency_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "slug",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      true,
+      false,
+      true
+    ]
+  },
+  "hash": "823776dbfefe3061b88492f5cba8ae2a58e3b8ff46a1e29b7f4a57bf68f8da84"
+}

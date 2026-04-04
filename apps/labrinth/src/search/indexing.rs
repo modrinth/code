@@ -461,6 +461,10 @@ pub async fn index_local(
                     featured_gallery: featured_gallery.clone(),
                     open_source,
                     color: project.color.map(|x| x as u32),
+                    required_dependencies: version.required_dependencies,
+                    optional_dependencies: version.optional_dependencies,
+                    embedded_dependencies: version.embedded_dependencies,
+                    incompatibilities: version.incompatibilities,
                     loader_fields,
                     project_loader_fields: project_loader_fields.clone(),
                     // 'loaders' is aggregate of all versions' loaders
@@ -482,6 +486,10 @@ struct PartialVersion {
     project_types: Vec<String>,
     version_fields: Vec<QueryVersionField>,
     date_published: DateTime<Utc>,
+    required_dependencies: Vec<String>,
+    optional_dependencies: Vec<String>,
+    embedded_dependencies: Vec<String>,
+    incompatibilities: Vec<String>,
 }
 
 async fn index_versions(
@@ -608,6 +616,39 @@ async fn index_versions(
                 .map(|(_, version_fields)| version_fields)
                 .unwrap_or_default();
 
+            let mut required_dependencies: Vec<String> = Vec::new();
+            let mut optional_dependencies: Vec<String> = Vec::new();
+            let mut embedded_dependencies: Vec<String> = Vec::new();
+            let mut incompatibilities: Vec<String> = Vec::new();
+
+            let records = sqlx::query!(
+                "
+                SELECT d.mod_dependency_id as \"mod_dependency_id: DBProjectId\", d.dependency_type, m.slug as \"slug\" FROM dependencies d
+                    INNER JOIN mods m ON m.id = d.mod_dependency_id
+                WHERE dependent_id = $1",
+                version_id.0
+            )
+                .fetch_all(pool)
+                .await?;
+
+            for r in records {
+                let v = match r.dependency_type.as_str() {
+                    "required" => &mut required_dependencies,
+                    "optional" => &mut optional_dependencies,
+                    "embedded" => &mut embedded_dependencies,
+                    "incompatible" => &mut incompatibilities,
+                    _ => continue,
+                };
+
+                if let Some(id) = r.mod_dependency_id {
+                    v.push(crate::models::ids::ProjectId::from(id).to_string())
+                }
+
+                if let Some(slug) = &r.slug {
+                    v.push(slug.to_string())
+                }
+            }
+
             res_versions
                 .entry(*project_id)
                 .or_default()
@@ -617,6 +658,10 @@ async fn index_versions(
                     project_types: version_loader_data.project_types,
                     version_fields,
                     date_published: *date_published,
+                    required_dependencies,
+                    optional_dependencies,
+                    embedded_dependencies,
+                    incompatibilities,
                 });
         }
     }
