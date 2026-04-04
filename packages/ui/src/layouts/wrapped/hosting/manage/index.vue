@@ -80,7 +80,7 @@
 		</div>
 
 		<Transition v-else name="fade" mode="out-in">
-			<div v-if="isLoading && !serverResponse" key="loading" class="flex flex-col gap-4 py-8">
+			<div v-if="isLoading || !authReady" key="loading" class="flex flex-col gap-4 py-8">
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
@@ -235,6 +235,7 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
+const authReady = computed(() => auth.isReady?.value ?? true)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
