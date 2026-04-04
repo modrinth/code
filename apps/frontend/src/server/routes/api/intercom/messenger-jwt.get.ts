@@ -63,7 +63,7 @@ export default defineEventHandler(async (event): Promise<IntercomTokenResponse> 
 	setHeader(event, 'cache-control', 'private, no-store, max-age=0')
 
 	const intercomSecret =
-		useRuntimeConfig(event).intercomIdentitySecret ?? (await getIntercomKeyFromSecretsStore())
+		await getIntercomKeyFromSecretsStore() ?? useRuntimeConfig(event).intercomIdentitySecret
 
 	if (!intercomSecret) {
 		throw createError({
