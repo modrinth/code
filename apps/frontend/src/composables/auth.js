@@ -104,13 +104,28 @@ export const initAuth = async (oldToken = null) => {
 	return auth
 }
 
+export const getSignInRedirectPath = (route) => {
+	const fullPath = route.fullPath
+	if (fullPath === '/auth' || fullPath.startsWith('/auth/')) {
+		return '/dashboard'
+	}
+	return fullPath
+}
+
+export const getSignInRouteObj = (route, redirectOverride) => ({
+	path: '/auth/sign-in',
+	query: {
+		redirect: redirectOverride ?? getSignInRedirectPath(route),
+	},
+})
+
 export const getAuthUrl = (provider, redirect = '/dashboard') => {
 	const config = useRuntimeConfig()
 	const route = useNativeRoute()
 
 	const fullURL = route.query.launcher
 		? getLauncherRedirectUrl(route)
-		: `${config.public.siteUrl}/auth/sign-in?redirect=${redirect}`
+		: `${config.public.siteUrl}/auth/sign-in?redirect=${encodeURIComponent(redirect)}`
 
 	return `${config.public.apiBaseUrl}auth/init?provider=${provider}&url=${encodeURIComponent(fullURL)}`
 }
