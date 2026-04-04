@@ -16,11 +16,14 @@
 					},
 				]"
 			>
-				<ServerIcon class="size-24 transition-[filter] group-hover:brightness-75" :image="displayIcon" />
-				<div class="absolute right-0 top-0 m-1">
-					<div class="flex items-center justify-center rounded-full bg-button-bg p-1.5">
-						<EditIcon aria-hidden="true" class="h-4 w-4 text-contrast" />
-					</div>
+				<ServerIcon
+					class="size-24 transition-[filter] group-hover:brightness-75"
+					:image="displayIcon"
+				/>
+				<div
+					class="absolute top-0 w-full h-full flex justify-center items-center opacity-0 transition-all group-hover:opacity-100"
+				>
+					<EditIcon aria-hidden="true" class="h-10 w-10" />
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #sync> <TransferIcon /> Sync icon </template>
@@ -35,7 +38,7 @@ import { useQueryClient } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
 import { OverflowMenu, ServerIcon } from '#ui/components'
-import { processImageBlob, useServerImage } from '#ui/composables'
+import { useServerImage } from '#ui/composables'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -52,9 +55,13 @@ const {
 	refetch: refetchRemoteIcon,
 	setImage,
 	clearImage,
-} = useServerImage(serverId, computed(() => server.value?.upstream ?? null), {
-	includeProjectFallback: false,
-})
+} = useServerImage(
+	serverId,
+	computed(() => server.value?.upstream ?? null),
+	{
+		includeProjectFallback: false,
+	},
+)
 
 function getStatusCode(error: unknown): number | undefined {
 	const err = error as { statusCode?: number; response?: { status?: number } }
@@ -117,7 +124,11 @@ const uploadFile = async (e: Event) => {
 
 		// Keep original file in sync when possible, but don't block icon updates on failures here.
 		try {
-			await client.kyros.files_v0.deleteFileOrFolderWithAuth(fsAuth, '/server-icon-original.png', false)
+			await client.kyros.files_v0.deleteFileOrFolderWithAuth(
+				fsAuth,
+				'/server-icon-original.png',
+				false,
+			)
 		} catch (deleteOriginalError) {
 			if (!isNotFound(deleteOriginalError)) {
 				// best effort
@@ -125,8 +136,7 @@ const uploadFile = async (e: Event) => {
 		}
 
 		try {
-			await client.kyros.files_v0
-				.uploadFileWithAuth(fsAuth, '/server-icon-original.png', file)
+			await client.kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', file)
 				.promise
 		} catch (originalUploadError) {
 			if (!isNotFound(originalUploadError)) {
