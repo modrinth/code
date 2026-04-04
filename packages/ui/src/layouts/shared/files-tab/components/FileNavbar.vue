@@ -179,8 +179,9 @@
 				</ButtonStyled>
 			</div>
 
-			<div v-else-if="!isEditingImage && isLogFile" class="flex gap-2">
+			<div v-else-if="!isEditingImage" class="flex gap-2">
 				<Button
+					v-if="isLogFile"
 					v-tooltip="formatMessage(messages.shareToMclogs)"
 					icon-only
 					transparent
@@ -188,6 +189,17 @@
 					@click="$emit('share')"
 				>
 					<ShareIcon />
+				</Button>
+				<Button
+					v-tooltip="formatMessage(messages.findInFile)"
+					icon-only
+					:transparent="!isEditorFindOpen"
+					:color="isEditorFindOpen ? 'brand' : undefined"
+					:aria-label="formatMessage(messages.findInFile)"
+					:aria-pressed="isEditorFindOpen"
+					@click="$emit('find')"
+				>
+					<SearchIcon />
 				</Button>
 			</div>
 		</div>
@@ -274,6 +286,10 @@ const messages = defineMessages({
 		id: 'files.navbar.share-to-mclogs',
 		defaultMessage: 'Share to mclo.gs',
 	},
+	findInFile: {
+		id: 'files.navbar.find-in-file',
+		defaultMessage: 'Find in file',
+	},
 })
 
 const props = defineProps<{
@@ -282,6 +298,7 @@ const props = defineProps<{
 	editingFileName?: string
 	editingFilePath?: string
 	isEditingImage?: boolean
+	isEditorFindOpen?: boolean
 	searchQuery: string
 	showRefreshButton?: boolean
 	showInstallFromUrl?: boolean
@@ -301,6 +318,7 @@ const emit = defineEmits<{
 	unzipFromUrl: [cf: boolean]
 	refresh: []
 	share: []
+	find: []
 }>()
 
 const refreshing = ref(false)
