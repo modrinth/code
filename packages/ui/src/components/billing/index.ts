@@ -1,5 +1,7 @@
 export { default as AddPaymentMethodModal } from './AddPaymentMethodModal.vue'
 export { default as ModrinthServersPurchaseModal } from './ModrinthServersPurchaseModal.vue'
 export { default as PurchaseModal } from './PurchaseModal.vue'
+export { default as ResubscribeModal } from './ResubscribeModal.vue'
+export { default as ServersGuestPlanModal } from './ServersGuestPlanModal.vue'
 export { default as ServersSpecs } from './ServersSpecs.vue'
 export { default as ServersUpgradeModalWrapper } from './ServersUpgradeModalWrapper.vue'

@@ -1,5 +1,11 @@
 <script setup>
-import { AuthFeature, PanelVersionFeature, TauriModrinthClient } from '@modrinth/api-client'
+import {
+	AuthFeature,
+	NodeAuthFeature,
+	nodeAuthState,
+	PanelVersionFeature,
+	TauriModrinthClient,
+} from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
 	ChangeSkinIcon,
@@ -128,8 +134,16 @@ const { addPopupNotification } = popupNotificationManager
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
 	features: [
+		new NodeAuthFeature({
+			getAuth: () => nodeAuthState.getAuth?.() ?? null,
+			refreshAuth: async () => {
+				if (nodeAuthState.refreshAuth) {
+					await nodeAuthState.refreshAuth()
+				}
+			},
+		}),
 		new AuthFeature({
-			token: async () => (await getCreds()).session,
+			token: async () => (await getCreds())?.session,
 		}),
 		new PanelVersionFeature(),
 	],
@@ -983,13 +997,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<WorldIcon />
 			</NavButton>
 			<NavButton
-				v-if="themeStore.featureFlags.servers_in_app"
-				v-tooltip.right="'Servers'"
-				to="/hosting/manage"
-			>
-				<ServerIcon />
-			</NavButton>
-			<NavButton
 				v-tooltip.right="'Discover content'"
 				to="/browse/modpack"
 				:is-primary="() => route.path.startsWith('/browse') && !route.query.i"
@@ -1011,6 +1018,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				"
 			>
 				<LibraryIcon />
+			</NavButton>
+			<NavButton
+				v-if="themeStore.featureFlags.servers_in_app"
+				v-tooltip.right="'Servers'"
+				to="/hosting/manage"
+			>
+				<ServerIcon />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1250,11 +1264,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 					</div>
 					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
-							<FriendsList
-								:credentials="credentials"
-								:sign-in="() => signIn()"
-								:refresh-credentials="fetchCredentials"
-							/>
+							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
 					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">

@@ -381,14 +381,6 @@ const messages = defineMessages({
 							})
 						}}
 					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
-							})
-						}}
-					</span>
 					<div>
 						<ButtonStyled color="orange">
 							<button
@@ -407,19 +399,20 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(messages.unlinkDescription, {
+								type: ctx.isServer ? 'server' : 'instance',
+								projectType: showModpackVersionActions ? 'modpack' : 'server',
+							})
+						}}
+					</span>
 				</div>
 
 				<!-- Reinstall -->
 				<div v-if="showModpackVersionActions" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.reinstallModpackTitle) }}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(messages.reinstallModpackDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-							})
-						}}
 					</span>
 					<div>
 						<ButtonStyled color="red">
@@ -440,6 +433,13 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(messages.reinstallModpackDescription, {
+								type: ctx.isServer ? 'server' : 'instance',
+							})
+						}}
+					</span>
 				</div>
 
 				<!-- Repair -->
@@ -448,15 +448,6 @@ const messages = defineMessages({
 						{{
 							formatMessage(
 								ctx.isServer ? messages.repairServerTitle : messages.repairInstanceTitle,
-							)
-						}}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
 							)
 						}}
 					</span>
@@ -477,6 +468,15 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(
+								ctx.isServer
+									? messages.repairServerDescription
+									: messages.repairInstanceDescription,
+							)
+						}}
+					</span>
 				</div>
 			</template>
 
@@ -617,16 +617,6 @@ const messages = defineMessages({
 							<span class="font-semibold text-contrast">{{ row.value }}</span>
 						</div>
 					</div>
-					<div class="flex items-start gap-2">
-						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
-						<span class="text-primary">
-							{{
-								formatMessage(
-									ctx.isServer ? messages.editWarningServer : messages.editWarningInstance,
-								)
-							}}
-						</span>
-					</div>
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled color="orange">
 							<button
@@ -640,6 +630,16 @@ const messages = defineMessages({
 						</ButtonStyled>
 						<slot name="unlinked-extra-buttons" />
 					</div>
+					<div class="flex items-start gap-2">
+						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+						<span class="text-primary">
+							{{
+								formatMessage(
+									ctx.isServer ? messages.editWarningServer : messages.editWarningInstance,
+								)
+							}}
+						</span>
+					</div>
 				</div>
 
 				<!-- Repair section -->
@@ -648,15 +648,6 @@ const messages = defineMessages({
 						{{
 							formatMessage(
 								ctx.isServer ? messages.repairServerTitle : messages.repairInstanceTitle,
-							)
-						}}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
 							)
 						}}
 					</span>
@@ -677,6 +668,15 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(
+								ctx.isServer
+									? messages.repairServerDescription
+									: messages.repairInstanceDescription,
+							)
+						}}
+					</span>
 				</div>
 			</template>
 
