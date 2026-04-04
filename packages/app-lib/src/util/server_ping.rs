@@ -8,6 +8,33 @@ use tokio::net::ToSocketAddrs;
 use tokio::select;
 use url::Url;
 
+const MAX_MINECRAFT_STATUS_STRING_LENGTH: usize = 32_767;
+const MAX_MODERN_STATUS_PACKET_LENGTH: usize =
+    MAX_MINECRAFT_STATUS_STRING_LENGTH + 4;
+const MAX_LEGACY_STATUS_UTF16_LENGTH: usize =
+    MAX_MINECRAFT_STATUS_STRING_LENGTH;
+
+/// Ensures the length of a packet as stated by a server is not longer than a
+/// hard-coded limit.
+///
+/// For example, if we ping a server that says its status packet is 2 billion
+/// bytes long, we don't try to allocate a 2 billion byte buffer, since that
+/// will OOM our machine.
+///
+/// Implemented as a function so that you can easily find callsites and see
+/// where we accept unvalidated input from servers.
+fn cap_length(
+    length: usize,
+    max_length: usize,
+    context: &'static str,
+) -> Result<usize> {
+    if length > max_length {
+        return Err(ErrorKind::InputError(context.to_string()).into());
+    }
+
+    Ok(length)
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct ServerStatus {
@@ -128,13 +155,11 @@ mod modern {
         stream.write_all(&[0x01, 0x00]).await?;
         stream.flush().await?;
 
-        let packet_length = varint::read(stream).await?;
-        if packet_length < 0 {
-            return Err(ErrorKind::InputError(
-                "Invalid status response packet length".to_string(),
-            )
-            .into());
-        }
+        let packet_length = cap_varint_length(
+            varint::read(stream).await?,
+            super::MAX_MODERN_STATUS_PACKET_LENGTH,
+            "invalid status response packet length",
+        )?;
 
         let mut packet_stream = stream.take(packet_length as u64);
         let packet_id = varint::read(&mut packet_stream).await?;
@@ -144,8 +169,12 @@ mod modern {
             )
             .into());
         }
-        let response_length = varint::read(&mut packet_stream).await?;
-        let mut json_response = vec![0_u8; response_length as usize];
+        let response_length = cap_varint_length(
+            varint::read(&mut packet_stream).await?,
+            super::MAX_MINECRAFT_STATUS_STRING_LENGTH,
+            "invalid status response length",
+        )?;
+        let mut json_response = vec![0_u8; response_length];
         packet_stream.read_exact(&mut json_response).await?;
 
         if packet_stream.limit() > 0 {
@@ -153,6 +182,27 @@ mod modern {
         }
 
         Ok(serde_json::from_slice(&json_response)?)
+    }
+
+    /// Ensures the length of a varint as stated by a server is not longer than a
+    /// hard-coded limit.
+    ///
+    /// For example, if we ping a server that says its status packet is 2 billion
+    /// bytes long, we don't try to allocate a 2 billion byte buffer, since that
+    /// will OOM our machine.
+    ///
+    /// Implemented as a function so that you can easily find callsites and see
+    /// where we accept unvalidated input from servers.
+    fn cap_varint_length(
+        length: i32,
+        max_length: usize,
+        context: &'static str,
+    ) -> crate::Result<usize> {
+        if length < 0 {
+            return Err(ErrorKind::InputError(context.to_string()).into());
+        }
+
+        super::cap_length(length as usize, max_length, context)
     }
 
     async fn ping(stream: &mut TcpStream) -> crate::Result<i64> {
@@ -275,8 +325,17 @@ mod legacy {
             )));
         }
 
-        let data_length = stream.read_u16().await?;
-        let mut data = vec![0u8; data_length as usize * 2];
+        let data_length = super::cap_length(
+            stream.read_u16().await? as usize,
+            super::MAX_LEGACY_STATUS_UTF16_LENGTH,
+            "invalid legacy status response length",
+        )?;
+        let data_byte_length = data_length.checked_mul(2).ok_or_else(|| {
+            ErrorKind::InputError(
+                "invalid legacy status response length".to_string(),
+            )
+        })?;
+        let mut data = vec![0u8; data_byte_length];
         stream.read_exact(&mut data).await?;
 
         drop(stream);
