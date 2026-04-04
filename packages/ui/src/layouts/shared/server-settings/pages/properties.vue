@@ -233,7 +233,7 @@
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			restart
-			:save="() => saveProperties()"
+			:save="async () => { await saveProperties() }"
 			:reset="resetProperties"
 		/>
 	</div>
@@ -452,7 +452,7 @@ function buildPatch(): Archon.Content.v1.PatchPropertiesFields {
 	return patch
 }
 
-const { mutate: saveProperties, isPending: isUpdating } = useMutation({
+const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
 	mutationFn: () =>
 		client.archon.properties_v1.patchProperties(serverId, worldId.value!, buildPatch()),
 	onSuccess: async () => {
