@@ -174,13 +174,20 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	let searchVersion = 0
 
 	watch(effectiveRequestParams, (newVal, oldVal) => {
-		debug('effectiveRequestParams changed', { from: oldVal?.substring(0, 80), to: newVal?.substring(0, 80) })
+		debug('effectiveRequestParams changed', {
+			from: oldVal?.substring(0, 80),
+			to: newVal?.substring(0, 80),
+		})
 		refreshSearch()
 	})
 
 	async function refreshSearch() {
 		const version = ++searchVersion
-		debug('refreshSearch start', { version, projectType: options.projectType.value, params: effectiveRequestParams.value.substring(0, 100) })
+		debug('refreshSearch start', {
+			version,
+			projectType: options.projectType.value,
+			params: effectiveRequestParams.value.substring(0, 100),
+		})
 
 		const currentHitsEmpty = isServerType.value
 			? serverHits.value.length === 0
@@ -203,7 +210,12 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 				projectHits.value = response.projectHits
 			}
 			totalHits.value = response.total_hits
-			debug('refreshSearch complete', { version, hits: response.total_hits, projectHits: response.projectHits.length, serverHits: response.serverHits.length })
+			debug('refreshSearch complete', {
+				version,
+				hits: response.total_hits,
+				projectHits: response.projectHits.length,
+				serverHits: response.serverHits.length,
+			})
 
 			updateUrlParams()
 			loading.value = false

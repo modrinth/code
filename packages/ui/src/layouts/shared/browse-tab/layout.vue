@@ -8,10 +8,10 @@ import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
-import { useDebugLogger } from '#ui/composables/debug-logger'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
+import { useDebugLogger } from '#ui/composables/debug-logger'
 import type { SortType } from '#ui/utils/search'
 
 import { injectBrowseManager } from './providers/browse-manager'
@@ -27,11 +27,26 @@ debug('totalHits:', ctx.totalHits.value)
 debug('isServerType:', ctx.isServerType.value)
 debug('effectiveLayout:', ctx.effectiveLayout.value)
 
-watch(() => ctx.projectType.value, (val) => debug('projectType changed:', val))
-watch(() => ctx.loading.value, (val) => debug('loading changed:', val))
-watch(() => ctx.projectHits.value, (val) => debug('projectHits changed, count:', val.length))
-watch(() => ctx.serverHits.value, (val) => debug('serverHits changed, count:', val.length))
-watch(() => ctx.totalHits.value, (val) => debug('totalHits changed:', val))
+watch(
+	() => ctx.projectType.value,
+	(val) => debug('projectType changed:', val),
+)
+watch(
+	() => ctx.loading.value,
+	(val) => debug('loading changed:', val),
+)
+watch(
+	() => ctx.projectHits.value,
+	(val) => debug('projectHits changed, count:', val.length),
+)
+watch(
+	() => ctx.serverHits.value,
+	(val) => debug('serverHits changed, count:', val.length),
+)
+watch(
+	() => ctx.totalHits.value,
+	(val) => debug('totalHits changed:', val),
+)
 </script>
 
 <template>
