@@ -8,6 +8,7 @@ import {
 	InfoIcon,
 	LinkIcon,
 	ServerIcon,
+	SignatureIcon,
 	TagsIcon,
 	UsersIcon,
 	VersionIcon,
@@ -46,6 +47,10 @@ const navItems = computed(() => {
 		projectV3.value?.project_types?.some((type) => ['mod', 'modpack'].includes(type)) &&
 		isStaff(currentMember.value?.user)
 
+	const hasPermissionsPage = computed(() =>
+		projectV3.value?.project_types?.some((type) => ['modpack'].includes(type)),
+	)
+
 	const items = [
 		{
 			link: `/${base}/settings`,
@@ -74,6 +79,11 @@ const navItems = computed(() => {
 			link: `/${base}/settings/description`,
 			label: formatMessage(commonProjectSettingsMessages.description),
 			icon: AlignLeftIcon,
+		},
+		hasPermissionsPage.value && {
+			link: `/${base}/settings/permissions`,
+			label: formatMessage(commonProjectSettingsMessages.permissions),
+			icon: SignatureIcon,
 		},
 		!isServerProject.value && {
 			link: `/${base}/settings/versions`,
