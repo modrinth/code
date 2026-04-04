@@ -274,6 +274,8 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	}
 
 	const disconnectSocket = (targetServerId?: string) => {
+		if (!targetServerId && !connectedSocketServerId.value) return
+
 		clearSocketListeners()
 
 		if (targetServerId) {
@@ -377,6 +379,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		cleanupCoreRuntime,
 		connectSocket,
 		connectedSocketServerId,
+		cpuData,
 		disconnectSocket,
 		fsAuth,
 		fsOps,
@@ -385,6 +388,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		isServerRunning,
 		isWsAuthIncorrect,
 		powerStateDetails,
+		ramData,
 		refreshFsAuth,
 		serverPowerState,
 		stats,

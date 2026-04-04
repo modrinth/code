@@ -147,7 +147,7 @@ const metrics = computed(() => {
 				value: '0.00%',
 				icon: CpuIcon,
 				data: cpuData.value,
-				showGraph: false,
+				showGraph: true,
 				warning: null,
 				link: null,
 			},
@@ -156,7 +156,7 @@ const metrics = computed(() => {
 				value: '0.00%',
 				icon: DatabaseIcon,
 				data: ramData.value,
-				showGraph: false,
+				showGraph: true,
 				warning: null,
 				link: null,
 			},
@@ -196,53 +196,63 @@ const metrics = computed(() => {
 	]
 })
 
-const getChartOptions = (hasWarning: string | null, index: number) => ({
-	chart: {
-		type: 'area' as const,
-		animations: { enabled: false },
-		sparkline: { enabled: true },
-		toolbar: { show: false },
-		padding: {
-			left: -10,
-			right: -10,
-			top: 0,
-			bottom: 0,
+const chartOptionsCache = new Map<string, object>()
+
+const getChartOptions = (hasWarning: string | null, index: number) => {
+	const cacheKey = `${index}-${hasWarning ? '1' : '0'}`
+	const cached = chartOptionsCache.get(cacheKey)
+	if (cached) return cached
+
+	const options = {
+		chart: {
+			type: 'area' as const,
+			animations: { enabled: false },
+			sparkline: { enabled: true },
+			toolbar: { show: false },
+			padding: {
+				left: -10,
+				right: -10,
+				top: 0,
+				bottom: 0,
+			},
+			events: {
+				mounted: () => onChartReady(index),
+				updated: () => onChartReady(index),
+			},
 		},
-		events: {
-			mounted: () => onChartReady(index),
-			updated: () => onChartReady(index),
+		stroke: { curve: 'smooth' as const, width: 3 },
+		fill: {
+			type: 'gradient' as const,
+			gradient: {
+				shadeIntensity: 1,
+				opacityFrom: 0.25,
+				opacityTo: 0.05,
+				stops: [0, 100],
+			},
 		},
-	},
-	stroke: { curve: 'smooth' as const, width: 3 },
-	fill: {
-		type: 'gradient' as const,
-		gradient: {
-			shadeIntensity: 1,
-			opacityFrom: 0.25,
-			opacityTo: 0.05,
-			stops: [0, 100],
+		tooltip: { enabled: false },
+		grid: { show: false },
+		xaxis: {
+			labels: { show: false },
+			axisBorder: { show: false },
+			type: 'numeric' as const,
+			tickAmount: 20,
+			range: 20,
 		},
-	},
-	tooltip: { enabled: false },
-	grid: { show: false },
-	xaxis: {
-		labels: { show: false },
-		axisBorder: { show: false },
-		type: 'numeric' as const,
-		tickAmount: 20,
-		range: 20,
-	},
-	yaxis: {
-		show: false,
-		min: 0,
-		max: 100,
-		forceNiceScale: false,
-	},
-	colors: [hasWarning ? 'var(--color-orange)' : 'var(--color-brand)'],
-	dataLabels: {
-		enabled: false,
-	},
-})
+		yaxis: {
+			show: false,
+			min: 0,
+			max: 100,
+			forceNiceScale: false,
+		},
+		colors: [hasWarning ? 'var(--color-orange)' : 'var(--color-brand)'],
+		dataLabels: {
+			enabled: false,
+		},
+	}
+	chartOptionsCache.set(cacheKey, options)
+	return options
+}
 
 watch(
 	() => props.data?.current,

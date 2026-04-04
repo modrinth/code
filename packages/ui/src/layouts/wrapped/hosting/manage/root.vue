@@ -92,25 +92,44 @@
 			</template>
 		</ErrorInformationCard>
 	</div>
+	<!-- Loading state (before serverData arrives) -->
+	<div
+		v-else-if="!serverData && !serverError"
+		class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4"
+	>
+		<LoaderCircleIcon class="size-16 animate-spin" />
+		<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
+	</div>
 	<!-- SERVER START -->
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
 		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
+		:class="'server-panel-' + revealState"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
 	>
+		<div
+			v-if="revealState === 'pending'"
+			class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4"
+		>
+			<LoaderCircleIcon class="size-16 animate-spin" />
+			<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
+		</div>
+
 		<ServerManageHeader
+			class="server-stagger-item"
+			:style="{ '--si': 0 }"
 			:server="serverData"
 			:server-image="serverImage"
 			:server-project="serverProject"
 			:uptime-seconds="showUptime ? uptimeSeconds : undefined"
 		>
 			<template #actions>
-				<div v-if="isConnected && !serverData.flows?.intro" class="flex gap-2">
+				<div v-if="!serverData.flows?.intro" class="flex gap-2">
 					<PanelServerActionButton :disabled="!!installError" />
 					<ButtonStyled circular size="large">
 						<button v-tooltip="'Server settings'" @click="() => openServerSettingsModal()">
@@ -135,12 +154,13 @@
 		<template v-else>
 			<div
 				data-pyro-navigation
-				class="isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+				class="server-stagger-item isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+				:style="{ '--si': 1 }"
 			>
 				<NavTabs :links="navLinks" replace />
 			</div>
 
-			<div data-pyro-mount class="h-full w-full flex-1">
+			<div data-pyro-mount class="server-stagger-item h-full w-full flex-1" :style="{ '--si': 2 }">
 				<div
 					v-if="installError"
 					class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
@@ -306,6 +326,7 @@
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError } from '@modrinth/api-client'
+import type { Stats } from '@modrinth/utils'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -342,7 +363,8 @@ import {
 	ServerManageHeader,
 } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
-import { useDebugLogger, useServerImage, useServerProject } from '#ui/composables'
+import { useDebugLogger, useModrinthServersConsole, useServerImage, useServerProject } from '#ui/composables'
+import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
@@ -402,6 +424,15 @@ const props = withDefaults(
 		browseContent: undefined,
 	},
 )
+
+const { formatMessage } = useVIntl()
+
+const loadingMessages = defineMessages({
+	loadingServerPanel: {
+		id: 'servers.manage.loading.serverPanel',
+		defaultMessage: 'Loading your server panel...',
+	},
+})
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
@@ -524,9 +555,13 @@ const {
 	backupsState,
 	cleanupCoreRuntime,
 	connectSocket,
+	cpuData,
 	fsOps,
 	fsQueuedOps,
 	isConnected,
+	ramData,
+	serverPowerState,
+	stats,
 	uptimeSeconds,
 } = useServerManageCoreRuntime({
 	serverId: computed(() => props.serverId),
@@ -540,6 +575,60 @@ const {
 	incrementUptimeLocally: true,
 	eventGuard: () => isMounted.value,
 	onStateEvent,
+})
+
+type CachedWsState = {
+	stats: Stats
+	cpuData: number[]
+	ramData: number[]
+	powerState: Archon.Websocket.v0.PowerState
+	uptimeSeconds: number
+	consoleLines: string[]
+}
+
+const modrinthServersConsole = useModrinthServersConsole()
+const wsStateCacheKey = ['servers', 'ws-state', props.serverId] as const
+const cachedWsState = queryClient.getQueryData<CachedWsState>(wsStateCacheKey)
+if (cachedWsState) {
+	stats.value = cachedWsState.stats
+	cpuData.value = cachedWsState.cpuData
+	ramData.value = cachedWsState.ramData
+	serverPowerState.value = cachedWsState.powerState
+	uptimeSeconds.value = cachedWsState.uptimeSeconds
+}
+
+let hasReceivedWsData = false
+
+const saveWsStateToCache = () => {
+	if (!hasReceivedWsData) return
+	queryClient.setQueryData(wsStateCacheKey, {
+		stats: stats.value,
+		cpuData: cpuData.value,
+		ramData: ramData.value,
+		powerState: serverPowerState.value,
+		uptimeSeconds: uptimeSeconds.value,
+		consoleLines: modrinthServersConsole.output.value,
+	} satisfies CachedWsState)
+}
+
+watch([stats, serverPowerState], () => {
+	if (!isConnected.value) return
+	hasReceivedWsData = true
+})
+
+const revealState = ref<'pending' | 'revealing' | 'visible'>(
+	isConnected.value || serverData.value ? 'visible' : 'pending',
+)
+
+const REVEAL_TOTAL_MS = 2 * 80 + 400
+
+watch(isConnected, (connected) => {
+	if (connected && revealState.value === 'pending') {
+		revealState.value = 'revealing'
+		setTimeout(() => {
+			revealState.value = 'visible'
+		}, REVEAL_TOTAL_MS)
+	}
 })
 
 const navLinks = computed<Tab[]>(() => [
@@ -1162,6 +1251,11 @@ function initializeServer() {
 				client.archon.sockets.on(targetServerId, 'filesystem-ops', handleFilesystemOps),
 				client.archon.sockets.on(targetServerId, 'new-mod', handleNewMod),
 			],
+		}).then((connected) => {
+			if (connected && cachedWsState?.consoleLines?.length) {
+				modrinthServersConsole.clear()
+				modrinthServersConsole.addLines(cachedWsState.consoleLines)
+			}
 		}).finally(() => {
 			isLoading.value = false
 		})
@@ -1176,6 +1270,8 @@ function initializeServer() {
 
 const cleanup = () => {
 	isMounted.value = false
+
+	saveWsStateToCache()
 
 	shutdown()
 
@@ -1287,6 +1383,26 @@ onUnmounted(() => {
 @media screen and (min-width: 640px) {
 	.mobile-blurred-servericon::before {
 		display: none;
+	}
+}
+
+.server-panel-pending .server-stagger-item {
+	opacity: 0;
+}
+
+.server-panel-revealing .server-stagger-item {
+	animation: serverReveal 0.4s ease-out both;
+	animation-delay: calc(var(--si) * 80ms);
+}
+
+@keyframes serverReveal {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
 	}
 }
 </style>

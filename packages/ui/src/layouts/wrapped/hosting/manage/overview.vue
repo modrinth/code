@@ -56,8 +56,8 @@
 
 		<div class="flex flex-col-reverse gap-6 md:flex-col">
 			<ServerManageStats
-				:data="isConnected && !isWsAuthIncorrect ? stats : undefined"
-				:loading="!isConnected || isWsAuthIncorrect"
+				:data="!isWsAuthIncorrect ? stats : undefined"
+				:loading="isWsAuthIncorrect"
 			/>
 
 			<div class="flex h-[700px] flex-col gap-4">
