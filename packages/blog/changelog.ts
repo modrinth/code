@@ -11,6 +11,24 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-04T15:48:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed a missing gap between the project filter tabs and the project list.
+- Fixed collections not being sorted by date updated on the user page.
+
+## Security
+- Fixed a security issue.`,
+	},
+	{
+		date: `2026-04-03T16:45:00-07:00`,
+		product: 'app',
+		version: '0.12.6',
+		body: `## Fixed
+- Fixed dependencies of dependencies not being automatically installed.
+- Improved error modal if the app errors on initialization.`,
+	},
+	{
 		date: `2026-03-26T18:45:00-07:00`,
 		product: 'hosting',
 		body: `## Added
