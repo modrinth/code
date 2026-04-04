@@ -653,7 +653,7 @@ const serverBackUrl = computed(() => {
 	if (!serverData.value) return ''
 	const id = serverData.value.server_id
 	if (fromContext.value === 'onboarding') return `/hosting/manage/${id}?resumeModal=setup-type`
-	if (fromContext.value === 'reset-server') return `/hosting/manage/${id}/options/loader`
+	if (fromContext.value === 'reset-server') return `/hosting/manage/${id}?openSettings=installation`
 	return `/hosting/manage/${id}/content`
 })
 
@@ -692,7 +692,7 @@ async function onModpackFlowCreate(config: CreationFlowContextValue) {
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', currentServerId.value] })
 			navigateTo(`/hosting/manage/${currentServerId.value}/content`)
 		} else {
-			navigateTo(`/hosting/manage/${currentServerId.value}/options/loader`)
+			navigateTo(`/hosting/manage/${currentServerId.value}?openSettings=installation`)
 		}
 	} catch (e) {
 		handleError(new Error(`Error installing modpack: ${e}`))

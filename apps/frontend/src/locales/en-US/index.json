@@ -2777,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.busy.backup-creating": {
-    "message": "Backup creation in progress"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Backup restore in progress"
-  },
-  "servers.busy.installing": {
-    "message": "Server is installing"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Content sync in progress"
-  },
   "servers.notice.actions": {
     "message": "Actions"
   },

@@ -89,7 +89,7 @@ export const Provisioning: Story = {
 	args: {
 		...baseServer,
 		name: 'My New Server',
-		status: 'installing',
+		isProvisioning: true,
 	},
 }
 

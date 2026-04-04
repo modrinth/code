@@ -1,5 +1,5 @@
 <template>
-	<div class="relative h-full w-full select-none">
+	<div class="relative h-screen w-full select-none max-h-[min(70vh,750px)]">
 		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4">
 			<Admonition
 				v-if="hasNoProperties"
@@ -229,11 +229,15 @@
 		</div>
 
 		<SaveBanner
-			:is-visible="hasUnsavedChanges"
+			:is-visible="hasUnsavedChanges || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			restart
-			:save="() => saveProperties()"
+			:save="
+				async () => {
+					await saveProperties()
+				}
+			"
 			:reset="resetProperties"
 		/>
 	</div>
@@ -346,6 +350,7 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
+let previousSpawnProtection = '16'
 
 function syncFormFromData() {
 	if (!propsData.value) return
@@ -379,8 +384,6 @@ watch(
 watch(powerState, () => {
 	queryClient.invalidateQueries({ queryKey: queryKey.value })
 })
-
-let previousSpawnProtection = '16'
 
 const combinedGamemode = computed<CombinedGamemode>({
 	get() {
@@ -453,7 +456,7 @@ function buildPatch(): Archon.Content.v1.PatchPropertiesFields {
 	return patch
 }
 
-const { mutate: saveProperties, isPending: isUpdating } = useMutation({
+const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
 	mutationFn: () =>
 		client.archon.properties_v1.patchProperties(serverId, worldId.value!, buildPatch()),
 	onSuccess: async () => {

@@ -7,7 +7,7 @@
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
-					'hover:brightness-125': !isDisabled,
+					hoverable: !isDisabled,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"
@@ -74,7 +74,7 @@
 						:show-player-count="showPlayerCount"
 						:class="{ 'opacity-50': isDisabled }"
 						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
+						class="flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
 					/>
 				</div>
 			</div>
@@ -396,7 +396,7 @@ type ServerListingProps = {
 
 const props = defineProps<ServerListingProps>()
 
-const { kyros, labrinth } = injectModrinthClient()
+const { archon, kyros, labrinth } = injectModrinthClient()
 
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
@@ -514,11 +514,30 @@ const { data: image } = useQuery({
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			try {
-				const blob = await kyros.files_v0.downloadFile('/server-icon-original.png')
+			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
 
-				return await processImageBlob(blob, 512)
-			} catch {
+			try {
+				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+				return await processImageBlob(blob, 64)
+			} catch (error) {
+				const statusCode = (error as { statusCode?: number })?.statusCode
+				if (statusCode != null && statusCode !== 404) {
+					throw error
+				}
+
+				try {
+					const originalBlob = await kyros.files_v0.downloadFileWithAuth(
+						fsAuth,
+						'/server-icon-original.png',
+					)
+					return await processImageBlob(originalBlob, 64)
+				} catch (originalError) {
+					const originalStatusCode = (originalError as { statusCode?: number })?.statusCode
+					if (originalStatusCode != null && originalStatusCode !== 404) {
+						throw originalError
+					}
+				}
+
 				const projectIcon = iconUrl.value
 				if (projectIcon) {
 					const response = await fetch(projectIcon)
@@ -528,22 +547,23 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					kyros.files_v0.uploadFile('/server-icon.png', scaledFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					kyros.files_v0.uploadFile('/server-icon-original.png', originalFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
+						.promise
 
 					return scaledDataUrl
 				}
 			}
+
+			return null
 		} catch (error) {
 			console.debug('Icon processing failed:', error)
 			return null
 		}
-
-		return null
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
@@ -562,5 +582,9 @@ async function copyToClipboard(text: string) {
 <style scoped>
 .server-listing-notice {
 	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
+}
+
+.hoverable:hover:not(:has([data-subdomain-label]:hover)) {
+	filter: brightness(1.25);
 }
 </style>

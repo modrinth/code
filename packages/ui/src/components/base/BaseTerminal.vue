@@ -1,12 +1,31 @@
 <template>
 	<div
-		class="flex size-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
+		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
+		:style="
+			fullscreen && snappedHeight
+				? { maxHeight: snappedHeight + 'px' }
+				: !fullscreen && componentHeight
+					? { height: componentHeight + 'px' }
+					: {}
+		"
+		:class="{ 'h-full': fullscreen }"
 	>
-		<div class="relative min-h-0 pb-1 flex-1 overflow-hidden">
-			<div ref="containerRef" class="size-full pl-2" />
-			<div v-if="!isAtBottom" class="absolute bottom-4 right-4">
+		<div class="relative min-h-0 flex-1 overflow-hidden">
+			<div ref="containerRef" class="size-full pl-2 mt-0.5" />
+			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
-					<button class="!shadow-none" aria-label="Scroll to bottom" @click="scrollToBottom">
+					<button
+						class="!shadow-none"
+						aria-label="Exit fullscreen"
+						@click="emit('exit-fullscreen')"
+					>
+						<XIcon />
+					</button>
+				</ButtonStyled>
+			</div>
+			<div v-if="!isAtBottom" class="absolute bottom-4 right-4">
+				<ButtonStyled circular type="highlight" size="large">
+					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
 						<ChevronDownIcon />
 					</button>
 				</ButtonStyled>
@@ -14,6 +33,7 @@
 		</div>
 		<div
 			v-if="showInput"
+			ref="inputRef"
 			class="border-t border-solid border-b-0 border-x-0 border-surface-5 bg-surface-3 p-4"
 		>
 			<StyledInput
@@ -29,9 +49,9 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
+import { ChevronDownIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
-import { ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
@@ -41,27 +61,116 @@ const props = withDefaults(
 	defineProps<{
 		scrollback?: number
 		showInput?: boolean
+		fullscreen?: boolean
 	}>(),
 	{
 		scrollback: 10000,
 		showInput: false,
+		fullscreen: false,
 	},
 )
 
 const emit = defineEmits<{
 	command: [command: string]
 	ready: [terminal: Terminal]
+	'exit-fullscreen': []
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
+const inputRef = ref<HTMLElement | null>(null)
 const commandInput = ref('')
+const componentHeight = ref(0)
 
-const { terminal, searchAddon, isAtBottom, write, writeln, clear, reset, fit, scrollToBottom } =
-	useTerminal({
-		container: containerRef,
-		scrollback: props.scrollback,
-		onReady: (term) => emit('ready', term),
-	})
+const snappedHeight = ref<number | null>(null)
+
+const {
+	terminal,
+	searchAddon,
+	isAtBottom,
+	write,
+	writeln,
+	clear,
+	reset,
+	fit: rawFit,
+	scrollToBottom,
+} = useTerminal({
+	container: containerRef,
+	scrollback: props.scrollback,
+	onReady: (term) => {
+		nextTick(() => {
+			updateComponentHeight()
+			snapToRows()
+		})
+		emit('ready', term)
+	},
+	onResize: () => {
+		updateComponentHeight()
+	},
+})
+
+function snapToRows() {
+	if (!props.fullscreen) {
+		snappedHeight.value = null
+		return
+	}
+	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
+	if (!screen) {
+		snappedHeight.value = null
+		return
+	}
+	const inputH = inputRef.value?.offsetHeight ?? 0
+	const borderW = 2
+	snappedHeight.value = screen.offsetHeight + inputH + borderW
+}
+
+let resizeDebounce: ReturnType<typeof setTimeout> | null = null
+
+function handleWindowResize() {
+	if (!props.fullscreen) return
+	if (resizeDebounce) clearTimeout(resizeDebounce)
+	snappedHeight.value = null
+	resizeDebounce = setTimeout(() => {
+		rawFit()
+		nextTick(() => snapToRows())
+	}, 50)
+}
+
+onMounted(() => {
+	window.addEventListener('resize', handleWindowResize)
+})
+
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', handleWindowResize)
+	if (resizeDebounce) clearTimeout(resizeDebounce)
+})
+
+function fit() {
+	rawFit()
+	snapToRows()
+}
+
+watch(
+	() => props.fullscreen,
+	() => {
+		if (props.fullscreen) {
+			nextTick(() => {
+				rawFit()
+				nextTick(() => snapToRows())
+			})
+		} else {
+			snappedHeight.value = null
+		}
+	},
+)
+
+function updateComponentHeight() {
+	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
+	if (!screen) return
+	const screenH = screen.offsetHeight
+	const inputH = inputRef.value?.offsetHeight ?? 0
+	const borderW = 2
+	componentHeight.value = screenH + inputH + borderW
+}
 
 const submitCommand = () => {
 	const cmd = commandInput.value.trim()
@@ -89,13 +198,18 @@ defineExpose({
 	height: 100% !important;
 }
 
-.xterm .xterm-scrollable-element {
-	height: 100% !important;
-}
-
 .xterm .xterm-screen {
-	min-height: 100% !important;
 	margin-left: auto !important;
 	margin-right: auto !important;
+}
+
+.xterm-scrollable-element > .scrollbar.vertical {
+	width: 8px !important;
+}
+
+.xterm-scrollable-element > .scrollbar.vertical > div {
+	width: 6px !important;
+	border-radius: 8px !important;
+	contain: layout style !important;
 }
 </style>

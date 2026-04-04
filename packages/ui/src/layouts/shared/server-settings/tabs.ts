@@ -31,7 +31,7 @@ export interface ServerSettingsTabDefinition {
 	id: ServerSettingsTabId
 	label: string
 	icon: Component
-	href: (ctx: ServerSettingsTabContext) => string
+	href?: (ctx: ServerSettingsTabContext) => string
 	external?: boolean
 	shown?: (ctx: ServerSettingsTabContext) => boolean
 }
@@ -41,32 +41,27 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		id: 'general',
 		label: 'General',
 		icon: SettingsIcon,
-		href: ({ serverId }) => `/hosting/manage/${serverId}/options`,
 	},
 	{
 		id: 'installation',
 		label: 'Installation',
 		icon: WrenchIcon,
-		href: ({ serverId }) => `/hosting/manage/${serverId}/options/loader`,
 	},
 	{
 		id: 'network',
 		label: 'Network',
 		icon: VersionIcon,
-		href: ({ serverId }) => `/hosting/manage/${serverId}/options/network`,
 	},
 	{
 		id: 'properties',
 		label: 'Properties',
 		icon: ListIcon,
-		href: ({ serverId }) => `/hosting/manage/${serverId}/options/properties`,
 		shown: ({ serverStatus }) => serverStatus !== 'installing',
 	},
 	{
 		id: 'advanced',
 		label: 'Advanced',
 		icon: TextQuoteIcon,
-		href: ({ serverId }) => `/hosting/manage/${serverId}/options/advanced`,
 	},
 	{
 		id: 'billing',
@@ -85,14 +80,3 @@ export const serverSettingsTabDefinitions: ServerSettingsTabDefinition[] = [
 		shown: ({ isAdmin }) => isAdmin,
 	},
 ]
-
-export function getServerSettingsNavLinks(ctx: ServerSettingsTabContext) {
-	return serverSettingsTabDefinitions.map((tab) => ({
-		id: tab.id,
-		icon: tab.icon,
-		label: tab.label,
-		href: tab.href(ctx),
-		external: tab.external,
-		shown: tab.shown ? tab.shown(ctx) : true,
-	}))
-}

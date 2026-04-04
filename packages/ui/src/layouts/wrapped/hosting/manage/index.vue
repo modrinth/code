@@ -51,9 +51,7 @@
 						<li>
 							<IntlFormatted :message-id="messages.errorQueueNotice">
 								<template #warning="{ children }">
-									<span class="font-medium text-contrast"
-										><component :is="() => children"
-									/></span>
+									<span class="font-medium text-contrast"><component :is="() => children" /></span>
 								</template>
 							</IntlFormatted>
 						</li>
@@ -71,9 +69,9 @@
 					</ul>
 				</div>
 				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com"
-						>{{ formatMessage(messages.contactSupportButton) }}</AutoLink
-					>
+					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com">{{
+						formatMessage(messages.contactSupportButton)
+					}}</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled size="large" @click="() => router.go(0)">
 					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
@@ -82,7 +80,11 @@
 		</div>
 
 		<Transition v-else name="fade" mode="out-in">
-			<div v-if="isLoading && !serverResponse" key="loading" class="flex flex-col gap-4 py-8">
+			<div
+				v-if="(isLoading || !authReady) && !serverResponse"
+				key="loading"
+				class="flex flex-col gap-4 py-8"
+			>
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
@@ -116,7 +118,9 @@
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
-					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">{{ formatMessage(messages.serversTitle) }}</h1>
+					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
+						{{ formatMessage(messages.serversTitle) }}
+					</h1>
 					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
 						<StyledInput
 							id="search"
@@ -125,7 +129,9 @@
 							type="search"
 							name="search"
 							autocomplete="off"
-							:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
+							:placeholder="
+								formatMessage(messages.searchPlaceholder, { count: filteredData.length })
+							"
 							wrapper-class="w-full md:w-72"
 						/>
 						<ButtonStyled type="standard" color="brand">
@@ -233,6 +239,7 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
+const authReady = computed(() => auth.isReady?.value ?? true)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -542,9 +549,16 @@ const fuse = computed(() => {
 	})
 })
 
-function introToTop(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
+function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
 	return array.slice().sort((a, b) => {
-		return Number(b.flows?.intro) - Number(a.flows?.intro)
+		const aSuspended = a.status === 'suspended' ? 1 : 0
+		const bSuspended = b.status === 'suspended' ? 1 : 0
+		if (aSuspended !== bSuspended) return aSuspended - bSuspended
+
+		const introDiff = Number(b.flows?.intro) - Number(a.flows?.intro)
+		if (introDiff !== 0) return introDiff
+
+		return (a.name || '').localeCompare(b.name || '')
 	})
 }
 
@@ -560,9 +574,9 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
 	const base = !searchInput.value.trim()
-		? introToTop(serverList.value)
+		? sortServers(serverList.value)
 		: fuse.value
-			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			? sortServers(fuse.value.search(searchInput.value).map((result) => result.item))
 			: []
 	return base.filter((server) => !filesExpired(server))
 })

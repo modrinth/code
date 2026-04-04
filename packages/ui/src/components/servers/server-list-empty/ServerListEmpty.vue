@@ -1,7 +1,7 @@
 <template>
-	<div class="flex gap-8 items-center justify-center py-10">
+	<div class="grid grid-cols-2 gap-8 items-center justify-center py-10 max-w-[760px]">
 		<!-- Left column -->
-		<div class="flex flex-col gap-8 items-start pr-8 shrink-0 w-[380px]">
+		<div class="flex flex-col gap-8 items-start pr-8 shrink-0">
 			<!-- Heading -->
 			<div class="flex flex-col gap-2 items-start w-[300px]">
 				<p class="text-sm text-secondary">{{ formatMessage(messages.modrinthHostingLabel) }}</p>
@@ -65,7 +65,7 @@
 			</div>
 
 			<!-- CTA section -->
-			<div class="flex flex-col gap-6 items-start w-[300px]">
+			<div class="flex flex-col gap-6 items-start">
 				<div class="flex flex-col gap-3 items-start">
 					<ButtonStyled color="brand">
 						<button @click="onClickNewServer?.()">
@@ -104,7 +104,7 @@
 
 		<!-- Right column - mod icon grid -->
 		<div
-			class="relative flex h-[617px] w-[380px] shrink-0 items-center justify-center overflow-hidden rounded-[40px] pointer-events-none select-none [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)]"
+			class="relative flex h-[617px] shrink-0 items-center justify-center overflow-hidden rounded-[40px] pointer-events-none select-none [mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_35%,transparent_100%)]"
 		>
 			<div class="rotate-[15deg]">
 				<div class="flex flex-col gap-4">

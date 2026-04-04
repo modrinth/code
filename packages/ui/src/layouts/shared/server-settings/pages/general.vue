@@ -68,38 +68,7 @@
 						</div>
 					</div>
 
-					<!-- Server icon -->
-					<div v-if="!data.is_medal" class="flex flex-col gap-2.5">
-						<span class="text-lg font-semibold text-contrast">Icon</span>
-						<div class="group relative w-fit">
-							<OverflowMenu
-								v-tooltip="'Edit icon'"
-								class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
-								:options="[
-									{
-										id: 'upload',
-										action: () => triggerFileInput(),
-									},
-									{
-										id: 'sync',
-										action: () => resetIcon(),
-									},
-								]"
-							>
-								<ServerIcon
-									class="size-24 transition-[filter] group-hover:brightness-75"
-									:image="icon"
-								/>
-								<div class="absolute right-0 top-0 m-1">
-									<div class="flex items-center justify-center rounded-full bg-button-bg p-1.5">
-										<EditIcon aria-hidden="true" class="h-4 w-4 text-contrast" />
-									</div>
-								</div>
-								<template #upload> <UploadIcon /> Upload icon </template>
-								<template #sync> <TransferIcon /> Sync icon </template>
-							</OverflowMenu>
-						</div>
-					</div>
+					<EditServerIcon v-if="!data.is_medal" />
 				</div>
 
 				<!-- preferences -->
@@ -148,7 +117,7 @@
 		</div>
 		<div v-else />
 		<SaveBanner
-			:is-visible="!!hasUnsavedChanges && !!isValidServerName"
+			:is-visible="(!!hasUnsavedChanges && !!isValidServerName) || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			:save="saveGeneral"
@@ -158,12 +127,12 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
-import { CopyCode, OverflowMenu, ServerIcon, StyledInput, Toggle } from '#ui/components'
+import { CopyCode, StyledInput, Toggle } from '#ui/components'
+import EditServerIcon from '#ui/components/servers/edit-server-icon/EditServerIcon.vue'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
 import {
 	injectModrinthClient,
@@ -184,7 +153,6 @@ const isValidCharsSubdomain = computed(
 	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
 )
 const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidCharsSubdomain.value)
-const icon = ref<string | undefined>(undefined)
 
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
@@ -315,112 +283,5 @@ const resetGeneral = () => {
 	serverName.value = data.value?.name || ''
 	serverSubdomain.value = data.value?.net?.domain ?? ''
 	newUserPreferences.value = { ...userPreferences.value }
-}
-
-const uploadFile = async (e: Event) => {
-	const file = (e.target as HTMLInputElement).files?.[0]
-	if (!file) {
-		addNotification({
-			type: 'error',
-			title: 'No file selected',
-			text: 'Please select a file to upload.',
-		})
-		return
-	}
-
-	const scaledFile = await new Promise<File>((resolve, reject) => {
-		const canvas = document.createElement('canvas')
-		const ctx = canvas.getContext('2d')
-		const img = new Image()
-		img.onload = () => {
-			canvas.width = 64
-			canvas.height = 64
-			ctx?.drawImage(img, 0, 0, 64, 64)
-			canvas.toBlob((blob) => {
-				if (blob) {
-					resolve(new File([blob], 'server-icon.png', { type: 'image/png' }))
-				} else {
-					reject(new Error('Canvas toBlob failed'))
-				}
-			}, 'image/png')
-			URL.revokeObjectURL(img.src)
-		}
-		img.onerror = reject
-		img.src = URL.createObjectURL(file)
-	})
-
-	try {
-		if (icon.value) {
-			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
-			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
-		}
-
-		await client.kyros.files_v0.uploadFile('/server-icon.png', scaledFile).promise
-		await client.kyros.files_v0.uploadFile('/server-icon-original.png', file).promise
-
-		const canvas = document.createElement('canvas')
-		const ctx = canvas.getContext('2d')
-		const img = new Image()
-		await new Promise<void>((resolve) => {
-			img.onload = () => {
-				canvas.width = 512
-				canvas.height = 512
-				ctx?.drawImage(img, 0, 0, 512, 512)
-				const dataURL = canvas.toDataURL('image/png')
-				icon.value = dataURL
-				resolve()
-				URL.revokeObjectURL(img.src)
-			}
-			img.src = URL.createObjectURL(file)
-		})
-
-		addNotification({
-			type: 'success',
-			title: 'Server icon updated',
-			text: 'Your server icon was successfully changed.',
-		})
-	} catch (error) {
-		console.error('Error uploading icon:', error)
-		addNotification({
-			type: 'error',
-			title: 'Upload failed',
-			text: 'Failed to upload server icon.',
-		})
-	}
-}
-
-const resetIcon = async () => {
-	if (icon.value) {
-		try {
-			await client.kyros.files_v0.deleteFileOrFolder('/server-icon.png', false)
-			await client.kyros.files_v0.deleteFileOrFolder('/server-icon-original.png', false)
-
-			icon.value = undefined
-
-			await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
-
-			addNotification({
-				type: 'success',
-				title: 'Server icon reset',
-				text: 'Your server icon was successfully reset.',
-			})
-		} catch (error) {
-			console.error('Error resetting icon:', error)
-			addNotification({
-				type: 'error',
-				title: 'Reset failed',
-				text: 'Failed to reset server icon.',
-			})
-		}
-	}
-}
-
-const triggerFileInput = () => {
-	const input = document.createElement('input')
-	input.type = 'file'
-	input.id = 'server-icon-field'
-	input.accept = 'image/png,image/jpeg,image/gif,image/webp'
-	input.onchange = uploadFile
-	input.click()
 }
 </script>

@@ -29,11 +29,15 @@
 			</template>
 
 			<template #extra-modals>
-				<ServerSetupModal
-					ref="setupModal"
-					@reinstall="onReinstall"
-					@browse-modpacks="onBrowseModpacks"
-				/>
+				<Teleport to="body">
+					<div class="relative z-[100]">
+						<ServerSetupModal
+							ref="setupModal"
+							@reinstall="onReinstall"
+							@browse-modpacks="onBrowseModpacks"
+						/>
+					</div>
+				</Teleport>
 			</template>
 		</InstallationSettingsLayout>
 
@@ -167,7 +171,7 @@ const messages = defineMessages({
 })
 
 const emit = defineEmits<{
-	reinstall: [any?]
+	reinstall: [unknown?]
 	'reinstall-failed': []
 }>()
 
@@ -766,9 +770,10 @@ watch(
 	},
 )
 
-function onReinstall(event?: any) {
+function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
 	emit('reinstall', event)
+	serverSettings.closeModal?.()
 }
 
 function onBrowseModpacks() {
@@ -796,6 +801,7 @@ async function confirmResetToOnboarding() {
 			title: formatMessage(messages.resetToOnboardingSuccessTitle),
 			text: formatMessage(messages.resetToOnboardingSuccessDescription),
 		})
+		serverSettings.closeModal?.()
 	} catch (err) {
 		addNotification({
 			type: 'error',

@@ -343,7 +343,7 @@ import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
-import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()

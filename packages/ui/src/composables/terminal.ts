@@ -54,6 +54,7 @@ function buildTerminalTheme() {
 		scrollbarSliderBackground: surface5,
 		scrollbarSliderHoverBackground: surface5,
 		scrollbarSliderActiveBackground: surface5,
+		overviewRulerBorder: 'transparent',
 	}
 }
 
@@ -62,6 +63,7 @@ export interface UseTerminalOptions {
 	options?: ITerminalOptions
 	scrollback?: number
 	onReady?: (terminal: Terminal) => void
+	onResize?: () => void
 }
 
 export interface UseTerminalReturn {
@@ -85,6 +87,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 
 	let resizeObserver: ResizeObserver | null = null
 	let themeObserver: MutationObserver | null = null
+	let wheelHandler: ((e: WheelEvent) => void) | null = null
 	let hasWritten = false
 	const pendingWrites: Array<{ data: string; newline: boolean }> = []
 
@@ -126,7 +129,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		if (!fa || !term) return
 		const dims = fa.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 	}
 
@@ -183,11 +186,16 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		await nextTick()
 		const dims = fit.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 
 		term.options.disableStdin = true
 		term.write('\x1b[?25l')
+
+		wheelHandler = (e: WheelEvent) => {
+			e.preventDefault()
+		}
+		container.addEventListener('wheel', wheelHandler, { passive: false })
 
 		term.onScroll(() => checkIfAtBottom())
 		term.onWriteParsed(() => {
@@ -212,8 +220,9 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		resizeObserver = new ResizeObserver(() => {
 			const d = fit.proposeDimensions()
 			if (d) {
-				term.resize(d.cols, d.rows + 1)
+				term.resize(d.cols, d.rows)
 			}
+			options.onResize?.()
 		})
 		resizeObserver.observe(container)
 
@@ -229,6 +238,10 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 	})
 
 	onBeforeUnmount(() => {
+		if (wheelHandler && options.container.value) {
+			options.container.value.removeEventListener('wheel', wheelHandler)
+			wheelHandler = null
+		}
 		resizeObserver?.disconnect()
 		resizeObserver = null
 		themeObserver?.disconnect()

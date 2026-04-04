@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts" generic="T">
-import { MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
+import { ChevronDownIcon, MessageIcon, ReplyIcon, SendIcon } from '@modrinth/assets'
 import type { QuickReply } from '@modrinth/moderation'
 import {
 	ButtonStyled,
@@ -90,7 +90,6 @@ import dayjs from 'dayjs'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { isStaff } from '~/helpers/users.js'
 
-import ChevronDownIcon from '../servers/icons/ChevronDownIcon.vue'
 import ThreadMessage from './ThreadMessage.vue'
 
 const { addNotification } = injectNotificationManager()
