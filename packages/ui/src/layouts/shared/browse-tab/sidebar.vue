@@ -1,0 +1,176 @@
+<script setup lang="ts">
+import { InfoIcon, XIcon } from '@modrinth/assets'
+import { computed } from 'vue'
+
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import Checkbox from '#ui/components/base/Checkbox.vue'
+import SearchSidebarFilter from '#ui/components/search/SearchSidebarFilter.vue'
+
+import { injectBrowseManager } from './providers/browse-manager'
+
+const ctx = injectBrowseManager()
+
+const isApp = computed(() => ctx.variant === 'app')
+
+const filterClass = computed(() => {
+	if (isApp.value) {
+		return 'border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
+	}
+	if (ctx.filtersMenuOpen?.value) {
+		return 'border-0 border-b-[1px] border-solid border-divider last:border-b-0'
+	}
+	return 'card-shadow rounded-2xl bg-bg-raised'
+})
+
+const buttonClass = computed(() => {
+	if (isApp.value) {
+		return 'button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg'
+	}
+	return 'button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none'
+})
+
+const contentClass = computed(() => (isApp.value ? 'mb-3' : 'mb-4 mx-3'))
+const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
+
+function getFilterOpenByDefault(filterId: string): boolean {
+	if (ctx.isServerType.value) {
+		return ![
+			'server_category_minecraft_server_meta',
+			'server_category_minecraft_server_community',
+			'server_game_version',
+			'server_status',
+		].includes(filterId)
+	}
+	if (isApp.value) {
+		return filterId.startsWith('category') || filterId === 'environment' || filterId === 'license'
+	}
+	if (
+		ctx.lockedFilterMessages?.gameVersionShaderMessage &&
+		ctx.projectType.value === 'shader' &&
+		filterId === 'game_version'
+	) {
+		return false
+	}
+	return true
+}
+</script>
+
+<template>
+	<slot name="prepend" />
+
+	<div v-if="ctx.filtersMenuOpen?.value" class="fixed inset-0 z-40 bg-bg" />
+
+	<div
+		class="flex flex-col"
+		:class="{
+			'gap-3': !isApp,
+			'fixed inset-0 z-50 m-4 mb-0 overflow-auto rounded-t-3xl bg-bg-raised':
+				ctx.filtersMenuOpen?.value,
+		}"
+	>
+		<div
+			v-if="ctx.filtersMenuOpen?.value"
+			class="sticky top-0 z-10 mx-1 flex items-center justify-between gap-3 border-0 border-b-[1px] border-solid border-divider bg-bg-raised px-6 py-4"
+		>
+			<h3 class="m-0 text-lg text-contrast">Filters</h3>
+			<ButtonStyled circular>
+				<button
+					@click="
+						() => {
+							ctx.filtersMenuOpen!.value = false
+							window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+						}
+					"
+				>
+					<XIcon />
+				</button>
+			</ButtonStyled>
+		</div>
+
+		<div
+			v-if="ctx.showHideInstalled?.value"
+			:class="
+				isApp
+					? 'border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid'
+					: 'card-shadow rounded-2xl bg-bg-raised p-4'
+			"
+		>
+			<Checkbox
+				v-model="ctx.hideInstalled!.value"
+				:label="ctx.hideInstalledLabel?.value ?? 'Hide installed content'"
+				class="filter-checkbox"
+				@update:model-value="ctx.onFilterChange()"
+				@click.prevent.stop
+			/>
+		</div>
+
+		<template v-if="ctx.isServerType.value">
+			<SearchSidebarFilter
+				v-for="filterType in ctx.serverFilterTypes.value.filter((f) => f.options.length > 0)"
+				:key="`server-filter-${filterType.id}`"
+				v-model:selected-filters="ctx.serverCurrentFilters.value"
+				v-model:toggled-groups="ctx.serverToggledGroups.value"
+				:provided-filters="[]"
+				:filter-type="filterType"
+				:class="filterClass"
+				:button-class="buttonClass"
+				:content-class="contentClass"
+				:inner-panel-class="innerPanelClass"
+				:open-by-default="getFilterOpenByDefault(filterType.id)"
+			>
+				<template #header>
+					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg'">
+						{{ filterType.formatted_name }}
+					</h3>
+				</template>
+			</SearchSidebarFilter>
+		</template>
+		<template v-else>
+			<SearchSidebarFilter
+				v-for="filter in ctx.filters.value.filter((f) => f.display !== 'none')"
+				:key="`filter-${filter.id}`"
+				v-model:selected-filters="ctx.currentFilters.value"
+				v-model:toggled-groups="ctx.toggledGroups.value"
+				v-model:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
+				:provided-filters="ctx.providedFilters?.value ?? []"
+				:filter-type="filter"
+				:class="filterClass"
+				:button-class="buttonClass"
+				:content-class="contentClass"
+				:inner-panel-class="innerPanelClass"
+				:open-by-default="getFilterOpenByDefault(filter.id)"
+			>
+				<template #header>
+					<h3 :class="isApp ? 'text-base m-0' : 'm-0 text-lg'">
+						{{ filter.formatted_name }}
+					</h3>
+				</template>
+				<template
+					v-if="
+						ctx.lockedFilterMessages?.gameVersionShaderMessage &&
+						ctx.projectType.value === 'shader' &&
+						filter.id === 'game_version'
+					"
+					#prefix
+				>
+					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
+						<InfoIcon class="mt-1 size-4" />
+						<span>{{ ctx.lockedFilterMessages.gameVersionShaderMessage }}</span>
+					</div>
+				</template>
+				<template v-if="ctx.lockedFilterMessages?.gameVersion" #locked-game_version>
+					{{ ctx.lockedFilterMessages.gameVersion }}
+				</template>
+				<template v-if="ctx.lockedFilterMessages?.modLoader" #locked-mod_loader>
+					{{ ctx.lockedFilterMessages.modLoader }}
+				</template>
+				<template v-if="ctx.lockedFilterMessages?.environment" #locked-environment>
+					{{ ctx.lockedFilterMessages.environment }}
+				</template>
+				<template v-if="ctx.lockedFilterMessages?.syncButton" #sync-button>
+					{{ ctx.lockedFilterMessages.syncButton }}
+				</template>
+			</SearchSidebarFilter>
+		</template>
+	</div>
+</template>
