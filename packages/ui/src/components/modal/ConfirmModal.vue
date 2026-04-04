@@ -30,17 +30,17 @@
 				placeholder="Type here..."
 				wrapper-class="max-w-[20rem]"
 			/>
-			<div class="flex gap-2">
+			<div class="flex gap-2 justify-end">
+				<ButtonStyled>
+					<button @click="hide()" class="!shadow-none">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
 				<ButtonStyled :color="danger ? 'red' : 'brand'">
 					<button :disabled="action_disabled" @click="proceed">
 						<component :is="proceedIcon" />
 						{{ proceedLabel }}
-					</button>
-				</ButtonStyled>
-				<ButtonStyled>
-					<button @click="hide()">
-						<XIcon />
-						Cancel
 					</button>
 				</ButtonStyled>
 			</div>
