@@ -208,7 +208,7 @@ export default defineNuxtConfig({
 		rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
 		pyroBaseUrl: process.env.PYRO_BASE_URL,
 		intercomIdentitySecret:
-			process.env.INTERCOM_IDENTITY_SECRET ||
+			process.env.INTERCOM_IDENTITY_SECRET ??
 			// @ts-ignore
 			globalThis.INTERCOM_IDENTITY_SECRET,
 		public: {
