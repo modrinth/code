@@ -229,7 +229,7 @@
 		</div>
 
 		<SaveBanner
-			:is-visible="hasUnsavedChanges"
+			:is-visible="hasUnsavedChanges || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			restart

@@ -117,7 +117,7 @@
 		</div>
 		<div v-else />
 		<SaveBanner
-			:is-visible="!!hasUnsavedChanges && !!isValidServerName"
+			:is-visible="(!!hasUnsavedChanges && !!isValidServerName) || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			:save="saveGeneral"
