@@ -53,7 +53,7 @@ const route = useRoute()
 const cosmetics = useCosmetics()
 const tags = useGeneratedState()
 const flags = useFeatureFlags()
-const auth = useAuth()
+const auth = await useAuth()
 
 const { handleError } = injectNotificationManager()
 
@@ -528,21 +528,6 @@ const serverBackUrl = computed(() => {
 	return `/hosting/manage/${id}/content`
 })
 
-const ogTitle = computed(
-	() =>
-		`Search ${projectType.value?.display ?? 'project'}s${searchState.query.value ? ' | ' + searchState.query.value : ''}`,
-)
-const description = computed(
-	() =>
-		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
-)
-
-useSeoMeta({
-	description,
-	ogTitle,
-	ogDescription: description,
-})
-
 const messages = defineMessages({
 	gameVersionProvidedByServer: {
 		id: 'search.filter.locked.server-game-version.title',
@@ -588,6 +573,21 @@ const searchState = useBrowseSearch({
 
 debug('calling initial refreshSearch')
 searchState.refreshSearch()
+
+const ogTitle = computed(
+	() =>
+		`Search ${projectType.value?.display ?? 'project'}s${searchState.query.value ? ' | ' + searchState.query.value : ''}`,
+)
+const description = computed(
+	() =>
+		`Search and browse thousands of Minecraft ${projectType.value?.display ?? 'project'}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value?.display ?? 'project'}s.`,
+)
+
+useSeoMeta({
+	description,
+	ogTitle,
+	ogDescription: description,
+})
 
 debug('calling provideBrowseManager')
 provideBrowseManager({
