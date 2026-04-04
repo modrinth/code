@@ -2846,6 +2846,9 @@
   "servers.manage.loading-servers": {
     "defaultMessage": "Loading your servers..."
   },
+  "servers.manage.loading.serverPanel": {
+    "defaultMessage": "Loading your server panel..."
+  },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
   },

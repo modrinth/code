@@ -233,7 +233,11 @@
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			restart
-			:save="async () => { await saveProperties() }"
+			:save="
+				async () => {
+					await saveProperties()
+				}
+			"
 			:reset="resetProperties"
 		/>
 	</div>

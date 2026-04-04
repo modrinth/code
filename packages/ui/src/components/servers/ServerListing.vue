@@ -7,7 +7,7 @@
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
 					'active:scale-95': !isDisabled && !hasNotice,
-					'hoverable': !isDisabled,
+					hoverable: !isDisabled,
 				}"
 				data-pyro-server-listing
 				:data-pyro-server-listing-id="server_id"

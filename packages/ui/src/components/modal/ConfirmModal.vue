@@ -32,7 +32,7 @@
 			/>
 			<div class="flex gap-2 justify-end">
 				<ButtonStyled>
-					<button @click="hide()" class="!shadow-none">
+					<button class="!shadow-none" @click="hide()">
 						<XIcon />
 						Cancel
 					</button>

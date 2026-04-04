@@ -326,7 +326,6 @@
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
 import { ModrinthApiError } from '@modrinth/api-client'
-import type { Stats } from '@modrinth/utils'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -343,6 +342,7 @@ import {
 	TransferIcon,
 	TriangleAlertIcon,
 } from '@modrinth/assets'
+import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
@@ -363,7 +363,12 @@ import {
 	ServerManageHeader,
 } from '#ui/components/servers/server-header'
 import ServerSettingsModal from '#ui/components/servers/ServerSettingsModal.vue'
-import { useDebugLogger, useModrinthServersConsole, useServerImage, useServerProject } from '#ui/composables'
+import {
+	useDebugLogger,
+	useModrinthServersConsole,
+	useServerImage,
+	useServerProject,
+} from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
@@ -1251,14 +1256,16 @@ function initializeServer() {
 				client.archon.sockets.on(targetServerId, 'filesystem-ops', handleFilesystemOps),
 				client.archon.sockets.on(targetServerId, 'new-mod', handleNewMod),
 			],
-		}).then((connected) => {
-			if (connected && cachedWsState?.consoleLines?.length) {
-				modrinthServersConsole.clear()
-				modrinthServersConsole.addLines(cachedWsState.consoleLines)
-			}
-		}).finally(() => {
-			isLoading.value = false
 		})
+			.then((connected) => {
+				if (connected && cachedWsState?.consoleLines?.length) {
+					modrinthServersConsole.clear()
+					modrinthServersConsole.addLines(cachedWsState.consoleLines)
+				}
+			})
+			.finally(() => {
+				isLoading.value = false
+			})
 	}
 
 	if (serverData.value?.flows?.intro && serverProject.value) {

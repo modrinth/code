@@ -93,6 +93,7 @@ import {
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { useModalStack } from '#ui/composables/modal-stack.ts'
+
 import { injectNotificationManager, type WebNotification } from '../../providers'
 import ButtonStyled from '../base/ButtonStyled.vue'
 
