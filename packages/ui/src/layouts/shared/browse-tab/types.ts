@@ -1,0 +1,42 @@
+import type { Labrinth } from '@modrinth/api-client'
+import type { Component } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
+
+export interface BrowseSearchResponse {
+	projectHits: (Labrinth.Search.v2.ResultSearchProject & {
+		installed?: boolean
+		installing?: boolean
+	})[]
+	serverHits: Labrinth.Search.v3.ResultSearchProject[]
+	total_hits: number
+	per_page: number
+}
+
+export interface BrowseInstallContext {
+	name: string
+	subtitle?: string
+	iconUrl?: string | null
+	iconComponent?: Component
+	backUrl: string | RouteLocationRaw
+	backLabel: string
+	heading: string
+}
+
+export interface CardAction {
+	key: string
+	label: string
+	icon: Component
+	disabled?: boolean
+	color?: 'brand' | 'red'
+	type?: 'standard' | 'outlined' | 'transparent'
+	circular?: boolean
+	tooltip?: string
+	onClick: () => void | Promise<void>
+}
+
+export interface ServerModpackContent {
+	name: string
+	icon?: string
+	onclick?: () => void
+	showCustomModpackTooltip: boolean
+}
