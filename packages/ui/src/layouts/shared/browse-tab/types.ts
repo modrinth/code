@@ -28,7 +28,7 @@ export interface CardAction {
 	icon: Component
 	disabled?: boolean
 	color?: 'brand' | 'red'
-	type?: 'outlined' | 'filled' | 'transparent'
+	type?: 'standard' | 'outlined' | 'transparent'
 	circular?: boolean
 	tooltip?: string
 	onClick: () => void | Promise<void>
@@ -36,7 +36,7 @@ export interface CardAction {
 
 export interface ServerModpackContent {
 	name: string
-	icon?: string | null
+	icon?: string
 	onclick?: () => void
 	showCustomModpackTooltip: boolean
 }

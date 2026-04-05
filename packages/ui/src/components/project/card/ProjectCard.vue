@@ -190,6 +190,7 @@
 
 <script setup lang="ts">
 import type { ProjectStatus } from '@modrinth/utils'
+import type { RouteLocationRaw } from 'vue-router'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
 
@@ -217,7 +218,7 @@ defineEmits<{
 
 const props = defineProps<{
 	layout: 'list' | 'grid'
-	link?: string | (() => void)
+	link?: string | RouteLocationRaw | (() => void)
 	iconUrl?: string
 	title: string
 	author?: {

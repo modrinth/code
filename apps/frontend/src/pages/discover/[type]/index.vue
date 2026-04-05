@@ -351,7 +351,7 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 		if (!project_name) return undefined
 		return {
 			name: project_name,
-			icon: project_icon,
+			icon: project_icon ?? undefined,
 			onclick:
 				project_id !== project.project_id ? () => navigateTo(`/project/${project_id}`) : undefined,
 			showCustomModpackTooltip: project_id === project.project_id,
@@ -579,9 +579,10 @@ provideBrowseManager({
 	tags,
 	projectType: projectTypeId,
 	...searchState,
-	getProjectLink: (result) =>
+	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) =>
 		`/${projectType.value?.id ?? 'project'}/${result.slug ? result.slug : result.project_id}`,
-	getServerProjectLink: (result) => `/server/${result.slug ?? result.project_id}`,
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
+		`/server/${result.slug ?? result.project_id}`,
 	selectableProjectTypes: computed(() => []),
 	showProjectTypeTabs: computed(() => false),
 	variant: 'web',

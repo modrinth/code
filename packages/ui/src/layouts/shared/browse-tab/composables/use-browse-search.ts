@@ -4,7 +4,7 @@ import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
-import type { FilterType, FilterValue, SortType } from '#ui/utils/search'
+import type { FilterType, FilterValue, ProjectType, SortType } from '#ui/utils/search'
 import { useSearch } from '#ui/utils/search'
 import { useServerSearch } from '#ui/utils/server-search'
 
@@ -75,7 +75,7 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 
 	debug('init, projectType:', options.projectType.value)
 
-	const projectTypes = computed(() => [options.projectType.value])
+	const projectTypes = computed(() => [options.projectType.value] as ProjectType[])
 	const isServerType = computed(() => options.projectType.value === 'server')
 
 	const {

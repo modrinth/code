@@ -11,7 +11,14 @@ import { injectBrowseManager } from './providers/browse-manager'
 const ctx = injectBrowseManager()
 
 const isApp = computed(() => ctx.variant === 'app')
-const lockedMessages = computed(() => toValue(lockedMessages))
+const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
+
+function closeFiltersMenu() {
+	if (ctx.filtersMenuOpen) {
+		ctx.filtersMenuOpen.value = false
+	}
+	window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+}
 
 const filterClass = computed(() => {
 	if (isApp.value) {
@@ -46,7 +53,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		return filterId.startsWith('category') || filterId === 'environment' || filterId === 'license'
 	}
 	if (
-		lockedMessages?.gameVersionShaderMessage &&
+		lockedMessages.value?.gameVersionShaderMessage &&
 		ctx.projectType.value === 'shader' &&
 		filterId === 'game_version'
 	) {
@@ -75,14 +82,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		>
 			<h3 class="m-0 text-lg text-contrast">Filters</h3>
 			<ButtonStyled circular>
-				<button
-					@click="
-						() => {
-							ctx.filtersMenuOpen!.value = false
-							window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-						}
-					"
-				>
+				<button @click="closeFiltersMenu">
 					<XIcon />
 				</button>
 			</ButtonStyled>

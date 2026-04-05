@@ -533,7 +533,7 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 		if (!project_name) return undefined
 		return {
 			name: project_name,
-			icon: project_icon,
+			icon: project_icon ?? undefined,
 			onclick:
 				project_id !== project.project_id
 					? () => {
@@ -649,7 +649,8 @@ function getCardActions(
 	}
 
 	// Non-server project actions
-	const projectResult = result as Labrinth.Search.v2.ResultSearchProject & {
+	const projectResult = result as (Labrinth.Search.v2.ResultSearchProject &
+		Labrinth.Search.v3.ResultSearchProject) & {
 		installed?: boolean
 		installing?: boolean
 	}
@@ -854,11 +855,12 @@ provideBrowseManager({
 	tags,
 	projectType,
 	...searchState,
-	getProjectLink: (result) => ({
+	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
 		path: `/project/${result.project_id ?? result.slug}`,
 		query: instance.value ? { i: instance.value.path } : undefined,
 	}),
-	getServerProjectLink: (result) => `/project/${result.slug ?? result.project_id}`,
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
+		`/project/${result.slug ?? result.project_id}`,
 	selectableProjectTypes,
 	showProjectTypeTabs: computed(() => !isServerContext.value),
 	variant: 'app',
