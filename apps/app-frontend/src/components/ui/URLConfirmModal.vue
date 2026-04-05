@@ -3,7 +3,7 @@ import { Button, injectNotificationManager, ProjectCard } from '@modrinth/ui'
 import { ref } from 'vue'
 
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
-import { get_project, get_version } from '@/helpers/cache.js'
+import { get_project_v3, get_version } from '@/helpers/cache.js'
 import { injectContentInstall } from '@/providers/content-install'
 
 const { handleError } = injectNotificationManager()
@@ -18,11 +18,11 @@ defineExpose({
 	async show(event) {
 		if (event.event === 'InstallVersion') {
 			version.value = await get_version(event.id, 'must_revalidate').catch(handleError)
-			project.value = await get_project(version.value.project_id, 'must_revalidate').catch(
+			project.value = await get_project_v3(version.value.project_id, 'must_revalidate').catch(
 				handleError,
 			)
 		} else {
-			project.value = await get_project(event.id, 'must_revalidate').catch(handleError)
+			project.value = await get_project_v3(event.id, 'must_revalidate').catch(handleError)
 			version.value = await get_version(
 				project.value.versions[project.value.versions.length - 1],
 				'must_revalidate',
@@ -46,7 +46,7 @@ async function install() {
 </script>
 
 <template>
-	<ModalWrapper ref="confirmModal" :header="`Install ${project?.title}`">
+	<ModalWrapper ref="confirmModal" :header="`Install ${project?.name}`">
 		<div class="modal-body">
 			<ProjectCard
 				:title="project.name"

@@ -104,19 +104,6 @@ const currentType = computed(() =>
 )
 
 debug('initial route.params.type:', route.params.type, '→ currentType:', currentType.value)
-console.log('[Discover] SETUP route.params.type:', route.params.type, '→ currentType:', currentType.value)
-
-watch(() => route.params.type, (val) => {
-	console.log('[Discover] route.params.type CHANGED:', val)
-	debug('route.params.type changed:', val, '→ currentType:', currentType.value)
-})
-watch(currentType, (val) => {
-	console.log('[Discover] currentType CHANGED:', val)
-	debug('currentType changed:', val)
-})
-watch(() => route.fullPath, (val) => {
-	console.log('[Discover] route.fullPath CHANGED:', val)
-})
 
 const isServerType = computed(() => currentType.value === 'server')
 
@@ -519,7 +506,6 @@ async function onModpackFlowCreate(config: CreationFlowContextValue) {
 	}
 }
 
-
 const serverBackUrl = computed(() => {
 	if (!serverData.value) return ''
 	const id = serverData.value.server_id
@@ -551,7 +537,6 @@ const messages = defineMessages({
 			'Shader packs for older versions most likely work on newer versions with only minor issues.',
 	},
 })
-
 
 const projectTypeId = computed(() => projectType.value?.id ?? 'mod')
 

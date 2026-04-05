@@ -269,10 +269,10 @@ async function handleStopServerProject(projectId: string) {
 async function handlePlayServerProject(projectId: string) {
 	debugLog('handlePlayServerProject', projectId)
 	await playServerProject(projectId)
-	checkServerRunningStates(lastServerHits)
+	checkServerRunningStates(lastServerHits.value)
 }
 
-let lastServerHits: Labrinth.Search.v3.ResultSearchProject[] = []
+const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 
 async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
 	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
@@ -473,7 +473,6 @@ watch(
 	},
 )
 
-
 const selectableProjectTypes = computed(() => {
 	let dataPacks = false,
 		mods = false,
@@ -527,7 +526,6 @@ const selectableProjectTypes = computed(() => {
 	]
 })
 
-
 const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject) => {
 	const content = project.minecraft_java_server?.content
 	if (content?.kind === 'modpack') {
@@ -547,7 +545,6 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 	}
 	return undefined
 }
-
 
 const contextMenuRef = ref(null)
 // @ts-expect-error - no event types
@@ -569,7 +566,6 @@ const handleOptionsClick = (args) => {
 	}
 }
 
-
 const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
@@ -582,7 +578,6 @@ const installContext = computed(() => {
 	}
 	return null
 })
-
 
 const installingProjectIds = ref<Set<string>>(new Set())
 
@@ -753,7 +748,6 @@ function onSearchResultInstalled(id: string) {
 	newlyInstalled.value.push(id)
 }
 
-
 async function search(requestParams: string) {
 	debugLog('searching v3', requestParams)
 	const isServer = projectType.value === 'server'
@@ -779,7 +773,7 @@ async function search(requestParams: string) {
 
 	if (isServer) {
 		const hits = rawResults.result.hits ?? []
-		lastServerHits = hits
+		lastServerHits.value = hits
 		serverPings.value = {}
 		pingServerHits(hits)
 		checkServerRunningStates(hits)
@@ -813,7 +807,6 @@ async function search(requestParams: string) {
 	}
 }
 
-
 const lockedFilterMessages = computed(() => ({
 	gameVersion: formatMessage(
 		isServerInstance.value
@@ -831,7 +824,6 @@ const lockedFilterMessages = computed(() => ({
 		isServerInstance.value ? messages.providedByServer : messages.providedByInstance,
 	),
 }))
-
 
 const searchState = useBrowseSearch({
 	projectType,
@@ -858,7 +850,6 @@ if (instance.value?.game_version) {
 
 await searchState.refreshSearch()
 
-
 provideBrowseManager({
 	tags,
 	projectType,
@@ -884,7 +875,7 @@ provideBrowseManager({
 	getServerModpackContent,
 	onContextMenu: handleRightClick,
 	offline,
-	lockedFilterMessages: lockedFilterMessages.value,
+	lockedFilterMessages,
 })
 </script>
 

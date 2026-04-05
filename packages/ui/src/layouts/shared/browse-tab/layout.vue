@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { SearchIcon } from '@modrinth/assets'
-import { watch } from 'vue'
+import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
@@ -11,42 +11,12 @@ import StyledInput from '#ui/components/base/StyledInput.vue'
 import ProjectCard from '#ui/components/project/card/ProjectCard.vue'
 import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
-import { useDebugLogger } from '#ui/composables/debug-logger'
 import type { SortType } from '#ui/utils/search'
 
 import { injectBrowseManager } from './providers/browse-manager'
 
-const debug = useDebugLogger('BrowseLayout')
 const ctx = injectBrowseManager()
-
-debug('mounted, projectType:', ctx.projectType.value)
-debug('loading:', ctx.loading.value)
-debug('projectHits count:', ctx.projectHits.value.length)
-debug('serverHits count:', ctx.serverHits.value.length)
-debug('totalHits:', ctx.totalHits.value)
-debug('isServerType:', ctx.isServerType.value)
-debug('effectiveLayout:', ctx.effectiveLayout.value)
-
-watch(
-	() => ctx.projectType.value,
-	(val) => debug('projectType changed:', val),
-)
-watch(
-	() => ctx.loading.value,
-	(val) => debug('loading changed:', val),
-)
-watch(
-	() => ctx.projectHits.value,
-	(val) => debug('projectHits changed, count:', val.length),
-)
-watch(
-	() => ctx.serverHits.value,
-	(val) => debug('serverHits changed, count:', val.length),
-)
-watch(
-	() => ctx.totalHits.value,
-	(val) => debug('totalHits changed:', val),
-)
+const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 </script>
 
 <template>
@@ -91,9 +61,9 @@ watch(
 			<span class="font-semibold text-secondary">{{ selected }}</span>
 		</DropdownSelect>
 
-		<div v-if="ctx.filtersMenuOpen" class="lg:hidden">
+		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
 			<ButtonStyled>
-				<button @click="ctx.filtersMenuOpen!.value = true">Filter results...</button>
+				<button @click="ctx.filtersMenuOpen.value = true">Filter results...</button>
 			</ButtonStyled>
 		</div>
 
@@ -124,7 +94,7 @@ watch(
 		:filters="ctx.filters.value.filter((f) => f.display !== 'none')"
 		:provided-filters="ctx.providedFilters?.value ?? []"
 		:overridden-provided-filter-types="ctx.overriddenProvidedFilterTypes.value"
-		:provided-message="ctx.lockedFilterMessages?.providedBy"
+		:provided-message="lockedMessages?.providedBy"
 	/>
 
 	<div class="search">
@@ -237,22 +207,24 @@ watch(
 					@mouseleave="ctx.onProjectHoverEnd?.()"
 				>
 					<template v-if="ctx.getCardActions" #actions>
-						<ButtonStyled
-							v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
-							:key="action.key"
-							:color="action.color"
-							:type="action.type"
-							:circular="action.circular"
-						>
-							<button
-								v-tooltip="action.tooltip"
-								:disabled="action.disabled"
-								@click.stop="action.onClick"
+						<div class="flex gap-2">
+							<ButtonStyled
+								v-for="action in ctx.getCardActions(result, ctx.projectType.value)"
+								:key="action.key"
+								:color="action.color"
+								:type="action.type"
+								:circular="action.circular"
 							>
-								<component :is="action.icon" />
-								<template v-if="!action.circular">{{ action.label }}</template>
-							</button>
-						</ButtonStyled>
+								<button
+									v-tooltip="action.tooltip"
+									:disabled="action.disabled"
+									@click.stop="action.onClick"
+								>
+									<component :is="action.icon" />
+									<template v-if="!action.circular">{{ action.label }}</template>
+								</button>
+							</ButtonStyled>
+						</div>
 					</template>
 				</ProjectCard>
 			</template>

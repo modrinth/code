@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import type { Component, ComputedRef, Ref, ShallowRef } from 'vue'
+import type { Component, ComputedRef, MaybeRef, Ref, ShallowRef } from 'vue'
 import type { RouteLocationRaw } from 'vue-router'
 
 import { createContext } from '#ui/providers/create-context'
@@ -88,14 +88,14 @@ export interface BrowseManagerContext {
 
 	filtersMenuOpen?: Ref<boolean>
 
-	lockedFilterMessages?: {
+	lockedFilterMessages?: MaybeRef<{
 		gameVersion?: string
 		modLoader?: string
 		environment?: string
 		syncButton?: string
 		providedBy?: string
 		gameVersionShaderMessage?: string
-	}
+	}>
 
 	loadingComponent?: Component
 }

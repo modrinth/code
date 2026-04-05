@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { InfoIcon, XIcon } from '@modrinth/assets'
-import { computed } from 'vue'
+import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Checkbox from '#ui/components/base/Checkbox.vue'
@@ -11,6 +11,7 @@ import { injectBrowseManager } from './providers/browse-manager'
 const ctx = injectBrowseManager()
 
 const isApp = computed(() => ctx.variant === 'app')
+const lockedMessages = computed(() => toValue(lockedMessages))
 
 const filterClass = computed(() => {
 	if (isApp.value) {
@@ -45,7 +46,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 		return filterId.startsWith('category') || filterId === 'environment' || filterId === 'license'
 	}
 	if (
-		ctx.lockedFilterMessages?.gameVersionShaderMessage &&
+		lockedMessages?.gameVersionShaderMessage &&
 		ctx.projectType.value === 'shader' &&
 		filterId === 'game_version'
 	) {
@@ -147,7 +148,7 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				</template>
 				<template
 					v-if="
-						ctx.lockedFilterMessages?.gameVersionShaderMessage &&
+						lockedMessages?.gameVersionShaderMessage &&
 						ctx.projectType.value === 'shader' &&
 						filter.id === 'game_version'
 					"
@@ -155,20 +156,20 @@ function getFilterOpenByDefault(filterId: string): boolean {
 				>
 					<div class="mb-4 grid grid-cols-[auto_1fr] gap-2 px-3 text-sm font-medium text-blue">
 						<InfoIcon class="mt-1 size-4" />
-						<span>{{ ctx.lockedFilterMessages.gameVersionShaderMessage }}</span>
+						<span>{{ lockedMessages.gameVersionShaderMessage }}</span>
 					</div>
 				</template>
-				<template v-if="ctx.lockedFilterMessages?.gameVersion" #locked-game_version>
-					{{ ctx.lockedFilterMessages.gameVersion }}
+				<template v-if="lockedMessages?.gameVersion" #locked-game_version>
+					{{ lockedMessages.gameVersion }}
 				</template>
-				<template v-if="ctx.lockedFilterMessages?.modLoader" #locked-mod_loader>
-					{{ ctx.lockedFilterMessages.modLoader }}
+				<template v-if="lockedMessages?.modLoader" #locked-mod_loader>
+					{{ lockedMessages.modLoader }}
 				</template>
-				<template v-if="ctx.lockedFilterMessages?.environment" #locked-environment>
-					{{ ctx.lockedFilterMessages.environment }}
+				<template v-if="lockedMessages?.environment" #locked-environment>
+					{{ lockedMessages.environment }}
 				</template>
-				<template v-if="ctx.lockedFilterMessages?.syncButton" #sync-button>
-					{{ ctx.lockedFilterMessages.syncButton }}
+				<template v-if="lockedMessages?.syncButton" #sync-button>
+					{{ lockedMessages.syncButton }}
 				</template>
 			</SearchSidebarFilter>
 		</template>
