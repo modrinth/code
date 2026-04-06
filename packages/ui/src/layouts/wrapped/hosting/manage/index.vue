@@ -135,11 +135,7 @@
 							wrapper-class="w-full md:w-72"
 						/>
 						<ButtonStyled type="standard" color="brand">
-							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
-								<PlusIcon />
-								{{ formatMessage(messages.newServerButton) }}
-							</AutoLink>
-							<button v-else @click="openPurchaseModal">
+							<button @click="openPurchaseModal">
 								<PlusIcon />
 								{{ formatMessage(messages.newServerButton) }}
 							</button>
