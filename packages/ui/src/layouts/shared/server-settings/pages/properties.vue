@@ -43,8 +43,8 @@
 					<div
 						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
 					>
-						<div class="flex w-full flex-col gap-4 min-[1100px]:max-w-[600px]">
-							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2">
+						<div class="flex w-full flex-col gap-1.5">
+							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2 my-1">
 								<span class="font-semibold text-contrast">Gamemode</span>
 								<Chips
 									v-model="combinedGamemode"
@@ -55,7 +55,7 @@
 
 							<div
 								v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
-								class="flex flex-col gap-2"
+								class="flex flex-col gap-2 my-1"
 							>
 								<span class="font-semibold text-contrast">Difficulty</span>
 								<Chips
@@ -65,31 +65,31 @@
 								/>
 							</div>
 
-							<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2">
+							<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2 my-1">
 								<span class="font-semibold text-contrast">Max players</span>
 								<StyledInput
 									id="server-property-max-players"
 									:model-value="liveProperties.max_players"
 									type="number"
 									placeholder="20"
-									wrapper-class="w-full"
+									wrapper-class="w-full max-w-[450px]"
 									@update:model-value="liveProperties.max_players = String($event)"
 								/>
 							</div>
 
-							<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2">
+							<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2 my-1">
 								<span class="font-semibold text-contrast">MOTD</span>
 								<StyledInput
 									id="server-property-motd"
 									v-model="liveProperties.motd"
 									placeholder="A Minecraft Server"
-									wrapper-class="w-full"
+									wrapper-class="w-full max-w-[450px]"
 								/>
 							</div>
 
 							<div
 								v-if="isPropertyVisible('allow_flight')"
-								class="flex flex-row items-center justify-between gap-4"
+								class="flex flex-row items-center justify-between gap-4 h-10"
 							>
 								<span class="font-semibold text-contrast">Allow flight</span>
 								<Toggle
@@ -101,7 +101,7 @@
 
 							<div
 								v-if="isPropertyVisible('allow_cheats')"
-								class="flex flex-row items-center justify-between gap-4"
+								class="flex flex-row items-center justify-between gap-4 h-10"
 							>
 								<span class="font-semibold text-contrast">Allow cheats</span>
 								<Toggle
@@ -113,7 +113,7 @@
 
 							<div
 								v-if="isPropertyVisible('white_list')"
-								class="flex flex-row items-center justify-between gap-4"
+								class="flex flex-row items-center justify-between gap-4 h-10"
 							>
 								<span class="font-semibold text-contrast">Enable whitelist</span>
 								<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
@@ -121,7 +121,7 @@
 
 							<div
 								v-if="isPropertyVisible('spawn_protection')"
-								class="flex flex-row items-center justify-between gap-4"
+								class="flex flex-row items-center justify-between gap-4 h-10"
 							>
 								<span class="font-semibold text-contrast">Enable spawn protection</span>
 								<Toggle
@@ -132,7 +132,7 @@
 
 							<div
 								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
-								class="flex items-center justify-between"
+								class="flex items-center justify-between h-10"
 							>
 								<span class="font-semibold text-contrast">Protection radius</span>
 								<StyledInput
@@ -163,18 +163,21 @@
 										{{ group.label }}
 									</h3>
 									<div
-										class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4"
+										class="flex flex-col gap-2 rounded-2xl border border-solid border-surface-5 p-4"
 									>
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
 												class="flex flex-row flex-wrap items-center justify-between h-10"
 											>
-												<span :id="`property-label-${key}`" class="font-semibold">
+												<span :id="`property-label-${key}`" class="font-semibold text-contrast">
 													{{ formatPropertyName(key) }}
 												</span>
 
-												<div v-if="getPropertyDef(key).type === 'toggle'" class="flex justify-end">
+												<div
+													v-if="getPropertyDef(key).type === 'toggle'"
+													class="flex w-full justify-end sm:w-[320px]"
+												>
 													<Toggle
 														:id="`server-property-${key}`"
 														:model-value="liveProperties[key] === 'true'"
@@ -196,7 +199,7 @@
 														@update:model-value="liveProperties[key] = String($event)"
 													/>
 												</div>
-												<div v-else class="mt-2 flex w-full justify-end sm:w-[320px]">
+												<div v-else class="flex w-full justify-end sm:w-[320px]">
 													<StyledInput
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
