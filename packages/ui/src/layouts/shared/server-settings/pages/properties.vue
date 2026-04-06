@@ -213,6 +213,7 @@
 									</div>
 								</div>
 							</template>
+							<div>All other properties can be edited in server.properties via the Files tab.</div>
 						</div>
 					</Accordion>
 
