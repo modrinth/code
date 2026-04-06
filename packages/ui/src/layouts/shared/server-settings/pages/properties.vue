@@ -151,6 +151,7 @@
 						v-if="hasVisibleAdvancedProperties"
 						overflow-visible
 						:force-open="isSearchActive"
+						button-class="flex w-full flex-col gap-2 bg-transparent m-0 p-0 border-none"
 					>
 						<template #title>
 							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
