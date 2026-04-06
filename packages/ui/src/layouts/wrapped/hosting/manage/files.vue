@@ -14,10 +14,7 @@ import { commonMessages } from '#ui/utils/common-messages'
 
 import FilePageLayout from '../../../shared/files-tab/layout.vue'
 import { provideFileManager } from '../../../shared/files-tab/providers/file-manager'
-import type {
-	EditingFile,
-	FileItem,
-} from '../../../shared/files-tab/types'
+import type { EditingFile, FileItem } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
 	showDebugInfo?: boolean
@@ -26,8 +23,7 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { serverId, fsOps, fsQueuedOps, busyReasons, uploadState, cancelUpload: cancelUploadRef } =
-	serverContext
+const { serverId, fsOps, busyReasons, uploadState, cancelUpload: cancelUploadRef } = serverContext
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 

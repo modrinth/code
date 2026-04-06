@@ -403,8 +403,7 @@ export const commonMessages = defineMessages({
 	},
 	clientOnlyWarning: {
 		id: 'label.client-only-warning',
-		defaultMessage:
-			'This is a client-side mod and may cause issues when starting your server',
+		defaultMessage: 'This is a client-side mod and may cause issues when starting your server',
 	},
 	clientRetainedWarning: {
 		id: 'label.client-retained-warning',

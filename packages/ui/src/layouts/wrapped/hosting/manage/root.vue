@@ -424,8 +424,8 @@ import {
 	provideServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
-import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
 
+import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
 
 interface Tab {

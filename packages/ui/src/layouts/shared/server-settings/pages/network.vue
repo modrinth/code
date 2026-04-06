@@ -73,8 +73,8 @@
 
 							<ButtonStyled color="brand">
 								<button
-									:disabled="!createAllocationName || creatingAllocation"
 									v-tooltip="!createAllocationName ? 'Enter a name to create an allocation' : ''"
+									:disabled="!createAllocationName || creatingAllocation"
 									@click="addNewAllocation"
 								>
 									<PlusIcon />

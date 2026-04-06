@@ -17,7 +17,11 @@ import {
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
 import { provideServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
-import { injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
 type ShowOptions = {
@@ -179,8 +183,7 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 		if (worldId.value) {
 			queryClient.prefetchQuery({
 				queryKey: ['servers', 'properties', 'v1', targetServerId, worldId.value],
-				queryFn: () =>
-					client.archon.properties_v1.getProperties(targetServerId, worldId.value!),
+				queryFn: () => client.archon.properties_v1.getProperties(targetServerId, worldId.value!),
 			})
 			queryClient.prefetchQuery({
 				queryKey: ['content', 'list', 'v1', targetServerId],

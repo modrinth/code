@@ -3155,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "monthly"
   },
+  "settings.billing.interval.quarter": {
+    "message": "quarter"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "quarterly"
+  },
   "settings.billing.interval.year": {
     "message": "year"
   },

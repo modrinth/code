@@ -192,7 +192,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
 	AutoLink,
@@ -319,8 +319,6 @@ const messages = defineMessages({
 		defaultMessage: 'An error occurred while resubscribing to your Modrinth server.',
 	},
 })
-
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
 const isPollingForNewServers = ref(false)
 const pollingState = ref({
