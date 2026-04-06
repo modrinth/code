@@ -1,36 +1,12 @@
 <template>
 	<div>
-		<NewModal ref="newAllocationModal" header="New allocation" width="550px">
-			<form class="flex w-full flex-col gap-2" @submit.prevent="addNewAllocation">
-				<label for="new-allocation-name" class="font-semibold text-contrast"> Name </label>
-				<StyledInput
-					id="new-allocation-name"
-					ref="newAllocationInput"
-					v-model="newAllocationName"
-					wrapper-class="w-full"
-					:maxlength="32"
-					placeholder="e.g. Secondary allocation"
-				/>
-				<div class="mb-1 mt-4 flex justify-end gap-2.5">
-					<ButtonStyled>
-						<button @click="newAllocationModal?.hide()">Cancel</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="!newAllocationName" type="submit">
-							<PlusIcon /> Create allocation
-						</button>
-					</ButtonStyled>
-				</div>
-			</form>
-		</NewModal>
-
 		<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
 			<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
 				<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
 				<StyledInput
 					id="edit-allocation-name"
 					ref="editAllocationInput"
-					v-model="newAllocationName"
+					v-model="editAllocationName"
 					wrapper-class="w-full"
 					:maxlength="32"
 					placeholder="e.g. Secondary allocation"
@@ -40,7 +16,7 @@
 						<button @click="editAllocationModal?.hide()">Cancel</button>
 					</ButtonStyled>
 					<ButtonStyled color="brand">
-						<button :disabled="!newAllocationName" type="submit">
+						<button :disabled="!editAllocationName || creatingAllocation" type="submit">
 							<SaveIcon /> Update allocation
 						</button>
 					</ButtonStyled>
@@ -89,16 +65,20 @@
 
 						<div class="flex w-full flex-col items-center justify-start gap-2 sm:flex-row">
 							<StyledInput
-								v-model="allocationSearch"
+								v-model="createAllocationName"
 								wrapper-class="grow max-w-[400px]"
-								:maxlength="64"
-								placeholder="Port name (e.g., Dynmap)"
+								:maxlength="32"
+								placeholder="e.g. Secondary allocation"
 							/>
 
-							<ButtonStyled color="brand" @click="showNewAllocationModal">
-								<button class="!w-full max-w-20">
+							<ButtonStyled color="brand">
+								<button
+									:disabled="!createAllocationName || creatingAllocation"
+									v-tooltip="!createAllocationName ? 'Enter a name to create an allocation' : ''"
+									@click="addNewAllocation"
+								>
 									<PlusIcon />
-									<span>Add</span>
+									<span>Create allocation</span>
 								</button>
 							</ButtonStyled>
 						</div>
@@ -259,8 +239,6 @@ const allocationColumns: TableColumn[] = [
 	{ key: 'actions', label: 'Actions', width: '33%', align: 'right' },
 ]
 
-const allocationSearch = ref('')
-
 const allocationRows = computed(() => {
 	const primary = {
 		name: 'Primary allocation',
@@ -272,12 +250,7 @@ const allocationRows = computed(() => {
 		port: a.port,
 		primary: false,
 	}))
-	const all = [primary, ...extra]
-	const query = allocationSearch.value.toLowerCase().trim()
-	if (!query) return all
-	return all.filter(
-		(row) => row.name.toLowerCase().includes(query) || String(row.port).includes(query),
-	)
+	return [primary, ...extra]
 })
 
 const dnsColumns: TableColumn[] = [
@@ -286,24 +259,24 @@ const dnsColumns: TableColumn[] = [
 	{ key: 'content', label: 'Content' },
 ]
 
-const newAllocationModal = ref<typeof NewModal>()
 const editAllocationModal = ref<typeof NewModal>()
 const confirmDeleteModal = ref<typeof ConfirmModal>()
-const newAllocationInput = ref<HTMLInputElement | null>(null)
 const editAllocationInput = ref<HTMLInputElement | null>(null)
-const newAllocationName = ref('')
+const createAllocationName = ref('')
+const editAllocationName = ref('')
 const newAllocationPort = ref(0)
 const allocationToDelete = ref<number | null>(null)
+const creatingAllocation = ref(false)
 
 const addNewAllocation = async () => {
-	if (!newAllocationName.value) return
+	if (!createAllocationName.value) return
+	creatingAllocation.value = true
 
 	try {
-		await client.archon.servers_v0.reserveAllocation(serverId, newAllocationName.value)
+		await client.archon.servers_v0.reserveAllocation(serverId, createAllocationName.value)
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 
-		newAllocationModal.value?.hide()
-		newAllocationName.value = ''
+		createAllocationName.value = ''
 
 		addNotification({
 			type: 'success',
@@ -312,21 +285,14 @@ const addNewAllocation = async () => {
 		})
 	} catch (error) {
 		console.error('Failed to reserve new allocation:', error)
+	} finally {
+		creatingAllocation.value = false
 	}
-}
-
-const showNewAllocationModal = () => {
-	newAllocationName.value = ''
-	newAllocationModal.value?.show()
-	nextTick(() => {
-		setTimeout(() => {
-			newAllocationInput.value?.focus()
-		}, 100)
-	})
 }
 
 const showEditAllocationModal = (port: number) => {
 	newAllocationPort.value = port
+	editAllocationName.value = allocations.value?.find((a) => a.port === port)?.name ?? ''
 	editAllocationModal.value?.show()
 	nextTick(() => {
 		setTimeout(() => {
@@ -356,18 +322,19 @@ const confirmDeleteAllocation = async () => {
 }
 
 const editAllocation = async () => {
-	if (!newAllocationName.value) return
+	if (!editAllocationName.value) return
+	creatingAllocation.value = true
 
 	try {
 		await client.archon.servers_v0.updateAllocation(
 			serverId,
 			newAllocationPort.value,
-			newAllocationName.value,
+			editAllocationName.value,
 		)
 		await queryClient.invalidateQueries({ queryKey: ['servers', 'allocations', serverId] })
 
 		editAllocationModal.value?.hide()
-		newAllocationName.value = ''
+		editAllocationName.value = ''
 
 		addNotification({
 			type: 'success',
@@ -376,6 +343,8 @@ const editAllocation = async () => {
 		})
 	} catch (error) {
 		console.error('Failed to reserve new allocation:', error)
+	} finally {
+		creatingAllocation.value = false
 	}
 }
 

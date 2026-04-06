@@ -6,7 +6,7 @@
 		<AutoLink
 			v-if="isLink"
 			:to="settingsLinkTarget"
-			class="flex min-w-0 items-center truncate text-sm font-semibold"
+			class="flex min-w-0 items-center truncate text-sm font-medium"
 			:class="settingsLinkTarget ? 'hover:underline' : ''"
 		>
 			<div class="flex flex-row items-center gap-1">
@@ -18,7 +18,7 @@
 		<div
 			v-else
 			v-tooltip="'Change server version'"
-			class="pointer-events-none flex min-w-0 flex-row items-center gap-1 truncate text-sm font-semibold"
+			class="pointer-events-none flex min-w-0 flex-row items-center gap-1 truncate text-sm font-medium"
 		>
 			{{ game[0].toUpperCase() + game.slice(1) }}
 			<span v-if="mcVersion">{{ mcVersion }}</span>
