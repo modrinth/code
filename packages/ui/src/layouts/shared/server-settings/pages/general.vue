@@ -99,7 +99,7 @@
 
 				<!-- Info -->
 				<div class="flex flex-col gap-2.5">
-					<div class="text-md m-0 font-semibold text-contrast">Info</div>
+					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
 							v-for="property in infoProperties"
