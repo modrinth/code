@@ -201,40 +201,42 @@ const messages = defineMessages({
 		<div class="float-end ml-10 relative group w-fit">
 			<div class="flex flex-col gap-1">
 				<span class="text-lg font-semibold text-contrast">Icon</span>
-				<OverflowMenu
-					v-tooltip="formatMessage(messages.editIcon)"
-					class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
-					:options="[
-						{
-							id: 'select',
-							action: () => setIcon(),
-						},
-						{
-							id: 'remove',
-							color: 'danger',
-							action: () => resetIcon(),
-							shown: !!icon,
-						},
-					]"
-				>
-					<Avatar
-						:src="icon ? convertFileSrc(icon) : icon"
-						size="108px"
-						class="transition-[filter] group-hover:brightness-75"
-						:tint-by="instance.path"
-						no-shadow
-					/>
-					<div
-						class="absolute top-0 h-full w-full flex items-center justify-center opacity-0 transition-all group-hover:opacity-100"
+				<div class="group relative w-fit">
+					<OverflowMenu
+						v-tooltip="formatMessage(messages.editIcon)"
+						class="bg-transparent border-none appearance-none p-0 m-0 cursor-pointer group-active:scale-95 transition-transform"
+						:options="[
+							{
+								id: 'select',
+								action: () => setIcon(),
+							},
+							{
+								id: 'remove',
+								color: 'danger',
+								action: () => resetIcon(),
+								shown: !!icon,
+							},
+						]"
 					>
-						<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
-					</div>
-					<template #select>
-						<UploadIcon />
-						{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
-					</template>
-					<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
-				</OverflowMenu>
+						<Avatar
+							:src="icon ? convertFileSrc(icon) : icon"
+							size="108px"
+							class="transition-[filter] group-hover:brightness-75"
+							:tint-by="instance.path"
+							no-shadow
+						/>
+						<div
+							class="absolute top-0 h-full w-full flex items-center justify-center opacity-0 transition-all group-hover:opacity-100"
+						>
+							<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
+						</div>
+						<template #select>
+							<UploadIcon />
+							{{ icon ? formatMessage(messages.replaceIcon) : formatMessage(messages.selectIcon) }}
+						</template>
+						<template #remove> <TrashIcon /> {{ formatMessage(messages.removeIcon) }} </template>
+					</OverflowMenu>
+				</div>
 			</div>
 		</div>
 		<label for="instance-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
