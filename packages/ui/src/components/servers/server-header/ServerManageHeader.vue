@@ -1,9 +1,5 @@
 <template>
 	<div class="w-full flex flex-col gap-4">
-		<AutoLink :to="props.backHref" :class="props.breadcrumbClass">
-			<LeftArrowIcon />
-			{{ props.backLabel }}
-		</AutoLink>
 		<ContentPageHeader :class="props.headerClass">
 			<template #icon>
 				<ServerIcon :image="headerImage" class="size-20 !rounded-2xl" />
@@ -74,7 +70,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { LeftArrowIcon, LinkIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
+import { LinkIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, LoaderIcon, ServerIcon } from '#ui/components'
@@ -96,7 +92,6 @@ const props = withDefaults(
 		uptimeSeconds?: number
 		showUptime?: boolean
 		backHref?: string
-		backLabel?: string
 		breadcrumbClass?: string
 		headerClass?: string
 	}>(),
@@ -107,7 +102,6 @@ const props = withDefaults(
 		uptimeSeconds: 0,
 		showUptime: true,
 		backHref: '/hosting/manage',
-		backLabel: 'All servers',
 		breadcrumbClass: 'breadcrumb goto-link flex w-fit items-center',
 		headerClass: '',
 	},
