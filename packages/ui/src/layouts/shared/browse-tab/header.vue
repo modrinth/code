@@ -6,8 +6,10 @@ import { useRouter } from 'vue-router'
 import Admonition from '#ui/components/base/Admonition.vue'
 import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
+import ContentPageHeader from '#ui/components/base/ContentPageHeader.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
 
+import { formatLoaderLabel } from '#ui/utils/loaders'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const MEDAL_ICON_URL = 'https://cdn-raw.modrinth.com/medal_icon.webp'
@@ -31,31 +33,28 @@ const iconSrc = computed(() => {
 
 <template>
 	<template v-if="installContext">
-		<div
-			class="flex flex-wrap items-center justify-between gap-3 mb-2 border-0 border-b border-solid border-divider pb-4"
-		>
-			<div class="flex items-center gap-2">
-				<Avatar :src="iconSrc" size="48px" />
-				<div class="flex flex-col gap-1">
-					<span
-						class="font-extrabold text-contrast"
-						:class="ctx.variant === 'web' ? 'text-base' : 'text-lg'"
-					>
-						{{ installContext.name }}
-					</span>
-					<span class="flex items-center gap-2 text-sm font-semibold text-secondary">
-						<GameIcon class="h-5 w-5 text-secondary" />
-						{{ installContext.loader }} {{ installContext.gameVersion }}
-					</span>
-				</div>
-			</div>
-			<ButtonStyled>
-				<button @click="router.push(installContext.backUrl)">
-					<LeftArrowIcon />
-					{{ installContext.backLabel }}
-				</button>
-			</ButtonStyled>
-		</div>
+		<ContentPageHeader class="mb-2">
+			<template #icon>
+				<Avatar :src="iconSrc" size="64px" />
+			</template>
+			<template #title>
+				{{ installContext.name }}
+			</template>
+			<template #summary>
+				<span class="flex items-center gap-2 text-sm font-semibold text-secondary">
+					<GameIcon class="h-5 w-5 text-secondary" />
+					{{ formatLoaderLabel(installContext.loader) }} {{ installContext.gameVersion }}
+				</span>
+			</template>
+			<template #actions>
+				<ButtonStyled>
+					<button @click="router.push(installContext.backUrl)">
+						<LeftArrowIcon />
+						{{ installContext.backLabel }}
+					</button>
+				</ButtonStyled>
+			</template>
+		</ContentPageHeader>
 		<h1 class="m-0 mb-1 text-xl font-extrabold">{{ installContext.heading }}</h1>
 		<Admonition v-if="installContext.warning" type="warning" class="mb-1">
 			{{ installContext.warning }}
