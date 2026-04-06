@@ -172,13 +172,17 @@ export function useBrowseSearch(options: UseBrowseSearchOptions): BrowseSearchSt
 	})
 
 	let searchVersion = 0
+	let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
 	watch(effectiveRequestParams, (newVal, oldVal) => {
 		debug('effectiveRequestParams changed', {
 			from: oldVal?.substring(0, 80),
 			to: newVal?.substring(0, 80),
 		})
-		refreshSearch()
+		if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
+		searchDebounceTimer = setTimeout(() => {
+			refreshSearch()
+		}, 200)
 	})
 
 	async function refreshSearch() {

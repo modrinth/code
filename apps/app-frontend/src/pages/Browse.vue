@@ -7,6 +7,7 @@ import {
 	GlobeIcon,
 	PlayIcon,
 	PlusIcon,
+	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
 import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
@@ -764,13 +765,7 @@ function getCardActions(
 					: shouldUseInstallIcon
 						? 'Install'
 						: 'Add to an instance',
-			icon: isInstalling
-				? PlusIcon
-				: isInstalled
-					? CheckIcon
-					: shouldUseInstallIcon
-						? PlusIcon
-						: PlusIcon,
+			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
 			disabled: isInstalled || isInstalling,
 			color: 'brand',
 			type: 'outlined',
