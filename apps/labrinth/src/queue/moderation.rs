@@ -1,6 +1,7 @@
 use crate::auth::checks::filter_visible_versions;
 use crate::database;
 use crate::database::PgPool;
+use crate::database::models::DBUserId;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::database::redis::RedisPool;
@@ -526,16 +527,12 @@ impl AutomatedModerationQueue {
                                     }
 
                                     if !insert_ids.is_empty() && !insert_hashes.is_empty() {
-                                        sqlx::query!(
-                                            "
-                                            INSERT INTO moderation_external_files (sha1, external_license_id)
-                                            SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
-                                            ON CONFLICT (sha1) DO NOTHING
-                                            ",
-                                            &insert_hashes[..],
-                                            &insert_ids[..]
+                                        crate::database::models::moderation_external_item::ExternalLicense::insert_files(
+                                            &pool,
+                                            &insert_hashes,
+                                            &insert_ids,
+                                            DBUserId(0),
                                         )
-                                            .execute(&pool)
                                             .await?;
                                     }
 

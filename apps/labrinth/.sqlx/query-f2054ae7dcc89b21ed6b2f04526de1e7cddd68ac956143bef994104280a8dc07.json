@@ -22,8 +22,7 @@
                 "low",
                 "medium",
                 "high",
-                "severe",
-                "malware"
+                "severe"
               ]
             }
           }
