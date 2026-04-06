@@ -8,8 +8,8 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ContentPageHeader from '#ui/components/base/ContentPageHeader.vue'
 import { useServerImage } from '#ui/composables/use-server-image'
-
 import { formatLoaderLabel } from '#ui/utils/loaders'
+
 import { injectBrowseManager } from './providers/browse-manager'
 
 const MEDAL_ICON_URL = 'https://cdn-raw.modrinth.com/medal_icon.webp'
