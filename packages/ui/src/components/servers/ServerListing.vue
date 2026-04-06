@@ -1,6 +1,10 @@
 <template>
 	<div>
-		<RouterLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
+		<component
+			:is="isDisabled ? 'div' : 'RouterLink'"
+			v-bind="!isDisabled ? { to: `/hosting/manage/${server_id}` } : {}"
+			:class="{ 'cursor-default': isDisabled }"
+		>
 			<div
 				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-all duration-150"
 				:class="{
@@ -31,7 +35,7 @@
 							{{ name }}
 						</h2>
 						<div
-							v-if="isConfiguring"
+							v-if="isConfiguring && noticeType !== 'cancelled' && noticeType !== 'setToCancel'"
 							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
 						>
 							<SparklesIcon class="size-5 shrink-0 font-semibold" />
@@ -78,7 +82,7 @@
 					/>
 				</div>
 			</div>
-		</RouterLink>
+		</component>
 
 		<div v-if="noticeType" class="server-listing-notice">
 			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
@@ -159,7 +163,7 @@
 
 			<div v-if="noticeButtons" class="flex gap-2">
 				<ButtonStyled
-					v-if="noticeButtons.downloadBackup && onDownloadBackup"
+					v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
 					type="outlined"
 					circular
 				>
@@ -398,6 +402,7 @@ const props = defineProps<ServerListingProps>()
 
 const { archon, kyros, labrinth } = injectModrinthClient()
 
+const isBackupDownloadEnabled = false
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
 	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
