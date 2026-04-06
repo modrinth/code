@@ -190,9 +190,9 @@
 
 <script setup lang="ts">
 import type { ProjectStatus } from '@modrinth/utils'
-import type { RouteLocationRaw } from 'vue-router'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
 import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'

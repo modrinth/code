@@ -5,17 +5,14 @@ import {
 	ClipboardCopyIcon,
 	ExternalIcon,
 	GlobeIcon,
-	LeftArrowIcon,
 	PlayIcon,
 	PlusIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
 import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
-	Admonition,
 	BrowsePageLayout,
 	BrowseSidebar,
-	ButtonStyled,
 	commonMessages,
 	CreationFlowModal,
 	defineMessages,
@@ -26,6 +23,7 @@ import {
 	useVIntl,
 } from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
 import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
@@ -33,7 +31,6 @@ import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
@@ -236,6 +233,49 @@ const instanceFilters = computed(() => {
 
 	return filters
 })
+
+const serverHideInstalled = ref(false)
+if (route.query.shi) {
+	serverHideInstalled.value = route.query.shi === 'true'
+}
+
+const serverContextFilters = computed(() => {
+	const filters: { type: string; option: string; negative?: boolean }[] = []
+	if (!serverContextServerData.value) return filters
+	const pt = projectType.value
+
+	if (pt !== 'modpack') {
+		const gameVersion = serverContextServerData.value.mc_version
+		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
+
+		const platform = serverContextServerData.value.loader?.toLowerCase()
+		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
+			filters.push({ type: 'mod_loader', option: platform })
+		if (platform && ['paper', 'purpur'].includes(platform))
+			filters.push({ type: 'plugin_loader', option: platform })
+
+		if (pt === 'mod') filters.push({ type: 'environment', option: 'server' })
+	}
+
+	if (pt === 'modpack') {
+		filters.push(
+			{ type: 'environment', option: 'client' },
+			{ type: 'environment', option: 'server' },
+		)
+	}
+
+	if (serverHideInstalled.value && serverContentProjectIds.value.size > 0) {
+		for (const id of serverContentProjectIds.value) {
+			filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+		}
+	}
+
+	return filters
+})
+
+const combinedProvidedFilters = computed(() =>
+	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
+)
 
 const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
@@ -570,10 +610,32 @@ const installContext = computed(() => {
 	if (isServerContext.value && serverContextServerData.value) {
 		return {
 			name: serverContextServerData.value.name,
-			subtitle: `${serverContextServerData.value.loader} ${serverContextServerData.value.mc_version}`,
+			loader: serverContextServerData.value.loader ?? '',
+			gameVersion: serverContextServerData.value.mc_version ?? '',
+			serverId: serverIdQuery.value,
+			upstream: serverContextServerData.value.upstream,
+			iconSrc: null as string | null,
+			isMedal: serverContextServerData.value.is_medal,
 			backUrl: serverBackUrl.value,
 			backLabel: serverBackLabel.value,
 			heading: serverBrowseHeading.value,
+		}
+	}
+	if (instance.value) {
+		return {
+			name: instance.value.name,
+			loader: instance.value.loader,
+			gameVersion: instance.value.game_version,
+			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			backUrl: `/instance/${encodeURIComponent(instance.value.path)}${isFromWorlds.value ? '/worlds' : ''}`,
+			backLabel: 'Back to instance',
+			heading: formatMessage(
+				isFromWorlds.value ? messages.addServersToInstance : messages.installContentToInstance,
+			),
+			warning:
+				isServerInstance.value && !isFromWorlds.value
+					? 'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.'
+					: undefined,
 		}
 	}
 	return null
@@ -755,11 +817,12 @@ async function search(requestParams: string) {
 
 	const rawResults = await queryClient.fetchQuery({
 		queryKey: ['search', 'v3', requestParams],
-		queryFn: () => get_search_results_v3(requestParams) as Promise<{
-			result: Labrinth.Search.v3.SearchResults & {
-				hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
-			}
-		} | null>,
+		queryFn: () =>
+			get_search_results_v3(requestParams) as Promise<{
+				result: Labrinth.Search.v3.SearchResults & {
+					hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
+				}
+			} | null>,
 		staleTime: 30_000,
 	})
 
@@ -787,8 +850,11 @@ async function search(requestParams: string) {
 	}
 
 	const hits = rawResults.result.hits.map((hit) => {
-		const mapped = { ...hit, title: hit.name, description: hit.summary } as unknown as
-			Labrinth.Search.v2.ResultSearchProject & { installed?: boolean }
+		const mapped = {
+			...hit,
+			title: hit.name,
+			description: hit.summary,
+		} as unknown as Labrinth.Search.v2.ResultSearchProject & { installed?: boolean }
 
 		if (instance.value || isServerContext.value) {
 			const installedIds = instance.value
@@ -808,34 +874,37 @@ async function search(requestParams: string) {
 	}
 }
 
+const isServerFilterContext = computed(() => isServerContext.value || isServerInstance.value)
+
 const lockedFilterMessages = computed(() => ({
 	gameVersion: formatMessage(
-		isServerInstance.value
+		isServerFilterContext.value
 			? messages.gameVersionProvidedByServer
 			: messages.gameVersionProvidedByInstance,
 	),
 	modLoader: formatMessage(
-		isServerInstance.value
+		isServerFilterContext.value
 			? messages.modLoaderProvidedByServer
 			: messages.modLoaderProvidedByInstance,
 	),
 	environment: formatMessage(messages.environmentProvidedByServer),
 	syncButton: formatMessage(messages.syncFilterButton),
 	providedBy: formatMessage(
-		isServerInstance.value ? messages.providedByServer : messages.providedByInstance,
+		isServerFilterContext.value ? messages.providedByServer : messages.providedByInstance,
 	),
 }))
 
 const searchState = useBrowseSearch({
 	projectType,
 	tags,
-	providedFilters: instanceFilters,
+	providedFilters: combinedProvidedFilters,
 	search,
-	persistentQueryParams: ['i', 'ai', 'sid', 'wid', 'from'],
+	persistentQueryParams: ['i', 'ai', 'shi', 'sid', 'wid', 'from'],
 	getExtraQueryParams: () => ({
 		sid: serverIdQuery.value || undefined,
 		wid: effectiveServerWorldId.value || undefined,
 		ai: instanceHideInstalled.value ? 'true' : undefined,
+		shi: serverHideInstalled.value ? 'true' : undefined,
 	}),
 })
 
@@ -866,9 +935,17 @@ provideBrowseManager({
 	variant: 'app',
 	getCardActions,
 	installContext,
-	providedFilters: instanceFilters,
-	hideInstalled: instanceHideInstalled,
-	showHideInstalled: computed(() => !!instance.value),
+	providedFilters: combinedProvidedFilters,
+	hideInstalled: computed({
+		get: () => (isServerContext.value ? serverHideInstalled.value : instanceHideInstalled.value),
+		set: (val: boolean) => {
+			if (isServerContext.value) serverHideInstalled.value = val
+			else instanceHideInstalled.value = val
+		},
+	}),
+	showHideInstalled: computed(
+		() => (isServerContext.value && projectType.value !== 'modpack') || !!instance.value,
+	),
 	hideInstalledLabel: computed(() =>
 		formatMessage(isFromWorlds.value ? messages.hideAddedServers : messages.hideInstalledContent),
 	),
@@ -884,46 +961,12 @@ provideBrowseManager({
 <template>
 	<div class="flex flex-col gap-3 p-6">
 		<BrowsePageLayout>
-			<template #header>
-			<template v-if="isServerContext && serverContextServerData">
-				<div class="mb-1 flex flex-wrap items-center justify-between gap-3">
-					<div class="flex min-w-0 flex-col gap-1">
-						<span class="text-lg font-bold text-contrast">{{ serverContextServerData.name }}</span>
-						<span class="text-sm font-medium text-secondary">
-							{{ serverContextServerData.loader }} {{ serverContextServerData.mc_version }}
-						</span>
-					</div>
-					<ButtonStyled>
-						<button @click="router.push(serverBackUrl)">
-							<LeftArrowIcon />
-							{{ serverBackLabel }}
-						</button>
-					</ButtonStyled>
-				</div>
-				<h1 class="m-0 mb-1 text-xl font-extrabold">{{ serverBrowseHeading }}</h1>
+			<template #after>
+				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
+					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+				</ContextMenu>
 			</template>
-			<template v-else-if="instance">
-				<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
-				<h1 class="m-0 mb-1 text-xl">
-					{{
-						formatMessage(
-							isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance,
-						)
-					}}
-				</h1>
-				<Admonition v-if="isServerInstance && !isFromWorlds" type="warning" class="mb-1">
-					Adding content can break compatibility when joining the server. Any added content will
-					also be lost when you update the server instance content.
-				</Admonition>
-			</template>
-		</template>
-
-		<template #after>
-			<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
-				<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
-				<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
-			</ContextMenu>
-		</template>
 		</BrowsePageLayout>
 		<CreationFlowModal
 			v-if="isServerContext && projectType === 'modpack'"

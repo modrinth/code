@@ -4,7 +4,7 @@ import { SearchIcon } from '@modrinth/assets'
 import { computed, toValue } from 'vue'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
-import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
+import Combobox, { type ComboboxOption } from '#ui/components/base/Combobox.vue'
 import LoadingIndicator from '#ui/components/base/LoadingIndicator.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import Pagination from '#ui/components/base/Pagination.vue'
@@ -14,14 +14,31 @@ import ProjectCardList from '#ui/components/project/ProjectCardList.vue'
 import SearchFilterControl from '#ui/components/search/SearchFilterControl.vue'
 import type { SortType } from '#ui/utils/search'
 
+import BrowseInstallHeader from './header.vue'
 import { injectBrowseManager } from './providers/browse-manager'
 
 const ctx = injectBrowseManager()
 const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
+
+const sortOptions = computed<ComboboxOption<SortType>[]>(() =>
+	ctx.effectiveSortTypes.value.map((st) => ({
+		value: st,
+		label: st.display,
+	})),
+)
+
+const maxResultsOptions = computed<ComboboxOption<number>[]>(() =>
+	(ctx.maxResultsOptions?.value ?? [5, 10, 15, 20, 50, 100]).map((n) => ({
+		value: n,
+		label: String(n),
+	})),
+)
 </script>
 
 <template>
-	<slot name="header" />
+	<template v-if="ctx.installContext?.value && ctx.variant !== 'web'">
+		<BrowseInstallHeader />
+	</template>
 
 	<NavTabs v-if="ctx.showProjectTypeTabs.value" :links="ctx.selectableProjectTypes.value" />
 
@@ -38,29 +55,29 @@ const lockedMessages = computed(() => toValue(ctx.lockedFilterMessages))
 	/>
 
 	<div class="flex flex-wrap items-center gap-2">
-		<DropdownSelect
-			v-slot="{ selected }"
-			v-model="ctx.effectiveCurrentSortType.value"
+		<Combobox
+			:model-value="ctx.effectiveCurrentSortType.value"
+			:options="sortOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[16rem]'"
-			name="Sort by"
-			:options="[...ctx.effectiveSortTypes.value]"
-			:display-name="(option?: SortType) => option?.display"
+			placeholder="Sort by"
+			@update:model-value="(val: SortType) => (ctx.effectiveCurrentSortType.value = val)"
 		>
-			<span class="font-semibold text-primary">Sort by: </span>
-			<span class="font-semibold text-secondary">{{ selected }}</span>
-		</DropdownSelect>
+			<template #prefix>
+				<span class="font-semibold text-primary">Sort by:</span>
+			</template>
+		</Combobox>
 
-		<DropdownSelect
-			v-slot="{ selected }"
-			v-model="ctx.maxResults.value"
-			name="Max results"
-			:options="ctx.maxResultsOptions?.value ?? [5, 10, 15, 20, 50, 100]"
-			:default-value="ctx.maxResults.value"
+		<Combobox
+			:model-value="ctx.maxResults.value"
+			:options="maxResultsOptions"
 			:class="ctx.variant === 'web' ? '!w-auto flex-grow md:flex-grow-0' : 'max-w-[9rem]'"
+			placeholder="View"
+			@update:model-value="(val: number) => (ctx.maxResults.value = val)"
 		>
-			<span class="font-semibold text-primary">View: </span>
-			<span class="font-semibold text-secondary">{{ selected }}</span>
-		</DropdownSelect>
+			<template #prefix>
+				<span class="font-semibold text-primary">View:</span>
+			</template>
+		</Combobox>
 
 		<div v-if="ctx.filtersMenuOpen && !ctx.filtersMenuOpen.value" class="lg:hidden">
 			<ButtonStyled>

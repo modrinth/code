@@ -4,21 +4,17 @@ import {
 	BookmarkIcon,
 	CheckIcon,
 	DownloadIcon,
-	GameIcon,
 	GridIcon,
 	HeartIcon,
 	ImageIcon,
-	LeftArrowIcon,
 	ListIcon,
-	MinecraftServerIcon,
 	MoreVerticalIcon,
 } from '@modrinth/assets'
 import type { CardAction, CreationFlowContextValue } from '@modrinth/ui'
 import {
-	Avatar,
+	BrowseInstallHeader,
 	BrowsePageLayout,
 	BrowseSidebar,
-	ButtonStyled,
 	CreationFlowModal,
 	defineMessages,
 	injectModrinthClient,
@@ -109,7 +105,10 @@ const isServerType = computed(() => currentType.value === 'server')
 
 const projectType = computed(() => tags.value.projectTypes.find((x) => x.id === currentType.value))
 
-watch(() => projectType.value?.id, (val) => debug('projectType.id changed:', val))
+watch(
+	() => projectType.value?.id,
+	(val) => debug('projectType.id changed:', val),
+)
 
 const resultsDisplayLocation = computed<DisplayLocation | undefined>(
 	() => projectType.value?.id as DisplayLocation,
@@ -361,7 +360,11 @@ function getServerModpackContent(project: Labrinth.Search.v3.ResultSearchProject
 }
 
 async function search(requestParams: string) {
-	debug('search() called', { requestParams: requestParams.substring(0, 100), isServer: isServerType.value, projectTypeId: projectTypeId.value })
+	debug('search() called', {
+		requestParams: requestParams.substring(0, 100),
+		isServer: isServerType.value,
+		projectTypeId: projectTypeId.value,
+	})
 	const config = useRuntimeConfig()
 	let base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
@@ -514,6 +517,34 @@ const serverBackUrl = computed(() => {
 	return `/hosting/manage/${id}/content`
 })
 
+const serverBackLabel = computed(() => {
+	if (fromContext.value === 'onboarding') return 'Back to setup'
+	if (fromContext.value === 'reset-server') return 'Cancel reset'
+	return 'Back to server'
+})
+
+const serverBrowseHeading = computed(() =>
+	fromContext.value === 'reset-server'
+		? 'Select modpack to install after reset'
+		: 'Install content to server',
+)
+
+const installContext = computed(() => {
+	if (!serverData.value) return null
+	return {
+		name: serverData.value.name,
+		loader: serverData.value.loader ?? '',
+		gameVersion: serverData.value.mc_version ?? '',
+		serverId: currentServerId.value,
+		upstream: serverData.value.upstream,
+		iconSrc: serverIcon.value,
+		isMedal: serverData.value.is_medal,
+		backUrl: serverBackUrl.value,
+		backLabel: serverBackLabel.value,
+		heading: serverBrowseHeading.value,
+	}
+})
+
 const messages = defineMessages({
 	gameVersionProvidedByServer: {
 		id: 'search.filter.locked.server-game-version.title',
@@ -587,6 +618,7 @@ provideBrowseManager({
 	showProjectTypeTabs: computed(() => false),
 	variant: 'web',
 	getCardActions,
+	installContext,
 	providedFilters: serverFilters,
 	hideInstalled: serverHideInstalled,
 	showHideInstalled: computed(() => !!serverData.value && projectType.value?.id !== 'modpack'),
@@ -613,57 +645,9 @@ provideBrowseManager({
 	<Teleport v-if="flags.searchBackground" to="#absolute-background-teleport">
 		<div class="search-background"></div>
 	</Teleport>
-	<Teleport v-if="serverData" to="#discover-header-prefix" defer>
-		<div
-			class="mb-4 flex flex-wrap items-center justify-between gap-3 border-0 border-b border-solid border-divider pb-4"
-		>
-			<button
-				tabindex="-1"
-				class="flex cursor-pointer flex-col gap-4 bg-transparent text-primary"
-				@click="navigateTo(serverBackUrl)"
-			>
-				<span class="flex items-center gap-2">
-					<Avatar
-						:src="
-							serverData.is_medal
-								? 'https://cdn-raw.modrinth.com/medal_icon.webp'
-								: (serverIcon ?? MinecraftServerIcon)
-						"
-						size="48px"
-					/>
-					<span class="flex flex-col gap-2">
-						<span class="bold font-extrabold text-contrast">
-							{{ serverData.name }}
-						</span>
-						<span class="flex items-center gap-2 font-semibold text-secondary">
-							<GameIcon class="h-5 w-5 text-secondary" />
-							{{ serverData.loader }} {{ serverData.mc_version }}
-						</span>
-					</span>
-				</span>
-			</button>
-			<ButtonStyled>
-				<button @click="navigateTo(serverBackUrl)">
-					<LeftArrowIcon />
-					{{
-						fromContext === 'onboarding'
-							? 'Back to setup'
-							: fromContext === 'reset-server'
-								? 'Cancel reset'
-								: 'Back to server'
-					}}
-				</button>
-			</ButtonStyled>
-		</div>
-		<h1 class="m-0 text-xl font-extrabold leading-none text-contrast">
-			{{
-				fromContext === 'reset-server'
-					? 'Select modpack to install after reset'
-					: 'Install content to server'
-			}}
-		</h1>
-	</Teleport>
-
+	<div v-if="installContext" class="normal-page__header mb-4 flex flex-col gap-2">
+		<BrowseInstallHeader />
+	</div>
 	<aside class="normal-page__sidebar" aria-label="Filters">
 		<AdPlaceholder v-if="!auth.user && !serverData" />
 		<BrowseSidebar />

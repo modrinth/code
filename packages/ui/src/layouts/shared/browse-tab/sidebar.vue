@@ -37,7 +37,7 @@ const buttonClass = computed(() => {
 	return 'button-animation flex flex-col gap-1 px-6 py-4 w-full bg-transparent cursor-pointer border-none'
 })
 
-const contentClass = computed(() => (isApp.value ? 'mb-3' : 'mb-4 mx-3'))
+const contentClass = computed(() => (isApp.value ? 'mt-2 mb-3' : 'mb-4 mx-3'))
 const innerPanelClass = computed(() => (isApp.value ? 'ml-2 mr-3' : 'p-1'))
 
 function getFilterOpenByDefault(filterId: string): boolean {
