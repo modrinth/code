@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed, nextTick, onUnmounted, reactive, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 import type { TabbedModalTab } from '#ui/components'
 import { TabbedModal } from '#ui/components'
@@ -17,8 +17,7 @@ import {
 	type ServerSettingsTabId,
 } from '#ui/layouts/shared/server-settings'
 import { provideServerSettings } from '#ui/layouts/shared/server-settings/providers/server-settings'
-import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
-import { type BusyReason, provideModrinthServerContext } from '#ui/providers/server-context'
+import { injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 import { commonMessages } from '#ui/utils/common-messages'
 
 type ShowOptions = {
@@ -50,58 +49,12 @@ const messages = defineMessages({
 
 const modal = ref<InstanceType<typeof TabbedModal> | null>(null)
 
-const currentServerId = ref('')
-const worldId = ref<string | null>(null)
-const server = ref<Archon.Servers.v0.Server>({} as Archon.Servers.v0.Server)
+const { serverId: currentServerId, worldId, server } = injectModrinthServerContext()
 
 const currentUserId = ref<string | null>(null)
 const currentUserRole = ref<string | null>(null)
 
 const isApp = ref(true)
-
-const isConnected = ref(true)
-const powerState = ref<Archon.Websocket.v0.PowerState>('stopped')
-const isServerRunning = computed(() => powerState.value === 'running')
-const backupsState = reactive(new Map())
-const isSyncingContent = ref(false)
-
-const busyReasons = computed<BusyReason[]>(() => {
-	const reasons: BusyReason[] = []
-	if (server.value?.status === 'installing') {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.installing',
-				defaultMessage: 'Server is installing',
-			}),
-		})
-	}
-	if (isSyncingContent.value) {
-		reasons.push({
-			reason: defineMessage({
-				id: 'servers.busy.syncing-content',
-				defaultMessage: 'Content sync in progress',
-			}),
-		})
-	}
-	return reasons
-})
-
-const fsAuth = ref<{ url: string; token: string } | null>(null)
-const fsOps = ref<Archon.Websocket.v0.FilesystemOperation[]>([])
-const fsQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
-
-async function refreshFsAuth() {
-	if (!currentServerId.value) {
-		fsAuth.value = null
-		return
-	}
-	fsAuth.value = await queryClient.fetchQuery({
-		queryKey: ['servers', 'filesystem-auth', currentServerId.value],
-		queryFn: () => client.archon.servers_v0.getFilesystemAuth(currentServerId.value),
-	})
-}
-
-function markBackupCancelled(_backupId: string) {}
 
 const serverSettingsTabComponentMap = {
 	general: ServerSettingsGeneralPage,
@@ -119,45 +72,6 @@ provideServerSettings({
 	closeModal: () => hide(),
 })
 
-provideModrinthServerContext({
-	get serverId() {
-		return currentServerId.value
-	},
-	worldId,
-	server,
-	isConnected,
-	powerState,
-	isServerRunning,
-	backupsState,
-	markBackupCancelled,
-	isSyncingContent,
-	busyReasons,
-	fsAuth,
-	fsOps,
-	fsQueuedOps,
-	refreshFsAuth,
-	stats: ref({
-		current: {
-			cpu_percent: 0,
-			ram_usage_bytes: 0,
-			ram_total_bytes: 1,
-			storage_usage_bytes: 0,
-			storage_total_bytes: 0,
-		},
-		past: {
-			cpu_percent: 0,
-			ram_usage_bytes: 0,
-			ram_total_bytes: 1,
-			storage_usage_bytes: 0,
-			storage_total_bytes: 0,
-		},
-		graph: { cpu: [], ram: [] },
-	}),
-	isWsAuthIncorrect: ref(false),
-	powerStateDetails: ref(undefined),
-	uptimeSeconds: ref(0),
-})
-
 const ownerId = computed(() => server.value?.owner_id ?? 'Ghost')
 const isOwner = computed(() => currentUserId.value != null && currentUserId.value === ownerId.value)
 const isAdmin = computed(() => currentUserRole.value === 'admin')
@@ -165,7 +79,7 @@ const isAdmin = computed(() => currentUserRole.value === 'admin')
 const tabs = computed<TabbedModalTab[]>(() =>
 	serverSettingsTabDefinitions.map((tab) => {
 		const ctx = {
-			serverId: currentServerId.value,
+			serverId: currentServerId,
 			ownerId: ownerId.value,
 			serverStatus: server.value?.status,
 			isOwner: isOwner.value,
@@ -206,25 +120,24 @@ async function fetchViewer() {
 
 async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 	try {
-		currentServerId.value = serverId
+		const targetServerId = currentServerId
+		if (serverId !== targetServerId) {
+			console.warn(
+				`[ServerSettingsModal] Ignoring mismatched serverId "${serverId}" in favor of context "${targetServerId}"`,
+			)
+		}
 
 		const cachedServer = queryClient.getQueryData<Archon.Servers.v0.Server>([
 			'servers',
 			'detail',
-			serverId,
+			targetServerId,
 		])
 		const cachedFull = queryClient.getQueryData<Archon.Servers.v1.ServerFull>([
 			'servers',
 			'v1',
 			'detail',
-			serverId,
+			targetServerId,
 		])
-
-		if (cachedServer) server.value = cachedServer
-		if (cachedFull) {
-			const activeWorld = cachedFull.worlds.find((world) => world.is_active)
-			worldId.value = activeWorld?.id ?? cachedFull.worlds[0]?.id ?? null
-		}
 
 		modal.value?.show()
 		const visibleTabs = tabs.value.filter((tab) => tab.shown !== false)
@@ -243,48 +156,42 @@ async function show({ serverId, tabIndex, tabId }: ShowOptions) {
 
 		const fetchPromises: Promise<unknown>[] = [fetchViewer()]
 
-		if (!cachedServer || !cachedFull) {
+		if (!cachedServer) {
 			fetchPromises.push(
-				queryClient
-					.fetchQuery({
-						queryKey: ['servers', 'detail', serverId],
-						queryFn: () => client.archon.servers_v0.get(serverId),
-					})
-					.then((data) => {
-						server.value = data
-					}),
-				queryClient
-					.fetchQuery({
-						queryKey: ['servers', 'v1', 'detail', serverId],
-						queryFn: () => client.archon.servers_v1.get(serverId),
-					})
-					.then((data) => {
-						const activeWorld = data.worlds.find((world) => world.is_active)
-						worldId.value = activeWorld?.id ?? data.worlds[0]?.id ?? null
-					}),
+				queryClient.fetchQuery({
+					queryKey: ['servers', 'detail', targetServerId],
+					queryFn: () => client.archon.servers_v0.get(targetServerId),
+				}),
+			)
+		}
+
+		if (!cachedFull) {
+			fetchPromises.push(
+				queryClient.fetchQuery({
+					queryKey: ['servers', 'v1', 'detail', targetServerId],
+					queryFn: () => client.archon.servers_v1.get(targetServerId),
+				}),
 			)
 		}
 
 		await Promise.all(fetchPromises)
 
-		setNodeAuthState(() => fsAuth.value, refreshFsAuth)
-		refreshFsAuth().catch(() => {})
-
 		if (worldId.value) {
 			queryClient.prefetchQuery({
-				queryKey: ['servers', 'properties', 'v1', serverId, worldId.value],
-				queryFn: () => client.archon.properties_v1.getProperties(serverId, worldId.value!),
+				queryKey: ['servers', 'properties', 'v1', targetServerId, worldId.value],
+				queryFn: () =>
+					client.archon.properties_v1.getProperties(targetServerId, worldId.value!),
 			})
 			queryClient.prefetchQuery({
-				queryKey: ['content', 'list', 'v1', serverId],
+				queryKey: ['content', 'list', 'v1', targetServerId],
 				queryFn: () =>
-					client.archon.content_v1.getAddons(serverId, worldId.value!, {
+					client.archon.content_v1.getAddons(targetServerId, worldId.value!, {
 						from_modpack: false,
 					}),
 			})
 			queryClient.prefetchQuery({
-				queryKey: ['servers', 'startup', 'v1', serverId, worldId.value],
-				queryFn: () => client.archon.options_v1.getStartup(serverId, worldId.value!),
+				queryKey: ['servers', 'startup', 'v1', targetServerId, worldId.value],
+				queryFn: () => client.archon.options_v1.getStartup(targetServerId, worldId.value!),
 			})
 		}
 	} catch (error) {
@@ -300,14 +207,6 @@ function hide() {
 	modal.value?.hide()
 }
 
-function onHide() {
-	clearNodeAuthState()
-}
-
-onUnmounted(() => {
-	clearNodeAuthState()
-})
-
 defineExpose({ show, hide })
 </script>
 
@@ -315,7 +214,6 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="tabs"
-		:on-hide="onHide"
 		:max-width="'min(980px, calc(95vw - 10rem))'"
 		:width="'min(980px, calc(95vw - 10rem))'"
 	>

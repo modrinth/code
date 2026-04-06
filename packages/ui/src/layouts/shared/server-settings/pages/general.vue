@@ -142,12 +142,18 @@ import {
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
-const { server, serverId, busyReasons } = injectModrinthServerContext()
+const { server: data, serverId, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
 
-const data = server
 const serverName = ref(data.value?.name)
 const serverSubdomain = ref(data.value?.net?.domain ?? '')
+
+watch(data, (newData) => {
+	if (newData) {
+		serverName.value = newData.name
+		serverSubdomain.value = newData.net?.domain ?? ''
+	}
+})
 const isValidLengthSubdomain = computed(() => serverSubdomain.value.length >= 5)
 const isValidCharsSubdomain = computed(
 	() => !serverSubdomain.value || /^[a-zA-Z0-9-]+$/.test(serverSubdomain.value),
@@ -157,8 +163,8 @@ const isValidSubdomain = computed(() => isValidLengthSubdomain.value && isValidC
 const isUpdating = ref(false)
 const isValidServerName = computed(() => (serverName.value?.length ?? 0) > 0)
 
-watch(serverName, (oldValue) => {
-	if (!isValidServerName.value) {
+watch(serverName, (newValue, oldValue) => {
+	if (!(newValue?.length ?? 0)) {
 		serverName.value = oldValue
 	}
 })
@@ -260,8 +266,9 @@ const saveGeneral = async () => {
 		// Save preferences to localStorage
 		userPreferences.value = { ...newUserPreferences.value }
 
-		await new Promise((resolve) => setTimeout(resolve, 500))
-		await queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
+		await queryClient.invalidateQueries({
+			queryKey: ['servers', 'detail', serverId],
+		})
 		addNotification({
 			type: 'success',
 			title: 'Server settings updated',

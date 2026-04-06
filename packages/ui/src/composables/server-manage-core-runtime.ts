@@ -1,10 +1,14 @@
-import { type Archon, type UploadState, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
+import {
+	type Archon,
+	clearNodeAuthState,
+	setNodeAuthState,
+	type UploadState,
+} from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
 import { computed, reactive, ref, watch } from 'vue'
 
 import type { FileOperation } from '../layouts/shared/files-tab/types'
-
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
 import type { BusyReason } from '../providers/server-context'
 import { defineMessage } from './i18n'
