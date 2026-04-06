@@ -1,3 +1,4 @@
+export * from './shared/browse-tab'
 export * from './shared/console'
 export * from './shared/content-tab'
 export * from './shared/files-tab'
