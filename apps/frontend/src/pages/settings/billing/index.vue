@@ -836,6 +836,14 @@ const messages = defineMessages({
 		id: 'settings.billing.interval.year',
 		defaultMessage: 'year',
 	},
+	intervalQuarter: {
+		id: 'settings.billing.interval.quarter',
+		defaultMessage: 'quarter',
+	},
+	intervalQuarterly: {
+		id: 'settings.billing.interval.quarterly.adjective',
+		defaultMessage: 'quarterly',
+	},
 	intervalMonthly: {
 		id: 'settings.billing.interval.monthly',
 		defaultMessage: 'monthly',
@@ -1016,15 +1024,20 @@ const messages = defineMessages({
 })
 
 function getIntervalNounLabel(interval) {
+	console.log(interval)
 	return interval === 'yearly'
 		? formatMessage(messages.intervalYear)
-		: formatMessage(messages.intervalMonth)
+		: interval === 'quarterly'
+			? formatMessage(messages.intervalQuarter)
+			: formatMessage(messages.intervalMonth)
 }
 
 function getIntervalAdjectiveLabel(interval) {
 	return interval === 'yearly'
 		? formatMessage(messages.intervalYearly)
-		: formatMessage(messages.intervalMonthly)
+		: interval === 'quarterly'
+			? formatMessage(messages.intervalQuarterly)
+			: formatMessage(messages.intervalMonthly)
 }
 
 const queryClient = useQueryClient()
