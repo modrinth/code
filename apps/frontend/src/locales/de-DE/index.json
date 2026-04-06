@@ -3209,6 +3209,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Vergangene Abbuchungen"
+  },
   "settings.billing.expires": {
     "message": "Läuft ab am {date}"
   },

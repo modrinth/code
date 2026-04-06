@@ -2343,7 +2343,7 @@
     "defaultMessage": "일반"
   },
   "project.settings.license.title": {
-    "defaultMessage": "라이센스"
+    "defaultMessage": "라이선스"
   },
   "project.settings.links.title": {
     "defaultMessage": "링크"
@@ -2457,7 +2457,7 @@
     "defaultMessage": "모든 버전 보이기"
   },
   "search.filter_type.license": {
-    "defaultMessage": "이용 허가"
+    "defaultMessage": "라이선스"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "오픈 소스"

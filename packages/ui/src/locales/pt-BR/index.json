@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Atualizar projetos"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Mantenha pressionada a tecla Shift enquanto clica em \"Atualizar tudo\" para ignorar esta confirmação no futuro."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Atualizar {count, plural, one {# projeto} other {# projetos}}"
   },
@@ -977,6 +980,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Não recomendamos editar as configurações da sua instalação após instalar conteúdo. Se quiser editá-las, redefina seu servidor."
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Auto corrigir"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Alterar carregador"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Desativar conflitos"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Ao alterar a versão do jogo, podemos desativar o conteúdo instalado incompatível ou tentar resolver as incompatibilidades."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Aviso de incompatibilidade"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Conteúdo incompatível instalado"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Ao alterar o carregador, todo o conteúdo instalado será desativado. Recomendamos redefinir seu servidor em vez disso."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Alterar carregadores é destrutivo"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Vinculado ao {projectType, select, server {projeto de servidor} other {pacote de mods}}"
   },
@@ -1149,7 +1176,7 @@
     "defaultMessage": "Trocar versão"
   },
   "instances.updater-modal.hide-incompatible": {
-    "defaultMessage": "Ver incompatibilidade"
+    "defaultMessage": "Ocultar incompatíveis"
   },
   "instances.updater-modal.loading-changelog": {
     "defaultMessage": "Carregando registro de alterações..."

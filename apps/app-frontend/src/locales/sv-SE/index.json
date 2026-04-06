@@ -111,13 +111,13 @@
     "message": "Utforska servrar"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' kommer bli **permanent borttagen**, och det kommer inte finnas något sätt att återskapa den."
+    "message": "'{name}' kommer ** tas bort permanent**, och det kommer inte finnas något sätt att återskapa den."
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Är du säker på att du vill permanent radera denna värld?"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "Moddade"
+    "message": "Moddad"
   },
   "app.instance.worlds.filter-offline": {
     "message": "Offline"
@@ -231,7 +231,7 @@
     "message": "Nedladdning slutförd"
   },
   "app.update-popup.reload": {
-    "message": "Kolla efter uppdateringar"
+    "message": "Ladda om"
   },
   "app.update-popup.title": {
     "message": "Uppdatering tillgänglig"

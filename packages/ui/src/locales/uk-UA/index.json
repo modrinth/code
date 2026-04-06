@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Оновлення проєктів"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Щоб пропустити це підтвердження в майбутньому, утримуйте клавішу Shift, натискаючи «Оновити все»."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
@@ -363,7 +366,7 @@
     "defaultMessage": "Будь ласка, зачекайте"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {умісту}}…"
+    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {елементів умісту}}…"
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Назви файлів"
@@ -976,6 +979,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, скиньте ваш сервер."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Виправити автоматично"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Змінити завантажувач"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Вимкнути конфлікти"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Змінюючи версію гри, ми можемо вимкнути несумісний встановлений вміст або спробувати усунути несумісність."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Попередження несумісности"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Установлено несумісний уміст"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "При зміні завантажувача весь встановлений уміст буде вимкнено. Натомість рекомендуємо скинути налаштування сервера."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Змінення завантажувача деструктивне"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType, select, server {Пов’заний проєкт сервера} other {Пов’зана збірка}}"

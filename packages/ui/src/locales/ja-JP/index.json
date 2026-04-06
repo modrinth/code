@@ -207,7 +207,7 @@
     "defaultMessage": "更新"
   },
   "button.upload-image": {
-    "defaultMessage": "画像のアップロード"
+    "defaultMessage": "画像をアップロード"
   },
   "changelog.justNow": {
     "defaultMessage": "今"
@@ -232,6 +232,9 @@
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "プロジェクトをアップデート"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Shiftキーを押しながら「すべて更新」をクリックすると、今後この確認をスキップできます。"
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "プロジェクトをアップデート"
@@ -570,10 +573,10 @@
     "defaultMessage": "保存されていない変更があります。"
   },
   "files.move-modal.current-location": {
-    "defaultMessage": "現在地"
+    "defaultMessage": "現在のパス"
   },
   "files.move-modal.destination-path": {
-    "defaultMessage": "ファイルへのパス"
+    "defaultMessage": "移動先のパス"
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "例: /my-folder"
@@ -620,6 +623,9 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URLからアップロード"
   },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} 展開済み"
+  },
   "files.operations.extracting": {
     "defaultMessage": "{source} を展開中"
   },
@@ -628,6 +634,12 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpackのURL"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "ファイルをアップロード中 ({completed} / {total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "名前変更 {name}"
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新しい名前"
@@ -642,10 +654,16 @@
     "defaultMessage": "名前"
   },
   "files.table-header.size": {
-    "defaultMessage": "大きさ"
+    "defaultMessage": "ファイル数"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "保存されていない変更があります。閉じる前に保存しますか？"
   },
   "files.unsaved-changes-modal.discard": {
     "defaultMessage": "削除"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "未保存の変更"
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "ファイル"
@@ -665,8 +683,29 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForgeのmodpackをインストールする"
   },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "リンクを入力"
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URLは必須です。"
+  },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "インストール"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "インストールに失敗"
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "URLをコピー"
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Modパックを探す"
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "バージョンを選択"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "不明なエラーが発生しました"
   },
   "form.label.address-line": {
     "defaultMessage": "住所 1行目"
@@ -874,6 +913,15 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "コンテンツのインストール後にインストール設定を編集することは推奨されません。編集する場合はサーバーをリセットしてください。"
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自動修正"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "ローダーを変更"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "競合を無効化する"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "リンクされた{projectType, select, server {サーバープロジェクト} other {Modパック}}"

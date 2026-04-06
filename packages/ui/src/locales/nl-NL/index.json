@@ -717,7 +717,7 @@
     "defaultMessage": "Wachtwoord"
   },
   "label.played": {
-    "defaultMessage": "Gespeeld {ago}"
+    "defaultMessage": "Voor het laatst gespeeld {ago}"
   },
   "label.project": {
     "defaultMessage": "Project"

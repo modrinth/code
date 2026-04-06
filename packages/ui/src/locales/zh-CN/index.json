@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "更新项目"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "在点击“全部更新”时按住 Shift 键，以后将跳过此确认。"
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "更新 {count, plural, other {# 个项目}}"
   },
@@ -977,6 +980,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "我们不建议在安装内容后修改安装设置。如果你想修改，请先重置你的服务器。"
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自动修复"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "更改加载器"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "禁用冲突项"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "切换游戏版本时 我们既可以选择禁用那些不兼容的已安装内容 也可以尝试去解决这些兼容性问题"
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "不兼容警告"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "安装了不兼容的内容"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "切换加载器时 所有已经安装的内容都会被强制禁用 我们建议你直接重置服务器"
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "更改加载器具有破坏性"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "链接 {projectType, select, server {服务器项目} other {整合包}}"
   },
@@ -1371,7 +1398,7 @@
     "defaultMessage": "单人游戏"
   },
   "label.sort-by": {
-    "defaultMessage": "排序方式: "
+    "defaultMessage": "排序方式："
   },
   "label.success": {
     "defaultMessage": "成功"
@@ -1587,7 +1614,7 @@
     "defaultMessage": "定时"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "正在审核"
+    "defaultMessage": "审核中"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "未列出"
@@ -2400,7 +2427,7 @@
     "defaultMessage": "定时"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "正在审核"
+    "defaultMessage": "审核中"
   },
   "project.visibility.unknown": {
     "defaultMessage": "未知"

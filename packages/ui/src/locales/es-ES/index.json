@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Actualizar proyectos"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Mantén Shift mientras pulsas \"Actualizar todo\" para omitir esta confirmación en el futuro."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Actualizar {count, plural, one {# proyecto} other {# proyectos}}"
   },
@@ -458,6 +461,12 @@
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Los archivos serán sobreescritos"
   },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Crear {type, select, directory {carpeta} other {archivo}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Crear {type, select, directory {una carpeta} other {un archivo}}"
+  },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "ej. mi-capeta"
   },
@@ -469,6 +478,9 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Eliminar archivo"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Esta carpeta y todos sus contenidos serán eliminados permanentemente. Esta acción es irreversible.} other {Este archivo será eliminado permanentemente. Esta acción es irreversible.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "No se pudo cargar los contenidos del archivo."
@@ -487,6 +499,12 @@
   },
   "files.editor.file-saved-title": {
     "defaultMessage": "Archivo guardado"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "La URL a tu archivo de registro se ha copiado a tu portapapeles."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "URL de registro copiada"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "No se pudo guardar el archivo."
@@ -547,6 +565,126 @@
   },
   "files.layout.unsaved-changes": {
     "defaultMessage": "Tienes cambios sin guardar."
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "ej. /mi-capeta"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {Mover carpeta} other {Mover archivo}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Regresar a inicio"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Inicio"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Instalar el paquete de CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Nuevo archivo"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Nueva carpeta"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Buscar archivos"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Compartir en mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Subir archivo"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Subir desde un archivo .zip"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Subir desde una URL .zip"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} extraídos"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Extrayendo {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Error"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "pack de mods desde una URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent}%)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Subiendo archivos ({completed}/{total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Renombrar {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Nuevo nombre"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# elemento} other {# elementos}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Creado"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Modificado"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Nombre"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Tamaño"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Tienes cambios sin guardar que se perderán si te sales. ¿Te gustaría guardarlos antes?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Descartar"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Cambios sin guardar"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Cancelado"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "Error - El archivo ya existe"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "Error - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "Error - Tipo de archivo incorrecto"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Error al subir {fileName}"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Archivo"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Ha ocurrido un error inesperado."
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": " - {count} restantes"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "El nombre solo debe contener caracteres alfanuméricos, guiones (-), guiones bajos (_) o espacios."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "El nombre solo debe contener caracteres alfanuméricos, guiones (-), guiones bajos (_), puntos (.) o espacios."
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Nombre"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "El nombre es obligatorio."
   },
   "form.label.address-line": {
     "defaultMessage": "Línea de dirección"
@@ -2923,6 +3061,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Tienes cambios sin guardar."
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "Tienes cambios sin guardar que se perderán si abandonas la página."
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "Tienes cambios sin guardar"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Salir"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Quedarse"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "¿Salir de la página?"
   }
 }
 

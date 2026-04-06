@@ -3201,13 +3201,16 @@
     "message": "你过去所有支付给Modrinth账户的款项都将列在这里："
   },
   "settings.billing.charges.product.medal-trial": {
-    "message": "服务器试用版"
+    "message": "Medal 服务器试用"
   },
   "settings.billing.charges.product.midas": {
     "message": "Modrinth Plus"
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth托管服务"
+  },
+  "settings.billing.charges.title": {
+    "message": "过去费用"
   },
   "settings.billing.expires": {
     "message": "有效期至{date}"
@@ -3588,13 +3591,13 @@
     "message": "未知平台"
   },
   "settings.sidebar.label.account": {
-    "message": "账户选项"
+    "message": "账户设置"
   },
   "settings.sidebar.label.developer": {
-    "message": "开发者选项"
+    "message": "开发者设置"
   },
   "settings.sidebar.label.display": {
-    "message": "显示选项"
+    "message": "显示设置"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Modrinth 的最新消息"

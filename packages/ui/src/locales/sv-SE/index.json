@@ -132,7 +132,7 @@
     "defaultMessage": "Spela"
   },
   "button.refresh": {
-    "defaultMessage": "Ladda om"
+    "defaultMessage": "Sök efter uppdateringar"
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Ominstallera modpaket"
@@ -439,6 +439,12 @@
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Över 100 filer kommer att skrivas över om du fortsätter med extrahering; här är några av dem."
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Länkstigsnavigering"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Skapa ny..."
   },
   "form.label.address-line": {
     "defaultMessage": "Adresslinje"

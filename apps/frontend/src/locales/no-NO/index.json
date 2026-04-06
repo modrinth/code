@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Kunne ikke reparere serveren"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Kunne ikke gjøre omstart på serveren til onboarding"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Kunne ikke lagre installeringsinnstillinger"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Fjerner all data på serveren din, inkludert verdene dine, modsa dine og konfigurasjonsfilene dine. Sikkerhetskopier blir igjen og kan bli gjenoppretta."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Tilbakestill til onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Dette kommer til å sende serveren tilbake til onboarding sånn at oppsetter kan bli fullført igjen. Er du sikker på at du vil gå videre?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Tilbakestill til onboarding"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Serveren har gått tilbake til onboarding-flyten."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Serveren har blitt tilbakestilt til onboarding"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Støtteinnstillingar"
   },
   "hosting.plan.out-of-stock": {
     "message": "Utsolgt"

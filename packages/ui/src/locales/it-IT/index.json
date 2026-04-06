@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Aggiornamento progetti"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Salta la conferma in futuro cliccando \"Aggiorna tutto\" tenendo premuto Shift."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aggiorna {count, plural, one {# progetto} other {# progetti}}"
   },
@@ -573,7 +576,7 @@
     "defaultMessage": "Percorso attuale"
   },
   "files.move-modal.destination-path": {
-    "defaultMessage": "Percorso di destinazione"
+    "defaultMessage": "Nuovo percorso"
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "es. /la-mia-cartella"
@@ -585,19 +588,19 @@
     "defaultMessage": "Torna alla home"
   },
   "files.navbar.breadcrumb-navigation": {
-    "defaultMessage": "Breadcrumb"
+    "defaultMessage": "Percorso attuale"
   },
   "files.navbar.create-new": {
     "defaultMessage": "Crea..."
   },
   "files.navbar.file-navigation": {
-    "defaultMessage": "Navigazione file"
+    "defaultMessage": "Navigazione tra i file"
   },
   "files.navbar.home": {
     "defaultMessage": "Home"
   },
   "files.navbar.install-curseforge-pack": {
-    "defaultMessage": "Installa da CurseForge"
+    "defaultMessage": "Importa da CurseForge"
   },
   "files.navbar.new-file": {
     "defaultMessage": "Nuovo file"
@@ -609,22 +612,22 @@
     "defaultMessage": "Cerca file"
   },
   "files.navbar.share-to-mclogs": {
-    "defaultMessage": "Condividi su mclo.gs"
+    "defaultMessage": "Condividi con mclo.gs"
   },
   "files.navbar.upload-file": {
     "defaultMessage": "Carica file"
   },
   "files.navbar.upload-from-zip": {
-    "defaultMessage": "Carica .zip da file"
+    "defaultMessage": "Carica da file .zip"
   },
   "files.navbar.upload-from-zip-url": {
-    "defaultMessage": "Carica .zip da URL"
+    "defaultMessage": "Carica da URL a .zip"
   },
   "files.operations.extracted": {
-    "defaultMessage": "estratti {size}"
+    "defaultMessage": "{size} estratti"
   },
   "files.operations.extracting": {
-    "defaultMessage": "Estraendo {source}"
+    "defaultMessage": "Estraendo {source}..."
   },
   "files.operations.failed": {
     "defaultMessage": "Errore"
@@ -648,10 +651,10 @@
     "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
   },
   "files.table-header.created": {
-    "defaultMessage": "Creato"
+    "defaultMessage": "Creazione"
   },
   "files.table-header.modified": {
-    "defaultMessage": "Modificato"
+    "defaultMessage": "Modifica"
   },
   "files.table-header.name": {
     "defaultMessage": "Nome"
@@ -687,7 +690,7 @@
     "defaultMessage": "File"
   },
   "files.upload-dropdown.file-uploads": {
-    "defaultMessage": "Caricamento {fileType}"
+    "defaultMessage": "Caricamenti {fileType}"
   },
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Tipo di file caricato errato"
@@ -976,6 +979,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Non consigliamo di modificare l'installazione dopo aver installato dei contenuti. Se vuoi modificarla, reimposta il server."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Sistema"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Cambia loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Disabilita conflitti"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Cambiando versione del gioco, possiamo disabilitare i contenuti installati incompatibili o provare a risolvere le incompatibilità."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Avviso di incompatibilità"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Contenuto incompatibile installato"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Cambiando loader, tutti i contenuti installati verranno disabilitati. Consigliamo di reimpostare il server invece."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Cambiare loader è un processo distruttivo"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType, select, server {Server} other {Pacchetto}} collegato"
