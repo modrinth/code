@@ -25,7 +25,11 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 malicious_origins: HashSet::new(),
             }));
 
-            // We refresh the ads window every 5 minutes for performance
+            // We refresh the ads window every 5 minutes to mitigate memory leak issues.
+            // While this loop doesn't include explicit checks to see if the window is still
+            // visible when we refresh, the Aditude wrapper will not make any ad requests
+            // unless Chromium reports the page as visible. The refresh does not reset the
+            // visibility state.
             let app = app.clone();
             tauri::async_runtime::spawn(async move {
                 loop {
@@ -109,6 +113,10 @@ pub async fn init_ads_window<R: Runtime>(
                     ),
                 )
                 .initialization_script_for_all_frames(include_str!("ads-init.js"))
+                // We use a standard Chrome user agent for compatibility with our ad provider,
+                // since Tauri is not recognized by ad providers by default.
+                // Aditude has separately informed SSPs and IVT vendors that this traffic
+                // originates from a desktop app.
                 .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
                 .zoom_hotkeys_enabled(false)
                 .transparent(true)
