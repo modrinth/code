@@ -384,23 +384,22 @@ import {
 	TriangleAlertIcon,
 	UploadIcon,
 } from '@modrinth/assets'
-import { formatBytes } from '@modrinth/utils'
 import type { Stats } from '@modrinth/utils'
+import { formatBytes } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
-import ServerNotice from '#ui/components/base/ServerNotice.vue'
-import Admonition from '#ui/components/base/Admonition.vue'
 import ProgressBar from '#ui/components/base/ProgressBar.vue'
-import BackupProgressAdmonitions from '#ui/components/servers/backups/BackupProgressAdmonitions.vue'
+import ServerNotice from '#ui/components/base/ServerNotice.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
-import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
+import BackupProgressAdmonitions from '#ui/components/servers/backups/BackupProgressAdmonitions.vue'
 import { ServerIcon } from '#ui/components/servers/icons'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
@@ -425,6 +424,7 @@ import {
 	provideServerSettingsModal,
 } from '#ui/providers'
 import { formatLoaderLabel } from '#ui/utils/loaders'
+import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
 
 import ServerOnboardingPanelPage from './[id]/onboarding.vue'
 
@@ -726,8 +726,8 @@ const revealState = ref<'pending' | 'revealing' | 'visible'>(
 
 const REVEAL_TOTAL_MS = 2 * 80 + 400
 
-watch(isConnected, (connected) => {
-	if (connected && revealState.value === 'pending') {
+watch([isConnected, serverData], ([connected, data]) => {
+	if ((connected || data) && revealState.value === 'pending') {
 		revealState.value = 'revealing'
 		setTimeout(() => {
 			revealState.value = 'visible'
