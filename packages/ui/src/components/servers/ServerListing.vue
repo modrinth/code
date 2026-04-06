@@ -6,7 +6,7 @@
 			:class="{ 'cursor-default': isDisabled }"
 		>
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-all duration-150"
+				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-bg-raised p-4 transition-all duration-150"
 				:class="{
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
@@ -169,7 +169,7 @@
 				>
 					<button
 						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
-						class="!border-surface-5"
+						class="!border-surface-4"
 						@click="onDownloadBackup"
 					>
 						<DownloadIcon />
@@ -178,7 +178,7 @@
 				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
 					<button
 						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
-						class="!border-surface-5"
+						class="!border-surface-4"
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied">
@@ -586,7 +586,7 @@ async function copyToClipboard(text: string) {
 
 <style scoped>
 .server-listing-notice {
-	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
+	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-4 bg-bg-raised text-primary;
 }
 
 .hoverable:hover:not(:has([data-subdomain-label]:hover)) {
