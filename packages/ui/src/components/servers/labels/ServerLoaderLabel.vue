@@ -8,7 +8,7 @@
 				v-if="isLink"
 				v-tooltip="'Change server loader'"
 				:to="settingsLinkTarget"
-				class="flex min-w-0 items-center text-sm font-semibold"
+				class="flex min-w-0 items-center font-medium text-sm"
 				:class="settingsLinkTarget ? 'hover:underline' : ''"
 			>
 				<span v-if="loader">
@@ -20,7 +20,7 @@
 					<span class="inline-block h-4 w-12 animate-pulse rounded bg-button-border"></span>
 				</span>
 			</AutoLink>
-			<div v-else class="pointer-events-none min-w-0 text-sm font-semibold">
+			<div v-else class="pointer-events-none min-w-0 font-medium text-sm">
 				<span v-if="loader">
 					{{ loader }}
 					<span v-if="loaderVersion">{{ loaderVersion }}</span>
