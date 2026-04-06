@@ -17,13 +17,13 @@
 				]"
 			>
 				<ServerIcon
-					class="size-24 transition-[filter] group-hover:brightness-75"
+					class="size-28 transition-[filter] group-hover:brightness-75"
 					:image="displayIcon"
 				/>
 				<div
 					class="absolute top-0 w-full h-full flex justify-center items-center opacity-0 transition-all group-hover:opacity-100"
 				>
-					<EditIcon aria-hidden="true" class="h-10 w-10" />
+					<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #sync> <TransferIcon /> Sync icon </template>
