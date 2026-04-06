@@ -290,6 +290,7 @@
 						}
 					}),
 				]"
+				class="mb-4"
 			/>
 
 			<ProjectCardList

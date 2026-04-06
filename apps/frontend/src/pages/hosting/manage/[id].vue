@@ -414,17 +414,16 @@ const isLoading = ref(true)
 const isMounted = ref(true)
 const unsubscribers = ref<(() => void)[]>([])
 const flags = useFeatureFlags()
+const config = useRuntimeConfig()
 
-const INTERCOM_APP_ID = ref('ykeritl9')
-const auth = (await useAuth()) as unknown as {
-	value: { user: { id: string; username: string; email: string; created: string } }
+type AuthUser = {
+	id: string
+	username: string
+	email?: string
+	created: string
 }
-const userId = ref(auth.value?.user?.id ?? null)
-const username = ref(auth.value?.user?.username ?? null)
-const email = ref(auth.value?.user?.email ?? null)
-const createdAt = ref(
-	auth.value?.user?.created ? Math.floor(new Date(auth.value.user.created).getTime() / 1000) : null,
-)
+
+const auth = (await useAuth()) as unknown as { value: { user: AuthUser | null } }
 
 const debug = useDebugLogger('ServerManage')
 const route = useNativeRoute()
@@ -1332,6 +1331,22 @@ const openInstallLog = () => {
 	})
 }
 
+async function initializeIntercom() {
+	if (!auth.value?.user) return
+
+	try {
+		const intercomData = await $fetch<{ token: string }>('/api/intercom/messenger-jwt')
+
+		Intercom({
+			app_id: config.public.intercomAppId,
+			intercom_user_jwt: intercomData.token,
+			session_duration: 1000 * 60 * 60 * 24,
+		})
+	} catch (error) {
+		console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
+	}
+}
+
 const cleanup = () => {
 	isMounted.value = false
 
@@ -1490,26 +1505,7 @@ onMounted(() => {
 		})
 	}
 
-	if (username.value && email.value && userId.value && createdAt.value) {
-		const currentUser = auth.value?.user as any
-		const matches =
-			username.value === currentUser?.username &&
-			email.value === currentUser?.email &&
-			userId.value === currentUser?.id &&
-			createdAt.value === Math.floor(new Date(currentUser?.created).getTime() / 1000)
-
-		if (matches) {
-			Intercom({
-				app_id: INTERCOM_APP_ID.value,
-				userId: userId.value,
-				name: username.value,
-				email: email.value,
-				created_at: createdAt.value,
-			})
-		} else {
-			console.warn('[PYROSERVERS][INTERCOM] mismatch')
-		}
-	}
+	void initializeIntercom()
 
 	DOMPurify.addHook(
 		'afterSanitizeAttributes',
