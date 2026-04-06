@@ -17,6 +17,7 @@
 				</div>
 				<div v-else class="flex flex-wrap items-center gap-2">
 					<div v-if="props.server?.loader" class="flex items-center gap-2 font-medium capitalize">
+						<LoaderIcon :loader="props.server.loader" class="flex shrink-0 [&&]:size-5" />
 						{{ props.server.loader }} {{ props.server.mc_version }}
 					</div>
 
@@ -31,12 +32,14 @@
 						class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
 						@click="copyServerAddress"
 					>
+						<LinkIcon class="flex size-5 shrink-0" />
 						{{ props.server.net.domain }}.modrinth.gg
 					</div>
 
 					<div v-if="showUptime" class="h-1.5 w-1.5 rounded-full bg-surface-5" />
 
 					<div v-if="showUptime" class="flex items-center gap-2 font-medium">
+						<TimerIcon class="flex size-5 shrink-0" />
 						{{ formattedUptime }}
 					</div>
 
@@ -67,7 +70,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { SettingsIcon } from '@modrinth/assets'
+import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
