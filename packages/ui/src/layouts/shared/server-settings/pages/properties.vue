@@ -10,8 +10,15 @@
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
-						Edit the Minecraft server properties file here, or use the Files tab to edit the full
-						file. If you're unsure about a setting, the
+						Edit the Minecraft server properties file here, or use the
+						<AutoLink
+							class="goto-link !inline-block"
+							:to="filesTabLink"
+							@click="onFilesTabLinkClick"
+						>
+							Files tab
+						</AutoLink>
+						to edit the full file. If you're unsure about a setting, the
 						<AutoLink
 							class="goto-link !inline-block"
 							to="https://minecraft.wiki/w/Server.properties"
@@ -214,7 +221,16 @@
 									</div>
 								</div>
 							</template>
-							<div>All other properties can be edited in server.properties via the Files tab.</div>
+							<div>
+								All other properties can be edited in server.properties via the
+								<AutoLink
+									class="goto-link !inline-block"
+									:to="filesTabLink"
+									@click="onFilesTabLinkClick"
+								>
+									Files tab </AutoLink
+								>.
+							</div>
 						</div>
 					</Accordion>
 
@@ -257,6 +273,7 @@ import { computed, ref, watch } from 'vue'
 
 import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -267,8 +284,16 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const filesTabLink = computed(
+	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
+)
+const serverSettings = injectServerSettings(null)
 
 const searchInput = ref('')
+
+function onFilesTabLinkClick() {
+	serverSettings?.closeModal?.()
+}
 
 type PropertyDef = { type: 'toggle' } | { type: 'number' } | { type: 'text' }
 
