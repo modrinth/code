@@ -29,7 +29,7 @@
 					<div
 						v-if="props.server?.net?.domain"
 						v-tooltip="'Copy server address'"
-						class="flex cursor-pointer items-center gap-2 font-medium hover:underline"
+						class="flex cursor-pointer items-center gap-2 font-medium hover:underline text-nowrap"
 						@click="copyServerAddress"
 					>
 						<LinkIcon class="flex size-5 shrink-0" />
@@ -48,7 +48,10 @@
 						class="h-1.5 w-1.5 rounded-full bg-surface-5"
 					/>
 
-					<div v-if="showProject" class="flex items-center gap-1.5 font-medium text-primary">
+					<div
+						v-if="showProject"
+						class="flex items-center gap-1.5 font-medium text-primary text-nowrap"
+					>
 						Linked to
 						<Avatar
 							:src="props.serverProject?.icon_url ?? undefined"

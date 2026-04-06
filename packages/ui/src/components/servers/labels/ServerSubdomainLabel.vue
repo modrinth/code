@@ -11,7 +11,7 @@
 		<div class="flex flex-row items-center gap-1.5">
 			<LinkIcon />
 			<div
-				class="flex min-w-0 font-medium text-sm"
+				class="flex min-w-0 font-medium text-sm text-nowrap"
 				:class="serverId ? 'hover:underline' : ''"
 				@click="copySubdomain"
 			>
