@@ -1,13 +1,5 @@
 <template>
 	<div class="contents">
-		<PanelActionConfirmModal
-			ref="confirmActionModal"
-			v-model:dont-ask-again="dontAskAgain"
-			:pending-action="pendingAction"
-			@confirm="executePendingAction"
-			@cancel="resetPendingAction"
-		/>
-
 		<NewModal
 			ref="detailsModal"
 			:header="`All of ${server.name || 'Server'} info`"
@@ -68,11 +60,7 @@ import { ButtonStyled, NewModal, ServerInfoLabels } from '#ui/components'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { injectModrinthServerContext } from '#ui/providers'
 
-import PanelActionConfirmModal from './PanelActionConfirmModal.vue'
-import {
-	type PanelActionConfirmModalController,
-	useServerPowerAction,
-} from './use-server-power-action'
+import { useServerPowerAction } from './use-server-power-action'
 
 const props = withDefaults(
 	defineProps<{
@@ -92,19 +80,10 @@ const props = withDefaults(
 const router = useRouter()
 const { serverId, server } = injectModrinthServerContext()
 
-const confirmActionModal = ref<PanelActionConfirmModalController | null>(null)
 const detailsModal = ref<InstanceType<typeof NewModal> | null>(null)
 
-const {
-	isInstalling,
-	pendingAction,
-	dontAskAgain,
-	initiateAction,
-	executePendingAction,
-	resetPendingAction,
-} = useServerPowerAction({
+const { isInstalling, initiateAction } = useServerPowerAction({
 	disabled: computed(() => props.disabled),
-	confirmModalRef: confirmActionModal,
 })
 
 const menuOptions = computed(() => [

@@ -1,5 +1,4 @@
-import { useStorage } from '@vueuse/core'
-import { computed, type Ref, ref } from 'vue'
+import { computed, type Ref } from 'vue'
 
 import { useVIntl } from '#ui/composables/i18n'
 import {
@@ -10,25 +9,11 @@ import {
 
 export type PowerAction = 'Start' | 'Stop' | 'Restart' | 'Kill'
 
-export type PanelActionConfirmModalController = {
-	show: () => void
-	hide: () => void
-}
-
-export function useServerPowerAction(options?: {
-	disabled?: Ref<boolean>
-	confirmModalRef?: Ref<PanelActionConfirmModalController | null>
-}) {
+export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const { formatMessage } = useVIntl()
 	const client = injectModrinthClient()
 	const { serverId, server, powerState, busyReasons } = injectModrinthServerContext()
 	const { addNotification } = injectNotificationManager()
-	const pendingAction = ref<PowerAction | null>(null)
-	const dontAskAgain = ref(false)
-
-	const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
-		powerDontAskAgain: false,
-	})
 
 	const isInstalling = computed(() => server.value.status === 'installing')
 	const isRunning = computed(() => powerState.value === 'running')
@@ -74,46 +59,11 @@ export function useServerPowerAction(options?: {
 
 	function initiateAction(action: PowerAction) {
 		if (!canTakeAction.value) return
-
-		if (action === 'Start') {
-			void sendPowerAction(action)
-			return
-		}
-
-		pendingAction.value = action
-
-		if (userPreferences.value.powerDontAskAgain) {
-			executePendingAction()
-		} else {
-			options?.confirmModalRef?.value?.show()
-		}
+		void sendPowerAction(action)
 	}
 
 	function handlePrimaryAction() {
 		initiateAction(isRunning.value ? 'Restart' : 'Start')
-	}
-
-	function executePendingAction() {
-		if (!pendingAction.value) return
-
-		if (!canTakeAction.value) {
-			resetPendingAction()
-			return
-		}
-
-		void sendPowerAction(pendingAction.value)
-
-		if (dontAskAgain.value) {
-			userPreferences.value.powerDontAskAgain = true
-		}
-
-		resetPendingAction()
-	}
-
-	function resetPendingAction() {
-		options?.confirmModalRef?.value?.hide()
-		pendingAction.value = null
-		dontAskAgain.value = false
 	}
 
 	return {
@@ -125,12 +75,8 @@ export function useServerPowerAction(options?: {
 		busyTooltip,
 		canTakeAction,
 		primaryActionText,
-		pendingAction,
-		dontAskAgain,
 		sendPowerAction,
 		initiateAction,
 		handlePrimaryAction,
-		executePendingAction,
-		resetPendingAction,
 	}
 }
