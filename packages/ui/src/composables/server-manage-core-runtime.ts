@@ -1,7 +1,9 @@
-import { type Archon, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
+import { type Archon, type UploadState, clearNodeAuthState, setNodeAuthState } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Ref } from 'vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+
+import type { FileOperation } from '../layouts/shared/files-tab/types'
 
 import { injectModrinthClient, provideModrinthServerContext } from '../providers'
 import type { BusyReason } from '../providers/server-context'
@@ -335,6 +337,51 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 	}
 
+	const uploadState = ref<UploadState>({
+		isUploading: false,
+		currentFileName: null,
+		currentFileProgress: 0,
+		uploadedBytes: 0,
+		totalBytes: 0,
+		completedFiles: 0,
+		totalFiles: 0,
+	})
+	const cancelUpload = ref<(() => void) | null>(null)
+
+	type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
+	const dismissedOpIds = ref<Set<string>>(new Set())
+
+	const activeOperations = computed<FileOperation[]>(() => [
+		...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
+		...(fsOps.value.filter((op) => !op.id || !dismissedOpIds.value.has(op.id)) as FileOperation[]),
+	])
+
+	async function dismissOperation(opId: string, action: 'dismiss' | 'cancel') {
+		if (action === 'dismiss') {
+			dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
+		}
+		try {
+			await client.kyros.files_v0.modifyOperation(opId, action)
+		} catch (error) {
+			if (action === 'dismiss') return
+			console.error(`Failed to ${action} operation:`, error)
+		}
+	}
+
+	watch(
+		() => fsOps.value,
+		(newOps) => {
+			for (const op of newOps) {
+				if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
+					setTimeout(() => {
+						dismissOperation(op.id!, 'dismiss')
+					}, 3000)
+				}
+			}
+		},
+		{ deep: true },
+	)
+
 	const refreshFsAuth = async () => {
 		if (!options.serverId.value) {
 			fsAuth.value = null
@@ -364,6 +411,10 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		fsOps,
 		fsQueuedOps,
 		refreshFsAuth,
+		uploadState,
+		cancelUpload,
+		activeOperations,
+		dismissOperation,
 	})
 
 	setNodeAuthState(() => fsAuth.value, refreshFsAuth)
@@ -374,13 +425,16 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	}
 
 	return {
+		activeOperations,
 		backupsState,
 		busyReasons,
+		cancelUpload,
 		cleanupCoreRuntime,
 		connectSocket,
 		connectedSocketServerId,
 		cpuData,
 		disconnectSocket,
+		dismissOperation,
 		fsAuth,
 		fsOps,
 		fsQueuedOps,
@@ -393,5 +447,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		serverPowerState,
 		stats,
 		uptimeSeconds,
+		uploadState,
 	}
 }

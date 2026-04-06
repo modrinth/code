@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Archon, Kyros } from '@modrinth/api-client'
+import type { Kyros } from '@modrinth/api-client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -17,8 +17,6 @@ import { provideFileManager } from '../../../shared/files-tab/providers/file-man
 import type {
 	EditingFile,
 	FileItem,
-	FileOperation,
-	UploadState,
 } from '../../../shared/files-tab/types'
 
 const props = defineProps<{
@@ -28,7 +26,8 @@ const props = defineProps<{
 
 const client = injectModrinthClient()
 const serverContext = injectModrinthServerContext()
-const { serverId, fsOps, fsQueuedOps, busyReasons } = serverContext
+const { serverId, fsOps, fsQueuedOps, busyReasons, uploadState, cancelUpload: cancelUploadRef } =
+	serverContext
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
@@ -350,43 +349,6 @@ async function downloadFile(path: string, fileName: string): Promise<void> {
 	}
 }
 
-// Operations tracking
-type QueuedOpWithState = Archon.Websocket.v0.QueuedFilesystemOp & { state: 'queued' }
-const localQueuedOps = ref<Archon.Websocket.v0.QueuedFilesystemOp[]>([])
-const dismissedOpIds = ref<Set<string>>(new Set())
-
-const activeOps = computed<FileOperation[]>(() => [
-	...localQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...fsQueuedOps.value.map((x) => ({ ...x, state: 'queued' }) satisfies QueuedOpWithState),
-	...(fsOps.value.filter((op) => !op.id || !dismissedOpIds.value.has(op.id)) as FileOperation[]),
-])
-
-async function dismissOperation(opId: string, action: 'dismiss' | 'cancel') {
-	if (action === 'dismiss') {
-		dismissedOpIds.value = new Set([...dismissedOpIds.value, opId])
-	}
-	try {
-		await client.kyros.files_v0.modifyOperation(opId, action)
-	} catch (error) {
-		if (action === 'dismiss') return
-		console.error(`Failed to ${action} operation:`, error)
-	}
-}
-
-watch(
-	() => fsOps.value,
-	(newOps) => {
-		for (const op of newOps) {
-			if (op.state === 'done' && op.id && !dismissedOpIds.value.has(op.id)) {
-				setTimeout(() => {
-					dismissOperation(op.id, 'dismiss')
-				}, 3000)
-			}
-		}
-	},
-	{ deep: true },
-)
-
 watch(
 	() => fsOps.value,
 	() => {
@@ -396,24 +358,12 @@ watch(
 
 onMounted(async () => {
 	initializeFileEdit()
-	localQueuedOps.value = []
 })
 
 // Restart
 async function restartServer() {
 	await client.archon.servers_v0.power(serverId, 'Restart')
 }
-
-// Upload state
-const uploadState = ref<UploadState>({
-	isUploading: false,
-	currentFileName: null,
-	currentFileProgress: 0,
-	uploadedBytes: 0,
-	totalBytes: 0,
-	completedFiles: 0,
-	totalFiles: 0,
-})
 
 let activeUploadCancel: (() => void) | null = null
 
@@ -430,6 +380,7 @@ async function uploadFiles(files: File[]) {
 		completedFiles: 0,
 		totalFiles: files.length,
 	}
+	cancelUploadRef.value = () => activeUploadCancel?.()
 
 	let completedBytes = 0
 
@@ -464,6 +415,7 @@ async function uploadFiles(files: File[]) {
 	}
 
 	activeUploadCancel = null
+	cancelUploadRef.value = null
 	refreshList()
 	uploadState.value = {
 		isUploading: false,
@@ -515,8 +467,6 @@ provideFileManager({
 	busyTooltip,
 	busyWarning,
 	extractFile,
-	activeOperations: activeOps,
-	dismissOperation,
 	prefetchDirectory,
 	prefetchFile,
 	showInstallFromUrl: true,

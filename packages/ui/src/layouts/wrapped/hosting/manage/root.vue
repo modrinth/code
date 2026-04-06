@@ -299,6 +299,41 @@
 						</template>
 					</InstallingBanner>
 				</Transition>
+				<Transition
+					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+					enter-from-class="opacity-0 max-h-0"
+					enter-to-class="opacity-100 max-h-40"
+					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+					leave-from-class="opacity-100 max-h-40"
+					leave-to-class="opacity-0 max-h-0"
+				>
+					<Admonition v-if="uploadState.isUploading" type="info" class="mb-4">
+						<template #icon>
+							<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
+						</template>
+						<template #header>
+							Uploading files ({{ uploadState.completedFiles }}/{{ uploadState.totalFiles }})
+							<span v-if="uploadState.currentFileName" class="font-normal text-secondary">
+								— {{ uploadState.currentFileName }}
+							</span>
+						</template>
+						<span class="text-secondary">
+							{{ formatBytes(uploadState.uploadedBytes) }} /
+							{{ formatBytes(uploadState.totalBytes) }} ({{
+								Math.round(uploadOverallProgress * 100)
+							}}%)
+						</span>
+						<template v-if="cancelUpload" #top-right-actions>
+							<ButtonStyled type="outlined" color="blue">
+								<button class="!border" @click="cancelUpload?.()">Cancel</button>
+							</ButtonStyled>
+						</template>
+						<template #progress>
+							<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+						</template>
+					</Admonition>
+				</Transition>
+				<FileOperationAdmonitions class="mb-4" />
 				<BackupProgressAdmonitions class="mb-4" />
 				<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
 			</div>
@@ -320,6 +355,12 @@
 			:browse-modpacks="handleBrowseModpacks"
 		/>
 	</Suspense>
+	<ConfirmLeaveModal
+		ref="confirmLeaveModal"
+		:header="formatMessage(leaveMessages.uploadInProgress)"
+		:body="formatMessage(leaveMessages.leavePageBody)"
+		admonition-type="critical"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -341,19 +382,25 @@ import {
 	SettingsIcon,
 	TransferIcon,
 	TriangleAlertIcon,
+	UploadIcon,
 } from '@modrinth/assets'
+import { formatBytes } from '@modrinth/utils'
 import type { Stats } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import ErrorInformationCard from '#ui/components/base/ErrorInformationCard.vue'
 import NavTabs from '#ui/components/base/NavTabs.vue'
 import ServerNotice from '#ui/components/base/ServerNotice.vue'
+import Admonition from '#ui/components/base/Admonition.vue'
+import ProgressBar from '#ui/components/base/ProgressBar.vue'
 import BackupProgressAdmonitions from '#ui/components/servers/backups/BackupProgressAdmonitions.vue'
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
+import FileOperationAdmonitions from '../../../shared/files-tab/components/FileOperationAdmonitions.vue'
 import { ServerIcon } from '#ui/components/servers/icons'
 import InstallingBanner from '#ui/components/servers/InstallingBanner.vue'
 import MedalServerCountdown from '#ui/components/servers/marketing/MedalServerCountdown.vue'
@@ -439,6 +486,17 @@ const loadingMessages = defineMessages({
 	},
 })
 
+const leaveMessages = defineMessages({
+	uploadInProgress: {
+		id: 'servers.manage.confirm-leave.upload-in-progress',
+		defaultMessage: 'Upload in progress',
+	},
+	leavePageBody: {
+		id: 'servers.manage.confirm-leave.body',
+		defaultMessage: 'A file upload is in progress. Leaving this page will cancel the upload.',
+	},
+})
+
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const queryClient = useQueryClient()
@@ -457,6 +515,7 @@ const errorLog = ref('')
 const errorLogFile = ref('')
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
+const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
 
 const INTERCOM_APP_ID = 'ykeritl9'
 
@@ -558,6 +617,7 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 
 const {
 	backupsState,
+	cancelUpload,
 	cleanupCoreRuntime,
 	connectSocket,
 	cpuData,
@@ -568,6 +628,7 @@ const {
 	serverPowerState,
 	stats,
 	uptimeSeconds,
+	uploadState,
 } = useServerManageCoreRuntime({
 	serverId: computed(() => props.serverId),
 	worldId,
@@ -581,6 +642,44 @@ const {
 	eventGuard: () => isMounted.value,
 	onStateEvent,
 })
+
+const uploadOverallProgress = computed(() => {
+	const state = uploadState.value
+	if (!state.isUploading || state.totalFiles === 0) return 0
+	return Math.min((state.completedFiles + state.currentFileProgress) / state.totalFiles, 1)
+})
+
+const isUploading = computed(() => uploadState.value.isUploading)
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+	if (isUploading.value) {
+		e.preventDefault()
+		return ''
+	}
+}
+
+if (typeof window !== 'undefined') {
+	watch(isUploading, (uploading) => {
+		if (uploading) {
+			window.addEventListener('beforeunload', handleBeforeUnload)
+		} else {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	})
+
+	onBeforeUnmount(() => {
+		window.removeEventListener('beforeunload', handleBeforeUnload)
+	})
+
+	onBeforeRouteLeave(async () => {
+		if (isUploading.value) {
+			const shouldLeave = (await confirmLeaveModal.value?.prompt()) ?? false
+			if (shouldLeave) cancelUpload.value?.()
+			return shouldLeave
+		}
+		return true
+	})
+}
 
 type CachedWsState = {
 	stats: Stats
@@ -847,8 +946,6 @@ const handleBackupProgress = (data: Archon.Websocket.v0.WSBackupProgressEvent) =
 	}
 }
 
-const opsQueuedForModification = ref<string[]>([])
-
 const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => {
 	const allOps = data.all
 
@@ -860,33 +957,14 @@ const handleFilesystemOps = (data: Archon.Websocket.v0.WSFilesystemOpsEvent) => 
 		(queuedOp) => !allOps.some((x) => x.src === queuedOp.src),
 	)
 
-	const dismissOp = async (opId: string) => {
-		try {
-			await client.kyros.files_v0.modifyOperation(opId, 'dismiss')
-		} catch (error) {
-			console.error('Failed to dismiss operation:', error)
-		}
-	}
-
 	const cancelled = allOps.filter((x) => x.state === 'cancelled')
-	Promise.all(cancelled.map((x) => dismissOp(x.id)))
-
-	const completed = allOps.filter((x) => x.state === 'done')
-	if (completed.length > 0) {
-		setTimeout(
-			async () =>
-				await Promise.all(
-					completed.map((x) => {
-						if (!opsQueuedForModification.value.includes(x.id)) {
-							opsQueuedForModification.value.push(x.id)
-							return dismissOp(x.id)
-						}
-						return Promise.resolve()
-					}),
-				),
-			3000,
-		)
-	}
+	Promise.all(
+		cancelled.map((x) =>
+			client.kyros.files_v0.modifyOperation(x.id, 'dismiss').catch((error) => {
+				console.error('Failed to dismiss cancelled operation:', error)
+			}),
+		),
+	)
 }
 
 const handleNewMod = () => {

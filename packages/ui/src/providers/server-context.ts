@@ -1,8 +1,9 @@
-import type { Archon } from '@modrinth/api-client'
+import type { Archon, UploadState } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
 import type { ComputedRef, Reactive, Ref } from 'vue'
 
 import type { MessageDescriptor } from '#ui/composables/i18n'
+import type { FileOperation } from '#ui/layouts/shared/files-tab/types'
 
 import { createContext } from '.'
 
@@ -55,6 +56,14 @@ export interface ModrinthServerContext {
 	readonly fsOps: Ref<Archon.Websocket.v0.FilesystemOperation[]>
 	readonly fsQueuedOps: Ref<Archon.Websocket.v0.QueuedFilesystemOp[]>
 	refreshFsAuth: () => Promise<void>
+
+	// File upload state
+	readonly uploadState: Ref<UploadState>
+	readonly cancelUpload: Ref<(() => void) | null>
+
+	// File operations (extract, move, etc.)
+	readonly activeOperations: ComputedRef<FileOperation[]>
+	dismissOperation: (opId: string, action: 'dismiss' | 'cancel') => Promise<void>
 }
 
 export const [injectModrinthServerContext, provideModrinthServerContext] =
