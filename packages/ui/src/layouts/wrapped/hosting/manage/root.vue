@@ -448,6 +448,8 @@ const props = withDefaults(
 		siteUrl?: string
 		products?: Labrinth.Billing.Internal.Product[]
 		authUser?: { id: string; username: string; email: string; created: string }
+		fetchIntercomToken?: () => Promise<{ token: string }>
+		intercomAppId?: string
 		navigateToBilling?: () => void
 		navigateToServers?: () => void
 		browseModpacks?: (args: {
@@ -470,6 +472,8 @@ const props = withDefaults(
 		siteUrl: undefined,
 		products: () => [],
 		authUser: undefined,
+		fetchIntercomToken: undefined,
+		intercomAppId: 'ykeritl9',
 		navigateToBilling: undefined,
 		navigateToServers: undefined,
 		browseModpacks: undefined,
@@ -516,8 +520,6 @@ const errorLogFile = ref('')
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()
-
-const INTERCOM_APP_ID = 'ykeritl9'
 
 const { data: serverData, error: serverQueryError } = useQuery({
 	queryKey: ['servers', 'detail', props.serverId],
@@ -1384,14 +1386,19 @@ onMounted(() => {
 		})
 	}
 
-	if (props.authUser) {
-		Intercom({
-			app_id: INTERCOM_APP_ID,
-			userId: props.authUser.id,
-			name: props.authUser.username,
-			email: props.authUser.email,
-			created_at: Math.floor(new Date(props.authUser.created).getTime() / 1000),
-		})
+	if (props.authUser && props.fetchIntercomToken) {
+		props
+			.fetchIntercomToken()
+			.then(({ token }) => {
+				Intercom({
+					app_id: props.intercomAppId!,
+					intercom_user_jwt: token,
+					session_duration: 1000 * 60 * 60 * 24,
+				})
+			})
+			.catch((error) => {
+				console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
+			})
 	}
 
 	DOMPurify.addHook(

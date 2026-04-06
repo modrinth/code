@@ -110,7 +110,8 @@
 								id: 'report',
 								color: 'red',
 								hoverFilled: true,
-								action: () => (auth.user ? reportVersion(version.id) : navigateTo('/auth/sign-in')),
+								action: () =>
+									auth.user ? reportVersion(version.id) : navigateTo(getSignInRouteObj(route)),
 								shown: !currentMember,
 							},
 							{ divider: true, shown: !!currentMember || flags.developerMode },
@@ -307,7 +308,10 @@ import {
 import { useTemplateRef } from 'vue'
 
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { reportVersion } from '~/utils/report-helpers.ts'
+
+const route = useRoute()
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()

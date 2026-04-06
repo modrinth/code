@@ -147,7 +147,7 @@
 					</a>
 				</ButtonStyled>
 				<ButtonStyled v-if="!auth.user">
-					<nuxt-link to="/auth/sign-in">
+					<nuxt-link :to="signInRouteObj">
 						<ReportIcon aria-hidden="true" />
 						Report
 					</nuxt-link>
@@ -443,6 +443,7 @@ import { formatBytes, renderHighlightedString } from '@modrinth/utils'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import Modal from '~/components/ui/Modal.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package.js'
@@ -454,6 +455,7 @@ const emit = defineEmits<{
 // Composables
 const data = useNuxtApp()
 const route = useNativeRoute()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const router = useRouter()
 const auth = await useAuth()
 const tags = useGeneratedState()

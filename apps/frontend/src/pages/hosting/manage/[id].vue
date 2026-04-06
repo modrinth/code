@@ -10,6 +10,8 @@
 		:site-url="config.public.siteUrl as string"
 		:products="products"
 		:auth-user="authUser"
+		:fetch-intercom-token="fetchIntercomToken"
+		:intercom-app-id="config.public.intercomAppId as string"
 		:navigate-to-billing="() => router.push('/settings/billing')"
 		:navigate-to-servers="() => router.push('/hosting/manage')"
 		:browse-modpacks="
@@ -59,6 +61,10 @@ const authUser = auth.value?.user
 			created: auth.value.user.created,
 		}
 	: undefined
+
+async function fetchIntercomToken(): Promise<{ token: string }> {
+	return $fetch('/api/intercom/messenger-jwt')
+}
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {
 	return {
