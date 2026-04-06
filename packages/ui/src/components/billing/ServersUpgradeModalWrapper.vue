@@ -185,11 +185,6 @@ function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
 }
 
 const subscription = ref<Labrinth.Billing.Internal.UserSubscription | null>(null)
-// Dry run state
-const dryRunResponse = ref<{
-	requires_payment: boolean
-	required_payment_is_proration: boolean
-} | null>(null)
 const pendingDowngradeBody = ref<Labrinth.Billing.Internal.EditSubscriptionRequest | null>(null)
 const currentPlanFromSubscription = computed<Labrinth.Billing.Internal.Product | undefined>(() => {
 	return subscription.value
@@ -246,20 +241,16 @@ async function initiatePayment(
 				dry: true,
 			})
 
-			if (dry && typeof dry === 'object' && 'payment_intent_id' in dry) {
-				dryRunResponse.value = {
-					requires_payment: !!dry.payment_intent_id,
-					required_payment_is_proration: true,
-				}
-				pendingDowngradeBody.value = transformedBody
-				if (dry.payment_intent_id) {
-					return await finalizeImmediate(transformedBody)
-				} else {
-					return null
-				}
-			} else {
-				// Fallback if dry run not supported
+			const requiresPayment =
+				dry && typeof dry === 'object' && 'requires_payment' in dry && dry.requires_payment
+
+			if (requiresPayment) {
+				// Upgrade: requires payment — finalize to create the payment intent
 				return await finalizeImmediate(transformedBody)
+			} else {
+				// Downgrade or no payment change — defer until user confirms
+				pendingDowngradeBody.value = transformedBody
+				return null
 			}
 		} catch (e) {
 			debug('Dry run failed, attempting immediate patch', e)
@@ -291,8 +282,10 @@ async function finalizeImmediate(body: Labrinth.Billing.Internal.EditSubscriptio
 }
 
 async function finalizeDowngrade() {
-	if (!subscription.value || !pendingDowngradeBody.value) return
 	try {
+		if (!subscription.value || !pendingDowngradeBody.value)
+			throw new Error('Missing subscription or pending downgrade body')
+
 		await finalizeImmediate(pendingDowngradeBody.value)
 		addNotification({
 			title: 'Subscription updated',
@@ -307,7 +300,6 @@ async function finalizeDowngrade() {
 		})
 		throw e
 	} finally {
-		dryRunResponse.value = null
 		pendingDowngradeBody.value = null
 	}
 }
