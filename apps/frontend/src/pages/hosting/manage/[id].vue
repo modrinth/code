@@ -1335,7 +1335,9 @@ async function initializeIntercom() {
 	if (!auth.value?.user) return
 
 	try {
-		const intercomData = await $fetch<{ token: string }>('/api/intercom/messenger-jwt')
+		const intercomData = await $fetch<{ token: string }>('/api/intercom/messenger-jwt', {
+			query: { server_id: serverId },
+		})
 
 		Intercom({
 			app_id: config.public.intercomAppId,

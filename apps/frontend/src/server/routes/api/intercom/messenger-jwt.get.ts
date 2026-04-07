@@ -21,6 +21,7 @@ async function getIntercomKeyFromSecretsStore(): Promise<string | undefined> {
 async function signIntercomUserJwt(
 	user: { id: string; username: string; email?: string; created: string },
 	secret: string,
+	serverId?: string,
 ): Promise<string> {
 	const createdAt = Math.floor(new Date(user.created).getTime() / 1000)
 
@@ -35,6 +36,10 @@ async function signIntercomUserJwt(
 
 	if (Number.isFinite(createdAt)) {
 		payload.created_at = createdAt
+	}
+
+	if (serverId) {
+		payload.server_id = serverId
 	}
 
 	return await new SignJWT(payload)
@@ -104,7 +109,10 @@ export default defineEventHandler(async (event): Promise<IntercomTokenResponse> 
 		})
 	}
 
-	const token = await signIntercomUserJwt(user, intercomSecret)
+	const query = getQuery(event)
+	const serverId = typeof query.server_id === 'string' ? query.server_id : undefined
+
+	const token = await signIntercomUserJwt(user, intercomSecret, serverId)
 
 	return {
 		token,
