@@ -33,6 +33,8 @@ on:
 jobs:
   build:
     name: Build
+    env:
+      VITE_STRIPE_PUBLISHABLE_KEY: pk_live_51JbFxJJygY5LJFfKLVVldb10HlLt24p421OWRsTOWc5sXYFOnFUXWieSc6HD3PHo25ktx8db1WcHr36XGFvZFVUz00V9ixrCs5
     strategy:
       fail-fast: false
       matrix:
