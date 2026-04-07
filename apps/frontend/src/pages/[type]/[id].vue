@@ -647,7 +647,7 @@
 									<nuxt-link
 										v-else
 										v-tooltip="formatMessage(commonMessages.followButton)"
-										to="/auth/sign-in"
+										:to="signInRouteObj"
 										:aria-label="formatMessage(commonMessages.followButton)"
 									>
 										<HeartIcon aria-hidden="true" />
@@ -655,7 +655,7 @@
 									<template #fallback>
 										<nuxt-link
 											v-tooltip="formatMessage(commonMessages.followButton)"
-											to="/auth/sign-in"
+											:to="signInRouteObj"
 											:aria-label="formatMessage(commonMessages.followButton)"
 										>
 											<HeartIcon aria-hidden="true" />
@@ -715,7 +715,7 @@
 										</button>
 									</template>
 								</PopoutMenu>
-								<nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+								<nuxt-link v-else v-tooltip="'Save'" :to="signInRouteObj" aria-label="Save">
 									<BookmarkIcon aria-hidden="true" />
 								</nuxt-link>
 							</ButtonStyled>
@@ -768,7 +768,11 @@
 										{
 											id: 'report',
 											action: () =>
-												auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+												auth.user
+													? reportProject(project.id)
+													: navigateTo(
+															getSignInRouteObj(route, getReportPath('project', project.id)),
+														),
 											color: 'red',
 											hoverOnly: true,
 											shown: !isMember,
@@ -1117,12 +1121,13 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'
 import { STALE_TIME, STALE_TIME_LONG } from '~/composables/queries/project'
 import { versionQueryOptions } from '~/composables/queries/version'
 import { userCollectProject, userFollowProject } from '~/composables/user.js'
 import { useModerationStore } from '~/store/moderation.ts'
-import { reportProject } from '~/utils/report-helpers.ts'
+import { getReportPath, reportProject } from '~/utils/report-helpers.ts'
 
 definePageMeta({
 	key: (route) => `${route.params.id}`,
@@ -1130,6 +1135,7 @@ definePageMeta({
 
 const data = useNuxtApp()
 const route = useRoute()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const config = useRuntimeConfig()
 const moderationStore = useModerationStore()
 const notifications = injectNotificationManager()

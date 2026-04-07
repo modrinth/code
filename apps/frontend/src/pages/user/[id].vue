@@ -199,7 +199,8 @@
 									{ divider: true, shown: auth.user && auth.user.id === user.id },
 									{
 										id: 'report',
-										action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
+										action: () =>
+											auth.user ? reportUser(user.id) : navigateTo(getSignInRouteObj(route)),
 										color: 'red',
 										hoverOnly: true,
 										shown: auth.user?.id !== user.id,
@@ -520,6 +521,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import AdPlaceholder from '~/components/ui/AdPlaceholder.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import ModalCreation from '~/components/ui/create/ProjectCreateModal.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { reportUser } from '~/utils/report-helpers.ts'
 
 const data = useNuxtApp()
