@@ -16,6 +16,9 @@ pub struct LabrinthError {
 
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
+    #[error("{0:?}")]
+    Any(eyre::Report),
+
     #[error("Filesystem error: {0}")]
     FSError(String),
 
@@ -210,6 +213,16 @@ impl<E: Into<ErrorKind>> From<E> for Error {
         Self {
             raw: boxed_error.clone(),
             source: boxed_error.in_current_span(),
+        }
+    }
+}
+
+impl From<eyre::Report> for Error {
+    fn from(err: eyre::Report) -> Self {
+        let err = Arc::new(ErrorKind::Any(err));
+        Self {
+            raw: err.clone(),
+            source: err.in_current_span(),
         }
     }
 }

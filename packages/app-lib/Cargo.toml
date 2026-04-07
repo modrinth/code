@@ -52,6 +52,7 @@ paste = { workspace = true }
 path-util = { workspace = true }
 phf = { workspace = true }
 png = { workspace = true }
+eyre = { workspace = true }
 quartz_nbt = { workspace = true, features = ["serde"] }
 quick-xml = { workspace = true, features = ["async-tokio"] }
 rand = { workspace = true }

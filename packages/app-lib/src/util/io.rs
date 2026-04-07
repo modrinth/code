@@ -1,6 +1,7 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
+use eyre::{Context, ContextCompat, Result, eyre};
 use std::{
     io::{ErrorKind, Write},
     path::Path,
@@ -46,12 +47,9 @@ impl IOError {
 
 pub fn canonicalize(
     path: impl AsRef<std::path::Path>,
-) -> Result<std::path::PathBuf, IOError> {
+) -> Result<std::path::PathBuf> {
     let path = path.as_ref();
-    dunce::canonicalize(path).map_err(|e| IOError::IOPathError {
-        source: e,
-        path: path.to_string_lossy().to_string(),
-    })
+    dunce::canonicalize(path).map_err(eyre::Error::new)
 }
 
 pub async fn read_dir(
@@ -181,17 +179,34 @@ fn sync_write(
     std::io::Result::Ok(())
 }
 
-pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool, IOError> {
+pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool> {
     #[cfg(unix)]
     {
         use std::os::unix::fs::MetadataExt;
+
+        println!(
+            "has path? {:#?}",
+            std::fs::read_dir(old_dir.parent().unwrap())
+                .unwrap()
+                .any(|p| p.as_ref().unwrap().path() == old_dir)
+        );
+
+        println!("canonical = {:?}", std::fs::canonicalize(old_dir));
+
+        let old_dir = canonicalize(old_dir)
+            .with_context(|| eyre!("canonicalizing old path {old_dir:?}"))?;
+        let new_dir = canonicalize(new_dir)
+            .with_context(|| eyre!("canonicalizing new path {new_dir:?}"))?;
+
         Ok(old_dir.metadata()?.dev() == new_dir.metadata()?.dev())
     }
 
     #[cfg(windows)]
     {
-        let old_dir = canonicalize(old_dir)?;
-        let new_dir = canonicalize(new_dir)?;
+        let old_dir = canonicalize(old_dir)
+            .with_context(|| eyre!("canonicalizing old path {old_dir:?}"))?;
+        let new_dir = canonicalize(new_dir)
+            .with_context(|| eyre!("canonicalizing new path {new_dir:?}"))?;
 
         let old_component = old_dir.components().next();
         let new_component = new_dir.components().next();
@@ -209,37 +224,54 @@ pub fn is_same_disk(old_dir: &Path, new_dir: &Path) -> Result<bool, IOError> {
 pub async fn rename_or_move(
     from: impl AsRef<std::path::Path>,
     to: impl AsRef<std::path::Path>,
-) -> Result<(), IOError> {
+) -> Result<()> {
     let from = from.as_ref();
     let to = to.as_ref();
 
-    if to
+    let from_parent = from
         .parent()
-        .map_or(Ok(false), |to_dir| is_same_disk(from, to_dir))?
-    {
+        .with_context(|| eyre!("getting parent of {from:?}"))?;
+
+    let parent = to
+        .parent()
+        .with_context(|| eyre!("getting parent of {to:?}"))?;
+
+    if is_same_disk(from_parent, parent).with_context(|| {
+        eyre!("checking if {from_parent:?} is on same disk as {parent:?}")
+    })? {
         tokio::fs::rename(from, to)
             .await
-            .map_err(|e| IOError::IOPathError {
-                source: e,
-                path: from.to_string_lossy().to_string(),
-            })
+            .with_context(|| eyre!("renaming {from:?} to {to:?}"))?;
+        Ok(())
     } else {
         move_recursive(from, to).await
     }
 }
 
 #[async_recursion::async_recursion]
-async fn move_recursive(from: &Path, to: &Path) -> Result<(), IOError> {
+async fn move_recursive(from: &Path, to: &Path) -> Result<()> {
     if from.is_file() {
-        copy(from, to).await?;
-        remove_file(from).await?;
+        copy(from, to)
+            .await
+            .with_context(|| eyre!("copying {from:?} to {to:?}"))?;
+        remove_file(from)
+            .await
+            .with_context(|| eyre!("removing {from:?}"))?;
         return Ok(());
     }
 
-    create_dir(to).await?;
+    create_dir(to)
+        .await
+        .with_context(|| eyre!("creating directory {to:?}"))?;
 
-    let mut dir = read_dir(from).await?;
-    while let Some(entry) = dir.next_entry().await? {
+    let mut dir = read_dir(from)
+        .await
+        .with_context(|| eyre!("reading directory {from:?}"))?;
+    while let Some(entry) = dir
+        .next_entry()
+        .await
+        .with_context(|| eyre!("reading directory {from:?}"))?
+    {
         let new_path = to.join(entry.file_name());
         move_recursive(&entry.path(), &new_path).await?;
     }

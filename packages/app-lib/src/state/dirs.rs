@@ -5,6 +5,7 @@ use crate::state::LAUNCHER_STATE;
 use crate::state::{JavaVersion, Profile, Settings};
 use crate::util::fetch::IoSemaphore;
 use dashmap::DashSet;
+use eyre::{Context, eyre};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::fs;
@@ -216,6 +217,11 @@ impl DirectoryInfo {
             async fn is_dir_writeable(
                 new_config_dir: &Path,
             ) -> crate::Result<bool> {
+                if let Err(err) = fs::create_dir_all(new_config_dir).await {
+                    tracing::error!("Error creating new config dir: {err}");
+                    return Ok(false);
+                }
+
                 let temp_path = new_config_dir.join(".tmp");
                 match fs::write(temp_path.clone(), "test").await {
                     Ok(_) => {
@@ -223,10 +229,7 @@ impl DirectoryInfo {
                         Ok(true)
                     }
                     Err(e) => {
-                        tracing::error!(
-                            "Error writing to new config dir: {}",
-                            e
-                        );
+                        tracing::error!("Error writing to new config dir: {e}");
                         Ok(false)
                     }
                 }
@@ -361,16 +364,7 @@ impl DirectoryInfo {
                                     &x.new,
                                 )
                                 .await
-                                    .map_err(|e| {
-                                        crate::Error::from(crate::ErrorKind::DirectoryMoveError(
-                                            format!(
-                                                "Failed to move directory from {} to {}: {}",
-                                                x.old.display(),
-                                                x.new.display(),
-                                                e
-                                            ),
-                                        ))
-                                    })?;
+                                .with_context(|| eyre!("moving directory from {} to {}", x.old.display(), x.new.display()))?;
 
                                 let _ = emit_loading(
                                     &loader_bar_id,
@@ -420,9 +414,16 @@ impl DirectoryInfo {
                                 &x.new,
                                 io_semaphore,
                             )
-                            .await.map_err(|e| { crate::Error::from(
-                                crate::ErrorKind::DirectoryMoveError(format!("Failed to move directory from {} to {}: {}", x.old.display(), x.new.display(), e)))
-                            })?;
+                            .await
+                            .with_context(
+                                || {
+                                    eyre!(
+                                        "moving directory from {} to {}",
+                                        x.old.display(),
+                                        x.new.display()
+                                    )
+                                },
+                            )?;
 
                             let _ = emit_loading(
                                 &loader_bar_id,
