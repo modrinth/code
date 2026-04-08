@@ -77,7 +77,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 		<template v-if="$slots.title" #title>
 			<slot name="title" />
 		</template>
-		<div class="grid grid-cols-[auto_1fr] p-6 pr-0">
+		<div class="grid grid-cols-[auto_1fr] p-6 pb-3 pr-0">
 			<div
 				class="flex flex-col gap-1 border-solid pr-4 border-0 border-r-[1px] border-divider min-w-[200px]"
 			>
@@ -121,7 +121,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 
 				<div
 					ref="scrollContainer"
-					class="min-w-[500px] overflow-y-auto px-6 h-screen max-h-[min(70vh,750px)]"
+					class="min-w-[500px] overflow-y-auto px-6 h-screen max-h-[min(75vh,750px)]"
 					@scroll="checkScrollState"
 				>
 					<Suspense>

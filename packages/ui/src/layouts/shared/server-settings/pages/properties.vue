@@ -43,113 +43,114 @@
 						placeholder="Search server properties..."
 					/>
 				</div>
+				<div class="flex flex-col gap-3 pb-2">
+					<div class="flex flex-col gap-6">
+						<!-- Basic Properties -->
+						<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
+						<div
+							class="rounded-2xl border border-solid border-surface-5 p-4 pb-2 [&:not(:has(*:not(:empty)))]:hidden"
+						>
+							<div class="flex w-full flex-col gap-1.5">
+								<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">Gamemode</span>
+									<Chips
+										v-model="combinedGamemode"
+										:items="gamemodeItems"
+										:format-label="capitalize"
+									/>
+								</div>
 
-				<div class="flex flex-col gap-6 pb-2">
-					<!-- Basic Properties -->
-					<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
-					<div
-						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
-					>
-						<div class="flex w-full flex-col gap-1.5">
-							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2 my-1">
-								<span class="font-semibold text-contrast">Gamemode</span>
-								<Chips
-									v-model="combinedGamemode"
-									:items="gamemodeItems"
-									:format-label="capitalize"
-								/>
-							</div>
+								<div
+									v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
+									class="flex flex-col gap-2.5 my-1"
+								>
+									<span class="font-semibold text-contrast">Difficulty</span>
+									<Chips
+										v-model="selectedDifficulty"
+										:items="difficultyItems"
+										:format-label="capitalize"
+									/>
+								</div>
 
-							<div
-								v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
-								class="flex flex-col gap-2 my-1"
-							>
-								<span class="font-semibold text-contrast">Difficulty</span>
-								<Chips
-									v-model="selectedDifficulty"
-									:items="difficultyItems"
-									:format-label="capitalize"
-								/>
-							</div>
+								<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">Max players</span>
+									<StyledInput
+										id="server-property-max-players"
+										:model-value="liveProperties.max_players"
+										type="number"
+										placeholder="20"
+										wrapper-class="w-full max-w-[450px]"
+										@update:model-value="liveProperties.max_players = String($event)"
+									/>
+								</div>
 
-							<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2 my-1">
-								<span class="font-semibold text-contrast">Max players</span>
-								<StyledInput
-									id="server-property-max-players"
-									:model-value="liveProperties.max_players"
-									type="number"
-									placeholder="20"
-									wrapper-class="w-full max-w-[450px]"
-									@update:model-value="liveProperties.max_players = String($event)"
-								/>
-							</div>
+								<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">MOTD</span>
+									<StyledInput
+										id="server-property-motd"
+										v-model="liveProperties.motd"
+										placeholder="A Minecraft Server"
+										wrapper-class="w-full max-w-[450px]"
+									/>
+								</div>
 
-							<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2 my-1">
-								<span class="font-semibold text-contrast">MOTD</span>
-								<StyledInput
-									id="server-property-motd"
-									v-model="liveProperties.motd"
-									placeholder="A Minecraft Server"
-									wrapper-class="w-full max-w-[450px]"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('allow_flight')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Allow flight</span>
+									<Toggle
+										id="server-property-allow-flight"
+										:model-value="liveProperties.allow_flight === 'true'"
+										@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('allow_flight')"
-								class="flex flex-row items-center justify-between gap-4 h-10"
-							>
-								<span class="font-semibold text-contrast">Allow flight</span>
-								<Toggle
-									id="server-property-allow-flight"
-									:model-value="liveProperties.allow_flight === 'true'"
-									@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('allow_cheats')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Allow cheats</span>
+									<Toggle
+										id="server-property-allow-cheats"
+										:model-value="liveProperties.allow_cheats === 'true'"
+										@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('allow_cheats')"
-								class="flex flex-row items-center justify-between gap-4 h-10"
-							>
-								<span class="font-semibold text-contrast">Allow cheats</span>
-								<Toggle
-									id="server-property-allow-cheats"
-									:model-value="liveProperties.allow_cheats === 'true'"
-									@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('white_list')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Enable whitelist</span>
+									<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
+								</div>
 
-							<div
-								v-if="isPropertyVisible('white_list')"
-								class="flex flex-row items-center justify-between gap-4 h-10"
-							>
-								<span class="font-semibold text-contrast">Enable whitelist</span>
-								<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
-							</div>
+								<div
+									v-if="isPropertyVisible('spawn_protection')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Enable spawn protection</span>
+									<Toggle
+										id="server-property-spawn-protection-toggle"
+										v-model="spawnProtectionEnabled"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('spawn_protection')"
-								class="flex flex-row items-center justify-between gap-4 h-10"
-							>
-								<span class="font-semibold text-contrast">Enable spawn protection</span>
-								<Toggle
-									id="server-property-spawn-protection-toggle"
-									v-model="spawnProtectionEnabled"
-								/>
-							</div>
-
-							<div
-								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
-								class="flex items-center justify-between h-10"
-							>
-								<span class="font-semibold text-contrast">Protection radius</span>
-								<StyledInput
-									id="server-property-spawn-protection-radius"
-									:model-value="liveProperties.spawn_protection"
-									type="number"
-									wrapper-class="w-full sm:w-[100px]"
-									input-class="text-right"
-									@update:model-value="liveProperties.spawn_protection = String($event)"
-								/>
+								<div
+									v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
+									class="flex items-center justify-between h-10"
+								>
+									<span class="font-semibold text-contrast">Protection radius</span>
+									<StyledInput
+										id="server-property-spawn-protection-radius"
+										:model-value="liveProperties.spawn_protection"
+										type="number"
+										wrapper-class="w-full sm:w-[100px]"
+										input-class="text-right"
+										@update:model-value="liveProperties.spawn_protection = String($event)"
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
