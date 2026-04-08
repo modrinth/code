@@ -59,7 +59,7 @@ import { injectModalBehavior } from '#ui/providers/modal-behavior'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { rewriteTerminal, useConsoleFilters } from './composables'
+import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
 import { injectConsoleManager } from './providers'
 import type { LogLevel } from './types'
 
@@ -151,12 +151,11 @@ watch(
 		const predicate = buildFilterPredicate()
 		for (let i = lastWrittenIndex; i < lines.length; i++) {
 			if (!predicate || predicate(lines[i])) {
-				terminalRef.value?.writeln(lines[i])
+				terminalRef.value?.writeln(colorize(lines[i]))
 			}
 		}
 		lastWrittenIndex = lines.length
 	},
-	{ deep: true },
 )
 
 watch(searchQuery, (query) => {
@@ -187,7 +186,7 @@ function handleClear() {
 async function handleShare() {
 	const predicate = buildFilterPredicate()
 	const lines = predicate ? ctx.logLines.value.filter(predicate) : ctx.logLines.value
-	const content = lines.join('\n')
+	const content = lines.map((l) => l.text).join('\n')
 
 	try {
 		const res = await fetch('https://api.mclo.gs/1/log', {

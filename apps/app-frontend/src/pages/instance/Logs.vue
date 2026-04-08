@@ -5,22 +5,21 @@
 </template>
 
 <script setup>
-import { ConsolePageLayout, injectNotificationManager, provideConsoleManager } from '@modrinth/ui'
-import dayjs from 'dayjs'
-import isToday from 'dayjs/plugin/isToday'
-import isYesterday from 'dayjs/plugin/isYesterday'
+import {
+	ConsolePageLayout,
+	injectNotificationManager,
+	provideConsoleManager,
+	useModrinthServersConsole,
+} from '@modrinth/ui'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { process_listener } from '@/helpers/events.js'
-import { get_latest_log_cursor, get_logs, get_output_by_filename } from '@/helpers/logs.js'
-import { get_by_profile_path } from '@/helpers/process.js'
-
-dayjs.extend(isToday)
-dayjs.extend(isYesterday)
+import { log_listener, process_listener } from '@/helpers/events.js'
+import { get_logs, get_output_by_filename } from '@/helpers/logs.js'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
+const consoleLines = useModrinthServersConsole()
 
 const props = defineProps({
 	instance: {
@@ -55,38 +54,10 @@ const props = defineProps({
 	},
 })
 
-const currentLiveLog = ref(null)
-const currentLiveLogCursor = ref(0)
-const emptyText = ['No live game detected.', 'Start your game to proceed.']
-
 const logs = ref([])
 await setLogs()
 
 const selectedLogIndex = ref(0)
-const interval = ref(null)
-
-async function getLiveStdLog() {
-	if (route.params.id) {
-		const processes = await get_by_profile_path(route.params.id).catch(handleError)
-		let returnValue
-		if (processes.length === 0) {
-			returnValue = emptyText.join('\n')
-		} else {
-			const logCursor = await get_latest_log_cursor(
-				props.instance.path,
-				currentLiveLogCursor.value,
-			).catch(handleError)
-			if (logCursor.new_file) {
-				currentLiveLog.value = ''
-			}
-			currentLiveLog.value = currentLiveLog.value + logCursor.output
-			currentLiveLogCursor.value = logCursor.cursor
-			returnValue = currentLiveLog.value
-		}
-		return { name: 'Live Log', stdout: returnValue, live: true }
-	}
-	return null
-}
 
 async function getLogs() {
 	return (await get_logs(props.instance.path, true).catch(handleError))
@@ -105,14 +76,19 @@ async function getLogs() {
 }
 
 async function setLogs() {
-	const [liveStd, allLogs] = await Promise.all([getLiveStdLog(), getLogs()])
-	logs.value = [liveStd, ...allLogs]
+	const allLogs = await getLogs()
+	logs.value = [{ name: 'Live Log', live: true }, ...allLogs]
 }
 
-const logLines = computed(() => {
+const isLive = computed(() => selectedLogIndex.value === 0)
+
+const loadHistoricalLog = () => {
 	const log = logs.value[selectedLogIndex.value]
-	return log?.stdout?.split('\n').filter(Boolean) ?? []
-})
+	const text = log?.stdout ?? ''
+	if (!text || text === 'Loading...') return
+	consoleLines.clear()
+	consoleLines.addLegacyLog(text)
+}
 
 const logSources = computed(() =>
 	logs.value.map((l, i) => ({
@@ -123,25 +99,30 @@ const logSources = computed(() =>
 )
 
 provideConsoleManager({
-	logLines,
+	logLines: consoleLines.output,
 	logSources,
 	activeLogSourceIndex: selectedLogIndex,
 	showCommandInput: false,
 	loading: ref(false),
 	onClear: () => {
-		currentLiveLog.value = ''
+		consoleLines.clear()
 	},
 	shareDisabled: computed(() => props.offline),
 })
 
 watch(selectedLogIndex, async (newIndex) => {
-	if (logs.value.length > 1 && newIndex !== 0) {
+	if (newIndex === 0) {
+		consoleLines.clear()
+		return
+	}
+	if (logs.value.length > 1) {
 		logs.value[newIndex].stdout = 'Loading...'
 		logs.value[newIndex].stdout = await get_output_by_filename(
 			props.instance.path,
 			logs.value[newIndex].log_type,
 			logs.value[newIndex].filename,
 		).catch(handleError)
+		loadHistoricalLog()
 	}
 })
 
@@ -151,28 +132,32 @@ if (logs.value.length > 1 && !props.playing) {
 	selectedLogIndex.value = 0
 }
 
-interval.value = setInterval(async () => {
-	if (logs.value.length > 0 && selectedLogIndex.value === 0) {
-		logs.value[0] = await getLiveStdLog()
+const profilePathId = computed(() => route.params.id)
+
+const unlistenLog = await log_listener((payload) => {
+	if (payload.profile_path_id !== profilePathId.value) return
+	if (!isLive.value) return
+
+	if (payload.type === 'log4j') {
+		consoleLines.addLog4jEvent(payload)
+	} else if (payload.type === 'legacy') {
+		consoleLines.addLegacyLog(payload.message)
 	}
-}, 250)
+})
 
 const unlistenProcesses = await process_listener(async (e) => {
 	if (e.event === 'launched') {
-		currentLiveLog.value = ''
-		currentLiveLogCursor.value = 0
+		consoleLines.clear()
 		selectedLogIndex.value = 0
 	}
 	if (e.event === 'finished') {
-		currentLiveLog.value = ''
-		currentLiveLogCursor.value = 0
 		await setLogs()
 		selectedLogIndex.value = 1
 	}
 })
 
 onUnmounted(() => {
-	clearInterval(interval.value)
+	unlistenLog()
 	unlistenProcesses()
 })
 </script>

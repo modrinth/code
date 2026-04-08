@@ -49,7 +49,10 @@ const initialConsoleMessage = [
 	'\x1B[32m ( .        , )\x1B[37m',
 	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
 	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
-]
+].map((text) => ({
+	text,
+	level: null as import('../layouts/shared/console/types').LogLevel | null,
+}))
 
 const createInitialStats = (): Stats => ({
 	current: {
@@ -213,8 +216,12 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
 		if (!shouldProcessEvent()) return
-		const log = data.message.split('\n').filter((line) => line.trim())
-		modrinthServersConsole.addLines(log)
+		modrinthServersConsole.addLegacyLog(data.message)
+	}
+
+	const handleLog4j = (data: Archon.Websocket.v0.WSLog4jEvent) => {
+		if (!shouldProcessEvent()) return
+		modrinthServersConsole.addLog4jEvent(data)
 	}
 
 	const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
@@ -318,12 +325,11 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
-			for (const line of initialConsoleMessage) {
-				modrinthServersConsole.addLine(line)
-			}
+			modrinthServersConsole.addLines(initialConsoleMessage)
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),
+				client.archon.sockets.on(targetServerId, 'log4j', handleLog4j),
 				client.archon.sockets.on(targetServerId, 'stats', handleStats),
 				client.archon.sockets.on(targetServerId, 'state', handleState),
 				client.archon.sockets.on(targetServerId, 'power-state', handlePowerState),

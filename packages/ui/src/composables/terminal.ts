@@ -167,7 +167,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 
 		const term = new Terminal({
 			disableStdin: true,
-			scrollback: options.scrollback ?? 10000,
+			scrollback: options.scrollback ?? Infinity,
 			convertEol: true,
 			smoothScrollDuration: 125,
 			fontFamily: 'monospace',

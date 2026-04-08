@@ -1,5 +1,9 @@
 use crate::event::emit::{emit_process, emit_profile};
 use crate::event::{ProcessPayloadType, ProfilePayloadType};
+#[cfg(feature = "tauri")]
+use crate::event::{LogEvent, LogPayload};
+#[cfg(feature = "tauri")]
+use tauri::Emitter;
 use crate::profile;
 use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
@@ -222,13 +226,14 @@ struct Process {
     rpc_server: RpcServer,
 }
 
-#[derive(Debug, Default)]
-struct Log4jEvent {
-    timestamp: Option<String>,
-    logger: Option<String>,
-    level: Option<String>,
-    thread: Option<String>,
-    message: Option<String>,
+#[derive(Debug, Default, Serialize, Clone)]
+pub struct Log4jEvent {
+    pub timestamp_millis: Option<i64>,
+    pub logger_name: Option<String>,
+    pub level: Option<String>,
+    pub thread_name: Option<String>,
+    pub message: Option<String>,
+    pub throwable: Option<String>,
 }
 
 impl Process {
@@ -285,17 +290,19 @@ impl Process {
 
                                     match key.as_str() {
                                         "logger" => {
-                                            current_event.logger = Some(value)
+                                            current_event.logger_name =
+                                                Some(value)
                                         }
                                         "level" => {
                                             current_event.level = Some(value)
                                         }
                                         "thread" => {
-                                            current_event.thread = Some(value)
+                                            current_event.thread_name =
+                                                Some(value)
                                         }
                                         "timestamp" => {
-                                            current_event.timestamp =
-                                                Some(value)
+                                            current_event.timestamp_millis =
+                                                value.parse::<i64>().ok()
                                         }
                                         _ => {}
                                     }
@@ -321,39 +328,17 @@ impl Process {
                             }
                             b"log4j:Throwable" => {
                                 in_throwable = false;
-                                // Process and write the log entry
-                                let thread = current_event
-                                    .thread
-                                    .as_deref()
-                                    .unwrap_or("");
-                                let level = current_event
-                                    .level
-                                    .as_deref()
-                                    .unwrap_or("");
-                                let logger = current_event
-                                    .logger
-                                    .as_deref()
-                                    .unwrap_or("");
+                                current_event.throwable =
+                                    if current_content.is_empty() {
+                                        None
+                                    } else {
+                                        Some(current_content.clone())
+                                    };
 
-                                if let Some(message) = &current_event.message {
-                                    let formatted_time =
-                                        Process::format_timestamp(
-                                            current_event.timestamp.as_deref(),
-                                        );
-                                    let formatted_log = format!(
-                                        "{} [{}] [{}{}]: {}\n",
-                                        formatted_time,
-                                        thread,
-                                        if !logger.is_empty() {
-                                            format!("{logger}/")
-                                        } else {
-                                            String::new()
-                                        },
-                                        level,
-                                        message.trim()
-                                    );
-
-                                    // Write the log message
+                                // Write log entry + throwable to file
+                                if let Some(formatted_log) =
+                                    Self::format_log4j_entry(&current_event)
+                                {
                                     if let Err(e) = Process::append_to_log_file(
                                         &log_path,
                                         &formatted_log,
@@ -364,82 +349,75 @@ impl Process {
                                         );
                                     }
 
-                                    // Write the throwable if present
-                                    if !current_content.is_empty()
-                                        && let Err(e) =
+                                    if let Some(ref throwable) =
+                                        current_event.throwable
+                                    {
+                                        if let Err(e) =
                                             Process::append_to_log_file(
                                                 &log_path,
-                                                &current_content,
+                                                throwable,
                                             )
-                                    {
-                                        tracing::error!(
-                                            "Failed to write throwable to log file: {}",
-                                            e
-                                        );
+                                        {
+                                            tracing::error!(
+                                                "Failed to write throwable to log file: {}",
+                                                e
+                                            );
+                                        }
                                     }
                                 }
+
+                                Self::emit_log4j_event(
+                                    profile_path,
+                                    &current_event,
+                                );
                             }
                             b"log4j:Event" => {
                                 in_event = false;
                                 // If no throwable was present, write the log entry at the end of the event
                                 if current_event.message.is_some()
-                                    && !in_throwable
+                                    && current_event.throwable.is_none()
                                 {
-                                    let thread = current_event
-                                        .thread
-                                        .as_deref()
-                                        .unwrap_or("");
-                                    let level = current_event
-                                        .level
-                                        .as_deref()
-                                        .unwrap_or("");
-                                    let logger = current_event
-                                        .logger
-                                        .as_deref()
-                                        .unwrap_or("");
-                                    let message = current_event
-                                        .message
-                                        .as_deref()
-                                        .unwrap_or("")
-                                        .trim();
-
-                                    let formatted_time =
-                                        Process::format_timestamp(
-                                            current_event.timestamp.as_deref(),
-                                        );
-                                    let formatted_log = format!(
-                                        "{} [{}] [{}{}]: {}\n",
-                                        formatted_time,
-                                        thread,
-                                        if !logger.is_empty() {
-                                            format!("{logger}/")
-                                        } else {
-                                            String::new()
-                                        },
-                                        level,
-                                        message
-                                    );
-
-                                    // Write the log message
-                                    if let Err(e) = Process::append_to_log_file(
-                                        &log_path,
-                                        &formatted_log,
-                                    ) {
-                                        tracing::error!(
-                                            "Failed to write to log file: {}",
-                                            e
-                                        );
+                                    if let Some(formatted_log) =
+                                        Self::format_log4j_entry(
+                                            &current_event,
+                                        )
+                                    {
+                                        if let Err(e) =
+                                            Process::append_to_log_file(
+                                                &log_path,
+                                                &formatted_log,
+                                            )
+                                        {
+                                            tracing::error!(
+                                                "Failed to write to log file: {}",
+                                                e
+                                            );
+                                        }
                                     }
 
-                                    if let Some(timestamp) =
-                                        current_event.timestamp.as_deref()
-                                        && let Err(e) = Self::maybe_handle_server_join_logging(
+                                    if let Some(timestamp_millis) =
+                                        current_event.timestamp_millis
+                                    {
+                                        let timestamp =
+                                            timestamp_millis.to_string();
+                                        let message = current_event
+                                            .message
+                                            .as_deref()
+                                            .unwrap_or("")
+                                            .trim();
+                                        if let Err(e) = Self::maybe_handle_server_join_logging(
                                             profile_path,
-                                            timestamp,
-                                            message
+                                            &timestamp,
+                                            message,
                                         ).await {
                                             tracing::error!("Failed to handle server join logging: {e}");
                                         }
+                                    }
+
+                                    Self::emit_log4j_event(
+                                        profile_path,
+                                        &current_event,
+                                    );
                                 }
                             }
                             _ => {}
@@ -453,16 +431,19 @@ impl Process {
                         } else if !in_event
                             && !e.inplace_trim_end()
                             && !e.inplace_trim_start()
-                            && let Ok(text) = e.xml_content()
-                            && let Err(e) = Process::append_to_log_file(
-                                &log_path,
-                                &format!("{text}\n"),
-                            )
                         {
-                            tracing::error!(
-                                "Failed to write to log file: {}",
-                                e
-                            );
+                            if let Ok(text) = e.xml_content() {
+                                if let Err(e) = Process::append_to_log_file(
+                                    &log_path,
+                                    &format!("{text}\n"),
+                                ) {
+                                    tracing::error!(
+                                        "Failed to write to log file: {}",
+                                        e
+                                    );
+                                }
+                                Self::emit_legacy_log(profile_path, &text);
+                            }
                         }
                     }
                     Ok(Event::CData(e)) => {
@@ -489,6 +470,10 @@ impl Process {
                     if let Err(e) = Self::append_to_log_file(&log_path, &line) {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
+                    Self::emit_legacy_log(
+                        profile_path,
+                        line.trim_ascii_end(),
+                    );
                     if let Err(e) = Self::maybe_handle_old_server_join_logging(
                         profile_path,
                         line.trim_ascii_end(),
@@ -506,27 +491,85 @@ impl Process {
         }
     }
 
-    fn format_timestamp(timestamp: Option<&str>) -> String {
-        if let Some(timestamp_str) = timestamp {
-            if let Ok(timestamp_val) = timestamp_str.parse::<i64>() {
-                let datetime_utc = if timestamp_val > i32::MAX as i64 {
-                    let secs = timestamp_val / 1000;
-                    let nsecs = ((timestamp_val % 1000) * 1_000_000) as u32;
+    fn format_timestamp(timestamp_millis: Option<i64>) -> String {
+        if let Some(timestamp_val) = timestamp_millis {
+            let datetime_utc = if timestamp_val > i32::MAX as i64 {
+                let secs = timestamp_val / 1000;
+                let nsecs = ((timestamp_val % 1000) * 1_000_000) as u32;
 
-                    chrono::DateTime::<Utc>::from_timestamp(secs, nsecs)
-                        .unwrap_or_default()
-                } else {
-                    chrono::DateTime::<Utc>::from_timestamp_secs(timestamp_val)
-                        .unwrap_or_default()
-                };
-
-                let datetime_local = datetime_utc.with_timezone(&chrono::Local);
-                format!("[{}]", datetime_local.format("%H:%M:%S"))
+                chrono::DateTime::<Utc>::from_timestamp(secs, nsecs)
+                    .unwrap_or_default()
             } else {
-                "[??:??:??]".to_string()
-            }
+                chrono::DateTime::<Utc>::from_timestamp_secs(timestamp_val)
+                    .unwrap_or_default()
+            };
+
+            let datetime_local = datetime_utc.with_timezone(&chrono::Local);
+            format!("[{}]", datetime_local.format("%H:%M:%S"))
         } else {
             "[??:??:??]".to_string()
+        }
+    }
+
+    fn format_log4j_entry(event: &Log4jEvent) -> Option<String> {
+        let message = event.message.as_ref()?;
+        let thread = event.thread_name.as_deref().unwrap_or("");
+        let level = event.level.as_deref().unwrap_or("");
+        let logger = event.logger_name.as_deref().unwrap_or("");
+        let formatted_time =
+            Self::format_timestamp(event.timestamp_millis);
+
+        Some(format!(
+            "{} [{}] [{}{}]: {}\n",
+            formatted_time,
+            thread,
+            if !logger.is_empty() {
+                format!("{logger}/")
+            } else {
+                String::new()
+            },
+            level,
+            message.trim()
+        ))
+    }
+
+    fn emit_log4j_event(profile_path: &str, event: &Log4jEvent) {
+        #[cfg(feature = "tauri")]
+        {
+            if let Ok(event_state) = crate::EventState::get() {
+                let _ = event_state.app.emit(
+                    "log",
+                    LogPayload {
+                        profile_path_id: profile_path.to_string(),
+                        event: LogEvent::Log4j(event.clone()),
+                    },
+                );
+            }
+        }
+        #[cfg(not(feature = "tauri"))]
+        {
+            let _ = (profile_path, event);
+        }
+    }
+
+    fn emit_legacy_log(profile_path: &str, message: &str) {
+        #[cfg(feature = "tauri")]
+        {
+            if let Ok(event_state) = crate::EventState::get() {
+                let _ = event_state.app.emit(
+                    "log",
+                    LogPayload {
+                        profile_path_id: profile_path.to_string(),
+                        event: LogEvent::Legacy {
+                            message: message.to_string(),
+                        },
+                    },
+                );
+            }
+        }
+        #[cfg(not(feature = "tauri"))]
+        {
+            let _ = (profile_path, message);
         }
     }
 

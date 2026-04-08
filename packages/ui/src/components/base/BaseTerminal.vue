@@ -64,7 +64,7 @@ const props = withDefaults(
 		fullscreen?: boolean
 	}>(),
 	{
-		scrollback: 10000,
+		scrollback: Infinity,
 		showInput: false,
 		fullscreen: false,
 	},
