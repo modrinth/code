@@ -5,17 +5,36 @@ import type { LogLevel, LogLine } from '../types'
 
 export type FilterPredicate = (line: LogLine) => boolean
 
-export function colorize(line: LogLine): string {
+function highlightMatches(text: string, query: string): string {
+	if (!query) return text
+	const lower = text.toLowerCase()
+	let result = ''
+	let pos = 0
+	while (pos < text.length) {
+		const idx = lower.indexOf(query, pos)
+		if (idx === -1) {
+			result += text.slice(pos)
+			break
+		}
+		result += text.slice(pos, idx)
+		result += `\x1b[1;7m${text.slice(idx, idx + query.length)}\x1b[27;22m`
+		pos = idx + query.length
+	}
+	return result
+}
+
+export function colorize(line: LogLine, searchQuery?: string): string {
+	const text = searchQuery ? highlightMatches(line.text, searchQuery) : line.text
 	switch (line.level) {
 		case 'error':
-			return `\x1b[31m${line.text}\x1b[0m`
+			return `\x1b[31m${text}\x1b[0m`
 		case 'warn':
-			return `\x1b[33m${line.text}\x1b[0m`
+			return `\x1b[33m${text}\x1b[0m`
 		case 'debug':
 		case 'trace':
-			return `\x1b[90m${line.text}\x1b[0m`
+			return `\x1b[90m${text}\x1b[0m`
 		default:
-			return line.text
+			return text
 	}
 }
 
@@ -45,8 +64,7 @@ export function useConsoleFilters() {
 		if (activeFilters.value.has('all')) return null
 		const allowed = activeFilters.value
 		return (line: LogLine) => {
-			if (line.level === null) return true
-			return allowed.has(line.level)
+			return allowed.has(line.level ?? 'info')
 		}
 	}
 
@@ -57,6 +75,7 @@ export function rewriteTerminal(
 	terminal: Terminal,
 	allLines: LogLine[],
 	predicate: FilterPredicate | null,
+	searchQuery?: string,
 ) {
 	terminal.reset()
 	terminal.write('\x1b[?25l')
@@ -65,6 +84,6 @@ export function rewriteTerminal(
 	if (filtered.length === 0) return
 
 	terminal.write('\x1b[?2026h')
-	terminal.write(filtered.map(colorize).join('\r\n'))
+	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n'))
 	terminal.write('\x1b[?2026l')
 }
