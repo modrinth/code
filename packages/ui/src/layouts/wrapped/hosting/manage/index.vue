@@ -164,7 +164,7 @@
 					v-if="filteredData.length > 0 || isPollingForNewServers"
 					name="list"
 					tag="ul"
-					class="m-0 flex flex-col gap-4 p-0"
+					class="m-0 flex flex-col gap-3 p-0"
 				>
 					<MedalServerListing
 						v-for="server in filteredData.filter((s) => s.is_medal)"

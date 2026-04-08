@@ -125,7 +125,7 @@ defineExpose({
 			>
 				<div
 					v-if="showSignInPrompt"
-					class="pointer-events-auto absolute inset-0 z-20 rounded-lg bg-black/60"
+					class="pointer-events-auto absolute inset-0 z-20 bg-black/60"
 					@click="closeSignInPrompt"
 				/>
 			</Transition>
