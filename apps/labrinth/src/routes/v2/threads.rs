@@ -21,10 +21,37 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(threads_get);
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(thread_get);
+    cfg.service(thread_send_message);
+}
+
+pub fn utoipa_config_message(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(message_delete);
+}
+
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(threads_get);
+}
+
 /// Get a thread by ID.
 ///
 /// Requires `THREAD_READ` authentication scope.
-#[get("{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyThread),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/{id}")]
 pub async fn thread_get(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -47,7 +74,15 @@ pub struct ThreadIds {
 /// Requires `THREAD_READ` authentication scope.
 /// Query parameters:
 /// - `ids` (required): The IDs of the threads, as a JSON array string.
-#[get("threads")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyThread>),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/threads")]
 pub async fn threads_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ThreadIds>,
@@ -78,7 +113,7 @@ pub async fn threads_get(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct NewThreadMessage {
     pub body: MessageBody,
 }
@@ -86,7 +121,17 @@ pub struct NewThreadMessage {
 /// Send a text message to a thread.
 ///
 /// Requires `THREAD_WRITE` authentication scope.
-#[post("{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    request_body = NewThreadMessage,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyThread),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[post("/{id}")]
 pub async fn thread_send_message(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -114,7 +159,16 @@ pub async fn thread_send_message(
 /// Delete a thread message.
 ///
 /// Requires `THREAD_WRITE` authentication scope.
-#[delete("{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}")]
 pub async fn message_delete(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,

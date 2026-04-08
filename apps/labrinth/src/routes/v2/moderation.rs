@@ -12,6 +12,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("moderation").service(get_projects));
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(get_projects);
+}
+
 #[derive(Deserialize)]
 pub struct ResultCount {
     #[serde(default = "default_count")]
@@ -27,7 +33,14 @@ fn default_count() -> u16 {
 /// Requires moderator access.
 /// Query parameters:
 /// - `count`: The number of projects to return (default: 100).
-#[get("projects")]
+#[utoipa::path(
+    tag = "moderation",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
+    ),
+)]
+#[get("/projects")]
 pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,

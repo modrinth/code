@@ -374,6 +374,7 @@ pub fn utoipa_app_config(
             |_cfg| ()
         }
     })
+    .configure(routes::v2::utoipa_config)
     .configure(routes::v3::utoipa_config)
     .configure(routes::internal::utoipa_config);
 }

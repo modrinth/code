@@ -23,6 +23,22 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(notification_get);
+    cfg.service(notification_read);
+    cfg.service(notification_delete);
+}
+
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(notifications_get);
+    cfg.service(notifications_delete);
+    cfg.service(notifications_read);
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct NotificationIds {
     pub ids: String,
@@ -33,7 +49,16 @@ pub struct NotificationIds {
 /// Requires `NOTIFICATION_READ` authentication scope.
 /// Query parameters:
 /// - `ids` (required): The IDs of the notifications, as a JSON array string.
-#[get("notifications")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyNotification>),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/notifications")]
 pub async fn notifications_get(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
@@ -65,7 +90,16 @@ pub async fn notifications_get(
 /// Get a notification by ID.
 ///
 /// Requires `NOTIFICATION_READ` authentication scope.
-#[get("{id}")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyNotification),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/{id}")]
 pub async fn notification_get(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -94,7 +128,16 @@ pub async fn notification_get(
 /// Mark a notification as read.
 ///
 /// Requires `NOTIFICATION_WRITE` authentication scope.
-#[patch("{id}")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/{id}")]
 pub async fn notification_read(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -111,7 +154,16 @@ pub async fn notification_read(
 /// Delete a notification.
 ///
 /// Requires `NOTIFICATION_WRITE` authentication scope.
-#[delete("{id}")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}")]
 pub async fn notification_delete(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -136,7 +188,16 @@ pub async fn notification_delete(
 /// Requires `NOTIFICATION_WRITE` authentication scope.
 /// Query parameters:
 /// - `ids` (required): The IDs of the notifications, as a JSON array string.
-#[patch("notifications")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/notifications")]
 pub async fn notifications_read(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
@@ -161,7 +222,16 @@ pub async fn notifications_read(
 /// Requires `NOTIFICATION_WRITE` authentication scope.
 /// Query parameters:
 /// - `ids` (required): The IDs of the notifications, as a JSON array string.
-#[delete("notifications")]
+#[utoipa::path(
+    tag = "notifications",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/notifications")]
 pub async fn notifications_delete(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,

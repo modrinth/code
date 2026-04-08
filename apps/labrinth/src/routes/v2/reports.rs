@@ -17,11 +17,31 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(report_get);
 }
 
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(reports_get);
+    cfg.service(reports);
+    cfg.service(report_create);
+    cfg.service(report_edit);
+    cfg.service(report_delete);
+    cfg.service(report_get);
+}
+
 /// Report a project, user, or version.
 ///
 /// Brings a project, user, or version to the attention of the moderators by reporting it.
 /// Requires `REPORT_CREATE` authentication scope.
-#[post("report")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyReport),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[post("/report")]
 pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -64,7 +84,16 @@ fn default_all() -> bool {
 /// Requires `REPORT_READ` authentication scope.
 /// Query parameters:
 /// - `count`: The number of reports to return (default: 100).
-#[get("report")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/report")]
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -107,7 +136,16 @@ pub struct ReportIds {
 /// Requires `REPORT_READ` authentication scope.
 /// Query parameters:
 /// - `ids` (required): The IDs of the reports, as a JSON array string.
-#[get("reports")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyReport>),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/reports")]
 pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
@@ -139,7 +177,16 @@ pub async fn reports_get(
 /// Get a report by ID.
 ///
 /// Requires `REPORT_READ` authentication scope.
-#[get("report/{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyReport),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/report/{id}")]
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -162,7 +209,7 @@ pub async fn report_get(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditReport {
     #[validate(length(max = 65536))]
     pub body: Option<String>,
@@ -173,7 +220,18 @@ pub struct EditReport {
 ///
 /// Requires `REPORT_WRITE` authentication scope.
 /// Accepts a JSON body with `body` and `closed` fields.
-#[patch("report/{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    request_body = EditReport,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/report/{id}")]
 pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -200,7 +258,14 @@ pub async fn report_edit(
 }
 
 /// Delete a report.
-#[delete("report/{id}")]
+#[utoipa::path(
+    tag = "threads",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+    ),
+)]
+#[delete("/report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,

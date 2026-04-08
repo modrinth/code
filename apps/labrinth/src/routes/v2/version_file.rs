@@ -30,13 +30,39 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(delete_file);
+    cfg.service(get_version_from_hash);
+    cfg.service(download_version);
+    cfg.service(get_update_from_hash);
+    cfg.service(get_projects_from_hashes);
+}
+
+pub fn utoipa_config_files(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(get_versions_from_hashes);
+    cfg.service(update_files);
+    cfg.service(update_files_many);
+    cfg.service(update_individual_files);
+}
+
 /// Get a version from a file hash.
 ///
 /// Query parameters:
 /// - `algorithm` (required): The hash algorithm (`sha1` or `sha512`).
 /// - `multiple`: Whether to return multiple results when looking for this hash (default: false).
 // under /api/v1/version_file/{hash}
-#[get("{version_id}")]
+#[utoipa::path(
+    tag = "version-files",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/{version_id}")]
 pub async fn get_version_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -68,7 +94,13 @@ pub async fn get_version_from_hash(
 
 /// Download a version file by hash (redirects to CDN).
 // under /api/v1/version_file/{hash}/download
-#[get("{version_id}/download")]
+#[utoipa::path(
+    tag = "version-files",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+    ),
+)]
+#[get("/{version_id}/download")]
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -96,7 +128,16 @@ pub async fn download_version(
 /// Query parameters:
 /// - `version_id`: Version ID to delete from, if multiple files of the same hash exist.
 // under /api/v1/version_file/{hash}
-#[delete("{version_id}")]
+#[utoipa::path(
+    tag = "version-files",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{version_id}")]
 pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -118,7 +159,7 @@ pub async fn delete_file(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UpdateData {
     pub loaders: Option<Vec<String>>,
     pub game_versions: Option<Vec<String>>,
@@ -128,7 +169,16 @@ pub struct UpdateData {
 /// Get the latest version of a project from a hash, loader(s), and game version(s).
 ///
 /// Accepts a JSON body with `loaders` and `game_versions` arrays.
-#[post("{version_id}/update")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = UpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyVersion),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[post("/{version_id}/update")]
 pub async fn get_update_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -176,7 +226,7 @@ pub async fn get_update_from_hash(
 }
 
 // Requests above with multiple versions below
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct FileHashes {
     pub algorithm: Option<String>,
     pub hashes: Vec<String>,
@@ -187,7 +237,15 @@ pub struct FileHashes {
 /// This is the same as `get_version_from_hash` except it accepts multiple hashes.
 /// Accepts a JSON body with `hashes` array and `algorithm`.
 // under /api/v2/version_files
-#[post("")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = FileHashes,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[post("/")]
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
@@ -231,7 +289,14 @@ pub async fn get_versions_from_hashes(
 /// Get projects from multiple file hashes.
 ///
 /// Accepts a JSON body with `hashes` array and `algorithm`.
-#[post("project")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = FileHashes,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyProject>),
+    ),
+)]
+#[post("/project")]
 pub async fn get_projects_from_hashes(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -289,7 +354,7 @@ pub async fn get_projects_from_hashes(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyUpdateData {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<String>,
@@ -301,7 +366,15 @@ pub struct ManyUpdateData {
 /// Get the latest versions of multiple projects from hashes, loader(s), and game version(s).
 ///
 /// Accepts a JSON body with `hashes` array, `algorithm`, `loaders`, and `game_versions`.
-#[post("update")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = ManyUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[post("/update")]
 pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -343,7 +416,15 @@ pub async fn update_files(
 /// Get the latest versions of multiple projects from hashes, returning multiple results per hash.
 ///
 /// Accepts a JSON body with `hashes` array, `algorithm`, `loaders`, and `game_versions`.
-#[post("update_many")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = ManyUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, Vec<LegacyVersion>>),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[post("/update_many")]
 pub async fn update_files_many(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -385,7 +466,7 @@ pub async fn update_files_many(
     Ok(HttpResponse::Ok().json(v3_versions))
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct FileUpdateData {
     pub hash: String,
     pub loaders: Option<Vec<String>>,
@@ -393,7 +474,7 @@ pub struct FileUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ManyFileUpdateData {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<FileUpdateData>,
@@ -402,7 +483,14 @@ pub struct ManyFileUpdateData {
 /// Get the latest versions of multiple projects from hashes with individual parameters per hash.
 ///
 /// Accepts a JSON body with `algorithm` and an array of per-hash objects containing `hash`, `loaders`, and `game_versions`.
-#[post("update_individual")]
+#[utoipa::path(
+    tag = "version-files",
+    request_body = ManyFileUpdateData,
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = HashMap<String, LegacyVersion>),
+    ),
+)]
+#[post("/update_individual")]
 pub async fn update_individual_files(
     req: HttpRequest,
     pool: web::Data<PgPool>,

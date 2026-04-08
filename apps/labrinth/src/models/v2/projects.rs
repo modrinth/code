@@ -253,7 +253,9 @@ impl LegacyProject {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Copy)]
+#[derive(
+    Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Copy, utoipa::ToSchema,
+)]
 #[serde(rename_all = "kebab-case")]
 pub enum LegacySideType {
     Required,
@@ -393,7 +395,9 @@ impl LegacyGalleryItem {
     }
 }
 
-#[derive(Serialize, Deserialize, Validate, Clone, Eq, PartialEq)]
+#[derive(
+    Serialize, Deserialize, Validate, Clone, Eq, PartialEq, utoipa::ToSchema,
+)]
 pub struct DonationLink {
     pub id: String,
     pub platform: String,

@@ -29,6 +29,12 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_create);
+}
+
 pub fn default_requested_status() -> ProjectStatus {
     ProjectStatus::Approved
 }
@@ -139,6 +145,15 @@ struct ProjectCreateData {
 /// Requires `PROJECT_CREATE` authentication scope.
 /// The request is a multipart request with a `data` field containing JSON project metadata
 /// and an optional `icon` file field.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
 #[post("/project")]
 pub async fn project_create(
     req: HttpRequest,
