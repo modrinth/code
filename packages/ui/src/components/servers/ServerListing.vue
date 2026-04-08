@@ -1,5 +1,10 @@
 <template>
-	<div>
+	<div
+		class="transition-all"
+		:class="{
+			pressable: !isDisabled,
+		}"
+	>
 		<component
 			:is="isDisabled ? 'div' : 'RouterLink'"
 			v-bind="!isDisabled ? { to: `/hosting/manage/${server_id}` } : {}"
@@ -10,7 +15,6 @@
 				:class="{
 					'!rounded-b-none border-b-0': hasNotice,
 					'bg-surface-2': isDisabled,
-					'active:scale-95': !isDisabled && !hasNotice,
 					hoverable: !isDisabled,
 				}"
 				data-pyro-server-listing
@@ -591,5 +595,9 @@ async function copyToClipboard(text: string) {
 
 .hoverable:hover:not(:has([data-subdomain-label]:hover)) {
 	filter: brightness(1.25);
+}
+
+.pressable:active:not(:has([data-subdomain-label]:active)) {
+	transform: scale(0.985);
 }
 </style>

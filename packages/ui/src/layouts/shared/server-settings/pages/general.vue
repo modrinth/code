@@ -186,11 +186,6 @@ const preferences = {
 		description: 'Show RAM usage in bytes instead of a percentage.',
 		implemented: true,
 	},
-	powerDontAskAgain: {
-		displayName: 'Power action confirmation',
-		description: 'Ask for confirmation before stopping or restarting the server.',
-		implemented: true,
-	},
 } as const
 
 type PreferenceKeys = keyof typeof preferences
@@ -203,7 +198,6 @@ const defaultPreferences: UserPreferences = {
 	hideSubdomainLabel: false,
 	// autoRestart: false,
 	ramAsNumber: false,
-	powerDontAskAgain: false,
 }
 
 const userPreferences = useStorage<UserPreferences>(
