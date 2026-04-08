@@ -1,73 +1,228 @@
 import { createGlobalState } from '@vueuse/core'
-import { type Ref, shallowRef } from 'vue'
+import { type Ref, shallowRef, triggerRef } from 'vue'
 
-const maxLines = 10000
+import { detectLogLevel } from '../layouts/shared/console/composables/log-level'
+import type { Log4jEvent, LogLevel, LogLine } from '../layouts/shared/console/types'
+
+// Flip to true during development to enable console perf logging.
+// Uses a plain constant to avoid turbo env-var declarations.
+const DEBUG_PERF = false
+
+// TODO: for true unbounded history, consider IndexedDB or similar
+const ARCHIVE_CAPACITY = 500_000
 const batchTimeout = 300
 const initialBatchSize = 256
 
+const LogLevelCode = {
+	None: 0,
+	Trace: 1,
+	Debug: 2,
+	Info: 3,
+	Warn: 4,
+	Error: 5,
+} as const
+type LogLevelCode = (typeof LogLevelCode)[keyof typeof LogLevelCode]
+
+function encodeLevel(level: LogLevel | null): LogLevelCode {
+	if (!level) return LogLevelCode.None
+	switch (level) {
+		case 'trace':
+			return LogLevelCode.Trace
+		case 'debug':
+			return LogLevelCode.Debug
+		case 'info':
+			return LogLevelCode.Info
+		case 'warn':
+			return LogLevelCode.Warn
+		case 'error':
+			return LogLevelCode.Error
+	}
+}
+
+function decodeLevel(code: LogLevelCode): LogLevel | null {
+	switch (code) {
+		case LogLevelCode.Trace:
+			return 'trace'
+		case LogLevelCode.Debug:
+			return 'debug'
+		case LogLevelCode.Info:
+			return 'info'
+		case LogLevelCode.Warn:
+			return 'warn'
+		case LogLevelCode.Error:
+			return 'error'
+		default:
+			return null
+	}
+}
+
+// Columnar ring buffer: stores text and level in parallel arrays instead of
+// LogLine objects, eliminating ~40 bytes of object header per line (~20MB
+// saved at 500k lines). Lines are stored by value — get(i) returns a fresh
+// LogLine each call, so consumers must not rely on reference identity.
+class ColumnarRingBuffer {
+	texts: (string | undefined)[]
+	levels: Uint8Array
+	private head = 0
+	private _size = 0
+
+	constructor(readonly capacity: number) {
+		this.texts = new Array(capacity)
+		this.levels = new Uint8Array(capacity)
+	}
+
+	get size(): number {
+		return this._size
+	}
+
+	push(text: string, level: LogLevel | null): boolean {
+		const wrapped = this._size === this.capacity
+		this.texts[this.head] = text
+		this.levels[this.head] = encodeLevel(level)
+		this.head = (this.head + 1) % this.capacity
+		if (!wrapped) this._size++
+		return wrapped
+	}
+
+	get(index: number): LogLine {
+		if (index < 0 || index >= this._size) {
+			throw new RangeError(`Index ${index} out of bounds [0, ${this._size})`)
+		}
+		const start = this._size === this.capacity ? this.head : 0
+		const physical = (start + index) % this.capacity
+		return {
+			text: this.texts[physical] as string,
+			level: decodeLevel(this.levels[physical] as LogLevelCode),
+		}
+	}
+
+	toArray(): LogLine[] {
+		if (this._size === 0) return []
+		const start = this._size === this.capacity ? this.head : 0
+		const result = new Array<LogLine>(this._size)
+		for (let i = 0; i < this._size; i++) {
+			const physical = (start + i) % this.capacity
+			result[i] = {
+				text: this.texts[physical] as string,
+				level: decodeLevel(this.levels[physical] as LogLevelCode),
+			}
+		}
+		return result
+	}
+
+	clear(): void {
+		this.texts = new Array(this.capacity)
+		this.levels = new Uint8Array(this.capacity)
+		this.head = 0
+		this._size = 0
+	}
+}
+
+function mapLog4jLevel(level?: string): LogLevel | null {
+	if (!level) return null
+	switch (level.toUpperCase()) {
+		case 'FATAL':
+		case 'ERROR':
+			return 'error'
+		case 'WARN':
+			return 'warn'
+		case 'INFO':
+			return 'info'
+		case 'DEBUG':
+			return 'debug'
+		case 'TRACE':
+			return 'trace'
+		default:
+			return null
+	}
+}
+
+function formatTimestamp(millis?: number): string {
+	if (!millis) return ''
+	const date = new Date(millis)
+	const h = String(date.getHours()).padStart(2, '0')
+	const m = String(date.getMinutes()).padStart(2, '0')
+	const s = String(date.getSeconds()).padStart(2, '0')
+	return `[${h}:${m}:${s}]`
+}
+
+function formatLog4jLines(event: Log4jEvent): LogLine[] {
+	const level = mapLog4jLevel(event.level)
+	const time = formatTimestamp(event.timestamp_millis)
+	const thread = event.thread_name ?? ''
+	const levelStr = event.level ?? ''
+	const message = event.message?.trim() ?? ''
+
+	const text = time
+		? `${time} [${thread}/${levelStr}]: ${message}`
+		: `[${thread}/${levelStr}]: ${message}`
+
+	const lines: LogLine[] = [{ text, level }]
+
+	if (event.throwable) {
+		for (const line of event.throwable.split('\n').filter(Boolean)) {
+			lines.push({ text: line, level: 'error' })
+		}
+	}
+
+	return lines
+}
+
+function textToLogLine(text: string): LogLine {
+	return { text, level: detectLogLevel(text) }
+}
+
 export const useModrinthServersConsole = createGlobalState(() => {
-	const output: Ref<string[]> = shallowRef<string[]>([])
-	const searchQuery: Ref<string> = shallowRef('')
-	const filteredOutput: Ref<string[]> = shallowRef([])
-	let searchRegex: RegExp | null = null
+	const archive = new ColumnarRingBuffer(ARCHIVE_CAPACITY)
+	const output: Ref<LogLine[]> = shallowRef<LogLine[]>([])
 
-	let lineBuffer: string[] = []
+	let lineBuffer: LogLine[] = []
 	let batchTimer: NodeJS.Timeout | null = null
-	let isProcessingInitialBatch = false
 
-	let refilterTimer: NodeJS.Timeout | null = null
-	const refilterTimeout = 100
+	let wrapCount = 0
+	let lastFlushMs = 0
 
-	const updateFilter = () => {
-		if (!searchQuery.value) {
-			filteredOutput.value = []
-			return
-		}
-
-		if (!searchRegex) {
-			searchRegex = new RegExp(searchQuery.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
-		}
-
-		filteredOutput.value = output.value.filter((line) => searchRegex?.test(line) ?? false)
-	}
-
-	const scheduleRefilter = () => {
-		if (refilterTimer) clearTimeout(refilterTimer)
-		refilterTimer = setTimeout(updateFilter, refilterTimeout)
-	}
-
-	const flushBuffer = () => {
+	const flushBuffer = (): void => {
 		if (lineBuffer.length === 0) return
 
-		const processedLines = lineBuffer.flatMap((line) => line.split('\n').filter(Boolean))
+		const t0 = DEBUG_PERF ? performance.now() : 0
+		const arr = output.value
+		const flushedCount = lineBuffer.length
+		let didWrap = false
 
-		if (isProcessingInitialBatch && processedLines.length >= initialBatchSize) {
-			isProcessingInitialBatch = false
-			output.value = processedLines.slice(-maxLines)
-		} else {
-			const newOutput = [...output.value, ...processedLines]
-			output.value = newOutput.slice(-maxLines)
+		for (const line of lineBuffer) {
+			if (archive.push(line.text, line.level)) didWrap = true
+			arr.push(line)
+		}
+
+		if (didWrap) {
+			const evictedCount = Math.max(0, arr.length - archive.size)
+			if (evictedCount > 0) {
+				arr.splice(0, evictedCount)
+			}
+			wrapCount++
 		}
 
 		lineBuffer = []
 		batchTimer = null
+		triggerRef(output)
 
-		if (searchQuery.value) {
-			scheduleRefilter()
+		if (DEBUG_PERF) {
+			lastFlushMs = performance.now() - t0
+			if (arr.length !== archive.size) {
+				console.error(
+					`[mr-console] drift: output.length=${arr.length} !== archive.size=${archive.size}`,
+				)
+			}
+			console.debug(
+				`[mr-console] flush: ${flushedCount} lines in ${lastFlushMs.toFixed(2)}ms` +
+					` | buffer: ${archive.size} | wrap: ${didWrap}`,
+			)
 		}
 	}
 
-	const addLine = (line: string): void => {
-		lineBuffer.push(line)
-
-		if (!batchTimer) {
-			batchTimer = setTimeout(flushBuffer, batchTimeout)
-		}
-	}
-
-	const addLines = (lines: string[]): void => {
+	const addLines = (lines: LogLine[]): void => {
 		if (output.value.length === 0 && lines.length >= initialBatchSize) {
-			isProcessingInitialBatch = true
 			lineBuffer = lines
 			flushBuffer()
 			return
@@ -80,41 +235,61 @@ export const useModrinthServersConsole = createGlobalState(() => {
 		}
 	}
 
-	const setSearchQuery = (query: string): void => {
-		searchQuery.value = query
-		searchRegex = null
-		updateFilter()
+	const addLog4jEvent = (event: Log4jEvent): void => {
+		addLines(formatLog4jLines(event))
+	}
+
+	const addLegacyLog = (message: string): void => {
+		const logLines = message
+			.split('\n')
+			.filter((l) => l.trim())
+			.map(textToLogLine)
+		addLines(logLines)
 	}
 
 	const clear = (): void => {
+		const t0 = DEBUG_PERF ? performance.now() : 0
+		archive.clear()
 		output.value = []
-		filteredOutput.value = []
-		searchQuery.value = ''
 		lineBuffer = []
-		isProcessingInitialBatch = false
+		wrapCount = 0
 		if (batchTimer) {
 			clearTimeout(batchTimer)
 			batchTimer = null
 		}
-		if (refilterTimer) {
-			clearTimeout(refilterTimer)
-			refilterTimer = null
+		if (DEBUG_PERF) {
+			console.debug(`[mr-console] clear in ${(performance.now() - t0).toFixed(2)}ms`)
 		}
-		searchRegex = null
 	}
 
-	const findLineIndex = (line: string): number => {
-		return output.value.findIndex((l) => l === line)
+	const __debugStats = ():
+		| { enabled: false }
+		| {
+				enabled: true
+				bufferSize: number
+				heapEstimate: number
+				recentFlushMs: number
+				wrapCount: number
+		  } => {
+		if (!DEBUG_PERF) return { enabled: false }
+		const heapEstimate =
+			archive.texts.reduce<number>((a, s) => a + (s?.length ?? 0) * 2, 0) +
+			archive.levels.byteLength
+		return {
+			enabled: true,
+			bufferSize: archive.size,
+			heapEstimate,
+			recentFlushMs: lastFlushMs,
+			wrapCount,
+		}
 	}
 
 	return {
 		output,
-		searchQuery,
-		filteredOutput,
-		addLine,
 		addLines,
-		setSearchQuery,
+		addLog4jEvent,
+		addLegacyLog,
 		clear,
-		findLineIndex,
+		__debugStats,
 	}
 })

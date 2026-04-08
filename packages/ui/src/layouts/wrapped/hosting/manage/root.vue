@@ -417,6 +417,7 @@ import {
 } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { useServerManageCoreRuntime } from '#ui/composables/server-manage-core-runtime'
+import type { LogLine } from '#ui/layouts/shared/console'
 import type { ServerSettingsTabId } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
@@ -689,7 +690,7 @@ type CachedWsState = {
 	ramData: number[]
 	powerState: Archon.Websocket.v0.PowerState
 	uptimeSeconds: number
-	consoleLines: string[]
+	consoleLines: LogLine[]
 }
 
 const modrinthServersConsole = useModrinthServersConsole()

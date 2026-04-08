@@ -1,10 +1,23 @@
 import type { Terminal } from '@xterm/xterm'
 import { ref } from 'vue'
 
-import type { LogLevel } from '../types'
-import { detectLogLevel } from './log-level'
+import type { LogLevel, LogLine } from '../types'
 
-export type FilterPredicate = (lineText: string) => boolean
+export type FilterPredicate = (line: LogLine) => boolean
+
+export function colorize(line: LogLine): string {
+	switch (line.level) {
+		case 'error':
+			return `\x1b[31m${line.text}\x1b[0m`
+		case 'warn':
+			return `\x1b[33m${line.text}\x1b[0m`
+		case 'debug':
+		case 'trace':
+			return `\x1b[90m${line.text}\x1b[0m`
+		default:
+			return line.text
+	}
+}
 
 export function useConsoleFilters() {
 	const activeFilters = ref<Set<LogLevel | 'all'>>(new Set(['all']))
@@ -31,10 +44,9 @@ export function useConsoleFilters() {
 	function buildFilterPredicate(): FilterPredicate | null {
 		if (activeFilters.value.has('all')) return null
 		const allowed = activeFilters.value
-		return (line: string) => {
-			const level = detectLogLevel(line)
-			if (level === null) return true
-			return allowed.has(level)
+		return (line: LogLine) => {
+			if (line.level === null) return true
+			return allowed.has(line.level)
 		}
 	}
 
@@ -43,7 +55,7 @@ export function useConsoleFilters() {
 
 export function rewriteTerminal(
 	terminal: Terminal,
-	allLines: string[],
+	allLines: LogLine[],
 	predicate: FilterPredicate | null,
 ) {
 	terminal.reset()
@@ -53,6 +65,6 @@ export function rewriteTerminal(
 	if (filtered.length === 0) return
 
 	terminal.write('\x1b[?2026h')
-	terminal.write(filtered.join('\r\n'))
+	terminal.write(filtered.map(colorize).join('\r\n'))
 	terminal.write('\x1b[?2026l')
 }

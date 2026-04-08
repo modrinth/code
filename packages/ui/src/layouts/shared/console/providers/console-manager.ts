@@ -2,10 +2,10 @@ import type { ComputedRef, Ref } from 'vue'
 
 import { createContext } from '#ui/providers/create-context'
 
-import type { LogSource } from '../types'
+import type { LogLine, LogSource } from '../types'
 
 export interface ConsoleManagerContext {
-	logLines: Ref<string[]>
+	logLines: Ref<LogLine[]>
 
 	logSources?: ComputedRef<LogSource[]>
 	activeLogSourceIndex?: Ref<number>
