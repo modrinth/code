@@ -96,14 +96,17 @@ pub async fn init_ads_window<R: Runtime>(
     }
 
     if let Ok((position, size)) = get_webview_position(&app, dpr) {
-        if let Some(webview) = app.webviews().get("ads-window") {
+        let webview = if let Some(webview) = app.webviews().get("ads-window") {
             if state.shown {
                 let _ = webview.set_position(position);
                 let _ = webview.set_size(size);
             } else {
-                let _ =
-                    webview.set_position(PhysicalPosition::new(-1000, -1000));
+                webview
+                    .set_position(PhysicalPosition::new(-1000, -1000))
+                    .ok();
             }
+
+            Some(webview.clone())
         } else if let Some(window) = app.get_window("main") {
             let webview = window.add_child(
                 tauri::webview::WebviewBuilder::new(
@@ -145,7 +148,38 @@ pub async fn init_ads_window<R: Runtime>(
                     unsafe { webview2_8.SetIsMuted(true) }.ok();
                 }
             })?;
-        }
+
+            Some(webview)
+        } else {
+            None
+        };
+
+        let Some(webview) = webview.clone() else {
+            return Ok(());
+        };
+
+        // tauri::async_runtime::spawn(async move {
+        //     loop {
+        //         webview.with_webview(|wv| {
+        //             use webkit2gtk::WebViewExt;
+
+        //             wv.inner().evaluate_javascript(
+        //                 "document.hidden",
+        //                 None,
+        //                 None,
+        //                 None::<&webkit2gtk::gio::Cancellable>,
+        //                 |result| {
+        //                     use javascriptcore::ValueExt;
+
+        //                     let hidden = result.map(|v| v.to_boolean());
+        //                     tracing::error!("!! ads wv hidden? {hidden:?}");
+        //                 },
+        //             );
+        //         });
+
+        //         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        //     }
+        // });
     }
 
     Ok(())
@@ -169,8 +203,9 @@ pub async fn show_ads_window<R: Runtime>(
 
         if state.shown {
             let (position, size) = get_webview_position(&app, dpr)?;
-            let _ = webview.set_size(size);
-            let _ = webview.set_position(position);
+            webview.set_size(size).ok();
+            webview.set_position(position).ok();
+            webview.show().ok();
         }
     }
 
@@ -192,7 +227,10 @@ pub async fn hide_ads_window<R: Runtime>(
             state.modal_shown = true;
         }
 
-        let _ = webview.set_position(PhysicalPosition::new(-1000, -1000));
+        webview
+            .set_position(PhysicalPosition::new(-1000, -1000))
+            .ok();
+        webview.hide().ok();
     }
 
     Ok(())
