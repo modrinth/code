@@ -269,7 +269,7 @@ const messages = defineMessages({
 		id: 'servers.manage.loading-servers',
 		defaultMessage: 'Loading your servers...',
 	},
-	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Servers' },
+	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Modrinth Hosting' },
 	searchPlaceholder: {
 		id: 'servers.manage.search-placeholder',
 		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',

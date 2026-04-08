@@ -2886,7 +2886,7 @@
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Servers"
+    "defaultMessage": "Modrinth Hosting"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
