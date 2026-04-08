@@ -59,7 +59,13 @@ import { injectModalBehavior } from '#ui/providers/modal-behavior'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
+import {
+	colorize,
+	computeHighlightColors,
+	LogHighlightAddon,
+	rewriteTerminal,
+	useConsoleFilters,
+} from './composables'
 import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
 
@@ -87,10 +93,14 @@ onBeforeUnmount(() => {
 		document.body.style.overflow = ''
 		modalBehavior?.onHide?.()
 	}
+	themeObserver?.disconnect()
+	themeObserver = null
 })
 
 let lastWrittenIndex = 0
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
+let highlightAddon: LogHighlightAddon | null = null
+let themeObserver: MutationObserver | null = null
 
 const resolvedShowInput = computed(() => {
 	const v = ctx.showCommandInput
@@ -105,7 +115,19 @@ const resolvedShareDisabled = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
-function handleTerminalReady(_terminal: Terminal) {
+function handleTerminalReady(terminal: Terminal) {
+	const addon = new LogHighlightAddon(computeHighlightColors())
+	terminal.loadAddon(addon)
+	highlightAddon = addon
+
+	themeObserver = new MutationObserver(() => {
+		addon.updateColors(computeHighlightColors())
+	})
+	themeObserver.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ['data-theme', 'class'],
+	})
+
 	writeAllLines()
 }
 
@@ -122,8 +144,11 @@ function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const predicate = buildCombinedPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
-	lastWrittenIndex = ctx.logLines.value.length
+	const lines = ctx.logLines.value
+	const filtered = predicate ? lines.filter(predicate) : lines
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
+	highlightAddon?.reapply(filtered.map((l) => l.level))
+	lastWrittenIndex = lines.length
 }
 
 function enterFullscreen() {
@@ -148,8 +173,11 @@ function writeAllLines() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const predicate = buildCombinedPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
-	lastWrittenIndex = ctx.logLines.value.length
+	const lines = ctx.logLines.value
+	const filtered = predicate ? lines.filter(predicate) : lines
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
+	highlightAddon?.reapply(filtered.map((l) => l.level))
+	lastWrittenIndex = lines.length
 }
 
 watch(
@@ -168,6 +196,7 @@ watch(
 		for (let i = lastWrittenIndex; i < lines.length; i++) {
 			if (!predicate || predicate(lines[i])) {
 				terminalRef.value?.writeln(colorize(lines[i], query))
+				highlightAddon?.pushLevel(lines[i].level)
 			}
 		}
 		lastWrittenIndex = lines.length
@@ -187,6 +216,7 @@ function handleCommand(cmd: string) {
 
 function handleClear() {
 	terminalRef.value?.reset()
+	highlightAddon?.reapply([])
 	lastWrittenIndex = 0
 	ctx.onClear?.()
 }
