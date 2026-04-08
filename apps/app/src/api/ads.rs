@@ -97,10 +97,14 @@ pub async fn init_ads_window<R: Runtime>(
 
     if let Ok((position, size)) = get_webview_position(&app, dpr) {
         let webview = if let Some(webview) = app.webviews().get("ads-window") {
+            // set both the `hide`/`show` state and `position`,
+            // to ensure that the webview is actually shown/hidden
             if state.shown {
-                let _ = webview.set_position(position);
-                let _ = webview.set_size(size);
+                webview.show().ok();
+                webview.set_position(position).ok();
+                webview.set_size(size).ok();
             } else {
+                webview.hide().ok();
                 webview
                     .set_position(PhysicalPosition::new(-1000, -1000))
                     .ok();
@@ -124,6 +128,8 @@ pub async fn init_ads_window<R: Runtime>(
                 .zoom_hotkeys_enabled(false)
                 .transparent(true)
                 .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny),
+                // set both the `hide`/`show` state and `position`,
+                // to ensure that the webview is actually shown/hidden
                 if state.shown {
                     position
                 } else {
@@ -131,6 +137,12 @@ pub async fn init_ads_window<R: Runtime>(
                 },
                 size,
             )?;
+
+            if state.shown {
+                webview.show().ok();
+            } else {
+                webview.hide().ok();
+            }
 
             webview.with_webview(#[allow(unused_variables)] |webview2| {
                 #[cfg(windows)]
@@ -232,6 +244,8 @@ pub async fn show_ads_window<R: Runtime>(
 
         if state.shown {
             let (position, size) = get_webview_position(&app, dpr)?;
+            // set both the `hide`/`show` state and `position`,
+            // to ensure that the webview is actually shown/hidden
             webview.set_size(size).ok();
             webview.set_position(position).ok();
             webview.show().ok();
@@ -256,6 +270,8 @@ pub async fn hide_ads_window<R: Runtime>(
             state.modal_shown = true;
         }
 
+        // set both the `hide`/`show` state and `position`,
+        // to ensure that the webview is actually shown/hidden
         webview
             .set_position(PhysicalPosition::new(-1000, -1000))
             .ok();

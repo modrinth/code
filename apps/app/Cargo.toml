@@ -44,8 +44,6 @@ tracing-error = { workspace = true }
 url = { workspace = true }
 urlencoding = { workspace = true }
 uuid = { workspace = true, features = ["serde", "v4"] }
-# webkit2gtk = { version = "2.0.2" }
-# javascriptcore-rs = "1.1.2"
 
 [build-dependencies]
 tauri-build = { workspace = true, features = ["codegen"] }
