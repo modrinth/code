@@ -4,9 +4,8 @@
 		<div class="flex flex-col gap-8 items-start pr-8 shrink-0">
 			<!-- Heading -->
 			<div class="flex flex-col gap-2 items-start w-[300px]">
-				<p class="text-sm text-secondary">{{ formatMessage(messages.modrinthHostingLabel) }}</p>
-				<p class="text-[30px] leading-9 font-semibold text-contrast">
-					{{ formatMessage(messages.noServersTitle) }}
+				<p class="text-3xl leading-9 font-semibold text-contrast">
+					{{ formatMessage(messages.modrinthHostingLabel) }}
 				</p>
 				<p class="text-base font-normal text-primary">
 					{{ formatMessage(messages.noServersDescription) }}

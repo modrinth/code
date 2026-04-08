@@ -1024,7 +1024,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</NavButton>
 			<NavButton
 				v-if="themeStore.featureFlags.servers_in_app"
-				v-tooltip.right="'Servers'"
+				v-tooltip.right="'Modrinth Hosting'"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
 				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"

@@ -8,7 +8,7 @@ definePageMeta({
 })
 
 useHead({
-	title: 'Servers - Modrinth',
+	title: 'Hosting - Modrinth',
 })
 
 const config = useRuntimeConfig()
