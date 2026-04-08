@@ -61,7 +61,7 @@ import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
 import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
 import { injectConsoleManager } from './providers'
-import type { LogLevel } from './types'
+import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
 const modalBehavior = injectModalBehavior()
@@ -70,6 +70,17 @@ const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
+
+function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
+	const levelPred = buildFilterPredicate()
+	const query = searchQuery.value.trim().toLowerCase()
+	if (!levelPred && !query) return null
+	return (line: LogLine) => {
+		if (levelPred && !levelPred(line)) return false
+		if (query && !line.text.toLowerCase().includes(query)) return false
+		return true
+	}
+}
 
 onBeforeUnmount(() => {
 	if (isFullscreen.value) {
@@ -103,11 +114,15 @@ function handleFilterToggle(value: LogLevel | 'all') {
 	rewriteFiltered()
 }
 
+function activeSearchQuery(): string {
+	return searchQuery.value.trim().toLowerCase()
+}
+
 function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
-	const predicate = buildFilterPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate)
+	const predicate = buildCombinedPredicate()
+	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
 	lastWrittenIndex = ctx.logLines.value.length
 }
 
@@ -132,8 +147,8 @@ function exitFullscreen() {
 function writeAllLines() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
-	const predicate = buildFilterPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate)
+	const predicate = buildCombinedPredicate()
+	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
 	lastWrittenIndex = ctx.logLines.value.length
 }
 
@@ -148,28 +163,21 @@ watch(
 			return
 		}
 
-		const predicate = buildFilterPredicate()
+		const predicate = buildCombinedPredicate()
+		const query = activeSearchQuery()
 		for (let i = lastWrittenIndex; i < lines.length; i++) {
 			if (!predicate || predicate(lines[i])) {
-				terminalRef.value?.writeln(colorize(lines[i]))
+				terminalRef.value?.writeln(colorize(lines[i], query))
 			}
 		}
 		lastWrittenIndex = lines.length
 	},
 )
 
-watch(searchQuery, (query) => {
+watch(searchQuery, () => {
 	if (searchDebounce) clearTimeout(searchDebounce)
 	searchDebounce = setTimeout(() => {
-		const addon = terminalRef.value?.searchAddon
-		if (!addon) return
-		if (query) {
-			addon.findNext(query, {
-				decorations: { activeMatchColorOverviewRuler: '#ffffff', matchOverviewRuler: '#888888' },
-			})
-		} else {
-			addon.clearDecorations()
-		}
+		rewriteFiltered()
 	}, 200)
 })
 
@@ -184,7 +192,7 @@ function handleClear() {
 }
 
 async function handleShare() {
-	const predicate = buildFilterPredicate()
+	const predicate = buildCombinedPredicate()
 	const lines = predicate ? ctx.logLines.value.filter(predicate) : ctx.logLines.value
 	const content = lines.map((l) => l.text).join('\n')
 
