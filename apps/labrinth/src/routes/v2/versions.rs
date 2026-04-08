@@ -45,6 +45,13 @@ fn default_true() -> bool {
     true
 }
 
+/// List a project's versions.
+///
+/// Query parameters:
+/// - `loaders`: The types of loaders to filter for, as a JSON array string.
+/// - `game_versions`: The game versions to filter for, as a JSON array string.
+/// - `featured`: Allows filtering for featured or non-featured versions only.
+/// - `include_changelog`: Whether to include the changelog field (default: true).
 #[get("version")]
 pub async fn version_list(
     req: HttpRequest,
@@ -128,6 +135,9 @@ pub async fn version_list(
     }
 }
 
+/// Get a version given a project ID/slug and a version number or ID.
+///
+/// If the version number matches multiple versions, only the oldest matching version will be returned.
 // Given a project ID/slug and a version slug
 #[get("version/{slug}")]
 pub async fn version_project_get(
@@ -164,6 +174,11 @@ pub struct VersionIds {
     pub include_changelog: bool,
 }
 
+/// Get multiple versions by IDs.
+///
+/// Query parameters:
+/// - `ids` (required): The IDs of the versions, as a JSON array string.
+/// - `include_changelog`: Whether to include the changelog field (default: true).
 #[get("versions")]
 pub async fn versions_get(
     req: HttpRequest,
@@ -199,6 +214,7 @@ pub async fn versions_get(
     }
 }
 
+/// Get a version by ID.
 #[get("{version_id}")]
 pub async fn version_get(
     req: HttpRequest,
@@ -258,6 +274,10 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
+/// Modify a version.
+///
+/// Requires `VERSION_WRITE` authentication scope.
+/// Accepts a JSON body with modified version fields.
 #[patch("{id}")]
 pub async fn version_edit(
     req: HttpRequest,
@@ -350,6 +370,9 @@ pub async fn version_edit(
     Ok(response)
 }
 
+/// Delete a version.
+///
+/// Requires `VERSION_DELETE` authentication scope.
 #[delete("{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,

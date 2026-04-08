@@ -31,6 +31,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Get the authenticated user from the authorization header.
+///
+/// Requires `USER_READ` authentication scope.
 #[get("user")]
 pub async fn user_auth_get(
     req: HttpRequest,
@@ -57,6 +60,10 @@ pub struct UserIds {
     pub ids: String,
 }
 
+/// Get multiple users by IDs.
+///
+/// Query parameters:
+/// - `ids` (required): The IDs of the users, as a JSON array string.
 #[get("users")]
 pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
@@ -82,6 +89,7 @@ pub async fn users_get(
     }
 }
 
+/// Get a user by ID or username.
 #[get("{id}")]
 pub async fn user_get(
     req: HttpRequest,
@@ -104,6 +112,7 @@ pub async fn user_get(
     }
 }
 
+/// Get a user's projects.
 #[get("{user_id}/projects")]
 pub async fn projects_list(
     req: HttpRequest,
@@ -156,6 +165,10 @@ pub struct EditUser {
     pub allow_friend_requests: Option<bool>,
 }
 
+/// Modify a user.
+///
+/// Requires `USER_WRITE` authentication scope.
+/// Accepts a JSON body with modified user fields.
 #[patch("{id}")]
 pub async fn user_edit(
     req: HttpRequest,
@@ -191,6 +204,10 @@ pub struct Extension {
     pub ext: String,
 }
 
+/// Change a user's avatar.
+///
+/// The new avatar may be up to 2MiB in size.
+/// Requires `USER_WRITE` authentication scope.
 #[patch("{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
@@ -218,6 +235,9 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Remove a user's avatar.
+///
+/// Requires `USER_WRITE` authentication scope.
 #[delete("{id}/icon")]
 pub async fn user_icon_delete(
     req: HttpRequest,
@@ -240,6 +260,7 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a user.
 #[delete("{id}")]
 pub async fn user_delete(
     req: HttpRequest,
@@ -255,6 +276,9 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Get a user's followed projects.
+///
+/// Requires `USER_READ` authentication scope.
 #[get("{id}/follows")]
 pub async fn user_follows(
     req: HttpRequest,
@@ -284,6 +308,9 @@ pub async fn user_follows(
     }
 }
 
+/// Get a user's notifications.
+///
+/// Requires `NOTIFICATION_READ` authentication scope.
 #[get("{id}/notifications")]
 pub async fn user_notifications(
     req: HttpRequest,

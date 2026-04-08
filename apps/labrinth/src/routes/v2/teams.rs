@@ -26,6 +26,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Get a project's team members.
+///
+/// Returns all members including the project's team members and the organization's team members
+/// if the project is associated with an organization. They can be differentiated by the
+/// `organization_permissions` field being null or not.
 // Returns all members of a project,
 // including the team members of the project's team, but
 // also the members of the organization's team if the project is associated with an organization
@@ -61,6 +66,9 @@ pub async fn team_members_get_project(
     }
 }
 
+/// Get a team's members.
+///
+/// Requires `PROJECT_READ` authentication scope.
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
 #[get("{id}/members")]
 pub async fn team_members_get(
@@ -92,6 +100,10 @@ pub struct TeamIds {
     pub ids: String,
 }
 
+/// Get the members of multiple teams.
+///
+/// Query parameters:
+/// - `ids` (required): The IDs of the teams, as a JSON array string.
 #[get("teams")]
 pub async fn teams_get(
     req: HttpRequest,
@@ -127,6 +139,9 @@ pub async fn teams_get(
     }
 }
 
+/// Join a team.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[post("{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
@@ -165,6 +180,10 @@ pub struct NewTeamMember {
     pub ordering: i64,
 }
 
+/// Add a user to a team.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+/// Accepts a JSON body with the user ID (usernames cannot be used here).
 #[post("{id}/members")]
 pub async fn add_team_member(
     req: HttpRequest,
@@ -203,6 +222,9 @@ pub struct EditTeamMember {
     pub ordering: Option<i64>,
 }
 
+/// Modify a team member's information.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[patch("{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
@@ -236,6 +258,9 @@ pub struct TransferOwnership {
     pub user_id: UserId,
 }
 
+/// Transfer team ownership to another user.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[patch("{id}/owner")]
 pub async fn transfer_ownership(
     req: HttpRequest,
@@ -260,6 +285,9 @@ pub async fn transfer_ownership(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Remove a member from a team.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[delete("{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,

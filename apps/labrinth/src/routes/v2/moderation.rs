@@ -22,6 +22,11 @@ fn default_count() -> u16 {
     100
 }
 
+/// Get projects pending moderation review.
+///
+/// Requires moderator access.
+/// Query parameters:
+/// - `count`: The number of projects to return (default: 100).
 #[get("projects")]
 pub async fn get_projects(
     req: HttpRequest,

@@ -17,6 +17,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(report_get);
 }
 
+/// Report a project, user, or version.
+///
+/// Brings a project, user, or version to the attention of the moderators by reporting it.
+/// Requires `REPORT_CREATE` authentication scope.
 #[post("report")]
 pub async fn report_create(
     req: HttpRequest,
@@ -55,6 +59,11 @@ fn default_all() -> bool {
     true
 }
 
+/// Get your open reports.
+///
+/// Requires `REPORT_READ` authentication scope.
+/// Query parameters:
+/// - `count`: The number of reports to return (default: 100).
 #[get("report")]
 pub async fn reports(
     req: HttpRequest,
@@ -93,6 +102,11 @@ pub struct ReportIds {
     pub ids: String,
 }
 
+/// Get multiple reports by IDs.
+///
+/// Requires `REPORT_READ` authentication scope.
+/// Query parameters:
+/// - `ids` (required): The IDs of the reports, as a JSON array string.
 #[get("reports")]
 pub async fn reports_get(
     req: HttpRequest,
@@ -122,6 +136,9 @@ pub async fn reports_get(
     }
 }
 
+/// Get a report by ID.
+///
+/// Requires `REPORT_READ` authentication scope.
 #[get("report/{id}")]
 pub async fn report_get(
     req: HttpRequest,
@@ -152,6 +169,10 @@ pub struct EditReport {
     pub closed: Option<bool>,
 }
 
+/// Modify a report.
+///
+/// Requires `REPORT_WRITE` authentication scope.
+/// Accepts a JSON body with `body` and `closed` fields.
 #[patch("report/{id}")]
 pub async fn report_edit(
     req: HttpRequest,
@@ -178,6 +199,7 @@ pub async fn report_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a report.
 #[delete("report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,

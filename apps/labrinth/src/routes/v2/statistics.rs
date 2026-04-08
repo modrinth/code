@@ -17,6 +17,9 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
+/// Various statistics about this Modrinth instance.
+///
+/// Returns counts of projects, versions, authors, and files.
 #[get("statistics")]
 pub async fn get_stats(
     pool: web::Data<PgPool>,

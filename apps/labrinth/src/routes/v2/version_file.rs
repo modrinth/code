@@ -30,6 +30,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Get a version from a file hash.
+///
+/// Query parameters:
+/// - `algorithm` (required): The hash algorithm (`sha1` or `sha512`).
+/// - `multiple`: Whether to return multiple results when looking for this hash (default: false).
 // under /api/v1/version_file/{hash}
 #[get("{version_id}")]
 pub async fn get_version_from_hash(
@@ -61,6 +66,7 @@ pub async fn get_version_from_hash(
     }
 }
 
+/// Download a version file by hash (redirects to CDN).
 // under /api/v1/version_file/{hash}/download
 #[get("{version_id}/download")]
 pub async fn download_version(
@@ -84,6 +90,11 @@ pub async fn download_version(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a file from its hash.
+///
+/// Requires `VERSION_WRITE` authentication scope.
+/// Query parameters:
+/// - `version_id`: Version ID to delete from, if multiple files of the same hash exist.
 // under /api/v1/version_file/{hash}
 #[delete("{version_id}")]
 pub async fn delete_file(
@@ -114,6 +125,9 @@ pub struct UpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
+/// Get the latest version of a project from a hash, loader(s), and game version(s).
+///
+/// Accepts a JSON body with `loaders` and `game_versions` arrays.
 #[post("{version_id}/update")]
 pub async fn get_update_from_hash(
     req: HttpRequest,
@@ -168,6 +182,10 @@ pub struct FileHashes {
     pub hashes: Vec<String>,
 }
 
+/// Get versions from multiple hashes.
+///
+/// This is the same as `get_version_from_hash` except it accepts multiple hashes.
+/// Accepts a JSON body with `hashes` array and `algorithm`.
 // under /api/v2/version_files
 #[post("")]
 pub async fn get_versions_from_hashes(
@@ -210,6 +228,9 @@ pub async fn get_versions_from_hashes(
     }
 }
 
+/// Get projects from multiple file hashes.
+///
+/// Accepts a JSON body with `hashes` array and `algorithm`.
 #[post("project")]
 pub async fn get_projects_from_hashes(
     req: HttpRequest,
@@ -277,6 +298,9 @@ pub struct ManyUpdateData {
     pub version_types: Option<Vec<VersionType>>,
 }
 
+/// Get the latest versions of multiple projects from hashes, loader(s), and game version(s).
+///
+/// Accepts a JSON body with `hashes` array, `algorithm`, `loaders`, and `game_versions`.
 #[post("update")]
 pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
@@ -316,6 +340,9 @@ pub async fn update_files(
     Ok(HttpResponse::Ok().json(v3_versions))
 }
 
+/// Get the latest versions of multiple projects from hashes, returning multiple results per hash.
+///
+/// Accepts a JSON body with `hashes` array, `algorithm`, `loaders`, and `game_versions`.
 #[post("update_many")]
 pub async fn update_files_many(
     pool: web::Data<ReadOnlyPgPool>,
@@ -372,6 +399,9 @@ pub struct ManyFileUpdateData {
     pub hashes: Vec<FileUpdateData>,
 }
 
+/// Get the latest versions of multiple projects from hashes with individual parameters per hash.
+///
+/// Accepts a JSON body with `algorithm` and an array of per-hash objects containing `hash`, `loaders`, and `game_versions`.
 #[post("update_individual")]
 pub async fn update_individual_files(
     req: HttpRequest,

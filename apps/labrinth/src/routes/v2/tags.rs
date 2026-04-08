@@ -35,6 +35,9 @@ pub struct CategoryData {
     pub header: String,
 }
 
+/// Get a list of categories.
+///
+/// Gets an array of categories, their icons, and applicable project types.
 #[get("category")]
 pub async fn category_list(
     pool: web::Data<PgPool>,
@@ -69,6 +72,9 @@ pub struct LoaderData {
     pub supported_project_types: Vec<String>,
 }
 
+/// Get a list of loaders.
+///
+/// Gets an array of loaders, their icons, and supported project types.
 #[get("loader")]
 pub async fn loader_list(
     pool: web::Data<PgPool>,
@@ -131,6 +137,12 @@ pub struct GameVersionQuery {
     major: Option<bool>,
 }
 
+/// Get a list of game versions.
+///
+/// Gets an array of game versions and information about them.
+/// Query parameters:
+/// - `type`: Filter by version type (release, snapshot, alpha, beta).
+/// - `major`: Filter by whether it is a major version.
 #[get("game_version")]
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
@@ -191,6 +203,9 @@ pub struct License {
     pub name: String,
 }
 
+/// Get a list of licenses.
+///
+/// Deprecated - simply use SPDX IDs.
 #[get("license")]
 pub async fn license_list() -> HttpResponse {
     let response = v3::tags::license_list().await;
@@ -218,6 +233,7 @@ pub struct LicenseText {
     pub body: String,
 }
 
+/// Get the text and title of a license.
 #[get("license/{id}")]
 pub async fn license_text(
     params: web::Path<(String,)>,
@@ -249,6 +265,9 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
+/// Get a list of donation platforms.
+///
+/// Gets an array of donation platforms and information about them.
 #[get("donation_platform")]
 pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
@@ -295,6 +314,9 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Get a list of report types.
+///
+/// Gets an array of valid report types.
 #[get("report_type")]
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
@@ -306,6 +328,9 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Get a list of project types.
+///
+/// Gets an array of valid project types.
 #[get("project_type")]
 pub async fn project_type_list(
     pool: web::Data<PgPool>,
@@ -317,6 +342,9 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Get a list of side types.
+///
+/// Gets an array of valid side types (required, optional, unsupported, unknown).
 #[get("side_type")]
 pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     // Original side types are no longer reflected in the database.

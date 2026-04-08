@@ -134,6 +134,11 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
+/// Create a new project.
+///
+/// Requires `PROJECT_CREATE` authentication scope.
+/// The request is a multipart request with a `data` field containing JSON project metadata
+/// and an optional `icon` file field.
 #[post("/project")]
 pub async fn project_create(
     req: HttpRequest,

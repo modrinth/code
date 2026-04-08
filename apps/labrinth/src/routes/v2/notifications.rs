@@ -28,6 +28,11 @@ pub struct NotificationIds {
     pub ids: String,
 }
 
+/// Get multiple notifications by IDs.
+///
+/// Requires `NOTIFICATION_READ` authentication scope.
+/// Query parameters:
+/// - `ids` (required): The IDs of the notifications, as a JSON array string.
 #[get("notifications")]
 pub async fn notifications_get(
     req: HttpRequest,
@@ -57,6 +62,9 @@ pub async fn notifications_get(
     }
 }
 
+/// Get a notification by ID.
+///
+/// Requires `NOTIFICATION_READ` authentication scope.
 #[get("{id}")]
 pub async fn notification_get(
     req: HttpRequest,
@@ -83,6 +91,9 @@ pub async fn notification_get(
     }
 }
 
+/// Mark a notification as read.
+///
+/// Requires `NOTIFICATION_WRITE` authentication scope.
 #[patch("{id}")]
 pub async fn notification_read(
     req: HttpRequest,
@@ -97,6 +108,9 @@ pub async fn notification_read(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a notification.
+///
+/// Requires `NOTIFICATION_WRITE` authentication scope.
 #[delete("{id}")]
 pub async fn notification_delete(
     req: HttpRequest,
@@ -117,6 +131,11 @@ pub async fn notification_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Mark multiple notifications as read.
+///
+/// Requires `NOTIFICATION_WRITE` authentication scope.
+/// Query parameters:
+/// - `ids` (required): The IDs of the notifications, as a JSON array string.
 #[patch("notifications")]
 pub async fn notifications_read(
     req: HttpRequest,
@@ -137,6 +156,11 @@ pub async fn notifications_read(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete multiple notifications.
+///
+/// Requires `NOTIFICATION_WRITE` authentication scope.
+/// Query parameters:
+/// - `ids` (required): The IDs of the notifications, as a JSON array string.
 #[delete("notifications")]
 pub async fn notifications_delete(
     req: HttpRequest,

@@ -21,6 +21,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(threads_get);
 }
 
+/// Get a thread by ID.
+///
+/// Requires `THREAD_READ` authentication scope.
 #[get("{id}")]
 pub async fn thread_get(
     req: HttpRequest,
@@ -39,6 +42,11 @@ pub struct ThreadIds {
     pub ids: String,
 }
 
+/// Get multiple threads by IDs.
+///
+/// Requires `THREAD_READ` authentication scope.
+/// Query parameters:
+/// - `ids` (required): The IDs of the threads, as a JSON array string.
 #[get("threads")]
 pub async fn threads_get(
     req: HttpRequest,
@@ -75,6 +83,9 @@ pub struct NewThreadMessage {
     pub body: MessageBody,
 }
 
+/// Send a text message to a thread.
+///
+/// Requires `THREAD_WRITE` authentication scope.
 #[post("{id}")]
 pub async fn thread_send_message(
     req: HttpRequest,
@@ -100,6 +111,9 @@ pub async fn thread_send_message(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a thread message.
+///
+/// Requires `THREAD_WRITE` authentication scope.
 #[delete("{id}")]
 pub async fn message_delete(
     req: HttpRequest,

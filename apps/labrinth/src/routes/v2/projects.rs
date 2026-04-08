@@ -50,6 +50,23 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+/// Search projects.
+///
+/// Facets are an essential concept for understanding how to filter out results.
+/// These are the most commonly used facet types:
+/// - `project_type`
+/// - `categories` (loaders are lumped in with categories in search)
+/// - `versions`
+/// - `client_side`
+/// - `server_side`
+/// - `open_source`
+///
+/// Several others are also available: `title`, `author`, `follows`, `project_id`,
+/// `license`, `downloads`, `color`, `created_timestamp` (Unix), `modified_timestamp` (Unix),
+/// `date_created` (ISO-8601), `date_modified` (ISO-8601).
+///
+/// In order to use facets, you need a value to filter by and an operation (`:`, `!=`, `>=`, `>`, `<=`, `<`).
+/// All elements in a single array are joined by OR. Separate arrays are joined by AND.
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
@@ -147,6 +164,10 @@ pub struct RandomProjects {
     pub count: u32,
 }
 
+/// Get a list of random projects.
+///
+/// Query parameters:
+/// - `count` (required): The number of random projects to return (0-100).
 #[get("projects_random")]
 pub async fn random_projects_get(
     web::Query(count): web::Query<RandomProjects>,
@@ -174,6 +195,10 @@ pub async fn random_projects_get(
     }
 }
 
+/// Get multiple projects by IDs or slugs.
+///
+/// Query parameters:
+/// - `ids` (required): The IDs and/or slugs of the projects, as a JSON array string.
 #[get("projects")]
 pub async fn projects_get(
     req: HttpRequest,
@@ -205,6 +230,7 @@ pub async fn projects_get(
     }
 }
 
+/// Get a project by ID or slug.
 #[get("{id}")]
 pub async fn project_get(
     req: HttpRequest,
@@ -240,7 +266,9 @@ pub async fn project_get(
     Ok(HttpResponse::Ok().json(project))
 }
 
-//checks the validity of a project id or slug
+/// Check project slug/ID validity.
+///
+/// Returns the project ID if the slug or ID is valid.
 #[get("{id}/check")]
 pub async fn project_get_check(
     info: web::Path<(String,)>,
@@ -259,6 +287,9 @@ struct DependencyInfo {
     pub versions: Vec<LegacyVersion>,
 }
 
+/// Get all of a project's dependencies.
+///
+/// Returns the projects and versions that this project depends on.
 #[get("dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
@@ -404,6 +435,10 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
 }
 
+/// Modify a project.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+/// Accepts a JSON body with modified project fields.
 #[patch("{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
@@ -642,6 +677,10 @@ pub struct BulkEditProject {
     pub discord_url: Option<Option<String>>,
 }
 
+/// Bulk-edit multiple projects.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+/// Accepts a JSON body with fields to edit on all projects specified by the `ids` query parameter.
 #[patch("projects")]
 pub async fn projects_edit(
     req: HttpRequest,
@@ -744,6 +783,10 @@ pub struct Extension {
     pub ext: String,
 }
 
+/// Change a project's icon.
+///
+/// The new icon may be up to 256KiB in size.
+/// Requires `PROJECT_WRITE` authentication scope.
 #[patch("{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_icon_edit(
@@ -771,6 +814,9 @@ pub async fn project_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a project's icon.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[delete("{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
@@ -803,6 +849,10 @@ pub struct GalleryCreateQuery {
     pub ordering: Option<i64>,
 }
 
+/// Add a gallery image to a project.
+///
+/// Modrinth allows you to upload files of up to 5MiB to a project's gallery.
+/// Requires `PROJECT_WRITE` authentication scope.
 #[post("{id}/gallery")]
 #[allow(clippy::too_many_arguments)]
 pub async fn add_gallery_item(
@@ -859,6 +909,9 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
+/// Modify a gallery image.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[patch("{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
@@ -890,6 +943,9 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
+/// Delete a gallery image from a project.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
 #[delete("{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
@@ -912,6 +968,9 @@ pub async fn delete_gallery_item(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a project.
+///
+/// Requires `PROJECT_DELETE` authentication scope.
 #[delete("{id}")]
 pub async fn project_delete(
     req: HttpRequest,
@@ -935,6 +994,9 @@ pub async fn project_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Follow a project.
+///
+/// Requires `USER_WRITE` authentication scope.
 #[post("{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
@@ -949,6 +1011,9 @@ pub async fn project_follow(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Unfollow a project.
+///
+/// Requires `USER_WRITE` authentication scope.
 #[delete("{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
