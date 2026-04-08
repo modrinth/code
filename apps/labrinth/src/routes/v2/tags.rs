@@ -41,7 +41,7 @@ pub fn utoipa_config(
     cfg.service(side_type_list);
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct CategoryData {
     pub icon: String,
     pub name: String,
@@ -85,7 +85,7 @@ pub async fn category_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct LoaderData {
     pub icon: String,
     pub name: String,
@@ -148,7 +148,7 @@ pub async fn loader_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
@@ -229,7 +229,7 @@ pub async fn game_version_list(
     )
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct License {
     pub short: String,
     pub name: String,
@@ -265,7 +265,7 @@ pub async fn license_list() -> HttpResponse {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct LicenseText {
     pub title: String,
     pub body: String,
@@ -301,7 +301,9 @@ pub async fn license_text(
     )
 }
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
+#[derive(
+    serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, utoipa::ToSchema,
+)]
 pub struct DonationPlatformQueryData {
     // The difference between name and short is removed in v3.
     // Now, the 'id' becomes the name, and the 'name' is removed (the frontend uses the id as the name)

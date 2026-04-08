@@ -18,7 +18,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 /// A project returned from the API
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyProject {
     /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
@@ -292,7 +292,7 @@ impl LegacySideType {
 }
 
 /// A specific version of a project
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyVersion {
     /// Relevant V2 fields- these were removed or modified in V3,
     /// and are now part of the dynamic fields system
@@ -370,7 +370,7 @@ impl From<Version> for LegacyVersion {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, utoipa::ToSchema)]
 pub struct LegacyGalleryItem {
     pub url: String,
     pub raw_url: String,

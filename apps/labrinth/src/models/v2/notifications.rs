@@ -12,7 +12,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyNotification {
     pub id: NotificationId,
     pub user_id: UserId,
@@ -29,7 +29,7 @@ pub struct LegacyNotification {
     pub actions: Vec<LegacyNotificationAction>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct LegacyNotificationAction {
     pub title: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
@@ -152,6 +152,25 @@ pub enum LegacyNotificationBody {
         body_md: String,
     },
     Unknown,
+}
+
+// manual `ToSchema` impl because otherwise `utoipa` generates code
+// which allocates a huge array (>16k bytes), and we stack overflow.
+// see:
+// - https://github.com/juhaku/utoipa/issues/1454
+// - https://github.com/juhaku/utoipa/pull/1504
+impl utoipa::PartialSchema for LegacyNotificationBody {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::SchemaType::AnyValue)
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for LegacyNotificationBody {
+    fn name() -> std::borrow::Cow<'static, str> {
+        std::borrow::Cow::Borrowed("LegacyNotificationBody")
+    }
 }
 
 impl LegacyNotification {

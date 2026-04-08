@@ -15,7 +15,7 @@ pub fn utoipa_config_root(
     cfg.service(get_stats);
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct V2Stats {
     pub projects: Option<i64>,
     pub versions: Option<i64>,

@@ -344,7 +344,7 @@ pub async fn project_get_check(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct DependencyInfo {
     pub projects: Vec<LegacyProject>,
     pub versions: Vec<LegacyVersion>,
