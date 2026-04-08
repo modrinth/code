@@ -158,57 +158,57 @@ pub async fn init_ads_window<R: Runtime>(
             return Ok(());
         };
 
-        tauri::async_runtime::spawn(async move {
-            loop {
-                webview.with_webview(|wv| {
-                    #[cfg(windows)]
-                    {
-                        use webview2_com::ExecuteScriptCompletedHandler;
+        // tauri::async_runtime::spawn(async move {
+        //     loop {
+        //         webview.with_webview(|wv| {
+        //             #[cfg(windows)]
+        //             {
+        //                 use webview2_com::ExecuteScriptCompletedHandler;
 
-                        let core_webview2 = unsafe {
-                            webview.controller().CoreWebView2().unwrap()
-                        };
+        //                 let core_webview2 = unsafe {
+        //                     webview.controller().CoreWebView2().unwrap()
+        //                 };
 
-                        let handler = ExecuteScriptCompletedHandler::create(Box::new(
-                            move |hr: windows_core::Result<()>, result: String| {
-                                if hr.is_ok() {
-                                    let hidden: bool = serde_json::from_str(&result).unwrap_or(true);
-                                    tracing::error!("!! ads wv hidden? {}", hidden);
-                                }
-                                Ok(())
-                            },
-                        ) as Box<_>);
+        //                 let handler = ExecuteScriptCompletedHandler::create(Box::new(
+        //                     move |hr: windows_core::Result<()>, result: String| {
+        //                         if hr.is_ok() {
+        //                             let hidden: bool = serde_json::from_str(&result).unwrap_or(true);
+        //                             tracing::error!("!! ads wv hidden? {}", hidden);
+        //                         }
+        //                         Ok(())
+        //                     },
+        //                 ) as Box<_>);
 
-                        unsafe {
-                            let _ = core_webview2.ExecuteScript(
-                                windows_core::w!("document.hidden"),
-                                &handler,
-                            );
-                        }
-                    }
+        //                 unsafe {
+        //                     let _ = core_webview2.ExecuteScript(
+        //                         windows_core::w!("document.hidden"),
+        //                         &handler,
+        //                     );
+        //                 }
+        //             }
 
-                    #[cfg(not(windows))]
-                    {
-                        use webkit2gtk::WebViewExt;
+        //             #[cfg(not(windows))]
+        //             {
+        //                 use webkit2gtk::WebViewExt;
 
-                        wv.inner().evaluate_javascript(
-                            "document.hidden",
-                            None,
-                            None,
-                            None::<&webkit2gtk::gio::Cancellable>,
-                            |result| {
-                                use javascriptcore::ValueExt;
+        //                 wv.inner().evaluate_javascript(
+        //                     "document.hidden",
+        //                     None,
+        //                     None,
+        //                     None::<&webkit2gtk::gio::Cancellable>,
+        //                     |result| {
+        //                         use javascriptcore::ValueExt;
 
-                                let hidden = result.map(|v| v.to_boolean());
-                                tracing::error!("!! ads wv hidden? {hidden:?}");
-                            },
-                        );
-                    }
-                });
+        //                         let hidden = result.map(|v| v.to_boolean());
+        //                         tracing::error!("!! ads wv hidden? {hidden:?}");
+        //                     },
+        //                 );
+        //             }
+        //         });
 
-                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-            }
-        });
+        //         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        //     }
+        // });
     }
 
     Ok(())
