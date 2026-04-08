@@ -1,8 +1,11 @@
 <template>
-	<div class="w-full flex flex-col gap-4">
+	<div class="w-full flex flex-col gap-4" :class="{ 'mt-4': isNuxt }">
 		<ContentPageHeader :class="props.headerClass">
 			<template #icon>
-				<ServerIcon :image="headerImage" class="size-16 !rounded-xl" />
+				<ServerIcon
+					:image="headerImage"
+					:class="isNuxt ? 'size-20 !rounded-2xl' : 'size-16 !rounded-xl'"
+				/>
 			</template>
 			<template #title>
 				{{ props.server?.name || 'Server' }}
@@ -73,11 +76,12 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
+import { NuxtModrinthClient } from '@modrinth/api-client'
 import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
-import { injectNotificationManager } from '#ui/providers'
+import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
 
 type ServerProjectSummary = {
 	id: string
@@ -110,7 +114,9 @@ const props = withDefaults(
 	},
 )
 
+const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
 const headerImage = computed(() => {
 	if (props.server?.is_medal) {

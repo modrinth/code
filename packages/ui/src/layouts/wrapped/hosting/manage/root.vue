@@ -1,7 +1,10 @@
 <template>
 	<div
 		v-if="filteredNotices.length > 0"
-		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 max-w-[1280px] flex-col gap-3 px-6"
+		class="experimental-styles-within relative mx-auto mb-4 flex w-full min-w-0 flex-col gap-3 px-6"
+		:class="{
+			'max-w-[1280px]': isNuxt,
+		}"
 	>
 		<ServerNotice
 			v-for="notice in filteredNotices"
@@ -104,13 +107,18 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 max-w-[1280px] flex-col gap-6 px-6 transition-all duration-300"
-		:class="'server-panel-' + revealState"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
 				: `linear-gradient(180deg, rgba(153,153,153,1) 0%, rgba(87,87,87,1) 100%)`,
 		}"
+		:class="[
+			'server-panel-' + revealState,
+			{
+				'max-w-[1280px]': isNuxt,
+			},
+		]"
 	>
 		<div
 			v-if="revealState === 'pending'"
@@ -366,7 +374,7 @@
 <script setup lang="ts">
 import { Intercom, shutdown } from '@intercom/messenger-js-sdk'
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { ModrinthApiError } from '@modrinth/api-client'
+import { ModrinthApiError, NuxtModrinthClient } from '@modrinth/api-client'
 import {
 	BoxesIcon,
 	CheckIcon,
@@ -504,6 +512,7 @@ const leaveMessages = defineMessages({
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
+const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 const queryClient = useQueryClient()
 const route = useRoute()
 const router = useRouter()
