@@ -23,7 +23,6 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:return-url="checkoutReturnUrl"
 			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
@@ -231,10 +230,6 @@ const props = defineProps<{
 	products: Labrinth.Billing.Internal.Product[]
 }>()
 
-const checkoutReturnUrl = computed(() => {
-	return props.siteUrl ? `${props.siteUrl}/hosting/manage` : undefined
-})
-
 const router = useRouter()
 const route = useRoute()
 const auth = injectAuth()
@@ -333,7 +328,7 @@ watch(isPollingForNewServers, (polling) => {
 	clearTimeout(pollingShowTimeout)
 	if (polling) {
 		pollingShowTimeout = setTimeout(() => {
-			showPollingForNewServers.value = true
+			showPollingForNewServers.value = isPollingForNewServers.value
 		}, 1500)
 	} else {
 		showPollingForNewServers.value = false
@@ -343,7 +338,7 @@ watch(isPollingForNewServers, (polling) => {
 const pollingState = ref({
 	enabled: false,
 	count: 0,
-	initialServers: [] as Archon.Servers.v0.Server[],
+	initialServerIds: new Set<string>(),
 })
 
 function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
@@ -352,7 +347,7 @@ function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
 	pollingState.value = {
 		enabled: true,
 		count: 0,
-		initialServers: [...initialServers],
+		initialServerIds: new Set(initialServers.map((s) => s.server_id)),
 	}
 }
 
@@ -517,7 +512,7 @@ const {
 } = useQuery({
 	queryKey: ['servers'],
 	queryFn: async () => {
-		const response = await client.archon.servers_v0.list()
+		const response = await client.archon.servers_v0.list({ limit: 100 })
 
 		// Fetch subscriptions for medal servers
 		const hasMedalServers = response.servers.some((s) => s.is_medal)
@@ -538,7 +533,10 @@ const {
 		// Check if new servers appeared (stop polling)
 		if (pollingState.value.enabled) {
 			pollingState.value.count++
-			if (response.servers.length !== pollingState.value.initialServers.length) {
+			const hasNewServer = response.servers.some(
+					(s) => !pollingState.value.initialServerIds.has(s.server_id),
+				)
+				if (hasNewServer) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
 
@@ -637,7 +635,7 @@ watch(
 		pollingState.value = {
 			enabled: false,
 			count: 0,
-			initialServers: [],
+			initialServerIds: new Set(),
 		}
 		void Promise.all([
 			queryClient.resetQueries({ queryKey: ['billing'] }),
