@@ -239,7 +239,7 @@ const messages = defineMessages({
 				</div>
 			</div>
 		</div>
-		<label for="instance-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
+		<label for="instance-name" class="m-0 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.name) }}
 		</label>
 		<div class="flex">
@@ -252,76 +252,82 @@ const messages = defineMessages({
 			/>
 		</div>
 		<template v-if="instance.install_stage == 'installed'">
-			<div>
-				<h2
-					id="duplicate-instance-label"
-					class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block"
-				>
+			<div class="flex flex-col gap-2.5 mt-6">
+				<h2 id="duplicate-instance-label" class="m-0 text-lg font-semibold text-contrast block">
 					{{ formatMessage(messages.duplicateInstance) }}
 				</h2>
-				<p class="m-0 mb-2">
+				<ButtonStyled>
+					<button
+						v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
+						aria-labelledby="duplicate-instance-label"
+						:disabled="installing"
+						class="w-max !shadow-none"
+						@click="duplicateProfile"
+					>
+						<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+					</button>
+				</ButtonStyled>
+				<p class="m-0">
 					{{ formatMessage(messages.duplicateInstanceDescription) }}
 				</p>
 			</div>
-			<ButtonStyled>
+		</template>
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.libraryGroups) }}
+			</h2>
+
+			<div class="flex flex-col gap-1">
+				<Checkbox
+					v-for="group in availableGroups"
+					:key="group"
+					:model-value="groups.includes(group)"
+					:label="group"
+					@click="toggleGroup(group)"
+				/>
+				<div class="flex gap-2 items-center">
+					<StyledInput
+						v-model="newCategoryInput"
+						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
+						@submit="() => addCategory"
+						class="w-full max-w-[300px]"
+					/>
+					<ButtonStyled>
+						<button class="w-fit !shadow-none" @click="() => addCategory()">
+							<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
+						</button>
+					</ButtonStyled>
+				</div>
+			</div>
+			<p class="m-0">
+				{{ formatMessage(messages.libraryGroupsDescription) }}
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5 mt-6">
+			<h2 id="delete-instance-label" class="m-0 text-lg font-semibold text-contrast block">
+				{{ formatMessage(messages.deleteInstance) }}
+			</h2>
+			<ButtonStyled color="red">
 				<button
-					v-tooltip="installing ? formatMessage(messages.duplicateButtonTooltipInstalling) : null"
-					aria-labelledby="duplicate-instance-label"
-					:disabled="installing"
-					@click="duplicateProfile"
+					aria-labelledby="delete-instance-label"
+					:disabled="removing"
+					@click="deleteConfirmModal.show()"
+					class="w-fit !shadow-none"
 				>
-					<CopyIcon /> {{ formatMessage(messages.duplicateButton) }}
+					<SpinnerIcon v-if="removing" class="animate-spin" />
+					<TrashIcon v-else />
+					{{
+						removing
+							? formatMessage(messages.deletingInstanceButton)
+							: formatMessage(messages.deleteInstanceButton)
+					}}
 				</button>
 			</ButtonStyled>
-		</template>
-		<h2 class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.libraryGroups) }}
-		</h2>
-		<p class="m-0 mb-2">
-			{{ formatMessage(messages.libraryGroupsDescription) }}
-		</p>
-		<div class="flex flex-col gap-1">
-			<Checkbox
-				v-for="group in availableGroups"
-				:key="group"
-				:model-value="groups.includes(group)"
-				:label="group"
-				@click="toggleGroup(group)"
-			/>
-			<div class="flex gap-2 items-center">
-				<StyledInput
-					v-model="newCategoryInput"
-					:placeholder="formatMessage(messages.libraryGroupsEnterName)"
-					@submit="() => addCategory"
-				/>
-				<ButtonStyled>
-					<button class="w-fit" @click="() => addCategory()">
-						<PlusIcon /> {{ formatMessage(messages.libraryGroupsCreate) }}
-					</button>
-				</ButtonStyled>
-			</div>
+			<p class="m-0">
+				{{ formatMessage(messages.deleteInstanceDescription) }}
+			</p>
 		</div>
-		<h2 id="delete-instance-label" class="m-0 mt-4 mb-1 text-lg font-extrabold text-contrast block">
-			{{ formatMessage(messages.deleteInstance) }}
-		</h2>
-		<p class="m-0 mb-2">
-			{{ formatMessage(messages.deleteInstanceDescription) }}
-		</p>
-		<ButtonStyled color="red">
-			<button
-				aria-labelledby="delete-instance-label"
-				:disabled="removing"
-				@click="deleteConfirmModal.show()"
-			>
-				<SpinnerIcon v-if="removing" class="animate-spin" />
-				<TrashIcon v-else />
-				{{
-					removing
-						? formatMessage(messages.deletingInstanceButton)
-						: formatMessage(messages.deleteInstanceButton)
-				}}
-			</button>
-		</ButtonStyled>
 	</div>
 </template>
 <style scoped lang="scss">
