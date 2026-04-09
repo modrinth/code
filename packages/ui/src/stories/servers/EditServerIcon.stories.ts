@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import type { Archon, UploadState } from '@modrinth/api-client'
 import type { Stats } from '@modrinth/utils'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { computed, reactive, ref } from 'vue'
 
 import EditServerIcon from '../../components/servers/edit-server-icon/EditServerIcon.vue'

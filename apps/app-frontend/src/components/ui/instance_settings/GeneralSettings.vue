@@ -289,8 +289,8 @@ const messages = defineMessages({
 					<StyledInput
 						v-model="newCategoryInput"
 						:placeholder="formatMessage(messages.libraryGroupsEnterName)"
-						@submit="() => addCategory"
 						class="w-full max-w-[300px]"
+						@submit="() => addCategory"
 					/>
 					<ButtonStyled>
 						<button class="w-fit !shadow-none" @click="() => addCategory()">
@@ -312,8 +312,8 @@ const messages = defineMessages({
 				<button
 					aria-labelledby="delete-instance-label"
 					:disabled="removing"
-					@click="deleteConfirmModal.show()"
 					class="w-fit !shadow-none"
+					@click="deleteConfirmModal.show()"
 				>
 					<SpinnerIcon v-if="removing" class="animate-spin" />
 					<TrashIcon v-else />
