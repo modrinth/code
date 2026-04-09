@@ -54,6 +54,9 @@ export interface InstallationSettingsContext {
 	/** When false, hides change-version and reinstall buttons in linked state (default: true) */
 	showModpackVersionActions?: boolean | ComputedRef<boolean>
 
+	/** True when the linked modpack was uploaded as a local file rather than from Modrinth */
+	isLocalFile?: boolean | ComputedRef<boolean>
+
 	repairing?: Ref<boolean>
 	reinstalling?: Ref<boolean>
 

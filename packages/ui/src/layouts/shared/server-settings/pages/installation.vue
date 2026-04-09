@@ -36,6 +36,7 @@
 							@reinstall="onReinstall"
 							@browse-modpacks="onBrowseModpacks"
 						/>
+						<UploadProgressModal ref="uploadProgressModal" />
 					</div>
 				</Teleport>
 			</template>
@@ -78,11 +79,14 @@ import {
 	InstallationSettingsLayout,
 	provideInstallationSettings,
 	ServerSetupModal,
+	UploadProgressModal,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+
+import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
@@ -92,6 +96,9 @@ const queryClient = useQueryClient()
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
+const filePicker = injectFilePicker()
+
+const uploadProgressModal = useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const messages = defineMessages({
 	resetServerTitle: {
@@ -526,7 +533,31 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
-		if (!modpack.value || modpack.value.spec.platform !== 'modrinth') return
+		if (!modpack.value) return
+		if (modpack.value.spec.platform === 'local_file') {
+			debug('reinstallModpack: local file, opening file picker')
+			const picked = await filePicker.pickModpackFile()
+			if (!picked) return
+			try {
+				const handle = client.kyros.content_v1.uploadModpackFile(
+					worldId.value!,
+					picked.file,
+					{ known: {} },
+					{ softOverride: true },
+				)
+				await uploadProgressModal.value!.track(handle)
+				emit('reinstall')
+				invalidateServerState()
+			} catch (err) {
+				emit('reinstall-failed')
+				addNotification({
+					type: 'error',
+					text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
+				})
+			}
+			return
+		}
+		if (modpack.value.spec.platform !== 'modrinth') return
 		debug(
 			'reinstallModpack: called, project:',
 			modpack.value.spec.project_id,
@@ -669,6 +700,7 @@ provideInstallationSettings({
 	isServer: true,
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
+	isLocalFile: computed(() => modpack.value?.spec.platform === 'local_file'),
 
 	lockPlatform: false,
 	hideLoaderVersion: false,
