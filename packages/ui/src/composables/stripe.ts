@@ -1,5 +1,5 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { loadStripe, type Stripe as StripeJs, type StripeElements } from '@stripe/stripe-js'
+import { loadStripe, type StripeElements, type Stripe as StripeJs } from '@stripe/stripe-js'
 import type { ContactOption } from '@stripe/stripe-js/dist/stripe-js/elements/address'
 import type Stripe from 'stripe'
 import { computed, type Ref, ref } from 'vue'
@@ -330,31 +330,39 @@ export const useStripe = (
 
 	const loadingElements = computed(() => elementsLoaded.value < 2)
 
-	async function submitPayment(returnUrl: string) {
+	async function submitPayment(returnUrl?: string): Promise<boolean> {
 		if (noPaymentRequired.value) {
 			completingPurchase.value = false
 			return true
 		}
 		completingPurchase.value = true
-		const secert = clientSecret.value
+		const secret = clientSecret.value
 
-		if (!secert) {
-			return handlePaymentError('No client secret')
+		if (!secret) {
+			handlePaymentError('No client secret')
+			return false
 		}
 
 		if (!stripe.value) {
-			return handlePaymentError('No stripe')
+			handlePaymentError('No stripe')
+			return false
 		}
 
 		submittingPayment.value = true
 		const productPrice = product.value?.prices.find((x) => x.currency_code === currency)
-		const { error } = await stripe.value.confirmPayment({
-			clientSecret: secert,
-			confirmParams: {
-				confirmation_token: confirmationToken.value,
-				return_url: `${returnUrl}?priceId=${productPrice?.id}&plan=${interval.value}`,
-			},
-		})
+
+		const { error } = returnUrl
+			? await stripe.value.confirmPayment({
+					clientSecret: secret,
+					confirmParams: {
+						confirmation_token: confirmationToken.value,
+						return_url: `${returnUrl}?priceId=${productPrice?.id}&plan=${interval.value}`,
+					},
+				})
+			: await stripe.value.confirmPayment({
+					clientSecret: secret,
+					redirect: 'if_required',
+				})
 
 		if (error) {
 			handlePaymentError(error.message ?? 'Unknown error submitting payment')

@@ -9,7 +9,7 @@
 		:customer="customer"
 		:payment-methods="paymentMethods"
 		:currency="selectedCurrency"
-		:return-url="`${props.siteUrl}/hosting/manage`"
+		:return-url="checkoutReturnUrl"
 		:pings="regionPings"
 		:regions="regionsData"
 		:refresh-payment-methods="fetchPaymentData"
@@ -40,9 +40,13 @@ import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
 	stripePublishableKey: string
-	siteUrl: string
+	siteUrl?: string
 	products: Labrinth.Billing.Internal.Product[]
 }>()
+
+const checkoutReturnUrl = computed(() => {
+	return props.siteUrl ? `${props.siteUrl}/hosting/manage` : undefined
+})
 
 const { addNotification } = injectNotificationManager()
 const { labrinth, archon } = injectModrinthClient()

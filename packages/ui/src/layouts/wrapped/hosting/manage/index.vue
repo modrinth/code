@@ -23,13 +23,14 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:return-url="`${props.siteUrl}/hosting/manage`"
+			:return-url="checkoutReturnUrl"
 			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
 			:affiliate-code="affiliateCode"
 			plan-stage
+			@purchase-success="handlePurchaseSuccess"
 		/>
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
@@ -152,7 +153,7 @@
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<div
-						v-if="isPollingForNewServers"
+						v-if="showPollingForNewServers"
 						class="bg-brand/10 my-4 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-brand"
 					>
 						<LoaderCircleIcon class="size-4 animate-spin" />
@@ -226,9 +227,13 @@ import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from
 
 const props = defineProps<{
 	stripePublishableKey: string
-	siteUrl: string
+	siteUrl?: string
 	products: Labrinth.Billing.Internal.Product[]
 }>()
+
+const checkoutReturnUrl = computed(() => {
+	return props.siteUrl ? `${props.siteUrl}/hosting/manage` : undefined
+})
 
 const router = useRouter()
 const route = useRoute()
@@ -321,11 +326,25 @@ const messages = defineMessages({
 })
 
 const isPollingForNewServers = ref(false)
+const showPollingForNewServers = ref(false)
 const pollingState = ref({
 	enabled: false,
 	count: 0,
 	initialServers: [] as Archon.Servers.v0.Server[],
 })
+
+function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
+	if (pollingState.value.enabled) return
+	isPollingForNewServers.value = true
+	setTimeout(() => {
+		showPollingForNewServers.value = isPollingForNewServers.value
+	}, 1500)
+	pollingState.value = {
+		enabled: true,
+		count: 0,
+		initialServers: [...initialServers],
+	}
+}
 
 const guestPlanModal = ref<InstanceType<typeof ServersGuestPlanModal> | null>(null)
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
@@ -512,10 +531,13 @@ const {
 			if (response.servers.length !== pollingState.value.initialServers.length) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
+				showPollingForNewServers.value = false
+
 				router.replace({ query: {} })
 			} else if (pollingState.value.count >= 5) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
+				showPollingForNewServers.value = false
 			}
 		}
 
@@ -583,12 +605,7 @@ watch(serverResponse, (response) => {
 		!pollingState.value.enabled &&
 		pollingState.value.count === 0
 	) {
-		isPollingForNewServers.value = true
-		pollingState.value = {
-			enabled: true,
-			count: 0,
-			initialServers: [...response.servers],
-		}
+		startNewServerPolling(response.servers)
 	}
 })
 
@@ -596,11 +613,20 @@ const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const { getLatestBackupDownload } = useServerBackupDownload()
 
+function handlePurchaseSuccess() {
+	startNewServerPolling(serverResponse.value?.servers ?? [])
+	void Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['servers'] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'v1'] }),
+	])
+}
+
 watch(
 	() => auth.user.value,
 	(user, previousUser) => {
 		if (user || !previousUser) return
 		isPollingForNewServers.value = false
+		showPollingForNewServers.value = false
 		pollingState.value = {
 			enabled: false,
 			count: 0,

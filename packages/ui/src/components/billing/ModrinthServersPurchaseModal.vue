@@ -8,8 +8,11 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
+import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
@@ -23,6 +26,8 @@ import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 export type RegionPing = {
 	region: string
@@ -34,7 +39,7 @@ export type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
 
 const props = defineProps<{
 	publishableKey: string
-	returnUrl: string
+	returnUrl?: string
 	paymentMethods: Stripe.PaymentMethod[]
 	customer: Stripe.Customer
 	currency: string
@@ -120,6 +125,16 @@ const titles: Record<Step, MessageDescriptor> = {
 	}),
 	review: defineMessage({ id: 'servers.purchase.step.review.title', defaultMessage: 'Review' }),
 }
+
+const purchaseSuccessTitle = defineMessage({
+	id: 'servers.purchase.notification.success.title',
+	defaultMessage: 'Purchase success',
+})
+
+const purchaseSuccessText = defineMessage({
+	id: 'servers.purchase.notification.success.text',
+	defaultMessage: 'Your Modrinth Hosting purchase was completed successfully.',
+})
 
 const currentRegion = computed(() => {
 	return props.regions.find((region) => region.shortcode === selectedRegion.value)
@@ -215,7 +230,22 @@ async function afterProceed(step: string) {
 
 async function setStep(step: Step | undefined, skipValidation = false) {
 	if (!step) {
-		await submitPayment(props.returnUrl)
+		const success = await submitPayment(props.returnUrl)
+
+		if (success) {
+			modal.value?.hide()
+			addNotification({
+				title: formatMessage(purchaseSuccessTitle),
+				text: formatMessage(purchaseSuccessText),
+				type: 'success',
+			})
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers'] }),
+				queryClient.invalidateQueries({ queryKey: ['servers', 'v1'] }),
+			])
+			emit('purchase-success')
+		}
+
 		return
 	}
 
@@ -275,8 +305,8 @@ defineExpose({
 	show: begin,
 })
 
-defineEmits<{
-	(e: 'hide'): void
+const emit = defineEmits<{
+	(e: 'hide' | 'purchase-success'): void
 }>()
 
 function handleChooseCustom() {
