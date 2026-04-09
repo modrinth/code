@@ -164,8 +164,12 @@ export class LogHighlightAddon implements ITerminalAddon {
 		const isEntryStart = LOG_ENTRY_START.test(lineText)
 
 		const bgColor = isEntryStart
-			? (level === 'error' ? this.colors.errorPrimary : this.colors.warnPrimary)
-			: (level === 'error' ? this.colors.errorWrap : this.colors.warnWrap)
+			? level === 'error'
+				? this.colors.errorPrimary
+				: this.colors.warnPrimary
+			: level === 'error'
+				? this.colors.errorWrap
+				: this.colors.warnWrap
 		const wrapColor = level === 'error' ? this.colors.errorWrap : this.colors.warnWrap
 
 		const primary = term.registerDecoration({
@@ -227,8 +231,12 @@ export class LogHighlightAddon implements ITerminalAddon {
 			}
 
 			const bgColor = tl.isEntryStart
-				? (tl.level === 'error' ? this.colors.errorPrimary : this.colors.warnPrimary)
-				: (tl.level === 'error' ? this.colors.errorWrap : this.colors.warnWrap)
+				? tl.level === 'error'
+					? this.colors.errorPrimary
+					: this.colors.warnPrimary
+				: tl.level === 'error'
+					? this.colors.errorWrap
+					: this.colors.warnWrap
 			const wrapColor = tl.level === 'error' ? this.colors.errorWrap : this.colors.warnWrap
 
 			tl.primary = term.registerDecoration({

@@ -184,28 +184,25 @@ function writeAllLines() {
 	lastWrittenIndex = lines.length
 }
 
-watch(
-	ctx.logLines,
-	(lines, oldLines) => {
-		const term = terminalRef.value?.terminal
-		if (!term) return
+watch(ctx.logLines, (lines, oldLines) => {
+	const term = terminalRef.value?.terminal
+	if (!term) return
 
-		if (lines !== oldLines || lines.length < lastWrittenIndex) {
-			rewriteFiltered()
-			return
-		}
+	if (lines !== oldLines || lines.length < lastWrittenIndex) {
+		rewriteFiltered()
+		return
+	}
 
-		const predicate = buildCombinedPredicate()
-		const query = activeSearchQuery()
-		for (let i = lastWrittenIndex; i < lines.length; i++) {
-			if (!predicate || predicate(lines[i])) {
-				terminalRef.value?.writeln(colorize(lines[i], query))
-				highlightAddon?.pushLevel(lines[i].level)
-			}
+	const predicate = buildCombinedPredicate()
+	const query = activeSearchQuery()
+	for (let i = lastWrittenIndex; i < lines.length; i++) {
+		if (!predicate || predicate(lines[i])) {
+			terminalRef.value?.writeln(colorize(lines[i], query))
+			highlightAddon?.pushLevel(lines[i].level)
 		}
-		lastWrittenIndex = lines.length
-	},
-)
+	}
+	lastWrittenIndex = lines.length
+})
 
 watch(searchQuery, () => {
 	if (searchDebounce) clearTimeout(searchDebounce)

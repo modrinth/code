@@ -717,7 +717,12 @@ if (cachedWsState) {
 const log = useDebugLogger('server-panel-reveal')
 
 const hasReceivedWsData = ref(!!cachedWsState)
-log('init', { hasCachedWsState: !!cachedWsState, hasReceivedWsData: hasReceivedWsData.value, isConnected: isConnected.value, serverData: !!serverData.value })
+log('init', {
+	hasCachedWsState: !!cachedWsState,
+	hasReceivedWsData: hasReceivedWsData.value,
+	isConnected: isConnected.value,
+	serverData: !!serverData.value,
+})
 
 const saveWsStateToCache = () => {
 	if (!hasReceivedWsData.value) return
@@ -737,7 +742,11 @@ watch([stats, serverPowerState], () => {
 })
 
 const canReveal = computed(() => serverData.value && hasReceivedWsData.value)
-log('canReveal initial', { canReveal: canReveal.value, serverData: !!serverData.value, hasReceivedWsData: hasReceivedWsData.value })
+log('canReveal initial', {
+	canReveal: canReveal.value,
+	serverData: !!serverData.value,
+	hasReceivedWsData: hasReceivedWsData.value,
+})
 
 const revealState = ref<'pending' | 'revealing' | 'visible'>(
 	canReveal.value ? 'visible' : 'pending',

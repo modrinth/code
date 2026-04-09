@@ -694,16 +694,14 @@ provideInstallationSettings({
 		const modrinthAddons = activeAddons.filter((a) => a.version?.id)
 		const customAddons = activeAddons.filter((a) => !a.version?.id)
 
-		const incompatibleItems: { kind: typeof activeAddons[number]['kind']; filename: string }[] =
+		const incompatibleItems: { kind: (typeof activeAddons)[number]['kind']; filename: string }[] =
 			customAddons.map((a) => ({ kind: a.kind, filename: a.filename }))
 
 		if (modrinthAddons.length > 0) {
 			const versionIds = modrinthAddons.map((a) => a.version!.id)
 			const versions = await client.labrinth.versions_v2.getVersions(versionIds)
 			const incompatibleVersionIds = new Set(
-				versions
-					.filter((v) => !v.game_versions.includes(targetGameVersion))
-					.map((v) => v.id),
+				versions.filter((v) => !v.game_versions.includes(targetGameVersion)).map((v) => v.id),
 			)
 			for (const addon of modrinthAddons) {
 				if (incompatibleVersionIds.has(addon.version!.id)) {

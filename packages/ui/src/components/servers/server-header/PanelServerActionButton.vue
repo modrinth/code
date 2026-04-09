@@ -9,7 +9,11 @@
 
 			<template v-else>
 				<ButtonStyled v-if="showStopButton" type="transparent" size="large">
-					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="initiateAction('Stop')">
+					<button
+						v-tooltip="busyTooltip"
+						:disabled="!canTakeAction"
+						@click="initiateAction('Stop')"
+					>
 						<div class="flex gap-1">
 							<StopCircleIcon class="h-5 w-5" />
 							<span>Stop</span>
