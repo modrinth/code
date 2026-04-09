@@ -6,7 +6,7 @@
 			type="critical"
 			:header="`${serverData?.name} shut down unexpectedly.`"
 			dismissible
-			@dismiss="clearError"
+			@dismiss="dismissError"
 		>
 			<template v-if="inspectingError.analysis.problems.length">
 				<p class="m-0 text-sm opacity-80">
@@ -191,8 +191,12 @@ const inspectError = async () => {
 	}
 }
 
-const clearError = () => {
+const dismissError = () => {
 	dismissedUntil.value = Date.now() + DISMISS_DURATION_MS
+	inspectingError.value = null
+}
+
+const clearError = () => {
 	inspectingError.value = null
 }
 
