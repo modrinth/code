@@ -4,7 +4,6 @@
 			:server-id="serverId"
 			:reload-page="() => router.go(0)"
 			:resolve-viewer="resolveViewer"
-			:show-uptime="false"
 			:show-copy-id-action="themeStore.devMode"
 			:navigate-to-billing="() => router.push('/settings/billing')"
 			:navigate-to-servers="() => router.push('/hosting/manage')"
