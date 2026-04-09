@@ -209,7 +209,7 @@ const instanceFilters = computed(() => {
 		if (isServerInstance.value) {
 			filters.push({
 				type: 'environment',
-				option: 'client',
+				option: 'client_side',
 			})
 		}
 

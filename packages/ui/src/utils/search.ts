@@ -1,5 +1,12 @@
 import type { Labrinth } from '@modrinth/api-client'
-import { ClientIcon, getCategoryIcon, getLoaderIcon, ServerIcon } from '@modrinth/assets'
+import {
+	ClientIcon,
+	getCategoryIcon,
+	getLoaderIcon,
+	ServerIcon,
+	UserIcon,
+	UsersIcon,
+} from '@modrinth/assets'
 import { sortedCategories } from '@modrinth/utils'
 import { type Component, computed, readonly, type Ref, ref } from 'vue'
 import { type LocationQueryRaw, type LocationQueryValue, useRoute } from 'vue-router'
@@ -25,7 +32,10 @@ type BaseOption = {
 export type FilterOption = BaseOption &
 	(
 		| { method: 'or' | 'and'; value: string }
-		| { method: 'environment'; environment: 'client' | 'server' }
+		| {
+				method: 'environment'
+				environment: 'client_side' | 'server_side' | 'singleplayer' | 'client_and_server'
+		  }
 	)
 
 export type FilterType = {
@@ -174,28 +184,52 @@ export function useSearch(
 				searchable: false,
 				options: [
 					{
-						id: 'client',
+						id: 'client_side',
 						formatted_name: formatMessage(
 							defineMessage({
-								id: 'search.filter_type.environment.client',
-								defaultMessage: 'Client',
+								id: 'search.filter_type.environment.client_side',
+								defaultMessage: 'Client-side',
 							}),
 						),
 						icon: ClientIcon,
 						method: 'environment',
-						environment: 'client',
+						environment: 'client_side',
 					},
 					{
-						id: 'server',
+						id: 'server_side',
 						formatted_name: formatMessage(
 							defineMessage({
-								id: 'search.filter_type.environment.server',
-								defaultMessage: 'Server',
+								id: 'search.filter_type.environment.server_side',
+								defaultMessage: 'Server-side',
 							}),
 						),
 						icon: ServerIcon,
 						method: 'environment',
-						environment: 'server',
+						environment: 'server_side',
+					},
+					{
+						id: 'singleplayer',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.filter_type.environment.singleplayer',
+								defaultMessage: 'Singleplayer',
+							}),
+						),
+						icon: UserIcon,
+						method: 'environment',
+						environment: 'singleplayer',
+					},
+					{
+						id: 'client_and_server',
+						formatted_name: formatMessage(
+							defineMessage({
+								id: 'search.filter_type.environment.client_and_server',
+								defaultMessage: 'Client and server',
+							}),
+						),
+						icon: UsersIcon,
+						method: 'environment',
+						environment: 'client_and_server',
 					},
 				],
 			},
@@ -494,22 +528,21 @@ export function useSearch(
 		}
 
 		// Environment facets
-		const client = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'client',
-		)
-		const server = filterValues.some(
-			(filter) => filter.type === 'environment' && filter.option === 'server',
-		)
-		for (const envGroup of getEnvironmentFilterGroups(client, server)) {
-			if (envGroup.length === 1) {
-				const [field, val] = envGroup[0].split(':')
-				parts.push(`${field} = "${val}"`)
-			} else if (envGroup.length > 1) {
-				const conditions = envGroup.map((f) => {
-					const [field, val] = f.split(':')
-					return `${field} = "${val}"`
-				})
-				parts.push(`(${conditions.join(' OR ')})`)
+		const selectedEnvOptions = filterValues
+			.filter((f) => f.type === 'environment')
+			.map((f) => f.option)
+		if (selectedEnvOptions.length > 0) {
+			const envValues = new Set<string>()
+			for (const opt of selectedEnvOptions) {
+				for (const val of getEnvironmentV3Values(opt)) {
+					envValues.add(val)
+				}
+			}
+			if (envValues.size === 1) {
+				parts.push(`environment = "${[...envValues][0]}"`)
+			} else if (envValues.size > 1) {
+				const quoted = [...envValues].map((v) => `"${v}"`).join(', ')
+				parts.push(`environment IN [${quoted}]`)
 			}
 		}
 
@@ -763,22 +796,36 @@ function mapProjectTypeToSearch(projectType: ProjectType): string {
 	return PROJECT_TYPE_SEARCH_MAP[projectType] ?? projectType
 }
 
-function getEnvironmentFilterGroups(client: boolean, server: boolean): string[][] {
-	const groups: string[][] = []
-	if (client && server) {
-		groups.push(
-			['client_side:required', 'client_side:optional', 'client_side:unsupported'],
-			['server_side:required', 'server_side:optional'],
-		)
-	} else if (client) {
-		groups.push(
-			['client_side:optional', 'client_side:required'],
-			['server_side:optional', 'server_side:unsupported'],
-		)
-	} else if (server) {
-		groups.push(['server_side:optional', 'server_side:required'])
+function getEnvironmentV3Values(option: string): string[] {
+	switch (option) {
+		case 'client_side':
+			return [
+				'client_only',
+				'client_only_server_optional',
+				'client_or_server',
+				'client_or_server_prefers_both',
+			]
+		case 'server_side':
+			return [
+				'server_only',
+				'dedicated_server_only',
+				'server_only_client_optional',
+				'client_or_server',
+				'client_or_server_prefers_both',
+			]
+		case 'singleplayer':
+			return ['singleplayer_only', 'server_only']
+		case 'client_and_server':
+			return [
+				'client_and_server',
+				'client_only_server_optional',
+				'server_only_client_optional',
+				'client_or_server',
+				'client_or_server_prefers_both',
+			]
+		default:
+			return []
 	}
-	return groups
 }
 
 function getOptionValue(option: FilterOption, negative?: boolean): string {

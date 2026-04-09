@@ -257,7 +257,7 @@ const serverFilters = computed(() => {
 		if (projectType.value?.id === 'mod') {
 			filters.push({
 				type: 'environment',
-				option: 'server',
+				option: 'server_side',
 			})
 		}
 
@@ -278,16 +278,10 @@ const serverFilters = computed(() => {
 	}
 
 	if (currentServerId.value && projectType.value?.id === 'modpack') {
-		filters.push(
-			{
-				type: 'environment',
-				option: 'client',
-			},
-			{
-				type: 'environment',
-				option: 'server',
-			},
-		)
+		filters.push({
+			type: 'environment',
+			option: 'server_side',
+		})
 	}
 	debug('serverFilters result:', filters)
 	return filters
