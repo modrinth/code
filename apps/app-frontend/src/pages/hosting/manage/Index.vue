@@ -1,12 +1,12 @@
 <template>
 	<div class="h-full w-full py-6">
-		<ServersManageRootLayout
-			:server-id="serverId"
-			:reload-page="() => router.go(0)"
-			:resolve-viewer="resolveViewer"
-			:show-copy-id-action="themeStore.devMode"
-			:navigate-to-billing="() => router.push('/settings/billing')"
-			:navigate-to-servers="() => router.push('/hosting/manage')"
+			<ServersManageRootLayout
+				:server-id="serverId"
+				:reload-page="() => router.go(0)"
+				:resolve-viewer="resolveViewer"
+				:show-copy-id-action="themeStore.devMode"
+				:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
+				:navigate-to-servers="() => router.push('/hosting/manage')"
 			:browse-modpacks="
 				({ serverId: sid, worldId: wid, from }) => {
 					router.push({
@@ -47,6 +47,7 @@
 <script setup lang="ts">
 import type { Labrinth } from '@modrinth/api-client'
 import { LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
