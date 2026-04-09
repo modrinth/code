@@ -686,16 +686,35 @@ provideInstallationSettings({
 		debug('disableAllContent: done')
 	},
 
-	async disableIncompatibleContent(diffs) {
-		debug('disableIncompatibleContent: processing', diffs.length, 'diffs')
+	async disableIncompatibleContent(targetGameVersion) {
+		debug('disableIncompatibleContent: fetching addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
-		const removedFiles = new Set(diffs.filter((d) => d.type === 'removed').map((d) => d.fileName))
-		const items = (addons.addons ?? [])
-			.filter((a) => !a.disabled && removedFiles.has(a.filename))
-			.map((a) => ({ kind: a.kind, filename: a.filename }))
-		if (items.length > 0) {
-			debug('disableIncompatibleContent: disabling', items.length, 'addons')
-			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		const activeAddons = (addons.addons ?? []).filter((a) => !a.disabled)
+
+		const modrinthAddons = activeAddons.filter((a) => a.version?.id)
+		const customAddons = activeAddons.filter((a) => !a.version?.id)
+
+		const incompatibleItems: { kind: typeof activeAddons[number]['kind']; filename: string }[] =
+			customAddons.map((a) => ({ kind: a.kind, filename: a.filename }))
+
+		if (modrinthAddons.length > 0) {
+			const versionIds = modrinthAddons.map((a) => a.version!.id)
+			const versions = await client.labrinth.versions_v2.getVersions(versionIds)
+			const incompatibleVersionIds = new Set(
+				versions
+					.filter((v) => !v.game_versions.includes(targetGameVersion))
+					.map((v) => v.id),
+			)
+			for (const addon of modrinthAddons) {
+				if (incompatibleVersionIds.has(addon.version!.id)) {
+					incompatibleItems.push({ kind: addon.kind, filename: addon.filename })
+				}
+			}
+		}
+
+		if (incompatibleItems.length > 0) {
+			debug('disableIncompatibleContent: disabling', incompatibleItems.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, incompatibleItems)
 		}
 		debug('disableIncompatibleContent: done')
 	},

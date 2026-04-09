@@ -1,8 +1,5 @@
 <template>
 	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<Admonition v-if="backupBusyReason" type="warning" :header="backupBusyReason">
-			Your server is still accessible during this time.
-		</Admonition>
 		<Admonition
 			v-if="inspectingError && isConnected && !isWsAuthIncorrect"
 			data-pyro-servers-inspecting-error
@@ -82,20 +79,19 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { useStorage } from '@vueuse/core'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import { useModrinthServersConsole, useVIntl } from '#ui/composables'
+import { useModrinthServersConsole } from '#ui/composables'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
 import ServerManageStats from './components/ServerManageStats.vue'
 
-const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const {
 	server: serverData,
 	serverId,
-	busyReasons,
 	isConnected,
 	isWsAuthIncorrect,
 	stats,
@@ -119,15 +115,6 @@ provideConsoleManager({
 		modrinthServersConsole.clear()
 	},
 	shareDisabled: computed(() => !isConnected.value),
-})
-
-const backupBusyReason = computed(() => {
-	const reason = busyReasons.value.find(
-		(r) =>
-			r.reason.id === 'servers.busy.backup-creating' ||
-			r.reason.id === 'servers.busy.backup-restoring',
-	)
-	return reason ? formatMessage(reason.reason) : null
 })
 
 interface ErrorData {
@@ -163,9 +150,15 @@ interface ErrorData {
 	}
 }
 
+const DISMISS_DURATION_MS = 30 * 60 * 1000
 const inspectingError = ref<ErrorData | null>(null)
+const dismissedUntil = useStorage(`modrinth-crash-dismissed-${serverId}`, 0)
+
+const isDismissed = () => Date.now() < dismissedUntil.value
 
 const inspectError = async () => {
+	if (isDismissed()) return
+
 	try {
 		const blob = await client.kyros.files_v0.downloadFile('/logs/latest.log')
 		const log = await blob.text()
@@ -199,6 +192,7 @@ const inspectError = async () => {
 }
 
 const clearError = () => {
+	dismissedUntil.value = Date.now() + DISMISS_DURATION_MS
 	inspectingError.value = null
 }
 

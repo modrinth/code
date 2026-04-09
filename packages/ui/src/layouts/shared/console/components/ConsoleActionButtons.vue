@@ -7,7 +7,11 @@
 			</button>
 		</ButtonStyled>
 		<ButtonStyled type="transparent" circular>
-			<button :disabled="shareDisabled" @click="emit('share')">
+			<button
+				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
+				:disabled="shareDisabled"
+				@click="emit('share')"
+			>
 				<ShareIcon />
 				Share
 			</button>
@@ -28,6 +32,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 defineProps<{
 	shareDisabled?: boolean
+	shareDisabledTooltip?: string
 }>()
 
 const emit = defineEmits<{

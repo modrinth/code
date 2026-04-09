@@ -325,7 +325,9 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
-			modrinthServersConsole.addLines(initialConsoleMessage)
+			if (serverPowerState.value === 'stopped') {
+				modrinthServersConsole.addLines(initialConsoleMessage)
+			}
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),

@@ -34,7 +34,7 @@
 		<div
 			v-if="showInput"
 			ref="inputRef"
-			class="border-t border-solid border-b-0 border-x-0 border-surface-5 bg-surface-3 p-4"
+			class="border-t border-solid border-b-0 border-x-0 border-surface-4 bg-surface-3 p-4"
 		>
 			<StyledInput
 				v-model="commandInput"

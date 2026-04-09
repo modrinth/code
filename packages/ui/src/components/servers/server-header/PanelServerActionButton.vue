@@ -9,20 +9,17 @@
 
 			<template v-else>
 				<ButtonStyled v-if="showStopButton" type="transparent" size="large">
-					<button :disabled="!canTakeAction" @click="initiateAction('Stop')">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="initiateAction('Stop')">
 						<div class="flex gap-1">
 							<StopCircleIcon class="h-5 w-5" />
-							<span>{{ isStopping ? 'Stopping...' : 'Stop' }}</span>
+							<span>Stop</span>
 						</div>
 					</button>
 				</ButtonStyled>
 
 				<ButtonStyled type="standard" color="brand" size="large">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<div v-if="isTransitioning" class="grid place-content-center">
-							<LoaderCircleIcon class="size-5 animate-spin" />
-						</div>
-						<component :is="isRunning ? UpdatedIcon : PlayIcon" v-else />
+						<component :is="isRunning || showStopButton ? UpdatedIcon : PlayIcon" />
 						<span>{{ primaryActionText }}</span>
 					</button>
 				</ButtonStyled>
@@ -51,8 +48,6 @@ const props = withDefaults(
 const {
 	isInstalling,
 	isRunning,
-	isStopping,
-	isTransitioning,
 	showStopButton,
 	busyTooltip,
 	canTakeAction,

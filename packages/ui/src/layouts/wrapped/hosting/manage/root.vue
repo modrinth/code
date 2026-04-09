@@ -603,6 +603,7 @@ const onStateEvent = (data: Archon.Websocket.v0.WSStateEvent) => {
 		progress: data.progress,
 		serverStatus: serverData.value?.status,
 	})
+	hasReceivedWsData.value = true
 	syncProgress.value = data.progress
 	contentError.value = data.content_error
 
@@ -713,10 +714,13 @@ if (cachedWsState) {
 	uptimeSeconds.value = cachedWsState.uptimeSeconds
 }
 
-let hasReceivedWsData = false
+const log = useDebugLogger('server-panel-reveal')
+
+const hasReceivedWsData = ref(!!cachedWsState)
+log('init', { hasCachedWsState: !!cachedWsState, hasReceivedWsData: hasReceivedWsData.value, isConnected: isConnected.value, serverData: !!serverData.value })
 
 const saveWsStateToCache = () => {
-	if (!hasReceivedWsData) return
+	if (!hasReceivedWsData.value) return
 	queryClient.setQueryData(wsStateCacheKey, {
 		stats: stats.value,
 		cpuData: cpuData.value,
@@ -729,22 +733,36 @@ const saveWsStateToCache = () => {
 
 watch([stats, serverPowerState], () => {
 	if (!isConnected.value) return
-	hasReceivedWsData = true
+	hasReceivedWsData.value = true
 })
 
+const canReveal = computed(() => serverData.value && hasReceivedWsData.value)
+log('canReveal initial', { canReveal: canReveal.value, serverData: !!serverData.value, hasReceivedWsData: hasReceivedWsData.value })
+
 const revealState = ref<'pending' | 'revealing' | 'visible'>(
-	isConnected.value || serverData.value ? 'visible' : 'pending',
+	canReveal.value ? 'visible' : 'pending',
 )
+log('revealState initial', revealState.value)
 
 const REVEAL_TOTAL_MS = 2 * 80 + 400
 
-watch([isConnected, serverData], ([connected, data]) => {
-	if ((connected || data) && revealState.value === 'pending') {
+watch(canReveal, (ready) => {
+	log('canReveal changed', { ready, revealState: revealState.value })
+	if (ready && revealState.value === 'pending') {
 		revealState.value = 'revealing'
 		setTimeout(() => {
 			revealState.value = 'visible'
+			log('revealState -> visible')
 		}, REVEAL_TOTAL_MS)
 	}
+})
+
+watch(isConnected, (connected) => {
+	log('isConnected changed', connected)
+})
+
+watch(serverData, (data) => {
+	log('serverData changed', !!data)
 })
 
 const navLinks = computed<Tab[]>(() => [

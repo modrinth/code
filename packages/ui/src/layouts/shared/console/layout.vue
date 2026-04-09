@@ -26,7 +26,8 @@
 			<div class="flex items-center justify-between">
 				<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
 				<ConsoleActionButtons
-					:share-disabled="resolvedShareDisabled"
+					:share-disabled="resolvedShareDisabled || !hasLogs"
+					:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
 					@clear="handleClear"
 					@share="handleShare"
 					@expand="enterFullscreen"
@@ -56,6 +57,7 @@ import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
 import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
+import { injectPageContext } from '#ui/providers/page-context'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
@@ -71,11 +73,13 @@ import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
 const modalBehavior = injectModalBehavior()
+const pageContext = injectPageContext()
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
+const hasLogs = computed(() => ctx.logLines.value.length > 0)
 
 function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
 	const levelPred = buildFilterPredicate()
@@ -181,7 +185,7 @@ function writeAllLines() {
 }
 
 watch(
-	() => ctx.logLines.value,
+	ctx.logLines,
 	(lines, oldLines) => {
 		const term = terminalRef.value?.terminal
 		if (!term) return
@@ -234,7 +238,7 @@ async function handleShare() {
 		})
 		const data = await res.json()
 		if (data.url) {
-			window.open(data.url, '_blank')
+			pageContext.openExternalUrl(data.url)
 		}
 	} catch (err) {
 		console.error('Failed to share logs:', err)

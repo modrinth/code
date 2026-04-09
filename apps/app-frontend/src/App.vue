@@ -105,6 +105,7 @@ import {
 	isDev,
 	isNetworkMetered,
 } from '@/helpers/utils.js'
+import { config } from '@/config'
 import i18n from '@/i18n.config'
 import { createContentInstall, provideContentInstall } from '@/providers/content-install'
 import {
@@ -134,6 +135,7 @@ const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	archonBaseUrl: config.archonBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
@@ -154,6 +156,7 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	openExternalUrl: (url) => openUrl(url),
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
