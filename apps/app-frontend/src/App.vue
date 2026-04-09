@@ -1305,8 +1305,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</div>
 	<I18nDebugPanel />
-	<NotificationPanel has-sidebar />
-	<PopupNotificationPanel has-sidebar />
+	<NotificationPanel :has-sidebar="sidebarVisible" />
+	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal
