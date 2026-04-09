@@ -5,6 +5,7 @@
 			<OverflowMenu
 				v-tooltip="'Edit icon'"
 				class="m-0 cursor-pointer appearance-none border-none bg-transparent p-0 transition-transform group-active:scale-95"
+				:disabled="isIconActionLoading"
 				:options="[
 					{
 						id: 'upload',
@@ -17,13 +18,20 @@
 				]"
 			>
 				<ServerIcon
-					class="size-28 transition-[filter] group-hover:brightness-75"
+					class="size-28 transition-[filter] group-hover:brightness-[0.50]"
+					:class="isIconActionLoading ? 'brightness-[0.50]' : ''"
 					:image="displayIcon"
 				/>
 				<div
-					class="absolute top-0 w-full h-full flex justify-center items-center opacity-0 transition-all group-hover:opacity-100"
+					class="absolute top-0 h-full w-full flex items-center justify-center"
+					:class="isIconActionLoading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
 				>
-					<EditIcon aria-hidden="true" class="h-10 w-10 text-primary" />
+					<SpinnerIcon
+						v-if="isIconActionLoading"
+						aria-hidden="true"
+						class="h-10 w-10 animate-spin text-primary"
+					/>
+					<EditIcon v-else aria-hidden="true" class="h-10 w-10 text-primary" />
 				</div>
 				<template #upload> <UploadIcon /> Upload icon </template>
 				<template #sync> <TransferIcon /> Sync icon </template>
@@ -33,9 +41,9 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
+import { EditIcon, SpinnerIcon, TransferIcon, UploadIcon } from '@modrinth/assets'
 import { useQueryClient } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 import { OverflowMenu, ServerIcon } from '#ui/components'
 import { useServerImage } from '#ui/composables'
@@ -49,6 +57,9 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { serverId, server } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const isUploadingIcon = ref(false)
+const isSyncingIcon = ref(false)
+const isIconActionLoading = computed(() => isUploadingIcon.value || isSyncingIcon.value)
 
 const {
 	image: displayIcon,
@@ -73,6 +84,8 @@ function isNotFound(error: unknown): boolean {
 }
 
 const uploadFile = async (e: Event) => {
+	if (isIconActionLoading.value) return
+
 	const file = (e.target as HTMLInputElement).files?.[0]
 	if (!file) {
 		addNotification({
@@ -83,28 +96,30 @@ const uploadFile = async (e: Event) => {
 		return
 	}
 
-	const scaledFile = await new Promise<File>((resolve, reject) => {
-		const canvas = document.createElement('canvas')
-		const ctx = canvas.getContext('2d')
-		const img = new Image()
-		img.onload = () => {
-			canvas.width = 64
-			canvas.height = 64
-			ctx?.drawImage(img, 0, 0, 64, 64)
-			canvas.toBlob((blob) => {
-				if (blob) {
-					resolve(new File([blob], 'server-icon.png', { type: 'image/png' }))
-				} else {
-					reject(new Error('Canvas toBlob failed'))
-				}
-			}, 'image/png')
-			URL.revokeObjectURL(img.src)
-		}
-		img.onerror = reject
-		img.src = URL.createObjectURL(file)
-	})
+	isUploadingIcon.value = true
 
 	try {
+		const scaledFile = await new Promise<File>((resolve, reject) => {
+			const canvas = document.createElement('canvas')
+			const ctx = canvas.getContext('2d')
+			const img = new Image()
+			img.onload = () => {
+				canvas.width = 64
+				canvas.height = 64
+				ctx?.drawImage(img, 0, 0, 64, 64)
+				canvas.toBlob((blob) => {
+					if (blob) {
+						resolve(new File([blob], 'server-icon.png', { type: 'image/png' }))
+					} else {
+						reject(new Error('Canvas toBlob failed'))
+					}
+				}, 'image/png')
+				URL.revokeObjectURL(img.src)
+			}
+			img.onerror = reject
+			img.src = URL.createObjectURL(file)
+		})
+
 		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
 
 		try {
@@ -173,10 +188,15 @@ const uploadFile = async (e: Event) => {
 			title: 'Upload failed',
 			text: 'Failed to upload server icon.',
 		})
+	} finally {
+		isUploadingIcon.value = false
 	}
 }
 
 const resetIcon = async () => {
+	if (isIconActionLoading.value) return
+	isSyncingIcon.value = true
+
 	try {
 		const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
 		const deleteResults = await Promise.allSettled([
@@ -208,10 +228,14 @@ const resetIcon = async () => {
 			title: 'Reset failed',
 			text: 'Failed to reset server icon.',
 		})
+	} finally {
+		isSyncingIcon.value = false
 	}
 }
 
 const triggerFileInput = () => {
+	if (isIconActionLoading.value) return
+
 	const input = document.createElement('input')
 	input.type = 'file'
 	input.id = 'server-icon-field'
