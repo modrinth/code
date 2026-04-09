@@ -327,6 +327,19 @@ const messages = defineMessages({
 
 const isPollingForNewServers = ref(false)
 const showPollingForNewServers = ref(false)
+let pollingShowTimeout: ReturnType<typeof setTimeout> | undefined
+
+watch(isPollingForNewServers, (polling) => {
+	clearTimeout(pollingShowTimeout)
+	if (polling) {
+		pollingShowTimeout = setTimeout(() => {
+			showPollingForNewServers.value = true
+		}, 1500)
+	} else {
+		showPollingForNewServers.value = false
+	}
+})
+
 const pollingState = ref({
 	enabled: false,
 	count: 0,
@@ -336,9 +349,6 @@ const pollingState = ref({
 function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
 	if (pollingState.value.enabled) return
 	isPollingForNewServers.value = true
-	setTimeout(() => {
-		showPollingForNewServers.value = isPollingForNewServers.value
-	}, 1500)
 	pollingState.value = {
 		enabled: true,
 		count: 0,
@@ -531,13 +541,11 @@ const {
 			if (response.servers.length !== pollingState.value.initialServers.length) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
-				showPollingForNewServers.value = false
 
 				router.replace({ query: {} })
 			} else if (pollingState.value.count >= 5) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
-				showPollingForNewServers.value = false
 			}
 		}
 
@@ -626,7 +634,6 @@ watch(
 	(user, previousUser) => {
 		if (user || !previousUser) return
 		isPollingForNewServers.value = false
-		showPollingForNewServers.value = false
 		pollingState.value = {
 			enabled: false,
 			count: 0,
