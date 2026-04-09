@@ -87,6 +87,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
@@ -134,6 +135,7 @@ const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	archonBaseUrl: config.archonBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
@@ -154,6 +156,7 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	openExternalUrl: (url) => openUrl(url),
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),

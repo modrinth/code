@@ -18,14 +18,15 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const isInstalling = computed(() => server.value.status === 'installing')
 	const isRunning = computed(() => powerState.value === 'running')
 	const isStopping = computed(() => powerState.value === 'stopping')
-	const isTransitioning = computed(
-		() => powerState.value === 'starting' || powerState.value === 'stopping',
-	)
-	const showStopButton = computed(() => isRunning.value || isStopping.value)
+	const isStarting = computed(() => powerState.value === 'starting')
+	const isTransitioning = computed(() => isStarting.value || isStopping.value)
+	const showStopButton = computed(() => isRunning.value || isStarting.value)
 
-	const busyTooltip = computed(() =>
-		busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined,
-	)
+	const busyTooltip = computed(() => {
+		if (isStopping.value) return 'Server is currently stopping'
+		if (isStarting.value) return 'Your server is starting'
+		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
+	})
 
 	const canTakeAction = computed(
 		() => !isTransitioning.value && !options?.disabled?.value && busyReasons.value.length === 0,
@@ -33,11 +34,8 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 
 	const primaryActionText = computed(() => {
 		switch (powerState.value) {
-			case 'starting':
-				return 'Starting...'
-			case 'stopping':
-				return 'Stopping...'
 			case 'running':
+			case 'starting':
 				return 'Restart'
 			default:
 				return 'Start'

@@ -11,7 +11,7 @@ import {
 	shallowRef,
 } from 'vue'
 
-function getCssVar(name: string, fallback: string): string {
+export function getCssVar(name: string, fallback: string): string {
 	if (typeof document === 'undefined') return fallback
 	const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 	return value || fallback
@@ -173,6 +173,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 			fontFamily: 'monospace',
 			fontSize: 14,
 			lineHeight: 1.5,
+			allowProposedApi: true,
 			theme: buildTerminalTheme(),
 			...options.options,
 		})

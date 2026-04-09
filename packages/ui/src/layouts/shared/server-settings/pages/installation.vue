@@ -36,6 +36,7 @@
 							@reinstall="onReinstall"
 							@browse-modpacks="onBrowseModpacks"
 						/>
+						<UploadProgressModal ref="uploadProgressModal" />
 					</div>
 				</Teleport>
 			</template>
@@ -78,11 +79,14 @@ import {
 	InstallationSettingsLayout,
 	provideInstallationSettings,
 	ServerSetupModal,
+	UploadProgressModal,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
+
+import { injectFilePicker } from '#ui/providers/file-picker'
 
 const debug = useDebugLogger('LoaderPage')
 const client = injectModrinthClient()
@@ -92,6 +96,9 @@ const queryClient = useQueryClient()
 const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
+const filePicker = injectFilePicker()
+
+const uploadProgressModal = useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const messages = defineMessages({
 	resetServerTitle: {
@@ -526,7 +533,31 @@ provideInstallationSettings({
 	},
 
 	async reinstallModpack() {
-		if (!modpack.value || modpack.value.spec.platform !== 'modrinth') return
+		if (!modpack.value) return
+		if (modpack.value.spec.platform === 'local_file') {
+			debug('reinstallModpack: local file, opening file picker')
+			const picked = await filePicker.pickModpackFile()
+			if (!picked) return
+			try {
+				const handle = client.kyros.content_v1.uploadModpackFile(
+					worldId.value!,
+					picked.file,
+					{ known: {} },
+					{ softOverride: true },
+				)
+				await uploadProgressModal.value!.track(handle)
+				emit('reinstall')
+				invalidateServerState()
+			} catch (err) {
+				emit('reinstall-failed')
+				addNotification({
+					type: 'error',
+					text: err instanceof Error ? err.message : formatMessage(messages.failedToReinstall),
+				})
+			}
+			return
+		}
+		if (modpack.value.spec.platform !== 'modrinth') return
 		debug(
 			'reinstallModpack: called, project:',
 			modpack.value.spec.project_id,
@@ -669,6 +700,7 @@ provideInstallationSettings({
 	isServer: true,
 	isApp: serverSettings.isApp.value,
 	showModpackVersionActions: computed(() => modpack.value?.spec.platform === 'modrinth'),
+	isLocalFile: computed(() => modpack.value?.spec.platform === 'local_file'),
 
 	lockPlatform: false,
 	hideLoaderVersion: false,
@@ -686,16 +718,33 @@ provideInstallationSettings({
 		debug('disableAllContent: done')
 	},
 
-	async disableIncompatibleContent(diffs) {
-		debug('disableIncompatibleContent: processing', diffs.length, 'diffs')
+	async disableIncompatibleContent(targetGameVersion) {
+		debug('disableIncompatibleContent: fetching addons')
 		const addons = await client.archon.content_v1.getAddons(serverId, worldId.value!)
-		const removedFiles = new Set(diffs.filter((d) => d.type === 'removed').map((d) => d.fileName))
-		const items = (addons.addons ?? [])
-			.filter((a) => !a.disabled && removedFiles.has(a.filename))
-			.map((a) => ({ kind: a.kind, filename: a.filename }))
-		if (items.length > 0) {
-			debug('disableIncompatibleContent: disabling', items.length, 'addons')
-			await client.archon.content_v1.disableAddons(serverId, worldId.value!, items)
+		const activeAddons = (addons.addons ?? []).filter((a) => !a.disabled)
+
+		const modrinthAddons = activeAddons.filter((a) => a.version?.id)
+		const customAddons = activeAddons.filter((a) => !a.version?.id)
+
+		const incompatibleItems: { kind: (typeof activeAddons)[number]['kind']; filename: string }[] =
+			customAddons.map((a) => ({ kind: a.kind, filename: a.filename }))
+
+		if (modrinthAddons.length > 0) {
+			const versionIds = modrinthAddons.map((a) => a.version!.id)
+			const versions = await client.labrinth.versions_v2.getVersions(versionIds)
+			const incompatibleVersionIds = new Set(
+				versions.filter((v) => !v.game_versions.includes(targetGameVersion)).map((v) => v.id),
+			)
+			for (const addon of modrinthAddons) {
+				if (incompatibleVersionIds.has(addon.version!.id)) {
+					incompatibleItems.push({ kind: addon.kind, filename: addon.filename })
+				}
+			}
+		}
+
+		if (incompatibleItems.length > 0) {
+			debug('disableIncompatibleContent: disabling', incompatibleItems.length, 'addons')
+			await client.archon.content_v1.disableAddons(serverId, worldId.value!, incompatibleItems)
 		}
 		debug('disableIncompatibleContent: done')
 	},

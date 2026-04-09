@@ -100,6 +100,12 @@ const showModpackVersionActions = computed(() => {
 	return typeof val === 'boolean' ? val : val.value
 })
 
+const isLocalFile = computed(() => {
+	const val = ctx.isLocalFile
+	if (val == null) return false
+	return typeof val === 'boolean' ? val : val.value
+})
+
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
 	const currentVersionId = ctx.updaterModalProps.value.currentVersionId
@@ -410,7 +416,7 @@ const messages = defineMessages({
 				</div>
 
 				<!-- Reinstall -->
-				<div v-if="showModpackVersionActions" class="flex flex-col gap-2.5">
+				<div v-if="showModpackVersionActions || isLocalFile" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.reinstallModpackTitle) }}
 					</span>
@@ -442,8 +448,8 @@ const messages = defineMessages({
 					</span>
 				</div>
 
-				<!-- Repair -->
-				<div class="flex flex-col gap-2.5">
+				<!-- Repair (hidden for local file modpacks — reinstall covers this) -->
+				<div v-if="!isLocalFile" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(
@@ -686,6 +692,7 @@ const messages = defineMessages({
 
 	<!-- Modals -->
 	<Teleport to="body">
+		<div class="relative z-[100]">
 		<ContentUpdaterModal
 			v-if="form.updatingModpack.value"
 			ref="contentUpdaterModal"
@@ -707,7 +714,6 @@ const messages = defineMessages({
 		<ConfirmModpackUpdateModal
 			ref="modpackUpdateModal"
 			:downgrade="isUpdateDowngrade"
-			:server="ctx.isServer"
 			:backup-tip="
 				[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
 			"
@@ -761,6 +767,7 @@ const messages = defineMessages({
 		/>
 
 		<ConfirmLeaveModal ref="confirmLeaveModal" />
+		</div>
 		<slot name="extra-modals" />
 	</Teleport>
 </template>

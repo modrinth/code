@@ -26,7 +26,8 @@
 			<div class="flex items-center justify-between">
 				<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
 				<ConsoleActionButtons
-					:share-disabled="resolvedShareDisabled"
+					:share-disabled="resolvedShareDisabled || !hasLogs"
+					:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
 					@clear="handleClear"
 					@share="handleShare"
 					@expand="enterFullscreen"
@@ -56,20 +57,29 @@ import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
 import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
+import { injectPageContext } from '#ui/providers/page-context'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
+import {
+	colorize,
+	computeHighlightColors,
+	LogHighlightAddon,
+	rewriteTerminal,
+	useConsoleFilters,
+} from './composables'
 import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
 const modalBehavior = injectModalBehavior()
+const pageContext = injectPageContext()
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
+const hasLogs = computed(() => ctx.logLines.value.length > 0)
 
 function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
 	const levelPred = buildFilterPredicate()
@@ -87,10 +97,14 @@ onBeforeUnmount(() => {
 		document.body.style.overflow = ''
 		modalBehavior?.onHide?.()
 	}
+	themeObserver?.disconnect()
+	themeObserver = null
 })
 
 let lastWrittenIndex = 0
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
+let highlightAddon: LogHighlightAddon | null = null
+let themeObserver: MutationObserver | null = null
 
 const resolvedShowInput = computed(() => {
 	const v = ctx.showCommandInput
@@ -105,7 +119,19 @@ const resolvedShareDisabled = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
-function handleTerminalReady(_terminal: Terminal) {
+function handleTerminalReady(terminal: Terminal) {
+	const addon = new LogHighlightAddon(computeHighlightColors())
+	terminal.loadAddon(addon)
+	highlightAddon = addon
+
+	themeObserver = new MutationObserver(() => {
+		addon.updateColors(computeHighlightColors())
+	})
+	themeObserver.observe(document.documentElement, {
+		attributes: true,
+		attributeFilter: ['data-theme', 'class'],
+	})
+
 	writeAllLines()
 }
 
@@ -122,8 +148,11 @@ function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const predicate = buildCombinedPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
-	lastWrittenIndex = ctx.logLines.value.length
+	const lines = ctx.logLines.value
+	const filtered = predicate ? lines.filter(predicate) : lines
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
+	highlightAddon?.reapply(filtered.map((l) => l.level))
+	lastWrittenIndex = lines.length
 }
 
 function enterFullscreen() {
@@ -148,31 +177,32 @@ function writeAllLines() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 	const predicate = buildCombinedPredicate()
-	rewriteTerminal(term, ctx.logLines.value, predicate, activeSearchQuery())
-	lastWrittenIndex = ctx.logLines.value.length
+	const lines = ctx.logLines.value
+	const filtered = predicate ? lines.filter(predicate) : lines
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
+	highlightAddon?.reapply(filtered.map((l) => l.level))
+	lastWrittenIndex = lines.length
 }
 
-watch(
-	() => ctx.logLines.value,
-	(lines, oldLines) => {
-		const term = terminalRef.value?.terminal
-		if (!term) return
+watch(ctx.logLines, (lines, oldLines) => {
+	const term = terminalRef.value?.terminal
+	if (!term) return
 
-		if (lines !== oldLines || lines.length < lastWrittenIndex) {
-			rewriteFiltered()
-			return
-		}
+	if (lines !== oldLines || lines.length < lastWrittenIndex) {
+		rewriteFiltered()
+		return
+	}
 
-		const predicate = buildCombinedPredicate()
-		const query = activeSearchQuery()
-		for (let i = lastWrittenIndex; i < lines.length; i++) {
-			if (!predicate || predicate(lines[i])) {
-				terminalRef.value?.writeln(colorize(lines[i], query))
-			}
+	const predicate = buildCombinedPredicate()
+	const query = activeSearchQuery()
+	for (let i = lastWrittenIndex; i < lines.length; i++) {
+		if (!predicate || predicate(lines[i])) {
+			terminalRef.value?.writeln(colorize(lines[i], query))
+			highlightAddon?.pushLevel(lines[i].level)
 		}
-		lastWrittenIndex = lines.length
-	},
-)
+	}
+	lastWrittenIndex = lines.length
+})
 
 watch(searchQuery, () => {
 	if (searchDebounce) clearTimeout(searchDebounce)
@@ -187,6 +217,7 @@ function handleCommand(cmd: string) {
 
 function handleClear() {
 	terminalRef.value?.reset()
+	highlightAddon?.reapply([])
 	lastWrittenIndex = 0
 	ctx.onClear?.()
 }
@@ -204,7 +235,7 @@ async function handleShare() {
 		})
 		const data = await res.json()
 		if (data.url) {
-			window.open(data.url, '_blank')
+			pageContext.openExternalUrl(data.url)
 		}
 	} catch (err) {
 		console.error('Failed to share logs:', err)
