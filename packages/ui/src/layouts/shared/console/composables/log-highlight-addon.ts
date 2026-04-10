@@ -127,7 +127,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 		}
 
 		this.lastProcessedLine = cursorAbsolute + 1
-		this.pendingLevels = []
+		this.pendingLevels = this.pendingLevels.slice(levelIdx)
 	}
 
 	private applyAll(levels: Array<LogLevel | null>): void {

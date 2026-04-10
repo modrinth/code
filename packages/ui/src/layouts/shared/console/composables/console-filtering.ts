@@ -27,9 +27,9 @@ export function colorize(line: LogLine, searchQuery?: string): string {
 	const text = searchQuery ? highlightMatches(line.text, searchQuery) : line.text
 	switch (line.level) {
 		case 'error':
-			return `\x1b[31m${text}\x1b[0m`
+			return `\x1b[31;40m${text}\x1b[K\x1b[0m`
 		case 'warn':
-			return `\x1b[33m${text}\x1b[0m`
+			return `\x1b[33;40m${text}\x1b[K\x1b[0m`
 		case 'debug':
 		case 'trace':
 			return `\x1b[90m${text}\x1b[0m`

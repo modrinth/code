@@ -10,6 +10,46 @@ const DEBUG_PERF = false
 
 // TODO: for true unbounded history, consider IndexedDB or similar
 const ARCHIVE_CAPACITY = 500_000
+
+const ENTRY_START_RE = /^\[\d{2}:\d{2}:\d{2}\]/
+
+/**
+ * Reorders a batch of log lines so that continuation lines (lines without a
+ * timestamp prefix) stay grouped with their parent error/warn entry, even when
+ * unrelated timestamped lines arrive between them from the server.
+ */
+function groupContinuations(lines: LogLine[]): LogLine[] {
+	if (lines.length <= 1) return lines
+
+	const groups: LogLine[][] = []
+
+	for (const line of lines) {
+		if (ENTRY_START_RE.test(line.text)) {
+			groups.push([line])
+		} else if (groups.length > 0) {
+			let target = groups.length - 1
+			const lastEntry = groups[target][0]
+
+			if (lastEntry.level !== 'error' && lastEntry.level !== 'warn') {
+				if (line.level === 'error' || line.level === null) {
+					for (let i = groups.length - 2; i >= 0; i--) {
+						if (groups[i][0].level === 'error' || groups[i][0].level === 'warn') {
+							target = i
+							break
+						}
+					}
+				}
+			}
+
+			groups[target].push(line)
+		} else {
+			groups.push([line])
+		}
+	}
+
+	return groups.flat()
+}
+
 const batchTimeout = 300
 const initialBatchSize = 256
 
@@ -187,10 +227,11 @@ export const useModrinthServersConsole = createGlobalState(() => {
 
 		const t0 = DEBUG_PERF ? performance.now() : 0
 		const arr = output.value
-		const flushedCount = lineBuffer.length
+		const lines = groupContinuations(lineBuffer)
+		const flushedCount = lines.length
 		let didWrap = false
 
-		for (const line of lineBuffer) {
+		for (const line of lines) {
 			if (archive.push(line.text, line.level)) didWrap = true
 			arr.push(line)
 		}
