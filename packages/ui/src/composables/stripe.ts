@@ -242,10 +242,18 @@ export const useStripe = (
 			if (confirmation) {
 				confirmationToken.value = id
 				if (result && 'payment_method' in result && result.payment_method) {
-					// payment_method is a string ID from the API, need to find the full object
-					const method = paymentMethods.find((x) => x.id === result.payment_method)
-					if (method) {
-						inputtedPaymentMethod.value = method
+					const paymentMethod = (
+						result as {
+							payment_method?: string | Stripe.PaymentMethod
+						}
+					).payment_method
+					if (typeof paymentMethod === 'string') {
+						const method = paymentMethods.find((x) => x.id === paymentMethod)
+						if (method) {
+							inputtedPaymentMethod.value = method
+						}
+					} else if (paymentMethod) {
+						inputtedPaymentMethod.value = paymentMethod
 					}
 				}
 			}
@@ -362,6 +370,9 @@ export const useStripe = (
 			: await stripe.value.confirmPayment({
 					clientSecret: secret,
 					redirect: 'if_required',
+					confirmParams: {
+						confirmation_token: confirmationToken.value,
+					},
 				})
 
 		if (error) {
