@@ -212,7 +212,7 @@ function textToLogLine(text: string): LogLine {
 	return { text, level: detectLogLevel(text) }
 }
 
-export const useModrinthServersConsole = createGlobalState(() => {
+export function createConsoleState() {
 	const archive = new ColumnarRingBuffer(ARCHIVE_CAPACITY)
 	const output: Ref<LogLine[]> = shallowRef<LogLine[]>([])
 
@@ -333,4 +333,6 @@ export const useModrinthServersConsole = createGlobalState(() => {
 		clear,
 		__debugStats,
 	}
-})
+}
+
+export const useModrinthServersConsole = createGlobalState(createConsoleState)

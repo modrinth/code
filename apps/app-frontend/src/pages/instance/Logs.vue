@@ -7,9 +7,9 @@
 <script setup>
 import {
 	ConsolePageLayout,
+	createConsoleState,
 	injectNotificationManager,
 	provideConsoleManager,
-	useModrinthServersConsole,
 } from '@modrinth/ui'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -19,7 +19,7 @@ import { get_logs, get_output_by_filename } from '@/helpers/logs.js'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
-const consoleLines = useModrinthServersConsole()
+const consoleLines = createConsoleState()
 
 const props = defineProps({
 	instance: {
