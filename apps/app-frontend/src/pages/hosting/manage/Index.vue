@@ -45,24 +45,47 @@
 </template>
 
 <script setup lang="ts">
-import type { Labrinth } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
+import { useQuery } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { get_user } from '@/helpers/cache'
 import { get as getCreds } from '@/helpers/mr_auth'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useTheming } from '@/store/theme'
 
 const route = useRoute()
 const router = useRouter()
 const themeStore = useTheming()
+const breadcrumbs = useBreadcrumbs()
 
 const serverId = computed(() => {
 	const rawId = route.params.id
 	return Array.isArray(rawId) ? rawId[0] : (rawId ?? '')
 })
+
+const { data: serverData } = useQuery({
+	queryKey: computed(() => ['servers', 'detail', serverId.value]),
+	queryFn: () => null as unknown as Archon.Servers.v0.Server,
+	enabled: false,
+})
+
+watch(
+	serverData,
+	(server) => {
+		if (server?.name) {
+			breadcrumbs.setName('Server', server.name)
+			breadcrumbs.setContext({
+				name: server.name,
+				link: `/hosting/manage/${serverId.value}/content`,
+			})
+		}
+	},
+	{ immediate: true },
+)
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {
 	const credentials = await getCreds().catch(() => null)

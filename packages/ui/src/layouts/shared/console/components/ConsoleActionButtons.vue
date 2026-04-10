@@ -1,12 +1,12 @@
 <template>
-	<div class="flex items-center gap-0.5">
-		<ButtonStyled type="transparent" circular>
+	<div class="flex items-center gap-1">
+		<ButtonStyled type="transparent">
 			<button @click="emit('clear')">
 				<XIcon />
 				Clear
 			</button>
 		</ButtonStyled>
-		<ButtonStyled type="transparent" circular>
+		<ButtonStyled type="transparent">
 			<button
 				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
 				:disabled="shareDisabled"
@@ -16,7 +16,7 @@
 				Share
 			</button>
 		</ButtonStyled>
-		<ButtonStyled type="transparent" circular>
+		<ButtonStyled type="transparent">
 			<button @click="emit('expand')">
 				<ExpandIcon />
 				Expand
