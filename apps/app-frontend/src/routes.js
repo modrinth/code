@@ -45,21 +45,33 @@ export default new createRouter({
 					path: '',
 					name: 'ServerManageOverview',
 					component: Hosting.Overview,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
 				},
 				{
 					path: 'content',
 					name: 'ServerManageContent',
 					component: Hosting.Content,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
 				},
 				{
 					path: 'files',
 					name: 'ServerManageFiles',
 					component: Hosting.Files,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
 				},
 				{
 					path: 'backups',
 					name: 'ServerManageBackups',
 					component: Hosting.Backups,
+					meta: {
+						breadcrumb: [{ name: '?Server' }],
+					},
 				},
 			],
 		},
