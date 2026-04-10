@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue'
+import { existsSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import svgLoader from 'vite-svg-loader'
@@ -6,6 +7,23 @@ import svgLoader from 'vite-svg-loader'
 import tauriConf from '../app/tauri.conf.json'
 
 const projectRootDir = resolve(__dirname)
+const appLibEnvDir = resolve(projectRootDir, '../../packages/app-lib')
+
+// Load .env from app-lib manually instead of using Vite's envDir, which would auto-load .env.local and override values
+const envFilePath = resolve(appLibEnvDir, '.env')
+if (existsSync(envFilePath)) {
+	for (const line of readFileSync(envFilePath, 'utf-8').split('\n')) {
+		const trimmed = line.trim()
+		if (!trimmed || trimmed.startsWith('#')) continue
+		const eqIndex = trimmed.indexOf('=')
+		if (eqIndex === -1) continue
+		const key = trimmed.slice(0, eqIndex)
+		const value = trimmed.slice(eqIndex + 1)
+		if (!(key in process.env)) {
+			process.env[key] = value
+		}
+	}
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -68,7 +86,7 @@ export default defineConfig({
 	},
 	// to make use of `TAURI_ENV_DEBUG` and other env variables
 	// https://v2.tauri.app/reference/environment-variables/#tauri-cli-hook-commands
-	envPrefix: ['VITE_', 'TAURI_'],
+	envPrefix: ['VITE_', 'TAURI_', 'MODRINTH_'],
 	build: {
 		rolldownOptions: {
 			onwarn(warning, defaultHandler) {
