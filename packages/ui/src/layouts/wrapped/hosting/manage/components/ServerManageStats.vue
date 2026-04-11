@@ -86,8 +86,7 @@ const props = withDefaults(
 
 const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
-const storageKey = computed(() => `pyro-server-${serverId || 'unknown'}-preferences`)
-const userPreferences = useStorage(storageKey, {
+const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
 	ramAsNumber: false,
 })
 
@@ -174,7 +173,6 @@ const metrics = computed(() => {
 			icon: CpuIcon,
 			data: cpuData.value,
 			showGraph: true,
-			warning: cpuPercent >= 90 ? 'CPU usage is very high' : null,
 			link: null,
 		},
 		{
@@ -186,7 +184,6 @@ const metrics = computed(() => {
 			icon: DatabaseIcon,
 			data: ramData.value,
 			showGraph: true,
-			warning: ramPercent >= 90 ? 'Memory usage is very high' : null,
 			link: null,
 		},
 		storageMetric,

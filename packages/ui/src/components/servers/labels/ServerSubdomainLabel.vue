@@ -12,7 +12,7 @@
 			<LinkIcon />
 			<div
 				class="flex min-w-0 font-medium text-sm text-nowrap"
-				:class="serverId ? 'hover:underline' : ''"
+				:class="props.subdomain ? 'hover:underline' : ''"
 				@click="copySubdomain"
 			>
 				{{ subdomain }}.modrinth.gg
@@ -34,6 +34,7 @@ const { addNotification } = injectNotificationManager()
 
 const props = defineProps<{
 	subdomain: string
+	serverId?: string
 	noSeparator?: boolean
 }>()
 
@@ -47,9 +48,9 @@ const copySubdomain = () => {
 }
 
 const route = useRoute()
-const serverId = computed(() => route.params.id as string)
+const serverId = props.serverId || (route.params.id as string)
 
-const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
 })
 

@@ -94,6 +94,7 @@
 				<ServerInfoLabels
 					v-else
 					:server-data="{ game, mc_version, loader, loader_version, net }"
+					:server-id="server_id"
 					:show-game-label="showGameLabel"
 					:show-loader-label="showLoaderLabel"
 					:linked="false"

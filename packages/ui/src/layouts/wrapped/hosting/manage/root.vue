@@ -442,7 +442,7 @@ import {
 import type { Stats } from '@modrinth/utils'
 import { formatBytes } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useTimeoutFn } from '@vueuse/core'
+import { useStorage, useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
 import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -593,12 +593,11 @@ const errorLogFile = ref('')
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
 
 const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
-const showSettingsHint = ref(
-	typeof localStorage !== 'undefined' && localStorage.getItem(SETTINGS_HINT_KEY) === null,
-)
+const settingsHintDismissed = useStorage(SETTINGS_HINT_KEY, false)
+const showSettingsHint = ref(!settingsHintDismissed.value)
 function dismissSettingsHint() {
 	showSettingsHint.value = false
-	localStorage.setItem(SETTINGS_HINT_KEY, 'true')
+	settingsHintDismissed.value = true
 }
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)

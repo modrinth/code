@@ -25,12 +25,12 @@
 					</div>
 
 					<div
-						v-if="props.server?.loader && props.server?.net?.domain"
+						v-if="props.server?.loader && props.server?.net?.domain && !userPreferences.hideSubdomainLabel"
 						class="h-1.5 w-1.5 rounded-full bg-surface-5"
 					/>
 
 					<div
-						v-if="props.server?.net?.domain"
+						v-if="props.server?.net?.domain && !userPreferences.hideSubdomainLabel"
 						v-tooltip="'Copy server address'"
 						class="flex cursor-pointer items-center gap-2 font-medium hover:underline text-nowrap"
 						@click="copyServerAddress"
@@ -78,10 +78,11 @@
 import type { Archon } from '@modrinth/api-client'
 import { NuxtModrinthClient } from '@modrinth/api-client'
 import { LinkIcon, LoaderIcon, SettingsIcon, TimerIcon } from '@modrinth/assets'
+import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
-import { injectModrinthClient, injectNotificationManager } from '#ui/providers'
+import { injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
 
 type ServerProjectSummary = {
 	id: string
@@ -116,7 +117,12 @@ const props = withDefaults(
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
+const { serverId } = injectModrinthServerContext()
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
+	hideSubdomainLabel: false,
+})
 
 const headerImage = computed(() => {
 	if (props.server?.is_medal) {
