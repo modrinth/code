@@ -121,7 +121,7 @@ defineExpose({ show, hide, selectedTab, setTab })
 
 				<div
 					ref="scrollContainer"
-					class="min-w-[500px] overflow-y-auto px-6 pb-6 h-screen max-h-[min(75vh,750px)]"
+					class="overflow-y-auto px-6 pb-6 h-screen max-h-[min(65vh,600px)]"
 					@scroll="checkScrollState"
 				>
 					<Suspense>
