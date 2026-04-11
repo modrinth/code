@@ -178,6 +178,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 			width: term.cols,
 			layer: 'bottom',
 		})
+		this.applyOverlayBg(primary, bgColor)
 
 		const wraps = this.createWrapDecorations(bufferLine, wrapColor)
 
@@ -206,10 +207,20 @@ export class LogHighlightAddon implements ITerminalAddon {
 				width: term.cols,
 				layer: 'bottom',
 			})
-			if (dec) decorations.push(dec)
+			if (dec) {
+				this.applyOverlayBg(dec, color)
+				decorations.push(dec)
+			}
 		}
 
 		return decorations
+	}
+
+	private applyOverlayBg(dec: IDecoration | undefined, color: string): void {
+		if (!dec) return
+		dec.onRender((el) => {
+			el.style.backgroundColor = color
+		})
 	}
 
 	private handleResize(): void {
@@ -245,6 +256,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 				width: term.cols,
 				layer: 'bottom',
 			})
+			this.applyOverlayBg(tl.primary, bgColor)
 
 			tl.wraps = this.createWrapDecorations(tl.marker.line, wrapColor)
 		}
