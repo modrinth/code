@@ -1,12 +1,12 @@
 <template>
 	<div class="h-full w-full py-6">
-			<ServersManageRootLayout
-				:server-id="serverId"
-				:reload-page="() => router.go(0)"
-				:resolve-viewer="resolveViewer"
-				:show-copy-id-action="themeStore.devMode"
-				:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
-				:navigate-to-servers="() => router.push('/hosting/manage')"
+		<ServersManageRootLayout
+			:server-id="serverId"
+			:reload-page="() => router.go(0)"
+			:resolve-viewer="resolveViewer"
+			:show-copy-id-action="themeStore.devMode"
+			:navigate-to-billing="() => openUrl('https://modrinth.com/settings/billing')"
+			:navigate-to-servers="() => router.push('/hosting/manage')"
 			:browse-modpacks="
 				({ serverId: sid, worldId: wid, from }) => {
 					router.push({
@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import type { Archon, Labrinth } from '@modrinth/api-client'
-import { LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
+import { injectAuth, LoadingIndicator, ServersManageRootLayout } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { computed, watch } from 'vue'
@@ -59,6 +59,7 @@ import { useTheming } from '@/store/theme'
 
 const route = useRoute()
 const router = useRouter()
+const auth = injectAuth()
 const themeStore = useTheming()
 const breadcrumbs = useBreadcrumbs()
 
@@ -85,6 +86,15 @@ watch(
 		}
 	},
 	{ immediate: true },
+)
+
+watch(
+	() => auth.user.value,
+	(user, previousUser) => {
+		if (user || !previousUser) return
+		if (route.path === '/hosting/manage' || route.path === '/hosting/manage/') return
+		void router.replace('/hosting/manage')
+	},
 )
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {

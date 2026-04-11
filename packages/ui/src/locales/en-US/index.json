@@ -2757,7 +2757,7 @@
     "defaultMessage": "New"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining> and can be downloaded below before they are deleted. "
+    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. "
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Your files will be preserved for 30 days after cancellation."
@@ -2938,6 +2938,12 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Undismissable"
+  },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Your Modrinth Hosting purchase was completed successfully."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Purchase success"
   },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "You won't be charged yet."

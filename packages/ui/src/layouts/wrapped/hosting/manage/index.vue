@@ -534,9 +534,9 @@ const {
 		if (pollingState.value.enabled) {
 			pollingState.value.count++
 			const hasNewServer = response.servers.some(
-					(s) => !pollingState.value.initialServerIds.has(s.server_id),
-				)
-				if (hasNewServer) {
+				(s) => !pollingState.value.initialServerIds.has(s.server_id),
+			)
+			if (hasNewServer) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
 
@@ -571,11 +571,23 @@ const fuse = computed(() => {
 	})
 })
 
+function isSetToCancel(server: Archon.Servers.v0.Server): boolean {
+	return (
+		server.status !== 'suspended' &&
+		Boolean(serverBillingMap.value.get(server.server_id)?.cancellationDate)
+	)
+}
+
+function getStatusPriority(server: Archon.Servers.v0.Server): number {
+	if (server.status === 'suspended') return 2
+	if (isSetToCancel(server)) return 1
+	return 0
+}
+
 function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
 	return array.slice().sort((a, b) => {
-		const aSuspended = a.status === 'suspended' ? 1 : 0
-		const bSuspended = b.status === 'suspended' ? 1 : 0
-		if (aSuspended !== bSuspended) return aSuspended - bSuspended
+		const priorityDiff = getStatusPriority(a) - getStatusPriority(b)
+		if (priorityDiff !== 0) return priorityDiff
 
 		const introDiff = Number(b.flows?.intro) - Number(a.flows?.intro)
 		if (introDiff !== 0) return introDiff
