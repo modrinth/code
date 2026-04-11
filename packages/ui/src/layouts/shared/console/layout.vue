@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="flex min-h-0 flex-1 flex-col gap-4"
-		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 pt-9' : ''"
+		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 py-10' : ''"
 	>
 		<div class="flex items-center gap-2">
 			<StyledInput
@@ -71,8 +71,8 @@ import {
 	rewriteTerminal,
 	useConsoleFilters,
 } from './composables'
-import { injectConsoleManager } from './providers'
 import type { ConditionalLevel } from './composables/console-filtering'
+import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
