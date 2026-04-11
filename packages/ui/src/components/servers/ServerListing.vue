@@ -78,6 +78,7 @@
 										: undefined,
 								}
 					"
+					:server-id="server_id"
 					:show-game-label="showGameLabel"
 					:show-loader-label="showLoaderLabel"
 					:show-player-count="showPlayerCount"
