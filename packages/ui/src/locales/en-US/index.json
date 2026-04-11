@@ -2885,6 +2885,15 @@
   "servers.manage.servers-title": {
     "defaultMessage": "Modrinth Hosting"
   },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "They can now be found here!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Don't show again"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Your server settings have moved"
+  },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
   },

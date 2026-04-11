@@ -281,7 +281,7 @@
 						"
 					>
 						<nuxt-link to="/hosting">
-							<ServerIcon aria-hidden="true" />
+							<ServerStackIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -463,7 +463,7 @@
 						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
+						<ServerStackIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -722,6 +722,7 @@ import {
 	ScaleIcon,
 	SearchIcon,
 	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
