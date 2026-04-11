@@ -1029,6 +1029,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="'Library'"
 				to="/library"
+				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
 				:is-subpage="
 					() =>
 						route.path.startsWith('/instance') ||
@@ -1039,7 +1040,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LibraryIcon />
 			</NavButton>
 			<NavButton
-				v-if="themeStore.featureFlags.servers_in_app"
 				v-tooltip.right="'Modrinth Hosting'"
 				to="/hosting/manage"
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"

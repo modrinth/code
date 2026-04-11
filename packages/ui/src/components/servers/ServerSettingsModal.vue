@@ -217,8 +217,8 @@ defineExpose({ show, hide })
 	<TabbedModal
 		ref="modal"
 		:tabs="tabs"
-		:max-width="'min(980px, calc(95vw - 10rem))'"
-		:width="'min(980px, calc(95vw - 10rem))'"
+		:max-width="'min(980px, calc(95vw - 2rem))'"
+		:width="'min(980px, calc(95vw - 2rem))'"
 	>
 		<template #title>
 			<span class="flex items-center gap-2 text-lg font-semibold text-primary">
