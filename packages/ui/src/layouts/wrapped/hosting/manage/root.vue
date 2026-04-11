@@ -98,7 +98,7 @@
 	<!-- Loading state (before serverData arrives) -->
 	<div
 		v-else-if="!serverData && !serverError"
-		class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4"
+		class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 relative bottom-12"
 	>
 		<LoaderCircleIcon class="size-16 animate-spin" />
 		<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
@@ -107,7 +107,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto mb-12 box-border flex min-h-screen w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within mobile-blurred-servericon relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -121,230 +121,236 @@
 		]"
 	>
 		<div
-			v-if="revealState === 'pending'"
+			v-if="revealState === 'pending' && !isOnboarding"
 			class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4"
 		>
 			<LoaderCircleIcon class="size-16 animate-spin" />
 			<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>
 		</div>
-
-		<ServerManageHeader
-			class="server-stagger-item"
-			:style="{ '--si': 0 }"
-			:server="serverData"
-			:server-image="serverImage"
-			:server-project="serverProject"
-			:uptime-seconds="showUptime ? uptimeSeconds : undefined"
-		>
-			<template #actions>
-				<div v-if="!serverData.flows?.intro" class="flex gap-2">
-					<PanelServerActionButton :disabled="!!installError" />
-					<ButtonStyled circular size="large">
-						<button v-tooltip="'Server settings'" @click="() => openServerSettingsModal()">
-							<SettingsIcon />
-						</button>
-					</ButtonStyled>
-					<PanelServerOverflowMenu
-						:disabled="!!installError"
-						:uptime-seconds="uptimeSeconds"
-						:show-copy-id-action="showCopyIdAction"
-						:show-debug-info="showAdvancedDebugInfo"
-					/>
-				</div>
-			</template>
-		</ServerManageHeader>
-
-		<ServerOnboardingPanelPage
-			v-if="serverData.flows?.intro"
-			:browse-modpacks="handleBrowseModpacks"
-		/>
-
 		<template v-else>
-			<div
-				data-pyro-navigation
-				class="server-stagger-item isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
-				:style="{ '--si': 1 }"
+			<ServerManageHeader
+				v-if="!isOnboarding"
+				class="server-stagger-item"
+				:style="{ '--si': 0 }"
+				:server="serverData"
+				:server-image="serverImage"
+				:server-project="serverProject"
+				:uptime-seconds="showUptime ? uptimeSeconds : undefined"
 			>
-				<NavTabs :links="navLinks" replace />
-			</div>
+				<template #actions>
+					<div class="flex gap-2">
+						<PanelServerActionButton :disabled="!!installError" />
+						<ButtonStyled circular size="large">
+							<button v-tooltip="'Server settings'" @click="() => openServerSettingsModal()">
+								<SettingsIcon />
+							</button>
+						</ButtonStyled>
+						<PanelServerOverflowMenu
+							:disabled="!!installError"
+							:uptime-seconds="uptimeSeconds"
+							:show-copy-id-action="showCopyIdAction"
+							:show-debug-info="showAdvancedDebugInfo"
+						/>
+					</div>
+				</template>
+			</ServerManageHeader>
 
-			<div data-pyro-mount class="server-stagger-item h-full w-full flex-1" :style="{ '--si': 2 }">
+			<ServerOnboardingPanelPage v-if="isOnboarding" :browse-modpacks="handleBrowseModpacks" />
+
+			<template v-else>
 				<div
-					v-if="installError"
-					class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+					data-pyro-navigation
+					class="server-stagger-item isolate flex w-full select-none flex-col justify-between gap-4 overflow-auto md:flex-row md:items-center"
+					:style="{ '--si': 1 }"
 				>
-					<div class="flex flex-row gap-4">
-						<IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
-						<div class="flex flex-col gap-2 leading-[150%]">
-							<div class="flex items-center gap-3">
-								<IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
-								<div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
-							</div>
+					<NavTabs :links="navLinks" replace />
+				</div>
 
-							<div
-								v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
-								class="font-normal"
-							>
-								<div
-									v-if="
-										errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
-									"
-								>
-									An invalid loader or Minecraft version was specified and could not be installed.
-									<ul class="m-0 mt-4 p-0 pl-4">
-										<li>
-											If this version of Minecraft was released recently, please check if Modrinth
-											Hosting supports it.
-										</li>
-										<li>
-											If you've installed a modpack, it may have been packaged incorrectly or may
-											not be compatible with the loader.
-										</li>
-										<li>
-											Your server may need to be reinstalled with a valid mod loader and version.
-											You can change the loader by clicking the "Change Loader" button.
-										</li>
-										<li>
-											If you're stuck, please contact Modrinth Support with the information below:
-										</li>
-									</ul>
-									<ButtonStyled>
-										<button class="mt-2" @click="copyServerDebugInfo">
-											<CopyIcon v-if="!copied" />
-											<CheckIcon v-else />
-											Copy Debug Info
-										</button>
-									</ButtonStyled>
-								</div>
-								<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
-									An internal error occurred while installing your server. Don't fret — try
-									reinstalling your server, and if the problem persists, please contact Modrinth
-									support with your server's debug information.
-								</div>
-								<div
-									v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
-								>
-									An error occurred while installing your server because Modrinth Hosting does not
-									support the version of Minecraft or the loader you specified. Try reinstalling
-									your server with a different version or loader, and if the problem persists,
-									please contact Modrinth Support with your server's debug information.
+				<div
+					data-pyro-mount
+					class="server-stagger-item h-full w-full flex-1"
+					:style="{ '--si': 2 }"
+				>
+					<div
+						v-if="installError"
+						class="mx-auto mb-4 flex justify-between gap-2 rounded-2xl border-2 border-solid border-red bg-bg-red p-4 font-semibold text-contrast"
+					>
+						<div class="flex flex-row gap-4">
+							<IssuesIcon class="hidden h-8 w-8 shrink-0 text-red sm:block" />
+							<div class="flex flex-col gap-2 leading-[150%]">
+								<div class="flex items-center gap-3">
+									<IssuesIcon class="flex h-8 w-8 shrink-0 text-red sm:hidden" />
+									<div class="flex gap-2 text-2xl font-bold">{{ errorTitle }}</div>
 								</div>
 
 								<div
-									v-if="errorTitle === 'Installation error'"
-									class="mt-2 flex flex-col gap-4 sm:flex-row"
+									v-if="errorTitle.toLocaleLowerCase() === 'installation error'"
+									class="font-normal"
 								>
-									<ButtonStyled v-if="errorLog">
-										<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
-									</ButtonStyled>
-									<ButtonStyled>
-										<button @click="copyServerDebugInfo">
-											<CopyIcon v-if="!copied" />
-											<CheckIcon v-else />
-											Copy Debug Info
-										</button>
-									</ButtonStyled>
-									<ButtonStyled color="red" type="standard">
-										<button class="whitespace-pre" @click="openServerSettingsModal('installation')">
-											<RightArrowIcon />
-											Change Loader
-										</button>
-									</ButtonStyled>
+									<div
+										v-if="
+											errorMessage.toLocaleLowerCase() === 'the specified version may be incorrect'
+										"
+									>
+										An invalid loader or Minecraft version was specified and could not be installed.
+										<ul class="m-0 mt-4 p-0 pl-4">
+											<li>
+												If this version of Minecraft was released recently, please check if Modrinth
+												Hosting supports it.
+											</li>
+											<li>
+												If you've installed a modpack, it may have been packaged incorrectly or may
+												not be compatible with the loader.
+											</li>
+											<li>
+												Your server may need to be reinstalled with a valid mod loader and version.
+												You can change the loader by clicking the "Change Loader" button.
+											</li>
+											<li>
+												If you're stuck, please contact Modrinth Support with the information below:
+											</li>
+										</ul>
+										<ButtonStyled>
+											<button class="mt-2" @click="copyServerDebugInfo">
+												<CopyIcon v-if="!copied" />
+												<CheckIcon v-else />
+												Copy Debug Info
+											</button>
+										</ButtonStyled>
+									</div>
+									<div v-if="errorMessage.toLocaleLowerCase() === 'internal error'">
+										An internal error occurred while installing your server. Don't fret — try
+										reinstalling your server, and if the problem persists, please contact Modrinth
+										support with your server's debug information.
+									</div>
+									<div
+										v-if="errorMessage.toLocaleLowerCase() === 'this version is not yet supported'"
+									>
+										An error occurred while installing your server because Modrinth Hosting does not
+										support the version of Minecraft or the loader you specified. Try reinstalling
+										your server with a different version or loader, and if the problem persists,
+										please contact Modrinth Support with your server's debug information.
+									</div>
+
+									<div
+										v-if="errorTitle === 'Installation error'"
+										class="mt-2 flex flex-col gap-4 sm:flex-row"
+									>
+										<ButtonStyled v-if="errorLog">
+											<button @click="openInstallLog"><FileIcon />Open Installation Log</button>
+										</ButtonStyled>
+										<ButtonStyled>
+											<button @click="copyServerDebugInfo">
+												<CopyIcon v-if="!copied" />
+												<CheckIcon v-else />
+												Copy Debug Info
+											</button>
+										</ButtonStyled>
+										<ButtonStyled color="red" type="standard">
+											<button
+												class="whitespace-pre"
+												@click="openServerSettingsModal('installation')"
+											>
+												<RightArrowIcon />
+												Change Loader
+											</button>
+										</ButtonStyled>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<div v-if="serverData.is_medal" class="mb-4">
-					<MedalServerCountdown
-						:server-id="serverId"
-						:stripe-publishable-key="stripePublishableKey"
-						:site-url="siteUrl"
-						:products="products"
-					/>
-				</div>
+					<div v-if="serverData.is_medal" class="mb-4">
+						<MedalServerCountdown
+							:server-id="serverId"
+							:stripe-publishable-key="stripePublishableKey"
+							:site-url="siteUrl"
+							:products="products"
+						/>
+					</div>
 
-				<div
-					v-if="!isConnected && !isReconnecting && !isLoading"
-					data-pyro-server-ws-error
-					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
-				>
-					<IssuesIcon class="size-5 text-red" />
-					Something went wrong...
-				</div>
-
-				<div
-					v-if="isReconnecting"
-					data-pyro-server-ws-reconnecting
-					class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
-				>
-					<LoaderCircleIcon class="h-5 w-5 animate-spin" />
-					Hang on, we're reconnecting to your server.
-				</div>
-
-				<Transition
-					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-					enter-from-class="opacity-0 max-h-0"
-					enter-to-class="opacity-100 max-h-40"
-					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-					leave-from-class="opacity-100 max-h-40"
-					leave-to-class="opacity-0 max-h-0"
-				>
-					<InstallingBanner
-						v-if="
-							(serverData.status === 'installing' || isSyncingContent || contentError) &&
-							syncProgress?.phase !== 'Analyzing'
-						"
-						data-pyro-server-installing
-						class="mb-4"
-						:progress="syncProgress"
-						:content-error="contentError"
-						@retry="handleContentRetry"
+					<div
+						v-if="!isConnected && !isReconnecting && !isLoading"
+						data-pyro-server-ws-error
+						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-red p-4 text-contrast"
 					>
-						<template #icon>
-							<ServerIcon :image="serverImage" class="!h-6 !w-6" />
-						</template>
-					</InstallingBanner>
-				</Transition>
-				<Transition
-					enter-active-class="transition-all duration-300 ease-out overflow-hidden"
-					enter-from-class="opacity-0 max-h-0"
-					enter-to-class="opacity-100 max-h-40"
-					leave-active-class="transition-all duration-200 ease-in overflow-hidden"
-					leave-from-class="opacity-100 max-h-40"
-					leave-to-class="opacity-0 max-h-0"
-				>
-					<Admonition v-if="uploadState.isUploading" type="info" class="mb-4">
-						<template #icon>
-							<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
-						</template>
-						<template #header>
-							Uploading files ({{ uploadState.completedFiles }}/{{ uploadState.totalFiles }})
-							<span v-if="uploadState.currentFileName" class="font-normal text-secondary">
-								— {{ uploadState.currentFileName }}
+						<IssuesIcon class="size-5 text-red" />
+						Something went wrong...
+					</div>
+
+					<div
+						v-if="isReconnecting"
+						data-pyro-server-ws-reconnecting
+						class="mb-4 flex w-full flex-row items-center gap-4 rounded-2xl bg-bg-orange p-4 text-sm text-contrast"
+					>
+						<LoaderCircleIcon class="h-5 w-5 animate-spin" />
+						Hang on, we're reconnecting to your server.
+					</div>
+
+					<Transition
+						enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-40"
+						leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+						leave-from-class="opacity-100 max-h-40"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<InstallingBanner
+							v-if="
+								(serverData.status === 'installing' || isSyncingContent || contentError) &&
+								syncProgress?.phase !== 'Analyzing'
+							"
+							data-pyro-server-installing
+							class="mb-4"
+							:progress="syncProgress"
+							:content-error="contentError"
+							@retry="handleContentRetry"
+						>
+							<template #icon>
+								<ServerIcon :image="serverImage" class="!h-6 !w-6" />
+							</template>
+						</InstallingBanner>
+					</Transition>
+					<Transition
+						enter-active-class="transition-all duration-300 ease-out overflow-hidden"
+						enter-from-class="opacity-0 max-h-0"
+						enter-to-class="opacity-100 max-h-40"
+						leave-active-class="transition-all duration-200 ease-in overflow-hidden"
+						leave-from-class="opacity-100 max-h-40"
+						leave-to-class="opacity-0 max-h-0"
+					>
+						<Admonition v-if="uploadState.isUploading" type="info" class="mb-4">
+							<template #icon>
+								<UploadIcon class="h-6 w-6 flex-none text-brand-blue" />
+							</template>
+							<template #header>
+								Uploading files ({{ uploadState.completedFiles }}/{{ uploadState.totalFiles }})
+								<span v-if="uploadState.currentFileName" class="font-normal text-secondary">
+									— {{ uploadState.currentFileName }}
+								</span>
+							</template>
+							<span class="text-secondary">
+								{{ formatBytes(uploadState.uploadedBytes) }} /
+								{{ formatBytes(uploadState.totalBytes) }} ({{
+									Math.round(uploadOverallProgress * 100)
+								}}%)
 							</span>
-						</template>
-						<span class="text-secondary">
-							{{ formatBytes(uploadState.uploadedBytes) }} /
-							{{ formatBytes(uploadState.totalBytes) }} ({{
-								Math.round(uploadOverallProgress * 100)
-							}}%)
-						</span>
-						<template v-if="cancelUpload" #top-right-actions>
-							<ButtonStyled type="outlined" color="blue">
-								<button class="!border" @click="cancelUpload?.()">Cancel</button>
-							</ButtonStyled>
-						</template>
-						<template #progress>
-							<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
-						</template>
-					</Admonition>
-				</Transition>
-				<FileOperationAdmonitions class="mb-4" />
-				<BackupProgressAdmonitions class="mb-4" />
-				<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
-			</div>
+							<template v-if="cancelUpload" #top-right-actions>
+								<ButtonStyled type="outlined" color="blue">
+									<button class="!border" @click="cancelUpload?.()">Cancel</button>
+								</ButtonStyled>
+							</template>
+							<template #progress>
+								<ProgressBar :progress="uploadOverallProgress" :max="1" color="blue" full-width />
+							</template>
+						</Admonition>
+					</Transition>
+					<FileOperationAdmonitions class="mb-4" />
+					<BackupProgressAdmonitions class="mb-4" />
+					<slot :on-reinstall="onReinstall" :on-reinstall-failed="onReinstallFailed" />
+				</div>
+			</template>
 		</template>
 	</div>
 	<div
@@ -527,6 +533,7 @@ const errorTitle = ref('Error')
 const errorMessage = ref('An unexpected error occurred.')
 const errorLog = ref('')
 const errorLogFile = ref('')
+const isOnboarding = computed(() => serverData.value?.flows?.intro)
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()

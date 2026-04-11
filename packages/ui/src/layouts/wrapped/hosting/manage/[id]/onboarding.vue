@@ -1,7 +1,7 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-6 max-w-[500px]">
+	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-16 max-w-[500px]">
 		<div class="flex flex-col gap-2 w-full">
-			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth</h2>
+			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth Hosting</h2>
 			<p class="m-0 text-base text-secondary">
 				Your server is ready. Here's what you need to do to start playing!
 			</p>
