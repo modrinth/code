@@ -10,7 +10,7 @@
 		"
 		:class="{ 'h-full': fullscreen }"
 	>
-		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden mb-2">
+		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
 			<div ref="containerRef" class="size-full mt-0.5" />
 			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
@@ -203,6 +203,10 @@ defineExpose({
 <style>
 .xterm {
 	height: 100% !important;
+}
+
+.xterm-viewport {
+	background-color: var(--surface-2) !important;
 }
 
 .xterm .xterm-screen {
