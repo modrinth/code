@@ -12,6 +12,7 @@ import QrcodeVue from 'qrcode.vue'
 import { computed, nextTick, ref } from 'vue'
 
 import { injectNotificationManager } from '#ui/providers'
+
 import { Button, ButtonStyled, NewModal, StyledInput } from '../index'
 
 const props = defineProps({

@@ -62,8 +62,8 @@ import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
-
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
+
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
 import {
