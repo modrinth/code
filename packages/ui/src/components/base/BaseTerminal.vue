@@ -203,6 +203,11 @@ defineExpose({
 	margin-right: auto;
 }
 
+.xterm .xterm-rows {
+	position: relative;
+	z-index: 7;
+}
+
 .xterm .xterm-decoration-container {
 	overflow: visible !important;
 }
