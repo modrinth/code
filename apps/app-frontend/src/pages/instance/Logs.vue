@@ -61,23 +61,27 @@ const {
 
 await hydrate()
 
+function buildLogList(rawLogs) {
+	return [
+		{ name: 'Live Log', live: true },
+		...rawLogs
+			.filter(
+				(log) =>
+					log.filename !== 'latest_stdout.log' &&
+					log.filename !== 'latest_stdout' &&
+					log.filename !== 'launcher_log.txt' &&
+					log.stdout !== '' &&
+					(log.filename.includes('.log') || log.filename.endsWith('.txt')),
+			)
+			.map((log) => ({
+				...log,
+				name: log.filename || 'Unknown',
+			})),
+	]
+}
+
 const allLogs = await getHistoricalLogs(props.instance.path)
-const logs = ref([
-	{ name: 'Live Log', live: true },
-	...allLogs
-		.filter(
-			(log) =>
-				log.filename !== 'latest_stdout.log' &&
-				log.filename !== 'latest_stdout' &&
-				log.filename !== 'launcher_log.txt' &&
-				log.stdout !== '' &&
-				(log.filename.includes('.log') || log.filename.endsWith('.txt')),
-		)
-		.map((log) => ({
-			...log,
-			name: log.filename || 'Unknown',
-		})),
-])
+const logs = ref(buildLogList(allLogs))
 
 const selectedLogIndex = ref(0)
 const isLive = computed(() => selectedLogIndex.value === 0)
@@ -112,6 +116,7 @@ provideConsoleManager({
 		activeConsole.value.clear()
 	},
 	shareDisabled: computed(() => props.offline),
+	emptyStateType: 'instance',
 })
 
 watch(selectedLogIndex, async (newIndex) => {
@@ -137,11 +142,7 @@ watch(selectedLogIndex, async (newIndex) => {
 	}
 })
 
-if (filteredLogs.value.length > 1 && !props.playing) {
-	selectedLogIndex.value = 1
-} else {
-	selectedLogIndex.value = 0
-}
+selectedLogIndex.value = 0
 
 const unlistenLog = await log_listener((payload) => {
 	if (payload.profile_path_id !== profilePathId.value) return
@@ -163,25 +164,7 @@ const unlistenProcesses = await process_listener(async (e) => {
 	if (e.event === 'finished') {
 		invalidate()
 		const freshLogs = await getHistoricalLogs(props.instance.path)
-		logs.value = [
-			{ name: 'Live Log', live: true },
-			...freshLogs
-				.filter(
-					(log) =>
-						log.filename !== 'latest_stdout.log' &&
-						log.filename !== 'latest_stdout' &&
-						log.filename !== 'launcher_log.txt' &&
-						log.stdout !== '' &&
-						(log.filename.includes('.log') || log.filename.endsWith('.txt')),
-				)
-				.map((log) => ({
-					...log,
-					name: log.filename || 'Unknown',
-				})),
-		]
-		if (filteredLogs.value.length > 1) {
-			selectedLogIndex.value = 1
-		}
+		logs.value = buildLogList(freshLogs)
 	}
 })
 

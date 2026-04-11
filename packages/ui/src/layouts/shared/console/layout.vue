@@ -1,7 +1,11 @@
 <template>
 	<div
 		class="flex min-h-0 flex-1 flex-col gap-4"
-		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 py-10' : ''"
+		:class="
+			isFullscreen
+				? `fixed inset-0 z-50 bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}`
+				: ''
+		"
 	>
 		<div class="flex items-center gap-2">
 			<StyledInput
@@ -86,6 +90,7 @@ const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const shareModal = ref<InstanceType<typeof ShareModal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
+const isApp = typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__
 const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)

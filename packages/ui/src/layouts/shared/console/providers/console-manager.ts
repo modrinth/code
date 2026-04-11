@@ -21,7 +21,7 @@ export interface ConsoleManagerContext {
 
 	shareDisabled?: Ref<boolean> | ComputedRef<boolean>
 
-	emptyStateType?: 'server'
+	emptyStateType?: 'server' | 'instance'
 }
 
 export const [injectConsoleManager, provideConsoleManager] = createContext<ConsoleManagerContext>(

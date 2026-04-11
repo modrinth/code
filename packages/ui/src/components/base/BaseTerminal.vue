@@ -1,13 +1,7 @@
 <template>
 	<div
 		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="
-			fullscreen && snappedHeight
-				? { maxHeight: snappedHeight + 'px' }
-				: !fullscreen && componentHeight
-					? { minHeight: componentHeight + 'px' }
-					: {}
-		"
+		:style="!fullscreen && componentHeight ? { minHeight: componentHeight + 'px' } : {}"
 		:class="{ 'h-full': fullscreen }"
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
@@ -53,7 +47,7 @@ const props = withDefaults(
 		showInput?: boolean
 		disableInput?: boolean
 		fullscreen?: boolean
-		emptyStateType?: 'server'
+		emptyStateType?: 'server' | 'instance'
 	}>(),
 	{
 		scrollback: Infinity,
@@ -64,11 +58,7 @@ const props = withDefaults(
 	},
 )
 
-const SERVER_EMPTY_STATE = [
-	'   __________________________________________________',
-	' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
-	'|   Press the green start button to start your server! |',
-	' \\____________________________________________________/',
+const FROG = [
 	'\x1B[32m     _    _ \x1B[37m',
 	'\x1B[32m    (o)--(o)      \x1B[37m',
 	'\x1B[32m   /.______.\\\x1B[37m',
@@ -78,6 +68,21 @@ const SERVER_EMPTY_STATE = [
 	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
 	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
 ]
+
+const EMPTY_STATE_BUBBLES: Record<string, string[]> = {
+	server: [
+		'   __________________________________________________',
+		' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
+		'|   Press the green start button to start your server! |',
+		' \\____________________________________________________/',
+	],
+	instance: [
+		'   _____________________________________________________________',
+		' /  Start your instance in the top right to start               \\',
+		'|   recieving live logs!                                        |',
+		' \\_____________________________________________________________/',
+	],
+}
 
 const emit = defineEmits<{
 	command: [command: string]
@@ -125,8 +130,9 @@ const {
 function writeEmptyState() {
 	if (!terminal.value || !props.emptyStateType) return
 	terminal.value.reset()
-	if (props.emptyStateType === 'server') {
-		for (const line of SERVER_EMPTY_STATE) {
+	const bubble = EMPTY_STATE_BUBBLES[props.emptyStateType]
+	if (bubble) {
+		for (const line of [...bubble, ...FROG]) {
 			terminal.value.writeln(line)
 		}
 	}
