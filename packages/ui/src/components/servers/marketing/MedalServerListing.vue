@@ -145,7 +145,6 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { NuxtModrinthClient } from '@modrinth/api-client'
 import { LockIcon, RocketIcon, SparklesIcon, SpinnerIcon } from '@modrinth/assets'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
@@ -187,7 +186,7 @@ const { formatMessage } = useVIntl()
 const client = injectModrinthClient()
 const router = useRouter()
 
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
+// const isNuxt = computed(() => client instanceof NuxtModrinthClient)
 
 const showGameLabel = computed(() => !!props.game)
 const showLoaderLabel = computed(() => !!props.loader)

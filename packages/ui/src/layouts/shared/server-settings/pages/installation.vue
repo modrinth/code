@@ -75,6 +75,7 @@ import {
 	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
+	initialConsoleMessage,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -82,11 +83,10 @@ import {
 	injectTags,
 	InstallationSettingsLayout,
 	provideInstallationSettings,
-	initialConsoleMessage,
-	useModrinthServersConsole,
 	ServerSetupModal,
 	UploadProgressModal,
 	useDebugLogger,
+	useModrinthServersConsole,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'

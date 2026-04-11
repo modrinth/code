@@ -163,9 +163,7 @@
 							<template #popper>
 								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
 									<div class="flex min-w-48 items-center justify-between gap-8">
-										<h3
-											class="m-0 whitespace-nowrap text-base font-bold text-contrast"
-										>
+										<h3 class="m-0 whitespace-nowrap text-base font-bold text-contrast">
 											{{ formatMessage(settingsHintMessages.title) }}
 										</h3>
 										<ButtonStyled size="small" circular>
@@ -177,9 +175,7 @@
 											</button>
 										</ButtonStyled>
 									</div>
-									<p
-										class="m-0 text-wrap text-sm font-medium leading-tight text-secondary"
-									>
+									<p class="m-0 text-wrap text-sm font-medium leading-tight text-secondary">
 										{{ formatMessage(settingsHintMessages.description) }}
 									</p>
 								</div>
@@ -1561,7 +1557,6 @@ onUnmounted(() => {
 .server-action-buttons-anim {
 	animation: server-action-buttons-anim 0.2s ease-out;
 }
-
 
 .server-panel-pending .server-stagger-item {
 	opacity: 0;

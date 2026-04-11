@@ -5,11 +5,7 @@
 </template>
 
 <script setup>
-import {
-	ConsolePageLayout,
-	injectNotificationManager,
-	provideConsoleManager,
-} from '@modrinth/ui'
+import { ConsolePageLayout, injectNotificationManager, provideConsoleManager } from '@modrinth/ui'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 

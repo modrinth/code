@@ -25,7 +25,11 @@
 					</div>
 
 					<div
-						v-if="props.server?.loader && props.server?.net?.domain && !userPreferences.hideSubdomainLabel"
+						v-if="
+							props.server?.loader &&
+							props.server?.net?.domain &&
+							!userPreferences.hideSubdomainLabel
+						"
 						class="h-1.5 w-1.5 rounded-full bg-surface-5"
 					/>
 
@@ -82,7 +86,11 @@ import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 
 import { AutoLink, Avatar, ContentPageHeader, ServerIcon } from '#ui/components'
-import { injectModrinthClient, injectModrinthServerContext, injectNotificationManager } from '#ui/providers'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	injectNotificationManager,
+} from '#ui/providers'
 
 type ServerProjectSummary = {
 	id: string
