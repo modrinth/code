@@ -122,7 +122,7 @@
 	>
 		<div
 			v-if="revealState === 'pending' && !isOnboarding"
-			class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4"
+			class="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 relative bottom-12"
 		>
 			<LoaderCircleIcon class="size-16 animate-spin" />
 			<span class="text-secondary">{{ formatMessage(loadingMessages.loadingServerPanel) }}</span>

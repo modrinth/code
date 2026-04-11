@@ -208,6 +208,7 @@ defineExpose({
 }
 
 .xterm .xterm-decoration-container > div {
+	box-sizing: content-box !important;
 	margin-left: -12px !important;
 	padding-left: 12px !important;
 	padding-right: 12px !important;

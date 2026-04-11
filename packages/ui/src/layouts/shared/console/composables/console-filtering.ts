@@ -38,6 +38,8 @@ export function colorize(line: LogLine, searchQuery?: string): string {
 	}
 }
 
+export type ConditionalLevel = 'debug' | 'trace'
+
 export function useConsoleFilters() {
 	const activeFilters = ref<Set<LogLevel | 'all'>>(new Set(['all']))
 

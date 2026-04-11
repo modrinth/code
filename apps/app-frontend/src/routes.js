@@ -248,7 +248,8 @@ export default new createRouter({
 	],
 	linkActiveClass: 'router-link-active',
 	linkExactActiveClass: 'router-link-exact-active',
-	scrollBehavior() {
+	scrollBehavior(to, from) {
+		if (to.path === from.path) return
 		// Sometimes Vue's scroll behavior is not working as expected, so we need to manually scroll to top (especially on Linux)
 		document.querySelector('.app-viewport')?.scrollTo(0, 0)
 		return {
