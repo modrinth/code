@@ -9,10 +9,11 @@
 		<ButtonStyled type="transparent">
 			<button
 				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
-				:disabled="shareDisabled"
+				:disabled="shareDisabled || sharing"
 				@click="emit('share')"
 			>
-				<ShareIcon />
+				<SpinnerIcon v-if="sharing" class="animate-spin" />
+				<ShareIcon v-else />
 				Share
 			</button>
 		</ButtonStyled>
@@ -26,13 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { ExpandIcon, ShareIcon, XIcon } from '@modrinth/assets'
+import { ExpandIcon, ShareIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 defineProps<{
 	shareDisabled?: boolean
 	shareDisabledTooltip?: string
+	sharing?: boolean
 }>()
 
 const emit = defineEmits<{

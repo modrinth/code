@@ -13,14 +13,13 @@
 					input-class="!h-10"
 					clearable
 				/>
-				<DropdownSelect
-					v-if="ctx.logSources?.value && ctx.activeLogSourceIndex"
-					:model-value="ctx.logSources.value[ctx.activeLogSourceIndex.value]?.name"
-					:options="ctx.logSources.value.map((s) => s.name)"
-					name="log-source"
-					class="w-[220px]"
-					@update:model-value="handleLogSourceChange"
-				/>
+				<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
+					<Combobox
+						:model-value="ctx.activeLogSourceIndex.value"
+						:options="logSourceOptions"
+						@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
+					/>
+				</div>
 			</div>
 
 			<div class="flex items-center justify-between">
@@ -28,6 +27,7 @@
 				<ConsoleActionButtons
 					:share-disabled="resolvedShareDisabled || !hasLogs"
 					:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
+					:sharing="isSharing"
 					@clear="handleClear"
 					@share="handleShare"
 					@expand="enterFullscreen"
@@ -54,7 +54,7 @@ import type { Terminal } from '@xterm/xterm'
 import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
-import DropdownSelect from '#ui/components/base/DropdownSelect.vue'
+import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
 import { injectPageContext } from '#ui/providers/page-context'
@@ -78,8 +78,12 @@ const pageContext = injectPageContext()
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
+const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)
+const logSourceOptions = computed(() =>
+	(ctx.logSources?.value ?? []).map((s, i) => ({ value: i, label: s.name })),
+)
 
 function buildCombinedPredicate(): ((line: LogLine) => boolean) | null {
 	const levelPred = buildFilterPredicate()
@@ -227,6 +231,7 @@ async function handleShare() {
 	const lines = predicate ? ctx.logLines.value.filter(predicate) : ctx.logLines.value
 	const content = lines.map((l) => l.text).join('\n')
 
+	isSharing.value = true
 	try {
 		const res = await fetch('https://api.mclo.gs/1/log', {
 			method: 'POST',
@@ -239,14 +244,8 @@ async function handleShare() {
 		}
 	} catch (err) {
 		console.error('Failed to share logs:', err)
-	}
-}
-
-function handleLogSourceChange(name: string) {
-	if (!ctx.logSources?.value || !ctx.activeLogSourceIndex) return
-	const idx = ctx.logSources.value.findIndex((s) => s.name === name)
-	if (idx >= 0) {
-		ctx.activeLogSourceIndex.value = idx
+	} finally {
+		isSharing.value = false
 	}
 }
 </script>

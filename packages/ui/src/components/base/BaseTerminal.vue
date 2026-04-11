@@ -23,7 +23,7 @@
 					</button>
 				</ButtonStyled>
 			</div>
-			<div v-if="!isAtBottom" class="absolute bottom-4 right-4">
+			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
 				<ButtonStyled circular type="highlight" size="large">
 					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
 						<ChevronDownIcon />
