@@ -26,7 +26,7 @@ import {
 	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
-	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
@@ -1045,7 +1045,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
 				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
 			>
-				<ServerIcon />
+				<ServerStackIcon />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1260,7 +1260,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
 					<Suspense
-						@pending="suspensePending = true; loading.startLoading()"
+						@pending="
+							() => {
+								suspensePending = true
+								loading.startLoading()
+							}
+						"
 						@resolve="loading.stopLoading()"
 					>
 						<component :is="Component"></component>
