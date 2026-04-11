@@ -193,11 +193,12 @@ function formatLog4jLines(event: Log4jEvent): LogLine[] {
 	const levelStr = event.level ?? ''
 	const message = event.message?.trim() ?? ''
 
-	const text = time
-		? `${time} [${thread}/${levelStr}]: ${message}`
-		: `[${thread}/${levelStr}]: ${message}`
-
-	const lines: LogLine[] = [{ text, level }]
+	const prefix = time ? `${time} [${thread}/${levelStr}]: ` : `[${thread}/${levelStr}]: `
+	const messageLines = message.split(/\r?\n/)
+	const lines: LogLine[] = [{ text: prefix + messageLines[0], level }]
+	for (let i = 1; i < messageLines.length; i++) {
+		lines.push({ text: messageLines[i], level })
+	}
 
 	if (event.throwable) {
 		for (const line of event.throwable.split('\n').filter(Boolean)) {
@@ -285,6 +286,16 @@ export function createConsoleState() {
 			.split('\n')
 			.filter((l) => l.trim())
 			.map(textToLogLine)
+
+		let parentLevel: LogLevel | null = null
+		for (const line of logLines) {
+			if (ENTRY_START_RE.test(line.text)) {
+				parentLevel = line.level
+			} else if (line.level === null && parentLevel !== null) {
+				line.level = parentLevel
+			}
+		}
+
 		addLines(logLines)
 	}
 

@@ -5,7 +5,12 @@
 </template>
 
 <script setup>
-import { ConsolePageLayout, injectNotificationManager, provideConsoleManager } from '@modrinth/ui'
+import {
+	ConsolePageLayout,
+	injectModrinthClient,
+	injectNotificationManager,
+	provideConsoleManager,
+} from '@modrinth/ui'
 import { computed, onUnmounted, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -13,6 +18,7 @@ import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { log_listener, process_listener } from '@/helpers/events.js'
 import { get_output_by_filename } from '@/helpers/logs.js'
 
+const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
 const route = useRoute()
 
@@ -106,6 +112,23 @@ watchEffect(() => {
 	triggerRef(logLines)
 })
 
+const crashAnalysis = ref(null)
+
+async function analyseForCrash() {
+	const lines = liveConsole.output.value
+	if (lines.length === 0) return
+
+	const content = lines.map((l) => l.text).join('\n')
+	try {
+		const data = await client.mclogs.insights_v1.analyse(content)
+		if (data.analysis?.problems?.length > 0) {
+			crashAnalysis.value = data
+		}
+	} catch {
+		// Crash analysis is best-effort
+	}
+}
+
 provideConsoleManager({
 	logLines,
 	logSources,
@@ -117,6 +140,10 @@ provideConsoleManager({
 	},
 	shareDisabled: computed(() => props.offline),
 	emptyStateType: 'instance',
+	crashAnalysis,
+	onDismissCrash: () => {
+		crashAnalysis.value = null
+	},
 })
 
 watch(selectedLogIndex, async (newIndex) => {
@@ -144,6 +171,10 @@ watch(selectedLogIndex, async (newIndex) => {
 
 selectedLogIndex.value = 0
 
+if (!props.playing) {
+	void analyseForCrash()
+}
+
 const unlistenLog = await log_listener((payload) => {
 	if (payload.profile_path_id !== profilePathId.value) return
 
@@ -165,6 +196,7 @@ const unlistenProcesses = await process_listener(async (e) => {
 		invalidate()
 		const freshLogs = await getHistoricalLogs(props.instance.path)
 		logs.value = buildLogList(freshLogs)
+		void analyseForCrash()
 	}
 })
 

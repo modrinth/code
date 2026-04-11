@@ -25,7 +25,8 @@
 			"allow": [
 				{ "url": "https://modrinth.com/*" },
 				{ "url": "https://*.modrinth.com/*" },
-				{ "url": "https://*.nodes.modrinth.com/*" }
+				{ "url": "https://*.nodes.modrinth.com/*" },
+				{ "url": "https://api.mclo.gs/*" }
 			]
 		},
 

@@ -1,11 +1,7 @@
 <template>
 	<div
 		class="flex min-h-0 flex-1 flex-col gap-4"
-		:class="
-			isFullscreen
-				? `fixed inset-0 z-50 bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}`
-				: ''
-		"
+		:class="isFullscreen ? `fixed inset-0 z-50 bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : ''"
 	>
 		<div class="flex items-center gap-2">
 			<StyledInput
@@ -43,6 +39,15 @@
 			/>
 		</div>
 
+		<CollapsibleAdmonition
+			v-if="ctx.crashAnalysis?.value"
+			type="critical"
+			:header="crashHeader"
+			:items="crashItems"
+			dismissible
+			@dismiss="ctx.onDismissCrash?.()"
+		/>
+
 		<BaseTerminal
 			ref="terminalRef"
 			class="min-h-0 flex-1"
@@ -63,9 +68,12 @@ import type { Terminal } from '@xterm/xterm'
 import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
+import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleAdmonition.vue'
+import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
+import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
 import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
@@ -83,14 +91,30 @@ import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
+const client = injectModrinthClient()
 const modalBehavior = injectModalBehavior()
 const { addNotification } = injectNotificationManager()
+
+const crashHeader = computed(() => {
+	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
+	const count = problems.length
+	return `${count} problem${count !== 1 ? 's' : ''} detected`
+})
+
+const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {
+	const problems = ctx.crashAnalysis?.value?.analysis.problems ?? []
+	return problems.map((p) => ({
+		title: p.message,
+		descriptions: p.solutions.map((s) => s.message),
+	}))
+})
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const shareModal = ref<InstanceType<typeof ShareModal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
-const isApp = typeof window !== 'undefined' && !!(window as any).__TAURI_INTERNALS__
+const isApp =
+	typeof window !== 'undefined' && !!(window as Record<string, unknown>).__TAURI_INTERNALS__
 const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)
@@ -131,9 +155,12 @@ onBeforeUnmount(() => {
 	}
 	themeObserver?.disconnect()
 	themeObserver = null
+	highlightAddon?.dispose()
+	highlightAddon = null
 })
 
 let lastWrittenIndex = 0
+let manuallyCleared = false
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
 let highlightAddon: LogHighlightAddon | null = null
 let themeObserver: MutationObserver | null = null
@@ -185,8 +212,13 @@ function activeSearchQuery(): string {
 function rewriteFiltered() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
-	const predicate = buildCombinedPredicate()
 	const lines = ctx.logLines.value
+	if (lines.length === 0 && isLiveSource.value) {
+		writeEmptyState()
+		return
+	}
+	terminalRef.value?.clearEmptyState()
+	const predicate = buildCombinedPredicate()
 	const filtered = predicate ? lines.filter(predicate) : lines
 	highlightAddon?.clearAll()
 	rewriteTerminal(term, lines, predicate, activeSearchQuery(), () => {
@@ -243,9 +275,13 @@ watch(ctx.logLines, (lines, oldLines) => {
 	if (!term) return
 
 	if (lines.length === 0 && isLiveSource.value) {
-		writeEmptyState()
+		if (!manuallyCleared) {
+			writeEmptyState()
+		}
 		return
 	}
+
+	manuallyCleared = false
 
 	if (
 		terminalRef.value?.showingEmptyState ||
@@ -291,6 +327,7 @@ function handleCommand(cmd: string) {
 }
 
 function handleClear() {
+	manuallyCleared = true
 	terminalRef.value?.reset()
 	highlightAddon?.clearAll()
 	lastWrittenIndex = 0
@@ -304,12 +341,7 @@ async function handleShare() {
 
 	isSharing.value = true
 	try {
-		const res = await fetch('https://api.mclo.gs/1/log', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: new URLSearchParams({ content }),
-		})
-		const data = await res.json()
+		const data = await client.mclogs.logs_v1.create(content)
 		if (data.url) {
 			shareModal.value?.show(data.url)
 		}

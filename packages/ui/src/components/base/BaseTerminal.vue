@@ -97,7 +97,7 @@ const componentHeight = ref(0)
 
 const snappedHeight = ref<number | null>(null)
 
-let showingEmptyState = false
+const showingEmptyState = ref(false)
 
 const {
 	terminal,
@@ -117,9 +117,6 @@ const {
 			updateComponentHeight()
 			snapToRows()
 		})
-		if (props.emptyStateType) {
-			writeEmptyState()
-		}
 		emit('ready', term)
 	},
 	onResize: () => {
@@ -136,13 +133,13 @@ function writeEmptyState() {
 			terminal.value.writeln(line)
 		}
 	}
-	showingEmptyState = true
+	showingEmptyState.value = true
 }
 
 function clearEmptyState() {
-	if (!showingEmptyState) return
+	if (!showingEmptyState.value) return
 	terminal.value?.reset()
-	showingEmptyState = false
+	showingEmptyState.value = false
 }
 
 function getWrapperMargins() {
