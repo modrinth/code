@@ -1,50 +1,47 @@
 <template>
 	<div
-		class="flex min-h-0 flex-1 flex-col"
-		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 pt-12' : 'gap-4'"
+		class="flex min-h-0 flex-1 flex-col gap-4"
+		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6' : ''"
 	>
-		<template v-if="!isFullscreen">
-			<div class="flex items-center gap-2">
-				<StyledInput
-					v-model="searchQuery"
-					:icon="SearchIcon"
-					placeholder="Search logs"
-					wrapper-class="flex-1"
-					input-class="!h-10"
-					clearable
+		<div class="flex items-center gap-2">
+			<StyledInput
+				v-model="searchQuery"
+				:icon="SearchIcon"
+				placeholder="Search logs"
+				wrapper-class="flex-1"
+				input-class="!h-10"
+				clearable
+			/>
+			<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
+				<Combobox
+					:model-value="ctx.activeLogSourceIndex.value"
+					:options="logSourceOptions"
+					@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
 				/>
-				<div v-if="ctx.logSources?.value && ctx.activeLogSourceIndex" class="w-[220px]">
-					<Combobox
-						:model-value="ctx.activeLogSourceIndex.value"
-						:options="logSourceOptions"
-						@update:model-value="(v) => (ctx.activeLogSourceIndex!.value = v)"
-					/>
-				</div>
 			</div>
+		</div>
 
-			<div class="flex items-center justify-between">
-				<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
-				<ConsoleActionButtons
-					:show-clear="isLiveSource"
-					:share-disabled="resolvedShareDisabled || !hasLogs"
-					:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
-					:sharing="isSharing"
-					@clear="handleClear"
-					@share="handleShare"
-					@expand="enterFullscreen"
-				/>
-			</div>
-		</template>
+		<div class="flex items-center justify-between">
+			<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
+			<ConsoleActionButtons
+				:show-clear="isLiveSource"
+				:share-disabled="resolvedShareDisabled || !hasLogs"
+				:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
+				:sharing="isSharing"
+				:fullscreen="isFullscreen"
+				@clear="handleClear"
+				@share="handleShare"
+				@toggle-fullscreen="toggleFullscreen"
+			/>
+		</div>
 
 		<BaseTerminal
 			ref="terminalRef"
 			class="min-h-0 flex-1"
-			:class="{ 'my-auto': isFullscreen }"
 			:show-input="resolvedShowInput"
 			:fullscreen="isFullscreen"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
-			@exit-fullscreen="exitFullscreen"
 		/>
 	</div>
 </template>
@@ -166,29 +163,41 @@ function rewriteFiltered() {
 	lastWrittenIndex = lines.length
 }
 
-function enterFullscreen() {
-	isFullscreen.value = true
-	document.body.style.overflow = 'hidden'
-	modalBehavior?.onShow?.()
+function toggleFullscreen() {
+	isFullscreen.value = !isFullscreen.value
+	if (isFullscreen.value) {
+		document.body.style.overflow = 'hidden'
+		modalBehavior?.onShow?.()
+	} else {
+		document.body.style.overflow = ''
+		modalBehavior?.onHide?.()
+	}
 	nextTick(() => {
 		terminalRef.value?.fit()
 	})
 }
 
-function exitFullscreen() {
-	isFullscreen.value = false
-	document.body.style.overflow = ''
-	modalBehavior?.onHide?.()
-	nextTick(() => {
-		terminalRef.value?.fit()
-	})
+let showingEmptyState = false
+
+function writeEmptyState() {
+	const term = terminalRef.value?.terminal
+	if (!term) return
+	term.reset()
+	term.write('\x1b[2m Start your instance to start receiving live logs.\x1b[0m')
+	showingEmptyState = true
+	lastWrittenIndex = 0
 }
 
 function writeAllLines() {
 	const term = terminalRef.value?.terminal
 	if (!term) return
-	const predicate = buildCombinedPredicate()
 	const lines = ctx.logLines.value
+	if (lines.length === 0 && isLiveSource.value) {
+		writeEmptyState()
+		return
+	}
+	showingEmptyState = false
+	const predicate = buildCombinedPredicate()
 	const filtered = predicate ? lines.filter(predicate) : lines
 	rewriteTerminal(term, lines, predicate, activeSearchQuery())
 	highlightAddon?.reapply(filtered.map((l) => l.level))
@@ -199,7 +208,13 @@ watch(ctx.logLines, (lines, oldLines) => {
 	const term = terminalRef.value?.terminal
 	if (!term) return
 
-	if (lines !== oldLines || lines.length < lastWrittenIndex) {
+	if (lines.length === 0 && isLiveSource.value) {
+		writeEmptyState()
+		return
+	}
+
+	if (showingEmptyState || lines !== oldLines || lines.length < lastWrittenIndex) {
+		showingEmptyState = false
 		rewriteFiltered()
 		return
 	}

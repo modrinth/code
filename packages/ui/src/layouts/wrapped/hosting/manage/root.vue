@@ -107,7 +107,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within mobile-blurred-servericon relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -1562,32 +1562,6 @@ onUnmounted(() => {
 	animation: server-action-buttons-anim 0.2s ease-out;
 }
 
-.mobile-blurred-servericon::before {
-	position: absolute;
-	left: 0;
-	top: 0;
-	display: block;
-	height: 9rem;
-	width: 100%;
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	filter: blur(1rem);
-	content: '';
-	background-image:
-		linear-gradient(
-			to bottom,
-			rgba(from var(--color-raised-bg) r g b / 0.2),
-			rgb(from var(--color-raised-bg) r g b / 0.8)
-		),
-		var(--server-bg-image);
-}
-
-@media screen and (min-width: 640px) {
-	.mobile-blurred-servericon::before {
-		display: none;
-	}
-}
 
 .server-panel-pending .server-stagger-item {
 	opacity: 0;
