@@ -163,7 +163,7 @@ const calculateMenuPosition = () => {
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
 	const menuRect = menuRef.value.getBoundingClientRect()
-	const menuWidth = menuRect.width
+	const menuWidth = menuRect.width + 16
 	const menuHeight = menuRect.height
 	const margin = 8
 
