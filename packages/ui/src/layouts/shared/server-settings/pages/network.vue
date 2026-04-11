@@ -1,36 +1,40 @@
 <template>
 	<div>
-		<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
-			<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
-				<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
-				<StyledInput
-					id="edit-allocation-name"
-					ref="editAllocationInput"
-					v-model="editAllocationName"
-					wrapper-class="w-full"
-					:maxlength="32"
-					placeholder="e.g. Secondary allocation"
-				/>
-				<div class="mb-1 mt-4 flex justify-end gap-2.5">
-					<ButtonStyled>
-						<button @click="editAllocationModal?.hide()">Cancel</button>
-					</ButtonStyled>
-					<ButtonStyled color="brand">
-						<button :disabled="!editAllocationName || creatingAllocation" type="submit">
-							<SaveIcon /> Update allocation
-						</button>
-					</ButtonStyled>
-				</div>
-			</form>
-		</NewModal>
+		<Teleport to="body">
+			<div class="relative z-[100]">
+				<NewModal ref="editAllocationModal" header="Edit allocation" width="550px">
+					<form class="flex w-full flex-col gap-2" @submit.prevent="editAllocation">
+						<label for="edit-allocation-name" class="font-semibold text-contrast"> Name </label>
+						<StyledInput
+							id="edit-allocation-name"
+							ref="editAllocationInput"
+							v-model="editAllocationName"
+							wrapper-class="w-full"
+							:maxlength="32"
+							placeholder="e.g. Secondary allocation"
+						/>
+						<div class="mb-1 mt-4 flex justify-end gap-2.5">
+							<ButtonStyled>
+								<button @click="editAllocationModal?.hide()">Cancel</button>
+							</ButtonStyled>
+							<ButtonStyled color="brand">
+								<button :disabled="!editAllocationName || creatingAllocation" type="submit">
+									<SaveIcon /> Update allocation
+								</button>
+							</ButtonStyled>
+						</div>
+					</form>
+				</NewModal>
 
-		<ConfirmModal
-			ref="confirmDeleteModal"
-			title="Deleting allocation"
-			:description="`You are deleting the allocation ${allocationToDelete}. This cannot be reserved again. Are you sure you want to proceed?`"
-			proceed-label="Delete"
-			@proceed="confirmDeleteAllocation"
-		/>
+				<ConfirmModal
+					ref="confirmDeleteModal"
+					title="Deleting allocation"
+					:description="`You are deleting the allocation ${allocationToDelete}. This cannot be reserved again. Are you sure you want to proceed?`"
+					proceed-label="Delete"
+					@proceed="confirmDeleteAllocation"
+				/>
+			</div>
+		</Teleport>
 
 		<div class="relative w-full">
 			<div
