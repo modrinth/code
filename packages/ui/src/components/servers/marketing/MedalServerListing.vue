@@ -102,7 +102,7 @@
 				/>
 			</div>
 
-			<div v-if="isNuxt" class="z-10 ml-auto">
+			<div class="z-10 ml-auto">
 				<ButtonStyled color="medal-promo" type="outlined" size="large">
 					<button class="my-auto" data-server-listing-button @click="handleUpgrade">
 						<RocketIcon /> {{ formatMessage(messages.upgradeButton) }}
