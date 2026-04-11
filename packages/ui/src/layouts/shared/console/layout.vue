@@ -22,7 +22,11 @@
 		</div>
 
 		<div class="flex items-center justify-between">
-			<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
+			<ConsoleFilterPills
+				v-model="activeFilters"
+				:present-levels="presentLevels"
+				@toggle="handleFilterToggle"
+			/>
 			<ConsoleActionButtons
 				:show-clear="isLiveSource"
 				:share-disabled="resolvedShareDisabled || !hasLogs"
@@ -67,6 +71,7 @@ import {
 	useConsoleFilters,
 } from './composables'
 import { injectConsoleManager } from './providers'
+import type { ConditionalLevel } from './composables/console-filtering'
 import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
@@ -79,6 +84,15 @@ const isFullscreen = ref(false)
 const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)
+const presentLevels = computed(() => {
+	const levels = new Set<ConditionalLevel>()
+	for (const line of ctx.logLines.value) {
+		if (line.level === 'debug') levels.add('debug')
+		if (line.level === 'trace') levels.add('trace')
+		if (levels.size === 2) break
+	}
+	return levels
+})
 const isLiveSource = computed(() => {
 	const sources = ctx.logSources?.value
 	const index = ctx.activeLogSourceIndex?.value

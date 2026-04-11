@@ -1,5 +1,6 @@
 export {
 	colorize,
+	type ConditionalLevel,
 	type FilterPredicate,
 	rewriteTerminal,
 	useConsoleFilters,

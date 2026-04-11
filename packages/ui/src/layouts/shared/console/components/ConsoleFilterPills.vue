@@ -1,5 +1,5 @@
 <template>
-	<FilterPills v-model="selectedFilters" :options="pillOptions">
+	<FilterPills v-model="selectedFilters" :options="visibleOptions">
 		<template #all> All </template>
 	</FilterPills>
 </template>
@@ -9,17 +9,25 @@ import { computed } from 'vue'
 
 import FilterPills from '#ui/components/base/FilterPills.vue'
 
+import type { ConditionalLevel } from '../composables/console-filtering'
 import type { LogLevel } from '../types'
 
 type FilterValue = LogLevel | 'all'
 
-const LOG_LEVEL_OPTIONS: Array<{ id: LogLevel; label: string }> = [
+const ALWAYS_VISIBLE: Array<{ id: LogLevel; label: string }> = [
 	{ id: 'error', label: 'Error' },
 	{ id: 'warn', label: 'Warn' },
 	{ id: 'info', label: 'Info' },
+]
+
+const CONDITIONAL_OPTIONS: Array<{ id: ConditionalLevel; label: string }> = [
 	{ id: 'debug', label: 'Debug' },
 	{ id: 'trace', label: 'Trace' },
 ]
+
+const props = defineProps<{
+	presentLevels: Set<ConditionalLevel>
+}>()
 
 const modelValue = defineModel<Set<FilterValue>>({ required: true })
 
@@ -27,7 +35,10 @@ const emit = defineEmits<{
 	toggle: [value: FilterValue]
 }>()
 
-const pillOptions = LOG_LEVEL_OPTIONS
+const visibleOptions = computed(() => [
+	...ALWAYS_VISIBLE,
+	...CONDITIONAL_OPTIONS.filter((opt) => props.presentLevels.has(opt.id)),
+])
 
 const selectedFilters = computed({
 	get() {
