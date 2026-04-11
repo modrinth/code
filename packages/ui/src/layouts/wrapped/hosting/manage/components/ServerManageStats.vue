@@ -103,8 +103,18 @@ const padGraph = (data: number[]) => {
 const cpuData = computed(() => padGraph(props.data?.graph.cpu ?? []))
 const ramData = computed(() => padGraph(props.data?.graph.ram ?? []))
 
-onMounted(async () => {
-	apexChartComponent.value = (await import('vue3-apexcharts')).default
+onMounted(() => {
+	const load = async () => {
+		apexChartComponent.value = (await import('vue3-apexcharts')).default
+	}
+	const isMac = navigator.platform.startsWith('Mac')
+	if (isMac && 'requestIdleCallback' in window) {
+		requestIdleCallback(() => void load())
+	} else if (isMac) {
+		setTimeout(() => void load(), 250)
+	} else {
+		void load()
+	}
 })
 
 const onChartReady = (index: number) => {

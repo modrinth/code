@@ -330,8 +330,9 @@ onUnmounted(() => {
 	@apply relative flex w-full rounded-b-2xl border-[1px] border-t-0 border-solid p-4 flex-col gap-4 border-surface-4 bg-bg-raised text-primary;
 }
 
-.hoverable:hover:not(:has([data-subdomain-label]:hover, [data-server-listing-button]:hover)) {
-	filter: brightness(1.2);
+.hoverable:hover:not(:has([data-subdomain-label]:hover, [data-server-listing-button]:hover))
+	.medal-promotion {
+	filter: brightness(1.05) saturate(1.1);
 }
 
 .pressable:active:not(:has([data-subdomain-label]:active, [data-server-listing-button]:active)) {
