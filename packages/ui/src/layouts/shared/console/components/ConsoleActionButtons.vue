@@ -18,16 +18,17 @@
 			</button>
 		</ButtonStyled>
 		<ButtonStyled type="transparent">
-			<button @click="emit('expand')">
-				<ExpandIcon />
-				Expand
+			<button @click="emit('toggle-fullscreen')">
+				<ContractIcon v-if="fullscreen" />
+				<ExpandIcon v-else />
+				{{ fullscreen ? 'Collapse' : 'Expand' }}
 			</button>
 		</ButtonStyled>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ExpandIcon, ShareIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
+import { ContractIcon, ExpandIcon, ShareIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
@@ -36,11 +37,12 @@ defineProps<{
 	shareDisabled?: boolean
 	shareDisabledTooltip?: string
 	sharing?: boolean
+	fullscreen?: boolean
 }>()
 
 const emit = defineEmits<{
 	clear: []
 	share: []
-	expand: []
+	'toggle-fullscreen': []
 }>()
 </script>

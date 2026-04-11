@@ -9,10 +9,12 @@ use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
+use std::sync::LazyLock;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
 use serde::Serialize;
+use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -24,6 +26,61 @@ use tokio::process::{Child, Command};
 use uuid::Uuid;
 
 const LAUNCHER_LOG_PATH: &str = "launcher_log.txt";
+const LOG_BUFFER_CAPACITY: usize = 50_000;
+
+struct LogRingBuffer {
+    lines: VecDeque<String>,
+}
+
+impl LogRingBuffer {
+    fn new() -> Self {
+        Self {
+            lines: VecDeque::new(),
+        }
+    }
+
+    fn push(&mut self, line: String) {
+        if self.lines.len() >= LOG_BUFFER_CAPACITY {
+            self.lines.pop_front();
+        }
+        self.lines.push_back(line);
+    }
+
+    fn get_all(&self) -> Vec<String> {
+        self.lines.iter().cloned().collect()
+    }
+
+    fn clear(&mut self) {
+        self.lines.clear();
+    }
+}
+
+static LOG_BUFFERS: LazyLock<DashMap<String, LogRingBuffer>> =
+    LazyLock::new(DashMap::new);
+
+pub fn push_log_line(profile_path: &str, line: String) {
+    LOG_BUFFERS
+        .entry(profile_path.to_string())
+        .or_insert_with(LogRingBuffer::new)
+        .push(line);
+}
+
+pub fn get_log_buffer(profile_path: &str) -> Vec<String> {
+    LOG_BUFFERS
+        .get(profile_path)
+        .map(|buf| buf.get_all())
+        .unwrap_or_default()
+}
+
+pub fn clear_log_buffer(profile_path: &str) {
+    if let Some(mut buf) = LOG_BUFFERS.get_mut(profile_path) {
+        buf.clear();
+    }
+}
+
+pub fn remove_log_buffer(profile_path: &str) {
+    LOG_BUFFERS.remove(profile_path);
+}
 
 pub struct ProcessManager {
     processes: DashMap<Uuid, Process>,
@@ -94,6 +151,8 @@ impl ProcessManager {
         }
 
         let log_path = logs_folder.join(LAUNCHER_LOG_PATH);
+
+        clear_log_buffer(profile_path);
 
         {
             let mut log_file = OpenOptions::new()
@@ -534,6 +593,15 @@ impl Process {
     }
 
     fn emit_log4j_event(profile_path: &str, event: &Log4jEvent) {
+        if let Some(formatted) = Self::format_log4j_entry(event) {
+            push_log_line(profile_path, formatted.trim_end().to_string());
+        }
+        if let Some(ref throwable) = event.throwable {
+            for line in throwable.lines().filter(|l| !l.is_empty()) {
+                push_log_line(profile_path, line.to_string());
+            }
+        }
+
         #[cfg(feature = "tauri")]
         {
             if let Ok(event_state) = crate::EventState::get() {
@@ -553,6 +621,8 @@ impl Process {
     }
 
     fn emit_legacy_log(profile_path: &str, message: &str) {
+        push_log_line(profile_path, message.to_string());
+
         #[cfg(feature = "tauri")]
         {
             if let Ok(event_state) = crate::EventState::get() {

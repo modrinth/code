@@ -12,17 +12,6 @@
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
 			<div ref="containerRef" class="size-full" />
-			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
-				<ButtonStyled circular type="highlight">
-					<button
-						class="!shadow-none"
-						aria-label="Exit fullscreen"
-						@click="emit('exit-fullscreen')"
-					>
-						<XIcon />
-					</button>
-				</ButtonStyled>
-			</div>
 			<div v-if="!isAtBottom" class="absolute bottom-4 right-4 z-10">
 				<ButtonStyled circular type="highlight" size="large">
 					<button class="!shadow-2xl" aria-label="Scroll to bottom" @click="scrollToBottom">
@@ -49,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon, TerminalSquareIcon, XIcon } from '@modrinth/assets'
+import { ChevronDownIcon, TerminalSquareIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
@@ -73,7 +62,6 @@ const props = withDefaults(
 const emit = defineEmits<{
 	command: [command: string]
 	ready: [terminal: Terminal]
-	'exit-fullscreen': []
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)

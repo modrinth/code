@@ -7,20 +7,18 @@
 <script setup>
 import {
 	ConsolePageLayout,
-	createConsoleState,
 	injectNotificationManager,
 	provideConsoleManager,
 } from '@modrinth/ui'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { log_listener, process_listener } from '@/helpers/events.js'
-import { get_logs, get_output_by_filename } from '@/helpers/logs.js'
+import { get_output_by_filename } from '@/helpers/logs.js'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
-const liveConsole = createConsoleState()
-const historicalConsole = createConsoleState()
 
 const props = defineProps({
 	instance: {
@@ -55,41 +53,38 @@ const props = defineProps({
 	},
 })
 
-const logs = ref([])
-await setLogs()
+const profilePathId = computed(() => route.params.id)
+const {
+	liveConsole,
+	historicalConsole,
+	hydrate,
+	getHistoricalLogs,
+	getHistoricalContent,
+	invalidate,
+} = useInstanceConsole(profilePathId.value)
 
-const selectedLogIndex = ref(0)
+await hydrate()
 
-async function getLogs() {
-	return (await get_logs(props.instance.path, true).catch(handleError))
+const allLogs = await getHistoricalLogs(props.instance.path)
+const logs = ref([
+	{ name: 'Live Log', live: true },
+	...allLogs
 		.filter(
 			(log) =>
 				log.filename !== 'latest_stdout.log' &&
 				log.filename !== 'latest_stdout' &&
+				log.filename !== 'launcher_log.txt' &&
 				log.stdout !== '' &&
 				(log.filename.includes('.log') || log.filename.endsWith('.txt')),
 		)
-		.map((log) => {
-			log.name = log.filename || 'Unknown'
-			log.stdout = 'Loading...'
-			return log
-		})
-}
+		.map((log) => ({
+			...log,
+			name: log.filename || 'Unknown',
+		})),
+])
 
-async function setLogs() {
-	const allLogs = await getLogs()
-	logs.value = [{ name: 'Live Log', live: true }, ...allLogs]
-}
-
+const selectedLogIndex = ref(0)
 const isLive = computed(() => selectedLogIndex.value === 0)
-
-const loadHistoricalLog = () => {
-	const log = filteredLogs.value[selectedLogIndex.value]
-	const text = log?.stdout ?? ''
-	if (!text || text === 'Loading...') return
-	historicalConsole.clear()
-	historicalConsole.addLegacyLog(text)
-}
 
 const filteredLogs = computed(() =>
 	props.playing ? logs.value.filter((l) => l.live || l.name !== 'latest.log') : logs.value,
@@ -121,13 +116,23 @@ watch(selectedLogIndex, async (newIndex) => {
 	if (newIndex === 0) return
 	const log = filteredLogs.value[newIndex]
 	if (!log) return
-	log.stdout = 'Loading...'
-	log.stdout = await get_output_by_filename(
+
+	const cached = getHistoricalContent(log.filename)
+	if (cached) {
+		historicalConsole.clear()
+		historicalConsole.addLegacyLog(cached)
+		return
+	}
+
+	const output = await get_output_by_filename(
 		props.instance.path,
 		log.log_type,
 		log.filename,
 	).catch(handleError)
-	loadHistoricalLog()
+	if (output) {
+		historicalConsole.clear()
+		historicalConsole.addLegacyLog(output)
+	}
 })
 
 if (filteredLogs.value.length > 1 && !props.playing) {
@@ -135,8 +140,6 @@ if (filteredLogs.value.length > 1 && !props.playing) {
 } else {
 	selectedLogIndex.value = 0
 }
-
-const profilePathId = computed(() => route.params.id)
 
 const unlistenLog = await log_listener((payload) => {
 	if (payload.profile_path_id !== profilePathId.value) return
@@ -149,13 +152,34 @@ const unlistenLog = await log_listener((payload) => {
 })
 
 const unlistenProcesses = await process_listener(async (e) => {
+	if (e.profile_path_id !== profilePathId.value) return
 	if (e.event === 'launched') {
 		liveConsole.clear()
+		invalidate()
 		selectedLogIndex.value = 0
 	}
 	if (e.event === 'finished') {
-		await setLogs()
-		selectedLogIndex.value = 1
+		invalidate()
+		const freshLogs = await getHistoricalLogs(props.instance.path)
+		logs.value = [
+			{ name: 'Live Log', live: true },
+			...freshLogs
+				.filter(
+					(log) =>
+						log.filename !== 'latest_stdout.log' &&
+						log.filename !== 'latest_stdout' &&
+						log.filename !== 'launcher_log.txt' &&
+						log.stdout !== '' &&
+						(log.filename.includes('.log') || log.filename.endsWith('.txt')),
+				)
+				.map((log) => ({
+					...log,
+					name: log.filename || 'Unknown',
+				})),
+		]
+		if (filteredLogs.value.length > 1) {
+			selectedLogIndex.value = 1
+		}
 	}
 })
 
