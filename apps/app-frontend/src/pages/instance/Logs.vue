@@ -19,7 +19,8 @@ import { get_logs, get_output_by_filename } from '@/helpers/logs.js'
 
 const { handleError } = injectNotificationManager()
 const route = useRoute()
-const consoleLines = createConsoleState()
+const liveConsole = createConsoleState()
+const historicalConsole = createConsoleState()
 
 const props = defineProps({
 	instance: {
@@ -86,8 +87,8 @@ const loadHistoricalLog = () => {
 	const log = logs.value[selectedLogIndex.value]
 	const text = log?.stdout ?? ''
 	if (!text || text === 'Loading...') return
-	consoleLines.clear()
-	consoleLines.addLegacyLog(text)
+	historicalConsole.clear()
+	historicalConsole.addLegacyLog(text)
 }
 
 const logSources = computed(() =>
@@ -98,23 +99,22 @@ const logSources = computed(() =>
 	})),
 )
 
+const activeConsole = computed(() => (isLive.value ? liveConsole : historicalConsole))
+
 provideConsoleManager({
-	logLines: consoleLines.output,
+	logLines: computed(() => activeConsole.value.output.value),
 	logSources,
 	activeLogSourceIndex: selectedLogIndex,
 	showCommandInput: false,
 	loading: ref(false),
 	onClear: () => {
-		consoleLines.clear()
+		activeConsole.value.clear()
 	},
 	shareDisabled: computed(() => props.offline),
 })
 
 watch(selectedLogIndex, async (newIndex) => {
-	if (newIndex === 0) {
-		consoleLines.clear()
-		return
-	}
+	if (newIndex === 0) return
 	if (logs.value.length > 1) {
 		logs.value[newIndex].stdout = 'Loading...'
 		logs.value[newIndex].stdout = await get_output_by_filename(
