@@ -1029,6 +1029,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="'Library'"
 				to="/library"
+				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
 				:is-subpage="
 					() =>
 						route.path.startsWith('/instance') ||
