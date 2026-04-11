@@ -12,6 +12,7 @@ export interface ConsoleManagerContext {
 
 	sendCommand?: (cmd: string) => void
 	showCommandInput?: boolean | Ref<boolean> | ComputedRef<boolean>
+	disableCommandInput?: boolean | Ref<boolean> | ComputedRef<boolean>
 
 	loading?: Ref<boolean> | ComputedRef<boolean>
 

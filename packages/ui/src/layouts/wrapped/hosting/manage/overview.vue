@@ -109,7 +109,8 @@ provideConsoleManager({
 			console.error('Error sending command:', error)
 		}
 	},
-	showCommandInput: computed(() => serverPowerState.value === 'running'),
+	showCommandInput: true,
+	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
 	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
 	onClear: () => {
 		modrinthServersConsole.clear()

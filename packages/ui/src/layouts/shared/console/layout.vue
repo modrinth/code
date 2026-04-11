@@ -1,7 +1,7 @@
 <template>
 	<div
 		class="flex min-h-0 flex-1 flex-col gap-4"
-		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6' : ''"
+		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 pt-9' : ''"
 	>
 		<div class="flex items-center gap-2">
 			<StyledInput
@@ -43,6 +43,7 @@
 			ref="terminalRef"
 			class="min-h-0 flex-1"
 			:show-input="resolvedShowInput"
+			:disable-input="resolvedDisableInput"
 			:fullscreen="isFullscreen"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
@@ -132,6 +133,12 @@ const resolvedShowInput = computed(() => {
 	const v = ctx.showCommandInput
 	if (v === undefined) return false
 	if (typeof v === 'boolean') return v
+	return isRef(v) ? v.value : v
+})
+
+const resolvedDisableInput = computed(() => {
+	const v = ctx.disableCommandInput
+	if (!v) return false
 	return isRef(v) ? v.value : v
 })
 
