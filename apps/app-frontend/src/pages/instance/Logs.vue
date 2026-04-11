@@ -6,7 +6,7 @@
 
 <script setup>
 import { ConsolePageLayout, injectNotificationManager, provideConsoleManager } from '@modrinth/ui'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, triggerRef, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
@@ -96,8 +96,14 @@ const logSources = computed(() =>
 
 const activeConsole = computed(() => (isLive.value ? liveConsole : historicalConsole))
 
+const logLines = shallowRef(activeConsole.value.output.value)
+watchEffect(() => {
+	logLines.value = activeConsole.value.output.value
+	triggerRef(logLines)
+})
+
 provideConsoleManager({
-	logLines: computed(() => activeConsole.value.output.value),
+	logLines,
 	logSources,
 	activeLogSourceIndex: selectedLogIndex,
 	showCommandInput: false,

@@ -78,14 +78,20 @@ export function rewriteTerminal(
 	allLines: LogLine[],
 	predicate: FilterPredicate | null,
 	searchQuery?: string,
+	callback?: () => void,
 ) {
 	terminal.reset()
 	terminal.write('\x1b[?25l')
 
 	const filtered = predicate ? allLines.filter(predicate) : allLines
-	if (filtered.length === 0) return
+	if (filtered.length === 0) {
+		callback?.()
+		return
+	}
 
 	terminal.write('\x1b[?2026h')
-	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n') + '\r\n')
-	terminal.write('\x1b[?2026l')
+	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n') + '\r\n', () => {
+		terminal.write('\x1b[?2026l')
+		callback?.()
+	})
 }

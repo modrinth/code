@@ -19,6 +19,8 @@ interface TrackedLine {
 	wraps: IDecoration[]
 }
 
+type HighlightClass = 'hl-error-primary' | 'hl-error-wrap' | 'hl-warn-primary' | 'hl-warn-wrap'
+
 const LOG_ENTRY_START = /^\[\d{2}:\d{2}:\d{2}\]/
 
 function parseHex(hex: string): [number, number, number] {
@@ -50,11 +52,9 @@ export function computeHighlightColors(): HighlightColors {
 export class LogHighlightAddon implements ITerminalAddon {
 	private terminal: Terminal | null = null
 	private tracked: TrackedLine[] = []
-	private pendingLevels: Array<'error' | 'warn' | null> = []
-	private pendingReapply: Array<LogLevel | null> | null = null
-	private lastProcessedLine = 0
 	private colors: HighlightColors
 	private disposables: IDisposable[] = []
+	private styleElement: HTMLStyleElement | null = null
 
 	constructor(colors: HighlightColors) {
 		this.colors = colors
@@ -62,82 +62,27 @@ export class LogHighlightAddon implements ITerminalAddon {
 
 	activate(terminal: Terminal): void {
 		this.terminal = terminal
-		this.disposables.push(
-			terminal.onWriteParsed(() => this.onWriteParsed()),
-			terminal.onResize(() => this.handleResize()),
-		)
+		this.injectStylesheet()
+		this.disposables.push(terminal.onResize(() => this.rebuildAllDecorations()))
 	}
 
 	dispose(): void {
 		for (const d of this.disposables) d.dispose()
 		this.disposables = []
-		this.clearTracked()
+		this.clearAll()
+		this.styleElement?.remove()
+		this.styleElement = null
 		this.terminal = null
 	}
 
-	pushLevel(level: LogLevel | null): void {
-		if (level === 'error' || level === 'warn') {
-			this.pendingLevels.push(level)
-		} else {
-			this.pendingLevels.push(null)
-		}
-	}
-
-	reapply(levels: Array<LogLevel | null>): void {
-		this.clearTracked()
-		this.pendingLevels = []
-		this.lastProcessedLine = 0
-		this.pendingReapply = levels
-	}
-
-	updateColors(colors: HighlightColors): void {
-		this.colors = colors
-		this.rebuildAllDecorations()
-	}
-
-	private onWriteParsed(): void {
-		if (this.pendingReapply) {
-			this.applyAll(this.pendingReapply)
-			this.pendingReapply = null
-			return
-		}
-		this.processPending()
-	}
-
-	private processPending(): void {
-		const term = this.terminal
-		if (!term || this.pendingLevels.length === 0) return
-
-		const buffer = term.buffer.active
-		const cursorAbsolute = buffer.baseY + buffer.cursorY
-		let levelIdx = 0
-
-		for (
-			let line = this.lastProcessedLine;
-			line <= cursorAbsolute && levelIdx < this.pendingLevels.length;
-			line++
-		) {
-			const bufLine = buffer.getLine(line)
-			if (!bufLine || bufLine.isWrapped) continue
-
-			const level = this.pendingLevels[levelIdx++]
-			if (level) {
-				this.decorateLogicalLine(line, level)
-			}
-		}
-
-		this.lastProcessedLine = cursorAbsolute
-		this.pendingLevels = this.pendingLevels.slice(levelIdx)
-	}
-
-	private applyAll(levels: Array<LogLevel | null>): void {
+	applyFromLine(startLine: number, levels: Array<LogLevel | null>): void {
 		const term = this.terminal
 		if (!term) return
 
 		const buffer = term.buffer.active
 		let levelIdx = 0
 
-		for (let line = 0; line < buffer.length && levelIdx < levels.length; line++) {
+		for (let line = startLine; line < buffer.length && levelIdx < levels.length; line++) {
 			const bufLine = buffer.getLine(line)
 			if (!bufLine || bufLine.isWrapped) continue
 
@@ -146,8 +91,52 @@ export class LogHighlightAddon implements ITerminalAddon {
 				this.decorateLogicalLine(line, level)
 			}
 		}
+	}
 
-		this.lastProcessedLine = buffer.baseY + buffer.cursorY
+	clearAll(): void {
+		for (const tl of this.tracked) {
+			tl.primary?.dispose()
+			for (const w of tl.wraps) w.dispose()
+			tl.marker.dispose()
+		}
+		this.tracked = []
+	}
+
+	updateColors(colors: HighlightColors): void {
+		this.colors = colors
+		this.updateStylesheet()
+		this.rebuildAllDecorations()
+	}
+
+	private injectStylesheet(): void {
+		const el = this.terminal?.element
+		if (!el) return
+		this.styleElement = document.createElement('style')
+		this.updateStylesheet()
+		el.appendChild(this.styleElement)
+	}
+
+	private updateStylesheet(): void {
+		if (!this.styleElement) return
+		this.styleElement.textContent = [
+			`.hl-error-primary { background-color: ${this.colors.errorPrimary} !important; }`,
+			`.hl-error-wrap { background-color: ${this.colors.errorWrap} !important; }`,
+			`.hl-warn-primary { background-color: ${this.colors.warnPrimary} !important; }`,
+			`.hl-warn-wrap { background-color: ${this.colors.warnWrap} !important; }`,
+		].join('\n')
+	}
+
+	private classForDecoration(level: 'error' | 'warn', isEntryStart: boolean): HighlightClass {
+		if (level === 'error') return isEntryStart ? 'hl-error-primary' : 'hl-error-wrap'
+		return isEntryStart ? 'hl-warn-primary' : 'hl-warn-wrap'
+	}
+
+	private tagElement(dec: IDecoration | undefined, cls: HighlightClass): void {
+		if (!dec) return
+		const disposable = dec.onRender((el) => {
+			el.classList.add(cls)
+			disposable.dispose()
+		})
 	}
 
 	private decorateLogicalLine(bufferLine: number, level: 'error' | 'warn'): void {
@@ -170,7 +159,6 @@ export class LogHighlightAddon implements ITerminalAddon {
 			: level === 'error'
 				? this.colors.errorWrap
 				: this.colors.warnWrap
-		const wrapColor = level === 'error' ? this.colors.errorWrap : this.colors.warnWrap
 
 		const primary = term.registerDecoration({
 			marker,
@@ -178,20 +166,21 @@ export class LogHighlightAddon implements ITerminalAddon {
 			width: term.cols,
 			layer: 'bottom',
 		})
-		this.applyOverlayBg(primary, bgColor)
-
-		const wraps = this.createWrapDecorations(bufferLine, wrapColor)
+		this.tagElement(primary, this.classForDecoration(level, isEntryStart))
+		const wraps = this.createWrapDecorations(bufferLine, level)
 
 		this.tracked.push({ marker, level, isEntryStart, primary, wraps })
 	}
 
-	private createWrapDecorations(primaryLine: number, color: string): IDecoration[] {
+	private createWrapDecorations(primaryLine: number, level: 'error' | 'warn'): IDecoration[] {
 		const term = this.terminal
 		if (!term) return []
 
 		const buffer = term.buffer.active
 		const decorations: IDecoration[] = []
 		const cursorAbsolute = buffer.baseY + buffer.cursorY
+		const cls = this.classForDecoration(level, false)
+		const color = level === 'error' ? this.colors.errorWrap : this.colors.warnWrap
 
 		for (let line = primaryLine + 1; line < buffer.length; line++) {
 			const bufLine = buffer.getLine(line)
@@ -208,23 +197,12 @@ export class LogHighlightAddon implements ITerminalAddon {
 				layer: 'bottom',
 			})
 			if (dec) {
-				this.applyOverlayBg(dec, color)
+				this.tagElement(dec, cls)
 				decorations.push(dec)
 			}
 		}
 
 		return decorations
-	}
-
-	private applyOverlayBg(dec: IDecoration | undefined, color: string): void {
-		if (!dec) return
-		dec.onRender((el) => {
-			el.style.backgroundColor = color
-		})
-	}
-
-	private handleResize(): void {
-		this.rebuildAllDecorations()
 	}
 
 	private rebuildAllDecorations(): void {
@@ -241,6 +219,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 				continue
 			}
 
+			const cls = this.classForDecoration(tl.level, tl.isEntryStart)
 			const bgColor = tl.isEntryStart
 				? tl.level === 'error'
 					? this.colors.errorPrimary
@@ -248,28 +227,16 @@ export class LogHighlightAddon implements ITerminalAddon {
 				: tl.level === 'error'
 					? this.colors.errorWrap
 					: this.colors.warnWrap
-			const wrapColor = tl.level === 'error' ? this.colors.errorWrap : this.colors.warnWrap
-
 			tl.primary = term.registerDecoration({
 				marker: tl.marker,
 				backgroundColor: bgColor,
 				width: term.cols,
 				layer: 'bottom',
 			})
-			this.applyOverlayBg(tl.primary, bgColor)
-
-			tl.wraps = this.createWrapDecorations(tl.marker.line, wrapColor)
+			this.tagElement(tl.primary, cls)
+			tl.wraps = this.createWrapDecorations(tl.marker.line, tl.level)
 		}
 
 		this.tracked = this.tracked.filter((tl) => tl.marker.line !== -1)
-	}
-
-	private clearTracked(): void {
-		for (const tl of this.tracked) {
-			tl.primary?.dispose()
-			for (const w of tl.wraps) w.dispose()
-			tl.marker.dispose()
-		}
-		this.tracked = []
 	}
 }

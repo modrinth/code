@@ -75,7 +75,6 @@ import {
 	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
-	initialConsoleMessage,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -830,7 +829,6 @@ watch(
 function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
 	modrinthServersConsole.clear()
-	modrinthServersConsole.addLines(initialConsoleMessage)
 	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
 	emit('reinstall', event)
 	serverSettings.closeModal?.()

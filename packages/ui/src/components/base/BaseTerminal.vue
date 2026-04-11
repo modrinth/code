@@ -53,14 +53,31 @@ const props = withDefaults(
 		showInput?: boolean
 		disableInput?: boolean
 		fullscreen?: boolean
+		emptyStateType?: 'server'
 	}>(),
 	{
 		scrollback: Infinity,
 		showInput: false,
 		disableInput: false,
 		fullscreen: false,
+		emptyStateType: undefined,
 	},
 )
+
+const SERVER_EMPTY_STATE = [
+	'   __________________________________________________',
+	' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
+	'|   Press the green start button to start your server! |',
+	' \\____________________________________________________/',
+	'\x1B[32m     _    _ \x1B[37m',
+	'\x1B[32m    (o)--(o)      \x1B[37m',
+	'\x1B[32m   /.______.\\\x1B[37m',
+	'\x1B[32m   \\________/     \x1B[37m',
+	'\x1B[32m  ./        \\.    \x1B[37m',
+	'\x1B[32m ( .        , )\x1B[37m',
+	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
+	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
+]
 
 const emit = defineEmits<{
 	command: [command: string]
@@ -74,6 +91,8 @@ const commandInput = ref('')
 const componentHeight = ref(0)
 
 const snappedHeight = ref<number | null>(null)
+
+let showingEmptyState = false
 
 const {
 	terminal,
@@ -93,12 +112,32 @@ const {
 			updateComponentHeight()
 			snapToRows()
 		})
+		if (props.emptyStateType) {
+			writeEmptyState()
+		}
 		emit('ready', term)
 	},
 	onResize: () => {
 		updateComponentHeight()
 	},
 })
+
+function writeEmptyState() {
+	if (!terminal.value || !props.emptyStateType) return
+	terminal.value.reset()
+	if (props.emptyStateType === 'server') {
+		for (const line of SERVER_EMPTY_STATE) {
+			terminal.value.writeln(line)
+		}
+	}
+	showingEmptyState = true
+}
+
+function clearEmptyState() {
+	if (!showingEmptyState) return
+	terminal.value?.reset()
+	showingEmptyState = false
+}
 
 function getWrapperMargins() {
 	if (!wrapperRef.value) return 0
@@ -189,6 +228,9 @@ defineExpose({
 	searchAddon,
 	isAtBottom,
 	commandInput,
+	showingEmptyState,
+	writeEmptyState,
+	clearEmptyState,
 })
 </script>
 

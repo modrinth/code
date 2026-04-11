@@ -36,24 +36,6 @@ type UseServerManageCoreRuntimeOptions = {
 	onStateEvent?: (data: Archon.Websocket.v0.WSStateEvent) => void
 }
 
-export const initialConsoleMessage = [
-	'   __________________________________________________',
-	' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
-	'|   Press the green start button to start your server! |',
-	' \\____________________________________________________/',
-	'\x1B[32m     _    _ \x1B[37m',
-	'\x1B[32m    (o)--(o)      \x1B[37m',
-	'\x1B[32m   /.______.\\\x1B[37m',
-	'\x1B[32m   \\________/     \x1B[37m',
-	'\x1B[32m  ./        \\.    \x1B[37m',
-	'\x1B[32m ( .        , )\x1B[37m',
-	'\x1B[32m  \\ \\_\\\\ //_/ /\x1B[37m',
-	'\x1B[32m   ~~  ~~  ~~\x1B[37m',
-].map((text) => ({
-	text,
-	level: null as import('../layouts/shared/console/types').LogLevel | null,
-}))
-
 const createInitialStats = (): Stats => ({
 	current: {
 		cpu_percent: 0,
@@ -325,9 +307,6 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 			isWsAuthIncorrect.value = false
 
 			modrinthServersConsole.clear()
-			if (serverPowerState.value === 'stopped') {
-				modrinthServersConsole.addLines(initialConsoleMessage)
-			}
 
 			const baseSubscriptions: SocketUnsubscriber[] = [
 				client.archon.sockets.on(targetServerId, 'log', handleLog),

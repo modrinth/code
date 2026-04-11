@@ -20,6 +20,8 @@ export interface ConsoleManagerContext {
 	onDelete?: () => Promise<void>
 
 	shareDisabled?: Ref<boolean> | ComputedRef<boolean>
+
+	emptyStateType?: 'server'
 }
 
 export const [injectConsoleManager, provideConsoleManager] = createContext<ConsoleManagerContext>(

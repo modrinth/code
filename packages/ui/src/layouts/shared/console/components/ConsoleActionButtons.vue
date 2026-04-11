@@ -1,12 +1,12 @@
 <template>
 	<div class="flex items-center gap-1">
-		<ButtonStyled v-if="showClear" type="transparent">
+		<ButtonStyled v-if="showClear && hasLogs" type="transparent">
 			<button @click="emit('clear')">
 				<XIcon />
 				Clear
 			</button>
 		</ButtonStyled>
-		<ButtonStyled type="transparent">
+		<ButtonStyled v-if="hasLogs" type="transparent">
 			<button
 				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
 				:disabled="shareDisabled || sharing"
@@ -34,6 +34,7 @@ import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 defineProps<{
 	showClear?: boolean
+	hasLogs?: boolean
 	shareDisabled?: boolean
 	shareDisabledTooltip?: string
 	sharing?: boolean

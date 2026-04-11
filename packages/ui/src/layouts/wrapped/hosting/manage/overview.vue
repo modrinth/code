@@ -82,7 +82,7 @@ import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
 import Admonition from '#ui/components/base/Admonition.vue'
-import { initialConsoleMessage, useModrinthServersConsole } from '#ui/composables'
+import { useModrinthServersConsole } from '#ui/composables'
 import { ConsolePageLayout, provideConsoleManager } from '#ui/layouts/shared/console'
 import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers'
 
@@ -114,9 +114,9 @@ provideConsoleManager({
 	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
 	onClear: () => {
 		modrinthServersConsole.clear()
-		modrinthServersConsole.addLines(initialConsoleMessage)
 	},
 	shareDisabled: computed(() => !isConnected.value),
+	emptyStateType: 'server',
 })
 
 interface ErrorData {

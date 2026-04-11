@@ -29,8 +29,8 @@
 			/>
 			<ConsoleActionButtons
 				:show-clear="isLiveSource"
-				:share-disabled="resolvedShareDisabled || !hasLogs"
-				:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
+				:has-logs="hasLogs"
+				:share-disabled="resolvedShareDisabled"
 				:sharing="isSharing"
 				:fullscreen="isFullscreen"
 				@clear="handleClear"
@@ -45,6 +45,7 @@
 			:show-input="resolvedShowInput"
 			:disable-input="resolvedDisableInput"
 			:fullscreen="isFullscreen"
+			:empty-state-type="ctx.emptyStateType"
 			@command="handleCommand"
 			@ready="handleTerminalReady"
 		/>
@@ -182,8 +183,13 @@ function rewriteFiltered() {
 	const predicate = buildCombinedPredicate()
 	const lines = ctx.logLines.value
 	const filtered = predicate ? lines.filter(predicate) : lines
-	rewriteTerminal(term, lines, predicate, activeSearchQuery())
-	highlightAddon?.reapply(filtered.map((l) => l.level))
+	highlightAddon?.clearAll()
+	rewriteTerminal(term, lines, predicate, activeSearchQuery(), () => {
+		highlightAddon?.applyFromLine(
+			0,
+			filtered.map((l) => l.level),
+		)
+	})
 	lastWrittenIndex = lines.length
 }
 
@@ -201,14 +207,8 @@ function toggleFullscreen() {
 	})
 }
 
-let showingEmptyState = false
-
 function writeEmptyState() {
-	const term = terminalRef.value?.terminal
-	if (!term) return
-	term.reset()
-	term.write('\x1b[2m Start your instance to start receiving live logs.\x1b[0m')
-	showingEmptyState = true
+	terminalRef.value?.writeEmptyState()
 	lastWrittenIndex = 0
 }
 
@@ -220,11 +220,16 @@ function writeAllLines() {
 		writeEmptyState()
 		return
 	}
-	showingEmptyState = false
+	terminalRef.value?.clearEmptyState()
 	const predicate = buildCombinedPredicate()
 	const filtered = predicate ? lines.filter(predicate) : lines
-	rewriteTerminal(term, lines, predicate, activeSearchQuery())
-	highlightAddon?.reapply(filtered.map((l) => l.level))
+	highlightAddon?.clearAll()
+	rewriteTerminal(term, lines, predicate, activeSearchQuery(), () => {
+		highlightAddon?.applyFromLine(
+			0,
+			filtered.map((l) => l.level),
+		)
+	})
 	lastWrittenIndex = lines.length
 }
 
@@ -237,19 +242,34 @@ watch(ctx.logLines, (lines, oldLines) => {
 		return
 	}
 
-	if (showingEmptyState || lines !== oldLines || lines.length < lastWrittenIndex) {
-		showingEmptyState = false
+	if (
+		terminalRef.value?.showingEmptyState ||
+		lines !== oldLines ||
+		lines.length < lastWrittenIndex
+	) {
+		terminalRef.value?.clearEmptyState()
 		rewriteFiltered()
 		return
 	}
 
 	const predicate = buildCombinedPredicate()
 	const query = activeSearchQuery()
+	const newLines: string[] = []
+	const newLevels: Array<LogLevel | null> = []
 	for (let i = lastWrittenIndex; i < lines.length; i++) {
 		if (!predicate || predicate(lines[i])) {
-			terminalRef.value?.writeln(colorize(lines[i], query))
-			highlightAddon?.pushLevel(lines[i].level)
+			newLines.push(colorize(lines[i], query))
+			newLevels.push(lines[i].level)
 		}
+	}
+	if (newLines.length > 0) {
+		const buffer = term.buffer.active
+		const onFreshLine = buffer.cursorX === 0
+		const startLine = buffer.baseY + buffer.cursorY + (onFreshLine ? 0 : 1)
+		const data = onFreshLine ? newLines.join('\r\n') : '\r\n' + newLines.join('\r\n')
+		term.write(data, () => {
+			highlightAddon?.applyFromLine(startLine, newLevels)
+		})
 	}
 	lastWrittenIndex = lines.length
 })
@@ -267,7 +287,7 @@ function handleCommand(cmd: string) {
 
 function handleClear() {
 	terminalRef.value?.reset()
-	highlightAddon?.reapply([])
+	highlightAddon?.clearAll()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
 }
