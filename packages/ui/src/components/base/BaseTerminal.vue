@@ -28,7 +28,8 @@
 			<StyledInput
 				v-model="commandInput"
 				:icon="TerminalSquareIcon"
-				placeholder="Send a command"
+				:placeholder="disableInput ? 'Server is not running' : 'Send a command'"
+				:disabled="disableInput"
 				wrapper-class="w-full"
 				input-class="!h-10"
 				@keydown.enter="submitCommand"
@@ -50,11 +51,13 @@ const props = withDefaults(
 	defineProps<{
 		scrollback?: number
 		showInput?: boolean
+		disableInput?: boolean
 		fullscreen?: boolean
 	}>(),
 	{
 		scrollback: Infinity,
 		showInput: false,
+		disableInput: false,
 		fullscreen: false,
 	},
 )
@@ -154,6 +157,7 @@ watch(
 			})
 		} else {
 			snappedHeight.value = null
+			componentHeight.value = 0
 		}
 	},
 )

@@ -1,6 +1,6 @@
 import { createConsoleState } from '@modrinth/ui'
 
-import { get_live_log_buffer, clear_log_buffer, get_logs } from '@/helpers/logs'
+import { clear_log_buffer, get_live_log_buffer, get_logs } from '@/helpers/logs'
 
 type ConsoleState = ReturnType<typeof createConsoleState>
 
@@ -46,10 +46,7 @@ async function hydrate(profilePathId: string): Promise<void> {
 	}
 }
 
-async function getHistoricalLogs(
-	profilePathId: string,
-	instancePath: string,
-): Promise<LogEntry[]> {
+async function getHistoricalLogs(profilePathId: string, instancePath: string): Promise<LogEntry[]> {
 	const entry = getOrCreate(profilePathId)
 	if (entry.logList) return entry.logList
 
@@ -65,10 +62,7 @@ async function getHistoricalLogs(
 	return logs
 }
 
-function getHistoricalContent(
-	profilePathId: string,
-	filename: string,
-): string | undefined {
+function getHistoricalContent(profilePathId: string, filename: string): string | undefined {
 	return instances.get(profilePathId)?.historicalCache.get(filename)
 }
 
@@ -90,10 +84,8 @@ export function useInstanceConsole(profilePathId: string) {
 		liveConsole: entry.liveConsole,
 		historicalConsole: entry.historicalConsole,
 		hydrate: () => hydrate(profilePathId),
-		getHistoricalLogs: (instancePath: string) =>
-			getHistoricalLogs(profilePathId, instancePath),
-		getHistoricalContent: (filename: string) =>
-			getHistoricalContent(profilePathId, filename),
+		getHistoricalLogs: (instancePath: string) => getHistoricalLogs(profilePathId, instancePath),
+		getHistoricalContent: (filename: string) => getHistoricalContent(profilePathId, filename),
 		invalidate: () => invalidate(profilePathId),
 		destroy: () => destroy(profilePathId),
 	}

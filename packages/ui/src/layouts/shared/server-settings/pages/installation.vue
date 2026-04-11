@@ -75,6 +75,7 @@ import {
 	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
+	initialConsoleMessage,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
@@ -85,6 +86,7 @@ import {
 	ServerSetupModal,
 	UploadProgressModal,
 	useDebugLogger,
+	useModrinthServersConsole,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -101,6 +103,7 @@ const tags = injectTags()
 const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
 const filePicker = injectFilePicker()
+const modrinthServersConsole = useModrinthServersConsole()
 
 const uploadProgressModal =
 	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
@@ -826,6 +829,9 @@ watch(
 
 function onReinstall(event?: unknown) {
 	installationSettingsLayout.value?.cancelEditing()
+	modrinthServersConsole.clear()
+	modrinthServersConsole.addLines(initialConsoleMessage)
+	queryClient.removeQueries({ queryKey: ['servers', 'ws-state', serverId] })
 	emit('reinstall', event)
 	serverSettings.closeModal?.()
 }

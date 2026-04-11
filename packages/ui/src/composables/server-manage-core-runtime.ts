@@ -36,7 +36,7 @@ type UseServerManageCoreRuntimeOptions = {
 	onStateEvent?: (data: Archon.Websocket.v0.WSStateEvent) => void
 }
 
-const initialConsoleMessage = [
+export const initialConsoleMessage = [
 	'   __________________________________________________',
 	' /  Welcome to your \x1B[32mModrinth Server\x1B[37m!                  \\',
 	'|   Press the green start button to start your server! |',
