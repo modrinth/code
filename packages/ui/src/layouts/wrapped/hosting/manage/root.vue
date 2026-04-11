@@ -140,11 +140,51 @@
 				<template #actions>
 					<div class="flex gap-2">
 						<PanelServerActionButton :disabled="!!installError" />
-						<ButtonStyled circular size="large">
-							<button v-tooltip="'Server settings'" @click="() => openServerSettingsModal()">
-								<SettingsIcon />
-							</button>
-						</ButtonStyled>
+						<Tooltip
+							theme="dismissable-prompt"
+							:triggers="[]"
+							:shown="showSettingsHint"
+							:auto-hide="false"
+							placement="bottom-end"
+						>
+							<ButtonStyled circular size="large">
+								<button
+									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
+									@click="
+										() => {
+											openServerSettingsModal()
+											dismissSettingsHint()
+										}
+									"
+								>
+									<SettingsIcon />
+								</button>
+							</ButtonStyled>
+							<template #popper>
+								<div class="experimental-styles-within grid grid-cols-[min-content] gap-1">
+									<div class="flex min-w-48 items-center justify-between gap-8">
+										<h3
+											class="m-0 whitespace-nowrap text-base font-bold text-contrast"
+										>
+											{{ formatMessage(settingsHintMessages.title) }}
+										</h3>
+										<ButtonStyled size="small" circular>
+											<button
+												v-tooltip="formatMessage(settingsHintMessages.dismiss)"
+												@click="dismissSettingsHint"
+											>
+												<XIcon aria-hidden="true" />
+											</button>
+										</ButtonStyled>
+									</div>
+									<p
+										class="m-0 text-wrap text-sm font-medium leading-tight text-secondary"
+									>
+										{{ formatMessage(settingsHintMessages.description) }}
+									</p>
+								</div>
+							</template>
+						</Tooltip>
 						<PanelServerOverflowMenu
 							:disabled="!!installError"
 							:uptime-seconds="uptimeSeconds"
@@ -397,12 +437,14 @@ import {
 	TransferIcon,
 	TriangleAlertIcon,
 	UploadIcon,
+	XIcon,
 } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { formatBytes } from '@modrinth/utils'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useTimeoutFn } from '@vueuse/core'
 import DOMPurify from 'dompurify'
+import { Tooltip } from 'floating-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
@@ -516,6 +558,21 @@ const leaveMessages = defineMessages({
 	},
 })
 
+const settingsHintMessages = defineMessages({
+	title: {
+		id: 'servers.manage.settings-hint.title',
+		defaultMessage: 'Your server settings have moved',
+	},
+	description: {
+		id: 'servers.manage.settings-hint.description',
+		defaultMessage: 'They can now be found here!',
+	},
+	dismiss: {
+		id: 'servers.manage.settings-hint.dismiss',
+		defaultMessage: "Don't show again",
+	},
+})
+
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const isNuxt = computed(() => client instanceof NuxtModrinthClient)
@@ -534,6 +591,15 @@ const errorMessage = ref('An unexpected error occurred.')
 const errorLog = ref('')
 const errorLogFile = ref('')
 const isOnboarding = computed(() => serverData.value?.flows?.intro)
+
+const SETTINGS_HINT_KEY = 'server-panel-settings-hint-dismissed'
+const showSettingsHint = ref(
+	typeof localStorage !== 'undefined' && localStorage.getItem(SETTINGS_HINT_KEY) === null,
+)
+function dismissSettingsHint() {
+	showSettingsHint.value = false
+	localStorage.setItem(SETTINGS_HINT_KEY, 'true')
+}
 
 const serverSettingsModal = ref<InstanceType<typeof ServerSettingsModal> | null>(null)
 const confirmLeaveModal = ref<InstanceType<typeof ConfirmLeaveModal>>()

@@ -25,6 +25,7 @@
 			<div class="flex items-center justify-between">
 				<ConsoleFilterPills v-model="activeFilters" @toggle="handleFilterToggle" />
 				<ConsoleActionButtons
+					:show-clear="isLiveSource"
 					:share-disabled="resolvedShareDisabled || !hasLogs"
 					:share-disabled-tooltip="!hasLogs ? 'There are no logs to share.' : undefined"
 					:sharing="isSharing"
@@ -81,6 +82,12 @@ const isFullscreen = ref(false)
 const isSharing = ref(false)
 const { activeFilters, toggleFilter, buildFilterPredicate } = useConsoleFilters()
 const hasLogs = computed(() => ctx.logLines.value.length > 0)
+const isLiveSource = computed(() => {
+	const sources = ctx.logSources?.value
+	const index = ctx.activeLogSourceIndex?.value
+	if (!sources || index === undefined) return true
+	return sources[index]?.live ?? true
+})
 const logSourceOptions = computed(() =>
 	(ctx.logSources?.value ?? []).map((s, i) => ({ value: i, label: s.name })),
 )

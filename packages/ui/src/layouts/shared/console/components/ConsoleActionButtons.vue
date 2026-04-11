@@ -1,6 +1,6 @@
 <template>
 	<div class="flex items-center gap-1">
-		<ButtonStyled type="transparent">
+		<ButtonStyled v-if="showClear" type="transparent">
 			<button @click="emit('clear')">
 				<XIcon />
 				Clear
@@ -32,6 +32,7 @@ import { ExpandIcon, ShareIcon, SpinnerIcon, XIcon } from '@modrinth/assets'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 
 defineProps<{
+	showClear?: boolean
 	shareDisabled?: boolean
 	shareDisabledTooltip?: string
 	sharing?: boolean

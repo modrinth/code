@@ -84,15 +84,19 @@ async function setLogs() {
 const isLive = computed(() => selectedLogIndex.value === 0)
 
 const loadHistoricalLog = () => {
-	const log = logs.value[selectedLogIndex.value]
+	const log = filteredLogs.value[selectedLogIndex.value]
 	const text = log?.stdout ?? ''
 	if (!text || text === 'Loading...') return
 	historicalConsole.clear()
 	historicalConsole.addLegacyLog(text)
 }
 
+const filteredLogs = computed(() =>
+	props.playing ? logs.value.filter((l) => l.live || l.name !== 'latest.log') : logs.value,
+)
+
 const logSources = computed(() =>
-	logs.value.map((l, i) => ({
+	filteredLogs.value.map((l, i) => ({
 		id: String(i),
 		name: l?.name ?? `Log ${i}`,
 		live: l?.live ?? false,
@@ -115,18 +119,18 @@ provideConsoleManager({
 
 watch(selectedLogIndex, async (newIndex) => {
 	if (newIndex === 0) return
-	if (logs.value.length > 1) {
-		logs.value[newIndex].stdout = 'Loading...'
-		logs.value[newIndex].stdout = await get_output_by_filename(
-			props.instance.path,
-			logs.value[newIndex].log_type,
-			logs.value[newIndex].filename,
-		).catch(handleError)
-		loadHistoricalLog()
-	}
+	const log = filteredLogs.value[newIndex]
+	if (!log) return
+	log.stdout = 'Loading...'
+	log.stdout = await get_output_by_filename(
+		props.instance.path,
+		log.log_type,
+		log.filename,
+	).catch(handleError)
+	loadHistoricalLog()
 })
 
-if (logs.value.length > 1 && !props.playing) {
+if (filteredLogs.value.length > 1 && !props.playing) {
 	selectedLogIndex.value = 1
 } else {
 	selectedLogIndex.value = 0
@@ -136,18 +140,17 @@ const profilePathId = computed(() => route.params.id)
 
 const unlistenLog = await log_listener((payload) => {
 	if (payload.profile_path_id !== profilePathId.value) return
-	if (!isLive.value) return
 
 	if (payload.type === 'log4j') {
-		consoleLines.addLog4jEvent(payload)
+		liveConsole.addLog4jEvent(payload)
 	} else if (payload.type === 'legacy') {
-		consoleLines.addLegacyLog(payload.message)
+		liveConsole.addLegacyLog(payload.message)
 	}
 })
 
 const unlistenProcesses = await process_listener(async (e) => {
 	if (e.event === 'launched') {
-		consoleLines.clear()
+		liveConsole.clear()
 		selectedLogIndex.value = 0
 	}
 	if (e.event === 'finished') {

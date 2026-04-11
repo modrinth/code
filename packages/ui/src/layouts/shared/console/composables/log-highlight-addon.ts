@@ -126,7 +126,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 			}
 		}
 
-		this.lastProcessedLine = cursorAbsolute + 1
+		this.lastProcessedLine = cursorAbsolute
 		this.pendingLevels = this.pendingLevels.slice(levelIdx)
 	}
 
@@ -147,7 +147,7 @@ export class LogHighlightAddon implements ITerminalAddon {
 			}
 		}
 
-		this.lastProcessedLine = buffer.baseY + buffer.cursorY + 1
+		this.lastProcessedLine = buffer.baseY + buffer.cursorY
 	}
 
 	private decorateLogicalLine(bufferLine: number, level: 'error' | 'warn'): void {
