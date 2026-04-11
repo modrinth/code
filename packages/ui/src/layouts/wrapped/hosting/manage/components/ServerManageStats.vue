@@ -22,12 +22,6 @@
 				<div class="flex items-center justify-between">
 					<span class="stat-drop-shadow flex items-center gap-2 font-medium text-lg text-primary">
 						{{ metric.title }}
-						<IssuesIcon
-							v-if="metric.warning && !loading"
-							v-tooltip="metric.warning"
-							class="size-5"
-							:style="{ color: 'var(--color-orange)' }"
-						/>
 					</span>
 					<span class="relative">
 						<component :is="metric.icon" class="stat-drop-shadow relative z-10 size-8" />
@@ -61,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { CpuIcon, DatabaseIcon, FolderOpenIcon, IssuesIcon } from '@modrinth/assets'
+import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
 import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
@@ -174,6 +168,7 @@ const metrics = computed(() => {
 			data: cpuData.value,
 			showGraph: true,
 			link: null,
+			warning: cpuPercent >= 90,
 		},
 		{
 			title: 'Memory',
@@ -185,12 +180,13 @@ const metrics = computed(() => {
 			data: ramData.value,
 			showGraph: true,
 			link: null,
+			warning: ramPercent >= 90,
 		},
 		storageMetric,
 	]
 })
 
-const getChartOptions = (hasWarning: string | null, index: number, data: number[]) => {
+const getChartOptions = (hasWarning: boolean | null, index: number, data: number[]) => {
 	const dataMax = Math.max(...data, 100)
 
 	return {
