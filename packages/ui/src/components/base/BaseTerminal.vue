@@ -11,7 +11,7 @@
 		:class="{ 'h-full': fullscreen }"
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
-			<div ref="containerRef" class="size-full mt-0.5" />
+			<div ref="containerRef" class="size-full" />
 			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
 					<button
@@ -213,6 +213,16 @@ defineExpose({
 	width: 100%;
 	margin-left: 8px;
 	margin-right: auto;
+}
+
+.xterm .xterm-decoration-container {
+	overflow: visible !important;
+}
+
+.xterm .xterm-decoration-container > div {
+	margin-left: -12px !important;
+	padding-left: 12px !important;
+	padding-right: 12px !important;
 }
 
 .xterm-scrollable-element > .scrollbar.vertical {

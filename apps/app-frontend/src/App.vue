@@ -415,18 +415,30 @@ const handleClose = async () => {
 }
 
 const router = useRouter()
+const route = useRoute()
+
+const loading = useLoading()
+loading.setEnabled(false)
+loading.startLoading()
+
+let suspensePending = false
+
+router.beforeEach(() => {
+	suspensePending = false
+	loading.startLoading()
+})
 router.afterEach((to, from, failure) => {
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
 		failed: failure,
 	})
+	setTimeout(() => {
+		if (!suspensePending) {
+			loading.stopLoading()
+		}
+	}, 100)
 })
-const route = useRoute()
-
-const loading = useLoading()
-loading.setEnabled(false)
-loading.startLoading()
 
 const error = useError()
 const errorModal = ref()
@@ -1247,7 +1259,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</Admonition>
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
-					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+					<Suspense
+						@pending="suspensePending = true; loading.startLoading()"
+						@resolve="loading.stopLoading()"
+					>
 						<component :is="Component"></component>
 					</Suspense>
 				</template>
