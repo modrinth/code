@@ -84,6 +84,6 @@ export function rewriteTerminal(
 	if (filtered.length === 0) return
 
 	terminal.write('\x1b[?2026h')
-	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n'))
+	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n') + '\r\n')
 	terminal.write('\x1b[?2026l')
 }
