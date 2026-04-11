@@ -174,7 +174,7 @@ async function finalizeSetup() {
 	client.archon.servers_v1.endIntro(serverId).then(() => {
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	})
-	await router.push(`/hosting/manage/${serverId}/content`)
+	await router.push(`/hosting/manage/${serverId}/`)
 }
 
 /** Map UI loader names to API Modloader values */
