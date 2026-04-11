@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="flex min-h-0 flex-col"
+		class="flex min-h-0 flex-1 flex-col"
 		:class="isFullscreen ? 'fixed inset-0 z-50 bg-surface-1 p-6 pt-12' : 'gap-4'"
 	>
 		<template v-if="!isFullscreen">
@@ -37,8 +37,8 @@
 
 		<BaseTerminal
 			ref="terminalRef"
-			class="min-h-0"
-			:class="{ 'flex-1 my-auto': isFullscreen }"
+			class="min-h-0 flex-1"
+			:class="{ 'my-auto': isFullscreen }"
 			:show-input="resolvedShowInput"
 			:fullscreen="isFullscreen"
 			@command="handleCommand"

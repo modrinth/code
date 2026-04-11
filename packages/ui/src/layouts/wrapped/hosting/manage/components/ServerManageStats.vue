@@ -36,7 +36,7 @@
 						/> -->
 					</span>
 				</div>
-				<span class="stat-drop-shadow text-4xl font-semibold text-contrast">
+				<span class="stat-drop-shadow text-4xl font-bold text-contrast">
 					{{ metric.value }}
 				</span>
 				<!-- <div
@@ -50,7 +50,7 @@
 					v-if="!loading && apexChartComponent"
 					type="area"
 					height="142"
-					:options="getChartOptions(metric.warning, index)"
+					:options="getChartOptions(metric.warning, index, metric.data)"
 					:series="[{ name: metric.title, data: metric.data }]"
 					class="chart"
 					:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
@@ -100,7 +100,7 @@ const stats = shallowRef(
 	},
 )
 
-const GRAPH_SIZE = 20
+const GRAPH_SIZE = 10
 
 const padGraph = (data: number[]) => {
 	if (data.length >= GRAPH_SIZE) return data.slice(-GRAPH_SIZE)
@@ -168,7 +168,7 @@ const metrics = computed(() => {
 		(stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100,
 		100,
 	)
-	const cpuPercent = Math.min(stats.value.cpu_percent, 100)
+	const cpuPercent = stats.value.cpu_percent
 
 	return [
 		{
@@ -196,14 +196,10 @@ const metrics = computed(() => {
 	]
 })
 
-const chartOptionsCache = new Map<string, object>()
+const getChartOptions = (hasWarning: string | null, index: number, data: number[]) => {
+	const dataMax = Math.max(...data, 100)
 
-const getChartOptions = (hasWarning: string | null, index: number) => {
-	const cacheKey = `${index}-${hasWarning ? '1' : '0'}`
-	const cached = chartOptionsCache.get(cacheKey)
-	if (cached) return cached
-
-	const options = {
+	return {
 		chart: {
 			type: 'area' as const,
 			animations: { enabled: false },
@@ -236,13 +232,12 @@ const getChartOptions = (hasWarning: string | null, index: number) => {
 			labels: { show: false },
 			axisBorder: { show: false },
 			type: 'numeric' as const,
-			tickAmount: 20,
-			range: 20,
+			tickAmount: GRAPH_SIZE,
 		},
 		yaxis: {
 			show: false,
 			min: 0,
-			max: 100,
+			max: dataMax + 4,
 			forceNiceScale: false,
 		},
 		colors: [hasWarning ? 'var(--color-orange)' : 'var(--color-brand)'],
@@ -250,8 +245,6 @@ const getChartOptions = (hasWarning: string | null, index: number) => {
 			enabled: false,
 		},
 	}
-	chartOptionsCache.set(cacheKey, options)
-	return options
 }
 
 watch(

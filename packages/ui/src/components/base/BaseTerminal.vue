@@ -5,13 +5,13 @@
 			fullscreen && snappedHeight
 				? { maxHeight: snappedHeight + 'px' }
 				: !fullscreen && componentHeight
-					? { height: componentHeight + 'px' }
+					? { minHeight: componentHeight + 'px' }
 					: {}
 		"
 		:class="{ 'h-full': fullscreen }"
 	>
-		<div class="relative min-h-0 flex-1 overflow-hidden">
-			<div ref="containerRef" class="size-full pl-2 mt-0.5" />
+		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden mb-2">
+			<div ref="containerRef" class="size-full mt-0.5" />
 			<div v-if="fullscreen" class="absolute top-4 right-4 z-10">
 				<ButtonStyled circular type="highlight">
 					<button
@@ -77,6 +77,7 @@ const emit = defineEmits<{
 }>()
 
 const containerRef = ref<HTMLElement | null>(null)
+const wrapperRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLElement | null>(null)
 const commandInput = ref('')
 const componentHeight = ref(0)
@@ -108,6 +109,12 @@ const {
 	},
 })
 
+function getWrapperMargins() {
+	if (!wrapperRef.value) return 0
+	const style = getComputedStyle(wrapperRef.value)
+	return parseFloat(style.marginTop) + parseFloat(style.marginBottom)
+}
+
 function snapToRows() {
 	if (!props.fullscreen) {
 		snappedHeight.value = null
@@ -120,7 +127,7 @@ function snapToRows() {
 	}
 	const inputH = inputRef.value?.offsetHeight ?? 0
 	const borderW = 2
-	snappedHeight.value = screen.offsetHeight + inputH + borderW
+	snappedHeight.value = screen.offsetHeight + getWrapperMargins() + inputH + borderW
 }
 
 let resizeDebounce: ReturnType<typeof setTimeout> | null = null
@@ -169,7 +176,7 @@ function updateComponentHeight() {
 	const screenH = screen.offsetHeight
 	const inputH = inputRef.value?.offsetHeight ?? 0
 	const borderW = 2
-	componentHeight.value = screenH + inputH + borderW
+	componentHeight.value = screenH + getWrapperMargins() + inputH + borderW
 }
 
 const submitCommand = () => {
@@ -199,8 +206,9 @@ defineExpose({
 }
 
 .xterm .xterm-screen {
-	margin-left: auto !important;
-	margin-right: auto !important;
+	width: 100%;
+	margin-left: 8px;
+	margin-right: auto;
 }
 
 .xterm-scrollable-element > .scrollbar.vertical {

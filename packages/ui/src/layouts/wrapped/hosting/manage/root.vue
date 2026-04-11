@@ -1096,6 +1096,8 @@ const onReinstall = async (
 	errorTitle.value = 'Error'
 	errorMessage.value = 'An unexpected error occurred.'
 
+	modrinthServersConsole.clear()
+
 	debug('[root.vue] onReinstall: triggering immediate invalidation')
 	queryClient.invalidateQueries({ queryKey: ['servers', 'detail', props.serverId] })
 	queryClient.invalidateQueries({ queryKey: ['content', 'list'] })
