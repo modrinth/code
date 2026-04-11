@@ -693,80 +693,80 @@ const messages = defineMessages({
 	<!-- Modals -->
 	<Teleport to="body">
 		<div class="relative z-[100]">
-		<ContentUpdaterModal
-			v-if="form.updatingModpack.value"
-			ref="contentUpdaterModal"
-			:versions="form.updatingProjectVersions.value"
-			:current-game-version="ctx.updaterModalProps.value.currentGameVersion"
-			:current-loader="ctx.updaterModalProps.value.currentLoader"
-			:current-version-id="ctx.updaterModalProps.value.currentVersionId"
-			:is-app="ctx.isApp"
-			project-type="modpack"
-			:project-icon-url="ctx.updaterModalProps.value.projectIconUrl"
-			:project-name="ctx.updaterModalProps.value.projectName"
-			:loading="form.loadingVersions.value"
-			:loading-changelog="form.loadingChangelog.value"
-			@update="handleModpackUpdateRequest"
-			@cancel="form.resetUpdateState()"
-			@version-select="form.handleUpdaterVersionSelect"
-			@version-hover="form.handleUpdaterVersionHover"
-		/>
-		<ConfirmModpackUpdateModal
-			ref="modpackUpdateModal"
-			:downgrade="isUpdateDowngrade"
-			:backup-tip="
-				[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
-			"
-			@confirm="handleModpackUpdateConfirm"
-			@cancel="handleModpackUpdateCancel"
-		/>
-		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
-		<ConfirmReinstallModal
-			ref="reinstallModal"
-			:server="ctx.isServer"
-			:backup-tip="ctx.modpack.value?.title"
-			@reinstall="handleReinstall"
-		/>
-		<ConfirmUnlinkModal
-			ref="unlinkModal"
-			:server="ctx.isServer"
-			:backup-tip="ctx.modpack.value?.title"
-			@unlink="handleUnlink"
-		/>
+			<ContentUpdaterModal
+				v-if="form.updatingModpack.value"
+				ref="contentUpdaterModal"
+				:versions="form.updatingProjectVersions.value"
+				:current-game-version="ctx.updaterModalProps.value.currentGameVersion"
+				:current-loader="ctx.updaterModalProps.value.currentLoader"
+				:current-version-id="ctx.updaterModalProps.value.currentVersionId"
+				:is-app="ctx.isApp"
+				project-type="modpack"
+				:project-icon-url="ctx.updaterModalProps.value.projectIconUrl"
+				:project-name="ctx.updaterModalProps.value.projectName"
+				:loading="form.loadingVersions.value"
+				:loading-changelog="form.loadingChangelog.value"
+				@update="handleModpackUpdateRequest"
+				@cancel="form.resetUpdateState()"
+				@version-select="form.handleUpdaterVersionSelect"
+				@version-hover="form.handleUpdaterVersionHover"
+			/>
+			<ConfirmModpackUpdateModal
+				ref="modpackUpdateModal"
+				:downgrade="isUpdateDowngrade"
+				:backup-tip="
+					[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
+				"
+				@confirm="handleModpackUpdateConfirm"
+				@cancel="handleModpackUpdateCancel"
+			/>
+			<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
+			<ConfirmReinstallModal
+				ref="reinstallModal"
+				:server="ctx.isServer"
+				:backup-tip="ctx.modpack.value?.title"
+				@reinstall="handleReinstall"
+			/>
+			<ConfirmUnlinkModal
+				ref="unlinkModal"
+				:server="ctx.isServer"
+				:backup-tip="ctx.modpack.value?.title"
+				@unlink="handleUnlink"
+			/>
 
-		<IncompatibleContentModal
-			v-if="form.incompatibleContentVariant.value"
-			ref="incompatibleContentModal"
-			:variant="form.incompatibleContentVariant.value"
-			:loading="form.isVerifying.value || form.isSaving.value"
-			@confirm-loader-change="form.confirmLoaderChange()"
-			@auto-fix="form.confirmAutoFix()"
-			@disable-conflicts="form.confirmDisableConflicts()"
-			@reset-server="handleIncompatibleResetServer"
-			@cancel="form.cancelPreview()"
-		/>
+			<IncompatibleContentModal
+				v-if="form.incompatibleContentVariant.value"
+				ref="incompatibleContentModal"
+				:variant="form.incompatibleContentVariant.value"
+				:loading="form.isVerifying.value || form.isSaving.value"
+				@confirm-loader-change="form.confirmLoaderChange()"
+				@auto-fix="form.confirmAutoFix()"
+				@disable-conflicts="form.confirmDisableConflicts()"
+				@reset-server="handleIncompatibleResetServer"
+				@cancel="form.cancelPreview()"
+			/>
 
-		<ContentDiffModal
-			v-if="form.pendingPreview.value && !form.incompatibleContentVariant.value"
-			ref="contentDiffModal"
-			:header="formatMessage(messages.confirmVersionChangeHeader)"
-			:description="
-				formatMessage(messages.confirmVersionChangeDescription, {
-					gameVersion: form.pendingPreview.value.newGameVersion,
-				})
-			"
-			:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
-			:diffs="form.pendingPreview.value.diffs"
-			:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
-			:confirm-label="formatMessage(messages.confirmVersionChange)"
-			:confirm-icon="SaveIcon"
-			:removed-label="formatMessage(messages.removedIncompatible)"
-			:show-backup-creator="ctx.isServer"
-			@confirm="form.confirmSave()"
-			@cancel="form.cancelPreview()"
-		/>
+			<ContentDiffModal
+				v-if="form.pendingPreview.value && !form.incompatibleContentVariant.value"
+				ref="contentDiffModal"
+				:header="formatMessage(messages.confirmVersionChangeHeader)"
+				:description="
+					formatMessage(messages.confirmVersionChangeDescription, {
+						gameVersion: form.pendingPreview.value.newGameVersion,
+					})
+				"
+				:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
+				:diffs="form.pendingPreview.value.diffs"
+				:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
+				:confirm-label="formatMessage(messages.confirmVersionChange)"
+				:confirm-icon="SaveIcon"
+				:removed-label="formatMessage(messages.removedIncompatible)"
+				:show-backup-creator="ctx.isServer"
+				@confirm="form.confirmSave()"
+				@cancel="form.cancelPreview()"
+			/>
 
-		<ConfirmLeaveModal ref="confirmLeaveModal" />
+			<ConfirmLeaveModal ref="confirmLeaveModal" />
 		</div>
 		<slot name="extra-modals" />
 	</Teleport>

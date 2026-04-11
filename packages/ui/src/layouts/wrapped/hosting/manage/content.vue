@@ -425,7 +425,9 @@ const updatingProjectVersions = computed(() => {
 })
 
 const loadingVersions = computed(() =>
-	updatingModpack.value ? modpackVersionsQuery.isLoading.value : projectVersionsQuery.isLoading.value,
+	updatingModpack.value
+		? modpackVersionsQuery.isLoading.value
+		: projectVersionsQuery.isLoading.value,
 )
 
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()

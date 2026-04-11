@@ -3,95 +3,87 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 
 import ButtonStyled from '../../components/base/ButtonStyled.vue'
 
-const colors = [
-  'standard',
-  'brand',
-  'red',
-  'orange',
-  'green',
-  'blue',
-  'purple',
-] as const
+const colors = ['standard', 'brand', 'red', 'orange', 'green', 'blue', 'purple'] as const
 const types = [
-  'standard',
-  'outlined',
-  'transparent',
-  'highlight',
-  'highlight-colored-text',
-  'chip',
+	'standard',
+	'outlined',
+	'transparent',
+	'highlight',
+	'highlight-colored-text',
+	'chip',
 ] as const
 const sizes = ['small', 'standard', 'large'] as const
 
 const meta = {
-  title: 'Base/ButtonStyled',
-  component: ButtonStyled,
-  argTypes: {
-    color: {
-      control: 'select',
-      options: [...colors, 'medal-promo'],
-    },
-    size: {
-      control: 'select',
-      options: [...sizes],
-    },
-    type: {
-      control: 'select',
-      options: [...types],
-    },
-    circular: { control: 'boolean' },
-    colorFill: {
-      control: 'select',
-      options: ['auto', 'background', 'text', 'none'],
-    },
-    hoverColorFill: {
-      control: 'select',
-      options: ['auto', 'background', 'text', 'none'],
-    },
-    highlighted: { control: 'boolean' },
-    highlightedStyle: {
-      control: 'select',
-      options: ['main-nav-primary', 'main-nav-secondary'],
-    },
-  },
-  args: {
-    color: 'standard',
-    size: 'standard',
-    type: 'standard',
-    circular: false,
-    colorFill: 'auto',
-    hoverColorFill: 'auto',
-    highlighted: false,
-    highlightedStyle: 'main-nav-primary',
-  },
-  render: (args) => ({
-    components: { ButtonStyled, DownloadIcon },
-    setup() {
-      return { args }
-    },
-    template: /*html*/ `
+	title: 'Base/ButtonStyled',
+	component: ButtonStyled,
+	argTypes: {
+		color: {
+			control: 'select',
+			options: [...colors, 'medal-promo'],
+		},
+		size: {
+			control: 'select',
+			options: [...sizes],
+		},
+		type: {
+			control: 'select',
+			options: [...types],
+		},
+		circular: { control: 'boolean' },
+		colorFill: {
+			control: 'select',
+			options: ['auto', 'background', 'text', 'none'],
+		},
+		hoverColorFill: {
+			control: 'select',
+			options: ['auto', 'background', 'text', 'none'],
+		},
+		highlighted: { control: 'boolean' },
+		highlightedStyle: {
+			control: 'select',
+			options: ['main-nav-primary', 'main-nav-secondary'],
+		},
+	},
+	args: {
+		color: 'standard',
+		size: 'standard',
+		type: 'standard',
+		circular: false,
+		colorFill: 'auto',
+		hoverColorFill: 'auto',
+		highlighted: false,
+		highlightedStyle: 'main-nav-primary',
+	},
+	render: (args) => ({
+		components: { ButtonStyled, DownloadIcon },
+		setup() {
+			return { args }
+		},
+		template: /*html*/ `
 			<ButtonStyled v-bind="args">
 				<button><DownloadIcon /> Button</button>
 			</ButtonStyled>
 		`,
-  }),
+	}),
 } satisfies Meta<typeof ButtonStyled>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {
-    type: 'standard',
-  },
+	args: {
+		type: 'standard',
+	},
 }
 
 export const AllVariants: Story = {
-  render: () => ({
-    components: { ButtonStyled },
-    setup() {
-      return { colors, types }
-    },
-    template: /*html*/ `
+	render: () => ({
+		components: { ButtonStyled },
+		setup() {
+			return { colors, types }
+		},
+		template: /*html*/ `
 			<div style="overflow-x: auto;">
 				<table style="border-collapse: collapse; width: 100%;">
 					<thead>
@@ -113,16 +105,16 @@ export const AllVariants: Story = {
 				</table>
 			</div>
 		`,
-  }),
+	}),
 }
 
 export const AllVariantsHighlighted: Story = {
-  render: () => ({
-    components: { ButtonStyled },
-    setup() {
-      return { colors, types }
-    },
-    template: /*html*/ `
+	render: () => ({
+		components: { ButtonStyled },
+		setup() {
+			return { colors, types }
+		},
+		template: /*html*/ `
 			<div style="overflow-x: auto;">
 				<table style="border-collapse: collapse; width: 100%;">
 					<thead>
@@ -144,16 +136,16 @@ export const AllVariantsHighlighted: Story = {
 				</table>
 			</div>
 		`,
-  }),
+	}),
 }
 
 export const Sizes: Story = {
-  render: () => ({
-    components: { ButtonStyled },
-    setup() {
-      return { sizes, types }
-    },
-    template: /*html*/ `
+	render: () => ({
+		components: { ButtonStyled },
+		setup() {
+			return { sizes, types }
+		},
+		template: /*html*/ `
 			<div style="overflow-x: auto;">
 				<table style="border-collapse: collapse; width: 100%;">
 					<thead>
@@ -175,16 +167,16 @@ export const Sizes: Story = {
 				</table>
 			</div>
 		`,
-  }),
+	}),
 }
 
 export const WithIcons: Story = {
-  render: () => ({
-    components: { ButtonStyled, DownloadIcon, HeartIcon, SettingsIcon },
-    setup() {
-      return { types }
-    },
-    template: /*html*/ `
+	render: () => ({
+		components: { ButtonStyled, DownloadIcon, HeartIcon, SettingsIcon },
+		setup() {
+			return { types }
+		},
+		template: /*html*/ `
 			<div style="overflow-x: auto;">
 				<table style="border-collapse: collapse; width: 100%;">
 					<thead>
@@ -214,21 +206,21 @@ export const WithIcons: Story = {
 				</table>
 			</div>
 		`,
-  }),
+	}),
 }
 
 export const Disabled: Story = {
-  render: () => ({
-    components: { ButtonStyled },
-    setup() {
-      return { types }
-    },
-    template: /*html*/ `
+	render: () => ({
+		components: { ButtonStyled },
+		setup() {
+			return { types }
+		},
+		template: /*html*/ `
 			<div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
 				<ButtonStyled v-for="type in types" :key="type" :type="type" color="brand">
 					<button disabled>{{ type }}</button>
 				</ButtonStyled>
 			</div>
 		`,
-  }),
+	}),
 }

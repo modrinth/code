@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { Archon, ModrinthApiError } from '@modrinth/api-client'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
@@ -99,7 +99,8 @@ const initialLoader = computed(() => {
 const initialGameVersion = computed(() => serverContext.server.value.mc_version ?? undefined)
 
 const creationFlowRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('creationFlowRef')
-const uploadProgressModal = useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
+const uploadProgressModal =
+	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
 	debug('onFlowComplete:', {

@@ -98,7 +98,8 @@ const { formatMessage } = useVIntl()
 const serverSettings = injectServerSettings()
 const filePicker = injectFilePicker()
 
-const uploadProgressModal = useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
+const uploadProgressModal =
+	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 const messages = defineMessages({
 	resetServerTitle: {

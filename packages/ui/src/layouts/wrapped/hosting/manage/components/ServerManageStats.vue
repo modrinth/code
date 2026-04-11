@@ -164,10 +164,7 @@ const metrics = computed(() => {
 		]
 	}
 
-	const ramPercent = Math.min(
-		(stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100,
-		100,
-	)
+	const ramPercent = (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100
 	const cpuPercent = stats.value.cpu_percent
 
 	return [

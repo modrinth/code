@@ -1,9 +1,5 @@
 <template>
-	<NewModal
-		ref="modal"
-		:header="formatMessage(messages.header)"
-		:closable="false"
-	>
+	<NewModal ref="modal" :header="formatMessage(messages.header)" :closable="false">
 		<div class="flex flex-col gap-4 md:w-[400px]">
 			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
 			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.warningText) }}</p>
