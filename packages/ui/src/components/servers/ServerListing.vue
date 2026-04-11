@@ -25,7 +25,7 @@
 				v-if="hasIconOverlay"
 				class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 			>
-				<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
+				<ServerIcon :image="image ?? undefined" :disabled="isDisabled" class="!rounded-xl" />
 				<SpinnerIcon
 					v-if="isProvisioning || isUpgrading"
 					class="size-8 animate-spin absolute text-contrast"

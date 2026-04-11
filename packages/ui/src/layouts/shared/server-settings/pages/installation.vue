@@ -1,12 +1,16 @@
 <template>
 	<div class="flex flex-col gap-6">
-		<ConfirmModal
-			ref="resetToOnboardingModal"
-			:title="formatMessage(messages.resetToOnboardingModalTitle)"
-			:description="formatMessage(messages.resetToOnboardingModalDescription)"
-			:proceed-label="formatMessage(messages.resetToOnboardingButton)"
-			@proceed="confirmResetToOnboarding"
-		/>
+		<Teleport to="body">
+			<div class="relative z-[100]">
+				<ConfirmModal
+					ref="resetToOnboardingModal"
+					:title="formatMessage(messages.resetToOnboardingModalTitle)"
+					:description="formatMessage(messages.resetToOnboardingModalDescription)"
+					:proceed-label="formatMessage(messages.resetToOnboardingButton)"
+					@proceed="confirmResetToOnboarding"
+				/>
+			</div>
+		</Teleport>
 
 		<InstallationSettingsLayout ref="installationSettingsLayout" @reset-server="setupModal?.show()">
 			<template #extra>
