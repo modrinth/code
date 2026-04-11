@@ -5,7 +5,6 @@ export const DEFAULT_FEATURE_FLAGS = {
 	page_path: false,
 	worlds_tab: false,
 	worlds_in_home: true,
-	servers_in_app: true,
 	server_project_qa: false,
 	i18n_debug: false,
 }
