@@ -48,6 +48,7 @@
 			@ready="handleTerminalReady"
 		/>
 	</div>
+	<ShareModal ref="shareModal" header="Share Logs" link :social-buttons="false" />
 </template>
 
 <script setup lang="ts">
@@ -58,9 +59,10 @@ import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
-import { injectPageContext } from '#ui/providers/page-context'
 
+import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
 import {
@@ -70,15 +72,16 @@ import {
 	rewriteTerminal,
 	useConsoleFilters,
 } from './composables'
-import { injectConsoleManager } from './providers'
 import type { ConditionalLevel } from './composables/console-filtering'
+import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
 
 const ctx = injectConsoleManager()
 const modalBehavior = injectModalBehavior()
-const pageContext = injectPageContext()
+const { addNotification } = injectNotificationManager()
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
+const shareModal = ref<InstanceType<typeof ShareModal> | null>(null)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const isSharing = ref(false)
@@ -276,10 +279,15 @@ async function handleShare() {
 		})
 		const data = await res.json()
 		if (data.url) {
-			pageContext.openExternalUrl(data.url)
+			shareModal.value?.show(data.url)
 		}
 	} catch (err) {
 		console.error('Failed to share logs:', err)
+		addNotification({
+			type: 'error',
+			title: 'Failed to share logs',
+			text: typeof err === 'string' ? err : 'Unknown error.',
+		})
 	} finally {
 		isSharing.value = false
 	}
