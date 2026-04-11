@@ -1,15 +1,12 @@
 use crate::event::emit::{emit_process, emit_profile};
-use crate::event::{ProcessPayloadType, ProfilePayloadType};
 #[cfg(feature = "tauri")]
 use crate::event::{LogEvent, LogPayload};
-#[cfg(feature = "tauri")]
-use tauri::Emitter;
+use crate::event::{ProcessPayloadType, ProfilePayloadType};
 use crate::profile;
 use crate::util::io::IOError;
 use crate::util::rpc::RpcServer;
 use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
 use dashmap::DashMap;
-use std::sync::LazyLock;
 use quick_xml::Reader;
 use quick_xml::events::Event;
 use serde::Deserialize;
@@ -20,6 +17,9 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
+use std::sync::LazyLock;
+#[cfg(feature = "tauri")]
+use tauri::Emitter;
 use tempfile::TempDir;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{Child, Command};
@@ -413,8 +413,7 @@ impl Process {
                                     {
                                         if let Err(e) =
                                             Process::append_to_log_file(
-                                                &log_path,
-                                                throwable,
+                                                &log_path, throwable,
                                             )
                                         {
                                             tracing::error!(
@@ -437,9 +436,7 @@ impl Process {
                                     && current_event.throwable.is_none()
                                 {
                                     if let Some(formatted_log) =
-                                        Self::format_log4j_entry(
-                                            &current_event,
-                                        )
+                                        Self::format_log4j_entry(&current_event)
                                     {
                                         if let Err(e) =
                                             Process::append_to_log_file(
@@ -529,10 +526,7 @@ impl Process {
                     if let Err(e) = Self::append_to_log_file(&log_path, &line) {
                         tracing::warn!("Failed to write to log file: {}", e);
                     }
-                    Self::emit_legacy_log(
-                        profile_path,
-                        line.trim_ascii_end(),
-                    );
+                    Self::emit_legacy_log(profile_path, line.trim_ascii_end());
                     if let Err(e) = Self::maybe_handle_old_server_join_logging(
                         profile_path,
                         line.trim_ascii_end(),
@@ -575,8 +569,7 @@ impl Process {
         let thread = event.thread_name.as_deref().unwrap_or("");
         let level = event.level.as_deref().unwrap_or("");
         let logger = event.logger_name.as_deref().unwrap_or("");
-        let formatted_time =
-            Self::format_timestamp(event.timestamp_millis);
+        let formatted_time = Self::format_timestamp(event.timestamp_millis);
 
         Some(format!(
             "{} [{}] [{}{}]: {}\n",
