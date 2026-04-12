@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choose between Vanilla, Fabric, Forge, Quilt and NeoForge. If it's on Modrinth, it can run on your server."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Failed to change modpack version"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Failed to load versions"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Failed to reinstall modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Failed to repair server"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Failed to reset server to onboarding"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Failed to save installation settings"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Failed to unlink modpack"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Loader} other {{loader}}} version"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Your server installation has been repaired."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Repair completed"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reset server"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Removes all data on your server, including your worlds, mods, and configuration files. Backups will remain and can be restored."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Reset to onboarding"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "This will send the server back into onboarding so setup can be completed again. Are you sure you want to continue?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Reset to onboarding"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "The server has been returned to the onboarding flow."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Server reset to onboarding"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Support options"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Out of stock"
   },
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sync with server"
   },
-  "servers.busy.backup-creating": {
-    "message": "Backup creation in progress"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Backup restore in progress"
-  },
-  "servers.busy.installing": {
-    "message": "Server is installing"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Content sync in progress"
-  },
   "servers.notice.actions": {
     "message": "Actions"
   },
@@ -3221,6 +3155,12 @@
   "settings.billing.interval.monthly": {
     "message": "monthly"
   },
+  "settings.billing.interval.quarter": {
+    "message": "quarter"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "quarterly"
+  },
   "settings.billing.interval.year": {
     "message": "year"
   },
@@ -3336,7 +3276,7 @@
     "message": "Error resubscribing"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made."
+    "message": "If the server is currently cancelled, it may take 10-15 minutes to set up the server."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Resubscription request submitted"

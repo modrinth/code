@@ -111,10 +111,10 @@ const messages = defineMessages({
 
 <template>
 	<div>
-		<h2 id="project-name" class="m-0 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="m-0 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaInstallation) }}
 		</h2>
-		<Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2" />
+		<Checkbox v-model="overrideJavaInstall" label="Custom Java installation" class="mb-2.5" />
 		<template v-if="!overrideJavaInstall">
 			<div class="flex my-2 items-center gap-2 font-semibold">
 				<template v-if="javaInstall">
@@ -144,10 +144,10 @@ const messages = defineMessages({
 			</div>
 		</template>
 		<JavaSelector v-if="overrideJavaInstall || !javaInstall" v-model="javaInstall" />
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaMemory) }}
 		</h2>
-		<Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2" />
+		<Checkbox v-model="overrideMemorySettings" label="Custom memory allocation" class="mb-2.5" />
 		<Slider
 			id="max-memory"
 			v-model="memory.maximum"
@@ -159,7 +159,7 @@ const messages = defineMessages({
 			:snap-range="512"
 			unit="MB"
 		/>
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaArguments) }}
 		</h2>
 		<Checkbox v-model="overrideJavaArgs" label="Custom java arguments" class="my-2" />
@@ -171,10 +171,10 @@ const messages = defineMessages({
 			placeholder="Enter java arguments..."
 			wrapper-class="w-full"
 		/>
-		<h2 id="project-name" class="mt-4 mb-1 text-lg font-extrabold text-contrast block">
+		<h2 id="project-name" class="mt-6 mb-2.5 text-lg font-semibold text-contrast block">
 			{{ formatMessage(messages.javaEnvironmentVariables) }}
 		</h2>
-		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2" />
+		<Checkbox v-model="overrideEnvVars" label="Custom environment variables" class="mb-2.5" />
 		<StyledInput
 			id="env-vars"
 			v-model="envVars"

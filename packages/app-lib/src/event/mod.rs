@@ -270,6 +270,29 @@ pub enum FriendPayload {
     StatusSync,
 }
 
+#[cfg(feature = "tauri")]
+pub use self::log_types::*;
+
+#[cfg(feature = "tauri")]
+mod log_types {
+    use crate::state::Log4jEvent;
+    use serde::Serialize;
+
+    #[derive(Serialize, Clone)]
+    #[serde(tag = "type", rename_all = "snake_case")]
+    pub enum LogEvent {
+        Log4j(Log4jEvent),
+        Legacy { message: String },
+    }
+
+    #[derive(Serialize, Clone)]
+    pub struct LogPayload {
+        pub profile_path_id: String,
+        #[serde(flatten)]
+        pub event: LogEvent,
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 pub enum EventError {
     #[error("Event state was not properly initialized")]
