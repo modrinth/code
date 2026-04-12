@@ -3,6 +3,15 @@
 		class="flex min-h-0 flex-1 flex-col gap-4"
 		:class="isFullscreen ? `fixed inset-0 z-50 bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : ''"
 	>
+		<CollapsibleAdmonition
+			v-if="ctx.crashAnalysis?.value"
+			type="critical"
+			:header="crashHeader"
+			:items="crashItems"
+			dismissible
+			@dismiss="ctx.onDismissCrash?.()"
+		/>
+
 		<div class="flex items-center gap-2">
 			<StyledInput
 				v-model="searchQuery"
@@ -39,15 +48,6 @@
 			/>
 		</div>
 
-		<CollapsibleAdmonition
-			v-if="ctx.crashAnalysis?.value"
-			type="critical"
-			:header="crashHeader"
-			:items="crashItems"
-			dismissible
-			@dismiss="ctx.onDismissCrash?.()"
-		/>
-
 		<BaseTerminal
 			ref="terminalRef"
 			class="min-h-0 flex-1"
@@ -79,13 +79,7 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import {
-	colorize,
-	computeHighlightColors,
-	LogHighlightAddon,
-	rewriteTerminal,
-	useConsoleFilters,
-} from './composables'
+import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
 import type { ConditionalLevel } from './composables/console-filtering'
 import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
@@ -153,17 +147,11 @@ onBeforeUnmount(() => {
 		document.body.style.overflow = ''
 		modalBehavior?.onHide?.()
 	}
-	themeObserver?.disconnect()
-	themeObserver = null
-	highlightAddon?.dispose()
-	highlightAddon = null
 })
 
 let lastWrittenIndex = 0
 let manuallyCleared = false
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
-let highlightAddon: LogHighlightAddon | null = null
-let themeObserver: MutationObserver | null = null
 
 const resolvedShowInput = computed(() => {
 	const v = ctx.showCommandInput
@@ -184,19 +172,7 @@ const resolvedShareDisabled = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
-function handleTerminalReady(terminal: Terminal) {
-	const addon = new LogHighlightAddon(computeHighlightColors())
-	terminal.loadAddon(addon)
-	highlightAddon = addon
-
-	themeObserver = new MutationObserver(() => {
-		addon.updateColors(computeHighlightColors())
-	})
-	themeObserver.observe(document.documentElement, {
-		attributes: true,
-		attributeFilter: ['data-theme', 'class'],
-	})
-
+function handleTerminalReady(_terminal: Terminal) {
 	writeAllLines()
 }
 
@@ -220,13 +196,7 @@ function rewriteFiltered() {
 	terminalRef.value?.clearEmptyState()
 	const predicate = buildCombinedPredicate()
 	const filtered = predicate ? lines.filter(predicate) : lines
-	highlightAddon?.clearAll()
-	rewriteTerminal(term, lines, predicate, activeSearchQuery(), () => {
-		highlightAddon?.applyFromLine(
-			0,
-			filtered.map((l) => l.level),
-		)
-	})
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
 	lastWrittenIndex = lines.length
 }
 
@@ -259,14 +229,7 @@ function writeAllLines() {
 	}
 	terminalRef.value?.clearEmptyState()
 	const predicate = buildCombinedPredicate()
-	const filtered = predicate ? lines.filter(predicate) : lines
-	highlightAddon?.clearAll()
-	rewriteTerminal(term, lines, predicate, activeSearchQuery(), () => {
-		highlightAddon?.applyFromLine(
-			0,
-			filtered.map((l) => l.level),
-		)
-	})
+	rewriteTerminal(term, lines, predicate, activeSearchQuery())
 	lastWrittenIndex = lines.length
 }
 
@@ -296,21 +259,16 @@ watch(ctx.logLines, (lines, oldLines) => {
 	const predicate = buildCombinedPredicate()
 	const query = activeSearchQuery()
 	const newLines: string[] = []
-	const newLevels: Array<LogLevel | null> = []
 	for (let i = lastWrittenIndex; i < lines.length; i++) {
 		if (!predicate || predicate(lines[i])) {
 			newLines.push(colorize(lines[i], query))
-			newLevels.push(lines[i].level)
 		}
 	}
 	if (newLines.length > 0) {
 		const buffer = term.buffer.active
 		const onFreshLine = buffer.cursorX === 0
-		const startLine = buffer.baseY + buffer.cursorY + (onFreshLine ? 0 : 1)
 		const data = onFreshLine ? newLines.join('\r\n') : '\r\n' + newLines.join('\r\n')
-		term.write(data, () => {
-			highlightAddon?.applyFromLine(startLine, newLevels)
-		})
+		term.write(data)
 	}
 	lastWrittenIndex = lines.length
 })
@@ -329,7 +287,6 @@ function handleCommand(cmd: string) {
 function handleClear() {
 	manuallyCleared = true
 	terminalRef.value?.reset()
-	highlightAddon?.clearAll()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
 }
