@@ -657,6 +657,10 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery",
     "featured_gallery",
     "color",
+    "required_dependencies",
+    "optional_dependencies",
+    "embedded_dependencies",
+    "incompatibilities",
     // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
     // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
     "environment",
@@ -696,6 +700,10 @@ const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] = &[
     "date_created",
     "date_modified",
     "version_published_timestamp",
+    "required_dependencies",
+    "optional_dependencies",
+    "embedded_dependencies",
+    "incompatibilities",
     "minecraft_java_server.verified_plays_2w",
     "minecraft_java_server.ping.data.players_online",
 ];
