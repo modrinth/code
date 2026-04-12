@@ -62,7 +62,9 @@ const authUser = auth.value?.user
 	: undefined
 
 async function fetchIntercomToken(): Promise<{ token: string }> {
-	return $fetch('/api/intercom/messenger-jwt')
+	return $fetch('/api/intercom/messenger-jwt', {
+		query: { server_id: serverId },
+	})
 }
 
 async function resolveViewer(): Promise<{ userId: string | null; userRole: string | null }> {

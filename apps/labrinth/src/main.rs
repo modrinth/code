@@ -23,7 +23,7 @@ use tracing_actix_web::TracingLogger;
 use utoipa::OpenApi;
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa_actix_web::AppExt;
-use utoipa_swagger_ui::SwaggerUi;
+use utoipa_scalar::Servable;
 
 #[cfg(target_os = "linux")]
 #[global_allocator]
@@ -260,9 +260,7 @@ async fn app() -> std::io::Result<()> {
             // Use `utoipa` for OpenAPI generation
             .into_utoipa_app()
             .configure(|cfg| utoipa_app_config(cfg, labrinth_config.clone()))
-            .openapi_service(|api| SwaggerUi::new("/docs/swagger-ui/{_:.*}")
-                .config(utoipa_swagger_ui::Config::default().try_it_out_enabled(true))
-                .url("/docs/openapi.json", ApiDoc::openapi().merge_from(api)))
+            .openapi_service(|api| utoipa_scalar::Scalar::with_url("/docs", ApiDoc::openapi().merge_from(api)))
             .into_app()
             .configure(|cfg| app_config(cfg, labrinth_config.clone()))
     })
