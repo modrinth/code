@@ -4,7 +4,7 @@ use ariadne::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct LegacyReport {
     pub id: ReportId,
     pub report_type: String,
@@ -17,7 +17,7 @@ pub struct LegacyReport {
     pub thread_id: ThreadId,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 #[serde(rename_all = "kebab-case")]
 pub enum LegacyItemType {
     Project,

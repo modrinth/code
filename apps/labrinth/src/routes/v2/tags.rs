@@ -27,7 +27,21 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(category_list);
+    cfg.service(loader_list);
+    cfg.service(game_version_list);
+    cfg.service(license_list);
+    cfg.service(license_text);
+    cfg.service(donation_platform_list);
+    cfg.service(report_type_list);
+    cfg.service(project_type_list);
+    cfg.service(side_type_list);
+}
+
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct CategoryData {
     pub icon: String,
     pub name: String,
@@ -35,7 +49,16 @@ pub struct CategoryData {
     pub header: String,
 }
 
-#[get("category")]
+/// Get a list of categories.
+///
+/// Gets an array of categories, their icons, and applicable project types.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<CategoryData>),
+    ),
+)]
+#[get("/category")]
 pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -62,14 +85,23 @@ pub async fn category_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct LoaderData {
     pub icon: String,
     pub name: String,
     pub supported_project_types: Vec<String>,
 }
 
-#[get("loader")]
+/// Get a list of loaders.
+///
+/// Gets an array of loaders, their icons, and supported project types.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LoaderData>),
+    ),
+)]
+#[get("/loader")]
 pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -116,7 +148,7 @@ pub async fn loader_list(
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
 pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
@@ -131,7 +163,19 @@ pub struct GameVersionQuery {
     major: Option<bool>,
 }
 
-#[get("game_version")]
+/// Get a list of game versions.
+///
+/// Gets an array of game versions and information about them.
+/// Query parameters:
+/// - `type`: Filter by version type (release, snapshot, alpha, beta).
+/// - `major`: Filter by whether it is a major version.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<GameVersionQueryData>),
+    ),
+)]
+#[get("/game_version")]
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
@@ -185,13 +229,22 @@ pub async fn game_version_list(
     )
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct License {
     pub short: String,
     pub name: String,
 }
 
-#[get("license")]
+/// Get a list of licenses.
+///
+/// Deprecated - simply use SPDX IDs.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<License>),
+    ),
+)]
+#[get("/license")]
 pub async fn license_list() -> HttpResponse {
     let response = v3::tags::license_list().await;
 
@@ -212,13 +265,21 @@ pub async fn license_list() -> HttpResponse {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct LicenseText {
     pub title: String,
     pub body: String,
 }
 
-#[get("license/{id}")]
+/// Get the text and title of a license.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LicenseText),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[get("/license/{id}")]
 pub async fn license_text(
     params: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
@@ -240,7 +301,9 @@ pub async fn license_text(
     )
 }
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
+#[derive(
+    serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, utoipa::ToSchema,
+)]
 pub struct DonationPlatformQueryData {
     // The difference between name and short is removed in v3.
     // Now, the 'id' becomes the name, and the 'name' is removed (the frontend uses the id as the name)
@@ -249,7 +312,16 @@ pub struct DonationPlatformQueryData {
     pub name: String,
 }
 
-#[get("donation_platform")]
+/// Get a list of donation platforms.
+///
+/// Gets an array of donation platforms and information about them.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<DonationPlatformQueryData>),
+    ),
+)]
+#[get("/donation_platform")]
 pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -295,7 +367,16 @@ pub async fn donation_platform_list(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("report_type")]
+/// Get a list of report types.
+///
+/// Gets an array of valid report types.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+    ),
+)]
+#[get("/report_type")]
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -306,7 +387,16 @@ pub async fn report_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("project_type")]
+/// Get a list of project types.
+///
+/// Gets an array of valid project types.
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+    ),
+)]
+#[get("/project_type")]
 pub async fn project_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -317,7 +407,16 @@ pub async fn project_type_list(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[get("side_type")]
+/// Get a list of side types.
+///
+/// Gets an array of valid side types (required, optional, unsupported, unknown).
+#[utoipa::path(
+    tag = "tags",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+    ),
+)]
+#[get("/side_type")]
 pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     // Original side types are no longer reflected in the database.
     // Therefore, we hardcode and return all the fields that are supported by our v2 conversion logic.

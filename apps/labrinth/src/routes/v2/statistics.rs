@@ -9,7 +9,13 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get_stats);
 }
 
-#[derive(serde::Serialize)]
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(get_stats);
+}
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct V2Stats {
     pub projects: Option<i64>,
     pub versions: Option<i64>,
@@ -17,7 +23,16 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
-#[get("statistics")]
+/// Various statistics about this Modrinth instance.
+///
+/// Returns counts of projects, versions, authors, and files.
+#[utoipa::path(
+    tag = "misc",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = V2Stats),
+    ),
+)]
+#[get("/statistics")]
 pub async fn get_stats(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {

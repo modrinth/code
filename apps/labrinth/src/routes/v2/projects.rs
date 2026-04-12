@@ -50,7 +50,60 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[get("search")]
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_get);
+    cfg.service(project_get_check);
+    cfg.service(project_delete);
+    cfg.service(project_edit);
+    cfg.service(project_icon_edit);
+    cfg.service(delete_project_icon);
+    cfg.service(add_gallery_item);
+    cfg.service(edit_gallery_item);
+    cfg.service(delete_gallery_item);
+    cfg.service(project_follow);
+    cfg.service(project_unfollow);
+    cfg.service(super::teams::team_members_get_project);
+    cfg.service(super::versions::version_list);
+    cfg.service(super::versions::version_project_get);
+    cfg.service(dependency_list);
+}
+
+pub fn utoipa_config_root(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_search);
+    cfg.service(projects_get);
+    cfg.service(projects_edit);
+    cfg.service(random_projects_get);
+}
+
+/// Search projects.
+///
+/// Facets are an essential concept for understanding how to filter out results.
+/// These are the most commonly used facet types:
+/// - `project_type`
+/// - `categories` (loaders are lumped in with categories in search)
+/// - `versions`
+/// - `client_side`
+/// - `server_side`
+/// - `open_source`
+///
+/// Several others are also available: `title`, `author`, `follows`, `project_id`,
+/// `license`, `downloads`, `color`, `created_timestamp` (Unix), `modified_timestamp` (Unix),
+/// `date_created` (ISO-8601), `date_modified` (ISO-8601).
+///
+/// In order to use facets, you need a value to filter by and an operation (`:`, `!=`, `>=`, `>`, `<=`, `<`).
+/// All elements in a single array are joined by OR. Separate arrays are joined by AND.
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacySearchResults),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[get("/search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     search_backend: web::Data<dyn SearchBackend>,
@@ -147,7 +200,18 @@ pub struct RandomProjects {
     pub count: u32,
 }
 
-#[get("projects_random")]
+/// Get a list of random projects.
+///
+/// Query parameters:
+/// - `count` (required): The number of random projects to return (0-100).
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[get("/projects_random")]
 pub async fn random_projects_get(
     web::Query(count): web::Query<RandomProjects>,
     pool: web::Data<PgPool>,
@@ -174,7 +238,17 @@ pub async fn random_projects_get(
     }
 }
 
-#[get("projects")]
+/// Get multiple projects by IDs or slugs.
+///
+/// Query parameters:
+/// - `ids` (required): The IDs and/or slugs of the projects, as a JSON array string.
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = Vec<LegacyProject>),
+    ),
+)]
+#[get("/projects")]
 pub async fn projects_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ProjectIds>,
@@ -205,7 +279,15 @@ pub async fn projects_get(
     }
 }
 
-#[get("{id}")]
+/// Get a project by ID or slug.
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = LegacyProject),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/{id}")]
 pub async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -240,8 +322,17 @@ pub async fn project_get(
     Ok(HttpResponse::Ok().json(project))
 }
 
-//checks the validity of a project id or slug
-#[get("{id}/check")]
+/// Check project slug/ID validity.
+///
+/// Returns the project ID if the slug or ID is valid.
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/{id}/check")]
 pub async fn project_get_check(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -253,13 +344,23 @@ pub async fn project_get_check(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct DependencyInfo {
     pub projects: Vec<LegacyProject>,
     pub versions: Vec<LegacyVersion>,
 }
 
-#[get("dependencies")]
+/// Get all of a project's dependencies.
+///
+/// Returns the projects and versions that this project depends on.
+#[utoipa::path(
+    tag = "projects",
+    responses(
+        (status = 200, description = "Expected response to a valid request", body = DependencyInfo),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[get("/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -305,7 +406,7 @@ pub async fn dependency_list(
     }
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditProject {
     #[validate(
         length(min = 3, max = 64),
@@ -404,7 +505,21 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
 }
 
-#[patch("{id}")]
+/// Modify a project.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+/// Accepts a JSON body with modified project fields.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    request_body = EditProject,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
@@ -579,7 +694,7 @@ pub async fn project_edit(
     Ok(response)
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct BulkEditProject {
     #[validate(length(max = 3))]
     pub categories: Option<Vec<String>>,
@@ -642,7 +757,21 @@ pub struct BulkEditProject {
     pub discord_url: Option<Option<String>>,
 }
 
-#[patch("projects")]
+/// Bulk-edit multiple projects.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+/// Accepts a JSON body with fields to edit on all projects specified by the `ids` query parameter.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    request_body = BulkEditProject,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/projects")]
 pub async fn projects_edit(
     req: HttpRequest,
     web::Query(ids): web::Query<ProjectIds>,
@@ -744,7 +873,19 @@ pub struct Extension {
     pub ext: String,
 }
 
-#[patch("{id}/icon")]
+/// Change a project's icon.
+///
+/// The new icon may be up to 256KiB in size.
+/// Requires `PROJECT_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+    ),
+)]
+#[patch("/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -771,7 +912,19 @@ pub async fn project_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("{id}/icon")]
+/// Delete a project's icon.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -803,7 +956,21 @@ pub struct GalleryCreateQuery {
     pub ordering: Option<i64>,
 }
 
-#[post("{id}/gallery")]
+/// Add a gallery image to a project.
+///
+/// Modrinth allows you to upload files of up to 5MiB to a project's gallery.
+/// Requires `PROJECT_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[post("/{id}/gallery")]
 #[allow(clippy::too_many_arguments)]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
@@ -859,7 +1026,19 @@ pub struct GalleryEditQuery {
     pub ordering: Option<i64>,
 }
 
-#[patch("{id}/gallery")]
+/// Modify a gallery image.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+        (status = 404, description = "The requested item(s) were not found or no authorization to access the requested item(s)"),
+    ),
+)]
+#[patch("/{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
@@ -890,7 +1069,19 @@ pub struct GalleryDeleteQuery {
     pub url: String,
 }
 
-#[delete("{id}/gallery")]
+/// Delete a gallery image from a project.
+///
+/// Requires `PROJECT_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
@@ -912,7 +1103,19 @@ pub async fn delete_gallery_item(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("{id}")]
+/// Delete a project.
+///
+/// Requires `PROJECT_DELETE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}")]
 pub async fn project_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -935,7 +1138,19 @@ pub async fn project_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[post("{id}/follow")]
+/// Follow a project.
+///
+/// Requires `USER_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[post("/{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -949,7 +1164,19 @@ pub async fn project_follow(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("{id}/follow")]
+/// Unfollow a project.
+///
+/// Requires `USER_WRITE` authentication scope.
+#[utoipa::path(
+    tag = "projects",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (status = 401, description = "Incorrect token scopes or no authorization to access the requested item(s)"),
+    ),
+)]
+#[delete("/{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
     info: web::Path<(String,)>,

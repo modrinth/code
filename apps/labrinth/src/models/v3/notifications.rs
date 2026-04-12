@@ -612,7 +612,7 @@ impl From<DBNotification> for Notification {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NotificationAction {
     pub name: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
