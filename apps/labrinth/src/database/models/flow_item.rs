@@ -1,9 +1,9 @@
 use super::ids::*;
-use crate::auth::AuthProvider;
 use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
+use crate::{auth::AuthProvider, routes::internal::flows::TempUser};
 use chrono::Duration;
 use rand::Rng;
 use rand::distributions::Alphanumeric;
@@ -21,6 +21,11 @@ pub enum DBFlow {
         url: String,
         provider: AuthProvider,
         existing_user_id: Option<DBUserId>,
+    },
+    OAuthPending {
+        url: String,
+        provider: AuthProvider,
+        user: TempUser,
     },
     Login2FA {
         user_id: DBUserId,
@@ -55,28 +60,38 @@ pub enum DBFlow {
 }
 
 impl DBFlow {
+    pub async fn insert_with_state(
+        &self,
+        expires: Duration,
+        redis: &RedisPool,
+        state: &str,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
+        redis
+            .set_serialized_to_json(
+                FLOWS_NAMESPACE,
+                &state,
+                &self,
+                Some(expires.num_seconds()),
+            )
+            .await?;
+        Ok(())
+    }
+
     pub async fn insert(
         &self,
         expires: Duration,
         redis: &RedisPool,
     ) -> Result<String, DatabaseError> {
-        let mut redis = redis.connect().await?;
-
-        let flow = ChaCha20Rng::from_entropy()
+        let state = ChaCha20Rng::from_entropy()
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)
             .collect::<String>();
 
-        redis
-            .set_serialized_to_json(
-                FLOWS_NAMESPACE,
-                &flow,
-                &self,
-                Some(expires.num_seconds()),
-            )
-            .await?;
-        Ok(flow)
+        self.insert_with_state(expires, redis, &state).await?;
+        Ok(state)
     }
 
     pub async fn get(
