@@ -6,7 +6,7 @@
 				Clear
 			</button>
 		</ButtonStyled>
-		<ButtonStyled v-if="showDelete" type="transparent" color="red">
+		<ButtonStyled v-if="showDelete" type="transparent" hover-color-fill="background" color="red">
 			<button
 				v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
 				:disabled="deleteDisabled"

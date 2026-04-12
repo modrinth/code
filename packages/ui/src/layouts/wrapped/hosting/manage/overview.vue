@@ -92,8 +92,13 @@ provideConsoleManager({
 	showCommandInput: true,
 	disableCommandInput: computed(() => serverPowerState.value !== 'running'),
 	loading: computed(() => !isConnected.value || isWsAuthIncorrect.value),
-	onClear: () => {
+	onClear: async () => {
 		modrinthServersConsole.clear()
+		try {
+			await client.kyros.logs_v1.clear()
+		} catch (error) {
+			console.error('Failed to clear server logs:', error)
+		}
 	},
 	shareDisabled: computed(() => !isConnected.value),
 	emptyStateType: 'server',
