@@ -83,6 +83,10 @@ pub struct RequestConfig {
     pub prioritize_exact_match: bool,
     #[serde(default = "default_prioritize_num_matching_fields")]
     pub prioritize_num_matching_fields: bool,
+    #[serde(default = "default_prioritize_token_positions")]
+    pub prioritize_token_positions: bool,
+    #[serde(default = "default_drop_tokens_threshold")]
+    pub drop_tokens_threshold: usize,
     #[serde(default)]
     pub text_match_type: TextMatchType,
     #[serde(default)]
@@ -98,6 +102,8 @@ impl Default for RequestConfig {
             prioritize_exact_match: default_prioritize_exact_match(),
             prioritize_num_matching_fields:
                 default_prioritize_num_matching_fields(),
+            prioritize_token_positions: default_prioritize_token_positions(),
+            drop_tokens_threshold: default_drop_tokens_threshold(),
             text_match_type: TextMatchType::default(),
             bucketing: Bucketing::default(),
         }
@@ -132,6 +138,14 @@ const fn default_prioritize_exact_match() -> bool {
 
 const fn default_prioritize_num_matching_fields() -> bool {
     false
+}
+
+const fn default_prioritize_token_positions() -> bool {
+    true
+}
+
+const fn default_drop_tokens_threshold() -> usize {
+    0
 }
 
 impl TypesenseConfig {
@@ -695,6 +709,14 @@ impl SearchBackend for Typesense {
                 info.typesense_config
                     .prioritize_num_matching_fields
                     .to_string(),
+            ),
+            (
+                "prioritize_token_positions",
+                info.typesense_config.prioritize_token_positions.to_string(),
+            ),
+            (
+                "drop_tokens_threshold",
+                info.typesense_config.drop_tokens_threshold.to_string(),
             ),
             (
                 "text_match_type",
