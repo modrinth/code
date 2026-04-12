@@ -6,6 +6,16 @@
 				Clear
 			</button>
 		</ButtonStyled>
+		<ButtonStyled v-if="showDelete" type="transparent" color="red">
+			<button
+				v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
+				:disabled="deleteDisabled"
+				@click="emit('delete')"
+			>
+				<TrashIcon />
+				Delete
+			</button>
+		</ButtonStyled>
 		<ButtonStyled v-if="hasLogs" type="transparent">
 			<button
 				v-tooltip="shareDisabled ? shareDisabledTooltip : undefined"
@@ -15,16 +25,6 @@
 				<SpinnerIcon v-if="sharing" class="animate-spin" />
 				<ShareIcon v-else />
 				Share
-			</button>
-		</ButtonStyled>
-		<ButtonStyled v-if="showDelete" type="transparent" color="red">
-			<button
-				v-tooltip="deleteDisabled ? deleteDisabledTooltip : undefined"
-				:disabled="deleteDisabled"
-				@click="emit('delete')"
-			>
-				<TrashIcon />
-				Delete
 			</button>
 		</ButtonStyled>
 		<ButtonStyled type="transparent">
