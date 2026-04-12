@@ -195,7 +195,6 @@ function rewriteFiltered() {
 	}
 	terminalRef.value?.clearEmptyState()
 	const predicate = buildCombinedPredicate()
-	const filtered = predicate ? lines.filter(predicate) : lines
 	rewriteTerminal(term, lines, predicate, activeSearchQuery())
 	lastWrittenIndex = lines.length
 }
