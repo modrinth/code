@@ -23,6 +23,14 @@
 				page. (WebSocket Authentication Failed)
 			</p>
 		</div>
+
+		<button
+			v-if="showAdvancedDebugInfo"
+			class="self-start rounded-lg bg-surface-3 px-3 py-1 text-sm text-contrast hover:brightness-125"
+			@click="downloadLog4jDebug"
+		>
+			Download WS debug JSON
+		</button>
 	</div>
 </template>
 
@@ -37,6 +45,15 @@ import { injectModrinthClient, injectModrinthServerContext } from '#ui/providers
 
 import ServerManageStats from './components/ServerManageStats.vue'
 
+const props = withDefaults(
+	defineProps<{
+		showAdvancedDebugInfo?: boolean
+	}>(),
+	{
+		showAdvancedDebugInfo: false,
+	},
+)
+
 const client = injectModrinthClient()
 const {
 	server: _serverData,
@@ -48,6 +65,14 @@ const {
 	powerStateDetails: _powerStateDetails,
 } = injectModrinthServerContext()
 const modrinthServersConsole = useModrinthServersConsole()
+
+watch(
+	() => props.showAdvancedDebugInfo,
+	(enabled) => {
+		modrinthServersConsole.setWsEventCaptureEnabled(enabled)
+	},
+	{ immediate: true },
+)
 
 const crashAnalysis = ref<Mclogs.Insights.v1.InsightsResponse | null>(null)
 const DISMISS_DURATION_MS = 30 * 60 * 1000
@@ -119,5 +144,18 @@ watch(
 
 if (serverPowerState.value === 'crashed') {
 	void inspectError()
+}
+
+const downloadLog4jDebug = () => {
+	const events = modrinthServersConsole.getWsEventHistory()
+	const blob = new Blob([JSON.stringify(events, null, 2)], { type: 'application/json' })
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url
+	a.download = `ws-debug-${serverId}-${Date.now()}.json`
+	document.body.appendChild(a)
+	a.click()
+	document.body.removeChild(a)
+	URL.revokeObjectURL(url)
 }
 </script>
