@@ -722,7 +722,7 @@ importers:
         specifier: ^2.2.4
         version: 2.2.4(ace-builds@1.43.6)(vue@3.5.27(typescript@5.9.3))
       vue3-apexcharts:
-        specifier: ^1.4.4
+        specifier: ^1.5.2
         version: 1.10.0(apexcharts@4.7.0)(vue@3.5.27(typescript@5.9.3))
       xss:
         specifier: ^1.0.14

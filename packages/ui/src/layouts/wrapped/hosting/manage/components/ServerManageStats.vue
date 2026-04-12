@@ -39,13 +39,12 @@
 			</div>
 
 			<div v-if="metric.showGraph" class="chart-space absolute bottom-0 left-0 right-0">
-				<component
-					:is="apexChartComponent"
-					v-if="!loading && apexChartComponent"
+				<VueApexCharts
+					v-if="!loading && metric.chartOptions"
 					type="area"
 					height="142"
-					:options="getChartOptions(metric.warning, index, metric.data)"
-					:series="[{ name: metric.title, data: metric.data }]"
+					:options="metric.chartOptions"
+					:series="metric.series!"
 					class="chart"
 					:class="chartsReady.has(index) ? 'opacity-100' : 'opacity-0'"
 				/>
@@ -58,8 +57,9 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { type Component, computed, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import VueApexCharts from 'vue3-apexcharts'
 
 import { injectModrinthServerContext } from '#ui/providers'
 
@@ -78,7 +78,6 @@ const props = withDefaults(
 	},
 )
 
-const apexChartComponent = shallowRef<Component | null>(null)
 const chartsReady = ref(new Set<number>())
 const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
 	ramAsNumber: false,
@@ -103,23 +102,54 @@ const padGraph = (data: number[]) => {
 const cpuData = computed(() => padGraph(props.data?.graph.cpu ?? []))
 const ramData = computed(() => padGraph(props.data?.graph.ram ?? []))
 
-onMounted(() => {
-	const load = async () => {
-		apexChartComponent.value = (await import('vue3-apexcharts')).default
-	}
-	const isMac = navigator.platform.startsWith('Mac')
-	if (isMac && 'requestIdleCallback' in window) {
-		requestIdleCallback(() => void load())
-	} else if (isMac) {
-		setTimeout(() => void load(), 250)
-	} else {
-		void load()
-	}
-})
+const cpuPercent = computed(() => stats.value.cpu_percent)
+const ramPercent = computed(() => (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100)
+
+const cpuWarning = computed(() => cpuPercent.value >= 90)
+const ramWarning = computed(() => ramPercent.value >= 90)
+
+const cpuDataMax = computed(() => Math.max(...cpuData.value, 100) + 4)
+const ramDataMax = computed(() => Math.max(...ramData.value, 100) + 4)
 
 const onChartReady = (index: number) => {
 	chartsReady.value.add(index)
 }
+
+const buildChartOptions = (warning: boolean, index: number, dataMax: number) => ({
+	chart: {
+		type: 'area' as const,
+		animations: { enabled: false },
+		sparkline: { enabled: true },
+		toolbar: { show: false },
+		padding: { left: -10, right: -10, top: 0, bottom: 0 },
+		events: {
+			mounted: () => onChartReady(index),
+			updated: () => onChartReady(index),
+		},
+	},
+	stroke: { curve: 'smooth' as const, width: 3 },
+	fill: {
+		type: 'gradient' as const,
+		gradient: { shadeIntensity: 1, opacityFrom: 0.25, opacityTo: 0.05, stops: [0, 100] },
+	},
+	tooltip: { enabled: false },
+	grid: { show: false },
+	xaxis: {
+		labels: { show: false },
+		axisBorder: { show: false },
+		type: 'numeric' as const,
+		tickAmount: GRAPH_SIZE,
+	},
+	yaxis: { show: false, min: 0, max: dataMax, forceNiceScale: false },
+	colors: [warning ? 'var(--color-orange)' : 'var(--color-brand)'],
+	dataLabels: { enabled: false },
+})
+
+const cpuChartOptions = computed(() => buildChartOptions(cpuWarning.value, 0, cpuDataMax.value))
+const ramChartOptions = computed(() => buildChartOptions(ramWarning.value, 1, ramDataMax.value))
+
+const cpuSeries = computed(() => [{ name: 'CPU', data: cpuData.value }])
+const ramSeries = computed(() => [{ name: 'Memory', data: ramData.value }])
 
 const formatBytes = (bytes: number) => {
 	const units = ['B', 'KB', 'MB', 'GB']
@@ -137,9 +167,9 @@ const metrics = computed(() => {
 		title: 'Storage',
 		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes),
 		icon: FolderOpenIcon,
-		data: [] as number[],
 		showGraph: false,
-		warning: null,
+		chartOptions: null as ReturnType<typeof buildChartOptions> | null,
+		series: null as { name: string; data: number[] }[] | null,
 		link: `/hosting/manage/${encodeURIComponent(serverId)}/files`,
 	}
 
@@ -149,103 +179,49 @@ const metrics = computed(() => {
 				title: 'CPU',
 				value: '0.00%',
 				icon: CpuIcon,
-				data: cpuData.value,
 				showGraph: true,
-				warning: null,
+				chartOptions: cpuChartOptions.value,
+				series: cpuSeries.value,
 				link: null,
 			},
 			{
 				title: 'Memory',
 				value: '0.00%',
 				icon: DatabaseIcon,
-				data: ramData.value,
 				showGraph: true,
-				warning: null,
+				chartOptions: ramChartOptions.value,
+				series: ramSeries.value,
 				link: null,
 			},
 			storageMetric,
 		]
 	}
 
-	const ramPercent = (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100
-	const cpuPercent = stats.value.cpu_percent
-
 	return [
 		{
 			title: 'CPU',
-			value: `${cpuPercent.toFixed(2)}%`,
+			value: `${cpuPercent.value.toFixed(2)}%`,
 			icon: CpuIcon,
-			data: cpuData.value,
 			showGraph: true,
+			chartOptions: cpuChartOptions.value,
+			series: cpuSeries.value,
 			link: null,
-			warning: cpuPercent >= 90,
 		},
 		{
 			title: 'Memory',
 			value:
 				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
 					? formatBytes(stats.value.ram_usage_bytes)
-					: `${ramPercent.toFixed(2)}%`,
+					: `${ramPercent.value.toFixed(2)}%`,
 			icon: DatabaseIcon,
-			data: ramData.value,
 			showGraph: true,
+			chartOptions: ramChartOptions.value,
+			series: ramSeries.value,
 			link: null,
-			warning: ramPercent >= 90,
 		},
 		storageMetric,
 	]
 })
-
-const getChartOptions = (hasWarning: boolean | null, index: number, data: number[]) => {
-	const dataMax = Math.max(...data, 100)
-
-	return {
-		chart: {
-			type: 'area' as const,
-			animations: { enabled: false },
-			sparkline: { enabled: true },
-			toolbar: { show: false },
-			padding: {
-				left: -10,
-				right: -10,
-				top: 0,
-				bottom: 0,
-			},
-			events: {
-				mounted: () => onChartReady(index),
-				updated: () => onChartReady(index),
-			},
-		},
-		stroke: { curve: 'smooth' as const, width: 3 },
-		fill: {
-			type: 'gradient' as const,
-			gradient: {
-				shadeIntensity: 1,
-				opacityFrom: 0.25,
-				opacityTo: 0.05,
-				stops: [0, 100],
-			},
-		},
-		tooltip: { enabled: false },
-		grid: { show: false },
-		xaxis: {
-			labels: { show: false },
-			axisBorder: { show: false },
-			type: 'numeric' as const,
-			tickAmount: GRAPH_SIZE,
-		},
-		yaxis: {
-			show: false,
-			min: 0,
-			max: dataMax + 4,
-			forceNiceScale: false,
-		},
-		colors: [hasWarning ? 'var(--color-orange)' : 'var(--color-brand)'],
-		dataLabels: {
-			enabled: false,
-		},
-	}
-}
 
 watch(
 	() => props.data?.current,
