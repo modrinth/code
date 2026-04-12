@@ -146,6 +146,12 @@ pub async fn profile_create(
             crate::launcher::install_minecraft(&profile, None, false).await?;
         }
 
+        let default_opts = state.directories.default_options_file_path();
+        let instance_options = full_path.join("options.txt");
+        if default_opts.exists() && !instance_options.exists() {
+            io::copy(&default_opts, &instance_options).await?;
+        }
+
         Ok(profile.path)
     }
     .await;

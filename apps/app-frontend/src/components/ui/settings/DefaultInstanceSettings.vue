@@ -1,11 +1,46 @@
 <script setup lang="ts">
-import { injectNotificationManager, Slider, StyledInput, Toggle } from '@modrinth/ui'
+import {
+	ButtonStyled,
+	defineMessages,
+	injectNotificationManager,
+	Slider,
+	StyledInput,
+	Toggle,
+	useVIntl,
+} from '@modrinth/ui'
 import { ref, watch } from 'vue'
 
 import useMemorySlider from '@/composables/useMemorySlider'
-import { get, set } from '@/helpers/settings.ts'
+import { ensure_default_options_file, get, set } from '@/helpers/settings.ts'
+import { openPath } from '@/helpers/utils.js'
 
 const { handleError } = injectNotificationManager()
+const { formatMessage } = useVIntl()
+
+const defaultOptionsMessages = defineMessages({
+	title: {
+		id: 'app.settings.default-options.title',
+		defaultMessage: 'Default options.txt',
+	},
+	description: {
+		id: 'app.settings.default-options.description',
+		defaultMessage:
+			'This file is copied to every new instance. Edit it to set default keybinds and other options.',
+	},
+	openFileLocation: {
+		id: 'app.settings.default-options.open-file-location',
+		defaultMessage: 'Open file location',
+	},
+})
+
+async function openDefaultOptionsLocation() {
+	try {
+		const path = await ensure_default_options_file()
+		await openPath(path)
+	} catch (e) {
+		handleError(e)
+	}
+}
 
 const fetchSettings = await get()
 fetchSettings.launchArgs = fetchSettings.extra_launch_args.join(' ')
@@ -52,6 +87,22 @@ watch(
 
 <template>
 	<div>
+		<h2 class="m-0 text-lg font-extrabold text-contrast">
+			{{ formatMessage(defaultOptionsMessages.title) }}
+		</h2>
+		<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
+			{{ formatMessage(defaultOptionsMessages.description) }}
+		</p>
+		<div class="mt-2 flex flex-wrap gap-2">
+			<ButtonStyled>
+				<button type="button" @click="openDefaultOptionsLocation">
+					{{ formatMessage(defaultOptionsMessages.openFileLocation) }}
+				</button>
+			</ButtonStyled>
+		</div>
+
+		<hr class="mt-4 bg-button-border border-none h-[1px]" />
+
 		<h2 class="m-0 text-lg font-extrabold text-contrast">Window size</h2>
 
 		<div class="flex items-center justify-between gap-4">

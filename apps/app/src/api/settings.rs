@@ -6,7 +6,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             settings_get,
             settings_set,
-            cancel_directory_change
+            cancel_directory_change,
+            ensure_default_options_file
         ])
         .build()
 }
@@ -34,4 +35,9 @@ pub async fn cancel_directory_change() -> Result<()> {
 
     settings::cancel_directory_change(identifier).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn ensure_default_options_file() -> Result<std::path::PathBuf> {
+    Ok(theseus::settings::ensure_default_options_file().await?)
 }
