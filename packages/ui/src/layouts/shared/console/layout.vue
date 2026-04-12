@@ -150,7 +150,6 @@ onBeforeUnmount(() => {
 })
 
 let lastWrittenIndex = 0
-let manuallyCleared = false
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
 
 const resolvedShowInput = computed(() => {
@@ -237,13 +236,9 @@ watch(ctx.logLines, (lines, oldLines) => {
 	if (!term) return
 
 	if (lines.length === 0 && isLiveSource.value) {
-		if (!manuallyCleared) {
-			writeEmptyState()
-		}
+		writeEmptyState()
 		return
 	}
-
-	manuallyCleared = false
 
 	if (
 		terminalRef.value?.showingEmptyState ||
@@ -284,10 +279,10 @@ function handleCommand(cmd: string) {
 }
 
 function handleClear() {
-	manuallyCleared = true
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
+	writeEmptyState()
 }
 
 async function handleShare() {

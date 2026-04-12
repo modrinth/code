@@ -57,11 +57,12 @@
 import { CpuIcon, DatabaseIcon, FolderOpenIcon } from '@modrinth/assets'
 import type { Stats } from '@modrinth/utils'
 import { useStorage } from '@vueuse/core'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
-import VueApexCharts from 'vue3-apexcharts'
 
 import { injectModrinthServerContext } from '#ui/providers'
+
+const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
 const { serverId } = injectModrinthServerContext()
 
@@ -108,8 +109,8 @@ const ramPercent = computed(() => (stats.value.ram_usage_bytes / stats.value.ram
 const cpuWarning = computed(() => cpuPercent.value >= 90)
 const ramWarning = computed(() => ramPercent.value >= 90)
 
-const cpuDataMax = computed(() => Math.max(...cpuData.value, 100) + 4)
-const ramDataMax = computed(() => Math.max(...ramData.value, 100) + 4)
+const cpuDataMax = 104
+const ramDataMax = 104
 
 const onChartReady = (index: number) => {
 	chartsReady.value.add(index)
@@ -145,8 +146,8 @@ const buildChartOptions = (warning: boolean, index: number, dataMax: number) => 
 	dataLabels: { enabled: false },
 })
 
-const cpuChartOptions = computed(() => buildChartOptions(cpuWarning.value, 0, cpuDataMax.value))
-const ramChartOptions = computed(() => buildChartOptions(ramWarning.value, 1, ramDataMax.value))
+const cpuChartOptions = computed(() => buildChartOptions(cpuWarning.value, 0, cpuDataMax))
+const ramChartOptions = computed(() => buildChartOptions(ramWarning.value, 1, ramDataMax))
 
 const cpuSeries = computed(() => [{ name: 'CPU', data: cpuData.value }])
 const ramSeries = computed(() => [{ name: 'Memory', data: ramData.value }])
@@ -252,5 +253,9 @@ watch(
 	box-shadow:
 		0 1px 2px 0 rgba(0, 0, 0, 0.3),
 		0 1px 3px 0 rgba(0, 0, 0, 0.15);
+}
+
+.chart :deep(svg) {
+	overflow: visible;
 }
 </style>

@@ -90,7 +90,7 @@ export function rewriteTerminal(
 	}
 
 	terminal.write('\x1b[?2026h')
-	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n') + '\r\n', () => {
+	terminal.write(filtered.map((line) => colorize(line, searchQuery)).join('\r\n'), () => {
 		terminal.write('\x1b[?2026l')
 		callback?.()
 	})

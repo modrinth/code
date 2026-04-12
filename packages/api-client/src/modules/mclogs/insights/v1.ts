@@ -11,7 +11,8 @@ export class MclogsInsightsV1Module extends AbstractModule {
 			api: 'https://api.mclo.gs',
 			version: '1',
 			method: 'POST',
-			body: { content },
+			body: new URLSearchParams({ content }),
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			skipAuth: true,
 		})
 	}
