@@ -34,6 +34,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_add_project_from_path,
             profile_toggle_disable_project,
             profile_remove_project,
+            profile_rename_project_companion_files,
             profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
@@ -284,6 +285,24 @@ pub async fn profile_remove_project(
     project_path: &str,
 ) -> Result<()> {
     profile::remove_project(path, project_path).await?;
+    Ok(())
+}
+
+// Rename existing project-related files, such as shader config,
+// to match the new project path
+// invoke('plugin:profile|profile_rename_project_companion_files')
+#[tauri::command]
+pub async fn profile_rename_project_companion_files(
+    path: &str,
+    project_old_path: &str,
+    project_new_path: &str,
+) -> Result<()> {
+    profile::rename_project_companion_files(
+        path,
+        project_old_path,
+        project_new_path,
+    )
+    .await?;
     Ok(())
 }
 
