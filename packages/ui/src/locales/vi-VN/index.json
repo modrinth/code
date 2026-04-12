@@ -281,6 +281,9 @@
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Đã thêm (phụ thuộc)"
   },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Đã tắt"
+  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Đã cập nhật"
   },
@@ -433,6 +436,273 @@
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "{count, number} đã được chọn"
+  },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Tóm tắt trích xuất"
+  },
+  "files.conflict-modal.overwrite-button": {
+    "defaultMessage": "Ghi đè"
+  },
+  "files.conflict-modal.overwrite-many-warning": {
+    "defaultMessage": "Hơn 100 tệp sẽ bị ghi đè nếu bạn tiếp tục giải nén; dưới đây là một số tệp trong số đó."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "{count} tệp sau đây đã tồn tại trên máy chủ và sẽ bị ghi đè nếu bạn tiếp tục giải nén."
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Ghi đè"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Những tệp sẽ bị ghi đè"
+  },
+  "files.create-modal.create-button": {
+    "defaultMessage": "Tạo {type, select, directory {thư mục} other {tệp}}"
+  },
+  "files.create-modal.header": {
+    "defaultMessage": "Tạo một {type, select, directory {thư mục} other {tệp}}"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "v.d. thu-muc-cua-toi"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "v.d. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Đang xoá \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Xoá tệp"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Thư mục này và toàn bộ nội dung của nó sẽ bị xoá vĩnh viễn. Hành động này một đi không trở lại.} other {Tệp này sẽ bị xoá vĩnh viễn. Hành động này một đi không trở lại.}}"
+  },
+  "files.editor.failed-to-open-text": {
+    "defaultMessage": "Không thể tải nội dung tệp."
+  },
+  "files.editor.failed-to-open-title": {
+    "defaultMessage": "Không mở tệp được"
+  },
+  "files.editor.failed-to-share-text": {
+    "defaultMessage": "Không thể tải lên mclo.gs."
+  },
+  "files.editor.failed-to-share-title": {
+    "defaultMessage": "Không chia sẻ tệp được"
+  },
+  "files.editor.file-saved-text": {
+    "defaultMessage": "Tệp của bạn đã được lưu lại."
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Tệp đã được lưu"
+  },
+  "files.editor.log-url-copied-text": {
+    "defaultMessage": "URL tệp nhật kí của bạn đã được chép vào bảng tạm."
+  },
+  "files.editor.log-url-copied-title": {
+    "defaultMessage": "Đã chép URL nhật kí"
+  },
+  "files.editor.save-failed-text": {
+    "defaultMessage": "Không lưu tệp này được."
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Không lưu được"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": ""
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Thử lại"
+  },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "Tệp ảnh quá lớn để xem (tối đa {maxDimension}x{maxDimension} pixels)"
+  },
+  "files.image_viewer.invalid_image": {
+    "defaultMessage": "Tệp ảnh rỗng hoặc không hợp lệ."
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Không thể tải ảnh"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Đặt lại thu phóng"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Phóng to"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Thu nhỏ"
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "Thư mục trống không"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Đang tải tệp..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "đã chọn {count}"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Bạn có thay đổi chưa được lưu."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "Vị trí hiện tại"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "Đường dẫn đích"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "v.d. /thu-muc-cua-toi"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Tạo mới..."
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "Cài đặt modpack từ CurseForge"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Tệp mới"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Thư mục mới"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Tìm kiếm tệp tin"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Chia sẻ lên mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Tải tệp lên"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "Tải lên từ tệp .zip"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "Tải lên từ URL tệp .zip"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "Đã giải nén {size}"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "Đang giải nén {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Thất bại"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "modpack từ URL"
+  },
+  "files.operations.upload-progress": {
+    "defaultMessage": "{uploaded} / {total} ({percent}%)"
+  },
+  "files.operations.uploading-files": {
+    "defaultMessage": "Đang tải tệp lên ({completed}/{total})"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "Đổi tên {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Tên mới"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# mục} other {# mục}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Thời gian tạo"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Lần chỉnh sửa cuối cùng"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Tên"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Kích thước"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "Bạn có các thay đổi chưa được lưu. Chúng sẽ bị mất nếu bạn rời khỏi trang này. Bạn có muốn lưu lại trước không?"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "Huỷ bỏ"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Thay đổi chưa lưu"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Đã huỷ"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "Quá trình tải lên tệp {fileName} đã thất bại"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Tệp"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "Tải lên "
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "Sai định dạng khi tải lên"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Đã có lỗi xảy ra"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": "Còn {count}"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Tên"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Bắt buộc phải có tên"
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "Cài đặt modpack của CurseForge"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "Cài đặt một modpack của CurseForge"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "Không thể tìm modpack của CurseForge từ đường dẫn đó"
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "Không thể tìm thấy modpack từ CurseForge"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "Nhập đường dẫn"
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "Đường dẫn phải khả dụng"
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "Bắt buộc có đường dẫn"
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Cài đặt"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Cài đặt thất bại"
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "Sao chép đường dẫn"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Tìm và xác định vị trí Modpack Curseforge mà bạn muốn"
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Tìm modpack"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "Vào mục \"Tệp\" và chọn phiên bản để cài"
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "Chọn phiên bản"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "Đã xảy ra lỗi không xác định"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "Sao chép và dán dường dẫn trực tiếp của tệp .zip"
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "Đang tải lên nội dung .zip từ đường dẫn"
   },
   "form.label.address-line": {
     "defaultMessage": "Dòng địa chỉ"
@@ -863,6 +1133,9 @@
   "label.client-only-warning": {
     "defaultMessage": "Đây là bản mod phía người chơi (client-side) và có thể gây ra lỗi. Chúng tôi vẫn giữ nó ở trạng thái kích hoạt vì một số tác giả thường gắn nhãn sai môi trường hoạt động, và trình nạp sẽ tự giải quyết các xung đột này."
   },
+  "label.client-retained-warning": {
+    "defaultMessage": "Đây là mod phía máy khách, được cài đặt làm phần phụ thuộc, và có thể gây ra vấn đề khi khởi động máy chủ của bạn"
+  },
   "label.collections": {
     "defaultMessage": "Bộ sưu tập"
   },
@@ -871,6 +1144,15 @@
   },
   "label.content": {
     "defaultMessage": "Nội dung"
+  },
+  "label.copied-filename": {
+    "defaultMessage": "Đã sao chép tên tệp"
+  },
+  "label.copied-path": {
+    "defaultMessage": "Đã sao chép đường dẫn"
+  },
+  "label.create-failed": {
+    "defaultMessage": "Tạo file không thành công"
   },
   "label.created-ago": {
     "defaultMessage": "Đã tạo {ago}"
@@ -881,6 +1163,9 @@
   "label.delete": {
     "defaultMessage": "Xóa"
   },
+  "label.delete-failed": {
+    "defaultMessage": "Xóa không thành công"
+  },
   "label.delete-immediately": {
     "defaultMessage": "Xoá ngay lập tức"
   },
@@ -890,6 +1175,12 @@
   "label.details": {
     "defaultMessage": "Chi tiết"
   },
+  "label.done": {
+    "defaultMessage": "Đã xong"
+  },
+  "label.download-failed": {
+    "defaultMessage": "Tải xuống không thành công"
+  },
   "label.email": {
     "defaultMessage": "Email"
   },
@@ -898,6 +1189,9 @@
   },
   "label.error": {
     "defaultMessage": "Lỗi"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "Giải nén không thành công"
   },
   "label.filter-by": {
     "defaultMessage": "Lọc theo"
@@ -925,6 +1219,9 @@
   },
   "label.modpack": {
     "defaultMessage": "Modpack"
+  },
+  "label.move-failed": {
+    "defaultMessage": "Chuyển không thành không"
   },
   "label.no": {
     "defaultMessage": "Không"
@@ -970,6 +1267,9 @@
   },
   "label.rejected": {
     "defaultMessage": "Bị từ chối"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "Đổi tên không thành công"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "Tôi đồng ý với <terms-link>Điều Khoản Chương Trình Phần Thưởng</terms-link>"
@@ -1018,6 +1318,9 @@
   },
   "label.update-available": {
     "defaultMessage": "Có cập nhật mới"
+  },
+  "label.updating": {
+    "defaultMessage": "Đang tải lên..."
   },
   "label.username": {
     "defaultMessage": "Tên đăng nhập"
@@ -2516,6 +2819,9 @@
   "tag.category.high": {
     "defaultMessage": "Cao"
   },
+  "tag.category.items": {
+    "defaultMessage": "Vật phẩm"
+  },
   "tag.category.keep-inventory": {
     "defaultMessage": "Chết không mất đồ"
   },
@@ -2542,6 +2848,9 @@
   },
   "tag.category.management": {
     "defaultMessage": "Quản lý"
+  },
+  "tag.category.media": {
+    "defaultMessage": ""
   },
   "tag.category.medium": {
     "defaultMessage": "Trung bình"
@@ -2626,6 +2935,9 @@
   },
   "tag.category.shadows": {
     "defaultMessage": "Đổ bóng"
+  },
+  "tag.category.simplistic": {
+    "defaultMessage": "Đơn điệu"
   },
   "tag.category.skyblock": {
     "defaultMessage": "Skyblock"
@@ -2761,6 +3073,15 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "Bạn có những thay đổi chưa được lưu"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "Rời khỏi trang"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "Ở lại trang này"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "Rời khỏi trang nhé?"
   }
 }
 

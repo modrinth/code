@@ -1047,7 +1047,7 @@
     "message": "Béka"
   },
   "hosting-marketing.available-locations": {
-    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető. Észak-Amerikában, Európában és Délkelet-Ázsiában széles körű lefedettség mellett elérhető."
+    "message": "Észak-Amerikában, Európában és Délkelet-Ázsiában érhető el széles körű lefedettség mellett."
   },
   "hosting-marketing.billing.monthly": {
     "message": "Havi fizetés"
@@ -1056,7 +1056,7 @@
     "message": "Negyedéves fizetés"
   },
   "hosting-marketing.billing.save-with-quarterly": {
-    "message": "Negyedéves számlázással 16% kedvezményt kap!"
+    "message": "Negyedéves számlázással 16% kedvezményt kapsz!"
   },
   "hosting-marketing.billing.starting-at": {
     "message": "Kezdőár: {price} / hó"
@@ -1194,7 +1194,7 @@
     "message": "Pontosan tudod, mire van szükséged?"
   },
   "hosting-marketing.medal.info": {
-    "message": "Próbálja ki 5 napig ingyen a <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
+    "message": "Próbáld ki 5 napig ingyen egy <orange>3 GB-os szervert</orange>, amelyet a <orange>Medal</orange> biztosít"
   },
   "hosting-marketing.medal.learn-more": {
     "message": "További információk"
@@ -1419,7 +1419,7 @@
     "message": "Új szerver"
   },
   "layout.action.publish": {
-    "message": "Közzététel"
+    "message": "Létrehozás"
   },
   "layout.action.review-projects": {
     "message": "Projekt áttekintés"
@@ -1476,7 +1476,7 @@
     "message": "Jutalomprogram"
   },
   "layout.footer.about.status": {
-    "message": "Státusz"
+    "message": "Állapot"
   },
   "layout.footer.legal": {
     "message": "Jogi megjegyzések"
@@ -2553,7 +2553,7 @@
     "message": "Szinkronizálás a szerverrel"
   },
   "servers.notice.actions": {
-    "message": "Akciók"
+    "message": "Műveletek"
   },
   "servers.notice.dismissable": {
     "message": "Elutasítható"

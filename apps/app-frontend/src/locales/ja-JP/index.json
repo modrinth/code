@@ -126,7 +126,7 @@
     "message": "オンライン"
   },
   "app.instance.worlds.filter-vanilla": {
-    "message": "バニラ(Mod非導入)"
+    "message": "バニラ"
   },
   "app.instance.worlds.no-worlds-description": {
     "message": "サーバーを追加、またはブラウズして始める"
@@ -144,7 +144,7 @@
     "message": "本当に {name} を削除しますか？"
   },
   "app.instance.worlds.search-worlds-placeholder": {
-    "message": "{count} 個のワールドを検索..."
+    "message": "{count} 個のワールドを検索…"
   },
   "app.instance.worlds.this-server": {
     "message": "このサーバー"
@@ -372,7 +372,7 @@
     "message": "ファイルを追加中 ({completed}/{total})"
   },
   "instance.files.save-as": {
-    "message": "名前をつけて保存..."
+    "message": "名前をつけて保存…"
   },
   "instance.server-modal.address": {
     "message": "アドレス"

@@ -225,13 +225,16 @@
     "defaultMessage": "Privé"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Êtes vous sûr de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
+    "defaultMessage": "Êtes vous sûr(e) de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Avertissement mise à jour"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Mettre à jour les projets"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Maintenez Shift en cliquant « Tout mettre à jour » pour passer cette confirmation à l'avenir."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Mettre à jour {count, plural, one {# projet} other {# projets}}"
@@ -976,6 +979,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Nous déconseillons de modifier vos paramètres d'installation après avoir installé du contenu. Si vous souhaitez néanmoins les modifier, réinitialisez votre serveur."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Réparer automatiquement"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Changer de loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Désactiver les conflits"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "En changeant la version du jeu, nous pouvons soit désactiver le contenu incompatible installé, ou bien résoudre les incompatibilités."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Avertissement d'incompatibilité"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Contenu incompatible installé"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "En changeant le loader, tout le contenu installé sera désactivé. Nous vous recommandons plutôt de réinitialiser votre serveur."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Changer de loader est destructif"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Associé le {projectType, select, server {projet du serveur} other {modpack}}"

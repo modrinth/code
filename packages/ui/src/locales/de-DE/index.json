@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Projekte aktualisieren"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Halte während du auf „Alle aktualisieren“ klickst die Umschalttaste gedrückt, um diese Bestätigung in Zukunft zu überspringen."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aktualisiere {count, plural, one {# Projekt} other {# Projekte}}"
   },
@@ -453,13 +456,13 @@
     "defaultMessage": "{count} überschrieben"
   },
   "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Überschrieben"
+    "defaultMessage": "Überschreibt"
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dateien werden überschrieben"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Erstelle {type, select, directory {Ordner} other {Datei}}"
+    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} erstellen"
   },
   "files.create-modal.header": {
     "defaultMessage": "Erstelle {type, select, directory {einen Ordner} other {eine Datei}}"
@@ -759,7 +762,7 @@
     "defaultMessage": "Wechsel zur Registerkarte „Dateien“ und wähle die zu installierende Version aus."
   },
   "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Wählen eine Version"
+    "defaultMessage": "Wähle eine Version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ein unbekannter Fehler ist aufgetreten"
@@ -972,10 +975,34 @@
     "defaultMessage": "Installation bearbeiten"
   },
   "installation-settings.edit.warning-instance": {
-    "defaultMessage": "Wir empfehlen nicht, deine Installationseinstellungen nach der Installation von Inhalten zu ändern. Falls du sie dennoch ändern möchtest, sei vorsichtig, da dies zu Problemen führen kann."
+    "defaultMessage": "Wir empfehlen, deine Installationseinstellungen nach der Installation von Inhalten nicht zu ändern. Falls du sie dennoch ändern möchtest, sei vorsichtig, da dies zu Problemen führen kann."
   },
   "installation-settings.edit.warning-server": {
-    "defaultMessage": "Wir empfehlen nicht, die Installationseinstellungen nach der Installation von Inhalten zu ändern. Falls du sie ändern möchtest, setze deinen Server zurück."
+    "defaultMessage": "Wir empfehlen, die Installationseinstellungen nach der Installation von Inhalten nicht zu ändern. Falls du sie ändern möchtest, setze deinen Server zurück."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Auto-fix"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Loader ändern"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Konflikte deaktivieren"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Beim Ändern der Spielversion können wir entweder inkompatible installierte Inhalte deaktivieren oder versuchen, die Inkompatibilitäten zu beheben."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Warnung wegen Inkompatibilität"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Inkompatibler Inhalt installiert"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Durch das Ändern des Loaders werden alle installierten Inhalte deaktiviert. Wir empfehlen stattdessen, deinen Server zurückzusetzen."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Das Ändern des Loaders ist irreversibel"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Verlinktes {projectType, select, server {Serverprojekt} other {Modpack}}"
@@ -1215,10 +1242,10 @@
     "defaultMessage": "Inhalt"
   },
   "label.copied-filename": {
-    "defaultMessage": "Kopierter Dateiname"
+    "defaultMessage": "Dateiname kopiert"
   },
   "label.copied-path": {
-    "defaultMessage": "Kopierter Pfad"
+    "defaultMessage": "Pfad kopiert"
   },
   "label.create-failed": {
     "defaultMessage": "Erstellen fehlgeschlagen"

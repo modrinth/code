@@ -1355,6 +1355,9 @@
   "landing.section.for-players.label": {
     "message": "För spelare"
   },
+  "landing.section.for-players.tagline": {
+    "message": "Upptäck över {count, number} kreationer"
+  },
   "landing.subheading": {
     "message": "Upptäck, spela och dela Minecraft-innehåll via vår plattform med öppen källkod som skapades för communityn."
   },

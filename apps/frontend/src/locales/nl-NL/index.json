@@ -1301,8 +1301,32 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Kies tussen Vanilla, Fabric, Forge, Quilt en NeoForge. Als het op Modrinth is kan het op uw server."
   },
+  "hosting.loader.failed-to-change-version": {
+    "message": "Het veranderen van modpakketversie gefaald"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "message": "Het laden van versies gefaald"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "message": "Het herinstalleren van modpakket gefaald"
+  },
+  "hosting.loader.failed-to-repair": {
+    "message": "De serverreparatie gefaald"
+  },
   "hosting.loader.repair-started-text": {
     "message": "Jou server installatie is gerepareerd."
+  },
+  "hosting.loader.repair-started-title": {
+    "message": "Reparatie voltooid"
+  },
+  "hosting.loader.reset-server": {
+    "message": "Herstel server"
+  },
+  "hosting.loader.reset-server-description": {
+    "message": "Verwijdert alla gegevens, zoals uw werelden, mods, en config bestanden, van uw server. Backups zullen blijven en herstelt kunnen worden"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Ondersteuningsopties"
   },
   "hosting.plan.out-of-stock": {
     "message": "Uitverkocht"
@@ -2780,6 +2804,9 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniseer met de server"
   },
+  "servers.busy.installing": {
+    "message": "Server is aan het installeren"
+  },
   "servers.notice.actions": {
     "message": "Acties"
   },
@@ -2816,6 +2843,36 @@
   "servers.plan.small.description": {
     "message": "Perfect voor 1-5 vrienden en een paar lichte mods"
   },
+  "settings.account.button.complete-setup": {
+    "message": "Vervolledig setup"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Weet u zeker dat u uw account wilt verwijderen?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Verwijder account"
+  },
+  "settings.account.delete.section.title": {
+    "message": "Verwijder account"
+  },
+  "settings.account.email.action.save": {
+    "message": "Sla email op"
+  },
+  "settings.account.email.field.label": {
+    "message": "Email adres"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Voer uw e-mailadres in..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Voeg e-mailadres toe"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Verander e-mailadres"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "......................"
+  },
   "settings.account.password.action.remove": {
     "message": "Wachtwoord verwijderen"
   },
@@ -2848,6 +2905,9 @@
   },
   "settings.account.providers.table.actions": {
     "message": "Acties"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Voeg e-mailadres toe"
   },
   "settings.account.security.password.action.add": {
     "message": "Wachtwoord toevoegen"

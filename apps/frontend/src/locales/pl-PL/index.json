@@ -3198,7 +3198,7 @@
     "message": "Czy na pewno chcesz unieważnić dostęp tej aplikacji?"
   },
   "settings.billing.charges.description": {
-    "message": "Wszystkie poprzednie wydatki z twojego konta Modrinth są wyświetlane poniżej:"
+    "message": "Wszystkie pobrane opłaty z twojego konta Modrinth są wyświetlane poniżej:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Okres próbny Medal"
@@ -3208,6 +3208,9 @@
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Pobrane opłaty"
   },
   "settings.billing.expires": {
     "message": "Wygasa {date}"

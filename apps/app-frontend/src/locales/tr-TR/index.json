@@ -6,16 +6,16 @@
     "message": "Doğrulama sunucularına erişilemedi"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Sunucuya içerik ekle"
+    "message": "Örneğe sunucuyu ekle"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "İçeriğe sunucu ekle"
+    "message": "Örneğinize sunucu ekleyin"
   },
   "app.browse.add-to-instance": {
-    "message": "İçerik ekle"
+    "message": "Örneğe ekle"
   },
   "app.browse.add-to-instance-name": {
-    "message": "{instanceName} içeriğine ekle"
+    "message": "{instanceName} örneğine ekle"
   },
   "app.browse.added": {
     "message": "Eklendi"
@@ -36,7 +36,7 @@
     "message": "Yüklü İçerikleri Gizle"
   },
   "app.browse.install-content-to-instance": {
-    "message": "İçeriği profile yükle"
+    "message": "İçeriği örneğe yükle"
   },
   "app.export-modal.description-placeholder": {
     "message": "Mod paketi açıklaması yazın..."
@@ -48,7 +48,7 @@
     "message": "Modpaketi çıkart"
   },
   "app.export-modal.modpack-name-label": {
-    "message": "Modpaketi adı"
+    "message": "Modpaketi Adı"
   },
   "app.export-modal.modpack-name-placeholder": {
     "message": "Modpaketi adı"
@@ -69,10 +69,10 @@
     "message": "Bu eylem geri alınamaz"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "İçeriği Sil"
+    "message": "Örneği Sil"
   },
   "app.instance.confirm-delete.header": {
-    "message": "İçeriği Sil"
+    "message": "Örneği Sil"
   },
   "app.instance.modpack-already-installed.body": {
     "message": "Bu mod paketi zaten <bold>{instanceName}</bold> örneğinde yüklü. Kopyalamak istediğinizden emin misiniz?"
@@ -84,7 +84,7 @@
     "message": "Modpaketi zaten kurulu"
   },
   "app.instance.modpack-already-installed.instance": {
-    "message": "İçerik"
+    "message": "Örnek"
   },
   "app.instance.mods.content-type-project": {
     "message": "proje"
@@ -102,16 +102,16 @@
     "message": "Mod paketi içeriğini paylaşıyorsunuz"
   },
   "app.instance.mods.successfully-uploaded": {
-    "message": "Başarı ile yüklendi"
+    "message": "Başarıyla yüklendi"
   },
   "app.instance.worlds.add-server": {
     "message": "Sunucu Ekle"
   },
   "app.instance.worlds.browse-servers": {
-    "message": "Sunucuya göz at"
+    "message": "Sunucuları Keşfet"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "'{name}' kalıcı olarak silinecek ve geri getirilmesi mümkün olmayacaktır."
+    "message": "'{name}' **kalıcı olarak silinecek** ve geri getirilmesi mümkün olmayacaktır."
   },
   "app.instance.worlds.delete-world-title": {
     "message": "Bu dünyayı kalıcı olarak silmek istediğinizden emin misiniz?"

@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Обновление проектов"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Удерживайте Shift при нажатии на кнопку \"Обновить всё\", чтобы пропустить это подтверждение в будущем."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Обновить {count, plural, one {# проект} few {# проекта} other {# проектов}}"
   },
@@ -437,11 +440,17 @@
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Выбрано: {count, number}"
   },
+  "files.conflict-modal.header": {
+    "defaultMessage": "Извлечь сводку"
+  },
   "files.conflict-modal.overwrite-button": {
     "defaultMessage": "Переписать"
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Более 100 файлов будет перезаписано если вы продолжите извлечение; вот несколько из них."
+  },
+  "files.conflict-modal.overwrite-warning": {
+    "defaultMessage": "Следующи{count, plural, one {й} few {е}} {count} файл{count, plural, one {} few {а} other {ов}} уже существуют на вашем сервере, и будут перезаписаны если вы продолжите извлечение."
   },
   "files.conflict-modal.overwritten-count": {
     "defaultMessage": "{count} переписано"
@@ -469,6 +478,9 @@
   },
   "files.delete-modal.header": {
     "defaultMessage": "Удалить файл"
+  },
+  "files.delete-modal.warning": {
+    "defaultMessage": "{type, select, directory {Эта папка и всё содержимое в ней будет удалено навсегда. Это действие необратимо.} other {Этот файл будет удалён навсегда. Это действие необратимо.}}"
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Не получилось загрузить контент файла."
@@ -527,6 +539,15 @@
   "files.image_viewer.zoom_out": {
     "defaultMessage": "Уменьшить"
   },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Файловые операции отключены, пока операция выполняется."
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "Ошибка при запуске пробной версии"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "Пробный запуск не удался"
+  },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Нет файлов или папок."
   },
@@ -565,6 +586,9 @@
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Вернуться на главную страницу"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Иерархическая навигация"
   },
   "files.navbar.create-new": {
     "defaultMessage": "Создать..."
@@ -623,6 +647,9 @@
   "files.rename-modal.new-name-label": {
     "defaultMessage": "Новое имя"
   },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# предмет} other {# предметы}}"
+  },
   "files.table-header.created": {
     "defaultMessage": "Создан"
   },
@@ -668,8 +695,20 @@
   "files.upload-dropdown.incorrect-file-type": {
     "defaultMessage": "Загрузка имела неправильный тип файла"
   },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "Произошла непредвиденная ошибка."
+  },
   "files.upload-dropdown.uploads-left": {
     "defaultMessage": " - {count} осталось"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "Перетащите сюда {type, select, undefined {файл(ы)} other {{type}}}, чтобы загрузить"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "Имя должно содержать только буквенные символы, дефисы, подчеркивания или пробелы."
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "Имя должно содержать только буквенные символы, дефисы, подчёркивания, точки или пробелы."
   },
   "files.validation.name-label": {
     "defaultMessage": "Имя"
@@ -712,6 +751,9 @@
   },
   "files.zip-url-modal.step-copy-title": {
     "defaultMessage": "Скопировать URL"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "Просмотрите CurseForge и найдите нужную вам сборку модов."
   },
   "files.zip-url-modal.step-find-title": {
     "defaultMessage": "Найти сборку модов"
@@ -937,6 +979,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Мы не рекомендуем редактировать ваши настройки установки после установки контента. Если вы хотите изменить их, перезагрузите сервер."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Автоматическое исправление"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Сменить загрузчика модов"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Отключить конфликты"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "При смене версии игры, мы можем либо отключить установленные несовместимые проекты, либо попытаться решить несовместимости."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Предупреждение об несовместимости"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Установлены несовместимые проекты"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "При смене загрузчика модов, все установленные проекты будут отключены. Вместо этого мы рекомендуем сбросить ваш сервер."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Смена загрузчика модов приведёт к повреждениям"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Отвязка {projectType, select, server {серверного проекта} other {сборки}}"
@@ -2454,10 +2520,10 @@
     "defaultMessage": "Загрузчик"
   },
   "search.server_content_type.modpack": {
-    "defaultMessage": "Со сборкой"
+    "defaultMessage": "Модовые"
   },
   "search.server_content_type.vanilla": {
-    "defaultMessage": "Без сборки"
+    "defaultMessage": "Ванильные"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "Что-то пошло не так во время создания {backupName}. Пожалуйста, попробуйте ещё раз или обратитесь в поддержку, если проблема продолжится."

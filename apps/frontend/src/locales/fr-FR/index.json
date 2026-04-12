@@ -369,7 +369,7 @@
     "message": "Cela va supprimer de manière permanente cette collection. Cette action est irréversible."
   },
   "collection.delete-modal.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette collection ?"
+    "message": "Êtes-vous sûr(e) de vouloir supprimer cette collection ?"
   },
   "collection.description": {
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
@@ -567,7 +567,7 @@
     "message": "Révoquer"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
+    "message": "Êtes-vous sûr(e) de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
@@ -630,7 +630,7 @@
     "message": "Pratiques de sécurité"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
-    "message": "Êtes-vous un citoyen des États-Unis d'Amérique ?"
+    "message": "Êtes-vous un(e) citoyen(ne) des États-Unis d'Amérique ?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
     "message": "Remplissez le formulaire fiscal"
@@ -1341,7 +1341,7 @@
     "message": "Réinitialiser à l'intégration"
   },
   "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr de vouloir continuer ?"
+    "message": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr(e) de vouloir continuer ?"
   },
   "hosting.loader.reset-to-onboarding-modal-title": {
     "message": "Réinitialiser à l'intégration"
@@ -1482,7 +1482,7 @@
     "message": "Partagez vos créations avec le monde"
   },
   "landing.section.for-players.description": {
-    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
+    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr(e) de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
   },
   "landing.section.for-players.label": {
     "message": "Pour les joueurs"
@@ -2904,7 +2904,7 @@
     "message": "Supprimer ce compte"
   },
   "settings.account.delete.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer votre compte ?"
+    "message": "Êtes-vous sûr(e) de vouloir supprimer votre compte ?"
   },
   "settings.account.delete.section.action": {
     "message": "Supprimer le compte"
@@ -3123,7 +3123,7 @@
     "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette application ? "
+    "message": "Êtes-vous sûr(e) de vouloir supprimer cette application ? "
   },
   "settings.applications.description.intro": {
     "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
@@ -3195,7 +3195,7 @@
     "message": "Cela révoquera l’accès de l’application à votre compte. Vous pourrez toujours la réautoriser plus tard."
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir révoquer cette application ?"
+    "message": "Êtes-vous sûr(e) de vouloir révoquer cette application ?"
   },
   "settings.billing.charges.description": {
     "message": "Toutes vos transactions passées sur votre compte Modrinth seront affichées ici :"
@@ -3208,6 +3208,9 @@
   },
   "settings.billing.charges.product.pyro": {
     "message": "Hébergement Modrinth"
+  },
+  "settings.billing.charges.title": {
+    "message": "Charges passées"
   },
   "settings.billing.expires": {
     "message": "Expire le {date}"
@@ -3264,7 +3267,7 @@
     "message": "Cela annulera votre abonnement. Vous conserverez vos avantages jusqu’à la fin du cycle de facturation en cours."
   },
   "settings.billing.modal.cancel.title": {
-    "message": "Êtes-vous sûr de vouloir annuler votre abonnement ?"
+    "message": "Êtes-vous sûr(e) de vouloir annuler votre abonnement ?"
   },
   "settings.billing.modal.delete.action": {
     "message": "Supprimer ce mode de paiement"
@@ -3273,7 +3276,7 @@
     "message": "Cela supprimera définitivement ce mode paiement. (vraiment toujours)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer ce mode de paiement ?"
+    "message": "Êtes-vous sûr(e) de vouloir supprimer ce mode de paiement ?"
   },
   "settings.billing.next": {
     "message": "Suivant :"

@@ -1313,6 +1313,9 @@
   "hosting.loader.failed-to-repair": {
     "message": "Sửa chữa máy chủ thất bại"
   },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "message": "Không thể đặt lại máy chủ về trạng thái thiết lập ban đầu"
+  },
   "hosting.loader.failed-to-save-settings": {
     "message": "Lưu cấu hình cài đặt thất bại"
   },
@@ -1333,6 +1336,24 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "Xóa toàn bộ dữ liệu trên máy chủ của bạn, bao gồm thế giới, các bản mod và tệp cấu hình. Các bản sao lưu sẽ được giữ lại và có thể khôi phục."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "message": "Thiết lập lại từ đầu"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "message": "Việc này sẽ đưa máy chủ về trạng thái thiết lập ban đầu. Bạn có chắc muốn tiếp tục để thực hiện lại quá trình cài đặt?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "message": "Thiết lập lại từ đầu"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "message": "Máy chủ đã được đưa trở lại quy trình thiết lập ban đầu."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "message": "Khôi phục máy chủ về thiết lập ban đầu"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "Các tùy chọn hỗ trợ"
   },
   "hosting.plan.out-of-stock": {
     "message": "Hết hàng"

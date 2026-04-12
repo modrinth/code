@@ -3209,6 +3209,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Caj sebelum ini"
+  },
   "settings.billing.expires": {
     "message": "Akan tamat tempoh {date}"
   },

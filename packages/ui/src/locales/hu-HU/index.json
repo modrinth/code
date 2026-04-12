@@ -63,7 +63,7 @@
     "defaultMessage": "Törlés"
   },
   "button.close": {
-    "defaultMessage": "Bezárt"
+    "defaultMessage": "Bezárás"
   },
   "button.continue": {
     "defaultMessage": "Tovább"
@@ -846,7 +846,7 @@
     "defaultMessage": "A frissítés meghibásodást okozhat a világban. Először nézd át a változásnaplót, és készíts biztonsági másolatot."
   },
   "label.actions": {
-    "defaultMessage": "Akciók"
+    "defaultMessage": "Műveletek"
   },
   "label.available": {
     "defaultMessage": "{amount} elérhető."
@@ -1735,6 +1735,15 @@
   },
   "project.server.region.tooltip": {
     "defaultMessage": "A szerver {regionName} régióban található"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.offline.tooltip": {
+    "defaultMessage": "A szerver offline állapotban van"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Statisztikák"
