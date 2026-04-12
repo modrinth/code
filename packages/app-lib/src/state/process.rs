@@ -410,17 +410,15 @@ impl Process {
 
                                     if let Some(ref throwable) =
                                         current_event.throwable
-                                    {
-                                        if let Err(e) =
+                                        && let Err(e) =
                                             Process::append_to_log_file(
                                                 &log_path, throwable,
                                             )
-                                        {
-                                            tracing::error!(
-                                                "Failed to write throwable to log file: {}",
-                                                e
-                                            );
-                                        }
+                                    {
+                                        tracing::error!(
+                                            "Failed to write throwable to log file: {}",
+                                            e
+                                        );
                                     }
                                 }
 
@@ -437,18 +435,16 @@ impl Process {
                                 {
                                     if let Some(formatted_log) =
                                         Self::format_log4j_entry(&current_event)
-                                    {
-                                        if let Err(e) =
+                                        && let Err(e) =
                                             Process::append_to_log_file(
                                                 &log_path,
                                                 &formatted_log,
                                             )
-                                        {
-                                            tracing::error!(
-                                                "Failed to write to log file: {}",
-                                                e
-                                            );
-                                        }
+                                    {
+                                        tracing::error!(
+                                            "Failed to write to log file: {}",
+                                            e
+                                        );
                                     }
 
                                     if let Some(timestamp_millis) =
@@ -487,19 +483,18 @@ impl Process {
                         } else if !in_event
                             && !e.inplace_trim_end()
                             && !e.inplace_trim_start()
+                            && let Ok(text) = e.xml_content()
                         {
-                            if let Ok(text) = e.xml_content() {
-                                if let Err(e) = Process::append_to_log_file(
-                                    &log_path,
-                                    &format!("{text}\n"),
-                                ) {
-                                    tracing::error!(
-                                        "Failed to write to log file: {}",
-                                        e
-                                    );
-                                }
-                                Self::emit_legacy_log(profile_path, &text);
+                            if let Err(e) = Process::append_to_log_file(
+                                &log_path,
+                                &format!("{text}\n"),
+                            ) {
+                                tracing::error!(
+                                    "Failed to write to log file: {}",
+                                    e
+                                );
                             }
+                            Self::emit_legacy_log(profile_path, &text);
                         }
                     }
                     Ok(Event::CData(e)) => {
