@@ -42,9 +42,13 @@
 				:share-disabled="resolvedShareDisabled"
 				:sharing="isSharing"
 				:fullscreen="isFullscreen"
+				:show-delete="showDelete"
+				:delete-disabled="resolvedDeleteDisabled"
+				:delete-disabled-tooltip="ctx.deleteDisabledTooltip"
 				@clear="handleClear"
 				@share="handleShare"
 				@toggle-fullscreen="toggleFullscreen"
+				@delete="handleDelete"
 			/>
 		</div>
 
@@ -60,18 +64,44 @@
 		/>
 	</div>
 	<ShareModal ref="shareModal" header="Share Logs" link :social-buttons="false" />
+	<NewModal ref="deleteModal" header="Delete log file" :fade="'danger'" max-width="500px">
+		<div class="flex flex-col gap-6">
+			<Admonition type="critical" header="This is irreversible">
+				Deleting this log file cannot be undone. Are you sure you want to continue?
+			</Admonition>
+		</div>
+		<template #actions>
+			<div class="flex justify-end gap-2">
+				<ButtonStyled type="outlined">
+					<button class="!border !border-surface-4" @click="deleteModal?.hide()">
+						<XIcon />
+						Cancel
+					</button>
+				</ButtonStyled>
+				<ButtonStyled color="red">
+					<button :disabled="isDeleting" @click="confirmDelete">
+						<TrashIcon />
+						Delete
+					</button>
+				</ButtonStyled>
+			</div>
+		</template>
+	</NewModal>
 </template>
 
 <script setup lang="ts">
-import { SearchIcon } from '@modrinth/assets'
+import { SearchIcon, TrashIcon, XIcon } from '@modrinth/assets'
 import type { Terminal } from '@xterm/xterm'
 import { computed, isRef, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
+import Admonition from '#ui/components/base/Admonition.vue'
 import BaseTerminal from '#ui/components/base/BaseTerminal.vue'
+import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import type { CollapsibleAdmonitionItem } from '#ui/components/base/CollapsibleAdmonition.vue'
 import CollapsibleAdmonition from '#ui/components/base/CollapsibleAdmonition.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
+import NewModal from '#ui/components/modal/NewModal.vue'
 import ShareModal from '#ui/components/modal/ShareModal.vue'
 import { injectModrinthClient } from '#ui/providers'
 import { injectModalBehavior } from '#ui/providers/modal-behavior'
@@ -105,6 +135,8 @@ const crashItems = computed<CollapsibleAdmonitionItem[]>(() => {
 
 const terminalRef = ref<InstanceType<typeof BaseTerminal> | null>(null)
 const shareModal = ref<InstanceType<typeof ShareModal> | null>(null)
+const deleteModal = ref<InstanceType<typeof NewModal> | null>(null)
+const isDeleting = ref(false)
 const searchQuery = ref('')
 const isFullscreen = ref(false)
 const isApp =
@@ -171,8 +203,16 @@ const resolvedShareDisabled = computed(() => {
 	return isRef(v) ? v.value : v
 })
 
+const showDelete = computed(() => !isLiveSource.value && ctx.onDelete != null)
+
+const resolvedDeleteDisabled = computed(() => {
+	const v = ctx.deleteDisabled
+	if (!v) return false
+	return isRef(v) ? v.value : v
+})
+
 function handleTerminalReady(_terminal: Terminal) {
-	writeAllLines()
+	rewriteFiltered()
 }
 
 function handleFilterToggle(value: LogLevel | 'all') {
@@ -215,20 +255,6 @@ function toggleFullscreen() {
 function writeEmptyState() {
 	terminalRef.value?.writeEmptyState()
 	lastWrittenIndex = 0
-}
-
-function writeAllLines() {
-	const term = terminalRef.value?.terminal
-	if (!term) return
-	const lines = ctx.logLines.value
-	if (lines.length === 0 && isLiveSource.value) {
-		writeEmptyState()
-		return
-	}
-	terminalRef.value?.clearEmptyState()
-	const predicate = buildCombinedPredicate()
-	rewriteTerminal(term, lines, predicate, activeSearchQuery())
-	lastWrittenIndex = lines.length
 }
 
 watch(ctx.logLines, (lines, oldLines) => {
@@ -282,6 +308,28 @@ function handleClear() {
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
+}
+
+function handleDelete() {
+	deleteModal.value?.show()
+}
+
+async function confirmDelete() {
+	if (!ctx.onDelete) return
+	isDeleting.value = true
+	try {
+		await ctx.onDelete()
+		deleteModal.value?.hide()
+	} catch (err) {
+		console.error('Failed to delete log file:', err)
+		addNotification({
+			type: 'error',
+			title: 'Failed to delete log file',
+			text: typeof err === 'string' ? err : 'Unknown error.',
+		})
+	} finally {
+		isDeleting.value = false
+	}
 }
 
 async function handleShare() {

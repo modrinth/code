@@ -16,7 +16,7 @@ import { useRoute } from 'vue-router'
 
 import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { log_listener, process_listener } from '@/helpers/events.js'
-import { get_output_by_filename } from '@/helpers/logs.js'
+import { delete_logs_by_filename, get_output_by_filename } from '@/helpers/logs.js'
 
 const client = injectModrinthClient()
 const { handleError } = injectNotificationManager()
@@ -86,8 +86,13 @@ function buildLogList(rawLogs) {
 	]
 }
 
-const allLogs = await getHistoricalLogs(props.instance.path)
-const logs = ref(buildLogList(allLogs))
+const logs = ref(buildLogList([]))
+
+void getHistoricalLogs(props.instance.path)
+	.then((allLogs) => {
+		logs.value = buildLogList(allLogs)
+	})
+	.catch(handleError)
 
 const selectedLogIndex = ref(0)
 const isLive = computed(() => selectedLogIndex.value === 0)
@@ -129,6 +134,24 @@ async function analyseForCrash() {
 	}
 }
 
+const selectedLog = computed(() => filteredLogs.value[selectedLogIndex.value])
+
+const deleteDisabled = computed(() => {
+	const log = selectedLog.value
+	if (!log || log.live) return true
+	return log.filename === 'latest.log' && props.playing
+})
+
+async function deleteSelectedLog() {
+	const log = selectedLog.value
+	if (!log || log.live) return
+	await delete_logs_by_filename(props.instance.path, log.log_type, log.filename)
+	invalidate()
+	const freshLogs = await getHistoricalLogs(props.instance.path)
+	logs.value = buildLogList(freshLogs)
+	selectedLogIndex.value = 0
+}
+
 provideConsoleManager({
 	logLines,
 	logSources,
@@ -138,6 +161,9 @@ provideConsoleManager({
 	onClear: () => {
 		activeConsole.value.clear()
 	},
+	onDelete: deleteSelectedLog,
+	deleteDisabled,
+	deleteDisabledTooltip: 'Cannot delete latest.log while the instance is running',
 	shareDisabled: computed(() => props.offline),
 	emptyStateType: 'instance',
 	crashAnalysis,

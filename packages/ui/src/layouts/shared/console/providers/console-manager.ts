@@ -19,6 +19,8 @@ export interface ConsoleManagerContext {
 
 	onClear?: () => void
 	onDelete?: () => Promise<void>
+	deleteDisabled?: Ref<boolean> | ComputedRef<boolean>
+	deleteDisabledTooltip?: string
 
 	shareDisabled?: Ref<boolean> | ComputedRef<boolean>
 

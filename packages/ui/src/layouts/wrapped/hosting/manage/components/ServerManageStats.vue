@@ -96,8 +96,9 @@ const stats = shallowRef(
 const GRAPH_SIZE = 10
 
 const padGraph = (data: number[]) => {
-	if (data.length >= GRAPH_SIZE) return data.slice(-GRAPH_SIZE)
-	return [...Array(GRAPH_SIZE - data.length).fill(0), ...data]
+	const capped = data.map((v) => Math.min(v, 100))
+	if (capped.length >= GRAPH_SIZE) return capped.slice(-GRAPH_SIZE)
+	return [...Array(GRAPH_SIZE - capped.length).fill(0), ...capped]
 }
 
 const cpuData = computed(() => padGraph(props.data?.graph.cpu ?? []))
