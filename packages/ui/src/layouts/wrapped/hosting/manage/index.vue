@@ -23,13 +23,14 @@
 			:customer="customer"
 			:payment-methods="paymentMethods"
 			:currency="selectedCurrency"
-			:return-url="`${props.siteUrl}/hosting/manage`"
 			:pings="regionPings"
 			:regions="regions"
 			:refresh-payment-methods="fetchPaymentData"
 			:fetch-stock="fetchStock"
 			:affiliate-code="affiliateCode"
 			plan-stage
+			@purchase-success="handlePurchaseSuccess"
+			@hide="clearPurchaseIntent"
 		/>
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
@@ -51,9 +52,7 @@
 						<li>
 							<IntlFormatted :message-id="messages.errorQueueNotice">
 								<template #warning="{ children }">
-									<span class="font-medium text-contrast"
-										><component :is="() => children"
-									/></span>
+									<span class="font-medium text-contrast"><component :is="() => children" /></span>
 								</template>
 							</IntlFormatted>
 						</li>
@@ -71,9 +70,9 @@
 					</ul>
 				</div>
 				<ButtonStyled size="large" type="standard" color="brand">
-					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com"
-						>{{ formatMessage(messages.contactSupportButton) }}</AutoLink
-					>
+					<AutoLink class="mt-6 !w-full" to="https://support.modrinth.com">{{
+						formatMessage(messages.contactSupportButton)
+					}}</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled size="large" @click="() => router.go(0)">
 					<button class="mt-3 !w-full">{{ formatMessage(messages.reloadButton) }}</button>
@@ -82,7 +81,11 @@
 		</div>
 
 		<Transition v-else name="fade" mode="out-in">
-			<div v-if="isLoading && !serverResponse" key="loading" class="flex flex-col gap-4 py-8">
+			<div
+				v-if="(isLoading || !authReady) && !serverResponse"
+				key="loading"
+				class="flex flex-col gap-4 py-8"
+			>
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
@@ -116,7 +119,9 @@
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
-					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">{{ formatMessage(messages.serversTitle) }}</h1>
+					<h1 class="w-full text-2xl m-0 font-extrabold text-contrast">
+						{{ formatMessage(messages.serversTitle) }}
+					</h1>
 					<div class="flex w-full flex-row items-center justify-end gap-2 md:mb-0">
 						<StyledInput
 							id="search"
@@ -125,15 +130,13 @@
 							type="search"
 							name="search"
 							autocomplete="off"
-							:placeholder="formatMessage(messages.searchPlaceholder, { count: filteredData.length })"
+							:placeholder="
+								formatMessage(messages.searchPlaceholder, { count: filteredData.length })
+							"
 							wrapper-class="w-full md:w-72"
 						/>
 						<ButtonStyled type="standard" color="brand">
-							<AutoLink v-if="isNuxt" :to="{ path: '/servers', hash: '#plan' }">
-								<PlusIcon />
-								{{ formatMessage(messages.newServerButton) }}
-							</AutoLink>
-							<button v-else @click="openPurchaseModal">
+							<button @click="openPurchaseModal">
 								<PlusIcon />
 								{{ formatMessage(messages.newServerButton) }}
 							</button>
@@ -150,7 +153,7 @@
 					leave-to-class="opacity-0 max-h-0"
 				>
 					<div
-						v-if="isPollingForNewServers"
+						v-if="showPollingForNewServers"
 						class="bg-brand/10 my-4 flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm text-brand"
 					>
 						<LoaderCircleIcon class="size-4 animate-spin" />
@@ -162,7 +165,7 @@
 					v-if="filteredData.length > 0 || isPollingForNewServers"
 					name="list"
 					tag="ul"
-					class="m-0 flex flex-col gap-4 p-0"
+					class="m-0 flex flex-col gap-3 p-0"
 				>
 					<MedalServerListing
 						v-for="server in filteredData.filter((s) => s.is_medal)"
@@ -190,7 +193,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Archon, type Labrinth, NuxtModrinthClient } from '@modrinth/api-client'
+import type { Archon, Labrinth } from '@modrinth/api-client'
 import { HammerIcon, LoaderCircleIcon, PlusIcon, SearchIcon } from '@modrinth/assets'
 import {
 	AutoLink,
@@ -224,7 +227,7 @@ import { createHostingPurchaseIntentContext, provideHostingPurchaseIntent } from
 
 const props = defineProps<{
 	stripePublishableKey: string
-	siteUrl: string
+	siteUrl?: string
 	products: Labrinth.Billing.Internal.Product[]
 }>()
 
@@ -233,6 +236,7 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
+const authReady = computed(() => auth.isReady?.value ?? true)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -266,7 +270,7 @@ const messages = defineMessages({
 		id: 'servers.manage.loading-servers',
 		defaultMessage: 'Loading your servers...',
 	},
-	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Servers' },
+	serversTitle: { id: 'servers.manage.servers-title', defaultMessage: 'Modrinth Hosting' },
 	searchPlaceholder: {
 		id: 'servers.manage.search-placeholder',
 		defaultMessage: 'Search {count} {count, plural, one {server} other {servers}}...',
@@ -317,14 +321,36 @@ const messages = defineMessages({
 	},
 })
 
-const isNuxt = computed(() => client instanceof NuxtModrinthClient)
-
 const isPollingForNewServers = ref(false)
+const showPollingForNewServers = ref(false)
+let pollingShowTimeout: ReturnType<typeof setTimeout> | undefined
+
+watch(isPollingForNewServers, (polling) => {
+	clearTimeout(pollingShowTimeout)
+	if (polling) {
+		pollingShowTimeout = setTimeout(() => {
+			showPollingForNewServers.value = isPollingForNewServers.value
+		}, 1500)
+	} else {
+		showPollingForNewServers.value = false
+	}
+})
+
 const pollingState = ref({
 	enabled: false,
 	count: 0,
-	initialServers: [] as Archon.Servers.v0.Server[],
+	initialServerIds: new Set<string>(),
 })
+
+function startNewServerPolling(initialServers: Archon.Servers.v0.Server[]) {
+	if (pollingState.value.enabled) return
+	isPollingForNewServers.value = true
+	pollingState.value = {
+		enabled: true,
+		count: 0,
+		initialServerIds: new Set(initialServers.map((s) => s.server_id)),
+	}
+}
 
 const guestPlanModal = ref<InstanceType<typeof ServersGuestPlanModal> | null>(null)
 const purchaseModal = ref<InstanceType<typeof ModrinthServersPurchaseModal> | null>(null)
@@ -487,7 +513,7 @@ const {
 } = useQuery({
 	queryKey: ['servers'],
 	queryFn: async () => {
-		const response = await client.archon.servers_v0.list()
+		const response = await client.archon.servers_v0.list({ limit: 100 })
 
 		// Fetch subscriptions for medal servers
 		const hasMedalServers = response.servers.some((s) => s.is_medal)
@@ -508,9 +534,13 @@ const {
 		// Check if new servers appeared (stop polling)
 		if (pollingState.value.enabled) {
 			pollingState.value.count++
-			if (response.servers.length !== pollingState.value.initialServers.length) {
+			const hasNewServer = response.servers.some(
+				(s) => !pollingState.value.initialServerIds.has(s.server_id),
+			)
+			if (hasNewServer) {
 				pollingState.value.enabled = false
 				isPollingForNewServers.value = false
+
 				router.replace({ query: {} })
 			} else if (pollingState.value.count >= 5) {
 				pollingState.value.enabled = false
@@ -542,9 +572,28 @@ const fuse = computed(() => {
 	})
 })
 
-function introToTop(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
+function isSetToCancel(server: Archon.Servers.v0.Server): boolean {
+	return (
+		server.status !== 'suspended' &&
+		Boolean(serverBillingMap.value.get(server.server_id)?.cancellationDate)
+	)
+}
+
+function getStatusPriority(server: Archon.Servers.v0.Server): number {
+	if (server.status === 'suspended') return 2
+	if (isSetToCancel(server)) return 1
+	return 0
+}
+
+function sortServers(array: Archon.Servers.v0.Server[]): Archon.Servers.v0.Server[] {
 	return array.slice().sort((a, b) => {
-		return Number(b.flows?.intro) - Number(a.flows?.intro)
+		const priorityDiff = getStatusPriority(a) - getStatusPriority(b)
+		if (priorityDiff !== 0) return priorityDiff
+
+		const introDiff = Number(b.flows?.intro) - Number(a.flows?.intro)
+		if (introDiff !== 0) return introDiff
+
+		return (a.name || '').localeCompare(b.name || '')
 	})
 }
 
@@ -560,9 +609,9 @@ function filesExpired(server: Archon.Servers.v0.Server): boolean {
 
 const filteredData = computed<Archon.Servers.v0.Server[]>(() => {
 	const base = !searchInput.value.trim()
-		? introToTop(serverList.value)
+		? sortServers(serverList.value)
 		: fuse.value
-			? introToTop(fuse.value.search(searchInput.value).map((result) => result.item))
+			? sortServers(fuse.value.search(searchInput.value).map((result) => result.item))
 			: []
 	return base.filter((server) => !filesExpired(server))
 })
@@ -575,18 +624,21 @@ watch(serverResponse, (response) => {
 		!pollingState.value.enabled &&
 		pollingState.value.count === 0
 	) {
-		isPollingForNewServers.value = true
-		pollingState.value = {
-			enabled: true,
-			count: 0,
-			initialServers: [...response.servers],
-		}
+		startNewServerPolling(response.servers)
 	}
 })
 
 const { addNotification } = injectNotificationManager()
 const queryClient = useQueryClient()
 const { getLatestBackupDownload } = useServerBackupDownload()
+
+function handlePurchaseSuccess() {
+	startNewServerPolling(serverResponse.value?.servers ?? [])
+	void Promise.all([
+		queryClient.invalidateQueries({ queryKey: ['servers'] }),
+		queryClient.invalidateQueries({ queryKey: ['servers', 'v1'] }),
+	])
+}
 
 watch(
 	() => auth.user.value,
@@ -596,7 +648,7 @@ watch(
 		pollingState.value = {
 			enabled: false,
 			count: 0,
-			initialServers: [],
+			initialServerIds: new Set(),
 		}
 		void Promise.all([
 			queryClient.resetQueries({ queryKey: ['billing'] }),
@@ -649,7 +701,7 @@ const hostingPurchaseIntent = createHostingPurchaseIntentContext({
 })
 provideHostingPurchaseIntent(hostingPurchaseIntent)
 
-const { openPurchaseModal, handleGuestPlanContinue } = hostingPurchaseIntent
+const { openPurchaseModal, handleGuestPlanContinue, clearPurchaseIntent } = hostingPurchaseIntent
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],

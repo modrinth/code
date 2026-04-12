@@ -23,6 +23,7 @@
 		<ServerSubdomainLabel
 			v-if="serverData.net?.domain"
 			:subdomain="serverData.net.domain"
+			:server-id="serverId"
 			:no-separator="column || (!showLoaderLabel && !showGameLabel)"
 			:is-link="linked"
 		/>
@@ -44,6 +45,7 @@ import ServerUptimeLabel from './ServerUptimeLabel.vue'
 interface ServerInfoLabelsProps {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	serverData: Record<string, any>
+	serverId?: string
 	showGameLabel: boolean
 	showLoaderLabel: boolean
 	showPlayerCount?: boolean

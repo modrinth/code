@@ -3,8 +3,6 @@
 
 import type { FunctionalComponent, SVGAttributes } from 'vue'
 
-export type IconComponent = FunctionalComponent<SVGAttributes>
-
 import _AffiliateIcon from './icons/affiliate.svg?component'
 import _AlignLeftIcon from './icons/align-left.svg?component'
 import _ArchiveIcon from './icons/archive.svg?component'
@@ -202,6 +200,7 @@ import _SearchIcon from './icons/search.svg?component'
 import _SendIcon from './icons/send.svg?component'
 import _ServerIcon from './icons/server.svg?component'
 import _ServerPlusIcon from './icons/server-plus.svg?component'
+import _ServerStackIcon from './icons/server-stack.svg?component'
 import _SettingsIcon from './icons/settings.svg?component'
 import _Settings2Icon from './icons/settings-2.svg?component'
 import _ShareIcon from './icons/share.svg?component'
@@ -386,11 +385,14 @@ import _VersionIcon from './icons/version.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
 import _WindowIcon from './icons/window.svg?component'
 import _WorldIcon from './icons/world.svg?component'
+import _WrapTextIcon from './icons/wrap-text.svg?component'
 import _WrenchIcon from './icons/wrench.svg?component'
 import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
 import _ZoomOutIcon from './icons/zoom-out.svg?component'
+
+export type IconComponent = FunctionalComponent<SVGAttributes>
 
 export const AffiliateIcon = _AffiliateIcon
 export const AlignLeftIcon = _AlignLeftIcon
@@ -589,6 +591,7 @@ export const SearchIcon = _SearchIcon
 export const SendIcon = _SendIcon
 export const ServerIcon = _ServerIcon
 export const ServerPlusIcon = _ServerPlusIcon
+export const ServerStackIcon = _ServerStackIcon
 export const SettingsIcon = _SettingsIcon
 export const Settings2Icon = _Settings2Icon
 export const ShareIcon = _ShareIcon
@@ -773,6 +776,7 @@ export const VersionIcon = _VersionIcon
 export const WikiIcon = _WikiIcon
 export const WindowIcon = _WindowIcon
 export const WorldIcon = _WorldIcon
+export const WrapTextIcon = _WrapTextIcon
 export const WrenchIcon = _WrenchIcon
 export const XIcon = _XIcon
 export const XCircleIcon = _XCircleIcon

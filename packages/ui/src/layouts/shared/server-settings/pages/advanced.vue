@@ -186,7 +186,7 @@
 			</div>
 		</div>
 		<SaveBanner
-			:is-visible="!!hasUnsavedChanges"
+			:is-visible="!!hasUnsavedChanges || isPending"
 			:server-id="serverId"
 			:is-updating="isPending"
 			:save="() => saveStartup()"

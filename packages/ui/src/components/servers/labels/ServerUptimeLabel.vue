@@ -8,8 +8,7 @@
 		<Separator v-if="!noSeparator" />
 
 		<div class="flex gap-1.5">
-			<TimerIcon />
-			<time class="truncate text-sm font-semibold" :aria-label="verboseUptime">
+			<time class="truncate text-sm font-medium" :aria-label="verboseUptime">
 				{{ formattedUptime }}
 			</time>
 		</div>
@@ -17,7 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { TimerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 
 import Separator from './Separator.vue'

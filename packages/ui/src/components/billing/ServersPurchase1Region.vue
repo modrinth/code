@@ -214,7 +214,7 @@ async function updateStock() {
 onMounted(() => {
 	// auto select region with lowest ping
 	loading.value = true
-	bestPing.value = props.pings.sort((a, b) => {
+	bestPing.value = [...props.pings].sort((a, b) => {
 		if (a.ping <= 0) return 1
 		if (b.ping <= 0) return -1
 		return a.ping - b.ping

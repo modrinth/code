@@ -207,30 +207,8 @@ export function useInstallationForm(
 
 	async function confirmDisableConflicts() {
 		try {
-			if (ctx.disableIncompatibleContent && ctx.previewSave) {
-				isVerifying.value = true
-				abortController = new AbortController()
-				const loaderVersionId =
-					selectedPlatform.value !== 'vanilla'
-						? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
-						: null
-
-				let preview: ContentDiffPreview | null
-				try {
-					preview = await ctx.previewSave(
-						selectedPlatform.value,
-						selectedGameVersion.value,
-						loaderVersionId,
-						abortController.signal,
-					)
-				} finally {
-					isVerifying.value = false
-					abortController = null
-				}
-
-				if (preview) {
-					await ctx.disableIncompatibleContent(preview.diffs)
-				}
+			if (ctx.disableIncompatibleContent) {
+				await ctx.disableIncompatibleContent(selectedGameVersion.value)
 			}
 
 			incompatibleContentVariant.value = null

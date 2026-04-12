@@ -5,6 +5,7 @@ import {
 	nodeAuthState,
 	PanelVersionFeature,
 	TauriModrinthClient,
+	VerboseLoggingFeature,
 } from '@modrinth/api-client'
 import {
 	ArrowBigUpDashIcon,
@@ -25,7 +26,7 @@ import {
 	RefreshCwIcon,
 	RestoreIcon,
 	RightArrowIcon,
-	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	UserIcon,
 	WorldIcon,
@@ -86,6 +87,7 @@ import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
+import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
 import { debugAnalytics, initAnalytics, trackEvent } from '@/helpers/analytics'
 import { check_reachable } from '@/helpers/auth.js'
@@ -133,6 +135,8 @@ const { addPopupNotification } = popupNotificationManager
 
 const tauriApiClient = new TauriModrinthClient({
 	userAgent: `modrinth/theseus/${getVersion()} (support@modrinth.com)`,
+	labrinthBaseUrl: config.labrinthBaseUrl,
+	archonBaseUrl: config.archonBaseUrl,
 	features: [
 		new NodeAuthFeature({
 			getAuth: () => nodeAuthState.getAuth?.() ?? null,
@@ -146,12 +150,14 @@ const tauriApiClient = new TauriModrinthClient({
 			token: async () => (await getCreds())?.session,
 		}),
 		new PanelVersionFeature(),
+		new VerboseLoggingFeature(),
 	],
 })
 provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	openExternalUrl: (url) => openUrl(url),
 })
 provideModalBehavior({
 	noblur: computed(() => !themeStore.advancedRendering),
@@ -409,17 +415,30 @@ const handleClose = async () => {
 }
 
 const router = useRouter()
+const route = useRoute()
+
+const loading = useLoading()
+loading.setEnabled(false)
+loading.startLoading()
+
+let suspensePending = false
+
+router.beforeEach(() => {
+	suspensePending = false
+	loading.startLoading()
+})
 router.afterEach((to, from, failure) => {
 	trackEvent('PageView', {
 		path: to.path,
 		fromPath: from.path,
 		failed: failure,
 	})
+	setTimeout(() => {
+		if (!suspensePending) {
+			loading.stopLoading()
+		}
+	}, 100)
 })
-const route = useRoute()
-
-const loading = useLoading()
-loading.setEnabled(false)
 
 const error = useError()
 const errorModal = ref()
@@ -1010,6 +1029,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			<NavButton
 				v-tooltip.right="'Library'"
 				to="/library"
+				:is-primary="(r) => r.path === '/library' || r.path === '/library'"
 				:is-subpage="
 					() =>
 						route.path.startsWith('/instance') ||
@@ -1020,11 +1040,12 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				<LibraryIcon />
 			</NavButton>
 			<NavButton
-				v-if="themeStore.featureFlags.servers_in_app"
-				v-tooltip.right="'Servers'"
+				v-tooltip.right="'Modrinth Hosting'"
 				to="/hosting/manage"
+				:is-primary="(r) => r.path === '/hosting/manage' || r.path === '/hosting/manage/'"
+				:is-subpage="(r) => r.path.startsWith('/hosting/manage/') && r.path !== '/hosting/manage/'"
 			>
-				<ServerIcon />
+				<ServerStackIcon />
 			</NavButton>
 			<div class="h-px w-6 mx-auto my-2 bg-surface-5"></div>
 			<suspense>
@@ -1195,7 +1216,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 				</div>
 			</transition>
 			<div
-				class="loading-indicator-container h-8 fixed z-50"
+				class="loading-indicator-container h-8 fixed z-50 pointer-events-none"
 				:style="{
 					top: 'calc(var(--top-bar-height))',
 					left: 'calc(var(--left-bar-width))',
@@ -1238,7 +1259,15 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</Admonition>
 			<RouterView v-slot="{ Component }">
 				<template v-if="Component">
-					<Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+					<Suspense
+						@pending="
+							() => {
+								suspensePending = true
+								loading.startLoading()
+							}
+						"
+						@resolve="loading.stopLoading()"
+					>
 						<component :is="Component"></component>
 					</Suspense>
 				</template>
@@ -1297,8 +1326,8 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 		</div>
 	</div>
 	<I18nDebugPanel />
-	<NotificationPanel has-sidebar />
-	<PopupNotificationPanel has-sidebar />
+	<NotificationPanel :has-sidebar="sidebarVisible" />
+	<PopupNotificationPanel :has-sidebar="sidebarVisible" />
 	<ErrorModal ref="errorModal" />
 	<MinecraftAuthErrorModal ref="minecraftAuthErrorModal" />
 	<ContentInstallModal

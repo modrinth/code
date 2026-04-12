@@ -1,5 +1,5 @@
 <template>
-	<div class="relative h-full w-full select-none">
+	<div class="relative h-screen w-full select-none max-h-[min(70vh,750px)]">
 		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4">
 			<Admonition
 				v-if="hasNoProperties"
@@ -10,8 +10,15 @@
 			<div class="flex flex-col gap-4">
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
-						Edit the Minecraft server properties file here, or use the Files tab to edit the full
-						file. If you're unsure about a setting, the
+						Edit the Minecraft server properties file here, or use the
+						<AutoLink
+							class="goto-link !inline-block"
+							:to="filesTabLink"
+							@click="onFilesTabLinkClick"
+						>
+							Files tab
+						</AutoLink>
+						to edit the full file. If you're unsure about a setting, the
 						<AutoLink
 							class="goto-link !inline-block"
 							to="https://minecraft.wiki/w/Server.properties"
@@ -36,113 +43,114 @@
 						placeholder="Search server properties..."
 					/>
 				</div>
+				<div class="flex flex-col gap-3 pb-2">
+					<div class="flex flex-col gap-6">
+						<!-- Basic Properties -->
+						<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
+						<div
+							class="rounded-2xl border border-solid border-surface-5 p-4 pb-2 [&:not(:has(*:not(:empty)))]:hidden"
+						>
+							<div class="flex w-full flex-col gap-1.5">
+								<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">Gamemode</span>
+									<Chips
+										v-model="combinedGamemode"
+										:items="gamemodeItems"
+										:format-label="capitalize"
+									/>
+								</div>
 
-				<div class="flex flex-col gap-6 pb-2">
-					<!-- Basic Properties -->
-					<!-- [&:not(:has(*:not(:empty)))]:hidden is to hide parent if all children are empty -->
-					<div
-						class="rounded-2xl border border-solid border-surface-5 p-4 [&:not(:has(*:not(:empty)))]:hidden"
-					>
-						<div class="flex w-full flex-col gap-4 min-[1100px]:max-w-[600px]">
-							<div v-if="isPropertyVisible('gamemode')" class="flex flex-col gap-2">
-								<span class="font-semibold text-contrast">Gamemode</span>
-								<Chips
-									v-model="combinedGamemode"
-									:items="gamemodeItems"
-									:format-label="capitalize"
-								/>
-							</div>
+								<div
+									v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
+									class="flex flex-col gap-2.5 my-1"
+								>
+									<span class="font-semibold text-contrast">Difficulty</span>
+									<Chips
+										v-model="selectedDifficulty"
+										:items="difficultyItems"
+										:format-label="capitalize"
+									/>
+								</div>
 
-							<div
-								v-if="combinedGamemode !== 'hardcore' && isPropertyVisible('difficulty')"
-								class="flex flex-col gap-2"
-							>
-								<span class="font-semibold text-contrast">Difficulty</span>
-								<Chips
-									v-model="selectedDifficulty"
-									:items="difficultyItems"
-									:format-label="capitalize"
-								/>
-							</div>
+								<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">Max players</span>
+									<StyledInput
+										id="server-property-max-players"
+										:model-value="liveProperties.max_players"
+										type="number"
+										placeholder="20"
+										wrapper-class="w-full max-w-[450px]"
+										@update:model-value="liveProperties.max_players = String($event)"
+									/>
+								</div>
 
-							<div v-if="isPropertyVisible('max_players')" class="flex flex-col gap-2">
-								<span class="font-semibold text-contrast">Max players</span>
-								<StyledInput
-									id="server-property-max-players"
-									:model-value="liveProperties.max_players"
-									type="number"
-									placeholder="20"
-									wrapper-class="w-full"
-									@update:model-value="liveProperties.max_players = String($event)"
-								/>
-							</div>
+								<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2.5 my-1">
+									<span class="font-semibold text-contrast">MOTD</span>
+									<StyledInput
+										id="server-property-motd"
+										v-model="liveProperties.motd"
+										placeholder="A Minecraft Server"
+										wrapper-class="w-full max-w-[450px]"
+									/>
+								</div>
 
-							<div v-if="isPropertyVisible('motd')" class="flex flex-col gap-2">
-								<span class="font-semibold text-contrast">MOTD</span>
-								<StyledInput
-									id="server-property-motd"
-									v-model="liveProperties.motd"
-									placeholder="A Minecraft Server"
-									wrapper-class="w-full"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('allow_flight')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Allow flight</span>
+									<Toggle
+										id="server-property-allow-flight"
+										:model-value="liveProperties.allow_flight === 'true'"
+										@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('allow_flight')"
-								class="flex flex-row items-center justify-between gap-4"
-							>
-								<span class="font-semibold text-contrast">Allow flight</span>
-								<Toggle
-									id="server-property-allow-flight"
-									:model-value="liveProperties.allow_flight === 'true'"
-									@update:model-value="liveProperties.allow_flight = $event ? 'true' : 'false'"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('allow_cheats')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Allow cheats</span>
+									<Toggle
+										id="server-property-allow-cheats"
+										:model-value="liveProperties.allow_cheats === 'true'"
+										@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('allow_cheats')"
-								class="flex flex-row items-center justify-between gap-4"
-							>
-								<span class="font-semibold text-contrast">Allow cheats</span>
-								<Toggle
-									id="server-property-allow-cheats"
-									:model-value="liveProperties.allow_cheats === 'true'"
-									@update:model-value="liveProperties.allow_cheats = $event ? 'true' : 'false'"
-								/>
-							</div>
+								<div
+									v-if="isPropertyVisible('white_list')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Enable whitelist</span>
+									<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
+								</div>
 
-							<div
-								v-if="isPropertyVisible('white_list')"
-								class="flex flex-row items-center justify-between gap-4"
-							>
-								<span class="font-semibold text-contrast">Enable whitelist</span>
-								<Toggle id="server-property-whitelist" v-model="whitelistEnabled" />
-							</div>
+								<div
+									v-if="isPropertyVisible('spawn_protection')"
+									class="flex flex-row items-center justify-between gap-4 h-10"
+								>
+									<span class="font-semibold text-contrast">Enable spawn protection</span>
+									<Toggle
+										id="server-property-spawn-protection-toggle"
+										v-model="spawnProtectionEnabled"
+									/>
+								</div>
 
-							<div
-								v-if="isPropertyVisible('spawn_protection')"
-								class="flex flex-row items-center justify-between gap-4"
-							>
-								<span class="font-semibold text-contrast">Enable spawn protection</span>
-								<Toggle
-									id="server-property-spawn-protection-toggle"
-									v-model="spawnProtectionEnabled"
-								/>
-							</div>
-
-							<div
-								v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
-								class="flex items-center justify-between"
-							>
-								<span class="font-semibold text-contrast">Protection radius</span>
-								<StyledInput
-									id="server-property-spawn-protection-radius"
-									:model-value="liveProperties.spawn_protection"
-									type="number"
-									wrapper-class="w-full sm:w-[100px]"
-									input-class="text-right"
-									@update:model-value="liveProperties.spawn_protection = String($event)"
-								/>
+								<div
+									v-if="spawnProtectionEnabled && isPropertyVisible('spawn_protection')"
+									class="flex items-center justify-between h-10"
+								>
+									<span class="font-semibold text-contrast">Protection radius</span>
+									<StyledInput
+										id="server-property-spawn-protection-radius"
+										:model-value="liveProperties.spawn_protection"
+										type="number"
+										wrapper-class="w-full sm:w-[100px]"
+										input-class="text-right"
+										@update:model-value="liveProperties.spawn_protection = String($event)"
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -151,6 +159,7 @@
 						v-if="hasVisibleAdvancedProperties"
 						overflow-visible
 						:force-open="isSearchActive"
+						button-class="flex w-full flex-col gap-2 bg-transparent m-0 p-0 border-none"
 					>
 						<template #title>
 							<span class="text-lg font-semibold text-contrast">Advanced properties</span>
@@ -163,18 +172,21 @@
 										{{ group.label }}
 									</h3>
 									<div
-										class="flex flex-col gap-4 rounded-2xl border border-solid border-surface-5 p-4"
+										class="flex flex-col gap-2 rounded-2xl border border-solid border-surface-5 p-4"
 									>
 										<template v-for="key in group.properties" :key="key">
 											<div
 												v-if="isPropertyVisible(key)"
 												class="flex flex-row flex-wrap items-center justify-between h-10"
 											>
-												<span :id="`property-label-${key}`" class="font-semibold">
+												<span :id="`property-label-${key}`" class="font-semibold text-contrast">
 													{{ formatPropertyName(key) }}
 												</span>
 
-												<div v-if="getPropertyDef(key).type === 'toggle'" class="flex justify-end">
+												<div
+													v-if="getPropertyDef(key).type === 'toggle'"
+													class="flex w-full justify-end sm:w-[320px]"
+												>
 													<Toggle
 														:id="`server-property-${key}`"
 														:model-value="liveProperties[key] === 'true'"
@@ -196,7 +208,7 @@
 														@update:model-value="liveProperties[key] = String($event)"
 													/>
 												</div>
-												<div v-else class="mt-2 flex w-full justify-end sm:w-[320px]">
+												<div v-else class="flex w-full justify-end sm:w-[320px]">
 													<StyledInput
 														:id="`server-property-${key}`"
 														v-model="liveProperties[key]"
@@ -210,6 +222,16 @@
 									</div>
 								</div>
 							</template>
+							<div>
+								All other properties can be edited in server.properties via the
+								<AutoLink
+									class="goto-link !inline-block"
+									:to="filesTabLink"
+									@click="onFilesTabLinkClick"
+								>
+									Files tab </AutoLink
+								>.
+							</div>
 						</div>
 					</Accordion>
 
@@ -229,11 +251,15 @@
 		</div>
 
 		<SaveBanner
-			:is-visible="hasUnsavedChanges"
+			:is-visible="hasUnsavedChanges || isUpdating"
 			:server-id="serverId"
 			:is-updating="isUpdating || busyReasons.length > 0"
 			restart
-			:save="() => saveProperties()"
+			:save="
+				async () => {
+					await saveProperties()
+				}
+			"
 			:reset="resetProperties"
 		/>
 	</div>
@@ -248,6 +274,7 @@ import { computed, ref, watch } from 'vue'
 
 import { Accordion, Admonition, AutoLink, Chips, StyledInput, Toggle } from '#ui/components'
 import SaveBanner from '#ui/components/servers/SaveBanner.vue'
+import { injectServerSettings } from '#ui/layouts/shared/server-settings'
 import {
 	injectModrinthClient,
 	injectModrinthServerContext,
@@ -258,8 +285,16 @@ const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { serverId, worldId, powerState, busyReasons } = injectModrinthServerContext()
 const queryClient = useQueryClient()
+const filesTabLink = computed(
+	() => `/hosting/manage/${encodeURIComponent(serverId)}/files?path=/&editing=server.properties`,
+)
+const serverSettings = injectServerSettings(null)
 
 const searchInput = ref('')
+
+function onFilesTabLinkClick() {
+	serverSettings?.closeModal?.()
+}
 
 type PropertyDef = { type: 'toggle' } | { type: 'number' } | { type: 'text' }
 
@@ -346,6 +381,7 @@ function flattenProperties(data: Archon.Content.v1.PropertiesFields): Record<str
 
 const liveProperties = ref<Record<string, string>>({})
 const originalProperties = ref<Record<string, string>>({})
+let previousSpawnProtection = '16'
 
 function syncFormFromData() {
 	if (!propsData.value) return
@@ -379,8 +415,6 @@ watch(
 watch(powerState, () => {
 	queryClient.invalidateQueries({ queryKey: queryKey.value })
 })
-
-let previousSpawnProtection = '16'
 
 const combinedGamemode = computed<CombinedGamemode>({
 	get() {
@@ -453,7 +487,7 @@ function buildPatch(): Archon.Content.v1.PatchPropertiesFields {
 	return patch
 }
 
-const { mutate: saveProperties, isPending: isUpdating } = useMutation({
+const { mutateAsync: saveProperties, isPending: isUpdating } = useMutation({
 	mutationFn: () =>
 		client.archon.properties_v1.patchProperties(serverId, worldId.value!, buildPatch()),
 	onSuccess: async () => {

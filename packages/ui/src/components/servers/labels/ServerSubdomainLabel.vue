@@ -2,15 +2,17 @@
 	<div
 		v-if="subdomain && !isHidden"
 		v-tooltip="'Copy custom URL'"
-		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
+		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer hover:underline"
+		data-subdomain-label
+		@click.stop.prevent
 	>
 		<Separator v-if="!noSeparator" />
 
 		<div class="flex flex-row items-center gap-1.5">
 			<LinkIcon />
 			<div
-				class="flex min-w-0 text-sm font-semibold"
-				:class="serverId ? 'hover:underline' : ''"
+				class="flex min-w-0 font-medium text-sm text-nowrap"
+				:class="props.subdomain ? 'hover:underline' : ''"
 				@click="copySubdomain"
 			>
 				{{ subdomain }}.modrinth.gg
@@ -32,6 +34,7 @@ const { addNotification } = injectNotificationManager()
 
 const props = defineProps<{
 	subdomain: string
+	serverId?: string
 	noSeparator?: boolean
 }>()
 
@@ -45,9 +48,9 @@ const copySubdomain = () => {
 }
 
 const route = useRoute()
-const serverId = computed(() => route.params.id as string)
+const serverId = props.serverId || (route.params.id as string)
 
-const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
 })
 

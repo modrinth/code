@@ -21,7 +21,6 @@ const resolvedProducts = computed<Labrinth.Billing.Internal.Product[]>(() => pro
 <template>
 	<ServersManagePageIndex
 		:stripe-publishable-key="stripePublishableKey"
-		:site-url="'https://modrinth.com'"
 		:products="resolvedProducts"
 	/>
 </template>

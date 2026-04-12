@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "View analytics"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Failed to load server settings"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -300,10 +303,7 @@
     "defaultMessage": "Delete {itemType}{count, plural, one {} other {s}}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Any mods or content you added on top of the modpack will be deleted."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Any mods or content you added on top of the modpack will be preserved."
+    "defaultMessage": "{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Update}} warning"
@@ -682,12 +682,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack from URL"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Uploading files ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Rename {name}"
@@ -1329,7 +1323,7 @@
     "defaultMessage": "This mod depends on a client-side mod and may cause issues when starting your server"
   },
   "label.client-only-warning": {
-    "defaultMessage": "This is a client-side mod and may cause issues. We've kept it enabled because some authors mislabel environments, and the loader should resolve the conflict."
+    "defaultMessage": "This is a client-side mod and may cause issues when starting your server"
   },
   "label.client-retained-warning": {
     "defaultMessage": "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
@@ -2693,6 +2687,18 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Restore"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Backup creation in progress"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Backup restore in progress"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Server is installing"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Content sync in progress"
+  },
   "servers.list-empty.already-have-server-label": {
     "defaultMessage": "Already have a server?"
   },
@@ -2751,7 +2757,7 @@
     "defaultMessage": "New"
   },
   "servers.listing.notice.files-kept-for-download": {
-    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining> and can be downloaded below before they are deleted. "
+    "defaultMessage": "Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. "
   },
   "servers.listing.notice.files-preserved-after-cancellation": {
     "defaultMessage": "Your files will be preserved for 30 days after cancellation."
@@ -2804,6 +2810,12 @@
   "servers.manage.checking-for-new-servers": {
     "defaultMessage": "Checking for new servers..."
   },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "A file upload is in progress. Leaving this page will cancel the upload."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "Upload in progress"
+  },
   "servers.manage.contact-support-button": {
     "defaultMessage": "Contact Modrinth Support"
   },
@@ -2830,6 +2842,9 @@
   },
   "servers.manage.loading-servers": {
     "defaultMessage": "Loading your servers..."
+  },
+  "servers.manage.loading.serverPanel": {
+    "defaultMessage": "Loading your server panel..."
   },
   "servers.manage.new-server-button": {
     "defaultMessage": "New server"
@@ -2868,7 +2883,16 @@
     "defaultMessage": "Search {count} {count, plural, one {server} other {servers}}..."
   },
   "servers.manage.servers-title": {
-    "defaultMessage": "Servers"
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "They can now be found here!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Don't show again"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Your server settings have moved"
   },
   "servers.medal-listing.countdown.remaining": {
     "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {day} other {days}} <hours-count>{hours}</hours-count> {hours, plural, one {hour} other {hours}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minute} other {minutes}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {second} other {seconds}} remaining..."
@@ -2923,6 +2947,12 @@
   },
   "servers.notice.undismissable": {
     "defaultMessage": "Undismissable"
+  },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Your Modrinth Hosting purchase was completed successfully."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Purchase success"
   },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "You won't be charged yet."

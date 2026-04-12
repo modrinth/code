@@ -1,84 +1,93 @@
 <template>
-	<div>
-		<RouterLink :to="isDisabled ? '' : `/hosting/manage/${server_id}`">
+	<div
+		class="transition-all"
+		:class="{
+			pressable: !isDisabled,
+			hoverable: !isDisabled,
+			'cursor-pointer': !isDisabled,
+		}"
+		:role="!isDisabled ? 'link' : undefined"
+		:tabindex="!isDisabled ? 0 : undefined"
+		@click="navigateToServer"
+		@keydown.enter.self="navigateToServer"
+		@keydown.space.prevent.self="navigateToServer"
+	>
+		<div
+			class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-4 bg-bg-raised p-4 transition-all duration-150"
+			:class="{
+				'!rounded-b-none border-b-0': hasNotice,
+				'bg-surface-2': isDisabled,
+			}"
+			data-pyro-server-listing
+			:data-pyro-server-listing-id="server_id"
+		>
 			<div
-				class="flex flex-row items-center overflow-x-hidden rounded-2xl border-[1px] border-solid border-surface-5 bg-bg-raised p-4 transition-all duration-150"
-				:class="{
-					'!rounded-b-none border-b-0': hasNotice,
-					'bg-surface-2': isDisabled,
-					'active:scale-95': !isDisabled && !hasNotice,
-					'hover:brightness-125': !isDisabled,
-				}"
-				data-pyro-server-listing
-				:data-pyro-server-listing-id="server_id"
+				v-if="hasIconOverlay"
+				class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
 			>
-				<div
-					v-if="hasIconOverlay"
-					class="flex size-16 items-center justify-center rounded-xl border-[1px] border-solid border-button-border bg-button-bg shadow-sm"
-				>
-					<ServerIcon :image="image ?? undefined" :disabled="isDisabled" />
-					<SpinnerIcon
-						v-if="isProvisioning || isUpgrading"
-						class="size-8 animate-spin absolute text-contrast"
-						:class="{ 'opacity-50': isDisabled }"
-					/>
-					<LockIcon v-else class="size-8 absolute" :class="{ 'opacity-50': isDisabled }" />
-				</div>
-				<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
-				<div class="ml-4 flex flex-col gap-2.5">
-					<div class="flex flex-row items-center gap-2">
-						<h2 class="m-0 text-xl font-bold text-contrast" :class="{ 'opacity-50': isDisabled }">
-							{{ name }}
-						</h2>
-						<div
-							v-if="isConfiguring"
-							class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
-						>
-							<SparklesIcon class="size-5 shrink-0 font-semibold" />
-							{{ formatMessage(messages.newLabel) }}
-						</div>
-					</div>
-
-					<div
-						v-if="projectData?.title"
-						class="m-0 flex flex-row items-center gap-2 text-sm font-medium"
-						:class="{ 'opacity-50': isDisabled }"
-					>
-						<Avatar
-							:src="iconUrl"
-							no-shadow
-							style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
-							:alt="formatMessage(messages.serverIconAlt)"
-						/>
-						{{ formatMessage(messages.usingProjectLabel, { projectTitle: projectData?.title }) }}
-					</div>
-
-					<ServerInfoLabels
-						:server-data="
-							isConfiguring
-								? { net }
-								: {
-										game,
-										mc_version,
-										loader,
-										loader_version,
-										net,
-										online,
-										players: playerCount
-											? { current: playerCount.current, max: playerCount.max }
-											: undefined,
-									}
-						"
-						:show-game-label="showGameLabel"
-						:show-loader-label="showLoaderLabel"
-						:show-player-count="showPlayerCount"
-						:class="{ 'opacity-50': isDisabled }"
-						:linked="false"
-						class="pointer-events-none flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
-					/>
-				</div>
+				<ServerIcon :image="image ?? undefined" :disabled="isDisabled" class="!rounded-xl" />
+				<SpinnerIcon
+					v-if="isProvisioning || isUpgrading"
+					class="size-8 animate-spin absolute text-contrast"
+					:class="{ 'opacity-50': isDisabled }"
+				/>
+				<LockIcon v-else class="size-8 absolute" :class="{ 'opacity-50': isDisabled }" />
 			</div>
-		</RouterLink>
+			<ServerIcon v-else :image="image ?? undefined" :disabled="isDisabled" />
+			<div class="ml-4 flex flex-col gap-1.5">
+				<div class="flex flex-row items-center gap-2">
+					<h2 class="m-0 text-xl font-bold text-contrast" :class="{ 'opacity-50': isDisabled }">
+						{{ name }}
+					</h2>
+					<div
+						v-if="isConfiguring && noticeType !== 'cancelled' && noticeType !== 'setToCancel'"
+						class="flex min-w-0 items-center gap-2 truncate text-sm font-medium text-brand rounded-full bg-brand-highlight border border-solid border-brand px-2.5 h-[28px]"
+					>
+						<SparklesIcon class="size-5 shrink-0 font-semibold" />
+						{{ formatMessage(messages.newLabel) }}
+					</div>
+				</div>
+
+				<div
+					v-if="projectData?.title"
+					class="m-0 flex flex-row items-center gap-2 text-sm font-medium"
+					:class="{ 'opacity-50': isDisabled }"
+				>
+					<Avatar
+						:src="iconUrl"
+						no-shadow
+						style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
+						:alt="formatMessage(messages.serverIconAlt)"
+					/>
+					{{ formatMessage(messages.usingProjectLabel, { projectTitle: projectData?.title }) }}
+				</div>
+
+				<ServerInfoLabels
+					:server-data="
+						isConfiguring
+							? { net }
+							: {
+									game,
+									mc_version,
+									loader,
+									loader_version,
+									net,
+									online,
+									players: playerCount
+										? { current: playerCount.current, max: playerCount.max }
+										: undefined,
+								}
+					"
+					:server-id="server_id"
+					:show-game-label="showGameLabel"
+					:show-loader-label="showLoaderLabel"
+					:show-player-count="showPlayerCount"
+					:class="{ 'opacity-50': isDisabled }"
+					:linked="false"
+					class="flex w-full flex-row flex-wrap items-center gap-2 text-primary *:hidden sm:flex-row sm:*:flex"
+				/>
+			</div>
+		</div>
 
 		<div v-if="noticeType" class="server-listing-notice">
 			<div v-if="noticeType === 'provisioning'" class="flex gap-2">
@@ -159,13 +168,14 @@
 
 			<div v-if="noticeButtons" class="flex gap-2">
 				<ButtonStyled
-					v-if="noticeButtons.downloadBackup && onDownloadBackup"
+					v-if="noticeButtons.downloadBackup && onDownloadBackup && isBackupDownloadEnabled"
 					type="outlined"
 					circular
 				>
 					<button
 						v-tooltip="formatMessage(messages.downloadLatestBackupTooltip)"
-						class="!border-surface-5"
+						class="!border-surface-4"
+						data-server-listing-button
 						@click="onDownloadBackup"
 					>
 						<DownloadIcon />
@@ -174,7 +184,8 @@
 				<ButtonStyled v-if="noticeButtons.copyId" type="outlined">
 					<button
 						v-tooltip="formatMessage(messages.copyCodeToClipboardTooltip)"
-						class="!border-surface-5"
+						class="!border-surface-4"
+						data-server-listing-button
 						@click="copyToClipboard(server_id)"
 					>
 						<template v-if="copied">
@@ -184,17 +195,17 @@
 					</button>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.support">
-					<a href="https://support.modrinth.com/en/" target="_blank"
+					<a href="https://support.modrinth.com/en/" target="_blank" data-server-listing-button
 						><MessagesSquareIcon /> {{ formatMessage(messages.supportLabel) }}
 					</a>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.manageBilling" color="brand">
-					<AutoLink :to="`/settings/billing#server-${server_id}`">
+					<AutoLink :to="`/settings/billing#server-${server_id}`" data-server-listing-button>
 						<CardIcon /> {{ formatMessage(messages.manageBillingLabel) }}
 					</AutoLink>
 				</ButtonStyled>
 				<ButtonStyled v-if="noticeButtons.resubscribe && onResubscribe" color="brand">
-					<button @click="onResubscribe">
+					<button data-server-listing-button @click="onResubscribe">
 						<RotateCounterClockwiseIcon /> {{ formatMessage(messages.resubscribeLabel) }}
 					</button>
 				</ButtonStyled>
@@ -239,6 +250,7 @@ import {
 import { AutoLink, ButtonStyled } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 import {
 	CardIcon,
@@ -300,7 +312,7 @@ const messages = defineMessages({
 	filesKeptForDownload: {
 		id: 'servers.listing.notice.files-kept-for-download',
 		defaultMessage:
-			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining> and can be downloaded below before they are deleted. ',
+			'Your files will be kept for <days-remaining>{daysRemaining} more {daysRemaining, plural, one {day} other {days} }</days-remaining>. Contact support to download the files before they are deleted. ',
 	},
 	subscriptionSetToCancel: {
 		id: 'servers.listing.notice.subscription-set-to-cancel',
@@ -395,9 +407,11 @@ type ServerListingProps = {
 }
 
 const props = defineProps<ServerListingProps>()
+const router = useRouter()
 
-const { kyros, labrinth } = injectModrinthClient()
+const { archon, kyros, labrinth } = injectModrinthClient()
 
+const isBackupDownloadEnabled = false
 const isConfiguring = computed(() => props.flows?.intro)
 const isUpgrading = computed(
 	() => props.status === 'suspended' && props.suspension_reason === 'upgrading',
@@ -514,11 +528,30 @@ const { data: image } = useQuery({
 		if (!props.server_id || props.status !== 'available') return null
 
 		try {
-			try {
-				const blob = await kyros.files_v0.downloadFile('/server-icon-original.png')
+			const fsAuth = await archon.servers_v0.getFilesystemAuth(props.server_id)
 
-				return await processImageBlob(blob, 512)
-			} catch {
+			try {
+				const blob = await kyros.files_v0.downloadFileWithAuth(fsAuth, '/server-icon.png')
+				return await processImageBlob(blob, 64)
+			} catch (error) {
+				const statusCode = (error as { statusCode?: number })?.statusCode
+				if (statusCode != null && statusCode !== 404) {
+					throw error
+				}
+
+				try {
+					const originalBlob = await kyros.files_v0.downloadFileWithAuth(
+						fsAuth,
+						'/server-icon-original.png',
+					)
+					return await processImageBlob(originalBlob, 64)
+				} catch (originalError) {
+					const originalStatusCode = (originalError as { statusCode?: number })?.statusCode
+					if (originalStatusCode != null && originalStatusCode !== 404) {
+						throw originalError
+					}
+				}
+
 				const projectIcon = iconUrl.value
 				if (projectIcon) {
 					const response = await fetch(projectIcon)
@@ -528,27 +561,42 @@ const { data: image } = useQuery({
 					const scaledBlob = await dataURLToBlob(scaledDataUrl)
 					const scaledFile = new File([scaledBlob], 'server-icon.png', { type: 'image/png' })
 
-					kyros.files_v0.uploadFile('/server-icon.png', scaledFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon.png', scaledFile).promise
 
 					const originalFile = new File([blob], 'server-icon-original.png', {
 						type: 'image/png',
 					})
-					kyros.files_v0.uploadFile('/server-icon-original.png', originalFile)
+					await kyros.files_v0.uploadFileWithAuth(fsAuth, '/server-icon-original.png', originalFile)
+						.promise
 
 					return scaledDataUrl
 				}
 			}
+
+			return null
 		} catch (error) {
 			console.debug('Icon processing failed:', error)
 			return null
 		}
-
-		return null
 	},
 	enabled: computed(() => !!props.server_id && props.status === 'available'),
 })
 
 const copied = ref(false)
+
+function navigateToServer(event: MouseEvent | KeyboardEvent) {
+	if (isDisabled.value) return
+
+	const target = event.target
+	if (
+		target instanceof HTMLElement &&
+		target.closest('[data-subdomain-label], [data-server-listing-button]')
+	) {
+		return
+	}
+
+	router.push(`/hosting/manage/${props.server_id}`)
+}
 
 async function copyToClipboard(text: string) {
 	await navigator.clipboard.writeText(text)
@@ -561,6 +609,14 @@ async function copyToClipboard(text: string) {
 
 <style scoped>
 .server-listing-notice {
-	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-5 bg-bg-raised text-primary;
+	@apply relative flex w-full rounded-b-2xl border-[1px] border-solid p-4 flex-col gap-4 border-surface-4 bg-bg-raised text-primary;
+}
+
+.hoverable:hover:not(:has([data-subdomain-label]:hover, [data-server-listing-button]:hover)) {
+	filter: brightness(1.2);
+}
+
+.pressable:active:not(:has([data-subdomain-label]:active, [data-server-listing-button]:active)) {
+	transform: scale(0.985);
 }
 </style>

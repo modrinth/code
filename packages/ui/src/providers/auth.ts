@@ -6,6 +6,8 @@ import { createContext } from './create-context'
 export interface AuthProvider {
 	session_token: Ref<string | null>
 	user: Ref<Labrinth.Users.v2.User | null>
+	/** True once the initial auth check has completed (regardless of result). */
+	isReady?: Ref<boolean>
 	requestSignIn: (redirectPath: string) => void | Promise<void>
 }
 

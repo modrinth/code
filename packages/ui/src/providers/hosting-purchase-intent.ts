@@ -30,6 +30,7 @@ export type GuestPlanModalHandle = {
 export interface HostingPurchaseIntentContext {
 	openPurchaseModal: () => void
 	handleGuestPlanContinue: (payload: GuestPlanContinuePayload) => void
+	clearPurchaseIntent: () => void
 }
 
 export interface CreateHostingPurchaseIntentContextOptions {
@@ -73,7 +74,7 @@ function writePendingPurchaseIntent(intent: PendingPurchaseIntent) {
 	window.sessionStorage.setItem(PURCHASE_INTENT_STORAGE_KEY, JSON.stringify(intent))
 }
 
-function clearPendingPurchaseIntent() {
+function clearStoredPurchaseIntent() {
 	if (typeof window === 'undefined') return
 	window.sessionStorage.removeItem(PURCHASE_INTENT_STORAGE_KEY)
 }
@@ -137,6 +138,13 @@ export function createHostingPurchaseIntentContext(
 		}
 	}
 
+	function clearPurchaseIntent() {
+		clearStoredPurchaseIntent()
+		pendingResumeIntent.value = null
+		lastSelectedInterval.value = 'quarterly'
+		lastSelectedPlanId.value = undefined
+	}
+
 	watch(
 		options.loggedIn,
 		(isLoggedIn) => {
@@ -145,7 +153,7 @@ export function createHostingPurchaseIntentContext(
 			const pendingIntent = readPendingPurchaseIntent()
 			if (!pendingIntent || pendingIntent.source !== options.intentSource) return
 
-			clearPendingPurchaseIntent()
+			clearStoredPurchaseIntent()
 			pendingResumeIntent.value = pendingIntent
 			lastSelectedInterval.value = pendingIntent.interval
 			lastSelectedPlanId.value = pendingIntent.planId
@@ -173,6 +181,7 @@ export function createHostingPurchaseIntentContext(
 	return {
 		openPurchaseModal,
 		handleGuestPlanContinue,
+		clearPurchaseIntent,
 	}
 }
 

@@ -1,5 +1,5 @@
 <template>
-	<div class="flex gap-1">
+	<div class="flex gap-1 text-sm font-medium">
 		<!-- indicator icon -->
 
 		{{ currentPlayers }} / {{ maxPlayers }} Players

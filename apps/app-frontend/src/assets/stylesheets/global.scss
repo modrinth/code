@@ -45,6 +45,14 @@
 	color-scheme: dark;
 	--view-width: calc(100% - 5rem);
 	--expanded-view-width: calc(100% - 13rem);
+	--medal-promotion-bg: #000;
+	--medal-promotion-bg-orange: rgba(208, 246, 255, 0.25);
+	--medal-promotion-text-orange: #42abff;
+	--medal-promotion-bg-gradient: linear-gradient(
+		90deg,
+		rgba(66, 170, 255, 0.15),
+		rgba(0, 0, 0, 0) 100%
+	);
 }
 
 body {
@@ -79,6 +87,8 @@ body {
 a {
 	color: inherit;
 	text-decoration: none;
+	-webkit-font-smoothing: antialiased;
+	will-change: filter;
 }
 
 .badge {
