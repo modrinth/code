@@ -42,7 +42,7 @@
 		"vue": "^3.5.13",
 		"yaml": "^2.8.2"
 	},
-	"packageManager": "pnpm@9.15.0",
+	"packageManager": "pnpm@10.33.0",
 	"pnpm": {
 		"patchedDependencies": {
 			"readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"

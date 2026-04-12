@@ -27,7 +27,10 @@
 						<slot name="header">{{ header }}</slot>
 					</div>
 				</div>
-				<div class="font-normal text-contrast/80" :class="!(header || $slots.header) && 'flex-1'">
+				<div
+					class="font-normal text-contrast opacity-85"
+					:class="!(header || $slots.header) && 'flex-1'"
+				>
 					<slot>{{ body }}</slot>
 				</div>
 			</div>
