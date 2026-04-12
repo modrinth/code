@@ -198,11 +198,13 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 
 	const handleLog = (data: Archon.Websocket.v0.WSLogEvent) => {
 		if (!shouldProcessEvent()) return
+		modrinthServersConsole.recordWsEvent({ event: 'log', ...data })
 		modrinthServersConsole.addLegacyLog(data.message)
 	}
 
 	const handleLog4j = (data: Archon.Websocket.v0.WSLog4jEvent) => {
 		if (!shouldProcessEvent()) return
+		modrinthServersConsole.recordWsEvent({ event: 'log4j', ...data })
 		modrinthServersConsole.addLog4jEvent(data)
 	}
 

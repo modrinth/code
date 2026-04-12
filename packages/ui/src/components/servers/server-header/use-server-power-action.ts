@@ -23,7 +23,6 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const showStopButton = computed(() => isRunning.value || isStarting.value)
 
 	const busyTooltip = computed(() => {
-		if (isStopping.value) return 'Server is currently stopping'
 		if (isStarting.value) return 'Your server is starting'
 		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
 	})
@@ -37,6 +36,8 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 			case 'running':
 			case 'starting':
 				return 'Restart'
+			case 'stopping':
+				return 'Stopping'
 			default:
 				return 'Start'
 		}

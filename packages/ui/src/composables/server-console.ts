@@ -194,16 +194,16 @@ function formatLog4jLines(event: Log4jEvent): LogLine[] {
 	const message = event.message?.trim() ?? ''
 
 	const prefix = time ? `${time} [${thread}/${levelStr}]: ` : `[${thread}/${levelStr}]: `
-	const messageLines = message.split(/\r?\n/)
+	const messageLines = message.split(/[\r\n]+/)
 	const lines: LogLine[] = [{ text: prefix + messageLines[0], level }]
 	for (let i = 1; i < messageLines.length; i++) {
-		if (!messageLines[i].trim()) continue
+		if (!messageLines[i]) continue
 		lines.push({ text: messageLines[i], level })
 	}
 
 	if (event.throwable) {
-		for (const line of event.throwable.split(/\r?\n/)) {
-			if (!line.trim()) continue
+		for (const line of event.throwable.split(/[\r\n]+/)) {
+			if (!line) continue
 			lines.push({ text: line, level: 'error' })
 		}
 	}
@@ -218,6 +218,9 @@ function textToLogLine(text: string): LogLine {
 export function createConsoleState() {
 	const archive = new ColumnarRingBuffer(ARCHIVE_CAPACITY)
 	const output: Ref<LogLine[]> = shallowRef<LogLine[]>([])
+	const WS_EVENT_HISTORY_MAX = 25000
+	const wsEventHistory: unknown[] = []
+	let wsEventCaptureEnabled = false
 
 	let lineBuffer: LogLine[] = []
 	let batchTimer: NodeJS.Timeout | null = null
@@ -283,10 +286,25 @@ export function createConsoleState() {
 		addLines(formatLog4jLines(event))
 	}
 
+	const recordWsEvent = (event: unknown): void => {
+		if (!wsEventCaptureEnabled) return
+		wsEventHistory.push(event)
+		if (wsEventHistory.length > WS_EVENT_HISTORY_MAX) {
+			wsEventHistory.splice(0, wsEventHistory.length - WS_EVENT_HISTORY_MAX)
+		}
+	}
+
+	const getWsEventHistory = (): unknown[] => wsEventHistory.slice()
+
+	const setWsEventCaptureEnabled = (enabled: boolean): void => {
+		wsEventCaptureEnabled = enabled
+		if (!enabled) wsEventHistory.length = 0
+	}
+
 	const addLegacyLog = (message: string): void => {
 		const logLines = message
-			.split('\n')
-			.filter((l) => l.trim())
+			.split(/[\r\n]+/)
+			.filter((l) => l)
 			.map(textToLogLine)
 
 		let parentLevel: LogLevel | null = null
@@ -306,6 +324,7 @@ export function createConsoleState() {
 		archive.clear()
 		output.value = []
 		lineBuffer = []
+		wsEventHistory.length = 0
 		wrapCount = 0
 		if (batchTimer) {
 			clearTimeout(batchTimer)
@@ -343,6 +362,9 @@ export function createConsoleState() {
 		addLines,
 		addLog4jEvent,
 		addLegacyLog,
+		recordWsEvent,
+		getWsEventHistory,
+		setWsEventCaptureEnabled,
 		clear,
 		__debugStats,
 	}

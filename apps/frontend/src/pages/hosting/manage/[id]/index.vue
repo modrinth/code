@@ -2,6 +2,7 @@
 import { injectModrinthServerContext, ServersManageOverviewPage } from '@modrinth/ui'
 
 const { server } = injectModrinthServerContext()
+const flags = useFeatureFlags()
 
 useHead({
 	title: computed(() => `Overview - ${server.value?.name ?? 'Server'} - Modrinth`),
@@ -9,5 +10,5 @@ useHead({
 </script>
 
 <template>
-	<ServersManageOverviewPage />
+	<ServersManageOverviewPage :show-advanced-debug-info="flags.advancedDebugInfo" />
 </template>
