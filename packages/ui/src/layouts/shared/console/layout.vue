@@ -1,10 +1,10 @@
 <template>
 	<div
 		class="flex min-h-0 flex-1 flex-col gap-4"
-		:class="isFullscreen ? `fixed inset-0 z-50 bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : ''"
+		:class="isFullscreen ? `fixed inset-0 z-[15] bg-surface-1 p-6 py-8 ${isApp ? 'pt-12' : ''}` : ''"
 	>
 		<CollapsibleAdmonition
-			v-if="ctx.crashAnalysis?.value"
+			v-if="ctx.crashAnalysis?.value && !isFullscreen"
 			type="critical"
 			:header="crashHeader"
 			:items="crashItems"
