@@ -197,11 +197,13 @@ function formatLog4jLines(event: Log4jEvent): LogLine[] {
 	const messageLines = message.split(/\r?\n/)
 	const lines: LogLine[] = [{ text: prefix + messageLines[0], level }]
 	for (let i = 1; i < messageLines.length; i++) {
+		if (!messageLines[i].trim()) continue
 		lines.push({ text: messageLines[i], level })
 	}
 
 	if (event.throwable) {
-		for (const line of event.throwable.split('\n').filter(Boolean)) {
+		for (const line of event.throwable.split(/\r?\n/)) {
+			if (!line.trim()) continue
 			lines.push({ text: line, level: 'error' })
 		}
 	}
