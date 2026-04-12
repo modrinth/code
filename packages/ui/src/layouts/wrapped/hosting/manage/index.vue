@@ -30,6 +30,7 @@
 			:affiliate-code="affiliateCode"
 			plan-stage
 			@purchase-success="handlePurchaseSuccess"
+			@hide="clearPurchaseIntent"
 		/>
 		<ResubscribeModal ref="resubscribeModal" @resubscribe="handleResubscribeConfirm" />
 
@@ -700,7 +701,7 @@ const hostingPurchaseIntent = createHostingPurchaseIntentContext({
 })
 provideHostingPurchaseIntent(hostingPurchaseIntent)
 
-const { openPurchaseModal, handleGuestPlanContinue } = hostingPurchaseIntent
+const { openPurchaseModal, handleGuestPlanContinue, clearPurchaseIntent } = hostingPurchaseIntent
 
 const { data: subscriptions } = useQuery({
 	queryKey: ['billing', 'subscriptions'],
