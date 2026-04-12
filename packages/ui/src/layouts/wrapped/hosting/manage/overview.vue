@@ -64,7 +64,7 @@ const inspectError = async () => {
 		if (!log) return
 
 		const data = await client.mclogs.insights_v1.analyse(log)
-		if (data.analysis && Array.isArray(data.analysis.problems)) {
+		if (data.analysis?.problems?.length) {
 			crashAnalysis.value = data
 		} else {
 			crashAnalysis.value = null

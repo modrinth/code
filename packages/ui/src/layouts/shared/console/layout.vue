@@ -282,7 +282,6 @@ function handleClear() {
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()
-	writeEmptyState()
 }
 
 async function handleShare() {
