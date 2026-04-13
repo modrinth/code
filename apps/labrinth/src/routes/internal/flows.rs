@@ -51,6 +51,7 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)
+            .service(create_oauth_account)
             .service(create_account_with_password)
             .service(login_password)
             .service(login_2fa)
@@ -1396,7 +1397,7 @@ struct NewOAuthAccount {
     pub sign_up_newsletter: bool,
 }
 
-#[get("/create/oauth")]
+#[post("/create/oauth")]
 async fn create_oauth_account(
     req: HttpRequest,
     db: Data<PgPool>,
