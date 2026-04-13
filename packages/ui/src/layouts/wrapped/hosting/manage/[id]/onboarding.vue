@@ -1,7 +1,7 @@
 <template>
-	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-6 max-w-[500px]">
+	<div class="mx-auto flex w-fit flex-col items-start gap-4 mt-16 max-w-[500px]">
 		<div class="flex flex-col gap-2 w-full">
-			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth</h2>
+			<h2 class="m-0 text-2xl font-semibold text-contrast">Welcome to Modrinth Hosting</h2>
 			<p class="m-0 text-base text-secondary">
 				Your server is ready. Here's what you need to do to start playing!
 			</p>
@@ -95,6 +95,19 @@ const route = useRoute()
 const router = useRouter()
 const queryClient = useQueryClient()
 
+const props = withDefaults(
+	defineProps<{
+		browseModpacks?: (args: {
+			serverId: string
+			worldId: string | null
+			from: 'onboarding'
+		}) => void | Promise<void>
+	}>(),
+	{
+		browseModpacks: undefined,
+	},
+)
+
 const modalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
 
 const uploading = ref(false)
@@ -109,6 +122,15 @@ const openModal = () => modalRef.value?.show()
 onBeforeUnmount(() => modalRef.value?.hide())
 
 function onBrowseModpacks() {
+	if (props.browseModpacks) {
+		props.browseModpacks({
+			serverId,
+			worldId: worldId.value,
+			from: 'onboarding',
+		})
+		return
+	}
+
 	router.push({
 		path: '/discover/modpacks',
 		query: { sid: serverId, from: 'onboarding', wid: worldId.value },
@@ -152,7 +174,7 @@ async function finalizeSetup() {
 	client.archon.servers_v1.endIntro(serverId).then(() => {
 		queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] })
 	})
-	await router.push(`/hosting/manage/${serverId}/content`)
+	await router.push(`/hosting/manage/${serverId}/`)
 }
 
 /** Map UI loader names to API Modloader values */

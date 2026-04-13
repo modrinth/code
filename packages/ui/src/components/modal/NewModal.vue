@@ -1,54 +1,61 @@
 <template>
-	<div
-		v-if="open"
-		:style="`${mouseX !== -1 ? `--_mouse-x: ${mouseX};` : ''} ${mouseY !== -1 ? `--_mouse-y: ${mouseY};` : ''}`"
-	>
-		<div
-			:class="{ shown: visible }"
-			class="tauri-overlay"
-			data-tauri-drag-region
-			@click="() => (closeOnClickOutside && closable ? hide() : {})"
-		/>
-		<div
-			:class="[
-				'modal-overlay',
-				{
-					shown: visible,
-					noblur: effectiveNoblur,
-				},
-				computedFade,
-			]"
-			@click="() => (closeOnClickOutside && closable ? hide() : {})"
-		/>
-		<div
-			class="modal-container experimental-styles-within"
-			:class="{ shown: visible }"
-			:style="{
-				'--_max-width': maxWidth,
-				'--_width': width,
-			}"
-		>
+	<Teleport to="body">
+		<div v-if="open" class="modal-root">
 			<div
-				ref="modalBodyRef"
-				role="dialog"
-				aria-modal="true"
-				:aria-labelledby="headerId"
-				class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
-				@keydown="handleKeyDown"
-			>
+				:class="{ shown: visible }"
+				class="tauri-overlay"
+				data-tauri-drag-region
+				@click="() => (closeOnClickOutside && closable ? hide() : {})"
+			/>
+			<div
+				:class="[
+					'modal-overlay',
+					{
+						shown: visible,
+						noblur: effectiveNoblur,
+					},
+					computedFade,
+				]"
+				@click="() => (closeOnClickOutside && closable ? hide() : {})"
+			/>
+			<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
 				<div
-					v-if="!hideHeader"
-					data-tauri-drag-region
-					class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
+					ref="modalBodyRef"
+					role="dialog"
+					aria-modal="true"
+					:aria-labelledby="headerId"
+					class="modal-body flex flex-col bg-bg-raised rounded-2xl border border-solid border-surface-5"
+					@keydown="handleKeyDown"
 				>
-					<div class="flex text-wrap break-words items-center gap-3 min-w-0">
-						<slot name="title">
-							<span v-if="header" :id="headerId" class="text-2xl font-semibold text-contrast">
-								{{ header }}
-							</span>
-						</slot>
+					<div
+						v-if="!hideHeader"
+						data-tauri-drag-region
+						class="grid grid-cols-[auto_min-content] items-center gap-4 p-6 border-solid border-0 border-b-[1px] border-surface-5 max-w-full"
+					>
+						<div class="flex text-wrap break-words items-center gap-3 min-w-0">
+							<slot name="title">
+								<span v-if="header" :id="headerId" class="text-2xl font-semibold text-contrast">
+									{{ header }}
+								</span>
+							</slot>
+						</div>
+						<ButtonStyled v-if="closable" circular>
+							<button
+								v-tooltip="closeLabel"
+								:aria-label="closeLabel"
+								:disabled="disableClose"
+								@click="hide"
+							>
+								<XIcon aria-hidden="true" />
+							</button>
+						</ButtonStyled>
 					</div>
-					<ButtonStyled v-if="closable" circular>
+
+					<ButtonStyled
+						v-if="props.mergeHeader && closable"
+						class="absolute top-4 right-4 z-10"
+						circular
+					>
 						<button
 							v-tooltip="closeLabel"
 							:aria-label="closeLabel"
@@ -58,82 +65,67 @@
 							<XIcon aria-hidden="true" />
 						</button>
 					</ButtonStyled>
-				</div>
 
-				<ButtonStyled
-					v-if="props.mergeHeader && closable"
-					class="absolute top-4 right-4 z-10"
-					circular
-				>
-					<button
-						v-tooltip="closeLabel"
-						:aria-label="closeLabel"
-						:disabled="disableClose"
-						@click="hide"
-					>
-						<XIcon aria-hidden="true" />
-					</button>
-				</ButtonStyled>
+					<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
+						<Transition
+							enter-active-class="transition-all duration-200 ease-out"
+							enter-from-class="opacity-0 max-h-0"
+							enter-to-class="opacity-100 max-h-6"
+							leave-active-class="transition-all duration-200 ease-in"
+							leave-from-class="opacity-100 max-h-6"
+							leave-to-class="opacity-0 max-h-0"
+						>
+							<div
+								v-if="showTopFade"
+								class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-6 bg-gradient-to-b from-bg-raised to-transparent"
+							/>
+						</Transition>
 
-				<div v-if="scrollable" class="relative flex-1 min-h-0 flex flex-col">
-					<Transition
-						enter-active-class="transition-all duration-200 ease-out"
-						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-6"
-						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-6"
-						leave-to-class="opacity-0 max-h-0"
-					>
 						<div
-							v-if="showTopFade"
-							class="pointer-events-none absolute left-0 right-0 top-0 z-10 h-6 bg-gradient-to-b from-bg-raised to-transparent"
-						/>
-					</Transition>
+							ref="scrollContainer"
+							:class="[
+								'flex-1 min-h-0',
+								props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+								{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
+							]"
+							:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
+							@scroll="checkScrollState"
+						>
+							<slot> You just lost the game.</slot>
+						</div>
+
+						<Transition
+							enter-active-class="transition-all duration-200 ease-out"
+							enter-from-class="opacity-0 max-h-0"
+							enter-to-class="opacity-100 max-h-6"
+							leave-active-class="transition-all duration-200 ease-in"
+							leave-from-class="opacity-100 max-h-6"
+							leave-to-class="opacity-0 max-h-0"
+						>
+							<div
+								v-if="showBottomFade"
+								class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-bg-raised to-transparent"
+							/>
+						</Transition>
+					</div>
 
 					<div
-						ref="scrollContainer"
+						v-else
 						:class="[
-							'flex-1 min-h-0',
-							props.noPadding ? '' : 'overflow-y-auto p-6 !pb-1 sm:pb-6',
+							props.noPadding ? '' : 'overflow-y-auto p-6',
 							{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
 						]"
-						:style="props.noPadding ? {} : { maxHeight: maxContentHeight }"
-						@scroll="checkScrollState"
 					>
 						<slot> You just lost the game.</slot>
 					</div>
 
-					<Transition
-						enter-active-class="transition-all duration-200 ease-out"
-						enter-from-class="opacity-0 max-h-0"
-						enter-to-class="opacity-100 max-h-6"
-						leave-active-class="transition-all duration-200 ease-in"
-						leave-from-class="opacity-100 max-h-6"
-						leave-to-class="opacity-0 max-h-0"
-					>
-						<div
-							v-if="showBottomFade"
-							class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 h-6 bg-gradient-to-t from-bg-raised to-transparent"
-						/>
-					</Transition>
-				</div>
-
-				<div
-					v-else
-					:class="[
-						props.noPadding ? '' : 'overflow-y-auto p-6',
-						{ 'pt-12': props.mergeHeader && closable && !props.noPadding },
-					]"
-				>
-					<slot> You just lost the game.</slot>
-				</div>
-
-				<div v-if="$slots.actions" class="p-4 pt-0">
-					<slot name="actions" />
+					<div v-if="$slots.actions" class="p-4 pt-0">
+						<slot name="actions" />
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</Teleport>
 </template>
 
 <script setup lang="ts">
@@ -221,6 +213,7 @@ const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
 
 const open = ref(false)
 const visible = ref(false)
+const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 let previousFocusEl: Element | null = null
 
@@ -238,6 +231,7 @@ function getFocusableElements(): HTMLElement[] {
 function show(event?: MouseEvent) {
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
+	stackDepth.value = modalStackSize()
 	open.value = true
 	previousFocusEl = document.activeElement
 	pushModal()
@@ -249,8 +243,8 @@ function show(event?: MouseEvent) {
 	if (event) {
 		updateMousePosition(event)
 	} else {
-		mouseX.value = window.innerWidth / 2
-		mouseY.value = window.innerHeight / 2
+		mouseX.value = Math.round(window.innerWidth / 2)
+		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 	setTimeout(() => {
 		visible.value = true
@@ -291,8 +285,17 @@ defineExpose({
 	checkScrollState,
 })
 
-const mouseX = ref(-1)
-const mouseY = ref(-1)
+const mouseX = ref(0)
+const mouseY = ref(0)
+
+const stackZBase = computed(() => stackDepth.value * 10)
+const stackOverlayZ = computed(() => stackZBase.value + 19)
+const stackTauriZ = computed(() => stackZBase.value + 20)
+const stackContainerZ = computed(() => stackZBase.value + 21)
+const resolvedMaxWidth = computed(() => props.maxWidth ?? '60rem')
+const resolvedWidth = computed(() => props.width ?? 'fit-content')
+const mouseXOffset = computed(() => `calc((-50vw + ${mouseX.value}px) / 16)`)
+const mouseYOffset = computed(() => `calc((-50vh + ${mouseY.value}px) / 16)`)
 
 function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseX.value = event.clientX
@@ -315,8 +318,8 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
-		mouseX.value = window.innerWidth / 2
-		mouseY.value = window.innerHeight / 2
+		mouseX.value = Math.round(window.innerWidth / 2)
+		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 }
 
@@ -351,7 +354,7 @@ function handleKeyDown(event: KeyboardEvent) {
 	left: 0;
 	width: 100%;
 	height: 100px;
-	z-index: 20;
+	z-index: v-bind(stackTauriZ);
 
 	&.shown {
 		opacity: 1;
@@ -362,7 +365,7 @@ function handleKeyDown(event: KeyboardEvent) {
 .modal-overlay {
 	position: fixed;
 	inset: -5rem;
-	z-index: 19;
+	z-index: v-bind(stackOverlayZ);
 	opacity: 0;
 	transition: all 0.2s ease-out;
 	//transform: translate(
@@ -417,13 +420,10 @@ function handleKeyDown(event: KeyboardEvent) {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 21;
+	z-index: v-bind(stackContainerZ);
 	visibility: hidden;
 	pointer-events: none;
-	transform: translate(
-		calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
-		calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16)
-	);
+	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));
 	transition: all 0.2s ease-out;
 
 	&.shown {
@@ -441,10 +441,10 @@ function handleKeyDown(event: KeyboardEvent) {
 		position: fixed;
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));
-		max-width: min(var(--_max-width, 60rem), calc(100% - 2 * var(--gap-lg)));
+		max-width: min(v-bind(resolvedMaxWidth), calc(100% - 2 * var(--gap-lg)));
 		overflow-y: hidden;
 		overflow-x: hidden;
-		width: var(--_width, fit-content);
+		width: v-bind(resolvedWidth);
 		pointer-events: auto;
 		scale: 0.97;
 

@@ -89,6 +89,8 @@ fn main() {
                         "logs_delete_logs",
                         "logs_delete_logs_by_filename",
                         "logs_get_latest_log_cursor",
+                        "logs_get_live_log_buffer",
+                        "logs_clear_live_log_buffer",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

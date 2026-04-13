@@ -192,6 +192,7 @@
 import type { ProjectStatus } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import { computed } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
 
 import { AutoLink, Avatar } from '../../base'
 import { SmartClickable } from '../../base/index.ts'
@@ -217,7 +218,7 @@ defineEmits<{
 
 const props = defineProps<{
 	layout: 'list' | 'grid'
-	link?: string | (() => void)
+	link?: string | RouteLocationRaw | (() => void)
 	iconUrl?: string
 	title: string
 	author?: {
