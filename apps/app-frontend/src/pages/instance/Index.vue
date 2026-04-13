@@ -114,9 +114,9 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button @click="stopInstance('InstancePage')">
+							<button :disabled="stopping" @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
-								Stop
+								{{ stopping ? 'Stopping...' : 'Stop' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
@@ -172,7 +172,7 @@
 							color="brand"
 							size="large"
 						>
-							<button disabled>Loading...</button>
+							<button disabled>Starting...</button>
 						</ButtonStyled>
 						<ButtonStyled circular size="large">
 							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
@@ -312,6 +312,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
@@ -345,6 +346,7 @@ window.addEventListener('online', () => {
 const instance = ref<GameInstance>()
 const playing = ref(false)
 const loading = ref(false)
+const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
@@ -494,8 +496,10 @@ const startInstance = async (context: string) => {
 }
 
 const stopInstance = async (context: string) => {
-	playing.value = false
+	stopping.value = true
 	await kill(route.params.id as string).catch(handleError)
+	stopping.value = false
+	playing.value = false
 
 	if (!instance.value) return
 	trackEvent('InstanceStop', {
@@ -644,6 +648,11 @@ const timePlayedHumanized = computed(() => {
 onUnmounted(() => {
 	unlistenProcesses()
 	unlistenProfiles()
+	const profilePath = route.params.id
+	if (profilePath) {
+		const { destroy } = useInstanceConsole(profilePath)
+		destroy()
+	}
 })
 </script>
 

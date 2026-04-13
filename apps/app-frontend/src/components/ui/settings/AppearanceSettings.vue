@@ -21,7 +21,7 @@ watch(
 )
 </script>
 <template>
-	<h2 class="m-0 text-lg font-extrabold text-contrast">Color theme</h2>
+	<h2 class="m-0 text-lg font-semibold text-contrast">Color theme</h2>
 	<p class="m-0 mt-1">Select your preferred color theme for Modrinth App.</p>
 
 	<ThemeSelector
@@ -36,9 +36,9 @@ watch(
 		system-theme-color="system"
 	/>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Advanced rendering</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Advanced rendering</h2>
 			<p class="m-0 mt-1">
 				Enables advanced rendering such as blur effects that may cause performance issues without
 				hardware-accelerated rendering.
@@ -57,48 +57,48 @@ watch(
 		/>
 	</div>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Hide nametag</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Hide nametag</h2>
 			<p class="m-0 mt-1">Disables the nametag above your player on the skins page.</p>
 		</div>
 		<Toggle id="hide-nametag-skins-page" v-model="settings.hide_nametag_skins_page" />
 	</div>
 
-	<div v-if="os !== 'MacOS'" class="mt-4 flex items-center justify-between gap-4">
+	<div v-if="os !== 'MacOS'" class="mt-6 flex items-center justify-between gap-4">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Native decorations</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Native decorations</h2>
 			<p class="m-0 mt-1">Use system window frame (app restart required).</p>
 		</div>
 		<Toggle id="native-decorations" v-model="settings.native_decorations" />
 	</div>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Minimize launcher</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Minimize launcher</h2>
 			<p class="m-0 mt-1">Minimize the launcher when a Minecraft process starts.</p>
 		</div>
 		<Toggle id="minimize-launcher" v-model="settings.hide_on_process_start" />
 	</div>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Default landing page</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Default landing page</h2>
 			<p class="m-0 mt-1">Change the page to which the launcher opens on.</p>
 		</div>
 		<Combobox
 			id="opening-page"
 			v-model="settings.default_page"
 			name="Opening page dropdown"
-			class="w-40"
+			class="max-w-40"
 			:options="['Home', 'Library'].map((v) => ({ value: v, label: v }))"
 			:display-value="settings.default_page ?? 'Select an option'"
 		/>
 	</div>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Jump back into worlds</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Jump back into worlds</h2>
 			<p class="m-0 mt-1">Includes recent worlds in the "Jump back in" section on the Home page.</p>
 		</div>
 		<Toggle
@@ -113,9 +113,9 @@ watch(
 		/>
 	</div>
 
-	<div class="mt-4 flex items-center justify-between">
+	<div class="mt-6 flex items-center justify-between">
 		<div>
-			<h2 class="m-0 text-lg font-extrabold text-contrast">Toggle sidebar</h2>
+			<h2 class="m-0 text-lg font-semibold text-contrast">Toggle sidebar</h2>
 			<p class="m-0 mt-1">Enables the ability to toggle the sidebar.</p>
 		</div>
 		<Toggle
