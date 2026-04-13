@@ -54,7 +54,6 @@ import { Avatar, injectModrinthClient } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
-import { useAuth } from '~/composables/auth.js'
 
 const createOrgModal = ref(null)
 

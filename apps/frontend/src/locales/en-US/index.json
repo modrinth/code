@@ -224,6 +224,9 @@
   "auth.authorize.redirect-url": {
     "message": "You will be redirected to <redirect-url>{url}</redirect-url>"
   },
+  "auth.continue-with-provider": {
+    "message": "Continue with {provider}"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
@@ -269,23 +272,26 @@
   "auth.sign-in.additional-options": {
     "message": "<forgot-password-link>Forgot password</forgot-password-link> • Don't have an account? <create-account-link>Sign up</create-account-link>"
   },
+  "auth.sign-in.continue-with-email": {
+    "message": "Continue with Email"
+  },
   "auth.sign-in.sign-in-with": {
     "message": "Sign into Modrinth"
   },
   "auth.sign-in.title": {
     "message": "Sign In"
   },
-  "auth.sign-in.use-password": {
-    "message": "Or use a password"
-  },
-  "auth.sign-up.action.create-account": {
-    "message": "Create account"
+  "auth.sign-up.continue-with-email": {
+    "message": "Continue with Email"
   },
   "auth.sign-up.legal-dislaimer": {
     "message": "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>."
   },
-  "auth.sign-up.notification.password-mismatch.text": {
-    "message": "Passwords do not match!"
+  "auth.sign-up.show-fewer-options": {
+    "message": "Show fewer options"
+  },
+  "auth.sign-up.show-other-options": {
+    "message": "Show other options"
   },
   "auth.sign-up.sign-in-option.title": {
     "message": "Already have an account?"
@@ -296,11 +302,8 @@
   "auth.sign-up.title": {
     "message": "Sign Up"
   },
-  "auth.sign-up.title.create-account": {
-    "message": "Or create an account yourself"
-  },
   "auth.sign-up.title.sign-up-with": {
-    "message": "Sign up with"
+    "message": "Create an Account"
   },
   "auth.verify-email.action.account-settings": {
     "message": "Account settings"

@@ -478,7 +478,7 @@ import SteamIcon from 'assets/icons/auth/sso-steam.svg'
 import QrcodeVue from 'qrcode.vue'
 
 import Modal from '~/components/ui/Modal.vue'
-import { getAuthUrl, removeAuthProvider } from '~/composables/auth.js'
+import { getAuthUrl, removeAuthProvider } from '~/composables/auth.ts'
 
 definePageMeta({
 	middleware: 'auth',
