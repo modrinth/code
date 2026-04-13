@@ -183,7 +183,7 @@ defineExpose({
 					v-tooltip="'Copy Link'"
 					type="button"
 					aria-label="Copy Link"
-					class="flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-lg border-none bg-button-bg px-3 pr-1.5 text-primary transition-all hover:bg-button-bg-hover hover:brightness-125 active:scale-95"
+					class="flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border-none bg-button-bg px-3 pr-1.5 text-primary transition-all hover:bg-button-bg-hover hover:brightness-125 active:scale-95"
 					@click="copyText"
 				>
 					<span class="cursor-pointer truncate text-left font-semibold text-primary">
@@ -195,8 +195,8 @@ defineExpose({
 				</button>
 				<ButtonStyled v-if="link">
 					<a :href="url" target="_blank" rel="noopener noreferrer" aria-label="Open in new tab">
-						<ExternalIcon aria-hidden="true" />
 						Open in new tab
+						<ExternalIcon aria-hidden="true" />
 					</a>
 				</ButtonStyled>
 				<div v-if="socialButtons" class="flex flex-row gap-2">
