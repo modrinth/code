@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Authenticatieservers kunnen niet worden bereikt"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Voeg server aan instantie toe"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Voeg servers aan instantie toe"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Voeg aan instantie toe"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Voeg aan {instanceName} toe"
+  },
+  "app.browse.added": {
+    "message": "Toegevoegd"
+  },
+  "app.browse.already-added": {
+    "message": "Al toegevoegd"
+  },
+  "app.browse.discover-content": {
+    "message": "Ontdek content"
+  },
+  "app.browse.discover-servers": {
+    "message": "Ontdek servers"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Verstop toegevoegde servers"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Verberg Geïnstalleerde inhoud"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Installeer inhoud naar instantie"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Voeg modpack beschrijving in..."
   },
@@ -41,8 +74,17 @@
   "app.instance.confirm-delete.header": {
     "message": "Verwijder instantie"
   },
+  "app.instance.modpack-already-installed.body": {
+    "message": "Deze modpakket is al in de <bold>{instanceName}<bold> instantie geïnstalleerd. Ben je zeker dat je hetgeen wil dupliceren?"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Maak"
+  },
   "app.instance.modpack-already-installed.header": {
     "message": "Modpack is al geïnstalleerd"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instantie"
   },
   "app.instance.mods.content-type-project": {
     "message": "project"
@@ -61,6 +103,42 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "Succesvol geüpload"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Voeg server toe"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "Zoek servers"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "{name} zal **permanent verwijderd** worden en kan niet hersteld worden."
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Gemod"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Voeg of zoek een server om te beginnen"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Noch servers noch werelden toegevoegd"
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Ben je zeker dat je {name} wil verwijderen?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Zoek werelden"
+  },
+  "app.instance.worlds.this-server": {
+    "message": "deze server"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Content vereist"
@@ -164,6 +242,24 @@
   "app.update.reload-to-update": {
     "message": "Herlaad om de update te installeren"
   },
+  "app.world.server-modal.placeholder-address": {
+    "message": "voorbeeld.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Kies een keuze"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Incompatibele versie{version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Nog niet gespeeld"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} online"
+  },
   "friends.action.add-friend": {
     "message": "Voeg een vriend toe"
   },
@@ -262,6 +358,12 @@
   },
   "instance.edit-world.title": {
     "message": "Wereld bewerken"
+  },
+  "instance.files.adding-files": {
+    "message": "Bestanden toevoegen ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Opslaan als..."
   },
   "instance.server-modal.address": {
     "message": "Adres"

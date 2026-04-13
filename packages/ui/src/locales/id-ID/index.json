@@ -248,12 +248,6 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Hapus {itemType}{count, plural, other {}}"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Semua mod atau konten yang Anda tambahkan ke dalam paket mod akan dihapus."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Semua mod atau konten yang Anda tambahkan ke dalam paket mod tersebut akan tetap tersimpan."
-  },
   "content.confirm-unlink.admonition-body": {
     "defaultMessage": "Mod dan konten akan digabungkan dengan apa yang Anda tambahkan di atas paket mod dan ia tidak akan lagi menerima pembaruan."
   },
@@ -1679,9 +1673,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metode pembayaran"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "ditagih {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pilih langganan tersuai dengan spesifikasi yang Anda perlukan saja."
   },
@@ -1697,17 +1688,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Paling Populer"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Pilih berlangganan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pilih Berlangganan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Pilih jumlah RAM dan spesifikasi yang sesuai dengan keperluan Anda."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Berlangganan"

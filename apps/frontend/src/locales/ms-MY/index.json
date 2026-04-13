@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Pilih antara Vanila, Fabric, Forge, Quilt dan NeoForge. Jika ia berada di Modrinth, ia boleh dijalankan pada pelayan anda."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Gagal menukar versi pek mod"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Gagal memuat versi"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Gagal memasang semula pek mod"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Gagal membaiki pelayan"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Gagal menetapkan semula pelayan kepada proses penetapan awal"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Gagal menyimpan tetapan pemasangan"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Gagal menyahpaut pek mod"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Versi {loader, select, null {Pemuat} other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Pemasangan pelayan anda telah dibaiki."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Pembaikan selesai"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Tetap semula pelayan"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Mengalih keluar semua data pada pelayan anda, termasuk dunia, mod dan fail konfigurasi anda. Sandaran akan kekal tersedia dan boleh dipulihkan."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Tetap semula ke proses penetapan awal"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Pilihan ini akan mengembalikan pelayan ke proses penetapan awal supaya penetapan boleh diselesaikan semula. Adakah anda pasti mahu meneruskan?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Tetap semula ke proses penetapan awal"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Pelayan telah dikembalikan ke aliran penetapan awal."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Pelayan ditetapkan semula ke proses penetapan awal"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Pilihan sokongan"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Kehabisan stok"
   },
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Selaraskan dengan pelayan"
   },
-  "servers.busy.backup-creating": {
-    "message": "Penciptaan sandaran sedang dijalankan"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Pemulihan sandaran sedang dijalankan"
-  },
-  "servers.busy.installing": {
-    "message": "Pelayan sedang dipasang"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Penyegerakan kandungan sedang dijalankan"
-  },
   "servers.notice.actions": {
     "message": "Tindakan"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Caj sebelum ini"
+  },
   "settings.billing.expires": {
     "message": "Akan tamat tempoh {date}"
   },
@@ -3331,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Ralat semasa melanggan semula"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Jika pelayan sedang digantung, percubaan pengecasan lain mungkin mengambil masa sehingga 10 minit."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Permintaan langganan semula telah dihantar"

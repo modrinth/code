@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "프로젝트 업데이트"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "향후 이 확인 메시지를 건너뛰려면 Shift 키를 누른 상태에서 “모두 업데이트”를 클릭하세요."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "프로젝트 {count}개 업데이트"
   },
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} 삭제"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "모드팩에 본인이 추가한 모든 모드나 콘텐츠는 삭제됩니다."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "모드팩에 본인이 추가한 모든 모드나 콘텐츠는 그대로 유지됩니다."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {다운그레이드} other {업데이트}} 주의"
@@ -632,12 +629,6 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "모드팩 URL"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "파일 업로드 중 ({completed}/{total})"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "{name} 이름 변경"
   },
@@ -977,6 +968,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "콘텐츠 설치 후에는 설치 설정을 변경하지 않는 것이 좋습니다. 설정을 변경하려면 서버를 초기화하십시오."
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "자동 고침"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "로더 변경"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "충돌 방지"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "게임 버전을 변경할 때, 호환되지 않는 콘텐츠를 비활성화하거나 호환성 문제 해결을 시도할 수 있습니다."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "호환성 경고"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "호환되지 않는 콘텐츠 설치됨"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "로더를 변경하면 설치된 모든 콘텐츠가 비활성화됩니다. 대신 서버를 초기화하는 것을 권장합니다."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "로더 변경 시 데이터 손실 위험"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "연결된 {projectType, select, server {서버 프로젝트} other {모드팩}}"
   },
@@ -1198,9 +1213,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "이 모드는 클라이언트 측 모드에 의존하므로 서버를 시작할 때 문제가 발생할 수 있습니다"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "이것은 클라이언트 측 모드이므로 문제가 발생할 수 있습니다. 일부 개발자가 환경 설정을 잘못 지정하는 경우가 있어 로더가 충돌을 해결하도록 활성화 상태로 유지했습니다."
   },
   "label.client-retained-warning": {
     "defaultMessage": "이것은 종속성으로 설치된 클라이언트 측 모드이므로 서버를 시작할 때 문제가 발생할 수 있습니다"
@@ -2343,7 +2355,7 @@
     "defaultMessage": "일반"
   },
   "project.settings.license.title": {
-    "defaultMessage": "라이센스"
+    "defaultMessage": "라이선스"
   },
   "project.settings.links.title": {
     "defaultMessage": "링크"
@@ -2457,7 +2469,7 @@
     "defaultMessage": "모든 버전 보이기"
   },
   "search.filter_type.license": {
-    "defaultMessage": "이용 허가"
+    "defaultMessage": "라이선스"
   },
   "search.filter_type.license.open_source": {
     "defaultMessage": "오픈 소스"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "결제 수단"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval} 청구"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "필요한 사양만을 갖춘 맞춤형 플랜을 선택하세요."
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "가장 인기"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "플랜을 선택하세요"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "플랜 선택"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "1–5명의 친구와 적은 수의 가벼운 모드에 적합합니다."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "필요에 맞는 RAM과 사양을 선택하세요."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "플랜"

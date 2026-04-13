@@ -1301,39 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Pilih antara Vanila, Fabric, Forge, Quilt, dan NeoForge. Bila ia ada di Modrinth, ia dapat dijalankan di server Anda."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Gagal mengubah versi paket mod"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Gagal memuat versi"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Gagal memasang ulang paket mod"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Gagal memperbaiki server"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Gagal menyinpan pengaturan pemasangan"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Gagal melepas tautan paket mod"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Versi {loader, select, null {pemuat} other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Pemasangan server Anda telah diperbaiki."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Perbaikan selesai"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Atur ulang server"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Menghapus semua data pada server Anda, termasuk dunia, mod, dan berkas konfigurasi Anda. Cadangan akan tetap ada dan dapat dipulihkan."
-  },
   "hosting.plan.out-of-stock": {
     "message": "Habis"
   },
@@ -2810,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sinkronkan dengan server"
   },
-  "servers.busy.backup-creating": {
-    "message": "Sedang membuat cadangan"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Sedang memulihkan cadangan"
-  },
-  "servers.busy.installing": {
-    "message": "Server sedang dipasang"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Sedang menyingkronkan konten"
-  },
   "servers.notice.actions": {
     "message": "Tindakan"
   },
@@ -2857,6 +2812,114 @@
   },
   "servers.plan.small.description": {
     "message": "Cocok untuk 1—5 orang teman dengan beberapa mod ringan."
+  },
+  "settings.account.delete.confirm.proceed": {
+    "message": "Hapus akun ini"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Apakah Anda yakin ingin menghapus akun ini?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Hapus akun"
+  },
+  "settings.account.delete.section.description": {
+    "message": "Setelah Anda menghapus akun Anda, tidak ada cara untuk kembali. Menghapus akun Anda akan menghapus semua data terkait, kecuali proyek, dari server kami."
+  },
+  "settings.account.delete.section.title": {
+    "message": "Hapus akun"
+  },
+  "settings.account.email.action.save": {
+    "message": "Simpan sur-el"
+  },
+  "settings.account.email.field.label": {
+    "message": "Alamat sur-el"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Masukkan alamat sur-el Anda..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Tambah sur-el"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Ubah sur-el"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "Informasi akun Anda tidak ditampilkan secara umum."
+  },
+  "settings.account.password.action.remove": {
+    "message": "Hapus kata sandi"
+  },
+  "settings.account.password.action.save": {
+    "message": "Simpan kata sandi"
+  },
+  "settings.account.password.error.mismatch": {
+    "message": "Kata sandi yang dimasukkan tidak cocok!"
+  },
+  "settings.account.password.field.confirm-current.description": {
+    "message": "Mohon masukkan kata sandi Anda untuk melanjutkan."
+  },
+  "settings.account.password.field.confirm-current.label": {
+    "message": "Konfirmasi kata sandi"
+  },
+  "settings.account.password.field.confirm-current.placeholder": {
+    "message": "Konfirmasi kata sandi"
+  },
+  "settings.account.password.field.confirm-new.label": {
+    "message": "Konfirmasi kata sandi baru"
+  },
+  "settings.account.password.field.confirm-new.placeholder": {
+    "message": "Konfirmasi kata sandi baru"
+  },
+  "settings.account.password.field.new.label": {
+    "message": "Kata sandi baru"
+  },
+  "settings.account.password.field.new.placeholder": {
+    "message": "Kata sandi baru"
+  },
+  "settings.account.password.field.old.label": {
+    "message": "Kata sandi lama"
+  },
+  "settings.account.password.field.old.placeholder": {
+    "message": "Kata sandi lama"
+  },
+  "settings.account.password.modal.header.add": {
+    "message": "Tambah kata sandi"
+  },
+  "settings.account.password.modal.header.change": {
+    "message": "Ubah kata sandi"
+  },
+  "settings.account.password.modal.header.remove": {
+    "message": "Hapus kata sandi"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Tambah"
+  },
+  "settings.account.providers.modal.header": {
+    "message": "Penyedia autentikasi"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Tindakan"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Penyedia"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Tambah sur-el"
+  },
+  "settings.account.security.email.action.change": {
+    "message": "Ubah sur-el"
+  },
+  "settings.account.security.email.description": {
+    "message": "Mengganti sur-el yang berkaitan dengan akun Anda."
+  },
+  "settings.account.security.email.title": {
+    "message": "Sur-el"
+  },
+  "settings.account.security.password.action.add": {
+    "message": "Tambah kata sandi"
+  },
+  "settings.account.security.password.action.change": {
+    "message": "Ubah kata sandi"
   },
   "settings.applications.about": {
     "message": "Tentang"
