@@ -104,8 +104,10 @@ const padGraph = (data: number[]) => {
 const cpuData = computed(() => padGraph(props.data?.graph.cpu ?? []))
 const ramData = computed(() => padGraph(props.data?.graph.ram ?? []))
 
-const cpuPercent = computed(() => stats.value.cpu_percent)
-const ramPercent = computed(() => (stats.value.ram_usage_bytes / stats.value.ram_total_bytes) * 100)
+const cpuPercent = computed(() => stats.value.cpu_percent ?? 0)
+const ramPercent = computed(
+	() => ((stats.value.ram_usage_bytes ?? 0) / (stats.value.ram_total_bytes || 1)) * 100,
+)
 
 const cpuWarning = computed(() => cpuPercent.value >= 90)
 const ramWarning = computed(() => ramPercent.value >= 90)
@@ -167,7 +169,7 @@ const formatBytes = (bytes: number) => {
 const metrics = computed(() => {
 	const storageMetric = {
 		title: 'Storage',
-		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes),
+		value: props.loading ? '0 B' : formatBytes(stats.value.storage_usage_bytes ?? 0),
 		icon: FolderOpenIcon,
 		showGraph: false,
 		chartOptions: null as ReturnType<typeof buildChartOptions> | null,
@@ -213,7 +215,7 @@ const metrics = computed(() => {
 			title: 'Memory',
 			value:
 				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
-					? formatBytes(stats.value.ram_usage_bytes)
+					? formatBytes(stats.value.ram_usage_bytes ?? 0)
 					: `${ramPercent.value.toFixed(2)}%`,
 			icon: DatabaseIcon,
 			showGraph: true,
