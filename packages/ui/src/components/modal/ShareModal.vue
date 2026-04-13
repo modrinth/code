@@ -1,6 +1,7 @@
 <script setup>
 import {
 	ClipboardCopyIcon,
+	ExternalIcon,
 	GlobeIcon,
 	MailIcon,
 	MastodonIcon,
@@ -192,6 +193,12 @@ defineExpose({
 						<ClipboardCopyIcon class="h-5 w-5" aria-hidden="true" />
 					</div>
 				</button>
+				<ButtonStyled v-if="link">
+					<a :href="url" target="_blank" rel="noopener noreferrer" aria-label="Open in new tab">
+						<ExternalIcon aria-hidden="true" />
+						Open in new tab
+					</a>
+				</ButtonStyled>
 				<div v-if="socialButtons" class="flex flex-row gap-2">
 					<Button v-if="canShare" v-tooltip="'Share'" aria-label="Share" icon-only @click="share">
 						<ShareIcon aria-hidden="true" />

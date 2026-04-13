@@ -1,9 +1,6 @@
 <template>
 	<Teleport to="body">
-		<div
-			v-if="open"
-			:style="`${mouseX !== -1 ? `--_mouse-x: ${mouseX};` : ''} ${mouseY !== -1 ? `--_mouse-y: ${mouseY};` : ''}`"
-		>
+		<div v-if="open" class="modal-root">
 			<div
 				:class="{ shown: visible }"
 				class="tauri-overlay"
@@ -21,14 +18,7 @@
 				]"
 				@click="() => (closeOnClickOutside && closable ? hide() : {})"
 			/>
-			<div
-				class="modal-container experimental-styles-within"
-				:class="{ shown: visible }"
-				:style="{
-					'--_max-width': maxWidth,
-					'--_width': width,
-				}"
-			>
+			<div class="modal-container experimental-styles-within" :class="{ shown: visible }">
 				<div
 					ref="modalBodyRef"
 					role="dialog"
@@ -223,6 +213,7 @@ const closeLabel = computed(() => formatMessage(commonMessages.closeButton))
 
 const open = ref(false)
 const visible = ref(false)
+const stackDepth = ref(0)
 const modalBodyRef = ref<HTMLElement | null>(null)
 let previousFocusEl: Element | null = null
 
@@ -240,6 +231,7 @@ function getFocusableElements(): HTMLElement[] {
 function show(event?: MouseEvent) {
 	props.onShow?.()
 	const wasEmpty = modalStackSize() === 0
+	stackDepth.value = modalStackSize()
 	open.value = true
 	previousFocusEl = document.activeElement
 	pushModal()
@@ -251,8 +243,8 @@ function show(event?: MouseEvent) {
 	if (event) {
 		updateMousePosition(event)
 	} else {
-		mouseX.value = window.innerWidth / 2
-		mouseY.value = window.innerHeight / 2
+		mouseX.value = Math.round(window.innerWidth / 2)
+		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 	setTimeout(() => {
 		visible.value = true
@@ -293,8 +285,17 @@ defineExpose({
 	checkScrollState,
 })
 
-const mouseX = ref(-1)
-const mouseY = ref(-1)
+const mouseX = ref(0)
+const mouseY = ref(0)
+
+const stackZBase = computed(() => stackDepth.value * 10)
+const stackOverlayZ = computed(() => stackZBase.value + 19)
+const stackTauriZ = computed(() => stackZBase.value + 20)
+const stackContainerZ = computed(() => stackZBase.value + 21)
+const resolvedMaxWidth = computed(() => props.maxWidth ?? '60rem')
+const resolvedWidth = computed(() => props.width ?? 'fit-content')
+const mouseXOffset = computed(() => `calc((-50vw + ${mouseX.value}px) / 16)`)
+const mouseYOffset = computed(() => `calc((-50vh + ${mouseY.value}px) / 16)`)
 
 function updateMousePosition(event: { clientX: number; clientY: number }) {
 	mouseX.value = event.clientX
@@ -317,8 +318,8 @@ function handleWindowKeyDown(event: KeyboardEvent) {
 	if (props.closeOnEsc && event.key === 'Escape' && props.closable) {
 		if (!isTopmostModal()) return
 		hide()
-		mouseX.value = window.innerWidth / 2
-		mouseY.value = window.innerHeight / 2
+		mouseX.value = Math.round(window.innerWidth / 2)
+		mouseY.value = Math.round(window.innerHeight / 2)
 	}
 }
 
@@ -353,7 +354,7 @@ function handleKeyDown(event: KeyboardEvent) {
 	left: 0;
 	width: 100%;
 	height: 100px;
-	z-index: 20;
+	z-index: v-bind(stackTauriZ);
 
 	&.shown {
 		opacity: 1;
@@ -364,7 +365,7 @@ function handleKeyDown(event: KeyboardEvent) {
 .modal-overlay {
 	position: fixed;
 	inset: -5rem;
-	z-index: 19;
+	z-index: v-bind(stackOverlayZ);
 	opacity: 0;
 	transition: all 0.2s ease-out;
 	//transform: translate(
@@ -419,13 +420,10 @@ function handleKeyDown(event: KeyboardEvent) {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	z-index: 21;
+	z-index: v-bind(stackContainerZ);
 	visibility: hidden;
 	pointer-events: none;
-	transform: translate(
-		calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
-		calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16)
-	);
+	transform: translate(v-bind(mouseXOffset), v-bind(mouseYOffset));
 	transition: all 0.2s ease-out;
 
 	&.shown {
@@ -443,10 +441,10 @@ function handleKeyDown(event: KeyboardEvent) {
 		position: fixed;
 		box-shadow: 4px 4px 26px 10px rgba(0, 0, 0, 0.08);
 		max-height: calc(100% - 2 * var(--gap-lg));
-		max-width: min(var(--_max-width, 60rem), calc(100% - 2 * var(--gap-lg)));
+		max-width: min(v-bind(resolvedMaxWidth), calc(100% - 2 * var(--gap-lg)));
 		overflow-y: hidden;
 		overflow-x: hidden;
-		width: var(--_width, fit-content);
+		width: v-bind(resolvedWidth);
 		pointer-events: auto;
 		scale: 0.97;
 

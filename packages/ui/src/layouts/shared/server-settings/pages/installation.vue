@@ -849,6 +849,12 @@ async function confirmResetToOnboarding() {
 	try {
 		isResettingToOnboarding.value = true
 		await client.archon.servers_v1.resetToOnboarding(serverId, worldId.value)
+		modrinthServersConsole.clear()
+		try {
+			await client.kyros.logs_v1.clear()
+		} catch (error) {
+			console.error('Failed to clear server logs:', error)
+		}
 		server.value.flows = { intro: true }
 		await Promise.all([
 			queryClient.invalidateQueries({ queryKey: ['servers', 'detail', serverId] }),
