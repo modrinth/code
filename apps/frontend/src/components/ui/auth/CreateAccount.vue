@@ -2,7 +2,7 @@
 	<div class="create-account-card">
 		<h1 class="create-account-title">{{ formatMessage(messages.title) }}</h1>
 
-		<section class="create-account-section">
+		<section v-if="requiresDob" class="create-account-section">
 			<label class="create-account-label" for="create-account-dob">
 				{{ formatMessage(messages.dateOfBirthLabel) }}
 			</label>
@@ -97,6 +97,10 @@ const props = defineProps({
 	globals: {
 		type: Object,
 		default: null,
+	},
+	requiresDob: {
+		type: Boolean,
+		default: true,
 	},
 	sourceCodeUrl: {
 		type: String,
