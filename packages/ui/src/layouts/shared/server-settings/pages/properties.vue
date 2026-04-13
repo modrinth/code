@@ -1,13 +1,12 @@
 <template>
 	<div class="relative h-screen w-full select-none max-h-[min(70vh,750px)]">
 		<div v-if="propsData" class="flex h-full w-full flex-col justify-between gap-4">
-			<Admonition
-				v-if="hasNoProperties"
-				type="warning"
-				body="Some expected properties are missing from your server.properties - this usually means the server hasn't completed its first startup yet."
-			/>
-
 			<div class="flex flex-col gap-4">
+				<Admonition
+					v-if="hasNoProperties"
+					type="warning"
+					body="Some expected properties are missing from your server.properties - this usually means the server hasn't completed its first startup yet."
+				/>
 				<div class="flex flex-col gap-2">
 					<div class="m-0">
 						Edit the Minecraft server properties file here, or use the
