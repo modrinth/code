@@ -163,7 +163,7 @@ const calculateMenuPosition = () => {
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
 	const menuRect = menuRef.value.getBoundingClientRect()
-	const menuWidth = menuRect.width
+	const menuWidth = menuRect.width + 16
 	const menuHeight = menuRect.height
 	const margin = 8
 
@@ -180,10 +180,8 @@ const calculateMenuPosition = () => {
 
 	if (triggerRect.right - menuWidth >= margin) {
 		left = triggerRect.right - menuWidth
-	} else if (triggerRect.left + menuWidth + margin <= window.innerWidth) {
-		left = triggerRect.left
 	} else {
-		left = Math.max(margin, window.innerWidth - menuWidth - margin)
+		left = Math.max(margin, triggerRect.left)
 	}
 
 	return {

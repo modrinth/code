@@ -357,9 +357,7 @@ const MAX_LINUX_REFRESHES = 3
 const isLinux = platform() === 'linux'
 const linuxRefreshCount = ref(0)
 
-const protocolVersion = ref<ProtocolVersion | null>(
-	await get_profile_protocol_version(instance.value.path),
-)
+const protocolVersion = ref<ProtocolVersion | null>(null)
 const managedServerName = ref<string | null>(null)
 const managedServerAddress = ref<string | null>(null)
 
@@ -424,22 +422,27 @@ watch(
 	{ immediate: true },
 )
 
-const unlistenProfile = await profile_listener(async (e: ProfileEvent) => {
-	if (e.profile_path_id !== instance.value.path) return
+const [unlistenProfile, , resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
+	profile_listener(async (e: ProfileEvent) => {
+		if (e.profile_path_id !== instance.value.path) return
 
-	console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+		console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
 
-	if (e.event === 'servers_updated') {
-		if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
-		if (isLinux) linuxRefreshCount.value++
+		if (e.event === 'servers_updated') {
+			if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
+			if (isLinux) linuxRefreshCount.value++
 
-		await refreshAllWorlds()
-	}
+			await refreshAllWorlds()
+		}
 
-	await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
-})
+		await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
+	}),
+	refreshAllWorlds(),
+	get_profile_protocol_version(instance.value.path).catch(() => null),
+	get_game_versions().catch(() => [] as GameVersion[]),
+])
 
-await refreshAllWorlds()
+protocolVersion.value = resolvedProtocolVersion
 
 async function refreshServer(address: string) {
 	if (!serverData.value[address]) {
@@ -589,7 +592,7 @@ function worldsMatch(world: World, other: World | undefined) {
 	return false
 }
 
-const gameVersions = ref<GameVersion[]>(await get_game_versions().catch(() => []))
+const gameVersions = ref<GameVersion[]>(resolvedGameVersions)
 const supportsServerQuickPlay = computed(() =>
 	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )

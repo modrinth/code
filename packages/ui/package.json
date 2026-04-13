@@ -54,6 +54,7 @@
 		"@codemirror/language": "^6.9.3",
 		"@codemirror/state": "^6.3.2",
 		"@codemirror/view": "^6.22.1",
+		"@intercom/messenger-js-sdk": "^0.0.14",
 		"@modrinth/api-client": "workspace:*",
 		"@modrinth/assets": "workspace:*",
 		"@modrinth/blog": "workspace:*",
@@ -62,6 +63,7 @@
 		"@tresjs/cientos": "^4.3.0",
 		"@tresjs/core": "^4.3.4",
 		"@tresjs/post-processing": "^2.4.0",
+		"@types/dompurify": "^3.0.5",
 		"@types/markdown-it": "^14.1.1",
 		"@types/three": "^0.172.0",
 		"@vintl/how-ago": "^3.0.1",
@@ -72,6 +74,7 @@
 		"ace-builds": "^1.43.5",
 		"apexcharts": "^4.0.0",
 		"dayjs": "^1.11.10",
+		"dompurify": "^3.1.7",
 		"es-toolkit": "^1.44.0",
 		"floating-vue": "^5.2.2",
 		"fuse.js": "^6.6.2",
@@ -87,7 +90,7 @@
 		"vue-select": "4.0.0-beta.6",
 		"vue-typed-virtual-list": "^1.0.10",
 		"vue3-ace-editor": "^2.2.4",
-		"vue3-apexcharts": "^1.4.4",
+		"vue3-apexcharts": "^1.5.2",
 		"xss": "^1.0.14"
 	},
 	"web-types": "../../web-types.json"

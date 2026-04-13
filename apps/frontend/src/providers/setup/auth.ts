@@ -13,6 +13,7 @@ export function setupAuthProvider(auth: Awaited<ReturnType<typeof useAuth>>) {
 	const authProvider: AuthProvider = {
 		session_token: sessionToken,
 		user,
+		isReady: ref(true),
 		requestSignIn: async (redirectPath: string) => {
 			await router.push({
 				path: '/auth/sign-in',

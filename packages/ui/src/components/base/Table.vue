@@ -1,7 +1,7 @@
 <template>
-	<div class="overflow-hidden rounded-2xl border border-solid border-surface-3">
-		<table class="w-full border-separate border-spacing-0">
-			<thead>
+	<div class="overflow-hidden rounded-2xl border border-solid border-surface-5">
+		<table class="w-full table-fixed border-separate border-spacing-0 border-surface-5">
+			<thead class="">
 				<tr class="bg-surface-3">
 					<th v-if="showSelection" class="w-10 pl-4">
 						<Checkbox
@@ -50,7 +50,7 @@
 					:key="rowIndex"
 					:class="rowIndex % 2 === 0 ? 'bg-surface-2' : 'bg-surface-1.5'"
 				>
-					<td v-if="showSelection" class="w-10">
+					<td v-if="showSelection" class="w-10 border-solid border-0 border-t border-surface-5">
 						<Checkbox
 							:model-value="isSelected(row)"
 							class="shrink-0 p-4"
@@ -60,7 +60,7 @@
 					<td
 						v-for="column in columns"
 						:key="column.key"
-						class="text-secondary h-14 first:pl-4 last:pr-4"
+						class="text-secondary h-14 overflow-hidden first:pl-4 last:pr-4 border-solid border-0 border-t border-surface-5"
 						:class="`text-${column.align ?? 'left'}`"
 						:style="column.width ? { width: column.width } : undefined"
 					>
