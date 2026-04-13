@@ -63,6 +63,7 @@ const {
 	getHistoricalLogs,
 	getHistoricalContent,
 	invalidate,
+	clearLive,
 } = useInstanceConsole(profilePathId.value)
 
 await hydrate()
@@ -159,7 +160,8 @@ provideConsoleManager({
 	showCommandInput: false,
 	loading: ref(false),
 	onClear: () => {
-		activeConsole.value.clear()
+		if (!isLive.value) return
+		void clearLive()
 	},
 	onDelete: deleteSelectedLog,
 	deleteDisabled,
