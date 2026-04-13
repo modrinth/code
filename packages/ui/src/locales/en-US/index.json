@@ -2471,11 +2471,17 @@
   "search.filter_type.environment": {
     "defaultMessage": "Environment"
   },
-  "search.filter_type.environment.client": {
-    "defaultMessage": "Client"
+  "search.filter_type.environment.client_and_server": {
+    "defaultMessage": "Client and server"
   },
-  "search.filter_type.environment.server": {
-    "defaultMessage": "Server"
+  "search.filter_type.environment.client_side": {
+    "defaultMessage": "Client-side"
+  },
+  "search.filter_type.environment.server_side": {
+    "defaultMessage": "Server-side"
+  },
+  "search.filter_type.environment.singleplayer": {
+    "defaultMessage": "Singleplayer"
   },
   "search.filter_type.game_version": {
     "defaultMessage": "Game version"
