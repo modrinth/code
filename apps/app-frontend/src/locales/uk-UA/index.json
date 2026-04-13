@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "Не вдається зв’язатися зі серверами автентифікації"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Додати сервер до профілю"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Додати сервера до вашого профілю"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Додати до профілю"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Додати до «{instanceName}»"
+  },
+  "app.browse.added": {
+    "message": "Додано"
+  },
+  "app.browse.already-added": {
+    "message": "Уже додано"
+  },
+  "app.browse.discover-content": {
+    "message": "Дослідити вміст"
+  },
+  "app.browse.discover-servers": {
+    "message": "Дослідити сервера"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Сховати додані сервера"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Сховати встановлений уміст"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "Установити вміст в профіль"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Уведіть опис збірки…"
   },
@@ -41,32 +74,20 @@
   "app.instance.confirm-delete.header": {
     "message": "Видалити профіль"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "Цю збірку вже встановлено в профілі «{instanceName}»."
+  "app.instance.modpack-already-installed.body": {
+    "message": "Ця збірка вже встановлена в профілі <bold>«{instanceName}»</bold>. Ви впевнені, що хочете її скопіювати?"
   },
-  "app.instance.modpack-already-installed.admonition-header": {
-    "message": "Дублікат збірки"
-  },
-  "app.instance.modpack-already-installed.create-anyway": {
-    "message": "Все одно створити"
-  },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "Перейти до профілю"
+  "app.instance.modpack-already-installed.create": {
+    "message": "Створити"
   },
   "app.instance.modpack-already-installed.header": {
     "message": "Збірку вже встановлено"
   },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Профіль"
+  },
   "app.instance.mods.content-type-project": {
     "message": "проєкт"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Копіювати посилання"
-  },
-  "app.instance.mods.installing": {
-    "message": "Установлення…"
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Збірка"
   },
   "app.instance.mods.project-was-added": {
     "message": "«{name}» було додано"
@@ -80,17 +101,53 @@
   "app.instance.mods.share-title": {
     "message": "Поширення вмісту збірки"
   },
-  "app.instance.mods.show-file": {
-    "message": "Показати файл"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Успішно вивантажено"
   },
-  "app.instance.mods.unknown-version": {
-    "message": "Невідомо"
+  "app.instance.worlds.add-server": {
+    "message": "Додати сервер"
   },
-  "app.instance.mods.updating": {
-    "message": "Оновлення…"
+  "app.instance.worlds.browse-servers": {
+    "message": "Переглянути сервера"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "«{name}» буде **назавжди видалено** й у вас не буде можливости відновлення."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "Ви впевнені, що хочете назавжди видалити цей світ?"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Модифікований"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Поза мережею"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "У мережі"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Ванільний"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "Додати сервер або переглянути, щоб почати"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "Сервера або світи не додано"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "«{name}» буде видалено з вашого списку, включно в грі, і без можливости відновлення."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "«{name}» ({address}) буде видалено з вашого списку, включно в грі, і без можливости відновлення."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "Ви впевнені, що хочете видалити «{name}»?"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "Пошук {count} світів…"
+  },
+  "app.instance.worlds.this-server": {
+    "message": "цей сервер"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Потрібний уміст"
@@ -139,9 +196,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Усталені налашт. профілю"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Спеціальні функції"
   },
   "app.settings.tabs.java-installations": {
     "message": "Інсталяції Java"
@@ -196,6 +250,24 @@
   },
   "app.update.reload-to-update": {
     "message": "Перезавантажте, щоб установити оновлення"
+  },
+  "app.world.server-modal.placeholder-address": {
+    "message": "example.modrinth.gg"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "Виберіть опцію"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "Несумісна версія {version}"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "Ще не зіграно"
+  },
+  "app.world.world-item.offline": {
+    "message": "Поза мережею"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} у мережі"
   },
   "friends.action.add-friend": {
     "message": "Додати друга"
@@ -295,6 +367,12 @@
   },
   "instance.edit-world.title": {
     "message": "Редагувати світ"
+  },
+  "instance.files.adding-files": {
+    "message": "Додавання файлів ({completed}/{total})"
+  },
+  "instance.files.save-as": {
+    "message": "Зберегти як…"
   },
   "instance.server-modal.address": {
     "message": "Адреса"
@@ -467,9 +545,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Не показувати на головній"
   },
-  "instance.worlds.filter.available": {
-    "message": "Доступно"
-  },
   "instance.worlds.game_already_open": {
     "message": "Профіль вже запущений"
   },
@@ -493,12 +568,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Грати у профіль"
-  },
-  "instance.worlds.type.server": {
-    "message": "Сервер"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Гра наодинці"
   },
   "instance.worlds.view_instance": {
     "message": "Переглянути профіль"

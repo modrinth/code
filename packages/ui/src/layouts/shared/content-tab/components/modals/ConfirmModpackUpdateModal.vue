@@ -13,7 +13,11 @@
 					formatMessage(messages.admonitionHeader, { action: downgrade ? 'downgrade' : 'update' })
 				"
 			>
-				{{ formatMessage(messages.admonitionBody) }}
+				{{
+					formatMessage(messages.admonitionBody, {
+						action: downgrade ? 'downgrade' : 'update',
+					})
+				}}
 			</Admonition>
 			<InlineBackupCreator
 				ref="backupCreator"
@@ -57,7 +61,6 @@ import InlineBackupCreator from './InlineBackupCreator.vue'
 
 const props = defineProps<{
 	downgrade?: boolean
-	server?: boolean
 	backupTip?: string
 }>()
 
@@ -81,7 +84,8 @@ const messages = defineMessages({
 	},
 	admonitionBody: {
 		id: 'content.confirm-modpack-update.admonition-body',
-		defaultMessage: 'Any mods or content you added on top of the modpack will be deleted.',
+		defaultMessage:
+			'{action, select, downgrade {Downgrading} other {Updating}} may cause compatibility issues. Mods or content you added on top of the modpack will be kept, but may not be compatible with the new version.',
 	},
 	confirmButton: {
 		id: 'content.confirm-modpack-update.confirm-button',

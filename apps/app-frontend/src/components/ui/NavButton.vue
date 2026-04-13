@@ -3,6 +3,7 @@
 		v-if="typeof to === 'string'"
 		:to="to"
 		v-bind="$attrs"
+		:active-class="isSubpage ? '' : undefined"
 		:class="{
 			'router-link-active': isPrimary && isPrimary(route),
 			'subpage-active': isSubpage && isSubpage(route),

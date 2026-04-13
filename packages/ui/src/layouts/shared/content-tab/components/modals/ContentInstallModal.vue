@@ -119,7 +119,7 @@
 						<button @click="emit('install', inst)">
 							{{
 								inst.installing
-									? formatMessage(messages.installingLabel)
+									? formatMessage(commonMessages.installingLabel)
 									: formatMessage(messages.installButton)
 							}}
 						</button>
@@ -176,7 +176,7 @@
 
 			<div class="flex flex-col gap-2.5">
 				<span class="font-semibold text-contrast">
-					{{ formatMessage(messages.gameVersionLabel) }}
+					{{ formatMessage(commonMessages.gameVersionLabel) }}
 				</span>
 				<Combobox
 					v-model="selectedGameVersion"
@@ -195,8 +195,8 @@
 							<EyeIcon v-else class="size-4" />
 							{{
 								showSnapshots
-									? formatMessage(messages.hideSnapshots)
-									: formatMessage(messages.showAllVersions)
+									? formatMessage(commonMessages.hideSnapshotsButton)
+									: formatMessage(commonMessages.showAllVersionsButton)
 							}}
 						</button>
 					</template>
@@ -291,10 +291,6 @@ const messages = defineMessages({
 		id: 'instances.content-install.installed-badge',
 		defaultMessage: 'Installed',
 	},
-	installingLabel: {
-		id: 'instances.content-install.installing-label',
-		defaultMessage: 'Installing...',
-	},
 	installButton: {
 		id: 'instances.content-install.install-button',
 		defaultMessage: 'Install',
@@ -319,10 +315,6 @@ const messages = defineMessages({
 		id: 'instances.content-install.loader-label',
 		defaultMessage: 'Loader',
 	},
-	gameVersionLabel: {
-		id: 'instances.content-install.game-version-label',
-		defaultMessage: 'Game version',
-	},
 	gameVersionPlaceholder: {
 		id: 'instances.content-install.game-version-placeholder',
 		defaultMessage: 'Select game version',
@@ -334,14 +326,6 @@ const messages = defineMessages({
 	noInstances: {
 		id: 'instances.content-install.no-instances',
 		defaultMessage: 'No compatible instances found',
-	},
-	showAllVersions: {
-		id: 'instances.content-install.show-all-versions',
-		defaultMessage: 'Show all versions',
-	},
-	hideSnapshots: {
-		id: 'instances.content-install.hide-snapshots',
-		defaultMessage: 'Hide snapshots',
 	},
 })
 

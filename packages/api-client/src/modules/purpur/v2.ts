@@ -13,6 +13,13 @@ export class PurpurVersionsV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Get the Purpur project info including all supported Minecraft versions.
+	 */
+	public async getProject(): Promise<Purpur.Versions.v2.Project> {
+		return $fetch<Purpur.Versions.v2.Project>(`${BASE_URL}/purpur`)
+	}
+
+	/**
 	 * Get available Purpur builds for a Minecraft version.
 	 *
 	 * @param mcVersion - Minecraft version (e.g. "1.21.4")

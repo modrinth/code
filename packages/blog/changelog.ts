@@ -11,6 +11,154 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'app',
+		version: '0.13.0',
+		body: `## Changed
+- The Logs page has been redesigned, and brought into the same style as the new overview page from Modrinth Hosting.
+- Refactored the Logs page to share its console, filtering, and share-to-mclo.gs functionality with the Modrinth Hosting server panel.
+- Aligned the instance header with the Modrinth Hosting server panel header for a consistent look across the app and web.
+- Historical log files are now fetched in the background (and stored much more efficiently) when opening the Logs page, so switching between them is instant.
+- Moved live log capture from the frontend to the Rust backend, significantly reducing overhead when an instance produces large volumes of output.`,
+	},
+	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Confirmation modal for resubscribing to a server.
+- Proper provisioning state for resubscription with live update once server is ready.
+- New empty state for manage servers page.
+- Brought server panel into app.
+- New server hosting console, with better filtering, searching, and sharing functionality.
+- New instance logs page with updated console.
+- New server settings modal, consistent across website and app, and reorganizes settings where it made sense.
+- Overhauled server properties settings, splitting advanced and basic settings.
+
+## Changed
+- Refreshed the server cards UI for consistency.
+- Contact support button.
+- Download cancelled server files button.
+- Countdown timer for number of days cancelled server's files are kept.
+- Updated existing server card states with better help text.
+- Applied consistent styling for purchase and upgrade server modals.
+- Applied consistent styling for app and instance settings modals.
+- Design refresh for server purchase modal plan selection, with handling for logged out users.
+
+## Fixed
+- Storybook global css not being used.
+- Server icon sync and reactivity.`,
+	},
+	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed certain currencies showing pricing with the incorrect number of digits.
+- Fix organization's member settings not persisting after saving and refresh.`,
+	},
+	{
+		date: `2026-04-04T15:48:39+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed a missing gap between the project filter tabs and the project list.
+- Fixed collections not being sorted by date updated on the user page.
+
+## Security
+- Fixed a security issue.`,
+	},
+	{
+		date: `2026-04-03T16:45:00-07:00`,
+		product: 'app',
+		version: '0.12.6',
+		body: `## Fixed
+- Fixed dependencies of dependencies not being automatically installed.
+- Improved error modal if the app errors on initialization.`,
+	},
+	{
+		date: `2026-03-26T18:45:00-07:00`,
+		product: 'hosting',
+		body: `## Added
+- Mods that are client-side dependencies now show a more specific warning: "This is a client-side mod that was installed as a dependency and may cause issues when starting your server"
+- Mods that depend on a client-side mod now warn: "This mod depends on a client-side mod and may cause issues when starting your server"
+- Server address in the panel header can now be clicked to copy it to your clipboard.
+- Added Minecraft-aware syntax highlighting for \`.log\` files in the file editor, with color-coded timestamps, log levels, and stack traces.
+
+## Changed
+- When updating your game version in the platform settings, incompatible mods are now disabled instead of removed.
+- Better UI for installed custom modpack files.
+- Redesigned the server panel header — loader, game version, server address, uptime, and linked project are now shown as clean inline stats with the project icon and a link to the project page, matching instances in the Modrinth App.
+- Rebuilt the Files tab with right-click context menus, keyboard shortcuts, drag-and-drop, improved modals for moving items and extracting archives, undo/redo for file moves and renames, and smoother scrolling for large directories, now aligned with the Content tab design.
+- Cleaned up backup progress indicators to be more compact.
+
+## Fixed
+- The "Change version" and "Re-install modpack" buttons are hidden for custom file modpacks, since there's no Modrinth project to pull versions from
+- The "Switch version" button on individual mods is hidden for content that isn't linked to a Modrinth project, preventing broken lookups
+- Project and version links are no longer generated for content that doesn't exist on Modrinth
+- Content type filter labels are now properly translated instead of displaying raw English strings.
+- Fixed a bug with server onboarding/reset flow not passing the correct NeoForge loader version for the selected game version.`,
+	},
+	{
+		date: `2026-03-26T18:45:00-07:00`,
+		product: 'app',
+		version: '0.12.5',
+		body: `## Added
+- Added a Files tab for instances, matching the Modrinth Hosting experience — browse, edit, and manage all files in your instance folder without leaving the app, ideal for editing config files, viewing crash reports, and more.
+- Added new filters to the Worlds tab: Online, Offline, Singleplayer, Modded, and Vanilla, replacing the previous set.
+- Added a "Browse servers" option to the Worlds tab, allowing you to search for compatible servers and quickly play or save them for later.
+- Added an empty state to the Worlds tab aligned with the Content tabs, with options to add or browse for servers.
+- Added icons alongside labels on instance tabs (Content, Files, Worlds, Logs) for easier visual scanning.
+
+## Changed
+- Redesigned the Worlds tab to align with the Content tab - searching and filtering for worlds and servers is now cleaner and more consistent.
+- The modpack "Already installed" pop-up has been redesigned.
+- The "Add server" and "Edit server" pop-ups in the worlds tab have been polished.
+- Moved the "switch version" button outside of the overflow menu on the instance Content tab.
+
+## Fixed
+- Navigating back from the browse page within an instance now returns you to the tab you came from (e.g. Worlds) instead of always defaulting to Content.
+- Content cards no longer sometimes display inconsistent column widths.
+- Deleting content that isn't linked to a project no longer causes a crash.
+- Fixed mod updates not being detected correctly in some cases.
+- Deleting servers from the Worlds tab no longer causes an "out of index" error to occur.
+- Server game version filter now correctly includes modded servers on the Browse page.
+- Breadcrumbs in the app header now fade at the edges when overflowing instead of clipping abruptly.
+- Fixed instance getting stuck at "Installing" after a failed version change.
+- Fixed "Invalid game version" error when updating to newly-released Minecraft versions.`,
+	},
+	{
+		date: `2026-03-26T18:45:00-07:00`,
+		product: 'web',
+		body: `## Added
+- Added unsaved changes warnings to project settings pages (general, description, tags, license, and server).
+
+## Fixed
+- Server game version filter now correctly includes modded servers on the Discover servers page.
+- Fixed Modpack projects with no mod loader displaying as Resource Packs in project page.
+- Fixed project versions table overflowing outside of table. Version tags will now truncate.
+- Fixed an unexpected styling issue with some buttons.`,
+	},
+	{
+		date: `2026-03-26T07:22:22+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed error on settings page.
+- Fixed the "500 Server Error" error on the "Authorized apps" settings page.`,
+	},
+	{
+		date: `2026-03-26T07:22:22+00:00`,
+		product: 'hosting',
+		body: `## Fixed
+- Fixed wrong mod being disabled on hosted servers - Disabling a non-Modrinth mod could incorrectly disable a different mod instead
+- Fixed content list not refreshing after installing mods - Navigating back to the content tab after installing something from Browse would show stale data for up to 10 seconds
+- Fixed copying mod filenames inserting a newline - Copying a filename or version number from the content tab no longer includes a line break in the middle
+- Fixed NeoForge installs sending an empty loader version - Changing to NeoForge on a hosted server could send a blank loader version, resulting in a broken installation`,
+	},
+	{
+		date: `2026-03-24T21:14:30-08:00`,
+		product: 'hosting',
+		body: `## Added
+- Added support for Java 25.`,
+	},
+	{
 		date: `2026-03-17T19:30:00-08:00`,
 		product: 'web',
 		body: `## Improvements

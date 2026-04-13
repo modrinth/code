@@ -73,9 +73,9 @@ const [
 ])
 
 const { data: modpackInfo } = useQuery({
-	queryKey: computed(() => ['linkedModpackInfo', instance.path]),
-	queryFn: () => get_linked_modpack_info(instance.path, 'must_revalidate'),
-	enabled: computed(() => !!instance.linked_data?.project_id && !offline),
+	queryKey: computed(() => ['linkedModpackInfo', instance.value.path]),
+	queryFn: () => get_linked_modpack_info(instance.value.path, 'must_revalidate'),
+	enabled: computed(() => !!instance.value.linked_data?.project_id && !offline),
 })
 
 const repairing = ref(false)
@@ -101,13 +101,13 @@ function getManifest(loader: string) {
 provideAppBackup({
 	async createBackup() {
 		const allProfiles = await list()
-		const prefix = `${instance.name} - Backup #`
+		const prefix = `${instance.value.name} - Backup #`
 		const existingNums = allProfiles
 			.filter((p) => p.name.startsWith(prefix))
 			.map((p) => parseInt(p.name.slice(prefix.length), 10))
 			.filter((n) => !isNaN(n))
 		const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1
-		const newPath = await duplicate(instance.path)
+		const newPath = await duplicate(instance.value.path)
 		await edit(newPath, { name: `${prefix}${nextNum}` })
 	},
 })
@@ -118,27 +118,30 @@ provideInstallationSettings({
 		const rows = [
 			{
 				label: formatMessage(commonMessages.platformLabel),
-				value: formatLoaderLabel(instance.loader),
+				value: formatLoaderLabel(instance.value.loader),
 			},
 			{
 				label: formatMessage(commonMessages.gameVersionLabel),
-				value: instance.game_version,
+				value: instance.value.game_version,
 			},
 		]
-		if (instance.loader !== 'vanilla' && instance.loader_version) {
+		if (instance.value.loader !== 'vanilla' && instance.value.loader_version) {
 			rows.push({
 				label: formatMessage(messages.loaderVersion, {
-					loader: formatLoaderLabel(instance.loader),
+					loader: formatLoaderLabel(instance.value.loader),
 				}),
-				value: instance.loader_version,
+				value: instance.value.loader_version,
 			})
 		}
 		return rows
 	}),
-	isLinked: computed(() => !!instance.linked_data?.locked),
+	isLinked: computed(() => !!instance.value.linked_data?.locked),
 	isBusy: computed(
 		() =>
-			instance.install_stage !== 'installed' || repairing.value || reinstalling.value || !!offline,
+			instance.value.install_stage !== 'installed' ||
+			repairing.value ||
+			reinstalling.value ||
+			!!offline,
 	),
 	modpack: computed(() => {
 		if (!modpackInfo.value) return null
@@ -149,9 +152,9 @@ provideInstallationSettings({
 			versionNumber: modpackInfo.value.version?.version_number,
 		}
 	}),
-	currentPlatform: computed(() => instance.loader),
-	currentGameVersion: computed(() => instance.game_version),
-	currentLoaderVersion: computed(() => instance.loader_version ?? ''),
+	currentPlatform: computed(() => instance.value.loader),
+	currentGameVersion: computed(() => instance.value.game_version),
+	currentLoaderVersion: computed(() => instance.value.loader_version ?? ''),
 	availablePlatforms: loaders?.value?.map((x) => x.name) ?? [],
 
 	resolveGameVersions(loader, showSnapshots) {
@@ -194,50 +197,50 @@ provideInstallationSettings({
 		if (platform !== 'vanilla' && loaderVersionId) {
 			editProfile.loader_version = loaderVersionId
 		}
-		await edit(instance.path, editProfile).catch(handleError)
+		await edit(instance.value.path, editProfile).catch(handleError)
 	},
 
 	afterSave: async () => {
-		await install(instance.path, false).catch(handleError)
+		await install(instance.value.path, false).catch(handleError)
 		trackEvent('InstanceRepair', {
-			loader: instance.loader,
-			game_version: instance.game_version,
+			loader: instance.value.loader,
+			game_version: instance.value.game_version,
 		})
 	},
 
 	async repair() {
 		repairing.value = true
-		await install(instance.path, true).catch(handleError)
+		await install(instance.value.path, true).catch(handleError)
 		repairing.value = false
 		trackEvent('InstanceRepair', {
-			loader: instance.loader,
-			game_version: instance.game_version,
+			loader: instance.value.loader,
+			game_version: instance.value.game_version,
 		})
 	},
 
 	async reinstallModpack() {
 		reinstalling.value = true
-		await update_repair_modrinth(instance.path).catch(handleError)
+		await update_repair_modrinth(instance.value.path).catch(handleError)
 		reinstalling.value = false
 		trackEvent('InstanceRepair', {
-			loader: instance.loader,
-			game_version: instance.game_version,
+			loader: instance.value.loader,
+			game_version: instance.value.game_version,
 		})
 	},
 
 	async unlinkModpack() {
-		await edit(instance.path, {
+		await edit(instance.value.path, {
 			linked_data: null as unknown as undefined,
 		})
 		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', instance.path],
+			queryKey: ['linkedModpackInfo', instance.value.path],
 		})
 		onUnlinked()
 	},
 
 	getCachedModpackVersions: () => null,
 	async fetchModpackVersions() {
-		const versions = await get_project_versions(instance.linked_data!.project_id!).catch(
+		const versions = await get_project_versions(instance.value.linked_data!.project_id!).catch(
 			handleError,
 		)
 		return (versions ?? []) as Labrinth.Versions.v2.Version[]
@@ -250,20 +253,20 @@ provideInstallationSettings({
 	},
 
 	async onModpackVersionConfirm(version) {
-		await update_managed_modrinth_version(instance.path, version.id)
+		await update_managed_modrinth_version(instance.value.path, version.id)
 		await queryClient.invalidateQueries({
-			queryKey: ['linkedModpackInfo', instance.path],
+			queryKey: ['linkedModpackInfo', instance.value.path],
 		})
 	},
 
 	updaterModalProps: computed(() => ({
 		isApp: true,
 		currentVersionId:
-			modpackInfo.value?.update_version_id ?? instance.linked_data?.version_id ?? '',
+			modpackInfo.value?.update_version_id ?? instance.value.linked_data?.version_id ?? '',
 		projectIconUrl: modpackInfo.value?.project?.icon_url,
 		projectName: modpackInfo.value?.project?.title ?? 'Modpack',
-		currentGameVersion: instance.game_version,
-		currentLoader: instance.loader,
+		currentGameVersion: instance.value.game_version,
+		currentLoader: instance.value.loader,
 	})),
 
 	isServer: false,

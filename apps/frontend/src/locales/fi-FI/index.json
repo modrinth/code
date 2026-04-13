@@ -143,6 +143,9 @@
   "app-marketing.features.performance.title": {
     "message": "Suorituskykyinen"
   },
+  "app-marketing.features.play.description": {
+    "message": "Käytä Modrinth sovellusta asentaaksesi ja pelataksesi sinun suosikki modeliila ja modpackeilla."
+  },
   "app-marketing.features.play.title": {
     "message": "Pelaa lempi modeillasi"
   },
@@ -331,6 +334,9 @@
   },
   "collection.label.created-at": {
     "message": "Luotu {ago}"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, =0 {No projects yet} other {<stat>{count}</stat> {type}}}"
   },
   "collection.label.updated-at": {
     "message": "Päivitetty {ago}"

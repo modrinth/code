@@ -1203,7 +1203,7 @@
     "message": "內建備份服務"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "每臺伺服器均包含 15 份安全儲存於異地的備份。"
+    "message": "每個伺服器均包含 15 份安全儲存於異地的備份。"
   },
   "hosting-marketing.included.custom-url": {
     "message": "自訂網址"
@@ -1212,13 +1212,13 @@
     "message": "使用自訂的 <contrast>modrinth.gg</contrast> 網址分享你的伺服器。"
   },
   "hosting-marketing.included.description": {
-    "message": "每臺伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
+    "message": "每個伺服器都隨附一系列功能，旨在提供唯有 Modrinth 才能帶給你的託管體驗。"
   },
   "hosting-marketing.included.file-manager": {
     "message": "直覺好用的檔案管理員"
   },
   "hosting-marketing.included.file-manager.description": {
-    "message": "直接輕鬆地搜尋、管理、編輯及上傳檔案到你的伺服器。"
+    "message": "輕鬆搜尋、管理、編輯檔案，並直接上傳至你的伺服器。"
   },
   "hosting-marketing.included.heading": {
     "message": "隨附所有你需要的強大功能。"
@@ -1278,7 +1278,7 @@
     "message": "從 Modrinth 上的數千個模組包中挑選，或是打造你專屬的組合。準備好遊玩時，直接邀請你的好友加入。"
   },
   "hosting-marketing.why.heading": {
-    "message": "找到模組包，一鍵變身伺服器"
+    "message": "找到模組包，秒變伺服器。"
   },
   "hosting-marketing.why.modern-reliable-hosting": {
     "message": "體驗現代且可靠的託管服務"
@@ -1333,6 +1333,9 @@
   },
   "hosting.loader.reset-server-description": {
     "message": "將刪除你伺服器上的所有資料，包括你的世界、模組以及設定檔。備份將保留，並可供還原。"
+  },
+  "hosting.loader.support-options-title": {
+    "message": "支援選項"
   },
   "hosting.plan.out-of-stock": {
     "message": "缺貨"
@@ -1687,9 +1690,6 @@
   },
   "layout.nav.discover-content": {
     "message": "探索內容"
-  },
-  "layout.nav.feature-flags": {
-    "message": "功能旗標"
   },
   "layout.nav.get-modrinth-app": {
     "message": "取得 Modrinth App"
@@ -2873,8 +2873,14 @@
   "settings.account.data-export.action.generating": {
     "message": "正在生成匯出..."
   },
+  "settings.account.data-export.description": {
+    "message": "申請你上傳至 Modrinth 的所有個人資料複本。此程序可能需要幾分鐘的時間才能完成。"
+  },
   "settings.account.data-export.title": {
     "message": "資料匯出"
+  },
+  "settings.account.delete.confirm.description": {
+    "message": "這個動作將會**立即刪除您的所有使用者資料與追蹤清單**。這不會刪除你的專案。帳號刪除後將無法還原。<br><br>若你需要帳號相關協助，請至 [Modrinth Discord](https://discord.modrinth.com) 取得支援。"
   },
   "settings.account.delete.confirm.proceed": {
     "message": "刪除這個帳號"
@@ -2884,6 +2890,9 @@
   },
   "settings.account.delete.section.action": {
     "message": "刪除帳號"
+  },
+  "settings.account.delete.section.description": {
+    "message": "一旦刪除帳號，將無法復原。刪除帳號後，除了專案以外，所有關聯資料都將從我們的伺服器中移除。"
   },
   "settings.account.delete.section.title": {
     "message": "刪除帳號"
@@ -3013,6 +3022,9 @@
   },
   "settings.account.security.two-factor.title": {
     "message": "雙重驗證"
+  },
+  "settings.account.two-factor.field.code.placeholder": {
+    "message": "輸入驗證碼..."
   },
   "settings.account.two-factor.setup.intro": {
     "message": "雙重驗證要求必須使用第二部裝置才能登入，藉此確保你的帳號安全性。"

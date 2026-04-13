@@ -3,6 +3,7 @@
 		ref="outerRef"
 		data-tauri-drag-region
 		class="min-w-0 overflow-hidden pl-3"
+		:class="{ 'breadcrumb-fade-mask': isOverflowing }"
 		:style="isOverflowing ? { '--scroll-distance': `-${overflowAmount}px` } : undefined"
 		@mouseenter="onMouseEnter"
 		@mouseleave="onMouseLeave"
@@ -128,6 +129,16 @@ watch(breadcrumbs, () => {
 </script>
 
 <style scoped>
+.breadcrumb-fade-mask {
+	mask-image: linear-gradient(
+		to right,
+		transparent,
+		black 12px,
+		black calc(100% - 12px),
+		transparent
+	);
+}
+
 .breadcrumbs-scroll {
 	animation: breadcrumb-scroll 10s ease-in-out infinite;
 }

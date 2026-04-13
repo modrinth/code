@@ -281,7 +281,7 @@
 						"
 					>
 						<nuxt-link to="/hosting">
-							<ServerIcon aria-hidden="true" />
+							<ServerStackIcon aria-hidden="true" />
 							{{ formatMessage(navMenuMessages.hostAServer) }}
 						</nuxt-link>
 					</ButtonStyled>
@@ -463,7 +463,7 @@
 						<LibraryIcon aria-hidden="true" /> {{ formatMessage(commonMessages.collectionsLabel) }}
 					</template>
 					<template #servers>
-						<ServerIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
+						<ServerStackIcon aria-hidden="true" /> {{ formatMessage(messages.myServers) }}
 					</template>
 					<template #plus>
 						<ArrowBigUpDashIcon aria-hidden="true" />
@@ -473,7 +473,8 @@
 						<SettingsIcon aria-hidden="true" /> {{ formatMessage(commonMessages.settingsLabel) }}
 					</template>
 					<template #flags>
-						<ReportIcon aria-hidden="true" /> {{ formatMessage(messages.featureFlags) }}
+						<ToggleRightIcon aria-hidden="true" />
+						{{ formatMessage(commonSettingsMessages.featureFlags) }}
 					</template>
 					<template #projects>
 						<BoxIcon aria-hidden="true" /> {{ formatMessage(messages.projects) }}
@@ -500,7 +501,7 @@
 				</OverflowMenu>
 				<template v-else>
 					<ButtonStyled color="brand">
-						<nuxt-link to="/auth/sign-in">
+						<nuxt-link :to="signInRouteObj">
 							<LogInIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.signInButton) }}
 						</nuxt-link>
@@ -555,7 +556,7 @@
 							<div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
 						</div>
 					</NuxtLink>
-					<nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
+					<nuxt-link v-else class="iconified-button brand-button" :to="signInRouteObj">
 						<LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
 					</nuxt-link>
 				</div>
@@ -585,9 +586,9 @@
 							<ScaleIcon aria-hidden="true" />
 							{{ formatMessage(commonMessages.moderationLabel) }}
 						</NuxtLink>
-						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/flags">
-							<ReportIcon aria-hidden="true" />
-							{{ formatMessage(messages.featureFlags) }}
+						<NuxtLink v-if="flags.developerMode" class="iconified-button" to="/settings/flags">
+							<ToggleRightIcon aria-hidden="true" />
+							{{ formatMessage(commonSettingsMessages.featureFlags) }}
 						</NuxtLink>
 					</template>
 					<NuxtLink class="iconified-button" to="/settings">
@@ -721,9 +722,11 @@ import {
 	ScaleIcon,
 	SearchIcon,
 	ServerIcon,
+	ServerStackIcon,
 	SettingsIcon,
 	ShieldAlertIcon,
 	SunIcon,
+	ToggleRightIcon,
 	TransferIcon,
 	UserIcon,
 	UserSearchIcon,
@@ -734,11 +737,13 @@ import {
 	ButtonStyled,
 	commonMessages,
 	commonProjectTypeCategoryMessages,
+	commonSettingsMessages,
 	defineMessages,
 	injectModrinthClient,
 	OverflowMenu,
 	useVIntl,
 } from '@modrinth/ui'
+import TeleportOverflowMenu from '@modrinth/ui/src/components/base/TeleportOverflowMenu.vue'
 import { isAdmin, isStaff, UserBadge } from '@modrinth/utils'
 import { useQuery } from '@tanstack/vue-query'
 
@@ -757,7 +762,7 @@ import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.
 import OrganizationCreateModal from '~/components/ui/create/OrganizationCreateModal.vue'
 import ProjectCreateModal from '~/components/ui/create/ProjectCreateModal.vue'
 import ModrinthFooter from '~/components/ui/ModrinthFooter.vue'
-import TeleportOverflowMenu from '~/components/ui/servers/TeleportOverflowMenu.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { errors as generatedStateErrors } from '~/generated/state.json'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 
@@ -776,6 +781,7 @@ const flags = useFeatureFlags()
 const config = useRuntimeConfig()
 const route = useNativeRoute()
 const router = useNativeRouter()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 const client = injectModrinthClient()
 
@@ -918,10 +924,6 @@ const messages = defineMessages({
 		id: 'layout.nav.upgrade-to-modrinth-plus',
 		defaultMessage: 'Upgrade to Modrinth+',
 	},
-	featureFlags: {
-		id: 'layout.nav.feature-flags',
-		defaultMessage: 'Feature flags',
-	},
 	projects: {
 		id: 'layout.nav.projects',
 		defaultMessage: 'Projects',
@@ -1045,7 +1047,7 @@ const userMenuOptions = computed(() => {
 		},
 		{
 			id: 'flags',
-			link: '/flags',
+			link: '/settings/flags',
 			shown: flags.value.developerMode,
 		},
 		{
@@ -1472,13 +1474,13 @@ const { cycle: changeTheme } = useTheme()
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.desktop-only {
 		display: none;
 	}
 }
 
-@media (any-hover: none) and (max-width: 640px) {
+@media (pointer: coarse) and (max-width: 640px) {
 	.mobile-navigation {
 		display: flex;
 	}

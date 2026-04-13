@@ -147,7 +147,7 @@
 					</a>
 				</ButtonStyled>
 				<ButtonStyled v-if="!auth.user">
-					<nuxt-link to="/auth/sign-in">
+					<nuxt-link :to="signInRouteObj">
 						<ReportIcon aria-hidden="true" />
 						Report
 					</nuxt-link>
@@ -341,7 +341,8 @@
 				<div v-if="project.project_type !== 'resourcepack'">
 					<h4>Loaders</h4>
 
-					<Categories :categories="version.loaders" :type="project.project_type" />
+					<span v-if="noModpackLoader">No mod loader</span>
+					<Categories v-else :categories="version.loaders ?? []" :type="project.project_type" />
 				</div>
 				<div>
 					<h4>Game versions</h4>
@@ -442,6 +443,7 @@ import { formatBytes, renderHighlightedString } from '@modrinth/utils'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CreateProjectVersionModal from '~/components/ui/create-project-version/CreateProjectVersionModal.vue'
 import Modal from '~/components/ui/Modal.vue'
+import { getSignInRouteObj } from '~/composables/auth.js'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package.js'
@@ -453,6 +455,7 @@ const emit = defineEmits<{
 // Composables
 const data = useNuxtApp()
 const route = useNativeRoute()
+const signInRouteObj = computed(() => getSignInRouteObj(route))
 const router = useRouter()
 const auth = await useAuth()
 const tags = useGeneratedState()
@@ -696,6 +699,25 @@ oldFileTypes.value = (version.value.files ?? []).map(
 // Computed properties
 const title = computed(
 	() => `${isCreating.value ? 'Create Version' : version.value.name} - ${project.value.title}`,
+)
+
+const modpackLoaders = computed<string[]>(() => {
+	if (project.value.project_type !== 'modpack') {
+		return []
+	}
+
+	if (Array.isArray(version.value.mrpack_loaders) && version.value.mrpack_loaders.length > 0) {
+		return version.value.mrpack_loaders
+	}
+
+	return (version.value.loaders ?? []).filter((loader: string) => loader !== 'mrpack')
+})
+
+const noModpackLoader = computed(
+	() =>
+		project.value.project_type === 'modpack' &&
+		((modpackLoaders.value.length === 1 && modpackLoaders.value[0] === 'minecraft') ||
+			modpackLoaders.value.length === 0),
 )
 
 const description = computed(

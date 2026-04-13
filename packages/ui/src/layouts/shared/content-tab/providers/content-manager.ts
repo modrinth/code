@@ -25,15 +25,7 @@ export interface ContentModpackData {
 	disabledText?: string
 }
 
-export interface UploadState {
-	isUploading: boolean
-	currentFileName: string | null
-	currentFileProgress: number
-	uploadedBytes: number
-	totalBytes: number
-	completedFiles: number
-	totalFiles: number
-}
+export type { UploadState } from '@modrinth/api-client'
 
 export interface ContentManagerContext {
 	// Data
@@ -89,9 +81,6 @@ export interface ContentManagerContext {
 
 	// Upload progress (optional)
 	uploadState?: Ref<UploadState> | ComputedRef<UploadState>
-
-	// Show client-only environment filter pill
-	showClientOnlyFilter?: boolean
 
 	// Bulk operation guard — set by layout, checked by providers to suppress refreshes
 	isBulkOperating?: Ref<boolean>

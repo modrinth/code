@@ -27,6 +27,8 @@ export namespace Archon {
 				disabled: boolean
 				kind: AddonKind
 				from_modpack: boolean
+				pack_client_retained: boolean
+				pack_client_depends: boolean
 				has_update: string | null
 				name: string | null
 				project_id: string | null
@@ -68,11 +70,20 @@ export namespace Archon {
 				| 'purpur'
 				| 'vanilla'
 
-			export type ModpackSpec = {
+			export type ModpackSpecModrinth = {
 				platform: 'modrinth'
 				project_id: string
 				version_id: string
 			}
+
+			export type ModpackSpecLocalFile = {
+				platform: 'local_file'
+				filename: string
+				name: string
+				description: string | null
+			}
+
+			export type ModpackSpec = ModpackSpecModrinth | ModpackSpecLocalFile
 
 			export type ModpackOwner = {
 				id: string
@@ -488,6 +499,16 @@ export namespace Archon {
 				message: string
 			}
 
+			export type WSLog4jEvent = {
+				event: 'log4j'
+				logger_name?: string
+				level?: string
+				thread_name?: string
+				timestamp_millis?: number
+				message?: string
+				throwable?: string
+			}
+
 			export type WSStatsEvent = {
 				event: 'stats'
 				cpu_percent: number
@@ -600,6 +621,11 @@ export namespace Archon {
 				percent: number
 			}
 
+			export type SyncContentError = {
+				step: string
+				description: string
+			}
+
 			export type WSStateEvent = {
 				event: 'state'
 				debug: string
@@ -609,6 +635,7 @@ export namespace Archon {
 				target: 'start' | 'stop' | 'restart' | null
 				uptime: number
 				progress: SyncContentProgress | null
+				content_error: SyncContentError | null
 			}
 
 			// Outgoing messages (client -> server)
@@ -627,6 +654,7 @@ export namespace Archon {
 			export type WSEvent =
 				| WSBackupProgressEvent
 				| WSLogEvent
+				| WSLog4jEvent
 				| WSStatsEvent
 				| WSPowerStateEvent
 				| WSStateEvent

@@ -446,13 +446,6 @@ textarea {
 	}
 }
 
-button,
-input[type='button'] {
-	cursor: pointer;
-	border: none;
-	outline: 2px solid transparent;
-}
-
 kbd {
 	background-color: var(--color-code-bg);
 	color: var(--color-code-text);
@@ -463,9 +456,9 @@ kbd {
 	font-size: 0.85em !important;
 }
 
-@import '~/assets/styles/layout.scss';
-@import '~/assets/styles/utils.scss';
-@import '~/assets/styles/components.scss';
+@import './layout.scss';
+@import './utils.scss';
+@import './components.scss';
 
 // OMORPHIA FIXES
 .card {

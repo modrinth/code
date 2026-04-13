@@ -104,18 +104,11 @@ svg {
 	}
 }
 
-input,
-button {
-	&:disabled {
-		cursor: not-allowed !important;
-	}
-}
-
-@media (prefers-reduced-motion) {
-	.button-animation,
-	button {
-		transform: none !important;
-	}
+button,
+input[type='button'] {
+	cursor: pointer;
+	border: none;
+	outline: 2px solid transparent;
 }
 
 input,

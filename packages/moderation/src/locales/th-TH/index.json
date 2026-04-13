@@ -5,6 +5,12 @@
   "nags.add-icon.title": {
     "defaultMessage": "เพิ่มไอคอน"
   },
+  "nags.add-java-address.description": {
+    "defaultMessage": "ระบุที่อยู่ IP และพอร์ตที่ผู้เล่น Java Edition สามารถใช้เพื่อเชื่อมต่อเข้าเซิร์ฟเวอร์ของคุณได้"
+  },
+  "nags.add-java-address.title": {
+    "defaultMessage": "เพิ่มที่อยู่ Java"
+  },
   "nags.add-links.title": {
     "defaultMessage": "เพิ่มลิงก์ภายนอก"
   },

@@ -21,16 +21,18 @@ import Avatar from '#ui/components/base/Avatar.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import Chips from '#ui/components/base/Chips.vue'
 import Combobox from '#ui/components/base/Combobox.vue'
+import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import { commonMessages } from '#ui/utils/common-messages'
+import { formatLoaderLabel } from '#ui/utils/loaders'
 
-import ConfirmLeaveModal from '../content-tab/components/modals/ConfirmLeaveModal.vue'
 import ConfirmModpackUpdateModal from '../content-tab/components/modals/ConfirmModpackUpdateModal.vue'
 import ConfirmReinstallModal from '../content-tab/components/modals/ConfirmReinstallModal.vue'
 import ConfirmRepairModal from '../content-tab/components/modals/ConfirmRepairModal.vue'
 import ConfirmUnlinkModal from '../content-tab/components/modals/ConfirmUnlinkModal.vue'
 import ContentUpdaterModal from '../content-tab/components/modals/ContentUpdaterModal.vue'
 import ContentDiffModal from './components/ContentDiffModal.vue'
+import IncompatibleContentModal from './components/IncompatibleContentModal.vue'
 import { useInstallationForm } from './composables'
 import { injectInstallationSettings } from './providers/installation-settings'
 
@@ -44,11 +46,17 @@ const unlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 const contentUpdaterModal = ref<InstanceType<typeof ContentUpdaterModal> | null>()
 
 const contentDiffModal = ref<InstanceType<typeof ContentDiffModal>>()
+const incompatibleContentModal = ref<InstanceType<typeof IncompatibleContentModal>>()
 const modpackUpdateModal = ref<InstanceType<typeof ConfirmModpackUpdateModal>>()
 const pendingUpdateVersion = ref<Labrinth.Versions.v2.Version | null>(null)
 const isUpdateDowngrade = ref(false)
 
-const form = useInstallationForm(ctx, contentUpdaterModal, contentDiffModal)
+const form = useInstallationForm(
+	ctx,
+	contentUpdaterModal,
+	contentDiffModal,
+	incompatibleContentModal,
+)
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
 	if (form.isSaving.value) {
@@ -86,7 +94,17 @@ const disabledPlatforms = computed(() => {
 	return ctx.availablePlatforms.filter((p) => p !== ctx.currentPlatform.value)
 })
 
-const showModpackVersionActions = ctx.showModpackVersionActions ?? true
+const showModpackVersionActions = computed(() => {
+	const val = ctx.showModpackVersionActions
+	if (val == null) return true
+	return typeof val === 'boolean' ? val : val.value
+})
+
+const isLocalFile = computed(() => {
+	const val = ctx.isLocalFile
+	if (val == null) return false
+	return typeof val === 'boolean' ? val : val.value
+})
 
 function handleModpackUpdateRequest(version: Labrinth.Versions.v2.Version, event?: MouseEvent) {
 	pendingUpdateVersion.value = version
@@ -127,6 +145,16 @@ function handleReinstall() {
 function handleUnlink() {
 	form.cancelEditing()
 	ctx.unlinkModpack()
+}
+
+const emit = defineEmits<{
+	'reset-server': []
+}>()
+
+function handleIncompatibleResetServer() {
+	form.cancelPreview()
+	form.cancelEditing()
+	emit('reset-server')
 }
 
 defineExpose({
@@ -284,26 +312,31 @@ const messages = defineMessages({
 						class="flex items-center gap-2.5 rounded-[20px] bg-surface-2 p-3"
 					>
 						<AutoLink :to="ctx.modpack.value.link" class="shrink-0">
-							<div
-								class="size-14 shrink-0 overflow-hidden rounded-2xl border border-solid border-surface-5"
-							>
-								<Avatar
-									v-if="ctx.modpack.value.iconUrl"
-									:src="ctx.modpack.value.iconUrl"
-									:alt="ctx.modpack.value.title"
-									size="100%"
-									no-shadow
-								/>
-							</div>
+							<Avatar
+								:src="ctx.modpack.value.iconUrl"
+								:alt="ctx.modpack.value.title"
+								size="3.5rem"
+								no-shadow
+								raised
+							/>
 						</AutoLink>
-						<div class="flex flex-col gap-1">
-							<AutoLink
-								:to="ctx.modpack.value.link"
-								class="font-semibold text-contrast hover:underline"
+						<div class="flex min-w-0 flex-col gap-1">
+							<div class="flex min-w-0 flex-col">
+								<AutoLink
+									:to="ctx.modpack.value.link"
+									class="truncate font-semibold text-contrast"
+									:class="ctx.modpack.value.link ? 'hover:underline' : ''"
+								>
+									{{ ctx.modpack.value.title }}
+								</AutoLink>
+								<span v-if="ctx.modpack.value.filename" class="truncate text-sm text-secondary">
+									{{ ctx.modpack.value.filename }}
+								</span>
+							</div>
+							<div
+								v-if="ctx.modpack.value.owner || ctx.modpack.value.versionNumber"
+								class="flex items-center gap-2 text-sm text-secondary"
 							>
-								{{ ctx.modpack.value.title }}
-							</AutoLink>
-							<div class="flex items-center gap-2 text-sm text-secondary">
 								<AutoLink
 									v-if="ctx.modpack.value.owner"
 									:to="
@@ -354,14 +387,6 @@ const messages = defineMessages({
 							})
 						}}
 					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(messages.unlinkDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-								projectType: showModpackVersionActions ? 'modpack' : 'server',
-							})
-						}}
-					</span>
 					<div>
 						<ButtonStyled color="orange">
 							<button
@@ -380,19 +405,20 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(messages.unlinkDescription, {
+								type: ctx.isServer ? 'server' : 'instance',
+								projectType: showModpackVersionActions ? 'modpack' : 'server',
+							})
+						}}
+					</span>
 				</div>
 
 				<!-- Reinstall -->
-				<div v-if="showModpackVersionActions" class="flex flex-col gap-2.5">
+				<div v-if="showModpackVersionActions || isLocalFile" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{ formatMessage(messages.reinstallModpackTitle) }}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(messages.reinstallModpackDescription, {
-								type: ctx.isServer ? 'server' : 'instance',
-							})
-						}}
 					</span>
 					<div>
 						<ButtonStyled color="red">
@@ -413,23 +439,21 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(messages.reinstallModpackDescription, {
+								type: ctx.isServer ? 'server' : 'instance',
+							})
+						}}
+					</span>
 				</div>
 
-				<!-- Repair -->
-				<div class="flex flex-col gap-2.5">
+				<!-- Repair (hidden for local file modpacks — reinstall covers this) -->
+				<div v-if="!isLocalFile" class="flex flex-col gap-2.5">
 					<span class="text-lg font-semibold text-contrast">
 						{{
 							formatMessage(
 								ctx.isServer ? messages.repairServerTitle : messages.repairInstanceTitle,
-							)
-						}}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
 							)
 						}}
 					</span>
@@ -450,6 +474,15 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(
+								ctx.isServer
+									? messages.repairServerDescription
+									: messages.repairInstanceDescription,
+							)
+						}}
+					</span>
 				</div>
 			</template>
 
@@ -468,6 +501,8 @@ const messages = defineMessages({
 							<Chips
 								v-model="form.selectedPlatform.value"
 								:items="ctx.availablePlatforms"
+								:format-label="formatLoaderLabel"
+								:capitalize="false"
 								:disabled-items="disabledPlatforms"
 								:disabled-tooltip="formatMessage(messages.platformLockTooltip)"
 								:aria-label="formatMessage(messages.selectPlatformAriaLabel)"
@@ -588,16 +623,6 @@ const messages = defineMessages({
 							<span class="font-semibold text-contrast">{{ row.value }}</span>
 						</div>
 					</div>
-					<div class="flex items-start gap-2">
-						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
-						<span class="text-primary">
-							{{
-								formatMessage(
-									ctx.isServer ? messages.editWarningServer : messages.editWarningInstance,
-								)
-							}}
-						</span>
-					</div>
 					<div class="flex flex-wrap gap-2">
 						<ButtonStyled color="orange">
 							<button
@@ -611,6 +636,16 @@ const messages = defineMessages({
 						</ButtonStyled>
 						<slot name="unlinked-extra-buttons" />
 					</div>
+					<div class="flex items-start gap-2">
+						<CircleAlertIcon class="mt-0.5 size-5 shrink-0 text-orange" />
+						<span class="text-primary">
+							{{
+								formatMessage(
+									ctx.isServer ? messages.editWarningServer : messages.editWarningInstance,
+								)
+							}}
+						</span>
+					</div>
 				</div>
 
 				<!-- Repair section -->
@@ -619,15 +654,6 @@ const messages = defineMessages({
 						{{
 							formatMessage(
 								ctx.isServer ? messages.repairServerTitle : messages.repairInstanceTitle,
-							)
-						}}
-					</span>
-					<span class="text-primary">
-						{{
-							formatMessage(
-								ctx.isServer
-									? messages.repairServerDescription
-									: messages.repairInstanceDescription,
 							)
 						}}
 					</span>
@@ -648,6 +674,15 @@ const messages = defineMessages({
 							</button>
 						</ButtonStyled>
 					</div>
+					<span class="text-primary">
+						{{
+							formatMessage(
+								ctx.isServer
+									? messages.repairServerDescription
+									: messages.repairInstanceDescription,
+							)
+						}}
+					</span>
 				</div>
 			</template>
 
@@ -657,69 +692,82 @@ const messages = defineMessages({
 
 	<!-- Modals -->
 	<Teleport to="body">
-		<ContentUpdaterModal
-			v-if="form.updatingModpack.value"
-			ref="contentUpdaterModal"
-			:versions="form.updatingProjectVersions.value"
-			:current-game-version="ctx.updaterModalProps.value.currentGameVersion"
-			:current-loader="ctx.updaterModalProps.value.currentLoader"
-			:current-version-id="ctx.updaterModalProps.value.currentVersionId"
-			:is-app="ctx.isApp"
-			project-type="modpack"
-			:project-icon-url="ctx.updaterModalProps.value.projectIconUrl"
-			:project-name="ctx.updaterModalProps.value.projectName"
-			:loading="form.loadingVersions.value"
-			:loading-changelog="form.loadingChangelog.value"
-			@update="handleModpackUpdateRequest"
-			@cancel="form.resetUpdateState()"
-			@version-select="form.handleUpdaterVersionSelect"
-			@version-hover="form.handleUpdaterVersionHover"
-		/>
-		<ConfirmModpackUpdateModal
-			ref="modpackUpdateModal"
-			:downgrade="isUpdateDowngrade"
-			:server="ctx.isServer"
-			:backup-tip="
-				[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
-			"
-			@confirm="handleModpackUpdateConfirm"
-			@cancel="handleModpackUpdateCancel"
-		/>
-		<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
-		<ConfirmReinstallModal
-			ref="reinstallModal"
-			:server="ctx.isServer"
-			:backup-tip="ctx.modpack.value?.title"
-			@reinstall="handleReinstall"
-		/>
-		<ConfirmUnlinkModal
-			ref="unlinkModal"
-			:server="ctx.isServer"
-			:backup-tip="ctx.modpack.value?.title"
-			@unlink="handleUnlink"
-		/>
+		<div class="relative z-[100]">
+			<ContentUpdaterModal
+				v-if="form.updatingModpack.value"
+				ref="contentUpdaterModal"
+				:versions="form.updatingProjectVersions.value"
+				:current-game-version="ctx.updaterModalProps.value.currentGameVersion"
+				:current-loader="ctx.updaterModalProps.value.currentLoader"
+				:current-version-id="ctx.updaterModalProps.value.currentVersionId"
+				:is-app="ctx.isApp"
+				project-type="modpack"
+				:project-icon-url="ctx.updaterModalProps.value.projectIconUrl"
+				:project-name="ctx.updaterModalProps.value.projectName"
+				:loading="form.loadingVersions.value"
+				:loading-changelog="form.loadingChangelog.value"
+				@update="handleModpackUpdateRequest"
+				@cancel="form.resetUpdateState()"
+				@version-select="form.handleUpdaterVersionSelect"
+				@version-hover="form.handleUpdaterVersionHover"
+			/>
+			<ConfirmModpackUpdateModal
+				ref="modpackUpdateModal"
+				:downgrade="isUpdateDowngrade"
+				:backup-tip="
+					[ctx.modpack.value?.title, pendingUpdateVersion?.version_number].filter(Boolean).join(' ')
+				"
+				@confirm="handleModpackUpdateConfirm"
+				@cancel="handleModpackUpdateCancel"
+			/>
+			<ConfirmRepairModal ref="repairModal" :server="ctx.isServer" @repair="handleRepair" />
+			<ConfirmReinstallModal
+				ref="reinstallModal"
+				:server="ctx.isServer"
+				:backup-tip="ctx.modpack.value?.title"
+				@reinstall="handleReinstall"
+			/>
+			<ConfirmUnlinkModal
+				ref="unlinkModal"
+				:server="ctx.isServer"
+				:backup-tip="ctx.modpack.value?.title"
+				@unlink="handleUnlink"
+			/>
 
-		<ContentDiffModal
-			v-if="form.pendingPreview.value"
-			ref="contentDiffModal"
-			:header="formatMessage(messages.confirmVersionChangeHeader)"
-			:description="
-				formatMessage(messages.confirmVersionChangeDescription, {
-					gameVersion: form.pendingPreview.value.newGameVersion,
-				})
-			"
-			:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
-			:diffs="form.pendingPreview.value.diffs"
-			:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
-			:confirm-label="formatMessage(messages.confirmVersionChange)"
-			:confirm-icon="SaveIcon"
-			:removed-label="formatMessage(messages.removedIncompatible)"
-			:show-backup-creator="ctx.isServer"
-			@confirm="form.confirmSave()"
-			@cancel="form.cancelPreview()"
-		/>
+			<IncompatibleContentModal
+				v-if="form.incompatibleContentVariant.value"
+				ref="incompatibleContentModal"
+				:variant="form.incompatibleContentVariant.value"
+				:loading="form.isVerifying.value || form.isSaving.value"
+				@confirm-loader-change="form.confirmLoaderChange()"
+				@auto-fix="form.confirmAutoFix()"
+				@disable-conflicts="form.confirmDisableConflicts()"
+				@reset-server="handleIncompatibleResetServer"
+				@cancel="form.cancelPreview()"
+			/>
 
-		<ConfirmLeaveModal ref="confirmLeaveModal" />
+			<ContentDiffModal
+				v-if="form.pendingPreview.value && !form.incompatibleContentVariant.value"
+				ref="contentDiffModal"
+				:header="formatMessage(messages.confirmVersionChangeHeader)"
+				:description="
+					formatMessage(messages.confirmVersionChangeDescription, {
+						gameVersion: form.pendingPreview.value.newGameVersion,
+					})
+				"
+				:admonition-header="formatMessage(messages.confirmVersionChangeHeader)"
+				:diffs="form.pendingPreview.value.diffs"
+				:has-unknown-content="form.pendingPreview.value.hasUnknownContent"
+				:confirm-label="formatMessage(messages.confirmVersionChange)"
+				:confirm-icon="SaveIcon"
+				:removed-label="formatMessage(messages.removedIncompatible)"
+				:show-backup-creator="ctx.isServer"
+				@confirm="form.confirmSave()"
+				@cancel="form.cancelPreview()"
+			/>
+
+			<ConfirmLeaveModal ref="confirmLeaveModal" />
+		</div>
 		<slot name="extra-modals" />
 	</Teleport>
 </template>

@@ -161,17 +161,11 @@
   "changelog.justNow": {
     "defaultMessage": "Ngayon lang"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "App"
   },
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "Website"
   },
   "collections.label.private": {
     "defaultMessage": "Pribado"
@@ -190,9 +184,6 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dinagdag (dependency)"
-  },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Tinanggal"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Na-update"
@@ -235,12 +226,6 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Pinakaluma ang mauuna"
-  },
-  "content.selection-bar.disable": {
-    "defaultMessage": "Patayin"
-  },
-  "content.selection-bar.enable": {
-    "defaultMessage": "Buksan"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -344,9 +329,6 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
   },
-  "hosting.content.copy-link": {
-    "defaultMessage": "Kopyahin ang link"
-  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Bigong ma-unlink ang modpack"
   },
@@ -428,17 +410,11 @@
   "instances.content-install.name-label": {
     "defaultMessage": "Pangalan"
   },
-  "instances.modpack-content-modal.copy-link": {
-    "defaultMessage": "Kopyahin ang link"
-  },
   "instances.modpack-content-modal.empty-description": {
     "defaultMessage": "Hindi naglalaman ng karagdagang kontento ang modpack na ito."
   },
   "instances.modpack-content-modal.empty-title": {
     "defaultMessage": "Walang mahanap na kontento"
-  },
-  "instances.modpack-content-modal.filter-all": {
-    "defaultMessage": "Lahat"
   },
   "instances.modpack-content-modal.header": {
     "defaultMessage": "Kontentong modpack"

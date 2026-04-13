@@ -89,6 +89,8 @@ fn main() {
                         "logs_delete_logs",
                         "logs_delete_logs_by_filename",
                         "logs_get_latest_log_cursor",
+                        "logs_get_live_log_buffer",
+                        "logs_clear_live_log_buffer",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -259,6 +261,14 @@ fn main() {
                         "open_link",
                         "get_ads_personalization",
                     ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "files",
+                InlinedPlugin::new()
+                    .commands(&["file_extract_zip", "file_save_as"])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),

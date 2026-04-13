@@ -71,9 +71,6 @@
   "app.settings.tabs.default-instance-options": {
     "message": "Oletusinstanssin asetukset"
   },
-  "app.settings.tabs.feature-flags": {
-    "message": "Ominaisuuskytkimet"
-  },
   "app.settings.tabs.java-installations": {
     "message": "Java asennukset"
   },
@@ -398,9 +395,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Älä näytä koti näkymässä"
   },
-  "instance.worlds.filter.available": {
-    "message": "Saatavilla"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instanssi on jo avattu"
   },
@@ -424,12 +418,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Pelaa instanssia"
-  },
-  "instance.worlds.type.server": {
-    "message": "Palvelin"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Yksinpeli"
   },
   "instance.worlds.view_instance": {
     "message": "Näytä instanssi"

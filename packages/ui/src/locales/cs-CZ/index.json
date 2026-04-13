@@ -182,17 +182,11 @@
   "changelog.justNow": {
     "defaultMessage": "Právě teď"
   },
-  "changelog.product.api": {
-    "defaultMessage": "API"
-  },
   "changelog.product.app": {
     "defaultMessage": "Aplikace"
   },
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
-  },
-  "changelog.product.web": {
-    "defaultMessage": "Webová stránka"
   },
   "collections.label.private": {
     "defaultMessage": "Soukromé"
@@ -251,9 +245,6 @@
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Přidáno (závislost)"
   },
-  "content.diff-modal.diff-type.removed": {
-    "defaultMessage": "Odstraněno"
-  },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Aktualizováno"
   },
@@ -298,9 +289,6 @@
   },
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Znovu nezobrazovat"
-  },
-  "content.modpack-card.updating": {
-    "defaultMessage": "Aktualizace"
   },
   "content.page-layout.additional-content": {
     "defaultMessage": "Dodatečný obsah"

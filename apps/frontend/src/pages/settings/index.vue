@@ -196,10 +196,6 @@ import { isDarkTheme, type Theme } from '~/plugins/theme/index.ts'
 const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 
-useHead({
-	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
-})
-
 const messages = defineMessages({
 	headTitle: {
 		id: 'settings.head-title',
@@ -217,6 +213,10 @@ const developerModeBanner = defineMessages({
 		id: 'settings.display.banner.developer-mode.button',
 		defaultMessage: 'Deactivate developer mode',
 	},
+})
+
+useHead({
+	title: () => `${formatMessage(messages.headTitle)} - Modrinth`,
 })
 
 const layoutMode = defineMessages({

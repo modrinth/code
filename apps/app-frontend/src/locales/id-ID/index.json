@@ -41,32 +41,11 @@
   "app.instance.confirm-delete.header": {
     "message": "Hapus instans"
   },
-  "app.instance.modpack-already-installed.admonition-body": {
-    "message": "Paket mod ini telah terpasang pada instans \"{instanceName}\"."
-  },
-  "app.instance.modpack-already-installed.admonition-header": {
-    "message": "Gandakan paket mod"
-  },
-  "app.instance.modpack-already-installed.create-anyway": {
-    "message": "Tetap buat"
-  },
-  "app.instance.modpack-already-installed.go-to-instance": {
-    "message": "Pergi ke instans"
-  },
   "app.instance.modpack-already-installed.header": {
     "message": "Paket mod telah terpasang"
   },
   "app.instance.mods.content-type-project": {
     "message": "proyek"
-  },
-  "app.instance.mods.copy-link": {
-    "message": "Salin tautan"
-  },
-  "app.instance.mods.installing": {
-    "message": "Memasang..."
-  },
-  "app.instance.mods.modpack-fallback": {
-    "message": "Paket Mod"
   },
   "app.instance.mods.project-was-added": {
     "message": "\"{name}\" telah ditambahkan"
@@ -80,17 +59,8 @@
   "app.instance.mods.share-title": {
     "message": "Membagi konten paket mod"
   },
-  "app.instance.mods.show-file": {
-    "message": "Tampilkan berkas"
-  },
   "app.instance.mods.successfully-uploaded": {
     "message": "Berhasil diunggah"
-  },
-  "app.instance.mods.unknown-version": {
-    "message": "Tidak diketahui"
-  },
-  "app.instance.mods.updating": {
-    "message": "Memperbarui..."
   },
   "app.modal.install-to-play.content-required": {
     "message": "Konten diperlukan"
@@ -139,9 +109,6 @@
   },
   "app.settings.tabs.default-instance-options": {
     "message": "Pilihan instans bawaan"
-  },
-  "app.settings.tabs.feature-flags": {
-    "message": "Bendera fitur"
   },
   "app.settings.tabs.java-installations": {
     "message": "Pemasangan Java"
@@ -467,9 +434,6 @@
   "instance.worlds.dont_show_on_home": {
     "message": "Jangan tampilkan di Beranda"
   },
-  "instance.worlds.filter.available": {
-    "message": "Tersedia"
-  },
   "instance.worlds.game_already_open": {
     "message": "Instans telah dibuka"
   },
@@ -493,12 +457,6 @@
   },
   "instance.worlds.play_instance": {
     "message": "Mainkan instans"
-  },
-  "instance.worlds.type.server": {
-    "message": "Server"
-  },
-  "instance.worlds.type.singleplayer": {
-    "message": "Bermain sendiri"
   },
   "instance.worlds.view_instance": {
     "message": "Lihat instans"

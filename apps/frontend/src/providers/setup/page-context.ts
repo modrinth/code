@@ -7,6 +7,7 @@ export function setupPageContextProvider() {
 	providePageContext({
 		hierarchicalSidebarAvailable: ref(false),
 		showAds: ref(false),
+		openExternalUrl: (url) => window.open(url, '_blank'),
 	})
 	provideModalBehavior({
 		noblur: computed(() => !(cosmetics.value?.advancedRendering ?? true)),

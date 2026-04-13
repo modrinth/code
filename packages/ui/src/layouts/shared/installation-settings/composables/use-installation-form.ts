@@ -6,13 +6,19 @@ import { formatLoaderLabel } from '#ui/utils/loaders'
 
 import type { ContentUpdaterModal } from '../../content-tab'
 import type ContentDiffModal from '../components/ContentDiffModal.vue'
+import type IncompatibleContentModal from '../components/IncompatibleContentModal.vue'
 import type { InstallationSettingsContext } from '../providers/installation-settings'
 import type { ContentDiffPreview } from '../types'
+
+export type IncompatibleContentVariant = 'loader-change' | 'game-version-change'
 
 export function useInstallationForm(
 	ctx: InstallationSettingsContext,
 	updaterModalRef: Ref<InstanceType<typeof ContentUpdaterModal> | null | undefined>,
 	contentDiffModalRef?: Ref<InstanceType<typeof ContentDiffModal> | null | undefined>,
+	incompatibleContentModalRef?: Ref<
+		InstanceType<typeof IncompatibleContentModal> | null | undefined
+	>,
 ) {
 	const isEditing = ref(false)
 	const selectedPlatform = ctx.editingPlatformRef ?? ref(ctx.currentPlatform.value)
@@ -22,6 +28,7 @@ export function useInstallationForm(
 	const isSaving = ref(false)
 	const isVerifying = ref(false)
 	const pendingPreview = ref<ContentDiffPreview | null>(null)
+	const incompatibleContentVariant = ref<IncompatibleContentVariant | null>(null)
 	let abortController: AbortController | null = null
 
 	const gameVersionOptions = computed(() =>
@@ -75,8 +82,25 @@ export function useInstallationForm(
 	async function save() {
 		isSaving.value = true
 		try {
+			const platformChanged = selectedPlatform.value !== ctx.currentPlatform.value
 			const isModded = ctx.currentPlatform.value !== 'vanilla'
 			const gameVersionChanged = selectedGameVersion.value !== ctx.currentGameVersion.value
+
+			if (platformChanged && ctx.disableAllContent) {
+				isSaving.value = false
+				incompatibleContentVariant.value = 'loader-change'
+				await nextTick()
+				incompatibleContentModalRef?.value?.show()
+				return
+			}
+
+			if (isModded && gameVersionChanged && ctx.disableIncompatibleContent) {
+				isSaving.value = false
+				incompatibleContentVariant.value = 'game-version-change'
+				await nextTick()
+				incompatibleContentModalRef?.value?.show()
+				return
+			}
 
 			if (ctx.previewSave && isModded && gameVersionChanged) {
 				isVerifying.value = true
@@ -127,6 +151,89 @@ export function useInstallationForm(
 		}
 	}
 
+	async function confirmLoaderChange() {
+		try {
+			if (ctx.disableAllContent) {
+				await ctx.disableAllContent()
+			}
+			incompatibleContentVariant.value = null
+			await performSave()
+		} catch {
+			incompatibleContentVariant.value = null
+			isSaving.value = false
+		}
+	}
+
+	async function confirmAutoFix() {
+		try {
+			if (ctx.previewSave) {
+				isVerifying.value = true
+				abortController = new AbortController()
+				const loaderVersionId =
+					selectedPlatform.value !== 'vanilla'
+						? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
+						: null
+
+				let preview: ContentDiffPreview | null
+				try {
+					preview = await ctx.previewSave(
+						selectedPlatform.value,
+						selectedGameVersion.value,
+						loaderVersionId,
+						abortController.signal,
+					)
+				} finally {
+					isVerifying.value = false
+					abortController = null
+				}
+
+				if (preview && (preview.diffs.length > 0 || preview.hasUnknownContent)) {
+					pendingPreview.value = preview
+					incompatibleContentVariant.value = null
+					await nextTick()
+					await nextTick()
+					contentDiffModalRef?.value?.show()
+					return
+				}
+			}
+
+			incompatibleContentVariant.value = null
+			await performSave()
+		} catch {
+			incompatibleContentVariant.value = null
+			isSaving.value = false
+		}
+	}
+
+	async function confirmDisableConflicts() {
+		try {
+			if (ctx.disableIncompatibleContent) {
+				await ctx.disableIncompatibleContent(selectedGameVersion.value)
+			}
+
+			incompatibleContentVariant.value = null
+			if (ctx.saveWithoutAutoFix) {
+				const loaderVersionId =
+					selectedPlatform.value !== 'vanilla'
+						? (loaderVersionEntries.value[selectedLoaderVersion.value]?.id ?? null)
+						: null
+				await ctx.saveWithoutAutoFix(
+					selectedPlatform.value,
+					selectedGameVersion.value,
+					loaderVersionId,
+				)
+				if (ctx.afterSave) await ctx.afterSave()
+				isEditing.value = false
+				isSaving.value = false
+			} else {
+				await performSave()
+			}
+		} catch {
+			incompatibleContentVariant.value = null
+			isSaving.value = false
+		}
+	}
+
 	async function confirmSave() {
 		pendingPreview.value = null
 		try {
@@ -138,6 +245,7 @@ export function useInstallationForm(
 
 	function cancelPreview() {
 		pendingPreview.value = null
+		incompatibleContentVariant.value = null
 		isSaving.value = false
 	}
 
@@ -262,7 +370,11 @@ export function useInstallationForm(
 		hasChanges,
 		save,
 		pendingPreview,
+		incompatibleContentVariant,
 		confirmSave,
+		confirmLoaderChange,
+		confirmAutoFix,
+		confirmDisableConflicts,
 		cancelPreview,
 		cancelEditing,
 		updatingModpack,

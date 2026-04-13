@@ -63,3 +63,13 @@ export async function delete_logs(profilePath) {
 export async function get_latest_log_cursor(profilePath, cursor) {
 	return await invoke('plugin:logs|logs_get_latest_log_cursor', { profilePath, cursor })
 }
+
+/// Get all buffered live log lines for a profile from the Rust ring buffer
+export async function get_live_log_buffer(profilePath) {
+	return await invoke('plugin:logs|logs_get_live_log_buffer', { profilePath })
+}
+
+/// Clear the live log buffer for a profile on the Rust side
+export async function clear_log_buffer(profilePath) {
+	return await invoke('plugin:logs|logs_clear_live_log_buffer', { profilePath })
+}

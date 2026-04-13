@@ -133,6 +133,8 @@ export function createContentInstall(opts: {
 			title: string
 			icon_url?: string | null
 			project_type?: string
+			organization?: string | null
+			team?: string
 		},
 		version?: Labrinth.Versions.v2.Version,
 	) {
@@ -163,6 +165,60 @@ export function createContentInstall(opts: {
 		const items = next.get(instancePath) ?? []
 		if (items.some((i) => i.file_name === placeholder.file_name)) return
 		next.set(instancePath, [...items, placeholder])
+		installingItems.value = next
+
+		if (project.organization) {
+			get_organization(project.organization)
+				.then((org: { id: string; slug: string; name: string; icon_url?: string }) => {
+					updateInstallingItem(instancePath, placeholder.file_name, {
+						owner: {
+							id: org.id,
+							name: org.name,
+							avatar_url: org.icon_url,
+							type: 'organization',
+						},
+					})
+				})
+				.catch(() => {})
+		} else if (project.team) {
+			get_team(project.team)
+				.then(
+					(
+						members: {
+							user: { id: string; username: string; avatar_url?: string }
+							is_owner: boolean
+						}[],
+					) => {
+						const owner = members.find((m) => m.is_owner)
+						if (owner) {
+							updateInstallingItem(instancePath, placeholder.file_name, {
+								owner: {
+									id: owner.user.id,
+									name: owner.user.username,
+									avatar_url: owner.user.avatar_url,
+									type: 'user',
+								},
+							})
+						}
+					},
+				)
+				.catch(() => {})
+		}
+	}
+
+	function updateInstallingItem(
+		instancePath: string,
+		fileName: string,
+		updates: Partial<ContentItem>,
+	) {
+		const next = new Map(installingItems.value)
+		const items = next.get(instancePath)
+		if (!items) return
+		const index = items.findIndex((i) => i.file_name === fileName)
+		if (index === -1) return
+		const updated = [...items]
+		updated[index] = { ...updated[index], ...updates }
+		next.set(instancePath, updated)
 		installingItems.value = next
 	}
 

@@ -343,7 +343,7 @@ import { DEFAULT_CREDIT_EMAIL_MESSAGE } from '@modrinth/utils/utils.ts'
 import { useQuery } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 
-import ModrinthServersIcon from '~/components/ui/servers/ModrinthServersIcon.vue'
+import ModrinthServersIcon from '~/components/brand/ModrinthServersIcon.vue'
 
 const { addNotification } = injectNotificationManager()
 const { labrinth } = injectModrinthClient()
@@ -519,7 +519,7 @@ async function modifyCharge() {
 		})
 		addNotification({
 			title: 'Modifications made',
-			text: 'If the server is currently suspended, it may take up to 10 minutes for another charge attempt to be made.',
+			text: 'If the server is currently cancelled, it may take up to 10 minutes for another charge attempt to be made.',
 			type: 'success',
 		})
 		await refreshCharges()
