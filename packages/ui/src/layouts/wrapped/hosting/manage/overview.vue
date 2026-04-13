@@ -1,6 +1,6 @@
 <template>
 	<div class="relative flex select-none flex-col gap-6" data-pyro-server-manager-root>
-		<div class="flex flex-col-reverse gap-6 md:flex-col">
+		<div class="flex flex-col gap-6">
 			<ServerManageStats
 				:data="!isWsAuthIncorrect ? stats : undefined"
 				:loading="isWsAuthIncorrect"
