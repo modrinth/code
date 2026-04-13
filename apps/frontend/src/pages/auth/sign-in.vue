@@ -1,18 +1,20 @@
 <template>
-	<SignInView
-		v-model:email="email"
-		v-model:password="password"
-		v-model:token="token"
-		v-model:two-factor-code="twoFactorCode"
-		:subtle-launcher-redirect-uri="subtleLauncherRedirectUri"
-		:flow="flow"
-		:redirect-target="redirectTarget"
-		:route-query="route.query"
-		:globals="globals"
-		:on-password-sign-in="beginPasswordSignIn"
-		:on-two-factor-sign-in="begin2FASignIn"
-		:on-set-captcha-ref="setCaptchaRef"
-	/>
+	<div>
+		<SignInView
+			v-model:email="email"
+			v-model:password="password"
+			v-model:token="token"
+			v-model:two-factor-code="twoFactorCode"
+			:subtle-launcher-redirect-uri="subtleLauncherRedirectUri"
+			:flow="flow"
+			:redirect-target="redirectTarget"
+			:route-query="route.query"
+			:globals="globals"
+			:on-password-sign-in="beginPasswordSignIn"
+			:on-two-factor-sign-in="begin2FASignIn"
+			:on-set-captcha-ref="setCaptchaRef"
+		/>
+	</div>
 </template>
 
 <script setup>

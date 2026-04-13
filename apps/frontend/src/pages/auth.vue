@@ -8,14 +8,15 @@ useSeoMeta({
 })
 </script>
 <template>
-	<NuxtPage class="auth-container universal-card border border-solid border-surface-5" />
+	<div class="grid min-h-[calc(100vh-4.5rem)] place-items-center pb-20">
+		<NuxtPage class="auth-container universal-card border border-solid border-surface-5" />
+	</div>
 </template>
 
 <style>
 .auth-container {
 	width: 28rem;
 	max-width: calc(100% - 2rem);
-	margin: 1rem auto;
 	display: flex;
 	flex-direction: column;
 	gap: 2rem;
