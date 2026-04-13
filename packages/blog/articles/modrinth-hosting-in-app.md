@@ -1,6 +1,6 @@
 ---
 title: Modrinth Hosting in the App
-summary: Buy, setup, and manage your server all in our app.
+summary: Buy, setup, and manage your server all in the Modrinth App.
 date: 2026-04-12T13:30:00-08:00
 authors: ['AJfd8YH6', 'bOHH0P9Z', '6EjnV9Uf', 'LnK8MbX7']
 ---
@@ -67,4 +67,4 @@ The properties page also got a big overhaul. We’ve split out many of the more 
 
 —
 
-That’s everything from us! Have a good weekend!
+That’s everything from us! Have a good week!
