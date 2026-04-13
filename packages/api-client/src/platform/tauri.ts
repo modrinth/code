@@ -60,10 +60,18 @@ export class TauriModrinthClient extends XHRUploadClient {
 
 			let body: BodyInit | null | undefined = undefined
 			if (options.body) {
-				if (typeof options.body === 'object' && !(options.body instanceof FormData)) {
-					body = JSON.stringify(options.body)
+				const raw = options.body
+				if (
+					typeof raw === 'object' &&
+					!(raw instanceof FormData) &&
+					!(raw instanceof URLSearchParams) &&
+					!(raw instanceof Blob) &&
+					!(raw instanceof ArrayBuffer) &&
+					!ArrayBuffer.isView(raw as ArrayBufferView)
+				) {
+					body = JSON.stringify(raw)
 				} else {
-					body = options.body as BodyInit
+					body = raw as BodyInit
 				}
 			}
 
