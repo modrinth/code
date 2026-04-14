@@ -155,7 +155,7 @@ const fn default_drop_tokens_threshold() -> usize {
 }
 
 const fn default_max_candidates() -> usize {
-    4
+    10
 }
 
 impl TypesenseConfig {
