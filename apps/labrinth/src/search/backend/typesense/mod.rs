@@ -91,6 +91,8 @@ pub struct RequestConfig {
     pub text_match_type: TextMatchType,
     #[serde(default)]
     pub bucketing: Bucketing,
+    #[serde(default = "default_max_candidates")]
+    pub max_candidates: usize,
 }
 
 impl Default for RequestConfig {
@@ -106,6 +108,7 @@ impl Default for RequestConfig {
             drop_tokens_threshold: default_drop_tokens_threshold(),
             text_match_type: TextMatchType::default(),
             bucketing: Bucketing::default(),
+            max_candidates: default_max_candidates(),
         }
     }
 }
@@ -149,6 +152,10 @@ const fn default_prioritize_token_positions() -> bool {
 
 const fn default_drop_tokens_threshold() -> usize {
     0
+}
+
+const fn default_max_candidates() -> usize {
+    4
 }
 
 impl TypesenseConfig {
@@ -732,6 +739,10 @@ impl SearchBackend for Typesense {
             ("group_limit", "1".to_string()),
             ("facet_by", "project_id".to_string()),
             ("max_facet_values", "0".to_string()),
+            (
+                "max_candidates",
+                info.typesense_config.max_candidates.to_string(),
+            ),
         ];
         if let Some(query_by_weights) =
             Self::query_by_weights(&info.typesense_config)
