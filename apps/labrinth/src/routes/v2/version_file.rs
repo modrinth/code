@@ -13,7 +13,7 @@ use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("version_file")
+        web::scope("/version_file")
             .service(delete_file)
             .service(get_version_from_hash)
             .service(download_version)

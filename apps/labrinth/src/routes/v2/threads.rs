@@ -13,11 +13,11 @@ use serde::Deserialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("thread")
+        web::scope("/thread")
             .service(thread_get)
             .service(thread_send_message),
     );
-    cfg.service(web::scope("message").service(message_delete));
+    cfg.service(web::scope("/message").service(message_delete));
     cfg.service(threads_get);
 }
 

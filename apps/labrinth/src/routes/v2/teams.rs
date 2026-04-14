@@ -16,7 +16,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(teams_get);
 
     cfg.service(
-        web::scope("team")
+        web::scope("/team")
             .service(team_members_get)
             .service(edit_team_member)
             .service(transfer_ownership)

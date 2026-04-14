@@ -19,7 +19,7 @@ use std::sync::Arc;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("admin")
+        web::scope("/admin")
             .service(count_download)
             .service(force_reindex),
     );

@@ -19,7 +19,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(users_get);
 
     cfg.service(
-        web::scope("user")
+        web::scope("/user")
             .service(user_get)
             .service(projects_list)
             .service(user_delete)

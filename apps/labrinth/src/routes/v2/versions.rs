@@ -21,7 +21,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(super::version_creation::version_create);
 
     cfg.service(
-        web::scope("version")
+        web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)

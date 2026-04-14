@@ -17,7 +17,7 @@ use crate::util::cors::default_cors;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        actix_web::web::scope("v2")
+        actix_web::web::scope("/v2")
             .wrap(default_cors())
             .configure(super::internal::admin::config)
             // Todo: separate these- they need to also follow v2-v3 conversion

@@ -9,7 +9,7 @@ use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("moderation").service(get_projects));
+    cfg.service(web::scope("/moderation").service(get_projects));
 }
 
 pub fn utoipa_config(

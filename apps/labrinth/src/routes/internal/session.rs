@@ -21,7 +21,7 @@ use woothee::parser::Parser;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
-        scope("session")
+        scope("/session")
             .service(list)
             .service(delete)
             .service(refresh),

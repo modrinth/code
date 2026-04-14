@@ -45,7 +45,7 @@ use zxcvbn::Score;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(
-        scope("auth")
+        scope("/auth")
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)

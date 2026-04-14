@@ -22,7 +22,7 @@ use crate::util::cors::default_cors;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
-        actix_web::web::scope("_internal")
+        actix_web::web::scope("/_internal")
             .wrap(default_cors())
             .configure(admin::config)
             .configure(oauth_clients::config)
