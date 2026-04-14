@@ -1025,7 +1025,7 @@ impl AuthProvider {
 
 #[derive(Serialize, Deserialize)]
 pub struct AuthorizationInit {
-    pub url: String,
+    pub url: Url,
     #[serde(default)]
     pub provider: AuthProvider,
     pub token: Option<String>,
@@ -1041,7 +1041,7 @@ pub struct Authorization {
 
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
 // http://localhost:8000/auth/init?url=https://modrinth.com
-#[get("init")]
+#[get("/init")]
 pub async fn init(
     req: HttpRequest,
     Query(info): Query<AuthorizationInit>, // callback url
@@ -1077,9 +1077,7 @@ pub async fn init(
         "Starting authentication flow"
     );
 
-    let url =
-        url::Url::parse(&info.url).map_err(|_| AuthenticationError::Url)?;
-
+    let url = info.url;
     let domain = url.host_str().ok_or(AuthenticationError::Url)?;
     if !ENV
         .ALLOWED_CALLBACK_URLS
@@ -1109,7 +1107,7 @@ pub async fn init(
 
     let state = DBFlow::OAuth {
         user_id,
-        url: info.url,
+        url,
         provider: info.provider,
         existing_user_id,
     }
@@ -1262,7 +1260,7 @@ pub async fn auth_callback(
             .wrap_err("failed to clear user caches")?;
 
             return Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*url))
+                .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })));
         }
 
@@ -1297,7 +1295,7 @@ pub async fn auth_callback(
             .await?;
 
             Ok(HttpResponse::TemporaryRedirect()
-                .append_header(("Location", &*url))
+                .append_header(("Location", url.as_str()))
                 .json(serde_json::json!({ "url": url })))
         } else if let Some(user_id) = user_id_opt {
             let user = crate::database::models::DBUser::get_id(
@@ -1311,15 +1309,14 @@ pub async fn auth_callback(
                     .insert(Duration::minutes(30), &redis)
                     .await?;
 
-                let redirect_url = format!(
-                    "{}{}error=2fa_required&flow={}",
-                    url,
-                    if url.contains('?') { "&" } else { "?" },
-                    flow
-                );
+                let mut redirect_url = url.clone();
+                redirect_url
+                    .query_pairs_mut()
+                    .append_pair("error", "2fa_required")
+                    .append_pair("flow", &flow);
 
                 Ok(HttpResponse::TemporaryRedirect()
-                    .append_header((LOCATION, &*redirect_url))
+                    .append_header((LOCATION, redirect_url.as_str()))
                     .json(serde_json::json!({ "url": redirect_url })))
             } else {
                 let session =
@@ -1327,20 +1324,13 @@ pub async fn auth_callback(
                         .await?;
                 transaction.commit().await?;
 
-                let redirect_url = format!(
-                    "{}{}code={}{}",
-                    url,
-                    if url.contains('?') { '&' } else { '?' },
-                    session.session,
-                    if user_id_opt.is_none() {
-                        "&new_account=true"
-                    } else {
-                        ""
-                    }
-                );
+                let mut redirect_url = url.clone();
+                redirect_url
+                    .query_pairs_mut()
+                    .append_pair("code", &session.session);
 
                 Ok(HttpResponse::TemporaryRedirect()
-                    .append_header((LOCATION, &*redirect_url))
+                    .append_header((LOCATION, redirect_url.as_str()))
                     .json(serde_json::json!({ "url": redirect_url })))
             }
         } else {
@@ -1443,13 +1433,10 @@ async fn create_oauth_account(
     let session = issue_session(req, user_id, &mut txn, &redis, None).await?;
     txn.commit().await?;
 
-    let mut redirect_url = url
-        .parse::<Url>()
-        .wrap_internal_err("invalid redirect URL")?;
+    let mut redirect_url = url.clone();
     redirect_url
         .query_pairs_mut()
-        .append_pair("code", &session.session)
-        .append_pair("new_account", "true");
+        .append_pair("code", &session.session);
     let redirect_url = redirect_url.to_string();
 
     Ok(Redirect::to(redirect_url))

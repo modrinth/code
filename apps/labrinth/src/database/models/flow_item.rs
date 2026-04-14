@@ -10,6 +10,7 @@ use rand::distributions::Alphanumeric;
 use rand_chacha::ChaCha20Rng;
 use rand_chacha::rand_core::SeedableRng;
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 const FLOWS_NAMESPACE: &str = "flows";
 
@@ -18,12 +19,12 @@ const FLOWS_NAMESPACE: &str = "flows";
 pub enum DBFlow {
     OAuth {
         user_id: Option<DBUserId>,
-        url: String,
+        url: Url,
         provider: AuthProvider,
         existing_user_id: Option<DBUserId>,
     },
     OAuthPending {
-        url: String,
+        url: Url,
         provider: AuthProvider,
         user: TempUser,
     },
