@@ -12,6 +12,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("moderation").service(get_projects));
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(utoipa_actix_web::scope("moderation").service(get_projects));
+}
+
 #[derive(Deserialize)]
 pub struct ResultCount {
     #[serde(default = "default_count")]
@@ -22,6 +28,31 @@ fn default_count() -> u16 {
     100
 }
 
+/// Get projects in the moderation queue.
+#[utoipa::path(
+    get,
+    path = "/v2/moderation/projects",
+    operation_id = "getModerationProjects",
+    params(
+        (
+            "count" = Option<u16>,
+            Query,
+            description = "Maximum number of projects to return"
+        )
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_READ"]))
+)]
 #[get("projects")]
 pub async fn get_projects(
     req: HttpRequest,

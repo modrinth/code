@@ -29,6 +29,12 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(project_create);
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(project_create);
+}
+
 pub fn default_requested_status() -> ProjectStatus {
     ProjectStatus::Approved
 }
@@ -134,6 +140,25 @@ struct ProjectCreateData {
     pub organization_id: Option<models::ids::OrganizationId>,
 }
 
+/// Create a new project with initial versions.
+#[utoipa::path(
+    post,
+    path = "/v2/project",
+    operation_id = "createProject",
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing `data` and uploaded files"
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_CREATE"]))
+)]
 #[post("/project")]
 pub async fn project_create(
     req: HttpRequest,

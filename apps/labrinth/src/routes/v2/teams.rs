@@ -26,11 +26,40 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(teams_get);
+    cfg.service(
+        utoipa_actix_web::scope("team")
+            .service(team_members_get)
+            .service(edit_team_member)
+            .service(transfer_ownership)
+            .service(add_team_member)
+            .service(join_team)
+            .service(remove_team_member),
+    );
+}
+
 // Returns all members of a project,
 // including the team members of the project's team, but
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
 // They can be differentiated by the "organization_permissions" field being null or not
+/// Get a project's team members.
+#[utoipa::path(
+    get,
+    path = "/v2/project/{id}/members",
+    operation_id = "getProjectTeamMembers",
+    params(("id" = String, Path, description = "The ID or slug of the project")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
 #[get("{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
@@ -62,6 +91,15 @@ pub async fn team_members_get_project(
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
+/// Get a team's members.
+#[utoipa::path(
+    get,
+    path = "/v2/team/{id}/members",
+    operation_id = "getTeamMembers",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    responses((status = 200, description = "Expected response to a valid request")),
+    security(("bearer_auth" = ["PROJECT_READ"]))
+)]
 #[get("{id}/members")]
 pub async fn team_members_get(
     req: HttpRequest,
@@ -87,11 +125,19 @@ pub async fn team_members_get(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct TeamIds {
     pub ids: String,
 }
 
+/// Get the members of multiple teams.
+#[utoipa::path(
+    get,
+    path = "/v2/teams",
+    operation_id = "getTeams",
+    params(("ids" = String, Query, description = "The JSON array of team IDs")),
+    responses((status = 200, description = "Expected response to a valid request"))
+)]
 #[get("teams")]
 pub async fn teams_get(
     req: HttpRequest,
@@ -127,6 +173,25 @@ pub async fn teams_get(
     }
 }
 
+/// Join a team with a pending invite.
+#[utoipa::path(
+    post,
+    path = "/v2/team/{id}/join",
+    operation_id = "joinTeam",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
 #[post("{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
@@ -149,7 +214,7 @@ fn default_ordering() -> i64 {
     0
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct NewTeamMember {
     pub user_id: UserId,
     #[serde(default = "default_role")]
@@ -165,6 +230,26 @@ pub struct NewTeamMember {
     pub ordering: i64,
 }
 
+/// Add a member to a team.
+#[utoipa::path(
+    post,
+    path = "/v2/team/{id}/members",
+    operation_id = "addTeamMember",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    request_body = NewTeamMember,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
 #[post("{id}/members")]
 pub async fn add_team_member(
     req: HttpRequest,
@@ -194,7 +279,7 @@ pub async fn add_team_member(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct EditTeamMember {
     pub permissions: Option<ProjectPermissions>,
     pub organization_permissions: Option<OrganizationPermissions>,
@@ -203,6 +288,33 @@ pub struct EditTeamMember {
     pub ordering: Option<i64>,
 }
 
+/// Modify a team member.
+#[utoipa::path(
+    patch,
+    path = "/v2/team/{id}/members/{user_id}",
+    operation_id = "modifyTeamMember",
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team"),
+        (
+            "user_id" = UserId,
+            Path,
+            description = "The ID of the user to modify"
+        )
+    ),
+    request_body = EditTeamMember,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
 #[patch("{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
@@ -231,11 +343,31 @@ pub async fn edit_team_member(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct TransferOwnership {
     pub user_id: UserId,
 }
 
+/// Transfer team ownership.
+#[utoipa::path(
+    patch,
+    path = "/v2/team/{id}/owner",
+    operation_id = "transferTeamOwnership",
+    params(("id" = TeamId, Path, description = "The ID of the team")),
+    request_body = TransferOwnership,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
 #[patch("{id}/owner")]
 pub async fn transfer_ownership(
     req: HttpRequest,
@@ -260,6 +392,32 @@ pub async fn transfer_ownership(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Remove a member from a team.
+#[utoipa::path(
+    delete,
+    path = "/v2/team/{id}/members/{user_id}",
+    operation_id = "deleteTeamMember",
+    params(
+        ("id" = TeamId, Path, description = "The ID of the team"),
+        (
+            "user_id" = UserId,
+            Path,
+            description = "The ID of the user to remove"
+        )
+    ),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["PROJECT_WRITE"]))
+)]
 #[delete("{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,

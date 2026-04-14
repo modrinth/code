@@ -38,3 +38,25 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(versions::config),
     );
 }
+
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(
+        utoipa_actix_web::scope("")
+            .guard(actix_web::guard::fn_guard(|_| false))
+            .wrap(default_cors())
+            .configure(moderation::utoipa_config)
+            .configure(notifications::utoipa_config)
+            .configure(project_creation::utoipa_config)
+            .configure(projects::utoipa_config)
+            .configure(reports::utoipa_config)
+            .configure(statistics::utoipa_config)
+            .configure(tags::utoipa_config)
+            .configure(teams::utoipa_config)
+            .configure(threads::utoipa_config)
+            .configure(users::utoipa_config)
+            .configure(version_file::utoipa_config)
+            .configure(versions::utoipa_config),
+    );
+}

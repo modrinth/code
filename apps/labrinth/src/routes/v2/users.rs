@@ -31,6 +31,38 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
+    cfg.service(user_auth_get);
+    cfg.service(users_get);
+    cfg.service(
+        utoipa_actix_web::scope("user")
+            .service(user_get)
+            .service(projects_list)
+            .service(user_delete)
+            .service(user_edit)
+            .service(user_icon_edit)
+            .service(user_icon_delete)
+            .service(user_notifications)
+            .service(user_follows),
+    );
+}
+
+/// Get the current user from the authorization header.
+#[utoipa::path(
+    get,
+    path = "/v2/user",
+    operation_id = "getUserFromAuth",
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_READ"]))
+)]
 #[get("user")]
 pub async fn user_auth_get(
     req: HttpRequest,
@@ -52,11 +84,19 @@ pub async fn user_auth_get(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct UserIds {
     pub ids: String,
 }
 
+/// Get multiple users by ID.
+#[utoipa::path(
+    get,
+    path = "/v2/users",
+    operation_id = "getUsers",
+    params(("ids" = String, Query, description = "The JSON array of user IDs")),
+    responses((status = 200, description = "Expected response to a valid request"))
+)]
 #[get("users")]
 pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
@@ -82,6 +122,20 @@ pub async fn users_get(
     }
 }
 
+/// Get a user by ID or username.
+#[utoipa::path(
+    get,
+    path = "/v2/user/{id}",
+    operation_id = "getUser",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
 #[get("{id}")]
 pub async fn user_get(
     req: HttpRequest,
@@ -104,6 +158,20 @@ pub async fn user_get(
     }
 }
 
+/// Get a user's projects.
+#[utoipa::path(
+    get,
+    path = "/v2/user/{user_id}/projects",
+    operation_id = "getUserProjects",
+    params(("user_id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
 #[get("{user_id}/projects")]
 pub async fn projects_list(
     req: HttpRequest,
@@ -133,7 +201,7 @@ pub async fn projects_list(
     }
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditUser {
     #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_USERNAME))]
     pub username: Option<String>,
@@ -156,6 +224,26 @@ pub struct EditUser {
     pub allow_friend_requests: Option<bool>,
 }
 
+/// Modify a user.
+#[utoipa::path(
+    patch,
+    path = "/v2/user/{id}",
+    operation_id = "modifyUser",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    request_body = EditUser,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_WRITE"]))
+)]
 #[patch("{id}")]
 pub async fn user_edit(
     req: HttpRequest,
@@ -186,11 +274,44 @@ pub async fn user_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Extension {
     pub ext: String,
 }
 
+/// Change a user's avatar.
+#[utoipa::path(
+    patch,
+    path = "/v2/user/{id}/icon",
+    operation_id = "changeUserIcon",
+    params(
+        ("id" = String, Path, description = "The ID or username of the user"),
+        (
+            "ext" = String,
+            Query,
+            description = "Image extension (png, jpg, jpeg, bmp, gif, webp, svg, svgz, rgb)"
+        )
+    ),
+    request_body(
+        content(
+            ("image/png"),
+            ("image/jpeg"),
+            ("image/bmp"),
+            ("image/gif"),
+            ("image/webp"),
+            ("image/svg+xml")
+        )
+    ),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_WRITE"]))
+)]
 #[patch("{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
@@ -218,6 +339,22 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Remove a user's avatar.
+#[utoipa::path(
+    delete,
+    path = "/v2/user/{id}/icon",
+    operation_id = "deleteUserIcon",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_WRITE"]))
+)]
 #[delete("{id}/icon")]
 pub async fn user_icon_delete(
     req: HttpRequest,
@@ -240,6 +377,25 @@ pub async fn user_icon_delete(
     .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Delete a user by ID or username.
+#[utoipa::path(
+    delete,
+    path = "/v2/user/{id}",
+    operation_id = "deleteUser",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_DELETE"]))
+)]
 #[delete("{id}")]
 pub async fn user_delete(
     req: HttpRequest,
@@ -255,6 +411,25 @@ pub async fn user_delete(
         .or_else(v2_reroute::flatten_404_error)
 }
 
+/// Get projects followed by a user.
+#[utoipa::path(
+    get,
+    path = "/v2/user/{id}/follows",
+    operation_id = "getFollowedProjects",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["USER_READ"]))
+)]
 #[get("{id}/follows")]
 pub async fn user_follows(
     req: HttpRequest,
@@ -284,6 +459,25 @@ pub async fn user_follows(
     }
 }
 
+/// Get notifications for a user.
+#[utoipa::path(
+    get,
+    path = "/v2/user/{id}/notifications",
+    operation_id = "getUserNotifications",
+    params(("id" = String, Path, description = "The ID or username of the user")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["NOTIFICATION_READ"]))
+)]
 #[get("{id}/notifications")]
 pub async fn user_notifications(
     req: HttpRequest,
