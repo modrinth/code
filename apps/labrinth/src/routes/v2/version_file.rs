@@ -22,7 +22,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 
     cfg.service(
-        web::scope("version_files")
+        web::scope("/version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
             .service(update_files_many)
@@ -323,7 +323,7 @@ pub struct FileHashes {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("/")]
+#[post("")]
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
