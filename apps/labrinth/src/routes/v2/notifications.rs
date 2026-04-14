@@ -10,22 +10,7 @@ use crate::routes::v3;
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(notifications_get);
-    cfg.service(notifications_delete);
-    cfg.service(notifications_read);
-
-    cfg.service(
-        web::scope("/notification")
-            .service(notification_get)
-            .service(notification_read)
-            .service(notification_delete),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(notifications_get);
     cfg.service(notifications_delete);
     cfg.service(notifications_read);

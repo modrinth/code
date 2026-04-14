@@ -11,28 +11,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/version_file")
-            .service(delete_file)
-            .service(get_version_from_hash)
-            .service(download_version)
-            .service(get_update_from_hash)
-            .service(get_projects_from_hashes),
-    );
-
-    cfg.service(
-        web::scope("/version_files")
-            .service(get_versions_from_hashes)
-            .service(update_files)
-            .service(update_files_many)
-            .service(update_individual_files),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
         utoipa_actix_web::scope("/version_file")
             .service(delete_file)

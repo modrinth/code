@@ -5,13 +5,7 @@ use crate::routes::{
 };
 use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_stats);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_stats);
 }
 

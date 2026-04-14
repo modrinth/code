@@ -12,23 +12,7 @@ use ariadne::ids::UserId;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(teams_get);
-
-    cfg.service(
-        web::scope("/team")
-            .service(team_members_get)
-            .service(edit_team_member)
-            .service(transfer_ownership)
-            .service(add_team_member)
-            .service(join_team)
-            .service(remove_team_member),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(teams_get);
     cfg.service(
         utoipa_actix_web::scope("/team")

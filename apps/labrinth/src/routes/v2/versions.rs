@@ -16,22 +16,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(versions_get);
-    cfg.service(super::version_creation::version_create);
-
-    cfg.service(
-        web::scope("/version")
-            .service(version_get)
-            .service(version_delete)
-            .service(version_edit)
-            .service(super::version_creation::upload_file_to_version),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
     cfg.service(

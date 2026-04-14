@@ -12,24 +12,7 @@ use actix_web::{HttpResponse, get, web};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/tag")
-            .service(category_list)
-            .service(loader_list)
-            .service(game_version_list)
-            .service(license_list)
-            .service(license_text)
-            .service(donation_platform_list)
-            .service(report_type_list)
-            .service(project_type_list)
-            .service(side_type_list),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
         utoipa_actix_web::scope("/tag")
             .service(category_list)

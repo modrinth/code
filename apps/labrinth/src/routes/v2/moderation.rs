@@ -8,13 +8,7 @@ use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{HttpRequest, HttpResponse, get, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("/moderation").service(get_projects));
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(utoipa_actix_web::scope("/moderation").service(get_projects));
 }
 

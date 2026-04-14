@@ -11,19 +11,7 @@ use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/thread")
-            .service(thread_get)
-            .service(thread_send_message),
-    );
-    cfg.service(web::scope("/message").service(message_delete));
-    cfg.service(threads_get);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
         utoipa_actix_web::scope("/thread")
             .service(thread_get)

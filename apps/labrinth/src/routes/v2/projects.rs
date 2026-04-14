@@ -21,38 +21,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(project_search);
-    cfg.service(projects_get);
-    cfg.service(projects_edit);
-    cfg.service(random_projects_get);
-
-    cfg.service(
-        web::scope("/project")
-            .service(project_get)
-            .service(project_get_check)
-            .service(project_delete)
-            .service(project_edit)
-            .service(project_icon_edit)
-            .service(delete_project_icon)
-            .service(add_gallery_item)
-            .service(edit_gallery_item)
-            .service(delete_gallery_item)
-            .service(project_follow)
-            .service(project_unfollow)
-            .service(super::teams::team_members_get_project)
-            .service(
-                web::scope("/{project_id}")
-                    .service(super::versions::version_list)
-                    .service(super::versions::version_project_get)
-                    .service(dependency_list),
-            ),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(project_search);
     cfg.service(projects_get);
     cfg.service(projects_edit);

@@ -8,18 +8,7 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(reports_get);
-    cfg.service(reports);
-    cfg.service(report_create);
-    cfg.service(report_edit);
-    cfg.service(report_delete);
-    cfg.service(report_get);
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(reports_get);
     cfg.service(reports);
     cfg.service(report_create);

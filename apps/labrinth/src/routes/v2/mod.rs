@@ -15,15 +15,21 @@ mod versions;
 pub use super::ApiError;
 use crate::util::cors::default_cors;
 
-pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+pub fn utoipa_config(
+    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
+) {
     cfg.service(
-        actix_web::web::scope("/v2")
+        utoipa_actix_web::scope("/v2")
             .wrap(default_cors())
-            .configure(super::internal::admin::config)
-            // Todo: separate these- they need to also follow v2-v3 conversion
-            .configure(super::internal::session::config)
-            .configure(super::internal::flows::config)
-            .configure(super::internal::pats::config)
+            .configure(|cfg| {
+                cfg.map(|raw_cfg| {
+                    raw_cfg
+                        .configure(super::internal::admin::config)
+                        .configure(super::internal::session::config)
+                        .configure(super::internal::flows::config)
+                        .configure(super::internal::pats::config)
+                });
+            })
             .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)
@@ -36,27 +42,5 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config),
-    );
-}
-
-pub fn utoipa_config(
-    cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
-) {
-    cfg.service(
-        utoipa_actix_web::scope("/v2")
-            .guard(actix_web::guard::fn_guard(|_| false))
-            .wrap(default_cors())
-            .configure(moderation::utoipa_config)
-            .configure(notifications::utoipa_config)
-            .configure(project_creation::utoipa_config)
-            .configure(projects::utoipa_config)
-            .configure(reports::utoipa_config)
-            .configure(statistics::utoipa_config)
-            .configure(tags::utoipa_config)
-            .configure(teams::utoipa_config)
-            .configure(threads::utoipa_config)
-            .configure(users::utoipa_config)
-            .configure(version_file::utoipa_config)
-            .configure(versions::utoipa_config),
     );
 }
