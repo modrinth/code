@@ -237,11 +237,11 @@ impl TempUser {
 impl AuthProvider {
     pub fn get_redirect_url(
         &self,
+        raw_redirect_url: Url,
         state: String,
     ) -> Result<String, AuthenticationError> {
         let self_addr = &ENV.SELF_ADDR;
-        let raw_redirect_uri = format!("{self_addr}/v2/auth/callback");
-        let redirect_uri = urlencoding::encode(&raw_redirect_uri);
+        let redirect_uri = urlencoding::encode(raw_redirect_url.as_str());
 
         Ok(match self {
             AuthProvider::GitHub => {
@@ -1107,17 +1107,17 @@ pub async fn init(
 
     let state = DBFlow::OAuth {
         user_id,
-        url,
+        url: url.clone(),
         provider: info.provider,
         existing_user_id,
     }
     .insert(Duration::minutes(30), &redis)
     .await?;
 
-    let url = info.provider.get_redirect_url(state)?;
+    let provider_redirect_url = info.provider.get_redirect_url(url, state)?;
     Ok(HttpResponse::TemporaryRedirect()
-        .append_header(("Location", &*url))
-        .json(serde_json::json!({ "url": url })))
+        .append_header(("Location", &*provider_redirect_url))
+        .json(serde_json::json!({ "url": provider_redirect_url })))
 }
 
 #[get("/callback")]
