@@ -147,15 +147,17 @@ const fn default_prioritize_num_matching_fields() -> bool {
 }
 
 const fn default_prioritize_token_positions() -> bool {
-    true
+    // true
+    false
 }
 
 const fn default_drop_tokens_threshold() -> usize {
-    0
+    // 0
+    1
 }
 
 const fn default_max_candidates() -> usize {
-    10
+    8
 }
 
 impl TypesenseConfig {
