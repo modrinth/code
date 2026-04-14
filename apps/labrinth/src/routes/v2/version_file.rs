@@ -55,7 +55,6 @@ pub fn utoipa_config(
 /// Get version metadata by file hash.
 #[utoipa::path(
     get,
-    path = "/v2/version_file/{version_id}",
     operation_id = "versionFromHash",
     params(
         (
@@ -82,7 +81,7 @@ pub fn utoipa_config(
         )
     )
 )]
-#[get("{version_id}")]
+#[get("/{version_id}")]
 pub async fn get_version_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -116,7 +115,6 @@ pub async fn get_version_from_hash(
 /// Download a file by hash.
 #[utoipa::path(
     get,
-    path = "/v2/version_file/{version_id}/download",
     operation_id = "downloadVersionFromHash",
     params(
         (
@@ -143,7 +141,7 @@ pub async fn get_version_from_hash(
         )
     )
 )]
-#[get("{version_id}/download")]
+#[get("/{version_id}/download")]
 pub async fn download_version(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -169,7 +167,6 @@ pub async fn download_version(
 /// Delete a file by hash.
 #[utoipa::path(
     delete,
-    path = "/v2/version_file/{version_id}",
     operation_id = "deleteFileFromHash",
     params(
         (
@@ -201,7 +198,7 @@ pub async fn download_version(
     ),
     security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
-#[delete("{version_id}")]
+#[delete("/{version_id}")]
 pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -233,7 +230,6 @@ pub struct UpdateData {
 /// Get the latest compatible version from a file hash.
 #[utoipa::path(
     post,
-    path = "/v2/version_file/{version_id}/update",
     operation_id = "getLatestVersionFromHash",
     params(
         (
@@ -262,7 +258,7 @@ pub struct UpdateData {
         )
     )
 )]
-#[post("{version_id}/update")]
+#[post("/{version_id}/update")]
 pub async fn get_update_from_hash(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -320,7 +316,6 @@ pub struct FileHashes {
 /// Get versions from file hashes.
 #[utoipa::path(
     post,
-    path = "/v2/version_files",
     operation_id = "versionsFromHashes",
     request_body = FileHashes,
     responses(
@@ -328,7 +323,7 @@ pub struct FileHashes {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("")]
+#[post("/")]
 pub async fn get_versions_from_hashes(
     req: HttpRequest,
     pool: web::Data<ReadOnlyPgPool>,
@@ -372,7 +367,6 @@ pub async fn get_versions_from_hashes(
 /// Get projects from file hashes.
 #[utoipa::path(
     post,
-    path = "/v2/version_files/project",
     operation_id = "projectsFromHashes",
     request_body = FileHashes,
     responses(
@@ -380,7 +374,7 @@ pub async fn get_versions_from_hashes(
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("project")]
+#[post("/project")]
 pub async fn get_projects_from_hashes(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -450,7 +444,6 @@ pub struct ManyUpdateData {
 /// Get latest compatible versions for multiple hashes.
 #[utoipa::path(
     post,
-    path = "/v2/version_files/update",
     operation_id = "getLatestVersionsFromHashes",
     request_body = ManyUpdateData,
     responses(
@@ -458,7 +451,7 @@ pub struct ManyUpdateData {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("update")]
+#[post("/update")]
 pub async fn update_files(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -500,7 +493,6 @@ pub async fn update_files(
 /// Get all latest compatible versions for multiple hashes.
 #[utoipa::path(
     post,
-    path = "/v2/version_files/update_many",
     operation_id = "getLatestVersionsFromHashesMany",
     request_body = ManyUpdateData,
     responses(
@@ -508,7 +500,7 @@ pub async fn update_files(
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("update_many")]
+#[post("/update_many")]
 pub async fn update_files_many(
     pool: web::Data<ReadOnlyPgPool>,
     redis: web::Data<RedisPool>,
@@ -567,7 +559,6 @@ pub struct ManyFileUpdateData {
 /// Get latest versions with per-hash filters.
 #[utoipa::path(
     post,
-    path = "/v2/version_files/update_individual",
     operation_id = "getLatestVersionsFromHashesIndividual",
     request_body = ManyFileUpdateData,
     responses(
@@ -575,7 +566,7 @@ pub struct ManyFileUpdateData {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[post("update_individual")]
+#[post("/update_individual")]
 pub async fn update_individual_files(
     req: HttpRequest,
     pool: web::Data<PgPool>,

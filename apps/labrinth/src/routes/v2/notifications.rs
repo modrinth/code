@@ -45,7 +45,6 @@ pub struct NotificationIds {
 /// Get multiple notifications by ID.
 #[utoipa::path(
     get,
-    path = "/v2/notifications",
     operation_id = "getNotifications",
     params(
         (
@@ -67,7 +66,7 @@ pub struct NotificationIds {
     ),
     security(("bearer_auth" = ["NOTIFICATION_READ"]))
 )]
-#[get("notifications")]
+#[get("/notifications")]
 pub async fn notifications_get(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
@@ -99,7 +98,6 @@ pub async fn notifications_get(
 /// Get a notification by ID.
 #[utoipa::path(
     get,
-    path = "/v2/notification/{id}",
     operation_id = "getNotification",
     params(("id" = NotificationId, Path, description = "The ID of the notification")),
     responses(
@@ -115,7 +113,7 @@ pub async fn notifications_get(
     ),
     security(("bearer_auth" = ["NOTIFICATION_READ"]))
 )]
-#[get("{id}")]
+#[get("/{id}")]
 pub async fn notification_get(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -144,7 +142,6 @@ pub async fn notification_get(
 /// Mark a notification as read.
 #[utoipa::path(
     patch,
-    path = "/v2/notification/{id}",
     operation_id = "readNotification",
     params(("id" = NotificationId, Path, description = "The ID of the notification")),
     responses(
@@ -160,7 +157,7 @@ pub async fn notification_get(
     ),
     security(("bearer_auth" = ["NOTIFICATION_WRITE"]))
 )]
-#[patch("{id}")]
+#[patch("/{id}")]
 pub async fn notification_read(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -177,7 +174,6 @@ pub async fn notification_read(
 /// Delete a notification by ID.
 #[utoipa::path(
     delete,
-    path = "/v2/notification/{id}",
     operation_id = "deleteNotification",
     params(("id" = NotificationId, Path, description = "The ID of the notification")),
     responses(
@@ -193,7 +189,7 @@ pub async fn notification_read(
     ),
     security(("bearer_auth" = ["NOTIFICATION_WRITE"]))
 )]
-#[delete("{id}")]
+#[delete("/{id}")]
 pub async fn notification_delete(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
@@ -216,7 +212,6 @@ pub async fn notification_delete(
 /// Mark multiple notifications as read.
 #[utoipa::path(
     patch,
-    path = "/v2/notifications",
     operation_id = "readNotifications",
     params(
         (
@@ -238,7 +233,7 @@ pub async fn notification_delete(
     ),
     security(("bearer_auth" = ["NOTIFICATION_WRITE"]))
 )]
-#[patch("notifications")]
+#[patch("/notifications")]
 pub async fn notifications_read(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
@@ -261,7 +256,6 @@ pub async fn notifications_read(
 /// Delete multiple notifications by ID.
 #[utoipa::path(
     delete,
-    path = "/v2/notifications",
     operation_id = "deleteNotifications",
     params(
         (
@@ -283,7 +277,7 @@ pub async fn notifications_read(
     ),
     security(("bearer_auth" = ["NOTIFICATION_WRITE"]))
 )]
-#[delete("notifications")]
+#[delete("/notifications")]
 pub async fn notifications_delete(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,

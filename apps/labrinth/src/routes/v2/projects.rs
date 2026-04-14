@@ -83,7 +83,6 @@ pub fn utoipa_config(
 /// Search projects.
 #[utoipa::path(
     get,
-    path = "/v2/search",
     operation_id = "searchProjects",
     params(
         (
@@ -117,7 +116,7 @@ pub fn utoipa_config(
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[get("search")]
+#[get("/search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     search_backend: web::Data<dyn SearchBackend>,
@@ -217,7 +216,6 @@ pub struct RandomProjects {
 /// Get random projects.
 #[utoipa::path(
     get,
-    path = "/v2/projects_random",
     operation_id = "randomProjects",
     params(
         (
@@ -231,7 +229,7 @@ pub struct RandomProjects {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[get("projects_random")]
+#[get("/projects_random")]
 pub async fn random_projects_get(
     web::Query(count): web::Query<RandomProjects>,
     pool: web::Data<PgPool>,
@@ -261,7 +259,6 @@ pub async fn random_projects_get(
 /// Get multiple projects by ID or slug.
 #[utoipa::path(
     get,
-    path = "/v2/projects",
     operation_id = "getProjects",
     params(
         (
@@ -272,7 +269,7 @@ pub async fn random_projects_get(
     ),
     responses((status = 200, description = "Expected response to a valid request"))
 )]
-#[get("projects")]
+#[get("/projects")]
 pub async fn projects_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ProjectIds>,
@@ -306,7 +303,6 @@ pub async fn projects_get(
 /// Get a project by ID or slug.
 #[utoipa::path(
     get,
-    path = "/v2/project/{id}",
     operation_id = "getProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -317,7 +313,7 @@ pub async fn projects_get(
         )
     )
 )]
-#[get("{id}")]
+#[get("/{id}")]
 pub async fn project_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -356,7 +352,6 @@ pub async fn project_get(
 /// Check that a project ID or slug exists.
 #[utoipa::path(
     get,
-    path = "/v2/project/{id}/check",
     operation_id = "checkProjectValidity",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -367,7 +362,7 @@ pub async fn project_get(
         )
     )
 )]
-#[get("{id}/check")]
+#[get("/{id}/check")]
 pub async fn project_get_check(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
@@ -388,7 +383,6 @@ struct DependencyInfo {
 /// Get dependency projects and versions for a project.
 #[utoipa::path(
     get,
-    path = "/v2/project/{id}/dependencies",
     operation_id = "getDependencies",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -399,7 +393,7 @@ struct DependencyInfo {
         )
     )
 )]
-#[get("dependencies")]
+#[get("/dependencies")]
 pub async fn dependency_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -547,7 +541,6 @@ pub struct EditProject {
 /// Modify a project.
 #[utoipa::path(
     patch,
-    path = "/v2/project/{id}",
     operation_id = "modifyProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     request_body = EditProject,
@@ -564,7 +557,7 @@ pub struct EditProject {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("{id}")]
+#[patch("/{id}")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
@@ -805,7 +798,6 @@ pub struct BulkEditProject {
 /// Bulk-edit multiple projects.
 #[utoipa::path(
     patch,
-    path = "/v2/projects",
     operation_id = "patchProjects",
     params(
         (
@@ -825,7 +817,7 @@ pub struct BulkEditProject {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("projects")]
+#[patch("/projects")]
 pub async fn projects_edit(
     req: HttpRequest,
     web::Query(ids): web::Query<ProjectIds>,
@@ -930,7 +922,6 @@ pub struct Extension {
 /// Change a project's icon.
 #[utoipa::path(
     patch,
-    path = "/v2/project/{id}/icon",
     operation_id = "changeProjectIcon",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
@@ -956,7 +947,7 @@ pub struct Extension {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("{id}/icon")]
+#[patch("/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn project_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -986,7 +977,6 @@ pub async fn project_icon_edit(
 /// Delete a project's icon.
 #[utoipa::path(
     delete,
-    path = "/v2/project/{id}/icon",
     operation_id = "deleteProjectIcon",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -999,7 +989,7 @@ pub async fn project_icon_edit(
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[delete("{id}/icon")]
+#[delete("/{id}/icon")]
 pub async fn delete_project_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1034,7 +1024,6 @@ pub struct GalleryCreateQuery {
 /// Add a gallery image to a project.
 #[utoipa::path(
     post,
-    path = "/v2/project/{id}/gallery",
     operation_id = "addGalleryImage",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
@@ -1088,7 +1077,7 @@ pub struct GalleryCreateQuery {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[post("{id}/gallery")]
+#[post("/{id}/gallery")]
 #[allow(clippy::too_many_arguments)]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
@@ -1147,7 +1136,6 @@ pub struct GalleryEditQuery {
 /// Modify a gallery image.
 #[utoipa::path(
     patch,
-    path = "/v2/project/{id}/gallery",
     operation_id = "modifyGalleryImage",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
@@ -1186,7 +1174,7 @@ pub struct GalleryEditQuery {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("{id}/gallery")]
+#[patch("/{id}/gallery")]
 pub async fn edit_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryEditQuery>,
@@ -1220,7 +1208,6 @@ pub struct GalleryDeleteQuery {
 /// Delete a gallery image.
 #[utoipa::path(
     delete,
-    path = "/v2/project/{id}/gallery",
     operation_id = "deleteGalleryImage",
     params(
         ("id" = String, Path, description = "The ID or slug of the project"),
@@ -1236,7 +1223,7 @@ pub struct GalleryDeleteQuery {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[delete("{id}/gallery")]
+#[delete("/{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
     web::Query(item): web::Query<GalleryDeleteQuery>,
@@ -1261,7 +1248,6 @@ pub async fn delete_gallery_item(
 /// Delete a project by ID or slug.
 #[utoipa::path(
     delete,
-    path = "/v2/project/{id}",
     operation_id = "deleteProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -1274,7 +1260,7 @@ pub async fn delete_gallery_item(
     ),
     security(("bearer_auth" = ["PROJECT_DELETE"]))
 )]
-#[delete("{id}")]
+#[delete("/{id}")]
 pub async fn project_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1300,7 +1286,6 @@ pub async fn project_delete(
 /// Follow a project.
 #[utoipa::path(
     post,
-    path = "/v2/project/{id}/follow",
     operation_id = "followProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -1313,7 +1298,7 @@ pub async fn project_delete(
     ),
     security(("bearer_auth" = ["USER_WRITE"]))
 )]
-#[post("{id}/follow")]
+#[post("/{id}/follow")]
 pub async fn project_follow(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -1330,7 +1315,6 @@ pub async fn project_follow(
 /// Unfollow a project.
 #[utoipa::path(
     delete,
-    path = "/v2/project/{id}/follow",
     operation_id = "unfollowProject",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -1343,7 +1327,7 @@ pub async fn project_follow(
     ),
     security(("bearer_auth" = ["USER_WRITE"]))
 )]
-#[delete("{id}/follow")]
+#[delete("/{id}/follow")]
 pub async fn project_unfollow(
     req: HttpRequest,
     info: web::Path<(String,)>,

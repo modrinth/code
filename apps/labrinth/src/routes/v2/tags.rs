@@ -55,7 +55,6 @@ pub struct CategoryData {
 /// Get the list of project categories.
 #[utoipa::path(
     get,
-    path = "/v2/tag/category",
     operation_id = "categoryList",
     responses(
         (
@@ -65,7 +64,7 @@ pub struct CategoryData {
         )
     )
 )]
-#[get("category")]
+#[get("/category")]
 pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -102,7 +101,6 @@ pub struct LoaderData {
 /// Get the list of loaders.
 #[utoipa::path(
     get,
-    path = "/v2/tag/loader",
     operation_id = "loaderList",
     responses(
         (
@@ -112,7 +110,7 @@ pub struct LoaderData {
         )
     )
 )]
-#[get("loader")]
+#[get("/loader")]
 pub async fn loader_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -177,7 +175,6 @@ pub struct GameVersionQuery {
 /// Get the list of game versions.
 #[utoipa::path(
     get,
-    path = "/v2/tag/game_version",
     operation_id = "versionList",
     params(
         (
@@ -199,7 +196,7 @@ pub struct GameVersionQuery {
         )
     )
 )]
-#[get("game_version")]
+#[get("/game_version")]
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
@@ -262,7 +259,6 @@ pub struct License {
 /// Get SPDX license identifiers and names.
 #[utoipa::path(
     get,
-    path = "/v2/tag/license",
     operation_id = "licenseList",
     responses(
         (
@@ -272,7 +268,7 @@ pub struct License {
         )
     )
 )]
-#[get("license")]
+#[get("/license")]
 pub async fn license_list() -> HttpResponse {
     let response = v3::tags::license_list().await;
 
@@ -302,7 +298,6 @@ pub struct LicenseText {
 /// Get full license text by SPDX ID.
 #[utoipa::path(
     get,
-    path = "/v2/tag/license/{id}",
     operation_id = "licenseText",
     params(("id" = String, Path, description = "The license ID to get the text for")),
     responses(
@@ -314,7 +309,7 @@ pub struct LicenseText {
         (status = 400, description = "Request was invalid, see given error")
     )
 )]
-#[get("license/{id}")]
+#[get("/license/{id}")]
 pub async fn license_text(
     params: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
@@ -350,7 +345,6 @@ pub struct DonationPlatformQueryData {
 /// Get available donation platforms.
 #[utoipa::path(
     get,
-    path = "/v2/tag/donation_platform",
     operation_id = "donationPlatformList",
     responses(
         (
@@ -360,7 +354,7 @@ pub struct DonationPlatformQueryData {
         )
     )
 )]
-#[get("donation_platform")]
+#[get("/donation_platform")]
 pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -409,7 +403,6 @@ pub async fn donation_platform_list(
 /// Get valid report types.
 #[utoipa::path(
     get,
-    path = "/v2/tag/report_type",
     operation_id = "reportTypeList",
     responses(
         (
@@ -419,7 +412,7 @@ pub async fn donation_platform_list(
         )
     )
 )]
-#[get("report_type")]
+#[get("/report_type")]
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -433,7 +426,6 @@ pub async fn report_type_list(
 /// Get valid project types.
 #[utoipa::path(
     get,
-    path = "/v2/tag/project_type",
     operation_id = "projectTypeList",
     responses(
         (
@@ -443,7 +435,7 @@ pub async fn report_type_list(
         )
     )
 )]
-#[get("project_type")]
+#[get("/project_type")]
 pub async fn project_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
@@ -457,7 +449,6 @@ pub async fn project_type_list(
 /// Get valid side-type values.
 #[utoipa::path(
     get,
-    path = "/v2/tag/side_type",
     operation_id = "sideTypeList",
     responses(
         (
@@ -467,7 +458,7 @@ pub async fn project_type_list(
         )
     )
 )]
-#[get("side_type")]
+#[get("/side_type")]
 pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
     // Original side types are no longer reflected in the database.
     // Therefore, we hardcode and return all the fields that are supported by our v2 conversion logic.

@@ -31,7 +31,6 @@ pub fn utoipa_config(
 /// Create a report for a project, version, or user.
 #[utoipa::path(
     post,
-    path = "/v2/report",
     operation_id = "submitReport",
     responses(
         (status = 200, description = "Expected response to a valid request"),
@@ -43,7 +42,7 @@ pub fn utoipa_config(
     ),
     security(("bearer_auth" = ["REPORT_CREATE"]))
 )]
-#[post("report")]
+#[post("/report")]
 pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -84,7 +83,6 @@ fn default_all() -> bool {
 /// Get open reports for the current user.
 #[utoipa::path(
     get,
-    path = "/v2/report",
     operation_id = "getOpenReports",
     params(
         (
@@ -106,7 +104,7 @@ fn default_all() -> bool {
     ),
     security(("bearer_auth" = ["REPORT_READ"]))
 )]
-#[get("report")]
+#[get("/report")]
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -147,7 +145,6 @@ pub struct ReportIds {
 /// Get multiple reports by ID.
 #[utoipa::path(
     get,
-    path = "/v2/reports",
     operation_id = "getReports",
     params(
         (
@@ -169,7 +166,7 @@ pub struct ReportIds {
     ),
     security(("bearer_auth" = ["REPORT_READ"]))
 )]
-#[get("reports")]
+#[get("/reports")]
 pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
@@ -201,7 +198,6 @@ pub async fn reports_get(
 /// Get a report by ID.
 #[utoipa::path(
     get,
-    path = "/v2/report/{id}",
     operation_id = "getReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
     responses(
@@ -217,7 +213,7 @@ pub async fn reports_get(
     ),
     security(("bearer_auth" = ["REPORT_READ"]))
 )]
-#[get("report/{id}")]
+#[get("/report/{id}")]
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -250,7 +246,6 @@ pub struct EditReport {
 /// Modify a report.
 #[utoipa::path(
     patch,
-    path = "/v2/report/{id}",
     operation_id = "modifyReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
     request_body = EditReport,
@@ -268,7 +263,7 @@ pub struct EditReport {
     ),
     security(("bearer_auth" = ["REPORT_WRITE"]))
 )]
-#[patch("report/{id}")]
+#[patch("/report/{id}")]
 pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -297,7 +292,6 @@ pub async fn report_edit(
 /// Delete a report by ID.
 #[utoipa::path(
     delete,
-    path = "/v2/report/{id}",
     operation_id = "deleteReport",
     params(("id" = crate::models::ids::ReportId, Path, description = "The ID of the report")),
     responses(
@@ -313,7 +307,7 @@ pub async fn report_edit(
     ),
     security(("bearer_auth" = ["REPORT_DELETE"]))
 )]
-#[delete("report/{id}")]
+#[delete("/report/{id}")]
 pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,

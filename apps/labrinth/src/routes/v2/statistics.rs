@@ -26,7 +26,6 @@ pub struct V2Stats {
 /// Get aggregate instance statistics.
 #[utoipa::path(
     get,
-    path = "/v2/statistics",
     operation_id = "statistics",
     responses(
         (
@@ -36,7 +35,7 @@ pub struct V2Stats {
         )
     )
 )]
-#[get("statistics")]
+#[get("/statistics")]
 pub async fn get_stats(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {

@@ -78,7 +78,6 @@ pub struct InitialVersionData {
 /// Create a version on an existing project.
 #[utoipa::path(
     post,
-    path = "/v2/version",
     operation_id = "createVersion",
     request_body(
         content(("multipart/form-data")),
@@ -94,7 +93,7 @@ pub struct InitialVersionData {
     ),
     security(("bearer_auth" = ["VERSION_CREATE"]))
 )]
-#[post("version")]
+#[post("/version")]
 pub async fn version_create(
     req: HttpRequest,
     payload: Multipart,
@@ -302,7 +301,6 @@ async fn get_example_version_fields(
 /// Add files to an existing version.
 #[utoipa::path(
     post,
-    path = "/v2/version/{version_id}/file",
     operation_id = "addFilesToVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),
     request_body(
@@ -322,7 +320,7 @@ async fn get_example_version_fields(
     ),
     security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
-#[post("{version_id}/file")]
+#[post("/{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,

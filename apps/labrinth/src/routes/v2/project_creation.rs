@@ -143,7 +143,6 @@ struct ProjectCreateData {
 /// Create a new project with initial versions.
 #[utoipa::path(
     post,
-    path = "/v2/project",
     operation_id = "createProject",
     request_body(
         content(("multipart/form-data")),

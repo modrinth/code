@@ -36,7 +36,6 @@ pub fn utoipa_config(
 /// Get a thread by ID.
 #[utoipa::path(
     get,
-    path = "/v2/thread/{id}",
     operation_id = "getThread",
     params(("id" = ThreadId, Path, description = "The ID of the thread")),
     responses(
@@ -48,7 +47,7 @@ pub fn utoipa_config(
     ),
     security(("bearer_auth" = ["THREAD_READ"]))
 )]
-#[get("{id}")]
+#[get("/{id}")]
 pub async fn thread_get(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -69,7 +68,6 @@ pub struct ThreadIds {
 /// Get multiple threads by ID.
 #[utoipa::path(
     get,
-    path = "/v2/threads",
     operation_id = "getThreads",
     params(("ids" = String, Query, description = "The JSON array of thread IDs")),
     responses(
@@ -81,7 +79,7 @@ pub struct ThreadIds {
     ),
     security(("bearer_auth" = ["THREAD_READ"]))
 )]
-#[get("threads")]
+#[get("/threads")]
 pub async fn threads_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ThreadIds>,
@@ -120,7 +118,6 @@ pub struct NewThreadMessage {
 /// Send a message to a thread.
 #[utoipa::path(
     post,
-    path = "/v2/thread/{id}",
     operation_id = "sendThreadMessage",
     params(("id" = ThreadId, Path, description = "The ID of the thread")),
     request_body = NewThreadMessage,
@@ -134,7 +131,7 @@ pub struct NewThreadMessage {
     ),
     security(("bearer_auth" = ["THREAD_WRITE"]))
 )]
-#[post("{id}")]
+#[post("/{id}")]
 pub async fn thread_send_message(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -162,7 +159,6 @@ pub async fn thread_send_message(
 /// Delete a thread message by ID.
 #[utoipa::path(
     delete,
-    path = "/v2/message/{id}",
     operation_id = "deleteThreadMessage",
     params(("id" = ThreadMessageId, Path, description = "The ID of the message")),
     responses(
@@ -178,7 +174,7 @@ pub async fn thread_send_message(
     ),
     security(("bearer_auth" = ["THREAD_WRITE"]))
 )]
-#[delete("{id}")]
+#[delete("/{id}")]
 pub async fn message_delete(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,

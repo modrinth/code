@@ -52,7 +52,6 @@ pub fn utoipa_config(
 /// Get the current user from the authorization header.
 #[utoipa::path(
     get,
-    path = "/v2/user",
     operation_id = "getUserFromAuth",
     responses(
         (status = 200, description = "Expected response to a valid request"),
@@ -63,7 +62,7 @@ pub fn utoipa_config(
     ),
     security(("bearer_auth" = ["USER_READ"]))
 )]
-#[get("user")]
+#[get("/user")]
 pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -92,12 +91,11 @@ pub struct UserIds {
 /// Get multiple users by ID.
 #[utoipa::path(
     get,
-    path = "/v2/users",
     operation_id = "getUsers",
     params(("ids" = String, Query, description = "The JSON array of user IDs")),
     responses((status = 200, description = "Expected response to a valid request"))
 )]
-#[get("users")]
+#[get("/users")]
 pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
@@ -125,7 +123,6 @@ pub async fn users_get(
 /// Get a user by ID or username.
 #[utoipa::path(
     get,
-    path = "/v2/user/{id}",
     operation_id = "getUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -136,7 +133,7 @@ pub async fn users_get(
         )
     )
 )]
-#[get("{id}")]
+#[get("/{id}")]
 pub async fn user_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -161,7 +158,6 @@ pub async fn user_get(
 /// Get a user's projects.
 #[utoipa::path(
     get,
-    path = "/v2/user/{user_id}/projects",
     operation_id = "getUserProjects",
     params(("user_id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -172,7 +168,7 @@ pub async fn user_get(
         )
     )
 )]
-#[get("{user_id}/projects")]
+#[get("/{user_id}/projects")]
 pub async fn projects_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -227,7 +223,6 @@ pub struct EditUser {
 /// Modify a user.
 #[utoipa::path(
     patch,
-    path = "/v2/user/{id}",
     operation_id = "modifyUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
     request_body = EditUser,
@@ -244,7 +239,7 @@ pub struct EditUser {
     ),
     security(("bearer_auth" = ["USER_WRITE"]))
 )]
-#[patch("{id}")]
+#[patch("/{id}")]
 pub async fn user_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -282,7 +277,6 @@ pub struct Extension {
 /// Change a user's avatar.
 #[utoipa::path(
     patch,
-    path = "/v2/user/{id}/icon",
     operation_id = "changeUserIcon",
     params(
         ("id" = String, Path, description = "The ID or username of the user"),
@@ -312,7 +306,7 @@ pub struct Extension {
     ),
     security(("bearer_auth" = ["USER_WRITE"]))
 )]
-#[patch("{id}/icon")]
+#[patch("/{id}/icon")]
 #[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
     web::Query(ext): web::Query<Extension>,
@@ -342,7 +336,6 @@ pub async fn user_icon_edit(
 /// Remove a user's avatar.
 #[utoipa::path(
     delete,
-    path = "/v2/user/{id}/icon",
     operation_id = "deleteUserIcon",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -355,7 +348,7 @@ pub async fn user_icon_edit(
     ),
     security(("bearer_auth" = ["USER_WRITE"]))
 )]
-#[delete("{id}/icon")]
+#[delete("/{id}/icon")]
 pub async fn user_icon_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -380,7 +373,6 @@ pub async fn user_icon_delete(
 /// Delete a user by ID or username.
 #[utoipa::path(
     delete,
-    path = "/v2/user/{id}",
     operation_id = "deleteUser",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -396,7 +388,7 @@ pub async fn user_icon_delete(
     ),
     security(("bearer_auth" = ["USER_DELETE"]))
 )]
-#[delete("{id}")]
+#[delete("/{id}")]
 pub async fn user_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -414,7 +406,6 @@ pub async fn user_delete(
 /// Get projects followed by a user.
 #[utoipa::path(
     get,
-    path = "/v2/user/{id}/follows",
     operation_id = "getFollowedProjects",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -430,7 +421,7 @@ pub async fn user_delete(
     ),
     security(("bearer_auth" = ["USER_READ"]))
 )]
-#[get("{id}/follows")]
+#[get("/{id}/follows")]
 pub async fn user_follows(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -462,7 +453,6 @@ pub async fn user_follows(
 /// Get notifications for a user.
 #[utoipa::path(
     get,
-    path = "/v2/user/{id}/notifications",
     operation_id = "getUserNotifications",
     params(("id" = String, Path, description = "The ID or username of the user")),
     responses(
@@ -478,7 +468,7 @@ pub async fn user_follows(
     ),
     security(("bearer_auth" = ["NOTIFICATION_READ"]))
 )]
-#[get("{id}/notifications")]
+#[get("/{id}/notifications")]
 pub async fn user_notifications(
     req: HttpRequest,
     info: web::Path<(String,)>,

@@ -49,7 +49,6 @@ pub fn utoipa_config(
 /// Get a project's team members.
 #[utoipa::path(
     get,
-    path = "/v2/project/{id}/members",
     operation_id = "getProjectTeamMembers",
     params(("id" = String, Path, description = "The ID or slug of the project")),
     responses(
@@ -60,7 +59,7 @@ pub fn utoipa_config(
         )
     )
 )]
-#[get("{id}/members")]
+#[get("/{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -94,13 +93,12 @@ pub async fn team_members_get_project(
 /// Get a team's members.
 #[utoipa::path(
     get,
-    path = "/v2/team/{id}/members",
     operation_id = "getTeamMembers",
     params(("id" = TeamId, Path, description = "The ID of the team")),
     responses((status = 200, description = "Expected response to a valid request")),
     security(("bearer_auth" = ["PROJECT_READ"]))
 )]
-#[get("{id}/members")]
+#[get("/{id}/members")]
 pub async fn team_members_get(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -133,12 +131,11 @@ pub struct TeamIds {
 /// Get the members of multiple teams.
 #[utoipa::path(
     get,
-    path = "/v2/teams",
     operation_id = "getTeams",
     params(("ids" = String, Query, description = "The JSON array of team IDs")),
     responses((status = 200, description = "Expected response to a valid request"))
 )]
-#[get("teams")]
+#[get("/teams")]
 pub async fn teams_get(
     req: HttpRequest,
     web::Query(ids): web::Query<TeamIds>,
@@ -176,7 +173,6 @@ pub async fn teams_get(
 /// Join a team with a pending invite.
 #[utoipa::path(
     post,
-    path = "/v2/team/{id}/join",
     operation_id = "joinTeam",
     params(("id" = TeamId, Path, description = "The ID of the team")),
     responses(
@@ -192,7 +188,7 @@ pub async fn teams_get(
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[post("{id}/join")]
+#[post("/{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -233,7 +229,6 @@ pub struct NewTeamMember {
 /// Add a member to a team.
 #[utoipa::path(
     post,
-    path = "/v2/team/{id}/members",
     operation_id = "addTeamMember",
     params(("id" = TeamId, Path, description = "The ID of the team")),
     request_body = NewTeamMember,
@@ -250,7 +245,7 @@ pub struct NewTeamMember {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[post("{id}/members")]
+#[post("/{id}/members")]
 pub async fn add_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -291,7 +286,6 @@ pub struct EditTeamMember {
 /// Modify a team member.
 #[utoipa::path(
     patch,
-    path = "/v2/team/{id}/members/{user_id}",
     operation_id = "modifyTeamMember",
     params(
         ("id" = TeamId, Path, description = "The ID of the team"),
@@ -315,7 +309,7 @@ pub struct EditTeamMember {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("{id}/members/{user_id}")]
+#[patch("/{id}/members/{user_id}")]
 pub async fn edit_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,
@@ -351,7 +345,6 @@ pub struct TransferOwnership {
 /// Transfer team ownership.
 #[utoipa::path(
     patch,
-    path = "/v2/team/{id}/owner",
     operation_id = "transferTeamOwnership",
     params(("id" = TeamId, Path, description = "The ID of the team")),
     request_body = TransferOwnership,
@@ -368,7 +361,7 @@ pub struct TransferOwnership {
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[patch("{id}/owner")]
+#[patch("/{id}/owner")]
 pub async fn transfer_ownership(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
@@ -395,7 +388,6 @@ pub async fn transfer_ownership(
 /// Remove a member from a team.
 #[utoipa::path(
     delete,
-    path = "/v2/team/{id}/members/{user_id}",
     operation_id = "deleteTeamMember",
     params(
         ("id" = TeamId, Path, description = "The ID of the team"),
@@ -418,7 +410,7 @@ pub async fn transfer_ownership(
     ),
     security(("bearer_auth" = ["PROJECT_WRITE"]))
 )]
-#[delete("{id}/members/{user_id}")]
+#[delete("/{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,

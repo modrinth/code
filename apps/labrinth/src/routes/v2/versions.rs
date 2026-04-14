@@ -62,7 +62,6 @@ fn default_true() -> bool {
 /// List versions for a project.
 #[utoipa::path(
     get,
-    path = "/v2/project/{project_id}/version",
     operation_id = "getProjectVersions",
     params(
         (
@@ -99,7 +98,7 @@ fn default_true() -> bool {
         )
     )
 )]
-#[get("version")]
+#[get("/version")]
 pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -186,7 +185,6 @@ pub async fn version_list(
 /// Get a project version by ID or version number.
 #[utoipa::path(
     get,
-    path = "/v2/project/{project_id}/version/{slug}",
     operation_id = "getVersionFromIdOrNumber",
     params(
         (
@@ -208,7 +206,7 @@ pub async fn version_list(
         )
     )
 )]
-#[get("version/{slug}")]
+#[get("/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
@@ -246,12 +244,11 @@ pub struct VersionIds {
 /// Get multiple versions by ID.
 #[utoipa::path(
     get,
-    path = "/v2/versions",
     operation_id = "getVersions",
     params(("ids" = String, Query, description = "The JSON array of version IDs")),
     responses((status = 200, description = "Expected response to a valid request"))
 )]
-#[get("versions")]
+#[get("/versions")]
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
@@ -289,7 +286,6 @@ pub async fn versions_get(
 /// Get a version by ID.
 #[utoipa::path(
     get,
-    path = "/v2/version/{version_id}",
     operation_id = "getVersion",
     params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
     responses(
@@ -300,7 +296,7 @@ pub async fn versions_get(
         )
     )
 )]
-#[get("{version_id}")]
+#[get("/{version_id}")]
 pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
@@ -362,7 +358,6 @@ pub struct EditVersionFileType {
 /// Modify an existing version.
 #[utoipa::path(
     patch,
-    path = "/v2/version/{id}",
     operation_id = "modifyVersion",
     params(("id" = VersionId, Path, description = "The ID of the version")),
     request_body = EditVersion,
@@ -379,7 +374,7 @@ pub struct EditVersionFileType {
     ),
     security(("bearer_auth" = ["VERSION_WRITE"]))
 )]
-#[patch("{id}")]
+#[patch("/{id}")]
 pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -474,7 +469,6 @@ pub async fn version_edit(
 /// Delete a version by ID.
 #[utoipa::path(
     delete,
-    path = "/v2/version/{version_id}",
     operation_id = "deleteVersion",
     params(("version_id" = VersionId, Path, description = "The ID of the version")),
     responses(
@@ -490,7 +484,7 @@ pub async fn version_edit(
     ),
     security(("bearer_auth" = ["VERSION_DELETE"]))
 )]
-#[delete("{version_id}")]
+#[delete("/{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,

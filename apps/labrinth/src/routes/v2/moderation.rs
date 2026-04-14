@@ -31,7 +31,6 @@ fn default_count() -> u16 {
 /// Get projects in the moderation queue.
 #[utoipa::path(
     get,
-    path = "/v2/moderation/projects",
     operation_id = "getModerationProjects",
     params(
         (
@@ -53,7 +52,7 @@ fn default_count() -> u16 {
     ),
     security(("bearer_auth" = ["PROJECT_READ"]))
 )]
-#[get("projects")]
+#[get("/projects")]
 pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
