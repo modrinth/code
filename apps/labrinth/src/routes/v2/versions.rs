@@ -35,7 +35,7 @@ pub fn utoipa_config(
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
     cfg.service(
-        utoipa_actix_web::scope("version")
+        utoipa_actix_web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)

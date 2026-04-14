@@ -58,7 +58,7 @@ pub fn utoipa_config(
     cfg.service(projects_edit);
     cfg.service(random_projects_get);
     cfg.service(
-        utoipa_actix_web::scope("project")
+        utoipa_actix_web::scope("/project")
             .service(project_get)
             .service(project_get_check)
             .service(project_delete)
@@ -72,7 +72,7 @@ pub fn utoipa_config(
             .service(project_unfollow)
             .service(super::teams::team_members_get_project)
             .service(
-                utoipa_actix_web::scope("{project_id}")
+                utoipa_actix_web::scope("/{project_id}")
                     .service(super::versions::version_list)
                     .service(super::versions::version_project_get)
                     .service(dependency_list),

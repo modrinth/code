@@ -37,7 +37,7 @@ pub fn utoipa_config(
     cfg.service(user_auth_get);
     cfg.service(users_get);
     cfg.service(
-        utoipa_actix_web::scope("user")
+        utoipa_actix_web::scope("/user")
             .service(user_get)
             .service(projects_list)
             .service(user_delete)

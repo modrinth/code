@@ -31,7 +31,7 @@ pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
     cfg.service(
-        utoipa_actix_web::scope("tag")
+        utoipa_actix_web::scope("/tag")
             .service(category_list)
             .service(loader_list)
             .service(game_version_list)

@@ -34,7 +34,7 @@ pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
     cfg.service(
-        utoipa_actix_web::scope("version_file")
+        utoipa_actix_web::scope("/version_file")
             .service(delete_file)
             .service(get_version_from_hash)
             .service(download_version)
@@ -43,7 +43,7 @@ pub fn utoipa_config(
     );
 
     cfg.service(
-        utoipa_actix_web::scope("version_files")
+        utoipa_actix_web::scope("/version_files")
             .service(get_versions_from_hashes)
             .service(update_files)
             .service(update_files_many)

@@ -15,7 +15,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
-    cfg.service(utoipa_actix_web::scope("moderation").service(get_projects));
+    cfg.service(utoipa_actix_web::scope("/moderation").service(get_projects));
 }
 
 #[derive(Deserialize)]

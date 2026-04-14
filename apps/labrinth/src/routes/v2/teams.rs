@@ -31,7 +31,7 @@ pub fn utoipa_config(
 ) {
     cfg.service(teams_get);
     cfg.service(
-        utoipa_actix_web::scope("team")
+        utoipa_actix_web::scope("/team")
             .service(team_members_get)
             .service(edit_team_member)
             .service(transfer_ownership)

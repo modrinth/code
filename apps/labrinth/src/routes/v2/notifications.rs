@@ -30,7 +30,7 @@ pub fn utoipa_config(
     cfg.service(notifications_delete);
     cfg.service(notifications_read);
     cfg.service(
-        utoipa_actix_web::scope("notification")
+        utoipa_actix_web::scope("/notification")
             .service(notification_get)
             .service(notification_read)
             .service(notification_delete),

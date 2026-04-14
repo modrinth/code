@@ -25,11 +25,11 @@ pub fn utoipa_config(
     cfg: &mut utoipa_actix_web::service_config::ServiceConfig,
 ) {
     cfg.service(
-        utoipa_actix_web::scope("thread")
+        utoipa_actix_web::scope("/thread")
             .service(thread_get)
             .service(thread_send_message),
     );
-    cfg.service(utoipa_actix_web::scope("message").service(message_delete));
+    cfg.service(utoipa_actix_web::scope("/message").service(message_delete));
     cfg.service(threads_get);
 }
 
