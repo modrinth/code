@@ -1342,17 +1342,16 @@ pub async fn auth_callback(
 
             flow_guard
                 .replace_with(DBFlow::OAuthPending {
-                    url,
+                    url: url.clone(),
                     provider,
                     user: oauth_user,
                 })
                 .await
                 .wrap_err("failed to replace flow for state")?;
 
-            let mut url = format!("{}/auth/create/oauth", &ENV.SITE_URL)
-                .parse::<Url>()
-                .expect("create OAuth account URL should be a valid URL");
-            url.query_pairs_mut()
+            let mut redirect_url = url.clone();
+            redirect_url
+                .query_pairs_mut()
                 .append_pair("state", &state)
                 .append_pair(
                     "requires_dob",
