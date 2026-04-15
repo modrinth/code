@@ -1493,7 +1493,11 @@ onMounted(() => {
 		})
 	}
 
-	if (props.authUser && props.fetchIntercomToken) {
+	let intercomInitialized = false
+	const tryInitIntercom = () => {
+		if (intercomInitialized) return
+		if (!props.authUser || !props.fetchIntercomToken) return
+		intercomInitialized = true
 		props
 			.fetchIntercomToken()
 			.then(({ token }) => {
@@ -1504,9 +1508,20 @@ onMounted(() => {
 				})
 			})
 			.catch((error) => {
+				intercomInitialized = false
 				console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
 			})
 	}
+	tryInitIntercom()
+	const stopIntercomWatch = watch(
+		() => props.authUser,
+		(user) => {
+			if (user) {
+				tryInitIntercom()
+				stopIntercomWatch()
+			}
+		},
+	)
 
 	DOMPurify.addHook(
 		'afterSanitizeAttributes',

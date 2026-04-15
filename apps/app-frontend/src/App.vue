@@ -60,6 +60,7 @@ import { useQuery } from '@tanstack/vue-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { type } from '@tauri-apps/plugin-os'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
@@ -497,9 +498,27 @@ setupAuthProvider(credentials, async (_redirectPath) => {
 	await signIn()
 })
 
+async function validateSession(sessionToken) {
+	try {
+		const response = await tauriFetch(`${config.labrinthBaseUrl}/v2/user`, {
+			method: 'GET',
+			headers: { Authorization: sessionToken },
+		})
+		if (response.status === 401) return false
+		return true
+	} catch {
+		return true
+	}
+}
+
 async function fetchCredentials() {
 	const creds = await getCreds().catch(handleError)
 	if (creds && creds.user_id) {
+		if (creds.session && !(await validateSession(creds.session))) {
+			await logout().catch(handleError)
+			credentials.value = null
+			return
+		}
 		creds.user = await get_user(creds.user_id, 'bypass').catch(handleError)
 	}
 	credentials.value = creds ?? null
