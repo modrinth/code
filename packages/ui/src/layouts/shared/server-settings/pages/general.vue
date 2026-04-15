@@ -89,26 +89,36 @@
 						</div>
 						<span>{{ prefConfig.description }}</span>
 					</label>
-					<Toggle
-						:id="`pref-${key}`"
-						v-model="newUserPreferences[key]"
-						class="flex-none"
-						:disabled="!prefConfig.implemented"
-					/>
+					<div v-tooltip="getPreferenceTooltip(key)">
+						<Toggle
+							:id="`pref-${key}`"
+							:model-value="getPreferenceValue(key)"
+							class="flex-none"
+							:disabled="!prefConfig.implemented || isPreferenceForcedByFeatureFlag(key)"
+							@update:model-value="(value) => setPreferenceValue(key, !!value)"
+						/>
+					</div>
 				</div>
 
 				<!-- Info -->
-				<div class="flex flex-col gap-2.5">
+				<div class="flex flex-col gap-2.5 pb-10">
 					<div class="text-lg m-0 font-semibold text-contrast">Info</div>
 					<div class="flex flex-col gap-2.5 rounded-xl bg-surface-2 p-4">
 						<div
 							v-for="property in infoProperties"
 							:key="property.name"
-							class="flex items-center justify-between gap-4"
+							class="flex items-start justify-between gap-4"
 						>
 							<template v-if="property.value !== 'Unknown'">
-								<span>{{ property.name }}</span>
-								<CopyCode :text="property.value" />
+								<span class="mt-1">{{ property.name }}</span>
+								<CopyCode v-if="property.type === 'copy'" :text="property.value" />
+								<div
+									v-else-if="property.type === 'specs'"
+									class="flex flex-col items-end text-right text-sm leading-5 break-words"
+								>
+									<span v-for="line in property.lines" :key="line">{{ line }}</span>
+								</div>
+								<span v-else class="text-right text-sm break-words">{{ property.value }}</span>
 							</template>
 						</div>
 					</div>
@@ -127,7 +137,8 @@
 </template>
 
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query'
+import type { Labrinth } from '@modrinth/api-client'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useStorage } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 
@@ -138,11 +149,13 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectPageContext,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
+const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
 
 const serverName = ref(data.value?.name)
@@ -207,11 +220,118 @@ const userPreferences = useStorage<UserPreferences>(
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
 
+const isRamAsBytesForcedByFeatureFlag = computed(
+	() => featureFlags?.serverRamAsBytesAlwaysOn?.value ?? false,
+)
+
+const isPreferenceForcedByFeatureFlag = (key: string) =>
+	key === 'ramAsNumber' && isRamAsBytesForcedByFeatureFlag.value
+
+const getPreferenceTooltip = (key: string) =>
+	isPreferenceForcedByFeatureFlag(key)
+		? 'Feature flag enabled to always show RAM as bytes.'
+		: undefined
+
+const getPreferenceValue = (key: string) =>
+	isPreferenceForcedByFeatureFlag(key) ? true : newUserPreferences.value[key as PreferenceKeys]
+
+const setPreferenceValue = (key: string, value: boolean) => {
+	if (isPreferenceForcedByFeatureFlag(key)) {
+		return
+	}
+	newUserPreferences.value[key as PreferenceKeys] = value
+}
+
+const { data: subscriptions } = useQuery({
+	queryKey: ['billing', 'subscriptions'],
+	queryFn: () => client.labrinth.billing_internal.getSubscriptions(),
+})
+
+const { data: products } = useQuery({
+	queryKey: ['billing', 'products'],
+	queryFn: () => client.labrinth.billing_internal.getProducts(),
+})
+
+const serverSubscription = computed(() =>
+	subscriptions.value?.find(
+		(subscription) =>
+			subscription.metadata?.type === 'pyro' && subscription.metadata.id === serverId,
+	),
+)
+
+const serverProduct = computed(() =>
+	products.value?.find((product) =>
+		product.prices.some((price) => price.id === serverSubscription.value?.price_id),
+	),
+)
+
+const formatSpecNumber = (value: number) =>
+	Number.isInteger(value) ? String(value) : value.toFixed(1)
+
+const getServerSpecs = (product?: Labrinth.Billing.Internal.Product | null) => {
+	const metadata = product?.metadata
+	if (!metadata || (metadata.type !== 'pyro' && metadata.type !== 'medal')) {
+		return null
+	}
+
+	const sharedCpus = formatSpecNumber(metadata.cpu / 2)
+	const burstCpus = formatSpecNumber(metadata.cpu)
+	const ramGb = formatSpecNumber(metadata.ram / 1024)
+	const swapGb = formatSpecNumber(metadata.swap / 1024)
+	const storageGb = formatSpecNumber(metadata.storage / 1024)
+
+	return {
+		sharedCpus,
+		burstCpus,
+		ramGb,
+		swapGb,
+		storageGb,
+	}
+}
+
+const serverHostname = computed(() =>
+	serverSubdomain.value ? `${serverSubdomain.value}.modrinth.gg` : 'Unknown',
+)
+
+const serverSpecs = computed(() => getServerSpecs(serverProduct.value))
+
+type InfoProperty =
+	| {
+			name: string
+			value: string
+			type: 'copy'
+	  }
+	| {
+			name: string
+			value: string
+			type: 'text'
+	  }
+	| {
+			name: string
+			value: string
+			type: 'specs'
+			lines: string[]
+	  }
+
 // Info properties
-const infoProperties = [
-	{ name: 'Server ID', value: serverId ?? 'Unknown' },
-	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown' },
-]
+const infoProperties = computed<InfoProperty[]>(() => [
+	{ name: 'Server ID', value: serverId ?? 'Unknown', type: 'copy' },
+	{ name: 'Node', value: data.value?.node?.instance ?? 'Unknown', type: 'copy' },
+	{ name: 'Hostname', value: serverHostname.value, type: 'copy' },
+	{
+		name: 'Server specs',
+		value: serverSpecs.value ? 'Available' : 'Unknown',
+		type: 'specs',
+		lines: serverSpecs.value
+			? [
+					`${serverSpecs.value.sharedCpus} Shared CPU${Number(serverSpecs.value.sharedCpus) > 1 ? 's' : ''} (Bursts up to ${serverSpecs.value.burstCpus} CPUs)`,
+					`${serverSpecs.value.ramGb} GB RAM`,
+					`${serverSpecs.value.swapGb} GB Swap`,
+					`${serverSpecs.value.storageGb} GB SSD`,
+				]
+			: [],
+	},
+])
 
 // Unsaved changes tracking (API fields + preferences)
 const hasUnsavedChanges = computed(

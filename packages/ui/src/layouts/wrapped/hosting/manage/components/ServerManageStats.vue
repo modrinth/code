@@ -2,7 +2,7 @@
 	<div
 		data-pyro-server-stats
 		style="font-variant-numeric: tabular-nums"
-		class="flex select-none flex-col items-center gap-4 md:flex-row"
+		class="flex select-none flex-col items-center gap-3 md:flex-row"
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>
@@ -60,11 +60,12 @@ import { useStorage } from '@vueuse/core'
 import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { injectModrinthServerContext } from '#ui/providers'
+import { injectModrinthServerContext, injectPageContext } from '#ui/providers'
 
 const VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
 
 const { serverId } = injectModrinthServerContext()
+const { featureFlags } = injectPageContext()
 
 const props = withDefaults(
 	defineProps<{
@@ -83,6 +84,9 @@ const chartsReady = ref(new Set<number>())
 const userPreferences = useStorage(`pyro-server-${serverId || 'unknown'}-preferences`, {
 	ramAsNumber: false,
 })
+const isRamAsBytesForcedByFeatureFlag = computed(
+	() => featureFlags?.serverRamAsBytesAlwaysOn?.value ?? false,
+)
 
 const stats = shallowRef(
 	props.data?.current || {
@@ -214,7 +218,9 @@ const metrics = computed(() => {
 		{
 			title: 'Memory',
 			value:
-				props.showMemoryAsBytes || userPreferences.value.ramAsNumber
+				props.showMemoryAsBytes ||
+				isRamAsBytesForcedByFeatureFlag.value ||
+				userPreferences.value.ramAsNumber
 					? formatBytes(stats.value.ram_usage_bytes ?? 0)
 					: `${ramPercent.value.toFixed(2)}%`,
 			icon: DatabaseIcon,
