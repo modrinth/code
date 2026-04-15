@@ -89,12 +89,15 @@
 						</div>
 						<span>{{ prefConfig.description }}</span>
 					</label>
-					<Toggle
-						:id="`pref-${key}`"
-						v-model="newUserPreferences[key]"
-						class="flex-none"
-						:disabled="!prefConfig.implemented"
-					/>
+					<div v-tooltip="getPreferenceTooltip(key)">
+						<Toggle
+							:id="`pref-${key}`"
+							:model-value="getPreferenceValue(key)"
+							class="flex-none"
+							:disabled="!prefConfig.implemented || isPreferenceForcedByFeatureFlag(key)"
+							@update:model-value="(value) => setPreferenceValue(key, !!value)"
+						/>
+					</div>
 				</div>
 
 				<!-- Info -->
@@ -138,11 +141,13 @@ import {
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
+	injectPageContext,
 } from '#ui/providers'
 
 const { addNotification } = injectNotificationManager()
 const client = injectModrinthClient()
 const { server: data, serverId, busyReasons } = injectModrinthServerContext()
+const { featureFlags } = injectPageContext()
 const queryClient = useQueryClient()
 
 const serverName = ref(data.value?.name)
@@ -206,6 +211,28 @@ const userPreferences = useStorage<UserPreferences>(
 )
 
 const newUserPreferences = ref<UserPreferences>(JSON.parse(JSON.stringify(userPreferences.value)))
+
+const isRamAsBytesForcedByFeatureFlag = computed(
+	() => featureFlags?.serverRamAsBytesAlwaysOn?.value ?? false,
+)
+
+const isPreferenceForcedByFeatureFlag = (key: string) =>
+	key === 'ramAsNumber' && isRamAsBytesForcedByFeatureFlag.value
+
+const getPreferenceTooltip = (key: string) =>
+	isPreferenceForcedByFeatureFlag(key)
+		? 'Feature flag enabled to always show RAM as bytes.'
+		: undefined
+
+const getPreferenceValue = (key: string) =>
+	isPreferenceForcedByFeatureFlag(key) ? true : newUserPreferences.value[key as PreferenceKeys]
+
+const setPreferenceValue = (key: string, value: boolean) => {
+	if (isPreferenceForcedByFeatureFlag(key)) {
+		return
+	}
+	newUserPreferences.value[key as PreferenceKeys] = value
+}
 
 // Info properties
 const infoProperties = [
