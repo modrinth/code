@@ -100,24 +100,38 @@ const loadingProgress = ref(0)
 const hidden = ref(false)
 const message = ref()
 
+// const MIN_DISPLAY_MS = 1000
+// const mountedAt = Date.now()
+
 const loading = useLoading()
 
-watch(loading, (newValue) => {
-	if (!newValue.barEnabled) {
-		if (loading.loading) {
-			loadingProgress.value = 0
-			fakeLoadingIncrease()
-		} else {
-			loadingProgress.value = 100
-			doneLoading.value = true
+watch(
+	loading,
+	(newValue) => {
+		if (!newValue.barEnabled) {
+			if (loading.loading) {
+				loadingProgress.value = 0
+				fakeLoadingIncrease()
+			} else {
+				// const elapsed = Date.now() - mountedAt
+				// const delay = Math.max(0, MIN_DISPLAY_MS - elapsed)
 
-			setTimeout(() => {
-				hidden.value = true
-				loading.setEnabled(true)
-			}, 50)
+				// setTimeout(() => {
+				// 	if (loading.loading) return
+
+				loadingProgress.value = 100
+				doneLoading.value = true
+
+				setTimeout(() => {
+					hidden.value = true
+					loading.setEnabled(true)
+				}, 50)
+				// }, delay)
+			}
 		}
-	}
-})
+	},
+	{ immediate: true },
+)
 
 function fakeLoadingIncrease() {
 	if (loadingProgress.value < 95) {

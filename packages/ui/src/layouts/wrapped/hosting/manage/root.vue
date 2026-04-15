@@ -107,7 +107,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
+		class="experimental-styles-within relative mx-auto pb-6 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
@@ -1493,7 +1493,11 @@ onMounted(() => {
 		})
 	}
 
-	if (props.authUser && props.fetchIntercomToken) {
+	let intercomInitialized = false
+	const tryInitIntercom = () => {
+		if (intercomInitialized) return
+		if (!props.authUser || !props.fetchIntercomToken) return
+		intercomInitialized = true
 		props
 			.fetchIntercomToken()
 			.then(({ token }) => {
@@ -1504,9 +1508,20 @@ onMounted(() => {
 				})
 			})
 			.catch((error) => {
+				intercomInitialized = false
 				console.warn('[PYROSERVERS][INTERCOM] failed to initialize secure support chat', error)
 			})
 	}
+	tryInitIntercom()
+	const stopIntercomWatch = watch(
+		() => props.authUser,
+		(user) => {
+			if (user) {
+				tryInitIntercom()
+				stopIntercomWatch()
+			}
+		},
+	)
 
 	DOMPurify.addHook(
 		'afterSanitizeAttributes',

@@ -60,8 +60,8 @@ export function useServerImage(
 
 	const { data: remoteImage, refetch } = useQuery({
 		queryKey,
-		queryFn: async (): Promise<string | null | undefined> => {
-			if (!serverId) return undefined
+		queryFn: async (): Promise<string | null> => {
+			if (!serverId) return null
 
 			try {
 				const fsAuth = await client.archon.servers_v0.getFilesystemAuth(serverId)
@@ -84,21 +84,21 @@ export function useServerImage(
 				}
 			} catch (error) {
 				console.debug('Server image fetch failed:', error)
-				return undefined
+				return null
 			}
 
-			if (!includeProjectFallback || !upstream.value?.project_id) return undefined
+			if (!includeProjectFallback || !upstream.value?.project_id) return null
 
 			try {
 				const project = await client.labrinth.projects_v2.get(upstream.value.project_id)
-				if (!project.icon_url) return undefined
+				if (!project.icon_url) return null
 				const response = await fetch(project.icon_url)
-				if (!response.ok) return undefined
+				if (!response.ok) return null
 				const blob = await response.blob()
 				return await processImageBlob(blob, iconSize)
 			} catch (error) {
 				console.debug('Project icon fallback failed:', error)
-				return undefined
+				return null
 			}
 		},
 		enabled: isEnabled,

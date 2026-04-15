@@ -63,6 +63,9 @@ const appendGraphData = (dataArray: number[], newValue: number): number[] => {
 	return updated
 }
 
+const STALE_STATS_THRESHOLD_MS = 5000
+const STALE_STATS_PUSH_INTERVAL_MS = 1000
+
 const mapPowerStateFromStateEvent = (
 	data: Archon.Websocket.v0.WSStateEvent,
 ): Archon.Websocket.v0.PowerState => {
@@ -101,6 +104,8 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	const ramData = ref<number[]>([])
 
 	let uptimeIntervalId: ReturnType<typeof setInterval> | null = null
+	let staleStatsTimeoutId: ReturnType<typeof setTimeout> | null = null
+	let staleStatsIntervalId: ReturnType<typeof setInterval> | null = null
 
 	const markBackupCancelled =
 		options.markBackupCancelled ??
@@ -183,6 +188,43 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 	}
 
+	const clearStaleStatsTimers = () => {
+		if (staleStatsTimeoutId) {
+			clearTimeout(staleStatsTimeoutId)
+			staleStatsTimeoutId = null
+		}
+		if (staleStatsIntervalId) {
+			clearInterval(staleStatsIntervalId)
+			staleStatsIntervalId = null
+		}
+	}
+
+	const pushZeroStats = () => {
+		if (!shouldProcessEvent()) return
+		cpuData.value = appendGraphData(cpuData.value, 0)
+		ramData.value = appendGraphData(ramData.value, 0)
+		stats.value = {
+			current: {
+				...stats.value.current,
+				cpu_percent: 0,
+				ram_usage_bytes: 0,
+			},
+			past: { ...stats.value.current },
+			graph: {
+				cpu: cpuData.value,
+				ram: ramData.value,
+			},
+		}
+	}
+
+	const armStaleStatsWatchdog = () => {
+		clearStaleStatsTimers()
+		staleStatsTimeoutId = setTimeout(() => {
+			pushZeroStats()
+			staleStatsIntervalId = setInterval(pushZeroStats, STALE_STATS_PUSH_INTERVAL_MS)
+		}, STALE_STATS_THRESHOLD_MS)
+	}
+
 	const updatePowerState = (
 		state: Archon.Websocket.v0.PowerState,
 		details?: { oom_killed?: boolean; exit_code?: number },
@@ -209,6 +251,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 	}
 
 	const handleStats = (data: Archon.Websocket.v0.WSStatsEvent) => {
+		armStaleStatsWatchdog()
 		updateStats({
 			cpu_percent: data.cpu_percent,
 			ram_usage_bytes: data.ram_usage_bytes,
@@ -280,6 +323,7 @@ export function useServerManageCoreRuntime(options: UseServerManageCoreRuntimeOp
 		}
 
 		stopUptimeTicker()
+		clearStaleStatsTimers()
 		connectedSocketServerId.value = null
 		isConnected.value = false
 		isWsAuthIncorrect.value = false
