@@ -288,7 +288,7 @@ const messages = defineMessages({
 			</div>
 		</div>
 	</ModalWrapper>
-	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 ml-2 mr-1">
+	<div v-if="userCredentials && !loading" class="flex gap-1 items-center mb-3 -ml-1">
 		<template v-if="sortedFriends.length > 0">
 			<ButtonStyled circular type="transparent">
 				<button
@@ -309,7 +309,7 @@ const messages = defineMessages({
 				@keyup.esc="search = ''"
 			/>
 		</template>
-		<h3 v-else class="ml-2 w-full text-base text-primary font-medium m-0">
+		<h3 v-else class="w-full text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<ButtonStyled v-if="incomingRequests.length > 0" circular type="transparent">
@@ -331,11 +331,11 @@ const messages = defineMessages({
 		</ButtonStyled>
 	</div>
 	<div class="flex flex-col gap-3">
-		<h3 v-if="loading" class="ml-4 mr-1 text-base text-primary font-medium m-0">
+		<h3 v-if="loading" class="text-base text-primary font-medium m-0">
 			{{ formatMessage(messages.friends) }}
 		</h3>
 		<template v-if="loading">
-			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse ml-4 mr-1">
+			<div v-for="n in 5" :key="n" class="flex gap-2 items-center animate-pulse">
 				<div class="min-w-9 min-h-9 bg-button-bg rounded-full"></div>
 				<div class="flex flex-col w-full">
 					<div class="h-3 bg-button-bg rounded-full w-1/2 mb-1"></div>
@@ -344,7 +344,7 @@ const messages = defineMessages({
 			</div>
 		</template>
 		<template v-else-if="sortedFriends.length === 0">
-			<div class="text-sm ml-4 mr-1">
+			<div class="text-sm">
 				<div v-if="!userCredentials">
 					<IntlFormatted :message-id="messages.signInToAddFriends">
 						<template #link="{ children }">
