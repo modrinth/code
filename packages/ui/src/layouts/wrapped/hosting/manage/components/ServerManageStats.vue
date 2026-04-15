@@ -2,7 +2,7 @@
 	<div
 		data-pyro-server-stats
 		style="font-variant-numeric: tabular-nums"
-		class="flex select-none flex-col items-center gap-4 md:flex-row"
+		class="flex select-none flex-col items-center gap-3 md:flex-row"
 		:class="{ 'pointer-events-none': loading }"
 		:aria-hidden="loading"
 	>

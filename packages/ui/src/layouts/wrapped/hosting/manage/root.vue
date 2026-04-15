@@ -107,7 +107,7 @@
 	<div
 		v-else-if="serverData"
 		data-pyro-server-manager-root
-		class="experimental-styles-within relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-6 px-6 transition-all duration-300"
+		class="experimental-styles-within relative mx-auto pb-12 box-border flex min-h-[calc(100svh-100px)] w-full min-w-0 flex-col gap-4 px-6 transition-all duration-300"
 		:style="{
 			'--server-bg-image': serverImage
 				? `url(${serverImage})`
