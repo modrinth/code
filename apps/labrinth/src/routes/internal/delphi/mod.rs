@@ -37,7 +37,7 @@ pub mod rescan;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("delphi")
+        web::scope("/delphi")
             .service(ingest_report)
             .service(_run)
             .service(version)

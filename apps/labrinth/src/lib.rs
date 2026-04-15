@@ -353,7 +353,6 @@ pub fn app_config(
     .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .app_data(web::Data::new(labrinth_config.anrok_client.clone()))
     .app_data(labrinth_config.rate_limiter.clone())
-    .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
     .configure(routes::root_config)
@@ -374,6 +373,7 @@ pub fn utoipa_app_config(
             |_cfg| ()
         }
     })
+    .configure(routes::v2::utoipa_config)
     .configure(routes::v3::utoipa_config)
     .configure(routes::internal::utoipa_config);
 }

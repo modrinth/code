@@ -1,6 +1,6 @@
 <template>
 	<div class="flex flex-col gap-2 border-0 border-b border-solid border-divider pb-4">
-		<div class="flex flex-wrap items-start gap-4">
+		<div class="flex flex-wrap items-start gap-4 max-md:flex-col">
 			<div class="flex min-w-0 flex-1 gap-4">
 				<slot name="icon" />
 				<div class="flex min-w-0 flex-col gap-2 justify-center">
