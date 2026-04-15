@@ -439,6 +439,24 @@
 				}"
 			>
 				<div class="normal-page__header relative my-4">
+					<div class="mb-6">
+						<ModerationProjectNags
+							v-if="
+								projectV3 &&
+								((currentMember && project.status === 'draft') ||
+									tags.rejectedStatuses.includes(project.status))
+							"
+							:project="project"
+							:project-v3="projectV3"
+							:versions="versions ?? undefined"
+							:current-member="currentMember"
+							:collapsed="collapsedChecklist"
+							:route-name="route.name"
+							:tags="tags"
+							@toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+							@set-processing="setProcessing"
+						/>
+					</div>
 					<ProjectHeader
 						v-if="projectV3Loaded"
 						:project="project"
@@ -1120,6 +1138,7 @@ import AutomaticAccordion from '~/components/ui/AutomaticAccordion.vue'
 import CollectionCreateModal from '~/components/ui/create/CollectionCreateModal.vue'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import ModerationChecklist from '~/components/ui/moderation/checklist/ModerationChecklist.vue'
+import ModerationProjectNags from '~/components/ui/moderation/ModerationProjectNags.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import { getSignInRouteObj } from '~/composables/auth.js'
 import { saveFeatureFlags } from '~/composables/featureFlags.ts'

@@ -157,6 +157,11 @@ provideModrinthClient(tauriApiClient)
 providePageContext({
 	hierarchicalSidebarAvailable: ref(true),
 	showAds: ref(false),
+	featureFlags: {
+		serverRamAsBytesAlwaysOn: computed(() =>
+			themeStore.getFeatureFlag('server_ram_as_bytes_always_on'),
+		),
+	},
 	openExternalUrl: (url) => openUrl(url),
 })
 provideModalBehavior({

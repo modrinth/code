@@ -280,7 +280,7 @@
 				<div class="flex flex-col justify-between gap-4">
 					<div class="flex flex-col gap-4">
 						<ModrinthServersIcon class="flex h-8 w-fit" />
-						<div class="flex flex-col gap-2">
+						<div class="flex flex-col gap-6">
 							<ServerListing
 								v-if="subscription.serverInfo"
 								v-bind="subscription.serverInfo"
@@ -311,15 +311,16 @@
 									/>
 								</div>
 							</div>
-							<h3 class="m-0 mt-4 text-xl font-semibold leading-none text-contrast">
-								{{
-									formatMessage(messages.planTitle, {
-										size: getProductSize(getPyroProduct(subscription)),
-									})
-								}}
-							</h3>
+
 							<div class="flex flex-row justify-between">
-								<div class="mt-2 flex flex-col gap-2">
+								<div class="flex flex-col gap-2">
+									<h3 class="m-0 mb-1 text-xl font-semibold leading-none">
+										{{
+											formatMessage(messages.planTitle, {
+												size: getProductSize(getPyroProduct(subscription)),
+											})
+										}}
+									</h3>
 									<div class="flex items-center gap-2">
 										<CheckCircleIcon class="h-5 w-5 text-brand" />
 										<span>
@@ -370,8 +371,8 @@
 								</div>
 								<div class="flex flex-col items-end justify-between">
 									<div class="flex flex-col items-end gap-2">
-										<div class="flex text-2xl font-bold text-contrast">
-											<span class="text-contrast">
+										<h3 class="m-0 flex text-lg font-semibold text-contrast">
+											<span class="leading-none text-contrast">
 												{{
 													getProductPrice(getPyroProduct(subscription), subscription.interval)
 														? formatPrice(
@@ -383,14 +384,14 @@
 														: ''
 												}}
 											</span>
-											<span>
+											<span class="leading-none">
 												{{
 													formatMessage(messages.slashInterval, {
 														interval: getIntervalNounLabel(subscription.interval),
 													})
 												}}
 											</span>
-										</div>
+										</h3>
 										<div
 											v-if="
 												getPyroCharge(subscription) &&

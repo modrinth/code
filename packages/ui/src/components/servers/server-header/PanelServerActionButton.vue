@@ -8,7 +8,7 @@
 			</ButtonStyled>
 
 			<template v-else>
-				<ButtonStyled v-if="showStopButton" type="transparent" size="large">
+				<ButtonStyled v-if="showStopButton" type="standard" color="red" size="large">
 					<button
 						v-tooltip="busyTooltip"
 						:disabled="!canTakeAction"
@@ -21,9 +21,38 @@
 					</button>
 				</ButtonStyled>
 
-				<ButtonStyled type="standard" color="brand" size="large">
+				<div v-if="showRestartDropdown" class="joined-buttons">
+					<ButtonStyled type="standard" color="orange" size="large">
+						<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+							<UpdatedIcon />
+							<span>{{ primaryActionText }}</span>
+						</button>
+					</ButtonStyled>
+					<ButtonStyled type="standard" color="orange" size="large">
+						<OverflowMenu
+							v-tooltip="busyTooltip"
+							:disabled="!canTakeAction"
+							:options="[
+								{
+									id: 'kill_server',
+									action: () => initiateAction('Kill'),
+								},
+							]"
+						>
+							<div class="w-0 text-xl relative top-0.5 right-2.5">
+								<DropdownIcon />
+							</div>
+
+							<template #kill_server>
+								<SlashIcon class="h-5 w-5" />
+								Kill server
+							</template>
+						</OverflowMenu>
+					</ButtonStyled>
+				</div>
+				<ButtonStyled v-else type="standard" color="brand" size="large">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<component :is="isRunning || showStopButton ? UpdatedIcon : PlayIcon" />
+						<PlayIcon />
 						<span>{{ primaryActionText }}</span>
 					</button>
 				</ButtonStyled>
@@ -33,10 +62,17 @@
 </template>
 
 <script setup lang="ts">
-import { LoaderCircleIcon, PlayIcon, StopCircleIcon, UpdatedIcon } from '@modrinth/assets'
+import {
+	DropdownIcon,
+	LoaderCircleIcon,
+	PlayIcon,
+	SlashIcon,
+	StopCircleIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { ButtonStyled } from '#ui/components'
+import { ButtonStyled, OverflowMenu } from '#ui/components'
 
 import { useServerPowerAction } from './use-server-power-action'
 
@@ -51,7 +87,6 @@ const props = withDefaults(
 
 const {
 	isInstalling,
-	isRunning,
 	showStopButton,
 	busyTooltip,
 	canTakeAction,
@@ -61,4 +96,32 @@ const {
 } = useServerPowerAction({
 	disabled: computed(() => props.disabled),
 })
+
+const showRestartDropdown = computed(() => primaryActionText.value === 'Restart')
 </script>
+
+<style scoped>
+.joined-buttons {
+	display: flex;
+	align-items: center;
+}
+
+.joined-buttons > :deep(.btn) {
+	border-radius: 0;
+}
+
+.joined-buttons > :deep(.btn:first-child) {
+	border-top-left-radius: var(--radius-md);
+	border-bottom-left-radius: var(--radius-md);
+}
+
+.joined-buttons > :deep(.btn:last-child) {
+	border-top-right-radius: var(--radius-md);
+	border-bottom-right-radius: var(--radius-md);
+	margin-left: -1px;
+}
+
+.joined-buttons > :deep(.btn:not(:last-child)) {
+	border-right: none;
+}
+</style>
