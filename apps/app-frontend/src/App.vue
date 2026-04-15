@@ -428,6 +428,13 @@ loading.startLoading()
 
 let suspensePending = false
 
+const sidebarOverlayScrollbarsOptions = Object.freeze({
+	overflow: {
+		x: 'hidden',
+		y: 'scroll',
+	},
+})
+
 router.beforeEach(() => {
 	suspensePending = false
 	loading.startLoading()
@@ -1279,29 +1286,26 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</RouterView>
 		</div>
 		<div
-			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid overflow-auto"
+			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
 			:class="{ 'has-plus': hasPlus }"
+			data-overlayscrollbars-initialize
+			v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
 		>
-			<div
-				class="app-sidebar-scrollable flex-grow shrink overflow-y-auto relative"
-				:class="{ 'pb-12': !hasPlus }"
-			>
+			<div class="app-sidebar-scrollable flex-grow shrink relative" :class="{ 'pb-12': !hasPlus }">
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>
 				<div class="sidebar-default-content" :class="{ 'sidebar-enabled': sidebarVisible }">
-					<div
-						class="p-4 pr-1 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid"
-					>
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<h3 class="text-base text-primary font-medium m-0">Playing as</h3>
 						<suspense>
 							<AccountsCard ref="accounts" mode="small" />
 						</suspense>
 					</div>
-					<div class="py-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
+					<div class="p-4 border-0 border-b-[1px] border-[--brand-gradient-border] border-solid">
 						<suspense>
 							<FriendsList :credentials="credentials" :sign-in="() => signIn()" />
 						</suspense>
 					</div>
-					<div v-if="news && news.length > 0" class="p-4 pr-1 flex flex-col items-center">
+					<div v-if="news && news.length > 0" class="p-4 flex flex-col items-center">
 						<h3 class="text-base mb-4 text-primary font-medium m-0 text-left w-full">News</h3>
 						<div class="space-y-4 flex flex-col items-center w-full">
 							<NewsArticleCard
@@ -1649,6 +1653,13 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 }
 </style>
 <style>
+.os-theme-dark,
+.os-theme-light {
+	--os-handle-bg: var(--color-scrollbar) !important;
+	--os-handle-bg-hover: var(--color-scrollbar) !important;
+	--os-handle-bg-active: var(--color-scrollbar) !important;
+}
+
 .mac {
 	.app-grid-statusbar {
 		padding-left: 5rem;
