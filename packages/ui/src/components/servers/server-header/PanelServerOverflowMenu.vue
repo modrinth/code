@@ -1,6 +1,6 @@
 <template>
 	<div class="contents">
-		<ButtonStyled circular type="transparent">
+		<ButtonStyled circular type="transparent" size="large">
 			<TeleportOverflowMenu :options="menuOptions">
 				<MoreVerticalIcon aria-hidden="true" />
 				<template #allServers>

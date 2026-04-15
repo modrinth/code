@@ -1,14 +1,14 @@
 <template>
 	<div class="contents">
 		<div class="flex flex-row items-center gap-2 rounded-lg">
-			<ButtonStyled v-if="isInstalling" type="standard" color="brand">
+			<ButtonStyled v-if="isInstalling" type="standard" color="brand" size="large">
 				<button disabled class="flex-shrink-0">
 					<LoaderCircleIcon class="size-5 animate-spin" /> Installing...
 				</button>
 			</ButtonStyled>
 
 			<template v-else>
-				<ButtonStyled v-if="showStopButton" type="standard" color="red">
+				<ButtonStyled v-if="showStopButton" type="standard" color="red" size="large">
 					<button
 						v-tooltip="busyTooltip"
 						:disabled="!canTakeAction"
@@ -22,13 +22,13 @@
 				</ButtonStyled>
 
 				<div v-if="showRestartDropdown" class="joined-buttons">
-					<ButtonStyled type="standard" color="orange">
+					<ButtonStyled type="standard" color="orange" size="large">
 						<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 							<UpdatedIcon />
 							<span>{{ primaryActionText }}</span>
 						</button>
 					</ButtonStyled>
-					<ButtonStyled type="standard" color="orange">
+					<ButtonStyled type="standard" color="orange" size="large">
 						<OverflowMenu
 							v-tooltip="busyTooltip"
 							:disabled="!canTakeAction"
@@ -39,7 +39,7 @@
 								},
 							]"
 						>
-							<div class="w-2 text-xl relative top-0.5 right-1.5">
+							<div class="w-0 text-xl relative top-0.5 right-2.5">
 								<DropdownIcon />
 							</div>
 
@@ -50,7 +50,7 @@
 						</OverflowMenu>
 					</ButtonStyled>
 				</div>
-				<ButtonStyled v-else type="standard" color="brand">
+				<ButtonStyled v-else type="standard" color="brand" size="large">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<PlayIcon />
 						<span>{{ primaryActionText }}</span>
