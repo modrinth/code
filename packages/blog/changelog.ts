@@ -11,6 +11,43 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Server stats inside server settings modal, in info card.
+- Feature flag to always display RAM as bytes.
+
+## Changed
+- Console search highlighting is clearer and more accurate.
+- When memory is shown as bytes, the max RAM is now displayed alongside it.
+- Consolidated spacing between server and instance pages in the Modrinth App.
+- Moved the "Kill server" action into a dropdown under the "Restart" button.
+
+## Fixed
+- The support bubble is now available on hosting pages in the Modrinth App.
+- Paper and Purpur build versions can be selected when resetting a server in the Modrinth App.
+- Server CPU and memory graphs no longer freeze on the last value after a hard crash or out-of-memory kill.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'web',
+		body: `## Added
+- Publishing checklist added back to project page.
+
+## Fixed
+- Fixed version-specific links returning 404.
+- Fixed overflow in the project page header on mobile.
+- Fixed markdown tables causing the project page to overflow.
+- Fixed menu anchoring in the Discover content menu.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'app',
+		version: '0.13.1',
+		body: `## Fixed
+- Fixed the sidebar gutter margin on macOS when the scrollbar is set to auto-hide.`,
+	},
+	{
 		date: `2026-04-12T22:12:15+00:00`,
 		product: 'app',
 		version: '0.13.0',
