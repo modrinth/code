@@ -1,6 +1,6 @@
 <template>
-	<div v-if="instance">
-		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
+	<div v-if="instance" class="flex h-full flex-col">
+		<div class="shrink-0 p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
 				:key="instance.path"
@@ -205,10 +205,10 @@
 				</template>
 			</ContentPageHeader>
 		</div>
-		<div class="px-6">
+		<div class="shrink-0 px-6">
 			<NavTabs :links="tabs" />
 		</div>
-		<div v-if="!!instance" class="p-6 pt-4">
+		<div v-if="!!instance" class="min-h-0 flex-1 overflow-y-auto p-6 pt-4">
 			<RouterView
 				v-if="route.path.startsWith('/instance')"
 				v-slot="{ Component }"

@@ -1,5 +1,5 @@
 <template>
-	<div class="h-full w-full py-6">
+	<div class="h-full w-full pt-6">
 		<ServersManageRootLayout
 			:server-id="serverId"
 			:reload-page="() => router.go(0)"
