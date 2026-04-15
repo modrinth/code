@@ -147,7 +147,7 @@
 							:auto-hide="false"
 							placement="bottom-end"
 						>
-							<ButtonStyled circular size="large">
+							<ButtonStyled circular>
 								<button
 									v-tooltip="showSettingsHint ? undefined : 'Server settings'"
 									@click="
