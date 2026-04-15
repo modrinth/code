@@ -1286,10 +1286,10 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 			</RouterView>
 		</div>
 		<div
+			v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
 			class="app-sidebar mt-px shrink-0 flex flex-col border-0 border-l-[1px] border-[--brand-gradient-border] border-solid"
 			:class="{ 'has-plus': hasPlus }"
 			data-overlayscrollbars-initialize
-			v-overlay-scrollbars="sidebarOverlayScrollbarsOptions"
 		>
 			<div class="app-sidebar-scrollable flex-grow shrink relative" :class="{ 'pb-12': !hasPlus }">
 				<div id="sidebar-teleport-target" class="sidebar-teleport-content"></div>

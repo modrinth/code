@@ -18,17 +18,18 @@ const mergeOptions = (options: PartialOptions = {}): PartialOptions => ({
 	},
 })
 
-export const overlayScrollbarsDirective: ObjectDirective<HTMLElement, PartialOptions | undefined> = {
-	mounted(el, binding) {
-		OverlayScrollbars(el, mergeOptions(binding.value))
-	},
-	updated(el, binding) {
-		if (binding.value === binding.oldValue) return
-		const instance = OverlayScrollbars(el)
-		instance?.options(mergeOptions(binding.value))
-	},
-	unmounted(el) {
-		const instance = OverlayScrollbars(el)
-		instance?.destroy()
-	},
-}
+export const overlayScrollbarsDirective: ObjectDirective<HTMLElement, PartialOptions | undefined> =
+	{
+		mounted(el, binding) {
+			OverlayScrollbars(el, mergeOptions(binding.value))
+		},
+		updated(el, binding) {
+			if (binding.value === binding.oldValue) return
+			const instance = OverlayScrollbars(el)
+			instance?.options(mergeOptions(binding.value))
+		},
+		unmounted(el) {
+			const instance = OverlayScrollbars(el)
+			instance?.destroy()
+		},
+	}
