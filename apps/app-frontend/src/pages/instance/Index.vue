@@ -1,6 +1,9 @@
 <template>
 	<div v-if="instance" class="flex h-full flex-col">
-		<div class="shrink-0 p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
+		<div
+			class="shrink-0 p-6 pr-2 pb-4"
+			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
+		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
 				:key="instance.path"

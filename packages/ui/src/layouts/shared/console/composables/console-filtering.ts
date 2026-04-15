@@ -136,11 +136,7 @@ export function applySearchHighlights(terminal: Terminal, query: string): number
 	return version
 }
 
-export function highlightAppendedRange(
-	terminal: Terminal,
-	fromRow: number,
-	version: number,
-) {
+export function highlightAppendedRange(terminal: Terminal, fromRow: number, version: number) {
 	if (getHighlightVersion(terminal) !== version) return
 	const query = activeQueries.get(terminal)
 	if (!query) return
