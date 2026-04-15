@@ -40,6 +40,7 @@
 
 <script setup lang="ts">
 import { SpinnerIcon } from '@modrinth/assets'
+import type { Ace } from 'ace-builds'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
@@ -52,31 +53,6 @@ import type { EditingFile } from '../../types'
 import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
 
-interface AceEditorInstance {
-	commands: {
-		addCommand: (cmd: {
-			name: string
-			bindKey: { win: string; mac: string }
-			exec: () => void
-		}) => void
-	}
-	find: (
-		needle: string,
-		options?: {
-			backwards?: boolean
-			wrap?: boolean
-			caseSensitive?: boolean
-			wholeWord?: boolean
-			regExp?: boolean
-		},
-		animate?: boolean,
-	) => unknown
-	findNext: (options?: object, animate?: boolean) => void
-	findPrevious: (options?: object, animate?: boolean) => void
-	replace: (replacement: string) => void
-	replaceAll: (replacement: string) => void
-	focus: () => void
-}
 
 const props = defineProps<{
 	file: EditingFile | null
@@ -140,7 +116,7 @@ const originalContent = ref('')
 const isEditingImage = ref(false)
 const imagePreview = ref<Blob | null>(null)
 const isLoading = ref(false)
-const editorInstance = ref<AceEditorInstance | null>(null)
+const editorInstance = ref<Ace.Editor | null>(null)
 const editorContainer = ref<HTMLElement | null>(null)
 const editorHeight = ref('300px')
 
@@ -229,7 +205,7 @@ function resetState() {
 	imagePreview.value = null
 }
 
-function onEditorInit(editor: AceEditorInstance) {
+function onEditorInit(editor: Ace.Editor) {
 	editorInstance.value = editor
 
 	editor.commands.addCommand({

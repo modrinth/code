@@ -180,27 +180,29 @@
 			</div>
 
 			<div v-else-if="!isEditingImage" class="flex gap-2">
-				<Button
-					v-if="isLogFile"
-					v-tooltip="formatMessage(messages.shareToMclogs)"
-					icon-only
-					transparent
-					:aria-label="formatMessage(messages.shareToMclogs)"
-					@click="$emit('share')"
+				<ButtonStyled v-if="isLogFile" type="transparent" circular>
+					<button
+						v-tooltip="formatMessage(messages.shareToMclogs)"
+						:aria-label="formatMessage(messages.shareToMclogs)"
+						@click="$emit('share')"
+					>
+						<ShareIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled
+					circular
+					:type="isEditorFindOpen ? 'standard' : 'transparent'"
+					:color="isEditorFindOpen ? 'brand' : 'standard'"
 				>
-					<ShareIcon />
-				</Button>
-				<Button
-					v-tooltip="formatMessage(messages.findInFile)"
-					icon-only
-					:transparent="!isEditorFindOpen"
-					:color="isEditorFindOpen ? 'brand' : undefined"
-					:aria-label="formatMessage(messages.findInFile)"
-					:aria-pressed="isEditorFindOpen"
-					@click="$emit('find')"
-				>
-					<SearchIcon />
-				</Button>
+					<button
+						v-tooltip="formatMessage(messages.findInFile)"
+						:aria-label="formatMessage(messages.findInFile)"
+						:aria-pressed="isEditorFindOpen"
+						@click="$emit('find')"
+					>
+						<SearchIcon />
+					</button>
+				</ButtonStyled>
 			</div>
 		</div>
 	</header>
@@ -224,7 +226,6 @@ import {
 } from '@modrinth/assets'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
-import Button from '#ui/components/base/Button.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import OverflowMenu from '#ui/components/base/OverflowMenu.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'

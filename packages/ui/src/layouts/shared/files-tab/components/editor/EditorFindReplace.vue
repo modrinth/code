@@ -7,18 +7,18 @@
 		>
 			<!-- Find row -->
 			<div class="flex items-center gap-1">
-				<Button
-					v-tooltip="formatMessage(messages.toggleReplace)"
-					icon-only
-					transparent
-					:aria-label="formatMessage(messages.toggleReplace)"
-					@click="toggleReplace"
-				>
-					<ChevronRightIcon
-						class="transition-transform duration-150"
-						:class="{ 'rotate-90': isReplaceOpen }"
-					/>
-				</Button>
+				<ButtonStyled type="transparent" circular>
+					<button
+						v-tooltip="formatMessage(messages.toggleReplace)"
+						:aria-label="formatMessage(messages.toggleReplace)"
+						@click="toggleReplace"
+					>
+						<ChevronRightIcon
+							class="transition-transform duration-150"
+							:class="{ 'rotate-90': isReplaceOpen }"
+						/>
+					</button>
+				</ButtonStyled>
 				<div
 					@keydown.enter.exact.prevent.stop="emit('findNext')"
 					@keydown.shift.enter.prevent.stop="emit('findPrevious')"
@@ -46,36 +46,36 @@
 								: ''
 					}}
 				</span>
-				<Button
-					v-tooltip="formatMessage(messages.previousMatch)"
-					icon-only
-					transparent
-					:disabled="findMatchCount === 0"
-					:aria-label="formatMessage(messages.previousMatch)"
-					@click="emit('findPrevious')"
-				>
-					<ChevronUpIcon />
-				</Button>
-				<Button
-					v-tooltip="formatMessage(messages.nextMatch)"
-					icon-only
-					transparent
-					:disabled="findMatchCount === 0"
-					:aria-label="formatMessage(messages.nextMatch)"
-					@click="emit('findNext')"
-				>
-					<ChevronDownIcon />
-				</Button>
+				<ButtonStyled type="transparent" circular>
+					<button
+						v-tooltip="formatMessage(messages.previousMatch)"
+						:disabled="findMatchCount === 0"
+						:aria-label="formatMessage(messages.previousMatch)"
+						@click="emit('findPrevious')"
+					>
+						<ChevronUpIcon />
+					</button>
+				</ButtonStyled>
+				<ButtonStyled type="transparent" circular>
+					<button
+						v-tooltip="formatMessage(messages.nextMatch)"
+						:disabled="findMatchCount === 0"
+						:aria-label="formatMessage(messages.nextMatch)"
+						@click="emit('findNext')"
+					>
+						<ChevronDownIcon />
+					</button>
+				</ButtonStyled>
 				<div class="mx-0.5 h-4 w-px bg-surface-5" />
-				<Button
-					v-tooltip="formatMessage(messages.closeFind)"
-					icon-only
-					transparent
-					:aria-label="formatMessage(messages.closeFind)"
-					@click="close"
-				>
-					<XIcon />
-				</Button>
+				<ButtonStyled type="transparent" circular>
+					<button
+						v-tooltip="formatMessage(messages.closeFind)"
+						:aria-label="formatMessage(messages.closeFind)"
+						@click="close"
+					>
+						<XIcon />
+					</button>
+				</ButtonStyled>
 			</div>
 
 			<!-- Replace row -->
@@ -119,7 +119,6 @@
 import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, XIcon } from '@modrinth/assets'
 import { nextTick, ref, watch } from 'vue'
 
-import Button from '#ui/components/base/Button.vue'
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import StyledInput from '#ui/components/base/StyledInput.vue'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
