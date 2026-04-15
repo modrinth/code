@@ -124,6 +124,19 @@ bitflags::bitflags! {
 
 bitflags_serde_impl!(Scopes, u64);
 
+impl utoipa::PartialSchema for Scopes {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        utoipa::openapi::ObjectBuilder::new()
+            .schema_type(utoipa::openapi::schema::Type::Integer)
+            .format(Some(utoipa::openapi::SchemaFormat::KnownFormat(
+                utoipa::openapi::KnownFormat::Int64,
+            )))
+            .into()
+    }
+}
+
+impl utoipa::ToSchema for Scopes {}
+
 impl Scopes {
     // these scopes cannot be specified in a personal access token
     pub fn restricted() -> Scopes {

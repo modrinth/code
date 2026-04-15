@@ -44,7 +44,7 @@ use tracing::warn;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("billing")
+        web::scope("/billing")
             .service(products)
             .service(subscriptions)
             .service(user_customer)
