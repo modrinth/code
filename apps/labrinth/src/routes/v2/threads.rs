@@ -11,17 +11,31 @@ use crate::routes::{ApiError, v2_reroute, v3};
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use serde::Deserialize;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
-        web::scope("thread")
+        utoipa_actix_web::scope("/thread")
             .service(thread_get)
             .service(thread_send_message),
     );
-    cfg.service(web::scope("message").service(message_delete));
+    cfg.service(utoipa_actix_web::scope("/message").service(message_delete));
     cfg.service(threads_get);
 }
 
-#[get("{id}")]
+/// Get a thread by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getThread",
+    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["THREAD_READ"]))
+)]
+#[get("/{id}")]
 pub async fn thread_get(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -34,12 +48,26 @@ pub async fn thread_get(
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ThreadIds {
     pub ids: String,
 }
 
-#[get("threads")]
+/// Get multiple threads by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getThreads",
+    params(("ids" = String, Query, description = "The JSON array of thread IDs")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["THREAD_READ"]))
+)]
+#[get("/threads")]
 pub async fn threads_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ThreadIds>,
@@ -70,12 +98,28 @@ pub async fn threads_get(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct NewThreadMessage {
     pub body: MessageBody,
 }
 
-#[post("{id}")]
+/// Send a message to a thread.
+#[utoipa::path(
+    post,
+    operation_id = "sendThreadMessage",
+    params(("id" = ThreadId, Path, description = "The ID of the thread")),
+    request_body = NewThreadMessage,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["THREAD_WRITE"]))
+)]
+#[post("/{id}")]
 pub async fn thread_send_message(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
@@ -100,7 +144,25 @@ pub async fn thread_send_message(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[delete("{id}")]
+/// Delete a thread message by ID.
+#[utoipa::path(
+    delete,
+    operation_id = "deleteThreadMessage",
+    params(("id" = ThreadMessageId, Path, description = "The ID of the message")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["THREAD_WRITE"]))
+)]
+#[delete("/{id}")]
 pub async fn message_delete(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,

@@ -11,7 +11,7 @@ use crate::models::sessions::Session;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::http::header::AUTHORIZATION;
-use actix_web::web::{Data, ServiceConfig, scope};
+use actix_web::web::Data;
 use actix_web::{HttpRequest, HttpResponse, delete, get, post, web};
 use chrono::{DateTime, Utc};
 use rand::distributions::Alphanumeric;
@@ -19,9 +19,9 @@ use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
 use woothee::parser::Parser;
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
-        scope("session")
+        utoipa_actix_web::scope("/session")
             .service(list)
             .service(delete)
             .service(refresh),
@@ -133,7 +133,16 @@ pub async fn issue_session(
     Ok(session)
 }
 
-#[get("list")]
+#[utoipa::path(
+    get,
+    operation_id = "listSessions",
+    responses(
+        (status = 200, description = "List of active sessions"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["SESSION_READ"]))
+)]
+#[get("/list")]
 pub async fn list(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -169,7 +178,17 @@ pub async fn list(
     Ok(HttpResponse::Ok().json(sessions))
 }
 
-#[delete("{id}")]
+#[utoipa::path(
+    delete,
+    operation_id = "deleteSession",
+    params(("id" = String, Path, description = "The session ID")),
+    responses(
+        (status = 204, description = "Session deleted"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["SESSION_DELETE"]))
+)]
+#[delete("/{id}")]
 pub async fn delete(
     info: web::Path<(String,)>,
     req: HttpRequest,
@@ -209,7 +228,15 @@ pub async fn delete(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[post("refresh")]
+#[utoipa::path(
+    post,
+    operation_id = "refreshSession",
+    responses(
+        (status = 200, description = "Session refreshed"),
+        (status = 401, description = "Unauthorized")
+    )
+)]
+#[post("/refresh")]
 pub async fn refresh(
     req: HttpRequest,
     pool: Data<PgPool>,
