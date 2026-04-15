@@ -34,7 +34,7 @@
 						@update:model-value="emit('update:findQuery', $event as string)"
 					/>
 				</div>
-				<span class="min-w-[6rem] px-1 text-right text-sm text-secondary tabular-nums">
+				<span class="min-w-[6rem] px-1 text-sm text-secondary tabular-nums">
 					{{
 						findMatchCount > 0
 							? formatMessage(messages.matchCount, {
@@ -85,7 +85,7 @@
 					<StyledInput
 						ref="replaceInputRef"
 						v-model="replaceQuery"
-						type="text"
+						type="search"
 						size="small"
 						autocomplete="off"
 						:placeholder="formatMessage(messages.replaceInFile)"
