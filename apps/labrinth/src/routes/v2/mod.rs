@@ -21,15 +21,10 @@ pub fn utoipa_config(
     cfg.service(
         utoipa_actix_web::scope("/v2")
             .wrap(default_cors())
-            .configure(|cfg| {
-                cfg.map(|raw_cfg| {
-                    raw_cfg
-                        .configure(super::internal::admin::config)
-                        .configure(super::internal::session::config)
-                        .configure(super::internal::flows::config)
-                        .configure(super::internal::pats::config)
-                });
-            })
+            .configure(super::internal::admin::config)
+            .configure(super::internal::session::config)
+            .configure(super::internal::flows::config)
+            .configure(super::internal::pats::config)
             .configure(moderation::config)
             .configure(notifications::config)
             .configure(project_creation::config)
