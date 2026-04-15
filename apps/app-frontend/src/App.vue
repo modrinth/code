@@ -440,7 +440,7 @@ router.afterEach((to, from, failure) => {
 		failed: failure,
 	})
 	setTimeout(() => {
-		if (!suspensePending) {
+		if (!suspensePending && stateInitialized.value) {
 			loading.stopLoading()
 		}
 	}, 100)
