@@ -53,7 +53,6 @@ import type { EditingFile } from '../../types'
 import EditorFindReplace from './EditorFindReplace.vue'
 import FileImageViewer from './FileImageViewer.vue'
 
-
 const props = defineProps<{
 	file: EditingFile | null
 	editorComponent: Component | null
