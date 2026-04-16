@@ -22,7 +22,6 @@ async_zip = { workspace = true, features = [
   "tokio-fs",
   "zstd",
 ] }
-eyre = { workspace = true }
 base64 = { workspace = true }
 bytemuck = { workspace = true, features = ["extern_crate_alloc"] }
 bytes = { workspace = true, features = ["serde"] }
@@ -38,6 +37,7 @@ dunce = { workspace = true }
 either = { workspace = true }
 encoding_rs = { workspace = true }
 enumset = { workspace = true }
+eyre = { workspace = true }
 flate2 = { workspace = true }
 fs4 = { workspace = true, features = ["tokio"] }
 futures = { workspace = true, features = ["alloc", "async-await"] }
