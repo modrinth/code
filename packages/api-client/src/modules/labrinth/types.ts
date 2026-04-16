@@ -278,6 +278,17 @@ export namespace Labrinth {
 				session: string
 			}
 
+			export type CreateOAuthAccountRequest = {
+				username: string
+				state: string
+				challenge: string
+				sign_up_newsletter: boolean
+			}
+
+			export type CreateOAuthAccountResponse = {
+				session: string
+			}
+
 			export type ResetPasswordRequest = {
 				username: string
 				challenge: string

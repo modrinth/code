@@ -164,9 +164,7 @@ defineExpose({
 	show,
 })
 
-const auth = (await useAuth()) as Ref<{
-	user: { id: string; username: string; avatar_url: string } | null
-}>
+const auth = await useAuth()
 
 const messages = defineMessages({
 	title: {

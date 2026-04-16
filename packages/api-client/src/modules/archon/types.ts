@@ -499,6 +499,16 @@ export namespace Archon {
 				message: string
 			}
 
+			export type WSLog4jEvent = {
+				event: 'log4j'
+				logger_name?: string
+				level?: string
+				thread_name?: string
+				timestamp_millis?: number
+				message?: string
+				throwable?: string
+			}
+
 			export type WSStatsEvent = {
 				event: 'stats'
 				cpu_percent: number
@@ -644,6 +654,7 @@ export namespace Archon {
 			export type WSEvent =
 				| WSBackupProgressEvent
 				| WSLogEvent
+				| WSLog4jEvent
 				| WSStatsEvent
 				| WSPowerStateEvent
 				| WSStateEvent

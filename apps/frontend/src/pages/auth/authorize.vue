@@ -95,7 +95,6 @@ import {
 import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 
-import { useAuth } from '@/composables/auth.js'
 import { useScopes } from '@/composables/auth/scopes.ts'
 
 const client = injectModrinthClient()

@@ -13,6 +13,8 @@ import { I18nDebugPanel, NotificationPanel } from '@modrinth/ui'
 import ModrinthLoadingIndicator from '~/components/ui/modrinth-loading-indicator.ts'
 import { setupProviders } from '~/providers/setup.ts'
 
+import { useAuth } from './composables/auth'
+
 const auth = await useAuth()
 setupProviders(auth)
 </script>

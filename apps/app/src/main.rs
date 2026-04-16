@@ -7,6 +7,7 @@
 use native_dialog::{DialogBuilder, MessageLevel};
 use std::env;
 use tauri::{Listener, Manager};
+use tauri_plugin_fs::FsExt;
 use theseus::prelude::*;
 
 mod api;
@@ -35,6 +36,8 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
         .allow_directory(state.directories.caches_dir(), true)?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir().join("icons"), true)?;
+    app.fs_scope()
+        .allow_directory(state.directories.profiles_dir(), true)?;
 
     Ok(())
 }

@@ -61,7 +61,7 @@ onUnmounted(() => {
 	<Transition name="floating-action-bar" appear>
 		<div
 			v-if="shown"
-			class="floating-action-bar drop-shadow-2xl fixed z-10 p-4 bottom-0"
+			class="floating-action-bar drop-shadow-2xl fixed z-[21] p-4 bottom-0"
 			aria-live="polite"
 		>
 			<div

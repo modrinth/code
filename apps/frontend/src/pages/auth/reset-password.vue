@@ -76,7 +76,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
+import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()

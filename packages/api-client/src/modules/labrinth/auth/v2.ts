@@ -58,6 +58,23 @@ export class LabrinthAuthV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Create a new account from an OAuth callback flow state
+	 *
+	 * @param data - OAuth account creation data
+	 * @returns Promise resolving to a session response
+	 */
+	public async createOAuthAccount(
+		data: Labrinth.Auth.v2.CreateOAuthAccountRequest,
+	): Promise<Labrinth.Auth.v2.CreateOAuthAccountResponse> {
+		return this.client.request<Labrinth.Auth.v2.CreateOAuthAccountResponse>(`/auth/create/oauth`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
 	 * Begin a password reset flow by sending a recovery email
 	 *
 	 * @param data - The username/email and captcha challenge

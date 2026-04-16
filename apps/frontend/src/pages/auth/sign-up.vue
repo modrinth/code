@@ -1,156 +1,30 @@
 <template>
-	<div>
-		<h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
-
-		<section class="third-party">
-			<a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-				<DiscordColorIcon />
-				<span>Discord</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('github', redirectTarget)">
-				<GitHubColorIcon />
-				<span>GitHub</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-				<MicrosoftColorIcon />
-				<span>Microsoft</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('google', redirectTarget)">
-				<GoogleColorIcon />
-				<span>Google</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-				<SteamColorIcon />
-				<span>Steam</span>
-			</a>
-			<a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-				<GitLabColorIcon />
-				<span>GitLab</span>
-			</a>
-		</section>
-
-		<h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
-
-		<section class="auth-form">
-			<label for="email" hidden>{{ formatMessage(commonMessages.emailLabel) }}</label>
-			<StyledInput
-				id="email"
-				v-model="email"
-				:icon="MailIcon"
-				type="email"
-				autocomplete="username"
-				:placeholder="formatMessage(commonMessages.emailLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="username" hidden>{{ formatMessage(commonMessages.usernameLabel) }}</label>
-			<StyledInput
-				id="username"
-				v-model="username"
-				:icon="UserIcon"
-				type="text"
-				autocomplete="username"
-				:placeholder="formatMessage(commonMessages.usernameLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
-				id="password"
-				v-model="password"
-				:icon="KeyIcon"
-				type="password"
-				autocomplete="new-password"
-				:placeholder="formatMessage(commonMessages.passwordLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<label for="confirm-password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
-			<StyledInput
-				id="confirm-password"
-				v-model="confirmPassword"
-				:icon="KeyIcon"
-				type="password"
-				autocomplete="new-password"
-				:placeholder="formatMessage(commonMessages.confirmPasswordLabel)"
-				wrapper-class="w-full"
-			/>
-
-			<Checkbox
-				v-model="subscribe"
-				class="subscribe-btn"
-				:label="formatMessage(messages.subscribeLabel)"
-				:description="formatMessage(messages.subscribeLabel)"
-			/>
-
-			<p v-if="!route.query.launcher">
-				<IntlFormatted :message-id="messages.legalDisclaimer">
-					<template #terms-link="{ children }">
-						<NuxtLink to="/legal/terms" class="text-link">
-							<component :is="() => children" />
-						</NuxtLink>
-					</template>
-					<template #privacy-policy-link="{ children }">
-						<NuxtLink to="/legal/privacy" class="text-link">
-							<component :is="() => children" />
-						</NuxtLink>
-					</template>
-				</IntlFormatted>
-			</p>
-
-			<HCaptcha v-if="globals?.captcha_enabled" ref="captcha" v-model="token" />
-
-			<button
-				class="btn btn-primary continue-btn centered-btn"
-				:disabled="globals?.captcha_enabled ? !token : false"
-				@click="createAccount"
-			>
-				{{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
-			</button>
-
-			<div class="auth-form__additional-options">
-				{{ formatMessage(messages.alreadyHaveAccountLabel) }}
-				<NuxtLink
-					class="text-link"
-					:to="{
-						path: '/auth/sign-in',
-						query: route.query,
-					}"
-				>
-					{{ formatMessage(commonMessages.signInButton) }}
-				</NuxtLink>
-			</div>
-		</section>
-	</div>
+	<SignUpView
+		v-model:email="email"
+		v-model:password="password"
+		v-model:token="token"
+		v-model:subscribe="subscribe"
+		:redirect-target="redirectTarget"
+		:show-other-options="showOtherOptions"
+		:route-query="route.query"
+		:globals="globals"
+		:on-toggle-other-options="toggleOtherOptions"
+		:on-create-account="createAccount"
+		:on-set-captcha-ref="setCaptchaRef"
+	/>
 </template>
 
 <script setup>
 import {
-	DiscordColorIcon,
-	GitHubColorIcon,
-	GitLabColorIcon,
-	GoogleColorIcon,
-	KeyIcon,
-	MailIcon,
-	MicrosoftColorIcon,
-	RightArrowIcon,
-	SteamColorIcon,
-	UserIcon,
-} from '@modrinth/assets'
-import {
-	Checkbox,
 	commonMessages,
 	defineMessages,
 	injectModrinthClient,
 	injectNotificationManager,
-	IntlFormatted,
-	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
-import HCaptcha from '@/components/ui/HCaptcha.vue'
-import { getAuthUrl } from '@/composables/auth.js'
+import SignUpView from '@/components/ui/auth/SignUp.vue'
 
 const client = injectModrinthClient()
 const { addNotification } = injectNotificationManager()
@@ -160,31 +34,6 @@ const messages = defineMessages({
 	title: {
 		id: 'auth.sign-up.title',
 		defaultMessage: 'Sign Up',
-	},
-	signUpWithTitle: {
-		id: 'auth.sign-up.title.sign-up-with',
-		defaultMessage: 'Sign up with',
-	},
-	createAccountTitle: {
-		id: 'auth.sign-up.title.create-account',
-		defaultMessage: 'Or create an account yourself',
-	},
-	subscribeLabel: {
-		id: 'auth.sign-up.subscribe.label',
-		defaultMessage: 'Subscribe to updates about Modrinth',
-	},
-	legalDisclaimer: {
-		id: 'auth.sign-up.legal-dislaimer',
-		defaultMessage:
-			"By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
-	},
-	createAccountButton: {
-		id: 'auth.sign-up.action.create-account',
-		defaultMessage: 'Create account',
-	},
-	alreadyHaveAccountLabel: {
-		id: 'auth.sign-up.sign-in-option.title',
-		defaultMessage: 'Already have an account?',
 	},
 })
 
@@ -196,12 +45,19 @@ const auth = await useAuth()
 const route = useNativeRoute()
 
 const redirectTarget = route.query.redirect
+const showOtherOptions = ref(false)
 
 if (auth.value.user) {
 	await navigateTo('/dashboard')
 }
 
 const captcha = ref()
+const setCaptchaRef = (captchaRef) => {
+	captcha.value = captchaRef
+}
+const toggleOtherOptions = () => {
+	showOtherOptions.value = !showOtherOptions.value
+}
 
 const { data: globals } = useQuery({
 	queryKey: ['auth-globals'],
@@ -216,29 +72,25 @@ const { data: globals } = useQuery({
 })
 
 const email = ref('')
-const username = ref('')
 const password = ref('')
-const confirmPassword = ref('')
 const token = ref('')
 const subscribe = ref(false)
+
+function generateUsernameFromEmail(emailAddress) {
+	const [localPart = '', domainPart = ''] = emailAddress.trim().toLowerCase().split('@')
+	const sanitized = `${localPart}_${domainPart}`
+		.replace(/[^a-zA-Z0-9_-]/g, '_')
+		.replace(/_+/g, '_')
+		.replace(/^_+|_+$/g, '')
+
+	return (sanitized || 'user').slice(0, 39)
+}
 
 async function createAccount() {
 	startLoading()
 	try {
-		if (confirmPassword.value !== password.value) {
-			addNotification({
-				title: formatMessage(commonMessages.errorNotificationTitle),
-				text: formatMessage({
-					id: 'auth.sign-up.notification.password-mismatch.text',
-					defaultMessage: 'Passwords do not match!',
-				}),
-				type: 'error',
-			})
-			captcha.value?.reset()
-		}
-
 		const res = await client.labrinth.auth_v2.createAccount({
-			username: username.value,
+			username: generateUsernameFromEmail(email.value),
 			password: password.value,
 			email: email.value,
 			challenge: token.value,
