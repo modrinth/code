@@ -30,18 +30,13 @@ import { SpinnerIcon } from '@modrinth/assets'
 import { type Component, computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
+import { injectModrinthClient } from '#ui/providers'
 import { injectNotificationManager } from '#ui/providers/web-notifications'
 import { getEditorLanguage, getFileExtension, isImageFile } from '#ui/utils/file-extensions'
 
 import { injectFileManager } from '../../providers/file-manager'
 import type { EditingFile } from '../../types'
 import FileImageViewer from './FileImageViewer.vue'
-
-interface MclogsResponse {
-	success: boolean
-	url?: string
-	error?: string
-}
 
 const props = defineProps<{
 	file: EditingFile | null
@@ -55,6 +50,7 @@ const emit = defineEmits<{
 const { formatMessage } = useVIntl()
 const { addNotification } = injectNotificationManager()
 const ctx = injectFileManager()
+const client = injectModrinthClient()
 
 const messages = defineMessages({
 	failedToOpenTitle: {
@@ -237,13 +233,7 @@ async function shareToMclogs() {
 	}
 
 	try {
-		const response = await fetch('https://api.mclo.gs/1/log', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: new URLSearchParams({ content: fileContent.value }),
-		})
-
-		const data = (await response.json()) as MclogsResponse
+		const data = await client.mclogs.logs_v1.create(fileContent.value)
 
 		if (data.success && data.url) {
 			await navigator.clipboard.writeText(data.url)
@@ -253,7 +243,7 @@ async function shareToMclogs() {
 				type: 'success',
 			})
 		} else {
-			throw new Error(data.error)
+			throw new Error('mclo.gs upload failed')
 		}
 	} catch (error) {
 		console.error('Error sharing file:', error)

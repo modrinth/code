@@ -2,14 +2,17 @@
 	<div
 		v-if="subdomain && !isHidden"
 		v-tooltip="'Copy custom URL'"
-		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer"
+		class="flex min-w-0 flex-row items-center gap-2 truncate hover:cursor-pointer hover:underline"
+		data-subdomain-label
+		@click.stop.prevent
 	>
-		<div v-if="!noSeparator" class="w-1.5 h-1.5 rounded-full bg-surface-5"></div>
-		<div class="flex flex-row items-center gap-2">
-			<LinkIcon class="flex size-5 shrink-0" />
+		<Separator v-if="!noSeparator" />
+
+		<div class="flex flex-row items-center gap-1.5">
+			<LinkIcon />
 			<div
-				class="flex min-w-0 text-sm font-semibold"
-				:class="serverId ? 'hover:underline' : ''"
+				class="flex min-w-0 font-medium text-sm text-nowrap"
+				:class="props.subdomain ? 'hover:underline' : ''"
 				@click="copySubdomain"
 			>
 				{{ subdomain }}.modrinth.gg
@@ -25,10 +28,13 @@ import { useStorage } from '@vueuse/core'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+import Separator from './Separator.vue'
+
 const { addNotification } = injectNotificationManager()
 
 const props = defineProps<{
 	subdomain: string
+	serverId?: string
 	noSeparator?: boolean
 }>()
 
@@ -42,9 +48,9 @@ const copySubdomain = () => {
 }
 
 const route = useRoute()
-const serverId = computed(() => route.params.id as string)
+const serverId = props.serverId || (route.params.id as string)
 
-const userPreferences = useStorage(`pyro-server-${serverId.value}-preferences`, {
+const userPreferences = useStorage(`pyro-server-${serverId}-preferences`, {
 	hideSubdomainLabel: false,
 })
 

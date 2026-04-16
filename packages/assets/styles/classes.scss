@@ -527,8 +527,6 @@ a:not(.no-click-animation),
 	margin-bottom: var(--gap-md);
 	outline: 2px solid transparent;
 
-	box-shadow: var(--shadow-card);
-
 	.card__overlay {
 		position: absolute;
 		top: 1rem;
@@ -908,10 +906,15 @@ a:not(.no-click-animation),
 		border-spacing: 0;
 		line-height: 1.5;
 		border: 0.1rem solid var(--color-button-bg);
-		border-radius: var(--radius-sm);
+		border-radius: var(--radius-xl);
 
 		th {
 			font-weight: 600;
+			background-color: var(--surface-3);
+		}
+
+		tr {
+			background-color: var(--surface-1-5);
 		}
 
 		td,
@@ -920,7 +923,7 @@ a:not(.no-click-animation),
 		}
 
 		tr:nth-child(2n) {
-			background-color: var(--color-accent-contrast);
+			background-color: var(--surface-1);
 		}
 
 		td:not(:last-of-type),

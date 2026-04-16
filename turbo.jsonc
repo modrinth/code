@@ -4,7 +4,14 @@
 	"globalDependencies": [
 		"packages/tooling-config/**",
 		"!packages/tooling-config/.turbo/**",
-		"!packages/tooling-config/node_modules/**"
+		"!packages/tooling-config/node_modules/**",
+		"packages/app-lib/.env"
+	],
+	"globalEnv": [
+		"MODRINTH_URL",
+		"MODRINTH_API_BASE_URL",
+		"MODRINTH_ARCHON_BASE_URL",
+		"VITE_STRIPE_PUBLISHABLE_KEY"
 	],
 	"tasks": {
 		"build": {

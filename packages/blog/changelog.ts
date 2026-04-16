@@ -11,6 +11,88 @@ export type VersionEntry = {
 
 const VERSIONS: VersionEntry[] = [
 	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Server stats inside server settings modal, in info card.
+- Feature flag to always display RAM as bytes.
+
+## Changed
+- Console search highlighting is clearer and more accurate.
+- When memory is shown as bytes, the max RAM is now displayed alongside it.
+- Consolidated spacing between server and instance pages in the Modrinth App.
+- Moved the "Kill server" action into a dropdown under the "Restart" button.
+
+## Fixed
+- The support bubble is now available on hosting pages in the Modrinth App.
+- Paper and Purpur build versions can be selected when resetting a server in the Modrinth App.
+- Server CPU and memory graphs no longer freeze on the last value after a hard crash or out-of-memory kill.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'web',
+		body: `## Added
+- Publishing checklist added back to project page.
+
+## Fixed
+- Fixed version-specific links returning 404.
+- Fixed overflow in the project page header on mobile.
+- Fixed markdown tables causing the project page to overflow.
+- Fixed menu anchoring in the Discover content menu.`,
+	},
+	{
+		date: `2026-04-15T19:39:48+00:00`,
+		product: 'app',
+		version: '0.13.1',
+		body: `## Fixed
+- Fixed the sidebar gutter margin on macOS when the scrollbar is set to auto-hide.`,
+	},
+	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'app',
+		version: '0.13.0',
+		body: `## Changed
+- The Logs page has been redesigned, and brought into the same style as the new overview page from Modrinth Hosting.
+- Refactored the Logs page to share its console, filtering, and share-to-mclo.gs functionality with the Modrinth Hosting server panel.
+- Aligned the instance header with the Modrinth Hosting server panel header for a consistent look across the app and web.
+- Historical log files are now fetched in the background (and stored much more efficiently) when opening the Logs page, so switching between them is instant.
+- Moved live log capture from the frontend to the Rust backend, significantly reducing overhead when an instance produces large volumes of output.`,
+	},
+	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'hosting',
+		body: `## Added
+- Confirmation modal for resubscribing to a server.
+- Proper provisioning state for resubscription with live update once server is ready.
+- New empty state for manage servers page.
+- Brought server panel into app.
+- New server hosting console, with better filtering, searching, and sharing functionality.
+- New instance logs page with updated console.
+- New server settings modal, consistent across website and app, and reorganizes settings where it made sense.
+- Overhauled server properties settings, splitting advanced and basic settings.
+
+## Changed
+- Refreshed the server cards UI for consistency.
+- Contact support button.
+- Download cancelled server files button.
+- Countdown timer for number of days cancelled server's files are kept.
+- Updated existing server card states with better help text.
+- Applied consistent styling for purchase and upgrade server modals.
+- Applied consistent styling for app and instance settings modals.
+- Design refresh for server purchase modal plan selection, with handling for logged out users.
+
+## Fixed
+- Storybook global css not being used.
+- Server icon sync and reactivity.`,
+	},
+	{
+		date: `2026-04-12T22:12:15+00:00`,
+		product: 'web',
+		body: `## Fixed
+- Fixed certain currencies showing pricing with the incorrect number of digits.
+- Fix organization's member settings not persisting after saving and refresh.`,
+	},
+	{
 		date: `2026-04-04T15:48:39+00:00`,
 		product: 'web',
 		body: `## Fixed

@@ -7,41 +7,31 @@ import {
 	GlobeIcon,
 	PlayIcon,
 	PlusIcon,
-	SearchIcon,
+	SpinnerIcon,
 	StopCircleIcon,
 } from '@modrinth/assets'
-import type { ProjectType, SortType, Tags } from '@modrinth/ui'
+import type { CardAction, ProjectType, Tags } from '@modrinth/ui'
 import {
-	Admonition,
-	ButtonStyled,
-	Checkbox,
+	BrowsePageLayout,
+	BrowseSidebar,
 	commonMessages,
+	CreationFlowModal,
 	defineMessages,
-	DropdownSelect,
 	injectNotificationManager,
-	LoadingIndicator,
-	NavTabs,
-	Pagination,
-	ProjectCard,
-	ProjectCardList,
-	SearchFilterControl,
-	SearchSidebarFilter,
-	StyledInput,
+	provideBrowseManager,
+	useBrowseSearch,
 	useDebugLogger,
-	useSearch,
-	useServerSearch,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQueryClient } from '@tanstack/vue-query'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import type { Ref } from 'vue'
-import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue'
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue'
 import type { LocationQuery } from 'vue-router'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import type Instance from '@/components/ui/Instance.vue'
-import InstanceIndicator from '@/components/ui/InstanceIndicator.vue'
-import SearchCard from '@/components/ui/SearchCard.vue'
 import { get_project_v3, get_search_results_v3 } from '@/helpers/cache.js'
 import { process_listener } from '@/helpers/events'
 import { get_by_profile_path } from '@/helpers/process'
@@ -54,7 +44,12 @@ import {
 import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import type { GameInstance } from '@/helpers/types'
 import { add_server_to_profile, get_profile_worlds, getServerLatency } from '@/helpers/worlds'
+import { injectContentInstall } from '@/providers/content-install'
 import { injectServerInstall } from '@/providers/server-install'
+import {
+	createServerInstallContent,
+	provideServerInstallContent,
+} from '@/providers/setup/server-install-content'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { getServerAddress } from '@/store/install.js'
 
@@ -62,15 +57,37 @@ const { handleError } = injectNotificationManager()
 const { formatMessage } = useVIntl()
 const { installingServerProjects, playServerProject, showAddServerToInstanceModal } =
 	injectServerInstall()
+const { install: installVersion } = injectContentInstall()
+const queryClient = useQueryClient()
 const debugLog = useDebugLogger('Browse')
 
 const router = useRouter()
 const route = useRoute()
-
-const projectTypes = computed(() => {
-	debugLog('projectTypes computed', route.params.projectType)
-	return [route.params.projectType as ProjectType]
-})
+const serverSetupModalRef = ref<InstanceType<typeof CreationFlowModal> | null>(null)
+const serverInstallContent = createServerInstallContent({ serverSetupModalRef })
+provideServerInstallContent(serverInstallContent)
+const {
+	serverIdQuery,
+	serverFlowFrom,
+	isFromWorlds,
+	isServerContext,
+	isSetupServerContext,
+	effectiveServerWorldId,
+	serverContextServerData,
+	serverContentProjectIds,
+	serverBackUrl,
+	serverBackLabel,
+	serverBrowseHeading,
+	initServerContext,
+	watchServerContextChanges,
+	searchServerModpacks,
+	getServerProjectVersions,
+	enforceSetupModpackRoute,
+	installProjectToServer,
+	onServerFlowBack,
+	handleServerModpackFlowCreate,
+	markServerProjectInstalled,
+} = serverInstallContent
 
 debugLog('fetching tags (categories, loaders, gameVersions)')
 const [categories, loaders, availableGameVersions] = await Promise.all([
@@ -110,7 +127,6 @@ const installedProjectIds: Ref<string[] | null> = ref(null)
 const instanceHideInstalled = ref(false)
 const newlyInstalled = ref<string[]>([])
 const isServerInstance = ref(false)
-const isFromWorlds = computed(() => route.query.from === 'worlds')
 
 if (isFromWorlds.value && route.params.projectType !== 'server') {
 	router.replace({
@@ -119,16 +135,26 @@ if (isFromWorlds.value && route.params.projectType !== 'server') {
 	})
 }
 
+enforceSetupModpackRoute(route.params.projectType as string | undefined)
+
 const allInstalledIds = computed(
 	() => new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])]),
 )
 
-const PERSISTENT_QUERY_PARAMS = ['i', 'ai', 'from']
+watchServerContextChanges()
 
 await initInstanceContext()
 
 async function initInstanceContext() {
-	debugLog('initInstanceContext', { queryI: route.query.i, queryAi: route.query.ai })
+	debugLog('initInstanceContext', {
+		queryI: route.query.i,
+		queryAi: route.query.ai,
+		querySid: route.query.sid,
+		queryWid: route.query.wid,
+		queryFrom: route.query.from,
+	})
+	await initServerContext()
+
 	if (route.query.i) {
 		instance.value = (await getInstance(route.query.i as string).catch(handleError)) ?? null
 		debugLog('instance loaded', {
@@ -137,9 +163,6 @@ async function initInstanceContext() {
 			gameVersion: instance.value?.game_version,
 		})
 
-		// Load installed project IDs in background — the page and initial search render immediately.
-		// When this resolves, instanceFilters recomputes and triggers a search refresh
-		// that applies the "hide installed" negative filters and marks installed badges.
 		if (route.query.from === 'worlds') {
 			get_profile_worlds(route.query.i as string)
 				.then((worlds) => {
@@ -172,7 +195,7 @@ async function initInstanceContext() {
 		}
 	}
 
-	if (route.query.ai && !(projectTypes.value.length === 1 && projectTypes.value[0] === 'modpack')) {
+	if (route.query.ai && !(route.params.projectType === 'modpack')) {
 		debugLog('setting instanceHideInstalled from query', route.query.ai)
 		instanceHideInstalled.value = route.query.ai === 'true'
 	}
@@ -180,37 +203,22 @@ async function initInstanceContext() {
 
 const instanceFilters = computed(() => {
 	const filters = []
-	debugLog('instanceFilters recomputing', {
-		hasInstance: !!instance.value,
-		isServer: isServerInstance.value,
-		hideInstalled: instanceHideInstalled.value,
-	})
 
 	if (instance.value) {
 		const gameVersion = instance.value.game_version
 		if (gameVersion) {
-			filters.push({
-				type: 'game_version',
-				option: gameVersion,
-			})
+			filters.push({ type: 'game_version', option: gameVersion })
 		}
 
 		const platform = instance.value.loader
-
 		const supportedModLoaders = ['fabric', 'forge', 'quilt', 'neoforge']
 
-		if (platform && projectTypes.value.includes('mod') && supportedModLoaders.includes(platform)) {
-			filters.push({
-				type: 'mod_loader',
-				option: platform,
-			})
+		if (platform && projectType.value === 'mod' && supportedModLoaders.includes(platform)) {
+			filters.push({ type: 'mod_loader', option: platform })
 		}
 
 		if (isServerInstance.value) {
-			filters.push({
-				type: 'environment',
-				option: 'client',
-			})
+			filters.push({ type: 'environment', option: 'client' })
 		}
 
 		if (
@@ -218,60 +226,58 @@ const instanceFilters = computed(() => {
 			(installedProjectIds.value || newlyInstalled.value.length > 0)
 		) {
 			const allInstalled = [...(installedProjectIds.value ?? []), ...newlyInstalled.value]
-
 			allInstalled
-				.map((x) => ({
-					type: 'project_id',
-					option: `project_id:${x}`,
-					negative: true,
-				}))
+				.map((x) => ({ type: 'project_id', option: `project_id:${x}`, negative: true }))
 				.forEach((x) => filters.push(x))
 		}
 	}
 
-	debugLog('instanceFilters result', filters)
 	return filters
 })
 
-const {
-	// Selections
-	query,
-	currentSortType,
-	currentFilters,
-	toggledGroups,
-	maxResults,
-	currentPage,
-	overriddenProvidedFilterTypes,
+const serverHideInstalled = ref(false)
+if (route.query.shi) {
+	serverHideInstalled.value = route.query.shi === 'true'
+}
 
-	// Lists
-	filters,
-	sortTypes,
+const serverContextFilters = computed(() => {
+	const filters: { type: string; option: string; negative?: boolean }[] = []
+	if (!serverContextServerData.value) return filters
+	const pt = projectType.value
 
-	// Computed
-	requestParams,
+	if (pt !== 'modpack') {
+		const gameVersion = serverContextServerData.value.mc_version
+		if (gameVersion) filters.push({ type: 'game_version', option: gameVersion })
 
-	// Functions
-	createPageParams,
-} = useSearch(projectTypes, tags, instanceFilters)
+		const platform = serverContextServerData.value.loader?.toLowerCase()
+		if (platform && ['fabric', 'forge', 'quilt', 'neoforge'].includes(platform))
+			filters.push({ type: 'mod_loader', option: platform })
+		if (platform && ['paper', 'purpur'].includes(platform))
+			filters.push({ type: 'plugin_loader', option: platform })
 
-const activeLoader = computed(() => {
-	const filter = currentFilters.value.find((f) => f.type === 'mod_loader')
-	if (filter) return filter.option
-	if (projectType.value === 'datapack' || projectType.value === 'resourcepack') return 'vanilla'
-	return instance.value?.loader ?? null
+		if (pt === 'mod') filters.push({ type: 'environment', option: 'server' })
+	}
+
+	if (pt === 'modpack') {
+		filters.push(
+			{ type: 'environment', option: 'client' },
+			{ type: 'environment', option: 'server' },
+		)
+	}
+
+	if (serverHideInstalled.value && serverContentProjectIds.value.size > 0) {
+		for (const id of serverContentProjectIds.value) {
+			filters.push({ type: 'project_id', option: `project_id:${id}`, negative: true })
+		}
+	}
+
+	return filters
 })
 
-const activeGameVersion = computed(() => {
-	const filter = currentFilters.value.find((f) => f.type === 'game_version')
-	if (filter) return filter.option
-	return instance.value?.game_version ?? null
-})
+const combinedProvidedFilters = computed(() =>
+	isServerContext.value ? serverContextFilters.value : instanceFilters.value,
+)
 
-const serverHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
-const filteredServerHits = computed(() => {
-	if (!instanceHideInstalled.value || allInstalledIds.value.size === 0) return serverHits.value
-	return serverHits.value.filter((hit) => !allInstalledIds.value.has(hit.project_id))
-})
 const serverPings = shallowRef<Record<string, number | undefined>>({})
 const runningServerProjects = ref<Record<string, string>>({})
 
@@ -304,8 +310,10 @@ async function handleStopServerProject(projectId: string) {
 async function handlePlayServerProject(projectId: string) {
 	debugLog('handlePlayServerProject', projectId)
 	await playServerProject(projectId)
-	checkServerRunningStates(serverHits.value)
+	checkServerRunningStates(lastServerHits.value)
 }
+
+const lastServerHits = shallowRef<Labrinth.Search.v3.ResultSearchProject[]>([])
 
 async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearchProject) {
 	debugLog('handleAddServerToInstance', { projectId: project.project_id, name: project.name })
@@ -331,6 +339,22 @@ async function handleAddServerToInstance(project: Labrinth.Search.v3.ResultSearc
 	}
 }
 
+async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
+	debugLog('pingServerHits', { hitCount: hits.length })
+	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
+	await Promise.all(
+		pingsToFetch.map(async (hit) => {
+			const address = hit.minecraft_java_server!.address!
+			try {
+				const latency = await getServerLatency(address)
+				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
+			} catch (err) {
+				console.error(`Failed to ping server ${address}:`, err)
+			}
+		}),
+	)
+}
+
 const unlistenProcesses = await process_listener(
 	(e: { event: string; profile_path_id: string }) => {
 		debugLog('process event', e)
@@ -349,45 +373,6 @@ const unlistenProcesses = await process_listener(
 onUnmounted(() => {
 	unlistenProcesses()
 })
-
-const {
-	serverCurrentSortType,
-	serverCurrentFilters,
-	serverToggledGroups,
-	serverSortTypes,
-	serverFilterTypes,
-	serverRequestParams,
-	createServerPageParams,
-} = useServerSearch({ tags, query, maxResults, currentPage })
-
-if (instance.value?.game_version) {
-	const gv = instance.value.game_version
-	const alreadyHasGv = serverCurrentFilters.value.some(
-		(f) => f.type === 'server_game_version' && f.option === gv,
-	)
-	if (!alreadyHasGv) {
-		serverCurrentFilters.value.push({ type: 'server_game_version', option: gv })
-	}
-}
-
-async function pingServerHits(hits: Labrinth.Search.v3.ResultSearchProject[]) {
-	debugLog('pingServerHits', { hitCount: hits.length })
-	const pingsToFetch = hits.filter((hit) => hit.minecraft_java_server?.address)
-	await Promise.all(
-		pingsToFetch.map(async (hit) => {
-			const address = hit.minecraft_java_server!.address!
-			try {
-				const latency = await getServerLatency(address)
-				serverPings.value = { ...serverPings.value, [hit.project_id]: latency }
-			} catch (err) {
-				console.error(`Failed to ping server ${address}:`, err)
-			}
-		}),
-	)
-}
-
-const previousFilterState = ref('')
-let searchVersion = 0
 
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
@@ -501,185 +486,21 @@ onBeforeRouteLeave(() => {
 	})
 })
 
-const loading = ref(true)
-
 const projectType = ref<ProjectType>(route.params.projectType as ProjectType)
-
-watch(projectType, () => {
-	loading.value = true
-})
-
-interface SearchResults extends Labrinth.Search.v3.SearchResults {
-	hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
-}
-
-const results: Ref<SearchResults | null> = shallowRef(null)
-const pageCount = computed(() =>
-	results.value ? Math.ceil(results.value.total_hits / results.value.hits_per_page) : 1,
-)
-
-const effectiveRequestParams = computed(() => {
-	const isServer = projectType.value === 'server'
-	debugLog('effectiveRequestParams computed', { isServer })
-	return isServer ? serverRequestParams.value : requestParams.value
-})
-
-let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null
-
-watch(effectiveRequestParams, () => {
-	if (!route.params.projectType) return
-	debugLog('effectiveRequestParams changed, debouncing search')
-	if (searchDebounceTimer) clearTimeout(searchDebounceTimer)
-	searchDebounceTimer = setTimeout(() => {
-		refreshSearch()
-	}, 200)
-})
-
-async function refreshSearch() {
-	const version = ++searchVersion
-	debugLog('refreshSearch start', { version, projectType: projectType.value })
-
-	try {
-		const isServer = projectType.value === 'server'
-		const searchParams = isServer ? serverRequestParams.value : requestParams.value
-
-		debugLog('searching v3', searchParams)
-		let rawResults = (await get_search_results_v3(searchParams)) as {
-			result: SearchResults
-		} | null
-
-		if (version !== searchVersion) {
-			debugLog('search version stale, discarding', { version, current: searchVersion })
-			return
-		}
-
-		if (!rawResults) {
-			rawResults = {
-				result: {
-					hits: [],
-					total_hits: 0,
-					hits_per_page: maxResults.value,
-					page: 1,
-				},
-			}
-		}
-
-		if (isServer) {
-			const hits = rawResults.result.hits ?? []
-			debugLog('server search results', {
-				hitCount: hits.length,
-				totalHits: rawResults.result.total_hits,
-			})
-			serverHits.value = hits
-			serverPings.value = {}
-			pingServerHits(hits)
-			checkServerRunningStates(hits)
-			results.value = {
-				hits: [],
-				total_hits: rawResults.result.total_hits ?? 0,
-				hits_per_page: maxResults.value,
-				page: 1,
-			}
-		} else {
-			if (instance.value) {
-				const allInstalledIds = new Set([
-					...newlyInstalled.value,
-					...(installedProjectIds.value ?? []),
-				])
-
-				rawResults.result.hits = rawResults.result.hits.map((val) => ({
-					...val,
-					installed: allInstalledIds.has(val.project_id),
-				}))
-			}
-			debugLog('v3 search results', {
-				hitCount: rawResults.result.hits.length,
-				totalHits: rawResults.result.total_hits,
-			})
-			results.value = {
-				...rawResults.result,
-				hits_per_page: maxResults.value,
-			}
-		}
-
-		const currentFilterState = JSON.stringify({
-			query: query.value,
-			filters: toRaw(currentFilters.value),
-			sort: toRaw(currentSortType.value),
-			maxResults: maxResults.value,
-			projectTypes: toRaw(projectTypes.value),
-		})
-
-		if (previousFilterState.value && previousFilterState.value !== currentFilterState) {
-			debugLog('filters changed, resetting to page 1')
-			currentPage.value = 1
-		}
-
-		previousFilterState.value = currentFilterState
-
-		const persistentParams: LocationQuery = {}
-
-		for (const [key, value] of Object.entries(route.query)) {
-			if (PERSISTENT_QUERY_PARAMS.includes(key)) {
-				persistentParams[key] = value
-			}
-		}
-
-		if (instanceHideInstalled.value) {
-			persistentParams.ai = 'true'
-		} else {
-			delete persistentParams.ai
-		}
-
-		const params = {
-			...persistentParams,
-			...(isServer ? createServerPageParams() : createPageParams()),
-		}
-
-		debugLog('updating URL', params)
-		router.replace({ path: route.path, query: params })
-
-		loading.value = false
-		debugLog('refreshSearch complete', { version })
-	} catch (err) {
-		debugLog('refreshSearch error', err)
-		if (version === searchVersion) {
-			loading.value = false
-		}
-	}
-}
-
-async function setPage(newPageNumber: number) {
-	debugLog('setPage', newPageNumber)
-	currentPage.value = newPageNumber
-
-	await onSearchChangeToTop()
-}
-
-const searchWrapper: Ref<HTMLElement | null> = ref(null)
-
-async function onSearchChangeToTop() {
-	await nextTick()
-
-	window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function clearSearch() {
-	debugLog('clearSearch')
-	query.value = ''
-	currentPage.value = 1
-}
 
 watch(
 	() => route.params.projectType as ProjectType,
 	async (newType) => {
-		// Check if the newType is not the same as the current value
+		if (isSetupServerContext.value) {
+			enforceSetupModpackRoute(newType)
+			if (newType !== 'modpack') return
+		}
+
 		if (!newType || newType === projectType.value) return
 
 		debugLog('projectType route param changed', { from: projectType.value, to: newType })
 		projectType.value = newType
 
-		// If instance context was removed (e.g. sidebar browse navigation), reset state
 		if (!route.query.i && instance.value) {
 			debugLog('instance context removed, resetting')
 			instance.value = null
@@ -690,9 +511,6 @@ watch(
 			breadcrumbs.setName('BrowseTitle', formatMessage(messages.discoverContent))
 			breadcrumbs.setContext(null)
 		}
-
-		currentSortType.value = { display: 'Relevance', name: 'relevance' }
-		query.value = ''
 	},
 )
 
@@ -722,18 +540,18 @@ const selectableProjectTypes = computed(() => {
 
 	const params: LocationQuery = {}
 
-	if (route.query.i) {
-		params.i = route.query.i
-	}
-	if (route.query.ai) {
-		params.ai = route.query.ai
-	}
-	if (route.query.from) {
-		params.from = route.query.from
-	}
+	if (route.query.i) params.i = route.query.i
+	if (route.query.ai) params.ai = route.query.ai
+	if (route.query.from) params.from = route.query.from
+	if (route.query.sid) params.sid = route.query.sid
+	if (effectiveServerWorldId.value) params.wid = effectiveServerWorldId.value
 
 	const queryString = new URLSearchParams(params as Record<string, string>).toString()
 	const suffix = queryString ? `?${queryString}` : ''
+
+	if (isSetupServerContext.value) {
+		return [{ label: 'Modpacks', href: `/browse/modpack${suffix}` }]
+	}
 
 	if (isFromWorlds.value) {
 		return [{ label: 'Servers', href: `/browse/server${suffix}` }]
@@ -756,7 +574,7 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 		if (!project_name) return undefined
 		return {
 			name: project_name,
-			icon: project_icon,
+			icon: project_icon ?? undefined,
 			onclick:
 				project_id !== project.project_id
 					? () => {
@@ -769,18 +587,11 @@ const getServerModpackContent = (project: Labrinth.Search.v3.ResultSearchProject
 	return undefined
 }
 
-const options = ref(null)
+const contextMenuRef = ref(null)
 // @ts-expect-error - no event types
 const handleRightClick = (event, result) => {
 	// @ts-ignore
-	options.value?.showMenu(event, result, [
-		{
-			name: 'open_link',
-		},
-		{
-			name: 'copy_link',
-		},
-	])
+	contextMenuRef.value?.showMenu(event, result, [{ name: 'open_link' }, { name: 'copy_link' }])
 }
 // @ts-expect-error - no event types
 const handleOptionsClick = (args) => {
@@ -796,337 +607,377 @@ const handleOptionsClick = (args) => {
 	}
 }
 
-debugLog('performing initial search')
-await refreshSearch()
+const installContext = computed(() => {
+	if (isServerContext.value && serverContextServerData.value) {
+		return {
+			name: serverContextServerData.value.name,
+			loader: serverContextServerData.value.loader ?? '',
+			gameVersion: serverContextServerData.value.mc_version ?? '',
+			serverId: serverIdQuery.value,
+			upstream: serverContextServerData.value.upstream,
+			iconSrc: null as string | null,
+			isMedal: serverContextServerData.value.is_medal,
+			backUrl: serverBackUrl.value,
+			backLabel: serverBackLabel.value,
+			heading: serverBrowseHeading.value,
+		}
+	}
+	if (instance.value) {
+		return {
+			name: instance.value.name,
+			loader: instance.value.loader,
+			gameVersion: instance.value.game_version,
+			iconSrc: instance.value.icon_path ? convertFileSrc(instance.value.icon_path) : null,
+			backUrl: `/instance/${encodeURIComponent(instance.value.path)}${isFromWorlds.value ? '/worlds' : ''}`,
+			backLabel: 'Back to instance',
+			heading: formatMessage(
+				isFromWorlds.value ? messages.addServersToInstance : messages.installContentToInstance,
+			),
+			warning:
+				isServerInstance.value && !isFromWorlds.value
+					? 'Adding content can break compatibility when joining the server. Any added content will also be lost when you update the server instance content.'
+					: undefined,
+		}
+	}
+	return null
+})
 
-// Initialize previousFilterState after first search
-previousFilterState.value = JSON.stringify({
-	query: query.value,
-	filters: currentFilters.value,
-	sort: currentSortType.value,
-	maxResults: maxResults.value,
-	projectTypes: projectTypes.value,
+const installingProjectIds = ref<Set<string>>(new Set())
+
+function getCardActions(
+	result: Labrinth.Search.v2.ResultSearchProject | Labrinth.Search.v3.ResultSearchProject,
+	currentProjectType: string,
+): CardAction[] {
+	if (currentProjectType === 'server') {
+		const serverResult = result as Labrinth.Search.v3.ResultSearchProject
+		const isInstalled = allInstalledIds.value.has(serverResult.project_id)
+
+		if (isFromWorlds.value && instance.value) {
+			return [
+				{
+					key: 'add-to-instance',
+					label: formatMessage(isInstalled ? messages.added : messages.addToInstance),
+					icon: isInstalled ? CheckIcon : PlusIcon,
+					disabled: isInstalled,
+					color: 'brand',
+					type: 'outlined',
+					onClick: () => handleAddServerToInstance(serverResult),
+				},
+			]
+		}
+
+		const actions: CardAction[] = []
+
+		actions.push({
+			key: 'add',
+			label: '',
+			icon: isInstalled ? CheckIcon : PlusIcon,
+			disabled: isInstalled,
+			circular: true,
+			tooltip: isInstalled
+				? formatMessage(messages.alreadyAdded)
+				: instance.value
+					? formatMessage(messages.addToInstanceName, { instanceName: instance.value.name })
+					: formatMessage(messages.addServerToInstance),
+			onClick: () => handleAddServerToInstance(serverResult),
+		})
+
+		if (runningServerProjects.value[serverResult.project_id]) {
+			actions.push({
+				key: 'stop',
+				label: formatMessage(commonMessages.stopButton),
+				icon: StopCircleIcon,
+				color: 'red',
+				type: 'outlined',
+				onClick: () => handleStopServerProject(serverResult.project_id),
+			})
+		} else {
+			const isInstalling = (installingServerProjects.value as string[]).includes(
+				serverResult.project_id,
+			)
+			actions.push({
+				key: 'play',
+				label: formatMessage(
+					isInstalling ? commonMessages.installingLabel : commonMessages.playButton,
+				),
+				icon: PlayIcon,
+				disabled: isInstalling,
+				color: 'brand',
+				type: 'outlined',
+				onClick: () => handlePlayServerProject(serverResult.project_id),
+			})
+		}
+
+		return actions
+	}
+
+	// Non-server project actions
+	const projectResult = result as (Labrinth.Search.v2.ResultSearchProject &
+		Labrinth.Search.v3.ResultSearchProject) & {
+		installed?: boolean
+		installing?: boolean
+	}
+	const isInstalled =
+		projectResult.installed ||
+		allInstalledIds.value.has(projectResult.project_id || '') ||
+		serverContentProjectIds.value.has(projectResult.project_id || '')
+	const isInstalling = installingProjectIds.value.has(projectResult.project_id)
+
+	if (
+		isServerContext.value &&
+		['modpack', 'mod', 'plugin', 'datapack'].includes(currentProjectType)
+	) {
+		return [
+			{
+				key: 'install',
+				label: isInstalling ? 'Installing' : isInstalled ? 'Installed' : 'Install',
+				icon: isInstalled ? CheckIcon : PlusIcon,
+				disabled: isInstalled || isInstalling,
+				color: 'brand',
+				type: 'outlined',
+				onClick: async () => {
+					installingProjectIds.value.add(projectResult.project_id)
+					try {
+						const didInstall = await installProjectToServer(projectResult)
+						if (didInstall !== false) {
+							onSearchResultInstalled(projectResult.project_id)
+						}
+					} catch (err) {
+						handleError(err as Error)
+					} finally {
+						installingProjectIds.value.delete(projectResult.project_id)
+					}
+				},
+			},
+		]
+	}
+
+	const isModpack = projectResult.project_types?.includes('modpack')
+	const shouldUseInstallIcon = !!instance.value || isModpack
+
+	return [
+		{
+			key: 'install',
+			label: isInstalling
+				? 'Installing'
+				: isInstalled
+					? 'Installed'
+					: shouldUseInstallIcon
+						? 'Install'
+						: 'Add to an instance',
+			icon: isInstalling ? SpinnerIcon : isInstalled ? CheckIcon : PlusIcon,
+			disabled: isInstalled || isInstalling,
+			color: 'brand',
+			type: 'outlined',
+			onClick: async () => {
+				installingProjectIds.value.add(projectResult.project_id)
+				await installVersion(
+					projectResult.project_id,
+					null,
+					instance.value ? instance.value.path : null,
+					'SearchCard',
+					(versionId) => {
+						installingProjectIds.value.delete(projectResult.project_id)
+						if (versionId) {
+							onSearchResultInstalled(projectResult.project_id)
+						}
+					},
+					(profile) => {
+						router.push(`/instance/${profile}`)
+					},
+					{
+						preferredLoader: instance.value?.loader ?? undefined,
+						preferredGameVersion: instance.value?.game_version ?? undefined,
+					},
+				).catch((err) => {
+					installingProjectIds.value.delete(projectResult.project_id)
+					handleError(err)
+				})
+			},
+		},
+	]
+}
+
+function onSearchResultInstalled(id: string) {
+	if (isServerContext.value) {
+		markServerProjectInstalled(id)
+		return
+	}
+	newlyInstalled.value.push(id)
+}
+
+async function search(requestParams: string) {
+	debugLog('searching v3', requestParams)
+	const isServer = projectType.value === 'server'
+
+	const rawResults = await queryClient.fetchQuery({
+		queryKey: ['search', 'v3', requestParams],
+		queryFn: () =>
+			get_search_results_v3(requestParams) as Promise<{
+				result: Labrinth.Search.v3.SearchResults & {
+					hits: (Labrinth.Search.v3.ResultSearchProject & { installed?: boolean })[]
+				}
+			} | null>,
+		staleTime: 30_000,
+	})
+
+	if (!rawResults) {
+		return {
+			projectHits: [],
+			serverHits: [],
+			total_hits: 0,
+			per_page: 20,
+		}
+	}
+
+	if (isServer) {
+		const hits = rawResults.result.hits ?? []
+		lastServerHits.value = hits
+		serverPings.value = {}
+		pingServerHits(hits)
+		checkServerRunningStates(hits)
+		return {
+			projectHits: [],
+			serverHits: hits,
+			total_hits: rawResults.result.total_hits ?? 0,
+			per_page: rawResults.result.hits_per_page,
+		}
+	}
+
+	const hits = rawResults.result.hits.map((hit) => {
+		const mapped = {
+			...hit,
+			title: hit.name,
+			description: hit.summary,
+		} as unknown as Labrinth.Search.v2.ResultSearchProject & { installed?: boolean }
+
+		if (instance.value || isServerContext.value) {
+			const installedIds = instance.value
+				? new Set([...newlyInstalled.value, ...(installedProjectIds.value ?? [])])
+				: serverContentProjectIds.value
+			mapped.installed = installedIds.has(hit.project_id)
+		}
+
+		return mapped
+	})
+
+	return {
+		projectHits: hits,
+		serverHits: [],
+		total_hits: rawResults.result.total_hits,
+		per_page: rawResults.result.hits_per_page,
+	}
+}
+
+const isServerFilterContext = computed(() => isServerContext.value || isServerInstance.value)
+
+const lockedFilterMessages = computed(() => ({
+	gameVersion: formatMessage(
+		isServerFilterContext.value
+			? messages.gameVersionProvidedByServer
+			: messages.gameVersionProvidedByInstance,
+	),
+	modLoader: formatMessage(
+		isServerFilterContext.value
+			? messages.modLoaderProvidedByServer
+			: messages.modLoaderProvidedByInstance,
+	),
+	environment: formatMessage(messages.environmentProvidedByServer),
+	syncButton: formatMessage(messages.syncFilterButton),
+	providedBy: formatMessage(
+		isServerFilterContext.value ? messages.providedByServer : messages.providedByInstance,
+	),
+}))
+
+const searchState = useBrowseSearch({
+	projectType,
+	tags,
+	providedFilters: combinedProvidedFilters,
+	search,
+	persistentQueryParams: ['i', 'ai', 'shi', 'sid', 'wid', 'from'],
+	getExtraQueryParams: () => ({
+		sid: serverIdQuery.value || undefined,
+		wid: effectiveServerWorldId.value || undefined,
+		ai: instanceHideInstalled.value ? 'true' : undefined,
+		shi: serverHideInstalled.value ? 'true' : undefined,
+	}),
+})
+
+if (instance.value?.game_version) {
+	const gv = instance.value.game_version
+	const alreadyHasGv = searchState.serverCurrentFilters.value.some(
+		(f) => f.type === 'server_game_version' && f.option === gv,
+	)
+	if (!alreadyHasGv) {
+		searchState.serverCurrentFilters.value.push({ type: 'server_game_version', option: gv })
+	}
+}
+
+await searchState.refreshSearch()
+
+provideBrowseManager({
+	tags,
+	projectType,
+	...searchState,
+	getProjectLink: (result: Labrinth.Search.v2.ResultSearchProject) => ({
+		path: `/project/${result.project_id ?? result.slug}`,
+		query: instance.value ? { i: instance.value.path } : undefined,
+	}),
+	getServerProjectLink: (result: Labrinth.Search.v3.ResultSearchProject) =>
+		`/project/${result.slug ?? result.project_id}`,
+	selectableProjectTypes,
+	showProjectTypeTabs: computed(() => !isServerContext.value),
+	variant: 'app',
+	getCardActions,
+	installContext,
+	providedFilters: combinedProvidedFilters,
+	hideInstalled: computed({
+		get: () => (isServerContext.value ? serverHideInstalled.value : instanceHideInstalled.value),
+		set: (val: boolean) => {
+			if (isServerContext.value) serverHideInstalled.value = val
+			else instanceHideInstalled.value = val
+		},
+	}),
+	showHideInstalled: computed(
+		() => (isServerContext.value && projectType.value !== 'modpack') || !!instance.value,
+	),
+	hideInstalledLabel: computed(() =>
+		formatMessage(isFromWorlds.value ? messages.hideAddedServers : messages.hideInstalledContent),
+	),
+	onInstalled: onSearchResultInstalled,
+	serverPings,
+	getServerModpackContent,
+	onContextMenu: handleRightClick,
+	offline,
+	lockedFilterMessages,
 })
 </script>
 
 <template>
-	<Teleport v-if="filters" to="#sidebar-teleport-target">
-		<div
-			v-if="instance"
-			class="border-0 border-b-[1px] p-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
-		>
-			<Checkbox
-				v-model="instanceHideInstalled"
-				:label="
-					formatMessage(isFromWorlds ? messages.hideAddedServers : messages.hideInstalledContent)
-				"
-				class="filter-checkbox"
-				@update:model-value="onSearchChangeToTop()"
-				@click.prevent.stop
-			/>
-		</div>
-		<template v-if="projectType === 'server'">
-			<SearchSidebarFilter
-				v-for="filterType in serverFilterTypes.filter((f) => f.options.length > 0)"
-				:key="`server-filter-${filterType.id}`"
-				v-model:selected-filters="serverCurrentFilters"
-				v-model:toggled-groups="serverToggledGroups"
-				:provided-filters="[]"
-				:filter-type="filterType"
-				class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
-				button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
-				content-class="mb-3"
-				inner-panel-class="ml-2 mr-3"
-				:open-by-default="
-					![
-						'server_category_minecraft_server_meta',
-						'server_category_minecraft_server_community',
-						'server_game_version',
-						'server_status',
-					].includes(filterType.id)
-				"
-			>
-				<template #header>
-					<h3 class="text-base m-0">{{ filterType.formatted_name }}</h3>
-				</template>
-			</SearchSidebarFilter>
-		</template>
-		<template v-else>
-			<SearchSidebarFilter
-				v-for="filter in filters.filter((f) => f.display !== 'none')"
-				:key="`filter-${filter.id}`"
-				v-model:selected-filters="currentFilters"
-				v-model:toggled-groups="toggledGroups"
-				v-model:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-				:provided-filters="instanceFilters"
-				:filter-type="filter"
-				class="border-0 border-b-[1px] [&:first-child>button]:pt-4 last:border-b-0 border-[--brand-gradient-border] border-solid"
-				button-class="button-animation flex flex-col gap-1 px-4 py-3 w-full bg-transparent cursor-pointer border-none hover:bg-button-bg"
-				content-class="mb-3"
-				inner-panel-class="ml-2 mr-3"
-				:open-by-default="
-					filter.id.startsWith('category') || filter.id === 'environment' || filter.id === 'license'
-				"
-			>
-				<template #header>
-					<h3 class="text-base m-0">{{ filter.formatted_name }}</h3>
-				</template>
-				<template #locked-game_version>
-					{{
-						formatMessage(
-							isServerInstance
-								? messages.gameVersionProvidedByServer
-								: messages.gameVersionProvidedByInstance,
-						)
-					}}
-				</template>
-				<template #locked-mod_loader>
-					{{
-						formatMessage(
-							isServerInstance
-								? messages.modLoaderProvidedByServer
-								: messages.modLoaderProvidedByInstance,
-						)
-					}}
-				</template>
-				<template #locked-environment>
-					{{ formatMessage(messages.environmentProvidedByServer) }}
-				</template>
-				<template #sync-button> {{ formatMessage(messages.syncFilterButton) }} </template>
-			</SearchSidebarFilter>
-		</template>
-	</Teleport>
-	<div ref="searchWrapper" class="flex flex-col gap-3 p-6">
-		<template v-if="instance">
-			<InstanceIndicator :instance="instance" :back-tab="isFromWorlds ? 'worlds' : undefined" />
-			<h1 class="m-0 mb-1 text-xl">
-				{{
-					formatMessage(
-						isFromWorlds ? messages.addServersToInstance : messages.installContentToInstance,
-					)
-				}}
-			</h1>
-			<Admonition v-if="isServerInstance && !isFromWorlds" type="warning" class="mb-1">
-				Adding content can break compatibility when joining the server. Any added content will also
-				be lost when you update the server instance content.
-			</Admonition>
-		</template>
-		<NavTabs :links="selectableProjectTypes" />
-		<StyledInput
-			v-model="query"
-			:icon="SearchIcon"
-			type="text"
-			autocomplete="off"
-			:placeholder="`Search ${projectType}s...`"
-			clearable
-			wrapper-class="w-full"
-			input-class="h-12"
-			@clear="clearSearch()"
-		/>
-		<div class="flex gap-2">
-			<DropdownSelect
-				v-slot="{ selected }"
-				:model-value="projectType === 'server' ? serverCurrentSortType : currentSortType"
-				class="max-w-[16rem]"
-				name="Sort by"
-				:options="(projectType === 'server' ? serverSortTypes : sortTypes) as any"
-				:display-name="(option: SortType | undefined) => option?.display"
-				@update:model-value="
-					(v: SortType) => {
-						if (projectType === 'server') serverCurrentSortType = v
-						else currentSortType = v
-					}
-				"
-			>
-				<span class="font-semibold text-primary">Sort by: </span>
-				<span class="font-semibold text-secondary">{{ selected }}</span>
-			</DropdownSelect>
-			<DropdownSelect
-				v-slot="{ selected }"
-				v-model="maxResults"
-				name="Max results"
-				:options="[5, 10, 15, 20, 50, 100]"
-				class="max-w-[9rem]"
-			>
-				<span class="font-semibold text-primary">View: </span>
-				<span class="font-semibold text-secondary">{{ selected }}</span>
-			</DropdownSelect>
-			<Pagination :page="currentPage" :count="pageCount" class="ml-auto" @switch-page="setPage" />
-		</div>
-		<SearchFilterControl
-			v-if="projectType === 'server'"
-			v-model:selected-filters="serverCurrentFilters"
-			:filters="serverFilterTypes"
-			:provided-filters="[]"
-			:overridden-provided-filter-types="[]"
-		/>
-		<SearchFilterControl
-			v-else
-			v-model:selected-filters="currentFilters"
-			:filters="filters.filter((f) => f.display !== 'none')"
-			:provided-filters="instanceFilters"
-			:overridden-provided-filter-types="overriddenProvidedFilterTypes"
-			:provided-message="isServerInstance ? messages.providedByServer : messages.providedByInstance"
-		/>
-		<div class="search">
-			<section v-if="loading" class="offline">
-				<LoadingIndicator />
-			</section>
-			<section v-else-if="offline && results?.total_hits === 0" class="offline">
-				You are currently offline. Connect to the internet to browse Modrinth!
-			</section>
-			<section
-				v-else-if="
-					projectType === 'server'
-						? filteredServerHits.length === 0
-						: results && results.hits && results.hits.length === 0
-				"
-				class="offline"
-			>
-				No results found for your query!
-			</section>
-
-			<ProjectCardList v-else :layout="'list'">
-				<template v-if="projectType === 'server'">
-					<ProjectCard
-						v-for="project in filteredServerHits"
-						:key="`server-card-${project.project_id}`"
-						:title="project.name"
-						:icon-url="project.icon_url || undefined"
-						:summary="project.summary"
-						:tags="project.categories"
-						:link="`/project/${project.slug ?? project.project_id}`"
-						:server-online-players="project.minecraft_java_server?.ping?.data?.players_online ?? 0"
-						:server-region="project.minecraft_server?.region"
-						:server-recent-plays="project.minecraft_java_server?.verified_plays_2w ?? 0"
-						:server-modpack-content="getServerModpackContent(project)"
-						:server-ping="serverPings[project.project_id]"
-						:server-status-online="!!project.minecraft_java_server?.ping?.data"
-						:hide-online-players-label="true"
-						:hide-recent-plays-label="true"
-						layout="list"
-						:max-tags="2"
-						is-server-project
-						exclude-loaders
-						@contextmenu.prevent.stop="
-							(event: any) =>
-								handleRightClick(event, { project_types: ['server'], slug: project.slug })
-						"
-					>
-						<template #actions>
-							<div class="flex gap-2">
-								<template v-if="isFromWorlds && instance">
-									<ButtonStyled color="brand" type="outlined">
-										<button
-											:disabled="allInstalledIds.has(project.project_id)"
-											@click.stop="() => handleAddServerToInstance(project)"
-										>
-											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
-											<PlusIcon v-else />
-											{{
-												formatMessage(
-													allInstalledIds.has(project.project_id)
-														? messages.added
-														: messages.addToInstance,
-												)
-											}}
-										</button>
-									</ButtonStyled>
-								</template>
-								<template v-else>
-									<ButtonStyled circular>
-										<button
-											v-tooltip="
-												allInstalledIds.has(project.project_id)
-													? formatMessage(messages.alreadyAdded)
-													: instance
-														? formatMessage(messages.addToInstanceName, {
-																instanceName: instance.name,
-															})
-														: formatMessage(messages.addServerToInstance)
-											"
-											:disabled="allInstalledIds.has(project.project_id)"
-											@click.stop="() => handleAddServerToInstance(project)"
-										>
-											<CheckIcon v-if="allInstalledIds.has(project.project_id)" />
-											<PlusIcon v-else />
-										</button>
-									</ButtonStyled>
-									<ButtonStyled
-										v-if="runningServerProjects[project.project_id]"
-										color="red"
-										type="outlined"
-									>
-										<button @click="() => handleStopServerProject(project.project_id)">
-											<StopCircleIcon />
-											{{ formatMessage(commonMessages.stopButton) }}
-										</button>
-									</ButtonStyled>
-									<ButtonStyled v-else color="brand" type="outlined">
-										<button
-											:disabled="
-												(installingServerProjects as string[]).includes(project.project_id)
-											"
-											@click="() => handlePlayServerProject(project.project_id)"
-										>
-											<PlayIcon />
-											{{
-												formatMessage(
-													(installingServerProjects as string[]).includes(project.project_id)
-														? commonMessages.installingLabel
-														: commonMessages.playButton,
-												)
-											}}
-										</button>
-									</ButtonStyled>
-								</template>
-							</div>
-						</template>
-					</ProjectCard>
-				</template>
-				<template v-else>
-					<SearchCard
-						v-for="result in results?.hits ?? []"
-						:key="result?.project_id"
-						:project-type="projectType"
-						:project="result"
-						:instance="instance ?? undefined"
-						:active-loader="activeLoader ?? undefined"
-						:active-game-version="activeGameVersion ?? undefined"
-						:categories="[
-							...(categories ?? []).filter(
-								(cat) =>
-									result?.display_categories.includes(cat.name) && cat.project_type === projectType,
-							),
-							...(loaders ?? []).filter(
-								(loader) =>
-									result?.display_categories.includes(loader.name) &&
-									loader.supported_project_types?.includes(projectType),
-							),
-						]"
-						:installed="result.installed || allInstalledIds.has(result.project_id || '')"
-						@install="
-							(id) => {
-								newlyInstalled.push(id)
-							}
-						"
-						@contextmenu.prevent.stop="(event: any) => handleRightClick(event, result)"
-					/>
-				</template>
-
-				<ContextMenu ref="options" @option-clicked="handleOptionsClick">
+	<div class="flex flex-col gap-3 p-6">
+		<BrowsePageLayout>
+			<template #after>
+				<ContextMenu ref="contextMenuRef" @option-clicked="handleOptionsClick">
 					<template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
 					<template #copy_link> <ClipboardCopyIcon /> Copy link </template>
 				</ContextMenu>
-			</ProjectCardList>
-			<div class="flex justify-end">
-				<pagination
-					:page="currentPage"
-					:count="pageCount"
-					class="pagination-after"
-					@switch-page="setPage"
-				/>
-			</div>
-		</div>
+			</template>
+		</BrowsePageLayout>
+		<CreationFlowModal
+			v-if="isServerContext && projectType === 'modpack'"
+			ref="serverSetupModalRef"
+			:type="serverFlowFrom === 'reset-server' ? 'reset-server' : 'server-onboarding'"
+			:available-loaders="['vanilla', 'fabric', 'neoforge', 'forge', 'quilt', 'paper', 'purpur']"
+			:show-snapshot-toggle="true"
+			:on-back="onServerFlowBack"
+			:search-modpacks="searchServerModpacks"
+			:get-project-versions="getServerProjectVersions"
+			@hide="() => {}"
+			@browse-modpacks="() => {}"
+			@create="handleServerModpackFlowCreate"
+		/>
+		<Teleport to="#sidebar-teleport-target">
+			<BrowseSidebar />
+		</Teleport>
 	</div>
 </template>

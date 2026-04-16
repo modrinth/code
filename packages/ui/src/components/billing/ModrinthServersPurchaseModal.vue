@@ -8,8 +8,11 @@ import {
 	SpinnerIcon,
 	XIcon,
 } from '@modrinth/assets'
+import { useQueryClient } from '@tanstack/vue-query'
 import type Stripe from 'stripe'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+
+import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import { defineMessage, type MessageDescriptor, useVIntl } from '../../composables/i18n'
 import { useStripe } from '../../composables/stripe'
@@ -23,6 +26,8 @@ import PaymentMethodSelector from './ServersPurchase2PaymentMethod.vue'
 import ConfirmPurchase from './ServersPurchase3Review.vue'
 
 const { formatMessage } = useVIntl()
+const { addNotification } = injectNotificationManager()
+const queryClient = useQueryClient()
 
 export type RegionPing = {
 	region: string
@@ -34,7 +39,7 @@ export type ServerBillingInterval = 'monthly' | 'quarterly' | 'yearly'
 
 const props = defineProps<{
 	publishableKey: string
-	returnUrl: string
+	returnUrl?: string
 	paymentMethods: Stripe.PaymentMethod[]
 	customer: Stripe.Customer
 	currency: string
@@ -120,6 +125,16 @@ const titles: Record<Step, MessageDescriptor> = {
 	}),
 	review: defineMessage({ id: 'servers.purchase.step.review.title', defaultMessage: 'Review' }),
 }
+
+const purchaseSuccessTitle = defineMessage({
+	id: 'servers.purchase.notification.success.title',
+	defaultMessage: 'Purchase success',
+})
+
+const purchaseSuccessText = defineMessage({
+	id: 'servers.purchase.notification.success.text',
+	defaultMessage: 'Your Modrinth Hosting purchase was completed successfully.',
+})
 
 const currentRegion = computed(() => {
 	return props.regions.find((region) => region.shortcode === selectedRegion.value)
@@ -215,7 +230,22 @@ async function afterProceed(step: string) {
 
 async function setStep(step: Step | undefined, skipValidation = false) {
 	if (!step) {
-		await submitPayment(props.returnUrl)
+		const success = await submitPayment(props.returnUrl)
+
+		if (success) {
+			modal.value?.hide()
+			addNotification({
+				title: formatMessage(purchaseSuccessTitle),
+				text: formatMessage(purchaseSuccessText),
+				type: 'success',
+			})
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: ['servers'] }),
+				queryClient.invalidateQueries({ queryKey: ['servers', 'v1'] }),
+			])
+			emit('purchase-success')
+		}
+
 		return
 	}
 
@@ -264,7 +294,8 @@ function begin(
 	selectedInterval.value = interval
 	customServer.value = !selectedPlan.value
 	selectedPaymentMethod.value = undefined
-	currentStep.value = steps[0]
+	const skipPlanStep = props.planStage && plan !== undefined
+	currentStep.value = skipPlanStep ? (steps[1] ?? steps[0]) : steps[0]
 	skipPaymentMethods.value = true
 	projectId.value = project
 	modal.value?.show()
@@ -274,13 +305,17 @@ defineExpose({
 	show: begin,
 })
 
-defineEmits<{
-	(e: 'hide'): void
+const emit = defineEmits<{
+	(e: 'hide' | 'purchase-success'): void
 }>()
 
 function handleChooseCustom() {
 	customServer.value = true
 	selectedPlan.value = undefined
+}
+
+function handleProceed() {
+	setStep(nextStep.value)
 }
 
 // When the user explicitly wants to change or add a payment method from Review
@@ -328,7 +363,7 @@ function goToBreadcrumbStep(id: string) {
 				</template>
 			</div>
 		</template>
-		<div class="w-[40rem] max-w-full">
+		<div :class="currentStep === 'plan' ? 'w-[56rem] max-w-full' : 'w-[40rem] max-w-full'">
 			<PlanSelector
 				v-if="currentStep === 'plan'"
 				v-model:plan="selectedPlan"
@@ -337,6 +372,7 @@ function goToBreadcrumbStep(id: string) {
 				:available-products="availableProducts"
 				:currency="currency"
 				@choose-custom="handleChooseCustom"
+				@proceed="handleProceed"
 			/>
 			<RegionSelector
 				v-else-if="currentStep === 'region'"
@@ -374,7 +410,7 @@ function goToBreadcrumbStep(id: string) {
 				:ping="currentPing"
 				:loading="paymentMethodLoading"
 				:selected-payment-method="selectedPaymentMethod || inputtedPaymentMethod"
-				:has-payment-method="hasPaymentMethod"
+				:has-payment-method="!!hasPaymentMethod"
 				:tax="tax"
 				:total="total"
 				:no-payment-required="noPaymentRequired"
@@ -410,12 +446,12 @@ function goToBreadcrumbStep(id: string) {
 				<button v-if="previousStep" @click="previousStep && setStep(previousStep, true)">
 					<LeftArrowIcon /> {{ formatMessage(commonMessages.backButton) }}
 				</button>
-				<button v-else @click="modal?.hide()">
+				<button v-else-if="currentStep !== 'plan'" @click="modal?.hide()">
 					<XIcon />
 					{{ formatMessage(commonMessages.cancelButton) }}
 				</button>
 			</ButtonStyled>
-			<ButtonStyled color="brand">
+			<ButtonStyled v-if="currentStep !== 'plan'" color="brand">
 				<button
 					v-tooltip="
 						currentStep === 'review' && !acceptedEula && !noPaymentRequired

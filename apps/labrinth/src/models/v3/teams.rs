@@ -33,6 +33,23 @@ bitflags::bitflags! {
 
 bitflags_serde_impl!(ProjectPermissions, u64);
 
+impl utoipa::PartialSchema for ProjectPermissions {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        u64::schema()
+    }
+}
+
+impl utoipa::ToSchema for ProjectPermissions {
+    fn schemas(
+        schemas: &mut Vec<(
+            String,
+            utoipa::openapi::RefOr<utoipa::openapi::schema::Schema>,
+        )>,
+    ) {
+        u64::schemas(schemas);
+    }
+}
+
 impl Default for ProjectPermissions {
     fn default() -> ProjectPermissions {
         ProjectPermissions::empty()
@@ -91,6 +108,23 @@ bitflags::bitflags! {
 }
 
 bitflags_serde_impl!(OrganizationPermissions, u64);
+
+impl utoipa::PartialSchema for OrganizationPermissions {
+    fn schema() -> utoipa::openapi::RefOr<utoipa::openapi::schema::Schema> {
+        u64::schema()
+    }
+}
+
+impl utoipa::ToSchema for OrganizationPermissions {
+    fn schemas(
+        schemas: &mut Vec<(
+            String,
+            utoipa::openapi::RefOr<utoipa::openapi::schema::Schema>,
+        )>,
+    ) {
+        u64::schemas(schemas);
+    }
+}
 
 impl Default for OrganizationPermissions {
     fn default() -> OrganizationPermissions {
