@@ -548,11 +548,41 @@
   "files.editor.file-saved-title": {
     "defaultMessage": "File saved"
   },
+  "files.editor.find-close": {
+    "defaultMessage": "Close"
+  },
+  "files.editor.find-in-file": {
+    "defaultMessage": "Find"
+  },
+  "files.editor.find-match-count": {
+    "defaultMessage": "{current} of {total}"
+  },
+  "files.editor.find-next-match": {
+    "defaultMessage": "Next match"
+  },
+  "files.editor.find-no-results": {
+    "defaultMessage": "No results"
+  },
+  "files.editor.find-previous-match": {
+    "defaultMessage": "Previous match"
+  },
+  "files.editor.find-toggle-replace": {
+    "defaultMessage": "Toggle replace"
+  },
   "files.editor.log-url-copied-text": {
     "defaultMessage": "Your log file URL has been copied to your clipboard."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "Log URL copied"
+  },
+  "files.editor.replace": {
+    "defaultMessage": "Replace"
+  },
+  "files.editor.replace-all": {
+    "defaultMessage": "Replace All"
+  },
+  "files.editor.replace-in-file": {
+    "defaultMessage": "Replace"
   },
   "files.editor.save-failed-text": {
     "defaultMessage": "Could not save the file."
@@ -643,6 +673,9 @@
   },
   "files.navbar.file-navigation": {
     "defaultMessage": "File navigation"
+  },
+  "files.navbar.find-in-file": {
+    "defaultMessage": "Find in file"
   },
   "files.navbar.home": {
     "defaultMessage": "Home"
