@@ -1,6 +1,5 @@
 <script setup>
 import {
-	ChevronDownIcon,
 	ClipboardCopyIcon,
 	EyeIcon,
 	FolderOpenIcon,
@@ -11,8 +10,8 @@ import {
 	TrashIcon,
 } from '@modrinth/assets'
 import {
+	Accordion,
 	DropdownSelect,
-	Collapsible,
 	formatLoader,
 	injectNotificationManager,
 	StyledInput,
@@ -150,14 +149,14 @@ const isSectionCollapsed = (sectionName) => {
 	return collapsedSectionKeys.value.has(getSectionKey(sectionName))
 }
 
-const toggleSectionCollapsed = (sectionName) => {
+const setSectionCollapsed = (sectionName, collapsed) => {
 	const sectionKey = getSectionKey(sectionName)
 	const collapsedSections = new Set(state.value.collapsedGroups ?? [])
 
-	if (collapsedSections.has(sectionKey)) {
-		collapsedSections.delete(sectionKey)
-	} else {
+	if (collapsed) {
 		collapsedSections.add(sectionKey)
+	} else {
+		collapsedSections.delete(sectionKey)
 	}
 
 	state.value.collapsedGroups = [...collapsedSections]
@@ -303,44 +302,31 @@ const filteredResults = computed(() => {
 			<span class="font-semibold text-secondary">{{ selected }}</span>
 		</DropdownSelect>
 	</div>
-	<div
+	<Accordion
 		v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({
 			key,
 			value,
 		}))"
 		:key="instanceSection.key"
+		:divider="instanceSection.key !== 'None'"
+		:open-by-default="!isSectionCollapsed(instanceSection.key)"
 		class="row"
+		@on-open="setSectionCollapsed(instanceSection.key, false)"
+		@on-close="setSectionCollapsed(instanceSection.key, true)"
 	>
-		<div v-if="instanceSection.key !== 'None'" class="divider">
-			<button
-				class="divider-toggle"
-				:aria-expanded="!isSectionCollapsed(instanceSection.key)"
-				@click="toggleSectionCollapsed(instanceSection.key)"
-			>
-				<p>{{ instanceSection.key }}</p>
-				<ChevronDownIcon
-					class="chevron"
-					:class="{ collapsed: isSectionCollapsed(instanceSection.key) }"
-					aria-hidden="true"
-				/>
-			</button>
-			<hr aria-hidden="true" />
-		</div>
-		<Collapsible
-			base-class="instances-collapsible"
-			:collapsed="instanceSection.key !== 'None' && isSectionCollapsed(instanceSection.key)"
-		>
-			<section class="instances">
-				<Instance
-					v-for="instance in instanceSection.value"
-					ref="instanceComponents"
-					:key="instance.path + instance.install_stage"
-					:instance="instance"
-					@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
-				/>
-			</section>
-		</Collapsible>
-	</div>
+		<template v-if="instanceSection.key !== 'None'" #title>
+			<span class="text-base">{{ instanceSection.key }}</span>
+		</template>
+		<section class="instances">
+			<Instance
+				v-for="instance in instanceSection.value"
+				ref="instanceComponents"
+				:key="instance.path + instance.install_stage"
+				:instance="instance"
+				@contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
+			/>
+		</section>
+	</Accordion>
 	<ConfirmDeleteInstanceModal ref="confirmModal" @delete="deleteProfile" />
 	<ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
 		<template #play> <PlayIcon /> Play </template>
@@ -355,97 +341,7 @@ const filteredResults = computed(() => {
 </template>
 <style lang="scss" scoped>
 .row {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
 	width: 100%;
-
-	.divider {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-		gap: 1rem;
-		margin-bottom: 1rem;
-		min-height: 1.5rem;
-
-		.divider-toggle {
-			display: flex;
-			align-items: center;
-			gap: 0.25rem;
-			background: transparent;
-			border: none;
-			padding: 0;
-			cursor: pointer;
-			color: var(--color-contrast);
-			font: inherit;
-		}
-
-		p {
-			margin: 0;
-			font-size: 1rem;
-			white-space: nowrap;
-			color: var(--color-contrast);
-		}
-
-		.chevron {
-			width: 1rem;
-			height: 1rem;
-			color: var(--color-secondary);
-			transition: transform 0.15s ease;
-
-			&.collapsed {
-				transform: rotate(-90deg);
-			}
-		}
-
-		hr {
-			background-color: var(--color-gray);
-			height: 1px;
-			width: 100%;
-			border: none;
-		}
-	}
-}
-
-.header {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	gap: 1rem;
-	align-items: inherit;
-	margin: 1rem 1rem 0 !important;
-	padding: 1rem;
-	width: calc(100% - 2rem);
-
-	.iconified-input {
-		flex-grow: 1;
-
-		input {
-			min-width: 100%;
-		}
-	}
-
-	.sort-dropdown {
-		width: 10rem;
-	}
-
-	.filter-dropdown {
-		width: 15rem;
-	}
-
-	.group-dropdown {
-		width: 10rem;
-	}
-
-	.labeled_button {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 0.5rem;
-		white-space: nowrap;
-	}
 }
 
 .instances {
@@ -456,10 +352,5 @@ const filteredResults = computed(() => {
 	margin-right: auto;
 	scroll-behavior: smooth;
 	overflow-y: auto;
-}
-
-.instances-collapsible {
-	align-self: stretch;
-	width: 100%;
 }
 </style>
