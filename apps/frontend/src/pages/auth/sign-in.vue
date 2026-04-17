@@ -49,6 +49,18 @@ useHead({
 const auth = await useAuth()
 const route = useNativeRoute()
 
+if (route.query.state !== undefined) {
+	await navigateTo(
+		{
+			path: '/auth/create/oauth',
+			query: route.query,
+		},
+		{
+			replace: true,
+		},
+	)
+}
+
 const redirectTarget = route.query.redirect || ''
 const subtleLauncherRedirectUri = ref()
 

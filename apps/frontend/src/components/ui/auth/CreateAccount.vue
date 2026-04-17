@@ -1,39 +1,46 @@
 <template>
-	<div class="create-account-card">
-		<h1 class="create-account-title">{{ formatMessage(messages.title) }}</h1>
+	<div
+		class="shadow-card mx-auto flex w-full max-w-[30rem] flex-col gap-6 rounded-2xl border border-button-bg bg-surface-3 p-6"
+	>
+		<h1
+			class="mx-auto my-0 flex w-full justify-center text-center text-2xl font-semibold text-contrast"
+		>
+			{{ formatMessage(messages.title) }}
+		</h1>
 
-		<section v-if="requiresDob" class="create-account-section">
-			<label class="create-account-label" for="create-account-dob">
+		<section v-if="requiresDob" class="flex flex-col gap-2.5">
+			<label class="text-md font-semibold text-contrast" for="create-account-dob">
 				{{ formatMessage(messages.dateOfBirthLabel) }}
 			</label>
-			<div class="date-input-wrap">
-				<input
-					id="create-account-dob"
-					v-model="dateOfBirthModel"
-					class="date-input"
-					type="date"
-					:max="maxBirthDate"
-				/>
-				<CalendarIcon class="date-input-icon" />
-			</div>
-			<p class="helper-text">{{ formatMessage(messages.over13HelperText) }}</p>
+			<input
+				id="create-account-dob"
+				v-model="dateOfBirthModel"
+				class="scheme-dark w-full border-0 bg-surface-4 text-lg text-contrast outline-none [color-scheme:dark]"
+				type="date"
+				:max="maxBirthDate"
+			/>
+			<div>You must be over 13 years old to use Modrinth.</div>
+			<Admonition type="info">
+				<div class="flex flex-col gap-1.5 leading-normal">
+					<div>
+						{{ formatMessage(messages.infoPanelText) }}
+					</div>
+					<a
+						class="w-fit text-link"
+						:href="sourceCodeUrl"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{{ formatMessage(messages.relevantSourceCodeText) }}
+					</a>
+				</div>
+			</Admonition>
 		</section>
 
-		<section class="info-panel">
-			<div class="info-panel-icon">
-				<InfoIcon />
-			</div>
-			<div class="info-panel-content">
-				<p>{{ formatMessage(messages.infoPanelText) }}</p>
-				<a class="text-link" :href="sourceCodeUrl" target="_blank" rel="noopener noreferrer">
-					{{ formatMessage(messages.relevantSourceCodeText) }}
-				</a>
-			</div>
-		</section>
-
-		<section class="create-account-section">
-			<label class="create-account-label" for="create-account-username">
+		<section class="flex flex-col gap-2.5">
+			<label class="text-md font-semibold text-contrast" for="create-account-username">
 				{{ formatMessage(messages.usernameOptionalLabel) }}
+				<span class="font-normal text-primary">(optional)</span>
 			</label>
 			<StyledInput
 				id="create-account-username"
@@ -44,23 +51,21 @@
 			/>
 		</section>
 
-		<section class="create-account-section">
-			<label class="create-account-label">{{ formatMessage(messages.securityCheckLabel) }}</label>
-			<div class="captcha-wrap">
-				<HCaptcha v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
-			</div>
+		<section class="flex flex-col gap-2.5" v-if="globals?.captcha_enabled">
+			<label class="text-md font-semibold text-contrast">{{
+				formatMessage(messages.securityCheckLabel)
+			}}</label>
+			<HCaptcha v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
 		</section>
 
-		<Checkbox
-			v-model="subscribeModel"
-			class="subscribe-checkbox"
-			:label="formatMessage(messages.subscribeLabel)"
-			:description="formatMessage(messages.subscribeLabel)"
-		/>
+		<div class="flex gap-2.5 rounded-2xl border border-solid border-surface-5 p-3 leading-normal">
+			<Checkbox v-model="subscribeModel" class="text-left" />
+			<div>{{ formatMessage(messages.subscribeLabel) }}</div>
+		</div>
 
 		<ButtonStyled color="brand">
 			<button
-				class="!w-full complete-sign-up-btn"
+				class="!w-full font-bold"
 				:disabled="globals?.captcha_enabled ? !tokenModel : false"
 				@click="onCompleteSignUp()"
 			>
@@ -71,8 +76,14 @@
 </template>
 
 <script setup>
-import { CalendarIcon, InfoIcon } from '@modrinth/assets'
-import { ButtonStyled, Checkbox, defineMessages, StyledInput, useVIntl } from '@modrinth/ui'
+import {
+	Admonition,
+	ButtonStyled,
+	Checkbox,
+	defineMessages,
+	StyledInput,
+	useVIntl,
+} from '@modrinth/ui'
 import { computed } from 'vue'
 
 import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
@@ -104,7 +115,8 @@ const props = defineProps({
 	},
 	sourceCodeUrl: {
 		type: String,
-		default: 'https://github.com/modrinth/labrinth/blob/main/apps/labrinth/src/routes/internal/flows.rs',
+		default:
+			'https://github.com/modrinth/labrinth/blob/main/apps/labrinth/src/routes/internal/flows.rs',
 	},
 	onCompleteSignUp: {
 		type: Function,
@@ -166,7 +178,8 @@ const messages = defineMessages({
 	},
 	infoPanelText: {
 		id: 'auth.create-account.info-panel.text',
-		defaultMessage: 'We do not store your date of birth, it is only used to confirm your age at sign up.',
+		defaultMessage:
+			'We do not store your date of birth, it is only used to confirm your age at sign up.',
 	},
 	relevantSourceCodeText: {
 		id: 'auth.create-account.info-panel.source-code-link',
@@ -174,7 +187,7 @@ const messages = defineMessages({
 	},
 	usernameOptionalLabel: {
 		id: 'auth.create-account.username.optional-label',
-		defaultMessage: 'Username (Optional)',
+		defaultMessage: 'Username',
 	},
 	usernamePlaceholder: {
 		id: 'auth.create-account.username.placeholder',
@@ -194,113 +207,3 @@ const messages = defineMessages({
 	},
 })
 </script>
-
-<style scoped lang="scss">
-.create-account-card {
-	background: var(--color-raised-bg);
-	border: 1px solid var(--color-button-bg);
-	border-radius: var(--size-rounded-xl);
-	box-shadow: var(--shadow-card);
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-md);
-	margin-inline: auto;
-	max-width: 30rem;
-	padding: var(--gap-xl);
-}
-
-.create-account-title {
-	font-size: var(--text-4xl);
-	font-weight: var(--weight-bold);
-	line-height: 1.2;
-	margin: 0;
-	text-align: center;
-}
-
-.create-account-section {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-sm);
-}
-
-.create-account-label {
-	color: var(--color-contrast);
-	font-size: var(--text-xl);
-	font-weight: var(--weight-bold);
-}
-
-.date-input-wrap {
-	align-items: center;
-	background: var(--color-button-bg);
-	border-radius: var(--size-rounded-lg);
-	display: flex;
-	gap: var(--gap-sm);
-	padding: 0.875rem 1rem;
-}
-
-.date-input {
-	background: transparent;
-	border: 0;
-	color: var(--color-contrast);
-	font-size: var(--text-lg);
-	outline: none;
-	width: 100%;
-}
-
-.date-input-icon {
-	color: var(--color-secondary);
-	flex-shrink: 0;
-	height: 1.2rem;
-	width: 1.2rem;
-}
-
-.helper-text {
-	color: var(--color-secondary);
-	font-size: var(--text-lg);
-	margin: 0;
-}
-
-.info-panel {
-	background: color-mix(in oklab, var(--color-brand) 20%, var(--color-bg));
-	border: 1px solid color-mix(in oklab, var(--color-brand) 80%, transparent);
-	border-radius: var(--size-rounded-xl);
-	display: flex;
-	gap: var(--gap-sm);
-	padding: var(--gap-md);
-}
-
-.info-panel-icon {
-	color: var(--color-brand);
-	display: flex;
-	flex-shrink: 0;
-}
-
-.info-panel-content {
-	display: flex;
-	flex-direction: column;
-	gap: var(--gap-xs);
-
-	p {
-		color: var(--color-contrast);
-		font-size: var(--text-lg);
-		margin: 0;
-	}
-}
-
-.captcha-wrap {
-	background: var(--color-button-bg);
-	border-radius: var(--size-rounded-lg);
-	min-height: 4.25rem;
-	padding: var(--gap-md);
-}
-
-.subscribe-checkbox {
-	border: 1px solid var(--color-button-bg);
-	border-radius: var(--size-rounded-xl);
-	padding: 0.75rem 1rem;
-}
-
-.complete-sign-up-btn {
-	font-weight: var(--weight-bold);
-}
-</style>
