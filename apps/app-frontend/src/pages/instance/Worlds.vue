@@ -37,6 +37,7 @@
 		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
 		@proceed="proceedDeleteWorld"
 	/>
+	<ReadyTransition :pending="worldsQuery.isLoading.value && !worldsQuery.data.value">
 	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 		<div class="flex flex-wrap items-center gap-2">
 			<StyledInput
@@ -158,6 +159,7 @@
 			</ButtonStyled>
 		</template>
 	</EmptyState>
+	</ReadyTransition>
 </template>
 <script setup lang="ts">
 import { CompassIcon, FilterIcon, PlusIcon, RefreshCwIcon, SearchIcon } from '@modrinth/assets'
@@ -169,11 +171,13 @@ import {
 	GAME_MODES,
 	type GameVersion,
 	injectNotificationManager,
+	ReadyTransition,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { platform } from '@tauri-apps/plugin-os'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import type ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -344,10 +348,18 @@ function toggleFilter(id: string) {
 	}
 }
 
+const queryClient = useQueryClient()
+
 const refreshingAll = ref(false)
 const hadNoWorlds = ref(true)
 const startingInstance = ref(false)
 const worldPlaying = ref<World>()
+
+const worldsQuery = useQuery({
+	queryKey: computed(() => ['worlds', instance.value.path]),
+	queryFn: () => refreshWorlds(instance.value.path),
+	staleTime: 30_000,
+})
 
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})
@@ -358,6 +370,14 @@ const isLinux = platform() === 'linux'
 const linuxRefreshCount = ref(0)
 
 const protocolVersion = ref<ProtocolVersion | null>(null)
+
+watch(() => worldsQuery.data.value, (data) => {
+	if (data) {
+		worlds.value = [...data]
+		refreshServers(worlds.value, serverData.value, protocolVersion.value)
+		hadNoWorlds.value = worlds.value.length === 0
+	}
+}, { immediate: true })
 const managedServerName = ref<string | null>(null)
 const managedServerAddress = ref<string | null>(null)
 
@@ -385,8 +405,8 @@ async function refreshManagedServerMetadata() {
 
 	try {
 		const [project, projectV3] = await Promise.all([
-			get_project(projectId, 'bypass'),
-			get_project_v3(projectId, 'bypass'),
+			get_project(projectId),
+			get_project_v3(projectId),
 		])
 
 		if (projectV3?.minecraft_server == null) {
@@ -422,27 +442,40 @@ watch(
 	{ immediate: true },
 )
 
-const [unlistenProfile, , resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
-	profile_listener(async (e: ProfileEvent) => {
-		if (e.profile_path_id !== instance.value.path) return
+let unlistenProfile: (() => void) | null = null
+let worldsTabAlive = true
 
-		console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
+async function initWorldsTab() {
+	const [_unlistenProfile, resolvedProtocolVersion, resolvedGameVersions] = await Promise.all([
+		profile_listener(async (e: ProfileEvent) => {
+			if (e.profile_path_id !== instance.value.path) return
 
-		if (e.event === 'servers_updated') {
-			if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
-			if (isLinux) linuxRefreshCount.value++
+			console.info(`Handling profile event '${e.event}' for profile: ${e.profile_path_id}`)
 
-			await refreshAllWorlds()
-		}
+			if (e.event === 'servers_updated') {
+				if (isLinux && linuxRefreshCount.value >= MAX_LINUX_REFRESHES) return
+				if (isLinux) linuxRefreshCount.value++
 
-		await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
-	}),
-	refreshAllWorlds(),
-	get_profile_protocol_version(instance.value.path).catch(() => null),
-	get_game_versions().catch(() => [] as GameVersion[]),
-])
+				await refreshAllWorlds()
+			}
 
-protocolVersion.value = resolvedProtocolVersion
+			await handleDefaultProfileUpdateEvent(worlds.value, instance.value.path, e)
+		}),
+		get_profile_protocol_version(instance.value.path).catch(() => null),
+		get_game_versions().catch(() => [] as GameVersion[]),
+	])
+
+	if (!worldsTabAlive) {
+		_unlistenProfile()
+		return
+	}
+
+	unlistenProfile = _unlistenProfile
+	protocolVersion.value = resolvedProtocolVersion
+	gameVersions.value = resolvedGameVersions
+}
+
+initWorldsTab()
 
 async function refreshServer(address: string) {
 	if (!serverData.value[address]) {
@@ -458,26 +491,10 @@ async function refreshAllWorlds() {
 		console.log(`Already refreshing, cancelling refresh.`)
 		return
 	}
-	await refreshManagedServerMetadata()
 
 	refreshingAll.value = true
-
-	worlds.value = await refreshWorlds(instance.value.path).finally(
-		() => (refreshingAll.value = false),
-	)
-	refreshServers(worlds.value, serverData.value, protocolVersion.value)
-
-	const hasNoWorlds = worlds.value.length === 0
-
-	if (hadNoWorlds.value && hasNoWorlds) {
-		setTimeout(() => {
-			refreshingAll.value = false
-		}, 1000)
-	} else {
-		refreshingAll.value = false
-	}
-
-	hadNoWorlds.value = hasNoWorlds
+	await queryClient.invalidateQueries({ queryKey: ['worlds', instance.value.path] })
+	refreshingAll.value = false
 }
 
 async function addServer(server: ServerWorld) {
@@ -592,7 +609,7 @@ function worldsMatch(world: World, other: World | undefined) {
 	return false
 }
 
-const gameVersions = ref<GameVersion[]>(resolvedGameVersions)
+const gameVersions = ref<GameVersion[]>([])
 const supportsServerQuickPlay = computed(() =>
 	hasServerQuickPlaySupport(gameVersions.value, instance.value.game_version),
 )
@@ -749,7 +766,8 @@ async function proceedDeleteWorld() {
 	worldToDelete.value = undefined
 }
 
-onUnmounted(() => {
-	unlistenProfile()
+onBeforeUnmount(() => {
+	worldsTabAlive = false
+	unlistenProfile?.()
 })
 </script>

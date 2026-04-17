@@ -15,7 +15,6 @@ import {
 	RefreshCwIcon,
 	SearchIcon,
 	ShareIcon,
-	SpinnerIcon,
 	TextCursorInputIcon,
 	TrashIcon,
 	UploadIcon,
@@ -504,30 +503,21 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 
 <template>
 	<div class="flex flex-col gap-4 pb-6">
-		<div
-			v-if="ctx.loading.value"
-			role="status"
-			aria-live="polite"
-			class="flex min-h-[50vh] w-full flex-col items-center justify-center gap-2 text-center text-secondary"
-		>
-			<SpinnerIcon class="animate-spin" />
-			{{ formatMessage(messages.loadingContent) }}
-		</div>
-
-		<div
-			v-else-if="ctx.error.value"
-			class="flex w-full flex-col items-center justify-center gap-4 p-4"
-		>
-			<div class="universal-card flex flex-col items-center gap-4 p-6">
-				<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
-				<p class="text-secondary">{{ ctx.error.value.message }}</p>
-				<ButtonStyled color="brand">
-					<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
-				</ButtonStyled>
+		<template v-if="!ctx.loading.value">
+			<div
+				v-if="ctx.error.value"
+				class="flex w-full flex-col items-center justify-center gap-4 p-4"
+			>
+				<div class="universal-card flex flex-col items-center gap-4 p-6">
+					<h2 class="m-0 text-xl font-bold">{{ formatMessage(messages.failedToLoad) }}</h2>
+					<p class="text-secondary">{{ ctx.error.value.message }}</p>
+					<ButtonStyled color="brand">
+						<button @click="handleRefresh">{{ formatMessage(commonMessages.retryButton) }}</button>
+					</ButtonStyled>
+				</div>
 			</div>
-		</div>
 
-		<template v-else>
+			<template v-else>
 			<Admonition v-if="ctx.isBusy.value && ctx.busyMessage?.value" type="warning">
 				<template #header>{{ ctx.busyMessage.value }}</template>
 				{{ formatMessage(messages.busyDescription) }}
@@ -802,6 +792,7 @@ const confirmUnlinkModal = ref<InstanceType<typeof ConfirmUnlinkModal>>()
 					</ButtonStyled>
 				</template>
 			</EmptyState>
+		</template>
 		</template>
 
 		<ContentSelectionBar

@@ -87,13 +87,13 @@
 
 <script setup>
 import { MaximizeIcon, MinimizeIcon, XIcon } from '@modrinth/assets'
+import { injectLoadingState } from '@modrinth/ui'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { ref, watch } from 'vue'
 
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
 import { getOS } from '@/helpers/utils.js'
-import { useLoading } from '@/store/loading.js'
 
 const doneLoading = ref(false)
 const loadingProgress = ref(0)
@@ -103,13 +103,13 @@ const message = ref()
 // const MIN_DISPLAY_MS = 1000
 // const mountedAt = Date.now()
 
-const loading = useLoading()
+const loading = injectLoadingState()
 
 watch(
-	loading,
-	(newValue) => {
-		if (!newValue.barEnabled) {
-			if (loading.loading) {
+	[loading.barEnabled, loading.pending],
+	([barEnabled, pending]) => {
+		if (!barEnabled) {
+			if (pending) {
 				loadingProgress.value = 0
 				fakeLoadingIncrease()
 			} else {
@@ -117,7 +117,7 @@ watch(
 				// const delay = Math.max(0, MIN_DISPLAY_MS - elapsed)
 
 				// setTimeout(() => {
-				// 	if (loading.loading) return
+				// 	if (loading.pending.value) return
 
 				loadingProgress.value = 100
 				doneLoading.value = true

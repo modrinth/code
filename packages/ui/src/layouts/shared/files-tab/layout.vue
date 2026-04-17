@@ -31,17 +31,7 @@
 			><TrashIcon class="size-5" /> {{ formatMessage(commonMessages.deleteLabel) }}</template
 		>
 	</FileContextMenu>
-	<Transition name="fade" mode="out-in">
-		<div
-			v-if="ctx.loading.value && items.length === 0"
-			key="loading"
-			class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
-		>
-			<SpinnerIcon class="animate-spin" />
-			{{ formatMessage(messages.loadingFiles) }}
-		</div>
-
-		<div v-else key="content" class="contents">
+	<div v-if="!(ctx.loading.value && items.length === 0)" class="contents">
 			<Admonition v-if="ctx.busyWarning?.value" type="warning" class="mb-5">
 				<template #header>{{ ctx.busyWarning.value }}</template>
 				{{ formatMessage(messages.busyWarning) }}
@@ -204,7 +194,6 @@
 				</div>
 			</FloatingActionBar>
 		</div>
-	</Transition>
 </template>
 
 <script setup lang="ts">
@@ -216,7 +205,6 @@ import {
 	PackageOpenIcon,
 	RightArrowIcon,
 	SaveIcon,
-	SpinnerIcon,
 	TrashIcon,
 } from '@modrinth/assets'
 import type { Component } from 'vue'
@@ -256,10 +244,6 @@ import type { FileContextMenuOption, FileItem } from './types'
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	loadingFiles: {
-		id: 'files.layout.loading',
-		defaultMessage: 'Loading files...',
-	},
 	busyWarning: {
 		id: 'files.layout.busy-warning',
 		defaultMessage: 'File operations are disabled while the operation is in progress.',

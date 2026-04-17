@@ -46,18 +46,14 @@
 				</ButtonStyled>
 			</div>
 
-			<div class="flex w-full flex-col gap-1.5">
-				<Transition name="fade" mode="out-in">
-					<div
-						v-if="groupedBackups.length === 0"
-						key="empty"
-						class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
-					>
-						<template v-if="!backupsData">
-							<SpinnerIcon class="animate-spin" />
-							Loading backups...
-						</template>
-						<template v-else>
+			<template v-if="backupsData">
+				<div class="flex w-full flex-col gap-1.5">
+					<Transition name="fade" mode="out-in">
+						<div
+							v-if="groupedBackups.length === 0"
+							key="empty"
+							class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
+						>
 							<EmptyState
 								type="empty-inbox"
 								heading="No backups yet"
@@ -77,46 +73,46 @@
 									</ButtonStyled>
 								</template>
 							</EmptyState>
-						</template>
-					</div>
+						</div>
 
-					<div v-else key="list" class="flex flex-col gap-1.5">
-						<template v-for="group in groupedBackups" :key="group.label">
-							<div class="flex items-center gap-2">
-								<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
-								<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
-							</div>
-
-							<div class="flex gap-2">
-								<div class="flex w-5 justify-center">
-									<div class="h-full w-px bg-surface-5" />
+						<div v-else key="list" class="flex flex-col gap-1.5">
+							<template v-for="group in groupedBackups" :key="group.label">
+								<div class="flex items-center gap-2">
+									<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
+									<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
 								</div>
 
-								<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
-									<BackupItem
-										v-for="backup in group.backups"
-										:key="`backup-${backup.id}`"
-										:backup="backup"
-										:restore-disabled="backupRestoreDisabled"
-										:kyros-url="server.node?.instance"
-										:jwt="server.node?.token"
-										:show-copy-id-action="showCopyIdAction"
-										:show-debug-info="showDebugInfo"
-										@download="() => triggerDownloadAnimation()"
-										@rename="() => renameBackupModal?.show(backup)"
-										@restore="() => restoreBackupModal?.show(backup)"
-										@delete="
-											(skipConfirmation?: boolean) =>
-												skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
-										"
-										@retry="() => retryBackup(backup.id)"
-									/>
-								</TransitionGroup>
-							</div>
-						</template>
-					</div>
-				</Transition>
-			</div>
+								<div class="flex gap-2">
+									<div class="flex w-5 justify-center">
+										<div class="h-full w-px bg-surface-5" />
+									</div>
+
+									<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
+										<BackupItem
+											v-for="backup in group.backups"
+											:key="`backup-${backup.id}`"
+											:backup="backup"
+											:restore-disabled="backupRestoreDisabled"
+											:kyros-url="server.node?.instance"
+											:jwt="server.node?.token"
+											:show-copy-id-action="showCopyIdAction"
+											:show-debug-info="showDebugInfo"
+											@download="() => triggerDownloadAnimation()"
+											@rename="() => renameBackupModal?.show(backup)"
+											@restore="() => restoreBackupModal?.show(backup)"
+											@delete="
+												(skipConfirmation?: boolean) =>
+													skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
+											"
+											@retry="() => retryBackup(backup.id)"
+										/>
+									</TransitionGroup>
+								</div>
+							</template>
+						</div>
+					</Transition>
+				</div>
+			</template>
 
 			<div
 				class="over-the-top-download-animation"
@@ -142,7 +138,7 @@
 
 <script setup lang="ts">
 import type { Archon } from '@modrinth/api-client'
-import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon, SpinnerIcon } from '@modrinth/assets'
+import { CalendarIcon, DownloadIcon, IssuesIcon, PlusIcon } from '@modrinth/assets'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import dayjs from 'dayjs'
 import type { Component } from 'vue'

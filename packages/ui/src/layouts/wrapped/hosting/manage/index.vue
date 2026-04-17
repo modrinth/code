@@ -80,32 +80,9 @@
 			</div>
 		</div>
 
-		<Transition v-else name="fade" mode="out-in">
+		<ReadyTransition :pending="isLoading || !authReady">
 			<div
-				v-if="(isLoading || !authReady) && !serverResponse"
-				key="loading"
-				class="flex flex-col gap-4 py-8"
-			>
-				<div class="mb-4 text-center">
-					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
-					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
-				</div>
-				<div
-					v-for="i in 3"
-					:key="i"
-					class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4"
-				>
-					<div class="size-16 rounded-xl bg-button-bg"></div>
-					<div class="flex flex-1 flex-col gap-2">
-						<div class="h-6 w-48 rounded bg-button-bg"></div>
-						<div class="h-4 w-64 rounded bg-button-bg opacity-75"></div>
-					</div>
-				</div>
-			</div>
-
-			<div
-				v-else-if="serverList.length === 0 && !isPollingForNewServers"
-				key="empty"
+				v-if="serverList.length === 0 && !isPollingForNewServers"
 				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
 				<ServerListEmpty
@@ -115,7 +92,7 @@
 				/>
 			</div>
 
-			<div v-else key="list">
+			<div v-else>
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
@@ -183,12 +160,9 @@
 						:on-download-backup="serverBillingMap.get(server.server_id)?.onDownloadBackup"
 					/>
 				</TransitionGroup>
-				<div v-else-if="isLoading" class="flex h-full items-center justify-center">
-					<p class="text-contrast"><LoaderCircleIcon class="size-5 animate-spin" /></p>
-				</div>
 				<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
 			</div>
-		</Transition>
+		</ReadyTransition>
 	</div>
 </template>
 
@@ -204,6 +178,7 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
+	ReadyTransition,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
