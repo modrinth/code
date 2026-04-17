@@ -20,15 +20,24 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	const isStopping = computed(() => powerState.value === 'stopping')
 	const isStarting = computed(() => powerState.value === 'starting')
 	const isTransitioning = computed(() => isStarting.value || isStopping.value)
-	const showStopButton = computed(() => isRunning.value || isStarting.value)
+
+	const showStopSplit = computed(() => isRunning.value || isStarting.value || isStopping.value)
+	const showRestartButton = computed(() => isRunning.value || isStarting.value)
+
+	const isBlockedByPropsOrBusy = computed(
+		() => Boolean(options?.disabled?.value) || busyReasons.value.length > 0,
+	)
 
 	const busyTooltip = computed(() => {
 		if (isStarting.value) return 'Your server is starting'
 		return busyReasons.value.length > 0 ? formatMessage(busyReasons.value[0].reason) : undefined
 	})
 
-	const canTakeAction = computed(
-		() => !isTransitioning.value && !options?.disabled?.value && busyReasons.value.length === 0,
+	const canTakeAction = computed(() => !isTransitioning.value && !isBlockedByPropsOrBusy.value)
+
+	const canKill = computed(
+		() =>
+			!isBlockedByPropsOrBusy.value && (isStopping.value || isRunning.value || isStarting.value),
 	)
 
 	const primaryActionText = computed(() => {
@@ -57,7 +66,11 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 	}
 
 	function initiateAction(action: PowerAction) {
-		if (!canTakeAction.value) return
+		if (action === 'Kill') {
+			if (!canKill.value) return
+		} else {
+			if (!canTakeAction.value) return
+		}
 		void sendPowerAction(action)
 	}
 
@@ -70,9 +83,11 @@ export function useServerPowerAction(options?: { disabled?: Ref<boolean> }) {
 		isRunning,
 		isStopping,
 		isTransitioning,
-		showStopButton,
+		showStopSplit,
+		showRestartButton,
 		busyTooltip,
 		canTakeAction,
+		canKill,
 		primaryActionText,
 		sendPowerAction,
 		initiateAction,

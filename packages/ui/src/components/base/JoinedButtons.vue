@@ -1,13 +1,26 @@
 <template>
 	<div class="joined-buttons">
-		<ButtonStyled :color="color">
-			<button :disabled="disabled" @click="handlePrimaryAction">
+		<ButtonStyled
+			:color="color"
+			:size="size"
+			:class="{ 'joined-buttons__primary--muted': primaryMuted }"
+		>
+			<button :disabled="primaryDisabledResolved" @click="handlePrimaryAction">
 				<component :is="primaryAction.icon" v-if="primaryAction.icon" aria-hidden="true" />
 				{{ primaryAction.label }}
 			</button>
 		</ButtonStyled>
-		<ButtonStyled v-if="dropdownActions.length > 0" :color="color">
-			<OverflowMenu class="btn-dropdown-animation" :options="dropdownOptions" :disabled="disabled">
+		<ButtonStyled
+			v-if="dropdownActions.length > 0"
+			:color="color"
+			:size="size"
+			class="joined-buttons__dropdown"
+		>
+			<OverflowMenu
+				class="btn-dropdown-animation !w-10"
+				:options="dropdownOptions"
+				:disabled="dropdownDisabledResolved"
+			>
 				<DropdownIcon />
 				<template v-for="action in dropdownActions" :key="action.id" #[action.id]>
 					<component :is="action.icon" v-if="action.icon" aria-hidden="true" />
@@ -40,13 +53,24 @@ export interface JoinedButtonAction {
 interface Props {
 	actions: JoinedButtonAction[]
 	color?: Colors
+	size?: 'standard' | 'large' | 'small'
 	disabled?: boolean
+	primaryDisabled?: boolean
+	dropdownDisabled?: boolean
+	primaryMuted?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
 	color: 'standard',
+	size: 'standard',
 	disabled: false,
+	primaryDisabled: undefined,
+	dropdownDisabled: undefined,
+	primaryMuted: false,
 })
+
+const primaryDisabledResolved = computed(() => props.primaryDisabled ?? props.disabled)
+const dropdownDisabledResolved = computed(() => props.dropdownDisabled ?? props.disabled)
 
 const primaryAction = computed(() => props.actions[0])
 
@@ -84,7 +108,7 @@ const dropdownOptions = computed(() =>
 )
 
 function handlePrimaryAction() {
-	if (primaryAction.value && !props.disabled) {
+	if (primaryAction.value && !primaryDisabledResolved.value) {
 		primaryAction.value.action()
 	}
 }
@@ -117,5 +141,9 @@ function handlePrimaryAction() {
 
 .btn-dropdown-animation {
 	padding: 0.5rem !important;
+}
+
+.joined-buttons__primary--muted {
+	opacity: 0.6;
 }
 </style>

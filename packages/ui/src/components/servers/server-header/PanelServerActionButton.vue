@@ -7,50 +7,46 @@
 				</button>
 			</ButtonStyled>
 
-			<template v-else>
-				<ButtonStyled v-if="showStopButton" type="standard" color="red" size="large">
-					<button
-						v-tooltip="busyTooltip"
-						:disabled="!canTakeAction"
-						@click="initiateAction('Stop')"
-					>
-						<div class="flex gap-1">
-							<StopCircleIcon class="h-5 w-5" />
-							<span>Stop</span>
-						</div>
+			<template v-else-if="showRestartButton">
+				<ButtonStyled type="standard" color="orange" size="large">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+						<UpdatedIcon />
+						<span>{{ primaryActionText }}</span>
 					</button>
 				</ButtonStyled>
 
-				<div v-if="showRestartDropdown" class="joined-buttons">
-					<ButtonStyled type="standard" color="orange" size="large">
-						<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-							<UpdatedIcon />
-							<span>{{ primaryActionText }}</span>
-						</button>
-					</ButtonStyled>
-					<ButtonStyled type="standard" color="orange" size="large">
-						<OverflowMenu
-							v-tooltip="busyTooltip"
-							:disabled="!canTakeAction"
-							:options="[
-								{
-									id: 'kill_server',
-									action: () => initiateAction('Kill'),
-								},
-							]"
-						>
-							<div class="w-0 text-xl relative top-0.5 right-2.5">
-								<DropdownIcon />
-							</div>
+				<JoinedButtons
+					color="red"
+					size="large"
+					:actions="stopSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canKill"
+				>
+					<template #kill_server>
+						<SlashIcon class="h-5 w-5" />
+						Kill server
+					</template>
+				</JoinedButtons>
+			</template>
 
-							<template #kill_server>
-								<SlashIcon class="h-5 w-5" />
-								Kill server
-							</template>
-						</OverflowMenu>
-					</ButtonStyled>
-				</div>
-				<ButtonStyled v-else type="standard" color="brand" size="large">
+			<template v-else-if="isStopping">
+				<JoinedButtons
+					color="red"
+					size="large"
+					:actions="stopSplitActions"
+					:primary-disabled="true"
+					:dropdown-disabled="!canKill"
+					:primary-muted="true"
+				>
+					<template #kill_server>
+						<SlashIcon class="h-5 w-5" />
+						Kill server
+					</template>
+				</JoinedButtons>
+			</template>
+
+			<template v-else>
+				<ButtonStyled type="standard" color="brand" size="large">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
 						<PlayIcon />
 						<span>{{ primaryActionText }}</span>
@@ -63,7 +59,6 @@
 
 <script setup lang="ts">
 import {
-	DropdownIcon,
 	LoaderCircleIcon,
 	PlayIcon,
 	SlashIcon,
@@ -72,7 +67,7 @@ import {
 } from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { ButtonStyled, OverflowMenu } from '#ui/components'
+import { ButtonStyled, type JoinedButtonAction, JoinedButtons } from '#ui/components'
 
 import { useServerPowerAction } from './use-server-power-action'
 
@@ -87,9 +82,11 @@ const props = withDefaults(
 
 const {
 	isInstalling,
-	showStopButton,
+	isStopping,
+	showRestartButton,
 	busyTooltip,
 	canTakeAction,
+	canKill,
 	primaryActionText,
 	initiateAction,
 	handlePrimaryAction,
@@ -97,31 +94,18 @@ const {
 	disabled: computed(() => props.disabled),
 })
 
-const showRestartDropdown = computed(() => primaryActionText.value === 'Restart')
+const stopSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'stop',
+		label: isStopping.value ? 'Stopping' : 'Stop',
+		icon: StopCircleIcon,
+		action: () => initiateAction('Stop'),
+	},
+	{
+		id: 'kill_server',
+		label: 'Kill server',
+		icon: SlashIcon,
+		action: () => initiateAction('Kill'),
+	},
+])
 </script>
-
-<style scoped>
-.joined-buttons {
-	display: flex;
-	align-items: center;
-}
-
-.joined-buttons > :deep(.btn) {
-	border-radius: 0;
-}
-
-.joined-buttons > :deep(.btn:first-child) {
-	border-top-left-radius: var(--radius-md);
-	border-bottom-left-radius: var(--radius-md);
-}
-
-.joined-buttons > :deep(.btn:last-child) {
-	border-top-right-radius: var(--radius-md);
-	border-bottom-right-radius: var(--radius-md);
-	margin-left: -1px;
-}
-
-.joined-buttons > :deep(.btn:not(:last-child)) {
-	border-right: none;
-}
-</style>
