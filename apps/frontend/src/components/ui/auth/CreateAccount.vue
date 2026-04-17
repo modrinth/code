@@ -58,9 +58,13 @@
 			<HCaptcha v-if="globals?.captcha_enabled" :ref="onSetCaptchaRef" v-model="tokenModel" />
 		</section>
 
-		<div class="flex gap-2.5 rounded-2xl border border-solid border-surface-5 p-3 leading-normal">
-			<Checkbox v-model="subscribeModel" class="text-left" />
-			<div>{{ formatMessage(messages.subscribeLabel) }}</div>
+		<div class="flex gap-2.5 rounded-2xl border border-solid border-surface-5 p-3">
+			<Checkbox
+				v-model="subscribeModel"
+				class="text-left leading-snug text-primary transition-all hover:brightness-100"
+				:label="formatMessage(messages.subscribeLabel)"
+				:description="formatMessage(messages.subscribeLabel)"
+			/>
 		</div>
 
 		<ButtonStyled color="brand">
