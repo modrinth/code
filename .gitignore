@@ -78,3 +78,6 @@ storybook-static
 
 # frontend robots.txt
 apps/frontend/src/public/robots.txt
+
+# Oh My Code
+.omc/
