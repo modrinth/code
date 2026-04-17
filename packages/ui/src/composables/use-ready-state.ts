@@ -1,15 +1,12 @@
+import type { DefaultError, UseQueryReturnType } from '@tanstack/vue-query'
 import type { Ref } from 'vue'
 import { computed } from 'vue'
 
-/**
- * Minimal shape of a TanStack `useQuery` return value that `useReadyState` reads.
- * Kept structural so consumers can pass either a real `UseQueryReturnType` or a
- * computed wrapper without an extra dependency on `@tanstack/vue-query` types.
- */
-export interface ReadyStateQueryLike<TData> {
-	isLoading: Readonly<Ref<boolean>>
-	data: Readonly<Ref<TData | undefined>>
-}
+/** Subset of {@link UseQueryReturnType} passed to {@link useReadyState}. */
+export type ReadyStateQuery<TData, TError = DefaultError> = Pick<
+	UseQueryReturnType<TData, TError>,
+	'isLoading' | 'data'
+>
 
 /**
  * Returns true while a query is loading for the FIRST time (no cached data yet).
@@ -18,8 +15,10 @@ export interface ReadyStateQueryLike<TData> {
  * have `isLoading === false` once data exists in the cache, so `ReadyTransition`
  * stays open and the loading bar stays silent.
  *
- * Pair with `<ReadyTransition :pending="useReadyState(query)" />`.
+ * Pair with `<ReadyTransition :pending="var which is useReadyState(query)" />`.
  */
-export function useReadyState<TData>(query: ReadyStateQueryLike<TData>): Readonly<Ref<boolean>> {
+export function useReadyState<TData, TError = DefaultError>(
+	query: ReadyStateQuery<TData, TError>,
+): Readonly<Ref<boolean>> {
 	return computed(() => query.isLoading.value && query.data.value === undefined)
 }

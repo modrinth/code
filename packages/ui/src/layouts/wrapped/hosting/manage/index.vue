@@ -80,9 +80,32 @@
 			</div>
 		</div>
 
-		<ReadyTransition :pending="isLoading || !authReady">
+		<Transition v-else name="fade" mode="out-in">
 			<div
-				v-if="serverList.length === 0 && !isPollingForNewServers"
+				v-if="showServersListLoading"
+				key="loading"
+				class="flex flex-col gap-4 py-8"
+			>
+				<div class="mb-4 text-center">
+					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
+					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>
+				</div>
+				<div
+					v-for="i in 3"
+					:key="i"
+					class="flex animate-pulse flex-row items-center gap-4 overflow-x-hidden rounded-2xl border-[1px] border-solid border-button-bg bg-bg-raised p-4"
+				>
+					<div class="size-16 rounded-xl bg-button-bg"></div>
+					<div class="flex flex-1 flex-col gap-2">
+						<div class="h-6 w-48 rounded bg-button-bg"></div>
+						<div class="h-4 w-64 rounded bg-button-bg opacity-75"></div>
+					</div>
+				</div>
+			</div>
+
+			<div
+				v-else-if="serverList.length === 0 && !isPollingForNewServers"
+				key="empty"
 				class="flex h-full flex-col items-center justify-center gap-8 grow max-h-[1100px]"
 			>
 				<ServerListEmpty
@@ -92,7 +115,7 @@
 				/>
 			</div>
 
-			<div v-else>
+			<div v-else key="list">
 				<div
 					class="relative flex h-fit w-full flex-col mb-4 items-center justify-between md:flex-row"
 				>
@@ -162,7 +185,7 @@
 				</TransitionGroup>
 				<div v-else>{{ formatMessage(messages.noServersFound) }}</div>
 			</div>
-		</ReadyTransition>
+		</Transition>
 	</div>
 </template>
 
@@ -178,7 +201,6 @@ import {
 	injectModrinthClient,
 	injectNotificationManager,
 	IntlFormatted,
-	ReadyTransition,
 	ModrinthServersPurchaseModal,
 	ResubscribeModal,
 	ServerListEmpty,
@@ -211,7 +233,6 @@ const route = useRoute()
 const auth = injectAuth()
 const client = injectModrinthClient()
 const loggedIn = computed(() => !!auth.user.value)
-const authReady = computed(() => auth.isReady?.value ?? true)
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
@@ -484,7 +505,7 @@ function runPingTest(region: Archon.Servers.v1.Region, index = 1) {
 const {
 	data: serverResponse,
 	error: fetchError,
-	isLoading,
+	isPending: serversQueryPending,
 } = useQuery({
 	queryKey: ['servers'],
 	queryFn: async () => {
@@ -530,6 +551,9 @@ const {
 })
 
 const hasError = computed(() => loggedIn.value && !!fetchError.value)
+
+/** Logged-in initial fetch: avoid treating "no data yet" as an empty server list. */
+const showServersListLoading = computed(() => loggedIn.value && serversQueryPending.value)
 
 const serverList = computed<Archon.Servers.v0.Server[]>(() => {
 	if (!loggedIn.value || !serverResponse.value) return []

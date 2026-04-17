@@ -37,7 +37,7 @@
 		:description="formatMessage(messages.deleteWorldDescription, { name: worldToDelete?.name })"
 		@proceed="proceedDeleteWorld"
 	/>
-	<ReadyTransition :pending="worldsQuery.isLoading.value && !worldsQuery.data.value">
+	<ReadyTransition :pending="worldsReadyPending">
 	<div v-if="dedupedWorlds.length > 0" class="flex flex-col gap-4">
 		<div class="flex flex-wrap items-center gap-2">
 			<StyledInput
@@ -173,6 +173,7 @@ import {
 	injectNotificationManager,
 	ReadyTransition,
 	StyledInput,
+	useReadyState,
 	useVIntl,
 } from '@modrinth/ui'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
@@ -360,6 +361,8 @@ const worldsQuery = useQuery({
 	queryFn: () => refreshWorlds(instance.value.path),
 	staleTime: 30_000,
 })
+
+const worldsReadyPending = useReadyState(worldsQuery)
 
 const worlds = ref<World[]>([])
 const serverData = ref<Record<string, ServerData>>({})

@@ -27,6 +27,7 @@
 		</div>
 
 		<div v-else key="content" class="contents">
+			<ReadyTransition :pending="backupsReadyPending">
 			<BackupCreateModal ref="createBackupModal" :backups="backupsData ?? []" />
 			<BackupRenameModal ref="renameBackupModal" :backups="backupsData ?? []" />
 			<BackupRestoreModal ref="restoreBackupModal" />
@@ -132,6 +133,7 @@
 					</div>
 				</div>
 			</div>
+			</ReadyTransition>
 		</div>
 	</Transition>
 </template>
@@ -147,11 +149,13 @@ import { useRoute } from 'vue-router'
 
 import ButtonStyled from '#ui/components/base/ButtonStyled.vue'
 import EmptyState from '#ui/components/base/EmptyState.vue'
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import BackupCreateModal from '#ui/components/servers/backups/BackupCreateModal.vue'
 import BackupDeleteModal from '#ui/components/servers/backups/BackupDeleteModal.vue'
 import BackupItem from '#ui/components/servers/backups/BackupItem.vue'
 import BackupRenameModal from '#ui/components/servers/backups/BackupRenameModal.vue'
 import BackupRestoreModal from '#ui/components/servers/backups/BackupRestoreModal.vue'
+import { useReadyState } from '#ui/composables'
 import { useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -180,12 +184,15 @@ defineEmits(['onDownload'])
 const backupsQueryKey = ['backups', 'list', serverId]
 const {
 	data: backupsData,
+	isLoading,
 	error,
 	refetch,
 } = useQuery({
 	queryKey: backupsQueryKey,
 	queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
 })
+
+const backupsReadyPending = useReadyState({ isLoading, data: backupsData })
 
 const deleteMutation = useMutation({
 	mutationFn: (backupId: string) =>

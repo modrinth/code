@@ -5,7 +5,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 
+import ReadyTransition from '#ui/components/base/ReadyTransition.vue'
 import ConfirmLeaveModal from '#ui/components/modal/ConfirmLeaveModal.vue'
+import { useReadyState } from '#ui/composables'
 import { defineMessages, useVIntl } from '#ui/composables/i18n'
 import {
 	injectModrinthClient,
@@ -120,6 +122,8 @@ const contentQuery = useQuery({
 	enabled: computed(() => worldId.value !== null),
 	staleTime: 0,
 })
+
+const contentReadyPending = useReadyState(contentQuery)
 
 const modpackProjectId = computed(() => {
 	const spec = contentQuery.data.value?.modpack?.spec
@@ -906,6 +910,7 @@ provideContentManager({
 </script>
 
 <template>
+	<ReadyTransition :pending="contentReadyPending">
 	<ContentPageLayout>
 		<template #modals>
 			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
@@ -950,6 +955,7 @@ provideContentManager({
 			/>
 		</template>
 	</ContentPageLayout>
+	</ReadyTransition>
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"
 		:downgrade="isModpackUpdateDowngrade"

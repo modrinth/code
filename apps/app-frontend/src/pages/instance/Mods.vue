@@ -1,4 +1,5 @@
 <template>
+	<ReadyTransition :pending="loading">
 	<ContentPageLayout>
 		<template #modals>
 			<ShareModalWrapper
@@ -60,6 +61,7 @@
 			/>
 		</template>
 	</ContentPageLayout>
+	</ReadyTransition>
 </template>
 
 <script setup lang="ts">
@@ -82,6 +84,7 @@ import {
 	type OverflowMenuOption,
 	provideAppBackup,
 	provideContentManager,
+	ReadyTransition,
 	useDebugLogger,
 	useVIntl,
 } from '@modrinth/ui'

@@ -1,6 +1,11 @@
 <script setup lang="ts">
+/**
+ * If `pending` is false on mount and never becomes true, the slot renders with no
+ * enter transition (cache-hit fast path). After a real pending phase, transitions
+ * behave as before for subsequent toggles.
+ */
 import type { Ref } from 'vue'
-import { computed, onBeforeUnmount, toRef, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, toRef, watch } from 'vue'
 
 import { injectLoadingState } from '#ui/providers/loading-state'
 
@@ -26,6 +31,9 @@ const resolvedPending = computed(() => {
 	return Boolean((v as Ref<boolean>).value)
 })
 
+const hasBeenPending = ref(false)
+const useShell = computed(() => resolvedPending.value || hasBeenPending.value)
+
 const loadingState = injectLoadingState(null)
 let token: symbol | null = null
 
@@ -36,31 +44,36 @@ function release() {
 	token = null
 }
 
-if (loadingState && !props.silent) {
-	watch(
-		resolvedPending,
-		(now) => {
-			if (typeof window === 'undefined') return
+watch(
+	resolvedPending,
+	(now) => {
+		if (now) {
+			hasBeenPending.value = true
+		}
+		if (loadingState && !props.silent && typeof window !== 'undefined') {
 			if (now) {
 				if (!token) token = loadingState.begin()
 			} else {
 				release()
 			}
-		},
-		{ immediate: true },
-	)
-}
+		}
+	},
+	{ immediate: true },
+)
 
 onBeforeUnmount(release)
 </script>
 
 <template>
-	<Transition name="ready-fade" mode="out-in" :duration="props.duration">
-		<div v-if="!resolvedPending" key="content" class="ready-transition-content">
-			<slot />
-		</div>
-		<div v-else key="pending" aria-hidden="true" class="ready-transition-pending" />
-	</Transition>
+	<template v-if="useShell">
+		<Transition name="ready-fade" mode="out-in" :duration="props.duration">
+			<div v-if="!resolvedPending" key="content" class="ready-transition-content">
+				<slot />
+			</div>
+			<div v-else key="pending" aria-hidden="true" class="ready-transition-pending" />
+		</Transition>
+	</template>
+	<slot v-else />
 </template>
 
 <style lang="scss" scoped>

@@ -32,6 +32,50 @@ export const Idle: Story = {
 	}),
 }
 
+/** Pending false from mount — no enter fade (cache-hit path). */
+export const CacheHit: Story = {
+	render: () => ({
+		components: { ReadyTransition, LoadingBar },
+		setup() {
+			provideLoadingState(createLoadingStateCore())
+			return { pending: ref(false) }
+		},
+		template: `
+			<div class="relative">
+				<LoadingBar />
+				<p class="text-secondary mb-4">pending stays false — content should appear with no fade-in.</p>
+				<ReadyTransition :pending="pending">
+					<div class="rounded bg-bg-raised p-4 text-contrast">Cached content visible immediately.</div>
+				</ReadyTransition>
+			</div>
+		`,
+	}),
+}
+
+/** Cold load: pending true then false — fade-in runs. */
+export const ColdLoad: Story = {
+	render: () => ({
+		components: { ReadyTransition, LoadingBar },
+		setup() {
+			provideLoadingState(createLoadingStateCore())
+			const pending = ref(true)
+			onMounted(() => {
+				setTimeout(() => (pending.value = false), 600)
+			})
+			return { pending }
+		},
+		template: `
+			<div class="relative">
+				<LoadingBar />
+				<p class="text-secondary mb-4">Pending 600ms then ready — content fades in; bar runs while pending.</p>
+				<ReadyTransition :pending="pending">
+					<div class="rounded bg-bg-raised p-4 text-contrast">Content after cold load.</div>
+				</ReadyTransition>
+			</div>
+		`,
+	}),
+}
+
 export const PendingThenReady: Story = {
 	render: () => ({
 		components: { ReadyTransition, LoadingBar },
