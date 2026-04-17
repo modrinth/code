@@ -23,7 +23,7 @@ use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
-use actix_web::web::{Data, Query, Redirect, ServiceConfig, scope};
+use actix_web::web::{Data, Query, ServiceConfig, scope};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
@@ -1336,9 +1336,9 @@ pub async fn auth_callback(
         } else {
             // user doesn't already exist; the user wants to create a new Modrinth account
             // linked to their OAuth account.
-            // for this, we redirect them to a frontend page which lets them set a username,
-            // then frontend will redirect them back to us (`/create/oauth`), with the same
-            // state parameter, and their chosen settings (username, subscribe to newsletter).
+            // for this, we redirect them to a frontend page which lets them set a username.
+            // then frontend will call `/create/oauth` with the same state parameter and
+            // chosen settings (username, subscribe to newsletter), and handle navigation.
 
             flow_guard
                 .replace_with(DBFlow::OAuthPending {
@@ -1358,7 +1358,7 @@ pub async fn auth_callback(
                     &requires_dob(provider).to_string(),
                 );
 
-            let redirect_url = url.to_string();
+            let redirect_url = redirect_url.to_string();
             Ok(HttpResponse::TemporaryRedirect()
                 .append_header((LOCATION, &*redirect_url))
                 .json(serde_json::json!({ "url": redirect_url })))
@@ -1393,7 +1393,7 @@ async fn create_oauth_account(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<RedisPool>,
     web::Json(new_account): web::Json<NewOAuthAccount>,
-) -> Result<Redirect, ApiError> {
+) -> Result<HttpResponse, ApiError> {
     if !check_hcaptcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
@@ -1404,7 +1404,7 @@ async fn create_oauth_account(
         .wrap_request_err("no flow for state")?;
 
     let DBFlow::OAuthPending {
-        url,
+        url: _url,
         provider,
         user,
     } = flow
@@ -1430,15 +1430,10 @@ async fn create_oauth_account(
         .await?;
 
     let session = issue_session(req, user_id, &mut txn, &redis, None).await?;
+    let res = crate::models::sessions::Session::from(session, true, None);
     txn.commit().await?;
 
-    let mut redirect_url = url.clone();
-    redirect_url
-        .query_pairs_mut()
-        .append_pair("code", &session.session);
-    let redirect_url = redirect_url.to_string();
-
-    Ok(Redirect::to(redirect_url))
+    Ok(HttpResponse::Ok().json(res))
 }
 
 #[derive(Deserialize)]
