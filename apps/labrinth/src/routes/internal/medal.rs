@@ -14,7 +14,7 @@ use crate::routes::ApiError;
 use crate::util::guards::medal_key_guard;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("medal").service(verify).service(redeem));
+    cfg.service(web::scope("/medal").service(verify).service(redeem));
 }
 
 #[derive(Deserialize)]

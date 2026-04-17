@@ -22,14 +22,23 @@ use crate::util::validate::validation_errors_to_string;
 use serde::Deserialize;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_pats);
     cfg.service(create_pat);
     cfg.service(edit_pat);
     cfg.service(delete_pat);
 }
 
-#[get("pat")]
+#[utoipa::path(
+    get,
+    operation_id = "getPats",
+    responses(
+        (status = 200, description = "List of PATs"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["PAT_READ"]))
+)]
+#[get("/pat")]
 pub async fn get_pats(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -65,7 +74,7 @@ pub async fn get_pats(
     ))
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewPersonalAccessToken {
     pub scopes: Scopes,
     #[validate(length(min = 3, max = 255))]
@@ -73,7 +82,17 @@ pub struct NewPersonalAccessToken {
     pub expires: DateTime<Utc>,
 }
 
-#[post("pat")]
+#[utoipa::path(
+    post,
+    operation_id = "createPat",
+    responses(
+        (status = 200, description = "PAT created"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["PAT_CREATE"]))
+)]
+#[post("/pat")]
 pub async fn create_pat(
     req: HttpRequest,
     info: web::Json<NewPersonalAccessToken>,
@@ -158,7 +177,7 @@ pub async fn create_pat(
     }))
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct ModifyPersonalAccessToken {
     pub scopes: Option<Scopes>,
     #[validate(length(min = 3, max = 255))]
@@ -166,7 +185,18 @@ pub struct ModifyPersonalAccessToken {
     pub expires: Option<DateTime<Utc>>,
 }
 
-#[patch("pat/{id}")]
+#[utoipa::path(
+    patch,
+    operation_id = "editPat",
+    params(("id" = String, Path, description = "The PAT ID")),
+    responses(
+        (status = 204, description = "PAT updated"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["PAT_WRITE"]))
+)]
+#[patch("/pat/{id}")]
 pub async fn edit_pat(
     req: HttpRequest,
     id: web::Path<(String,)>,
@@ -263,7 +293,17 @@ pub async fn edit_pat(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[delete("pat/{id}")]
+#[utoipa::path(
+    delete,
+    operation_id = "deletePat",
+    params(("id" = String, Path, description = "The PAT ID")),
+    responses(
+        (status = 204, description = "PAT deleted"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["PAT_DELETE"]))
+)]
+#[delete("/pat/{id}")]
 pub async fn delete_pat(
     req: HttpRequest,
     id: web::Path<(String,)>,

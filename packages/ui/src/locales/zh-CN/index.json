@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "更新项目"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "在点击“全部更新”时按住 Shift 键，以后将跳过此确认。"
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "更新 {count, plural, other {# 个项目}}"
   },
@@ -246,13 +249,7 @@
     "defaultMessage": "删除 {count} 个{itemType}"
   },
   "content.confirm-deletion.header": {
-    "defaultMessage": "删除 {count} 个{itemType}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "你在整合包之上添加的任何模组或内容都将被删除。"
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "你在整合包之上添加的任何模组或内容都将被保留。"
+    "defaultMessage": "删除{itemType}{count, plural,one {} other {s}}"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {降级} other {升级}}警告"
@@ -632,12 +629,6 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "来自链接的整合包"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total}（{percent}%）"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "正在上传文件（{completed}/{total}）"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "重命名 {name}"
   },
@@ -977,6 +968,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "我们不建议在安装内容后修改安装设置。如果你想修改，请先重置你的服务器。"
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自动修复"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "更改加载器"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "禁用冲突项"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "切换游戏版本时 我们既可以选择禁用那些不兼容的已安装内容 也可以尝试去解决这些兼容性问题"
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "不兼容警告"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "安装了不兼容的内容"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "切换加载器时 所有已经安装的内容都会被强制禁用 我们建议你直接重置服务器"
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "更改加载器具有破坏性"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "链接 {projectType, select, server {服务器项目} other {整合包}}"
   },
@@ -1199,9 +1214,6 @@
   "label.client-depends-warning": {
     "defaultMessage": "该模组依赖客户端模组，启动服务器时可能出现问题"
   },
-  "label.client-only-warning": {
-    "defaultMessage": "这是一个客户端模组，可能会引发一些问题。我们之所以将其保持开启状态，是因为有些作者会错误地标注运行环境，而加载器应该能够解决这种冲突。"
-  },
   "label.client-retained-warning": {
     "defaultMessage": "该模组是作为依赖安装的客户端模组，启动服务器时可能出现问题"
   },
@@ -1371,7 +1383,7 @@
     "defaultMessage": "单人游戏"
   },
   "label.sort-by": {
-    "defaultMessage": "排序方式: "
+    "defaultMessage": "排序方式："
   },
   "label.success": {
     "defaultMessage": "成功"
@@ -1587,7 +1599,7 @@
     "defaultMessage": "定时"
   },
   "omorphia.component.badge.label.under-review": {
-    "defaultMessage": "正在审核"
+    "defaultMessage": "审核中"
   },
   "omorphia.component.badge.label.unlisted": {
     "defaultMessage": "未列出"
@@ -2400,7 +2412,7 @@
     "defaultMessage": "定时"
   },
   "project.visibility.under-review": {
-    "defaultMessage": "正在审核"
+    "defaultMessage": "审核中"
   },
   "project.visibility.unknown": {
     "defaultMessage": "未知"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支付方式"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "按 {interval} 付款"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "按照你特定需要的配置选择一个定制方案。"
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "热门方案"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "选择一个方案"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "选择方案"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "适合 1–5 位朋友使用，加少量轻量模组。"
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "选择适合你需求的运行内存大小和配置。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "方案"
@@ -2718,7 +2721,7 @@
     "defaultMessage": "跟随系统"
   },
   "settings.display.theme.title": {
-    "defaultMessage": "色彩主题"
+    "defaultMessage": "主题颜色"
   },
   "settings.feature-flags.title": {
     "defaultMessage": "功能开关"

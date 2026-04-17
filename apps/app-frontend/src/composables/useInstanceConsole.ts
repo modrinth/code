@@ -73,6 +73,12 @@ function invalidate(profilePathId: string): void {
 	entry.logList = null
 }
 
+async function clearLive(profilePathId: string): Promise<void> {
+	const entry = getOrCreate(profilePathId)
+	entry.liveConsole.clear()
+	await clear_log_buffer(profilePathId).catch(() => {})
+}
+
 async function destroy(profilePathId: string): Promise<void> {
 	instances.delete(profilePathId)
 	await clear_log_buffer(profilePathId).catch(() => {})
@@ -87,6 +93,7 @@ export function useInstanceConsole(profilePathId: string) {
 		getHistoricalLogs: (instancePath: string) => getHistoricalLogs(profilePathId, instancePath),
 		getHistoricalContent: (filename: string) => getHistoricalContent(profilePathId, filename),
 		invalidate: () => invalidate(profilePathId),
+		clearLive: () => clearLive(profilePathId),
 		destroy: () => destroy(profilePathId),
 	}
 }

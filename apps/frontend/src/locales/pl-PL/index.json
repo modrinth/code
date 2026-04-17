@@ -96,7 +96,7 @@
     "message": "Tryb offline"
   },
   "app-marketing.features.open-source.description": {
-    "message": "Launcher Modrinth jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
+    "message": "Modrinth Launcher jest w pełni otwarto-źródłowy. Kod źródłowy możesz zobaczyć na naszym <github-link>GitHubie</github-link>!"
   },
   "app-marketing.features.open-source.title": {
     "message": "Otwarte oprogramowanie"
@@ -1300,60 +1300,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Wybieraj między Vanilla, Fabric, Forge, Quilt i NeoForge. Jeśli coś jest na Modrinth, może działać na Twoim serwerze."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Nie udało się zmienić wersji paczki modów"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Nie udało się załadować wersji"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Nie udało się zainstalować ponownie paczki modów"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Nie udało się naprawić serwera"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Nie udało się zresetować serwera do trybu onboardingu"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Nie udało się zapisać ustawień instalacji"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Nie udało się rozłączyć od paczki modów"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Wersja {loader, select, null {loadera} other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Twoja instalacja serwera została naprawiona."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Naprawa ukończona"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Zresetuj serwer"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Usuwa wszystkie dane z Twojego serwera, w tym światy, mody i pliki konfiguracji. Kopie zapasowe nie ulegną zmianie i nadal będą mogły być przywrócone."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Resetuj do trybu onboardingu"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "To przywróci serwer do trybu onboardingu, skąd będzie można ustawić go od nowa. Czy jesteś pewien?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Resetuj do trybu onboardingu"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Serwer został przywrócony do trybu onboardingu."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Resetuj serwer do trybu onboardingu"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opcje pomocy"
   },
   "hosting.plan.out-of-stock": {
     "message": "Wyprzedane"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synchronizuj z serwerem"
   },
-  "servers.busy.backup-creating": {
-    "message": "Trwa tworzenie kopii zapasowej"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Trwa przywracanie kopii zapasowej"
-  },
-  "servers.busy.installing": {
-    "message": "Serwer jest instalowany"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Synchronizacja zawartości w toku"
-  },
   "servers.notice.actions": {
     "message": "Akcje"
   },
@@ -3198,7 +3132,7 @@
     "message": "Czy na pewno chcesz unieważnić dostęp tej aplikacji?"
   },
   "settings.billing.charges.description": {
-    "message": "Wszystkie poprzednie wydatki z twojego konta Modrinth są wyświetlane poniżej:"
+    "message": "Wszystkie pobrane opłaty z twojego konta Modrinth są wyświetlane poniżej:"
   },
   "settings.billing.charges.product.medal-trial": {
     "message": "Okres próbny Medal"
@@ -3208,6 +3142,9 @@
   },
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
+  },
+  "settings.billing.charges.title": {
+    "message": "Pobrane opłaty"
   },
   "settings.billing.expires": {
     "message": "Wygasa {date}"
@@ -3331,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Błąd ponawiania subskrypcji"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Jeżeli serwer jest aktualnie zawieszony, następna próba pobrania opłaty może potrwać około 10 minut."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Wysłano wniosek o ponowienie subskrypcji"

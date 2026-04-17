@@ -3,10 +3,6 @@
 		<ButtonStyled circular type="transparent" size="large">
 			<TeleportOverflowMenu :options="menuOptions">
 				<MoreVerticalIcon aria-hidden="true" />
-				<template #kill>
-					<SlashIcon class="h-5 w-5" />
-					<span>Kill server</span>
-				</template>
 				<template #allServers>
 					<ServerIcon class="h-5 w-5" />
 					<span>All servers</span>
@@ -21,15 +17,13 @@
 </template>
 
 <script setup lang="ts">
-import { ClipboardCopyIcon, MoreVerticalIcon, ServerIcon, SlashIcon } from '@modrinth/assets'
+import { ClipboardCopyIcon, MoreVerticalIcon, ServerIcon } from '@modrinth/assets'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { ButtonStyled } from '#ui/components'
 import TeleportOverflowMenu from '#ui/components/base/TeleportOverflowMenu.vue'
 import { injectModrinthServerContext } from '#ui/providers'
-
-import { useServerPowerAction } from './use-server-power-action'
 
 const props = withDefaults(
 	defineProps<{
@@ -49,21 +43,7 @@ const props = withDefaults(
 const router = useRouter()
 const { serverId } = injectModrinthServerContext()
 
-const { isInstalling, initiateAction } = useServerPowerAction({
-	disabled: computed(() => props.disabled),
-})
-
 const menuOptions = computed(() => [
-	...(isInstalling.value
-		? []
-		: [
-				{
-					id: 'kill',
-					label: 'Kill server',
-					icon: SlashIcon,
-					action: () => initiateAction('Kill'),
-				},
-			]),
 	{
 		id: 'allServers',
 		label: 'All servers',

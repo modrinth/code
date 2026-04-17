@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Aktualizuj projekty"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Przytrzymaj Shift klikając \"Zaktualizuj wszystko\" by pominąć ten dialog w przyszłości."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aktualizuj {count, plural, one {# projekt} few {# projekty} other {# projektów}}"
   },
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Usuń {itemType} ({count, plural, one {1 sztuka} other {{count} szt.Mapping}}) "
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Wszystkie mody i treści dodane dodatkowo do tej paczki zostaną usunięte."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Wszystkie mody i treści dodane dodatkowo do tej paczki zostaną zachowane."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Ostrzeżenie o {action, select, downgrade {degradowaniu} other {aktualizowaniu}}"
@@ -632,12 +629,6 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "paczka modów z linku"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Przesyłanie plików ({completed}/{total})"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "Zmień nazwę {name}"
   },
@@ -777,7 +768,7 @@
     "defaultMessage": "Adres, wiersz 2 (niewymagane)"
   },
   "form.label.amount": {
-    "defaultMessage": "Ilość"
+    "defaultMessage": "Kwota"
   },
   "form.label.bank-name": {
     "defaultMessage": "Nazwa banku"
@@ -976,6 +967,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Nie polecamy edytowania twoich ustawień instalacji, po zainstalowaniu zasobów. Jeśli chcesz je edytować, zresetuj swój serwer."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Napraw automatycznie"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Zmień loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Wyłącz konfliktujące"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Przy zmianie wersji gry możemy albo wyłączyć niekompatybilne zainstalowane treści, albo spróbować rozwiązać konflikty."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Ostrzeżenie o niekompatybilności"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Zainstalowano niekompatybilne treści"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Przy zmianie loadera wszystkie zainstalowane treści zostaną wyłączone. Zamiast tego zalecamy resetowanie serwera."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Zmiana loadera jest destruktywna"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Połączone {projectType, select, server {projekty serwera} other {paczki zasobów}}"
@@ -1198,9 +1213,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Zależność tego moda jest wymagana po stronie klienta i może powodować problemy z włączaniem Twojego serwera"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "To jest mod po stronie klienta, i może on wywołać problemy. Zostawiliśmy go, ponieważ jakiś autor błędnie oznaczył środowisko, i silnik powinien naprawić problem."
   },
   "label.client-retained-warning": {
     "defaultMessage": "Ten mod, zainstalowany jako zależność, działa tylko po stronie klienta i może powodować problemy z włączaniem Twojego serwera"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metoda płatności"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "rozliczane {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Wybierz dostosowany plan ze specyfikacją, której potrzebujesz."
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Najbardziej popularny"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Wybierz plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Wybierz plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Idealny dla 1–5 przyjaciół z kilkoma lekkimi modami."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wybierz ilość pamięci RAM i specyfikacje, która pasuje do Twoich potrzeb."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

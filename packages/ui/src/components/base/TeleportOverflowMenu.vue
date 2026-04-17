@@ -162,9 +162,8 @@ const calculateMenuPosition = () => {
 	if (!triggerRef.value || !menuRef.value) return { top: '0px', left: '0px' }
 
 	const triggerRect = triggerRef.value.getBoundingClientRect()
-	const menuRect = menuRef.value.getBoundingClientRect()
-	const menuWidth = menuRect.width + 16
-	const menuHeight = menuRect.height
+	const menuWidth = menuRef.value.offsetWidth
+	const menuHeight = menuRef.value.offsetHeight
 	const margin = 8
 
 	let top: number

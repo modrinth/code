@@ -7,23 +7,48 @@
 				</button>
 			</ButtonStyled>
 
-			<template v-else>
-				<ButtonStyled v-if="showStopButton" type="transparent" size="large">
-					<button
-						v-tooltip="busyTooltip"
-						:disabled="!canTakeAction"
-						@click="initiateAction('Stop')"
-					>
-						<div class="flex gap-1">
-							<StopCircleIcon class="h-5 w-5" />
-							<span>Stop</span>
-						</div>
+			<template v-else-if="showRestartButton">
+				<ButtonStyled type="standard" color="orange" size="large">
+					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
+						<UpdatedIcon />
+						<span>{{ primaryActionText }}</span>
 					</button>
 				</ButtonStyled>
 
+				<JoinedButtons
+					color="red"
+					size="large"
+					:actions="stopSplitActions"
+					:primary-disabled="!canTakeAction"
+					:dropdown-disabled="!canKill"
+				>
+					<template #kill_server>
+						<SlashIcon class="h-5 w-5" />
+						Kill server
+					</template>
+				</JoinedButtons>
+			</template>
+
+			<template v-else-if="isStopping">
+				<JoinedButtons
+					color="red"
+					size="large"
+					:actions="stopSplitActions"
+					:primary-disabled="true"
+					:dropdown-disabled="!canKill"
+					:primary-muted="true"
+				>
+					<template #kill_server>
+						<SlashIcon class="h-5 w-5" />
+						Kill server
+					</template>
+				</JoinedButtons>
+			</template>
+
+			<template v-else>
 				<ButtonStyled type="standard" color="brand" size="large">
 					<button v-tooltip="busyTooltip" :disabled="!canTakeAction" @click="handlePrimaryAction">
-						<component :is="isRunning || showStopButton ? UpdatedIcon : PlayIcon" />
+						<PlayIcon />
 						<span>{{ primaryActionText }}</span>
 					</button>
 				</ButtonStyled>
@@ -33,10 +58,16 @@
 </template>
 
 <script setup lang="ts">
-import { LoaderCircleIcon, PlayIcon, StopCircleIcon, UpdatedIcon } from '@modrinth/assets'
+import {
+	LoaderCircleIcon,
+	PlayIcon,
+	SlashIcon,
+	StopCircleIcon,
+	UpdatedIcon,
+} from '@modrinth/assets'
 import { computed } from 'vue'
 
-import { ButtonStyled } from '#ui/components'
+import { ButtonStyled, type JoinedButtonAction, JoinedButtons } from '#ui/components'
 
 import { useServerPowerAction } from './use-server-power-action'
 
@@ -51,14 +82,30 @@ const props = withDefaults(
 
 const {
 	isInstalling,
-	isRunning,
-	showStopButton,
+	isStopping,
+	showRestartButton,
 	busyTooltip,
 	canTakeAction,
+	canKill,
 	primaryActionText,
 	initiateAction,
 	handlePrimaryAction,
 } = useServerPowerAction({
 	disabled: computed(() => props.disabled),
 })
+
+const stopSplitActions = computed<JoinedButtonAction[]>(() => [
+	{
+		id: 'stop',
+		label: isStopping.value ? 'Stopping' : 'Stop',
+		icon: StopCircleIcon,
+		action: () => initiateAction('Stop'),
+	},
+	{
+		id: 'kill_server',
+		label: 'Kill server',
+		icon: SlashIcon,
+		action: () => initiateAction('Kill'),
+	},
+])
 </script>

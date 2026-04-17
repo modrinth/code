@@ -16,12 +16,11 @@ use actix_web::{HttpRequest, HttpResponse, delete, get, patch, web};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(versions_get);
     cfg.service(super::version_creation::version_create);
-
     cfg.service(
-        web::scope("version")
+        utoipa_actix_web::scope("/version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
@@ -29,7 +28,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, utoipa::ToSchema)]
 pub struct VersionListFilters {
     pub game_versions: Option<String>,
     pub loaders: Option<String>,
@@ -45,7 +44,46 @@ fn default_true() -> bool {
     true
 }
 
-#[get("version")]
+/// List versions for a project.
+#[utoipa::path(
+    get,
+    operation_id = "getProjectVersions",
+    params(
+        (
+            "project_id" = String,
+            Path,
+            description = "The ID or slug of the project"
+        ),
+        (
+            "loaders" = Option<String>,
+            Query,
+            description = "JSON array of loaders to filter by"
+        ),
+        (
+            "game_versions" = Option<String>,
+            Query,
+            description = "JSON array of game versions to filter by"
+        ),
+        (
+            "featured" = Option<bool>,
+            Query,
+            description = "Filter by featured status"
+        ),
+        (
+            "include_changelog" = Option<bool>,
+            Query,
+            description = "Whether to include changelog fields"
+        )
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/version")]
 pub async fn version_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -129,7 +167,31 @@ pub async fn version_list(
 }
 
 // Given a project ID/slug and a version slug
-#[get("version/{slug}")]
+/// Get a project version by ID or version number.
+#[utoipa::path(
+    get,
+    operation_id = "getVersionFromIdOrNumber",
+    params(
+        (
+            "project_id" = String,
+            Path,
+            description = "The ID or slug of the project"
+        ),
+        (
+            "slug" = String,
+            Path,
+            description = "The version ID or version number"
+        )
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/version/{slug}")]
 pub async fn version_project_get(
     req: HttpRequest,
     info: web::Path<(String, String)>,
@@ -157,14 +219,21 @@ pub async fn version_project_get(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct VersionIds {
     pub ids: String,
     #[serde(default = "default_true")]
     pub include_changelog: bool,
 }
 
-#[get("versions")]
+/// Get multiple versions by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getVersions",
+    params(("ids" = String, Query, description = "The JSON array of version IDs")),
+    responses((status = 200, description = "Expected response to a valid request"))
+)]
+#[get("/versions")]
 pub async fn versions_get(
     req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
@@ -199,7 +268,20 @@ pub async fn versions_get(
     }
 }
 
-#[get("{version_id}")]
+/// Get a version by ID.
+#[utoipa::path(
+    get,
+    operation_id = "getVersion",
+    params(("version_id" = models::ids::VersionId, Path, description = "The ID of the version")),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    )
+)]
+#[get("/{version_id}")]
 pub async fn version_get(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
@@ -223,7 +305,7 @@ pub async fn version_get(
     }
 }
 
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Serialize, Deserialize, Validate, utoipa::ToSchema)]
 pub struct EditVersion {
     #[validate(
         length(min = 1, max = 64),
@@ -251,14 +333,33 @@ pub struct EditVersion {
     pub file_types: Option<Vec<EditVersionFileType>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct EditVersionFileType {
     pub algorithm: String,
     pub hash: String,
     pub file_type: Option<FileType>,
 }
 
-#[patch("{id}")]
+/// Modify an existing version.
+#[utoipa::path(
+    patch,
+    operation_id = "modifyVersion",
+    params(("id" = VersionId, Path, description = "The ID of the version")),
+    request_body = EditVersion,
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
+#[patch("/{id}")]
 pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,
@@ -350,7 +451,25 @@ pub async fn version_edit(
     Ok(response)
 }
 
-#[delete("{version_id}")]
+/// Delete a version by ID.
+#[utoipa::path(
+    delete,
+    operation_id = "deleteVersion",
+    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_DELETE"]))
+)]
+#[delete("/{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,

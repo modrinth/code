@@ -6,10 +6,10 @@
     "message": "Impossible de contacter les serveurs d'authentification"
   },
   "app.browse.add-server-to-instance": {
-    "message": "Ajouter le serveur a l'instance"
+    "message": "Ajouter le serveur à l'instance"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Ajouter des serveurs a votre instance"
+    "message": "Ajouter des serveurs à votre instance"
   },
   "app.browse.add-to-instance": {
     "message": "Ajouter à l'instance"
@@ -63,7 +63,7 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "Toutes les données pour votre instance seront supprimée à jamais, y comprit vos mondes, configurations, et contenu supprimé."
+    "message": "Toutes les données pour votre instance seront supprimées à jamais, y compris vos mondes, vos configurations, et le contenu installé."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "Cette action est irréversible"
@@ -114,7 +114,7 @@
     "message": "« {name} » sera supprimé **pour toujours**, et il sera impossible de le récupérer."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "Étes-vous sûr.e de vouloir supprimer ce monde pour toujours ?"
+    "message": "Êtes-vous sûr.e de vouloir supprimer ce monde pour toujours ?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddé"
@@ -210,7 +210,7 @@
     "message": "Gestion des ressources"
   },
   "app.update-popup.body": {
-    "message": "Modrinth App v{version} est prête à être installée ! Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."
+    "message": "Modrinth App v{version} est prête à être installée ! Relancez l'application pour faire la mise à jour maintenant, ou automatiquement à la fermeture de Modrinth App."
   },
   "app.update-popup.body.download-complete": {
     "message": "Modrinth App v{version} a finie d'être téléchargée. Rechargez pour mettre à jour maintenant, ou automatiquement quand vous fermez Modrinth App."

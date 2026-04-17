@@ -75,7 +75,25 @@ pub struct InitialVersionData {
 }
 
 // under `/api/v1/version`
-#[post("version")]
+/// Create a version on an existing project.
+#[utoipa::path(
+    post,
+    operation_id = "createVersion",
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing `data` and uploaded files"
+    ),
+    responses(
+        (status = 200, description = "Expected response to a valid request"),
+        (status = 400, description = "Request was invalid, see given error"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_CREATE"]))
+)]
+#[post("/version")]
 pub async fn version_create(
     req: HttpRequest,
     payload: Multipart,
@@ -280,7 +298,29 @@ async fn get_example_version_fields(
 }
 
 // under /api/v1/version/{version_id}
-#[post("{version_id}/file")]
+/// Add files to an existing version.
+#[utoipa::path(
+    post,
+    operation_id = "addFilesToVersion",
+    params(("version_id" = VersionId, Path, description = "The ID of the version")),
+    request_body(
+        content(("multipart/form-data")),
+        description = "Multipart payload containing files to upload"
+    ),
+    responses(
+        (status = 204, description = "Expected response to a valid request"),
+        (
+            status = 401,
+            description = "Incorrect token scopes or no authorization to access the requested item(s)"
+        ),
+        (
+            status = 404,
+            description = "The requested item(s) were not found or no authorization to access the requested item(s)"
+        )
+    ),
+    security(("bearer_auth" = ["VERSION_WRITE"]))
+)]
+#[post("/{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: web::Path<(VersionId,)>,

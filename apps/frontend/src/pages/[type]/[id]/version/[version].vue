@@ -128,7 +128,7 @@
 						class="action"
 						:to="`/${project.project_type}/${
 							project.slug ? project.slug : project.id
-						}/version/${encodeURI(version.displayUrlEnding)}`"
+						}/version/${encodeURI(version.displayUrlEnding ? version.displayUrlEnding : version.id)}`"
 					>
 						<XIcon aria-hidden="true" />
 						Discard changes

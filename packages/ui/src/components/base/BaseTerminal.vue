@@ -1,8 +1,6 @@
 <template>
 	<div
-		class="flex w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
-		:style="!fullscreen && componentHeight ? { minHeight: componentHeight + 'px' } : {}"
-		:class="{ 'h-full': fullscreen }"
+		class="flex h-full w-full flex-col bg-surface-2 overflow-hidden rounded-[20px] border border-solid border-surface-4"
 	>
 		<div ref="wrapperRef" class="relative min-h-0 flex-1 overflow-hidden pb-2 pt-1">
 			<div ref="containerRef" class="size-full" />
@@ -93,7 +91,6 @@ const containerRef = ref<HTMLElement | null>(null)
 const wrapperRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLElement | null>(null)
 const commandInput = ref('')
-const componentHeight = ref(0)
 
 const snappedHeight = ref<number | null>(null)
 
@@ -114,13 +111,9 @@ const {
 	scrollback: props.scrollback,
 	onReady: (term) => {
 		nextTick(() => {
-			updateComponentHeight()
 			snapToRows()
 		})
 		emit('ready', term)
-	},
-	onResize: () => {
-		updateComponentHeight()
 	},
 })
 
@@ -175,12 +168,21 @@ function handleWindowResize() {
 	}, 50)
 }
 
+function handleDocumentPointerDown(event: PointerEvent) {
+	if (!terminal.value?.hasSelection()) return
+	const target = event.target as Node | null
+	if (target && containerRef.value?.contains(target)) return
+	terminal.value.clearSelection()
+}
+
 onMounted(() => {
 	window.addEventListener('resize', handleWindowResize)
+	document.addEventListener('pointerdown', handleDocumentPointerDown)
 })
 
 onBeforeUnmount(() => {
 	window.removeEventListener('resize', handleWindowResize)
+	document.removeEventListener('pointerdown', handleDocumentPointerDown)
 	if (resizeDebounce) clearTimeout(resizeDebounce)
 })
 
@@ -199,19 +201,9 @@ watch(
 			})
 		} else {
 			snappedHeight.value = null
-			componentHeight.value = 0
 		}
 	},
 )
-
-function updateComponentHeight() {
-	const screen = containerRef.value?.querySelector('.xterm-screen') as HTMLElement | null
-	if (!screen) return
-	const screenH = screen.offsetHeight
-	const inputH = inputRef.value?.offsetHeight ?? 0
-	const borderW = 2
-	componentHeight.value = screenH + getWrapperMargins() + inputH + borderW
-}
 
 const submitCommand = () => {
 	const cmd = commandInput.value.trim()

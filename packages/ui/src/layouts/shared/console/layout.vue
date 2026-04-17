@@ -111,7 +111,14 @@ import { injectNotificationManager } from '#ui/providers/web-notifications.ts'
 
 import ConsoleActionButtons from './components/ConsoleActionButtons.vue'
 import ConsoleFilterPills from './components/ConsoleFilterPills.vue'
-import { colorize, rewriteTerminal, useConsoleFilters } from './composables'
+import {
+	clearSearchHighlights,
+	colorize,
+	getHighlightVersion,
+	highlightAppendedRange,
+	rewriteTerminal,
+	useConsoleFilters,
+} from './composables'
 import type { ConditionalLevel } from './composables/console-filtering'
 import { injectConsoleManager } from './providers'
 import type { LogLevel, LogLine } from './types'
@@ -279,18 +286,21 @@ watch(ctx.logLines, (lines, oldLines) => {
 	}
 
 	const predicate = buildCombinedPredicate()
-	const query = activeSearchQuery()
 	const newLines: string[] = []
 	for (let i = lastWrittenIndex; i < lines.length; i++) {
 		if (!predicate || predicate(lines[i])) {
-			newLines.push(colorize(lines[i], query))
+			newLines.push(colorize(lines[i]))
 		}
 	}
 	if (newLines.length > 0) {
 		const buffer = term.buffer.active
 		const onFreshLine = buffer.cursorX === 0
 		const data = onFreshLine ? newLines.join('\r\n') : '\r\n' + newLines.join('\r\n')
-		term.write(data)
+		const fromRow = buffer.baseY + buffer.cursorY
+		const version = getHighlightVersion(term)
+		term.write(data, () => {
+			highlightAppendedRange(term, fromRow, version)
+		})
 	}
 	lastWrittenIndex = lines.length
 })
@@ -307,6 +317,8 @@ function handleCommand(cmd: string) {
 }
 
 function handleClear() {
+	const term = terminalRef.value?.terminal
+	if (term) clearSearchHighlights(term)
 	terminalRef.value?.reset()
 	lastWrittenIndex = 0
 	ctx.onClear?.()

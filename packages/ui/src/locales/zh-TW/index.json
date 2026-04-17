@@ -41,6 +41,15 @@
   "badge.new": {
     "defaultMessage": "新功能"
   },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "取消"
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "錯誤"
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "方案"
+  },
   "button.accept": {
     "defaultMessage": "接受"
   },
@@ -153,7 +162,7 @@
     "defaultMessage": "修復"
   },
   "button.repairing": {
-    "defaultMessage": "修復中..."
+    "defaultMessage": "修復中......"
   },
   "button.report": {
     "defaultMessage": "檢舉"
@@ -218,6 +227,9 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
   },
+  "changelog.product.web": {
+    "defaultMessage": "平台"
+  },
   "collections.label.private": {
     "defaultMessage": "私人"
   },
@@ -229,6 +241,9 @@
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "更新專案"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "按住 Shift 鍵並點選「全部更新」，即可在日後跳過這項確認步驟。"
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "更新 {count} 個專案"
@@ -244,12 +259,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "刪除{itemType}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "你在該模組包之上額外新增的任何模組或內容都將被刪除。"
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "你在該模組包之上額外新增的任何模組或內容都將被保留。"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {降級} other {更新}}警告"
@@ -277,6 +286,9 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "已新增（相依項）"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "已停用"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "已更新"
@@ -509,6 +521,9 @@
   "files.error.try-again": {
     "defaultMessage": "再試一次"
   },
+  "files.image_viewer.image_too_large": {
+    "defaultMessage": "圖片過大無法預覽 (最大 {maxDimension}x{maxDimension} 像素)"
+  },
   "files.image_viewer.invalid_image": {
     "defaultMessage": "圖片檔案無效或內容為空。"
   },
@@ -529,6 +544,231 @@
   },
   "files.layout.busy-warning": {
     "defaultMessage": "作業進行中，已停用檔案操作功能。"
+  },
+  "files.layout.dry-run-failed-text": {
+    "defaultMessage": "執行模擬測試時發生錯誤"
+  },
+  "files.layout.dry-run-failed-title": {
+    "defaultMessage": "模擬測試失敗"
+  },
+  "files.layout.empty-folder-description": {
+    "defaultMessage": "沒有任何檔案或資料夾"
+  },
+  "files.layout.empty-folder-title": {
+    "defaultMessage": "此資料夾是空的"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "該資料夾可能不存在"
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "無法載入檔案"
+  },
+  "files.layout.extraction-started-title": {
+    "defaultMessage": "解壓縮已開始"
+  },
+  "files.layout.loading": {
+    "defaultMessage": " 正在載入檔案..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "已選擇 {count} 個"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "您有未儲存的變更"
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "目前位置"
+  },
+  "files.move-modal.destination-path": {
+    "defaultMessage": "目標路徑"
+  },
+  "files.move-modal.destination-placeholder": {
+    "defaultMessage": "例如：/my-folder"
+  },
+  "files.move-modal.header": {
+    "defaultMessage": "{type, select, directory {移動資料夾} other {移動檔案}}"
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "回到首頁"
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "麵包屑導覽"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "建立新的..."
+  },
+  "files.navbar.file-navigation": {
+    "defaultMessage": "檔案導覽"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "首頁"
+  },
+  "files.navbar.install-curseforge-pack": {
+    "defaultMessage": "安裝 CurseForge 整合包"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "新檔案"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "新資料夾"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "搜尋檔案"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "分享至 mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "上傳檔案"
+  },
+  "files.navbar.upload-from-zip": {
+    "defaultMessage": "從 .zip 檔案上傳"
+  },
+  "files.navbar.upload-from-zip-url": {
+    "defaultMessage": "從 .zip 網址上傳"
+  },
+  "files.operations.extracted": {
+    "defaultMessage": "已解壓縮 {size}"
+  },
+  "files.operations.extracting": {
+    "defaultMessage": "正在解壓縮 {source}"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "失敗"
+  },
+  "files.operations.modpack-from-url": {
+    "defaultMessage": "來自網址的整合包"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "重新命名 {name}"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "新名稱"
+  },
+  "files.row.item-count": {
+    "defaultMessage": "{count, plural, one {# 個項目} other {# 個項目}}"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "建立時間"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "修改時間"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "名稱"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "大小"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "您有未儲存的變更，如果離開將會遺失。離開前要儲存嗎？"
+  },
+  "files.unsaved-changes-modal.discard": {
+    "defaultMessage": "捨棄"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "未儲存的變更"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "已取消"
+  },
+  "files.upload-dropdown.failed-file-exists": {
+    "defaultMessage": "失敗 - 檔案已存在"
+  },
+  "files.upload-dropdown.failed-generic": {
+    "defaultMessage": "失敗 - {error}"
+  },
+  "files.upload-dropdown.failed-incorrect-type": {
+    "defaultMessage": "失敗 - 檔案類型不正確"
+  },
+  "files.upload-dropdown.failed-to-upload": {
+    "defaultMessage": "上傳 {fileName} 失敗"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "檔案"
+  },
+  "files.upload-dropdown.file-uploads": {
+    "defaultMessage": "{fileType} 上傳"
+  },
+  "files.upload-dropdown.incorrect-file-type": {
+    "defaultMessage": "上傳的檔案類型不正確"
+  },
+  "files.upload-dropdown.unexpected-error": {
+    "defaultMessage": "發生非預期的錯誤"
+  },
+  "files.upload-dropdown.uploads-left": {
+    "defaultMessage": "剩餘 {count} 個"
+  },
+  "files.upload.drag-and-drop.drop-to-upload": {
+    "defaultMessage": "將 {type, select, undefined {檔案} other {{type}}} 拖曳到這裡以上傳"
+  },
+  "files.validation.name-invalid-directory": {
+    "defaultMessage": "名稱只能包含英數字、破折號、底線或空格"
+  },
+  "files.validation.name-invalid-file": {
+    "defaultMessage": "名稱只能包含英數字、破折號、底線、點或空格"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "名稱"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "名稱為必填項目"
+  },
+  "files.zip-url-modal.backup-name": {
+    "defaultMessage": "安裝 CurseForge 整合包"
+  },
+  "files.zip-url-modal.cf-header": {
+    "defaultMessage": "安裝 CurseForge 整合包"
+  },
+  "files.zip-url-modal.cf-not-found-text": {
+    "defaultMessage": "在該網址找不到 CurseForge 整合包"
+  },
+  "files.zip-url-modal.cf-not-found-title": {
+    "defaultMessage": "找不到 CurseForge 整合包"
+  },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "輸入連結"
+  },
+  "files.zip-url-modal.error-cf-url": {
+    "defaultMessage": "網址必須是 CurseForge 整合包版本網址"
+  },
+  "files.zip-url-modal.error-url-invalid": {
+    "defaultMessage": "網址必須有效"
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "網址為必填項目"
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "安裝"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "安裝失敗"
+  },
+  "files.zip-url-modal.step-copy-description": {
+    "defaultMessage": "複製版本頁面網址並貼到下方"
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "複製網址"
+  },
+  "files.zip-url-modal.step-find-description": {
+    "defaultMessage": "瀏覽 CurseForge 並找到您想要的整合包"
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "尋找整合包"
+  },
+  "files.zip-url-modal.step-select-description": {
+    "defaultMessage": "前往「檔案」分頁並選擇要安裝的版本"
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "選擇版本"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "發生未知錯誤"
+  },
+  "files.zip-url-modal.zip-description": {
+    "defaultMessage": "複製並貼上 .zip 檔案的直接下載網址"
+  },
+  "files.zip-url-modal.zip-header": {
+    "defaultMessage": "正在從網址上傳 .zip 內容"
   },
   "form.label.address-line": {
     "defaultMessage": "地址行 1"
@@ -736,6 +976,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "我們不建議在安裝內容後修改安裝設定。若你想進行變更，請重設你的伺服器。"
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自動修復"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "變更載入器"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "停用衝突項目"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "變更遊戲版本時，我們可以停用不相容的已安裝內容，或是嘗試解決相容性問題。"
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "不相容警告"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "安裝了不相容的內容"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "變更載入器時，所有已安裝的內容都將被停用。我們建議改為重設你的伺服器。"
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "變更載入器具有破壞性"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "已連結的{projectType, select, server {伺服器專案} other {模組包}}"
@@ -956,8 +1220,11 @@
   "label.changes-saved": {
     "defaultMessage": "變更已儲存"
   },
-  "label.client-only-warning": {
-    "defaultMessage": "這是一個用戶端模組，可能會導致問題。我們仍保持啟用狀態，是因為部分作者會誤標執行環境，且載入器應能自行解決衝突。"
+  "label.client-depends-warning": {
+    "defaultMessage": "此模組依賴客戶端模組，啟動伺服器時可能會造成問題"
+  },
+  "label.client-retained-warning": {
+    "defaultMessage": "這是一個作為依賴項安裝的客戶端模組，啟動伺服器時可能會造成問題"
   },
   "label.collections": {
     "defaultMessage": "收藏"
@@ -968,6 +1235,15 @@
   "label.content": {
     "defaultMessage": "內容"
   },
+  "label.copied-filename": {
+    "defaultMessage": "已複製檔案名稱"
+  },
+  "label.copied-path": {
+    "defaultMessage": "已複製路徑"
+  },
+  "label.create-failed": {
+    "defaultMessage": "建立失敗"
+  },
   "label.created-ago": {
     "defaultMessage": "建立時間：{ago}"
   },
@@ -976,6 +1252,9 @@
   },
   "label.delete": {
     "defaultMessage": "刪除"
+  },
+  "label.delete-failed": {
+    "defaultMessage": "刪除失敗"
   },
   "label.delete-immediately": {
     "defaultMessage": "立即刪除"
@@ -986,6 +1265,12 @@
   "label.details": {
     "defaultMessage": "詳細資訊"
   },
+  "label.done": {
+    "defaultMessage": "完成"
+  },
+  "label.download-failed": {
+    "defaultMessage": "下載失敗"
+  },
   "label.email": {
     "defaultMessage": "電子郵件地址"
   },
@@ -994,6 +1279,9 @@
   },
   "label.error": {
     "defaultMessage": "錯誤"
+  },
+  "label.extract-failed": {
+    "defaultMessage": "解壓縮失敗"
   },
   "label.filter-by": {
     "defaultMessage": "篩選依據"
@@ -1021,6 +1309,9 @@
   },
   "label.modpack": {
     "defaultMessage": "模組包"
+  },
+  "label.move-failed": {
+    "defaultMessage": "移動失敗"
   },
   "label.no": {
     "defaultMessage": "否"
@@ -1066,6 +1357,9 @@
   },
   "label.rejected": {
     "defaultMessage": "已拒絕"
+  },
+  "label.rename-failed": {
+    "defaultMessage": "重新命名失敗"
   },
   "label.rewards-program-terms-agreement": {
     "defaultMessage": "我同意《<terms-link>獎勵計畫條款</terms-link>》"
@@ -1114,6 +1408,12 @@
   },
   "label.update-available": {
     "defaultMessage": "有可用的更新"
+  },
+  "label.updating": {
+    "defaultMessage": "更新中..."
+  },
+  "label.upload-failed": {
+    "defaultMessage": "上傳失敗"
   },
   "label.username": {
     "defaultMessage": "使用者名稱"
@@ -2285,6 +2585,9 @@
   "servers.backups.item.restore": {
     "defaultMessage": "還原"
   },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "撤銷"
   },
@@ -2321,9 +2624,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "付款方式"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "按 {interval} 付款"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "根據你需要的規格挑選自訂方案。"
   },
@@ -2339,17 +2639,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "最受歡迎"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "挑選一個方案"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "選擇方案"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "適合 1 到 5 位好友及少量輕量模組。"
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "選擇符合你需求的記憶體容量與規格。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "方案"
@@ -2440,6 +2734,9 @@
   },
   "settings.display.theme.title": {
     "defaultMessage": "色彩主題"
+  },
+  "settings.feature-flags.title": {
+    "defaultMessage": "功能標記"
   },
   "settings.language.categories.default": {
     "defaultMessage": "標準語言"
@@ -2905,6 +3202,21 @@
   },
   "ui.component.unsaved-changes-popup.body": {
     "defaultMessage": "你的變更尚未儲存。"
+  },
+  "ui.confirm-leave-modal.body": {
+    "defaultMessage": "您有未儲存的變更，如果離開此頁面將會遺失"
+  },
+  "ui.confirm-leave-modal.header": {
+    "defaultMessage": "您有未儲存的變更"
+  },
+  "ui.confirm-leave-modal.leave": {
+    "defaultMessage": "離開頁面"
+  },
+  "ui.confirm-leave-modal.stay": {
+    "defaultMessage": "留在頁面"
+  },
+  "ui.confirm-leave-modal.title": {
+    "defaultMessage": "離開頁面？"
   }
 }
 

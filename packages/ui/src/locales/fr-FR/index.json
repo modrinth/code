@@ -225,13 +225,16 @@
     "defaultMessage": "Privé"
   },
   "content.confirm-bulk-update.admonition-body": {
-    "defaultMessage": "Êtes vous sûr de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
+    "defaultMessage": "Êtes vous sûr.e de vouloir télécharger la dernière mise à jour compatible de {count, plural, one {# projet} other {# projets}} ? Il est recommandé de mettre à jour le contenu un par un."
   },
   "content.confirm-bulk-update.admonition-header": {
     "defaultMessage": "Avertissement mise à jour"
   },
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Mettre à jour les projets"
+  },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Maintenez Maj (Shift) en cliquant « Tout mettre à jour » pour passer cette confirmation à l'avenir."
   },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Mettre à jour {count, plural, one {# projet} other {# projets}}"
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Supprimer {count, plural, one {un } other {des }}{itemType}{count,  plural, one {} other {s}}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Tous les mods ou contenus que vous avez ajoutés en haut du modpack seront supprimés."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Tous les mods ou contenus que vous avez ajoutés sur le dessus du modpack seront conservés."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Avertissement {action, select, downgrade {rétrogradation} other {mise à jour}}"
@@ -632,12 +629,6 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack depuis URL"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent} %)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Importation des fichiers ({completed}/{total})"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "Renommer {name}"
   },
@@ -977,6 +968,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Nous déconseillons de modifier vos paramètres d'installation après avoir installé du contenu. Si vous souhaitez néanmoins les modifier, réinitialisez votre serveur."
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Réparer automatiquement"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Changer de loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Désactiver les conflits"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "En changeant la version du jeu, nous pouvons soit désactiver le contenu incompatible installé, ou bien résoudre les incompatibilités."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Avertissement d'incompatibilité"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Contenu incompatible installé"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "En changeant le loader, tout le contenu installé sera désactivé. Nous vous recommandons plutôt de réinitialiser votre serveur."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Changer de loader est destructif"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Associé le {projectType, select, server {projet du serveur} other {modpack}}"
   },
@@ -1198,9 +1213,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Ce mod dépend d'un mod côté client et peut causer des problèmes lors du démarrage de votre serveur"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ceci est un mod coté client et peut causer des problèmes. Nous l'avons gardé activé car l'auteur a mal étiqueté les environnements, le loader devrait résoudre le conflit."
   },
   "label.client-retained-warning": {
     "defaultMessage": "Il s'agit d'un mod côté client qui a été installé en tant que dépendance et peut causer des problèmes lors du démarrage de votre serveur"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Méthode de paiement"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "prélevé {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Choisissez un forfait personnalisé avec uniquement les spécifications dont vous avez besoin."
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Le plus populaire"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Choisissez un forfait"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Sélectionner le forfait"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Parfait pour 1–5 amis et quelques mods légers."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Choisissez la quantité de RAM et les spécifications qui correspondent à vos besoins."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Forfait"
@@ -2643,7 +2646,7 @@
     "defaultMessage": "Europe centrale"
   },
   "servers.region.custom.prompt": {
-    "defaultMessage": "Quelle quantité de RAM souhaitez-vous que votre serveur ait ?"
+    "defaultMessage": "Quelle quantité de mémoire vive souhaitez-vous donner à votre serveur ?"
   },
   "servers.region.north-america": {
     "defaultMessage": "Amérique du Nord"
