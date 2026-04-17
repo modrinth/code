@@ -10155,6 +10155,7 @@ dependencies = [
  "either",
  "encoding_rs",
  "enumset",
+ "eyre",
  "flate2",
  "fs4",
  "futures",

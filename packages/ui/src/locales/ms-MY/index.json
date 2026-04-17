@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Kemas kini projek"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Tahan Shift sambil mengklik \"Kemas kini semua\" untuk melangkau pengesahan ini pada masa akan datang."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Kemas kini {count, plural, other {# projek}}"
   },
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Padam {itemType}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Sebarang mod atau kandungan yang anda tambahkan di atas pek mod akan dipadamkan."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Sebarang mod atau kandungan yang anda tambahkan di atas pek mod akan dikekalkan."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Amaran {action, select, downgrade {penurunan taraf} other {pengemaskinian}}"
@@ -315,7 +312,7 @@
     "defaultMessage": "Cipta sandaran"
   },
   "content.inline-backup.shift-click-hint": {
-    "defaultMessage": "Tekan Shift sambil mengklik untuk melangkau pengesahan."
+    "defaultMessage": "Tahan Shift sambil mengklik untuk melangkau pengesahan."
   },
   "content.inline-backup.warning-body": {
     "defaultMessage": "Kami mengesyorkan agar anda membuat sandaran sebelum meneruskan supaya anda boleh memulihkan {type, select, server {dunia} other {pemasangan}} anda sekiranya terdapat sebarang kerosakan."
@@ -631,12 +628,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pek mod daripada URL"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Sedang memuat naik fail ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Namakan semula {name}"
@@ -977,6 +968,30 @@
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Kami tidak mengesyorkan anda untuk menyunting tetapan pemasangan anda selepas memasang kandungan. Jika anda ingin menyuntingnya tetap semula pelayan anda."
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Autobaiki"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Tukar pemuat"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Nyahdayakan kandungan bercanggah"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Apabila menukar versi permainan, kami boleh sama ada menyahdayakan kandungan yang dipasang yang tidak serasi atau cuba menyelesaikan ketidakserasian tersebut."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Amaran ketidakserasian"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Kandungan yang tidak serasi dipasang"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Apabila menukar pemuat, semua kandungan yang telah dipasang akan dinyahdayakan. Kami mengesyorkan supaya anda menetapkan semula pelayan anda."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Menukar pemuat boleh menyebabkan kerosakan"
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType, select, server {Projek pelayan} other {Pek mod}} dipautkan"
   },
@@ -1198,9 +1213,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Mod ini bergantung pada mod bahagian pelanggan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Ini ialah mod bahagian pelanggan dan mungkin menyebabkan masalah. Kami tetap mengaktifkannya kerana sesetengah pengarang salah melabel persekitaran dan pemuat sepatutnya menyelesaikan konflik tersebut."
   },
   "label.client-retained-warning": {
     "defaultMessage": "Ini ialah mod bahagian pelanggan yang dipasang sebagai kebergantungan dan mungkin menyebabkan masalah semasa memulakan pelayan anda"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Kaedah pembayaran"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "dibilkan {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pilih pelan tersuai dengan hanya spesifikasi yang anda perlukan."
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Paling Popular"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Pilih pelan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pilih Pelan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Sesuai untuk 1–5 rakan dengan beberapa mod ringan."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Pilih jumlah RAM dan spesifikasi yang sesuai dengan keperluan anda."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Pelan"

@@ -364,10 +364,9 @@ impl DirectoryInfo {
                                     .map_err(|e| {
                                         crate::Error::from(crate::ErrorKind::DirectoryMoveError(
                                             format!(
-                                                "Failed to move directory from {} to {}: {}",
+                                                "Failed to move directory from {} to {}: {e:?}",
                                                 x.old.display(),
                                                 x.new.display(),
-                                                e
                                             ),
                                         ))
                                     })?;
@@ -421,7 +420,7 @@ impl DirectoryInfo {
                                 io_semaphore,
                             )
                             .await.map_err(|e| { crate::Error::from(
-                                crate::ErrorKind::DirectoryMoveError(format!("Failed to move directory from {} to {}: {}", x.old.display(), x.new.display(), e)))
+                                crate::ErrorKind::DirectoryMoveError(format!("Failed to move directory from {} to {}: {e:?}", x.old.display(), x.new.display())))
                             })?;
 
                             let _ = emit_loading(

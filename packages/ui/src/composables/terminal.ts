@@ -11,7 +11,7 @@ import {
 	shallowRef,
 } from 'vue'
 
-function getCssVar(name: string, fallback: string): string {
+export function getCssVar(name: string, fallback: string): string {
 	if (typeof document === 'undefined') return fallback
 	const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
 	return value || fallback
@@ -54,6 +54,7 @@ function buildTerminalTheme() {
 		scrollbarSliderBackground: surface5,
 		scrollbarSliderHoverBackground: surface5,
 		scrollbarSliderActiveBackground: surface5,
+		overviewRulerBorder: 'transparent',
 	}
 }
 
@@ -62,6 +63,7 @@ export interface UseTerminalOptions {
 	options?: ITerminalOptions
 	scrollback?: number
 	onReady?: (terminal: Terminal) => void
+	onResize?: () => void
 }
 
 export interface UseTerminalReturn {
@@ -85,6 +87,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 
 	let resizeObserver: ResizeObserver | null = null
 	let themeObserver: MutationObserver | null = null
+	let wheelHandler: ((e: WheelEvent) => void) | null = null
 	let hasWritten = false
 	const pendingWrites: Array<{ data: string; newline: boolean }> = []
 
@@ -126,7 +129,7 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		if (!fa || !term) return
 		const dims = fa.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 	}
 
@@ -164,12 +167,13 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 
 		const term = new Terminal({
 			disableStdin: true,
-			scrollback: options.scrollback ?? 10000,
+			scrollback: options.scrollback ?? Infinity,
 			convertEol: true,
 			smoothScrollDuration: 125,
 			fontFamily: 'monospace',
 			fontSize: 14,
 			lineHeight: 1.5,
+			allowProposedApi: true,
 			theme: buildTerminalTheme(),
 			...options.options,
 		})
@@ -183,11 +187,27 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		await nextTick()
 		const dims = fit.proposeDimensions()
 		if (dims) {
-			term.resize(dims.cols, dims.rows + 1)
+			term.resize(dims.cols, dims.rows)
 		}
 
 		term.options.disableStdin = true
 		term.write('\x1b[?25l')
+
+		// term.attachCustomKeyEventHandler((e) => {
+		// 	if (e.type !== 'keydown') return true
+		// 	const mod = e.ctrlKey || e.metaKey
+		// 	if (!mod) return true
+		// 	const key = e.key.toLowerCase()
+		// 	if (key === 'c' || key === 'insert' || key === 'a') {
+		// 		return false
+		// 	}
+		// 	return true
+		// })
+
+		wheelHandler = (e: WheelEvent) => {
+			e.preventDefault()
+		}
+		container.addEventListener('wheel', wheelHandler, { passive: false })
 
 		term.onScroll(() => checkIfAtBottom())
 		term.onWriteParsed(() => {
@@ -212,8 +232,9 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		resizeObserver = new ResizeObserver(() => {
 			const d = fit.proposeDimensions()
 			if (d) {
-				term.resize(d.cols, d.rows + 1)
+				term.resize(d.cols, d.rows)
 			}
+			options.onResize?.()
 		})
 		resizeObserver.observe(container)
 
@@ -229,6 +250,10 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 	})
 
 	onBeforeUnmount(() => {
+		if (wheelHandler && options.container.value) {
+			options.container.value.removeEventListener('wheel', wheelHandler)
+			wheelHandler = null
+		}
 		resizeObserver?.disconnect()
 		resizeObserver = null
 		themeObserver?.disconnect()

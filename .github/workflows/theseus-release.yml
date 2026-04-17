@@ -9,6 +9,7 @@ jobs:
     name: Release Modrinth App
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
       startsWith(github.event.workflow_run.head_branch, 'v')
     runs-on: ubuntu-latest
 
@@ -23,6 +24,25 @@ jobs:
       - name: 📥 Check out code
         uses: actions/checkout@v4
 
+      - name: 🔒 Verify ref is a tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          tag_sha=$(gh api "repos/${{ github.repository }}/git/refs/tags/${VERSION_TAG}" --jq '.object.sha' 2>/dev/null || true)
+          if [ -z "$tag_sha" ]; then
+            echo "::error::${VERSION_TAG} is not a git tag in this repo"
+            exit 1
+          fi
+          if [ "$tag_sha" != "$HEAD_SHA" ]; then
+            commit_sha=$(gh api "repos/${{ github.repository }}/git/tags/${tag_sha}" --jq '.object.sha' 2>/dev/null || echo "$tag_sha")
+            if [ "$commit_sha" != "$HEAD_SHA" ]; then
+              echo "::error::Tag ${VERSION_TAG} (${commit_sha}) does not match build head_sha (${HEAD_SHA})"
+              exit 1
+            fi
+          fi
+          echo "Verified ${VERSION_TAG} is a tag pointing at ${HEAD_SHA}"
+
       - name: 📥 Download Modrinth App artifacts
         uses: dawidd6/action-download-artifact@v11
         with:
@@ -32,12 +52,32 @@ jobs:
           branch: ${{ env.VERSION_TAG }}
           use_unzip: true
 
+      - name: 📝 Extract app changelog
+        env:
+          VERSION: ${{ env.VERSION_TAG }}
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const version = process.env.VERSION.replace(/^v/, '');
+          const src = fs.readFileSync('packages/blog/changelog.ts', 'utf8');
+          const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const re = new RegExp("product:\\s*'app',\\s*version:\\s*'" + escaped + "',\\s*body:\\s*`([\\s\\S]*?)`,\\s*\\}");
+          const m = src.match(re);
+          if (!m) {
+            console.error(`No app changelog entry found for version ${version}`);
+            process.exit(1);
+          }
+          fs.writeFileSync('release-notes.md', m[1]);
+          console.log(`Extracted changelog for app ${version}:`);
+          console.log(m[1]);
+          EOF
+
       - name: 🛠️ Generate version manifest
         run: |
           # Reference: https://tauri.app/plugin/updater/#server-support
           jq -nc \
             --arg versionTag "${VERSION_TAG#v}" \
-            --arg releaseNotes "See the full changelog at https://modrinth.com/news/changelog" \
+            --rawfile releaseNotes release-notes.md \
             --rawfile macOsAarch64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile macOsX64UpdateArtifactSignature "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/macos/Modrinth App.app.tar.gz.sig" \
             --rawfile linuxX64UpdateArtifactSignature "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION_TAG#v}_amd64.AppImage.tar.gz.sig" \
@@ -120,7 +160,7 @@ jobs:
 
           gh release create "$VERSION_TAG" \
             --title "Modrinth App ${VERSION}" \
-            --notes "See the full changelog at https://modrinth.com/news/changelog" \
+            --notes-file release-notes.md \
             "${WINDOWS_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/nsis/Modrinth App_${VERSION}_x64-setup.exe" \
             "${MACOS_UNIVERSAL_BUNDLE_ARTIFACT_NAME}/universal-apple-darwin/release/bundle/dmg/Modrinth App_${VERSION}_universal.dmg" \
             "${LINUX_X64_BUNDLE_ARTIFACT_NAME}/release/bundle/appimage/Modrinth App_${VERSION}_amd64.AppImage" \

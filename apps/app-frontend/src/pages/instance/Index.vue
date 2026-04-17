@@ -1,6 +1,9 @@
 <template>
-	<div v-if="instance">
-		<div class="p-6 pr-2 pb-4" @contextmenu.prevent.stop="(event) => handleRightClick(event)">
+	<div v-if="instance" class="flex h-full flex-col">
+		<div
+			class="shrink-0 p-6 pr-2 pb-4"
+			@contextmenu.prevent.stop="(event) => handleRightClick(event)"
+		>
 			<ExportModal ref="exportModal" :instance="instance" />
 			<InstanceSettingsModal
 				:key="instance.path"
@@ -114,9 +117,9 @@
 							</button>
 						</ButtonStyled>
 						<ButtonStyled v-else-if="playing === true" color="red" size="large">
-							<button @click="stopInstance('InstancePage')">
+							<button :disabled="stopping" @click="stopInstance('InstancePage')">
 								<StopCircleIcon />
-								Stop
+								{{ stopping ? 'Stopping...' : 'Stop' }}
 							</button>
 						</ButtonStyled>
 						<ButtonStyled
@@ -172,7 +175,7 @@
 							color="brand"
 							size="large"
 						>
-							<button disabled>Loading...</button>
+							<button disabled>Starting...</button>
 						</ButtonStyled>
 						<ButtonStyled circular size="large">
 							<button v-tooltip="'Instance settings'" @click="settingsModal?.show()">
@@ -205,10 +208,10 @@
 				</template>
 			</ContentPageHeader>
 		</div>
-		<div class="px-6">
+		<div class="shrink-0 px-6">
 			<NavTabs :links="tabs" />
 		</div>
-		<div v-if="!!instance" class="p-6 pt-4">
+		<div v-if="!!instance" class="min-h-0 flex-1 overflow-y-auto p-6 pt-4">
 			<RouterView
 				v-if="route.path.startsWith('/instance')"
 				v-slot="{ Component }"
@@ -312,6 +315,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import InstanceSettingsModal from '@/components/ui/modal/InstanceSettingsModal.vue'
 import UpdateToPlayModal from '@/components/ui/modal/UpdateToPlayModal.vue'
+import { useInstanceConsole } from '@/composables/useInstanceConsole'
 import { trackEvent } from '@/helpers/analytics'
 import { get_project_v3 } from '@/helpers/cache.js'
 import { process_listener, profile_listener } from '@/helpers/events'
@@ -345,6 +349,7 @@ window.addEventListener('online', () => {
 const instance = ref<GameInstance>()
 const playing = ref(false)
 const loading = ref(false)
+const stopping = ref(false)
 const exportModal = ref<InstanceType<typeof ExportModal>>()
 const updateToPlayModal = ref<InstanceType<typeof UpdateToPlayModal>>()
 
@@ -494,8 +499,10 @@ const startInstance = async (context: string) => {
 }
 
 const stopInstance = async (context: string) => {
-	playing.value = false
+	stopping.value = true
 	await kill(route.params.id as string).catch(handleError)
+	stopping.value = false
+	playing.value = false
 
 	if (!instance.value) return
 	trackEvent('InstanceStop', {
@@ -644,6 +651,11 @@ const timePlayedHumanized = computed(() => {
 onUnmounted(() => {
 	unlistenProcesses()
 	unlistenProfiles()
+	const profilePath = route.params.id
+	if (profilePath) {
+		const { destroy } = useInstanceConsole(profilePath)
+		destroy()
+	}
 })
 </script>
 

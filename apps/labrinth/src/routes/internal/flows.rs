@@ -23,7 +23,7 @@ use crate::util::ext::get_image_ext;
 use crate::util::img::upload_image_optimized;
 use crate::util::validate::validation_errors_to_string;
 use actix_http::header::LOCATION;
-use actix_web::web::{Data, Query, ServiceConfig, scope};
+use actix_web::web::{Data, Query};
 use actix_web::{HttpRequest, HttpResponse, delete, get, patch, post, web};
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
@@ -45,9 +45,9 @@ use url::Url;
 use validator::Validate;
 use zxcvbn::Score;
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(
-        scope("auth")
+        utoipa_actix_web::scope("/auth")
             .service(init)
             .service(auth_callback)
             .service(delete_auth_provider)
@@ -1023,7 +1023,7 @@ impl AuthProvider {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct AuthorizationInit {
     pub url: Url,
     #[serde(default)]
@@ -1033,7 +1033,7 @@ pub struct AuthorizationInit {
     /// this will be set to the user's auth token from the frontend.
     pub auth_token: Option<String>,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Authorization {
     pub code: String,
     pub state: String,
@@ -1041,6 +1041,14 @@ pub struct Authorization {
 
 // Init link takes us to GitHub API and calls back to callback endpoint with a code and state
 // http://localhost:8000/auth/init?url=https://modrinth.com
+#[utoipa::path(
+    get,
+    operation_id = "authInit",
+    responses(
+        (status = 307, description = "Redirect to OAuth provider"),
+        (status = 400, description = "Invalid input")
+    )
+)]
 #[get("/init")]
 pub async fn init(
     req: HttpRequest,
@@ -1120,6 +1128,14 @@ pub async fn init(
         .json(serde_json::json!({ "url": url })))
 }
 
+#[utoipa::path(
+    get,
+    operation_id = "authCallback",
+    responses(
+        (status = 307, description = "Redirect with auth code"),
+        (status = 401, description = "Authentication failed")
+    )
+)]
 #[get("/callback")]
 pub async fn auth_callback(
     req: HttpRequest,
@@ -1376,7 +1392,7 @@ fn requires_dob(provider: AuthProvider) -> bool {
     )
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 struct NewOAuthAccount {
     // keep in sync with NewAccount
     #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
@@ -1386,6 +1402,14 @@ struct NewOAuthAccount {
     pub sign_up_newsletter: bool,
 }
 
+#[utoipa::path(
+    post,
+    operation_id = "createOAuthAccount",
+    responses(
+        (status = 200, description = "Account created"),
+        (status = 400, description = "Invalid input")
+    )
+)]
 #[post("/create/oauth")]
 async fn create_oauth_account(
     req: HttpRequest,
@@ -1436,12 +1460,22 @@ async fn create_oauth_account(
     Ok(HttpResponse::Ok().json(res))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct DeleteAuthProvider {
     pub provider: AuthProvider,
 }
 
-#[delete("provider")]
+#[utoipa::path(
+    delete,
+    operation_id = "deleteAuthProvider",
+    responses(
+        (status = 204, description = "Auth provider removed"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = ["USER_AUTH_WRITE"]))
+)]
+#[delete("/provider")]
 pub async fn delete_auth_provider(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1525,7 +1559,7 @@ pub async fn check_sendy_subscription(
     Ok(response.trim() == "Subscribed")
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct NewAccount {
     // keep in sync with NewOAuthAccount
     #[validate(length(min = 1, max = 39), regex(path = *crate::util::validate::RE_URL_SAFE))]
@@ -1538,7 +1572,15 @@ pub struct NewAccount {
     pub sign_up_newsletter: Option<bool>,
 }
 
-#[post("create")]
+#[utoipa::path(
+    post,
+    operation_id = "createAccountPassword",
+    responses(
+        (status = 200, description = "Account created"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/create")]
 pub async fn create_account_with_password(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1667,7 +1709,7 @@ pub async fn create_account_with_password(
     Ok(HttpResponse::Ok().json(res))
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct Login {
     #[serde(rename = "username")]
     pub username_or_email: String,
@@ -1675,7 +1717,15 @@ pub struct Login {
     pub challenge: String,
 }
 
-#[post("login")]
+#[utoipa::path(
+    post,
+    operation_id = "loginPassword",
+    responses(
+        (status = 200, description = "Login successful"),
+        (status = 401, description = "Invalid credentials")
+    )
+)]
+#[post("/login")]
 pub async fn login_password(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1740,7 +1790,7 @@ pub async fn login_password(
     }
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct Login2FA {
     pub code: String,
     pub flow: String,
@@ -1825,7 +1875,15 @@ async fn validate_2fa_code(
     }
 }
 
-#[post("login/2fa")]
+#[utoipa::path(
+    post,
+    operation_id = "login2fa",
+    responses(
+        (status = 200, description = "2FA login successful"),
+        (status = 401, description = "Invalid credentials")
+    )
+)]
+#[post("/login/2fa")]
 pub async fn login_2fa(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1874,7 +1932,16 @@ pub async fn login_2fa(
     }
 }
 
-#[post("2fa/get_secret")]
+#[utoipa::path(
+    post,
+    operation_id = "begin2faFlow",
+    responses(
+        (status = 200, description = "2FA secret generated"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/2fa/get_secret")]
 pub async fn begin_2fa_flow(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1913,7 +1980,16 @@ pub async fn begin_2fa_flow(
     }
 }
 
-#[post("2fa")]
+#[utoipa::path(
+    post,
+    operation_id = "finish2faFlow",
+    responses(
+        (status = 200, description = "2FA enabled"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/2fa")]
 pub async fn finish_2fa_flow(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2031,12 +2107,21 @@ pub async fn finish_2fa_flow(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct Remove2FA {
     pub code: String,
 }
 
-#[delete("2fa")]
+#[utoipa::path(
+    delete,
+    operation_id = "remove2fa",
+    responses(
+        (status = 204, description = "2FA removed"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[delete("/2fa")]
 pub async fn remove_2fa(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2117,14 +2202,22 @@ pub async fn remove_2fa(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct ResetPassword {
     #[serde(rename = "username")]
     pub username_or_email: String,
     pub challenge: String,
 }
 
-#[post("password/reset")]
+#[utoipa::path(
+    post,
+    operation_id = "resetPasswordBegin",
+    responses(
+        (status = 204, description = "Password reset email sent"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/password/reset")]
 pub async fn reset_password_begin(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2212,14 +2305,24 @@ pub async fn reset_password_begin(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct ChangePassword {
     pub flow: Option<String>,
     pub old_password: Option<String>,
     pub new_password: Option<String>,
 }
 
-#[patch("password")]
+#[utoipa::path(
+    patch,
+    operation_id = "changePassword",
+    responses(
+        (status = 204, description = "Password changed"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[patch("/password")]
 pub async fn change_password(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2366,13 +2469,23 @@ pub async fn change_password(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[derive(Deserialize, Validate)]
+#[derive(Deserialize, Validate, utoipa::ToSchema)]
 pub struct SetEmail {
     #[validate(email)]
     pub email: String,
 }
 
-#[patch("email")]
+#[utoipa::path(
+    patch,
+    operation_id = "setEmail",
+    responses(
+        (status = 204, description = "Email set"),
+        (status = 400, description = "Invalid input"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[patch("/email")]
 pub async fn set_email(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2481,7 +2594,16 @@ pub async fn set_email(
     Ok(HttpResponse::Ok().finish())
 }
 
-#[post("email/resend_verify")]
+#[utoipa::path(
+    post,
+    operation_id = "resendVerifyEmail",
+    responses(
+        (status = 204, description = "Verification email resent"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/email/resend_verify")]
 pub async fn resend_verify_email(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2539,12 +2661,20 @@ pub async fn resend_verify_email(
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 pub struct VerifyEmail {
     pub flow: String,
 }
 
-#[post("email/verify")]
+#[utoipa::path(
+    post,
+    operation_id = "verifyEmail",
+    responses(
+        (status = 204, description = "Email verified"),
+        (status = 400, description = "Invalid input")
+    )
+)]
+#[post("/email/verify")]
 pub async fn verify_email(
     pool: Data<PgPool>,
     redis: Data<RedisPool>,
@@ -2599,7 +2729,16 @@ pub async fn verify_email(
     }
 }
 
-#[post("email/subscribe")]
+#[utoipa::path(
+    post,
+    operation_id = "subscribeNewsletter",
+    responses(
+        (status = 204, description = "Newsletter subscription toggled"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[post("/email/subscribe")]
 pub async fn subscribe_newsletter(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -2636,7 +2775,16 @@ pub async fn subscribe_newsletter(
     Ok(HttpResponse::NoContent().finish())
 }
 
-#[get("email/subscribe")]
+#[utoipa::path(
+    get,
+    operation_id = "getNewsletterSubscriptionStatus",
+    responses(
+        (status = 200, description = "Subscription status"),
+        (status = 401, description = "Unauthorized")
+    ),
+    security(("bearer_auth" = []))
+)]
+#[get("/email/subscribe")]
 pub async fn get_newsletter_subscription_status(
     req: HttpRequest,
     pool: Data<PgPool>,

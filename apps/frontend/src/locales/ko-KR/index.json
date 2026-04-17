@@ -9,7 +9,7 @@
     "message": "사용자를 찾을 수 없습니다"
   },
   "app-marketing.download.description": {
-    "message": "데스크톱 앱은 모든 플랫폼에서 사용할 수 있으며, 원하는 버전을 선택하세요."
+    "message": "데스크톱 앱은 모든 플랫폼에서 사용할 수 있습니다. 원하는 버전을 선택하세요."
   },
   "app-marketing.download.download-appimage": {
     "message": "AppImage 다운로드"
@@ -1300,60 +1300,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "바닐라, Fabric, Forge, Quilt, NeoForge 중에서 선택하세요. Modrinth에서 실행되는 모드라면 여러분의 서버에서도 실행할 수 있습니다."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "모드팩 버전 변경 실패"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "버전 불러오기 실패"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "모드팩 재설치 실패"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "서버 복구 실패"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "서버 온보딩 상태로 재설정 실패"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "설치 설정 저장 실패"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "모드팩 연결 해제 실패"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {로더} other {{loader}}} 버전"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "서버 설치가 복구되었습니다."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "복구 완료"
-  },
-  "hosting.loader.reset-server": {
-    "message": "서버 초기화"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "서버에 저장된 세계, 모드, 설정 파일 등의 모든 데이터가 삭제됩니다. 백업 파일은 그대로 유지되며, 필요 시 복원할 수 있습니다."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "온보딩 상태로 재설정"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "서버가 다시 온보딩 단계로 돌아가 설정을 다시 완료할 수 있습니다. 계속하시겠습니까?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "온보딩 상태로 재설정"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "서버가 온보딩 상태로 되돌아갔습니다."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "온보딩 상태로 서버 재설정"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "지원 옵션"
   },
   "hosting.plan.out-of-stock": {
     "message": "품절"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "서버와 동기화"
   },
-  "servers.busy.backup-creating": {
-    "message": "백업 생성 진행 중"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "백업 복원 진행 중"
-  },
-  "servers.busy.installing": {
-    "message": "서버 설치 중"
-  },
-  "servers.busy.syncing-content": {
-    "message": "콘텐츠 동기화 진행 중"
-  },
   "servers.notice.actions": {
     "message": "활동"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "과거 결제 내역"
+  },
   "settings.billing.expires": {
     "message": "{date} 만료"
   },
@@ -3331,9 +3268,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "재구독 오류"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "서버가 현재 일시 중지된 상태라면, 다음 결제 시도가 이루어지기까지 최대 10분이 소요될 수 있습니다."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "재구독 요청 접수됨"

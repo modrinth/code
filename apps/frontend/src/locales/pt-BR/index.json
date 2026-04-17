@@ -1301,60 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Escolha entre Jogo padrão, Fabric, Forge, Quilt e NeoForge. Se estiver no Modrinth, pode ser executado no seu servidor."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Falha ao alterar a versão do pacote de mods"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Falha ao carregar as versões"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Falha ao reinstalar o pacote de mods"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Falha ao reparar o servidor"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Falha ao redefinir o servidor para a integração"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Falha ao salvar as configurações de instalação"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Falha ao desvincular o pacote de mods"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Carregador} other {{loader}}} versão"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "A instalação do seu servidor foi reparada."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparo concluído"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Reiniciar servidor"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Remove todos os dados do seu servidor, incluindo seus mundos, mods e arquivos de configuração. As cópias de segurança permanecerão e poderão ser restauradas."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Redefinir para a integração"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Isso enviará o servidor de volta para a integração, para que a configuração possa ser concluída novamente. Tem certeza de que deseja continuar?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Redefinir para a integração"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "O servidor foi retornado ao fluxo de integração."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Servidor redefinido para a integração"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Opções de suporte"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Esgotado"
   },
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Sincronizar com o servidor"
   },
-  "servers.busy.backup-creating": {
-    "message": "Criação de cópia de segurança em andamento"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Restauração da cópia de segurança em andamento"
-  },
-  "servers.busy.installing": {
-    "message": "O servidor está sendo instalado"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Sincronização de conteúdo em andamento"
-  },
   "servers.notice.actions": {
     "message": "Ações"
   },
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Cobranças anteriores"
+  },
   "settings.billing.expires": {
     "message": "Expira em {date}"
   },
@@ -3217,6 +3154,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "mensal"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "trimestre"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "trimestral"
   },
   "settings.billing.interval.year": {
     "message": "ano"
@@ -3327,19 +3270,19 @@
     "message": "{gb} GB de RAM"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Ocorreu um erro ao se reinscrever no seu Modrinth server."
+    "message": "Ocorreu um erro ao reassinar o seu Modrinth server."
   },
   "settings.billing.pyro.resubscribe.error.title": {
-    "message": "Erro ao reativar a assinatura"
+    "message": "Erro ao reassinar"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Se o servidor estiver suspenso, pode levar até 10 minutos para que outra tentativa de cobrança seja feita."
+    "message": "Se o servidor estiver cancelado no momento, a configuração pode levar de 10–15 minutos."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
-    "message": "Solicitação de reativação enviada"
+    "message": "Solicitação de reassinar enviada"
   },
   "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Assinatura do servidor reativada com sucesso"
+    "message": "Assinatura do servidor reassinada com sucesso"
   },
   "settings.billing.pyro.status.failed": {
     "message": "O pagamento da sua assinatura falhou. Por favor, atualize sua forma de pagamento, e tente assinar novamente."
@@ -3363,7 +3306,7 @@
     "message": "Renova {date}"
   },
   "settings.billing.resubscribe": {
-    "message": "Reativar assinatura"
+    "message": "Reassinar"
   },
   "settings.billing.since": {
     "message": "Desde {date}"

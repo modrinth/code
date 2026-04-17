@@ -281,6 +281,33 @@
   "content.modpack-card.dismiss-hint": {
     "defaultMessage": "Não mostrar novamente"
   },
+  "content.page-layout.share.file-names": {
+    "defaultMessage": "Nomes dos ficheiros"
+  },
+  "content.page-layout.share.label": {
+    "defaultMessage": "Partilhar"
+  },
+  "content.page-layout.share.markdown-links": {
+    "defaultMessage": "Links Markdown"
+  },
+  "content.page-layout.share.project-links": {
+    "defaultMessage": "Links dos projetos"
+  },
+  "content.page-layout.share.project-names": {
+    "defaultMessage": "Nomes dos projetos"
+  },
+  "content.page-layout.sort.alphabetical": {
+    "defaultMessage": "Alfabético"
+  },
+  "content.page-layout.sort.date-added-newest": {
+    "defaultMessage": "Mais recentes primeiro"
+  },
+  "content.page-layout.sort.date-added-oldest": {
+    "defaultMessage": "Mais antigos primeiro"
+  },
+  "content.page-layout.sort.label": {
+    "defaultMessage": "Ordenar por {mode}"
+  },
   "files.delete-modal.header": {
     "defaultMessage": "Eliminar ficheiro"
   },
@@ -319,12 +346,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpack a partir de URL"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "A carregar ficheiros ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Renomear {name}"
@@ -465,10 +486,16 @@
     "defaultMessage": "Funcionalidades"
   },
   "header.category.minecraft-server-gameplay": {
-    "defaultMessage": "Jogabilidade"
+    "defaultMessage": "Modo de jogo"
+  },
+  "header.category.minecraft-server-meta": {
+    "defaultMessage": "Parâmetros"
   },
   "header.category.performance-impact": {
-    "defaultMessage": "Impacto na performance"
+    "defaultMessage": "Impacto no desempenho"
+  },
+  "header.category.resolutions": {
+    "defaultMessage": "Resolução"
   },
   "hosting.specs.burst": {
     "defaultMessage": "Turbo até {cpus} CPUs"
@@ -671,11 +698,17 @@
   "label.singleplayer": {
     "defaultMessage": "Um jogador"
   },
+  "label.sort-by": {
+    "defaultMessage": "Ordenar por: "
+  },
   "label.success": {
     "defaultMessage": "Sucesso"
   },
   "label.title": {
     "defaultMessage": "Título"
+  },
+  "label.unknown": {
+    "defaultMessage": "Desconhecido"
   },
   "label.unlisted": {
     "defaultMessage": "Não listado"
@@ -1071,13 +1104,13 @@
     "defaultMessage": "Cliente e servidor"
   },
   "project.about.compatibility.environments.client-side": {
-    "defaultMessage": "Lado do cliente"
+    "defaultMessage": "Cliente"
   },
   "project.about.compatibility.environments.dedicated-servers-only": {
     "defaultMessage": "Apenas servidores dedicados"
   },
   "project.about.compatibility.environments.server-side": {
-    "defaultMessage": "Lado do servidor"
+    "defaultMessage": "Servidor"
   },
   "project.about.compatibility.environments.singleplayer": {
     "defaultMessage": "Um jogador"
@@ -1175,6 +1208,9 @@
   "project.about.server.title": {
     "defaultMessage": "Detalhes do servidor"
   },
+  "project.about.tags.title": {
+    "defaultMessage": "Etiquetas"
+  },
   "project.environment.client-and-server.title": {
     "defaultMessage": "Cliente e servidor, necessário em ambos"
   },
@@ -1222,6 +1258,9 @@
   },
   "project.environment.unknown.title": {
     "defaultMessage": "Ambiente desconhecido"
+  },
+  "project.follower-count-tooltip": {
+    "defaultMessage": "{count, number} {count, plural, one {seguidor} other {seguidores}}"
   },
   "project.server.language.af": {
     "defaultMessage": "Africânder"
@@ -1441,6 +1480,33 @@
   },
   "project.server.language.zu": {
     "defaultMessage": "Zulu"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Ásia"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Austrália"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Europa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Oriente Médio"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Rússia"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "América do Sul"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "O servidor está alojado em {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "Leste dos EUA"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "Oeste dos EUA"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Estatísticas"
@@ -1676,8 +1742,14 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID do projeto"
   },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Região"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Carregador"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Com mods"
   },
   "search.server_content_type.vanilla": {
     "defaultMessage": "Vanilla"
@@ -1739,9 +1811,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Método de pagamento"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "cobrado {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Escolhe um plano personalizado apenas com as especificações de que precisas."
   },
@@ -1757,17 +1826,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Mais Popular"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Escolhe um plano"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Selecionar Plano"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfeito para 1 a 5 amigos com alguns mods leves."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Escolhe a quantidade de RAM e especificações que se adequam às tuas necessidades."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plano"
@@ -1907,6 +1970,9 @@
   "tag.category.adventure": {
     "defaultMessage": "Aventura"
   },
+  "tag.category.adventure-mode": {
+    "defaultMessage": "Modo aventura"
+  },
   "tag.category.anarchy": {
     "defaultMessage": "Anarquia"
   },
@@ -1932,7 +1998,7 @@
     "defaultMessage": "Bosses"
   },
   "tag.category.cartoon": {
-    "defaultMessage": "Desenho Animado"
+    "defaultMessage": "Desenho animado"
   },
   "tag.category.challenging": {
     "defaultMessage": "Desafiador"
@@ -1941,7 +2007,7 @@
     "defaultMessage": "Classes"
   },
   "tag.category.colored-lighting": {
-    "defaultMessage": "Iluminação Colorida"
+    "defaultMessage": "Iluminação colorida"
   },
   "tag.category.combat": {
     "defaultMessage": "Combate"
@@ -1950,13 +2016,19 @@
     "defaultMessage": "Competitivo"
   },
   "tag.category.core-shaders": {
-    "defaultMessage": "Shaders Base"
+    "defaultMessage": "Shaders principais"
+  },
+  "tag.category.creative-mode": {
+    "defaultMessage": "Modo criativo"
+  },
+  "tag.category.crossplay": {
+    "defaultMessage": "Multiplataforma"
   },
   "tag.category.cursed": {
     "defaultMessage": "Bizarro"
   },
   "tag.category.custom-content": {
-    "defaultMessage": "Conteúdo Personalizado"
+    "defaultMessage": "Conteúdo personalizado"
   },
   "tag.category.decoration": {
     "defaultMessage": "Decoração"
@@ -1992,10 +2064,16 @@
     "defaultMessage": "Comida"
   },
   "tag.category.game-mechanics": {
-    "defaultMessage": "Mecânicas de Jogo"
+    "defaultMessage": "Mecânicas de jogo"
+  },
+  "tag.category.gens": {
+    "defaultMessage": "Geradores"
   },
   "tag.category.gui": {
-    "defaultMessage": "GUI"
+    "defaultMessage": "Interface"
+  },
+  "tag.category.hardcore-mode": {
+    "defaultMessage": "Modo hardcore"
   },
   "tag.category.high": {
     "defaultMessage": "Alto"
@@ -2004,7 +2082,7 @@
     "defaultMessage": "Itens"
   },
   "tag.category.keep-inventory": {
-    "defaultMessage": "Manter Inventário"
+    "defaultMessage": "Manter o inventário"
   },
   "tag.category.kitchen-sink": {
     "defaultMessage": "Salada Russa"
@@ -2030,6 +2108,9 @@
   "tag.category.medium": {
     "defaultMessage": "Médio"
   },
+  "tag.category.microgames": {
+    "defaultMessage": "Microjogos"
+  },
   "tag.category.minigame": {
     "defaultMessage": "Minijogo"
   },
@@ -2043,7 +2124,7 @@
     "defaultMessage": "Mobs"
   },
   "tag.category.modded": {
-    "defaultMessage": "Compatível com Mods"
+    "defaultMessage": "Compatível com mods"
   },
   "tag.category.models": {
     "defaultMessage": "Modelos"
@@ -2051,14 +2132,23 @@
   "tag.category.multiplayer": {
     "defaultMessage": "Multijogador"
   },
+  "tag.category.network": {
+    "defaultMessage": "Rede"
+  },
+  "tag.category.offline-mode": {
+    "defaultMessage": "Modo offline"
+  },
   "tag.category.optimization": {
     "defaultMessage": "Otimização"
   },
   "tag.category.path-tracing": {
-    "defaultMessage": "Path Tracing"
+    "defaultMessage": "Path tracing"
   },
   "tag.category.pbr": {
     "defaultMessage": "PBR"
+  },
+  "tag.category.personal-worlds": {
+    "defaultMessage": "Mundos pessoais"
   },
   "tag.category.potato": {
     "defaultMessage": "Batata"
@@ -2097,13 +2187,13 @@
     "defaultMessage": "Captura de ecrã"
   },
   "tag.category.semi-realistic": {
-    "defaultMessage": "Semirrealistico"
+    "defaultMessage": "Semirrealista"
   },
   "tag.category.shadows": {
     "defaultMessage": "Sombras"
   },
   "tag.category.simplistic": {
-    "defaultMessage": "Simplístico"
+    "defaultMessage": "Simplista"
   },
   "tag.category.skyblock": {
     "defaultMessage": "Skyblock"
@@ -2118,7 +2208,7 @@
     "defaultMessage": "Armazenamento"
   },
   "tag.category.survival-mode": {
-    "defaultMessage": "Modo Sobrevivência"
+    "defaultMessage": "Modo sobrevivência"
   },
   "tag.category.teams": {
     "defaultMessage": "Equipas"
@@ -2136,7 +2226,7 @@
     "defaultMessage": "Vilas"
   },
   "tag.category.transportation": {
-    "defaultMessage": "Transportes"
+    "defaultMessage": "Transporte"
   },
   "tag.category.tweaks": {
     "defaultMessage": "Ajustes"
@@ -2145,16 +2235,16 @@
     "defaultMessage": "Utilidade"
   },
   "tag.category.vanilla-like": {
-    "defaultMessage": "Estilo Vanilla"
+    "defaultMessage": "Estilo vanilla"
   },
   "tag.category.whitelisted": {
     "defaultMessage": "Com lista branca"
   },
   "tag.category.world-resets": {
-    "defaultMessage": "Reinícios de Mundo"
+    "defaultMessage": "Reinícios de mundo"
   },
   "tag.category.worldgen": {
-    "defaultMessage": "Geração de Mundo"
+    "defaultMessage": "Geração de mundo"
   },
   "tag.loader.babric": {
     "defaultMessage": "Babric"

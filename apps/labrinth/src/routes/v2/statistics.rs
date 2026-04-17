@@ -5,11 +5,11 @@ use crate::routes::{
 };
 use actix_web::{HttpResponse, get, web};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
+pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
     cfg.service(get_stats);
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, utoipa::ToSchema)]
 pub struct V2Stats {
     pub projects: Option<i64>,
     pub versions: Option<i64>,
@@ -17,7 +17,19 @@ pub struct V2Stats {
     pub files: Option<i64>,
 }
 
-#[get("statistics")]
+/// Get aggregate instance statistics.
+#[utoipa::path(
+    get,
+    operation_id = "statistics",
+    responses(
+        (
+            status = 200,
+            description = "Expected response to a valid request",
+            body = V2Stats
+        )
+    )
+)]
+#[get("/statistics")]
 pub async fn get_stats(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {

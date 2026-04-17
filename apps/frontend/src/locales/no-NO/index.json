@@ -1301,39 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Velg mellom Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, så kan det kjøre på serveren din."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Kunne ikke endre modpakkeversjon"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Kunne ikke laste inn versjoner"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Kunne ikke re-installere modpakka"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Kunne ikke reparere serveren"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Kunne ikke lagre installeringsinnstillinger"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Kunne ikke kople fra modpakka"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Loader} other {{loader}}} versjon"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Serverinstalleringa di har blitt reparert."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Reparering fullført"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Tilbakestill server"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Fjerner all data på serveren din, inkludert verdene dine, modsa dine og konfigurasjonsfilene dine. Sikkerhetskopier blir igjen og kan bli gjenoppretta."
-  },
   "hosting.plan.out-of-stock": {
     "message": "Utsolgt"
   },
@@ -2810,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synkroniser med server"
   },
-  "servers.busy.backup-creating": {
-    "message": "Sikkerhetskopieringsinstanse på veg"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Gjennoppretting av sikkerhetskopier på veg"
-  },
-  "servers.busy.installing": {
-    "message": "Server blir installert"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Syncing av innhold pågår"
-  },
   "servers.notice.actions": {
     "message": "Handlinger"
   },
@@ -3310,9 +3265,6 @@
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Error når vi prøvde å abonnere igjen"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Viss serveren for tida er suspendert, så kan det ta opp til 10 minutt for å prøve å betale igjen."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Forespørsel om å abonnere igjen har blitt sendt inn"

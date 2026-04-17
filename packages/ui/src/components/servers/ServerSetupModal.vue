@@ -16,21 +16,12 @@
 		@browse-modpacks="$emit('browse-modpacks')"
 	/>
 
-	<NewModal
-		ref="uploadModal"
-		:header="formatMessage(messages.uploadingModpackHeader)"
-		:closable="false"
-	>
-		<div class="flex flex-col gap-4 md:w-[400px]">
-			<AppearingProgressBar :max-value="totalBytes" :current-value="uploadedBytes" />
-			<p class="m-0 text-sm text-secondary">{{ formatMessage(messages.uploadWarningText) }}</p>
-		</div>
-	</NewModal>
+	<UploadProgressModal ref="uploadProgressModal" />
 </template>
 
 <script setup lang="ts">
 import type { Archon, ModrinthApiError } from '@modrinth/api-client'
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
 import { useDebugLogger } from '#ui/composables/debug-logger'
 
@@ -38,22 +29,13 @@ import { defineMessages, useVIntl } from '../../composables/i18n'
 import { injectModrinthClient } from '../../providers/api-client'
 import { injectModrinthServerContext } from '../../providers/server-context'
 import { injectNotificationManager } from '../../providers/web-notifications'
-import { AppearingProgressBar } from '../base'
 import type { CreationFlowContextValue } from '../flows/creation-flow-modal/creation-flow-context'
 import CreationFlowModal from '../flows/creation-flow-modal/index.vue'
-import { NewModal } from '../modal'
+import { UploadProgressModal } from '../modal'
 
 const { formatMessage } = useVIntl()
 
 const messages = defineMessages({
-	uploadingModpackHeader: {
-		id: 'servers.setup.uploading-modpack.header',
-		defaultMessage: 'Uploading modpack',
-	},
-	uploadWarningText: {
-		id: 'servers.setup.upload-warning',
-		defaultMessage: "Please don't close this page while uploading.",
-	},
 	rateLimitTitle: {
 		id: 'servers.setup.rate-limit.title',
 		defaultMessage: 'Cannot reinstall server',
@@ -117,10 +99,8 @@ const initialLoader = computed(() => {
 const initialGameVersion = computed(() => serverContext.server.value.mc_version ?? undefined)
 
 const creationFlowRef = useTemplateRef<InstanceType<typeof CreationFlowModal>>('creationFlowRef')
-const uploadModal = useTemplateRef<InstanceType<typeof NewModal>>('uploadModal')
-
-const uploadedBytes = ref(0)
-const totalBytes = ref(0)
+const uploadProgressModal =
+	useTemplateRef<InstanceType<typeof UploadProgressModal>>('uploadProgressModal')
 
 async function onFlowComplete(ctx: CreationFlowContextValue) {
 	debug('onFlowComplete:', {
@@ -210,32 +190,15 @@ async function onFlowComplete(ctx: CreationFlowContextValue) {
 }
 
 async function handleMrpackUpload(file: File, properties: Archon.Content.v1.PropertiesFields) {
-	uploadedBytes.value = 0
-	totalBytes.value = file.size
-
 	creationFlowRef.value?.hide()
-	await nextTick()
-	uploadModal.value?.show()
-
-	try {
-		const handle = client.kyros.content_v1.uploadModpackFile(
-			serverContext.worldId.value!,
-			file,
-			properties,
-			{
-				softOverride: false,
-				onProgress: ({ loaded, total }) => {
-					uploadedBytes.value = loaded
-					totalBytes.value = total
-				},
-			},
-		)
-
-		await handle.promise
-		emitReinstall()
-	} finally {
-		uploadModal.value?.hide()
-	}
+	const handle = client.kyros.content_v1.uploadModpackFile(
+		serverContext.worldId.value!,
+		file,
+		properties,
+		{ softOverride: false },
+	)
+	await uploadProgressModal.value!.track(handle)
+	emitReinstall()
 }
 
 function emitReinstall(args?: { loader: string; lVersion: string; mVersion: string | null }) {

@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Переглянути аналітику"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Не вдалося завантажити налаштування сервера"
+  },
   "badge.beta": {
     "defaultMessage": "Бета"
   },
@@ -40,6 +43,54 @@
   },
   "badge.new": {
     "defaultMessage": "Нове"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Скасувати"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} спільних ЦП"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Ви збираєтеся повторно підписатися на <server-name>{serverName}</server-name>. Вашу підписку буде відновлено, і ваш сервер продовжить працювати без перерв."
+  },
+  "billing.resubscribe-modal.error.text": {
+    "defaultMessage": "Не можна повторно підписатися, не вдалося завантажити деталі підписки."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Помилка"
+  },
+  "billing.resubscribe-modal.failed-load": {
+    "defaultMessage": "Не вдалося завантажити деталей підписки."
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 днів"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/місяць"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/квартал"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/рік"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Ваше наступне списання буде <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "План"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} ГБ ОЗП"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Підписатися повторно"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} ГБ сховища"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Підписатися повторно до сервера"
   },
   "button.accept": {
     "defaultMessage": "Прийняти"
@@ -233,6 +284,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Оновлення проєктів"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Щоб пропустити це підтвердження в майбутньому, утримуйте клавішу Shift, натискаючи «Оновити все»."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Оновити {count, plural, one {# проєкт} few {# проєкти} other {# проєктів}}"
   },
@@ -249,10 +303,7 @@
     "defaultMessage": "Видалення {itemType}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Усі моди та вміст, який ви додали до збірки, буде видалено."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Усі моди та вміст, який ви додали до збірки, буде збережено."
+    "defaultMessage": "{action, select, downgrade {Пониження} other {Підвищення}} може спричинити проблеми сумісности. Моди чи вміст, який ви додали в збірку, буде збережено, але може бути несумісним із новою версією."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Попередження щодо {action, select, downgrade {відкату оновлень} other {оновлень}}"
@@ -363,7 +414,7 @@
     "defaultMessage": "Будь ласка, зачекайте"
   },
   "content.page-layout.search-placeholder": {
-    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {умісту}}…"
+    "defaultMessage": "Пошук серед {count} {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} проєкт {проєкту} проєктs {проєктів} other {елементів умісту}}…"
   },
   "content.page-layout.share.file-names": {
     "defaultMessage": "Назви файлів"
@@ -432,7 +483,7 @@
     "defaultMessage": "Оновлення {contentType, select, mod {мода} mods {модів} plugin {плаґіна} plugins {плаґінів} datapack {пакета даних} datapacks {пакетів даних} project {проєкту} projects {проєктів} other {вмісту}}…"
   },
   "content.selection-bar.selected-count": {
-    "defaultMessage": "{count} {contentType, select, mod {мод} mods {{count, plural, few {моди} other {модів}}} plugin {плаґін} plugins {{count, plural, few {плаґіни} other {плаґінів}}} datapack {пакет даних} datapacks {{count, plural, few {пакети даних} other {пакетів даних}}} project {проєкт} projects {{count, plural, few {проєкти} other {проєктів}}} other {{count, plural, one {елемент умісту} few {елементи вмісту} other {елементів умісту}}}} вибрано"
+    "defaultMessage": "Вибрано {count} {contentType, select, mod {мод} mods {{count, plural, few {моди} other {модів}}} plugin {плаґін} plugins {{count, plural, few {плаґіни} other {плаґінів}}} datapack {пакет даних} datapacks {{count, plural, few {пакети даних} other {пакетів даних}}} проєкт {проєкт} проєктs {{count, plural, few {проєкти} other {проєктів}}} other {{count, plural, one {елемент умісту} few {елементи вмісту} other {елементів умісту}}}}"
   },
   "content.selection-bar.selected-count-simple": {
     "defaultMessage": "Вибрано {count, number}"
@@ -631,12 +682,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "збірки із посилання"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Вивантаження файлів ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "Перейменувати «{name}»"
@@ -905,6 +950,60 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Не вдалося оновити файл"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Не вдалося змінити версію збірки"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Не вдалося завантажити версії"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Не вдалося перевстановити збірку"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Не вдалося полагодити сервер"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Не вдалося скинути до початкового стану"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Не вдалося зберегти налаштування інсталяції"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Не вдалося відв’язати збірку"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Версія {loader, select, null {завантажувача} other {{loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "Інсталяція вашого сервера була полагоджена."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Лагодження завершено"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Скинути сервер"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Скинути до початкового стану"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Це призведе до повернення сервера в початковий стан, щоб можна було повторно виконати процес налаштування. Ви впевнені, що хочете продовжити?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Скинути до початкового стану"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Сервер повернуто до початкового стану для налаштування."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Сервер скинуто до початкового стану"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Налаштування підтримки"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Короткочасно до {cpus} ЦП"
   },
@@ -976,6 +1075,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Ми не рекомендуємо змінювати налаштування інсталяції після встановлення вмісту. Якщо ви все ж хочете їх змінити, скиньте ваш сервер."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Виправити автоматично"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Змінити завантажувач"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Вимкнути конфлікти"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Змінюючи версію гри, ми можемо вимкнути несумісний встановлений вміст або спробувати усунути несумісність."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Попередження несумісности"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Установлено несумісний уміст"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "При зміні завантажувача весь встановлений уміст буде вимкнено. Натомість рекомендуємо скинути налаштування сервера."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Змінення завантажувача деструктивне"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType, select, server {Пов’заний проєкт сервера} other {Пов’зана збірка}}"
@@ -1200,7 +1323,7 @@
     "defaultMessage": "Цей мод залежить від клієнтського мода, що може спричинити проблеми під час запуску сервера"
   },
   "label.client-only-warning": {
-    "defaultMessage": "Це мод для клієнтської сторони, який може спричинити проблеми. Ми залишили його увімкненим, оскільки деякі автори неправильно позначають середовища, а завантажувач повинен вирішити цей конфлікт."
+    "defaultMessage": "Це клієнтський мод, який може викликати проблеми під час запуску сервера"
   },
   "label.client-retained-warning": {
     "defaultMessage": "Це клієнтський мод, який був встановлений як залежність і може спричинити проблеми під час запуску сервера"
@@ -2564,6 +2687,114 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Відновлення"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "Триває створення резервної копії"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "Триває відновлення резервної копії"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "Сервер установлюється"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "Триває синхронізація вмісту"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Уже маєте сервер?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Дізнайтеся більше про Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Новий сервер"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Установлюйте моди, запрошуйте друзів і грайте разом із Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Серверів ще немає"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Виберіть свої улюблені моди, а ми подбаємо про решту."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Установлення мода в одне натискання"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Запросіть друзів і налаштуйте їх прямо в Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Грайте з друзями"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Увійти"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Налаштуйте свій сервер як світ для гри наодинці."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Просте налаштування"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Скопійовано"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Скопіювати код у буфер обміну"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Скопіювати ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Завантажити останню резервну копію"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Керування платежами"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Новий"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Успіх"
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Тепер їх можна знайти тут!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Не показувати знову"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Налаштування вашого сервера переміщено"
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Новий сервер"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "Пробна версія вашого сервера Medal закінчилася, а роботу сервера призупинено. Оновіть, щоб продовжувати використовувати свій сервер."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Ваш сервер призупинено. Оновіть свою платіжну інформацію або зверніться до служби підтримки Modrinth для подробиць."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Ваш сервер призупинено: {reason}. Оновіть свою платіжну інформацію або зверніться до служби підтримки Modrinth для подробиць."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "Апаратне забезпечення вашого сервера зараз оновлюється та незабаром відновиться."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Значок сервера"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Покращити"
+  },
+  "servers.medal-listing.using-project-label": {
+    "defaultMessage": "Використання {projectTitle}"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Відхилити"
   },
@@ -2591,6 +2822,12 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Не можна відхилити"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "Ваша покупка Modrinth Hosting була успішно завершена."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Успішна покупка"
+  },
   "servers.purchase.step.payment.description": {
     "defaultMessage": "З вас ще не стягуватиметься плата."
   },
@@ -2600,17 +2837,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Спосіб оплати"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "оплачується {interval}"
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Доступно у Північній Америці, Європі та Південно-східній Азії."
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Виберіть індивідуальний план із необхідними вам характеристиками."
   },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Знаєте, що саме вам потрібно?"
+  },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Почнімо"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Великий"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ідеально підходить для 15–25 гравців, збірок або великої кількости модів."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Середній"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Чудово підходить для 6–15 гравців та кількох модів."
@@ -2618,20 +2864,20 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Найпопулярніший"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Виберіть план"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Вибрати план"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Малий"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Прекрасно підходить для 1–5 друзів із кількома легкими модами."
   },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Виберіть обсяг оперативної пам’яті та характеристики, які відповідають вашим потребам."
-  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "План"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Ваш поточний план"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Регіон"

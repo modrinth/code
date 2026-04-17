@@ -179,7 +179,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 
 <template>
 	<div class="grid sm:grid-cols-[3fr_2fr] gap-4">
-		<div class="bg-table-alternateRow p-4 rounded-2xl">
+		<div class="bg-surface-2 p-4 rounded-2xl">
 			<div class="flex items-center gap-2 mb-3">
 				<ModrinthServersIcon class="flex h-5 w-fit" />
 				<TagItem>{{ planName }}</TagItem>
@@ -194,9 +194,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 				/>
 			</div>
 		</div>
-		<div
-			class="bg-table-alternateRow p-4 rounded-2xl flex flex-col gap-2 items-center justify-center"
-		>
+		<div class="bg-surface-2 p-4 rounded-2xl flex flex-col gap-2 items-center justify-center">
 			<img
 				v-if="flag"
 				class="aspect-[16/10] max-w-12 w-full object-cover rounded-md border-1 border-button-border border-solid"
@@ -304,10 +302,7 @@ function setInterval(newInterval: ServerBillingInterval) {
 				"
 			/>
 		</template>
-		<div
-			v-else
-			class="p-4 rounded-2xl bg-table-alternateRow text-sm text-secondary leading-relaxed"
-		>
+		<div v-else class="p-4 rounded-2xl bg-surface-2 text-sm text-secondary leading-relaxed">
 			No payment required. Your downgrade will apply at the end of the current billing period.
 		</div>
 	</div>

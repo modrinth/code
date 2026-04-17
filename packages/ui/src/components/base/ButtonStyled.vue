@@ -204,6 +204,9 @@ const colorVariables = computed(() => {
 
 	if (props.type === 'outlined' || props.type === 'transparent') {
 		colors.bg = 'transparent'
+		if (props.hoverColorFill === 'none') {
+			hoverColors.bg = 'transparent'
+		}
 		colors = setColorFill(colors, props.colorFill === 'auto' ? 'text' : props.colorFill)
 		hoverColors = setColorFill(
 			hoverColors,
@@ -263,8 +266,10 @@ const fontSize = computed(() => {
 	> *:first-child
 	> *:first-child
 	> :is(button, a, .button-like):first-child {
-	@apply flex cursor-pointer flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
+	@apply flex cursor-pointer flex-row items-center justify-center border-solid border border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight] whitespace-nowrap;
 	box-shadow: var(--_box-shadow, inset 0 0 0 transparent);
+	-webkit-font-smoothing: antialiased;
+	will-change: filter;
 	transition:
 		scale 0.125s ease-in-out,
 		background-color 0.25s ease-in-out,

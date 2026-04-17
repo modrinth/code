@@ -30,6 +30,10 @@ export abstract class AbstractModrinthClient extends AbstractUploadClient {
 	public readonly archon!: InferredClientModules['archon'] & { sockets: AbstractWebSocketClient }
 	public readonly kyros!: InferredClientModules['kyros']
 	public readonly iso3166!: InferredClientModules['iso3166']
+	public readonly mclogs!: InferredClientModules['mclogs']
+	public readonly launchermeta!: InferredClientModules['launchermeta']
+	public readonly paper!: InferredClientModules['paper']
+	public readonly purpur!: InferredClientModules['purpur']
 
 	constructor(config: ClientConfig) {
 		super()

@@ -62,67 +62,77 @@ async function findLauncherDir() {
 </script>
 
 <template>
-	<h2 class="m-0 text-lg font-extrabold text-contrast">App directory</h2>
-	<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
-		The directory where the launcher stores all of its files. Changes will be applied after
-		restarting the launcher.
-	</p>
+	<div class="flex flex-col gap-6">
+		<div class="flex flex-col gap-2.5">
+			<h2 class="m-0 text-lg font-semibold text-contrast">App directory</h2>
+			<StyledInput
+				id="appDir"
+				v-model="settings.custom_dir"
+				:icon="BoxIcon"
+				type="text"
+				wrapper-class="w-full"
+			>
+				<template #right>
+					<Button class="ml-1.5" @click="findLauncherDir">
+						<FolderSearchIcon />
+					</Button>
+				</template>
+			</StyledInput>
+			<p class="m-0 leading-tight text-secondary">
+				The directory where the launcher stores all of its files. Changes will be applied after
+				restarting the launcher.
+			</p>
+		</div>
 
-	<div class="m-1 my-2">
-		<StyledInput
-			id="appDir"
-			v-model="settings.custom_dir"
-			:icon="BoxIcon"
-			type="text"
-			wrapper-class="w-full"
-		>
-			<template #right>
-				<Button class="r-btn" @click="findLauncherDir">
-					<FolderSearchIcon />
-				</Button>
-			</template>
-		</StyledInput>
+		<div class="flex flex-col gap-2.5">
+			<ConfirmModalWrapper
+				ref="purgeCacheConfirmModal"
+				title="Are you sure you want to purge the cache?"
+				description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+				:has-to-type="false"
+				proceed-label="Purge cache"
+				:show-ad-on-close="false"
+				@proceed="purgeCache"
+			/>
+			<h2 class="m-0 text-lg font-semibold text-contrast">App cache</h2>
+			<button id="purge-cache" class="btn min-w-max" @click="$refs.purgeCacheConfirmModal.show()">
+				<TrashIcon />
+				Purge cache
+			</button>
+			<p class="m-0 leading-tight text-secondary">
+				The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
+				app to reload data. This may slow down the app temporarily.
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5">
+			<h2 class="m-0 text-lg font-semibold text-contrast mt-4">Maximum concurrent downloads</h2>
+			<Slider
+				id="max-downloads"
+				v-model="settings.max_concurrent_downloads"
+				:min="1"
+				:max="10"
+				:step="1"
+			/>
+			<p class="m-0 leading-tight text-secondary">
+				The maximum amount of files the launcher can download at the same time. Set this to a lower
+				value if you have a poor internet connection. (app restart required to take effect)
+			</p>
+		</div>
+
+		<div class="flex flex-col gap-2.5">
+			<h2 class="mt-0 m-0 text-lg font-semibold text-contrast">Maximum concurrent writes</h2>
+			<Slider
+				id="max-writes"
+				v-model="settings.max_concurrent_writes"
+				:min="1"
+				:max="50"
+				:step="1"
+			/>
+			<p class="m-0 leading-tight text-secondary">
+				The maximum amount of files the launcher can write to the disk at once. Set this to a lower
+				value if you are frequently getting I/O errors. (app restart required to take effect)
+			</p>
+		</div>
 	</div>
-
-	<div>
-		<ConfirmModalWrapper
-			ref="purgeCacheConfirmModal"
-			title="Are you sure you want to purge the cache?"
-			description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
-			:has-to-type="false"
-			proceed-label="Purge cache"
-			:show-ad-on-close="false"
-			@proceed="purgeCache"
-		/>
-
-		<h2 class="m-0 text-lg font-extrabold text-contrast">App cache</h2>
-		<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
-			The Modrinth app stores a cache of data to speed up loading. This can be purged to force the
-			app to reload data. This may slow down the app temporarily.
-		</p>
-	</div>
-	<button id="purge-cache" class="btn min-w-max" @click="$refs.purgeCacheConfirmModal.show()">
-		<TrashIcon />
-		Purge cache
-	</button>
-
-	<h2 class="m-0 text-lg font-extrabold text-contrast mt-4">Maximum concurrent downloads</h2>
-	<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
-		The maximum amount of files the launcher can download at the same time. Set this to a lower
-		value if you have a poor internet connection. (app restart required to take effect)
-	</p>
-	<Slider
-		id="max-downloads"
-		v-model="settings.max_concurrent_downloads"
-		:min="1"
-		:max="10"
-		:step="1"
-	/>
-
-	<h2 class="mt-4 m-0 text-lg font-extrabold text-contrast">Maximum concurrent writes</h2>
-	<p class="m-0 mt-1 mb-2 leading-tight text-secondary">
-		The maximum amount of files the launcher can write to the disk at once. Set this to a lower
-		value if you are frequently getting I/O errors. (app restart required to take effect)
-	</p>
-	<Slider id="max-writes" v-model="settings.max_concurrent_writes" :min="1" :max="50" :step="1" />
 </template>

@@ -201,7 +201,7 @@ function getCategoryName(category: Category): string {
 
 		<div ref="$languagesList" class="flex flex-col gap-2.5">
 			<template v-for="[category, categoryLocales] in $displayCategories" :key="category">
-				<strong class="mt-4 font-bold">
+				<strong class="mt-4 font-semibold text-contrast">
 					{{ getCategoryName(category) }}
 				</strong>
 
@@ -234,7 +234,7 @@ function getCategoryName(category: Category): string {
 						<RadioButtonIcon v-else class="size-6" />
 
 						<div class="flex flex-1 flex-wrap justify-between gap-x-6">
-							<div class="font-bold">
+							<div class="font-medium">
 								{{ loc.displayName }}
 							</div>
 

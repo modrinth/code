@@ -1301,45 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vanilla, Fabric, Forge, Quilt ve NeoForge arasından seçin. Modrinth'de varsa sunucunuzda çalışır."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Modpaketi sürümü değiştirilemedi"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Sürümler yüklenemedi"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Mod paketi yeniden yüklenemedi"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Sunucu tamiri başarısız oldu"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Sunucu başlangıç ayarlarına sıfırlanamadı"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Kurulum ayarları kaydedilemedi"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Mod paketi bağlantısı kaldırılamadı"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Yükleyici} other {Yükleyici}} sürüm"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Sunucu kurulumunuz başarıyla onarıldı."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Tamir tamamlandı"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Sunucuyu sıfırla"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Sunucunuzdaki tüm verileri, dünyalarınızı, modları ve yapılandırma dosyalarınızı siler. Yedekler korunur ve geri yüklenebilir."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Kurulum aşamasına sıfırla"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Stokta yok"
   },
