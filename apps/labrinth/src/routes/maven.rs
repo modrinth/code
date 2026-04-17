@@ -329,7 +329,7 @@ pub async fn version_file(
             artifact_id: project_id,
             version: vnum,
             name: project.inner.name,
-            description: project.inner.description,
+            description: format!(r#""{}""#, project.inner.summary),
         };
         return Ok(HttpResponse::Ok()
             .content_type("text/xml")
