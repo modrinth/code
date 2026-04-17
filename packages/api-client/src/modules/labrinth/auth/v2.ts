@@ -58,6 +58,22 @@ export class LabrinthAuthV2Module extends AbstractModule {
 	}
 
 	/**
+	 * Validate email/password inputs for account creation without creating an account.
+	 *
+	 * @param data - Prospective account credentials
+	 */
+	public async validateCreateAccount(
+		data: Labrinth.Auth.v2.ValidateCreateAccountRequest,
+	): Promise<void> {
+		return this.client.request(`/auth/create/validate`, {
+			api: 'labrinth',
+			version: 2,
+			method: 'POST',
+			body: data,
+		})
+	}
+
+	/**
 	 * Create a new account from an OAuth callback flow state
 	 *
 	 * @param data - OAuth account creation data

@@ -15,25 +15,29 @@
 			<input
 				id="create-account-dob"
 				v-model="dateOfBirthModel"
-				class="scheme-dark w-full border-0 bg-surface-4 text-lg text-contrast outline-none [color-scheme:dark]"
+				class="scheme-dark w-full border-0 bg-surface-4 text-lg text-primary outline-none [color-scheme:dark]"
 				type="date"
 				:max="maxBirthDate"
 			/>
-			<div>You must be over 13 years old to use Modrinth.</div>
-			<Admonition type="info">
-				<div class="flex flex-col gap-1.5 leading-normal">
-					<div>
-						{{ formatMessage(messages.infoPanelText) }}
+			<div>
+				{{ formatMessage(messages.over13HelperText) }}
+			</div>
+			<Admonition :type="'info'">
+				<template #header>
+					<div class="-mb-2 flex flex-col gap-1.5 font-normal leading-normal">
+						<div>
+							{{ formatMessage(messages.infoPanelText) }}
+						</div>
+						<a
+							class="w-fit text-link underline"
+							:href="sourceCodeUrl"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{{ formatMessage(messages.relevantSourceCodeText) }}
+						</a>
 					</div>
-					<a
-						class="w-fit text-link"
-						:href="sourceCodeUrl"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{{ formatMessage(messages.relevantSourceCodeText) }}
-					</a>
-				</div>
+				</template>
 			</Admonition>
 		</section>
 
@@ -71,7 +75,7 @@
 			<button
 				class="!w-full font-bold"
 				:disabled="globals?.captcha_enabled ? !tokenModel : false"
-				@click="onCompleteSignUp()"
+				@click="onCompleteSignUpClick"
 			>
 				{{ formatMessage(messages.completeSignUpButton) }}
 			</button>
@@ -85,6 +89,7 @@ import {
 	ButtonStyled,
 	Checkbox,
 	defineMessages,
+	injectNotificationManager,
 	StyledInput,
 	useVIntl,
 } from '@modrinth/ui'
@@ -120,7 +125,7 @@ const props = defineProps({
 	sourceCodeUrl: {
 		type: String,
 		default:
-			'https://github.com/modrinth/labrinth/blob/main/apps/labrinth/src/routes/internal/flows.rs',
+			'https://github.com/modrinth/code/blob/main/apps/frontend/src/components/ui/auth/CreateAccount.vue',
 	},
 	onCompleteSignUp: {
 		type: Function,
@@ -165,7 +170,39 @@ const maxBirthDate = computed(() => {
 	return date.toISOString().slice(0, 10)
 })
 
+const isDateOfBirthMissing = computed(() => props.requiresDob && dateOfBirthModel.value === '')
+
+const isUnder13 = computed(
+	() =>
+		props.requiresDob &&
+		dateOfBirthModel.value !== '' &&
+		dateOfBirthModel.value > maxBirthDate.value,
+)
+
+const { addNotification } = injectNotificationManager()
 const { formatMessage } = useVIntl()
+
+function onCompleteSignUpClick() {
+	if (isDateOfBirthMissing.value) {
+		addNotification({
+			title: formatMessage(messages.dateOfBirthRequiredTitle),
+			text: formatMessage(messages.dateOfBirthRequiredText),
+			type: 'warning',
+		})
+		return
+	}
+
+	if (isUnder13.value) {
+		addNotification({
+			title: formatMessage(messages.ageRequirementWarningTitle),
+			text: formatMessage(messages.under13HelperText),
+			type: 'error',
+		})
+		return
+	}
+
+	props.onCompleteSignUp()
+}
 
 const messages = defineMessages({
 	title: {
@@ -176,9 +213,25 @@ const messages = defineMessages({
 		id: 'auth.create-account.date-of-birth.label',
 		defaultMessage: 'Date of birth',
 	},
+	dateOfBirthRequiredTitle: {
+		id: 'auth.create-account.date-of-birth.required.title',
+		defaultMessage: 'Date of birth required',
+	},
+	dateOfBirthRequiredText: {
+		id: 'auth.create-account.date-of-birth.required.text',
+		defaultMessage: 'Please enter your date of birth before continuing.',
+	},
 	over13HelperText: {
 		id: 'auth.create-account.date-of-birth.over13-helper',
 		defaultMessage: 'You must be over 13 years old to use Modrinth.',
+	},
+	under13HelperText: {
+		id: 'auth.create-account.date-of-birth.under13-helper',
+		defaultMessage: 'You cannot create an account at Modrinth unless you are 13 years old.',
+	},
+	ageRequirementWarningTitle: {
+		id: 'auth.create-account.age-requirement.warning-title',
+		defaultMessage: 'Age requirement',
 	},
 	infoPanelText: {
 		id: 'auth.create-account.info-panel.text',

@@ -79,13 +79,6 @@
 				wrapper-class="w-full"
 			/>
 
-			<Checkbox
-				v-model="subscribeModel"
-				class="subscribe-btn"
-				:label="formatMessage(messages.subscribeLabel)"
-				:description="formatMessage(messages.subscribeLabel)"
-			/>
-
 			<p v-if="!routeQuery.launcher">
 				<IntlFormatted :message-id="messages.legalDisclaimer">
 					<template #terms-link="{ children }">
@@ -101,17 +94,11 @@
 				</IntlFormatted>
 			</p>
 
-			<HCaptcha
-				v-if="globals?.captcha_enabled && emailModel && passwordModel"
-				:ref="onSetCaptchaRef"
-				v-model="tokenModel"
-			/>
-
 			<ButtonStyled color="brand">
 				<button
 					class="!w-full"
-					:disabled="globals?.captcha_enabled ? !tokenModel : false"
-					@click="onCreateAccount()"
+					:disabled="!emailModel || !passwordModel"
+					@click="onContinueWithEmail()"
 				>
 					{{ formatMessage(messages.continueWithEmail) }} <RightArrowIcon />
 				</button>
@@ -147,7 +134,6 @@ import {
 } from '@modrinth/assets'
 import {
 	ButtonStyled,
-	Checkbox,
 	commonMessages,
 	defineMessages,
 	IntlFormatted,
@@ -156,7 +142,6 @@ import {
 } from '@modrinth/ui'
 import { computed } from 'vue'
 
-import HCaptcha from '@/components/ui/auth/HCaptcha.vue'
 import { getAuthUrl } from '@/composables/auth.ts'
 
 const props = defineProps({
@@ -172,10 +157,6 @@ const props = defineProps({
 		type: Object,
 		default: () => ({}),
 	},
-	globals: {
-		type: Object,
-		default: null,
-	},
 	email: {
 		type: String,
 		default: '',
@@ -184,29 +165,17 @@ const props = defineProps({
 		type: String,
 		default: '',
 	},
-	token: {
-		type: String,
-		default: '',
-	},
-	subscribe: {
-		type: Boolean,
-		default: false,
-	},
 	onToggleOtherOptions: {
 		type: Function,
 		default: () => {},
 	},
-	onCreateAccount: {
+	onContinueWithEmail: {
 		type: Function,
 		default: () => {},
 	},
-	onSetCaptchaRef: {
-		type: Function,
-		default: undefined,
-	},
 })
 
-const emit = defineEmits(['update:email', 'update:password', 'update:token', 'update:subscribe'])
+const emit = defineEmits(['update:email', 'update:password'])
 
 const emailModel = computed({
 	get: () => props.email,
@@ -216,16 +185,6 @@ const emailModel = computed({
 const passwordModel = computed({
 	get: () => props.password,
 	set: (value) => emit('update:password', value),
-})
-
-const tokenModel = computed({
-	get: () => props.token,
-	set: (value) => emit('update:token', value),
-})
-
-const subscribeModel = computed({
-	get: () => props.subscribe,
-	set: (value) => emit('update:subscribe', value),
 })
 
 const { formatMessage } = useVIntl()
@@ -238,10 +197,6 @@ const messages = defineMessages({
 	continueWithProvider: {
 		id: 'auth.continue-with-provider',
 		defaultMessage: 'Continue with {provider}',
-	},
-	subscribeLabel: {
-		id: 'auth.sign-up.subscribe.label',
-		defaultMessage: 'Subscribe to updates about Modrinth',
 	},
 	legalDisclaimer: {
 		id: 'auth.sign-up.legal-dislaimer',

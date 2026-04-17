@@ -1,15 +1,22 @@
 <template>
 	<SignUpView
+		v-if="!isCreateAccountStep"
 		v-model:email="email"
 		v-model:password="password"
-		v-model:token="token"
-		v-model:subscribe="subscribe"
 		:redirect-target="redirectTarget"
 		:show-other-options="showOtherOptions"
 		:route-query="route.query"
-		:globals="globals"
 		:on-toggle-other-options="toggleOtherOptions"
-		:on-create-account="createAccount"
+		:on-continue-with-email="continueWithEmail"
+	/>
+	<CreateAccountView
+		v-else
+		v-model:date-of-birth="dateOfBirth"
+		v-model:username="username"
+		v-model:token="token"
+		v-model:subscribe="subscribe"
+		:globals="globals"
+		:on-complete-sign-up="createAccount"
 		:on-set-captcha-ref="setCaptchaRef"
 	/>
 </template>
@@ -24,6 +31,7 @@ import {
 } from '@modrinth/ui'
 import { useQuery } from '@tanstack/vue-query'
 
+import CreateAccountView from '@/components/ui/auth/CreateAccount.vue'
 import SignUpView from '@/components/ui/auth/SignUp.vue'
 
 const client = injectModrinthClient()
@@ -34,6 +42,14 @@ const messages = defineMessages({
 	title: {
 		id: 'auth.sign-up.title',
 		defaultMessage: 'Sign Up',
+	},
+	ageRequirementWarningTitle: {
+		id: 'auth.sign-up.age-requirement.warning-title',
+		defaultMessage: 'Age requirement',
+	},
+	under13HelperText: {
+		id: 'auth.create-account.date-of-birth.under13-helper',
+		defaultMessage: 'You cannot create an account at Modrinth unless you are 13 years old.',
 	},
 })
 
@@ -46,6 +62,7 @@ const route = useNativeRoute()
 
 const redirectTarget = route.query.redirect
 const showOtherOptions = ref(false)
+const isCreateAccountStep = ref(false)
 
 if (auth.value.user) {
 	await navigateTo('/dashboard')
@@ -73,12 +90,38 @@ const { data: globals } = useQuery({
 
 const email = ref('')
 const password = ref('')
+const dateOfBirth = ref('')
+const username = ref('')
 const token = ref('')
 const subscribe = ref(false)
 
+async function continueWithEmail() {
+	startLoading()
+	try {
+		const generatedUsername = generateUsernameFromEmail(email.value)
+
+		await client.labrinth.auth_v2.validateCreateAccount({
+			username: generatedUsername,
+			password: password.value,
+			email: email.value,
+		})
+
+		token.value = ''
+		username.value = generatedUsername
+		isCreateAccountStep.value = true
+	} catch (err) {
+		addNotification({
+			title: formatMessage(commonMessages.errorNotificationTitle),
+			text: err.data ? err.data.description : err,
+			type: 'error',
+		})
+	}
+	stopLoading()
+}
+
 function generateUsernameFromEmail(emailAddress) {
-	const [localPart = '', domainPart = ''] = emailAddress.trim().toLowerCase().split('@')
-	const sanitized = `${localPart}_${domainPart}`
+	const [localPart = ''] = emailAddress.trim().toLowerCase().split('@')
+	const sanitized = localPart
 		.replace(/[^a-zA-Z0-9_-]/g, '_')
 		.replace(/_+/g, '_')
 		.replace(/^_+|_+$/g, '')
@@ -90,7 +133,7 @@ async function createAccount() {
 	startLoading()
 	try {
 		const res = await client.labrinth.auth_v2.createAccount({
-			username: generateUsernameFromEmail(email.value),
+			username: username.value.trim() || generateUsernameFromEmail(email.value),
 			password: password.value,
 			email: email.value,
 			challenge: token.value,

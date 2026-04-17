@@ -278,6 +278,12 @@ export namespace Labrinth {
 				session: string
 			}
 
+			export type ValidateCreateAccountRequest = {
+				username: string
+				password: string
+				email: string
+			}
+
 			export type CreateOAuthAccountRequest = {
 				username: string
 				state: string
