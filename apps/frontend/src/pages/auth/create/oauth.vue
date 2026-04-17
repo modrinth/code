@@ -66,7 +66,7 @@ const oauthFlowState = computed(() => {
 const defaultUsername = computed(() => {
 	const queryUsername = route.query.username
 	const value = Array.isArray(queryUsername) ? queryUsername[0] : queryUsername
-	return typeof value === 'string' && value.length > 0 ? value : 'user'
+	return typeof value === 'string' && value.length > 0 ? value : ''
 })
 
 const dateOfBirth = ref('')
