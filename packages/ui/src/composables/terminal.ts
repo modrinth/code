@@ -193,16 +193,16 @@ export function useTerminal(options: UseTerminalOptions): UseTerminalReturn {
 		term.options.disableStdin = true
 		term.write('\x1b[?25l')
 
-		// term.attachCustomKeyEventHandler((e) => {
-		// 	if (e.type !== 'keydown') return true
-		// 	const mod = e.ctrlKey || e.metaKey
-		// 	if (!mod) return true
-		// 	const key = e.key.toLowerCase()
-		// 	if (key === 'c' || key === 'insert' || key === 'a') {
-		// 		return false
-		// 	}
-		// 	return true
-		// })
+		term.attachCustomKeyEventHandler((e) => {
+			if (e.type !== 'keydown') return true
+			const mod = e.ctrlKey || e.metaKey
+			if (!mod) return true
+			const key = e.key.toLowerCase()
+			if (key === 'c' || key === 'insert' || key === 'a') {
+				return false
+			}
+			return true
+		})
 
 		wheelHandler = (e: WheelEvent) => {
 			e.preventDefault()
