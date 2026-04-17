@@ -564,7 +564,7 @@
     "message": "Habam-buhay na babawiin ang affiliate code na `{id}` at ang lahat ng ibinahaging link sa code na ito ay magiging imbalido."
   },
   "dashboard.affiliate-links.revoke-confirm.button": {
-    "message": "I-revoke"
+    "message": "Bawiin"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
     "message": "Sigurado ka ba sa pagbabawi ng iyong affiliate link na \"{title}\"?"
@@ -1301,9 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Mapa-Vanilla, mapa-Fabric, mapa-Forge, mapa-Quilt o mapa-NeoForge ba ang pili mo. Kung ito'y nasa Modrinth, gagana ito sa server mo."
   },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Bigong ma-unlink ang modpack"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Wala nang stock"
   },
@@ -1329,7 +1326,7 @@
     "message": "Data and Statistics"
   },
   "landing.creator.feature.discovery.description": {
-    "message": "Gawing madaling matuklas sa libo-libong tagagamit ang iyong proyekto gamit ang panghanap, sa aming home page, sa Discord server, at sa iiba pang paraan sa darating na panahon!"
+    "message": "Gawing madaling matuklas sa libo-libong tagagamit ang iyong proyekto gamit ang panghanap, sa aming pahina ng tahanan, sa Discord server, at sa iiba pang paraan sa darating na panahon!"
   },
   "landing.creator.feature.discovery.title": {
     "message": "Pagtutuklas"
@@ -1662,7 +1659,7 @@
     "message": "Kunin ang Modrinth App"
   },
   "layout.nav.home": {
-    "message": "Home"
+    "message": "Tahanan"
   },
   "layout.nav.host-a-server": {
     "message": "Mag-host ng server"
@@ -1671,7 +1668,7 @@
     "message": "Modrinth App"
   },
   "layout.nav.modrinth-home-page": {
-    "message": "Modrinth home page"
+    "message": "Pahina ng tahanan ng Modrinth"
   },
   "layout.nav.my-servers": {
     "message": "Aking mga server"
@@ -2238,7 +2235,7 @@
     "message": "Paglalarawan"
   },
   "project.details.licensed": {
-    "message": "Linisensiya"
+    "message": "Lisensiyang"
   },
   "project.download.game-version": {
     "message": "Bersiyon ng laro: {version}"
@@ -2816,6 +2813,30 @@
   "servers.plan.small.description": {
     "message": "Nakaaangkop sa 1–5 manlalaro na may iilang mod."
   },
+  "settings.account.email.modal.header.add": {
+    "message": "Magdagdag ng email"
+  },
+  "settings.account.providers.action.add": {
+    "message": "Idagdag"
+  },
+  "settings.account.providers.table.actions": {
+    "message": "Aksiyon"
+  },
+  "settings.account.providers.table.provider": {
+    "message": "Provider"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Magdagdag ng email"
+  },
+  "settings.account.security.email.title": {
+    "message": "Email"
+  },
+  "settings.account.security.password.title": {
+    "message": "Password"
+  },
+  "settings.account.security.two-factor.action.setup": {
+    "message": "Maghanda ng 2FA"
+  },
   "settings.applications.about": {
     "message": "Tungkol"
   },
@@ -2909,6 +2930,39 @@
   "settings.applications.secret.disclaimer": {
     "message": "I-save ang secret mo na, ito ay ililihid matapos mong umalis sa pahinang ito!"
   },
+  "settings.authorizations.about-this-app": {
+    "message": "Tungkol sa app"
+  },
+  "settings.authorizations.by": {
+    "message": "ni/ng"
+  },
+  "settings.authorizations.empty-state": {
+    "message": "Kasalukuyang hindi namin mapapakita ang mga pinahintulutang app, kinukumpuni pa namin ito. Mangyaring bisitahin ang pahinang ito sa ibang pagkataon!"
+  },
+  "settings.authorizations.head-title": {
+    "message": "Mga Pagpapahintulot"
+  },
+  "settings.authorizations.revoke.action": {
+    "message": "Bawiin"
+  },
+  "settings.authorizations.revoke.confirm.description": {
+    "message": "Babawiin nito ang akses ng aplikasyon sa iyong accunt. Maaari mo itong mapahintulutan muli."
+  },
+  "settings.authorizations.revoke.confirm.title": {
+    "message": "Sigurado ka ba sa pagbababwi ng aplikasyong ito?"
+  },
+  "settings.billing.interval.month": {
+    "message": "buwan"
+  },
+  "settings.billing.interval.monthly": {
+    "message": "buwanan"
+  },
+  "settings.billing.interval.year": {
+    "message": "taon"
+  },
+  "settings.billing.interval.yearly": {
+    "message": "taunan"
+  },
   "settings.billing.modal.cancel.action": {
     "message": "Kanselahin ang iyong subscription"
   },
@@ -2926,6 +2980,9 @@
   },
   "settings.billing.modal.delete.title": {
     "message": "Sigurado ka bang gusto mong tanggalin itong paraan ng pagbabayad?"
+  },
+  "settings.billing.next": {
+    "message": "Susunod:"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Magdagdag ng paraan ng pagbabayad"
@@ -2954,11 +3011,17 @@
   "settings.billing.pyro_subscription.title": {
     "message": "Mga Modrinth Server Subscription"
   },
+  "settings.billing.subscribe": {
+    "message": "Mag-subscribe"
+  },
   "settings.billing.subscription.description": {
     "message": "Pamahalaan ang iyong mga subscription sa Modrinth."
   },
   "settings.billing.subscription.title": {
     "message": "Mga subscription"
+  },
+  "settings.billing.upgrade": {
+    "message": "Mag-upgrade"
   },
   "settings.display.banner.developer-mode.button": {
     "message": "Patayin ang developer mode"
@@ -2972,6 +3035,9 @@
   "settings.display.flags.title": {
     "message": "Pagtatakda ng tampok"
   },
+  "settings.display.notification.developer-mode-deactivated.text": {
+    "message": "Pinatay ang moda ng nagde-develop"
+  },
   "settings.display.project-list-layouts.datapack": {
     "message": "Pahina ng Mga Data Pack"
   },
@@ -2980,6 +3046,15 @@
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Pahina ng mga mod"
+  },
+  "settings.display.project-list-layouts.mode.gallery": {
+    "message": "Galeriya"
+  },
+  "settings.display.project-list-layouts.mode.grid": {
+    "message": "Parilya"
+  },
+  "settings.display.project-list-layouts.mode.rows": {
+    "message": "Hilera"
   },
   "settings.display.project-list-layouts.modpack": {
     "message": "Pahina ng mga modpack"
@@ -3130,6 +3205,12 @@
   },
   "settings.sessions.unknown-platform": {
     "message": "Hindi kilalang plataforma"
+  },
+  "settings.sidebar.label.account": {
+    "message": "Account"
+  },
+  "settings.sidebar.label.display": {
+    "message": "Display"
   },
   "ui.latest-news-row.latest-news": {
     "message": "Mga nagbabagang balita galing sa Modrinth"

@@ -209,6 +209,9 @@
   "changelog.product.hosting": {
     "defaultMessage": "ארח"
   },
+  "changelog.product.web": {
+    "defaultMessage": "פלטפורמה"
+  },
   "collections.label.private": {
     "defaultMessage": "פרטי"
   },
@@ -235,9 +238,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "מחק {itemType}{count, plural, one {} other {ים}}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "כל מוד או תוכן שהוספת לחבילת המודים שלך ימחק."
   },
   "content.diff-modal.added-count": {
     "defaultMessage": "{count} נוספו"
@@ -283,6 +283,15 @@
   },
   "content.page-layout.share.label": {
     "defaultMessage": "שתף"
+  },
+  "content.selection-bar.bulk.updating-waiting": {
+    "defaultMessage": "מעדכן {סוגתוכן}..."
+  },
+  "files.layout.loading": {
+    "defaultMessage": "טוען קבצים..."
+  },
+  "files.move-modal.current-location": {
+    "defaultMessage": "מיקום נוכחי"
   },
   "form.label.address-line": {
     "defaultMessage": "שורת הכתובת"
@@ -1043,9 +1052,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "שיטת תשלום"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "מחויב כל {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "בחר תוכנית מותאמת אישית עם המפרט שאתה צריך בלבד."
   },
@@ -1061,17 +1067,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "הכי פופולרי"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "בחר תוכנית"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "בחר תוכנית"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "מושלם ל‑1–5 חברים עם מספר מועט של מודים קלים."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "בחר את כמות ה‑RAM והמאפיינים המתאימים לצרכיך."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "תוכנית"

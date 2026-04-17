@@ -1293,55 +1293,13 @@
     "message": "Установка модов и сборок встроена в Modrinth Hosting и работает прямо на сервере."
   },
   "hosting-marketing.why.why-modrinth-hosting": {
-    "message": "Преимущества Modrinth Hosting"
+    "message": "Почему именно Modrinth Hosting?"
   },
   "hosting-marketing.why.your-favorite-mods": {
-    "message": "Все самые любимые моды"
+    "message": "Все ваши любимые моды"
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Выбирайте Fabric, Forge, Quilt, NeoForge или сервер без модов. Всё, что есть на Modrinth, работает на сервере."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Не удалось загрузить версии наборов модов"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Не удалось загрузить версии"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Не удалось переустановить набор модов"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Не удалось восстановить сервер"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Не удалось сохранить установочные настройки"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Не удалось отвязать набор модов"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Версия загрузчика} other {Версия {loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Установка вашего сервера была восстановлена."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Восстановление завершено"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Сбросить сервер"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Удаляет все данные сервера, включая миры, моды и файлы настроек. Резервные копии останутся и их можно будет восстановить."
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Это действие вернет сервер на этап изначальной настройки для её повторного прохождения. Вы уверены, что хотите продолжить?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Вернуть к изначальным настройкам"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Настройки поддержки"
   },
   "hosting.plan.out-of-stock": {
     "message": "Нет в наличии"
@@ -2472,25 +2430,25 @@
     "message": "Не удалось найти {item, select, project {проект} version {версию} user {пользователя} other {контент}}"
   },
   "report.for.violation": {
-    "message": "Нарушение наших <rules-link>правил</rules-link> или <terms-link>условий</terms-link>"
+    "message": "На нарушение наших <rules-link>правил</rules-link> или <terms-link>условий</terms-link>"
   },
   "report.for.violation.description": {
     "message": "Спам, оскорбления, обман, вредоносный или незаконный контент."
   },
   "report.form-not-for": {
-    "message": "Для чего не предназначена форма:"
+    "message": "Для чего не предназначена форма"
   },
   "report.go-to-report": {
     "message": "Перейти к жалобе"
   },
   "report.not-for.bug-reports": {
-    "message": "Отчёты об ошибках"
+    "message": "Для сообщения об ошибках"
   },
   "report.not-for.bug-reports.description": {
     "message": "Сообщайте об ошибках в <issues-link>трекере проекта</issues-link>."
   },
   "report.not-for.dmca": {
-    "message": "Нарушение DMCA"
+    "message": "Для удаления по DMCA"
   },
   "report.not-for.dmca.description": {
     "message": "Ознакомьтесь с нашей <policy-link>политикой авторских прав</policy-link>."
@@ -2508,7 +2466,7 @@
     "message": "Отчёты от Microsoft Defender, VirusTotal или Систем обнаружения вредоносного ПО не считаются доказательством и рассматриваться не будут."
   },
   "report.please-report": {
-    "message": "На что жаловаться:"
+    "message": "На что жаловаться"
   },
   "report.question.content-id": {
     "message": "Какой ID у {item, select, project {проекта} version {версии} user {пользователя} other {контента}}?"
@@ -2819,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Использовать с сервера"
   },
-  "servers.busy.backup-creating": {
-    "message": "Резервное копирование в процессе"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Восстановление из резервной копии в процессе"
-  },
-  "servers.busy.installing": {
-    "message": "Сервер устанавливается"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Синхронизация контента в процессе"
-  },
   "servers.notice.actions": {
     "message": "Действия"
   },
@@ -3108,7 +3054,7 @@
     "message": "Удалить это приложение"
   },
   "settings.applications.delete.confirm.description": {
-    "message": "Приложение будет удалено навсегда, и все токены доступа перестанут работать. (безвозвратно!)"
+    "message": "Это приложение и все его токены доступа будут удалены навсегда. (безвозвратно!)"
   },
   "settings.applications.delete.confirm.title": {
     "message": "Вы действительно хотите удалить это приложение?"
@@ -3197,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "История списаний"
+  },
   "settings.billing.expires": {
     "message": "Истекает {date}"
   },
@@ -3205,6 +3154,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "ежемесячно"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "3 месяца"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "3 месяца"
   },
   "settings.billing.interval.year": {
     "message": "год"
@@ -3267,7 +3222,7 @@
     "message": "Далее:"
   },
   "settings.billing.or-yearly-save": {
-    "message": "Или {price} / год (экономия {percent}%)"
+    "message": "Или {price} в год (экономия {percent}%)"
   },
   "settings.billing.payment_method.action.add": {
     "message": "Добавить способ оплаты"
@@ -3294,7 +3249,7 @@
     "message": "{size} план"
   },
   "settings.billing.price.per-interval": {
-    "message": "{price} / {interval}"
+    "message": "{price} в {interval}"
   },
   "settings.billing.price.slash-interval": {
     "message": "/{interval}"
@@ -3303,31 +3258,28 @@
     "message": "{shared, plural, one {# разделяемый} other {# разделяемых}} CPU (временный рост до {bursts} CPU)"
   },
   "settings.billing.pyro.linked-server.not-found": {
-    "message": "Для этой подписки не удалось найти связанный сервер. Этому есть несколько возможных объяснений. Если вы только что приобрели сервер, это нормально. Подготовка сервера может занять до часа. В противном случае, если вы приобрели этот сервер некоторое время назад, он, вероятно, уже приостановлен. Если это не то, чего вы ожидали, пожалуйста, свяжитесь со службой поддержки Modrinth, предоставив следующую информацию:"
+    "message": "Привязанный сервер не найден. Возможных причин несколько: сервер куплен только что — подождите, подготовка занимает до часа; сервер куплен давно — вероятно, его уже приостановили. Если что‑то не так, свяжитесь с поддержкой Modrinth, указав следующие данные:"
   },
   "settings.billing.pyro.linked-server.server-id": {
     "message": "ID сервера: {id}"
   },
   "settings.billing.pyro.linked-server.stripe-id": {
-    "message": "Stripe ID: {id}"
+    "message": "ID Stripe: {id}"
   },
   "settings.billing.pyro.ram": {
-    "message": "{gb} ГБ RAM"
+    "message": "{gb} ГБ ОЗУ"
   },
   "settings.billing.pyro.resubscribe.error.text": {
-    "message": "Произошла ошибка при повторной подписке Modrinth server."
+    "message": "Произошла ошибка при возобновлении подписки на сервер Modrinth."
   },
   "settings.billing.pyro.resubscribe.error.title": {
-    "message": "Ошибка при повторной подписке"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Если сервер в данный момент приостановлен, повторная попытка списания средств может занять до 10 минут."
+    "message": "Не удалось возобновить подписку"
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
-    "message": "Запрос на повторную подписку отправлен"
+    "message": "Подписка возобновляется"
   },
   "settings.billing.pyro.resubscribe.success.text": {
-    "message": "Подписка на сервер успешно продлена"
+    "message": "Подписка на сервер успешно возобновлена"
   },
   "settings.billing.pyro.status.failed": {
     "message": "Платёж не прошёл. Обновите способ оплаты и возобновите подписку."
@@ -3375,7 +3327,7 @@
     "message": "Ежемесячная оплата обойдётся на {amount} в год дороже"
   },
   "settings.billing.switches-to-billing-on": {
-    "message": "{interval, select, ежемесячно {Ежемесячная} ежегодно {Ежегодная} other {{interval}}} оплата с {date}"
+    "message": "{interval, select, ежемесячно {Ежемесячная оплата} ежегодно {Ежегодная оплата} 3 месяца {Оплата раз в 3 месяца} other {{interval} оплата}} с {date}"
   },
   "settings.billing.update-method": {
     "message": "Обновить способ"
@@ -3387,25 +3339,25 @@
     "message": "Отключить режим разработчика"
   },
   "settings.display.banner.developer-mode.description": {
-    "message": "<strong>Режим разработчика</strong> включён. Отображаются внутренние идентификаторы различных частей Modrinth, что может пригодиться при работе с API. Чтобы включить или отключить режим разработчика, нажмите на логотип Modrinth внизу страницы 5 раз."
+    "message": "<strong>Режим разработчика</strong> включён. Отображаются внутренние идентификаторы различных элементов сайта, что удобно при работе с API. Чтобы отключить, снова нажмите на логотип Modrinth внизу страницы 5 раз."
   },
   "settings.display.flags.description": {
-    "message": "Включите или отключите определённые функции на этом устройстве."
+    "message": "Настройте отдельные функции на этом устройстве."
   },
   "settings.display.flags.title": {
-    "message": "Переключение функций"
+    "message": "Настройка функций"
   },
   "settings.display.notification.developer-mode-deactivated.text": {
-    "message": "Режим разработчика отключен"
+    "message": "Режим разработчика больше не активен"
   },
   "settings.display.notification.developer-mode-deactivated.title": {
-    "message": "Режим разработчика отключен"
+    "message": "Режим разработчика отключён"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Страница наборов данных"
   },
   "settings.display.project-list-layouts.description": {
-    "message": "Выберите макет для каждой страницы с проектами на этом устройстве."
+    "message": "Выберите вид для каждой страницы с проектами на этом устройстве."
   },
   "settings.display.project-list-layouts.mod": {
     "message": "Страница модов"
@@ -3435,7 +3387,7 @@
     "message": "Страница шейдеров"
   },
   "settings.display.project-list-layouts.title": {
-    "message": "Представление проектов"
+    "message": "Вид проектов"
   },
   "settings.display.project-list-layouts.user": {
     "message": "Страницы пользователей"
@@ -3444,16 +3396,16 @@
     "message": "Коллекция"
   },
   "settings.display.sidebar.advanced-rendering.description": {
-    "message": "Включает продвинутые эффекты наподобие размытия фона, которые могут понизить производительность на устройствах без аппаратного ускорения графики."
+    "message": "Включает продвинутые эффекты вроде размытия. Возможно снижение производительности на устройствах без аппаратного ускорения."
   },
   "settings.display.sidebar.advanced-rendering.title": {
-    "message": "Особые эффекты"
+    "message": "Расширенные эффекты"
   },
   "settings.display.sidebar.external-links-new-tab.description": {
-    "message": "Ссылки, ведущие за пределы Modrinth, будут открываться в новой вкладке. Независимо от этой настройки, ссылки на тот же домен и в описаниях Markdown будут открываться в той же вкладке, а ссылки на рекламные объявления и редактирование страниц — в новой вкладке."
+    "message": "Ссылки за пределы Modrinth будут открываться в новой вкладке. Исключения: ссылки внутри домена и в Markdown — всегда в той же вкладке; реклама и страницы редактирования — всегда в новой."
   },
   "settings.display.sidebar.external-links-new-tab.title": {
-    "message": "Открывать внешние ссылки в новой вкладке"
+    "message": "Внешние ссылки в новой вкладке"
   },
   "settings.display.sidebar.hide-app-promos.description": {
     "message": "Убирает кнопку «Скачать Modrinth App» с поисковых страниц. Ссылку на раздел с Modrinth App всё ещё можно найти на главной странице или в нижней части интерфейса."
@@ -3462,16 +3414,16 @@
     "message": "Скрывать кнопку скачивания Modrinth App"
   },
   "settings.display.sidebar.left-aligned-content-sidebar.title": {
-    "message": "Отображать боковую панель страниц контента слева"
+    "message": "Панель сведений слева"
   },
   "settings.display.sidebar.right-aligned-content-sidebar.description": {
-    "message": "Помещает боковую панель слева от содержимого страницы."
+    "message": "Помещает панель сведений слева от содержимого страницы."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.description": {
-    "message": "Помещает боковую панель с фильтрами справа от результатов поиска."
+    "message": "Помещает панель фильтров справа от результатов поиска."
   },
   "settings.display.sidebar.right-aligned-filters-sidebar.title": {
-    "message": "Отображать боковую панель фильтров поиска справа"
+    "message": "Панель фильтров справа"
   },
   "settings.display.theme.description": {
     "message": "Выберите тему для Modrinth на этом устройстве."

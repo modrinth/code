@@ -248,12 +248,6 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType} kaldır"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Mod paketinin üzerine eklediğiniz mod veya içerikler kaldırılacak."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Mod paketi üzerine eklediğiniz tüm modlar veya içerikler korunacaktır."
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Sürüm Düşürme} other {Güncelleme}} uyarısı"
   },
@@ -631,12 +625,6 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "URL'den mod paketi"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Dosyalar yükleniyor ({completed}/{total})"
   },
   "files.rename-modal.header": {
     "defaultMessage": "{name} adını değiştir"
@@ -1198,9 +1186,6 @@
   },
   "label.client-depends-warning": {
     "defaultMessage": "Bu mod, istemci tarafı (client-side) bir moda bağımlıdır ve sunucunuzu başlatırken sorunlara neden olabilir"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Bu istemci-tarafı bir mod ve sorun yaşatabilir. Kapatmadık çünkü bazen çevreler yanlış etiketli olabilir ve yükleyici sorunu çözer."
   },
   "label.client-retained-warning": {
     "defaultMessage": "Bu, bağımlılık olarak yüklenmiş bir istemci tarafı (client-side) modudur ve sunucunuzu başlatırken sorunlara neden olabilir"
@@ -2600,9 +2585,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Ödeme yöntemi"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval} faturalandırılır"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Sana gereken şeyler için özel bir plan oluştur."
   },
@@ -2618,17 +2600,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "En Popüler"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Bir plan seç"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Plan seç"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "1–5 arkadaş ve birkaç hafif mod için mükemmel."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "İhtiyaçlarını karşılayan RAM miktarını ve özellikleri seç."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

@@ -12,7 +12,7 @@
     "message": "将服务器添加到你的实例"
   },
   "app.browse.add-to-instance": {
-    "message": "添加到实例"
+    "message": "前往实例"
   },
   "app.browse.add-to-instance-name": {
     "message": "添加到 {instanceName}"
@@ -75,7 +75,7 @@
     "message": "删除实例"
   },
   "app.instance.modpack-already-installed.body": {
-    "message": "该整合包已经被安装到实例<bold>{instanceName}</bold>中了。你确定要重复安装吗？"
+    "message": "该整合包已经被安装到实例<bold>{instanceName}</bold> 中了。你确定要重复安装吗？"
   },
   "app.instance.modpack-already-installed.create": {
     "message": "创建"
@@ -90,7 +90,7 @@
     "message": "项目"
   },
   "app.instance.mods.project-was-added": {
-    "message": "已添加“{name}”"
+    "message": "已添加 “{name}”"
   },
   "app.instance.mods.projects-were-added": {
     "message": "已添加 {count} 个项目"
@@ -117,7 +117,7 @@
     "message": "你确定要永久删除这个世界吗？"
   },
   "app.instance.worlds.filter-modded": {
-    "message": "修改版"
+    "message": "模组适配"
   },
   "app.instance.worlds.filter-offline": {
     "message": "离线"
@@ -441,7 +441,7 @@
     "message": "名称"
   },
   "instance.settings.tabs.hooks": {
-    "message": "启动Hooks"
+    "message": "启动 Hooks"
   },
   "instance.settings.tabs.hooks.custom-hooks": {
     "message": "自定义启动Hooks"

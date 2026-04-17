@@ -9,7 +9,7 @@
     "message": "Aggiungi server all'istanza"
   },
   "app.browse.add-servers-to-instance": {
-    "message": "Aggiungi server alla tua istanza"
+    "message": "Aggiungi i server alla tua istanza"
   },
   "app.browse.add-to-instance": {
     "message": "Aggiungi all'istanza"
@@ -24,7 +24,7 @@
     "message": "Già aggiunto"
   },
   "app.browse.discover-content": {
-    "message": "Esplora contenuti"
+    "message": "Esplora i contenuti"
   },
   "app.browse.discover-servers": {
     "message": "Esplora i server"
@@ -36,7 +36,7 @@
     "message": "Nascondi contenuti installati"
   },
   "app.browse.install-content-to-instance": {
-    "message": "Installa nella istanza"
+    "message": "Installa contenuti nell'istanza"
   },
   "app.export-modal.description-placeholder": {
     "message": "Inserisci descrizione del pacchetto..."
@@ -111,10 +111,10 @@
     "message": "Esplora i server"
   },
   "app.instance.worlds.delete-world-description": {
-    "message": "\"{name}\" verrà eliminato permanentemente e non ci sarà modo di recuperarlo."
+    "message": "\"{name}\" verrà **eliminato permanentemente** e non ci sarà modo di recuperarlo."
   },
   "app.instance.worlds.delete-world-title": {
-    "message": "Vuoi davvero eliminare permanentemente questo mondo?"
+    "message": "Vuoi davvero eliminare questo mondo per sempre?"
   },
   "app.instance.worlds.filter-modded": {
     "message": "Moddato"
@@ -132,13 +132,13 @@
     "message": "Inizia esplorando o aggiungendo un server"
   },
   "app.instance.worlds.no-worlds-heading": {
-    "message": "Nessun server o mondi aggiunti"
+    "message": "Nessun server o mondo aggiunto"
   },
   "app.instance.worlds.remove-server-description": {
-    "message": "\"{name}\" sarà rimosso dalla tua lista, inclusa quella in-gioco, e non ci sarà modo di recuperarlo."
+    "message": "\"{name}\" sarà rimosso dalla tua lista, inclusa quella nel gioco, e non ci sarà modo di recuperarlo."
   },
   "app.instance.worlds.remove-server-description-with-address": {
-    "message": "\"{name}\" ({address}) sarà rimosso dalla tua lista, inclusa quella in-gioco, e non ci sarà modo di recuperarlo."
+    "message": "\"{name}\" ({address}) sarà rimosso dalla tua lista, inclusa quella nel gioco, e non ci sarà modo di recuperarlo."
   },
   "app.instance.worlds.remove-server-title": {
     "message": "Vuoi davvero rimuovere {name}?"
@@ -246,7 +246,7 @@
     "message": "Scarica aggiornamento"
   },
   "app.update.downloading-update": {
-    "message": "Scaricando aggiornamento ({percent}%)"
+    "message": "Scaricando l'aggiornamento ({percent}%)"
   },
   "app.update.reload-to-update": {
     "message": "Ricarica per installare l'aggiornamento"

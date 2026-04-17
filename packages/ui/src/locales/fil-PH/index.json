@@ -68,6 +68,9 @@
   "button.copy-id": {
     "defaultMessage": "Kopyahin ang ID"
   },
+  "button.copy-link": {
+    "defaultMessage": "Kopyahin ang link"
+  },
   "button.copy-permalink": {
     "defaultMessage": "Kopyahin ang permanenteng link"
   },
@@ -76,6 +79,9 @@
   },
   "button.decline": {
     "defaultMessage": "Tanggihan"
+  },
+  "button.disable": {
+    "defaultMessage": "Patayin"
   },
   "button.download": {
     "defaultMessage": "I-download"
@@ -86,6 +92,9 @@
   "button.edit": {
     "defaultMessage": "Baguhin"
   },
+  "button.enable": {
+    "defaultMessage": "Buksan"
+  },
   "button.follow": {
     "defaultMessage": "Sundan"
   },
@@ -94,6 +103,9 @@
   },
   "button.more-options": {
     "defaultMessage": "Ibang mga opsiyon"
+  },
+  "button.move": {
+    "defaultMessage": "Ilipat"
   },
   "button.next": {
     "defaultMessage": "Susunod"
@@ -112,6 +124,9 @@
   },
   "button.remove-image": {
     "defaultMessage": "Tanggalin ang imahe"
+  },
+  "button.rename": {
+    "defaultMessage": "I-rename"
   },
   "button.repair": {
     "defaultMessage": "Ayusin"
@@ -133,6 +148,9 @@
   },
   "button.saving": {
     "defaultMessage": "Sine-save"
+  },
+  "button.show-file": {
+    "defaultMessage": "Ipakita ang talaksan"
   },
   "button.sign-in": {
     "defaultMessage": "Mag-sign in"
@@ -167,11 +185,11 @@
   "changelog.product.hosting": {
     "defaultMessage": "Hosting"
   },
+  "changelog.product.web": {
+    "defaultMessage": "Plataporma"
+  },
   "collections.label.private": {
     "defaultMessage": "Pribado"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Ang kahit anong mod o kontentong dinagdag sa itaas ng modpack ay matatanggal."
   },
   "content.confirm-unlink.admonition-header": {
     "defaultMessage": "Ina-unlink ang modpack"
@@ -184,6 +202,9 @@
   },
   "content.diff-modal.diff-type.added": {
     "defaultMessage": "Dinagdag (dependency)"
+  },
+  "content.diff-modal.diff-type.removed": {
+    "defaultMessage": "Nakapatay"
   },
   "content.diff-modal.diff-type.updated": {
     "defaultMessage": "Na-update"
@@ -226,6 +247,60 @@
   },
   "content.page-layout.sort.date-added-oldest": {
     "defaultMessage": "Pinakaluma ang mauuna"
+  },
+  "content.selection-bar.all-already-disabled": {
+    "defaultMessage": "Nakapatay na ang lahat ng piniling konento"
+  },
+  "content.selection-bar.all-already-enabled": {
+    "defaultMessage": "Nakabukas na ang lahat ng piniling kontento"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Pumunta sa folder ng tahanan"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Subukan muli"
+  },
+  "files.layout.busy-warning": {
+    "defaultMessage": "Nakapatay ang mga operasyon sa talaksan habang ang operasyon ay isinasagawa."
+  },
+  "files.navbar.back-to-home": {
+    "defaultMessage": "Bumalik sa tahanan"
+  },
+  "files.navbar.home": {
+    "defaultMessage": "Tahanan"
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Bagong talaksan"
+  },
+  "files.operations.failed": {
+    "defaultMessage": "Nabigo"
+  },
+  "files.rename-modal.new-name-label": {
+    "defaultMessage": "Bagong pangalan"
+  },
+  "files.table-header.created": {
+    "defaultMessage": "Linikha"
+  },
+  "files.table-header.modified": {
+    "defaultMessage": "Binago"
+  },
+  "files.table-header.name": {
+    "defaultMessage": "Pangalan"
+  },
+  "files.table-header.size": {
+    "defaultMessage": "Sukat"
+  },
+  "files.upload-dropdown.cancelled": {
+    "defaultMessage": "Kinansela"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Talaksan"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Pangalan"
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "I-install"
   },
   "form.label.address-line": {
     "defaultMessage": "Address line"
@@ -329,6 +404,12 @@
   "header.category.resolutions": {
     "defaultMessage": "Resolusyon"
   },
+  "hosting.content.failed-to-bulk-disable": {
+    "defaultMessage": "Bigong mapatay ang tumutunggaling kontento"
+  },
+  "hosting.content.failed-to-bulk-enable": {
+    "defaultMessage": "Bigong mabukas ang kontento"
+  },
   "hosting.content.failed-to-unlink": {
     "defaultMessage": "Bigong ma-unlink ang modpack"
   },
@@ -374,8 +455,23 @@
   "installation-settings.confirm-version-change": {
     "defaultMessage": "Kumpirmahin"
   },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Kusang-ayusin"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Patayin ang tumutunggali"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Sa pagpapalit ng bersiyon ng laro, maaari naming patayin ang mga tumutunggaling na-install na kontento o subukang lutasin ang mga pagtutunggali."
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Sa pagpapalit ng loader, ang lahat ng na-install na kontento ay mapapatay. Sa halip, inimumungkahi namin na i-reset ang iyong server."
+  },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Naka-link na {projectType, select, server {server project} other {modpack}}"
+  },
+  "installation-settings.saving": {
+    "defaultMessage": "Sine-save..."
   },
   "installation-settings.unlink": {
     "defaultMessage": "Mag-unlink"
@@ -500,6 +596,9 @@
   "label.details": {
     "defaultMessage": "Detalye"
   },
+  "label.done": {
+    "defaultMessage": "Tapos"
+  },
   "label.email": {
     "defaultMessage": "Email"
   },
@@ -538,6 +637,21 @@
   },
   "label.password": {
     "defaultMessage": "Password"
+  },
+  "label.plan-custom": {
+    "defaultMessage": "Custom"
+  },
+  "label.plan-large": {
+    "defaultMessage": "Large"
+  },
+  "label.plan-medium": {
+    "defaultMessage": "Medium"
+  },
+  "label.plan-small": {
+    "defaultMessage": "Small"
+  },
+  "label.platform": {
+    "defaultMessage": "Plataporma"
   },
   "label.played": {
     "defaultMessage": "Linaro {ago}"
@@ -1070,8 +1184,14 @@
   "project.about.server.recommendedVersion": {
     "defaultMessage": "(Iminumungkahi)"
   },
+  "project.about.server.region": {
+    "defaultMessage": "Rehiyon"
+  },
   "project.about.server.title": {
     "defaultMessage": "Detalye ng server"
+  },
+  "project.about.tags.title": {
+    "defaultMessage": "Mga tag"
   },
   "project.download-count-tooltip": {
     "defaultMessage": "{count, number} {count, plural, one {download} other {na download}}"
@@ -1244,11 +1364,173 @@
   "project.server.language.id": {
     "defaultMessage": "Indones"
   },
+  "project.server.language.is": {
+    "defaultMessage": "Islandes"
+  },
+  "project.server.language.it": {
+    "defaultMessage": "Italyano"
+  },
+  "project.server.language.ja": {
+    "defaultMessage": "Hapon"
+  },
+  "project.server.language.ka": {
+    "defaultMessage": "Heorhiyano"
+  },
+  "project.server.language.kk": {
+    "defaultMessage": "Kasaho"
+  },
+  "project.server.language.km": {
+    "defaultMessage": "Kamboyano"
+  },
+  "project.server.language.kn": {
+    "defaultMessage": "Kannada"
+  },
+  "project.server.language.ko": {
+    "defaultMessage": "Koreano"
+  },
+  "project.server.language.lo": {
+    "defaultMessage": "Laosyano"
+  },
+  "project.server.language.lt": {
+    "defaultMessage": "Litwano"
+  },
+  "project.server.language.lv": {
+    "defaultMessage": "Latbiyano"
+  },
+  "project.server.language.mk": {
+    "defaultMessage": "Macedonio"
+  },
+  "project.server.language.ml": {
+    "defaultMessage": "Malayalam"
+  },
+  "project.server.language.mn": {
+    "defaultMessage": "Monggol"
+  },
+  "project.server.language.mr": {
+    "defaultMessage": "Marathi"
+  },
+  "project.server.language.ms": {
+    "defaultMessage": "Malayo"
+  },
+  "project.server.language.my": {
+    "defaultMessage": "Birmano"
+  },
+  "project.server.language.ne": {
+    "defaultMessage": "Nepales"
+  },
+  "project.server.language.nl": {
+    "defaultMessage": "Olandes"
+  },
+  "project.server.language.no": {
+    "defaultMessage": "Norwego"
+  },
+  "project.server.language.pa": {
+    "defaultMessage": "Punjabi"
+  },
+  "project.server.language.pl": {
+    "defaultMessage": "Polako"
+  },
+  "project.server.language.pt": {
+    "defaultMessage": "Portuges"
+  },
+  "project.server.language.ro": {
+    "defaultMessage": "Rumano"
+  },
+  "project.server.language.ru": {
+    "defaultMessage": "Ruso"
+  },
+  "project.server.language.si": {
+    "defaultMessage": "Singgales"
+  },
+  "project.server.language.sk": {
+    "defaultMessage": "Eslobako"
+  },
+  "project.server.language.sl": {
+    "defaultMessage": "Eslobeno"
+  },
   "project.server.language.sq": {
     "defaultMessage": "Albanes"
   },
+  "project.server.language.sr": {
+    "defaultMessage": "Serbiyo"
+  },
+  "project.server.language.sv": {
+    "defaultMessage": "Suweko"
+  },
+  "project.server.language.sw": {
+    "defaultMessage": "Swahili"
+  },
+  "project.server.language.ta": {
+    "defaultMessage": "Tamil"
+  },
+  "project.server.language.te": {
+    "defaultMessage": "Telugu"
+  },
+  "project.server.language.th": {
+    "defaultMessage": "Taylandes"
+  },
+  "project.server.language.tl": {
+    "defaultMessage": "Filipino"
+  },
+  "project.server.language.tr": {
+    "defaultMessage": "Turko"
+  },
+  "project.server.language.uk": {
+    "defaultMessage": "Ukranyo"
+  },
+  "project.server.language.ur": {
+    "defaultMessage": "Urdu"
+  },
+  "project.server.language.uz": {
+    "defaultMessage": "Usbeko"
+  },
+  "project.server.language.vi": {
+    "defaultMessage": "Biyetnamita"
+  },
+  "project.server.language.yo": {
+    "defaultMessage": "Yoruba"
+  },
+  "project.server.language.zh": {
+    "defaultMessage": "Tsino"
+  },
+  "project.server.language.zu": {
+    "defaultMessage": "Zulu"
+  },
   "project.server.ping.ms": {
     "defaultMessage": "{ping, number} ms"
+  },
+  "project.server.region.asia": {
+    "defaultMessage": "Asya"
+  },
+  "project.server.region.australia": {
+    "defaultMessage": "Australya"
+  },
+  "project.server.region.europe": {
+    "defaultMessage": "Yuropa"
+  },
+  "project.server.region.middle_east": {
+    "defaultMessage": "Gitnang Silangan"
+  },
+  "project.server.region.russia": {
+    "defaultMessage": "Rusya"
+  },
+  "project.server.region.south_america": {
+    "defaultMessage": "Timog Amerika"
+  },
+  "project.server.region.tooltip": {
+    "defaultMessage": "Naka-host ang server sa {regionName}"
+  },
+  "project.server.region.us_east": {
+    "defaultMessage": "Silangang EU"
+  },
+  "project.server.region.us_west": {
+    "defaultMessage": "Kanlurang EU"
+  },
+  "project.server.status.offline": {
+    "defaultMessage": "Offline"
+  },
+  "project.server.status.online": {
+    "defaultMessage": "Online"
   },
   "project.settings.analytics.title": {
     "defaultMessage": "Analitika"
@@ -1484,8 +1766,26 @@
   "search.filter_type.project_id": {
     "defaultMessage": "ID ng proyekto"
   },
+  "search.filter_type.server_content_type": {
+    "defaultMessage": "Uri"
+  },
+  "search.filter_type.server_language": {
+    "defaultMessage": "Wika"
+  },
+  "search.filter_type.server_region": {
+    "defaultMessage": "Rehiyon"
+  },
+  "search.filter_type.server_status": {
+    "defaultMessage": "Estado"
+  },
   "search.filter_type.shader_loader": {
     "defaultMessage": "Loader"
+  },
+  "search.server_content_type.modpack": {
+    "defaultMessage": "Modded"
+  },
+  "search.server_content_type.vanilla": {
+    "defaultMessage": "Vanilla"
   },
   "servers.backups.admonition.backup-failed.description": {
     "defaultMessage": "May maling nangyari habang nililikha ang {backupName}. Mangyaring subukan muli o abutin ang suporta kung magpapatuloy ang suliranin."
@@ -1559,9 +1859,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Paraan ng pagbabayad"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "billed {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Pumili ng pinasadyang plan sa specs na kailangan mo."
   },
@@ -1577,17 +1874,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Pinakasikat"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Pumili ng plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Pumili ng plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Nakaaangkop sa 1–5 manlalaro na may iilang mod."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Piliin ang halaga ng RAM at specs na tutumpak sa kailangan mo."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"
@@ -1850,6 +2141,9 @@
   "tag.category.kitchen-sink": {
     "defaultMessage": "Samot-sari't Labis"
   },
+  "tag.category.kitpvp": {
+    "defaultMessage": "Kit PvP"
+  },
   "tag.category.library": {
     "defaultMessage": "Librarya"
   },
@@ -1931,11 +2225,20 @@
   "tag.category.plots": {
     "defaultMessage": "Plots"
   },
+  "tag.category.pokemon": {
+    "defaultMessage": "Pokémon"
+  },
   "tag.category.potato": {
     "defaultMessage": "Kamote"
   },
   "tag.category.prison": {
     "defaultMessage": "Bilanggo"
+  },
+  "tag.category.pve": {
+    "defaultMessage": "PvE"
+  },
+  "tag.category.pvp": {
+    "defaultMessage": "PvP"
   },
   "tag.category.questing": {
     "defaultMessage": "Paggawa ng gawain"

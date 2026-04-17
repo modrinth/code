@@ -216,7 +216,7 @@
     "message": "Modrinth App v{version} 已完成下載！立即重新載入以更新，或在關閉 Modrinth App 時自動更新。"
   },
   "app.update-popup.body.linux": {
-    "message": "Modrinth App v{version} 現已推出。請使用套件管理員進行更新，以取得最新的功能與修正！"
+    "message": "Modrinth App v{version} 現已推出。請使用軟體包管理員進行更新，以取得最新的功能與修正！"
   },
   "app.update-popup.body.metered": {
     "message": "Modrinth App v{version} 現已推出！由於你目前使用的是計量付費網路，我們並未自動下載更新。"

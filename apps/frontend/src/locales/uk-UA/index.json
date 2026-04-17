@@ -978,13 +978,13 @@
     "message": "Надані вами банківські реквізити недійсні. Будь ласка, перевірте свою інформацію."
   },
   "dashboard.withdraw.error.invalid-bank.title": {
-    "message": "Недійсні банківські реквізити"
+    "message": "Хибні банківські реквізити"
   },
   "dashboard.withdraw.error.invalid-wallet.text": {
-    "message": "Вказана вами адреса криптогаманця недійсна. Будь ласка, перевірте ще раз і спробуйте ще раз."
+    "message": "Указана вами адреса криптогаманця недійсна. Будь ласка, перевірте ще раз і спробуйте ще раз."
   },
   "dashboard.withdraw.error.invalid-wallet.title": {
-    "message": "Недійсна адреса гаманця"
+    "message": "Хибна адреса гаманця"
   },
   "dashboard.withdraw.error.minimum-not-met.text": {
     "message": "Сума виведення (після комісій) не відповідає мінімальній вимозі. Будь ласка, збільште суму виведення."
@@ -1300,60 +1300,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Вибирайте між ванільною грою, Fabric, Forge, Quilt і NeoForge. Якщо воно є Modrinth — значить воно працюватиме на вашому сервері."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Не вдалося змінити версію збірки"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Не вдалося завантажити версії"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Не вдалося перевстановити збірку"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Не вдалося полагодити сервер"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Не вдалося скинути до початкового стану"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Не вдалося зберегти налаштування інсталяції"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Не вдалося відв’язати збірку"
-  },
-  "hosting.loader.loader-version": {
-    "message": "Версія {loader, select, null {завантажувача} other {{loader}}}"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Інсталяція вашого сервера була полагоджена."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Лагодження завершено"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Скинути сервер"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Видаляє всі дані на вашому сервері, включаючи світи, моди та файли налаштувань. Резервні копії збережуться, і їх можна буде відновити."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Скинути до початкового стану"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Це призведе до повернення сервера в початковий стан, щоб можна було повторно виконати процес налаштування. Ви впевнені, що хочете продовжити?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Скинути до початкового стану"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Сервер повернуто до початкового стану для налаштування."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Сервер скинуто до початкового стану"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Налаштування підтримки"
   },
   "hosting.plan.out-of-stock": {
     "message": "Немає в наявності"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Синхронізувати з сервером"
   },
-  "servers.busy.backup-creating": {
-    "message": "Триває створення резервної копії"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Триває відновлення резервної копії"
-  },
-  "servers.busy.installing": {
-    "message": "Сервер установлюється"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Триває синхронізація вмісту"
-  },
   "servers.notice.actions": {
     "message": "Дії"
   },
@@ -2892,7 +2826,7 @@
     "message": "Створення файлу експорту…"
   },
   "settings.account.data-export.description": {
-    "message": "Запросити копіювання всіх ваших персональних даних які ви завантажили но Modrinth. Це може зайняти деякий час."
+    "message": "Запросіть копіювання всіх ваших персональних даних, які ви завантажили на Modrinth. Це може зайняти деякий час."
   },
   "settings.account.data-export.title": {
     "message": "Експорт даних"
@@ -3024,7 +2958,7 @@
     "message": "Керувати сервісами"
   },
   "settings.account.security.providers.description": {
-    "message": "Додати або прибрати способи входу для вашого облікового запису, зокрема GitHub, GitLab, Microsoft, Discord, Steam і Google."
+    "message": "Додайте або приберіть способи входу для вашого облікового запису, зокрема GitHub, GitLab, Microsoft, Discord, Steam і Google."
   },
   "settings.account.security.providers.title": {
     "message": "Керування сервісами входу"
@@ -3209,6 +3143,9 @@
   "settings.billing.charges.product.pyro": {
     "message": "Modrinth Hosting"
   },
+  "settings.billing.charges.title": {
+    "message": "Останні списання"
+  },
   "settings.billing.expires": {
     "message": "Сплине {date}"
   },
@@ -3217,6 +3154,12 @@
   },
   "settings.billing.interval.monthly": {
     "message": "щомісячно"
+  },
+  "settings.billing.interval.quarter": {
+    "message": "квартал"
+  },
+  "settings.billing.interval.quarterly.adjective": {
+    "message": "щоквартально"
   },
   "settings.billing.interval.year": {
     "message": "рік"
@@ -3333,7 +3276,7 @@
     "message": "Помилка поновлення підписки"
   },
   "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Якщо сервер наразі призупинено, повторна спроба оплати може зайняти до 10 хвилин."
+    "message": "Якщо сервер наразі скасовано, налаштування сервера може зайняти 10-15 хвилин."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Запит на поновлення підписки надіслано"

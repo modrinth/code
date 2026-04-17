@@ -881,6 +881,9 @@
   "dashboard.withdraw.completion.date": {
     "message": "Datum"
   },
+  "dashboard.withdraw.completion.exchange-rate": {
+    "message": "Växelkurs"
+  },
   "dashboard.withdraw.completion.fee": {
     "message": "Avgift"
   },
@@ -890,11 +893,23 @@
   "dashboard.withdraw.completion.net-amount": {
     "message": "Nettoantal"
   },
+  "dashboard.withdraw.completion.recipient": {
+    "message": "Mottagare"
+  },
+  "dashboard.withdraw.completion.title": {
+    "message": "Uttag lyckades"
+  },
   "dashboard.withdraw.completion.transactions-button": {
     "message": "Transaktioner"
   },
   "dashboard.withdraw.completion.wallet": {
     "message": "Saldo"
+  },
+  "dashboard.withdraw.error.account-not-linked.text": {
+    "message": "Vänligen länka ditt betalkonto före uttag."
+  },
+  "dashboard.withdraw.error.account-not-linked.title": {
+    "message": "Konto inte länkat"
   },
   "dashboard.withdraw.error.insufficient-balance.title": {
     "message": "Otillräcklig saldo"
@@ -1211,18 +1226,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Välja mellan Vanilla, Fabric, Forge; Quilt och NeoForge. Om det finns på Modrinth så kan din server köra det."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Misslyckades med att ändra modpaketets version"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Kunde inte ominstallera modpaket"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Kunde inte avlänka modpaketet"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Återställ server"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Ej i lager"
   },
@@ -1354,6 +1357,9 @@
   },
   "landing.section.for-players.label": {
     "message": "För spelare"
+  },
+  "landing.section.for-players.tagline": {
+    "message": "Upptäck över {count, number} kreationer"
   },
   "landing.subheading": {
     "message": "Upptäck, spela och dela Minecraft-innehåll via vår plattform med öppen källkod som skapades för communityn."

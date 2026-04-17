@@ -105,7 +105,7 @@
     "message": "Moniteur d'activité"
   },
   "app-marketing.features.performance.cpu-percent": {
-    "message": "% CPU"
+    "message": "Pourcentage du processeur"
   },
   "app-marketing.features.performance.description": {
     "message": "Modrinth App est plus performante que la plupart des autres gestionnaires de mods, tout en n'utilisant que 150 Mo de RAM !"
@@ -348,7 +348,7 @@
     "message": "Bienvenue"
   },
   "collection.button.edit-icon": {
-    "message": "Éditer l'icône"
+    "message": "Modifier l'icône"
   },
   "collection.button.remove-icon": {
     "message": "Supprimer l'icône"
@@ -369,7 +369,7 @@
     "message": "Cela va supprimer de manière permanente cette collection. Cette action est irréversible."
   },
   "collection.delete-modal.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette collection ?"
+    "message": "Êtes-vous sûr.e de vouloir supprimer cette collection ?"
   },
   "collection.description": {
     "message": "{description} - Voir la collection {name} par {username} sur Modrinth"
@@ -567,7 +567,7 @@
     "message": "Révoquer"
   },
   "dashboard.affiliate-links.revoke-confirm.title": {
-    "message": "Êtes-vous sûr de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
+    "message": "Êtes-vous sûr.e de vouloir révoquer votre lien d'affiliation ''{title}'' ?"
   },
   "dashboard.affiliate-links.search": {
     "message": "Rechercher des liens d'affiliation..."
@@ -630,7 +630,7 @@
     "message": "Pratiques de sécurité"
   },
   "dashboard.creator-tax-form-modal.us-citizen.question": {
-    "message": "Êtes-vous un citoyen des États-Unis d'Amérique ?"
+    "message": "Êtes-vous un.e citoyen(ne) des États-Unis d'Amérique ?"
   },
   "dashboard.creator-withdraw-modal.complete-tax-form": {
     "message": "Remplissez le formulaire fiscal"
@@ -1119,13 +1119,13 @@
     "message": "Payer annuellement"
   },
   "hosting-marketing.faq.burst-threads": {
-    "message": "Comment les pics de puissance CPU fonctionnent-ils ?"
+    "message": "Comment les threads de rafale du processeur fonctionnent-ils ?"
   },
   "hosting-marketing.faq.burst-threads.answer": {
-    "message": "Lorsque votre serveur est fortement sollicité, nous lui accordons temporairement l'accès à des threads CPU supplémentaires afin d'atténuer les pics de latence et l'instabilité. Cela permet d'éviter que le TPS ne descende en dessous de 20, garantissant ainsi une expérience aussi fluide que possible. Étant donné que ces threads CPU supplémentaires ne sont disponibles que brièvement pendant les périodes de forte charge, ils peuvent ne pas apparaître dans les rapports Spark ou d'autres outils de profilage."
+    "message": "Lorsque votre serveur est fortement sollicité, nous lui accordons temporairement l'accès à des threads de processeur supplémentaires afin d'atténuer les pics de latence et l'instabilité. Cela permet d'éviter que le TPS ne descende en dessous de 20, garantissant ainsi une expérience aussi fluide que possible. Étant donné que ces threads de processeur supplémentaires ne sont disponibles que brièvement pendant les périodes de forte charge, ils peuvent ne pas apparaître dans les rapports Spark ou d'autres outils de profilage."
   },
   "hosting-marketing.faq.cpu-kind": {
-    "message": "Sur quelle sorte de CPU Modrinth Hosting exécute-t-il les serveurs ?"
+    "message": "Sur quelle sorte de processeurs Modrinth Hosting exécute-t-il les serveurs ?"
   },
   "hosting-marketing.faq.cpu-kind.answer": {
     "message": "Les serveurs de Modrinth Hosting sont équipés de processeurs AMD Ryzen 7900 et 7950X3D équivalents cadencés à plus de 5 GHz, associés à une mémoire DDR5."
@@ -1200,10 +1200,10 @@
     "message": "Ajoutez votre propre domaine à votre serveur, réservez jusqu'à 15 ports pour les mods qui en ont besoin, et plus encore."
   },
   "hosting-marketing.included.backups-included": {
-    "message": "Sauvegardes de secours incluses"
+    "message": "Sauvegardes y comprises"
   },
   "hosting-marketing.included.backups-included.description": {
-    "message": "Chaque serveur est livré avec 15 sauvegardes de secours stockées en toute sécurité hors site."
+    "message": "Chaque serveur est livré avec 15 sauvegardes stockées en toute sécurité hors site."
   },
   "hosting-marketing.included.custom-url": {
     "message": "URL personnalisée"
@@ -1224,7 +1224,7 @@
     "message": "Tous les boutons dont vous rêvez."
   },
   "hosting-marketing.included.help": {
-    "message": "De l'aide quand vous en avez besoin"
+    "message": "Un coup de main à portée de main"
   },
   "hosting-marketing.included.help.description": {
     "message": "Contactez l'équipe Modrinth pour obtenir de l'aide avec votre serveur à tout moment."
@@ -1284,7 +1284,7 @@
     "message": "Profitez d'un hébergement moderne et fiable"
   },
   "hosting-marketing.why.modern-reliable-hosting.description": {
-    "message": "Les serveurs d'hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une RAM DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
+    "message": "Les serveurs d'hébergement Modrinth sont hébergés sur des <contrast>processeurs AMD hautes performances avec une mémoire vive DDR5</contrast>, fonctionnant sur un logiciel sur mesure pour assurer le bon fonctionnement de votre serveur."
   },
   "hosting-marketing.why.where-mods-are": {
     "message": "Jouez là où se trouvent vos mods"
@@ -1300,60 +1300,6 @@
   },
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Choisissez entre Vanilla, Fabric, Forge, Quilt et NeoForge. Tout le contenu de Modrinth est compatible avec votre serveur."
-  },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Impossible de changer la version du modpack"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Impossible de charger les versions"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Impossible de réinstaller le modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Impossible de réparer le serveur"
-  },
-  "hosting.loader.failed-to-reset-to-onboarding": {
-    "message": "Impossible de réinitialiser le serveur à l'intégration"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Impossible de sauvegarder les paramètres d'installation"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Impossible de délier le modpack"
-  },
-  "hosting.loader.loader-version": {
-    "message": "{loader, select, null {Version} other {{version}}} du loader"
-  },
-  "hosting.loader.repair-started-text": {
-    "message": "Votre installation serveur a été réparée."
-  },
-  "hosting.loader.repair-started-title": {
-    "message": "Réparation terminée"
-  },
-  "hosting.loader.reset-server": {
-    "message": "Réinitialiser le serveur"
-  },
-  "hosting.loader.reset-server-description": {
-    "message": "Supprime définitivement toutes les données de votre serveur, y compris vos mondes, vos mods, et vos fichiers paramètres. Les sauvegardes resteront et pourront être restaurées."
-  },
-  "hosting.loader.reset-to-onboarding-button": {
-    "message": "Réinitialiser à l'intégration"
-  },
-  "hosting.loader.reset-to-onboarding-modal-description": {
-    "message": "Cela enverra le serveur à l'intégration afin que la configuration puisse être terminée à nouveau. Êtes-vous sûr de vouloir continuer ?"
-  },
-  "hosting.loader.reset-to-onboarding-modal-title": {
-    "message": "Réinitialiser à l'intégration"
-  },
-  "hosting.loader.reset-to-onboarding-success-description": {
-    "message": "Le serveur a été renvoyé au flux d'intégration."
-  },
-  "hosting.loader.reset-to-onboarding-success-title": {
-    "message": "Serveur réinitialisé à l'intégration"
-  },
-  "hosting.loader.support-options-title": {
-    "message": "Options de prise en charge"
   },
   "hosting.plan.out-of-stock": {
     "message": "En rupture de stock"
@@ -1482,7 +1428,7 @@
     "message": "Partagez vos créations avec le monde"
   },
   "landing.section.for-players.description": {
-    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
+    "message": "Des biomes magiques aux donjons maudits, vous pouvez être sûr.e de trouver ce que vous cherchez pour amener votre gameplay au niveau supérieur."
   },
   "landing.section.for-players.label": {
     "message": "Pour les joueurs"
@@ -2831,18 +2777,6 @@
   "search.filter.locked.server.sync": {
     "message": "Synchroniser avec le serveur"
   },
-  "servers.busy.backup-creating": {
-    "message": "Création d'une sauvegarde en cours"
-  },
-  "servers.busy.backup-restoring": {
-    "message": "Restauration de sauvegarde en cours"
-  },
-  "servers.busy.installing": {
-    "message": "Le serveur est en cours d'installation"
-  },
-  "servers.busy.syncing-content": {
-    "message": "Synchronisation du contenu en cours"
-  },
   "servers.notice.actions": {
     "message": "Actions"
   },
@@ -2904,7 +2838,7 @@
     "message": "Supprimer ce compte"
   },
   "settings.account.delete.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer votre compte ?"
+    "message": "Êtes-vous sûr.e de vouloir supprimer votre compte ?"
   },
   "settings.account.delete.section.action": {
     "message": "Supprimer le compte"
@@ -3123,7 +3057,7 @@
     "message": "Vous êtes sur le point de supprimer cette application et retirer tous les jetons d'accès. (pour toujours !)"
   },
   "settings.applications.delete.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer cette application ? "
+    "message": "Êtes-vous sûr.e de vouloir supprimer cette application ? "
   },
   "settings.applications.description.intro": {
     "message": "Les applications permettent d'authentifier les utilisateurs de Modrinth auprès de vos produits. Pour plus d'informations, consultez la <docs-link>documentation de l'API Modrinth</docs-link>."
@@ -3195,7 +3129,7 @@
     "message": "Cela révoquera l’accès de l’application à votre compte. Vous pourrez toujours la réautoriser plus tard."
   },
   "settings.authorizations.revoke.confirm.title": {
-    "message": "Êtes-vous sûr de vouloir révoquer cette application ?"
+    "message": "Êtes-vous sûr.e de vouloir révoquer cette application ?"
   },
   "settings.billing.charges.description": {
     "message": "Toutes vos transactions passées sur votre compte Modrinth seront affichées ici :"
@@ -3208,6 +3142,9 @@
   },
   "settings.billing.charges.product.pyro": {
     "message": "Hébergement Modrinth"
+  },
+  "settings.billing.charges.title": {
+    "message": "Charges passées"
   },
   "settings.billing.expires": {
     "message": "Expire le {date}"
@@ -3264,7 +3201,7 @@
     "message": "Cela annulera votre abonnement. Vous conserverez vos avantages jusqu’à la fin du cycle de facturation en cours."
   },
   "settings.billing.modal.cancel.title": {
-    "message": "Êtes-vous sûr de vouloir annuler votre abonnement ?"
+    "message": "Êtes-vous sûr.e de vouloir annuler votre abonnement ?"
   },
   "settings.billing.modal.delete.action": {
     "message": "Supprimer ce mode de paiement"
@@ -3273,7 +3210,7 @@
     "message": "Cela supprimera définitivement ce mode paiement. (vraiment toujours)."
   },
   "settings.billing.modal.delete.title": {
-    "message": "Êtes-vous sûr de vouloir supprimer ce mode de paiement ?"
+    "message": "Êtes-vous sûr.e de vouloir supprimer ce mode de paiement ?"
   },
   "settings.billing.next": {
     "message": "Suivant :"
@@ -3312,7 +3249,7 @@
     "message": "/{interval}"
   },
   "settings.billing.pyro.cpu": {
-    "message": "{shared} CPU partagés (pics jusqu’à {bursts} CPU)"
+    "message": "{shared} processeurs partagés (pics jusqu’à {bursts} processeurs)"
   },
   "settings.billing.pyro.linked-server.not-found": {
     "message": "Un serveur lié n’a pas pu être trouvé pour cet abonnement. Il y a plusieurs explications possibles. Si vous venez d’acheter votre serveur, c’est normal. Il peut prendre jusqu’à une heure pour que votre serveur soit provisionné. Sinon, si vous avez acheté ce serveur il y a un certain temps, il a probablement été suspendu depuis. Si ce n’est pas ce à quoi vous vous attendiez, veuillez contacter le support Modrinth avec les informations suivantes :"
@@ -3324,16 +3261,13 @@
     "message": "ID Stripe : {id}"
   },
   "settings.billing.pyro.ram": {
-    "message": "{gb} Go de RAM"
+    "message": "{gb} Go de mémoire vive"
   },
   "settings.billing.pyro.resubscribe.error.text": {
     "message": "Une erreur est survenue lors de la tentative de réabonnement à votre serveur Modrinth."
   },
   "settings.billing.pyro.resubscribe.error.title": {
     "message": "Erreur lors du réabonnement"
-  },
-  "settings.billing.pyro.resubscribe.request-submitted.text": {
-    "message": "Si le serveur est actuellement suspendu, une nouvelle tentative de paiement peut prendre jusqu’à 10 minutes."
   },
   "settings.billing.pyro.resubscribe.request-submitted.title": {
     "message": "Demande de réabonnement envoyée"

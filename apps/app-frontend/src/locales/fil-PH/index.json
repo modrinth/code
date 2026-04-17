@@ -5,11 +5,47 @@
   "app.auth-servers.unreachable.header": {
     "message": "Hindi maabot ang mga authentication server"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "Idagdag ang server sa instansiya"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "Idagdag ang mga server sa iyong instansiya"
+  },
+  "app.browse.add-to-instance": {
+    "message": "Idagdag sa instansiya"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "Idagdag sa {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "Dinagdag"
+  },
+  "app.browse.already-added": {
+    "message": "Nadagdag na"
+  },
+  "app.browse.discover-content": {
+    "message": "Tumuklas ng kontento"
+  },
+  "app.browse.discover-servers": {
+    "message": "Tumuklas ng mga server"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "Taguin ang mga nadagdag na server"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "Taguin ang mga na-install na kontento"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "I-install ang kontento sa instansiya"
+  },
   "app.export-modal.description-placeholder": {
     "message": "Ilagay ang paglalarawan ng modpack..."
   },
   "app.export-modal.export-button": {
     "message": "Iluwas"
+  },
+  "app.export-modal.header": {
+    "message": "Iluwas ang modpack"
   },
   "app.export-modal.modpack-name-label": {
     "message": "Pangalan ng Modpack"
@@ -17,17 +53,62 @@
   "app.export-modal.modpack-name-placeholder": {
     "message": "Pangalan ng modpack"
   },
+  "app.export-modal.select-files-label": {
+    "message": "Pumili ng mga talaksan at folder na isasali sa pack"
+  },
+  "app.export-modal.version-number-label": {
+    "message": "Numero ng bersiyon"
+  },
   "app.export-modal.version-number-placeholder": {
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
     "message": "Ang lahat ng data ng iyong instansiya ay tuluyang mawawala, kabilang na ang iyong mga mundo, kumpigurasyon, at lahat ng na-install na kontento."
   },
+  "app.instance.confirm-delete.admonition-header": {
+    "message": "Hindi mababawi ang aksiyong ito"
+  },
+  "app.instance.confirm-delete.delete-button": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "app.instance.confirm-delete.header": {
+    "message": "Tanggalin ang instansiya"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "Ilikha"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "Instansiya"
+  },
   "app.instance.mods.content-type-project": {
     "message": "proyekto"
   },
   "app.instance.mods.project-was-added": {
     "message": "Ang \"{name}\" ay nadagdag"
+  },
+  "app.instance.mods.projects-were-added": {
+    "message": "{count} proyekto ang nadagdag"
+  },
+  "app.instance.mods.share-title": {
+    "message": "Binabahagi ang kontento ng modpack"
+  },
+  "app.instance.mods.successfully-uploaded": {
+    "message": "Matagumpay na na-upload"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "Magdagdag ng server"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "Modded"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "Offline"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "Online"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "Vanilla"
   },
   "app.modal.install-to-play.content-required": {
     "message": "Nangangailangan ng kontento"
@@ -66,7 +147,7 @@
     "message": "Kailangang mag-update upang malaro ang {name}. Mangyaring mag-update sa pinakabagong bersiyon upang ma-launch ang laro."
   },
   "app.settings.developer-mode-enabled": {
-    "message": "Nakabukas ang moda ng nagdidibelop."
+    "message": "Binuksan ang moda ng nagdi-develop."
   },
   "app.settings.downloading": {
     "message": "Dina-download ang v{version}"
@@ -130,6 +211,9 @@
   },
   "app.update.reload-to-update": {
     "message": "Handang ma-install ang update"
+  },
+  "app.world.world-item.offline": {
+    "message": "Offline"
   },
   "friends.action.add-friend": {
     "message": "Magdagdag ng kaibigan"
@@ -201,10 +285,10 @@
     "message": "Idagdag ang server"
   },
   "instance.add-server.resource-pack.disabled": {
-    "message": "Hindi pinahihintulotan"
+    "message": "Tanggihan"
   },
   "instance.add-server.resource-pack.enabled": {
-    "message": "Pinahihintulotan"
+    "message": "Payagan"
   },
   "instance.add-server.resource-pack.prompt": {
     "message": "Magpahintulot"
@@ -216,7 +300,7 @@
     "message": "Baguhin ang server"
   },
   "instance.edit-world.hide-from-home": {
-    "message": "Huwag ipakita sa Home na pahina"
+    "message": "Itago sa pahina ng Tahanan"
   },
   "instance.edit-world.name": {
     "message": "Pangalan"
@@ -399,7 +483,7 @@
     "message": "Kopyahin ang adres"
   },
   "instance.worlds.dont_show_on_home": {
-    "message": "Huwag ipakita sa Home"
+    "message": "Huwag ipakita sa Tahanan"
   },
   "instance.worlds.game_already_open": {
     "message": "Bukas naman ang instansiya"

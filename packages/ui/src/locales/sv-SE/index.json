@@ -132,7 +132,7 @@
     "defaultMessage": "Spela"
   },
   "button.refresh": {
-    "defaultMessage": "Ladda om"
+    "defaultMessage": "Sök efter uppdateringar"
   },
   "button.reinstall-modpack": {
     "defaultMessage": "Ominstallera modpaket"
@@ -244,12 +244,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Radera {count, plural, one {{itemType, select, project {projekt} version {version} user {användare} other {projekt}}} other {{itemType, select, project {projekt} version {versioner} user {användare} other {projekt}}}}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Alla moddar eller innehåll som du lade till över modpaketet kommer att raderas."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Alla moddar eller innehåll du har lagt till utöver modpaketet kommer bevaras."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Varning om att {action, select, downgrade {nedgradera} other {uppdatera}}"
@@ -439,6 +433,108 @@
   },
   "files.conflict-modal.overwrite-many-warning": {
     "defaultMessage": "Över 100 filer kommer att skrivas över om du fortsätter med extrahering; här är några av dem."
+  },
+  "files.conflict-modal.overwritten-count": {
+    "defaultMessage": "{count} överskriven"
+  },
+  "files.conflict-modal.overwritten-label": {
+    "defaultMessage": "Överskriven"
+  },
+  "files.conflict-modal.warning-header": {
+    "defaultMessage": "Filer kommer att skrivas över"
+  },
+  "files.create-modal.placeholder-directory": {
+    "defaultMessage": "t.ex. min-mapp"
+  },
+  "files.create-modal.placeholder-file": {
+    "defaultMessage": "t.ex. config.yml"
+  },
+  "files.delete-modal.deleting-name": {
+    "defaultMessage": "Raderar \"{name}\""
+  },
+  "files.delete-modal.header": {
+    "defaultMessage": "Radera fil"
+  },
+  "files.editor.file-saved-title": {
+    "defaultMessage": "Filen sparades"
+  },
+  "files.editor.save-failed-title": {
+    "defaultMessage": "Sparning misslyckades"
+  },
+  "files.error.go-to-home": {
+    "defaultMessage": "Gå till hemmapp"
+  },
+  "files.error.try-again": {
+    "defaultMessage": "Försök igen"
+  },
+  "files.image_viewer.load_failed": {
+    "defaultMessage": "Kunde inte ladda bilden"
+  },
+  "files.image_viewer.reset_zoom": {
+    "defaultMessage": "Återställ zoom"
+  },
+  "files.image_viewer.zoom_in": {
+    "defaultMessage": "Zooma in"
+  },
+  "files.image_viewer.zoom_out": {
+    "defaultMessage": "Zooma ut"
+  },
+  "files.layout.error-message": {
+    "defaultMessage": "Mappen kanske inte existerar."
+  },
+  "files.layout.error-title": {
+    "defaultMessage": "Kunde inte ladda filerna"
+  },
+  "files.layout.loading": {
+    "defaultMessage": "Laddar filer..."
+  },
+  "files.layout.selected-count": {
+    "defaultMessage": "{count} valda"
+  },
+  "files.layout.unsaved-changes": {
+    "defaultMessage": "Du har osparade ändringar."
+  },
+  "files.navbar.breadcrumb-navigation": {
+    "defaultMessage": "Länkstigsnavigering"
+  },
+  "files.navbar.create-new": {
+    "defaultMessage": "Skapa ny..."
+  },
+  "files.navbar.new-file": {
+    "defaultMessage": "Ny fil"
+  },
+  "files.navbar.new-folder": {
+    "defaultMessage": "Ny mapp"
+  },
+  "files.navbar.search-files": {
+    "defaultMessage": "Sök filer"
+  },
+  "files.navbar.share-to-mclogs": {
+    "defaultMessage": "Dela till mclo.gs"
+  },
+  "files.navbar.upload-file": {
+    "defaultMessage": "Ladda upp fil"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "Osparade ändringar"
+  },
+  "files.upload-dropdown.file": {
+    "defaultMessage": "Fil"
+  },
+  "files.validation.name-label": {
+    "defaultMessage": "Namn"
+  },
+  "files.validation.name-required": {
+    "defaultMessage": "Namn krävs."
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "Länk krävs."
+  },
+  "files.zip-url-modal.install-button": {
+    "defaultMessage": "Installera"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "Installation misslyckades"
   },
   "form.label.address-line": {
     "defaultMessage": "Adresslinje"
@@ -865,9 +961,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "Ändringar sparade"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Detta är en mod på klientens sida och kan skapa fel. Vi har behållet den eftersom några skapare kan felmärka miljöer och loadern skall lösa konflikten."
   },
   "label.collections": {
     "defaultMessage": "Samlingar"
@@ -2231,9 +2324,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Betalningsmetod"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "fakturerad {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Välj en anpassad plan med just de specifikationer du behöver."
   },
@@ -2249,17 +2339,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Populärast"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Välj en plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Välj plan"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfekt för 1–5 vänner med några få lätta moddar."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Välj den mängd RAM och specifikationer som passar dina behov."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

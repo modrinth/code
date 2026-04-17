@@ -215,9 +215,6 @@
   "content.confirm-deletion.header": {
     "defaultMessage": "Smazat {itemType}{count, plural, one {} other {}}"
   },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Jakékoli mody, které jste přidali, budou smazány."
-  },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Upozornění na {action, select, downgrade {zhoršení} other {vylepšení}}"
   },
@@ -1280,9 +1277,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Platební metoda"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "fakturováno {interval}"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Vyberte si plán na míru s přesně těmi specifikacemi, které potřebujete."
   },
@@ -1298,17 +1292,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Nejoblíbenější"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Vyberte si plán"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Vyberte si plán"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Ideální pro 1–5 přátel s pár lehkými módámi."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Vyberte si množství RAM a specifikace, které odpovídají vašim potřebám."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plán"

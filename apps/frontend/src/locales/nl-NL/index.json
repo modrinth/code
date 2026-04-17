@@ -1301,9 +1301,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Kies tussen Vanilla, Fabric, Forge, Quilt en NeoForge. Als het op Modrinth is kan het op uw server."
   },
-  "hosting.loader.repair-started-text": {
-    "message": "Jou server installatie is gerepareerd."
-  },
   "hosting.plan.out-of-stock": {
     "message": "Uitverkocht"
   },
@@ -2816,6 +2813,36 @@
   "servers.plan.small.description": {
     "message": "Perfect voor 1-5 vrienden en een paar lichte mods"
   },
+  "settings.account.button.complete-setup": {
+    "message": "Vervolledig setup"
+  },
+  "settings.account.delete.confirm.title": {
+    "message": "Weet u zeker dat u uw account wilt verwijderen?"
+  },
+  "settings.account.delete.section.action": {
+    "message": "Verwijder account"
+  },
+  "settings.account.delete.section.title": {
+    "message": "Verwijder account"
+  },
+  "settings.account.email.action.save": {
+    "message": "Sla email op"
+  },
+  "settings.account.email.field.label": {
+    "message": "Email adres"
+  },
+  "settings.account.email.field.placeholder": {
+    "message": "Voer uw e-mailadres in..."
+  },
+  "settings.account.email.modal.header.add": {
+    "message": "Voeg e-mailadres toe"
+  },
+  "settings.account.email.modal.header.change": {
+    "message": "Verander e-mailadres"
+  },
+  "settings.account.email.modal.notice": {
+    "message": "......................"
+  },
   "settings.account.password.action.remove": {
     "message": "Wachtwoord verwijderen"
   },
@@ -2848,6 +2875,9 @@
   },
   "settings.account.providers.table.actions": {
     "message": "Acties"
+  },
+  "settings.account.security.email.action.add": {
+    "message": "Voeg e-mailadres toe"
   },
   "settings.account.security.password.action.add": {
     "message": "Wachtwoord toevoegen"

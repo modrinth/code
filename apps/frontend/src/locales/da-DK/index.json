@@ -1151,24 +1151,6 @@
   "hosting-marketing.why.your-favorite-mods.description": {
     "message": "Vælg imellem Vanilla, Fabric, Forge, Quilt og NeoForge. Hvis det er på Modrinth, det kan køre på din server."
   },
-  "hosting.loader.failed-to-change-version": {
-    "message": "Fejlede i at ændre modpack version"
-  },
-  "hosting.loader.failed-to-load-versions": {
-    "message": "Fejlede i at indlæse versioner"
-  },
-  "hosting.loader.failed-to-reinstall": {
-    "message": "Fejlede i at geninstallere modpack"
-  },
-  "hosting.loader.failed-to-repair": {
-    "message": "Fejlede i at reparere server"
-  },
-  "hosting.loader.failed-to-save-settings": {
-    "message": "Fejlede i at gemme installation indstillinger"
-  },
-  "hosting.loader.failed-to-unlink": {
-    "message": "Fejlede i at unlink modpack"
-  },
   "hosting.plan.out-of-stock": {
     "message": "Ikke på lager"
   },
