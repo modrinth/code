@@ -4941,6 +4941,7 @@ dependencies = [
  "paste",
  "path-util",
  "prometheus",
+ "quick-xml 0.38.3",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "redis",
