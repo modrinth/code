@@ -32,6 +32,9 @@
   "affiliate.viewAnalytics": {
     "defaultMessage": "Mostra analitiche"
   },
+  "app.server-settings.failed-to-load-server": {
+    "defaultMessage": "Errore nel caricamento delle impostazioni del server"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
@@ -40,6 +43,48 @@
   },
   "badge.new": {
     "defaultMessage": "Novità"
+  },
+  "billing.resubscribe-modal.cancel": {
+    "defaultMessage": "Annulla"
+  },
+  "billing.resubscribe-modal.cpus": {
+    "defaultMessage": "{sharedCpus} CPU condivise"
+  },
+  "billing.resubscribe-modal.description": {
+    "defaultMessage": "Stai per riabbonarti al server <server-name>{serverName}</server-name>. L'abbonamento sarà riattivato e il tuo server continuerà a funzionare senza interruzioni."
+  },
+  "billing.resubscribe-modal.error.title": {
+    "defaultMessage": "Errore"
+  },
+  "billing.resubscribe-modal.interval.five-days": {
+    "defaultMessage": "/5 giorni"
+  },
+  "billing.resubscribe-modal.interval.monthly": {
+    "defaultMessage": "/mese"
+  },
+  "billing.resubscribe-modal.interval.quarterly": {
+    "defaultMessage": "/trimestre"
+  },
+  "billing.resubscribe-modal.interval.yearly": {
+    "defaultMessage": "/anno"
+  },
+  "billing.resubscribe-modal.next-charge": {
+    "defaultMessage": "Il prossimo addebito sarà il <charge-date>{date}</charge-date>."
+  },
+  "billing.resubscribe-modal.plan-label": {
+    "defaultMessage": "Piano"
+  },
+  "billing.resubscribe-modal.ram": {
+    "defaultMessage": "{ramGb} GB di RAM"
+  },
+  "billing.resubscribe-modal.resubscribe": {
+    "defaultMessage": "Riabbonati"
+  },
+  "billing.resubscribe-modal.storage": {
+    "defaultMessage": "{storageGb} GB di spazio"
+  },
+  "billing.resubscribe-modal.title": {
+    "defaultMessage": "Riabbonamento al server"
   },
   "button.accept": {
     "defaultMessage": "Accetta"
@@ -96,7 +141,7 @@
     "defaultMessage": "Scarica"
   },
   "button.downloading": {
-    "defaultMessage": "Scaricando"
+    "defaultMessage": "In download"
   },
   "button.edit": {
     "defaultMessage": "Modifica"
@@ -233,6 +278,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Aggiornamento progetti"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Salta la conferma in futuro cliccando \"Aggiorna tutto\" tenendo premuto Shift."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aggiorna {count, plural, one {# progetto} other {# progetti}}"
   },
@@ -249,10 +297,7 @@
     "defaultMessage": "Elimina {count, plural, one {{itemType, select, project {progetto} version {versione} user {utente} other {contenuto}}} other {{itemType, select, project {progetti} version {versioni} user {utenti} other {contenuti}}}}"
   },
   "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà rimosso."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Qualsiasi mod o contenuto aggiunto al pacchetto verrà preservato."
+    "defaultMessage": "{action, select, downgrade {Retrocedere} other {Aggiornare}} potrebbe causare problemi di compatibilità. Le mod o i contenuti aggiunti al pacchetto saranno tenuti, ma potrebbero non essere compatibili con la nuova versione."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "Avviso di {action, select, downgrade {retrocessione} other {aggiornamento}}"
@@ -444,7 +489,7 @@
     "defaultMessage": "Sovrascrivi"
   },
   "files.conflict-modal.overwrite-many-warning": {
-    "defaultMessage": "Oltre 100 file verranno sovrascritti proseguendo con l'estrazione; eccone alcuni."
+    "defaultMessage": "Proseguendo con l'estrazione, oltre 100 file verranno sovrascritti; eccone alcuni."
   },
   "files.conflict-modal.overwrite-warning": {
     "defaultMessage": "I seguenti {count} file esistono già sul tuo server e verranno sovrascritti se procedi con l'estrazione."
@@ -471,13 +516,13 @@
     "defaultMessage": "es. config.yml"
   },
   "files.delete-modal.deleting-name": {
-    "defaultMessage": "Eliminando \"{name}\""
+    "defaultMessage": "Eliminare \"{name}\""
   },
   "files.delete-modal.header": {
     "defaultMessage": "Elimina file"
   },
   "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Questa cartella e tutti i suoi contenuti verranno eliminati permanentemente} other {Questo file verrà eliminato permanentemente}}. Questa azione non può essere annullata."
+    "defaultMessage": "{type, select, directory {Questa cartella e tutti i suoi contenuti verranno eliminati} other {Questo file verrà eliminato}} per sempre. Questa azione non può essere annullata."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Impossibile caricare i contenuti del file."
@@ -498,7 +543,7 @@
     "defaultMessage": "File salvato"
   },
   "files.editor.log-url-copied-text": {
-    "defaultMessage": "L'URL dei tuoi log è stato copiato negli appunti."
+    "defaultMessage": "L'URL del tuo log è stato copiato negli appunti."
   },
   "files.editor.log-url-copied-title": {
     "defaultMessage": "URL dei log copiato"
@@ -510,13 +555,13 @@
     "defaultMessage": "Errore nel salvataggio"
   },
   "files.error.go-to-home": {
-    "defaultMessage": "Vai alla cartella home"
+    "defaultMessage": "Vai alla cartella principale"
   },
   "files.error.try-again": {
     "defaultMessage": "Riprova"
   },
   "files.image_viewer.image_too_large": {
-    "defaultMessage": "L'immagine è troppo grande per essere visualizzata (massimo {maxDimension}x{maxDimension} pixel)"
+    "defaultMessage": "Impossibile mostrare immagini oltre {maxDimension}x{maxDimension} pixel"
   },
   "files.image_viewer.invalid_image": {
     "defaultMessage": "File immagine vuoto o non valido."
@@ -525,25 +570,25 @@
     "defaultMessage": "Errore nel caricamento dell'immagine"
   },
   "files.image_viewer.reset_zoom": {
-    "defaultMessage": "Resetta zoom"
+    "defaultMessage": "Reimposta zoom"
   },
   "files.image_viewer.viewed_image_alt": {
-    "defaultMessage": "Immagine mostrata"
+    "defaultMessage": "Immagine"
   },
   "files.image_viewer.zoom_in": {
     "defaultMessage": "Ingrandisci"
   },
   "files.image_viewer.zoom_out": {
-    "defaultMessage": "Rimpicciolisci"
+    "defaultMessage": "Riduci"
   },
   "files.layout.busy-warning": {
-    "defaultMessage": "L'operazione sui file è disabilitata quando è in corso l'operazione."
+    "defaultMessage": "Attendi il termine dell'operazione precedente prima di effettuarne un'altra."
   },
   "files.layout.dry-run-failed-text": {
-    "defaultMessage": "Errore nell'esecuzione del test"
+    "defaultMessage": "Impossibile eseguire il test"
   },
   "files.layout.dry-run-failed-title": {
-    "defaultMessage": "Errore nel test"
+    "defaultMessage": "Test fallito"
   },
   "files.layout.empty-folder-description": {
     "defaultMessage": "Non ci sono file o cartelle."
@@ -573,7 +618,7 @@
     "defaultMessage": "Percorso attuale"
   },
   "files.move-modal.destination-path": {
-    "defaultMessage": "Percorso di destinazione"
+    "defaultMessage": "Destinazione"
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "es. /la-mia-cartella"
@@ -585,13 +630,13 @@
     "defaultMessage": "Torna alla home"
   },
   "files.navbar.breadcrumb-navigation": {
-    "defaultMessage": "Breadcrumb"
+    "defaultMessage": "Percorso attuale"
   },
   "files.navbar.create-new": {
     "defaultMessage": "Crea..."
   },
   "files.navbar.file-navigation": {
-    "defaultMessage": "Navigazione file"
+    "defaultMessage": "Navigazione tra i file"
   },
   "files.navbar.home": {
     "defaultMessage": "Home"
@@ -615,28 +660,22 @@
     "defaultMessage": "Carica file"
   },
   "files.navbar.upload-from-zip": {
-    "defaultMessage": "Carica .zip da file"
+    "defaultMessage": "Carica da file .zip"
   },
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": "Carica .zip da URL"
   },
   "files.operations.extracted": {
-    "defaultMessage": "estratti {size}"
+    "defaultMessage": "{size} estratti"
   },
   "files.operations.extracting": {
-    "defaultMessage": "Estraendo {source}"
+    "defaultMessage": "Estrazione di {source}"
   },
   "files.operations.failed": {
     "defaultMessage": "Errore"
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "pacchetto di mod da URL"
-  },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Caricando i file ({completed}/{total})..."
   },
   "files.rename-modal.header": {
     "defaultMessage": "Rinomina {name}"
@@ -648,10 +687,10 @@
     "defaultMessage": "{count, plural, one {# oggetto} other {# oggetti}}"
   },
   "files.table-header.created": {
-    "defaultMessage": "Creato"
+    "defaultMessage": "Creazione"
   },
   "files.table-header.modified": {
-    "defaultMessage": "Modificato"
+    "defaultMessage": "Modifica"
   },
   "files.table-header.name": {
     "defaultMessage": "Nome"
@@ -687,10 +726,10 @@
     "defaultMessage": "File"
   },
   "files.upload-dropdown.file-uploads": {
-    "defaultMessage": "Caricamento {fileType}"
+    "defaultMessage": "Caricamenti {fileType}"
   },
   "files.upload-dropdown.incorrect-file-type": {
-    "defaultMessage": "Tipo di file caricato errato"
+    "defaultMessage": "Il tipo di file caricato è errato"
   },
   "files.upload-dropdown.unexpected-error": {
     "defaultMessage": "Si è verificato un errore imprevisto."
@@ -699,13 +738,13 @@
     "defaultMessage": " - {count, select, one {# rimanente} other {# rimanenti}}"
   },
   "files.upload.drag-and-drop.drop-to-upload": {
-    "defaultMessage": "Rilascia i file qui per caricarli"
+    "defaultMessage": "Trascina qui i file per caricarli"
   },
   "files.validation.name-invalid-directory": {
-    "defaultMessage": "Il nome può contenere solo lettere, numeri, trattini o spazi."
+    "defaultMessage": "Il nome può contenere solo lettere, numeri, spazi o trattini alti o bassi."
   },
   "files.validation.name-invalid-file": {
-    "defaultMessage": "Il nome può contenere solo lettere, numeri, trattini, punti o spazi."
+    "defaultMessage": "Il nome può contenere solo lettere, numeri, punti, spazi o trattini alti o bassi."
   },
   "files.validation.name-label": {
     "defaultMessage": "Nome"
@@ -714,10 +753,10 @@
     "defaultMessage": "Nome richiesto."
   },
   "files.zip-url-modal.backup-name": {
-    "defaultMessage": "Installazione pacchetto CurseForge"
+    "defaultMessage": "Pacchetto importato da CurseForge"
   },
   "files.zip-url-modal.cf-header": {
-    "defaultMessage": "Installa pacchetto da CurseForge"
+    "defaultMessage": "Importa pacchetto da CurseForge"
   },
   "files.zip-url-modal.cf-not-found-text": {
     "defaultMessage": "Non è stato trovato su CurseForge un pacchetto di mod a quell'URL."
@@ -729,22 +768,22 @@
     "defaultMessage": "Inserisci link"
   },
   "files.zip-url-modal.error-cf-url": {
-    "defaultMessage": "L'URL deve essere di una versione del pacchetto."
+    "defaultMessage": "L'URL deve puntare a una versione del pacchetto."
   },
   "files.zip-url-modal.error-url-invalid": {
     "defaultMessage": "URL non valido."
   },
   "files.zip-url-modal.error-url-required": {
-    "defaultMessage": "URL richiesto."
+    "defaultMessage": "URL necessario."
   },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "Installa"
   },
   "files.zip-url-modal.install-failed-title": {
-    "defaultMessage": "Errore nell'installazione"
+    "defaultMessage": "Errore durante l'installazione"
   },
   "files.zip-url-modal.step-copy-description": {
-    "defaultMessage": "Copia l'URL della pagina della versione e incollala sotto."
+    "defaultMessage": "Copia l'URL della pagina della versione e incollalo sotto."
   },
   "files.zip-url-modal.step-copy-title": {
     "defaultMessage": "Copia l'URL"
@@ -753,10 +792,10 @@
     "defaultMessage": "Esplora su CurseForge e trova il pacchetto di mod che desideri."
   },
   "files.zip-url-modal.step-find-title": {
-    "defaultMessage": "Trova il pacchetto di mod"
+    "defaultMessage": "Trova il pacchetto"
   },
   "files.zip-url-modal.step-select-description": {
-    "defaultMessage": "Vai nella scheda \"File\" e seleziona la versione da installare."
+    "defaultMessage": "Vai sulla scheda \"File\" e seleziona la versione da installare."
   },
   "files.zip-url-modal.step-select-title": {
     "defaultMessage": "Seleziona una versione"
@@ -765,7 +804,7 @@
     "defaultMessage": "Errore sconosciuto"
   },
   "files.zip-url-modal.zip-description": {
-    "defaultMessage": "Copia e incolla un URL di download diretto del file .zip."
+    "defaultMessage": "Copia e incolla l'URL diretto che scarica il file .zip."
   },
   "files.zip-url-modal.zip-header": {
     "defaultMessage": "Caricando i contenuti del .zip dall'URL"
@@ -905,6 +944,60 @@
   "hosting.content.failed-to-upload": {
     "defaultMessage": "Errore nel caricamento del file"
   },
+  "hosting.loader.failed-to-change-version": {
+    "defaultMessage": "Errore nella modifica della versione del pacchetto"
+  },
+  "hosting.loader.failed-to-load-versions": {
+    "defaultMessage": "Errore nel caricamento delle versioni"
+  },
+  "hosting.loader.failed-to-reinstall": {
+    "defaultMessage": "Errore nella reinstallazione del pacchetto"
+  },
+  "hosting.loader.failed-to-repair": {
+    "defaultMessage": "Errore nella riparazione del server"
+  },
+  "hosting.loader.failed-to-reset-to-onboarding": {
+    "defaultMessage": "Errore nella reinizializzazione"
+  },
+  "hosting.loader.failed-to-save-settings": {
+    "defaultMessage": "Errore nel salvataggio delle impostazioni"
+  },
+  "hosting.loader.failed-to-unlink": {
+    "defaultMessage": "Errore nello scollegamento del pacchetto"
+  },
+  "hosting.loader.loader-version": {
+    "defaultMessage": "Versione {loader, select, null {del loader} other {di {loader}}}"
+  },
+  "hosting.loader.repair-started-text": {
+    "defaultMessage": "L'installazione del server è stata riparata."
+  },
+  "hosting.loader.repair-started-title": {
+    "defaultMessage": "Riparazione completata"
+  },
+  "hosting.loader.reset-server": {
+    "defaultMessage": "Reimposta server"
+  },
+  "hosting.loader.reset-server-description": {
+    "defaultMessage": "Rimuove tutti i dati dal tuo server, inclusi i mondi, mod, e configurazioni. Eventuali backup rimarranno intatti e potranno essere ripristinati."
+  },
+  "hosting.loader.reset-to-onboarding-button": {
+    "defaultMessage": "Reinizializza"
+  },
+  "hosting.loader.reset-to-onboarding-modal-description": {
+    "defaultMessage": "Il server verrà ripristinato alla configurazione iniziale così da poterlo riconfigurare. Vuoi davvero continuare?"
+  },
+  "hosting.loader.reset-to-onboarding-modal-title": {
+    "defaultMessage": "Reinizializza"
+  },
+  "hosting.loader.reset-to-onboarding-success-description": {
+    "defaultMessage": "Il server è stato ripristinato alla configurazione iniziale."
+  },
+  "hosting.loader.reset-to-onboarding-success-title": {
+    "defaultMessage": "Server reinizializzato"
+  },
+  "hosting.loader.support-options-title": {
+    "defaultMessage": "Opzioni di assistenza"
+  },
   "hosting.specs.burst": {
     "defaultMessage": "Fino a {cpus} CPU in supercarica"
   },
@@ -976,6 +1069,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Non consigliamo di modificare l'installazione dopo aver installato dei contenuti. Se vuoi modificarla, reimposta il server."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Risolvi"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Cambia loader"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Disabilita incompatibili"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Cambiando la versione del gioco, è necessario disabilitare i contenuti incompatibili o tentare di risolverne le incompatibilità."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Avviso di incompatibilità"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Contenuto incompatibile installato"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Cambiando loader, tutti i contenuti installati verranno disabilitati. Consigliamo invece di reimpostare il server."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Cambiare loader è un'azione distruttiva"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "{projectType, select, server {Server} other {Pacchetto}} collegato"
@@ -1197,13 +1314,13 @@
     "defaultMessage": "Modifiche salvate"
   },
   "label.client-depends-warning": {
-    "defaultMessage": "Questa mod dipende da una mod lato client e potrebbe causare problemi con l'avvio del server"
+    "defaultMessage": "Questa mod necessita di un'altra lato client. Ciò potrebbe causare problemi durante l'avvio del server"
   },
   "label.client-only-warning": {
-    "defaultMessage": "Questa è una mod lato client e potrebbe causare problemi. L'abbiamo lasciata abilitata in quando alcuni autori sbagliano a selezionare l'ambiente, e il loader dovrebbe risolvere il conflitto."
+    "defaultMessage": "Questa è una mod client. Potrebbe causare problemi durante l'avvio del server"
   },
   "label.client-retained-warning": {
-    "defaultMessage": "Questa è una mod lato client che è stata installata come dipendenza e potrebbe causare problemi con l'avvio del server"
+    "defaultMessage": "Questa mod è lato client ed è stata installata come dipendenza; potrebbe causare problemi durante l'avvio del server"
   },
   "label.collections": {
     "defaultMessage": "Raccolte"
@@ -1245,7 +1362,7 @@
     "defaultMessage": "Dettagli"
   },
   "label.done": {
-    "defaultMessage": "Finito"
+    "defaultMessage": "Fatto"
   },
   "label.download-failed": {
     "defaultMessage": "Errore nel download"
@@ -1290,7 +1407,7 @@
     "defaultMessage": "Pacchetto di mod"
   },
   "label.move-failed": {
-    "defaultMessage": "Errore nello spostare"
+    "defaultMessage": "Errore nello spostamento"
   },
   "label.no": {
     "defaultMessage": "No"
@@ -2564,6 +2681,222 @@
   "servers.backups.item.restore": {
     "defaultMessage": "Ripristina"
   },
+  "servers.busy.backup-creating": {
+    "defaultMessage": "È in corso la creazione di un backup"
+  },
+  "servers.busy.backup-restoring": {
+    "defaultMessage": "È in corso il ripristino da un backup"
+  },
+  "servers.busy.installing": {
+    "defaultMessage": "È in corso l'installazione del server"
+  },
+  "servers.busy.syncing-content": {
+    "defaultMessage": "È in corso la sincronizzazione dei contenuti"
+  },
+  "servers.list-empty.already-have-server-label": {
+    "defaultMessage": "Hai già un server?"
+  },
+  "servers.list-empty.learn-more-link": {
+    "defaultMessage": "Scopri di più su Modrinth Hosting"
+  },
+  "servers.list-empty.modrinth-hosting-label": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.list-empty.new-server-button": {
+    "defaultMessage": "Nuovo server"
+  },
+  "servers.list-empty.no-servers-description": {
+    "defaultMessage": "Gioca con i tuoi amici in un server unico, pieno di mod, attraverso la Modrinth App."
+  },
+  "servers.list-empty.no-servers-title": {
+    "defaultMessage": "Ancora nessun server"
+  },
+  "servers.list-empty.one-click-mod-installs-description": {
+    "defaultMessage": "Scegli le tue mod preferite, al resto ci pensiamo noi."
+  },
+  "servers.list-empty.one-click-mod-installs-title": {
+    "defaultMessage": "Installa con un clic"
+  },
+  "servers.list-empty.play-with-friends-description": {
+    "defaultMessage": "Invita chiunque desideri e senza problemi, tutto tramite la Modrinth App."
+  },
+  "servers.list-empty.play-with-friends-title": {
+    "defaultMessage": "Gioca con gli amici"
+  },
+  "servers.list-empty.sign-in-button": {
+    "defaultMessage": "Accedi"
+  },
+  "servers.list-empty.simple-setup-description": {
+    "defaultMessage": "Imposta il tuo server come se fosse un mondo in singolo."
+  },
+  "servers.list-empty.simple-setup-title": {
+    "defaultMessage": "Configurazione semplice"
+  },
+  "servers.listing.copied-label": {
+    "defaultMessage": "Copiato"
+  },
+  "servers.listing.copy-code-tooltip": {
+    "defaultMessage": "Copia il codice negli appunti"
+  },
+  "servers.listing.copy-id-label": {
+    "defaultMessage": "Copia ID"
+  },
+  "servers.listing.download-latest-backup-tooltip": {
+    "defaultMessage": "Scarica l'ultimo backup"
+  },
+  "servers.listing.manage-billing-label": {
+    "defaultMessage": "Gestione fatturazione"
+  },
+  "servers.listing.new-label": {
+    "defaultMessage": "Nuovo"
+  },
+  "servers.listing.notice.files-kept-for-download": {
+    "defaultMessage": "I file saranno preservati per <days-remaining>{daysRemaining, plural, one {# altro giorno} other {altri # giorni}}</days-remaining>. Contatta il supporto per scaricarli prima che verranno cancellati. "
+  },
+  "servers.listing.notice.files-preserved-after-cancellation": {
+    "defaultMessage": "I file saranno preservati per 30 giorni dopo l'annullamento."
+  },
+  "servers.listing.notice.moderated": {
+    "defaultMessage": "Il server è stato sospeso dai moderatori. "
+  },
+  "servers.listing.notice.provisioning": {
+    "defaultMessage": "Attendi mentre prepariamo il tuo server. Potrebbe richiedere fino a 10 minuti."
+  },
+  "servers.listing.notice.subscription-cancelled": {
+    "defaultMessage": "Il tuo abbonamento è stato annullato."
+  },
+  "servers.listing.notice.subscription-cancelled-on-date": {
+    "defaultMessage": "L'abbonamento è stato annullato il <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed": {
+    "defaultMessage": "L'abbonamento è stato annullato per mancato pagamento."
+  },
+  "servers.listing.notice.subscription-cancelled-payment-failed-on-date": {
+    "defaultMessage": "L'abbonamento è stato annullato il <date>{formattedDate}</date> per mancato pagamento. "
+  },
+  "servers.listing.notice.subscription-set-to-cancel": {
+    "defaultMessage": "L'abbonamento verrà annullato."
+  },
+  "servers.listing.notice.subscription-set-to-cancel-on-date": {
+    "defaultMessage": "L'abbonamento verrà annullato il <date>{formattedDate}</date>. "
+  },
+  "servers.listing.notice.suspended": {
+    "defaultMessage": "Il server è stato sospeso. Contatta il supporto di Modrinth per maggiori informazioni."
+  },
+  "servers.listing.notice.upgrading": {
+    "defaultMessage": "L'hardware del tuo server sta venendo aggiornato, dovrebbe tornare online a momenti."
+  },
+  "servers.listing.resubscribe-label": {
+    "defaultMessage": "Riabbonati"
+  },
+  "servers.listing.server-icon-alt": {
+    "defaultMessage": "Icona del server"
+  },
+  "servers.listing.support-label": {
+    "defaultMessage": "Supporto"
+  },
+  "servers.manage.confirm-leave.body": {
+    "defaultMessage": "È in corso il caricamento di un file. Abbandonare questa pagina annullerà l'operazione."
+  },
+  "servers.manage.confirm-leave.upload-in-progress": {
+    "defaultMessage": "È in corso un caricamento"
+  },
+  "servers.manage.contact-support-button": {
+    "defaultMessage": "Contatta il supporto"
+  },
+  "servers.manage.error.alert-notice": {
+    "defaultMessage": "I nostri sistemi ci avvertono automaticamente quando c'è un problema. Stiamo già lavorando per farli tornare online."
+  },
+  "servers.manage.error.description": {
+    "defaultMessage": "Potremmo avere dei problemi temporanei coi nostri server."
+  },
+  "servers.manage.error.details": {
+    "defaultMessage": "Dettagli sull'errore:"
+  },
+  "servers.manage.error.queue-notice": {
+    "defaultMessage": "Se hai acquistato il tuo server Modrinth Hosting di recente, è in attesa e apparirà qui appena è pronto. <warning>Non cercare di acquistarne un altro.</warning>"
+  },
+  "servers.manage.error.support-notice": {
+    "defaultMessage": "Se hai bisogno di aiuto personalizzato a proposito dello stato del tuo server, contatta il supporto di Modrinth."
+  },
+  "servers.manage.error.title": {
+    "defaultMessage": "Impossibile caricare i server"
+  },
+  "servers.manage.handle-error.title": {
+    "defaultMessage": "Si è verificato un errore"
+  },
+  "servers.manage.loading-servers": {
+    "defaultMessage": "Caricando i tuoi server..."
+  },
+  "servers.manage.new-server-button": {
+    "defaultMessage": "Nuovo server"
+  },
+  "servers.manage.no-servers-found": {
+    "defaultMessage": "Nessun server trovato."
+  },
+  "servers.manage.purchase-unavailable.title": {
+    "defaultMessage": "Acquisto non disponibile"
+  },
+  "servers.manage.reload-button": {
+    "defaultMessage": "Ricarica"
+  },
+  "servers.manage.resubscribe-error.text": {
+    "defaultMessage": "Si è verificato un errore nel riabbonamento del tuo server Modrinth."
+  },
+  "servers.manage.resubscribe-error.title": {
+    "defaultMessage": "Errore nel riabbonamento"
+  },
+  "servers.manage.resubscribe-submitted.text": {
+    "defaultMessage": "Se il server è stato annullato, un nuovo tentativo di addebito potrebbe richiedere fino a 10 minuti."
+  },
+  "servers.manage.resubscribe-submitted.title": {
+    "defaultMessage": "Richiesta di riabbonamento inviata"
+  },
+  "servers.manage.resubscribe-success.text": {
+    "defaultMessage": "Riabbonamento al server effettuato con successo"
+  },
+  "servers.manage.resubscribe-success.title": {
+    "defaultMessage": "Successo"
+  },
+  "servers.manage.search-placeholder": {
+    "defaultMessage": "Cerca tra {count} server..."
+  },
+  "servers.manage.servers-title": {
+    "defaultMessage": "Modrinth Hosting"
+  },
+  "servers.manage.settings-hint.description": {
+    "defaultMessage": "Ora possono essere trovate qui!"
+  },
+  "servers.manage.settings-hint.dismiss": {
+    "defaultMessage": "Non mostrare più"
+  },
+  "servers.manage.settings-hint.title": {
+    "defaultMessage": "Le impostazioni del server sono state spostate"
+  },
+  "servers.medal-listing.countdown.remaining": {
+    "defaultMessage": "<days-count>{days}</days-count> {days, plural, one {giorno} other {giorni}} <hours-count>{hours}</hours-count> {hours, plural, one {ora} other {ore}} <minutes-count>{minutes}</minutes-count> {minutes, plural, one {minuto} other {minuti}} <seconds-count>{seconds}</seconds-count> {seconds, plural, one {secondo rimanente} other {secondi rimanenti}}..."
+  },
+  "servers.medal-listing.new-server-label": {
+    "defaultMessage": "Nuovo server"
+  },
+  "servers.medal-listing.notice.medal-trial-ended": {
+    "defaultMessage": "La prova del server Medal è terminata e il tuo server è stato sospeso. Aggiorna per continuare a usarlo."
+  },
+  "servers.medal-listing.notice.suspended": {
+    "defaultMessage": "Il server è stato sospeso. Aggiorna il tuo metodo di pagamento o contatta il supporto di Modrinth per maggiori informazioni."
+  },
+  "servers.medal-listing.notice.suspended-with-reason": {
+    "defaultMessage": "Il server è stato sospeso: {reason}. Aggiorna il tuo metodo di pagamento o contatta il supporto di Modrinth per maggiori informazioni."
+  },
+  "servers.medal-listing.notice.upgrading": {
+    "defaultMessage": "L'hardware del tuo server sta venendo aggiornato, dovrebbe tornare online a momenti."
+  },
+  "servers.medal-listing.server-icon-alt": {
+    "defaultMessage": "Icona del server"
+  },
+  "servers.medal-listing.upgrade-button": {
+    "defaultMessage": "Aggiorna"
+  },
   "servers.notice.dismiss": {
     "defaultMessage": "Ignora"
   },
@@ -2591,8 +2924,14 @@
   "servers.notice.undismissable": {
     "defaultMessage": "Non ignorabile"
   },
+  "servers.purchase.notification.success.text": {
+    "defaultMessage": "L'acquisto su Modrinth Hosting è avvenuto con successo."
+  },
+  "servers.purchase.notification.success.title": {
+    "defaultMessage": "Acquisto avvenuto con successo"
+  },
   "servers.purchase.step.payment.description": {
-    "defaultMessage": "Non sarai accreditato per ora."
+    "defaultMessage": "Non verrà addebitato nulla per ora."
   },
   "servers.purchase.step.payment.prompt": {
     "defaultMessage": "Seleziona un metodo di pagamento"
@@ -2600,17 +2939,26 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Metodo di pagamento"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "fatturato {interval}"
+  "servers.purchase.step.plan.billing-subtitle": {
+    "defaultMessage": "Disponibile in Nord America, in Europa e nel Sud-est asiatico."
   },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Scegli un piano su misura con le specifiche di cui hai bisogno."
   },
+  "servers.purchase.step.plan.custom.heading": {
+    "defaultMessage": "Sai esattamente cosa ti serve?"
+  },
   "servers.purchase.step.plan.get-started": {
     "defaultMessage": "Inizia"
   },
+  "servers.purchase.step.plan.large": {
+    "defaultMessage": "Grande"
+  },
   "servers.purchase.step.plan.large.desc": {
     "defaultMessage": "Ideale per 15–25 giocatori, pacchetti di mod o modding intenso."
+  },
+  "servers.purchase.step.plan.medium": {
+    "defaultMessage": "Medio"
   },
   "servers.purchase.step.plan.medium.desc": {
     "defaultMessage": "Ottimo per 6–15 giocatori e più mod."
@@ -2618,20 +2966,20 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Il più scelto"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Scegli un piano"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Seleziona piano"
+  },
+  "servers.purchase.step.plan.small": {
+    "defaultMessage": "Piccolo"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfetto per 1–5 giocatori e qualche mod leggera."
   },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Scegli quanta RAM e quali specifiche ti servono."
-  },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Piano"
+  },
+  "servers.purchase.step.plan.your-current-plan": {
+    "defaultMessage": "Piano attuale"
   },
   "servers.purchase.step.region.title": {
     "defaultMessage": "Regione"
@@ -3189,7 +3537,7 @@
     "defaultMessage": "Hai modifiche non salvate."
   },
   "ui.confirm-leave-modal.body": {
-    "defaultMessage": "Le modifiche non salvate andranno perse se abbandoni questa pagina."
+    "defaultMessage": "Se abbandoni questa pagina, le modifiche non salvate andranno perse."
   },
   "ui.confirm-leave-modal.header": {
     "defaultMessage": "Hai modifiche non salvate"

@@ -18,13 +18,10 @@ import {
 	LibraryIcon,
 	LogInIcon,
 	LogOutIcon,
-	MaximizeIcon,
-	MinimizeIcon,
 	NewspaperIcon,
 	NotepadTextIcon,
 	PlusIcon,
 	RefreshCwIcon,
-	RestoreIcon,
 	RightArrowIcon,
 	ServerStackIcon,
 	SettingsIcon,
@@ -35,7 +32,6 @@ import {
 import {
 	Admonition,
 	Avatar,
-	Button,
 	ButtonStyled,
 	commonMessages,
 	ContentInstallModal,
@@ -87,6 +83,7 @@ import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 import QuickInstanceSwitcher from '@/components/ui/QuickInstanceSwitcher.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import WindowControls from '@/components/ui/WindowControls.vue'
 import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import { config } from '@/config'
 import { hide_ads_window, init_ads_window, show_ads_window } from '@/helpers/ads.js'
@@ -1075,6 +1072,7 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </script>
 
 <template>
+	<WindowControls />
 	<SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
 	<div id="teleports"></div>
 	<div
@@ -1272,22 +1270,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 						<RunningAppBar />
 					</Suspense>
 				</div>
-				<section v-if="!nativeDecorations" class="window-controls" data-tauri-drag-region-exclude>
-					<Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
-						<MinimizeIcon />
-					</Button>
-					<Button
-						class="titlebar-button"
-						icon-only
-						@click="() => getCurrentWindow().toggleMaximize()"
-					>
-						<RestoreIcon v-if="isMaximized" />
-						<MaximizeIcon v-else />
-					</Button>
-					<Button class="titlebar-button close" icon-only @click="handleClose">
-						<XIcon />
-					</Button>
-				</section>
 			</section>
 		</div>
 	</div>
@@ -1459,72 +1441,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 </template>
 
 <style lang="scss" scoped>
-.window-controls {
-	z-index: 20;
-	display: none;
-	flex-direction: row;
-	align-items: center;
-
-	.titlebar-button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		cursor: pointer;
-		transition: all ease-in-out 0.1s;
-		background-color: transparent;
-		color: var(--color-base);
-		height: 100%;
-		width: 3rem;
-		position: relative;
-		box-shadow: none;
-
-		&:last-child {
-			padding-right: 0.75rem;
-			width: 3.75rem;
-		}
-
-		svg {
-			width: 1.25rem;
-			height: 1.25rem;
-		}
-
-		&::before {
-			content: '';
-			border-radius: 999999px;
-			width: 3rem;
-			height: 3rem;
-			aspect-ratio: 1 / 1;
-			margin-block: auto;
-			position: absolute;
-			background-color: transparent;
-			scale: 0.9;
-			transition: all ease-in-out 0.2s;
-			z-index: -1;
-		}
-
-		&.close {
-			&:hover,
-			&:active {
-				color: var(--color-accent-contrast);
-
-				&::before {
-					background-color: var(--color-red);
-				}
-			}
-		}
-
-		&:hover,
-		&:active {
-			color: var(--color-contrast);
-
-			&::before {
-				background-color: var(--color-button-bg);
-				scale: 1;
-			}
-		}
-	}
-}
-
 .app-grid-layout,
 .app-contents {
 	--top-bar-height: 3rem;
@@ -1756,10 +1672,6 @@ provideAppUpdateDownloadProgress(appUpdateDownload)
 .windows {
 	.fake-appbar {
 		height: 2.5rem !important;
-	}
-
-	.window-controls {
-		display: flex !important;
 	}
 
 	.info-card {

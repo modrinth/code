@@ -5,6 +5,39 @@
   "app.auth-servers.unreachable.header": {
     "message": "تعذر الوصول إلى خوادم المصادقة"
   },
+  "app.browse.add-server-to-instance": {
+    "message": "أضف الخادم للنموذج"
+  },
+  "app.browse.add-servers-to-instance": {
+    "message": "أضف الخوادم لنموذجك"
+  },
+  "app.browse.add-to-instance": {
+    "message": "أضف للنموذج"
+  },
+  "app.browse.add-to-instance-name": {
+    "message": "أضف للنموذج {instanceName}"
+  },
+  "app.browse.added": {
+    "message": "مضاف"
+  },
+  "app.browse.already-added": {
+    "message": "مضاف فعلا"
+  },
+  "app.browse.discover-content": {
+    "message": "استكشف محتوى"
+  },
+  "app.browse.discover-servers": {
+    "message": "استكشف خوادم"
+  },
+  "app.browse.hide-added-servers": {
+    "message": "إخفاء الخوادم المضافة"
+  },
+  "app.browse.hide-installed-content": {
+    "message": "إخفاء المحتوى المضاف"
+  },
+  "app.browse.install-content-to-instance": {
+    "message": "تثبيت محتوى لنموذجك"
+  },
   "app.export-modal.description-placeholder": {
     "message": "أدخل وصف التعديل..."
   },
@@ -30,19 +63,28 @@
     "message": "1.0.0"
   },
   "app.instance.confirm-delete.admonition-body": {
-    "message": "سيتم حذف جميع البيانات الخاصة بمثيلك نهائيًا، بما في ذلك عوالمك والتكوينات وكل المحتوى المثبت."
+    "message": "سيتم حذف جميع البيانات الخاصة لنموذجك نهائيًا، بما في ذلك عوالمك والتكوينات وكل المحتوى المثبت."
   },
   "app.instance.confirm-delete.admonition-header": {
     "message": "لا يمكن التراجع عن هذا الإجراء"
   },
   "app.instance.confirm-delete.delete-button": {
-    "message": "حذف المثيل"
+    "message": "حذف النموذج"
   },
   "app.instance.confirm-delete.header": {
-    "message": "حذف المثيل"
+    "message": "حذف النموذج"
+  },
+  "app.instance.modpack-already-installed.body": {
+    "message": "حُزْمَة التعديل هذه مثبته فعلًا في نموذج <bold>{instanceName}</bold>. هل انت متأكد بإرادة نسخه؟"
+  },
+  "app.instance.modpack-already-installed.create": {
+    "message": "إنشاء"
   },
   "app.instance.modpack-already-installed.header": {
-    "message": "تم تثبيت حزمة التعديل بالفعل"
+    "message": "حُزْمَة التعديل مثبتة بالفعل"
+  },
+  "app.instance.modpack-already-installed.instance": {
+    "message": "النموذج"
   },
   "app.instance.mods.content-type-project": {
     "message": "مشروع"
@@ -51,7 +93,7 @@
     "message": "تمت إضافة \"{name}\""
   },
   "app.instance.mods.projects-were-added": {
-    "message": "تمت إضافة {count} من المشاريع"
+    "message": "تمت إضافة {count} مشروع"
   },
   "app.instance.mods.share-text": {
     "message": "تحقق من المشاريع التي أستخدمها في حزمة التعديل الخاص بي!"
@@ -61,6 +103,51 @@
   },
   "app.instance.mods.successfully-uploaded": {
     "message": "تم الرفع بنجاح"
+  },
+  "app.instance.worlds.add-server": {
+    "message": "أضف خادم"
+  },
+  "app.instance.worlds.browse-servers": {
+    "message": "تصفح الخوادم"
+  },
+  "app.instance.worlds.delete-world-description": {
+    "message": "سيتم حذف '{name}' **نهائيا**, و لن هناك أي طريقة لاسترداده."
+  },
+  "app.instance.worlds.delete-world-title": {
+    "message": "هل أنت متيقِّن من رغبتك بحذف هذا العالم نهائيا؟"
+  },
+  "app.instance.worlds.filter-modded": {
+    "message": "معدّل"
+  },
+  "app.instance.worlds.filter-offline": {
+    "message": "مفصول"
+  },
+  "app.instance.worlds.filter-online": {
+    "message": "يعمل"
+  },
+  "app.instance.worlds.filter-vanilla": {
+    "message": "الأصلي"
+  },
+  "app.instance.worlds.no-worlds-description": {
+    "message": "أضف خادما أو تصفح لكي تبدأ"
+  },
+  "app.instance.worlds.no-worlds-heading": {
+    "message": "لم تتم إضافة أي من الخوادم أو العوالم"
+  },
+  "app.instance.worlds.remove-server-description": {
+    "message": "ستتم إزالة '{name}' من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
+  },
+  "app.instance.worlds.remove-server-description-with-address": {
+    "message": "ستتم إزالة '{name}' ({address}) من قائمتك, إضافة لما داخل اللعبة, و لن يكون هناك أي طريقة لاسترداده."
+  },
+  "app.instance.worlds.remove-server-title": {
+    "message": "هل أنت متيقِّن من رغبتك في إزالة {name}؟"
+  },
+  "app.instance.worlds.search-worlds-placeholder": {
+    "message": "ابحث بين ال{count} عوالم..."
+  },
+  "app.instance.worlds.this-server": {
+    "message": "هذا الخادم"
   },
   "app.modal.install-to-play.content-required": {
     "message": "المحتوى مطلوب"
@@ -81,10 +168,10 @@
     "message": "يتطلب هذا الخادم تعديلات للعب. انقر فوق \"تثبيت\" لإعداد الملفات المطلوبة من Modrinth، ثم قم بتشغيله مباشرة إلى الخادم."
   },
   "app.modal.install-to-play.shared-instance": {
-    "message": "حزمة مشتركة"
+    "message": "النماذج المشتركة"
   },
   "app.modal.install-to-play.shared-server-instance": {
-    "message": "حزمة خادم مشتركة"
+    "message": "نماذج الخادم مشتركة"
   },
   "app.modal.install-to-play.view-contents": {
     "message": "عرض المحتويات"
@@ -96,7 +183,7 @@
     "message": "يلزم التحديث"
   },
   "app.modal.update-to-play.update-required-description": {
-    "message": "هناك تحديث لازم للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
+    "message": "هناك تحديث مطلوب للعب بـ {name}. الرجاء التحديث إلى آخر اصدار لتشغيل اللعبة."
   },
   "app.settings.developer-mode-enabled": {
     "message": "تم تفعيل وضع المطوّر."
@@ -163,6 +250,21 @@
   },
   "app.update.reload-to-update": {
     "message": "أعد التحميل لتثبيت التحديث"
+  },
+  "app.world.server-modal.select-an-option": {
+    "message": "حدد خيارا"
+  },
+  "app.world.world-item.incompatible-version": {
+    "message": "إصدار غير مطابق ({version})"
+  },
+  "app.world.world-item.not-played-yet": {
+    "message": "لم يتم اللعب به"
+  },
+  "app.world.world-item.offline": {
+    "message": "مفصول"
+  },
+  "app.world.world-item.players-online": {
+    "message": "{count} متصل حاليا"
   },
   "friends.action.add-friend": {
     "message": "إضافة صديق"
@@ -263,6 +365,12 @@
   "instance.edit-world.title": {
     "message": "تعديل العالم"
   },
+  "instance.files.adding-files": {
+    "message": "إضافة ملفات ({completed}\\{total})"
+  },
+  "instance.files.save-as": {
+    "message": "حفظ ك..."
+  },
   "instance.server-modal.address": {
     "message": "العنوان"
   },
@@ -300,7 +408,7 @@
     "message": "نسخة النسخة"
   },
   "instance.settings.tabs.general.duplicate-instance.description": {
-    "message": "إنشاء."
+    "message": "ينشئ نسخة من هذا النموذج شاملا عوالمه, تعديلاتها النصيه, إلخ..."
   },
   "instance.settings.tabs.general.edit-icon": {
     "message": "تعديل الأيقونة"
@@ -480,7 +588,7 @@
     "message": "يقدمها الخادم"
   },
   "search.filter.locked.server-environment.title": {
-    "message": "يمكن إضافة التعديلات من جانب العميل فقط إلى مثيل الخادم"
+    "message": "يمكن إضافة التعديلات **المحليه** فقط إلى نموذج الخادم"
   },
   "search.filter.locked.server-game-version.title": {
     "message": "يتم توفير نسخة اللعبة من قبل الخادم"

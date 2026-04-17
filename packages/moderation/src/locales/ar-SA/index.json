@@ -77,8 +77,26 @@
   "nags.identical-links.title": {
     "defaultMessage": "روابط متطابقة"
   },
+  "nags.image-heavy-description.description": {
+    "defaultMessage": "وصفك يجب أن يحتوي على نص عادي أو نص بديل للصورة، لتكون متاحة لمستخدمي قارئ الشاشة أو من لا توجد عنده اتصال إنترنت جيد."
+  },
+  "nags.image-heavy-description.title": {
+    "defaultMessage": "يرجى التأكد من إمكانية الوصول في وصفك"
+  },
+  "nags.invalid-license-url.description.default": {
+    "defaultMessage": "رابط الرخصة غير صالح."
+  },
+  "nags.link-shortener-usage.title": {
+    "defaultMessage": "لا تستخدم مقصر روابط"
+  },
   "nags.long-headers.description": {
     "defaultMessage": "{count, plural, one {# header} other {# headers}} في وصفك {count, plural, one {طويل جدًا} other {طويلة جدًا}}. يجب أن تكون العناوين مختصرة وتعمل كعناوين للأقسام، وليست جملًا كاملة.\n"
+  },
+  "nags.long-headers.title": {
+    "defaultMessage": "قصر العناوين"
+  },
+  "nags.minecraft-title-clause.description": {
+    "defaultMessage": "المشاريع يجب ان لا تستخدم العلامات التجارية الخاصة ب \"ماينكرفت\" اذا كانت جزءا كبيرا من اسم المشروع."
   }
 }
 

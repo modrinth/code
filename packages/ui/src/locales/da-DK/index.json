@@ -1121,9 +1121,6 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Mest Populær"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Vælg en plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Vælg Plan"
   },

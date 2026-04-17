@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "Projekte aktualisieren"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Halte Shift während du auf \"Alle aktualisieren\" klickst um diese Bestätigung in zukunft zu überspringen."
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "Aktualisiere {count, plural, one {# Projekt} other {# Projekte}}"
   },
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "Lösche {itemType}{count, plural, one {} other {s}}"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Jegliche Mods und Inhalte, welche du zusätzlich zum Modpack installiert hast, werden gelöscht."
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Mods oder Inhalte, die du zusätzlich zum Modpack hinzugefügt hast, bleiben erhalten."
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {Downgrade} other {Aktualisierungs}}warnung"
@@ -453,16 +450,16 @@
     "defaultMessage": "{count} überschrieben"
   },
   "files.conflict-modal.overwritten-label": {
-    "defaultMessage": "Überschrieben"
+    "defaultMessage": "Überschreibt"
   },
   "files.conflict-modal.warning-header": {
     "defaultMessage": "Dateien werden überschrieben"
   },
   "files.create-modal.create-button": {
-    "defaultMessage": "Erstelle {type, select, directory {Ordner} other {Datei}}"
+    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} erstellen"
   },
   "files.create-modal.header": {
-    "defaultMessage": "Erstelle {type, select, directory {einen Ordner} other {eine Datei}}"
+    "defaultMessage": "{type, select, directory {einen Ordner} other {eine Datei}} erstellen"
   },
   "files.create-modal.placeholder-directory": {
     "defaultMessage": "z. B. mein-ordner"
@@ -477,7 +474,7 @@
     "defaultMessage": "Datei löschen"
   },
   "files.delete-modal.warning": {
-    "defaultMessage": "{type, select, directory {Dieser Ordner und sein gesamter Inhalt werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.} other {Diese Datei wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.}}"
+    "defaultMessage": "{type, select, directory {Dieser Ordner und sein gesamter Inhalt werden dauerhaft gelöscht.} other {Diese Datei wird dauerhaft gelöscht.}} Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "files.editor.failed-to-open-text": {
     "defaultMessage": "Inhalt der Datei konnte nicht geladen werden."
@@ -516,7 +513,7 @@
     "defaultMessage": "Erneut versuchen"
   },
   "files.image_viewer.image_too_large": {
-    "defaultMessage": "Das Bild ist zu groß, um es anzuzeigen (max {maxDimension} x {maxDimension} Pixel)"
+    "defaultMessage": "Das Bild ist zu gross, um es anzuzeigen (max {maxDimension} x {maxDimension} Pixel)"
   },
   "files.image_viewer.invalid_image": {
     "defaultMessage": "Ungültige oder leere Bilddatei."
@@ -579,7 +576,7 @@
     "defaultMessage": "z. B. /mein-ordner"
   },
   "files.move-modal.header": {
-    "defaultMessage": "{type, select, directory {Ordner verschieben} other {Datei verschieben}}"
+    "defaultMessage": "{type, select, directory {Ordner} other {Datei}} verschieben"
   },
   "files.navbar.back-to-home": {
     "defaultMessage": "Zurück zum Start"
@@ -632,12 +629,6 @@
   "files.operations.modpack-from-url": {
     "defaultMessage": "Modpack aus URL"
   },
-  "files.operations.upload-progress": {
-    "defaultMessage": "{uploaded} / {total} ({percent}%)"
-  },
-  "files.operations.uploading-files": {
-    "defaultMessage": "Dateien werden hochgeladen ({completed}/{total})"
-  },
   "files.rename-modal.header": {
     "defaultMessage": "{name} umbenennen"
   },
@@ -657,7 +648,7 @@
     "defaultMessage": "Name"
   },
   "files.table-header.size": {
-    "defaultMessage": "Größe"
+    "defaultMessage": "Grösse"
   },
   "files.unsaved-changes-modal.body": {
     "defaultMessage": "Du hast ungespeicherte Änderungen, die verloren gehen, wenn du die Seite verlässt. Möchtest du vor dem Verlassen speichern?"
@@ -759,7 +750,7 @@
     "defaultMessage": "Wechsel zur Registerkarte „Dateien“ und wähle die zu installierende Version aus."
   },
   "files.zip-url-modal.step-select-title": {
-    "defaultMessage": "Wählen eine Version"
+    "defaultMessage": "Wähle eine Version"
   },
   "files.zip-url-modal.unknown-error": {
     "defaultMessage": "Ein unbekannter Fehler ist aufgetreten"
@@ -976,6 +967,30 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "Wir empfehlen nicht, die Installationseinstellungen nach der Installation zu ändern. Wenn du sie ändern willst, setze deinen Server zurück."
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "Auto-fix"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "Loader ändern"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "Konflikte deaktivieren"
+  },
+  "installation-settings.incompatible-content.game-version-warning-body": {
+    "defaultMessage": "Beim ändern der Spielversion können wir entweder installierte, inkompatible Inhalte deaktivieren, oder versuchen, diese inkompatibilitäten zu beheben."
+  },
+  "installation-settings.incompatible-content.game-version-warning-title": {
+    "defaultMessage": "Inkompatibilitätswarnung"
+  },
+  "installation-settings.incompatible-content.header": {
+    "defaultMessage": "Inkompatibler Inhalt installiert"
+  },
+  "installation-settings.incompatible-content.loader-change-body": {
+    "defaultMessage": "Durch das ändern des Loaders werden alle installierten Inhalte deaktiviert. Wir empfehlen lieber das neu aufsetzen des Servers."
+  },
+  "installation-settings.incompatible-content.loader-change-title": {
+    "defaultMessage": "Das ändern von Loadern ist zerstörerisch"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "Verlinktes {projectType, select, server {Server Projekt} other {Modpack}}"
@@ -1197,13 +1212,10 @@
     "defaultMessage": "Änderungen gespeichert"
   },
   "label.client-depends-warning": {
-    "defaultMessage": "Dieser Mod ist von einem clientseitigen Mod abhängig und kann beim Starten deines Servers zu Problemen führen"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "Dies ist eine clientseitige Mod und könnte Probleme verursachen. Wir liesen sie aktiviert, da einige Autoren ihre Umgebungen falsch angeben. Der Loader sollte den Konflikt beheben."
+    "defaultMessage": "Diese Mod ist von einem clientseitigen Mod abhängig und kann beim Starten deines Servers zu Problemen führen"
   },
   "label.client-retained-warning": {
-    "defaultMessage": "Das ist ein clientseitiger Mod, der als Abhängigkeit installiert wurde und beim Starten deines Servers zu Problemen führen kann"
+    "defaultMessage": "Dies ist eine clientseitige Mod, welche als Abhängigkeit installiert wurde und beim Starten deines Servers zu Problemen führen kann"
   },
   "label.collections": {
     "defaultMessage": "Kollektionen"
@@ -1215,10 +1227,10 @@
     "defaultMessage": "Inhalt"
   },
   "label.copied-filename": {
-    "defaultMessage": "Kopierter Dateiname"
+    "defaultMessage": "Dateiname kopiert"
   },
   "label.copied-path": {
-    "defaultMessage": "Kopierter Pfad"
+    "defaultMessage": "Pfad kopiert"
   },
   "label.create-failed": {
     "defaultMessage": "Erstellen fehlgeschlagen"
@@ -2600,9 +2612,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "Zahlungsmethode"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval} in Rechnung gestellt"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "Wähle einen benutzerdefinierten Plan mit genau den Eigenschaften, die du brauchst."
   },
@@ -2618,17 +2627,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "Am beliebtesten"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "Wähle einen Plan"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "Plan wählen"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "Perfekt für 1 bis 5 Freunde mit ein paar leichten Mods."
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "Wähle die RAM-Kapazität und die technischen Spezifikationen, die deinen Anforderungen entsprechen."
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "Plan"

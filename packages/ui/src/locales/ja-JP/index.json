@@ -207,7 +207,7 @@
     "defaultMessage": "更新"
   },
   "button.upload-image": {
-    "defaultMessage": "画像のアップロード"
+    "defaultMessage": "画像をアップロード"
   },
   "changelog.justNow": {
     "defaultMessage": "今"
@@ -233,6 +233,9 @@
   "content.confirm-bulk-update.header": {
     "defaultMessage": "プロジェクトをアップデート"
   },
+  "content.confirm-bulk-update.shift-click-hint": {
+    "defaultMessage": "Shiftキーを押しながら「すべて更新」をクリックすると、今後この確認をスキップできます。"
+  },
   "content.confirm-bulk-update.update-button": {
     "defaultMessage": "プロジェクトをアップデート"
   },
@@ -247,12 +250,6 @@
   },
   "content.confirm-deletion.header": {
     "defaultMessage": "{itemType}を削除"
-  },
-  "content.confirm-modpack-update.admonition-body": {
-    "defaultMessage": "Modパックに追加したModやコンテンツはすべて削除されます。"
-  },
-  "content.confirm-modpack-update.admonition-body-app": {
-    "defaultMessage": "Modpackに追加したModやコンテンツはすべて保存されます。"
   },
   "content.confirm-modpack-update.admonition-header": {
     "defaultMessage": "{action, select, downgrade {ダウングレード} other {アップデート}}前にご確認ください"
@@ -570,10 +567,10 @@
     "defaultMessage": "保存されていない変更があります。"
   },
   "files.move-modal.current-location": {
-    "defaultMessage": "現在地"
+    "defaultMessage": "現在のパス"
   },
   "files.move-modal.destination-path": {
-    "defaultMessage": "ファイルへのパス"
+    "defaultMessage": "移動先のパス"
   },
   "files.move-modal.destination-placeholder": {
     "defaultMessage": "例: /my-folder"
@@ -620,6 +617,9 @@
   "files.navbar.upload-from-zip-url": {
     "defaultMessage": ".zip URLからアップロード"
   },
+  "files.operations.extracted": {
+    "defaultMessage": "{size} 展開済み"
+  },
   "files.operations.extracting": {
     "defaultMessage": "{source} を展開中"
   },
@@ -628,6 +628,9 @@
   },
   "files.operations.modpack-from-url": {
     "defaultMessage": "modpackのURL"
+  },
+  "files.rename-modal.header": {
+    "defaultMessage": "名前変更 {name}"
   },
   "files.rename-modal.new-name-label": {
     "defaultMessage": "新しい名前"
@@ -642,10 +645,16 @@
     "defaultMessage": "名前"
   },
   "files.table-header.size": {
-    "defaultMessage": "大きさ"
+    "defaultMessage": "ファイル数"
+  },
+  "files.unsaved-changes-modal.body": {
+    "defaultMessage": "保存されていない変更があります。閉じる前に保存しますか？"
   },
   "files.unsaved-changes-modal.discard": {
     "defaultMessage": "削除"
+  },
+  "files.unsaved-changes-modal.header": {
+    "defaultMessage": "未保存の変更"
   },
   "files.upload-dropdown.file": {
     "defaultMessage": "ファイル"
@@ -665,8 +674,29 @@
   "files.zip-url-modal.cf-header": {
     "defaultMessage": "CurseForgeのmodpackをインストールする"
   },
+  "files.zip-url-modal.enter-link": {
+    "defaultMessage": "リンクを入力"
+  },
+  "files.zip-url-modal.error-url-required": {
+    "defaultMessage": "URLは必須です。"
+  },
   "files.zip-url-modal.install-button": {
     "defaultMessage": "インストール"
+  },
+  "files.zip-url-modal.install-failed-title": {
+    "defaultMessage": "インストールに失敗"
+  },
+  "files.zip-url-modal.step-copy-title": {
+    "defaultMessage": "URLをコピー"
+  },
+  "files.zip-url-modal.step-find-title": {
+    "defaultMessage": "Modパックを探す"
+  },
+  "files.zip-url-modal.step-select-title": {
+    "defaultMessage": "バージョンを選択"
+  },
+  "files.zip-url-modal.unknown-error": {
+    "defaultMessage": "不明なエラーが発生しました"
   },
   "form.label.address-line": {
     "defaultMessage": "住所 1行目"
@@ -874,6 +904,15 @@
   },
   "installation-settings.edit.warning-server": {
     "defaultMessage": "コンテンツのインストール後にインストール設定を編集することは推奨されません。編集する場合はサーバーをリセットしてください。"
+  },
+  "installation-settings.incompatible-content.auto-fix-button": {
+    "defaultMessage": "自動修正"
+  },
+  "installation-settings.incompatible-content.change-loader-button": {
+    "defaultMessage": "ローダーを変更"
+  },
+  "installation-settings.incompatible-content.disable-conflicts-button": {
+    "defaultMessage": "競合を無効化する"
   },
   "installation-settings.linked-instance.title": {
     "defaultMessage": "リンクされた{projectType, select, server {サーバープロジェクト} other {Modパック}}"
@@ -1093,9 +1132,6 @@
   },
   "label.changes-saved": {
     "defaultMessage": "変更が保存されました"
-  },
-  "label.client-only-warning": {
-    "defaultMessage": "これはクライアント側のModであり問題が発生する可能性があります。一部の作成者が環境を誤って指定している場合があるため、ローダーが競合を解決するはずなので、この機能を有効にしたままにしています。"
   },
   "label.collections": {
     "defaultMessage": "コレクション"
@@ -2474,9 +2510,6 @@
   "servers.purchase.step.payment.title": {
     "defaultMessage": "支払い方法"
   },
-  "servers.purchase.step.plan.billed": {
-    "defaultMessage": "{interval}ごとに請求"
-  },
   "servers.purchase.step.plan.custom.desc": {
     "defaultMessage": "必要な仕様だけのカスタマイズされたプランを選択。"
   },
@@ -2492,17 +2525,11 @@
   "servers.purchase.step.plan.most-popular": {
     "defaultMessage": "最人気"
   },
-  "servers.purchase.step.plan.prompt": {
-    "defaultMessage": "プランを選択してください"
-  },
   "servers.purchase.step.plan.select": {
     "defaultMessage": "プランを選択"
   },
   "servers.purchase.step.plan.small.desc": {
     "defaultMessage": "1〜5人、軽量なModを少し導入するなら最適"
-  },
-  "servers.purchase.step.plan.subtitle": {
-    "defaultMessage": "利用法に合ったRAM容量とスペックを選択してください。"
   },
   "servers.purchase.step.plan.title": {
     "defaultMessage": "プラン"

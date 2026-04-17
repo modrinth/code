@@ -17,6 +17,12 @@
   "nags.add-java-address.title": {
     "defaultMessage": "Adj hozzá egy Java Címet"
   },
+  "nags.add-links-server.description": {
+    "defaultMessage": "Adj meg minden releváns, a Modrinthon kívüli linket, például egy weboldalt, boltot vagy Discord-meghívót."
+  },
+  "nags.add-links-server.title": {
+    "defaultMessage": "Adj hozzá külső linkeket"
+  },
   "nags.add-links.description": {
     "defaultMessage": "Adj hozzá bármilyen releváns linket, amely a Modrinthon kívülre visz, mint például a forráskód, hibajelentő oldal vagy Discord meghívó."
   },
@@ -30,7 +36,7 @@
     "defaultMessage": "Válaszd ki a pontos címkéket"
   },
   "nags.description-too-short.description": {
-    "defaultMessage": "A leírásod {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
+    "defaultMessage": "A jelenlegi leírás {length} olvasható karakter hosszú. Egy világos és informatív leíráshoz legalább {minChars} karakter ajánlott."
   },
   "nags.description-too-short.title": {
     "defaultMessage": "Fejtsd ki a leírást"
@@ -64,6 +70,12 @@
   },
   "nags.gpl-license-source-required.title": {
     "defaultMessage": "Adj meg egy forráskódot"
+  },
+  "nags.identical-links.description": {
+    "defaultMessage": "Úgy tűnik, hogy néhány külső hivatkozásod megegyezik. Minden hivatkozást csak egyszer szabad megadni, és a megfelelő hivatkozástípussal kell ellátni."
+  },
+  "nags.identical-links.title": {
+    "defaultMessage": "Azonos hivatkozások"
   },
   "nags.image-heavy-description.description": {
     "defaultMessage": "A leírásnak elegendő mennyiségű egyszerű szöveget vagy képhelyettesítő szöveget kell tartalmaznia, hogy a képernyőolvasókat használók vagy lassú internetkapcsolattal rendelkezők számára is hozzáférhető legyen."
@@ -128,6 +140,9 @@
   "nags.multiple-resolution-tags.title": {
     "defaultMessage": "Válaszd ki a megfelelő felbontást"
   },
+  "nags.select-compatibility.description": {
+    "defaultMessage": "Válaszd ki, hogy a szervered mely verziókat támogatja, válassz egy modcsomagot, vagy tölts fel sajátot."
+  },
   "nags.select-compatibility.title": {
     "defaultMessage": "Kompatibilitás kiválasztása"
   },
@@ -186,7 +201,7 @@
     "defaultMessage": "Tisztítsd meg az összegzést"
   },
   "nags.summary-too-short.description": {
-    "defaultMessage": "Az összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
+    "defaultMessage": "A jelenlegi összegzés {length} karakter hosszú. Egy informatív és figyelemfelkeltő összegzéshez legalább {minChars} karakter ajánlott."
   },
   "nags.summary-too-short.title": {
     "defaultMessage": "Fejtsd ki az összegzést"
