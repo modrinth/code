@@ -911,50 +911,50 @@ provideContentManager({
 
 <template>
 	<ReadyTransition :pending="contentReadyPending">
-	<ContentPageLayout>
-		<template #modals>
-			<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
-			<ModpackContentModal
-				ref="modpackContentModal"
-				:modpack-name="modpack?.project.title"
-				:modpack-icon-url="modpack?.project.icon_url"
-				enable-toggle
-				@update:enabled="handleModpackContentToggle"
-				@bulk:enable="handleModpackBulkToggle($event, true)"
-				@bulk:disable="handleModpackBulkToggle($event, false)"
-			/>
-			<ContentUpdaterModal
-				v-if="updatingProject || updatingModpack"
-				ref="contentUpdaterModal"
-				:versions="updatingProjectVersions"
-				:current-game-version="currentGameVersion"
-				:current-loader="currentLoader"
-				:current-version-id="
-					updatingModpack
-						? contentQuery.data.value?.modpack?.spec.platform === 'modrinth'
-							? contentQuery.data.value.modpack.spec.version_id
-							: ''
-						: (updatingProject?.version?.id ?? '')
-				"
-				:is-app="false"
-				:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
-				:project-icon-url="
-					updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
-				"
-				:project-name="
-					updatingModpack
-						? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
-						: (updatingProject?.project?.title ?? updatingProject?.file_name)
-				"
-				:loading="loadingVersions"
-				:loading-changelog="loadingChangelog"
-				@update="handleModalUpdate"
-				@cancel="resetUpdateState"
-				@version-select="handleVersionSelect"
-				@version-hover="handleVersionHover"
-			/>
-		</template>
-	</ContentPageLayout>
+		<ContentPageLayout>
+			<template #modals>
+				<ConfirmUnlinkModal ref="modpackUnlinkModal" server @unlink="handleModpackUnlinkConfirm" />
+				<ModpackContentModal
+					ref="modpackContentModal"
+					:modpack-name="modpack?.project.title"
+					:modpack-icon-url="modpack?.project.icon_url"
+					enable-toggle
+					@update:enabled="handleModpackContentToggle"
+					@bulk:enable="handleModpackBulkToggle($event, true)"
+					@bulk:disable="handleModpackBulkToggle($event, false)"
+				/>
+				<ContentUpdaterModal
+					v-if="updatingProject || updatingModpack"
+					ref="contentUpdaterModal"
+					:versions="updatingProjectVersions"
+					:current-game-version="currentGameVersion"
+					:current-loader="currentLoader"
+					:current-version-id="
+						updatingModpack
+							? contentQuery.data.value?.modpack?.spec.platform === 'modrinth'
+								? contentQuery.data.value.modpack.spec.version_id
+								: ''
+							: (updatingProject?.version?.id ?? '')
+					"
+					:is-app="false"
+					:project-type="updatingModpack ? 'modpack' : updatingProject?.project_type"
+					:project-icon-url="
+						updatingModpack ? modpack?.project.icon_url : updatingProject?.project?.icon_url
+					"
+					:project-name="
+						updatingModpack
+							? (modpack?.project.title ?? formatMessage(commonMessages.modpackLabel))
+							: (updatingProject?.project?.title ?? updatingProject?.file_name)
+					"
+					:loading="loadingVersions"
+					:loading-changelog="loadingChangelog"
+					@update="handleModalUpdate"
+					@cancel="resetUpdateState"
+					@version-select="handleVersionSelect"
+					@version-hover="handleVersionHover"
+				/>
+			</template>
+		</ContentPageLayout>
 	</ReadyTransition>
 	<ConfirmModpackUpdateModal
 		ref="modpackUpdateModal"

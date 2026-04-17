@@ -28,111 +28,113 @@
 
 		<div v-else key="content" class="contents">
 			<ReadyTransition :pending="backupsReadyPending">
-			<BackupCreateModal ref="createBackupModal" :backups="backupsData ?? []" />
-			<BackupRenameModal ref="renameBackupModal" :backups="backupsData ?? []" />
-			<BackupRestoreModal ref="restoreBackupModal" />
-			<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
+				<BackupCreateModal ref="createBackupModal" :backups="backupsData ?? []" />
+				<BackupRenameModal ref="renameBackupModal" :backups="backupsData ?? []" />
+				<BackupRestoreModal ref="restoreBackupModal" />
+				<BackupDeleteModal ref="deleteBackupModal" @delete="deleteBackup" />
 
-			<div v-if="backupsData?.length" class="mb-2 flex items-center align-middle justify-between">
-				<span class="text-2xl font-semibold text-contrast">Backups</span>
-				<ButtonStyled color="brand">
-					<button
-						v-tooltip="backupCreationDisabled"
-						:disabled="!!backupCreationDisabled"
-						@click="showCreateModel"
-					>
-						<PlusIcon class="size-5" />
-						Create backup
-					</button>
-				</ButtonStyled>
-			</div>
-
-			<template v-if="backupsData">
-				<div class="flex w-full flex-col gap-1.5">
-					<Transition name="fade" mode="out-in">
-						<div
-							v-if="groupedBackups.length === 0"
-							key="empty"
-							class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
+				<div v-if="backupsData?.length" class="mb-2 flex items-center align-middle justify-between">
+					<span class="text-2xl font-semibold text-contrast">Backups</span>
+					<ButtonStyled color="brand">
+						<button
+							v-tooltip="backupCreationDisabled"
+							:disabled="!!backupCreationDisabled"
+							@click="showCreateModel"
 						>
-							<EmptyState
-								type="empty-inbox"
-								heading="No backups yet"
-								description="Create your first backup"
+							<PlusIcon class="size-5" />
+							Create backup
+						</button>
+					</ButtonStyled>
+				</div>
+
+				<template v-if="backupsData">
+					<div class="flex w-full flex-col gap-1.5">
+						<Transition name="fade" mode="out-in">
+							<div
+								v-if="groupedBackups.length === 0"
+								key="empty"
+								class="mt-6 flex flex-col items-center justify-center gap-2 text-center text-secondary"
 							>
-								<template #actions>
-									<ButtonStyled color="brand">
-										<button
-											v-tooltip="backupCreationDisabled"
-											:disabled="!!backupCreationDisabled"
-											class="w-min mx-auto"
-											@click="showCreateModel"
-										>
-											<PlusIcon class="size-5" />
-											Create backup
-										</button>
-									</ButtonStyled>
-								</template>
-							</EmptyState>
-						</div>
+								<EmptyState
+									type="empty-inbox"
+									heading="No backups yet"
+									description="Create your first backup"
+								>
+									<template #actions>
+										<ButtonStyled color="brand">
+											<button
+												v-tooltip="backupCreationDisabled"
+												:disabled="!!backupCreationDisabled"
+												class="w-min mx-auto"
+												@click="showCreateModel"
+											>
+												<PlusIcon class="size-5" />
+												Create backup
+											</button>
+										</ButtonStyled>
+									</template>
+								</EmptyState>
+							</div>
 
-						<div v-else key="list" class="flex flex-col gap-1.5">
-							<template v-for="group in groupedBackups" :key="group.label">
-								<div class="flex items-center gap-2">
-									<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
-									<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
-								</div>
-
-								<div class="flex gap-2">
-									<div class="flex w-5 justify-center">
-										<div class="h-full w-px bg-surface-5" />
+							<div v-else key="list" class="flex flex-col gap-1.5">
+								<template v-for="group in groupedBackups" :key="group.label">
+									<div class="flex items-center gap-2">
+										<component :is="group.icon" v-if="group.icon" class="size-6 text-secondary" />
+										<span class="text-lg font-semibold text-secondary">{{ group.label }}</span>
 									</div>
 
-									<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
-										<BackupItem
-											v-for="backup in group.backups"
-											:key="`backup-${backup.id}`"
-											:backup="backup"
-											:restore-disabled="backupRestoreDisabled"
-											:kyros-url="server.node?.instance"
-											:jwt="server.node?.token"
-											:show-copy-id-action="showCopyIdAction"
-											:show-debug-info="showDebugInfo"
-											@download="() => triggerDownloadAnimation()"
-											@rename="() => renameBackupModal?.show(backup)"
-											@restore="() => restoreBackupModal?.show(backup)"
-											@delete="
-												(skipConfirmation?: boolean) =>
-													skipConfirmation ? deleteBackup(backup) : deleteBackupModal?.show(backup)
-											"
-											@retry="() => retryBackup(backup.id)"
-										/>
-									</TransitionGroup>
-								</div>
-							</template>
-						</div>
-					</Transition>
-				</div>
-			</template>
+									<div class="flex gap-2">
+										<div class="flex w-5 justify-center">
+											<div class="h-full w-px bg-surface-5" />
+										</div>
 
-			<div
-				class="over-the-top-download-animation"
-				:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
-			>
-				<div>
-					<div
-						class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
-					></div>
-					<div
-						class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
-					></div>
-					<div
-						class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
-					>
-						<DownloadIcon class="h-20 w-20 text-contrast" />
+										<TransitionGroup name="list" tag="div" class="flex flex-1 flex-col gap-3 py-3">
+											<BackupItem
+												v-for="backup in group.backups"
+												:key="`backup-${backup.id}`"
+												:backup="backup"
+												:restore-disabled="backupRestoreDisabled"
+												:kyros-url="server.node?.instance"
+												:jwt="server.node?.token"
+												:show-copy-id-action="showCopyIdAction"
+												:show-debug-info="showDebugInfo"
+												@download="() => triggerDownloadAnimation()"
+												@rename="() => renameBackupModal?.show(backup)"
+												@restore="() => restoreBackupModal?.show(backup)"
+												@delete="
+													(skipConfirmation?: boolean) =>
+														skipConfirmation
+															? deleteBackup(backup)
+															: deleteBackupModal?.show(backup)
+												"
+												@retry="() => retryBackup(backup.id)"
+											/>
+										</TransitionGroup>
+									</div>
+								</template>
+							</div>
+						</Transition>
+					</div>
+				</template>
+
+				<div
+					class="over-the-top-download-animation"
+					:class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+				>
+					<div>
+						<div
+							class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
+						></div>
+						<div
+							class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
+						></div>
+						<div
+							class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
+						>
+							<DownloadIcon class="h-20 w-20 text-contrast" />
+						</div>
 					</div>
 				</div>
-			</div>
 			</ReadyTransition>
 		</div>
 	</Transition>
@@ -190,6 +192,7 @@ const {
 } = useQuery({
 	queryKey: backupsQueryKey,
 	queryFn: () => client.archon.backups_v1.list(serverId, worldId.value!),
+	enabled: computed(() => worldId.value !== null),
 })
 
 const backupsReadyPending = useReadyState({ isLoading, data: backupsData })

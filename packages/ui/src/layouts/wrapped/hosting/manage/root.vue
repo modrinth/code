@@ -523,13 +523,6 @@ const props = withDefaults(
 
 const { formatMessage } = useVIntl()
 
-const loadingMessages = defineMessages({
-	loadingServerPanel: {
-		id: 'servers.manage.loading.serverPanel',
-		defaultMessage: 'Loading your server panel...',
-	},
-})
-
 const leaveMessages = defineMessages({
 	uploadInProgress: {
 		id: 'servers.manage.confirm-leave.upload-in-progress',

@@ -505,7 +505,9 @@ watch(stateInitialized, (ready) => {
 						if (server.is_medal) {
 							const sub = subscriptions.find((s) => s.metadata?.id === server.server_id)
 							if (sub) {
-								server.medal_expires = new Date(new Date(sub.created).getTime() + 5 * 86400000).toISOString()
+								server.medal_expires = new Date(
+									new Date(sub.created).getTime() + 5 * 86400000,
+								).toISOString()
 							}
 						}
 					}

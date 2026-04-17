@@ -81,11 +81,7 @@
 		</div>
 
 		<Transition v-else name="fade" mode="out-in">
-			<div
-				v-if="showServersListLoading"
-				key="loading"
-				class="flex flex-col gap-4 py-8"
-			>
+			<div v-if="showServersListLoading" key="loading" class="flex flex-col gap-4 py-8">
 				<div class="mb-4 text-center">
 					<LoaderCircleIcon class="mx-auto size-8 animate-spin text-contrast" />
 					<p class="m-0 mt-2 text-secondary">{{ formatMessage(messages.loadingServers) }}</p>

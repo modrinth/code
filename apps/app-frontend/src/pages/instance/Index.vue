@@ -316,11 +316,10 @@ import { get_by_profile_path } from '@/helpers/process'
 import { finish_install, get, get_full_path, kill, run } from '@/helpers/profile'
 import type { GameInstance } from '@/helpers/types'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { get_server_status } from '@/helpers/worlds'
+import { get_server_status, refreshWorlds } from '@/helpers/worlds'
 import { injectServerInstall } from '@/providers/server-install'
 import { handleSevereError } from '@/store/error.js'
 import { useBreadcrumbs } from '@/store/state'
-import { refreshWorlds } from '@/helpers/worlds'
 
 dayjs.extend(duration)
 dayjs.extend(relativeTime)

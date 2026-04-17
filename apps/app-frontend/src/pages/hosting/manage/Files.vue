@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { injectModrinthClient, injectModrinthServerContext, ServersManageFilesPage } from '@modrinth/ui'
+import {
+	injectModrinthClient,
+	injectModrinthServerContext,
+	ServersManageFilesPage,
+} from '@modrinth/ui'
 import { useQueryClient } from '@tanstack/vue-query'
 
 const client = injectModrinthClient()
