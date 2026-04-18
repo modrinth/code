@@ -31,6 +31,7 @@ use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 use std::time::Instant;
 use tokio::io::AsyncWriteExt;
+use tokio::task::JoinSet;
 use tokio_util::compat::FuturesAsyncWriteCompatExt;
 use url::Url;
 
