@@ -28,6 +28,7 @@ pub fn config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
         .service(get_project_meta)
         .service(set_project_meta)
         .service(acquire_lock)
+        .service(override_lock)
         .service(get_lock_status)
         .service(release_lock)
         .service(release_lock_beacon)
@@ -553,6 +554,51 @@ async fn acquire_lock(
             expired: Some(lock.expired),
         })),
     }
+}
+
+/// Force-acquire a moderation lock on a project (moderator override).
+#[utoipa::path(
+    responses(
+        (status = OK, body = LockAcquireResponse),
+        (status = NOT_FOUND, description = "Project not found")
+    )
+)]
+#[post("/lock/{project_id}/override")]
+async fn override_lock(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+    path: web::Path<(String,)>,
+) -> Result<web::Json<LockAcquireResponse>, ApiError> {
+    let user = check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Scopes::PROJECT_WRITE,
+    )
+    .await?;
+
+    let project_id_str = path.into_inner().0;
+    let project =
+        database::models::DBProject::get(&project_id_str, &**pool, &redis)
+            .await?
+            .ok_or(ApiError::NotFound)?;
+
+    let db_project_id = project.inner.id;
+    let db_user_id = database::models::DBUserId::from(user.id);
+
+    DBModerationLock::force_acquire(db_project_id, db_user_id, &pool).await?;
+
+    Ok(web::Json(LockAcquireResponse {
+        success: true,
+        is_own_lock: true,
+        locked_by: None,
+        locked_at: None,
+        expires_at: None,
+        expired: None,
+    }))
 }
 
 /// Check the lock status for a project

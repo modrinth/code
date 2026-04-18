@@ -1,5 +1,15 @@
 <template>
 	<KeybindsModal ref="keybindsModal" />
+	<ConfirmModal
+		v-if="lockStatus?.locked && !lockStatus?.isOwnLock"
+		ref="takeOverModal"
+		title="Override moderation lock"
+		description="Are you sure you want to override?"
+		:has-to-type="false"
+		:markdown="false"
+		proceed-label="Take over"
+		@proceed="confirmTakeOverOverride"
+	/>
 	<div
 		tabindex="0"
 		class="moderation-checklist flex w-[600px] max-w-full flex-col rounded-2xl border-[1px] border-solid border-orange bg-bg-raised p-4 transition-all delay-200 duration-200 ease-in-out"
@@ -60,7 +70,7 @@
 						class="mt-4 flex grow justify-between gap-2 border-0 border-t-[1px] border-solid border-surface-5 pt-4"
 					>
 						<div class="flex items-center gap-2">
-							<ButtonStyled v-if="lockStatus.expired" @click="retryAcquireLock">
+							<ButtonStyled @click="openTakeOverModal">
 								<button>
 									<LockIcon aria-hidden="true" />
 									Take over
@@ -460,6 +470,7 @@ import {
 	ButtonStyled,
 	Checkbox,
 	Collapsible,
+	ConfirmModal,
 	DropdownSelect,
 	injectNotificationManager,
 	injectProjectPageContext,
@@ -491,6 +502,7 @@ const { addNotification } = notifications
 const debug = useDebugLogger('ModerationChecklist')
 
 const keybindsModal = ref<InstanceType<typeof KeybindsModal>>()
+const takeOverModal = ref<InstanceType<typeof ConfirmModal>>()
 
 const props = defineProps<{
 	collapsed: boolean
@@ -748,18 +760,26 @@ async function handleExit() {
 	emit('exit')
 }
 
-async function retryAcquireLock() {
+function openTakeOverModal() {
+	takeOverModal.value?.show()
+}
+
+async function confirmTakeOverOverride() {
 	const projectId = projectV2.value?.id
 	if (!projectId) {
-		console.warn('[retryAcquireLock] No project ID available')
+		console.warn('[confirmTakeOverOverride] No project ID available')
 		return
 	}
-	const result = await moderationStore.acquireLock(projectId)
+	const result = await moderationStore.overrideLock(projectId)
 
 	if (result.success) {
+		addNotification({
+			title: 'Moderation lock overridden',
+			text: 'You are now moderating this project.',
+			type: 'success',
+		})
 		handleLockAcquired()
 	} else if (result.locked_by) {
-		// Still locked by another moderator, update status
 		lockStatus.value = {
 			locked: true,
 			lockedBy: result.locked_by,
@@ -770,7 +790,6 @@ async function retryAcquireLock() {
 		}
 		lockError.value = false
 
-		// Restart countdown timer
 		updateLockCountdown()
 		if (!lockCountdownInterval.value) {
 			lockCountdownInterval.value = setInterval(updateLockCountdown, 1000)

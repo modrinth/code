@@ -517,6 +517,83 @@ async fn test_http_post_acquire_blocked_returns_200_with_success_false() {
 }
 
 #[actix_rt::test]
+async fn test_lock_force_acquire_steals_active_lock() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<common::api_v3::ApiV3>| async move {
+            let project_id = DBProjectId(
+                test_env.dummy.project_alpha.project_id_parsed.0 as i64,
+            );
+            let mod1 = DBUserId(MOD_USER_ID_PARSED);
+            let mod2 = DBUserId(ADMIN_USER_ID_PARSED);
+            let pool = &test_env.db.pool;
+
+            DBModerationLock::acquire(project_id, mod1, pool)
+                .await
+                .unwrap()
+                .unwrap();
+
+            DBModerationLock::force_acquire(project_id, mod2, pool)
+                .await
+                .expect("force_acquire should not error");
+
+            let lock = DBModerationLock::get_with_user(project_id, pool)
+                .await
+                .unwrap()
+                .expect("lock should exist after override");
+            assert_eq!(
+                lock.moderator_id, mod2,
+                "lock holder should be the overriding moderator"
+            );
+            assert!(
+                !lock.expired,
+                "fresh override lock should not be expired"
+            );
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
+async fn test_http_post_override_active_lock_succeeds() {
+    with_test_environment(
+        None,
+        |test_env: TestEnvironment<common::api_v3::ApiV3>| async move {
+            let api = &test_env.api;
+            let pid = test_env.dummy.project_alpha.project_id.as_str();
+
+            let first = test::TestRequest::post()
+                .uri(&format!("/_internal/moderation/lock/{pid}"))
+                .append_header(("Authorization", MOD_USER_PAT.unwrap()))
+                .to_request();
+            assert_eq!(api.call(first).await.status(), StatusCode::OK);
+
+            let override_req = test::TestRequest::post()
+                .uri(&format!("/_internal/moderation/lock/{pid}/override"))
+                .append_header(("Authorization", ADMIN_USER_PAT.unwrap()))
+                .to_request();
+            let resp = api.call(override_req).await;
+            assert_eq!(resp.status(), StatusCode::OK);
+            let body: Value = test::read_body_json(resp).await;
+            assert_eq!(body["success"], true);
+            assert_eq!(body["is_own_lock"], true);
+
+            let get = test::TestRequest::get()
+                .uri(&format!("/_internal/moderation/lock/{pid}"))
+                .append_header(("Authorization", ADMIN_USER_PAT.unwrap()))
+                .to_request();
+            let get_resp = api.call(get).await;
+            assert_eq!(get_resp.status(), StatusCode::OK);
+            let status: Value = test::read_body_json(get_resp).await;
+            assert_eq!(status["locked"], true);
+            assert_eq!(status["is_own_lock"], true);
+            assert_eq!(status["locked_by"]["username"], "Admin");
+        },
+    )
+    .await;
+}
+
+#[actix_rt::test]
 async fn test_http_delete_release_success_then_noop() {
     with_test_environment(
         None,

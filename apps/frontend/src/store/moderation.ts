@@ -128,6 +128,26 @@ export const useModerationStore = defineStore(
 			}
 		}
 
+		async function overrideLock(projectId: string): Promise<LockAcquireResponse> {
+			try {
+				const response = (await useBaseFetch(`moderation/lock/${projectId}/override`, {
+					method: 'POST',
+					internal: true,
+				})) as LockAcquireResponse
+
+				if (response.success) {
+					currentLock.value = { projectId, lockedAt: new Date() }
+				} else if (currentLock.value?.projectId === projectId) {
+					currentLock.value = null
+				}
+
+				return response
+			} catch (error) {
+				console.error('Failed to override moderation lock:', error)
+				return { success: false, is_own_lock: false }
+			}
+		}
+
 		async function releaseLock(projectId: string): Promise<boolean> {
 			try {
 				const response = (await useBaseFetch(`moderation/lock/${projectId}`, {
@@ -186,6 +206,7 @@ export const useModerationStore = defineStore(
 			getCurrentProjectId,
 			resetQueue,
 			acquireLock,
+			overrideLock,
 			releaseLock,
 			checkLock,
 			refreshLock,

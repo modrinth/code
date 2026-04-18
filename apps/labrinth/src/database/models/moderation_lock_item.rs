@@ -94,6 +94,30 @@ impl DBModerationLock {
         }
     }
 
+    /// Reassign the lock to `moderator_id`, even when another moderator holds an active lock.
+    /// Used only after explicit client confirmation (override flow).
+    pub async fn force_acquire(
+        project_id: DBProjectId,
+        moderator_id: DBUserId,
+        pool: &PgPool,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            r#"
+            INSERT INTO moderation_locks (project_id, moderator_id, locked_at)
+            VALUES ($1, $2, NOW())
+            ON CONFLICT (project_id) DO UPDATE SET
+                moderator_id = EXCLUDED.moderator_id,
+                locked_at = EXCLUDED.locked_at
+            "#,
+        )
+        .bind(project_id)
+        .bind(moderator_id)
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     /// Get lock status for a project, including moderator username
     pub async fn get_with_user(
         project_id: DBProjectId,
