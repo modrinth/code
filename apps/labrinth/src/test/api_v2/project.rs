@@ -22,7 +22,7 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use serde_json::json;
 
-use crate::test::database::MOD_USER_PAT;
+use crate::test::database::ADMIN_USER_PAT;
 
 use super::{
     ApiV2,
@@ -95,10 +95,10 @@ impl ApiProject for ApiV2 {
         let resp = self.create_project(creation_data, pat).await;
         assert_status!(&resp, StatusCode::OK);
 
-        // Approve as a moderator.
+        // Approve as admin so fixture setup is not blocked by the moderation-lock guard.
         let req = TestRequest::patch()
             .uri(&format!("/v2/project/{slug}"))
-            .append_pat(MOD_USER_PAT)
+            .append_pat(ADMIN_USER_PAT)
             .set_json(json!(
                 {
                     "status": "approved"

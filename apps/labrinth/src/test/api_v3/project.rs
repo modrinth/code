@@ -23,7 +23,7 @@ use crate::test::{
         models::{CommonItemType, CommonProject, CommonVersion},
         request_data::{ImageData, ProjectCreationRequestData},
     },
-    database::MOD_USER_PAT,
+    database::ADMIN_USER_PAT,
     dummy_data::TestFile,
 };
 
@@ -49,10 +49,11 @@ impl ApiProject for ApiV3 {
         let resp = self.create_project(creation_data, pat).await;
         assert_status!(&resp, StatusCode::OK);
 
-        // Approve as a moderator.
+        // Approve as admin so fixture setup is not blocked by the moderation-lock guard
+        // (non-admin moderators must hold a lock to move a project out of processing).
         let req = TestRequest::patch()
             .uri(&format!("/v3/project/{slug}"))
-            .append_pat(MOD_USER_PAT)
+            .append_pat(ADMIN_USER_PAT)
             .set_json(json!(
                 {
                     "status": "approved"
