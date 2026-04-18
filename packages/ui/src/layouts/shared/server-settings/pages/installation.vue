@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Archon, LauncherMeta } from '@modrinth/api-client'
+import type { Archon } from '@modrinth/api-client'
 import { RotateCounterClockwiseIcon } from '@modrinth/assets'
 import {
 	ButtonStyled,
@@ -75,12 +75,14 @@ import {
 	ConfirmModal,
 	defineMessages,
 	formatLoaderLabel,
+	type GameVersionOption,
 	injectModrinthClient,
 	injectModrinthServerContext,
 	injectNotificationManager,
 	injectServerSettings,
 	injectTags,
 	InstallationSettingsLayout,
+	type LoaderVersionEntry,
 	provideInstallationSettings,
 	ServerSetupModal,
 	UploadProgressModal,
@@ -295,7 +297,21 @@ const purpurSupportedVersionsQuery = useQuery({
 	staleTime: 5 * 60 * 1000,
 })
 
-type LoaderVersionEntry = LauncherMeta.Manifest.v0.LoaderVersion
+function handleGameVersionHover(option: GameVersionOption) {
+	if (editingPlatform.value === 'paper') {
+		void queryClient.prefetchQuery({
+			queryKey: ['paper-builds', option.value] as const,
+			queryFn: () => client.paper.versions_v3.getBuilds(option.value),
+			staleTime: 5 * 60 * 1000,
+		})
+	} else if (editingPlatform.value === 'purpur') {
+		void queryClient.prefetchQuery({
+			queryKey: ['purpur-builds', option.value] as const,
+			queryFn: () => client.purpur.versions_v2.getBuilds(option.value),
+			staleTime: 5 * 60 * 1000,
+		})
+	}
+}
 
 function getLoaderVersionsForGameVersion(
 	loader: string,
@@ -303,8 +319,18 @@ function getLoaderVersionsForGameVersion(
 ): LoaderVersionEntry[] {
 	if (loader === 'paper') {
 		return (paperBuildsQuery.data.value?.builds ?? [])
-			.toSorted((a, b) => b - a)
-			.map((b) => ({ id: String(b), stable: true }))
+			.toSorted((a, b) => b.id - a.id)
+			.map((b): LoaderVersionEntry => {
+				const u = String(b.channel).toUpperCase()
+				let channelTag: LoaderVersionEntry['channelTag'] | undefined
+				if (u === 'ALPHA' || u === 'BETA') channelTag = u
+				return {
+					id: String(b.id),
+					stable: b.channel === 'STABLE',
+					label: `Build ${b.id}`,
+					channelTag,
+				}
+			})
 	}
 	if (loader === 'purpur') {
 		return (purpurBuildsQuery.data.value?.builds.all ?? [])
@@ -328,6 +354,7 @@ function toApiLoader(loader: string): Archon.Content.v1.Modloader {
 }
 
 provideInstallationSettings({
+	onGameVersionHover: handleGameVersionHover,
 	loading: computed(() => !server.value || addonsQuery.isLoading.value),
 	installationInfo: computed(() => {
 		const addons = addonsQuery.data.value

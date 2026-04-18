@@ -35,6 +35,9 @@
   "app.server-settings.failed-to-load-server": {
     "defaultMessage": "Failed to load server settings"
   },
+  "badge.alpha": {
+    "defaultMessage": "Alpha"
+  },
   "badge.beta": {
     "defaultMessage": "Beta"
   },
