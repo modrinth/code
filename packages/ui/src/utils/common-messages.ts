@@ -13,6 +13,10 @@ export const commonMessages = defineMessages({
 		id: 'button.analytics',
 		defaultMessage: 'Analytics',
 	},
+	alpha: {
+		id: 'badge.alpha',
+		defaultMessage: 'Alpha',
+	},
 	betaRelease: {
 		id: 'badge.beta-release',
 		defaultMessage: 'Beta Release',
