@@ -545,10 +545,7 @@ async fn test_lock_force_acquire_steals_active_lock() {
                 lock.moderator_id, mod2,
                 "lock holder should be the overriding moderator"
             );
-            assert!(
-                !lock.expired,
-                "fresh override lock should not be expired"
-            );
+            assert!(!lock.expired, "fresh override lock should not be expired");
         },
     )
     .await;
