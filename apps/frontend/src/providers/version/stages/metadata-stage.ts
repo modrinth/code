@@ -9,7 +9,8 @@ import type { ManageVersionContextValue } from '../manage-version-modal'
 export const stageConfig: StageConfigInput<ManageVersionContextValue> = {
 	id: 'metadata',
 	stageContent: markRaw(MetadataStage),
-	title: 'Metadata',
+	title: (ctx) => (ctx.editingVersion.value ? 'Edit version' : 'Metadata'),
+	nonProgressStage: (ctx) => ctx.editingVersion.value,
 	leftButtonConfig: (ctx) =>
 		ctx.editingVersion.value
 			? {
